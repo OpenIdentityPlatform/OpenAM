@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>修改提供者實體內的遠端服務提供者屬性 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteprofile"></a><h4>修改提供者實體內的遠端服務提供者屬性</h4><a name="indexterm-80"></a><p>建立實體並新增服務提供者之後，您可以編輯服務提供者的設定檔。這可能需要向最初新增服務提供者時或修改已配置的資料時無法配置的那些屬性新增值。起點為聯合介面下的實體。</p><ol>
+<li><b>在配置的提供者實體名稱上按一下以修改其設定檔。</b><p>會顯示實體的設定檔頁面。</p></li>
+<li><b>從 [檢視] 功能表選取 [服務提供者]。</b></li>
+<li><b>修改 [共用屬性] 的值。</b><p>[共用屬性] 包含通常定義識別提供者本身的值。</p><dl><dt>提供者類型</dt>
+<dd><p>此屬性的靜態值會定義這是主控或是遠端提供者。</p></dd>
+<dt>描述</dt>
+<dd><p>此屬性值為您建立實體時提供的說明。您可以修改原先輸入的說明，或在說明不存在時新增說明。</p></dd>
+<dt>協定支援列舉</dt>
+<dd><p>選擇此實體支援的「Liberty Alliance Project Liberty 識別聯合架構」 (Liberty ID-FF) 版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 代表 Liberty ID-FF 1.2 版。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 代表 Liberty ID-FF 1.1 版。</p></li></ul>
+</dd>
+<dt>伺服器名稱識別碼對映連結</dt>
+<dd><p>名稱識別碼對映允許服務提供者為已在不同服務提供者的名稱空間中聯合的主體取得名稱識別碼。因此，請求提供者可以與其他服務提供者通訊，以取得主體的相關資訊，而無需在它們之間進行主體的識別聯合。鍵入一個 URI，該 URI 可識別取得識別碼時使用的通訊協定，然後按一下 [新增]。</p>
+<hr><p><b>備註 &#8211; </b>目前 Access Manager 中的「名稱識別碼對映」設定檔只支援 SOAP。如果使用此屬性，其值必須是 <tt>http://projectliberty.org/profiles/nim-sp-http</tt>。</p>
+<hr>
+</dd>
+<dt>簽署金鑰：金鑰別名</dt>
+<dd><p>憑證儲存在 Java 金鑰庫檔案中。該檔案中的每一個憑證都會對映至用來擷取它的別名。鍵入與用來簽署請求及回應的憑證相關聯的金鑰別名。</p></dd>
+<dt>加密金鑰：金鑰別名</dt>
+<dd><p>憑證儲存在 Java 金鑰庫檔案中。該檔案中的每一個憑證都會對映至用來擷取它的別名。鍵入與提供者的安全憑證相關聯的金鑰別名。</p></dd>
+<dt>加密金鑰：金鑰大小</dt>
+<dd><p>鍵入 Web 服務用戶與其他實體互動時所用金鑰的長度。</p></dd>
+<dt>加密金鑰：加密方法</dt>
+<dd><p>選擇加密方法。選擇包括：</p>
+<ul><li><p>無</p></li>
+<li><p>AES</p></li>
+<li><p>DESede</p></li></ul>
+</dd>
+<dt>名稱識別碼加密</dt>
+<dd><p>選取核取方塊以啟用名稱識別碼的加密。</p></dd>
+</dl>
+</li>
+<li><b>修改通訊 URL 屬性的值。</b><p>通訊 URL 屬性包含一些位置，提供者可以將針對此識別提供者做記號的傳輸內容傳送至這些位置。</p><dl><dt>SOAP 端點</dt>
+<dd><p>鍵入識別提供者的 SOAP 訊息收件者的 URL。此值以非瀏覽器通訊的方式傳送 SOAP 收件者位置。</p></dd>
+<dt>單一登出服務</dt>
+<dd><p>鍵入服務提供者可以傳送登出請求的 URL。單一登出會同步處理所有由這個識別提供者所認證的階段作業之登出功能。</p></dd>
+<dt>單一登出回傳</dt>
+<dd><p>鍵入識別提供者在完成登出之後將主體重新導向到的 URL。</p></dd>
+<dt>聯合終止服務</dt>
+<dd><p>鍵入服務提供者會將聯合終止請求傳送到的 URL。</p></dd>
+<dt>聯合終止回傳</dt>
+<dd><p>鍵入識別提供者在完成聯合終止之後將主體重新導向到的 URL。</p></dd>
+<dt>名稱註冊服務</dt>
+<dd><p>鍵入一個 URL，服務提供者將會向這一 URL 傳送請求，以指定與此識別提供者就特定主體進行通訊時所用的名稱識別碼。只有在建立聯合階段作業之後，才能實作此選用服務。</p></dd>
+<dt>名稱註冊回傳</dt>
+<dd><p>鍵入一個 URL，識別提供者會在基於 HTTP 重新導向的名稱註冊完成之後，將主體重新導向這一 URL。</p></dd>
+</dl>
+</li>
+<li><b>修改通訊設定檔屬性的值。</b><p>Liberty Alliance Project <b>設定檔</b>定義訊息內容與用來傳輸它的機制之組合。下列通訊設定檔屬性定義識別提供者用於每一個功能的設定檔。</p><dl><dt>聯合終止</dt>
+<dd><p>選取一個設定檔，供識別提供者將主體的聯合終止通知給其他提供者時使用。</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>單一登出</dt>
+<dd><p>選取一個設定檔，供識別提供者將主體登出通知給其他提供者時使用。</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>HTTP 取得</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>名稱註冊</dt>
+<dd><p>選取一個設定檔，供其他提供者為註冊主體的新名稱識別碼而連絡此識別提供者時使用。</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>單次登入/聯合</dt>
+<dd><p>選取設定檔，以供此識別提供者傳送回應至認證或聯合請求時使用。</p>
+<ul><li><p>瀏覽器 Post (指定基於瀏覽器的 HTTP POST 協定)</p></li>
+<li><p>瀏覽器工件 (指定一個基於 (非瀏覽器) SOAP 的協定)</p></li>
+<li><p>LECP (指定一個啟用 Liberty 的用戶端代理)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>選取任何可用的信任圈以指定給提供者。</b><p>提供者可以屬於一或多個信任圈。然而，沒有指定信任圈的提供者不能參與以 Liberty Alliance Project 規格為基礎的通訊。如果未建立信任圈，您稍後可以定義此屬性。</p></li>
+<li><b>修改 [服務供應程式] 屬性的值。</b><p>[服務供應程式] 屬性定義有關服務提供者的一般資訊。</p><dl><dt>指定使用者 URL</dt>
+<dd><p>鍵入端點的 URL，此端點將接收並處理所有已傳送至服務提供者的 SAML 指定。</p></dd>
+<dt>指定使用者服務 URL ID</dt>
+<dd><p>如果 [協定支援列舉] 共用屬性的值是 <tt>urn:liberty:iff:2003-08</tt>，請鍵入必要的 ID。</p></dd>
+<dt>將假定使用者服務 URL 設定為預設值</dt>
+<dd><p>當請求中並未提供識別碼時，選取核取方塊可使用指定使用者服務 URL 做為預設值。</p></dd>
+<dt>簽名認證請求</dt>
+<dd><p>選取此核取方塊可以使服務提供者總是簽署認證請求。</p></dd>
+<dt>聯盟後的名稱註冊</dt>
+<dd><p>選取此核取方塊以便在聯合主體之後，可讓服務提供者參與名稱註冊。</p></dd>
+<dt>名稱 ID 策略</dt>
+<dd><p>選取允許請求程式在識別提供者一端影響名稱識別碼策略的選項。選項包括：</p><dl><dt>無</dt>
+<dd><p>識別提供者將傳回的名稱識別碼與識別提供者和請求服務提供者或主體的附屬提供者群組間存在的聯合相對應。若不存在這樣的聯合，則將傳回一個錯誤。</p></dd>
+<dt>一次</dt>
+<dd><p>識別提供者將於聯合後為主體發出一份暫時的、一次性使用的識別碼。</p></dd>
+<dt>聯合</dt>
+<dd><p>若主體不存在識別聯合，識別提供者會啟動一個新的識別聯合。</p></dd>
+</dl>
+</dd>
+<dt>附屬提供者聯合</dt>
+<dd><p>選取核取方塊以啟用附屬提供者聯合。</p></dd>
+</dl>
+</li>
+<li><b>提供 [代理伺服器認證配置] 屬性的資訊。</b><p>識別提供者若被要求認證已經過另一個識別提供者認證的主體，則可以代表請求服務提供者代理認證識別提供者的認證請求。這是<b>動態識別提供者代理作業</b>。代理伺服器認證配置屬性定義動態識別提供者代理作業的值。</p><dl><dt>代理伺服器認證</dt>
+<dd><p>選取此核取方塊以啟用動態識別提供者代理作業。</p></dd>
+<dt>代理伺服器識別提供者清單</dt>
+<dd><p>新增可以用於動態識別提供者代理作業的識別提供者清單。此屬性的值是 URI，此 URI 將符合所有者/提供者所屬實體之 [實體名稱] 屬性中定義的值。</p></dd>
+<dt>最大代理伺服器數目</dt>
+<dd><p>鍵入可以將請求傳送到的代理伺服器識別提供者的最多數目。</p></dd>
+<dt>使用簡介 Cookie 執行代理作業</dt>
+<dd><p>若要使用簡介來尋找代理識別提供者，請選取核取方塊。</p></dd>
+</dl>
+</li>
+<li><b>提供 [組織設定檔] 屬性的值。</b><p>[組織設定檔] 屬性提供與主體互動時可能需要的基本資訊。這些是選用屬性。</p>
+<hr><p><b>備註 &#8211; </b>如果 [名稱] 屬性包含值，則必須為 [顯示名稱] 及 [URL] 屬性新增值。</p>
+<hr>
+<dl><dt>名稱</dt>
+<dd><p>輸入實體組織的合法名稱，並按一下 [新增]。定義值的格式為 <i>locale</i>| <i> organization-name</i>。例如，<tt>en</tt>| <tt> example.com</tt>。</p></dd>
+<dt>顯示名稱</dt>
+<dd><p>輸入適合於向主體顯示的實體組織名稱，並按一下 [新增]。定義值的格式為 <i>locale</i>|<i>organization-display-name</i>。例如，<tt>en</tt>|<tt>example.com</tt>。</p></dd>
+<dt>URL</dt>
+<dd><p>輸入組織的 URL，並按一下 [新增]。定義值的格式為 <i>locale</i>|<i> organization-URL</i>。例如，<tt>en</tt>|<tt> http://www.example.com</tt>。</p></dd>
+</dl>
+</li>
+<li><b>若要配置提供者的 [連絡人員]，按一下 [新建連絡人員]。</b><p>此為選用屬性。如需更多資訊，請參閱<a href="federation.fscreatecontactperson.html">新增連絡人員至提供者實體內的提供者</a>。</p></li>
+<li><b>按一下 [儲存] 以完成配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

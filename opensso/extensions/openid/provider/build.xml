@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.5 2009/04/24 21:11:40 rparekh Exp $
+
+-->
+
+<project name="openid" default="core" basedir=".">
+	
+  <property file="./build.properties" />
+
+  <!-- App name-dependent settings. -->
+  <property name="appname" value="openid"/>
+
+
+  <!-- change this property to use a compiler other than javac. -->
+  <property name="build.compiler" value="classic"/>
+  
+  <!-- Source file location. -->
+  <property name="src" value="./src/java"/>
+  <property name="src.root" value="./src"/>
+  <property name="web.src" value="./web"/>
+
+	
+
+  <!-- Destination directory for the build -->
+  <property name="build" value="./build"/>
+  <property name="build.classesdir" value="${build}/classes"/>
+
+  <property name="dist" value="./dist"/>
+  <property name="lib.dir" value="./lib"/>
+
+
+  
+  <!-- Destination directory for the assembly targets -->
+  <property name="assemble" value="./assemble"/>
+  <property name="assemble.war" value="${assemble}/war"/>
+  <property name="war" value="${appname}.war"/>
+
+
+
+  <!-- ======================================================= -->
+  <!-- Compile all classes.                                    -->
+  <!-- ======================================================= -->
+  <target name="compile">
+<echo message="Classpath ${build.classpath}" />
+    <mkdir dir="${build.classesdir}"/>
+	<javac source="1.5" srcdir="${src}" destdir="${build.classesdir}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}">
+        <classpath>	   
+	        <fileset dir="${lib.dir}">
+	          <include name="**/*.jar"/>
+	        </fileset>
+	        <fileset dir="${j2ee.home}/lib">
+	          <include name="javaee.jar"/>
+	        </fileset>
+		        	
+        </classpath>
+	</javac>
+  </target> 
+
+  <!-- ======================================================= -->
+  <!-- Clean up various files and directories.                 -->
+  <!-- ======================================================= -->
+
+  <target name="clean_war">
+    <delete dir="${assemble.war}"/>
+  </target>
+  <target name="clean_assemble">
+    <delete dir="${assemble}"/>
+  </target>
+  <target name="clean" depends="clean_assemble">
+    <delete dir="${build}"/>
+  </target>
+
+  <target name="fixforunix">
+    <fixcrlf srcdir="${src}"
+       cr="remove" eof="remove"
+       includes="**/*.jsp,**/*.html,**/*.tld,**/*.xml,**/*.java,**/*.sh,**/*.sql"
+    />
+  </target>
+
+
+  <!-- ======================================================= -->
+  <!-- Assemble WAR module.                                    -->
+  <!-- ======================================================= -->
+  <target name="war" depends="clean_war,compile">
+    <mkdir dir="${assemble.war}"/>
+    <copy todir="${assemble.war}">
+      <fileset dir="${web.src}" excludes="cvs,annontation"/>
+    </copy>
+    <copy todir="${assemble.war}/WEB-INF/classes/">
+      <fileset dir="${build.classesdir}/"/>
+    </copy>
+
+
+<!--
+    <copy  todir="${assemble.war}/WEB-INF/classes">
+      <fileset dir="${src}" includes="*.properties"/>
+    </copy>
+-->
+  	
+    <copy  todir="${assemble.war}/WEB-INF/lib">
+      <fileset dir="${lib.dir}" includes="*.jar"/>
+    </copy>
+    
+    
+    <jar jarfile="${build}/${war}"
+       basedir="${assemble.war}"/>
+  	
+  	<delete dir="${assemble}"/>
+  </target>
+	
+  <target name="dist" depends="war">
+		
+		<delete dir="${dist}" />
+    	<copy  todir="${dist}/lib"> <fileset dir="${lib.dir}" includes="*.jar"/></copy>
+  		<copy  todir="${dist}/src"> <fileset dir="${src.root}" includes="**/*.*"/></copy>
+  		<copy  todir="${dist}/web"> <fileset dir="${web.src}" includes="**/*.*"/></copy>
+  		<copy todir="${dist}/" file="./README" />
+  	    <copy todir="${dist}/" file="./build.xml" />
+  	    <copy todir="${dist}/" file="./build.properties" />
+	
+		  <zip destfile="${build}/${appname}.zip"
+		       basedir="${dist}/"
+		       update="true"
+		  />
+		
+  		<delete dir="${dist}" />
+
+	</target>
+
+
+
+
+  <target name="core" depends="compile, war" />
+  <target name="all" depends="core" />
+
+
+</project>

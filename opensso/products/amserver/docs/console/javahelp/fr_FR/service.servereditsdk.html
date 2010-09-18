@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SDK - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsdk"></a><h4>SDK</h4>
+<p>Les attributs SDK sp&#233;cifient les d&#233;finitions de configuration du magasin de donn&#233;es
+d'arri&#232;re-plan.</p>
+
+<a name="ggkan"></a><h5>Magasin de donn&#233;es </h5>
+<p>Les attributs de magasin de donn&#233;es d&#233;finissent la configuration de base de
+magasin de donn&#233;es&#160;:</p>
+
+<a name="ggkem"></a><h5>Activer la notification de magasin de donn&#233;es</h5>
+<p>Indique si la notification de magasin de donn&#233;es d'arri&#232;re-plan est activ&#233;e. Si
+la valeur est d&#233;finie sur false, la notification en m&#233;moire est activ&#233;e.</p>
+
+<a name="ggkfc"></a><h5>Activer le proxy d'annuaire</h5>
+<p>La valeur par d&#233;faut est false. Le r&#244;le de cet indicateur est
+de signaler &#224; la fonction de gestion des services que le proxy
+d'annuaire doit &#234;tre utilis&#233; pour les op&#233;rations de lecture, d'&#233;criture et/ou de
+modification sur le serveur Directory Server. Cet indicateur d&#233;termine &#233;galement si les
+ACI ou les privil&#232;ges de d&#233;l&#233;gation doivent &#234;tre utilis&#233;s. Cet indicateur doit
+&#234;tre d&#233;fini sur true lorsque le SDK Access Manager (&#224; partir de
+la version 7 ou 7.1) communique avec Access Manger version 6.3. </p><p>Par exemple, dans le mode co-existence/h&#233;rit&#233;, cette valeur doit &#234;tre true. Dans
+le DIT h&#233;rit&#233;, les politiques de d&#233;l&#233;gation n'&#233;taient pas prises en charge.
+Seuls les ACI &#233;taient pris en charge. Aussi, pour une v&#233;rification de
+d&#233;l&#233;gation correcte, cet indicateur doit &#234;tre d&#233;fini sur true dans l'installation en
+mode h&#233;rit&#233; afin d'utiliser les ACI pour le contr&#244;le de l'acc&#232;s, sans
+quoi la v&#233;rification de d&#233;l&#233;gation &#233;chouera.  </p><p>En mode domaine, cette valeur doit &#234;tre d&#233;finie sur false afin que
+seules les strat&#233;gies de d&#233;l&#233;gation soient utilis&#233;es pour le contr&#244;le de l'acc&#232;s.
+Dans la version 7.0 et ult&#233;rieure, Access Manager ou OpenSSO prend en
+charge la fonction agnostique de donn&#233;es dans l'installation en mode domaine. Ainsi,
+outre le serveur Directory Server, d'autres serveurs peuvent &#234;tre utilis&#233;s pour stocker
+les donn&#233;es de configuration de service. En outre, cet indicateur signale &#224;
+la fonction de gestion des services que le proxy d'annuaire n'a pas
+besoin d'&#234;tre utilis&#233; pour les op&#233;rations de lecture, d'&#233;criture et/ou de modification
+en vue du stockage d'arri&#232;re-plan. La raison &#224; cela est que certains
+magasins de donn&#233;es, tels qu'Active Directory, peuvent ne pas prendre en charge
+le protocole proxy.</p>
+
+<a name="ggkcv"></a><h5>Service d'&#233;v&#233;nement</h5>
+<p>Les attributs suivants d&#233;finissent la notification de service d'&#233;v&#233;nement pour le magasin
+de donn&#233;es&#160;:</p>
+
+<a name="ggkez"></a><h5>Nombre de relances des connexions de services d'&#233;v&#233;nement</h5>
+<p>La valeur par d&#233;faut est 3. Indique le nombre de tentatives n&#233;cessaires
+pour r&#233;tablir avec succ&#232;s les connexions au service d'&#233;v&#233;nements.  </p>
+
+<a name="ggkdr"></a><h5>D&#233;lai entre les tentatives de connexion LDAP</h5>
+<p>La valeur par d&#233;faut est 3&#160;000. Indique le d&#233;lai, en millisecondes, entre
+les tentatives de r&#233;tablissement des connexions au service d'&#233;v&#233;nements.   
+</p>
+
+<a name="ggkcq"></a><h5>Codes d'erreur des tentatives de connexion LDAP</h5>
+<p>Les valeurs par d&#233;faut sont 80, 81 et 91. Indique les codes
+d'erreur de l'exception LDAP pour lesquels sont effectu&#233;es des tentatives de r&#233;tablissement
+des connexions au service d'&#233;v&#233;nements.</p>
+
+<a name="ggncc"></a><h5>D&#233;lai d'inactivit&#233;</h5>
+<p>La valeur par d&#233;faut est 0. Indique le d&#233;lai, en minutes, apr&#232;s
+lequel les recherches persistantes seront red&#233;marr&#233;es.    </p><p>Cette propri&#233;t&#233; est utilis&#233;e lorsqu'un &#233;quilibreur de charge ou un pare-feu se
+trouve entre les agents de strat&#233;gie et le serveur Directory Server et
+que les connexions de recherche persistante sont interrompues en cas de d&#233;lai
+d'inactivit&#233; TCP. La valeur de la propri&#233;t&#233; doit &#234;tre inf&#233;rieure au d&#233;lai
+de l'&#233;quilibreur de charge ou du pare-feu. Ainsi, les recherches persistantes sont
+relanc&#233;es avant abandon des connexions. Une valeur &#233;gale &#224; 0 indique que
+les recherches ne sont pas relanc&#233;es. Seules les connexions ayant expir&#233; sont
+r&#233;initialis&#233;es.</p>
+
+<a name="ggndm"></a><h5>Connexion de service d'&#233;v&#233;nement d&#233;sactiv&#233;e</h5>
+<p>Indique quelle connexion d'&#233;v&#233;nement peut &#234;tre d&#233;sactiv&#233;e. Les valeurs (sensibles &#224; la
+casse) peuvent &#234;tre : </p>
+<ul><li><p>aci &#8212; Modifications de l'attribut aci, avec la recherche &#224; l'aide du filtre LDAP (aci=&#42;).</p></li>
+<li><p>sm &#8212; Modifications de l'arborescence d'informations d'OpenSSO (ou du n&#339;ud de gestion du service), qui comprend les objets appartenant &#224; la classe d'objet marqueur <tt>sunService</tt> ou <tt>sunServiceComponent </tt>. Vous pouvez, par exemple, cr&#233;er une strat&#233;gie visant &#224; d&#233;finir les privil&#232;ges d'acc&#232;s &#224; une ressource prot&#233;g&#233;e ou modifier les r&#232;gles, objets, conditions ou fournisseurs de r&#233;ponse d'une strat&#233;gie existante.</p></li>
+<li><p>um &#8212; Modifications dans le r&#233;pertoire utilisateur (ou n&#339;ud de gestion des utilisateurs). Vous pouvez, par exemple, modifier le nom ou l'adresse de l'utilisateur.</p></li></ul>
+<p>Par exemple, pour d&#233;sactiver des recherches persistantes de modifications de l'arborescence d'informations
+d'OpenSSO (ou du n&#339;ud de gestion du service) :  </p><p><tt>com.sun.am.event.connection.disable.list=sm </tt></p>
+<hr><p><b>Attention &#8211; </b>Les recherches persistantes provoquent quelques d&#233;passements de performances sur Directory Server. Si
+vous d&#233;terminez que la suppression d'une partie de ce d&#233;passement de performances
+est absolument indispensable dans un environnement de production, vous pouvez d&#233;sactiver une
+ou plusieurs recherches persistantes &#224; l'aide de cette propri&#233;t&#233;.  </p><p>Cependant, avant de d&#233;sactiver une recherche persistante, vous devez comprendre les restrictions
+pr&#233;sent&#233;es ci-apr&#232;s. Nous vous recommandons fortement de ne pas modifier cette propri&#233;t&#233;
+&#224; moins que cela ne soit absolument n&#233;cessaire. Cette propri&#233;t&#233; a &#233;t&#233;
+initialement introduite pour &#233;viter tout d&#233;passement sur Directory Server lorsque plusieurs agents
+2.1 J2EE sont utilis&#233;s car chacun de ces agents cr&#233;e ces recherches
+persistantes. Les agents 2.2 J2EE ne cr&#233;ant plus ces recherches persistantes, il
+n'est pas n&#233;cessaire d'utiliser cette propri&#233;t&#233;.  </p><p>Il n'est pas recommand&#233; de d&#233;sactiver les recherches persistantes de l'un de
+ces composants. De fait, lorsqu'une recherche persistante d'un composant est d&#233;sactiv&#233;e, ce
+dernier ne re&#231;oit pas de notification de Directory Server. Par cons&#233;quent, les
+modifications effectu&#233;es dans le serveur Directory Server pour ce composant sp&#233;cifique ne
+seront pas signal&#233;es au cache de composant. Par exemple, si vous d&#233;sactivez
+les recherches persistantes des modifications dans le r&#233;pertoire utilisateur ((<tt>um</tt>), OpenSSO ne
+recevra plus les notifications de Directory Server. Par cons&#233;quent, un agent ne
+recevra pas les notifications d'OpenSSO l'avertissant de mettre &#224; jour son cache
+utilisateur local vers les nouvelles valeurs de l'attribut utilisateur. Si ensuite une
+application demande &#224; l'agent de lui fournir les attributs utilisateur, elle recevra
+les anciennes valeurs.  </p><p>N'utilisez cette propri&#233;t&#233; que dans des circonstances sp&#233;ciales et lorsque cela est
+absolument n&#233;cessaire. Par exemple, si vous savez que les modifications de la
+configuration du service (en rapport avec la modification des valeurs de n'importe
+quel service tel que le service de session ou les services d'authentification)
+ne seront pas mises en &#339;uvre dans l'environnement de production, vous pouvez
+d&#233;sactiver la recherche persistante sur le composant Service Management (<tt>sm</tt>). Cependant, en
+cas de modification d'un service quelconque, vous devrez red&#233;marrer le serveur. La
+m&#234;me condition s'applique aux recherches persistantes sp&#233;cifi&#233;es par les valeurs <tt>aci </tt> et
+<tt>um</tt>. </p>
+<hr>
+
+
+<a name="ggnip"></a><h5>Connexion LDAP</h5>
+<p>Les attributs suivants d&#233;finissent les donn&#233;es de connexion du magasin de donn&#233;es
+d'arri&#232;re-plan&#160;:</p>
+
+<a name="ggnjl"></a><h5>Nombre de relances de connexion LDAP</h5>
+<p>La valeur par d&#233;faut est 1&#160;000. Sp&#233;cifie le nombre de millisecondes entre
+deux nouvelles tentatives.</p>
+
+<a name="ggnhu"></a><h5>D&#233;lai entre les relances de connexion LDAP</h5>
+<p>La valeur par d&#233;faut est 3. Sp&#233;cifie le nombre de tentatives effectu&#233;es
+pour r&#233;tablir la connexion LDAP.</p>
+
+<a name="ggnjt"></a><h5>Codes d'erreur des relances de connexion LDAP</h5>
+<p>Les valeurs par d&#233;faut sont 80, 81 et 91. Sp&#233;cifie les codes
+d'erreur <tt>LDAPException</tt> pour lesquels sont effectu&#233;es des tentatives de r&#233;tablissement de la
+connexion LDAP.</p>
+
+<a name="ggkcx"></a><h5>Mise en cache et r&#233;plication</h5>
+<p>Les attributs suivants d&#233;finissent la configuration de mise en cache et de
+r&#233;plication&#160;:</p>
+
+<a name="ggkcm"></a><h5>Taille max. de cache SDK. Taille</h5>
+<p>La valeur par d&#233;faut est 10&#160;000. Indique la taille du cache du
+SDK lorsque la mise en cache est activ&#233;e. Utilisez un nombre entier
+sup&#233;rieur &#224; 0. Sinon, la taille par d&#233;faut (10000&#160;utilisateurs) est utilis&#233;e.</p>
+
+<a name="ggkdo"></a><h5>Relances de r&#233;plique SDK</h5>
+<p>La valeur par d&#233;faut est 0. Sp&#233;cifie le nombre de nouvelles tentatives.</p>
+
+<a name="ggker"></a><h5>D&#233;lai entre les tentatives de r&#233;plique SDK</h5>
+<p>La valeur par d&#233;faut est 1&#160;000. Sp&#233;cifie le nombre de millisecondes entre
+deux nouvelles tentatives.</p>
+<br/>
+
+</body>
+</html>

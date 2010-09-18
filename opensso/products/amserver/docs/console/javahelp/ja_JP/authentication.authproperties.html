@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>認証 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>認証</h3>
+<p><a name="indexterm-5"></a>ユーザーがほかの認証モジュールタイプを使用してログインできるようにするには、一般認証サービスがレルムに登録されている必要があります。コア認証サービスにより、OpenSSO の管理者は、レルムの認証パラメータのデフォルト値を定義できます。指定された認証モジュールに上書き値が定義されていない場合に、これらの値を使用できます。コア認証サービスのデフォルト値は <tt>amAuth.xml</tt> ファイルで定義され、インストール後に Directory Server に格納されます。</p><p>認証プロパティーは次のとおりです。</p><dl><dt>拡張プロパティー</dt>
+<dd><p>「拡張プロパティー」ボタンをクリックすると、レルムに対して定義できるコア認証属性が表示されます。グローバル属性はレルムに適用できないので、表示されません。</p></dd>
+<dt>デフォルト認証連鎖</dt>
+<dd><p>レルムに使用する認証連鎖を定義します。「認証連鎖」属性で新しい連鎖を作成すると、その連鎖がプルダウンリストに表示され選択可能になります。詳細については、<a href="authentication.newauthconfig.html">「新しい認証連鎖を作成する」</a>を参照してください。</p></dd>
+<dt>管理者認証連鎖</dt>
+<dd><p>管理者専用の認証連鎖を定義します。この属性は、管理者とエンドユーザーの認証連鎖を別々のものにする必要がある場合に使用できます。この属性で設定されたモジュールは、OpenSSO コンソールがアクセスされたときに継承されます。</p></dd>
+<dt>ログイン成功時に返すデフォルトの URL</dt>
+<dd><p>レルムへの認証の成功時にユーザーをリダイレクトする URL を指定します。</p></dd>
+<dt>モジュールインスタンス</dt>
+<dd><p>レルムに使用する OpenSSO デフォルト認証モジュールの定義と設定を行うことができます。同じ認証モジュールのインスタンスを複数追加できます。詳細については、<a href="authentication.newauthinstance.html">「新しい認証モジュールインスタンスを作成する」</a>を参照してください。</p></dd>
+<dt>認証連鎖</dt>
+<dd><p>1 つまたは複数の認証モジュールを設定して、それらすべてに認証証明情報を渡すようユーザーに義務付けることができます。これは、認証連鎖と呼ばれます。この属性では、レルムの認証連鎖オプションを定義できます。作成した連鎖は「デフォルト認証連鎖」リストに表示されます。詳細については、<a href="authentication.newauthconfig.html">「新しい認証連鎖を作成する」</a>を参照してください。</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

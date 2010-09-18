@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>命名 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamnamingservice"></a><h4>命名</h4>
+<p><a name="indexterm-204"></a>命名服務用來取得並設定 URL、外掛程式及配置，以及各種其他 OpenSSO 服務 (如階段作業、認證、記錄、SAML 及聯合) 的請求通知。</p><p>如果平台正在執行多個 OpenSSO，此服務可讓用戶端尋找正確的服務 URL。找到命名 URL 後，命名服務將解碼使用者階段作業，並且動態使用此階段作業的參數取代協定、主機與連接埠。這樣可確保為此服務傳回的 URL 用於在其上建有使用者階段作業的主機。命名屬性包括：</p>
+<ul><li><p><a href="#fwfgc">設定檔服務 URL</a></p></li>
+<li><p><a href="#fwfgg">階段作業服務 URL</a></p></li>
+<li><p><a href="#fwfgf">記錄服務 URL</a></p></li>
+<li><p><a href="#fwfgh">策略服務 URL</a></p></li>
+<li><p><a href="#fwfge">認證服務 URL</a></p></li>
+<li><p><a href="#fwfgl">SAML 網際網路設定檔/Artifact 服務 URL</a></p></li>
+<li><p><a href="#fwfgm">SAML SOAP 服務 URL</a></p></li>
+<li><p><a href="#fwfgk">SAML 網際網路設定檔/POST 服務 URL</a></p></li>
+<li><p><a href="#fwfgi">SAML 指定管理程式服務 URL</a></p></li>
+<li><p><a href="#fwfgn">聯合指定管理程式服務 URL</a></p></li>
+<li><p><a href="#fwfgp">安全記號管理程式 URL</a></p></li>
+<li><p><a href="#fwfgo">JAXRPC 端點 URL</a></p></li></ul>
+
+
+<a name="fwfgc"></a><h5>設定檔服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/profileservice</tt></p><p>此語法允許基於特定的階段作業參數動態取代設定檔 URL。</p>
+
+<a name="fwfgg"></a><h5>階段作業服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/sessionservice</tt></p><p>此語法允許基於特定的階段作業參數動態取代階段作業 URL。</p>
+
+<a name="fwfgf"></a><h5>記錄服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/loggingservice</tt></p><p>此語法允許基於特定的階段作業參數動態取代記錄 URL。</p>
+
+<a name="fwfgh"></a><h5>策略服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/policyservice</tt></p><p>此語法允許基於特定的階段作業參數動態取代策略 URL。</p>
+
+<a name="fwfge"></a><h5>認證服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/authservice</tt></p><p>此語法允許基於特定的階段作業參數動態取代認證 URL。</p>
+
+<a name="fwfgl"></a><h5>SAML 網際網路設定檔/Artifact 服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLAwareServlet</tt></p><p>此語法允許基於特定的階段作業參數動態取代 SAML 網際網路設定檔/artifact URL。</p>
+
+<a name="fwfgm"></a><h5>SAML SOAP 服務 URL</h5>
+<p>此欄位採用的值等於</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLSOAPReceiver</tt></p><p>此語法允許基於特定的階段作業參數動態取代 SAML SOAP URL。</p>
+
+<a name="fwfgk"></a><h5>SAML 網際網路設定檔/POST 服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLPOSTProfileServlet</tt></p><p>此語法允許基於特定的階段作業參數動態取代 SAML Web 設定檔/POST URL。</p>
+
+<a name="fwfgi"></a><h5>SAML 指定管理程式服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/AssertionManagerServlet/AssertionM anagerIF</tt></p><p>此語法允許基於特定的階段作業參數動態取代 SAML 指定管理程式服務 URL。</p>
+
+<a name="fwfgn"></a><h5>聯合指定管理程式服務 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/amserver/FSAssertionManagerServlet/FSAssertionMana gerIF</tt></p><p>此語法允許基於特定的階段作業參數動態取代聯合指定管理程式服務 URL。</p>
+
+<a name="fwfgp"></a><h5>安全記號管理程式 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/amserver/SecurityTokenManagerServlet/SecurityToken ManagerIF/</tt></p><p>此語法允許基於特定的階段作業參數動態取代安全記號管理程式 URL。</p>
+
+<a name="fwfgo"></a><h5>JAXRPC 端點 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port/amserver/jaxrpc/</tt></p><p>此語法允許基於特定的階段作業參數動態取代 JAXRPC 端點 URL。</p>
+
+<a name="gguep"></a><h5>身份識別 Web 服務端點 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port%uri/identityservices/</tt></p><p>此語法允許基於特定的階段作業參數動態取代身份識別 Web 服務端點 URL。</p>
+
+<a name="ggudo"></a><h5>身份識別 REST 服務端點 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port%uri/identity//</tt></p><p>此語法允許基於特定的階段作業參數動態取代身份識別 REST 服務端點 URL。</p>
+
+<a name="ggueo"></a><h5>安全性記號服務端點 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>此語法允許基於特定的階段作業參數動態取代安全性記號服務端點 URL。</p>
+
+<a name="gguff"></a><h5>安全性記號服務 MEX 端點 URL</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port%uri/sts/mex</tt></p><p>此語法允許基於特定的階段作業參數動態取代安全性記號服務 MEX 端點 URL。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+#
+#
+#------------------------------------------------------------------------------
+# J2EE Agents Bootstrap File
+#
+# OpenSSO Policy Agent for:
+# GlassFish 2.1
+#
+# Version: 3.0
+
+#------------------------------------------------------------------------------
+#
+# THIS FILE PROVIDES THE CONFIGURATION SETTINGS NECESSARY FOR THE AGENT
+# TO FUNCTION CORRECTLY. PLEASE REFER TO THE DOCUMENTATION BEFORE 
+# MODIFYING ANY OF THE VALUES IN THIS FILE.
+#
+# Note:
+#   Data present in this file provides the necessary configuration
+#   settings needed by Agent to work correctly. Invalid configuration 
+#   data present in this file can lead to malfunction of the Agent, the
+#   application, and the Application Server.
+#
+# WARNING: The contents of this file are classified as an UNSTABLE
+# interface by Sun Microsystems, Inc.  As such, they are subject to
+# significant, incompatible changes in any future release of the
+# software.
+#
+# INVALID CONFIGURATION SETTINGS MAY RESULT IN MALFUNCTION OF THE ENTIRE
+# SYSTEM.
+#------------------------------------------------------------------------------
+#
+# NAMING SERVICE URL
+#    Specifies the naming service url(s) that can be used by the system 
+#    for naming lookups. One or more urls can be specified for this 
+#    property as a string of urls separated by single space characters.
+# Hot-Swap Enabled: No
+#
+com.iplanet.am.naming.url=@AM_SERVICES_PROTO@://@AM_SERVICES_HOST@:@AM_SERVICES_PORT@@AM_SERVICES_DEPLOY_URI@/namingservice
+
+#
+# SERVICE RESOLVER
+#   Specifies the service resolver used by this Agent.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.config.service.resolver = com.sun.opensso.agents.jsr196.JSR196ServiceResolver
+
+#
+# AGENT USERNAME AND PASSWORD PROPERTIES
+#   These are the credentials used by the Agent to identify and 
+#   authenticate itself before requesting any services that require the 
+#   Agent to be authenticated. If plain text password should not be 
+#   used, then supply the encrypted password and encryption key.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.app.username = @AGENT_PROFILE_NAME@
+com.iplanet.am.service.secret = @AGENT_ENCRYPTED_PASSWORD@
+
+com.sun.identity.agent.policyadmin.location = @AGENT_POLICYADM_LOCATION@
+
+# The key that will be used to encrypt and decrypt passwords
+# Hot-Swap Enabled: No
+am.encryption.pwd = @AGENT_ENCRYPT_KEY@
+
+#
+# DEBUG SERVICE PROPERTIES
+#   - com.iplanet.services.debug.directory: Specifies the complete path to the
+#     directory where debug files will be stored by the Agent.
+#   - com.sun.services.debug.mergeall: consolidates all the debug information
+#     into one file if it is set to on. Each component has its own debug file
+#     if it is set to off.
+# Hot-Swap Enabled: No
+#
+com.iplanet.services.debug.directory=@DEBUG_LOGS_DIR@
+com.sun.services.debug.mergeall=on
+
+#
+# AUDIT LOG PROPERTY
+#   - local.logfile: Specifies the complete path to the local audit log file
+#     to be used by the Agent.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.config.local.logfile = @AUDIT_LOGS_DIR@/@AUDIT_LOG_FILENAME@
+
+#
+# ORGANIZATION NAME
+#   Specifies the organization or realm name to be used for authenticating
+#   the Agent during runtime. The default value "/" identifies the root
+#   organization or realm.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.config.organization.name = /
+
+#
+# LOCK OF AGENT CONFIGURATION
+#    When it's set to true, agent config in run-time is locked.
+#    Agent has to be restarted to let agent config change take effective 
+#    whether the changed config parameter is Hot-Swap or not.
+#    When it's set to false, change of Hot-Swap agent config parameter can be 
+#    updated into run-time.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.config.lock.enable = false
+
+#
+# AGENT PROFILE NAME
+#   The profile name used by the Agent to fetch the agent configuration data.
+#   The value of this property is the same as that of com.sun.identity.agents.app.username
+#   in most cases. However if multiple agent instances need to use the same credentials 
+#   to authenticate, com.sun.identity.agents.app.username and com.iplanet.am.service.secret
+#   need to be set to the authenticating credentials accordingly.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.config.profilename = @AGENT_PROFILE_NAME@

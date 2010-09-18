@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置支持的容器 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsppservicesupportedcontaineradd"></a><h5>配置支持的容器</h5>
+<p><b>容器</b>是用于定义身份数据持有者的属性。以下是向 Liberty 个人配置文件服务添加新属性的过程。起点是 Web 服务模块中的 Liberty 个人配置文件服务配置屏幕。</p><ol>
+<li><b>单击“新建”以显示新的“支持的容器”属性，或单击已配置的容器名称以修改其配置文件。</b></li>
+<li><b>基于以下信息，为容器属性提供值：</b><dl><dt>容器名称</dt>
+<dd><p>输入容器的名称，如 <b>CreditCard</b>。</p></dd>
+<dt>插件</dt>
+<dd><p>输入处理整个容器的类名。可用它覆盖默认实现 <tt>com.sun.identity.liberty.ws.idpp.plugin.</tt><tt>IDPPContainer</tt>。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”完成“容器”的配置操作。</b></li>
+<li><b>单击“Liberty 个人配置文件服务”页面上的“保存”完成服务的配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

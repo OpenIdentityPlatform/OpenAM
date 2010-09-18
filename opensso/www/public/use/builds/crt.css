@@ -1,0 +1,69 @@
+BODY, TH, TD, P, DIV, SPAN, INPUT, SELECT, TEXTAREA, FORM, B, STRONG, I, U,
+BLOCKQUOTE, H4, H5, H6, DL, DD, DT, UL, LI, OL, OPTION, A {
+    font-family: verdana, helvetica, sans-serif;
+    font-size: small
+    }
+
+.PgTtl {
+    font-family: verdana, helvetica, sans-serif;
+    font-size: x-large;
+    color: #594FBF;
+    font-weight: bold;
+    }
+
+H1 {
+    font-family: verdana, helvetica, sans-serif;
+    font-size: large;
+    }
+
+H2 {
+    font-family: verdana, helvetica, sans-serif;
+    font-size: medium;
+    font-weight: bold;
+    margin-bottom: 10px;
+    }
+
+.SecHdrTxt {
+    font-weight: bold;
+    font-size: medium; }
+
+.SecSubHdrTxt {
+    font-weight: bold;
+    font-size: small; }
+
+.HdrTxt {
+    font-weight: bold;
+    }
+
+.small {
+    color: #333333;
+    font-size: small;
+    }
+
+.PrjTxt {
+    font-weight: bold;
+    font-size: small;
+    margin-bottom: 0px; margin-left: 5px;
+    }
+
+.TblHdr {
+    background: #cccccc;
+    }
+
+.TblHdrTxt {
+    font-weight: bold;
+    }
+
+a:link, a:visited {
+    color: #594FBF;
+    text-decoration: none;
+    }
+
+a:hover {
+    color: #594FBF;
+    text-decoration: underline;
+    }
+
+pre, code {
+    font-size: medium;
+}

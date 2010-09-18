@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So konfigurieren Sie einen Site-Bezeichner - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>So konfigurieren Sie einen Site-Bezeichner</h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>Dieses Attribut legt die Sites auf dem Server fest, auf dem OpenSSO
+installiert ist. F&#252;r den Host werden w&#228;hrend der Installation ein Standardwert und
+eine automatisch generierte Site-ID festgelegt. Es sind mehrere Eintr&#228;ge m&#246;glich. Beispielsweise m&#252;ssten
+Load Balancing oder mehrere Instanzen von OpenSSO, die denselben Directory Server nutzen,
+jeweils definiert werden. Der Ausgangspunkt ist das Attribut "Site-Bezeichner" im SAML-Bildschirm der
+Verbindungsschnittstelle. Site-IDs werden auf dem Konfigurationsbildschirm f&#252;r Server und Sites definiert. Weitere
+Infiormationen finden Sie unter <a href="service.serversite.html">Server und Sites</a>.</p><ol>
+<li><b>Klicken Sie auf "Neu", um einen neuen Site-Bezeichner hinzuzuf&#252;gen, oder klicken Sie
+auf den Namen eines bereits konfigurierten Site-Bezeichners, um dessen Profil zu &#228;ndern.</b><p>Die Site-Bezeichner-Attribute werden angezeigt.</p></li>
+<li><b>Legen Sie die Werte der Site-Bezeichner-Attribute entsprechend der folgenden Informationen fest:</b><dl><dt>Instanz-ID</dt>
+<dd><p>Der Wert dieser Eigenschaft lautet <i>protocol</i><tt> ://</tt><i>host</i><tt>:</tt><i> port</i>.</p><p> Wenn Sie SAML f&#252;r SSL konfigurieren (sowohl in der Quell- als auch in der Ziel-Site), m&#252;ssen Sie hier als Protokoll <tt>https//</tt> angeben.</p></dd>
+<dt>Site-ID</dt>
+<dd><p>Die Site-ID ist ein f&#252;r jede Site generierter Bezeichner (bei mehreren f&#252;r den Lastenausgleich konfigurierten Servern ist dieser Wert allerdings identisch). Das Paket <tt>com.sun.identity.saml.common </tt> enth&#228;lt eine Klasse, mit der dieser Bezeichner bei Bedarf manuell generiert werden kann. Geben Sie in die Befehlszeile folgenden Befehl ein:</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>Ausstellername</dt>
+<dd><p>Der Standardwert f&#252;r diese Eigenschaft lautet <i>host</i><tt> :</tt><i>port</i>, es k&#246;nnte sich jedoch um jeden beliebigen URI handeln.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "OK", um die Konfiguration des Site-Bezeichners abzuschlie&#223;en.</b></li>
+<li><b>Klicken Sie auf der Seite "Lokale Site-Eigenschaften" auf "Speichern", um die SAML-Konfiguration
+abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

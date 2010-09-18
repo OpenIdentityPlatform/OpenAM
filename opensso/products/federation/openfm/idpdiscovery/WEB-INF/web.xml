@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <display-name>OpenSSO IDP Discovery Service</display-name>
+    <filter>
+        <filter-name>idpDiscoveryConfiguratorFilter</filter-name>
+        <filter-class>com.sun.identity.saml2.idpdiscovery.ConfiguratorFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>idpDiscoveryConfiguratorFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>saml2writer</servlet-name>
+        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>saml2reader</servlet-name>
+        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieReaderServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>idffwriter</servlet-name>
+        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieWriterServlet
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>idffreader</servlet-name>
+        <servlet-class>com.sun.identity.saml2.idpdiscovery.CookieReaderServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>saml2writer</servlet-name>
+        <url-pattern>/saml2writer</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>saml2reader</servlet-name>
+        <url-pattern>/saml2reader</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>idffwriter</servlet-name>
+        <url-pattern>/idffwriter</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>idffreader</servlet-name>
+        <url-pattern>/idffreader</url-pattern>
+    </servlet-mapping>
+</web-app>

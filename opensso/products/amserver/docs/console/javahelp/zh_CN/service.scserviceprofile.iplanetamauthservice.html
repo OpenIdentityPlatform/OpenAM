@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>核心 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthservice"></a><h4>核心</h4>
+<p><a name="indexterm-170"></a>该模块是常规配置 OpenSSO 验证服务的基础。必须对其进行注册并配置才能使用任一特定的验证模块实例。它使管理员能够定义默认值，当未在 OpenSSO 默认验证模块中特别设置值时，将使用这些值。“核心”属性包括全局属性和领域属性。这些属性包括：</p>
+<ul><li><p><a href="#gcnje">可插接的验证模块类</a></p></li>
+<li><p><a href="#gcnjc">客户机支持的验证模块</a></p></li>
+<li><p><a href="#gcnir">LDAP 连接池大小</a></p></li>
+<li><p><a href="#gcnkh">LDAP 连接池的默认大小</a></p></li>
+<li><p><a href="#gcnkq">用户配置文件</a></p></li>
+<li><p><a href="#gcnks">管理员验证配置</a></p></li>
+<li><p><a href="#gcnjw">用户配置文件动态创建默认角色</a></p></li>
+<li><p><a href="#gcnjn">持久 Cookie 模式</a></p></li>
+<li><p><a href="#gcnke">持久 Cookie 最长时间</a></p></li>
+<li><p><a href="#gcnlc">别名搜索属性名称</a></p></li>
+<li><p><a href="#gcnkt">默认验证语言环境</a></p></li>
+<li><p><a href="#gcnjj">组织验证配置</a></p></li>
+<li><p><a href="#gcnkl">登录失败锁定模式</a></p></li>
+<li><p><a href="#gcnjz">登录失败锁定计数</a></p></li>
+<li><p><a href="#gcnko">登录失败锁定间隔</a></p></li>
+<li><p><a href="#gcnkd">用于发送锁定通知的电子邮件地址</a></p></li>
+<li><p><a href="#gcnkr">N 次失败后警告用户</a></p></li>
+<li><p><a href="#gcnkc">登录失败锁定时间</a></p></li>
+<li><p><a href="#gcnjy">锁定属性名</a></p></li>
+<li><p><a href="#gcnle">锁定属性值</a></p></li>
+<li><p><a href="#gcnkz">默认成功登录 URL</a></p></li>
+<li><p><a href="#gcnlf">默认失败登录 URL</a></p></li>
+<li><p><a href="#gcnlb">验证后期处理类</a></p></li>
+<li><p><a href="#gcnjl">生成用户 ID 模式</a></p></li>
+<li><p><a href="#gcnjq">可插接用户名生成器类</a></p></li>
+<li><p><a href="#gcnki">身份类型</a></p></li>
+<li><p><a href="#gcnlh">可插接的用户状态事件类</a></p></li>
+<li><p><a href="#gcnjv">将无效尝试存储到数据存储库中</a></p></li>
+<li><p><a href="#gcnjo">基于模块的验证</a></p></li>
+<li><p><a href="#fwbfn">默认验证级别</a></p></li></ul>
+
+
+<a name="gcnje"></a><h5>可插接的验证模块类</h5>
+<p>指定 OpenSSO 平台中所有已配置的领域都可以使用的验证模块的 Java 类。可通过实现 AMLoginModule SPI 或 JAAS LoginModule SPI 来编写自定义验证模块。有关详细信息，参见
+OpenSSO Developer's Guide。要定义新的服务，该字段必须使用文本字符串以指定每个新验证服务的完整类名（包括软件包名称）。</p>
+
+<a name="gcnjc"></a><h5>客户机支持的验证模块</h5>
+<p>指定特定客户机所支持的验证模块列表。格式如下所示：</p><p><tt>clientType | module1,module2,module3</tt></p><p>当启用了“客户机检测”时，该属性有效。</p>
+
+<a name="gcnir"></a><h5>LDAP 连接池大小</h5>
+<p>指定特定 LDAP 服务器与端口所使用的最小和最大连接池。该属性仅适用于 LDAP 和成员资格验证服务。格式如下所示：</p><p><tt>host:port:min:max</tt></p>
+<hr><p><b>注 &#8211; </b>该连接池与 <tt>serverconfig.xml</tt> 中配置的 SDK 连接池不同。</p>
+<hr>
+
+
+<a name="gcnkh"></a><h5>LDAP 连接池的默认大小</h5>
+<p>设置与所有 LDAP 验证模块配置一起使用的连接池的默认最大值和最小值。如果“LDAP 连接池大小”属性中存在主机和端口条目，最小值和最大值设置将不使用 LDAP 连接池的默认大小中的相应值。</p>
+
+<a name="gcnkq"></a><h5>用户配置文件</h5>
+<p>该选项允许您为用户配置文件指定选项。这些选项包括：</p><dl><dt><b>必需</b></dt>
+<dd><p>指定如果验证成功，与 OpenSSO 一起安装的本地 Directory Server 中需要存在用户配置文件，验证服务才会发布 SSOToken。</p></dd>
+<dt><b>动态</b></dt>
+<dd><p>指定如果验证成功，但尚无用户配置文件，验证服务将创建用户配置文件。然后发布 SSOToken。在随 OpenSSO 一起安装的本地 Directory Server 中创建用户配置文件。</p></dd>
+<dt><b>随用户别名动态变换</b></dt>
+<dd><p>指定如果验证成功，验证服务将使用“用户别名列表”属性创建用户配置文件。</p></dd>
+<dt><b>忽略</b></dt>
+<dd><p>指定如果验证成功，验证服务不需要用户配置文件就可以发布 SSOToken。</p></dd>
+</dl>
+
+
+<a name="ggukq"></a><h5>远程验证安全性</h5>
+<p>如果启用，则所有远程验证请求都需要应用程序的 SSOToken 以验证调用方的身份，因此 OpenSSO 配置信息可获取与应用程序相关的用户名和密码的有效值。</p>
+
+<a name="ggull"></a><h5>保持 Post 处理对象用于注销处理</h5>
+<p>如果启用，则在登录过程使用的 Post 处理验证插件的实例会保存在 OpenSSO 会话中。以后调用注销时，会调用这些实例的 <tt>onLogout</tt> 方法。如果没有启用该属性，则不会保存登录过程中的 Post 处理实例。调用注销和 <tt>onLogout</tt> 方法时，可创建 Post
+处理插件的新实例。</p>
+
+<a name="gguji"></a><h5>保持验证模块对象用于注销处理</h5>
+<p>如果启用，则所有在验证过程使用的验证模块的实例都会保存在 OpenSSO 会话中。以后调用注销时，会在相同的实例中调用 logout/destroyModulestate 方法。如果没有启用该属性，则不会保存注销过程中的验证模块实例。注销时不会调用验证模块中的任何方法。</p>
+
+<a name="gcnks"></a><h5>管理员验证配置</h5>
+<p>定义仅向管理员提供的验证服务。如果需要将管理员的验证模块与最终用户的验证模块区别开来，则可以使用该属性。在访问 OpenSSO 控制台时，将使用该属性中配置的模块。例如：</p><p><tt><b>http://</tt><i>servername.port/console_deploy_uri</i><tt></b></tt></p>
+
+<a name="gcnjw"></a><h5>用户配置文件动态创建默认角色</h5>
+<p>如果在“用户配置文件”中选择了“动态创建”，则该字段指定分配给创建了配置文件的新用户的那些角色。该字段没有默认值。管理员必须指定要分配给新用户的角色的 DN。</p>
+<hr><p><b>注 &#8211; </b>所指定的角色必须属于正在为其配置验证的领域。该角色既可以是 OpenSSO 角色，也可以是 LDAP 角色，但不能是已过滤角色。</p><p>如果希望为用户自动指定特定服务，您必须配置用户配置文件中的“必需服务”属性。</p>
+<hr>
+
+
+<a name="gcnjn"></a><h5>持久 Cookie 模式</h5>
+<p>该选项用于确定用户能否重新启动浏览器并仍返回其经过验证的会话。通过启用“启用持久 Cookie 模式”可以保留用户会话。启用“启用持久 Cookie 模式”之后，直到用户会话的持久 Cookie 过期或用户明确注销后，该用户会话才会过期。到期时间是在“持久 Cookie 最长时间”中指定的。默认值是未启用“持久 Cookie 模式”，且验证服务仅使用内存 Cookie。</p>
+<hr><p><b>注 &#8211; </b>客户机必须明确申请持久 Cookie，方法是使用登录 URL 中的 <i>iPSPCookie=yes</i> 参数。 </p>
+<hr>
+
+
+<a name="gcnke"></a><h5>持久 Cookie 最长时间</h5>
+<p>指定经过多长时间后持久 Cookie 到期。该时间间隔从成功验证用户的会话时起开始计算。最大值为 2147483647（以秒为单位）。该字段会接受小于最大值的任意整数值。</p>
+
+<a name="gcnlc"></a><h5>别名搜索属性名称</h5>
+<p>用户验证成功后，将检索用户的配置文件。该字段用于指定次 LDAP 属性，当根据首选 LDAP 属性进行搜索而没有找到匹配的用户配置文件，将使用该字段指定的属性进行搜索。该属性主要用于当验证模块返回的用户标识与“用户命名属性”中指定的用户标识不相同时。例如，RADIUS 服务器可能返回 <tt>abc1234</tt>，但用户名却为 <tt>abc</tt>。该属性不存在默认值。</p><p>此字段可以接受任何有效的 LDAP 属性（例如 cn）。</p>
+
+<a name="gcnkt"></a><h5>默认验证语言环境</h5>
+<p>指定验证服务要使用的默认语言子类型。默认值为 en_US。有关有效语言子类型的列表，参见<a href="supportedlang.html">支持的语言环境</a>。</p><p>为了使用其他语言环境，首先必须创建该语言环境的所有验证模板。然后需要为这些模板创建新的目录。有关详细信息，请参阅管理员指南中的“登录 URL 参数”。</p>
+
+<a name="gcnjj"></a><h5>组织验证配置</h5>
+<p>设置组织的验证模块。默认验证模块为 LDAP。</p>
+
+<a name="gcnkl"></a><h5>登录失败锁定模式</h5>
+<p>指定用户在第一次登录失败后是否可以尝试第二次验证。选择该属性将启用锁定功能，用户将只有一次验证的机会。默认情况下，不启用锁定功能。该属性与同锁定相关的属性和通知属性一起发挥作用。</p>
+
+<a name="gcnjz"></a><h5>登录失败锁定计数</h5>
+<p>定义在登录失败锁定间隔中指定的时间间隔内，用户在被锁定之前试图进行验证的次数。</p>
+
+<a name="gcnko"></a><h5>登录失败锁定间隔</h5>
+<p>定义两次失败的登录尝试之间的时间（以分钟为单位）。如果一次登录失败并且在锁定间隔内随后的一次登录仍失败，则锁定计数将加 1。否则，将重置锁定计数。</p>
+
+<a name="gcnkd"></a><h5>用于发送锁定通知的电子邮件地址</h5>
+<p>指定发生用户锁定时将会接到通知的电子邮件地址。要向多个地址发送电子邮件通知，请用空格将每个电子邮件地址分隔开。对非英语语言环境，格式为：</p><p><tt>email_address|locale|charset</tt></p>
+
+<a name="gcnkr"></a><h5>N 次失败后警告用户</h5>
+<p>指定在 OpenSSO 发送警告消息警告用户将被锁定之前，允许发生的验证失败次数。</p>
+
+<a name="gcnkc"></a><h5>登录失败锁定时间</h5>
+<p>启用内存锁定。默认情况下，锁定机制会使<i>锁定属性名</i>中定义的用户配置文件失效（一次登录失败后）。如果登录失败锁定时间的值大于 0，则将在指定的时间（分钟数）内锁定其内存锁定和用户帐户。</p>
+
+<a name="ggulj"></a><h5>锁定时间乘数</h5>
+<p>该属性为每次连续锁定定义与“登录失败锁定时间”相乘的值。例如，如果将“登录失败锁定时间”设置为 3 分钟，并且将“锁定时间乘数”设置为 2，那么会将用户帐户锁定 6 分钟。</p>
+
+<a name="gcnjy"></a><h5>锁定属性名</h5>
+<p>指定所有要设置为锁定的 LDAP 属性。还必须更改“锁定属性值”中的值以启用该属性名称的锁定。默认情况下，OpenSSO 控制台中的“锁定属性名”为空。当用户被锁定且“登录失败锁定时间”设置为 0 时，默认实现值为 <i>inetuserstatus</i>（LDAP 属性）和 <i>inactive</i>。</p>
+
+<a name="gcnle"></a><h5>锁定属性值</h5>
+<p>该属性用于指定对于“锁定属性名”中定义的属性启用或禁用锁定。默认情况下，<i>inetuserstatus</i> 的值被设置为“无效”。</p>
+
+<a name="gcnkz"></a><h5>默认成功登录 URL</h5>
+<p>该字段接受一系列的值，这些值用于指定验证成功后用户被重定向到的 URL。此属性的格式为 <tt>clientType|URL</tt>，尽管可以仅指定 URL 的值（假定为默认类型 HTML）。默认值为 <i>/amserver/console</i>。</p>
+
+<a name="gcnlf"></a><h5>默认失败登录 URL</h5>
+<p>该字段接受一系列的值，这些值用于指定验证成功后用户被重定向到的 URL。此属性的格式为 <tt>clientType|URL</tt>，尽管可以仅指定 URL 的值（假定为默认类型 HTML）。</p>
+
+<a name="gcnlb"></a><h5>验证后期处理类</h5>
+<p>指定用于为成功或不成功登录自定义登记验证过程的 Java 类的名称。示例：</p><p><tt>com.abc.authentication.</tt><tt>PostProcessClass</tt></p><p>Java 类必须执行以下 Java 接口：</p><p><tt>com.sun.identity.authentication.spi.AMPostAuthProcessInterface</tt></p><p>另外，必须将类所在的路径添加到 Web Server 的 "Java Classpath" 属性中。</p>
+
+<a name="gcnjl"></a><h5>生成用户 ID 模式</h5>
+<p>该属性适用于成员资格验证模块。如果启用了该属性字段，则成员资格模块可以在自注册过程中生成特定用户的用户 ID（如果用户 ID 已经存在）。用户 ID 是从在可插入用户名生成器类中指定的 Java 类生成的。</p>
+
+<a name="gcnjq"></a><h5>可插接用户名生成器类</h5>
+<p>指定当使用启用生成用户 ID 模式时，用来生成用户 ID 的 Java 类的名称。</p>
+
+<a name="gcnki"></a><h5>身份类型</h5>
+<p>列出 OpenSSO 将搜索的身份类型。</p>
+
+<a name="gcnlh"></a><h5>可插接的用户状态事件类</h5>
+<p>扩展验证 SPI 从而为验证过程中的用户状态更改提供回调机制。支持以下状态更改：</p><dl><dt><tt>帐户锁定</tt></dt>
+<dd><p>任何验证模块都可以发生帐户锁定事件。可通过<a href="#gcnkl">登录失败锁定模式</a>属性配置该功能。</p></dd>
+<dt><tt>密码更改</tt></dt>
+<dd><p>仅适用于 LDAP 验证模块类型，因为只有该模块可以使用“密码更改”功能。</p></dd>
+</dl>
+
+
+<a name="gcnjv"></a><h5>将无效尝试存储到数据存储库中</h5>
+<p>如果启用，则此属性允许在由多个 OpenSSO 实例共享的身份系统信息库中共享登录失败尝试。例如，如果用于特定部署的身份系统信息库为 Directory Server，则无效尝试将存储在 <tt>sunAMAuthInvalidAttemptsData</tt>（属于 <tt>sunAMAuthAccountLockout</tt> 对象类）中。数据的存储格式为：</p><p><tt>&#60;InvalidPassword>&#60;InvalidCount>&#60;/InvalidCount>&#60;LastInvalidAt>&#60;/LastInvalidAt>&#60;LockedoutAt>&#60;/LockedoutAt>&#60;ActualLockoutDuration>&#60;/ActualLockoutDuration>&#60;/InvalidPassword> </tt></p><p>每位用户的这一信息都会保留在 Directory Server 中。出现无效尝试时，<tt>&#60;InvalidCount></tt> 随即增加。</p>
+
+<a name="gcnjo"></a><h5>基于模块的验证</h5>
+<p>如果启用，此属性允许用户通过基于模块的验证进行验证。如果未启用，则不允许基于模块的登录。所有 <tt>module=&#60; </tt><i> module_instance_name</i><tt>></tt> 形式的登录尝试都将导致登录失败。</p>
+
+<a name="ggurt"></a><h5>用户属性映射到会话属性</h5>
+<p>这样可将属性设置为从验证用户配置文件（保存在数据存储库中）到用户 SSOToken 的会话属性。格式为：</p><p><tt>UserProfile_Attribute|Session_Attribute_name</tt></p><p>如果未指定 <tt>Session_Attribute_name</tt>，则会检索会话的属性名作为用户配置文件属性的值。所有会话属性均包含 am.<tt>protected</tt> 前缀，以保证无法从客户机 SDK 编辑它们。</p>
+
+<a name="fwbfn"></a><h5>默认验证级别</h5>
+<p>验证级别值表示信任验证的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。SSO 令牌被提交到用户要访问的应用程序时，该应用程序使用存储的值来判断验证级别是否足够高，以确定是否允许用户访问。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。</p><p>验证级别应在领域的特定验证模板中进行设置。此处所述的“默认验证级别”值仅当未在特定领域的验证模板的“验证级别”字段中指定任何验证级别时才适用。“默认验证级别”的默认值为 0。（此属性中的值不由 OpenSSO 使用，而由可以选择使用它的任何外部应用程序所使用。）</p>
+<br/>
+
+</body>
+</html>

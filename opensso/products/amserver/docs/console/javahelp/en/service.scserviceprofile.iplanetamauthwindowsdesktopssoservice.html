@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows Desktop SSO - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>Windows Desktop SSO</h4>
+<p><a name="indexterm-183"></a>This module is specific to Windows and is also known as Kerberos authentication.
+The user presents a Kerberos token to OpenSSO through the Simple and Protected
+GSS-API Negotiation Mechanism (SPNEGO) protocol. The Windows Desktop SSO authentication plug-in module provides a
+client (user) with desktop single sign-on. This means that a user who has
+already authenticated with a key distribution center can be authenticated with OpenSSO without
+having to provide the login information again. The Windows Desktop SSO attributes are global
+attributes. The attributes are:</p>
+<ul><li><p><a href="#fwbfr">Service Principal</a></p></li>
+<li><p><a href="#fwbfo">Keytab File Name</a></p></li>
+<li><p><a href="#fwbhy">Kerberos Realm</a></p></li>
+<li><p><a href="#fwbid">Kerberos Server Name</a></p></li>
+<li><p><a href="#fwbhw">Return Principal with Domain Name</a></p></li>
+<li><p><a href="#fwbic">Authentication Level</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>Service Principal</h5>
+<p>Specifies the Kerberos principal that is used for authentication. Use the following format:</p><p><tt><b>HTTP/</tt><i>hostname.domainname@dc_domain_name</i><tt></b></tt></p><p><b>hostname</b> and <b>domainame</b> represent the hostname and domain name of the OpenSSO instance.
+<b>dc_domain_name</b>  is the Kerberos domain in which the Windows Kerberos server (domain
+controller) resides. It is possibly different from the domain name of the OpenSSO.</p>
+
+<a name="fwbfo"></a><h5>Keytab File Name</h5>
+<p>This attribute specifies the Kerberos keytab file that is used for authentication. Use
+the following format, although the format is not required:</p><p><tt><b></tt><i>hostname</i><tt>.HTTP.keytab</b></tt></p><p><b>hostname</b> is the hostname of the OpenSSO instance.</p>
+
+<a name="fwbhy"></a><h5>Kerberos Realm</h5>
+<p>This attribute specifies the Kerberos Distribution Center (domain controller) domain name. Depending up
+on your configuration, the domain name of the domain controller may be different
+than the OpenSSO domain name.</p>
+
+<a name="fwbid"></a><h5>Kerberos Server Name</h5>
+<p>This attribute specifies the Kerberos Distribution Center (the domain controller) hostname. You must
+enter the fully qualified domain name (FQDN) of the domain controller.</p>
+
+<a name="fwbhw"></a><h5>Return Principal with Domain Name</h5>
+<p>If enabled, this attributes allows OpenSSO to automatically return the Kerberos principal with
+the domain controller's domain name during authentication.</p>
+
+<a name="fwbic"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

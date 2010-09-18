@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=iso-8859-1">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAPv3-Repository-Plug-In-Attribute
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="realm.idrepoadd"></A><h3>LDAPv3-Repository-Plug-In-Attribute</h3>
+<p><A NAME="indexterm-13"></A>Folgende Attribute werden zur Konfiguration eines LDAPv3-Repository-Plug-Ins verwendet:</p>
+<ul><li><p><A HREF="realm.idrepoadd.html#fyfdo">Prim&auml;rer LDAP-Server</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdt">LDAP-BIND-DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfds">LDAP-BIND-Passwort</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdu">LDAP-BIND-Passwort (Best&auml;tigen)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdv">LDAP-Organisations-DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdw">LDAP-SSL aktivieren</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfej">LDAP-Verbindung Pool-Mindestgr&ouml;&szlig;e</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfee">Maximalgr&ouml;&szlig;e des LDAP-Verbindungs-Pools</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdx">Maximale Ergebnisse aus Suchlauf</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfen">Timeout f&uuml;r Suche</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdz">LDAP richtet sich nach Bezug</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffh">LDAPv3 Repository Plugin-Klassenname</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeu">Name-Mapping-Attribut</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffb">LDAPv3 Plugin-unterst&uuml;tzte Typen und Vorg&auml;nge</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffj">Suchattribut (LDAP-Benutzer)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeo">Suchfilter (LDAP-Benutzer)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffi">LDAP-Benutzerobjektklasse</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfez">LDAP-Benutzerattribute</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeb">Suchattribut (LDAP-Gruppen)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfep">Suchfilter (LDAP-Gruppen)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfed">Namensattribut f&uuml;r LDAP-Gruppen-Container</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfec">LDAP-Gruppen-Containerwert</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffc">LDAP-Gruppenobjektklasse</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfff">LDAP-Gruppenattribute</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfea">Attributname f&uuml;r Gruppenmitgliedschaft</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfes">Attributname von Gruppenmitglied</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfev">Attributsname des Gruppenmitglieds-URL</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfem">Namensattribut f&uuml;r LDAP-Personen-Container</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffe">LDAP-Personen-Containerwert</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffk">Suchattribut (LDAP-Agenten)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffl">LDAP-Agentencontainer-Namensattribut</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffa">LDAP-Agentencontainerwert</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffd">Suchfilter (LDAP-Agenten)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfey">LDAP-Agentenobjektklasse</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfew">LDAP-Agentenattribute</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfef">Permanente Suchbasis-DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffz">Durchgehende maximale Leerlaufzeit bei Suche bevor ein Neustart durchgef&uuml;hrt wird</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfgh">Maximale Anzahl der Versuche nach einem Fehler</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfge">Zeit zwischen zwei Versuchen</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffr">LDAPException-Fehlercodes beim Wiederholen auf</A></p>
+</li>
+</ul>
+<A NAME="fyfdo"></A><h4>Prim&auml;rer LDAP-Server</h4>
+<p>Geben Sie den Namen des LDAP-Servers ein, mit dem Sie eine Verbindung herstellen. Das Format ist <tt>hostname.domainname:portnumber</tt>. </p>
+<p>Wenn mehrere <tt>host:portnumber</tt>-Eintr&auml;ge vorhanden sind, wird eine Verbindung mit dem ersten Host der Liste hergestellt. Schl&auml;gt die Verbindung fehl, wird der n&auml;chste Hosteintrag verwendet.</p>
+<A NAME="fyfdt"></A><h4>LDAP-BIND-DN</h4>
+<p>Gibt den DN-Namen an, den Access Manager zur Authentifizierung bei dem LDAP-Server verwendet, mit dem Sie zurzeit verbunden sind. Der Benutzer mit dem DN-Namen der Bindung sollte &uuml;ber die Berechtigungen zum Hinzuf&uuml;gen, &Auml;ndern und L&ouml;schen verf&uuml;gen, die im Attribut <A HREF="realm.idrepoadd.html#fyffb">LDAPv3 Plugin-unterst&uuml;tzte Typen und Vorg&auml;nge</A> festgelegt sind.</p>
+<A NAME="fyfds"></A><h4>LDAP-BIND-Passwort</h4>
+<p>Gibt das DN-Passwort an, das Access Manager zur Authentifizierung bei dem LDAP-Server verwendet, mit dem Sie zurzeit verbunden sind.</p>
+<A NAME="fyfdu"></A><h4>LDAP-BIND-Passwort (Best&auml;tigen)</h4>
+<p>Best&auml;tigen Sie das Passwort.</p>
+<A NAME="fyfdv"></A><h4>LDAP-Organisations-DN</h4>
+<p>Gibt den DN an, dem dieses Data Store-Repository zugeordnet ist. Dieser DN wird als Basis-DN f&uuml;r alle in diesem Data Store ausgef&uuml;hrten Vorg&auml;nge verwendet. </p>
+<A NAME="fyfdw"></A><h4>LDAP-SSL aktivieren</h4>
+<p>Wenn aktiviert, stellt Access Manager &uuml;ber das HTTPS-Protokoll eine Verbindung mit dem prim&auml;ren Server her.</p>
+<A NAME="fyfej"></A><h4>LDAP-Verbindung Pool-Mindestgr&ouml;&szlig;e</h4>
+<p>Gibt die anf&auml;ngliche Anzahl an Verbindungen im Verbindungspool an. Wenn Sie einen Verbindungspool verwenden, m&uuml;ssen Sie nicht jedes Mal eine neue Verbindung herstellen. </p>
+<A NAME="fyfee"></A><h4>Maximalgr&ouml;&szlig;e des LDAP-Verbindungs-Pools</h4>
+<p>Gibt die maximale Anzahl der zul&auml;ssigen Verbindungen an.</p>
+<A NAME="fyfdx"></A><h4>Maximale Ergebnisse aus Suchlauf</h4>
+<p>Gibt die maximale Anzahl der bei einem Suchvorgang zur&uuml;ckgegebenen Eintr&auml;ge an. Wenn die Grenze erreicht ist, gibt Directory Server alle Eintr&auml;ge zur&uuml;ck, die mit der Suchanforderung &uuml;bereinstimmen.</p>
+<A NAME="fyfen"></A><h4>Timeout f&uuml;r Suche</h4>
+<p>Gibt die maximal zul&auml;ssige Zeit f&uuml;r eine Suchanforderung an. Wenn die Grenze erreicht ist, gibt Directory Server alle Eintr&auml;ge zur&uuml;ck, die mit der Suchanforderung &uuml;bereinstimmen.</p>
+<A NAME="fyfdz"></A><h4>LDAP richtet sich nach Bezug</h4>
+<p>Wenn aktiviert, werden Bez&uuml;ge zu anderen LDAP-Servern automatisch verfolgt.</p>
+<A NAME="fyffh"></A><h4>LDAPv3 Repository Plugin-Klassenname</h4>
+<p>Gibt den Speicherort der Klassendatei an, die das LDAPv3-Repository implementiert.</p>
+<A NAME="fyfeu"></A><h4>Name-Mapping-Attribut</h4>
+<p>Aktiviert allgemeine Attribute, von denen dem Framework bekannt ist, dass sie dem nativen Data Store zugeordnet sind. Beispiel: F&uuml;r das Attribut  <tt>inetUserStatus </tt>, das das Framework zur Ermittlung des Benutzerstatus verwendet, verwendet der native Data Store m&ouml;glicherweise das Attribut <tt>userStatus</tt>. Bei den Attributdefinitionen muss die Gro&szlig;-/Kleinschreibung beachtet werden.</p>
+<A NAME="fyffb"></A><h4>LDAPv3 Plugin-unterst&uuml;tzte Typen und Vorg&auml;nge</h4>
+<p>Gibt die Vorg&auml;nge an, die f&uuml;r diesen LDAP-Server zugelassen sind. Die Standardvorg&auml;nge sind die einzigen Vorg&auml;nge, die von diesem LDAPv3-Repository-Plug-In unterst&uuml;tzt werden. Folgende Vorg&auml;nge werden vom LDAPv3-Repository-Plug-In unterst&uuml;tzt:</p>
+<ul><li><p>Gruppe: Lesen, Erstellen, Bearbeiten, L&ouml;schen</p>
+</li>
+<li><p>Bereich: Lesen, Erstellen, Bearbeiten, L&ouml;schen, Dienst</p>
+</li>
+<li><p>Benutzer: Lesen, Erstellen, Bearbeiten, L&ouml;schen, Dienst</p>
+</li>
+<li><p>Agent: Lesen, Erstellen, Bearbeiten, L&ouml;schen</p>
+</li>
+</ul>
+<p>Berechtigungen f&uuml;r diese Vorg&auml;nge k&ouml;nnen Sie zwar abh&auml;ngig von Ihren LDAP-Servereinstellungen und den erforderlichen Aufgaben entfernen, </p>
+<p>Sie k&ouml;nnen jedoch keine weiteren Berechtigungen hinzuf&uuml;gen.</p>
+<A NAME="fyffj"></A><h4>Suchattribut (LDAP-Benutzer)</h4>
+<p>&Uuml;ber dieses Attribut wird die Art des Attributs festgelegt, nach dem eine Suche nach einem Benutzer durchgef&uuml;hrt wird. Wenn der Benutzer-DN beispielsweise <tt>uid=user1,ou=people,dc=iplanet,dc=com </tt> lautet, ist <tt>uid</tt> das Namensattribut. </p>
+<A NAME="fyfeo"></A><h4>Suchfilter (LDAP-Benutzer)</h4>
+<p>Gibt den Suchfilter an, der bei der Suche nach Benutzereintr&auml;gen verwendet wird.</p>
+<A NAME="fyffi"></A><h4>LDAP-Benutzerobjektklasse</h4>
+<p>Gibt die Objektklassen eines Benutzers an. Bei der Erstellung eines Benutzers wird diese Liste mit Benutzerobjektklassen der Attributliste des Benutzers hinzugef&uuml;gt.</p>
+<A NAME="fyfez"></A><h4>LDAP-Benutzerattribute</h4>
+<p>Legt die einem Benutzer zugeordnete Attributliste fest. Das Lesen und Schreiben von Benutzerattributen, die sich nicht in dieser Liste befinden, ist unzul&auml;ssig. Bei den Attributen muss die Gro&szlig;-/Kleinschreibung beachtet werden. Die Objektklassen und das Attributschema m&uuml;ssen in Directory Server definiert sein, bevor Sie sie in diesem Attribut festlegen.</p>
+<A NAME="fyfeb"></A><h4>Suchattribut (LDAP-Gruppen)</h4>
+<p>&Uuml;ber dieses Attribut wird die Art des Attributs festgelegt, nach dem eine Suche nach einer Gruppe durchgef&uuml;hrt wird. Der Standardwert ist <tt>cn</tt>.</p>
+<A NAME="fyfep"></A><h4>Suchfilter (LDAP-Gruppen)</h4>
+<p>Gibt den Suchfilter an, der bei der Suche nach Gruppeneintr&auml;gen verwendet wird. Der Standardwert ist <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+<A NAME="fyfed"></A><h4>Namensattribut f&uuml;r LDAP-Gruppen-Container</h4>
+<p>Gibt das Namensattribut eines Gruppen-Containers an, falls die Gruppe einem Container zugeordnet ist. Anderenfalls bleibt dieses Attribut leer. Beispiel: Wenn sich der Gruppen-DN <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> in <tt>ou=groups</tt> befindet, lautet das Namensattribut des Gruppen-Containers <tt>ou</tt>.</p>
+<A NAME="fyfec"></A><h4>LDAP-Gruppen-Containerwert</h4>
+<p>Gibt den Wert des Gruppen-Containers an. Beispiel: Wenn sich der Gruppe-DN <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> im Container <tt>ou=groups</tt> befindet, lautet der Gruppen-Containerwert <tt>groups</tt>. </p>
+<A NAME="fyffc"></A><h4>LDAP-Gruppenobjektklasse</h4>
+<p>Gibt die Objektklassen f&uuml;r Gruppen an. Bei der Erstellung einer Gruppe wird diese Liste mit Gruppenobjektklassen der Attributliste der Gruppe hinzugef&uuml;gt.</p>
+<A NAME="fyfff"></A><h4>LDAP-Gruppenattribute</h4>
+<p>Legt die einer Gruppe zugeordnete Attributliste fest. Das Lesen und Schreiben von Gruppenattributen, die sich nicht in dieser Liste befinden, ist unzul&auml;ssig. Bei den Attributen muss die Gro&szlig;-/Kleinschreibung beachtet werden. Die Objektklassen und das Attributschema m&uuml;ssen in Directory Server definiert sein, bevor Sie sie in diesem Attribut festlegen.</p>
+<A NAME="fyfea"></A><h4>Attributname f&uuml;r Gruppenmitgliedschaft</h4>
+<p>Gibt den Namen des Attributs an, dessen Wert eine Liste mit den Namen aller Gruppen ist, denen der DN zugeordnet ist. Der Standardwert ist <tt>memberOf</tt>. </p>
+<A NAME="fyfes"></A><h4>Attributname von Gruppenmitglied</h4>
+<p>Gibt den Namen des Attributs an, dessen Wert ein DN ist, der dieser Gruppe zugeordnet ist. Der Standardwert ist <tt>uniqueMember</tt>.</p>
+<A NAME="fyfev"></A><h4>Attributsname des Gruppenmitglieds-URL</h4>
+<p>Gibt den Namen des Attributs an, dessen Wert ein LDAP-URL ist, der zu Mitgliedern dieser Gruppe aufgel&ouml;st wird. Der Standardwert ist <tt> memberUrl</tt>.</p>
+<A NAME="fyfem"></A><h4>Namensattribut f&uuml;r LDAP-Personen-Container</h4>
+<p>Gibt das Namensattribut des Personen-Containers an, falls der Benutzer einem Personen-Container zugeordnet ist. Wenn sich der Benutzer nicht in einem Personen-Container befindet, bleibt das Feld leer. </p>
+<A NAME="fyffe"></A><h4>LDAP-Personen-Containerwert</h4>
+<p>Gibt den Wert des Personen-Containers an. Der Standardwert ist <tt> people</tt>.</p>
+<A NAME="fyffk"></A><h4>Suchattribut (LDAP-Agenten)</h4>
+<p>&Uuml;ber dieses Attribut wird die Art des Attributs festgelegt, nach dem eine Suche nach einem Agenten durchgef&uuml;hrt wird. Der Standardwert ist <tt>uid</tt>.</p>
+<A NAME="fyffl"></A><h4>LDAP-Agentencontainer-Namensattribut</h4>
+<p>Gibt das Namensattribut des Agentencontainers an, falls der Agent einem Agentencontainer zugeordnet ist. Wenn sich der Agent nicht in einem Agentencontainer befindet, bleibt das Feld leer.</p>
+<A NAME="fyffa"></A><h4>LDAP-Agentencontainerwert</h4>
+<p>Gibt den Wert des Agentencontainers an. Der Standardwert ist <tt> agents</tt>.</p>
+<A NAME="fyffd"></A><h4>Suchfilter (LDAP-Agenten)</h4>
+<p>Definiert den Filter f&uuml;r die Suche nach einem Agenten. Diesem Feld wird das Suchattribut (LDAP-Agenten) vorangestellt. Es bildet den eigentlichen Agenten-Suchfilter. </p>
+<p>Beispiel: Wenn das Suchattribut (LDAP-Agenten) den Wert <tt>uid</tt> enth&auml;lt und Suchfilter (LDAP-Agenten) den Wert <tt>(objectClass=sunIdentityServerDevice) </tt>, dann lautet der tats&auml;chliche Agentensuchfilter wie folgt: <tt>(&amp;(uid=*)(objectClass=sunIdentityServ erDevice))</tt></p>
+<A NAME="fyfey"></A><h4>LDAP-Agentenobjektklasse</h4>
+<p>Gibt die Objektklassen f&uuml;r Agenten an. Bei der Erstellung eines Agenten wird diese Liste mit Agentenobjektklassen der Attributliste des Agenten hinzugef&uuml;gt.</p>
+<A NAME="fyfew"></A><h4>LDAP-Agentenattribute</h4>
+<p>Legt die einem Agenten zugeordnete Attributliste fest. Das Lesen und Schreiben von Agentenattributen, die sich nicht in dieser Liste befinden, ist unzul&auml;ssig. Bei den Attributen muss die Gro&szlig;-/Kleinschreibung beachtet werden. Die Objektklassen und das Attributschema m&uuml;ssen in Directory Server definiert sein, bevor Sie sie in diesem Attribut festlegen.</p>
+<A NAME="fyfef"></A><h4>Permanente Suchbasis-DN</h4>
+<p>Legt den Basis-DN f&uuml;r die permanente Suche fest. Einige LDAPv3-Server unterst&uuml;tzen die permanente Suche nur auf Root-Suffix-Ebene.</p>
+<A NAME="fyffz"></A><h4>Durchgehende maximale Leerlaufzeit bei Suche bevor ein Neustart durchgef&uuml;hrt wird</h4>
+<p>Legt die maximale Leerlaufzeit fest, bevor die permanente Suche neu gestartet wird. Der Wert muss gr&ouml;&szlig;er als 1 sein. Bei Werten kleiner oder gleich 1 wird die Suche unabh&auml;ngig von der Leerlaufzeit der Verbindung neu gestartet.</p>
+<p>Ein besonderer Fall sind Access Manager-Implementierungen mit Lastenausgleich. Manche Lastenausgleichsysteme werden nach einer gewissen Leerlaufzeit wegen Zeit&uuml;berschreitung beendet. In diesem Fall sollten Sie Durchgehende maximale Leerlaufzeit bei Suche bevor ein Neustart durchgef&uuml;hrt wird auf einen geringeren Wert setzen als den f&uuml;r den Lastenausgleich angegebenen Zeit&uuml;berschreitungswert. </p>
+<A NAME="fyfgh"></A><h4>Maximale Anzahl der Versuche nach einem Fehler</h4>
+<p>Legt die maximale Anzahl der Wiederholungsversuche f&uuml;r permanente Suchvorg&auml;nge fest, wenn einer der in LDAPException-Fehlercodes beim Wiederholen auf angegebenen Fehler auftritt.</p>
+<A NAME="fyfge"></A><h4>Zeit zwischen zwei Versuchen</h4>
+<p>Gibt die Zeit zwischen den einzelnen Wiederholungsversuchen an. Dieses Attribut gilt nur f&uuml;r permanente Suchverbindungen.</p>
+<A NAME="fyffr"></A><h4>LDAPException-Fehlercodes beim Wiederholen auf</h4>
+<p>Legt die Fehlercodes fest, bei denen ein permanenter Suchvorgang wiederholt wird. Dieses Attribut gilt nur f&uuml;r die permanente Suche (nicht f&uuml;r die anderen LDAP-Vorg&auml;nge).</p>
+
+<br />
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sample_service.xml,v 1.1 2008/11/22 02:41:21 ak138937 Exp $
+
+-->
+
+<!--
+    Document   : sample_service.xml
+    Description:
+        This serves as sample XML for defining service manifests.
+        Every service should supply this XML service manifest to 
+        the framework.
+-->
+
+    <!-- 
+    service id   : unique id to distinguish this service
+            name : name associated with this service
+            clazz: fully qualified name of the class that implements
+                   this service. 
+    -->
+<service id="SampleService" name="Sample Service" 
+    clazz="com.sun.identity.diagnostic.plugin.services.DOMAINDIR.YOURCLASSNAME">
+
+    <!-- 
+    typeofservice defines whether its a core service or application service. 
+    Valid inputs are 'core', 'application'. All services implemented under
+    plugin directory should have the value as 'application'. 
+    -->
+    <typeofservice>application</typeofservice>
+
+    <!-- 
+    'realization' defines how the service needs to be realized in the 
+     application. Application UI i.e. GUI/CLI model is based on 
+     categories or domain. The category id, defines the domain of the
+     test case i.e. server, agent, reports etc. The operation is the 
+     feature implemented under the given domain/category. There can 
+     be multiple operations under a given domain/category.
+    -->
+    <realization>
+        <category id="sample" operation="SampleCommand-1" "name="Sample-1" />
+        <category id="sample" operation="SampleCommand-2" "name="Sample-2" />
+    </realization>    
+    
+    <!-- 
+    Defines the list of libraries/classes and resources to be loaded for 
+    this service. Relative paths defined here are assumed to be relative 
+    to the service home i.e. <ZIP_ROOT>/services.   
+    -->
+    <runtime>
+        <load-on-startup>true</load-on-startup>
+        <libraries>
+            <library>lib/sample.jar</library>
+        </libraries>
+        <resource-bundles>
+            <resource>locale/ServiceResource</resource>
+        </resource-bundles>
+    </runtime>
+</service>

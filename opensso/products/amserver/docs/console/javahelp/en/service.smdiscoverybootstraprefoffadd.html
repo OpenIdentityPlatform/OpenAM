@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a Resource Offering for Bootstrapping - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverybootstraprefoffadd"></a><h5>To Configure a Resource Offering for Bootstrapping</h5>
+<a name="indexterm-146"></a><a name="indexterm-147"></a><p>Only one resource offering is allowed for bootstrapping; by default, this offering contains
+information regarding the Discovery Service. If a resource offering is already defined, you
+can modify the attributes by clicking on its name. You may also check
+the box next to the name and delete the existing resource offering. To
+configure a new resource offering, you would then click New.</p><ol>
+<li><b>Click New to display the new mapper attributes or click on the name
+of a configured mapper to modify it.</b></li>
+<li><b>Enter an optional description for the resource offering.</b></li>
+<li><b>Provide values for the Service Instance attributes based on the following information:</b><dl><dt>Service Type</dt>
+<dd><p>This attribute takes as a value a URI that defines the type of service the resource offering implements. For example, <tt><b>urn:liberty:disco:2003-08</b></tt>.</p>
+<hr><p><b>Note &#8211; </b>It is recommended that this URI be the same as the <tt>targetNamespace</tt> URI of the abstract WSDL description for the service.</p>
+<hr>
+</dd>
+<dt>Provider ID</dt>
+<dd><p>This attribute takes as a value a URI of the provider of the service instance. For example, <tt><b>http://daiquiri.sun.com:80/amserver/Liberty/disco</b></tt>.</p></dd>
+<dt>Service Description</dt>
+<dd><p>This attribute defines a running web service at a distinct protocol endpoint. Information about service instances needs to be communicated in various contexts. For example, the Discovery Service defined in this specification is an identity service which provides an enumeration of resource offerings (each of which includes a service instance description). See <a href="service.smdiscoverydescriptionadd.html">To Configure a Service Description</a>.</p></dd>
+</dl>
+</li>
+<li><b>Provide values for the Resource Offering Options attributes based on the following information:</b><dl><dt>Options</dt>
+<dd><p>Check this box if the service has no options available for the resource offering. Options provide hints to a potential requester whether certain data or operations may be available with a particular resource offering. For example, an option may be provided stating that home contact information is available.</p></dd>
+<dt>Option List</dt>
+<dd><p>This attribute contains a list of options for the service instance. The option is defined as a URI. The set of possible URIs are generally standardized by the service type.</p></dd>
+</dl>
+</li>
+<li><b>Enable Directives based on the following information:</b><dl><dt>Description ID Refs For: GenerateBearerToken</dt>
+<dd><p>All <a href="supporteddirectives.html">Supported Directives</a> may contain a descriptive reference. If the ID Refs attribute is not enabled for a directive, the directive is taken to apply to all authentication mechanisms provided in the resource offering. If the ID Refs attribute is enabled for a directive, it MUST contain a list of ID Refs which refer to the authentication mechanism with which the directive is associated. If the attribute is present, the directive MUST be taken to apply only to those descriptions referred to in the ID Refs list. This may be useful if certain directives are incompatible with certain security mechanisms.</p></dd>
+<dt>Description ID Refs For: Authenticate Requestor</dt>
+<dd><p>All <a href="supporteddirectives.html">Supported Directives</a> may contain a descriptive reference. If the ID Refs attribute is not enabled for a directive, the directive is taken to apply to all authentication mechanisms provided in the resource offering. If the ID Refs attribute is enabled for a directive, it MUST contain a list of ID Refs which refer to the authentication mechanism with which the directive is associated. If the attribute is present, the directive MUST be taken to apply only to those descriptions referred to in the ID Refs list. This may be useful if certain directives are incompatible with certain security mechanisms.</p></dd>
+<dt>Description ID Refs For: Encrypt ResourceID</dt>
+<dd><p>All <a href="supporteddirectives.html">Supported Directives</a> may contain a descriptive reference. If the ID Refs attribute is not enabled for a directive, the directive is taken to apply to all authentication mechanisms provided in the resource offering. If the ID Refs attribute is enabled for a directive, it MUST contain a list of ID Refs which refer to the authentication mechanism with which the directive is associated. If the attribute is present, the directive MUST be taken to apply only to those descriptions referred to in the ID Refs list. This may be useful if certain directives are incompatible with certain security mechanisms.</p></dd>
+<dt>Description ID Refs For: AuthenticateSessionContext</dt>
+<dd><p>All <a href="supporteddirectives.html">Supported Directives</a> may contain a descriptive reference. If the ID Refs attribute is not enabled for a directive, the directive is taken to apply to all authentication mechanisms provided in the resource offering. If the ID Refs attribute is enabled for a directive, it MUST contain a list of ID Refs which refer to the authentication mechanism with which the directive is associated. If the attribute is present, the directive MUST be taken to apply only to those descriptions referred to in the ID Refs list. This may be useful if certain directives are incompatible with certain security mechanisms.</p></dd>
+<dt>Description ID Refs For: Authorize Requester</dt>
+<dd><p>All <a href="supporteddirectives.html">Supported Directives</a> may contain a descriptive reference. If the ID Refs attribute is not enabled for a directive, the directive is taken to apply to all authentication mechanisms provided in the resource offering. If the ID Refs attribute is enabled for a directive, it MUST contain a list of ID Refs which refer to the authentication mechanism with which the directive is associated. If the attribute is present, the directive MUST be taken to apply only to those descriptions referred to in the ID Refs list. This may be useful if certain directives are incompatible with certain security mechanisms.</p></dd>
+</dl>
+</li>
+<li><b>Click Save to complete the configuration.</b></li>
+<li><b>Click Save on the Discovery Service page to complete the service configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

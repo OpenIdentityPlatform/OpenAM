@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>策略配置服务 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>策略配置服务</h4>
+<p>“策略配置”服务用于通过 Federated Access Manager 控制台为每个组织配置与策略相关的属性。您还可以定义资源名称实现和 Directory Server 数据存储库，结合 Federated Access Manager 策略框架使用。“策略配置服务”中指定的
+Directory Server 用于对 LDAP 用户、LDAP 组、LDAP 角色和组织策略主题的成员资格评估。</p>
+
+<a name="ggdbf"></a><h5>主题结果的生存时间</h5>
+<p>要改善策略评估的性能，成员资格评估将缓存一段时间，该时间由“策略配置”服务中定义的“主题结果的生存时间”属性定义。这些缓存的成员资格决定可在“主题结果的生存时间”属性中所定义的时间到期之前使用。这之后的成员资格评估用于在目录中反映用户的当前状态。</p>
+
+<a name="ggday"></a><h5>动态属性</h5>
+<p>这些是允许的动态属性名称，它们可在列表中显示并供选择，以定义策略响应提供者动态属性。所定义的名称需要与在数据系统信息库中定义的属性名称相同。</p>
+
+<a name="ggdcj"></a><h5>amldapuser 定义</h5>
+<p><tt>amldapuser</tt> 是在“策略配置”服务中指定的 Directory Server 使用的默认安装过程中创建的用户。必要时，这可以由领域的管理员或策略管理员来更改。</p>
+<br/>
+
+</body>
+</html>

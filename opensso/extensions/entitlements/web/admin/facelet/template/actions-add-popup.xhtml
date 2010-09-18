@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: actions-add-popup.xhtml,v 1.5 2009/08/05 16:00:43 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:popup
+        width="300"
+        type="#{viewApplicationHolder == null ? 'question' : 'warning'}"
+        handler="#{booleanActionsHandler}"
+        modal="true"
+        title="Add Action"
+        visible="#{booleanActionsBean.addPopupVisible}"
+        closeListenerMethod="addPopupCancelListener">
+        <ui:define name="body">
+            <ice:panelGroup>
+                <ice:panelGroup
+                    style="text-align: left; padding-bottom: 10px">
+                    <ice:outputFormat
+                        rendered="#{viewApplicationHolder != null}"
+                        escape="false"
+                        value="#{resources['actions-add-popup.warning']}">
+                        <f:param value="#{viewApplicationHolder.viewApplication.title}"/>
+                    </ice:outputFormat>
+                    <ice:outputText
+                        rendered="#{viewApplicationHolder == null}"
+                        value="#{resources['actions-add-popup.question']}"/>
+                </ice:panelGroup>
+                <ice:panelGrid
+                    columns="2">
+                    <ice:outputLabel
+                        for="actions-add-popup-name"
+                        value="Action name"/>
+                    <ice:inputText
+                        id="actions-add-popup-name"
+                        value="#{booleanActionsBean.addPopupName}"/>
+                </ice:panelGrid>
+                <ice:panelGrid
+                    styleClass="button-group"
+                    columns="2">
+                    <o:button
+                        type="cancel"
+                        handler="#{booleanActionsHandler}"
+                        listenerMethod="addPopupCancelListener"/>
+                    <o:button
+                        type="ok"
+                        handler="#{booleanActionsHandler}"
+                        listenerMethod="addPopupOkListener">
+                        <ui:define name="attributes">
+                            <f:attribute
+                                name="viewApplicationsBean"
+                                value="#{viewApplicationsBean}"/>
+                            <f:attribute
+                                name="viewApplicationDao"
+                                value="#{viewApplicationDao}"/>
+                            <f:attribute
+                                name="viewApplication"
+                                value="#{viewApplicationHolder.viewApplication}"/>
+                        </ui:define>
+                    </o:button>
+                </ice:panelGrid>
+            </ice:panelGroup>
+        </ui:define>
+    </o:popup>
+</span>

@@ -1,0 +1,71 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.11 2009/07/09 17:04:14 veiming Exp $
+
+-->
+
+<project name="opensso-distauth" default="all">
+    <description>Open Web Single Sign-On: DistAuth</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.distauth.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="distauth.classes.dir" location="${amserver.built.distauth.dir}/classes"/>
+    <property name="distauth.src.dir" location="${amserver.distauth.dir}/source"/>
+
+    <target name="all" depends="preparebuild">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${distauth.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${amserver.distauth.dir}/configurator/source"/>
+            <classpath refid="build.class.path"/>
+        </javac>        
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${amserver.built.distauth.dir}"/>
+        <mkdir dir="${amserver.dist.dir}"/>
+        <mkdir dir="${distauth.classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${distauth.classes.dir}"/>
+        <delete dir="${amserver.built.distauth.dir}"/>
+    </target>
+
+</project>

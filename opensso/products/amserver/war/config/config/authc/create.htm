@@ -1,0 +1,137 @@
+<link href="$context/assets/css/Specific/confUserStore.css" rel="stylesheet" type="text/css" />
+<script>
+
+    YAHOO.namespace("sun.container");
+
+    YAHOO.util.Event.onDOMReady(init);
+
+    AjaxUtils.load('addStore', '$context/config/dlg/popupAuthenticationUserStore.htm');
+    YAHOO.sun.container.addStore = new YAHOO.widget.Panel("addStore", { width:"280px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true});
+    YAHOO.sun.container.addStore.render();
+
+    var DOM = YAHOO.util.Dom;
+
+    var pageURI = null;
+    var afterAddToStoreSuccessFunction = null;
+    var validateFormFunction = null;
+
+    var isAuthenticationSelected = false;
+    var isRealmSelected = false;
+    var selectedRealm = null;
+
+    var tableColumnDefs = [
+        {key:"realmName", label:"$page.getLocalizedString('configuration.authentication_store.realms.header')", sortable:true}
+    ];
+    var responseSchema = {
+        resultsList: "records",
+        fields: ["realmName"]
+    };
+
+    var realmsTable = new APP.util.SimpleTable("realmsTable", "$context/config/authc/realmList.htm", null, tableColumnDefs, responseSchema, true);
+
+
+    function init() {
+        DOM.get("addStoreButton").disabled = true;
+        realmsTable.dataTable.subscribe("rowSelectEvent", selectRealm, false);
+    }
+
+    function addToStore() {
+        var requestData = AjaxUtils.serializeForm("authenticationStoreForm");
+        requestData = requestData + "&realmName=" + selectedRealm;
+        AjaxUtils.doPost(null, pageURI, requestData, afterAddToStoreSuccessFunction, null);
+    }
+
+    function cancel() {
+        document.location = "$context/commonTasks.htm";
+    }
+
+    function selectRealm() {
+        var selectedRow = realmsTable.dataTable.getSelectedTrEls()[0];
+        var value = DOM.getChildren(selectedRow)[0].innerHTML;
+        selectedRealm = value;
+        isRealmSelected = (value != null);
+        adjustAddStoreButton();
+    }
+
+    function selectAuthentication() {
+        var authenticationPagePath = null;
+        var optionField = DOM.get("authenticationSource");
+        var optionFieldValue = optionField.options[optionField.selectedIndex].value;
+        isAuthenticationSelected = (optionField.selectedIndex > 0);
+        adjustAddStoreButton();
+
+        switch (optionFieldValue) {
+            case "LDAP":
+                authenticationPagePath = "$context/config/authc/LDAP.htm"; break;
+            case "Certificate":
+                authenticationPagePath = "$context/config/authc/certificate.htm"; break;
+            case "Windows Desktop SSO":
+                authenticationPagePath = "$context/config/authc/window.htm"; break;
+            case "Data Store":
+                authenticationPagePath = "$context/config/authc/dataStore.htm"; break;
+            case "Federation":
+                authenticationPagePath = "$context/config/authc/federation.htm"; break;
+            case "HTTP Basic":
+                authenticationPagePath = "$context/config/authc/HTTP.htm"; break;
+            case "JDBC":
+                authenticationPagePath = "$context/config/authc/JDBC.htm"; break;
+            case "Anonymous":
+                authenticationPagePath = "$context/config/authc/anonymous.htm"; break;
+        }
+
+        if (authenticationPagePath != null) {
+            AjaxUtils.doGet("configureAuthenticationStoreBody", authenticationPagePath, null, null, null);
+        }
+        else {
+            DOM.get("configureAuthenticationStoreBody").innerHTML = "";
+        }
+    }
+
+    function adjustAddStoreButton() {
+        var allValid = (isAuthenticationSelected && isRealmSelected && ((validateFormFunction) ? validateFormFunction() : true));
+        DOM.get("addStoreButton").disabled = !allValid;
+    }
+
+</script>
+
+<div id="mainPanel" align="center">
+    <div id="createPanel" class="createpanel">
+        <form id="authenticationStoreForm" >
+            <br />
+            <div class="bodywhite">
+                <h2>$page.getLocalizedString("configuration.authentication_store.title")</h2>
+                <small>$page.getLocalizedString("configuration.authentication_store.description")</small>
+            </div>
+            <br />
+            <div class="bodywhite">
+                $page.getLocalizedString("configuration.authentication_store.select_realm")
+                <div id="realmsTable"></div>
+                <br/>
+				<br/>
+            </div>
+            <br />
+            <div class="bodywhite">
+                <br/>
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.select_authentication_store")</p>
+                <select name="authenticationSource" id="authenticationSource" style="width:200px" onchange="selectAuthentication();">
+                    <option value="None">$page.getLocalizedString("configuration.authentication_store.select_one")</option>
+                    <option value="LDAP">$page.getLocalizedString("configuration.authentication_store.ldap")</option>
+                    <option value="Certificate">$page.getLocalizedString("configuration.authentication_store.certificate")</option>
+                    <option value="Windows Desktop SSO">$page.getLocalizedString("configuration.authentication_store.windows_desktop")</option>
+                    <option value="Data Store">$page.getLocalizedString("configuration.authentication_store.data_store")</option>
+                    <option value="Federation">$page.getLocalizedString("configuration.authentication_store.federation")</option>
+                    <option value="HTTP Basic">$page.getLocalizedString("configuration.authentication_store.http_basic")</option>
+                    <option value="JDBC">$page.getLocalizedString("configuration.authentication_store.jdbc")</option>
+                    <option value="Anonymous">$page.getLocalizedString("configuration.authentication_store.anonymous")</option>
+                </select><br/><br/>
+            </div>
+            <div id="configureAuthenticationStoreBody"></div>
+            <div class="subbody">
+                <button type="button" value="Cancel" onClick="cancel();">$page.getLocalizedString("configuration.authentication_store.button.cancel")</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="addStoreButton" type="button" value="addStore" onClick="addToStore();">$page.getLocalizedString("configuration.authentication_store.button.add_to_store")</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="addStore" style="visibility:hidden"></div>
+

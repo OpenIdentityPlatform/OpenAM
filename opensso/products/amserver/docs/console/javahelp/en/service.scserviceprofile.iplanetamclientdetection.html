@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Client Detection - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>Client Detection</h4>
+<p><a name="indexterm-200"></a>An initial step in the authentication process is to identify the type of
+client making the HTTP(S) request. This OpenSSO feature is known as client detection.
+The URL information is used to retrieve the client's characteristics. Based on these
+characteristics, the appropriate authentication pages are returned. For example, when a Netscape browser is
+used to request a web page, OpenSSO 8.0 displays an HTML login page.
+Once the user is validated, the client type ( Netscape browser) is added
+to the session token. The attributes defined in the Client Detection service are
+global attributes.</p>
+<ul><li><p><a href="#fxcei">Client Types</a></p></li>
+<li><p><a href="#fxbxh">Default Client Type</a></p></li>
+<li><p><a href="#fxccp">Client Detection Class</a></p></li>
+<li><p><a href="#fxbvy">Client Detection</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>Client Types</h5>
+<p>In order to detect client types, OpenSSO needs to recognize their identifying characteristics.
+These characteristics identify the properties of all supported types in the form of
+client data. This attribute allows you to modify the client data through the
+Client Manager interface. To access the Client Manager, click the Edit link. Out of
+the box, OpenSSO contains the following client types:</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>For descriptions of these client types, see the <a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>.</p>
+
+<a name="gciwk"></a><h5>Client Manager</h5>
+<p><a name="indexterm-201"></a>The Client Manager is the interface that lists the base clients, styles and associated
+properties, and allows you to add and configure devices. The Base client types
+are listed at the top of Client Manager. These client types contain the
+default properties that can be inherited by all devices that belong to the
+client type.</p>
+
+<a name="gcivx"></a><h5>Client Type</h5>
+<p>Style Profile The Client Manager groups all available clients, including the Base client
+type itself, in the Client Type list. For each client, you can modify
+the client properties by clicking on the device name. The properties are then
+displayed in the Client Editor window. To edit the properties, select the following
+classifications from the pull-down list:</p><dl><dt>Hardware Platform</dt>
+<dd><p>Contains properties of the device's hardware, such as display size, supported character sets, and so forth.</p></dd>
+<dt>Software Platform</dt>
+<dd><p>Contains properties of the device's application environment, operating system, and installed software. </p></dd>
+<dt>Network Characteristics</dt>
+<dd><p>Contains properties describing the network environment, including the supported bearers.</p></dd>
+<dt>BrowserUA</dt>
+<dd><p>Contains attributes related to the browser user agent running on the device.</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>Contains properties of the Wireless Application Protocol (WAP) environment supported by the device.</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>Contains properties of the WAP environment supported by the device.</p></dd>
+<dt>Additional Properties</dt>
+<dd><p>Contains properties of the Wireless Application Protocol (WAP) environment supported by the device.</p></dd>
+</dl>
+
+<hr><p><b>Note &#8211; </b>For specific property definitions, see the <b>Open Mobile Alliance Ltd. (OMA) Wireless Application Protocol, Version 20-Oct-2001</b>.</p><p>In order to access the document, you may first have to register with
+WAP Forum<sup>TM</sup>. For information, please visit <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm</a>.</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>Default Client Type</h5>
+<p>This attribute defines the default client type derived from the list of client
+types in the Client Types attribute. The default is genericHTML.</p>
+
+<a name="fxccp"></a><h5>Client Detection Class</h5>
+<p>This attribute defines the client detection class for which all client detection requests
+are routed. The string returned by this attribute should match one of the
+client types listed in the Client Types attribute. The default client detection class
+is <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>. OpenSSO also contains <tt>com.iplanet.services.cdm.ClientDetectionDefaultImpl</tt> .</p>
+
+<a name="fxbvy"></a><h5>Client Detection</h5>
+<p>Enables client detection. If client detection is enabled (default), every request is routed
+thought the class specified in the Client Detection Class attribute. By default, the
+client detection capability is enabled. If this attribute is not selected, OpenSSO assumes
+that the client is genericHTML and will be accessed from a HTML browser.</p>
+<br/>
+
+</body>
+</html>

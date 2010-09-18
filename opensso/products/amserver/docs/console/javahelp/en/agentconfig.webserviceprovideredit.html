@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web Service Provider - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceprovideredit"></a><h4>Web Service Provider</h4>
+<p>The Web Service Provider agent profile describes the configuration that is used for
+validating web service requests from web service clients and securing web service responses
+from a web service provider. The name of the web service provider must
+be unique across all agents.</p>
+
+<a name="ggouz"></a><h5>General</h5>
+<p>The following General attributes define basic web service provider properties:</p>
+
+<a name="ggovu"></a><h5>Group</h5>
+<p>The Group mechanism allows you to define a collection of similar types of
+agents. The group must be dfined before including the particular agent into a
+collection. </p>
+
+<a name="ggotz"></a><h5>Password</h5>
+<p>Defines the password for the web service provider agent.</p>
+
+<a name="ggotl"></a><h5>Password Confirm</h5>
+<p>Confirm the password.</p>
+
+<a name="ggova"></a><h5>Status</h5>
+<p>Defines whether the web service provider agent will be Active or Inactive in
+the system. By default, it is set to Active, meaning that the agent
+will participate in validating web service requests from web service clients and securing
+service responses from a web service provider.</p>
+
+<a name="ggowp"></a><h5>Universal Identifier</h5>
+<p>Lists the basic LDAP properties, that uniquely define the web service provider agent.</p>
+
+<a name="gglej"></a><h5>Security</h5>
+<p>The following attributes define web service provider security attributes: </p>
+
+<a name="gglhw"></a><h5>Security Mechanism</h5>
+<p>Defines the type of security credential that are used to validate the web
+service request. The type of security mechanism is part of the web service
+request from a web service client and is accepted by a web service
+provider. Choose from the following types: </p>
+<ul><li><p>Anonymous &#8212; The anonymous security mechanism contains no security credentials.</p></li>
+<li><p>KerberosToken &#8212; Uses Kerberos security tokens.</p></li>
+<li><p>LibertyBearerToken &#8211; Uses the Liberty-defined bearer token.</p></li>
+<li><p>LibertySAMLToken &#8211; Uses the Libery-defined SAML token.</p></li>
+<li><p>LibertyX509Token &#8211; Uses the Libery-defined X509 cerficiate..</p></li>
+<li><p>SAML-HolderOfKey - Uses the SAML 1.1 assertion type Holder-Of-Key..</p></li>
+<li><p>SAML-SenderVouches - Uses the SAML 1.1 assertion type Sender Vouches.</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; Uses the SAML 2.0 assertion token type Holder-Of-Key.</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; Uses the SAML 2.0 assertion token type Sender Vouches.</p></li>
+<li><p>UserNameToken &#8211; Uses a user name token.</p></li>
+<li><p>UserNameToken-Plain &#8211; Uses a user name token with a clear text password.</p></li>
+<li><p>X509Token &#8211; Uses the X509 certificate.</p></li></ul>
+
+
+<a name="gglfy"></a><h5>Authentication Chain</h5>
+<p>Defines the authentication chain or service name that can be used to authenticate
+to the OpenSSO authentication service using the credentials from an incoming web service
+request's security token to generate OpenSSO's authenticated SSOToken.</p>
+
+<a name="ghbbd"></a><h5>Token Conversion Type</h5>
+<p>Defines the type of token that will be converted when a web service
+provider requests a token conversion from the Security Token service. The token is
+converted to the specified SAML or SSOToken (session token) with the same identity,
+but with attribute definitions specific to the token type. This new token can
+be used by the web service provider making a web service call to
+another web service provider. The token types you can define are:</p>
+<ul><li><p>SAML 1.1 token</p></li>
+<li><p>SAML2 token</p></li>
+<li><p>SSOToken</p></li></ul>
+<p>In order to use this attribute, any SAML token must be selected in
+the <a href="#gglhw">Security Mechanism</a> attribute and any <a href="#gglfy">Authentication Chain</a> defined for the web service provider.</p>
+
+<a name="ggoum"></a><h5>Preserve Security Headers in Message</h5>
+<p>When enabled, this attribute defines that the SOAP security headers are preserved by
+the web service provider for further processing.</p>
+
+<a name="gglhq"></a><h5>Private Key Type</h5>
+<p>Defines the key type used by the web service provider during the web
+service request signature verification process. The default value is <tt>PublicKey</tt>.</p>
+
+<a name="ggovi"></a><h5>Liberty Service Type URN</h5>
+<p>The URN (Universal Resource Name) describes a Liberty service type that the web
+service provider will use for service lookups.</p>
+
+<a name="ggovn"></a><h5>Credential for User Token</h5>
+<p>This attribute represents the username/password shared secrets that are used by the web
+service provider to validate a username security token from an incoming web service
+request. These credentials are compared against the credentials from the username security token from
+an incoming web service request.</p>
+
+<a name="gglfz"></a><h5>SAML Configuration</h5>
+<p>The following attributes configure the Security Assertion Markup Language (SAML) for the web
+service provider:</p>
+
+<a name="gglfx"></a><h5>SAML Attribute Mapping</h5>
+<p>This configuration represents a SAML attribute that needs to be generated as an
+Attribute Statement during SAML assertion creation by the Security Token Service for a
+web service provider. The format is <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i>Real_attr_name</i><tt></tt>.</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> is the SAML attribute name from a SAML assertion from an incoming
+web service request. <tt></tt><i>Real_attr_name</i><tt></tt> is the attribute name that is fetched from either the
+authenticated SSOToken or the identity repository.</p>
+
+<a name="gglgf"></a><h5>SAML NameID Mapper Plugin</h5>
+<p>Defines the NameID mapper plug-in class that is used for SAML account mapping.</p>
+
+<a name="gglhk"></a><h5>SAML Attributes Namespace</h5>
+<p>Defines the name space used for generating SAML attributes.</p>
+
+<a name="gglfv"></a><h5>Include Memberships</h5>
+<p>If enabled, this attribute defines that the principal's membership must be included as
+a SAML attribute.</p>
+
+<a name="ggovx"></a><h5>signing and Encryption</h5>
+<p>The following attributes define signing and encryption configuration for web provider security:</p>
+
+<a name="ggowr"></a><h5>Is Response signed</h5>
+<p>When enabled, the web service provider signs the response using its X509 certificate.</p>
+
+<a name="ggouo"></a><h5>Is Response Encrypted</h5>
+<p>When enabled, the web service response will be encrypted.</p>
+
+<a name="ggowz"></a><h5>Is Request Signature Verified</h5>
+<p>When enabled, the web service request signature is verified.</p>
+
+<a name="ggouw"></a><h5>Is Request Header Decrypted</h5>
+<p>When enabled, the web service client request's security header will be decrypted.</p>
+
+<a name="ggotr"></a><h5>Is Request Decrypted</h5>
+<p>When enabled, the web service client request will be decrypted.</p>
+
+<a name="gglls"></a><h5>Key Store</h5>
+<p>The following attributes configure the keystore to be used for certificate storage and
+retrieval: </p>
+
+<a name="gglld"></a><h5>Public Key Alias of Web Service Client</h5>
+<p>This attribute defines the public certificate key alias that is sued to encrypt
+the web service response or verify the signature of the web service request.</p>
+
+<a name="gglmc"></a><h5>Private Key Alias</h5>
+<p>This attribute defines the private certificate key alias that is used to sign
+the web service response or decrypt the web service request.</p>
+
+<a name="ggljf"></a><h5>Key Storage Usage</h5>
+<p>This configuration defines whether to use the default keystore, or a custom keystore.
+The following values must be defined for a custom key store:</p>
+<ul><li><p>Location of Key Store</p></li>
+<li><p>Password of Key Store</p></li>
+<li><p>Password of Key</p></li></ul>
+
+
+<a name="gglko"></a><h5>End Points</h5>
+<p>The following attributes define web service endpoints:</p>
+
+<a name="gglmp"></a><h5>Web Service Proxy End Point</h5>
+<p>This attribute defines a web service end point to which the web service
+client is making a request. The end point is optional unless it is
+configured to use web security proxy. </p>
+
+<a name="ghbed"></a><h5>Web Service End Point</h5>
+<p>This attribute defines a web service end point to which the web service
+client is making a request.</p>
+
+<a name="ghbay"></a><h5>Kerberos Configuration</h5>
+<p>Kerberos is a security profile supported by the web services security to secure
+web services communications between a web service client and a web service provider.
+In a typical scenario, a user authenticates to the desktop and invokes a
+web service and the web service client. This requires a Kerberos ticket to
+secure the request to web service provider by identifying his principal as Kerberos
+token. Typically, Kerberos-based web services security is used in same the context of Kerberos
+domain (realm) as opposed to across boundaries, for example SAML-based web services security.
+However, Kerberos is one of the strongest authentication mechanisms, especially in the Windows
+Domain Controller environment.</p>
+
+<a name="ghbbv"></a><h5>Kerberos Domain Server</h5>
+<p>This attribute specifies the Kerberos Distribution Center (the domain controller) hostname. You must
+enter the fully qualified domain name (FQDN) of the domain controller.</p>
+
+<a name="ghbdx"></a><h5>Kerberos Domain</h5>
+<p>This attribute specifies the Kerberos Distribution Center (domain controller) domain name. Depending up
+on your configuration, the domain name of the domain controller may be different
+than the OpenSSO domain name.</p>
+
+<a name="ghbcq"></a><h5>Kerberos Service Principal</h5>
+<p>Specifies the Kerberos principal as the owner of the generated Security token.</p><p>Use the following format: </p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt> </p><p><tt>hostname</tt> and <tt>domainame</tt> represent the hostname and domain name of the OpenSSO instance.
+<tt>dc_domain_name</tt>  is the Kerberos domain in which the Windows Kerberos server (domain
+controller) resides. It is possible that the Kerberos server is different from the
+domain name of the OpenSSO instance.</p>
+
+<a name="ghbae"></a><h5>Kerberos Key Tab File</h5>
+<p>This attribute specifies the Kerberos keytab file that is used for issuing the
+token. Use the following format, although the format is not required:</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> is the hostname of the OpenSSO instance.</p>
+
+<a name="ghbep"></a><h5>Verify Kerberos Signature</h5>
+<p>If enabled, this attribute specifies that the Kerberos token is signed.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,865 @@
+#!/bin/sh 
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-directory-template,v 1.5 2008/08/19 19:08:31 veiming Exp $ 
+#
+#
+
+stopLDAP(){
+
+        if [ $isDS5OrOlderVersion -eq 1 ]; then 
+           $DS_INSTANCE_DIR/stop-slapd
+        else
+           $DSADMIN stop $DS_INSTANCE_DIR
+        fi
+}
+
+startLDAP(){
+
+        if [ $isDS5OrOlderVersion -eq 1 ]; then 
+           $DS_INSTANCE_DIR/start-slapd
+        else
+           $DSADMIN start $DS_INSTANCE_DIR
+        fi
+}
+
+
+calculateDBCacheSize() {
+    db_cache_size=0
+    for db_dir in $db_dirs; do
+        db_size=`du -ks $db_dir | $CUT -f1`
+        db_cache_size=`$ECHO "scale=0;$db_cache_size + $db_size" | $BC`
+    done
+    db_cache_size=`$ECHO "scale=0; ($db_cache_size * 1024 * 1.2) / 1" | $BC`
+    $ECHO $db_cache_size
+}
+
+availableDBDirs() {
+    db_dirs=`find $DS_INSTANCE_DIR/db -type 'd' | xargs`
+    db_dirs=`$ECHO $db_dirs | $CUT -f2- -d' '`
+    $ECHO $db_dirs
+}
+
+printCacheSize() {
+    db_dir=$1
+    db_base=`$BASENAME $db_dir`
+    db_size=`du -ks $db_dir | $CUT -f1`
+    db_size=`$ECHO "$db_size * 1024" | $BC`
+}
+
+existingCacheSize() {
+    for db_dir in $db_dirs; do
+        printCacheSize db_dir
+    done
+}
+
+suggestDBEntryCacheSize() {
+        if [ -d $db_dir ]; then
+                db_size=`du -ks $db_dir/*id2entry* | $CUT -f1`
+        fi
+        db_size=`$ECHO "scale=0; ($db_size * 1024 * 1.2)/1" | $BC`
+
+        $ECHO $db_size
+}
+
+suggestDBEntryCacheSizebyBackend() {
+
+        backend_name=$1
+
+        db_dir=$DS_INSTANCE_DIR/db/$backend_name
+
+        if [ -d $db_dir ]; then
+                db_size=`du -ks $db_dir | $CUT -f1`
+        fi
+        db_size=`$ECHO "scale=0; ($db_size * 1024 * 1.2)/1" | $BC`
+
+        $ECHO $db_size
+}
+
+tuneUsingDSE() {
+    tune_file="$DS_INSTANCE_DIR/config/dse.ldif"
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning "` "$tune_file..."
+    $ECHO
+    $ECHO `$gettext "File                 :  "` "$tune_file"
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "1.   DB Home Directory in RAM Disk"`
+    $ECHO `$gettext "Current Value        : "` "nsslapd-db-home-directory: " "$cur_db_home_location"
+    $ECHO `$gettext "Recommended Value    : "` "nsslapd-db-home-directory: " "$$new_db_home_location"
+    $ECHO
+    $ECHO
+
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    if [ "$cur_db_home_location" = "$new_db_home_location" ]; then
+        return
+    fi
+
+    #Stop the DS server before doing all of these
+    stopLDAP
+
+    #backup DS
+    backUpDS
+    if [ $? != 0 ]; then
+        $ECHO `$gettext "Database cannot be backed up. Tuning will not be applied."`
+        startLDAP
+        return
+    fi
+
+    check_file_for_write $tune_file
+    if [ $? = 100 ]; then
+        startLDAP
+        return
+    fi
+
+    delete_line $tune_file "nsslapd-db-home-directory: "
+    insert_line $tune_file "nsslapd-dbcachesize: " "nsslapd-db-home-directory: $new_db_home_location"
+  
+    #Start the DS server 
+    startLDAP
+}
+
+tuneUsingLdapModify() {
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning Directory Server using command line tool (ldapmodify)"`
+    $ECHO
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "Root Suffix                               : "` "$ROOT_SUFFIX"
+    $ECHO "DB DN for Suffix                          : "
+    for item in $db_suffix; do
+        $ECHO "                                          : `getDBDNbyBackend $item`"
+    done
+    $ECHO `$gettext "DB Directory for Root Suffix              : "` "$db_dir"
+    $ECHO
+    $ECHO "1.   "`$gettext "DS Worker Threads"`
+    $ECHO "DN                   : cn=config"
+    $ECHO `$gettext "Attribute            : "` "nsslapd-threadnumber"
+    $ECHO `$gettext "Current Value        : "` "$cur_number_worker_threads"
+    $ECHO `$gettext "Recommended Value    : "` "$new_number_worker_threads"
+    $ECHO
+    $ECHO "2.   "`$gettext "DS Access Log"`
+    $ECHO "DN                   : cn=config"
+    $ECHO `$gettext "Attribute            : "` "nsslapd-accesslog-logging-enabled"
+    $ECHO `$gettext "Current Value        : "` "$cur_access_log_status"
+    $ECHO `$gettext "Recommended Value    : "` `$gettext "on"`
+    $ECHO
+    $ECHO "3.   "`$gettext "DB Cache Size"`
+    $ECHO "DN                   : cn=config,cn=ldbm database,cn=plugins,cn=config"
+    $ECHO `$gettext "Attribute            : "` "nsslapd-dbcachesize"
+    $ECHO `$gettext "Current Value        : "` "$cur_db_cache_size"
+    $ECHO `$gettext "Recommended Value    : "` "$new_db_cache_size"
+    $ECHO
+    $ECHO "4.   "`$gettext "DB Entry Cache Size"`
+    $ECHO
+    for item in $db_suffix; do
+       cur_db_entry_cache_size=`getDBEntryCacheSizebyBackend $item`
+       if [ "$cur_db_entry_cache_size" = "" ]; then
+           $ECHO `$gettext "Failed to obtain directory configuration for "` `$gettext "DB Entry Cache Size "` "$item"
+           $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed"`
+           exit
+       fi
+       new_db_entry_cache_size=`suggestDBEntryCacheSizebyBackend $item`
+       if [ "$new_db_entry_cache_size" = "" ]; then
+           $ECHO `$gettext "Cannot compute recommended "` `$gettext "DB Cache Size"` `$gettext "for "` "$item." `$gettext "Cannot proceed."`
+           exit
+       fi
+        $ECHO "Suffix               : `getSuffixbyBackend $item`"
+        $ECHO "DN                   : `getDBDNbyBackend $item`"
+        $ECHO `$gettext "Attribute            : "` "nsslapd-cachememsize"
+        $ECHO `$gettext "Current Value        : "` "$cur_db_entry_cache_size"
+        $ECHO `$gettext "Recommended Value    : "` "$new_db_entry_cache_siz"
+        $ECHO
+        $ECHO 
+    done
+
+    if [ "$ENABLE_MODE" = "enabled" ]; then
+      $ECHO "5.   "`$gettext "ACIs"`
+      $ECHO
+      $ECHO `$gettext "In realm mode, since delegation privileges are used to determine permissions,"`
+      $ECHO `$gettext "we recommend to remove the ACIs that are not used to improve the performance."`
+      $ECHO `$gettext "A list of unused ACIs can be found in "` "$SCRIPT_LOCATION/remacis.ldif file."
+      $ECHO
+    fi
+
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    is_change_made=false
+
+    tmp_ldif_file="/tmp/dir.ldif"
+    $ECHO "# amtune ldif file"                                          > $tmp_ldif_file
+
+    if [ $cur_number_worker_threads -lt $new_number_worker_threads ]; then
+        $ECHO `$gettext "Preparing LDIF file to modify "` `$gettext "Number of Worker Threads"`
+        
+        $ECHO "dn: cn=config"                                           >> $tmp_ldif_file
+        $ECHO "changetype: modify"                                      >> $tmp_ldif_file 
+        $ECHO `$gettext "replace: "` "nsslapd-threadnumber"                           >> $tmp_ldif_file
+        $ECHO "nsslapd-threadnumber: 24"                                >> $tmp_ldif_file
+        $ECHO                                                           >> $tmp_ldif_file
+    else
+        $ECHO `$gettext "There are enough "` `$gettext "DS Worker Threads"`
+    fi
+
+    if [ "$cur_access_log_status" != "on" ]; then
+        $ECHO `$gettext "Preparing LDIF file to modifying access log status"`
+
+        $ECHO "dn: cn=config"                                           >> $tmp_ldif_file
+        $ECHO "changetype: modify"                                      >> $tmp_ldif_file 
+        $ECHO `$gettext "replace: "` "nsslapd-accesslog-logging-enabled"              >> $tmp_ldif_file
+        $ECHO "nsslapd-accesslog-logging-enabled: on"                   >> $tmp_ldif_file
+        $ECHO                                                           >> $tmp_ldif_file
+    else
+        $ECHO `$gettext "Access Log is already on"`
+    fi
+
+    if [ $new_db_cache_size -gt $cur_db_cache_size ]; then
+        $ECHO `$gettext "Preparing LDIF file to modify "` `$gettext "DB Cache Size"`
+
+        $ECHO "dn: cn=config,cn=ldbm database,cn=plugins,cn=config"     >> $tmp_ldif_file
+        $ECHO "changetype: modify"                                      >> $tmp_ldif_file 
+        $ECHO `$gettext "replace: "` "nsslapd-dbcachesize"                            >> $tmp_ldif_file
+        $ECHO "nsslapd-dbcachesize: $new_db_cache_size"                 >> $tmp_ldif_file
+        $ECHO                                                           >> $tmp_ldif_file
+    else
+        $ECHO `$gettext "DB Cache Size"` `$gettext "is already large enough"`
+    fi
+
+    for item in $db_suffix; do
+       cur_db_entry_cache_size=`getDBEntryCacheSizebyBackend $item`
+       new_db_entry_cache_size=`suggestDBEntryCacheSizebyBackend $item`
+
+       if [ $new_db_entry_cache_size -gt $cur_db_entry_cache_size ]; then
+            $ECHO `$gettext "Preparing LDIF file to modify "` `$gettext "DB Entry Cache Size "` `$gettext "for "` "$item"
+
+            $ECHO "dn: `getDBDNbyBackend $item`"                                >> $tmp_ldif_file
+            $ECHO "changetype: modify"                                          >> $tmp_ldif_file 
+            $ECHO `$gettext "replace: "` "nsslapd-cachememsize"                               >> $tmp_ldif_file
+            $ECHO "nsslapd-cachememsize: $new_db_entry_cache_size"              >> $tmp_ldif_file
+            $ECHO                                                               >> $tmp_ldif_file
+       else
+            $ECHO `$gettext "DB Entry Cache Size"` `$gettext "is already large enough "` `$gettext "for "` "$item"
+       fi
+    done
+
+    if [ -f $tmp_ldif_file ] && [ "`cat $tmp_ldif_file`" != "# amtune ldif file" ]; then
+
+        if [ $isDS5OrOlderVersion -eq 0 ]; then
+           #Stop the DS server before doing all of these
+           stopLDAP
+        fi
+
+        #backup DS
+        backUpDS
+        if [ $? != 0 ]; then
+            $ECHO `$gettext "Database cannot be backed up. Tuning will not be applied."`
+            if [ $isDS5OrOlderVersion -eq 0 ]; then
+               #Start the DS server 
+               startLDAP
+            fi
+            return
+        fi
+        if [ $isDS5OrOlderVersion -eq 0 ]; then
+           #Start the DS server 
+           startLDAP
+        fi
+
+        $LDAPMODIFY -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -f $tmp_ldif_file
+        $RM $tmp_ldif_file
+        is_change_made=true
+    fi
+
+    # In realm mode, since delegation privileges are used to determine
+    # permissions, remove the acis that are not used.
+    #
+    if [ "$ENABLE_MODE" = "enabled" ]; then
+        $ECHO 
+       $ECHO `$gettext "Removing unused ACIs in Realm mode..."`
+       remacis_ldif=$SCRIPT_LOCATION/remacis.ldif
+       $CP $remacis_ldif $remacis_ldif+
+       sed -e "s#NM_ORG_ROOT_SUFFIX#$NM_SUFFIX#g" \
+           -e "s#ORG_ROOT_SUFFIX#$ROOT_SUFFIX#g" \
+           -e "s#ROOT_SUFFIX#$ROOT_SUFFIX#g" \
+           -e "s#ORG_OBJECT_CLASS#$ORG_OBJECT_CLASS#g" \
+            $remacis_ldif+ > $remacis_ldif
+       $RM -f $remacis_ldif+
+    
+       $LDAPMODIFY -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -f $remacis_ldif
+        if [ $? -eq 0 ]; then
+          is_change_made=true
+        fi
+    fi
+
+    # Only restart the server if DS is modified
+    if [ "$is_change_made" = "true" ]; then
+       #Stop the DS server before doing all of these
+       stopLDAP
+
+       #Start the DS server 
+       startLDAP
+    fi
+}
+
+get_list_index() {
+
+        if [ $isDS5OrOlderVersion -eq 1 ]; then
+           DB_NAME=`getDBDN | $CUT -f1 -d"," | $CUT -f2 -d "="` 
+           $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=index,cn=$DB_NAME,cn=ldbm database,cn=plugins,cn=config" "(objectclass=*)" | $GREP "dn:" | $CUT -f2 -d"="  | $CUT -f1 -d ","`
+        else
+           $ECHO `$DSCFG list-indexes --port $DS_PORT --no-inter --pwd-file $DSADMIN_PASSFILE $ROOT_SUFFIX`
+        fi
+
+
+}
+
+getDBName() {
+
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(&(|(cn=$ROOT_SUFFIX)(cn=\"$ROOT_SUFFIX\"))(nsslapd-backend=*))" | $GREP "nsslapd-backend:" | $CUT -f2 -d ":" | sed -e 's/ //g'`
+
+}
+
+createIndex() {
+
+        attr_name=$1
+
+        if [ $isDS5OrOlderVersion -eq 1 ]; then
+            DB_NAME=`getDBName`
+            tmp_ldif_file="amtune-$DB_NAME-$CUR_DATE.ldif"
+            $ECHO "dn: cn=$attr_name,cn=index,cn=$DB_NAME,cn=ldbm database,cn=plugins,cn=config" > $tmp_ldif_file
+            $ECHO "objectClass:top"     >> $tmp_ldif_file
+            $ECHO "objectClass:nsIndex" >> $tmp_ldif_file
+            $ECHO "cn:$attr_name"       >> $tmp_ldif_file
+            $ECHO "nsSystemIndex:false" >> $tmp_ldif_file
+            $ECHO "nsIndexType:pres"    >> $tmp_ldif_file
+            $ECHO "nsIndexType:eq"      >> $tmp_ldif_file
+            $ECHO "nsIndexType:sub"     >> $tmp_ldif_file
+            $LDAPMODIFY -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -a -f $tmp_ldif_file
+            $RM $tmp_ldif_file  
+            $DB2INDEX -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -n $DB_NAME -t $attr_name
+        else
+            $DSCFG create-index --port $DS_PORT  --no-inter --pwd-file $DSADMIN_PASSFILE $ROOT_SUFFIX $attr_name
+        fi
+}
+
+verify_index()
+{
+
+    list_index=$1
+
+    $ECHO `$gettext "Index Exists?        Attributes"`
+    $ECHO "-------------        ----------"
+    for attr_item in $list_index; do
+        if [ `$ECHO "$list_existing_index" | $GREP -i $attr_item | $WC -l | $SED -e 's/ //g'` -eq 1 ]; then
+           $ECHO "Yes           $attr_item"
+        else
+           $ECHO "No            $attr_item"
+           list_attributes_not_index="$list_attributes_not_index $attr_item"
+        fi
+    done
+    $ECHO
+
+}
+
+tuneDSIndex() {
+
+    list_attributes_not_index=
+
+    list_existing_index=`get_list_index`
+
+    list_am_default_index="nsroledn memberof iplanet-am-static-group-dn iplanet-am-modifiable-by iplanet-am-user-federation-info-key sunxmlkeyvalue o ou sunPreferredDomain associatedDomain sunOrganizationAlias"
+ 
+    list_am_search_attributes=`$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "ou=default,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthLDAPService,ou=services,$ROOT_SUFFIX" "(objectclass=*)" | $GREP "sunkeyvalue: iplanet-am-auth-ldap-user-search-attributes=" | $CUT -f2 -d"="`
+
+    # Default value of search attribute
+    if [ "$list_am_search_attributes" = "" ]; then
+        list_am_search_attributes=uid
+    fi
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning Directory Server Index"`
+    $ECHO
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "Root Suffix                               : "` "$ROOT_SUFFIX"
+    $ECHO
+    $ECHO `$gettext "1. The following attributes are used to search for a user to be authenticated"`
+    $ECHO `$gettext "We recommend to create index(es) for them."`
+    $ECHO
+    verify_index "$list_am_search_attributes"
+    $ECHO
+    $ECHO `$gettext "2. Verify OpenSSO indexes"`
+    $ECHO
+    verify_index "$list_am_default_index"
+    $ECHO
+
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+         return
+    fi
+    if [ "$list_attributes_not_index" = "" ]; then
+        $ECHO `$gettext "All indexes exist.  No index is created."`
+    else
+        $ECHO `$gettext "Creating index(es) for the following attributes "` "$list_attributes_not_index..."
+        for attr_item in $list_attributes_not_index; do
+           $ECHO `$gettext "Create index for attribute "` "$attr_item"
+           createIndex $attr_item
+           if [ $? -eq 0 ]; then
+              $ECHO `$gettext "Done."`
+           else
+              $ECHO `$gettext "ERROR: Problem creating index for attribute "` "$attr_name"
+           fi
+           $ECHO
+        done
+    fi
+
+}
+
+tuneFuture() {
+    $ECHO $LINE_SEP
+    $ECHO
+    $ECHO `$gettext "Further DS tuning recommendations:"`
+    $ECHO `$gettext "You will find detailed description of these parameters in Directory Server"`
+    $ECHO `$gettext "Performance Tuning Guide."`
+    $ECHO "1. " `$gettext "Tune the following for "` "dn: db_dn"
+    $ECHO       `$gettext "a."` "nsslapd-sizelimit"
+    $ECHO       `$gettext "b."` "nsslapd-timelimit"
+    $ECHO       `$gettext "c."` "nsslapd-lookthroughlimit"
+    $ECHO       `$gettext "d."` "nslapd-require-index"
+    $ECHO
+    $ECHO "2. " `$gettext "Tune the following for "` "dn: cn=config,cn=ldbm database,cn=plugins,cn=config"
+    $ECHO       `$gettext "a."` "nsslapd-db-transaction-batch-val"
+    $ECHO       `$gettext "b."` "nsslapd-db-logbuf-size"
+    $ECHO
+    $ECHO "3. " `$gettext "Tune the following for "` "dn: cn=referential integrity postoperation,cn=plugins,cn=config" 
+    $ECHO       `$gettext "a."` "nsslapd-pluginarg0"
+    $ECHO
+    $ECHO `$gettext "4. Consider splitting the various components of the server onto different filesystems."`
+    $ECHO `$gettext "   The database, transaction logs and logs(access, error) generates a significant I/O activity."`
+    $ECHO `$gettext "      Isolating these different physical disks will help."`
+    $ECHO
+    $ECHO `$gettext "5. ACI tuning:"`
+    $ECHO `$gettext "   AM uses Proxy User (puser/dsame user) to perform its searches."`
+    $ECHO `$gettext "   If you are benchmarking DS, make sure you run your search benchmarks"` 
+    $ECHO `$gettext "   using puser as opposed to Directory Manager. Directory Manager is a super user"` 
+    $ECHO `$gettext "   and no ACIs are evaluated."`
+    $ECHO `$gettext "   Also, some ACIs generated by AM are not optimal. Typically, ACIs containing "`
+    $ECHO `$gettext "   wildcards (* for instance) in the target field of the ACIs are potential tunables."`
+    $ECHO
+    $ECHO `$gettext "6. If you are not using Delegated Admin features of AM, please remove unused Roles from AM console."`
+    $ECHO `$gettext "   Roles might have ACIs associated with it and may impact performance."`
+    $ECHO
+}
+
+backUpDS() {
+
+    DB_BACKUP_SUCCESS_FILE=$DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR/SUCCESS.donotdelete
+
+    if [ -f "$DB_BACKUP_SUCCESS_FILE" ]; then
+        return
+    fi
+
+    # Make sure that the bak directory exists.
+    # if not, db2bak will fail badly. db2bak does not create more than one level directory structure
+    # we assume that there is a bak directory under DS_INSTANCE_DIR. Its there under default install
+
+    if [ ! -d $DS_INSTANCE_DIR/bak ]; then
+        $MKDIR $DS_INSTANCE_DIR/bak
+    fi
+
+    if [ $isDS5OrOlderVersion -eq 1 ]; then
+       $DB2BAK $DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR
+    else
+       $DB2BAK $DS_INSTANCE_DIR $DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR
+    fi
+    #Check for the status for return code from db2bak. If its not 0, then there was a problem
+    #backing up the db. In this case, should not proceed with changes
+    
+    return_status=$?
+    if [ "$return_status" != "0" ]; then
+        return $return_status
+    fi
+
+    $CP $DS_INSTANCE_DIR/config/dse.ldif $DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR
+
+    $TOUCH $DB_BACKUP_SUCCESS_FILE
+
+    return $?
+}
+
+getUsage() {
+    $ECHO `$gettext "Mandatory Parameter for "` "amtune-directory:"
+    $ECHO `$gettext "1. Directory Manager"` "($DIRMGR_UID) Password"
+    $ECHO
+    $ECHO `$gettext "Sample Command Line:"`
+    $ECHO "amtune-directory <dirmanager_password_file>" `$gettext "i.e. sample password file is "` "amtune-samplepasswordfile"
+    $ECHO `$gettext "or"`
+    $ECHO "amtune-directory <dirmanager_password>"
+    $ECHO 
+}
+#############################################################################
+# Start of main program
+#############################################################################
+SCRIPT_LOCATION=`/usr/bin/dirname $0`
+SCRIPT_BASENAME=`/bin/basename $0`
+SCRIPT_ARG=$1
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-directory-template
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+INSTALL_FILE_NOT_REQUIRED=true
+. $SCRIPT_LOCATION/amtune-utils
+
+
+#---------------------------------------------------------------------------
+# PLEASE DO NOT MODIFY ANYTHING IN THIS FILE except for
+# the customizable parameters
+#   
+# You can customize the following parameters:
+#   1. AMTUNE_MODE: (REVIEW/CHANGE)
+#   2. AMTUNE_LOG_LEVEL: (NONE, TERM, or FILE (default)) This value is set to not display
+#                        the output, display on the terminal, or display on both terminal and 
+#                        output file.   
+#   3. AMTUNE_DEBUG_FILE_PREFIX: (any valid filename prefix) This will be suffixed with 
+#                                timestamp and pid.
+#                                A log of all recommendations/changes with be placed in the file
+#   4. DB_BACKUP_DIR_PREFIX: (any valid filename prefix) This will be suffixed with 
+#                            timestamp and pid.
+#                            The directory server instance database will be backed up before
+#                            amtune-directory changes anything. Also, a copy of dse.ldif
+#                            will be placed in the same location. 
+#                            The actual DB backup directory name can be obtained from the 
+#                            debug file.
+#                            Note that db2bak does not copy over dse.ldif file.
+#   5. DS_HOST: Sun Directory Server hostname including domain name, where AM (FAM) server data are stored.
+#   6. DS_PORT: Sun Directory Server instance port number where AM (FAM) server data are stored.
+#   7. ROOT_SUFFIX: Root suffix for AM (FAM) server configuration or user data
+#   8. DIRMGR_UID: Sun Directory Server manager ID: the default value is "cn=Directory Manager".
+#   9. RAM_DISK: this parameter should not be modified.  It is where DS transaction log files get
+#                stored for faster access since /tmp is memory-mapped, following Sun DS Performance 
+#                Tuning Guide's recommendation.
+#   10. DS_INSTANCE: Directory Server instance location where AM (FAM) server data are installed.
+#   11. DS_VERSION: Sun Directory Server version number.
+#   12. ENABLE_MODE: Whether "realm" mode available since AM 7.0 is enabled or not.  The valid values
+#                    are "enabled" or "disabled".  For removing the unnecessary ACI's, this should  
+#                    be enabled.
+#   13. NM_SUFFIX: This parameter's value should be the same as that of ROTT_SUFFIX: This one is used
+#                  only for removing the unnecessary ACI's for performance gain.
+#   14. ORG_OBJECT_CLASS: The object class for the organization.  This one is used only for removing 
+#                         the unnecessary ACI's for performance enhancement.
+#
+# If you cannot start DS after running amtune in CHANGE mode, you will need to do the following
+# to get back to the original state.
+#   a. Stop Directory Server
+#   b. Copy over dse.ldif from the backup directory to the config directory
+#   c. Run bak2db <backup directory name> for DS 5.2 or dsadm backup for DS 6.0 and later.
+#   
+#---------------------------------------------------------------------------
+# Please take extra care before running Directory tuning in change mode. 
+# Backup all DB files, schemas, configs before running this utility in CHANGE mode
+# Its not recommended to use this utility to tune large databases
+#---------------------------------------------------------------------------
+AMTUNE_MODE="REVIEW"
+AMTUNE_LOG_LEVEL="FILE"
+AMTUNE_DEBUG_FILE_PREFIX=amtune
+DB_BACKUP_DIR_PREFIX=amtune
+#---------------------------------------------------------------------------
+DS_HOST='hostname.domainname'
+DS_PORT='389'
+ROOT_SUFFIX=''
+DIRMGR_UID='cn=Directory Manager'
+RAM_DISK='/tmp'
+DS_INSTANCE_DIR=''
+DS_VERSION='6.2'
+ENABLE_MODE='enabled'
+NM_SUFFIX=''
+ORG_OBJECT_CLASS='sunismanagedorganization'
+
+if [ "$DS_HOST" = "" ] || [ "$DS_PORT" = "" ] || 
+        [ "$ROOT_SUFFIX" = "" ] || [ "$DIRMGR_UID" = "" ] || 
+        [ "$RAM_DISK" = "" ] || [ "$DS_INSTANCE_DIR" = "" ]; then
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+if [ `$ECHO $DS_VERSION | $CUT -c1` -le 5 ]; then
+      isDS5OrOlderVersion=1
+else
+      isDS5OrOlderVersion=0
+fi
+#-------------------------------------------------------------------------------
+#Parameter Validation
+#-------------------------------------------------------------------------------
+if [ $# -lt 1 ] || [ "$SCRIPT_ARG" = "?" ] || [ "$SCRIPT_ARG" = "help" ]; then
+    getUsage
+    exit 
+fi
+
+$ECHO "Checking the argument a valid password file..."
+if [ -f "$SCRIPT_ARG"  ]; then
+   DIRMGR_PASSWORD=`$GREP "DS_ADMIN_PASSWORD" $SCRIPT_ARG | $CUT -f2 -d"="`
+   password_option="file"
+else
+   DIRMGR_PASSWORD=$SCRIPT_ARG
+   password_option="string"
+fi
+
+$ECHO "########################################"
+$ECHO "Password option is $password_option"
+$ECHO "########################################"
+
+if [ "$DIRMGR_PASSWORD" = "" ]; then
+   $ECHO "ERROR: Directory Server password not found.  Cannot proceed."
+   exit 1
+fi
+
+DSADMIN_PASSFILE=/tmp/dspassfile
+$ECHO $DIRMGR_PASSWORD > $DSADMIN_PASSFILE
+chmod 400 $DSADMIN_PASSFILE
+
+LDAP_WORKER_THREADS=24
+if  [ $isDS5OrOlderVersion -eq 1 ]; then
+  # This ldap commands is for DS 5.2.  For DS 6.0+, use the one defined in amtune-utils
+  LDAPSEARCH=$DS_INSTANCE_DIR/../shared/bin/ldapsearch
+  LDAPMODIFY=$DS_INSTANCE_DIR/../shared/bin/ldapmodify
+  DB2BAK=$DS_INSTANCE_DIR/db2bak
+  DB2INDEX=$DS_INSTANCE_DIR/db2index.pl
+  LD_LIBRARY_PATH=$DS_INSTANCE_DIR/../lib:$LD_LIBRARY_PATH
+  # hpux-dev : Added for HP-UX
+  SHLIB_PATH=$DS_INSTANCE_DIR/../lib:$SHLIB_PATH
+else
+  # Command to start, stop, and back up Directory Server 6 or later
+  check_ldap_packages
+  DSADMIN=$LDAP_DIR/ds6/bin/dsadm
+  DSCFG=$LDAP_DIR/ds6/bin/dsconf
+  DB2BAK="$DSADMIN backup"
+  LD_LIBRARY_PATH=$LDAP_DIR/lib:$LD_LIBRARY_PATH
+  # hpux-dev : Added for HP-UX
+  SHLIB_PATH=$LDAP_DIR/lib:$SHLIB_PATH
+fi
+
+CUR_DATE=`$DATE +'%Y%m%d'`
+
+cur_number_worker_threads=`getNumberOfWorkerThreads`
+cur_access_log_status=`getAccessLogStatus`
+cur_db_cache_size=`getDBCacheSize`
+db_suffix=`getBackend`
+cur_db_home_location=`getDBHomeLocation`
+db_dir=`getDBDirectory`
+
+if [ "$cur_number_worker_threads" = "" ]; then
+    $ECHO `$gettext "Failed to obtain directory configuration: "` `$gettext "Number of Worker Threads"`
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed"`
+    exit
+fi
+
+if [ "$cur_access_log_status" = "" ]; then
+    $ECHO `$gettext "Failed to obtain directory configuration: "` `$gettext "Access Log Status"`
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+if [ "$cur_db_cache_size" = "" ]; then
+    $ECHO `$gettext "Failed to obtain directory configuration: "` `$gettext "DB Cache Size"`
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+if [ "$db_suffix" = "" ]; then
+    $ECHO `$gettext "Failed to obtain directory configuration: "` `$gettext "Backend for the DB"`
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+if [ "$cur_db_home_location" = "" ]; then
+    $ECHO `$gettext "Failed to obtain directory configuration: "` `$gettext "DB Home Location"`
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+if [ "$db_dir" = "" ]; then
+    $ECHO `$gettext "Failed to obtain directory configuration: "` `$gettext "DB Directory"`
+    $ECHO `$gettext "Invalid configuration. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+SCRIPT_BASENAME="$SCRIPT_LOCATION/$SCRIPT_BASENAME : `$DATE +'%D %T'`"
+
+if [ `$ECHO $AMTUNE_MODE | $GREP -i "CHANGE" | wc -l` -eq 1 ]; then
+    AMTUNE_MODE="CHANGE"
+else
+    AMTUNE_MODE="REVIEW"
+fi
+
+if [ "$AMTUNE_DEBUG_FILE_PREFIX" = "" ]; then
+    AMTUNE_DEBUG_FILE_PREFIX=amtune
+fi
+
+debug_dir=$SCRIPT_LOCATION
+setLogOutput $debug_dir
+
+if [ "$DB_BACKUP_DIR_PREFIX" = "" ]; then
+    DB_BACKUP_DIR_PREFIX=amtune
+fi
+DB_BACKUP_DIR=$DB_BACKUP_DIR_PREFIX-$CUR_DATE-$$
+
+ECHO_MSG $CHAPTER_SEP 
+ECHO_MSG "$SCRIPT_BASENAME"
+ECHO_MSG $CHAPTER_SEP 
+ECHO_MSG "`$gettext 'Initializing...'`"
+
+ECHO_MSG $LINE_SEP
+
+# check system env
+ECHO_MSG "`$gettext 'Checking System Environment...'`"
+check_env 
+
+# check for root
+ECHO_MSG "`$gettext 'Checking User...'`"
+check_root_user 
+
+# Print mode and components to tune
+ECHO_MSG $LINE_SEP 
+ECHO_MSG "amtune-directory `$gettext 'information...'`"
+ECHO_MSG $LINE_SEP
+ECHO_MSG "amtune Mode      : $AMTUNE_MODE"
+
+ECHO_MSG $LINE_SEP 
+ECHO_MSG "`$gettext 'Detecting System Environment...'`"
+ECHO_MSG $LINE_SEP
+
+numCPUS=`getNumberOfCPUS`
+ECHO_MSG "`$gettext 'Number of CPUs in the system:'`" $numCPUS
+if [ "$numCPUS" = "" ]; then 
+    $ECHO `$gettext "Unable to obtain available CPUs. "` `$gettext "Cannot proceed."`
+    exit;
+fi
+
+memAvail=`getSystemMemory`
+if [ "$memAvail" = "" ]; then 
+    $ECHO `$gettext "Unable to obtain available memory. "` `$gettext "Cannot proceed."`
+    exit
+fi
+memAvail=`$ECHO "
+scale=0
+$memAvail * 1024 * 1024
+" | $BC`
+if [ "$memAvail" = "" ]; then 
+    $ECHO `$gettext "Unable to obtain available memory. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+ECHO_MSG "`$gettext 'Calculating memory needs for DS Caching...'`"
+
+db_dirs=`availableDBDirs`
+if [ "$db_dirs" = "" ]; then
+    $ECHO `$gettext "Error locating DB directories. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+new_db_cache_size=`calculateDBCacheSize`
+
+if [ "$new_db_cache_size" = "" ]; then
+    $ECHO `$gettext "Cannot compute recommended DB Cache Size. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+total_new_db_entry_cache_size=0
+
+for item in $db_suffix; do
+   new_db_entry_cache_size=`suggestDBEntryCacheSizebyBackend $item`
+   if [ "$new_db_entry_cache_size" = "" ]; then
+       $ECHO `$gettext "Cannot compute recommended DB Cache Size for "` "$item. " `$gettext "Cannot proceed."`
+       exit
+   fi
+   total_new_db_entry_cache_size=`$ECHO "scale=0;$total_new_db_entry_cache_size + $new_db_entry_cache_size" | $BC`
+done
+
+memNeeded=` $ECHO "
+scale=0
+$new_db_cache_size + $total_new_db_entry_cache_size
+" | $BC `
+
+if [ "$memNeeded" = "" ]; then 
+    $ECHO `$gettext "Unable to compute memory requirements. "` `$gettext "Cannot proceed."`
+    exit;
+fi
+
+ECHO_MSG "`$gettext 'Memory Available (bytes)             : '`" $memAvail 
+ECHO_MSG "`$gettext 'Memory Needed for DS Caching (bytes) : '`" $memNeeded
+
+memEnough=` $ECHO "
+scale=0
+if ( $memNeeded <= $memAvail ) {
+1
+}
+" | $BC`
+
+if [ "$memEnough" = "1" ]; then
+    ECHO_MSG "`$gettext 'There is enough memory.'`"
+else
+    $ECHO `$gettext "There is not enough memory."`
+    exit
+fi
+
+new_db_home_location="$RAM_DISK/`$BASENAME $DS_INSTANCE_DIR`"
+if [ "$new_db_home_location" = "" ]; then
+    $ECHO `$gettext "Cannot compute new DB Home. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+new_number_worker_threads=$LDAP_WORKER_THREADS
+if [ "$new_number_worker_threads" = "" ]; then
+    $ECHO `$gettext "Cannot compute optimum number of DS worker threads. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+# Check for DS password file before tuning DS
+if [ ! -f  "$DSADMIN_PASSFILE" ]; then
+   $ECHO `$gettext "ERROR: Directory Server password file not found. "` `$gettext "Cannot proceed."`
+   exit 1
+fi
+
+ECHO_MSG $PARA_SEP
+ECHO_MSG "`$gettext 'OpenSSO - Directory Server Tuning Script'`"
+
+#determine physical memory limitations
+#determine application size (32-bits, 64-bits)
+
+tuneUsingLdapModify     | eval $OUTPUT_TYPE
+tuneUsingDSE            | eval $OUTPUT_TYPE
+tuneDSIndex             | eval $OUTPUT_TYPE
+tuneFuture              | eval $OUTPUT_TYPE
+
+$RM $DSADMIN_PASSFILE
+
+ECHO_MSG $PARA_SEP

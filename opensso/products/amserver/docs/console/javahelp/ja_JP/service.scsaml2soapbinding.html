@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 SOAP バインド - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>SAMLv2 SOAP バインド</h4>
+<p>SAMLv2 SOAP バインドサービスは、OpenSSO クライアントと OpenSSO サーバーとの間で SAMLv2 の要求および応答メッセージを SOAP ベースで交換できるようにします。受信された要求は、要求ハンドラに委譲され、さらに処理されます。要求ハンドラとメタエイリアスに対するキーは、SOAP バインドサービス URL
+にあります。メタエイリアスと要求ハンドラのマッピングは、SAMLv2 SOAP バインドサービスに格納され、OpenSSO の設定ストアから読み取ることができます。 </p>
+
+<a name="ggokv"></a><h5>要求ハンドラリスト</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>要求ハンドラリストは、メタエイリアスから要求ハンドラ実装へのマッピングを含むキーと値のペアのエントリのリストです。OpenSSO 8.0 サーバーがポリシー決定ポイント (PDP) として機能するように設定されている場合は、この属性を設定する必要があります。 </p><p>「<i>キー</i>」はポリシー決定ポイントのメタエイリアスで、「<i>クラス</i>」は XACML 要求を処理できる要求ハンドラインタフェースの実装を表す Java クラス名です。  </p><p>たとえば、XACML ポリシー決定ポイントが <tt>/pdp</tt> で、インタフェースの実装が <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt> である場合は、キーを <tt>/pdp</tt> に設定し、クラスを <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt> に設定するようにしてください。 </p>
+<br/>
+
+</body>
+</html>

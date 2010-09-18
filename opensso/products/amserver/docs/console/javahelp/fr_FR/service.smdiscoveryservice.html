@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service de d&#233;couverte - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>Service de d&#233;couverte</h3>
+<a name="indexterm-119"></a><p>L'&#233;tape initiale pour acc&#233;der aux donn&#233;es d'identit&#233; consiste &#224; d&#233;terminer l'emplacement de
+ces informations (par exemple, le service d'identit&#233; contenant les informations de carte
+bancaire de Principal ou le serveur stockant le service de calendrier de
+Principal). G&#233;n&#233;ralement, il existe sur un r&#233;seau un ou plusieurs services qui
+permettent &#224; d'autres entit&#233;s d'effectuer une action sur les donn&#233;es d'identit&#233;. Les
+clients n'&#233;tant pas suppos&#233; effectuer le suivi de ces services ni conna&#238;tre
+les services de confiance, ils n&#233;cessitent un service de d&#233;couverte. Un <b>service de d&#233;couverte</b>
+est essentiellement une interface de service Web servant &#224; la d&#233;tection des
+ressources. Une <b>ressource de d&#233;couverte</b> est un registre d'offres de ressource. Une <b>offre de ressource</b> d&#233;finit
+une association entre un &#233;l&#233;ment de donn&#233;e d'identit&#233; et l'instance de service
+qui lui permet d'acc&#233;der &#224; cette donn&#233;e. Un <b>identificateur de ressource</b> est un identificateur
+de ressource unique (URI, unique resource identifier) enregistr&#233; aupr&#232;s du service de
+d&#233;couverte qui pointe vers une ressource de d&#233;couverte particuli&#232;re. Lorsqu'un client envoie
+une demande concernant un certain type de donn&#233;es, il inclut un identificateur
+de ressource que le Service de d&#233;couverte d'OpenSSO utilise pour localiser le
+fournisseur de services Web pour les attributs demand&#233;s. Le Service de d&#233;couverte
+renvoie une offre de ressource qui contient les informations n&#233;cessaires &#224; la
+localisation des donn&#233;es.</p>
+<hr><p><b>Remarque &#8211; </b>Pour pouvoir y acc&#233;der, le fournisseur h&#233;bergeant Service de profil personnel Liberty
+doit &#234;tre enregistr&#233; aupr&#232;s de Service de d&#233;couverte pour chaque identit&#233; principale.</p>
+<hr>
+<p>Les attributs g&#233;n&#233;raux suivants du Service de d&#233;couverte peuvent &#234;tre configur&#233;s pour
+votre impl&#233;mentation.</p>
+<ul><li><p><a href="dsproviderid.html">ID fournisseur</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">M&#233;canismes d'authentification pris en charge</a></p></li>
+<li><p><a href="supporteddirectives.html">Directives prises en charge</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">&#201;valuation de strat&#233;gie pour la recherche de d&#233;couverte</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">&#201;valuation de strat&#233;gie pour la mise &#224; jour de d&#233;couverte</a></p></li>
+<li><p><a href="authorizerpluginclass.html">Classe de plug-in du module d'autorisation</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">Classe de plug-in du gestionnaire d'entr&#233;es</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">Classes de plug-in de mappage d'ID de ressource </a></p></li>
+<li><p><a href="authresponsemessage.html">Authentifier le message de r&#233;ponse</a></p></li>
+<li><p><a href="generatesessioncontext.html">Instructions comportant la session pour l'amor&#231;age</a></p></li>
+<li><p><a href="encryptnameidentifier.html">Cryptez l'identificateur de nom dans le contexte de session pour l'amor&#231;age.</a></p></li>
+<li><p><a href="useimpliedresource.html">Ressource impliqu&#233;e</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">Offres de ressources pour l'amor&#231;age</a></p></li></ul>
+<p>Les t&#226;che suivantes sont associ&#233;es &#224; la configuration du Service de d&#233;couverte
+:</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">Configuration d'une offre de ressource pour l'amor&#231;age</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">Configuration d'une description de service</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

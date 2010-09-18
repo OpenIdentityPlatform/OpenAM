@@ -1,0 +1,61 @@
+<script type="text/javascript">
+    YAHOO.namespace("sun.container");
+    YAHOO.util.Event.onDOMReady( init );
+    var DOM = YAHOO.util.Dom;
+
+    function init(){
+        loadRealms();
+    }
+
+    function loadRealms(){
+        AjaxUtils.call("$context/config/authc/realmList.htm", paintRealmsCombo);
+    }
+
+    function paintRealmsCombo(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        var combo = DOM.get("realms");
+        var length = combo.options.length;
+
+        for (var i = 0; i < length; i++) {
+            combo.remove(0);
+        }
+
+        var option = document.createElement('OPTION');
+        for (var i = 0; i < response.records.length; i++) {
+            option = document.createElement('OPTION');
+            option.value = response.records[i].realmName;
+            option.text = response.records[i].realmName;
+            combo.options.add(option, combo.options.length);
+        }
+
+    }
+
+    var CreateCircle = new Object();
+    CreateCircle.onCancel = function(){}
+    CreateCircle.onSave = function(){}
+
+    function cancel(){
+       CreateCircle.onCancel();
+    }
+
+    function save(){
+        var circleName = DOM.get('circleName').value;
+        var realmName = DOM.get('realms').value;
+        if (circleName != null && realmName != null && circleName != '' && realmName != ''){
+            var postData = AjaxUtils.serializeForm("circleForm");
+            AjaxUtils.doPost(null, "$context$path", postData, CreateCircle.onSave);
+        }
+    }
+
+</script>
+<form id="circleForm" name="circleForm">
+<div id="newCircleBody" style="width:220px">
+    <p align="left"><b>Name the circle of trust:</b><br />
+    <input id="circleName" name="circleName" style="width:200px"/></p>
+    <p align="left"><b>Select the circle of trust's realm:</b><br />
+    <select id="realms" name="realmName" size="3" style="width:200px"></select>
+    </p>
+    <p align="right" style="color:#000066"><a class="pointer" onclick="cancel()">Cancel</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a class="pointer" onclick="save()">Save</a></p>
+</div>
+</form>

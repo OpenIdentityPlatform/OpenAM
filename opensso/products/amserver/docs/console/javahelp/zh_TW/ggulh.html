@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>聯合 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggulh"></a><h4>聯合</h4>
+<p><a name="indexterm-172"></a>驗證單次登入協定訊息之後，服務提供者會使用聯合認證模組來建立使用者階段作業。此認證模組是由 SAML、SAMLv2、ID-FF 和 WS-Federation 協定所使用。</p>
+
+<a name="ggujq"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

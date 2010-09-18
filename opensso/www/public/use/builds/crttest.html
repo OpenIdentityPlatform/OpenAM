@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+        <META HTTP-EQUIV="Expires" CONTENT="-1">
+        <title>OpenSSO CRT</title>
+        <script src="https://opensso.dev.java.net/public/use/builds/crttest.js" type="text/javascript"></script> 
+    </head> 
+    <body bgcolor="#ffffff" text="#000000"> 
+        <table cellpadding="2" width="100%"> 
+            <tbody>
+              <tr> 
+                <td align="center" valign="top" width="99%"> <h2>OpenSSO Change/Patch Request Template (v1.1)</h2> </td> 
+              </tr> 
+            </tbody>
+        </table> 
+        <hr color="#cccccc" noshade="noshade" size="1">
+      <div id="crtform" style="display:inline">
+        <form name="CRT" id="CRT" onSubmit="aggSubmit();return false;" >
+          <div class="secHdrTxt"><b>General</b></div> <br>  
+          <table> 
+            <tbody> 
+              <tr> 
+                <td valign="top"><font color="red">*</font></td><td>Submitter :</td> 
+                  <td><input size="17" name="submitter" type="text" valuel="CRTsubmitter" value=""></td> 
+              </tr> 
+              <tr> 
+                <td valign="top"><font color="red">*</font></td>
+                <td>Issue number:</td> 
+                <td><input size="17" name="id" type="text" valuel="CRTid" value="">&nbsp;<a href="#" onClick="isValidIssueId(getElementById('CRT').id.value, true)">Check</a></td> 
+              </tr> 
+              <tr> 
+                <td valign="top"><font color="red">*</font></td> <td colspan="2" valign="top">Short description of the problem :</td> 
+              </tr> 
+              <tr> 
+                <td>&nbsp;</td> 
+                <td colspan="2"><textarea name="descr" cols="80" rows="5" CRTdescr></textarea></td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top; font-weight: bold;"><font color="red">*</font></td>
+                <td style="vertical-align: top;" colspan="2">Solution:<br></td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top;"><br></td>
+                <td style="vertical-align: top;" colspan="2"><textarea name="solution" cols="80" rows="5" CRTsolution></textarea> <br></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <tbody>
+              <tr>
+                <td style="vertical-align: top;"><span style="color: rgb(255, 0, 0); font-weight: bold;">*</span><br></td><td style="vertical-align: top;" colspan="2">Select all areas that have been changed or will be affected:<br></td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top;"><br></td>
+                <td style="vertical-align: top;" colspan="1"><input name="changeadminconsole" type="checkbox" CRTchangeadminconsole> Admin Console<br></td>
+                <td style="vertical-align: top;"><input name="changecli" type="checkbox" CRTchangecli> CLI<br></td>
+                <td style="vertical-align: top;"><input name="changepolicy" type="checkbox" CRTchangepolicy> Policy<br></td>
+                <td style="vertical-align: top;"><input name="changeidrepo" type="checkbox" CRTchangeidrepo> ID Repo<br></td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top;"><br></td>
+                <td style="vertical-align: top;"><input name="changeauthn" type="checkbox" CRTchangeauthn> Authentication<br></td>
+                <td style="vertical-align: top;"><input name="changefed" type="checkbox" CRTchangefed> Federation<br></td>
+                <td style="vertical-align: top;"><input name="changewebservices" type="checkbox" CRTchangewebservices> Web Services<br></td>
+                <td style="vertical-align: top;"><input name="changesession" type="checkbox" CRTchangesession> Session<br></td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top;"><br></td>
+                <td style="vertical-align: top;"><input name="changemigration" type="checkbox" CRTchangemigration> Migration<br></td>
+                <td style="vertical-align: top;"><input name="changeupgrade" type="checkbox" CRTchangeupgrade> Upgrade<br></td>
+                <td style="vertical-align: top;"><input name="changelogging" type="checkbox" CRTchangelogging> Logging<br></td>
+                <td style="vertical-align: top;"><input name="changeinstall" type="checkbox" CRTchangeinstall> Installation<br></td>
+              </tr>
+              <tr> 
+                <td style="vertical-align: top;"><br> </td>
+                <td style="vertical-align: top;"><input name="changej2eeagent" type="checkbox" CRTchangej2eeagent> J2EE Agent<br> </td>
+                <td style="vertical-align: top;"><input name="changewebagent" type="checkbox" CRTchangewebagent> Web Agent<br> </td>
+                <td style="vertical-align: top;"><input name="changewebservicessecurityagents" type="checkbox" CRTwebservicessecurityagents> Web Services Security Agents<br> </td>
+                <td style="vertical-align: top;"><input name="changeqa" type="checkbox" CRTchangeqa> QA Automation<br> </td>
+              </tr> 
+              <tr> 
+                <td style="vertical-align: top;"><br> </td>
+                <td style="vertical-align: top;"><input name="changesamples" type="checkbox" CRTchangesamples> Samples<br> </td>
+              </tr> 
+            </tbody>
+        </table>  
+        <p></p><hr color="#cccccc" noshade="noshade" size="1"> 
+        <div class="secHdrTxt"><b>Documentation</b></div>
+        <br> Any changes involving the user interface (command line or browser), programmatic interfaces, configuration files, or new components will typically require some documentation changes. <br> <br> Documentation update instructions:<br> 
+        <div style="margin-left: 40px;">1) Select the appropriate Wiki to add your documentation update.<br> 2) Place the anchor tag to your update in the text field. <br> 3) Select the View link to verify your tag is correct.<br> <br>  </div> 
+        <table>
+            <tbody>
+              <tr>
+                <td valign="top"><font color="red">*</font></td>
+                <td>User documentation :<br>(Please provide <a href="javascript:popUpWindow('http://wiki.java.net/bin/view/Projects/CommunityDocumentation')">Wiki</a> pointer)</td>
+                <td><input name="userdocs" type="text" size="50" valuel="CRTuserdocs" value="">&nbsp;<a href="javascript:popUpWindow(document.getElementById('CRT').userdocs.value)">View</a> </td>
+              </tr> 
+              <tr>
+                <td valign="top"><font color="red">*</font></td>
+                <td>Diagnostics/Troubleshooting documentation :<br>(Please provide <a href="javascript:popUpWindow('http://wiki.java.net/bin/view/Projects/TroubleshootingDebugging')">Wiki</a> pointer)</td>
+                <td><input name="tddocs" type="text" valuel="CRTtddocs" value="" size="50"> &nbsp;<a href="javascript:popUpWindow(document.getElementById('CRT').tddocs.value)">View</a> </td>
+              </tr>
+              <tr>
+                <td valign="top"><font color="red"></font></td>
+                <td>Online Help Changes :<br>(Please provide <a href="javascript:popUpWindow('http://wiki.java.net/bin/view/Projects/OnlineHelp')">Wiki</a> pointer)</td>
+                <td><input name="online" type="text" valuel="CRTonline" value="" size="50"> &nbsp;<a href="javascript:popUpWindow(document.getElementById('CRT').online.value)">View</a> </td>
+              </tr>
+            </tbody>
+        </table>
+        <blockquote> <font size="-1"> ** Diagnostic and troubleshooting documentation should include detection of misconfigurations and tips on correcting them.<br> <br> </font> </blockquote> <p> </p><hr color="#cccccc" noshade="noshade" size="1">
+        <div class="secHdrTxt"><b>Migration/Upgrading</b></div> <br> 
+        <table>
+            <tbody>
+              <tr>
+                <td align="top"><font color="red"></font></td>
+                <td> If this change affects migration/upgrading from previous release <font color="#6666cc"><a href="javascript:popUpWindow('https://opensso.dev.java.net/public/use/builds/migration_help.html')"> <i>(more information...)</i> </a></font>, please describe : <br><textarea name="desc_migration_updating" cols="80" rows="5" CRTdesc_migration_updating></textarea> </td>
+              </tr>
+            </tbody>
+        </table>  
+        <p> </p><hr color="#cccccc" noshade="noshade" size="1"> 
+        <div class="secHdrTxt"><b>Installer</b></div> <br> 
+        <table>
+            <tbody>
+              <tr>
+                <td align="top"><font color="red"></font></td>
+                <td>  If this change affects the installer <font color="#6666cc"><a href="javascript:popUpWindow('https://opensso.dev.java.net/public/use/builds/installer_help.html')"> <i>(more information...)</i> </a></font>, please describe : <br><textarea name="desc_installer_change" cols="80" rows="5" CRTdesc_installer_change></textarea> </td>
+              </tr>
+            </tbody>
+        </table> 
+        <p> </p><hr color="#cccccc" noshade="noshade" size="1">
+        <div class="secHdrTxt"><b>Test/Quality</b></div> <br> 
+        <table>
+            <tbody>
+              <tr>
+                <td>&nbsp;</td>
+                <td> Please make sure (i) Component packaging is tested (ii) Unit Tests are developed.</td>
+              </tr>
+              <tr>
+                <td align="top"><font color="red">*</font></td>
+                <td valign="top">Location of the unit test files : <br><textarea name="unittestloc" cols="80" rows="5" CRTunittestloc></textarea></td>
+              </tr>
+              <tr>
+                <td colspan="3">&nbsp;</td>
+              </tr>
+              <tr>
+                <td><font color="red">*</font></td>
+                <td colspan="2" valign="top">Description of testing performed.</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td colspan="2"><textarea name="testing" cols="80" rows="5" CRTtesting></textarea></td>
+              </tr>
+              <tr>
+                <td><font color="red">*</font></td>
+                <td>SQE Approver(s):&nbsp;<input size="30" name="qareviewer" type="text" valuel="CRTqareviewer" value=""> <a href="https://opensso.dev.java.net/nonav/servlets/AssignableUsers" onclick="return launch(this.href, 3, false, document.getElementById('CRT').qareviewer)">Lookup users</a> </td>
+              </tr>
+            </tbody>
+        </table>
+        <p> </p><hr color="#cccccc" noshade="noshade" size="1">
+        <div class="secHdrTxt"><b>Review/Diffs</b></div> <br>  
+        <table>
+            <tbody>
+              <tr>
+                <td align="top"><font color="red">*</font></td>
+                <td><a href="javascript:popUpWindow('https://opensso.dev.java.net/public/improve/codingguidelines/paper.html')">Coding standards</a> must be followed. </td>
+              </tr>
+            </tbody>
+        </table>  
+        <table>
+            <tbody>
+              <tr>
+                <td align="top"><font color="red">*</font></td>
+                <td>  All reviewer comments are expected to be completed/addressed. </td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td> If not, why. <br><textarea name="desc_comments_addressed" cols="80" rows="5" CRTdesc_comments_addressed></textarea> </td>
+              </tr>
+            </tbody>
+        </table>  
+        <table>
+            <tbody>
+              <tr>
+                <td><font color="red">*</font></td>
+                <td> Listing of the files created/deleted/updated. <i>(use 'cvs stat')</i> </td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td><textarea name="files" cols="80" rows="10" CRTfiles></textarea></td> </tr>
+            </tbody>
+        </table>   
+        <p> 
+        <table>
+            <tbody>
+              <tr>
+                <td><font color="red">*</font></td>
+                <td>Change Reviewer(s):&nbsp;<input size="30" name="codereviewer" type="text" valuel="CRTcodereviewer" value=""> <a href="https://opensso.dev.java.net/nonav/servlets/AssignableUsers" onclick="return launch(this.href, 3, false, document.getElementById('CRT').codereviewer)">Lookup users</a> </td>
+              </tr>
+              <tr>
+                <td><font color="red">*</font></td>
+                <td>Context specific diffs (or pointer to the diffs) of the added/modified/removed files</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td><textarea name="diffs" cols="80" rows="10" CRTdiffs></textarea></td>
+              </tr>
+            </tbody>
+          </table>  
+          </p><hr color="#cccccc" noshade="noshade" size="1">   
+          <table>
+            <tbody>
+              <tr>
+                <td><input name="submitC" value="Submit" type="submit" onclick="return setBtn('2');"></td>
+                <td><input name="reset" value="Reset" type="reset"></td>
+              </tr>
+            </tbody>
+          </table>  
+        </form>
+      </div>
+      <div id="crttext" style="display:none"> <p><a onClick="hideStuff('crttext');showStuff('crtform');" href="#">Form View</a>&nbsp;|&nbsp;*Text View <br><br><textarea id="crttexttb" cols=80 rows=100>CRTTEXTDATA</textarea>
+          <div id="reqstatus"></div> 
+          <hr> <div id="myspan"> </div>
+      </div>
+      <div id="reqstatus"></div> 
+      <div CRTApproveForm style="display:none">
+            <fieldset>
+              <legend>Approval</legend>
+                <form name="approve" id="approve" onSubmit="approveSubmit();return false;"><a href="https://opensso.dev.java.net/nonav/servlets/AssignableUsers" onclick="return launch(this.href, 3, false, document.getElementById('approve').userid)">UserId:</a><input name="userid" type="text">Check if Approved:<input name="approval" type="checkbox">Brief comment :<input name="comment" type="text"><input name="Submit" type="Submit" value="Submit" >
+                </form>
+             </fieldset>
+             <p><a>*Form View</a>&nbsp;|&nbsp;
+             <a onClick="showStuff('crttext');hideStuff('crtform');" href="#">Text View</a>
+      </div>
+      <div id="ff3stuff" style="display:none"> 
+          <p>You are using Firefox 3.+. Please follow the following steps:
+          <li>Copy the text below (eg SelectAll in text area ) and paste it
+          to a file - preferably <b id="ff3filename">CRT</b>
+          <li>Enter the filename (full path) in the field or use the "Browse" button to select the file and click on "Submit" next to it.
+          <br><br>
+          <textarea id="ff3stufftxt" cols=80 rows=25>FF3Stuff</textarea>
+          <br><br>
+          <form method="post" action="https://opensso.dev.java.net/issues/createattachment.cgi" enctype="multipart/form-data" id="ff3form">
+            <input type="hidden" name="id" id="ff3formid" value="46" />
+            File : <input type="file" name="data" id="ff3formfile"  size="60" />
+            <input type="hidden" name="description" size="60" id="ff3formdesc"/>
+            <input type="hidden" name="type" size="60" id="ff3formtype" value="text/html" />
+            <input type="hidden" name="othertype" size="30" />
+            <input type="submit" value="Submit" />
+          </form>
+      </div>
+      <script> getUser(true); if (userid == null || userid.length == 0 || userid == 'Login') alert("You must Login first."); else { setupUser('CRT', 'submitter'); setupUser('approve', 'userid');} </script> 
+    </body>
+</html>

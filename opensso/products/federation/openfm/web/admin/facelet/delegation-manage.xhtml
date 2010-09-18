@@ -1,0 +1,420 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: delegation-manage.xhtml,v 1.10 2009/11/19 01:06:10 farble1670 Exp $
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText
+            value="#{resources['delegation-manage.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText
+            value="#{resources['delegation-manage.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <ui:include
+            src="/admin/facelet/template/delegation-manage-view-options-popup.xhtml"/>
+        <ui:include
+            src="/admin/facelet/template/delegation-manage-remove-popup.xhtml"/>
+        <o:section>
+            <ui:define name="section-title">
+                <ice:dataPaginator
+                    for="delegationManageTable"
+                    rowsCountVar="rowsCount"
+                    displayedRowsCountVar="displayedRowsCountVar"
+                    firstRowIndexVar="firstRowIndex"
+                    lastRowIndexVar="lastRowIndex"
+                    pageCountVar="pageCount"
+                    pageIndexVar="pageIndex">
+                    <ice:outputFormat
+                        rendered="#{!delegationManageBean.limited}"
+                        value="#{resources['delegation-manage.tableTitle']}">
+                        <f:param value="#{firstRowIndex}" />
+                        <f:param value="#{lastRowIndex}" />
+                        <f:param value="#{rowsCount}" />
+                    </ice:outputFormat>
+                    <ice:outputFormat
+                        rendered="#{delegationManageBean.limited}"
+                        value="#{resources['delegation-manage.tableTitle']}">
+                        <f:param value="#{firstRowIndex}" />
+                        <f:param value="#{lastRowIndex}" />
+                        <f:param value="#{rowsCount}*" />
+                    </ice:outputFormat>
+                </ice:dataPaginator>
+            </ui:define>
+            <ui:define name="section-details">
+                <ice:outputText
+                    value="#{resources['delegation-manage.sectionDetails']}"/>
+            </ui:define>
+            <ui:define name="section-links">
+                <ice:panelGrid
+                    columns="5">
+                    <ice:commandLink
+                        actionListener="#{delegationManageHandler.removeListener}"
+                        styleClass="command-link">
+                        <ice:graphicImage
+                            value="/admin/image/remove.png"/>
+                        <ice:outputText
+                            value="#{resources['delegation-manage.remove']}"/>
+                    </ice:commandLink>
+                    <o:clink
+                        type="view-options"
+                        handler="#{delegationManageHandler}"
+                        listenerMethod="viewOptionsListener"/>
+                    <ice:panelGroup>
+                        <!-- TODO: need search attrs for backend -->
+                        <ice:graphicImage
+                            value="/admin/image/search.png"/>
+                        <ice:inputText
+                            styleClass="section-input"
+                            onkeyup="submitNow(this);"
+                            value="#{delegationManageBean.searchFilter}"/>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+            </ui:define>
+            <ui:define name="section-body">
+                <ui:include
+                    src="/admin/facelet/template/delegation-manage-filters.xhtml"/>
+                <ice:panelGroup
+                    style="padding-top: 10px"
+                    rendered="#{o:size(delegationManageBean.delegationBeans) == 0}">
+                    <ice:outputText
+                        value="#{resources['delegation-manage.noDelegations']}"/>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    rendered="#{o:size(delegationManageBean.delegationBeans) > 0}">
+                    <ice:dataTable
+                        id="delegationManageTable"
+                        var="delegationBean"
+                        rows="#{delegationManageBean.delegationManageTableBean.rows}"
+                        styleClass="policy-manage"
+                        value="#{delegationManageBean.delegationBeans}"
+                        sortColumn="#{delegationManageBean.delegationManageTableBean.sortKey.column}"
+                        sortAscending="#{delegationManageBean.delegationManageTableBean.sortKey.ascending}"
+                        resizable="true">
+
+                        <ice:column>
+                            <f:facet name="header">
+                                <ice:panelGrid
+                                    columns="2">
+                                    <ice:commandLink
+                                        actionListener="#{delegationManageHandler.selectAllListener}">
+                                        <ice:graphicImage
+                                            value="../image/select-all.png"/>
+                                    </ice:commandLink>
+                                    <ice:commandLink
+                                        actionListener="#{delegationManageHandler.selectNoneListener}">
+                                        <ice:graphicImage
+                                            value="../image/select-none.gif"/>
+                                    </ice:commandLink>
+                                </ice:panelGrid>
+                            </f:facet>
+                            <ice:selectBooleanCheckbox
+                                value="#{delegationBean.selected}">
+                            </ice:selectBooleanCheckbox>
+                        </ice:column>
+                        <ice:column>
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="name"
+                                        actionListener="#{delegationManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['delegation-manage.nameColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                rendered="#{permissionsBean.delegationEditAllowed}"
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputLink
+                                    styleClass="command-link"
+                                    value="delegation-edit.xhtml?delegationName=#{delegationBean.name}">
+                                    <ice:outputText
+                                        value="#{delegationBean.name}"/>
+                                </ice:outputLink>
+                            </ice:panelGroup>
+                            <ice:panelGroup
+                                rendered="#{!permissionsBean.delegationEditAllowed}"
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputLink
+                                    styleClass="command-link"
+                                    value="delegation-view.xhtml?delegationName=#{delegationBean.name}">
+                                    <ice:outputText
+                                        value="#{delegationBean.name}"/>
+                                </ice:outputLink>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.descriptionColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="description"
+                                        actionListener="#{delegationManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['delegation-manage.descriptionColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                panelTooltip="descriptionTooltip"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{delegationBean.description}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="descriptionTooltip"
+                                title="#{delegationeBean.name}: description">
+                                <ui:define name="body">
+                                    <ice:outputText
+                                        value="#{delegationBean.description}"/>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.modifierColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="modifier"
+                                        actionListener="#{delegationManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['delegation-manage.modifierColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{delegationBean.modifier}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.authorColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="author"
+                                        actionListener="#{delegationManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['delegation-manage.authorColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{delegationBean.author}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.modifiedColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="modified"
+                                        actionListener="#{delegationManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['delegation-manage.modifiedColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{delegationBean.modified}">
+                                    <f:convertDateTime
+                                        dateStyle="short"
+                                        timeZone="#{timeZoneBean.timeZone.ID}"
+                                        type="both" />
+                                </ice:outputText>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.birthColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="birth"
+                                        actionListener="#{delegationManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['delegation-manage.birthColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{delegationBean.birth}">
+                                    <f:convertDateTime
+                                        dateStyle="short"
+                                        timeZone="#{timeZoneBean.timeZone.ID}"
+                                        type="both" />
+                                </ice:outputText>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.resourcesColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['delegation-manage.resourcesColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="resourcesTooltip">
+                                <ice:outputText
+                                    value="#{delegationBean.resourcesToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="resourcesTooltip"
+                                title="#{delegationBean.name}: resources (#{o:size(delegationBean.resources)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{delegationBean.resourcesToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.subjectsColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['delegation-manage.subjectsColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="subjectsTooltip">
+                                <ice:outputText
+                                    value="#{delegationBean.viewSubjectsToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="subjectsTooltip"
+                                title="#{delegationBean.name}: subjects (#{o:size(delegationBean.viewSubjects)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{delegationBean.viewSubjectsToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{delegationManageBean.delegationManageTableBean.actionsColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['delegation-manage.actionsColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{delegationBean.action.title}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                    </ice:dataTable>
+                    <ice:panelGroup
+                        styleClass="limited"
+                        rendered="#{delegationManageBean.limited}">
+                        <ice:outputText
+                            value="#{resources['delegation-manage.limited']}"/>
+                    </ice:panelGroup>
+                    <center>
+                        <ice:panelGrid
+                            columns="1" >
+                            <ice:dataPaginator
+                                binding="#{delegationManageBean.dataPaginator}"
+                                for="delegationManageTable"
+                                rowsCountVar="rowsCount"
+                                displayedRowsCountVar="displayedRowsCountVar"
+                                rendered="#{o:size(delegationManageBean.delegationBeans) > delegationManageBean.delegationManageTableBean.rows}"
+                                fastStep="1"
+                                pageCountVar="pageCount"
+                                pageIndexVar="pageIndex"
+                                paginatorMaxPages="9"
+                                paginator="true">
+                                <f:facet
+                                    name="first">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-first.gif"
+                                        style="border:none;"/>
+                                </f:facet>
+                                <f:facet
+                                    name="last">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-last.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="previous">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-previous.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="next">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-next.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="fastforward">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-ff.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="fastrewind">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-fr.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                            </ice:dataPaginator>
+                        </ice:panelGrid>
+                    </center>
+                </ice:panelGroup>
+            </ui:define>
+        </o:section>
+    </ui:define>
+</ui:composition>

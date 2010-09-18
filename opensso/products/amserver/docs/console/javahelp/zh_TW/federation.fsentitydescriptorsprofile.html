@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>修改提供者實體或是附屬提供者實體的一般屬性 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsprofile"></a><h4>修改提供者實體或是附屬提供者實體的一般屬性</h4><a name="indexterm-70"></a><a name="indexterm-71"></a><a name="indexterm-72"></a><p>在建立實體之後，您可以編輯其設定檔。這可能包括修改屬性、新增識別提供者及服務提供者，或配置附屬提供者。編輯實體設定檔的一般屬性可能需要修改已經定義的共用屬性、新增連絡人員或是提供選擇性的組織資訊。下列程序用於編輯一般屬性。起點為聯合之下的實體畫面。</p><ol>
+<li><b>選取配置的實體名稱以修改其設定檔。</b><p>依預設，會顯示實體設定檔的 [一般] 屬性頁面。如果不在 [一般] 屬性頁面上，您可以從 [檢視] 功能表選取 [一般]。</p></li>
+<li><b>編輯任何 [實體的一般屬性] 的值。</b><dl><dt>實體名稱</dt>
+<dd><p>此屬性的靜態值為您建立實體時提供的名稱。</p></dd>
+<dt>類型</dt>
+<dd><p>此屬性的靜態值是實體的類型 (提供者或附屬提供者)。</p></dd>
+<dt>描述</dt>
+<dd><p>此屬性值為您建立實體時提供的說明。您可以修改原先輸入的說明，或在說明不存在時新增說明。</p></dd>
+</dl>
+</li>
+<li><b>提供 [實體連絡人員設定檔] 屬性的值。</b><p>[實體連絡人員設定檔] 屬性提供有關實體要連絡何人的相關資訊。這些是選用屬性。</p><dl><dt>名字</dt>
+<dd><p>鍵入實體連絡人員的指定名字。</p></dd>
+<dt>姓氏</dt>
+<dd><p>鍵入實體連絡人員的姓氏。</p></dd>
+<dt>類型</dt>
+<dd><p>從下拉式功能表中選擇連絡類型：</p>
+<ul><li><p>管理</p></li>
+<li><p>帳單</p></li>
+<li><p>技術</p></li>
+<li><p>其他</p></li></ul>
+</dd>
+<dt>公司</dt>
+<dd><p>鍵入此人所屬公司的名稱。</p></dd>
+<dt>Liberty 首要 ID</dt>
+<dd><p>鍵入統一資源識別碼 (URI)，它必須指向連絡人員的個人資訊設定檔的實例。</p></dd>
+<dt>電子郵件</dt>
+<dd><p>鍵入連絡人員的一個或多個電子郵件地址，並按一下 [新增]。</p></dd>
+<dt>電話號碼</dt>
+<dd><p>鍵入連絡人員的一個或多個電話號碼，並按一下 [新增]。</p></dd>
+</dl>
+</li>
+<li><b>提供 [組織設定檔] 屬性的值。</b><p>[組織設定檔] 屬性提供與主體互動時可能需要的基本資訊。這些是選用屬性。</p>
+<hr><p><b>備註 &#8211; </b>如果 [名稱] 屬性包含值，則必須為 [顯示名稱] 及 [URL] 屬性新增值。</p>
+<hr>
+<dl><dt>名稱</dt>
+<dd><p>輸入實體組織的合法名稱，並按一下 [新增]。定義值的格式為 <i>locale</i>| <i> organization-name</i>。例如，<tt>en</tt>| <tt> example.com</tt>。</p></dd>
+<dt>顯示名稱</dt>
+<dd><p>輸入適合於向主體顯示的實體組織名稱，並按一下 [新增]。定義值的格式為 <i>locale</i>|<i>organization-display-name</i>。例如，<tt>en</tt>|<tt>example.com</tt>。</p></dd>
+<dt>URL</dt>
+<dd><p>輸入組織的 URL，並按一下 [新增]。定義值的格式為 <i>locale</i>|<i> organization-URL</i>。例如，<tt>en</tt>|<tt> http://www.example.com</tt>。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [儲存] 來完成配置，或繼續定義識別提供者、服務提供者或附屬提供者屬性的值。</b><p>如果繼續進行配置，請參閱：</p><ul>
+<li><b><a href="federation.fsidentityprovider.html">新增識別提供者至提供者實體</a>，以定義識別提供者屬性的值。</b></li>
+<li><b><a href="federation.fsserviceprovider.html">新增服務提供者至提供者實體</a>，以定義 [服務供應程式] 屬性的值。</b></li>
+<li><b><a href="federation.fsentitydescriptorsaffiliate.html">新增成員至附屬提供者實體</a>，將成員寫入附屬提供者實體。</b></li></ul></li></ol>
+<br/>
+
+</body>
+</html>

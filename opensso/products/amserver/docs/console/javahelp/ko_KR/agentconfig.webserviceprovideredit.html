@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>웹 서비스 공급자 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceprovideredit"></a><h4>웹 서비스 공급자</h4>
+<p>웹 서비스 공급자 에이전트 프로필은 웹 서비스 클라이언트에서 보낸 웹 서비스 요청의
+유효성을 검사하고 웹 서비스 공급자가 보낸 웹 서비스 응답을 보호하는 데 사용되는
+구성을 설명합니다. 웹 서비스 공급자의 이름은 모든 에이전트에서 고유해야 합니다.</p>
+
+<a name="ggouz"></a><h5>일반</h5>
+<p>다음 일반 속성은 기본 웹 서비스 공급자 등록 정보를 정의합니다.</p>
+
+<a name="ggovu"></a><h5>그룹</h5>
+<p>그룹 메커니즘을 사용하면 유사한 에이전트 유형 모음을 정의할 수 있습니다. 그룹은 특정
+에이전트를 유형 모음에 포함하기 전에 정의해야 합니다. </p>
+
+<a name="ggotz"></a><h5>비밀번호</h5>
+<p>웹 서비스 공급자 에이전트의 비밀번호를 정의합니다.</p>
+
+<a name="ggotl"></a><h5>비밀번호 확인</h5>
+<p>비밀번호를 확인합니다.</p>
+
+<a name="ggova"></a><h5>상태</h5>
+<p>웹 서비스 공급자 에이전트를 시스템에서 활성화할지 또는 비활성할지를 정의합니다. 기본적으로 활성 상태로
+설정되며, 이 상태에서는 에이전트가 웹 서비스 클라이언트에서 보낸 웹 서비스 요청의 유효성을
+검사하고 웹 서비스 공급자에서 보낸 서비스 응답을 보호합니다.</p>
+
+<a name="ggowp"></a><h5>범용 식별자</h5>
+<p>웹 서비스 공급자 에이전트를 고유하게 정의하는 기본 LDAP 등록 정보를 나열합니다.</p>
+
+<a name="gglej"></a><h5>보안</h5>
+<p>다음 속성은 웹 서비스 공급자 보안 속성을 정의합니다. </p>
+
+<a name="gglhw"></a><h5>보안 메커니즘</h5>
+<p>웹 서비스 요청의 유효성을 검사하는 데 사용되는 보안 자격 증명 유형을 정의합니다.
+보안 메커니즘의 유형은 웹 서비스 클라이언트에서 보낸 웹서비스 요청의 일부이며 웹 서비스
+공급자에 적용됩니다. 다음 유형 중에서 선택하십시오. </p>
+<ul><li><p>익명 &#8212; 익명 보안 메커니즘에 보안 자격 증명이 포함되지 않습니다.</p></li>
+<li><p>KerberosToken &#8212; 커버로스 보안 토큰을 사용합니다.</p></li>
+<li><p>LibertyBearerToken &#8211; Liberty 정의 베어러 토큰을 사용합니다.</p></li>
+<li><p>LibertySAMLToken &#8211; Libery 정의 SAML 토큰을 사용합니다.</p></li>
+<li><p>LibertyX509Token &#8211; Libery 정의 X509 자격 증명을 사용합니다.</p></li>
+<li><p>SAML-HolderOfKey - SAML 1.1 명제 유형 Holder-Of-Key를 사용합니다.</p></li>
+<li><p>SAML-SenderVouches - SAML 1.1 명제 유형 Sender Vouches를 사용합니다.</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; SAML 2.0 명제 토큰 유형 Holder-Of-Key를 사용합니다.</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; SAML 2.0 명제 토큰 유형 Sender Vouches를 사용합니다.</p></li>
+<li><p>UserNameToken &#8211; 사용자 이름 토큰을 사용합니다.</p></li>
+<li><p>UserNameToken-Plain &#8211; 일반 텍스트 비밀번호를 가진 사용자 이름 토큰을 사용합니다.</p></li>
+<li><p>X509Token &#8211; X509 인증서를 사용합니다.</p></li></ul>
+
+
+<a name="gglfy"></a><h5>인증 체인</h5>
+<p>OpenSSO의 인증 SSOToken을 생성하기 위해 수신 웹 서비스 요청의 보안 토큰에 있는
+자격 증명을 사용하여 OpenSSO 인증 서비스를 인증하는 데 사용할 수 있는 인증
+체인 또는 서비스 이름을 정의합니다.</p>
+
+<a name="ghbbd"></a><h5>토큰 변환 유형</h5>
+<p>웹 서비스 공급자가 보안 토큰 서비스에서 토큰 변환을 요청하는 경우 변환될 토큰
+유형을 정의합니다. 토큰은 Identity는 동일하지만 이 토큰 유형에 해당하는 속성 정의를 사용하여
+지정된 SAML 또는  SSOToken(세션 토큰)으로 변환됩니다. 다른 웹 서비스 공급자에 대한
+웹 서비스 호출을 수행하는 웹 서비스 공급자가 이 새 토큰을 사용할 수
+있습니다. 정의할 수 있는 토큰 유형은 다음과 같습니다.</p>
+<ul><li><p>SAML 1.1 토큰</p></li>
+<li><p>SAML2 토큰</p></li>
+<li><p>SSOToken</p></li></ul>
+<p>이 속성을 사용하려면 <a href="#gglhw">보안 메커니즘</a> 속성에서 SAML 토큰을 선택하고 웹 서비스 공급자에 대해
+<a href="#gglfy">인증 체인</a>을 정의해야 합니다.</p>
+
+<a name="ggoum"></a><h5>메시지의 보안 헤더 보존</h5>
+<p>사용 설정되면 이 속성은 향후 처리를 위해 웹 서비스 공급자가 SOAP 보안
+헤더를 보존하도록 정의합니다. </p>
+
+<a name="gglhq"></a><h5>개인 키 유형</h5>
+<p>웹 서비스 요청 서명 확인 프로세스에서 웹 서비스 공급자가 사용하는 키 유형을
+정의합니다. 기본값은 <tt>PublicKey</tt>입니다.</p>
+
+<a name="ggovi"></a><h5>리버티 서비스 유형 URN</h5>
+<p>URN(Universal Resource Name)은 웹 서비스 공급자가 서비스 조회에 사용할 리버티 서비스 유형을
+설명합니다.</p>
+
+<a name="ggovn"></a><h5>사용자 토큰의 자격 증명</h5>
+<p>이 속성은 웹 서비스 공급자가 수신 웹 서비스 요청의 사용자 이름 보안
+토큰의 유효성을 검사하는 데 사용할 사용자 이름/비밀번호 공유 비밀을 나타냅니다. 이러한 자격
+증명은 들어오는 웹 서비스 요청의 사용자 이름 보안 토큰에 있는 자격 증명과
+비교됩니다.</p>
+
+<a name="gglfz"></a><h5>SAML 구성</h5>
+<p>다음 속성은 웹 서비스 공급자의 SAML(Security Assertion Markup Language)을 구성합니다.</p>
+
+<a name="gglfx"></a><h5>SAML 속성 매핑</h5>
+<p>이 구성은 웹 서비스 공급자의 STS(Security Token Service)에서 SAML 명제 생성 중에
+속성 명령문으로 생성해야 하는 SAML 속성을 나타냅니다. 형식은 <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>입니다.</p><p><tt></tt><i>SAML_attr_name</i><tt></tt>은 들어오는 웹 서비스 요청의 SAML 명제에 있는 SAML 속성 이름입니다. <tt></tt><i>Real_attr_name</i><tt></tt>은
+인증된 SSOToken 또는 Identity 저장소에서 불러온 속성 이름입니다.</p>
+
+<a name="gglgf"></a><h5>SAML NameID Mapper 플러그인</h5>
+<p>SAML 계정 매핑에 사용하는 NameID 매퍼 플러그인 클래스를 정의합니다.</p>
+
+<a name="gglhk"></a><h5>SAML 속성 이름 공간</h5>
+<p>SAML 속성 생성에 사용하는 이름 공간을 정의합니다.</p>
+
+<a name="gglfv"></a><h5>구성원 포함</h5>
+<p>이 속성은 기본의 구성원을 SAML 속성으로 포함해야 함을 정의합니다.</p>
+
+<a name="ggovx"></a><h5>서명 및 암호화</h5>
+<p>다음 속성은 웹 공급자 보안에 대한 서명 및 암호화 구성을 정의합니다.</p>
+
+<a name="ggowr"></a><h5>응답 서명됨</h5>
+<p>사용 설정되면 웹 서비스 공급자가 X509 인증서를 사용하여 응답에 서명합니다.</p>
+
+<a name="ggouo"></a><h5>응답 암호화됨</h5>
+<p>사용 설정되면 웹 서비스 응답이 암호화됩니다.</p>
+
+<a name="ggowz"></a><h5>요청 서명 확인됨</h5>
+<p>사용 설정되면 웹 서비스 요청 서명을 확인합니다.</p>
+
+<a name="ggouw"></a><h5>요청 헤더 해독됨</h5>
+<p>사용 설정되면 웹 서비스 클라이언트 요청의 보안 헤더가 해독됩니다.</p>
+
+<a name="ggotr"></a><h5>요청 해독됨</h5>
+<p>사용 설정되면 웹 서비스 클라이언트 요청이 해독됩니다.</p>
+
+<a name="gglls"></a><h5>키 저장소</h5>
+<p>다음 속성은 인증서 저장소 및 검색에 사용할 키 저장소를 구성합니다. </p>
+
+<a name="gglld"></a><h5>웹 서비스 클라이언트의 공개 키 별칭</h5>
+<p>이 속성은 웹 서비스 응답을 암호화하거나 웹 서비스 요청의 서명을 확인하는 데
+사용되는 공개 인증서 키 별칭을 정의합니다.</p>
+
+<a name="gglmc"></a><h5>개인 키 별칭</h5>
+<p>이 속성은 웹 서비스 응답에 서명하거나 웹 서비스 요청을 해독하는 데 사용되는
+개인 인증서 키 별칭을 정의합니다.</p>
+
+<a name="ggljf"></a><h5>키 저장소 사용</h5>
+<p>이 구성은 기본 키 저장소를 사용할지 또는 사용자 정의 키 저장소를 사용할지
+정의합니다. 사용자 정의 키 저장소에 대해 다음 값을 정의해야 합니다.</p>
+<ul><li><p>키 저장소 위치</p></li>
+<li><p>키 저장소 비밀번호</p></li>
+<li><p>키 비밀번호</p></li></ul>
+
+
+<a name="gglko"></a><h5>종단점</h5>
+<p>다음 속성은 웹 서비스 종단점을 정의합니다.</p>
+
+<a name="gglmp"></a><h5>웹 서비스 프록시 종단점</h5>
+<p>이 속성은 웹 서비스 클라이언트가 요청을 보낼 웹 서비스  종단점을 정의합니다.
+웹 보안 프록시를 사용하도록 구성하지 않는 경우 이 종단점은 선택 사항입니다. </p>
+
+<a name="ghbed"></a><h5>웹 서비스 종단점</h5>
+<p>이 속성은 웹 서비스 클라이언트가 요청을 보낼 웹 서비스 종단점을 정의합니다.</p>
+
+<a name="ghbay"></a><h5>커버로스 구성</h5>
+<p>커버로스는 웹 서비스 클라이언트와 웹 서비스 공급자 간의 웹 서비스 통신을 보호하기
+위해 웹 서비스 보안에서 지원하는 보안 프로필입니다. 대개 사용자는 데스크탑에 대한 인증을
+수행한 다음 웹 서비스 및 웹 서비스 클라이언트를 실행합니다. 따라서 사용자 기본을
+커버로스 토큰으로 식별하여 커버로스 티켓을 통해 웹 서비스 공급자에 대한 요청을 보호해야
+합니다. 일반적으로 커버로스 기반 웹 서비스 보안은 경계를 넘어가는 SAML 기반 웹
+서비스 보안 등과는 반대로 커버로스 도메인(영역)과 동일한 컨텍스트에서 사용됩니다. 그러나 커버로스는 가장
+강력한 인증 메커니즘 중 하나로, 특히 Windows 도메인 컨트롤러 환경에서 강력합니다.</p>
+
+<a name="ghbbv"></a><h5>커버로스 도메인 서버</h5>
+<p>이 속성은 커버로스 배포 센터(도메인 제어기)의 호스트 이름을 지정합니다. 도메인 제어기의 정규화된
+도메인 이름(FQDN)을 입력해야 합니다.</p>
+
+<a name="ghbdx"></a><h5>커버로스 도메인</h5>
+<p>이 속성은 커버로스 배포 센터(도메인 제어기)의 도메인 이름을 지정합니다. 구성에 따라 도메인
+제어기의 도메인 이름은 OpenSSO 도메인 이름과 다를 수 있습니다.</p>
+
+<a name="ghbcq"></a><h5>커버로스 서비스 기본</h5>
+<p>커버로스 기본을 생성된 보안 토큰의 소유자로 지정합니다.</p><p>다음 형식을 사용합니다. </p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt></p><p><tt>hostname</tt> 및 <tt>domainame</tt>은 OpenSSO 인스턴스의 호스트 이름과 도메인 이름을 나타냅니다. <tt>dc_domain_name</tt>은 Windows
+커버로스 서버(도메인 컨트롤러)가 있는 커버로스 도메인이며,커버로스 서버는 OpenSSO 인스턴스의 도메인 이름과 다를
+수 있습니다.</p>
+
+<a name="ghbae"></a><h5>커버로스 키 탭 파일</h5>
+<p>이 속성은 토큰 발급에 사용되는 커버로스 키 탭 파일을 지정합니다. 다음 형식을
+사용합니다(반드시 따라야 하는 형식은 아님).</p><p><tt>hostname.HTTP.keytab</tt></p><p><tt>hostname</tt>은 OpenSSO 인스턴스의 호스트 이름입니다.</p>
+
+<a name="ghbep"></a><h5>커버로스 서명 확인</h5>
+<p>이 속성을 사용하면 커버로스 속성이 서명되어 있는지를 지정할 수 있습니다.</p>
+<br/>
+
+</body>
+</html>

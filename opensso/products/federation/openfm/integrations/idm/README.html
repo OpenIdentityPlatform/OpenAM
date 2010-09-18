@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Win32)">
+	<META NAME="AUTHOR" CONTENT="Rahul Gopal">
+	<META NAME="CREATED" CONTENT="20090729;12142600">
+	<META NAME="CHANGEDBY" CONTENT="Rahul Gopal">
+	<META NAME="CHANGED" CONTENT="20090729;12304100">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><FONT SIZE=5 STYLE="font-size: 20pt">README</FONT></FONT></P>
+<P ALIGN=CENTER STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt">(
+Integration between OpenSSO and Sun Identity Manager )</FONT></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">The
+files in this directory, are intended as samples, to enable some of
+the usecases in the context of integration between OpenSSO and Sun
+Identity Manager. The samples are part of the opensso.zip
+distribution.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">The
+relevant usecases are:</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><U><B>(1)
+Configuring &quot;Password-Expiry&quot; or &quot;Administrator-Driven
+Password-Reset&quot; Behavior</B></U></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
+a user's password is close to expiry, the Directory Server will send
+a warning, at the time configured in the password policy. When this
+event occurs, the user will be redirected by OpenSSO, to IDM, where
+he can change his password, the next time the user attempts to login
+to OpenSSO.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">If
+the user does not change his password, and lets his password expire,
+he will need to request the Helpdesk, for a password-reset.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
+a help-desk administrator resets an end-user's password, a flag will
+be set in the user's profile. The help-desk administrator will give
+the temporary password to the end-user, by email or over the phone.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
+the end-user logs in, using the temporary password, he is redirected
+to Identity Manager's user interface, to reset his password. After
+his password has been reset, the flag, that was earlier set, will get
+un-set.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><A NAME="title-text"></A><A NAME="title-heading"></A>
+<FONT FACE="Andale Sans UI, sans-serif"><U><B>(2) Configuring
+&quot;Self-Service Password-Reset&quot; or &quot;Forgot Password&quot;
+Behavior</B></U> </FONT>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">If
+the user has forgotten his password, he should be allowed to change /
+reset his password all by himself, without requiring assistance from
+a helpdesk. <BR>To identify himself, he should correctly answer his
+challenge questions. Unless he does this correctly, he will not be
+able to change / reset his password. </FONT>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><U><B>(3)
+Configuring Anonymous-Enrollment Or Self-Registration By User</B></U></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">This usecase
+requires that an end-user be able to create his account in the
+system.</FONT></P>
+<P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">The user
+will be allowed to provide the minimum details required of him, so
+that an account can be created for him on IDM. This account will get
+automatically provisioned into OpenSSO. </FONT>
+</P>
+<P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">Such a
+user-account, would be the most basic account with the least
+privileges assigned / available to him.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><U><B>(4)
+Configuring First-Time User Login Behavior</B></U></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
+a user is logging into the protected application, through OpenSSO,
+for the first time, after being provisioned, he should be requested
+to set his challenge/response answers. These answers could later be
+used to verify his identity, when he wants to reset a forgotten
+password. </FONT>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><U><B>(5)
+Configuring Single-Logout (SLO) Between IDM And OpenSSO</B></U></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
+the user logs out from the IDM app, he should automatically logged
+out from OpenSSO as well.</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><U><B>(6)
+Configuring User-Account Self-UnLock Behavior</B></U></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">When a
+user's account is locked, as a result of the conditions configured in
+the password-policy assigned to the user, or as a result of marking
+his ldap account as inactive, it is possible to allow the user to
+unlock his account himself, without requiring an intervention from an
+administrator.</FONT></P>
+<P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">The user's
+account could have been locked, due to the following reasons:</FONT></P>
+<UL>
+	<LI><P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">in-memory
+	account locking </FONT>
+	</P>
+	<UL>
+		<LI><P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">the
+		user may have exceeded the allowed number of failed attempts to
+		login, as configured in the password policy. In such types of
+		locking, the user may remain locked for a set amount of time, and
+		can only reset his password after that time has passed. The &quot;locked
+		state&quot; of the user account is maintained in memory, and no
+		information is written to his LDAP profile. </FONT>
+		</P>
+	</UL>
+	<LI><P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">physical
+	account locking </FONT>
+	</P>
+	<UL>
+		<LI><P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">the
+		user's account may have been locked either explicitly by an
+		administrator, or as a result of some automated processes, by
+		changing the value of the </FONT><TT><FONT FACE="Andale Sans UI, sans-serif">inetuserstatus</FONT></TT><FONT FACE="Andale Sans UI, sans-serif">
+		attribute in his profile, to </FONT><TT><FONT FACE="Andale Sans UI, sans-serif">Inactive</FONT></TT><FONT FACE="Andale Sans UI, sans-serif">.
+		</FONT>
+		</P>
+	</UL>
+</UL>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><B>For
+a detailed description about how to configure OpenSSO and Sun
+Identity Manager, for the above usecases, and how to use the sample
+files included here, please refer to the <A HREF="http://docs.sun.com/app/docs/doc/820-4729/ggsmu">OpenSSO
+Integration Guide.</A></B></FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">The
+sample files included here are:</FONT></P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><IMG SRC="samples_sitemap.jpg" NAME="graphics1" ALIGN=LEFT WIDTH=1134 HEIGHT=697 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+<P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
+</P>
+</BODY>
+</HTML>

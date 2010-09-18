@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'un PEP XACML SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pep"></a><h4>Personnalisation d'un PEP XACML SAMLv2</h4>
+<p>Le PEP XACML contient les attributs personnalisables suivants&#160;:</p>
+<ul><li><p><a href="#ggwgy">&#201;num&#233;ration des protocoles pris en charge</a></p></li>
+<li><p><a href="#ggwkt">Alias de la cl&#233; de signature</a></p></li>
+<li><p><a href="#ggwhc">Alias de la cl&#233; de chiffrement</a></p></li>
+<li><p><a href="#ggwhq">Autorisation standard</a></p></li>
+<li><p><a href="#ggwgq">R&#233;ponse de d&#233;cision d'autorisation sign&#233;e</a></p></li>
+<li><p><a href="#ggwjn">Assertion chiffr&#233;e</a></p></li></ul>
+
+
+<a name="ggwgy"></a><h5>&#201;num&#233;ration des protocoles pris en charge</h5>
+<p>Affiche la version du PEP XACML prise en charge par ce fournisseur.</p>
+
+<a name="ggwkt"></a><h5>Alias de la cl&#233; de signature</h5>
+<p>D&#233;finit l'alias de cl&#233; utilis&#233; pour signer les demandes et les r&#233;ponses.</p>
+
+<a name="ggwhc"></a><h5>Alias de la cl&#233; de chiffrement</h5>
+<p>D&#233;finit l'alias de cl&#233; pour le chiffrage XACML. </p>
+
+<a name="ggwhq"></a><h5>Autorisation standard</h5>
+<p>L'authentification standard peut &#234;tre activ&#233;e pour prot&#233;ger les extr&#233;mit&#233;s SOAP. Tout fournisseur
+qui acc&#232;de &#224; ces extr&#233;mit&#233;s doit avoir le nom d'utilisateur et le
+mot de passe d&#233;finis dans les propri&#233;t&#233;s suivantes&#160;: <tt>User Name</tt> et <tt>Password</tt>.</p>
+
+<a name="ggwgq"></a><h5>R&#233;ponse de d&#233;cision d'autorisation sign&#233;e</h5>
+<p>Lorsqu'il est activ&#233;, cet attribut demande la signature de toutes les r&#233;ponses
+pour la d&#233;cision d'autorisation XACML.</p>
+
+<a name="ggwjn"></a><h5>Assertion chiffr&#233;e</h5>
+<p>Lorsqu'il est activ&#233;, cet attribut demande le chiffrement de toutes les assertions.</p>
+<br/>
+
+</body>
+</html>

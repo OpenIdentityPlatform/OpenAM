@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>策略配置 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>策略配置</h4>
+<p><a name="indexterm-191"></a>“策略配置”属性允许管理员设置“策略”服务所使用的全局和领域配置属性。</p>
+<ul><li><p><a href="#fufnk">全局属性</a></p></li>
+<li><p><a href="#fufmb">领域属性</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>全局属性</h5>
+<p>全局属性包括：</p>
+
+<a name="gciwg"></a><h5>资源比较器</h5>
+<p>指定资源比较器的信息，这些信息用于比较策略规则定义中指定的资源。在策略创建和评估的过程中，都要用到资源比较。</p><p>单击“添加”按钮并定义以下属性：</p><dl><dt>服务类型</dt>
+<dd><p>指定要使用比较器的服务。</p></dd>
+<dt>类</dt>
+<dd><p>定义实现资源比较算法的 Java 类。</p></dd>
+<dt>分隔符</dt>
+<dd><p>指定资源名称中使用的分界符。</p></dd>
+<dt>通配符</dt>
+<dd><p>指定可在资源名称中定义的通配符。</p></dd>
+<dt>一级通配符</dt>
+<dd><p>在相同通配符边界与零个或多个字符相匹配。</p></dd>
+<dt>区分大小写</dt>
+<dd><p>指定对两种资源进行比较时应考虑条件还是忽略条件。False 表示忽略条件，True 表示考虑条件。</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>拒绝决定时继续评估</h5>
+<p>指定策略框架是否应继续评估后续策略（甚至是在策略决定为“拒绝”时）。如果没有选择（默认设置），确认“拒绝”决策后，策略评估将跳过后续策略。</p>
+
+<a name="fufng"></a><h5>可由 OpenSSO 处理的建议</h5>
+<p>用于定义策略建议键的名称，策略强制点（策略代理）会为其将用户代理重定向至 OpenSSO。如果代理收到不允许访问某资源的策略决定，但又确实拥有建议，代理会检查是否在此属性中列有建议键。</p><p>如果发现此类建议，用户代理则被重定向至 OpenSSO，从而可能会允许访问该资源。</p>
+
+<a name="gdpdm"></a><h5>组织别名引用</h5>
+<p>设置为“是”时，该属性允许用户在子领域中创建策略，而不必在顶层或父领域中创建引用策略。用户只能创建用于保护 HTTP 或 HTTPS 资源的策略，且这些资源的全限定主机名应与领域的 DNS 别名相匹配。默认情况下，该属性设置为“否”。</p>
+
+<a name="fufmb"></a><h5>领域属性</h5>
+<p>LDAP 属性包括：</p>
+
+<a name="fufmg"></a><h5>主 LDAP 服务器</h5>
+<p>指定安装 OpenSSO 过程中指定的主 LDAP 服务器的主机名和端口号，这些数据将用于搜索策略主体，如 LDAP 用户、LDAP 角色、LDAP 组等。</p><p>格式为 <i>hostname:port</i>。例如：<tt>machine1.example.com:389</tt></p><p>对于多个 LDAP 服务器主机的故障切换配置，该值可为以空格分隔的主机列表。格式为 <i>hostname1:port1 hostname2:port2...</i></p><p>例如：<tt>machine1.example1.com:389 machine2.example1.com:389 </tt></p><p>如果指定多个条目，条目前面必须带有本地服务器名称。这样可将特定的 OpenSSO 配置为与特定 Directory Server 进行通信。</p><p>格式为 <i>servername|hostname:port</i>。例如：</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>对于故障切换配置：</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389 </tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>LDAP 基 DN</h5>
+<p>指定 LDAP 服务器中的基 DN，搜索将从该 DN 开始。默认情况下，它是 OpenSSO 安装的顶层领域。</p>
+
+<a name="fufmd"></a><h5>LDAP 用户基 DN</h5>
+<p>该属性指定由 LDAP 服务器中的 LDAP 用户主体使用的基 DN，搜索将从此 DN 开始进行。默认情况下，它是 OpenSSO 安装基的顶层领域。</p>
+
+<a name="fufmz"></a><h5>OpenSSO 角色基 DN</h5>
+<p>定义领域或组织的 DN，在搜索 OpenSSO 角色的值时会将该 DN 用作基础。该属性由 <i>AccessManagerRoles</i> 策略主体使用。 </p>
+
+<a name="fufme"></a><h5>LDAP 绑定 DN</h5>
+<p>指定 LDAP 服务器中的绑定 DN。</p>
+
+<a name="fufmf"></a><h5>LDAP 绑定密码</h5>
+<p>定义用于绑定 LDAP 服务器的密码。默认情况下，会将安装过程中输入的 <tt>amldapuser</tt> 密码用作绑定用户。</p>
+
+<a name="fufmn"></a><h5>LDAP 组织搜索过滤器</h5>
+<p>指定用于查找组织条目的搜索过滤器。默认值为 <tt>(objectclass=sunMangagedOrganization)</tt>。</p>
+
+<a name="fufmm"></a><h5>LDAP 组织搜索范围</h5>
+<p>定义用于查找组织条目的范围。该范围必须为以下值之一：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB（默认值）</p></li></ul>
+
+
+<a name="fufmq"></a><h5>LDAP 组搜索范围</h5>
+<p>定义用于查找组条目的范围。该范围必须为以下值之一：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB（默认值）</p></li></ul>
+
+
+<a name="fufmp"></a><h5>LDAP 组搜索过滤器</h5>
+<p>指定用于查找组条目的搜索过滤器。默认值为 <tt>(objectclass=groupOfUniqueNames)</tt>。</p>
+
+<a name="fufms"></a><h5>LDAP 用户搜索过滤器</h5>
+<p>指定用于查找用户条目的搜索过滤器。默认值为 <tt>(objectclass=inetorgperson)</tt>。</p>
+
+<a name="fufmt"></a><h5>LDAP 用户搜索范围</h5>
+<p>定义用于查找用户条目的范围。该范围必须为以下值之一：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB（默认值）</p></li></ul>
+
+
+<a name="fufmv"></a><h5>LDAP 角色搜索过滤器</h5>
+<p>该属性指定用于查找角色条目的搜索过滤器。默认值为 <tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions)) </tt>。</p>
+
+<a name="fufmw"></a><h5>LDAP 角色搜索范围</h5>
+<p>该属性定义用于查找角色条目的范围。该范围必须为以下值之一：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB（默认值）</p></li></ul>
+
+
+<a name="fufmy"></a><h5>OpenSSO 角色搜索范围</h5>
+<p>定义用于查找 OpenSSO 角色主体条目的范围。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB（默认值）</p></li></ul>
+
+
+<a name="fufmo"></a><h5>LDAP 组织搜索属性</h5>
+<p>定义搜索组织时使用的属性类型。默认值为 o。</p>
+
+<a name="fufmr"></a><h5>LDAP 组搜索属性</h5>
+<p>定义搜索组时使用的属性类型。默认值为 <tt>cn</tt>。</p>
+
+<a name="fufmu"></a><h5>LDAP 用户搜索属性</h5>
+<p>定义搜索用户时使用的属性类型。默认值为 <tt>uid</tt>。</p>
+
+<a name="fufmx"></a><h5>LDAP 角色搜索属性</h5>
+<p>该字段用于定义搜索角色时使用的属性类型。默认值为 <tt>cn</tt>。</p>
+
+<a name="fufnj"></a><h5>搜索返回的结果的最大数目</h5>
+<p>该字段定义搜索返回的结果的最大数目。默认值为 100。如果搜索限制超过了指定的数量，将返回达到该数量前搜索到的条目。</p>
+
+<a name="fufnl"></a><h5>搜索超时</h5>
+<p>指定经过多长时间后搜索将超时。如果搜索超过了指定的时间，将返回在该时间前搜索到的条目。</p>
+
+<a name="fufmi"></a><h5>LDAP SSL</h5>
+<p>指定 LDAP 服务器是否运行 SSL。选择该属性将启用 SSL，取消选择（默认）则将禁用 SSL。</p><p>如果 LDAP 服务器已启用 SSL (LDAPS)，您必须确保 OpenSSO 已配置正确的 SSL 可信赖证书，以使 OpenSSO 可以通过 LDAPS
+协议连接到 Directory Server。</p>
+
+<a name="fufmk"></a><h5>LDAP 连接池的最小尺寸</h5>
+<p>指定用于连接 Directory Server 的连接池的最小尺寸，它与 LDAP 服务器属性中指定的一致。默认端口为 1。</p>
+
+<a name="fufmj"></a><h5>连接池的最大尺寸</h5>
+<p>该属性指定用于连接 Directory Server 的连接池的最大尺寸，它与 LDAP 服务器属性中指定的一致。默认值为 10。</p>
+
+<a name="fufna"></a><h5>选定的策略主体</h5>
+<p>允许选择一组可用的主体类型以用于在领域中定义策略。</p>
+
+<a name="fufnc"></a><h5>选定的策略条件</h5>
+<p>允许选择一组可用的条件类型以用于在领域中定义策略。</p>
+
+<a name="fufnd"></a><h5>选定的策略引用组织</h5>
+<p>允许选择一组可用的引用类型以用于在领域中定义策略。</p>
+
+<a name="fufml"></a><h5>主体结果的生存时间</h5>
+<p>该属性指定一段时间（以分钟为单位），在这段时间内，可以使用缓存的主体结果基于单点登录令牌对同一策略请求进行评估。</p><p>当基于 SSO 令牌对策略开始进行评估时，将评估该策略中的主体实例以确定该策略是否适用于给定的用户。通过 SSO 令牌 ID 添加了密钥的主体结果缓存在策略中。如果在“主体结果的生存时间”属性中指定的时间内对同一个策略中的同一个 SSO 令牌 ID 进行了另一次评估，策略框架将检索缓存的主体结果，而不是评估主体实例。这会明显减少策略评估的时间。</p>
+
+<a name="fufnm"></a><h5>用户别名</h5>
+<p>如果创建策略来保护其主体的成员在远程 Directory Server 中化名为本地用户的资源，则必须启用该属性。例如，如果在远程 Directory Server 中创建 <tt>uid=rmuser</tt>，然后将 <tt>rmuser</tt> 作为别名添加到 OpenSSO 中的本地用户（如
+<tt>uid=luser</tt>），则必须启用该属性。以 <tt>rmuser</tt> 身份登录时，将使用本地用户 (<tt>luser</tt>) 创建会话，并会成功强制实行策略。</p>
+
+<a name="fufni"></a><h5>选定的响应提供者</h5>
+<p>定义为领域启用的策略响应提供者插件。只有该属性中选定的响应提供者插件才能够被添加到领域中定义的策略中。</p>
+
+<a name="fufnn"></a><h5>选定的动态响应属性</h5>
+<p>定义为领域启用的动态响应属性。只有在该属性中选定的名称子集才能在 <i>IDResponseProvider</i> 的动态属性列表中定义，以添加到在领域中定义的策略。</p>
+<br/>
+
+</body>
+</html>

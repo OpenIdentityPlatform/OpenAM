@@ -1,0 +1,161 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.12 2009/07/09 17:04:15 veiming Exp $
+
+-->
+
+<project name="opensso-sample" default="all">
+    <description>Open Web Single Sign-On: Samples</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.samples.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="samples.classes.dir" location="${amserver.built.samples.dir}/classes"/>
+    <property name="samples.package.dir" location="${amserver.built.samples.dir}/packages"/>
+    <property name="samples.xml.dir" location="${amserver.samples.dir}/xml"/>
+    <property name="samples.src.dir" location="${amserver.samples.dir}/source"/>
+
+    <target name="all" depends="client">
+        <ant antfile="${amserver.samples.dir}/server/build.xml" inheritRefs="true"/>
+    </target>
+
+    <target name="client" depends="preparebuild">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${samples.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${samples.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+
+        <java classname="com.sun.identity.samples.setup.Scripts" fork="true">
+            <classpath>
+                <pathelement path="${samples.classes.dir}"/>
+            </classpath>
+            <arg value="${amserver.samples.dir}" />
+        </java>
+
+        <copy file="${amserver.samples.dir}/manifest"
+            tofile="${samples.package.dir}/manifest" />
+
+        <copy file="${amserver.samples.dir}/resources/clientDefault.properties"
+            tofile="${samples.package.dir}/classes/clientDefault.properties" />
+
+        <copy todir="${samples.package.dir}/source">
+            <fileset dir="${amserver.samples.dir}/source">
+                <include name="**/*.java" />
+                <exclude name="com/sun/identity/samples/setup/Scripts.java" />
+                <exclude name="com/sun/identity/samples/setup/ScriptFileFilter.java" />
+            </fileset>
+        </copy>
+
+        <copy todir="${samples.package.dir}/scripts">
+            <fileset dir="${amserver.samples.dir}/scripts">
+                <include name="*.sh" />
+                <include name="*.bat" />
+            </fileset>
+        </copy>
+
+        <copy todir="${samples.package.dir}/lib">
+            <fileset dir="${extlib.dir}">
+                <include name="j2ee.jar" />
+            </fileset>
+            <fileset dir="${amserver.dist.dir}">
+                <include name="amclientsdk.jar" />
+                <include name="opensso-sharedlib.jar" />
+            </fileset>
+        </copy>
+
+        <copy todir="${samples.package.dir}/classes">
+            <fileset dir="${amserver.res.i18n.dir}">
+                <include name="amAuth.properties" />
+                <include name="amAuthContext.properties" />
+                <include name="amIdRepo.properties" />
+                <include name="amUtilMsgs.properties" />
+                <include name="amNaming.properties" />
+                <include name="amProfile.properties" />
+                <include name="amSDK.properties" />
+                <include name="amSecurity.properties" />
+                <include name="amSSOProvider.properties" />
+                <include name="amSession.properties" />
+            </fileset>
+            <fileset dir="${samples.classes.dir}">
+                <exclude name="com/sun/identity/samples/setup/Scripts.class" />
+                <exclude name="com/sun/identity/samples/setup/ScriptFileFilter.class" />
+            </fileset>
+        </copy>
+
+        <xslt in="${amserver.samples.dir}/xml/Readme.xml"
+            out="${samples.package.dir}/docs/Readme.txt"
+            style="${amserver.samples.dir}/xml/ReadmeText.xsl" />
+
+        <ant antfile="${amserver.samples.dir}/clientsdk/build.xml" inheritRefs="true"/>
+
+        <zip destfile="${amserver.dist.dir}/openssosamples.zip"
+            basedir="${samples.package.dir}" />
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${amserver.built.samples.dir}"/>
+        <mkdir dir="${samples.classes.dir}"/>
+        <mkdir dir="${amserver.dist.dir}"/>
+        <mkdir dir="${samples.package.dir}" />
+        <mkdir dir="${samples.package.dir}/source" />
+        <mkdir dir="${samples.package.dir}/scripts" />
+        <mkdir dir="${samples.package.dir}/classes" />
+        <mkdir dir="${samples.package.dir}/docs" />
+        <mkdir dir="${samples.package.dir}/xml" />
+        <mkdir dir="${samples.package.dir}/resources" />
+        <mkdir dir="${samples.package.dir}/lib" />
+    </target>
+
+    <target name="clean">
+        <delete file="${amserver.dist.dir}/openssosamples.zip"/>
+        <delete dir="${samples.package.dir}/xml" />
+        <delete dir="${samples.package.dir}/resources" />
+        <delete dir="${samples.package.dir}/docs" />
+        <delete dir="${samples.package.dir}/lib" />
+        <delete dir="${samples.package.dir}/classes" />
+        <delete dir="${samples.package.dir}/scripts" />
+        <delete dir="${samples.package.dir}/source" />
+        <delete dir="${samples.package.dir}"/>
+        <delete dir="${samples.classes.dir}"/>
+        <delete dir="${amserver.built.samples.dir}"/>
+        <ant antfile="${amserver.samples.dir}/clientsdk/build.xml" inheritRefs="true"
+            target="clean"/>
+    </target>
+</project>

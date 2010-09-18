@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie eine Anbieter-Entity oder eine Partner-Entity - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsadd"></a><h4>So erstellen Sie eine Anbieter-Entity oder eine Partner-Entity</h4><a name="indexterm-66"></a><a name="indexterm-67"></a><a name="indexterm-68"></a><a name="indexterm-69"></a><p>Die Einrichtung von Entities besteht aus zwei Schritten. Zun&#228;chst erstellen Sie die
+Entity. (In diesem Schritt legen Sie auch fest, ob es sich um
+eine <b>Anbieter-Entity</b> oder eine <b>Partner-Entity</b> handelt.) Nach der Erstellung der Entity f&#252;llen
+Sie sie mit Anbietern. Mit dem folgenden Verfahren wird eine neue Entity
+erstellt. Der Ausgangspunkt ist "Entities" in der Verbindungsschnittstelle.</p>
+<hr><p><b>Hinweis &#8211; </b>Eine Entity kann zwar erstellt werden, aber sie kann erst dann einem
+Circle of Trust zugewiesen werden, wenn sie Anbieter enth&#228;lt.</p>
+<hr>
+<ol>
+<li><b>Klicken Sie auf "Neu", um die Attribute f&#252;r Entities anzuzeigen.</b><p>Die Seite "Neue Entity" wird angezeigt.</p></li>
+<li><b>Geben Sie einen Namen f&#252;r die Entity ein.</b><p>Das Attribut "Entity-Name" definiert einen Uniform Resource Identifier (URI) f&#252;r die Entity.
+Dieser Wert muss unter den Entity-Namen eindeutig sein.</p></li>
+<li><b>Geben Sie eine Beschreibung der Entity ein.</b></li>
+<li><b>W&#228;hlen Sie den Entity-Typ.</b>
+<ul><li><p>Wenn Sie eine Anbieter-Entity erstellen m&#246;chten, w&#228;hlen Sie <b>Anbieter</b> aus.</p></li>
+<li><p>Wenn Sie eine Partner-Entity erstellen m&#246;chten, w&#228;hlen Sie <b>Partner</b> aus und definieren Sie die Werte f&#252;r die erforderlichen Attribute "Partner-Name" und "Partner-Eigent&#252;mer".</p>
+<ul><li><p>"Partner-Name" definiert einen URI f&#252;r die Partner-Entity. Dieser Wert muss unter den Partner-Namen eindeutig sein.</p></li>
+<li><p>"Partner-Eigent&#252;mer" gibt einen Anbieter als &#252;bergeordneten Administrator der Partnerschaft an. Der Wert dieses Attributs ist ein URI, der mit dem Wert &#252;bereinstimmt, der im Attribut "Entity-Name" der Entity definiert wurde, zu der der Partner-Eigent&#252;mer/Anbieter geh&#246;rt.</p></li></ul>
+
+<hr><p><b>Hinweis &#8211; </b>Wenn ein Anbieter als "Partner-Eigent&#252;mer" definiert wird, wird er damit nicht automatisch als Mitglied der Partnerschaft aufgenommen. Wenn ein Eigent&#252;mer gleichzeitig Mitglied ist, muss der URI hier als Eigent&#252;mer und innerhalb der Partner-Entity selbst als Mitglied definiert werden. Informationen zum Hinzuf&#252;gen von Mitgliedern zu einer Partnerschaft finden Sie unter <a href="federation.fsentitydescriptorsaffiliate.html">So f&#252;gen Sie Mitglieder zu einer Partner-Entity hinzu</a>.</p>
+<hr>
+</li></ul>
+</li>
+<li><b>Klicken Sie auf "OK".</b><p>Die neue Entity wird im Bildschirm "Entities" angezeigt.</p></li></ol>
+<br/>
+
+</body>
+</html>

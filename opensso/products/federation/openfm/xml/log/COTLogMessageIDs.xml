@@ -1,0 +1,389 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: COTLogMessageIDs.xml,v 1.4 2008/08/19 19:13:00 veiming Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="COT">
+    <logmessage name="INVALID_COT_NAME" id="1"
+        loglevel="LL_INFO"
+        description="Invalid circle of trust name.">
+        <datainfo>
+            <item>Realm or organization name</item>
+            <item>Circle of Trust Name</item>
+        </datainfo>
+        <triggers>
+            <item>Accessing the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the name and retry accessing the circle of trust.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_MODIFY_COT_DESCRIPTOR" id="2"
+        loglevel="LL_INFO"
+        description="Configuration error modifying the circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Modifying the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check COT debug , fmCOT, for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_COT_DESCRIPTOR" id="3"
+        loglevel="LL_INFO"
+        description="Error retreiving all circle of trusts.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Getting all circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration; check debug for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_COT_NAME_CREATE_COT_DESCRIPTOR" id="4"
+        loglevel="LL_INFO"
+        description="Invalid name , error creating the circle of trust.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Creating the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the name to create circle of trust descriptor.</item>
+        </actions>
+    </logmessage>    
+    <logmessage name="COT_EXISTS_CREATE_COT_DESCRIPTOR" id="5"
+        loglevel="LL_INFO"
+        description="Circle of Trust exists.">
+        <datainfo>
+            <item>Name of the circle of trust</item> 
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Creating the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Create Circle of Trust with a unique name.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_COT_TYPE" id="6"
+        loglevel="LL_INFO"
+        description="Circle of Trust Type is invalid">
+        <datainfo>
+            <item>Realm or organization name</item>
+            <item>Circle of Trust Type</item>
+        </datainfo>
+        <triggers>
+            <item>Creating the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>The values for Circle of Trust type are IDFF , SAML2. 
+                  Create Circle of Trust using either of these values.
+            </item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_CREATE_COT_DESCRIPTOR" id="7"
+        loglevel="LL_INFO"
+        description="Configuration error while creating circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the fmCOT debug file for detailed errors.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="COT_DESCRIPTOR_CREATED" id="8"
+        loglevel="LL_INFO"
+        description="Circle of trust created.">
+        <datainfo>
+            <item>Name of the circle of trust</item> 
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Creating the circle of trust.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="NULL_COT_NAME_ADD_COT_DESCRIPTOR" id="9"
+        loglevel="LL_INFO"
+        description="Circle of Trust name is null, error adding 
+                     to circle of trust.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Adding to the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the name of the circle of trust.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NULL_ENTITYID_ADD_COT_DESCRIPTOR" id="10"
+        loglevel="LL_INFO"
+        description="Entity Identifier is null , cannot add entity to circle
+                     of trust">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Adding to the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the value of entity id.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_ADD_COT_MEMBER" id="11"
+        loglevel="LL_INFO"
+        description="Error adding entity to the circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>Entity Id</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Adding entity to circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check COT debug for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_COT_NAME_REMOVE_COT_MEMBER" id="12"
+        loglevel="LL_INFO"
+        description="Null circle of trust name.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Removing member from the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the name of the circle of trust.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NULL_ENTITYID_REMOVE_COT_MEMBER" id="13"
+        loglevel="LL_INFO"
+        description="Null entity identifier.">
+        <datainfo>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Removing member from the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the value of the  entity identifier.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_REMOVE_COT_MEMBER" id="14"
+        loglevel="LL_INFO"
+        description="Error while removing entity from the circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>Entity Id</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Removing entity identifier from the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check COT debug for more detailed error message.</item>
+        </actions>
+    </logmessage> 
+    <logmessage name="NULL_COT_NAME_LIST_COT" id="15"
+        loglevel="LL_INFO"
+        description="Null circle of trust name.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Listing entities in Circle of Trust</item>
+        </triggers>
+        <actions>
+            <item>Check the name of the circle of trust.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_LIST_COT_MEMBER" id="16"
+        loglevel="LL_INFO"
+        description="Error listing providers in the circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Listing providers in the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check COT debug for more detailed error message.</item>
+        </actions>
+    </logmessage> 
+    <logmessage name="CONFIG_ERROR_DELETE_COT_DESCRIPTOR" id="17"
+        loglevel="LL_INFO"
+        description="Error while deleting the circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Deleting the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check COT debug for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_NAME_ERROR_DELETE_COT_DESCRIPTOR" id="18"
+        loglevel="LL_INFO"
+        description="Invalid name, cannot delete circle of trust.">
+        <datainfo>
+            <item>Circle of Trust Name</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Deleting the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check the circle of trust name and retry deletion.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="HAS_ENTITIES_DELETE_COT_DESCRIPTOR" id="19"
+        loglevel="LL_INFO"
+        description="Cannot delete circle of trust which has entities.">
+        <datainfo>
+            <item>Circle of Trust Name</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Deleting the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Remove all entities from the circle of trust and retry deletion.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_COT_TYPE_DELETE_COT_DESCRIPTOR" id="20"
+        loglevel="LL_INFO"
+        description="Invalid type cannot delete circle of trust.">
+        <datainfo>
+            <item>Realm or organization name</item>
+            <item>Circle of Trust Name</item>
+            <item>Circle of Trust Type</item>
+        </datainfo>
+        <triggers>
+            <item>Deleting the circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Specify correct Circle of Trust type and retry delete.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="COT_DESCRIPTOR_DELETED" id="21"
+        loglevel="LL_INFO"
+        description="Circle of trust deleted.">
+        <datainfo>
+            <item>Name of the circle of trust</item> 
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Deleting the circle of trust.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="COT_FROM_CACHE" id="22"
+        loglevel="LL_FINE"
+        description="Retrieved the circle of trust from cache.">
+        <datainfo>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Retreived the circle of trust from cache.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_COT_DESCRIPTOR" id="23"
+        loglevel="LL_INFO"
+        description="Error while getting the circle of trust from data store.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Retreiving the circle of trust</item>
+        </triggers>
+        <actions>
+             <item>Check configuration</item>
+             <item>check debug for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_RETREIVE_COT" id="24"
+        loglevel="LL_INFO"
+        description="Error determining an entity is in a circle of trust.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Name of the circle of trust</item>
+            <item>ID of an entity</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Determining an entity is in a circle of trust.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for more detailed error message.</item>
+        </actions>
+    </logmessage>     
+    <logmessage name="COT_DESCRIPTOR_RETRIEVED" id="25"
+        loglevel="LL_INFO"
+        description="Retrieved the circle of trust descriptor.">
+        <datainfo>
+            <item>Name of the circle of trust</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieving the circle of trust under a realm.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+</logmessages>

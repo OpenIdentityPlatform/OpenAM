@@ -1,0 +1,861 @@
+
+    <test name="AuthTestLDAPModule">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestLDAPService">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestLDAPAuthLevel">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestLDAPRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestAnonymousModule">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestAnonymousService">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestAnonymousAuthLevel">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestDataStoreModule">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestDataStoreService">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestDataStoreAuthLevel">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestDataStoreRealm">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestMembershipModule">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestMembershipService">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestMembershipAuthLevel">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+   </test>
+    <test name="AuthTestMembershipRealm">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+   </test>
+   <test name="AuthTestLDAPUser">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+   </test>
+   <test name="AuthTestAnonymousUser">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+   </test>
+   <test name="AuthTestDataStoreUser">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+   </test>
+   <test name="AuthTestMembershipUser">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestRequired">
+        <parameter name="testChainName" value="chain8"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestRequisite">
+        <parameter name="testChainName" value="chain9"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestOptional">
+        <parameter name="testChainName" value="chain11"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestOneUsernamePassword">
+        <parameter name="testChainName" value="chain10"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestSufficient">
+        <parameter name="testChainName" value="chain12"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="RedirectTestLDAPRootRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+     <test name="RedirectTestLDAPSubRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="gotoldaprealm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+    <test name="RedirectTestDataStoreRootRealm">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+     <test name="RedirectTestDataStoreSubRealm">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testRealm" value="gotodsrealm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+    <test name="RedirectTestMembershipRootRealm">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+     <test name="RedirectTestMembershipSubRealm">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testRealm" value="gotomemrealm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_noneExist">
+        <parameter name="testCaseName" value="noneExist"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inetuserPositive">
+        <parameter name="testCaseName" value="inetuserPositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_loginPositive">
+        <parameter name="testCaseName" value="loginPositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lifePositive">
+        <parameter name="testCaseName" value="lifePositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test> 
+    <test name="UserAuthAttributeTest_inetuserNegative">
+        <parameter name="testCaseName" value="inetuserNegative"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>                  
+    <test name="ProfileAttributesRequiredTest">
+        <parameter name="testProfile" value="required"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ProfileAttributesTest"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeSanityTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeSanityTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestSameModule">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="false"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestForceAuthSameModule">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="false"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeSanityTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm1"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeSanityTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm2"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeLevelSanityTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeLevelSanityTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeLevelMismatchTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeLevelMismatchTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeLevelSanityTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm3"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeLevelSanityTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm4"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeMismatchTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm17"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchLevelTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm18"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchLevelTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm19"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm20"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+    <test name="ApplicationAuthTest">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="negativeTest" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="ApplicationAuthTestNegative">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="negativeTest" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="ApplicationAuthTestSubRealm">
+        <parameter name="testRealm" value="apprealm"/>
+        <parameter name="negativeTest" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="ApplicationAuthTestSubRealmNegative">
+        <parameter name="testRealm" value="apprealm2"/>
+        <parameter name="negativeTest" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthContextLogoutSubRealm">
+        <parameter name="testRealm" value="logoutrealm"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>    
+    <test name="NewSessionArgTest">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testModule" value="datastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgTestSubRealm">
+        <parameter name="testRealm" value="nssubrealm"/>
+        <parameter name="testModule" value="datastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgAnonymousTest">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testModule" value="anonymous"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgTestSubRealm">
+        <parameter name="testRealm" value="nssubrealm2"/>
+        <parameter name="testModule" value="anonymous"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="MapUserAttrToSSOTokenRootRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.PostAuthProcessingTest"/>
+        </classes>
+    </test>
+    <test name="MapUserAttrToSSOTokenSubRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="postrealm"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.PostAuthProcessingTest"/>
+        </classes>
+    </test>
+    

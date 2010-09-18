@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright (c) 2010 ForgeRock AS. All Rights Reserved.
+ 
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+ 
+  You can obtain a copy of the License at
+  http://forgerock.org/license/CDDLv1.0.html
+  See the License for the specific language governing
+  permission and limitations under the License.
+ 
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at http://forgerock.org/license/CDDLv1.0.html
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+-->
+
+<schema 
+targetNamespace="urn:oasis:names:tc:SAML:metadata:attribute" 
+xmlns="http://www.w3.org/2001/XMLSchema" 
+xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" 
+xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute" 
+elementFormDefault="unqualified" 
+attributeFormDefault="unqualified" 
+blockDefault="substitution" 
+version="2.0">
+
+    <import namespace="urn:oasis:names:tc:SAML:2.0:assertion"
+        schemaLocation="saml-schema-assertion-2.0.xsd"/>
+    <import namespace="http://www.w3.org/XML/1998/namespace"
+        schemaLocation="xml.xsd"/>
+
+  <annotation>
+    <documentation>
+      Document title: SAML V2.0 Metadata Extention for Entity Attributes Schema
+      Document identifier: sstc-metadata-attr.xsd
+      Location: http://www.oasis-open.org/committees/documents.php?wg_abbrev=security
+      Revision history:
+      V1.0 (November 2008):
+        Initial version.
+    </documentation>
+  </annotation>
+
+  <import namespace="urn:oasis:names:tc:SAML:2.0:assertion" schemaLocation="saml-schema-assertion-2.0.xsd"/>
+
+  <element name="EntityAttributes" type="mdattr:EntityAttributesType"/>
+  <complexType name="EntityAttributesType">
+    <choice maxOccurs="unbounded">
+      <element ref="saml:Attribute"/>
+      <element ref="saml:Assertion"/>
+    </choice>
+  </complexType>
+
+</schema>

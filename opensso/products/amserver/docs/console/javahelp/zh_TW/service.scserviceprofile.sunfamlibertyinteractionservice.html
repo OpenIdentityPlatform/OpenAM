@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty 互動式服務 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Liberty 互動式服務</h4>
+
+
+<a name="ggofj"></a><h5>重新導向使用者以便進行互動的 WSP</h5>
+<p>此屬性指出 Web 服務提供者是否將重新導向使用者以獲得同意。預設值為「是」。</p>
+
+<a name="ggofq"></a><h5>重新導向使用者以便進行資料互動的 WSP</h5>
+<p>這可啟動互動，以獲得使用者同意或收集額外資料。此特性指出 Web 服務提供者是否將重新導向使用者以收集其他資料。預設值為「是」。</p>
+
+<a name="ggogl"></a><h5>WSP 的預期互動持續時間</h5>
+<p>此屬性指出 Web 服務提供者預期完成互動並將控制權交還給 Web 服務用戶端所需的時間長度 (以秒為單位)。例如，Web 服務提供者收到請求，該請求指出 Web 服務用戶端最多將等待 30 秒 (在
+[WSC 的預期互動持續時間] 中設定) 以進行互動。如果此屬性設為 40 秒，Web 服務提供者將傳回 SOAP 錯誤 (<tt>timeNotSufficient </tt>)，表示互動的時間不足。</p>
+
+<a name="ggogn"></a><h5>強制 returnToURL 必須為 SSL 的 WSP</h5>
+<p>此屬性指出 Web 服務提供者是否將強制 Web 服務用戶端指定 HTTPS <tt>returnToURL</tt>。 Liberty Alliance Project 規格表示此特性的值始終為「是」。「false」值主要表示採用分階段的方式簡化部署。</p>
+
+<a name="ggoib"></a><h5>強制返回主機與請求主機相同的 WSP</h5>
+<p>此屬性指出 Web 服務提供者是否強制使用 <tt>returnToHost</tt> 和 <tt> requestHost</tt> 的位址值 (如果兩者相同)。 Liberty Alliance Project 規格表示此特性的值始終為「是」。「false」值主要表示採用分階段的方式簡化部署。</p>
+
+<a name="ggoha"></a><h5>HTML 樣式表位置</h5>
+<p>此屬性指出用於以 HTML 方式呈現互動式頁面的樣式表位置。</p>
+
+<a name="ggohi"></a><h5>WML 樣式表位置</h5>
+<p>此屬性指出用於以 WML 方式呈現互動式頁面的樣式表位置。</p>
+
+<a name="ggogg"></a><h5>WSP 互動式 URL</h5>
+<p>此屬性指定在其中部署 <tt>WSPRedirectHandler</tt> servlet 的 URL。此 servlet 會處理互動的服務提供者端，以進行使用者重新導向。</p>
+
+<a name="ggoft"></a><h5>位於負載平衡器後的 WSP 互動式 URL</h5>
+<p>定義由負載平衡器公開的 WSP 重新導向處理程式 URL。</p>
+
+<a name="ggogq"></a><h5>位於負載平衡器後之 WSP 叢集 (網站) 的互動式 URL 清單</h5>
+<p>定義叢集中受信任伺服器的 WSP 重新導向處理程式 URL。</p>
+
+<a name="ggogx"></a><h5>互動式配置類別</h5>
+<p>此屬性指定提供存取方法以讀取互動配置的類別。</p>
+
+<a name="ggogj"></a><h5>用於 WSC 參與互動的選項</h5>
+<p>此屬性指出 WSC 在配置為參與使用者重新導向時將參與的互動層級。可能的值為 interactIfNeeded、doNotInteract 及 doNotInteractForData。預設值為表示肯定的 interactIfNeeded。</p>
+
+<a name="ggogs"></a><h5>包含 userInteractionHeader 的 WSC</h5>
+<p>此屬性指出 Web 服務用戶端是否將包含 SOAP 標頭，以便根據 Liberty 規格指明互動的特定喜好設定。預設值為「是」。</p>
+
+<a name="ggofn"></a><h5>重新導向使用者以便進行互動的 WSC</h5>
+<p>此屬性定義 WSC 是否參與使用者重新導向。預設值為「是」。</p>
+
+<a name="ggoim"></a><h5>WSC 的預期互動持續時間</h5>
+<p>此屬性定義 Web 服務用戶端能夠為 Web 服務提供者完成其互動部分而等待的最長時間 (以秒為單位)。如果互動需要的時間可能比設定的時間長，則 Web 服務提供者將不會啟動互動。例如，Web 服務提供者收到請求，其中此特性設為最長 30 秒。如果 Web
+服務提供者特性 [WSP 的預期互動持續時間] 設為 40 秒，則 Web 服務提供者會傳回 SOAP 錯誤 (<tt>timeNotSufficient</tt>)，指出互動的時間不足。</p>
+
+<a name="ggofx"></a><h5>強制重新導向 URL 必須為 SSL 的 WSC</h5>
+<p>此屬性指定 Web 服務用戶端是否將在重新導向的 URL 中強制使用 HTTPS。Liberty Alliance Project 規格指出，此特性的值固定為「是」，表示 Web 服務提供者在 <tt>redirectURL</tt>
+的值 (由 Web 服務提供者指定) 不是 HTTPS URL 時，將不會重新導向使用者。「false」值主要用於簡化分階段的部署。</p>
+<br/>
+
+</body>
+</html>

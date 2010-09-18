@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自定义 ID-FF 服务提供者 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffsp"></a><h4>自定义 ID-FF 服务提供者</h4>
+<p>ID-FF 服务提供者属性被分组为以下部分：</p>
+<ul><li><p><a href="#ggwvs">公共属性</a></p></li>
+<li><p><a href="#ggwvp">通信 URL</a></p></li>
+<li><p><a href="#ggwrw">通信配置文件</a></p></li>
+<li><p><a href="#ggwud">服务提供者配置</a></p></li>
+<li><p><a href="#ggwyd">服务 URL</a></p></li>
+<li><p><a href="#ggwsf">插件</a></p></li>
+<li><p><a href="#ggwtb">服务提供者属性映射程序</a></p></li>
+<li><p><a href="#ggwtp">自动联合</a></p></li>
+<li><p><a href="#ggwrv">验证环境</a></p></li>
+<li><p><a href="#ggwub">代理验证配置</a></p></li></ul>
+
+
+<a name="ggwvs"></a><h5>公共属性</h5>
+
+<ul><li><p><a href="#ggwwh">提供者类型</a></p></li>
+<li><p><a href="#ggwrt">说明</a></p></li>
+<li><p><a href="#ggwuu">协议支持枚举</a></p></li>
+<li><p><a href="#ggwwn">签名密钥</a></p></li>
+<li><p><a href="#ggwuj">加密密钥</a></p></li>
+<li><p><a href="#ggwsc">名称标识符加密</a></p></li>
+<li><p><a href="#ggwwa">签名验证请求</a></p></li></ul>
+
+
+<a name="ggwwh"></a><h5>提供者类型</h5>
+<p>此属性的静态值是正在配置的提供者类型：托管或远程。</p>
+
+<a name="ggwrt"></a><h5>说明</h5>
+<p>该属性的值是服务提供者的说明。</p>
+
+<a name="ggwuu"></a><h5>协议支持枚举</h5>
+<p>选择此提供者支持的 Liberty ID-FF 发行版。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 是指 Liberty Identity Federation Framework 版本 1.2。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 是指 Liberty Identity Federation Framework 版本 1.1。</p></li></ul>
+
+
+<a name="ggwwn"></a><h5>签名密钥</h5>
+<p>定义用于签署请求和响应的安全凭证别名。证书存储在 Java 密钥库文件中。每个特定证书都被映射到用于获取证书的别名。</p>
+
+<a name="ggwuj"></a><h5>加密密钥</h5>
+<p>定义用于加密签名密钥和加密密钥的证书存储在 Java 密钥库文件中。每个特定证书都被映射到用于获取证书的别名。</p>
+
+<a name="ggwsc"></a><h5>名称标识符加密</h5>
+<p>选中此复选框可启用名称标识符加密。</p>
+
+<a name="ggwwa"></a><h5>签名验证请求</h5>
+<p>如果启用，则服务提供者将签署所有验证请求。</p>
+
+<a name="ggwvp"></a><h5>通信 URL</h5>
+
+<ul><li><p><a href="#ggwrz">SOAP 端点</a></p></li>
+<li><p><a href="#ggwun">单点注销服务</a></p></li>
+<li><p><a href="#ggwrn">单点注销返回</a></p></li>
+<li><p><a href="#ggwvg">联合终止服务</a></p></li>
+<li><p><a href="#ggwup">联合终止返回</a></p></li>
+<li><p><a href="#ggwry">名称注册服务</a></p></li>
+<li><p><a href="#ggwvd">名称注册返回</a></p></li>
+<li><p><a href="#ggwtq">声明使用方 URL</a></p></li>
+<li><p><a href="#ggwrh">声明使用方服务 URL ID</a></p></li>
+<li><p><a href="#ggwvi">将声明使用方服务 URL 设置为默认值</a></p></li></ul>
+
+
+<a name="ggwrz"></a><h5>SOAP 端点</h5>
+<p>定义服务提供者的 SOAP 消息接收方的 URI。在非浏览器通信中，此值用于同 SOAP 接收方的位置进行通信。</p>
+
+<a name="ggwun"></a><h5>单点注销服务</h5>
+<p>定义身份认证提供者可将注销请求发送到的 URL。单点注销会在此身份认证提供者验证的所有会话间对注销功能进行同步。</p>
+
+<a name="ggwrn"></a><h5>单点注销返回</h5>
+<p>定义身份认证提供者可将单点注销响应发送到的 URL。</p>
+
+<a name="ggwvg"></a><h5>联合终止服务</h5>
+<p>定义身份认证提供者可将联合终止请求发送到的 URL。</p>
+
+<a name="ggwup"></a><h5>联合终止返回</h5>
+<p>定义身份认证提供者可将联合终止响应发送到的 URL。</p>
+
+<a name="ggwry"></a><h5>名称注册服务</h5>
+<p>定义特定 URL，当与身份认证提供者进行通信来为主体指定新的名称标识符时，会使用这些 URL。（只能在建立联合会话后注册。）</p>
+
+<a name="ggwvd"></a><h5>名称注册返回</h5>
+<p>定义身份认证提供者可将名称注册响应发送到的 URL。（只能在建立联合会话后注册。）</p>
+
+<a name="ggwtq"></a><h5>声明使用方 URL</h5>
+<p>定义身份认证提供者可将 SAML 声明发送到的 URL。</p>
+
+<a name="ggwrh"></a><h5>声明使用方服务 URL ID</h5>
+<p>如果“协议支持枚举”公共属性的值为 <tt>urn:liberty:iff:2003-08</tt>，请键入所需的 ID。</p>
+
+<a name="ggwvi"></a><h5>将声明使用方服务 URL 设置为默认值</h5>
+<p>如果请求中未提供标识符，选中此复选框，以默认值使用“声明使用方服务 URL”。</p>
+
+<a name="ggwrw"></a><h5>通信配置文件</h5>
+
+<ul><li><p><a href="#ggwwg">联合终止</a></p></li>
+<li><p><a href="#ggwuc">单点注销</a></p></li>
+<li><p><a href="#ggwsy">名称注册</a></p></li>
+<li><p><a href="#ggwuk">支持的 SSO 配置文件</a></p></li></ul>
+
+
+<a name="ggwwg"></a><h5>联合终止</h5>
+<p>选择将主体的联合终止通知其他提供者的配置文件：</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuc"></a><h5>单点注销</h5>
+<p>选择将主体的注销通知其他提供者的配置文件：</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>获取 HTTP</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwsy"></a><h5>名称注册</h5>
+<p>选择将主体的名称注册通知其他提供者的配置文件：</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuk"></a><h5>支持的 SSO 配置文件</h5>
+<p>选择用于发送验证请求的配置文件：</p>
+<ul><li><p>浏览器 POST（指定基于浏览器的 HTTP POST 协议）</p></li>
+<li><p>浏览器工件（指定基于 SOAP 的非浏览器协议）</p></li>
+<li><p>WML（指定无线标记语言协议）</p></li>
+<li><p>LECP（指定一个启用了 Liberty 的客户机代理）</p>
+<hr><p><b>注 &#8211; </b>OpenSSO 可处理来自启用 Liberty 的客户机代理配置文件的请求，但是它所需的某些配置未包含在本手册中。</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwud"></a><h5>服务提供者配置</h5>
+
+<ul><li><p><a href="#ggwtx">提供者别名</a></p></li>
+<li><p><a href="#ggwuf">验证类型</a></p></li>
+<li><p><a href="#ggwvl">身份认证提供者强制验证</a></p></li>
+<li><p><a href="#ggwrk">请求身份认证提供者被动</a></p></li>
+<li><p><a href="#ggwwi">联合后的名称注册</a></p></li>
+<li><p><a href="#ggwsq">名称 ID 策略</a></p></li>
+<li><p><a href="#ggwvr">联合提供者联盟</a></p></li>
+<li><p><a href="#ggwwp">提供者状态</a></p></li>
+<li><p><a href="#ggwti">响应结果</a></p></li></ul>
+
+
+<a name="ggwtx"></a><h5>提供者别名</h5>
+<p>定义本地服务提供者的别名。</p>
+
+<a name="ggwuf"></a><h5>验证类型</h5>
+<p>选择应用于本地托管提供者发出的验证请求的提供者：</p>
+<ul><li><p><b>远程</b>，指定本地托管提供者应在收到验证请求时联系远程身份认证提供者。</p></li>
+<li><p><b>本地</b>，指定本地托管提供者应在收到验证请求时联系本地身份认证提供者（实质上是其本身）。</p></li></ul>
+
+
+<a name="ggwvl"></a><h5>身份认证提供者强制验证</h5>
+<p>选中该复选框表示身份认证提供者在收到验证请求时必须重新验证（即使是处于活动的会话期间）。默认情况下会启用此属性。</p>
+
+<a name="ggwrk"></a><h5>请求身份认证提供者被动</h5>
+<p>选中该复选框以指定身份认证提供者决不能与主体交互，而必须与用户交互。</p>
+
+<a name="ggwwi"></a><h5>联合后的名称注册</h5>
+<p>如果启用，则此选项将在服务提供者被联合后允许其参与名称注册。</p>
+
+<a name="ggwsq"></a><h5>名称 ID 策略</h5>
+<p>枚举允许请求者影响身份认证提供者的名称标识符策略。</p>
+
+<a name="ggwvr"></a><h5>联合提供者联盟</h5>
+<p>选中此复选框可启用联合提供者联合。</p>
+
+<a name="ggwwp"></a><h5>提供者状态</h5>
+<p>定义服务提供者处于活动状态还是非活动状态。默认为活动状态，这意味着服务提供者能处理请求并生成响应。</p>
+
+<a name="ggwti"></a><h5>响应结果</h5>
+<p>指定服务提供者能生成的语句类型。例如 <tt>lib:AuthenticationStatement</tt>。</p>
+
+<a name="ggwyd"></a><h5>服务 URL</h5>
+
+<ul><li><p><a href="#ggwro">COT 列表页面 URL</a></p></li>
+<li><p><a href="#ggwri">联合页面 URL</a></p></li>
+<li><p><a href="#ggwtf">主页 URL</a></p></li>
+<li><p><a href="#ggwsa">单点登录失败重定向 URL</a></p></li>
+<li><p><a href="#ggwta">终止完成 URL</a></p></li>
+<li><p><a href="#ggwrd">错误页面 URL</a></p></li>
+<li><p><a href="#ggwth">注销完成 URL</a></p></li></ul>
+
+
+<a name="ggwro"></a><h5>COT 列表页面 URL</h5>
+<p>定义列出提供者所属的所有信任环的 URL。</p>
+
+<a name="ggwri"></a><h5>联合页面 URL</h5>
+<p>指定执行联合操作的 URL。</p>
+
+<a name="ggwtf"></a><h5>主页 URL</h5>
+<p>定义身份认证提供者的主页的 URL。</p>
+
+<a name="ggwsa"></a><h5>单点登录失败重定向 URL</h5>
+<p>定义主体在单点登录失败时将被重定向到的 URL。</p>
+
+<a name="ggwta"></a><h5>终止完成 URL</h5>
+<p>定义联合终止完成后将主体重定向到的 URL。</p>
+
+<a name="ggwrd"></a><h5>错误页面 URL</h5>
+<p>定义出错时将主体重定向到的 URL。</p>
+
+<a name="ggwth"></a><h5>注销完成 URL</h5>
+<p>定义注销后将主体重定向到的 URL。</p>
+
+<a name="ggwsf"></a><h5>插件</h5>
+
+<ul><li><p><a href="#ggwuh">服务提供者适配器</a></p></li>
+<li><p><a href="#ggwtd">联合 SP 适配器环境</a></p></li>
+<li><p><a href="#ggwuv">用户提供者类</a></p></li>
+<li><p><a href="#ggwsu">名称标识符实现</a></p></li></ul>
+
+
+<a name="ggwuh"></a><h5>服务提供者适配器</h5>
+<p>定义 <tt>com.sun.identity.federation.plugins.FSSPAdapter</tt> 接口的实现类。默认值为：</p><p><tt>com.sun.identity.federation.plugins.FSDefaultSPAdapter</tt></p>
+
+<a name="ggwtd"></a><h5>联合 SP 适配器环境</h5>
+<p>定义服务提供者适配器 SPI 实现类使用的环境属性的列表。</p>
+
+<a name="ggwuv"></a><h5>用户提供者类</h5>
+<p>指定可插入类，该类用于提供查找用户、获取用户属性等用户操作。默认值为：</p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider</tt></p>
+
+<a name="ggwsu"></a><h5>名称标识符实现</h5>
+<p>此字段用于定义服务提供者参与名称注册时所使用的类。名称注册是一个配置文件，服务提供者以此指定身份认证提供者在与服务提供者通信时使用的主体名称标识符。该值为 <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt>。</p>
+
+<a name="ggwtb"></a><h5>服务提供者属性映射程序</h5>
+
+<ul><li><p><a href="#ggwvz">属性映射程序类</a></p></li>
+<li><p><a href="#ggwsh">服务提供者属性映射</a></p></li></ul>
+
+
+<a name="ggwvz"></a><h5>属性映射程序类</h5>
+<p>用于将本地定义的用户属性映射到 SAML 声明中的属性的类。没有默认类。</p>
+
+<a name="ggwsh"></a><h5>服务提供者属性映射</h5>
+<p>指定值，用于定义以上指定的默认属性映射程序所使用的映射。映射应该按以下格式配置：</p><p><i>SAML-attribute</i>=<i>local-attribute</i></p><p>例如，<tt>Email=emailaddress</tt> 或 <tt>Address=postaladdress</tt>。将映射作为“新值”键入，并单击“添加”。</p>
+
+<a name="ggwtp"></a><h5>自动联合</h5>
+
+<ul><li><p><a href="#ggwrl">自动联合</a></p></li>
+<li><p><a href="#ggwsd">自动联合公共属性名称</a></p></li></ul>
+
+
+<a name="ggwrl"></a><h5>自动联合</h5>
+<p>选中此复选框可启用自动联合。</p>
+
+<a name="ggwsd"></a><h5>自动联合公共属性名称</h5>
+<p>定义用户的公共 LDAP 属性名称，如 <tt>telephonenumber</tt>。用于创建自动联合属性语句。将在创建自动联合属性语句时使用此属性值。该语句将包含属性元素和此公共属性作为其值。</p>
+
+<a name="ggwrv"></a><h5>验证环境</h5>
+<p>此属性定义服务提供者的默认验证环境类（验证方法）。服务提供者发送验证请求时总会调用此方法。此值还指定了服务提供者在未知用户试图访问受保护的资源时所使用的验证环境。这些选项包括：</p><dl><dt>支持</dt>
+<dd><p>如果服务提供者支持验证环境类，请选中其旁边的复选框。</p></dd>
+<a name="indexterm-74"></a><a name="indexterm-75"></a><a name="indexterm-76"></a><dt>环境参考</dt>
+<dd><p>Liberty 定义的验证环境类为：</p>
+<ul><li><p>Mobile Contract</p></li>
+<li><p>Mobile Digital ID</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Time-Sync-Token</p></li></ul>
+</dd>
+<dt>级别</dt>
+<dd><p>对于存在多个环境的情况，请选择一个优先级。</p></dd>
+</dl>
+
+
+<a name="ggwub"></a><h5>代理验证配置</h5>
+
+<ul><li><p><a href="#ggwur">代理验证</a></p></li>
+<li><p><a href="#ggwrs">代理身份认证提供者列表</a></p></li>
+<li><p><a href="#ggwsr">代理的最大数目</a></p></li>
+<li><p><a href="#ggwtu">对代理使用引入 Cookie</a></p></li></ul>
+<p>“代理验证配置”属性定义了动态提供者代理值。</p>
+
+<a name="ggwur"></a><h5>代理验证</h5>
+<p>选中复选框来为服务提供者启用代理验证。</p>
+
+<a name="ggwrs"></a><h5>代理身份认证提供者列表</h5>
+<p>在“新值”中键入可用于代理验证的身份认证提供者标识符，然后单击“添加”。该值是定义为提供者标识符的 URI。</p>
+
+<a name="ggwsr"></a><h5>代理的最大数目</h5>
+<p>输入可用于代理验证的身份认证提供者的最大数目。</p>
+
+<a name="ggwtu"></a><h5>对代理使用引入 Cookie</h5>
+<p>如果您要使用引入 Cookie 来查找代理身份认证提供者，请选中此复选框。</p>
+<br/>
+
+</body>
+</html>

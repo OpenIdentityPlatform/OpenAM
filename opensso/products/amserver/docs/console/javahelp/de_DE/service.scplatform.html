@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Plattform - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>Plattform</h4>
+<p><a name="indexterm-205"></a>Mithilfe des Plattformdienstes k&#246;nnen zus&#228;tzliche Server zur OpenSSO-Konfiguration hinzugef&#252;gt und andere Optionen
+auf der obersten Ebene der OpenSSO-Anwendung &#252;bernommen werden. Bei den Plattformdienstattributen handelt
+es sich um globale Attribute. Es existieren folgende Attribute:</p>
+<ul><li><p><a href="#fxcgy">Plattform-L&#228;ndereinstellung</a></p></li>
+<li><p><a href="#fxcpo">Cookie-Dom&#228;nen</a></p></li>
+<li><p><a href="#fxcmi">Verf&#252;gbare L&#228;ndereinstellungen</a></p></li>
+<li><p><a href="#fxctg">Client-Zeichens&#228;tze</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>Plattform-L&#228;ndereinstellung</h5>
+<p>Der Wert dieses Attributs ist der Standard-Sprachenuntertyp, mit dem OpenSSO installiert wurde.
+Die Authentifizierungs-, Protokoll- und Verwaltungsdienste werden in der mit diesem Attribut eingestellten
+Sprache verwaltet. Der Standardwert ist en_US. Eine Liste der unterst&#252;tzten Sprachuntertypen finden
+Sie unter <a href="supportedlang.html">Unterst&#252;tzte Sprach- bzw. L&#228;ndereinstellungen</a>.</p>
+
+<a name="fxcpo"></a><h5>Cookie-Dom&#228;nen</h5>
+<p>Dieses Attribut gibt die Liste der Dom&#228;nen an, die im Cookie-Header zur&#252;ckgegeben
+werden, wenn w&#228;hrend der Authentifizierung ein Cookie f&#252;r den Browser des Benutzers
+eingerichtet wird. Falls dieses Attribut leer ist, wird keine Cookie-Dom&#228;ne eingerichtet. Mit
+anderen Worten: Das OpenSSO-Sitzungscookie wird lediglich an OpenSSO weitergeleitet und an keinen
+anderen Server der Dom&#228;ne.</p><p>Wenn f&#252;r andere Server in der Dom&#228;ne SSO erforderlich ist, muss in
+diesem Attribut die Cookie-Dom&#228;ne angegeben werden. Wenn auf einem OpenSSO zwei Schnittstellen
+in unterschiedlichen Dom&#228;nen vorhanden sind, m&#252;ssen in diesem Attribut beide Cookie-Dom&#228;nen angegeben
+werden. Wird ein Lastenausgleichssystem eingesetzt, muss die Dom&#228;ne dieses Systems als Cookie-Dom&#228;ne
+angegeben werden und nicht die Dom&#228;ne der Server hinter diesem System. Der
+Standardwert f&#252;r dieses Feld ist die Dom&#228;ne des installierten OpenSSO.</p>
+
+<a name="fxcmi"></a><h5>Verf&#252;gbare L&#228;ndereinstellungen</h5>
+<p>Dieses Attribut speichert alle f&#252;r die Plattform verf&#252;gbaren L&#228;ndereinstellungen. Verwenden Sie nach
+M&#246;glichkeit eine Anwendung, die dem Benutzer die Auswahl der L&#228;ndereinstellungen erm&#246;glicht. Eine
+solche Anwendung ruft dieses Attribut aus dem Plattformprofil ab und zeigt dem
+Benutzer die Liste der verf&#252;gbaren L&#228;ndereinstellungen an. Die vom Benutzer ausgew&#228;hlte L&#228;ndereinstellung
+wird von der Anwendung im Benutzereintrag <i> preferredLocale</i> gespeichert.</p>
+
+<a name="fxctg"></a><h5>Client-Zeichens&#228;tze</h5>
+<p>Dieses Attribut gibt die Zeichens&#228;tze f&#252;r unterschiedliche Clients auf Plattformebene an. Es
+enth&#228;lt eine Liste der Client-Typen mit den zugeh&#246;rigen Zeichens&#228;tzen. Weitere Informationen finden
+Sie unter <a href="service.scplatformclientcharsetsadd.html">So erstellen Sie einen neuen Zeichensatz</a>.</p>
+<br/>
+
+</body>
+</html>

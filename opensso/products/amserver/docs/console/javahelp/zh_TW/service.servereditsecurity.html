@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>安全性 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>安全性</h4>
+<p>[安全性] 屬性定義加密、驗證和 Cookie 資訊，以控制伺服器實例的安全等級。</p>
+
+<a name="ggkbi"></a><h5>加密</h5>
+<p>加密屬性包括：</p>
+
+<a name="ggkcb"></a><h5>密碼加密金鑰</h5>
+<p>指定用來加密和解密密碼，並且儲存在「服務管理系統」配置中的金鑰。值會在安裝期間設定。範例：<tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd </tt></p>
+
+<a name="ggkbg"></a><h5>認證服務共用密碼</h5>
+<p>應用程式認證模組的共用密碼。值會在安裝期間設定。範例：<tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl </tt></p>
+
+<a name="ggkbd"></a><h5>加密類別</h5>
+<p>預設值為 <tt>com.iplanet.services.util.JCEEncryption</tt>。指定加密類別實作。可用類別包括：<tt>com.iplanet.services.util.JCEEncryption</tt> 和 <tt>com.iplanet.services.util.JSSEncryption </tt>。</p>
+
+<a name="ggkby"></a><h5>安全隨機工廠類別</h5>
+<p> 預設值為 <tt>com.iplanet.am.</tt><tt>util.JSSSecureRandomFactoryImp </tt>l。指定 <tt>SecureRandomFactory </tt>的工廠類別名稱。可用的實作類別包括：使用 JSS 的 <tt>com.iplanet.am.</tt><tt>util.JSSSecureRandomFactoryImpl</tt>，以及用純 Java 的 <tt>com.iplanet.am.</tt><tt>util.SecureRandomFactoryImpl</tt>。</p>
+
+<a name="ggkbr"></a><h5>驗證</h5>
+<p>驗證屬性包括：</p>
+
+<a name="ggkay"></a><h5>平台低階通訊最大內容長度</h5>
+<p>預設值為 16384 或 16k。指定 OpenSSO 可接受的 <tt>HttpRequest</tt> 最大內容長度。</p>
+
+<a name="ggkbb"></a><h5>用戶端 IP 位址檢查</h5>
+<p>預設值為「否」。指定在建立或驗證所有 <tt>SSOToken</tt> 的過程中是否檢查用戶端的 IP 位址。</p>
+
+<a name="ggkba"></a><h5>Cookie</h5>
+<p>Cookie 屬性包括：</p>
+
+<a name="ggkad"></a><h5>Cookie 名稱</h5>
+<p>預設值為 <tt>iPlanetDirectoryPro</tt>。「認證服務」用來設定有效的階段作業處理程式 ID 的 Cookie 名稱。此 Cookie 名稱的值可用來擷取有效的階段作業資訊。</p>
+
+<a name="ggkaw"></a><h5>安全 Cookie</h5>
+<p>允許在安全模式中設定 OpenSSO Cookie，在此模式中，瀏覽器只有在使用如 <tt>HTTP(s)</tt> 的安全協定時才會傳回 Cookie。預設值為 false。</p>
+
+<a name="ggkbk"></a><h5>編碼 Cookie 值</h5>
+<p>此特性允許 OpenSSO 對 Cookie 值執行 <tt>URLencode</tt>，此作業會將字元轉換成 HTTP 能夠了解的字元。</p>
+
+<a name="ggkbc"></a><h5>金鑰庫</h5>
+<p>下列屬性可讓您為建立的額外網站和伺服器配置金鑰庫資訊：</p>
+
+<a name="ggkbj"></a><h5>金鑰庫檔案</h5>
+<p>值會在安裝期間設定。範例：<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/keystore.jks</tt>。指定 SAML XML 金鑰庫密碼檔的路徑。</p>
+
+<a name="ggkbu"></a><h5>金鑰庫密碼檔案</h5>
+<p>值會在安裝期間設定。範例：<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.storepass</tt>。指定 SAML XML 金鑰庫密碼檔案的路徑。</p>
+
+<a name="ggkbs"></a><h5>私密金鑰密碼檔案</h5>
+<p>值會在安裝期間設定。範例：<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.keypass。</tt> 指定 SAML XML 金鑰密碼檔案的路徑。</p>
+
+<a name="ggkaq"></a><h5>憑證別名</h5>
+<p>預設值為 test。</p>
+
+<a name="ggkbw"></a><h5>憑證撤銷清單快取</h5>
+<p>這些屬性會定義本機憑證撤銷清單 (Certificate Revocation List , CRL) 快取儲存庫，用於保存來自憑證授權單位的 CRL。任何需要取得 CRL 進行憑證驗證的服務，都將收到以這項資訊為基礎的 CRL。</p>
+
+<a name="ggkch"></a><h5>LDAP 伺服器主機名稱</h5>
+<p>指定儲存憑證的 LDAP 伺服器名稱。預設值是安裝 OpenSSO 時指定的主機名稱。可以使用任何儲存憑證的 LDAP 伺服器之主機名稱。</p>
+
+<a name="ggkau"></a><h5>LDAP 伺服器連接埠號碼</h5>
+<p>指定儲存憑證的 LDAP 伺服器的連接埠號碼。預設值是安裝 OpenSSO 時指定的連接埠。可以使用任何儲存憑證的 LDAP 伺服器之連接埠。</p>
+
+<a name="ggkam"></a><h5>已啟用 SSL</h5>
+<p>指定是否使用 SSL 來存取 LDAP 伺服器。預設情況下，憑證認證服務不使用 SSL 存取 LDAP。</p>
+
+<a name="ggkbv"></a><h5>LDAP 伺服器連結使用者名稱</h5>
+<p>指定 LDAP 伺服器中的連結 DN。</p>
+
+<a name="ggkaj"></a><h5>LDAP 伺服器連結密碼</h5>
+<p>定義用於連結至 LDAP 伺服器的密碼。依預設，會使用安裝期間輸入的 amldapuser 密碼做為連結使用者。</p>
+
+<a name="ggkce"></a><h5>LDAP 搜尋基底 DN</h5>
+<p>此屬性指定 LDAP 伺服器中由 LDAP 使用者主體使用的基底 DN，搜尋將從此基底 DN 開始。依預設，它是 OpenSSO 安裝基底的頂層範圍。</p>
+
+<a name="ggkbp"></a><h5>搜尋屬性</h5>
+<p>發行者 <tt>subjectDN</tt> 的任何 DN 元件都可以用來從本機 LDAP 伺服器擷取 CRL。此為單值字串，如 "cn"。所有根 CA 都需使用相同的搜尋屬性。</p>
+
+<a name="ggkaa"></a><h5>線上憑證狀態協定檢查</h5>
+<p>線上憑證狀態協定 (Online Certificate Status Protocol, OCSP) 可讓 OpenSSO 服務判斷指定憑證的 (撤銷) 狀態。OCSP 可用於滿足某些操作需求，提供比
+CRL 更多的即時撤銷資訊，並且可用來取得額外的狀態資訊。OCSP 用戶端會向 OCSP 回應程式發出狀態請求，並且暫緩接受正在處理中的憑證，直到回應程式提供回應為止。</p>
+
+<a name="ggkal"></a><h5>已啟用檢查</h5>
+<p>此屬性會啟用 OCSP 檢查。依預設會啟用。</p>
+
+<a name="ggkav"></a><h5>回應程式 URL</h5>
+<p>此屬性定義用來識別 OCSP 回應程式位置的 URL。例如，<tt>http://ocsp.example.net:80</tt>。</p><p>依預設，OCSP 回應程式的位置是由驗證的憑證以隱含的方式決定。此特性會在憑證中缺少授權單位資訊存取延伸 (在 RFC 3280 中定義) 或是需要置換時使用。</p>
+
+<a name="ggkai"></a><h5>憑證暱稱</h5>
+<p>OCSP 回應程式暱稱是該回應程式的 CA 憑證暱稱，例如 <tt>Certificate Manager - sun</tt>。如果已設定，則 Web 伺服器的憑證資料庫中必須有 CA 憑證。如果已設定 OCSP URL，則必須同時設定 OCSP
+回應程式暱稱。否則兩者都會被忽略。如果兩者都未設定，則會利用使用者憑證中存在的 OCSP 回應程式 URL 進行 OCSP 驗證。如果使用者憑證中沒有 OCSP 回應程式 URL，則不會執行 OCSP 驗證。</p>
+
+<a name="ggkag"></a><h5>聯邦資訊處理標準</h5>
+<p>依照「資訊技術管理重整法案」(公法 104-106)，美國商務部長認可由美國國家標準與技術研究院 (National Institute of Standards and Technology, NIST) 針對聯邦電腦系統所開發的標準及準則。這些標準及準則由 NIST 發佈，作為美國政府部門使用的聯邦資訊處理標準
+(Federal Information Processing Standards, FIPS)。當聯邦政府出現安全性和互通性這類迫切需求，但是卻沒有滿意的業界標準或解決方案時，NIST 會開發 FIPS。</p>
+
+<a name="ggkap"></a><h5>FIPS 模式</h5>
+<p>此特性可以是 true 或 false。所有加密作業只會在特性為 true 時執行 FIPS 相容模式。</p>
+<br/>
+
+</body>
+</html>

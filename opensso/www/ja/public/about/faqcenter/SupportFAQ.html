@@ -1,0 +1,141 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+	<tr><td><h2>Sun Microsystems OpenSSO Express FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#what_is">OpenSSO とは何ですか?</a></li>
+<li><a href="#sjsam">Sun Java System Access Manager とは何ですか?</a></li>
+<li><a href="#sjsfm">Sun Java System Federation Manager とは何ですか?</a></li>
+<li><a href="#codebase">OpenSSO のコードベースは Access Manager や Federation Manager のものと異なりますか?</a></li>
+<li><a href="#support">Sun Microsystems はどのようにして OpenSSO をサポートしますか?</a></li>
+<li><a href="#express">OpenSSO Express ビルドとは何ですか?</a></li>
+<li><a href="#availability">どれくらいの間隔で新しい OpenSSO Express ビルドがリリースされますか?</a></li>
+<li><a href="#communitybuild">OpenSSO Community ビルドとは何ですか?</a></li>
+<li><a href="#communitybuildsupport">OpenSSO Community ビルドはサポートされますか?</a></li>
+<li><a href="#upgrade">最新の OpenSSO Express ビルドがリリースされたら、それにアップグレードする必要がありますか?</a></li>
+<li><a href="#expresssupport">OpenSSO Express ビルドを使用している場合、サポートを受けられますか?</a></li>
+<li><a href="#testing">OpenSSO Express ビルドは、リリースされる前にどのようなテストが行われていますか?</a></li>
+
+</ol>
+</font></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="what_is"></a>OpenSSO とは何ですか?</b></b></p>
+
+<p>OpenSSO と称されている Open Web Single Sign-On プロジェクトは、
+ Sun Microsystems, Inc. より提供されていたアイデンティティと連携(フェデレーション)に関する 2 つの商用製品である 
+<a href="http://jp.sun.com/practice/software/identity/jp/access_mgr/">Sun Java<sup>TM</sup> System Access Manager</a> と <a href="http://jp.sun.com/practice/software/identity/jp/federation_mgr/"> Sun Java System Federation Manager</a> のソースコードをベースにしたオープンな開発プロジェクトです。
+OpenSSO のゴールはパブリックドメインにおけるアイデンティティサービスインフラに対する拡張可能な基盤を提供したり、Web やアプリケーションサーバーでホストされる Web アプリケーションに対するシングルサインオン(SSO) の実現を手助けすることです。
+OpenSSO のコードベースは Sun Microsystems からリリースされるアイデンティティおよび連携関連の次期商用製品の基盤となります。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="sjsam"></a> Sun Java System Access Manager とは何ですか?</b></b></p>
+
+<p><a href="http://jp.sun.com/practice/software/identity/jp/access_mgr/">Sun Java System Access Manager</a> は、Sun Microsystems がリリースしている商用製品で、
+OpenSSO のコードのベースとなっているものです。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="sjsfm"></a> Sun Java System Federation Manager とは何ですか?
+</b></b></p>
+
+<p><a href="http://jp.sun.com/practice/software/identity/jp/federation_mgr/">Sun Java System Federation Manager</a> は、Sun Microsystems がリリースしている商用製品で、OpenSSO のコードのベースとなっているものです。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="codebase"></a>
+OpenSSO のコードベースは Access Manager や Federation Manager のものと異なりますか?
+</b></b></p>
+
+<p>コードベースは同じです。
+Access Manager や Federation Manager をリリースした後に、Sun はコードを寄付し、 OpenSSO オープンソースプロジェクトを立ち上げました。
+それ以降、Sun のエンジニアと OpenSSO コミュニティがオープンな環境でコードを開発し、ナイトリービルドを作り、最新の機能をテストしたり使用できるように、定期的に安定したダウンロード用ビルドを作成しています。
+2009年1月現在、Sun OpenSSO Enterprise 8.0 が OpenSSO の最新の商用製品としてリリースされています。詳細は、<a href="http://jp.sun.com/products/software/opensso_enterprise/">こちら</a>を参照してください。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="support"></a> 
+Sun Microsystems はどのようにして OpenSSO をサポートしますか?
+</b></b></p>
+
+<p>2008年7月23日より、Sun Java System Access Manager または OpenSSO のサポートを受けるには、以下のことが必要です:
+
+<OL>
+<LI>
+Sun Java System Access Manager の perpetual license、または Sun Identity Management Suite か Java Enterprise System の subscription を購入する
+</LI>
+<LI><a href="http://jp.sun.com/practice/software/identity/jp/access_mgr/">Sun Java System Access Manager</a> または、<a href="https://opensso.dev.java.net/public/use/index.html">OpenSSO Express ビルド</a> または <a href="http://jp.sun.com/products/software/opensso_enterprise/support.html">Sun OpenSSO Enterprise 版</a>をダウンロードする</LI>
+</OL>
+
+その他は必要ありません。お客様は、OpenSSO のサポートや法的補償を受けるのに追加のライセンスやサポート契約を購入する必要はありません。
+Sun Java System Federation Manager は、OpenSSO を介してはサポートされない製品であることに注意してください。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="express"></a> 
+OpenSSO Express ビルドとは何ですか?
+</b></b></p>
+
+<p><a href="#communitybuild">ナイトリービルド</i></a>の中で、最新の 2 つの安定版ビルドを OpenSSO Express ビルドと呼んでいます。OpenSSO Express ビルドは、
+Sun Quality Assurance (QA) engineering チームによるマニュアルテストと自動化テストを経てリリースされています。 
+Sun Customer Support チャネルから問題をレポートするには、OpenSSO Enterprise 版か、その時点でサポートされている OpenSSO Express ビルドを配備している必要があります。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="availability"></a> 
+どれくらいの間隔で新しい OpenSSO Express ビルドがリリースされますか?
+</b></b></p>
+
+<p>新しい OpenSSO Express ビルドはだいたい 3 ヶ月に 1 回のペースでリリースされています。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="communitybuild"></a> 
+OpenSSO Community ビルドとは何ですか?
+</b></b></p>
+
+<p>OpenSSO のサイトにあるナイトリービルドを <i>Community ビルド</i> と呼んでいます。Community ビルドには常にその時点での最新のコードが含まれていますが、
+Sun Quality Assurance (QA) engineering チームによるテストは行われていません。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="communitybuildsupport"></a> 
+OpenSSO Community ビルドはサポートされますか?
+</b></b></p>
+
+<p>OpenSSO Community ビルドのサポートは、OpenSSO コミュニティ上のみで行われ、IRC や メーリングリスト、メンバーのブログ、<a href="http://wiki.opensso.org">OpenSSO wiki</a>、 <a href="http://www.opensso.org">OpenSSO web サイト</a>にアップされているドキュメントマニュアルや記事を通じて行われます。 
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="upgrade"></a> 
+最新の OpenSSO Express ビルドがリリースされたら、それにアップグレードする必要がありますか?
+</b></b></p>
+
+<p>
+最新ビルドにアップグレードしなくてもかまいません。必要な限り、現在のビルドをそのまま使っていただいて、その後、サポート契約が有効である間に、いつでも構いませんので、より新しいビルドや商用リリース版にアップグレードしてください。
+ただし、もしあなたが何か問題を見つけて、サポートチームに連絡を入れた場合、サポートチームから最初にお願いされるのは、最新のビルドにアップグレードすること、になると思いますのでご承知おきください。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="expresssupport"></a> 
+OpenSSO Express ビルドを使用している場合、サポートを受けられますか?
+</b></b></p>
+
+<p>まず最初に、問題をレポートする時点で、現在使用されているビルドが <a href="https://opensso.dev.java.net/public/use/index.html">OpenSSO Express ビルド</a>の一覧に含まれているかどうかを確認してください。
+もし含まれていれば、通常の Sun Customer Support チャネルを通じてサポートを受けられます。
+もし含まれていなければ、現在お使いのビルドは古いものということになりますので、サポートにコールする前に、お使いの環境を現在サポートされている Express ビルドか、商用リリース(Enterprise 版)にアップグレードして、その問題が新しい環境でも再現するかを確認していただく必要があります。
+<a href="https://opensso.dev.java.net/servlets/ProjectIssues">課題トラッカー</a>を使って、現在オープンになっている、または過去にオープンされていて現在解決済みであるバグを検索することができます。データベースの検索はどなたでも可能です。</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="testing"></a> 
+OpenSSO Express ビルドは、リリースされる前にどのようなテストが行われていますか?
+</b></b></p>
+
+<p>Sun QA engineering チームにより広範囲に渡っての、マニュアルテストおよび自動化テストが行われています。また、サードパーティ製品との 相互運用(interoperability)テストも行われています。
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>
+</html>

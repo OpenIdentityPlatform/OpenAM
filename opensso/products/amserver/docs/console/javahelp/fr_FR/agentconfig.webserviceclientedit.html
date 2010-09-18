@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs du client de service Web - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceclientedit"></a><h4>Attributs du client de service Web</h4>
+<p>Le profil d'agent du client du service Web d&#233;crit la configuration utilis&#233;e
+pour s&#233;curiser les demandes de service Web sortantes d'un client de service
+Web. Le nom du client de services Web doit &#234;tre unique pour
+l'ensemble des agents.</p>
+
+<a name="gglmr"></a><h5>D'ordre g&#233;n&#233;ral</h5>
+<p>Les attributs d'ordre g&#233;n&#233;ral suivants d&#233;finissent les propri&#233;t&#233;s du client de service
+Web de base&#160;:</p>
+
+<a name="ggoue"></a><h5>Groupe</h5>
+<p>Le m&#233;canisme de groupe permet de d&#233;finir un ensemble de types d'agents
+similaires. Vous devez d&#233;finir le groupe avant d'inclure l'agent sp&#233;cifique dans un
+ensemble. </p>
+
+<a name="ggowm"></a><h5>Mot de passe</h5>
+<p>D&#233;finit le mot de passe de l'agent du client de services Web.</p>
+
+<a name="ggoti"></a><h5>Confirmation de mot de passe</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="ggllf"></a><h5>Statut</h5>
+<p>D&#233;finit si l'agent du client de services Web est actif ou inactif
+au sein du syst&#232;me. Par d&#233;faut, cet attribut est activ&#233;, ce qui
+signifie que l'agent va participer &#224; la s&#233;curisation des demandes de services
+Web sortantes &#233;mises par les clients de services Web et va valider
+les r&#233;ponses de services Web renvoy&#233;es par un fournisseur de services Web.</p>
+
+<a name="gglje"></a><h5>Identificateur universel</h5>
+<p>R&#233;pertorie les propri&#233;t&#233;s LDAP de base qui d&#233;finissent de mani&#232;re unique l'agent
+du client du service Web.</p>
+
+<a name="gglnb"></a><h5>S&#233;curit&#233;</h5>
+<p>Les attributs suivants d&#233;finissent les attributs de s&#233;curit&#233; du client du service
+Web&#160;:</p>
+
+<a name="ggliy"></a><h5>M&#233;canisme de s&#233;curit&#233;</h5>
+<p>D&#233;finit le type de r&#233;f&#233;rence de s&#233;curit&#233; utilis&#233; pour s&#233;curiser la demande
+du client de services Web. Faites votre choix parmi les types de
+r&#233;f&#233;rences de s&#233;curit&#233; suivants&#160;:</p>
+<ul><li><p>Anonyme &#8212; Le m&#233;canisme de s&#233;curit&#233; anonyme ne contient aucune r&#233;f&#233;rence de s&#233;curit&#233;.</p></li>
+<li><p>Jeton Kerberos - Utilise des jetons de s&#233;curit&#233; Kerberos.</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; Utilise des jetons de s&#233;curit&#233; Liberty.</p></li>
+<li><p>SAML-HolderOfKey &#8212; Utilise le type d'assertion SAML 1.1 Holder-Of-Key.</p></li>
+<li><p>SAML-SenderVouches &#8212; Utilise le type d'assertion SAML 1.1 SenderVouches.</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8212; Utilise le type de jeton d'assertion SAML 2.0 Holder-Of-Key.</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8212; Utilise le type de jeton d'assertion SAML 2.0 SenderVouches.</p></li>
+<li><p>STSSecurity &#8212; Utilise le jeton de s&#233;curit&#233; g&#233;n&#233;r&#233; &#224; partir du service STS pour un fournisseur de services Web donn&#233;.</p></li>
+<li><p>UserNameToken &#8212; Utilise le jeton de nom d'utilisateur avec un mot de passe digeste.</p></li>
+<li><p>UserNameToken-Plain &#8212; Utilise un jeton de nom d'utilisateur avec un mot de passe en texte clair pour s&#233;curiser les demandes du service Web.</p></li>
+<li><p>X509Token &#8212; Utilise le certificat X509.</p></li></ul>
+
+
+<a name="gglmn"></a><h5>Configuration STS</h5>
+<p>Cet attribut est activ&#233; lorsque le client de services Web utilise le
+service de jeton de s&#233;curit&#233; comme m&#233;canisme de s&#233;curit&#233;. Cette configuration d&#233;crit
+une liste de profils d'agent STS utilis&#233;s pour communiquer avec le service
+STS et s&#233;curiser les demandes de services Web sur ce dernier.</p>
+
+<a name="ggljq"></a><h5>Configuration de la d&#233;tection</h5>
+<p>Cet attribut est activ&#233; lorsque le client du service Web est activ&#233;
+pour la s&#233;curit&#233; du service de d&#233;couverte. Cette configuration d&#233;crit une liste
+de profils d'agent de d&#233;couverte utilis&#233;s pour s&#233;curiser les demandes au service
+de d&#233;couverte.</p>
+
+<a name="ggljr"></a><h5>Authentification utilisateur requise</h5>
+<p>Lorsque cet attribut est activ&#233;, il sp&#233;cifie que la page prot&#233;g&#233;e du
+client des services n&#233;cessite que l'utilisateur soit authentifi&#233; pour obtenir l'acc&#232;s.</p>
+
+<a name="gglmd"></a><h5>Pr&#233;server les en-t&#234;tes de s&#233;curit&#233; dans les messages</h5>
+<p>Lorsque cet attribut est activ&#233;, il sp&#233;cifie que les en-t&#234;tes de s&#233;curit&#233;
+SOAP sont conserv&#233;s par le client de services Web en vue d'un
+traitement approfondi.</p>
+
+<a name="ghbbp"></a><h5>Utiliser le jeton de s&#233;curit&#233; d'intercommunication</h5>
+<p>Lorsqu'il est activ&#233;, cet attribut indique que le service Web client va
+traverser le jeton de s&#233;curit&#233; re&#231;u de l'objet. Il ne va pas
+essayer de cr&#233;er le jeton localement ou &#224; partir de communications STS.</p>
+
+<a name="ggllx"></a><h5>URN de type de service Liberty</h5>
+<p>L'URN (Universal Resource Name) d&#233;crit un type de service Liberty que le
+client du service Web utilise pour les recherches de services.</p>
+
+<a name="gglji"></a><h5>R&#233;f&#233;rences du jeton d'utilisateur</h5>
+<p>L'attribut repr&#233;sente les secrets partag&#233;s nom d'utilisateur/mot de passe que le client
+du service Web utilise pour g&#233;n&#233;rer un jeton de s&#233;curit&#233; de nom
+d'utilisateur.</p>
+
+<a name="ggliu"></a><h5>Signature et chiffrement</h5>
+<p>Les attributs suivants d&#233;finissent la configuration de signature et de chiffrement pour
+la s&#233;curit&#233; du service Web&#160;:</p>
+
+<a name="gglna"></a><h5>Demande sign&#233;e</h5>
+<p>Lorsque cet attribut est activ&#233;, le client du service Web signe la
+demande avec un type de jeton donn&#233;.</p>
+
+<a name="ggllb"></a><h5>L'en-t&#234;te de demande est chiffr&#233;</h5>
+<p>Lorsque cet attribut est activ&#233;, l'en-t&#234;te de s&#233;curit&#233; du client du service
+Web est chiffr&#233;.</p>
+
+<a name="gglnh"></a><h5>La demande est chiffr&#233;e</h5>
+<p>Lorsque cet attribut est activ&#233;, la demande du client de services Web
+est chiffr&#233;e.</p>
+
+<a name="ggljs"></a><h5>La signature de r&#233;ponse est v&#233;rifi&#233;e</h5>
+<p>Lorsque cet attribut est activ&#233;, la signature de r&#233;ponse du service Web
+est v&#233;rifi&#233;e.</p>
+
+<a name="gglks"></a><h5>La r&#233;ponse est d&#233;chiffr&#233;e</h5>
+<p>Lorsque cet attribut est activ&#233;, la r&#233;ponse du service Web est d&#233;chiffr&#233;e.</p>
+
+<a name="ggllsa"></a><h5>Keystore</h5>
+<p>Les attributs suivants configurent le keystore &#224; utiliser pour le stockage et
+l'extraction du certificat&#160;: </p>
+
+<a name="ggllda"></a><h5>Alias de cl&#233; publique du fournisseur de services Web</h5>
+<p>Cet attribut d&#233;finit l'alias de cl&#233; de certificat publique, utilis&#233; pour chiffrer
+la demande de service Web ou v&#233;rifier la signature de la r&#233;ponse
+du service Web.</p>
+
+<a name="gglmca"></a><h5>Alias de cl&#233; priv&#233;e</h5>
+<p>Cet attribut d&#233;finit l'alias de cl&#233; de certificat priv&#233;e, utilis&#233; pour signer
+la demande de services Web ou d&#233;chiffrer la r&#233;ponse des services Web.</p>
+
+<a name="ggljfa"></a><h5>Utilisation du keystore</h5>
+<p>Cette configuration sp&#233;cifie d'utiliser le keystore par d&#233;faut ou un keystore personnalis&#233;.
+Les valeurs suivantes doivent &#234;tre d&#233;finies pour un keystore personnalis&#233;&#160;:</p>
+<ul><li><p>Emplacement de keystore</p></li>
+<li><p>Mot de passe de keystore</p></li>
+<li><p>Mot de passe de cl&#233;</p></li></ul>
+
+
+<a name="endpoint"></a><h5>Points d'arriv&#233;e</h5>
+<p>Les attributs suivants d&#233;finissent les points d'arriv&#233;e du service Web&#160;:</p>
+
+<a name="gglmpa"></a><h5>Extr&#233;mit&#233; proxy du service Web</h5>
+<p>Cet attribut d&#233;finit un point d'arriv&#233;e de service Web auquel le client
+du service Web fait une demande. Cette extr&#233;mit&#233; est facultative, sauf si
+elle est configur&#233;e comme proxy de s&#233;curit&#233; Web.</p>
+
+<a name="ghbdv"></a><h5>Point d'arriv&#233;e de service Web</h5>
+<p>Cet attribut d&#233;finit un point d'arriv&#233;e de service Web auquel le client
+du service Web fait une demande.</p>
+
+<a name="ghcei"></a><h5>Configuration Kerberos</h5>
+<p>Kerberos est un profil de s&#233;curit&#233; pris en charge par les services
+Web de s&#233;curit&#233; pour s&#233;curiser les communications de services Web entre un
+client et un fournisseur de services Web. Dans un sc&#233;nario standard, un
+utilisateur s'authentifie au poste de travail et appelle un service Web et
+le client du service Web. Cette op&#233;ration requiert un ticket Kerberos afin
+de s&#233;curiser la demande au fournisseur de services Web service en identifiant
+son principal comme jeton Kerberos. En r&#232;gle g&#233;n&#233;rale, la s&#233;curit&#233; des services
+Web bas&#233;s sur Kerberos est employ&#233;e dans le contexte d'un domaine Kerberos
+et non pas dans un contexte r&#233;seau h&#233;t&#233;rog&#232;ne ou &#233;tendu comme c'est
+le cas de la s&#233;curit&#233; des services Web bas&#233;e sur SAML. Cependant,
+Kerberos est l'un des plus forts m&#233;canismes d'authentification, en particulier dans l'environnement
+du contr&#244;leur de domaine Windows.</p>
+
+<a name="ghcfu"></a><h5>Serveur de domaine Kerberos</h5>
+<p>Cet attribut indique le nom d'h&#244;te de Kerberos Distribution Center (contr&#244;leur de
+domaine). Vous devez entrer le nom de domaine complet (FQDN) du contr&#244;leur
+de domaine.</p>
+
+<a name="ghccy"></a><h5>Domaine Kerberos</h5>
+<p>Cet attribut indique le nom de domaine de Kerberos Distribution Center (KDC).
+Selon votre configuration, le nom de domaine du contr&#244;leur de domaine peut
+&#234;tre diff&#233;rent du nom de domaine OpenSSO.</p>
+
+<a name="ghcfa"></a><h5>Service du Principal Kerberos</h5>
+<p>Indique le service Web principal enregistr&#233; avec le KDC (Kerberos Distribution Center).
+</p><p>Utilisez le format suivant : </p><p><tt>HTTP/nomh&#244;te.nomdomaine&#64;nom_domaine_dc</tt> </p><p><tt>nomh&#244;te</tt> et <tt>nomdomaine</tt> repr&#233;sentent le nom d'h&#244;te et le nom de domaine
+de l'instance OpenSSO. <tt>nom_domaine_dc</tt> est le domaine Kerberos dans lequel le serveur
+Kerberos Windows  (contr&#244;leur de domaine) r&#233;side. Le serveur Kerberos peut &#234;tre
+diff&#233;rent du nom de domaine de l'instance OpenSSO.</p>
+
+<a name="ghcdq"></a><h5>R&#233;pertoire cache des tickets Kerberos</h5>
+<p>Sp&#233;cifie le r&#233;pertoire du cache Kerberos TGT (Ticket Granting Ticket). Lorsque l'utilisateur
+s'authentifie aupr&#232;s de l'ordinateur ou effectue une initialisation &#224; l'aide de <tt> kinit</tt>
+(la commande permettant d'obtenir le ticket TGT aupr&#232;s de KDC), le ticket
+TGT est stock&#233; dans le cache local, comme indiqu&#233; dans cet attribut.</p>
+<br/>
+
+</body>
+</html>

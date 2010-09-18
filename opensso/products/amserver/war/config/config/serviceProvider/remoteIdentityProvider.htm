@@ -1,0 +1,105 @@
+<script type="text/javascript">
+YAHOO.namespace("sun.container");
+var DOM = YAHOO.util.Dom;
+
+function createIdentityProvider(){
+    var postData = AjaxUtils.serializeForm("identityProviderForm");
+    AjaxUtils.doPost("container", "$context$path", postData);
+
+}
+function exit(){
+	window.location = "$context/config/commonTasks.htm";
+}
+
+
+function activateMetadataFileSection(activate){
+    activateSection(activate, "metadataFileSection");
+}
+
+function activateMetadataSection(activate){
+    activateSection(activate, "metadataSection");
+}
+
+
+function enableFileMetadata(){
+    DOM.get('metadataFile').disabled='';
+    DOM.get('metadataUrl').disabled='disabled';
+}
+
+function enableUrlMetadata(){
+    DOM.get('metadataFile').disabled='disabled';
+    DOM.get('metadataUrl').disabled='';
+}
+
+function enableIdentityProviderFileMetadata(){
+    DOM.get('identityProviderMetadataFile').disabled='';
+    DOM.get('identityProviderMetadataUrl').disabled='disabled';
+}
+
+function activateSection(activate, elementId){
+    var section = DOM.get(elementId);
+    if (activate)
+		section.style.display="";
+	else
+		section.style.display="none";
+}
+</script>
+<form name="identityProviderForm" id="identityProviderForm">
+<div id="mainPanel" align="center">
+	<div id="createPanel" class="createpanel">
+		<br />
+		<div class="bodywhite" align="left">
+			<p class="OrangeSmall">Do you want to configure a remote identity provider now?</p>
+			<input type="radio" name="service" value="true" onclick="activateMetadataSection(true);"/>Yes
+			<input type="radio" name="service" value="false" onclick="activateMetadataSection(false);" />No
+
+
+            <div id="metadataSection" style="display:none">
+                #if($serviceProvider.hasMetadata())
+                <p class="OrangeSmall">Do you have a <span id="federalProtocolNameSpan">$serviceProvider.federalProtocol.name</span> metadata file for this hosted service?</p>
+                <input type="radio" name="metadata" value="true" onclick="activateMetadataFileSection(true);"/>Yes&nbsp;&nbsp;
+                <input type="radio" name="metadata" value="false" onclick="activateMetadataFileSection(false);"/>No
+                <div id="metadataFileSection" style="display:none">
+                    <p class="OrangeSmall">Is the metadata available in a file or at a URL?</p>
+                    <p><input type="radio" name="metadataType" value="file" onclick="enableFileMetadata()"/>&nbsp;File&nbsp;&nbsp;<input type="file" value="Browse" name="metadataFile" id="metadataFile" disabled="disabled"/></p>
+                    <p><input type="radio" name="metadataType" value="url" onclick="enableUrlMetadata()"/>&nbsp;URL&nbsp;<input type="text" id="metadataUrl" name="metadataUrl" disabled="disabled"/></p>
+                </div>
+                #end
+                
+                #if($serviceProvider.hasIdentityProviderMetadata() && !$serviceProvider.hasMetadata())
+                <div id="identityProviderExtraInfo">
+                    <br />
+                    <p class="OrangeSmall">Display name (optional)<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <input type="text" name="displayName"/></p>
+                </div>
+                #end
+
+                #if(!$serviceProvider.hasIdentityProviderMetadata() && !$serviceProvider.hasMetadata())
+                <div id="identityProviderExtraInfo">
+                    <br />
+                    <p class="OrangeSmall">Entity ID:<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <input type="text" name="entityId"/></p>
+                    <p class="OrangeSmall">Display name (optional)<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <input type="text" name="displayName"/></p>
+                    <p class="OrangeSmall">Single signon service URL:<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <input type="text" name="ssoUrl"/></p>
+                    <p class="OrangeSmall">Single logout service URL(Optional):<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <input type="text" name="logoutUrl"/></p>
+                    <p class="OrangeSmall">Artifact resolution service(Optional):<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <input type="text" name="artifactResolutionUrl"/></p>
+                    <p class="OrangeSmall">Assertion signing certificate:<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+                    <textarea id="assertionSigningCertificate"></textarea></p>
+                </div>
+                #end
+            </div>
+
+        </div>
+		<div class="subbody">
+			<button id="btnExit" type="button" value="Exit" onclick="exit();">Exit</button>
+			<button id="btnCreate" type="button" value="CREATE PROVIDER" onclick="createIdentityProvider();">CREATE PROVIDER</button>
+		</div>
+	</div>
+</div>
+</form>
+<!--
+<div id="createNew"></div>-->

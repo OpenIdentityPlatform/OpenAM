@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Administration - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amadminconsoleservice"></a><h4>Administration</h4>
+<p><a name="indexterm-187"></a>Mit dem Dienst "Administration" k&#246;nnen Sie die OpenSSO-Konsole auf globaler Ebene sowie
+auf der Ebene eines konfigurierten Bereichs konfigurieren ("Einstellungen" bzw. "Optionen" f&#252;r einen
+konfigurierten Bereich). Bei den Attributen des Administrationsdienstes handelt es sich sowohl um
+globale Attribute als auch um Attribute auf Bereichsebene. </p>
+<hr><p><b>Hinweis &#8211; </b>Einige der in diesem Abschnitt aufgef&#252;hrten Attribute gelten nur f&#252;r die Installation
+im Legacy-Modus.</p>
+<hr>
+<p>Es existieren folgende Attribute:</p>
+<ul><li><p><a href="#fufly">Verbindungsverwaltung</a></p></li>
+<li><p><a href="#fsvge">Benutzerverwaltung</a></p></li>
+<li><p><a href="#fsvgj">Personen-Container</a></p></li>
+<li><p><a href="#fsvgm">Organisationseinheiten-Container</a></p></li>
+<li><p><a href="#fsvgq">Gruppen-Container</a></p></li>
+<li><p><a href="#fsvgh">Typ der verwalteten Gruppe</a></p></li>
+<li><p><a href="#fsvgr">Standardrollenberechtigungen</a> </p></li>
+<li><p><a href="#fsvgt">Dom&#228;nen-Komponentenverzeichnis</a></p></li>
+<li><p><a href="#fsvgs">Verwaltungsgruppen</a></p></li>
+<li><p><a href="#fsvgv">L&#246;schen von Benutzern nach &#220;bereinstimmung</a></p></li>
+<li><p><a href="#fsvgu">Dynamische ACIs f&#252;r Admin-Rollen</a></p></li>
+<li><p><a href="#ftbxa">Benutzerprofildienstklassen</a></p></li>
+<li><p><a href="#fsvgw">Attributliste f&#252;r DC-Knoten</a></p></li>
+<li><p><a href="#fsvgx">Suchfilter f&#252;r gel&#246;schte Objekte</a></p></li>
+<li><p><a href="#fsvgy">Standard-Personen-Container</a></p></li>
+<li><p><a href="#fsvhe">Standard-Gruppen-Container</a></p></li>
+<li><p><a href="#fsvhd">Standard-Agent-Container</a></p></li>
+<li><p><a href="#fsvhb">Standard-Personen-Container von Gruppen</a></p></li>
+<li><p><a href="#fsvha">Personen-Container-Liste von Gruppen</a></p></li>
+<li><p><a href="#fsvhc">Benutzerprofil-Anzeigenklasse</a></p></li>
+<li><p><a href="#fsvhh">Endbenutzerprofil-Anzeigenklasse</a></p></li>
+<li><p><a href="#fsvhi">Rollen auf Benutzerprofil-Seite anzeigen</a></p></li>
+<li><p><a href="#fsvhj">Gruppen auf Benutzerprofil-Seite anzeigen</a></p></li>
+<li><p><a href="#fsvhf">Automatische Benutzersubskription f&#252;r Gruppe</a></p></li>
+<li><p><a href="#fsvhk">Optionen f&#252;r Benutzerprofil-Anzeige</a></p></li>
+<li><p><a href="#fsvhl">Standardrollen bei Benutzererstellung</a></p></li>
+<li><p><a href="#fsvhm">Tabulatoren der Admin-Konsole</a></p></li>
+<li><p><a href="#fsvho">Maximale Ergebnisse aus Suchlauf</a></p></li>
+<li><p><a href="#fsvhp">Timeout f&#252;r Suche</a></p></li>
+<li><p><a href="#fsvhs">JSP-Verzeichnisname</a></p></li>
+<li><p><a href="#fsvhr">Dokumente der Online-Hilfe</a></p></li>
+<li><p><a href="#fsvhq">Erforderliche Dienste</a></p></li>
+<li><p><a href="#fsvhu">Schl&#252;ssel f&#252;r Benutzersuche</a></p></li>
+<li><p><a href="#fsvht">R&#252;ckgabeattribut f&#252;r Benutzersuche</a></p></li>
+<li><p><a href="#fsvhv">Benachrichtigungsliste f&#252;r Benutzererstellung</a></p></li>
+<li><p><a href="#fsvhw">Benachrichtigungsliste f&#252;r Benutzerl&#246;schvorgang</a></p></li>
+<li><p><a href="#fsvhx">Benachrichtigungsliste f&#252;r Benutzermodifizierung</a></p></li>
+<li><p><a href="#fsvia">Maximale Anzahl pro Seite angezeigter Elemente</a></p></li>
+<li><p><a href="#fsvhz">Ereigniszielger&#228;teklassen</a></p></li>
+<li><p><a href="#fsvhy">Vor- und Nachverarbeitungsklassen</a></p></li>
+<li><p><a href="#fsvic">Abruf externer Attribute</a></p></li>
+<li><p><a href="#fsvib">Ung&#252;ltige Benutzer-ID-Zeichen</a></p></li>
+<li><p><a href="#fsvie">Benutzer-ID- und Passwort-Validierungs-Plugin-Klasse</a></p></li></ul>
+
+
+<a name="fufly"></a><h5>Verbindungsverwaltung</h5>
+<p>Aktiviert die Verbindungsverwaltung. Diese Option ist standardm&#228;&#223;ig ausgew&#228;hlt. Wenn Sie diese Option
+deaktivieren m&#246;chten, heben Sie die Auswahl des Feldes auf. Die Registerkarte ";Verbindungsverwaltung"
+wird dann nicht mehr auf der Konsole angezeigt.</p>
+
+<a name="fsvge"></a><h5>Benutzerverwaltung</h5>
+<p>Aktiviert die Benutzerverwaltung. Diese Option ist standardm&#228;&#223;ig aktiviert. Dieses Attribut gilt nur
+f&#252;r OpenSSO im Legacy-Modus. </p>
+
+<a name="fsvgj"></a><h5>Personen-Container</h5>
+<p>Dieses Attribut ist standardm&#228;&#223;ig deaktiviert und gilt nur f&#252;r OpenSSO im Legacy-Modus.
+Wenn das Attribut aktiviert ist, werden Personen-Container auf der Registerkarte ";Verzeichnisverwaltung" angezeigt.
+Es empfiehlt sich, in Ihrem DIT einen einzelnen Personen-Container zu verwenden und
+Rollen zur Verwaltung von Konten und Diensten zu nutzen. Standardm&#228;&#223;ig werden Personen-Container
+auf der OpenSSO-Konsole ausgeblendet. Wenn Ihr DIT mehrere Personen-Container enth&#228;lt, sollten Sie
+jedoch dieses Attribut aktivieren, um die Personen-Container als verwaltete Objekte anzuzeigen.</p>
+
+<a name="fsvgm"></a><h5>Organisationseinheiten-Container</h5>
+<p>Dieses Attribut ist standardm&#228;&#223;ig deaktiviert und gilt f&#252;r OpenSSO im Legacy-Modus. Wenn
+das Attribut aktiviert ist, werden Container auf der Registerkarte ";Verzeichnisverwaltung" angezeigt.</p>
+
+<a name="fsvgq"></a><h5>Gruppen-Container</h5>
+<p>Dieses Attribut ist standardm&#228;&#223;ig deaktiviert und gilt f&#252;r OpenSSO im Legacy-Modus. Wenn
+das Attribut aktiviert ist, werden Gruppen-Container auf der Registerkarte ";Verzeichnisverwaltung" angezeigt.</p>
+
+<a name="fsvgh"></a><h5>Typ der verwalteten Gruppe</h5>
+<p>Legt fest, ob &#252;ber die Konsole erstellte Subskriptionsgruppen als statische oder dynamische
+Gruppen angelegt werden. Auf der Konsole k&#246;nnen nur statische oder nur dynamische
+Subskriptionsgruppen erstellt und angezeigt werden. Die gleichzeitige Verwendung beider Gruppentypen ist nicht
+m&#246;glich. (Gefilterte Gruppen werden unabh&#228;ngig vom Wert dieses Attributs immer unterst&#252;tzt.) Der
+Standardwert ist ";Dynamisch".</p>
+<ul><li><p>Eine statische Gruppe listet unter Verwendung der Objektklasse <tt>groupOfNames</tt> bzw. <tt>groupOfUniqueNames </tt> explizit jedes Gruppenmitglied auf. Der Gruppeneintrag enth&#228;lt f&#252;r jedes Gruppenmitglied das Attribut <i>uniqueMember </i>. Mitglieder statischer Gruppen werden manuell hinzugef&#252;gt. Der Benutzereintrag selbst bleibt dabei unver&#228;ndert. Gruppen mit wenigen Mitgliedern sollten als statische Gruppen konfiguriert werden. </p></li>
+<li><p>Eine dynamische Gruppe verwendet bei der Eintragung jedes neuen Gruppenmitglieds das Attribut <tt>memberOf. </tt> Mitglieder dynamischer Gruppen werden &#252;ber einen LDAP-Filter erstellt, der alle Eintr&#228;ge sucht und zur&#252;ckgibt, die das Attribut <tt>memberOf</tt> enthalten. Gruppen mit sehr vielen Mitgliedern sollten als dynamische Gruppen konfiguriert werden. </p></li>
+<li><p>Eine gefilterte Gruppe verwendet einen LDAP-Filter f&#252;r die Suche nach Mitgliedern, die die Filterkriterien erf&#252;llen. Der Filter kann beispielsweise Mitglieder mit einer bestimmten Benutzer-ID(<tt>uid=g&#42;</tt>) oder E-Mail-Adresse (<tt>mail=&#42;&#64;example.com</tt>) generieren. </p></li></ul>
+<p>Als Suchergebnis der oben angef&#252;hrten Beispiele w&#252;rde der LDAP-Filter alle Benutzer zur&#252;ckgeben,
+deren Benutzer-ID mit <tt>g</tt> beginnt bzw. deren E-Mail-Adresse auf <tt>example.com</tt> endet. Gefilterte
+Gruppen k&#246;nnen nur innerhalb der Ansicht ";Benutzerverwaltung" durch Auswahl der Option "Mitgliedschaft
+nach Filter" erstellt werden.</p><p>Administratoren k&#246;nnen einen der folgenden Werte ausw&#228;hlen:</p>
+<ul><li><p>Dynamisch - Gruppen, die &#252;ber die Option ";Mitgliedschaft nach Subskription" erstellt werden, sind dynamisch.</p></li>
+<li><p>Statisch - Gruppen, die &#252;ber die Option ";Mitgliedschaft nach Subskription" erstellt werden, sind statisch.</p></li></ul>
+
+
+<a name="fsvgr"></a><h5>Standardrollenberechtigungen</h5>
+<p>Legt eine Liste der Standard-ACIs (Access Control Instructions, Zugriffskontrollanweisungen) bzw. <b>Berechtigungen</b> fest,
+anhand derer bei der Erstellung neuer Rollen Berechtigungen erteilt werden. W&#228;hlen Sie
+eine dieser ACIs entsprechend der gew&#252;nschten Berechtigungsebene aus. OpenSSO wird mit vier
+standardm&#228;&#223;igen Rollenberechtigungen geliefert:</p><p>Keine Berechtigungen  &#8211;  Dieser Rolle werden keine Berechtigungen zugewiesen.</p><p>Organisations-Admin  &#8211;  Der Organisations-Administrator verf&#252;gt &#252;ber Lese- und Schreibzugriff auf
+alle Eintr&#228;ge in der konfigurierten Organisation.</p><p>Organisations-Help-Desk-Admin &#8211;  Der Organisations-Help-Desk-Administrator verf&#252;gt &#252;ber Lesezugriff auf alle Eintr&#228;ge in
+der konfigurierten Organisation und &#252;ber Schreibzugriff auf das Attribut <tt>userPassword</tt>.</p><p>Organisationsrichtlinien-Admin &#8211;  Der Organisationsrichtlinien-Administrator verf&#252;gt &#252;ber Lese- und Schreibzugriff auf alle
+Richtlinien im Bereich. Organisations-Richtlinien-Administratoren k&#246;nnen keine Bezugsrichtlinien erstellen.  </p>
+
+<a name="fsvgt"></a><h5>Dom&#228;nen-Komponentenverzeichnis</h5>
+<p>Der Dom&#228;ne Komponenten-Baum (DC-Baum) stellt eine spezifische DIT-Struktur dar, die von vielen
+Sun Java System-Komponenten f&#252;r die Zuweisung von DNS-Namen und Bereichseintr&#228;gen verwendet wird.</p><p>Wenn diese Option aktiviert ist, wird der DC-Baumeintrag f&#252;r einen Bereich erstellt,
+sofern der DNS-Name des Bereichs bereits bei der Erstellung des Bereichs eingegeben
+wurde. Das DNS-Namensfeld wird auf der Seite Bereich erstellen angezeigt. Diese Option
+ist nur f&#252;r die Verwendung in Kombination mit Bereichen oberster Ebene vorgesehen
+und wird nicht f&#252;r Unterbereiche angezeigt.</p><p>Jede Status&#228;nderung an dem Attribut <i>inetdomainstatus</i>, die im Bereichsbaum &#252;ber das OpenSSO-SDK
+vorgenommen wird, f&#252;hrt zu einer Aktualisierung des Eintragsstatus des entsprechenden DC-Baumes. (Statusaktualisierungen,
+die nicht &#252;ber das OpenSSO-SDK vorgenommen werden, werden nicht synchronisiert.) Wird beispielsweise
+ein neuer Bereich namens "sun" mit dem DNS-Namensattribut <tt>sun.com </tt>erstellt, wird im DC-Baum
+folgender Eintrag erstellt:</p><p><tt>dc=sun,dc=com,o=internet,root suffix</tt></p><p>Standardm&#228;&#223;ig ist hierf&#252;r die Root-Ebene von OpenSSO festgelegt. Soll ein anderes Suffix
+verwendet werden, muss dieses mithilfe von LDAP-Befehlen erstellt werden. Die ACIs f&#252;r
+Administratoren, die zur Erstellung von Bereichen berechtigt sind, m&#252;ssen modifiziert werden, damit
+der uneingeschr&#228;nkte Zugriff auf das neue Root-Verzeichnis des DC-Baumes gew&#228;hrleistet ist.</p>
+
+<a name="fsvgs"></a><h5>Verwaltungsgruppen</h5>
+<p>Legt fest, ob die DomainAdministrators- und DomainHelpDeskAdministrators-Gruppen erstellt werden. Wenn diese Option
+aktiviert ist, werden die oben genannten Gruppen erstellt und jeweils der Organisations-Admin-
+und der Organisations-Help-Desk-Admin-Rolle zugeordnet. Wird nach der Erstellung ein Benutzer in einer
+dieser zugeordneten Rollen hinzugef&#252;gt oder entfernt, wird dieser Vorgang synchron f&#252;r die
+entsprechende Gruppe durchgef&#252;hrt. Umgekehrt funktioniert dieses Verfahren allerdings nicht. Durch das Hinzuf&#252;gen
+oder Entfernen eines Benutzers zu oder aus einer dieser Gruppen wird der
+Benutzer nicht gleichzeitig in den ihm zugeordneten Rollen hinzugef&#252;gt oder entfernt.</p><p>Die DomainAdministrators- und DomainHelpDeskAdministrators-Gruppen werden nur innerhalb von Bereichen erstellt, die nach
+Aktivierung dieser Option erstellt wurden.  </p>
+<hr><p><b>Hinweis &#8211; </b>Diese Option gilt nicht f&#252;r Unterbereiche mit Ausnahme des Root-Bereichs. F&#252;r den
+Root-Bereich werden die ServiceAdministrators- und ServiceHelpDesk Administrators-Gruppen jeweils den Top-Level-Admin- und den
+Top-Level-Help-Desk-Admin-Rollen zugeordnet. Die Funktionsweise ist identisch.</p>
+<hr>
+
+
+<a name="fsvgv"></a><h5>L&#246;schen von Benutzern nach &#220;bereinstimmung</h5>
+<p>Legt fest, ob ein Benutzereintrag tats&#228;chlich aus dem Verzeichnis gel&#246;scht oder nur
+als gel&#246;scht markiert wird. Dieses Attribut gilt nur f&#252;r OpenSSO im Legacy-Modus.</p><p>Wird ein Benutzereintrag gel&#246;scht, wenn diese Option aktiviert (True) ist, ist der
+Benutzereintrag weiterhin im Verzeichnis vorhanden, wird jedoch als gel&#246;scht markiert. Benutzereintr&#228;ge, die
+zum L&#246;schen markiert sind, werden bei Directory Server-Suchl&#228;ufen ignoriert. Ist diese Option
+nicht aktiviert, wird der Benutzereintrag aus dem Verzeichnis gel&#246;scht.</p>
+
+<a name="fsvgu"></a><h5>Dynamische ACIs f&#252;r Admin-Rollen</h5>
+<p>Legt die Zugriffskontrollanweisungen f&#252;r dynamisch erstellte Administratorrollen fest, wenn eine Gruppe oder
+ein Bereich mit OpenSSO konfiguriert wird. Anhand dieser Rollen werden Administrationsprivilegien f&#252;r
+die jeweils erstellte Eintragsgruppe erteilt. Die Standard-ACIs k&#246;nnen nur in dieser Attributliste
+ge&#228;ndert werden.</p>
+<hr><p><b>Hinweis &#8211; </b>Administratoren auf Bereichs-Ebene verf&#252;gen &#252;ber umfassenderen Zugriff als Gruppen-Administratoren. Jedoch kann ein
+Benutzer standardm&#228;&#223;ig das Passwort f&#252;r jedes Mitglied einer Gruppe &#228;ndern, wenn er
+der Administrator-Rolle der betreffenden Gruppe angeh&#246;rt. Dies gilt auch f&#252;r jeden Bereichs-Administrator,
+der Mitglied dieser Gruppe ist.</p>
+<hr>
+<p>Die Container-Help-Desk-Admin-Rolle verf&#252;gt &#252;ber Lesezugriff auf alle Eintr&#228;ge in einem Bereich und &#252;ber
+Schreibzugriff auf das Attribut <i>userPassword</i>  in Benutzereintr&#228;gen in der betreffenden Container-Einheit.</p><p>Der Bereichs-Help-Desk-Admin verf&#252;gt &#252;ber Lesezugriff auf alle Eintr&#228;ge des Bereichs und &#252;ber
+Schreibzugriff auf das Attribut <i>userPassword. </i> Bedenken Sie bei der Erstellung eines Unterbereichs,
+dass die Administrator-Rollen innerhalb des Unterbereichs und nicht innerhalb des &#252;bergeordneten Bereichs
+erstellt werden.</p><p>Die Container-Admin-Rolle verf&#252;gt &#252;ber Lese- und Schreibzugriff auf alle Eintr&#228;ge in einer
+LDAP-Organisationseinheit. "Container" ist eine in OpenSSO h&#228;ufig verwendete Bezeichnung f&#252;r eine LDAP-Organisationseinheit.</p><p>Der Organisationsrichtlinien-Administrator verf&#252;gt &#252;ber Lese- und Schreibzugriff auf alle Richtlinien und kann
+alle Richtlinien innerhalb des jeweiligen Bereichs erstellen, zuweisen, &#228;ndern und l&#246;schen.</p><p>Der Personen-Container-Administrator ist die Standardeinstellung; jeder Benutzereintrag in einem neu erstellten Bereich
+ist Mitglied des Personen-Containers des jeweiligen Bereichs. Der Personen-Container-Administrator verf&#252;gt &#252;ber Lese-
+und Schreibzugriff auf s&#228;mtliche Benutzereintr&#228;ge im Personen-Container des Bereichs. Ber&#252;cksichtigen Sie, dass
+diese Rolle KEINEN Lese- oder Schreibzugriff auf die Attribute einschlie&#223;t, die Rollen-
+oder Gruppen-DNs enthalten. Aus diesem Grund k&#246;nnen Personen-Container-Administratoren weder Rollen- oder Gruppen-Attribute
+bearbeiten noch Benutzer aus einer Rolle oder Gruppe entfernen.</p><p>In OpenSSO k&#246;nnen weitere Container f&#252;r Benutzereintr&#228;ge, Gruppeneintr&#228;ge oder andere Containereintr&#228;ge konfiguriert
+werden. Bei der Zuweisung der Administratorrolle f&#252;r einen Container, der erst nach
+der Konfiguration eines Bereichs erstellt wurde, werden die Standardwerte der Container-Admin- bzw.
+der Container-Help-Desk-Admin-Rolle verwendet.</p><p>Die Gruppen-Admin-Rolle verf&#252;gt &#252;ber Lese- und Schreibzugriff auf alle Mitglieder einer bestimmten
+Gruppe. Gruppen-Administratoren k&#246;nnen neue Benutzer erstellen, Benutzer den von ihnen verwalteten Gruppen
+zuweisen sowie die von ihnen erstellten Benutzer l&#246;schen. Bei der Erstellung einer
+Gruppe wird die Gruppen-Administrator-Rolle automatisch generiert und mit den f&#252;r die Verwaltung
+der Gruppe erforderlichen Privilegien versehen. Einem Gruppenmitglied wird diese Rolle nicht automatisch
+zugewiesen. Die Zuweisung erfolgt &#252;ber den Ersteller der Gruppe bzw. &#252;ber einen
+Benutzer, der &#252;ber Zugriff auf die Gruppen-Administrator-Rolle verf&#252;gt.</p><p>Die Top-Level-Admin-Rolle verf&#252;gt &#252;ber Lese- und Schreibzugriff auf alle Eintr&#228;ge der oberen
+Bereichsebene. Mit anderen Worten: Die Rolle Top-Level-Admin verf&#252;gt &#252;ber Berechtigungen f&#252;r jede
+Hauptkonfiguration innerhalb der OpenSSO-Anwendung.</p><p>Die Organisations-Admin-Rolle verf&#252;gt &#252;ber Lese- und Schreibzugriff auf alle Eintr&#228;ge in einem
+Bereich. Bei der Erstellung eines Bereichs wird die Organisations-Admin-Rolle automatisch generiert und
+mit den f&#252;r die Verwaltung des Bereichs erforderlichen Berechtigungen versehen.</p>
+
+<a name="ftbxa"></a><h5>Benutzerprofildienstklassen</h5>
+<p>Listet die Dienste auf, deren Anzeige auf der Seite ";Benutzerprofil" angepasst ist.
+F&#252;r einige Dienste reicht die Standardanzeige der Konsole eventuell nicht aus. Mit
+diesem Attribut kann die Anzeige f&#252;r jeden Dienst angepasst werden. Sie erhalten
+so die vollst&#228;ndige Kontrolle dar&#252;ber, welche Informationen &#252;ber Dienste angezeigt werden und
+wie dies geschieht. Die Syntax ist:</p><p><tt>Dienstname | relativer URL()</tt></p><p>Die in diesem Attribut aufgef&#252;hrten Dienste werden nicht auf den Seiten f&#252;r
+die Benutzererstellung angezeigt. Die Einrichtung der Daten f&#252;r eine angepasste Anzeige eines
+Dienstes muss auf den Benutzerprofil-Seiten vorgenommen werden.</p>
+
+<a name="fsvgw"></a><h5>Attributliste f&#252;r DC-Knoten</h5>
+<p>Legt einen Satz mit Attributen fest, die bei der Erstellung von Objekten
+im DC-Baum eingerichtet werden. Die Standardparameter sind:</p><table><tr><td align="left" valign="top" scope="row"><p>maildomainwelcomemessage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailhost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailclientattachmentquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutingsmarthost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailaccessproxyreplay</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredlanguage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>domainuidseparator</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainmsgquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainallowedserviceaccess</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailmessagestore</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>objectclass=maildomain</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutinghosts</p></td>
+</tr>
+</table>
+
+<a name="fsvgx"></a><h5>Suchfilter f&#252;r gel&#246;schte Objekte</h5>
+<p>Legt die Suchfilter f&#252;r diejenigen Objekte fest, die bei Aktivierung des Benutzereinwilligungs-L&#246;schmodus
+entfernt werden sollen.</p>
+
+<a name="fsvgy"></a><h5>Standard-Personen-Container</h5>
+<p>Gibt den Standard-Personen-Container an, in dem der Benutzer erstellt wird.</p>
+
+<a name="fsvhe"></a><h5>Standard-Gruppen-Container</h5>
+<p>Gibt den Standard-Gruppen-Container an, in dem die Gruppe erstellt wird.</p>
+
+<a name="fsvhd"></a><h5>Standard-Agent-Container</h5>
+<p>Gibt den Standard-Agent-Container an, in dem der Agent erstellt wird. Der Standardwert
+lautet <tt>Agents</tt>.</p>
+
+<a name="fsvhb"></a><h5>Standard-Personen-Container von Gruppen</h5>
+<p>Gibt den Personen-Container an, in dem Benutzer bei der Erstellung standardm&#228;&#223;ig abgelegt
+werden. Es gibt keinen Standardwert. G&#252;ltige Werte sind DNs von Personen-Containern. Beachten
+Sie den Hinweis &#252;ber die Rangfolge bei der automatischen Auswahl von Personen-Containern
+unter ";Personen-Container-Liste von Gruppen".</p>
+
+<a name="fsvha"></a><h5>Personen-Container-Liste von Gruppen</h5>
+<p>Legt eine Liste mit Personen-Containern fest, die ein Gruppen-Administrator beim Erstellen eines
+neuen Benutzers ausw&#228;hlen kann. Diese Liste kann verwendet werden, wenn mehrere Personen-Container
+innerhalb des Verzeichnisbaums verf&#252;gbar sind. (Wenn weder in dieser Liste noch im
+Feld "Standard-Personen-Container von Gruppen" ein Personen-Container angegeben ist, werden Benutzer im Standard-Personen-Container
+von OpenSSO, <tt>ou=people</tt>, erstellt.) F&#252;r dieses Feld gibt es keinen Standardwert.</p><p>Die Syntax dieses Attributs lautet:</p><p><tt></tt><i>dn of group</i><tt> | </tt><i>dn of people container</i><tt></tt>   </p><p>Beim Erstellen eines Benutzers wird gepr&#252;ft, ob dieses Attribut einen Container f&#252;r
+die Ablage des Benutzereintrags vorgibt. Wenn das Attribut leer ist, wird der
+Container im Attribut Standard-Personen-Container von Gruppen gesucht. Wenn dieses Attribut ebenfalls leer
+ist, wird der Eintrag unter <tt>ou=people </tt> erstellt.</p><p>Dieses Attribut gilt nur f&#252;r OpenSSO im Legacy-Modus. Es gibt keinen Standardwert.</p>
+
+<a name="fsvhc"></a><h5>Benutzerprofil-Anzeigenklasse</h5>
+<p>Gibt die Java-Klasse an, die von der OpenSSO-Konsole zur Anzeige der Benutzerprofil-Seiten
+verwendet wird.</p>
+
+<a name="fsvhh"></a><h5>Endbenutzerprofil-Anzeigenklasse</h5>
+<p>Gibt die Java-Klasse an, die von der OpenSSO-Konsole zur Anzeige der Endbenutzerprofil-Seiten
+verwendet wird.</p>
+
+<a name="fsvhi"></a><h5>Rollen auf Benutzerprofil-Seite anzeigen</h5>
+<p>Legt fest, ob auf der Benutzerprofil-Seite eine Liste der dem Benutzer zugewiesenen
+Rollen angezeigt wird. Wenn der Parameter deaktiviert ist (Standardeinstellung), werden die Benutzerrollen
+nur auf den Benutzerprofil-Seiten von Administratoren angezeigt.</p>
+
+<a name="fsvhj"></a><h5>Gruppen auf Benutzerprofil-Seite anzeigen</h5>
+<p>Legt fest, ob auf der Benutzerprofil-Seite eine Liste der dem Benutzer zugewiesenen
+Gruppen angezeigt wird. Wenn der Parameter deaktiviert ist (Standardeinstellung), werden die Benutzergruppen
+nur auf den Benutzerprofil-Seiten von Administratoren angezeigt.</p>
+
+<a name="fsvhf"></a><h5>Automatische Benutzersubskription f&#252;r Gruppe</h5>
+<p>Legt fest, ob sich Benutzer eigenst&#228;ndig zu Mitgliedern von Gruppen machen k&#246;nnen,
+die f&#252;r Subskriptionen offen stehen. Wenn der Parameter deaktiviert ist (Standardeinstellung), ist
+die &#196;nderung der Gruppenmitgliedschaft eines Benutzers &#252;ber die Benutzerprofil-Seite nur durch einen
+Administrator m&#246;glich. Dieser Parameter wird nur angewendet, wenn die Option Gruppen auf
+Benutzerprofil-Seite anzeigen aktiviert ist.</p>
+
+<a name="fsvhk"></a><h5>Optionen f&#252;r Benutzerprofil-Anzeige</h5>
+<p>Dieses Men&#252; legt fest, welche Dienstattribute auf der Benutzerprofil-Seite angezeigt werden. Administratoren
+stehen folgende Werte zur Auswahl:</p><dl><dt>Nur Benutzer</dt>
+<dd><p>Zeigt die verf&#252;gbaren Benutzerschema-Attribute der dem Benutzer zugewiesenen Dienste an. Die Werte von Benutzerdienstattributen k&#246;nnen vom Benutzer angezeigt werden, wenn sie das Schl&#252;sselwort ";Display" enthalten. N&#228;here Informationen finden Sie im Handbuch f&#252;r Entwickler zu OpenSSO.</p></dd>
+<dt>Kombiniert</dt>
+<dd><p>Zeigt die verf&#252;gbaren Benutzerschema-Attribute sowie die dynamischen Schema-Attribute der dem Benutzer zugewiesenen Dienste an.</p></dd>
+</dl>
+
+
+<a name="fsvhl"></a><h5>Standardrollen bei Benutzererstellung</h5>
+<p>Legt eine Liste der Rollen fest, die neu erstellten Benutzern automatisch zugewiesen
+werden. Es gibt keinen Standardwert. Administratoren k&#246;nnen den DN einer oder mehrerer
+Rollen eingeben.  </p><p>In diesem Feld muss eine vollst&#228;ndige Distinguished-Name-Adresse angegeben werden; Rollennamen sind nicht
+zul&#228;ssig. Au&#223;erdem muss es sich um eine OpenSSO-Rolle handeln; LDAP-Rollen (Directory Server)
+sind nicht zul&#228;ssig.</p>
+
+<a name="fsvhm"></a><h5>Tabulatoren der Admin-Konsole</h5>
+<p>Listet die Java-Klassen der im oberen Bereich der Konsole angezeigten Module auf.
+Die Syntax lautet <tt>i18N key | java class name</tt>.</p><p>Der i18N-Schl&#252;ssel wird f&#252;r den lokalisierten Namen des Eintrags auf der Konsole
+verwendet.</p>
+
+<a name="fsvho"></a><h5>Maximale Ergebnisse aus Suchlauf</h5>
+<p>Legt fest, wie viele Suchergebnisse maximal angezeigt werden. Der Standardwert ist 200.
+ </p><p>Geben Sie keinen Wert &#252;ber 1000 ein, es sein denn, Sie verf&#252;gen
+&#252;ber ausreichend Systemressourcen.</p>
+<hr><p><b>Hinweis &#8211; </b>OpenSSO ist so vorkonfiguriert, dass maximal 4000 Sucheintr&#228;ge zur&#252;ckgegeben werden. Dieser Wert
+kann &#252;ber die Konsole bzw. mithilfe von <tt>ldapmodify</tt> ge&#228;ndert werden. If you
+wish to change it using <tt>ldapmodify,</tt>create a <tt>newConfig.xml </tt>, with the following values
+(in this example, <tt>nsSizeLimit </tt>: -1 means unlimited):</p>dn: cn=puser,ou=DSAME Users,ORG_ROOT_SUFFIX changetype: modify replace:nsSizeLimit   nsSizeLimit: -1<p>F&#252;hren Sie dann <tt>ldapmodify</tt> aus. Beispiel:</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:  /usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f newConfig.xml<p>&#196;nderungen an diesem Attribut, die &#252;ber <tt>LDAPModify</tt> vorgenommen werden, haben Vorrang vor
+&#196;nderungen, die &#252;ber die OpenSSO-Konsole vorgenommen werden. </p>
+<hr>
+
+
+<a name="fsvhp"></a><h5>Timeout f&#252;r Suche</h5>
+<p>Legt fest, wie lange (in Sekunden) eine Suche fortgesetzt wird, bevor sie
+wegen Zeit&#252;berschreitung abgebrochen wird. Sehr lange Suchvorg&#228;nge werden auf diese Weise abgebrochen.
+Nach Erreichen der maximalen Suchzeit wird die Suche abgebrochen und ein Fehler
+wird zur&#252;ckgegeben. Der Standardwert betr&#228;gt 5 Sekunden.</p>
+<hr><p><b>Hinweis &#8211; </b>Directory Server ist so vorkonfiguriert, dass es nach 120 Sekunden zur Zeit&#252;berschreitung
+kommt. Dieser Wert kann &#252;ber die Directory Server-Konsole bzw. mithilfe von <tt>ldapmodify</tt>
+ge&#228;ndert werden. Wenn Sie die &#196;nderung mithilfe von <tt>ldapmodify</tt> vornehmen m&#246;chten, erstellen
+Sie eine Datei namens <tt> newConfig.xml</tt> mit folgenden Werten (in diesem Beispiel wird
+der Wert f&#252;r die Zeit&#252;berschreitung von 120 in 3600 Sekunden ge&#228;ndert):</p>dn: cn=config changetype: modify replace:nsslapd-timelimit nsslapd-timelimit: 3600<p>F&#252;hren Sie dann <tt>ldapmodify</tt> aus. Beispiel:</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:  /usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f newConfig.xml
+<hr>
+
+
+<a name="fsvhs"></a><h5>JSP-Verzeichnisname</h5>
+<p>Gibt den Namen des Verzeichnisses an, das die JSP-Dateien eines Bereichs enth&#228;lt.
+Mit diesem Attribut kann der Administrator einzelne Bereiche anpassen. Der Standardwert dieses
+Attributs lautet <tt>console</tt>. Dieses Attribut gilt nur f&#252;r OpenSSO im Legacy-Modus. </p>
+
+<a name="fsvhr"></a><h5>Dokumente der Online-Hilfe</h5>
+<p>Listet die Links zur Online-Hilfe auf, die auf der Hauptseite der OpenSSO-Hilfe
+erstellt werden. Diese Option erm&#246;glicht es anderen Anwendungen, ihre eigenen Online-Hilfe-Links auf
+der OpenSSO-Seite einzuf&#252;gen. Das Format dieses Attributs ist:</p><p><tt>linki18nkey | html page to load | i18n properties file | remote server</tt>  </p><p>Das Remote Server-Attribut ist ein optionales Argument, mit dem Sie den Remote-Server
+angeben k&#246;nnen, auf dem sich die Dokumente der Online-Hilfe befinden. Der Standardwert
+ist:</p><p><tt>DSAME Help|/contents.html|amAdminModlueMsgs</tt></p><p>Dieses Attribut gilt nur f&#252;r OpenSSO im Legacy-Modus.</p>
+
+<a name="fsvhq"></a><h5>Erforderliche Dienste</h5>
+<p>Listet die Dienste auf, die bei der Erstellung eines Benutzers dynamisch zu
+den Benutzereintr&#228;gen hinzugef&#252;gt werden. Administratoren k&#246;nnen angeben, welche Dienste bei der Erstellung
+hinzugef&#252;gt werden sollen. Dieses Attribut wird nicht von der Konsole, sondern vom
+OpenSSO-SDK verwendet. Dynamisch mit dem Befehlszeilendienstprogramm <tt>amadmin</tt> erstellten Benutzern werden die in
+diesem Attribut aufgef&#252;hrten Dienste zugewiesen.</p>
+
+<a name="fsvhu"></a><h5>Schl&#252;ssel f&#252;r Benutzersuche</h5>
+<p>Dieses Attribut legt den Attributnamen fest, der bei Durchf&#252;hrung eines einfachen Suchlaufs
+auf der Navigationsseite gesucht wird. Der Standardwert f&#252;r dieses Attribut lautet <tt>cn</tt>.</p><p>Wenn Sie in das Feld "Name" des Navigations-Frames beispielsweise<tt> j&#42;</tt> eingeben, werden Benutzer
+angezeigt, deren Namen mit "j" oder "J" beginnen.</p>
+
+<a name="fsvht"></a><h5>R&#252;ckgabeattribut f&#252;r Benutzersuche</h5>
+<p>Legt den Attributnamen fest, der f&#252;r die Anzeige der nach einem einfachen
+Suchlauf zur&#252;ckgegebenen Benutzer verwendet wird. Der Standardwert f&#252;r dieses Attribut lautet uid
+cn. Bei dieser Einstellung werden die Benutzer-ID und der vollst&#228;ndige Name des
+Benutzers angezeigt.</p><p>Der zuerst angegebene Attributname dient au&#223;erdem als Schl&#252;ssel f&#252;r die Sortierung der
+ausgegebenen Benutzergruppe. Zur Vermeidung eines Leistungsabfalls sollten Sie ein Attribut verwenden, dessen
+Wert in einem Benutzereintrag festgelegt ist.</p>
+
+<a name="fsvhv"></a><h5>Benachrichtigungsliste f&#252;r Benutzererstellung</h5>
+<p>Legt eine Liste mit E-Mail-Adressen fest, an die nach der Erstellung eines
+neuen Benutzers eine Benachrichtigung gesendet wird. Es k&#246;nnen mehrere E-Mail-Adressen angegeben werden.
+Ein Beispiel f&#252;r die Syntax:</p><p> <tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt></p><p>Die Benachrichtigungsliste akzeptiert auch verschiedene L&#228;ndereinstellungen bei Verwendung der entsprechenden Option (<tt>-|locale</tt>
+).</p><p>Eine Liste der unterst&#252;tzten L&#228;ndereinstellungen finden Sie unter  <a href="supportedlang.html">Unterst&#252;tzte Sprach- bzw. L&#228;ndereinstellungen</a>.  </p><p>Die E-Mail-ID des Absenders kann mit der Eigenschaft 497 in der Datei
+<tt>amProfile.properties</tt> ge&#228;ndert werden, die sich standardm&#228;&#223;ig unter <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt> befindet.</p>
+
+<a name="fsvhw"></a><h5>Benachrichtigungsliste f&#252;r Benutzerl&#246;schvorgang</h5>
+<p>Legt eine Liste mit E-Mail-Adressen fest, an die nach dem L&#246;schen eines
+Benutzers eine Benachrichtigung gesendet wird. Es k&#246;nnen mehrere E-Mail-Adressen angegeben werden. Ein
+Beispiel f&#252;r die Syntax:</p><p> <tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt></p><p>Die Benachrichtigungsliste akzeptiert auch verschiedene L&#228;ndereinstellungen bei Verwendung der entsprechenden Option (<tt>-|locale</tt>
+).</p><p>Hier finden Sie eine Liste der lokalen <a href="supportedlang.html">Unterst&#252;tzte Sprach- bzw. L&#228;ndereinstellungen</a>.  </p><p>Die E-Mail-ID des Absenders kann mit der Eigenschaft 497 in der Datei
+<tt>amProfile.properties</tt> ge&#228;ndert werden, die sich standardm&#228;&#223;ig unter <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt> befindet.</p><p>Die Standard-Absender-ID lautet <tt>DSAME</tt>.</p>
+
+<a name="fsvhx"></a><h5>Benachrichtigungsliste f&#252;r Benutzermodifizierung</h5>
+<p>Legt eine Liste mit Attributen fest und weist diesen Attributen E-Mail-Adressen zu.
+Wird ein Attribut dieser Liste durch einen Benutzer modifiziert, wird eine Benachrichtigung
+an die dem Attribut zugewiesenen E-Mail-Adressen gesendet. Jedem Attribut k&#246;nnen verschiedene Adressen
+zugewiesen werden. Es k&#246;nnen mehrere E-Mail-Adressen angegeben werden. Ein Beispiel f&#252;r die
+Syntax:</p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt> </p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt> </p><p>Das Schl&#252;sselwort <tt>-self</tt> kann anstelle einer der Adressen verwendet werden. Bei Verwendung
+dieses Schl&#252;sselwortes werden E-Mails an den Benutzer gesendet, dessen Profil ge&#228;ndert wurde.
+Im Beispiel:</p><p><tt>manager someuser&#64;sun.com|self|admin&#64;sun.com</tt></p><p>Es werden E-Mails an die im Manager-Attribut angegebene Adresse gesendet, an <tt> someuser&#64;sun.com</tt>,
+<tt>admin&#64;sun</tt> sowie an die Person, die den Benutzer (";self") ge&#228;ndert hat.</p><p>Die Benachrichtigungsliste akzeptiert auch verschiedene L&#228;ndereinstellungen bei Verwendung der entsprechenden Option (<tt>-|locale</tt>
+). Wenn Sie zum Beispiel eine Benachrichtigung an einen Administrator in Frankreich
+senden m&#246;chten, verwenden Sie folgende Syntax:</p><p><tt>manager someuser&#64;sun.com|self|admin&#64;sun.com|fr</tt> Eine Liste der L&#228;ndereinstellungen finden Sie unter<a href="supportedlang.html">Unterst&#252;tzte Sprach- bzw. L&#228;ndereinstellungen</a>.  </p><p>Als Attributnamen verwenden Sie den Namen des Directory Server-Schemas, nicht den Anzeigenamen
+der Konsole.</p>
+
+<a name="fsvia"></a><h5>Maximale Anzahl pro Seite angezeigter Elemente</h5>
+<p>Legt die maximale Anzahl der pro Seite angezeigten Zeilen fest. The default
+is 25. For example, if a user search returns 100 rows, there
+will be 4 pages with 25 rows displayed in each page.</p>
+
+<a name="fsvhz"></a><h5>Ereigniszielger&#228;teklassen</h5>
+<p>Listet die Zielger&#228;te auf, die Erstellungs-, &#196;nderungs- und L&#246;schereignisse von der OpenSSO-Konsole
+empfangen k&#246;nnen.</p>
+
+<a name="fsvhy"></a><h5>Vor- und Nachverarbeitungsklassen</h5>
+<p>This field defines a list of implementation classes through plug-ins that extend
+the <tt>com.iplanet.am.sdk.AMCallBack</tt> class to receive callbacks during pre and post processing operations
+for users, realm, roles and groups. Zu den Vor- und Nachverarbeitungsvorg&#228;ngen z&#228;hlen
+die folgenden Vorg&#228;nge:</p>
+<ul><li><p>Erstellen</p></li>
+<li><p>delete</p></li>
+<li><p>&#196;ndern</p></li>
+<li><p>Benutzer zu Rollen/Gruppen hinzuf&#252;gen</p></li>
+<li><p>Benutzer aus Rollen/Gruppen entfernen</p></li></ul>
+<p>Sie m&#252;ssen den vollst&#228;ndigen Klassennamen des Plugins eingeben und danach den Klassenpfad
+Ihres Web-Containers entsprechend anpassen (in der OpenSSO-Installationsbasis). Der Klassenpfad muss den vollst&#228;ndigen
+Pfad zum Speicherort der Plugin-Klasse enthalten.</p>
+
+<a name="fsvic"></a><h5>Abruf externer Attribute</h5>
+<p>Durch diese Option erhalten Plugins die M&#246;glichkeit, durch einen R&#252;ckruf externe Attribute
+abzurufen (beliebige anwendungsspezifische Attribute externer Anwendungen). Externe Attribute werden nicht im OpenSSO-SDK
+zwischengespeichert. Diese Option erm&#246;glicht daher einen Abruf von Attributen auf Bereichsebene. Die
+Option ist standardm&#228;&#223;ig deaktiviert.</p>
+
+<a name="fsvib"></a><h5>Ung&#252;ltige Benutzer-ID-Zeichen</h5>
+<p>Legt eine Liste mit Zeichen fest, die in Benutzernamen unzul&#228;ssig sind. Die
+Zeichen m&#252;ssen jeweils durch ein Pipe-Zeichen (|) getrennt werden. Beispiel:</p><p><tt>&#42;|(|)|&#38;|!</tt></p>
+
+<a name="fsvie"></a><h5>Benutzer-ID- und Passwort-Validierungs-Plugin-Klasse</h5>
+<p>Diese Klasse stellt einen Plugin-Mechanismus zur Validierung von Benutzer-IDs und Passw&#246;rtern bereit.
+Die Methoden dieser Klasse m&#252;ssen durch die Implementierungs-Plugin-Module ersetzt werden, die Benutzer-IDs
+bzw. Benutzerpassw&#246;rter &#252;berpr&#252;fen. Die Implementierungs-Plugin-Module werden aufgerufen, sobald auf der OpenSSO-Konsole &#252;ber
+die Befehlszeilenschnittstelle <tt>amadmin</tt> oder &#252;ber das SDK ein Benutzer-ID-Wert oder ein Passwort-Wert
+hinzugef&#252;gt oder ge&#228;ndert wird.</p><p>Die Plugins zur Erweiterung dieser Klasse k&#246;nnen auf Bereichsebene konfiguriert werden. Ist
+f&#252;r einen Bereich kein Plugin verf&#252;gbar, wird das auf globaler Ebene konfigurierte
+Plugin verwendet.</p><p>Kommt es bei der Validierung durch das Plugin zu einem Fehler, kann
+das Plugin-Modul eine Ausnahme zur&#252;ckgeben, die die Anwendung &#252;ber den Fehler in
+der eingegebenen Benutzer-ID oder dem eingegebenen Passwort informiert.</p>
+<br/>
+
+</body>
+</html>

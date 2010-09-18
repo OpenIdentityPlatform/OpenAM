@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service de liaison SOAP - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>Service de liaison SOAP</h3>
+<a name="indexterm-150"></a><p>Service de liaison SOAP est une couche de transport qui permet d'envoyer
+et de recevoir des messages SOAP. Dans le processus Service de liaison
+SOAP, un service d'identit&#233; appelle l'interface de programmation d'application c&#244;t&#233; client pour
+cr&#233;er un message et l'envoie &#224; l'URL d'extr&#233;mit&#233; du SOAP, en l'occurrence
+un servlet r&#233;cepteur SOAP. Le servlet r&#233;cepteur SOAP re&#231;oit le message, v&#233;rifie
+la signature et cr&#233;e un second message. Il appelle ensuite le gestionnaire
+de demandes appropri&#233; pour envoyer en r&#233;ponse le second messages au service
+d'identit&#233; correspondant. Le service d'identit&#233; traite le second message, g&#233;n&#232;re une r&#233;ponse,
+puis renvoie cette r&#233;ponse au servlet r&#233;cepteur SOAP. Le r&#233;cepteur SOAP, &#224;
+son tour, renvoie la r&#233;ponse au service d'identit&#233;, qui la traite. </p><p>Les attributs g&#233;n&#233;raux du service Service de liaison SOAP peuvent &#234;tre configur&#233;s
+pour votre impl&#233;mentation.</p>
+<ul><li><p><a href="requesthandlerlist.html">Liste de gestionnaires de demandes</a></p></li>
+<li><p><a href="ggodb.html">Attributs de liaison SOAP</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">Configuration d'un gestionnaire de demandes</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

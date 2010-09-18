@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Plataforma - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>Plataforma</h4>
+<p><a name="indexterm-205"></a>El servicio de plataforma es aqu&#233;l en el que se pueden agregar
+servidores adicionales a las configuraciones de OpenSSO, as&#237; como otras opciones aplicadas
+en el nivel superior de la aplicaci&#243;n OpenSSO. Los atributos del servicio
+de plataforma son globales. Los atributos son:</p>
+<ul><li><p><a href="#fxcgy">Idioma de plataforma</a></p></li>
+<li><p><a href="#fxcpo">Dominios de cookies</a></p></li>
+<li><p><a href="#fxcmi">Idiomas disponibles</a></p></li>
+<li><p><a href="#fxctg">Conjunto de caracteres del cliente</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>Idioma de plataforma</h5>
+<p>El valor de configuraci&#243;n regional de la plataforma es el subtipo de
+idioma predeterminado con el que se instal&#243; OpenSSO. Los servicios administraci&#243;n, registro
+y autenticaci&#243;n se administran con el idioma de este valor. El valor
+predeterminado es en_US. Consulte <a href="supportedlang.html">Idiomas admitidos</a> para obtener una lista de los subtipos
+de idiomas admitidos.</p>
+
+<a name="fxcpo"></a><h5>Dominios de cookies</h5>
+<p>La lista de dominios que se devolver&#225;n en el encabezado de cookie
+al configurar una cookie en el explorador del usuario durante la autenticaci&#243;n.
+Si se deja vac&#237;o, no se configurar&#225; ning&#250;n dominio de cookie. Es
+decir, la cookie de sesi&#243;n de OpenSSO s&#243;lo se reenviar&#225; a esta
+aplicaci&#243;n y no al resto de servidores del dominio.</p><p>Si se requiere SSO con otros servidores del dominio, este atributo debe
+configurarse con el dominio de cookies. Si dispone de dos interfaces en
+dominios distintos de una instancia de OpenSSO, deber&#225; configurar ambos dominios de
+cookies en este atributo. Si se utiliza un equilibrador de carga, el
+dominio de cookies debe ser el del dominio del equilibrador de carga
+y no los servidores detr&#225;s del equilibrador. El valor predeterminado de este
+campo es el dominio de la instancia de OpenSSO instalada.</p>
+
+<a name="fxcmi"></a><h5>Idiomas disponibles</h5>
+<p>Este atributo almacena todos las configuraciones regionales configuradas para la plataforma. Considere
+una aplicaci&#243;n que permite al usuario elegir la configuraci&#243;n regional del usuario.
+La aplicaci&#243;n obtendr&#225; el atributo del perfil de la plataforma y mostrar&#225;
+al usuario la lista de configuraciones regionales. El usuario elegir&#225; una configuraci&#243;n
+regional y la aplicaci&#243;n la configurar&#225; en la entrada de usuario <i>preferredLocale</i>.</p>
+
+<a name="fxctg"></a><h5>Conjunto de caracteres del cliente</h5>
+<p>Este atributo especifica el conjunto de caracteres establecido para los distintos clientes
+en el nivel de la plataforma. Contiene una lista con los tipos
+de clientes y los correspondientes conjuntos de caracteres. Consulte <a href="service.scplatformclientcharsetsadd.html">Para crear un conjunto de caracteres nuevo</a> para obtener
+m&#225;s informaci&#243;n.</p>
+<br/>
+
+</body>
+</html>

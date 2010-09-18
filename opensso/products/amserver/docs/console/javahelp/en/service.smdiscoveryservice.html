@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Discovery Service - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>Discovery Service</h3>
+<a name="indexterm-119"></a><p>The initial step in accessing identity data is to determine where the information
+is located. (For example, which identity service holds the principal's credit card information,
+or which server stores the principal's calendar service.) Typically, there are one or
+more services on a network that allow other entities to perform an action on
+identity data. Because clients are not expected to keep track of these services
+or to know which can be trusted, they require a discovery service. A
+<b>discovery service</b> is essentially a web service interface for discovery resources. A <b>discovery resource</b> is
+a registry of resource offerings. A <b>resource offering</b> defines an association between a
+piece of identity data and the service instance that provides access to that
+data. A <b>resource identifier</b> is a unique resource identifier (URI) registered with the discovery
+service that points to a particular discovery resource. When a client sends a
+request for some type of data, it includes a resource identifier that the
+OpenSSO Discovery Service uses to locate the web services provider for the requested
+attributes. The Discovery Service returns a resource offering that contains the information necessary to
+locate the data.</p>
+<hr><p><b>Note &#8211; </b>In order for access to occur, the hosting provider of the Liberty Personal
+Profile Service needs to be registered with the Discovery Service on behalf
+of each identity principal.</p>
+<hr>
+<p>The following Discovery Service global attributes can be configured for your implementation.</p>
+<ul><li><p><a href="dsproviderid.html">Provider ID</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">Supported Authentication Mechanisms</a></p></li>
+<li><p><a href="supporteddirectives.html">Supported Directives</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">Policy Evaluation for Discovery Lookup</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">Policy Evaluation for Discovery Update</a></p></li>
+<li><p><a href="authorizerpluginclass.html">Authorizer Plug-in Class:</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">Entry Handler Plug-in Class:</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">Classes for ResourceID Mapper Plug-in</a></p></li>
+<li><p><a href="authresponsemessage.html">Authenticate Response Message</a></p></li>
+<li><p><a href="generatesessioncontext.html">Session Context Statement for Bootstrapping</a></p></li>
+<li><p><a href="encryptnameidentifier.html">Encrypt Name Identifier in Session Context for Bootstrapping</a></p></li>
+<li><p><a href="useimpliedresource.html">Implied Resource</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">Resource Offerings for Bootstrapping</a></p></li></ul>
+<p>The following tasks are associated with configuring the Discovery Service:</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">To Configure a Resource Offering for Bootstrapping</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">To Configure a Service Description</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

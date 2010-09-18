@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Win32)">
+	<META NAME="AUTHOR" CONTENT="Rahul Gopal">
+	<META NAME="CREATED" CONTENT="20090811;11275200">
+	<META NAME="CHANGEDBY" CONTENT="Rahul Gopal">
+	<META NAME="CHANGED" CONTENT="20090811;14431000">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<META NAME="CHANGEDBY" CONTENT="Rahul Gopal">
+	<META NAME="CHANGEDBY" CONTENT="Rahul Gopal">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P><BR><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="Palatino Linotype, serif"><FONT SIZE=5><B>Configuring
+Anonymous-Enrollment Or Self-Registration By User</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT FACE="Palatino Linotype, serif">Changes
+/ additions are <SPAN STYLE="background: #ffff00">highlighted</SPAN>
+below.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<TABLE WIDTH=1384 BORDER=1 CELLPADDING=4 CELLSPACING=3>
+	<COL WIDTH=1368>
+	<TR>
+		<TD WIDTH=1368 VALIGN=TOP BGCOLOR="#ccccff">
+			<P><FONT FACE="Palatino Linotype, serif"><B>File:
+			</B></FONT><FONT FACE="Courier New, monospace"><B>opensso/config/auth/default/Login.jsp</B></FONT></P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=1368 VALIGN=TOP>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;%</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>String
+			ServiceURI = (String)
+			viewBean.getDisplayFieldValue(viewBean.SERVICE_URI);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>String
+			encoded = &quot;false&quot;;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>String
+			gotoURL = (String) viewBean.getValidatedInputURL(</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>request.getParameter(&quot;goto&quot;),
+			request.getParameter(&quot;encoded&quot;), request);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>String
+			encodedQueryParams = (String)
+			viewBean.getEncodedQueryParams(request);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>if
+			((gotoURL != null) &amp;&amp; (gotoURL.length() != 0)) {</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>encoded
+			= &quot;true&quot;;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">String
+			replaygotoURL = &quot;&quot;;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">String
+			goToURL = request.getParameter(&quot;goto&quot;);</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">if(gotoURL
+			!= null &amp;&amp; !gotoURL.equals(&quot;null&quot;) &amp;&amp;
+			(gotoURL.length() &gt; 0)){</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">replaygotoURL
+			= &quot;&amp;goto=&quot; + goToURL;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">}</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">System.out.println(&quot;replaygotoURL:
+			&quot; + replaygotoURL);</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>%&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;link
+			rel=&quot;stylesheet&quot; href=&quot;&lt;%= ServiceURI
+			%&gt;/css/styles.css&quot; type=&quot;text/css&quot; /&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;script
+			language=&quot;JavaScript&quot; src=&quot;&lt;%= ServiceURI
+			%&gt;/js/browserVersion.js&quot;&gt;&lt;/script&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;script
+			language=&quot;JavaScript&quot; src=&quot;&lt;%= ServiceURI
+			%&gt;/js/auth.js&quot;&gt;&lt;/script&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>function
+			LoginSubmit(value) {</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>aggSubmit();</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>var
+			hiddenFrm = document.forms['Login'];</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>if
+			(hiddenFrm != null) {</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>hiddenFrm.elements['IDButton'].value
+			= value;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>if
+			(this.submitted) {</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>alert(&quot;The
+			request is currently being processed&quot;);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>else
+			{</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>this.submitted
+			= true;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>hiddenFrm.submit();</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">function
+			RegisterUser() {</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">window.location
+			=
+			&quot;http://am-v490-01.red.iplanet.com:6480/idm/authutil/anonEnrollment.jsp?id=endUserAnonymousEnrollment&lt;%=replaygotoURL%&gt;&quot;;
+			</SPAN></FONT></FONT>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">}</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;jato:content
+			name=&quot;hasNoButton&quot;&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;tr&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;td&gt;&lt;img
+			src=&quot;&lt;%= ServiceURI %&gt;/images/dot.gif&quot; </FONT></FONT>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>width=&quot;1&quot;
+			height=&quot;15&quot; alt=&quot;&quot; /&gt;&lt;/td&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;td&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;table
+			border=0 cellpadding=0 cellspacing=0&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;script
+			language=&quot;javascript&quot;&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>markupButton(</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>'&lt;jato:text
+			name=&quot;lblSubmit&quot; /&gt;',</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&quot;javascript:LoginSubmit('&lt;jato:text
+			name=&quot;lblSubmit&quot; /&gt;')&quot;);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/script&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;script
+			language=&quot;javascript&quot;&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">markupButton(</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">'Register
+			User',</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&quot;javascript:RegisterUser()&quot;);</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;/script&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;/table&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;/td&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/tr&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;!--
+			end of hasNoButton --&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/jato:content&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;input
+			type=&quot;hidden&quot; name=&quot;goto&quot; value=&quot;&lt;%=
+			gotoURL %&gt;&quot;&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;input
+			type=&quot;hidden&quot; name=&quot;SunQueryParamsString&quot;
+			value=&quot;&lt;%= encodedQueryParams %&gt;&quot;&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;input
+			type=&quot;hidden&quot; name=&quot;encoded&quot; value=&quot;&lt;%=
+			encoded %&gt;&quot;&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;input
+			type=&quot;hidden&quot; name=&quot;plaingoto&quot; value=&quot;&lt;%=
+			request.getParameter(&quot;goto&quot;) %&gt;&quot;&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/auth:form&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/jato:content&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+</BODY>
+</HTML>

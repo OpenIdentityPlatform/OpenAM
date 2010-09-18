@@ -1,0 +1,121 @@
+<div><table cellpadding="0" cellspacing="10" border="0" align="left" valign="top">
+   <col WIDTH=100%>
+    <tr><td><img src="../../../../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+
+<tr><td><font size="2">
+<i>You can post comments and questions regarding the documentation provided below on the <a href="http://wiki.java.net/bin/view/Projects/DocFeedback" target="_blank">Documentation Feedback Wiki Page</a>. The page will open in a new window.</i>
+</font></td></tr>
+
+    <tr><td><h2>Adding Attributes to the OpenSSO Liberty Personal Profile Service</h2>
+    
+<font size="2">    
+
+<p>The Liberty Personal Profile Service is an identity service that contains default attributes and values that can be queried and modified. Based on the <a href="http://www.projectliberty.org/resource_center/specifications/liberty_alliance_id_sis_1_0_specifications">Liberty ID-SIS Personal Profile Service Specification</a>, the OpenSSO Liberty Personal Profile Service also provides a framework to add attributes which are not specifically defined. According to the specification, these <i>extensions</i> can be configured specifically as new attributes under an already defined <i>container</i> or group of attributes (for example, under <tt>/PP/CommonName</tt>, </tt>/PP/LegalIdentity</tt>, or <tt>/PP/AddressCard</tt>) or globally as new attributes under a specific extension attribute container defined as <tt>/PP/Extension</tt>. Currently, OpenSSO only supports the configuration of new attributes globally by defining a schema under the extension attribute container. Following is the OpenSSO schema for <tt>/PP/Extension</tt>.</p>
+
+<pre>
+<code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema";
+  xmlns="http://www.sun.com/identity/liberty/pp";
+  targetNamespace="http://www.sun.com/identity/liberty/pp";&gt;
+  &lt;xs:annotation&gt;
+      &lt;xs:documentation&gt;
+      &lt;/xs:documentation&gt;
+  &lt;/xs:annotation&gt;
+
+  &lt;xs:element name="PPISExtension"&gt;
+     &lt;xs:complexType&gt;
+        &lt;xs:simpleContent&gt;
+           &lt;xs:extension base="xs:string"&gt;
+              &lt;xs:attribute name="name" type="xs:string" use="required"/&gt;
+           &lt;/xs:extension&gt;
+        &lt;/xs:simpleContent&gt;
+     &lt;/xs:complexType&gt;
+   &lt;/xs:element&gt;
+&lt;/xs:schema&gt;</code>
+</pre>
+
+<ul>
+  <li><a href="#add">Adding the Attribute to a Directory</a></li>
+  <li><a href="#config">Configuring OpenSSO with the New Attribute</a></li>
+  <li><a href="#test">Testing the New Attribute</a></li>
+</ul>
+
+<a name="add"></a><h3>Adding the Attribute to a Directory</h3>
+
+<p>OpenSSO defines a schema for each attribute exposed in the Liberty Personal Profile Service. Each attribute also maps to a corresponding LDAP attribute. For example, the specification attribute <tt>/PP/CommonName/CN</tt> is defined as <tt>sunIdentityServerPPCommonNameCN</tt> in the Liberty Personal Profile Service and mapped to the <tt>CN</tt> LDAP attribute. So, for each extension attribute defined, there must be a corresponding LDAP schema and attribute. The schema can be defined in either of two ways:</P>
+
+<P></P>
+
+<OL>
+<LI>Define an OpenSSO compliant XML service file</LI>
+<LI>Define a new LDAP object class with corresponding attributes</LI>
+</OL>
+
+For this article, we define the following schema for an attribute named <tt>creditcard</tt> within the already defined OpenSSO <tt>extensionPPService</tt> object class.
+
+<pre><code>dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( creditcard-oid NAME 'creditcard' DESC 'Sample CreditCard'
+SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management')
+objectClasses: ( extensionPPService-oid NAME 'extensionPPService' DESC 'PP Extensions OC'
+SUP top AUXILIARY MAY ( creditcard )  X-ORIGIN 'Sun Java System Identity Management' )</code></pre>
+
+<P></P>
+
+Now we use <tt>ldapmodify</tt> to load the new schema into an LDAP directory.
+
+<P></P>
+     
+<tt>ldapmodify -D "cn=Directory Manager" -w <i>password</i> -f <i>file</i>.ldif</tt>
+
+<P></P>
+
+After loading the schema, you can add the new object class to a user's entry using the directory's console or an LDAP-enabled browser. You can also assign a value to the attribute, for example, 1234-567890-5678. For more details, see your particular directory's documentation.
+
+<P></P>
+
+<a name="config"></a><h3>Configuring OpenSSO with the New Attribute</h3>
+
+Login into the OpenSSO console as the <tt>amadmin</tt> administrator.
+
+<OL>
+<LI>Click on the Web Services tab.</LI>
+<LI>Click on the Liberty Personal Profile tab.</LI>
+<LI>Click New under PPLDAP Attribute Map.</LI>
+<LI>Define a new mapping as <tt>creditcard</tt> to <tt>creditcard</tt>.</LI>
+<LI>Add <tt>creditcard</tt> as a new attribute under Extension Container Attributes.</LI>
+<LI>Save the configuration.</LI>
+</OL>
+<P></p>
+
+<a name="test"></a><h3>Testing the New Attribute</h3>
+
+<b>NOTE:</b> This procedure assumes you have configured and run the Liberty sample located in the <tt><i>install-dir</i>/SUNWam/samples/phase2/wsc</tt> directory.
+
+<P></P>
+
+Access the PP query as follows:
+
+<P></P>
+
+<tt>/<i>pp</i>:PP/<i>pp</i>:Extension/<i>ispp</i>:PPISExtension[@name='creditcard']</tt>
+
+<P></P>
+
+where <i>pp</i> is the name space prefix for the personal profile and <i>ispp</i> is the name space prefix for the Extension schema. (The latter is defined in the Extension Container Attributes attribute of the Liberty Personal Profile Service.)
+
+<p></p>
+
+More information on the LIberty Personal Profile Service can be found in the <a href="http://docs.sun.com/doc/819-4674/6n6qelg74?a=view">chapter on Data Services</a> in the <i>Sun Java System Access Manager Federation and SAML Guide</i>.
+
+<P></P>
+
+<hr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

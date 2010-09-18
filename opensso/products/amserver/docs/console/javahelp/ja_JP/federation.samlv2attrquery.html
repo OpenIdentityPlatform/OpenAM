@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 属性クエリーのカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>SAMLv2 属性クエリーのカスタマイズ</h4>
+<p>SAMLv2 属性クエリーには、カスタマイズ用に次の属性が含まれています。</p>
+<ul><li><p><a href="#ggwht">「NameID の書式」</a></p></li>
+<li><p><a href="#ggwgs">「証明書エイリアス」</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>NameID の書式</h5>
+<p>属性クエリープロバイダによってサポートされる名前 ID の形式を定義します。名前 ID は、プロバイダがユーザーに関して相互に通信するための手段です。シングルサインオンの対話では、次の 3 つのタイプの識別子がサポートされます。</p>
+<ul><li><p><b>X509SubjectName</b> は、X509 の暗号化タイプの対象名を定義します。</p></li>
+<li><p><b>持続識別子</b>は、特定のユーザーのデータストアエントリに 2 つの属性の値として保存されます。</p></li>
+<li><p><b>一時識別子</b>は一時的なものであり、ユーザーの永続的なデータストアにデータは書き込まれません。</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>証明書エイリアス</h5>
+<p>この属性は、プロバイダ用の証明書エイリアス要素を定義します。「<tt>署名</tt>」は、キーストアで正しい署名証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。「<tt>暗号化</tt>」は、キーストアで正しい暗号化証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。</p>
+<br/>
+
+</body>
+</html>

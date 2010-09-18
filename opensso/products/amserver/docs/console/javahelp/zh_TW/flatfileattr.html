@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>平面檔案儲存庫屬性 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>平面檔案儲存庫屬性</h4>
+<p><a name="indexterm-15"></a>下列屬性用於配置平面檔案儲存庫：</p>
+
+<a name="gdokj"></a><h5>檔案儲存庫外掛程式類別名稱</h5>
+<p>此屬性指定可提供平面檔案實作的 Java 類別檔案。此屬性不得修改。</p>
+
+<a name="gdojs"></a><h5>檔案儲存庫目錄</h5>
+<p>定義存放識別及其屬性的基底目錄。</p>
+
+<a name="gdoke"></a><h5>快取</h5>
+<p>若啟用 (預設值)，則會快取識別及其屬性。從而後續請求將不會存取檔案系統。</p>
+
+<a name="gdokm"></a><h5>更新快取的時間</h5>
+<p>若啟用了快取，則此屬性決定檢查快取的時間間隔 (以分鐘為單位)，即在該時間間隔之後會檢查快取中的項目，以確定有無對檔案系統進行過任何變更。檢查機制基於時間戳記。</p>
+
+<a name="gdojw"></a><h5>檔案使用者物件類別</h5>
+<p>定義建立使用者時要自動新增至使用者的物件類別。</p>
+
+<a name="gdojt"></a><h5>密碼屬性</h5>
+<p>提供包含用於認證之密碼的屬性名稱。若啟用了「資料存放區」認證模組，則此屬性用於認證使用者。</p>
+
+<a name="gdokq"></a><h5>狀態屬性</h5>
+<p>提供儲存識別狀態的屬性名稱。狀態屬性的值是<tt>使用中</tt>或<tt>非使用中</tt>。認證識別期間可使用狀態屬性。如果識別是<tt>非使用中</tt>，則不會認證使用者。</p>
+
+<a name="gdojk"></a><h5>雜湊的屬性</h5>
+<p>提供一份屬性值將雜湊且儲存在檔案內的屬性清單。一旦雜湊，就無法取得原始值。只能擷取雜湊的值。這可用來確保特定屬性不應永久儲存 (但需用於驗證) 情況下的私密性。識別的密碼屬性即為此類屬性的範例。</p>
+
+<a name="gdojb"></a><h5>已加密的屬性</h5>
+<p>提供一份屬性值將加密且儲存在檔案內的屬性清單。雖然屬性經過加密及儲存，但呼叫識別存放區 API 仍會傳回原來未加密的值。這樣可防止使用者直接存取檔案系統並讀取機密屬性。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>인증자 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authorizer"></a><h4>인증자</h4>
+<a name="indexterm-89"></a><a name="indexterm-90"></a><p>요청을 처리하기 전에 리버티 개인 프로필 서비스는 요청 중인 WSC의 인증을 확인합니다.
+두 가지 수준의 인증 확인이 이루어질 수 있습니다.</p>
+<ol><li><p>요청하는 엔티티가 요청된 자원 프로필 정보에 액세스하는 것을 인증받았습니까?</p></li>
+<li><p>요청된 자원이 요청자에게 게시되었습니까?</p></li></ol>
+<p>인증은 플러그인을 통해 리버티 개인 프로필 서비스: <tt> com.sun.identity.liberty.ws.interfaces.</tt><tt>Authorizer</tt> 인터페이스의 구현에 대해 수행됩니다.
+새 구현을 개발할 수 있지만 OpenSSO에서 기본값 <tt>com.sun.identity.liberty.ws.idpp.plugin.</tt><tt>IDPPAuthorizer</tt>를 제공합니다. 이 플러그인은 다음과
+같이 쿼리 및 수정 작업에 대해 네 가지 정책 작업 값을 정의합니다.</p>
+<ul><li><p>허용</p></li>
+<li><p>거부</p></li>
+<li><p>동의 상호 작용</p></li>
+<li><p>값 상호 작용</p></li></ul>
+<p>규칙에 대한 자원 값은 리버티 개인 프로필 서비스에 의해 정의된 <tt>x-path</tt> 식과
+유사합니다.</p>/PP/CommonName/AnalyzedName/FN     쿼리     동의 상호 작용 /PP/CommonName/*                          수정     값 상호 작용 /PP/InformalName                            쿼리     거부<p>리버티 개인 프로필 서비스에 정의된 다음 속성 중 하나 또는 둘 다를
+선택 취소하여 인증을 해제할 수 있습니다.</p>
+<ul><li><p><a href="requirequery.html">쿼리 정책 평가 요구</a></p></li>
+<li><p><a href="requiremodify.html">수정 정책 평가 요구</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

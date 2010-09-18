@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建新组 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggobg"></a><h5>创建新组</h5>
+<p>如有必要，在 Federated Access Manager 管理控制台中执行该任务。该任务适用于 Web 代理组和 J2EE 代理组。</p><p>如果要使代理继承组的特定属性，则创建一个组。J2EE 代理可以继承 J2EE 代理组的属性，而 Web 代理可以继承 Web 代理组的属性。</p><ol>
+<li><b>单击“配置”选项卡下的“代理”。</b></li>
+<li><b>如有必要，选择适当代理类型的选项卡。</b><ul>
+<li><b>Web 代理：</b><p>"Web" 选项卡适用于 Web 代理且为默认选项。无需再次选择。</p></li>
+<li><b>J2EE 代理：</b><p>"J2EE" 选项卡适用于 J2EE 代理。如果适用，单击该选项卡。</p></li></ul></li>
+<li><b>在“组”部分中单击“新建”。</b><p>在“名称”字段中输入新组的名称。</p></li>
+<li><b>在“服务器 URL”字段中，输入 Federated Access Manager 服务器 URL。</b></li>
+<li><b>单击“创建”。</b><p>控制台创建代理组，并再次显示代理（WebAgent 或 J2EEAgent）页面，其中包含指向该组的链接。</p><p>要对组进行其他配置，单击该链接显示“编辑”代理组页面。</p><p>您设置为配置组的属性与用于个体代理的属性相同，仅有的不同之处是在该组级别下不能使用“组”、“密码”、“密码确认”属性。</p>
+<hr><p><b>注 &#8211; </b>此外，要注意到一些组属性已经分配了在大多数情况下不应更改的变量值。此类值的一个示例如下：</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

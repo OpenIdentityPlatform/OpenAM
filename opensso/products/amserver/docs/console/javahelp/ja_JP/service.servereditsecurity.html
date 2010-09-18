@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>セキュリティー - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>セキュリティー</h4>
+<p>セキュリティー属性は、サーバーインスタンスのセキュリティーレベルを制御するための暗号化、検証、および Cookie の情報を定義します。</p>
+
+<a name="ggkbi"></a><h5>暗号化</h5>
+<p>暗号化属性は次のとおりです。</p>
+
+<a name="ggkcb"></a><h5>パスワードの暗号鍵</h5>
+<p>パスワードの暗号化と復号化に使用する鍵を指定します。サービス管理システムの設定に格納されます。値はインストールの間に設定されます。次に例を示します。<tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd</tt></p>
+
+<a name="ggkbg"></a><h5>認証サービス共有シークレット</h5>
+<p>アプリケーション認証モジュールの共有シークレット。値はインストールの間に設定されます。次に例を示します。<tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl</tt></p>
+
+<a name="ggkbd"></a><h5>暗号クラス</h5>
+<p>デフォルト値は <tt>com.iplanet.services.util.JCEEncryption</tt> です。暗号化クラス実装を指定します。指定可能なクラスは <tt>com.iplanet.services.util.JCEEncryption</tt> および <tt>com.iplanet.services.util.JSSEncryption</tt> です。</p>
+
+<a name="ggkby"></a><h5>セキュリティー保護されたランダムファクトリクラス</h5>
+<p>デフォルト値は <tt>com.iplanet.am.util.JSSSecureRandomFactoryImpl</tt> です。<tt>SecureRandomFactory</tt> のファクトリクラス名を指定します。指定可能な実装クラスは、JSS を使用する <tt>com.iplanet.am.util.JSSSecureRandomFactoryImpl</tt> および純粋な Java を使用する <tt>com.iplanet.am.util.SecureRandomFactoryImpl</tt> です。 
+ </p>
+
+<a name="ggkbr"></a><h5>検証</h5>
+<p>検証属性は次のとおりです。</p>
+
+<a name="ggkay"></a><h5>プラットフォームの低レベル通信。最大コンテンツ長</h5>
+<p>デフォルト値は 16384 または 16k です。OpenSSO が許容する <tt>HttpRequest</tt> の最大コンテンツ長を指定します。</p>
+
+<a name="ggkbb"></a><h5>クライアント IP アドレス確認</h5>
+<p>デフォルト値は NO です。すべての <tt>SSOToken</tt> の作成または検証において、クライアントの IP アドレスがチェックされるかどうかを指定します。</p>
+
+<a name="ggkba"></a><h5>Cookie</h5>
+<p>Cookie 属性は次のとおりです。</p>
+
+<a name="ggkad"></a><h5>Cookie 名</h5>
+<p>デフォルト値は <tt>iPlanetDirectoryPro</tt> です。有効なセッションハンドラ ID を設定するために認証サービスで使用する Cookie 名。この Cookie 名の値は、有効なセッション情報を取得するために使用されます。</p>
+
+<a name="ggkaw"></a><h5>セキュリティー保護された Cookie</h5>
+<p>OpenSSO Cookie をセキュリティー保護されたモードで設定できるようにし、<tt>HTTP(s)</tt> などのセキュリティー保護されたプロトコルが使用されているときにブラウザが OpenSSO Cookie だけを返すようにします。デフォルト値は false (いいえ) です。 </p>
+
+<a name="ggkbk"></a><h5>Cookie 値のエンコード</h5>
+<p>このプロパティーにより、OpenSSO は Cookie 値を <tt>URLencode</tt> でエンコードできます。URLencode は、文字を HTTP で理解できる形式に変換します。</p>
+
+<a name="ggkbc"></a><h5>キーストア</h5>
+<p>次の属性を使用して、追加で作成するサイトやサーバーのキーストア情報を設定できます。</p>
+
+<a name="ggkbj"></a><h5>キーストアファイル</h5>
+<p>値はインストールの間に設定されます。次に例を示します。<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/keystore.jks</tt>SAML XML キーストアパスワードファイルのパスを指定します。</p>
+
+<a name="ggkbu"></a><h5>キーストアパスワードファイル</h5>
+<p>値はインストールの間に設定されます。次に例を示します。<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/.storepass</tt>SAML XML キーストアパスファイルのパスを指定します。</p>
+
+<a name="ggkbs"></a><h5>非公開鍵パスワードファイル</h5>
+<p>値はインストールの間に設定されます。次に例を示します。<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.keypass</tt> SAML XML キーパスワードファイルのパスを指定します。</p>
+
+<a name="ggkaq"></a><h5>証明書エイリアス</h5>
+<p>デフォルト値は test です。</p>
+
+<a name="ggkbw"></a><h5>証明書失効リストのキャッシュ</h5>
+<p>これらの属性は、証明書発行局からの証明書失効リスト (CRL) を保持するために使用する、ローカルの CRL キャッシュリポジトリを定義します。証明書の検証のために CRL を取得する必要があるサービスは、この情報に基づいて CRL を受け取ります。 </p>
+
+<a name="ggkch"></a><h5>LDAP サーバーのホスト名</h5>
+<p>証明書が格納されている LDAP サーバーの名前を指定します。デフォルト値は、OpenSSO のインストール時に指定したホスト名です。証明書が格納されている LDAP サーバーのホスト名を使用できます。 </p>
+
+<a name="ggkau"></a><h5>LDAP サーバーのポート番号</h5>
+<p>証明書が格納されている LDAP サーバーのポート番号を指定します。デフォルト値は、OpenSSO のインストール時に指定したポートです。証明書が格納されている LDAP サーバーのポートを使用できます。 </p>
+
+<a name="ggkam"></a><h5>SSL を有効</h5>
+<p>LDAP サーバーへのアクセスに SSL を使用するかどうかを指定します。デフォルトでは、証明書認証サービスは LDAP アクセスに SSL を使用しません。</p>
+
+<a name="ggkbv"></a><h5>LDAP サーバーのバインドユーザー名</h5>
+<p>LDAP サーバー内のバインド DN を指定します。 </p>
+
+<a name="ggkaj"></a><h5>LDAP サーバーのバインドパスワード</h5>
+<p>LDAP サーバーへのバインドに使用するパスワードを定義します。デフォルトでは、インストール時に入力された amldapuser パスワードが、バインドユーザーとして使用されます。</p>
+
+<a name="ggkce"></a><h5>LDAP 検索のベース DN</h5>
+<p>この属性は、LDAP サーバーの LDAP ユーザー対象が使用するベース DN を指定します。そこから検索が開始されます。デフォルトでは、OpenSSO インストールベースの最上位レルムです。</p>
+
+<a name="ggkbp"></a><h5>属性の検索</h5>
+<p>発行者の <tt>subjectDN</tt> の任意の DN コンポーネントを使用して、ローカル LDAP サーバーから CRL を取得できます。これは、「cn」などの単値文字列です。すべてのルート CA で同じ検索属性を使用する必要があります。</p>
+
+<a name="ggkaa"></a><h5>オンライン証明書の状態プロトコルの確認</h5>
+<p>オンライン証明書の状態プロトコル (OCSP) を使用することで、OpenSSO サービスは指定された証明書の (失効) 状態を判定できます。OCSP を使用すると、CRL を使用した場合よりもタイムリーに失効情報を提供するという運用要件の一部を満たすことができ、追加の状態情報を取得することもできます。OCSP クライアントは OCSP レスポンダに状態要求を発行し、レスポンダが応答を返すまではその証明書の受入れを保留します。 </p>
+
+<a name="ggkal"></a><h5>確認が有効</h5>
+<p>この属性は OCSP チェックを有効にします。これはデフォルトでは有効になっています。</p>
+
+<a name="ggkav"></a><h5>レスポンダ URL</h5>
+<p>この属性は、OCSP レスポンダの場所を特定する URL を定義します。たとえば、<tt>http://ocsp.example.net:80</tt> です。</p><p>デフォルトでは、OCSP レスポンダの場所は、検証される証明書から暗黙的に決定されます。RFC 3280 に定義されている Authority Information Access 拡張機能が証明書にない場合、またはオーバーライドが必要な場合に、このプロパティーが使用されます。 </p>
+
+<a name="ggkai"></a><h5>証明書のニックネーム</h5>
+<p>OCSP レスポンダのニックネームは、そのレスポンダに対する CA 証明書のニックネームで、たとえば <tt>Certificate Manager - sun</tt> となります。設定する場合、CA 証明書が Web サーバーの証明書データベースに存在している必要があります。OCSP URL を設定する場合、OCSP レスポンダニックネームも設定する必要があります。設定しないと、両方とも無視されます。これらが設定されない場合、ユーザーの証明書で提示された
+OCSP レスポンダ URL が OCSP 妥当性検査に使用されます。OCSP レスポンダ URL がユーザーの証明書で提示されない場合、OCSP 妥当性検査は実行されません。 </p>
+
+<a name="ggkag"></a><h5>連邦情報処理規格</h5>
+<p>情報技術管理改革法 (一般法 104-106) に基づき、商務長官は連邦コンピュータシステムに関して米国国立標準技術研究所 (NIST) によって作成された標準規格とガイドラインを承認します。これらの標準規格とガイドラインは、政府全体で使用する連邦情報処理規格 (FIPS) として NIST によって発行されます。セキュリティーや相互運用性などについて連邦政府の切実な要求があり、条件を満たした業界標準やソリューションがない場合に、NIST が FIPS
+を作成します。 </p>
+
+<a name="ggkap"></a><h5>FIPS モード</h5>
+<p>このプロパティーの取り得る値は true (はい) または false (いいえ) です。これが true の場合のみ、すべての暗号化操作が FIPS に準拠したモードで実行されます。 </p>
+<br/>
+
+</body>
+</html>

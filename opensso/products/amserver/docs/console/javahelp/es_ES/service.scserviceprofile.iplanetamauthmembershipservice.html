@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Condici&#243;n de miembro - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>Condici&#243;n de miembro</h4>
+<p><a name="indexterm-176"></a>El m&#243;dulo de autenticaci&#243;n Condici&#243;n de miembro se implementa para sitios personalizados.
+Cuando se habilita, un usuario se puede autorregistrar. Esto significa que el
+usuario puede crear una cuenta, personalizarla y acceder a ella sin necesidad
+de un administrador. Los atributos son atributos de dominio. Los atributos son:</p>
+<ul><li><p><a href="#fumys">Longitud de contrase&#241;a m&#237;nima</a></p></li>
+<li><p><a href="#fumyr">Roles de usuario predeterminados</a></p></li>
+<li><p><a href="#fumyt">Estado de usuario despu&#233;s del registro</a></p></li>
+<li><p><a href="#fumzm">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>Longitud de contrase&#241;a m&#237;nima</h5>
+<p>Especifica el n&#250;mero m&#237;nimo de caracteres necesario para una contrase&#241;a configurada durante
+el autorregistro. El valor predeterminado es 8.</p><p>Si se modifica este valor, tambi&#233;n se deber&#237;a cambiar en el texto
+del registro y de error en el siguiente archivo:</p><p><tt></tt><i>AcessManager-base</i><tt>/locale/amAuthMembership.properties </tt> (entrada <i>PasswdMinChars</i>)</p>
+
+<a name="fumyr"></a><h5>Roles de usuario predeterminados</h5>
+<p>Especifica los roles asignados a los nuevos usuarios cuyos perfiles se crean
+mediante el autorregistro. No hay ning&#250;n valor predeterminado. El administrador debe especificar
+los DN de los roles que se asignar&#225;n al nuevo usuario.</p>
+<hr><p><b>Nota &#8211; </b>El rol especificado debe encontrarse debajo del dominio para el que se
+est&#225; configurando la autenticaci&#243;n. S&#243;lo se agregar&#225;n los roles que se pueden
+asignar al usuario durante el autorregistro. El resto de DN se ignorar&#225;n.
+Puede utilizarse un rol de OpenSSO o LDAP, pero no se aceptan
+roles filtrados.</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>Estado de usuario despu&#233;s del registro</h5>
+<p>Especifica si los servicios est&#225;n disponibles inmediatamente para un usuario que se
+haya autorregistrado. El valor predeterminado es Active (activo) y los servicios est&#225;n
+disponibles para el nuevo usuario. Al seleccionar Inactive (inactivo), el administrador elige
+que no haya servicios disponibles para el nuevo usuario.</p>
+
+<a name="fumzm"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

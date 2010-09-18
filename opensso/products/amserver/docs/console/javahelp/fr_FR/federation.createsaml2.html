@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Cr&#233;ation d'un fournisseur d'entit&#233;s SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createsaml2"></a><h5>Cr&#233;ation d'un fournisseur d'entit&#233;s SAMLv2</h5>
+<p>Suivez cette proc&#233;dure pour cr&#233;er un fournisseur d'entit&#233;s bas&#233; sur le plug-in
+SAMLv2 des services de f&#233;d&#233;ration. Vous pouvez attribuer un, plusieurs ou l'ensemble
+des r&#244;les de fournisseur &#224; l'entit&#233;, mais tous les r&#244;les que vous
+d&#233;finissez appartiendront au m&#234;me fournisseur d'entit&#233;s.</p><ol>
+<li><b>Connectez-vous en tant qu'administrateur.</b></li>
+<li><b>Cliquez sur l'onglet F&#233;d&#233;ration de la console, puis sur Nouveau dans le
+tableau Fournisseur d'entit&#233;s.</b></li>
+<li><b>&#192; l'invite, s&#233;lectionnez SAMLv2 comme fournisseur d'entit&#233;s.</b></li>
+<li><b>S&#233;lectionnez le domaine auquel le fournisseur d'entit&#233;s appartiendra.</b></li>
+<li><b>Tapez un nom dans le champ Identificateur de l'entit&#233;. </b></li>
+<li><b>Choisissez le r&#244;le de fournisseur d'entit&#233;s que vous souhaitez attribuer au fournisseur
+d'entit&#233;s.</b><p>La saisie de donn&#233;es dans le champ M&#233;ta-alias cr&#233;e automatiquement le r&#244;le
+de fournisseur d'entit&#233;s et l'attribue au fournisseur d'entit&#233;s.</p></li>
+<li><b>Indiquez les valeurs des attributs suivants pour un ou plusieurs r&#244;les&#160;:</b><dl><dt>M&#233;ta-alias</dt>
+<dd><p>Sp&#233;cifie une propri&#233;t&#233; <tt>metaAlias</tt> pour le r&#244;le de fournisseur en cours de configuration. La propri&#233;t&#233; <tt>metaAlias</tt> permet de localiser l'identificateur de l'entit&#233; du fournisseur et l'organisation dans laquelle il se trouve. Il est compos&#233; du nom du domaine ou de l'organisation, d'une barre oblique et du nom du fournisseur. Par exemple, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Attention &#8211; </b>Les noms utilis&#233;s dans la propri&#233;t&#233; <tt>metaAlias</tt> ne doivent pas contenir de barre oblique (<tt>/</tt>).</p>
+<hr>
+</dd>
+<dt>Alias du certificat de signature</dt>
+<dd><p>Sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le certificat de signature correct dans le keystore. </p></dd>
+<dt>Alias du certificat de chiffrement</dt>
+<dd><p>Sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le certificat de chiffrement correct dans le keystore.</p></dd>
+<dt>Membres d'affiliation (affiliation h&#233;berg&#233;e uniquement)</dt>
+<dd><p>Un fournisseur doit &#234;tre membre d'un cercle de confiance pour prendre part &#224; des communications SAMLv2. Il peut avoir une ou plusieurs affiliations. L'attribut F&#233;d&#233;ration d'affiliation doit &#234;tre activ&#233; pour le fournisseur s&#233;lectionn&#233;. Saisissez le m&#233;ta-alias du fournisseur dans le champ Nouvelle valeur et cliquez sur Ajouter.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Cr&#233;er.</b><p>Le fournisseur d'entit&#233;s, les r&#244;les qui lui ont &#233;t&#233; attribu&#233;s et l'emplacement
+s'afficheront dans la liste Fournisseurs d'entit&#233;s. </p></li>
+<li><b>Pour personnaliser le comportement des r&#244;les des fournisseurs d'entit&#233;s, cliquez sur le
+nom d'un fournisseur d'entit&#233;s puis sur l'onglet correspondant au r&#244;le que vous
+souhaitez personnaliser.</b></li></ol>
+<br/>
+
+</body>
+</html>

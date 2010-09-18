@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>Le module d'authentification Windows NT permet de s'authentifier aupr&#232;s d'un serveur Microsoft
+Windows NT. Les attributs sont des attributs de domaine. Les valeurs qui
+leur sont appliqu&#233;es sous Configuration des services deviennent les valeurs par d&#233;faut
+pour le mod&#232;le Authentification Windows NT. Le mod&#232;le de service doit &#234;tre
+cr&#233;&#233; apr&#232;s l'enregistrement du service pour le domaine. Les valeurs par d&#233;faut
+sont modifiables apr&#232;s l'enregistrement par l'administrateur du domaine. Les attributs de domaine
+ne sont pas h&#233;rit&#233;s par les entr&#233;es des sous-arborescences du domaine.</p><p>Pour permettre l'activation du module Authentification Windows NT, Samba Client 2.2.2 doit
+&#234;tre t&#233;l&#233;charg&#233; et install&#233; dans le r&#233;pertoire suivant :</p><p><tt></tt><i>Base AccessManager</i><tt>/SUNWam/bin</tt></p><p>Le client Samba est un serveur de fichier et d'impression permettant de
+m&#233;langer des machines Windows et UNIX sans serveur Windows NT/2000 s&#233;par&#233;.</p><p>Red Hat Linux est fourni avec un client Samba situ&#233; dans le
+r&#233;pertoire <tt>/usr/bin</tt>.</p><p>Pour s'authentifier avec le service d'authentification Windows NT pour Linux, copiez le
+fichier binaire du client dans <tt></tt><i>base OpenSSO </i><tt> /identity/bin</tt>.</p><p>Les attributs Windows NT sont les suivants :</p>
+<ul><li><p><a href="#fumve">Domaine d'authentification</a></p></li>
+<li><p><a href="#fumvp">H&#244;te d'authentification</a></p></li>
+<li><p><a href="#fumvq">Nom du fichier de configuration Samba</a></p></li>
+<li><p><a href="#fumwi">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>Domaine d'authentification</h5>
+<p>D&#233;finit le nom de domaine auquel appartient l'utilisateur.</p>
+
+<a name="fumvp"></a><h5>H&#244;te d'authentification</h5>
+<p>D&#233;finit le nom d'h&#244;te de l'authentification Windows NT. Le nom d'h&#244;te doit
+&#234;tre le nom netBIOS, contrairement au nom de domaine complet (FQDN). Par
+d&#233;faut, la premi&#232;re partie du nom de domaine complet est le nom
+netBIOS.</p><p>Si le protocole DHCP (Dynamic Host Configuration Protocol) est utilis&#233;, vous devez
+placer une entr&#233;e appropri&#233;e dans le fichier HOSTS de la machine Windows
+2000.</p><p>La r&#233;solution de noms sera effectu&#233;e sur la base du nom netBIOS.
+Si vous ne disposez pas sur votre sous-r&#233;seau d'un serveur fournissant la
+r&#233;solution de noms netBIOS, les mappages doivent &#234;tre pr&#233;programm&#233;s. Par exemple, le
+nom d'h&#244;te doit &#234;tre <tt>exemple1</tt> et non  <tt>exemple1.soci&#233;t&#233;1.com</tt>.</p>
+
+<a name="fumvq"></a><h5>Nom du fichier de configuration Samba</h5>
+<p>D&#233;finit le nom du fichier de configuration Samba et prend en charge
+l'option <tt>-s</tt> dans la commande <tt>smbclient. </tt> Cette valeur doit &#234;tre le chemin
+complet du r&#233;pertoire dans lequel est situ&#233; le fichier de configuration Samba.
+Par exemple&#160;: <tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

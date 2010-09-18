@@ -1,0 +1,177 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+	<tr><td><h2>OpenSSO の概要の FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#what_is">OpenSSO とは何ですか?</a></li>
+<li><a href="#why">何故、Sun はプロプライエタリコードをオープンソースすることにしたのですか?</a></li>
+<li><a href="#benefits">オープンソースソフトウェアの利点は何ですか?</a></li>
+<li><a href="#openssobenefits">OpenSSO の利点は何ですか?</a></li>
+<li><a href="#objectives">OpenSSO プロジェクトの目的は何ですか?</a></li>
+<li><a href="#comprises">OpenSSO には何が含まれていますか?</a></li>
+<li><a href="#large">OpenSSO コミュニティはどれくらいの規模ですか?</a></li>
+<li><a href="#available">OpenSSO プロジェクトサイトでは何を利用できますか?</a></li>
+<li><a href="#license">OpenSSO のコードにはどのようなライセンスが使われていますか?</a></li>
+<li><a href="#cost">OpenSSO のソースコードを使用するにあたってコストがかかりますか?</a></li>
+<li><a href="#allowed">OpenSSO ソースコードに対して何をすることが許されていますか?</a></li>
+<li><a href="#amname">自分でコードをビルドした場合、それを Access Manager と称することはできますか?</a></li>
+<li><a href="#register">OpenSSO のソースコードをダウンロードするのに登録は必要ですか?</a></li>
+<li><a href="#participate">どのようにして OpenSSO プロジェクトに参加することができますか?</a></li>
+<li><a href="#start">どこから始めればよいですか?</a></li>
+<li><a href="#support">OpenSSO に関してサポートが得られますか?</a></li>
+</ol>
+</font></td></tr>
+<tr><td><p><b>Q:<b><a name="what_is"></a> OpenSSO とは何ですか?</b></b></p>
+
+
+<p>OpenSSO と称されている Open Web Single Sign-On プロジェクトは、
+ Sun Microsystems, Inc. より提供されていたアイデンティティと連携(フェデレーション)に関する 2 つの製品である 
+<a href="http://jp.sun.com/practice/software/identity/jp/access_mgr/">Sun Java<sup>TM</sup> System Access Manager</a> と <a href="http://jp.sun.com/practice/software/identity/jp/federation_mgr/"> Sun Java System Federation Manager</a> のソースコードをベースにしたオープンな開発プロジェクトです。
+OpenSSO のゴールはパブリックドメインにおけるアイデンティティサービスインフラに対する拡張可能な基盤を提供したり、Web やアプリケーションサーバーでホストされる Web アプリケーションに対するシングルサインオン(SSO) の実現を手助けすることです。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="why"></a> 何故、Sun はプロプライエタリコードをオープンソースすることにしたのですか?</b></b></p>
+
+<p>この質問に対する Sun Microsystems の公式な回答については <a href="http://jp.sun.com/products/software/opensso_enterprise/">Sun のweb サイト</a>を参照してください。簡単に書きますと、Sun のゴールは開発者がもっと SSO テクノロジに接する機会を増やすことです。SSO は Web セキュリティインフラストラクチャーにおけるユビキタスとなりうるものです。OpenSSO はソフトウェアライセンスに関わるコストを予算に追加せずとも、開発者が SSO テクノロジを使って、内部の Web インフラをセキュアなものにする自由を提供します。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="benefits"></a> オープンソースソフトウェアの利点は何ですか?</b></b></p>
+
+<p>Open-sourcing software:
+<P></P>
+<ul>
+<li>最小限の法的規制のもとで、開発者が時間と距離を超えて自由に協力しあえる。</li>
+<li>コードの品質とセキュリティの向上</li>
+<li>開発コストの削減</li>
+<li>カスタマイズの受容力の向上</li>
+<li>ソフトウェアの再利用の促進</li>
+<!--<li>Enables a community where skill and merit matter. </li>-->
+</ul></p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="openssobenefits"></a> OpenSSO の利点は何ですか?</b></b></p>
+
+<p>アイデンティティーベースの認証とシングルサインオン機能を提供するフリーでオープンなソースコードを利用可能にすることで、Java コミュニティーでそれらのテクノロジーが幅広く採用されることになります。OpenSSO で利用可能なモジュールは、ドメイン内でのユーザー認証とシングルサインオンを可能にするアイデンティティーサービスを含んでいます。開発者は、このアイデンティティーサービスを自由に web や J2EE ベースのアプリケーションやそういったアプリケーションを提供するサービスに組み入れることができます。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="objectives"></a> OpenSSO プロジェクトの目的は何ですか?</b></b></p>
+
+<p>OpenSSO プロジェクトは:
+<P></P>
+<ul>
+<li>アイデンティティーインフラストラクチャーのソースコードへのオープンなアクセスを提供します。</li>
+<li>次世代のオープンネットワークサービスを構築するためのイノベーションを可能にします。</li>
+<li>オープンな XML ベースのファイルフォーマットと言語に依存しないコンポーネントアプリケーションプログラムインタフェース(API)を確立します。</li>
+</ul></p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="comprises"></a> OpenSSO には何が含まれていますか?</b></b></p>
+
+<p>Sun Microsystems は無償のRTU(right-to-use)ライセンスで Java 開発者コミュニティーに次のモジュールのソースを提供します:
+
+<ul>
+<li>セッション管理</li>
+<li>ポリシー</li>
+<li>コンソール</li>
+<li>管理ツール</li>
+<li>連携</li>
+<li>Web サービス</li>
+<li>ポリシーエージェント</li>
+</ul></p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="large"></a> OpenSSO コミュニティはどれくらいの規模ですか?</b></b></p>
+
+<p>2007年6月時点で、およそ 400 名のメンバーがいます。
+
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="available"></a> OpenSSO プロジェクトサイトでは何を利用できますか?</b></b></p>
+
+<p>OpenSSO サイトでは、ソースコード、ナイトリービルド、ガバナンスプロポーザル、貢献者同意書(contributor agreement)、マニュアルドキュメント、フォーラム、メーリングリストおよび関連する情報へのリンクを利用できます。 
+さらに、どのようにしてプロジェクトに関わっていけばよいかについての手引きもあります。個々については、左サイドのナビゲーションバーをクリックしてみてください。ナビゲーションバーの「日本語」をクリックすると、日本語のトップページが表示され、そこから日本語で書かれた個々のページへと移動できます。(一部、英語のページへと飛ぶ場合もあります。)
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="license"></a> OpenSSO のコードにはどのようなライセンスが使われていますか?</b></b></p>
+
+<p>OpenSSO のコードは CDDL(Common Development and Distribution LicenseL) のもとでリリースされています。このライセンスに関する情報は <a href="http://www.sun.com/cddl/">http://www.sun.com/cddl/</a> と <a href="http://www.opensource.org/licenses/cddl1.php">http://www.opensource.org/licenses/cddl1.php</a> で参照できます。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="cost"></a> OpenSSO のソースコードを使用するにあたってコストがかかりますか?</b></b></p>
+
+<p>いいえ、OpenSSO のソースコードは無償で使用、改変、再配布できます。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="allowed"></a> OpenSSO ソースコードに対して何をすることが許されていますか?</b></b></p>
+
+
+<p> OpenSSO ソースのコードを参照したり、改変しｔり、ビルドしたり、使用したり、再配布できます。
+個々のバイナリダウンロード物は、それぞれ固有の権利と制限が定められたライセンスを持っています。ソースコードとバイナリに関するライセンス事項の情報については、
+<a href="http://www.sun.com/cddl/cddl.html">ライセンスのページ</a> を参照してください。</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="amname"></a> 自分でコードをビルドした場合、それを Access Manager と称することはできますか?</b></b></p>
+
+<p>いいえ、Access Manager、 Federation Manager および Federated Access Manager は Sun Microsystems の商標です。あなたがビルドしたもの、あるいは改変したものを、それらの名称で呼ぶことはできません。まだ商標登録されていない名称であれば、名前をつけることはできます。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="register"></a> OpenSSO のソースコードをダウンロードするのに登録は必要ですか?</b></b></p>
+
+<p>
+OpenSSO のソースコードをダウンロードするのに、 
+<a href="http://www.java.net/">java.net</a> サイトのユーザー登録をする必要はありません。また、OpenSSO プロジェクトのメンバー登録をする必要もありません。</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="participate"></a> どのようにして OpenSSO プロジェクトに参加することができますか?</b></b></p>
+
+<p>OpenSSO プロジェクトはシンプルなガバナンス構造にならっています。
+<ul>
+<li>パブリックなディスカッショングループによって決定される。</li>
+<li>投票（多数決）ではなくて、意見の一致によって決定される。</li>
+<li>透過的に決定され、プロジェクトのどのメンバーでも決定したことに対する懸念事項を意見できる。
+</li>
+</ul>
+どなたでも、自由に OpenSSO コミュニティーに参加し、何らかの貢献をすることができます。OpenSSO のメンバーは行動規範に従って、ガバナンスプロセスにしたがって行動します。
+OpenSSO のメンバーは、以下の 1 つ以上のロールを担うことができます。
+
+<ul>
+<li>ユーザー</li>
+<li>貢献者</li>
+<li>コミッター</li>
+<li>モジュールオーナー</li>
+<li>プロジェクト管理者</li>
+</ul>
+
+詳細については<a href="https://opensso.dev.java.net/public/about/governance/index.html">こちら</a>を参照してください。 
+
+</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="start"></a> どこから始めればよいですか?</b></b></p>
+
+<p>手始めに、<a href="https://opensso.dev.java.net/ja">OpenSSO のトップページ</a>にアクセスするとよいでしょう。このページから、ナイトリービルドのダウンロードページや、ディスカッショングループやマニュアル、ソースコードのダウンロードページや、ホワイトペーパーなどへアクセスできます。 
+CVS に関する質問や OpenSSO のソースのどのような構成になっているかについては <a href="faqgetstart.html">こちら</a>を参照することで回答が得られるかもしれません。 
+ソースコードに関する技術的な質問に対する回答は<a href="faqsourcecode.html">こちら</a>のページで得られるかもしれません。</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="support"></a> OpenSSO に関してサポートが得られますか?</b></b></p>
+
+<p>これは、「はい」とも「いいえ」とも言えます。 
+<a href="https://opensso.dev.java.net/servlets/ProjectMailingListList">メーリングリスト</a>や<a href="https://opensso.dev.java.net/servlets/ForumMessageList?forumID=1554">コミュニティーフォーラム</a>で質問を投稿し、OpenSSO コミュニティーのメンバーから助けを得ることができます。
+また、Sun Microsystems は OpenSSO のソースコードを基にした企業向け商用版である OpenSSO Enterprise についてはサポートします。しかしながら、現時点では 
+Sun Microsystems は OpenSSO(Enterprise 版ではない OpenSSO) はサポートしません。</p></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>
+</html>

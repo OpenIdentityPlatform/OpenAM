@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置網站識別碼  - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>配置網站識別碼 </h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>此屬性定義由安裝 OpenSSO 之伺服器代管的任何網站。安裝期間會為主機定義預設值和自動產生的網站 ID。可以有多個項目。例如，負載平衡或共用同一 Directory Server 的多個 OpenSSO 實例全都需要加以定義。起點是聯合介面 SAML 畫面上的 [網站識別碼]
+屬性。網站 ID 是在 [伺服器與網站配置] 畫面中定義的。如需詳細資訊，請參閱<a href="service.serversite.html">伺服器與網站</a>。</p><ol>
+<li><b>按一下 [新建] 以新增一個新的網站識別碼，或是在已配置的網站識別碼的名稱上按一下以修改其設定檔。</b><p>會顯示 [網站識別碼] 屬性。</p></li>
+<li><b>根據下列資訊提供網站識別碼屬性的值：</b><dl><dt>實例 ID</dt>
+<dd><p>此特性的值為 <i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i>。</p><p>如果為 SSL 配置 SAML (同時在資源與目標網站內)，請確保此處定義的協定為 <tt>https//</tt>。</p></dd>
+<dt>網站 ID</dt>
+<dd><p>網站 ID 是為每個網站 (雖然在負載平衡器之後的多個伺服器之值將會相同) 所產生的識別碼。如果需要的話，<tt>com.sun.identity.saml.common</tt> 套裝軟體內有一個類別，可用來手動產生此識別碼。在指令行鍵入如下：</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>發行者名稱</dt>
+<dd><p>此特性的預設值為 <i>host</i><tt>:</tt><i>port</i>，但它可以是任何 URI。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [確定] 以完成網站識別碼配置。</b></li>
+<li><b>按一下 [本機網站特性] 頁面上的 [儲存] 以完成 SAML 配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

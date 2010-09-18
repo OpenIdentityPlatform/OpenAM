@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-WSF Security Service - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Liberty ID-WSF Security Service</h4>
+
+
+<a name="ggohs"></a><h5>Security Attribute Plugin Class</h5>
+<p>This attribute specifies the implementation class name for the <tt>com.sun.identity.liberty.ws.security.SecurityAttributePlugin</tt> interface. The class
+returns a list of SAML attributes to be included in the credentials generated
+by the Discovery Service.</p>
+
+<a name="ggoia"></a><h5>Key Info Type</h5>
+<p>The value set in this attribute is used in the <tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider</tt> implementation
+class. It specifies the data type to be put into the <tt>KeyInfo</tt> block
+inside the XML signature. If value is <tt>certificate</tt>, the signer's X059 Certificate will be
+included inside <tt>KeyInfo</tt>. Otherwise, corresponding DSA/RSA key will be included in <tt>KeyInfo</tt>.</p>
+
+<a name="ggoin"></a><h5>Security Token Provider Class</h5>
+<p>This attribute specifies the implementation class for the security token provider.</p>
+
+<a name="ggohw"></a><h5>Default WSC Certificate Alias</h5>
+<p>This attribute specifies default certificate alias for the issuing web service security token
+for this web service client.</p>
+
+<a name="ggohz"></a><h5>Trusted Authority Signing Certificate Alias</h5>
+<p>This attribute specifies the certificate alias for the trusted authority that will be
+used to sign the SAML or SAML BEARER token of response message.</p>
+
+<a name="ggohd"></a><h5>Trusted CA Signing Certificate Aliases</h5>
+<p>This attribute specifies the certificate aliases for trusted CA. SAML or SAML BEARER
+tokens of an incoming request. The message must be signed by a trusted
+CA in this list. The syntax is <tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|..... </tt></p><p>Example: <tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>. </p><p>The value issuer is used when the token does not have a
+<tt>KeyInfo</tt> inside of the signature. The issuer of the token must be in
+this list and the corresponding certificate alias will be used to verify the
+signature. If <tt>KeyInfo</tt> exists, the keystore must contain a certificate alias that matches
+the <tt>KeyInfo</tt> and the certificate alias must be in this list.</p>
+<br/>
+
+</body>
+</html>

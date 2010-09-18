@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新規エージェントを作成する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>新規エージェントを作成する</h5>
+<p>新規エージェントの作成は、新規エージェントプロファイルの作成とも呼ばれます。この作業は OpenSSO 管理コンソールで実行できます。個々の手順の一部は、J2EE および Web ポリシーエージェントタイプにのみ適用されます。</p><ol>
+<li><b>「アクセス制御」タブをクリックします。</b></li>
+<li><b>エージェントが属するレルムの名前をクリックします。</b></li>
+<li><b>「エージェント」タブをクリックします。</b></li>
+<li><b>適切なエージェントタイプのタブを選択します。</b><ul>
+<li><b>Web エージェント</b></li>
+<li><b>J2EE エージェント</b></li>
+<li><b>Web サービスプロバイダエージェント</b></li>
+<li><b>Web サービスクライアントエージェント</b></li>
+<li><b>STS クライアントエージェント</b><p>セキュリティートークンサービスのクライアントエージェントについては、ディスカバリエージェントと STS エージェントの 2 種類から選択します。これらのエージェントタイプについては、<a href="agentconfig.stsclientedit.html">「STS クライアント」</a>を参照してください。</p></li>
+<li><b>2.2 エージェント</b><p>「2.2 エージェント」タブは、ポリシーエージェント 2.2 ソフトウェアセットのエージェント用です。</p></li>
+<li><b>エージェント認証</b></li></ul></li>
+<li><b>「エージェント」セクションの「新規」をクリックします。</b></li>
+<li><b>「名前」フィールドに新しいエージェントプロファイルの名前を入力します。</b></li>
+<li><b>パスワードを入力し、確認します。</b>
+<hr><p><b>注意 &#8211; </b>このパスワードは、<tt>agentadmin</tt> プログラムを実行してエージェントをインストールする際に指定する、エージェントプロファイルパスワードファイルに入力するパスワードと一致する必要があります。</p>
+<hr>
+<p><b>手順 8 から 10 までは、Web および J2EE ポリシーエージェントにのみ適用されます。</b></p></li>
+<li><b>該当する設定として「ローカル」または「集中化」を選択します。</b><p>「ローカル」設定を選択した場合、このエージェントに関連するプロパティーはコンソールから編集できません。その場合、エージェントはエージェントのインストールディレクトリにあるローカルファイル (<tt>OpenSSOAgentBootstrap.properties</tt> および <tt>OpenSSOAgentConfiguration.properites</tt>) から設定情報を取得します。「ローカル」設定のエージェントの場合は、<tt>OpenSSOAgentConfiguration.properites</tt> ファイルを直接編集することによってプロパティー値を変更します。</p></li>
+<li><b>「サーバー URL」フィールドに、OpenSSO のサーバー URL を入力します。</b><p>次に例を示します。</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>「エージェント URL」フィールドに、エージェントアプリケーション <tt>agentapp</tt> の URL を入力します。</b><p>次に例を示します。</p><dl><dt>Web エージェント</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>J2EE エージェント</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>「作成」をクリックします。</b><p>コンソールでエージェントプロファイルが作成され、そのエージェントプロファイルへのリンクを含んだエージェントページが再度表示されます。</p><p>エージェントプロファイルに対して追加の設定を行うには、このリンクをクリックして「エージェントの編集」ページを表示します。</p></li></ol>
+<br/>
+
+</body>
+</html>

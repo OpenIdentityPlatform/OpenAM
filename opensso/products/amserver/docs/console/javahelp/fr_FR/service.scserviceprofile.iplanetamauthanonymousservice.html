@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Anonyme - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthanonymousservice"></a><h4>Anonyme</h4>
+<p><a name="indexterm-167"></a>Ce type de module permet &#224; un utilisateur de se connecter sans
+sp&#233;cifier d'informations d'authentification. Vous pouvez cr&#233;er un utilisateur Anonyme afin de permettre
+&#224; n'importe quel utilisateur de se connecter sans avoir &#224; fournir de
+mot de passe. Les connexions anonymes sont g&#233;n&#233;ralement personnalis&#233;es par l'administrateur OpenSSO
+afin que les utilisateurs Anonyme b&#233;n&#233;ficient d'un acc&#232;s limit&#233; au serveur. Les
+attributs d'authentification Anonyme sont des attributs de domaine. Ces attributs sont les
+suivants :</p>
+<ul><li><p><a href="#fwblp">Utilisateurs anonymes valides</a></p></li>
+<li><p><a href="#fwbnz">Nom d'utilisateur anonyme par d&#233;faut</a></p></li>
+<li><p><a href="#fwbto">ID utilisateur avec distinction des majuscules et des minuscules</a></p></li>
+<li><p><a href="#fwbli">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwblp"></a><h5>Utilisateurs anonymes valides</h5>
+<p>Contient la liste des ID utilisateur autoris&#233;s &#224; se connecter sans fournir
+de donn&#233;es d'authentification. Si le nom de connexion d'un utilisateur correspond &#224;
+un ID utilisateur de la liste, l'acc&#232;s est autoris&#233; et la session
+est attribu&#233;e &#224; cet ID utilisateur.</p><p>Si la liste est vide, l'acc&#232;s &#224; l'URL de connexion de l'instance
+de module par d&#233;faut suivant est authentifi&#233; sous le nom d'utilisateur anonyme
+par d&#233;faut :</p><p><tt>protocole://h&#244;te_serveur.domaine_serveur:port_serveur/uri_d&#233;ploiement_serveur/UI/Login?module=Anonymous&#38;org=nom_org</tt></p><p>Si cette liste n'est pas vide, l'acc&#232;s &#224; l'URL de connexion de
+l'instance de module par d&#233;faut (m&#234;me que ci-dessus) invite l'utilisateur &#224; entrer
+un nom d'utilisateur anonyme valide. Si la liste n'est pas vide, l'utilisateur
+a la possibilit&#233; de se connecter sans voir la page de connexion,
+en acc&#233;dant &#224; l'URL suivant :</p><p><tt>protocole://h&#244;te_serveur.domaine_serveur:port_serveur/uri_d&#233;ploiement_serveur/UI/Login?module=Anonymous&#38;org=nom_org&#38;IDToken1=&#60;nom utilisateur anonyme&#62;</tt> </p>
+
+<a name="fwbnz"></a><h5>Nom d'utilisateur anonyme par d&#233;faut</h5>
+<p>D&#233;finit l'ID utilisateur qui est assign&#233; &#224; une session si la liste
+des utilisateurs anonymes valides est vide et que l'utilisateur acc&#232;de &#224; l'URL
+de connexion de l'instance de module par d&#233;faut :</p><p><tt>protocole://h&#244;te_serveur.domaine_serveur:port_serveur/uri_d&#233;ploiement_serveur/UI/Login?module=Anonymous&#38;org=nom_org</tt></p><p>La valeur par d&#233;faut est anonyme. Un utilisateur Anonyme doit &#233;galement &#234;tre
+cr&#233;&#233; dans le domaine.</p>
+<hr><p><b>Remarque &#8211; </b>Si la liste des utilisateurs anonymes valides n'est pas vide, vous pouvez
+vous connecter sans passer par la page de connexion en utilisant l'utilisateur
+d&#233;fini dans Nom d'utilisateur anonyme par d&#233;faut. Pour ce faire, entrez l'URL
+suivant :</p><p><tt>protocole://h&#244;te_serveur.domaine_serveur:port_serveur/uri_d&#233;ploiement_serveur/UI/Login?module=Anonymous&#38;org=nom_org&#38;IDToken1= </tt> <tt></tt><i>Nom d'utilisateur anonyme par d&#233;faut</i><tt></tt></p>
+<hr>
+
+
+<a name="fwbto"></a><h5>ID utilisateur avec distinction des majuscules et des minuscules</h5>
+<p>Si cette option est activ&#233;e, les ID utilisateur diff&#233;rencient les majuscules et
+les minuscules. Par d&#233;faut, cet attribut n'est pas activ&#233;.</p>
+
+<a name="fwbli"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

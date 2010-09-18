@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN </h4>
+<p><a name="indexterm-177"></a>MSISDN(Mobile Station Integrated Services Digital Network) 인증 모듈로 휴대 전화와 같은 장치와
+연결된 모바일 가입자 ISDN을 사용한 인증이 가능합니다. 이 모듈은 비대화식 모듈입니다. 가입자
+ISDN을 검색하고 이를 디렉토리 서버에서 검증하여 번호에 맞는 사용자를 찾습니다. MSISDN 인증
+속성은 영역 속성입니다. MSISDN 인증 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fumxe">신뢰할 수 있는 게이트웨이 IP 주소</a></p></li>
+<li><p><a href="#fumxg">MSISDN 번호 인수</a></p></li>
+<li><p><a href="#fumxf">LDAP 서버 및 포트</a></p></li>
+<li><p><a href="#fumxi">LDAP 시작 검색 DN</a></p></li>
+<li><p><a href="#fumxk">LDAP 검색에 사용할 속성</a></p></li>
+<li><p><a href="#fumxl">LDAP 서버 기본 사용자</a></p></li>
+<li><p><a href="#fumxn">LDAP 서버 기본 비밀번호</a></p></li>
+<li><p><a href="#fumxm">LDAP 서버 기본 비밀번호(확인)</a></p></li>
+<li><p><a href="#fumxo">LDAP 액세스에 SSL 사용</a></p></li>
+<li><p><a href="#fumxp">사용자 프로필 검색 시 사용되는 LDAP 속성</a></p></li>
+<li><p><a href="#fumxr">인증 시에 사용자 DN 반환</a></p></li>
+<li><p><a href="#fumxs">인증 수준</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>신뢰할 수 있는 게이트웨이 IP 주소</h5>
+<p>MSISDN 모듈에 액세스할 수 있는 신뢰할 수 있는 클라이언트의 IP 주소 목록을
+지정합니다. 입력 필드에 주소(예: <tt>123.456.123.111</tt>)를 입력하고 [추가]를 눌러, 모든 클라이언트의 IP 주소에서
+MSISDN 모듈에 액세스할 수 있도록 설정할 수 있습니다. 기본적으로 이 목록은 비어
+있습니다. 이 속성이 비어 있으면 모든 클라이언트가 MSISDN 모듈에 액세스할 수 있습니다.
+none으로 지정하면 어떤 클라이언트도 액세스할 수 없습니다.</p>
+
+<a name="fumxg"></a><h5>MSISDN 번호 인수</h5>
+<p>요청 헤더 또는 쿠키 헤더에서 MSISDN 번호를 검색할 매개 변수를 식별하는 매개
+변수 이름의 목록을 지정합니다. 예를 들어, <i>x-Cookie-Param</i>, <i>AM_NUMBER</i> 및 <i>COOKIE-ID</i>를 정의하면 MSISDN
+인증 서비스는 이 매개 변수에서 MSISDN 번호를 검색합니다.</p>
+
+<a name="fumxf"></a><h5>LDAP 서버 및 포트</h5>
+<p>MSISDN 번호를 사용하여 사용자를 검색할 디렉토리 서버의 호스트 이름 및 포트 번호를
+지정합니다. 형식은 <tt></tt><i>hostname:port</i><tt></tt>입니다. 포트 번호가 없는 경우 포트 번호를 <tt>389</tt>라고 가정합니다.</p><p>OpenSSO를 여러 도메인으로 배포한 경우 OpenSSO의 특정 인스턴스와 Directory Server의 특정 인스턴스
+간의 통신 링크를 다음 형식으로 지정할 수 있습니다(항목이 여러 개이면 로컬 서버
+이름을 접두어로 사용해야 함).</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>예를 들어, 서로 다른 위치(L1-machine1-IS 및 L2-machine2-IS)에 배포된 두 개의 OpenSSO 인스턴스가
+Directory Server(L1-machine1-DS 및 L2-machine2-DS)의 여러 인스턴스와 통신하는 경우 다음과 같이 지정할 수
+있습니다.</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fumxi"></a><h5>LDAP 시작 검색 DN</h5>
+<p>사용자의 MSISDN 번호에 대한 검색을 시작해야 하는 노드의 DN을 지정합니다. 기본값은 없습니다.
+이 필드는 모든 유효한 DN을 인식합니다. 여러 항목이 있을 경우 로컬 서버
+이름을 접두어로 지정해야 합니다. 형식은 <tt></tt><i>servername|search dn</i><tt></tt>입니다.</p><p>여러 항목이 있는 경우:</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>같은 사용자 아이디의 루트 조직 아래에 여러 항목이 있는 경우 인증을 위해
+한 항목만 검색하거나 찾을 수 있도록 이 매개 변수를 설정해야 합니다. 예를
+들어, 루트 조직 아래의 에이전트 아이디와 사용자 아이디가 같으면 이 매개 변수는
+루트 조직의 경우 에이전트 아이디를 사용하여 인증하도록 <tt>ou=Agents</tt>로 설정하고 루트 사용자의 경우
+사용자 아이디를 사용하여 인증하도록 <tt>ou=People</tt>로 설정해야 합니다.</p>
+
+<a name="fumxk"></a><h5>LDAP 검색에 사용할 속성</h5>
+<p>특정 사용자에 대해 검색할 MSISDN 번호를 포함하고 있는 사용자 프로필의 속성 이름을
+지정합니다. 기본값은 <i>sunIdentityMSISDNNumber</i>입니다. 사용자 프로필의 다른 속성이 동일한 MSISDN 번호를 포함하고 있는지
+확실하지 않으면 이 값을 변경하지 마십시오.</p>
+
+<a name="fumxl"></a><h5>LDAP 서버 기본 사용자</h5>
+<p>디렉토리 서버에서 MSISDN을 검색할 수 있도록 LDAP 바인드 DN을 지정합니다. 기본 바인드
+DN은 <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com</tt>입니다.</p>
+
+<a name="fumxn"></a><h5>LDAP 서버 기본 비밀번호</h5>
+<p>LDAP 서버 기본 사용자에 정의된 대로 바인드 DN에 대한 LDAP 바인드 비밀번호를
+지정합니다.</p>
+
+<a name="fumxm"></a><h5>LDAP 서버 기본 비밀번호(확인)</h5>
+<p>비밀번호를 확인합니다.</p>
+
+<a name="fumxo"></a><h5>LDAP 액세스에 SSL 사용</h5>
+<p>LDAP 서버 및 포트 속성에 지정된 디렉토리 서버에 대한 SSL 액세스를 사용
+가능하게 합니다. 기본적으로 이 옵션은 사용 불가능하므로 디렉토리 서버에 액세스하는 데 SSL
+프로토콜이 사용되지 않습니다. 그러나 이 속성이 사용 가능한 경우 비 SSL 서버에
+바인드할 수 있습니다.</p>
+
+<a name="fumxp"></a><h5>사용자 프로필 검색 시 사용되는 LDAP 속성</h5>
+<p>MSISDN 번호에 대한 요청을 검색할 때 사용할 헤더를 지정합니다. 지원되는 값은 다음과
+같습니다.</p><dl><dt>쿠키 헤더</dt>
+<dd><p>쿠키에서 검색을 수행합니다.</p></dd>
+<dt>RequestHeader</dt>
+<dd><p>요청 헤더에서 검색을 수행합니다. </p></dd>
+<dt>RequestParameter</dt>
+<dd><p>요청 매개 변수에서 검색을 수행합니다. 기본적으로 모든 옵션이 선택되어 있습니다.</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>인증 시에 사용자 DN 반환</h5>
+<p>OpenSSO 디렉토리가 MSDISN용으로 구성된 디렉토리와 동일하면 이 옵션을 사용할 수 있습니다. 이
+옵션을 사용 가능하게 하면 이 인증 모듈은 사용자 아이디 대신 DN을 반환할
+수 있으며 검색이 필요하지 않습니다. 일반적으로 인증 모듈은 사용자 아이디만 반환하고 인증
+서비스는 로컬 OpenSSO에서 사용자를 검색합니다. 외부 디렉토리가 사용될 경우 일반적으로 이 옵션은
+사용 가능하지 않습니다.</p>
+
+<a name="fumxs"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

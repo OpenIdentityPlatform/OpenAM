@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>プロバイダエンティティーまたはアフィリエイトエンティティーの一般属性を変更する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsprofile"></a><h4>プロバイダエンティティーまたはアフィリエイトエンティティーの一般属性を変更する</h4><a name="indexterm-70"></a><a name="indexterm-71"></a><a name="indexterm-72"></a><p>エンティティーを作成した後、そのプロファイルを編集できます。この操作には、属性の変更、アイデンティティープロバイダおよびサービスプロバイダの追加、またはアフィリエイトの設定が含まれる場合があります。エンティティープロファイルの一般属性を編集する際に、定義済みの共通属性の変更、担当者の追加、またはオプションの組織情報の指定が必要になる場合があります。「一般属性」を編集する手順は、次のとおりです。連携の「エンティティー」画面から作業を始めます。</p><ol>
+<li><b>プロファイルを変更する設定済みエンティティーの名前を選択します。</b><p>デフォルトでは、エンティティーのプロファイルの「一般属性」ページが表示されます。「一般属性」ページが表示されない場合は、「表示」メニューから「一般」を選択できます。</p></li>
+<li><b>いずれかの「エンティティーの共通属性」の値を編集します。</b><dl><dt>エンティティー名</dt>
+<dd><p>この属性の静的な値は、エンティティーの作成時に指定した名前です。</p></dd>
+<dt>タイプ</dt>
+<dd><p>この属性の静的な値は、エンティティーの種類「プロバイダ」または「アフィリエイト」です。</p></dd>
+<dt>説明</dt>
+<dd><p>この属性の値は、エンティティーの作成時に入力した説明です。始めに入力した説明を変更するか、その説明がない場合は新たに説明を追加することができます。</p></dd>
+</dl>
+</li>
+<li><b>「エンティティー担当者プロファイル」属性に値を指定します。</b><p>「エンティティー担当者プロファイル」属性は、エンティティー関連の連絡先についての情報を提供します。これらの属性はオプションです。</p><dl><dt>名</dt>
+<dd><p>エンティティーの担当者の名を入力します。</p></dd>
+<dt>姓</dt>
+<dd><p>エンティティーの担当者の姓を入力します。</p></dd>
+<dt>タイプ</dt>
+<dd><p>ドロップダウンメニューから連絡先のタイプを選択します。</p>
+<ul><li><p>管理</p></li>
+<li><p>課金</p></li>
+<li><p>テクニカル</p></li>
+<li><p>その他</p></li></ul>
+</dd>
+<dt>会社</dt>
+<dd><p>この担当者が勤務する会社の名前を入力します。</p></dd>
+<dt>Liberty 主体者 ID</dt>
+<dd><p>担当者の個人情報プロファイルのインスタンスを指し示す URI を入力します。</p></dd>
+<dt>電子メール</dt>
+<dd><p>担当者の電子メールアドレスを 1 つ以上入力し、「追加」をクリックします。</p></dd>
+<dt>電話番号</dt>
+<dd><p>担当者の電話番号を 1 つ以上入力し、「追加」をクリックします。</p></dd>
+</dl>
+</li>
+<li><b>「組織プロファイル」属性に値を指定します。</b><p>「組織プロファイル」属性は、主体とやり取りするときに必要になることがある基本情報を提供します。これらの属性はオプションです。</p>
+<hr><p><b>注 &#8211; </b>「名前」属性に値を指定した場合は、「表示名」および「URL」属性に値を追加する必要があります。</p>
+<hr>
+<dl><dt>名前</dt>
+<dd><p>エンティティーの組織の正式名称を入力し、「追加」をクリックします。この値は、<i>locale</i>| <i> organization-name</i> の形式で定義します。たとえば、<tt>en</tt>|<tt> example.com</tt> のようにします。</p></dd>
+<dt>表示名</dt>
+<dd><p>主体者への表示に適したエンティティーの組織の名前を入力し、「追加」をクリックします。この値は、<i>locale</i>|<i>organization-display-name</i> の形式で定義します。たとえば、<tt>en</tt>|<tt>example.com</tt> のようにします。</p></dd>
+<dt>URL</dt>
+<dd><p>組織の URL を入力し、「追加」をクリックします。この値は、<i>locale</i>|<i> organization-URL</i> の形式で定義します。たとえば、<tt>en</tt>|<tt> http://www.example.com</tt> のようにします。</p></dd>
+</dl>
+</li>
+<li><b>「保存」をクリックして設定を完了するか、引き続き「アイデンティティープロバイダ」、「サービスプロバイダ」、または「アフィリエイト」属性の値を定義します。</b><p>設定を継続する場合は、次の情報を参照してください。</p><ul>
+<li><b>「アイデンティティープロバイダ」属性の値を定義するには、<a href="federation.fsidentityprovider.html">「アイデンティティープロバイダをプロバイダエンティティーに追加する」</a>。</b></li>
+<li><b>「サービスプロバイダ」属性の値を定義するには、<a href="federation.fsserviceprovider.html">「サービスプロバイダをプロバイダエンティティーに追加する」</a>。</b></li>
+<li><b>アフィリエイトエンティティーにメンバーを設定するには、<a href="federation.fsentitydescriptorsaffiliate.html">「アフィリエイトエンティティーにメンバーを追加する」</a>。</b></li></ul></li></ol>
+<br/>
+
+</body>
+</html>

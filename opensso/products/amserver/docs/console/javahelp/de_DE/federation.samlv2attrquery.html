@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2-Attributsanforderungsanpassung  - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>SAMLv2-Attributsanforderungsanpassung </h4>
+<p>Die SAMLv2-Attributabfrage enth&#228;lt die folgenden Attribute f&#252;r die Anpassung:</p>
+<ul><li><p><a href="#ggwht">NameID-Format</a></p></li>
+<li><p><a href="#ggwgs">Cert-Alias</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>NameID-Format</h5>
+<p>Definiert die Formate f&#252;r der Namensbezeichner, die vom Attributsabfrageanbieter unterst&#252;tzt werden. Namensbezeichner
+sind eine M&#246;glichkeit f&#252;r Anbieter, miteinander im Hinblick auf einen Benutzer zu
+kommunizieren. Single Sign-On-Interaktionen unterst&#252;tzen drei Bezeichnertypen:</p>
+<ul><li><p>Ein <b>X509SubjectName</b> definiert den Betreffsnamen f&#252;r den X509-Verschl&#252;sselungstyp.</p></li>
+<li><p>Ein <b>best&#228;ndiger Bezeichner</b> wird im Datenspeichereintrag eines bestimmten Benutzers als der Wert von zwei Attributen gespeichert.</p></li>
+<li><p>Ein <b>tempor&#228;rer Bezeichner</b> ist vor&#252;bergehend und es werden keine Daten in den best&#228;ndigen Datenspeicher des Benutzers geschrieben.</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>Cert-Alias</h5>
+<p>Dieses Attribut definiert die Zertifikatalias-Elemente f&#252;r den Anbieter. <tt>Signieren</tt>Gibt den Anbieterzertifikatalias an,
+der f&#252;r die Suche nach dem richtigen Signaturzertifikat im Schl&#252;sselspeicher verwendet wird.
+<tt>Verschl&#252;sselung</tt>Gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Verschl&#252;sselungszertifikat
+im Schl&#252;sselspeicher verwendet wird.</p>
+<br/>
+
+</body>
+</html>

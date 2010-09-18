@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Core - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthservice"></a><h4>Core</h4>
+<p><a name="indexterm-170"></a>Dieses Modul ist die allgemeine Konfigurationsbasis f&#252;r die Authentifizierungsdienste von OpenSSO. Es
+muss f&#252;r die einzelnen Authentifizierungsmodulinstanzen registriert und konfiguriert sein. In diesem Modul
+legt der Administrator Standardwerte fest, die f&#252;r Werte &#252;bernommen werden, welche nicht
+explizit in den Standard-Authentifizierungsmodulen von OpenSSO angegeben sind. Bei den Kern-Attributen handelt
+es sich sowohl um globale als auch um Bereichsattribute. Es existieren folgende
+Attribute:</p>
+<ul><li><p><a href="#gcnje">PAM-Klassen (Pluggable Authentification Module)</a></p></li>
+<li><p><a href="#gcnjc">Unterst&#252;tzte Authentifizierungsmodule f&#252;r Clients</a></p></li>
+<li><p><a href="#gcnir">LDAP-Verbindung Pool-Gr&#246;&#223;e</a></p></li>
+<li><p><a href="#gcnkh">LDAP-Verbindung Standard-Pool-Gr&#246;&#223;e</a></p></li>
+<li><p><a href="#gcnkq">Benutzerprofil</a></p></li>
+<li><p><a href="#gcnks">Administrator-Authentifizierungskonfiguration</a></p></li>
+<li><p><a href="#gcnjw">Standardrollen f&#252;r dynamisches Erstellen von Benutzerprofilen</a></p></li>
+<li><p><a href="#gcnjn">Modus f&#252;r persistentes Cookie</a></p></li>
+<li><p><a href="#gcnke">Maximaler Zeitraum f&#252;r persistentes Cookie</a></p></li>
+<li><p><a href="#gcnlc">Attributname f&#252;r Aliassuche</a></p></li>
+<li><p><a href="#gcnkt">Standard-Authentifizierungs-L&#228;ndereinstellung</a></p></li>
+<li><p><a href="#gcnjj">Konfiguration der Organisationsauthentifizierung</a></p></li>
+<li><p><a href="#gcnkl">Anmeldefehler Sperrmodus</a></p></li>
+<li><p><a href="#gcnjz">Anmeldefehler Sperrz&#228;hlung</a></p></li>
+<li><p><a href="#gcnko">Anmeldefehler Sperrintervall</a></p></li>
+<li><p><a href="#gcnkd">E-Mail-Adresse f&#252;r das Versenden der Sperrbenachrichtigung</a></p></li>
+<li><p><a href="#gcnkr">Benutzer nach n Fehlern warnen</a></p></li>
+<li><p><a href="#gcnkc">Anmeldefehler Sperrdauer</a></p></li>
+<li><p><a href="#gcnjy">Sperrattributname</a></p></li>
+<li><p><a href="#gcnle">Sperrattributwert</a></p></li>
+<li><p><a href="#gcnkz">Standard-URL f&#252;r erfolgreiche Anmeldung</a></p></li>
+<li><p><a href="#gcnlf">Standard-URL f&#252;r erfolglose Anmeldung</a></p></li>
+<li><p><a href="#gcnlb">Nachverarbeitungs-Authentifizierungsklasse</a></p></li>
+<li><p><a href="#gcnjl">Modus f&#252;r UserID-Erzeugung</a></p></li>
+<li><p><a href="#gcnjq">Plugf&#228;hige Generator-Klasse f&#252;r Benutzernamen</a></p></li>
+<li><p><a href="#gcnki">Identit&#228;tstypen</a></p></li>
+<li><p><a href="#gcnlh">Ersetzbare Benutzerstatus-Ereignisklassen</a></p></li>
+<li><p><a href="#gcnjv">Ung&#252;ltige Versuche im Data Store speichern</a></p></li>
+<li><p><a href="#gcnjo">Modulbasierte Authentifizierung</a></p></li>
+<li><p><a href="#fwbfn">Standard-Authentifizierungsebene</a></p></li></ul>
+
+
+<a name="gcnje"></a><h5>PAM-Klassen (Pluggable Authentification Module)</h5>
+<p>Gibt die Java-Klassen der Authentifizierungsmodule an, die f&#252;r alle innerhalb der OpenSSO-Plattform
+konfigurierten Bereiche zur Verf&#252;gung stehen. Mit der AMLoginModule-SPI oder der JAAS LoginModule-SPI
+k&#246;nnen Sie eigene Authentifizierungsmodule entwickeln. Weitere Informationen finden Sie im Handbuch f&#252;r
+Entwickler zu OpenSSO. Zur Definition neuer Authentifizierungsdienste m&#252;ssen Sie in dieses Feld
+den vollst&#228;ndigen Klassennamen (einschlie&#223;lich des Paketnamens) des neuen Dienstes eingegeben.</p>
+
+<a name="gcnjc"></a><h5>Unterst&#252;tzte Authentifizierungsmodule f&#252;r Clients</h5>
+<p>Legt eine Liste der unterst&#252;tzten Authentifizierungsmodule f&#252;r einen bestimmten Client fest. Das
+Attribut hat folgendes Format:</p><p><tt>clientType | module1,module2,module3</tt></p><p>Dieses Attribut ist nur aktiv, wenn ";Client-Erkennung" aktiviert ist.</p>
+
+<a name="gcnir"></a><h5>LDAP-Verbindung Pool-Gr&#246;&#223;e</h5>
+<p>Gibt den Minimal- und Maximalwert des Verbindungspools an, der f&#252;r einen bestimmten
+LDAP-Server und -Anschluss verwendet werden soll. Dieses Attribut wird nur f&#252;r LDAP-
+und Mitgliedschafts-Authentifizierungsdienste verwendet. Das Attribut hat folgendes Format:</p><p><tt>host:port:min:max</tt></p>
+<hr><p><b>Hinweis &#8211; </b>Dieser Verbindungspool ist nicht identisch mit dem &#252;ber <tt>serverconfig.xml</tt> konfigurierten SDK-Verbindungspool.</p>
+<hr>
+
+
+<a name="gcnkh"></a><h5>LDAP-Verbindung Standard-Pool-Gr&#246;&#223;e</h5>
+<p>Gibt den Standard-Minimal- und -Maximalwert des Verbindungspools an, der f&#252;r alle Konfigurationen
+von LDAP-Authentifizierungsmodulen verwendet werden soll. Wenn im Attribut ";LDAP-Verbindung Pool-Gr&#246;&#223;e" ein Eintrag
+f&#252;r Host und Port vorhanden ist, werden nicht die Einstellungen f&#252;r Minimum
+und Maximum aus "LDAP-Verbindung Standard-Pool-Gr&#246;&#223;e" &#252;bernommen.</p>
+
+<a name="gcnkq"></a><h5>Benutzerprofil</h5>
+<p>Hiermit legen Sie die Optionen f&#252;r ein Benutzerprofil fest. Es stehen folgende
+Optionen zur Verf&#252;gung:</p><dl><dt><b>Erforderlich</b></dt>
+<dd><p>Diese Option legt fest, dass nach der erfolgreichen Authentifizierung eines Benutzers auf dem lokalen Directory Server von OpenSSO ein entsprechendes Benutzerprofil vorhanden sein muss, damit der Authentifizierungsdienst ein SSO-Token ausstellen kann.</p></dd>
+<dt><b>Dynamisch</b></dt>
+<dd><p>Diese Option legt fest, dass nach der erfolgreichen Authentifizierung eines Benutzers ein entsprechendes Benutzerprofil durch den Authentifizierungsdienst erstellt wird, sofern noch keines vorhanden ist. Das SSO-Token wird anschlie&#223;end ausgestellt. Das Benutzerprofil wird auf dem lokalen Directory Server von OpenSSO erstellt.</p></dd>
+<dt><b>Dynamisch mit Benutzer-Alias</b></dt>
+<dd><p>Diese Option legt fest, dass nach der erfolgreichen Authentifizierung eines Benutzers ein entsprechendes Benutzerprofil durch den Authentifizierungsdienst unter Verwendung des Attributs ";Benutzer-Alias-Liste" erstellt wird. </p></dd>
+<dt><b>Ignorieren</b></dt>
+<dd><p>Diese Option legt fest, dass f&#252;r die erfolgreiche Authentifizierung und die Ausstellung eines SSO-Tokens durch den Authentifizierungsdienst kein Benutzerprofil ben&#246;tigt wird.</p></dd>
+</dl>
+
+
+<a name="ggukq"></a><h5>Sicherheit f&#252;r Remoteauthentifizierung</h5>
+<p>Wenn diese Option aktiviert ist, ist es f&#252;r alle Authentifizierungsanforderungen erforderlich, dass
+das SSOToken der Anwendung die Identit&#228;t des Aufrufers &#252;berpr&#252;ft, sodass die Konfigurationsinformationen
+von OpenSSO die g&#252;ltigen Werte f&#252;r Benutzernamen und Passwort f&#252;r die Anwendung
+abrufen k&#246;nnen.</p>
+
+<a name="ggull"></a><h5>Nachverarbeitungsobjekte f&#252;r Abmeldungsverarbeitung beibehalten</h5>
+<p>Wenn diese Option aktiviert ist, werden die Instanzen der Nachverarbeitungs-Authentifizierungs-Plugins, die w&#228;hrend
+der Anmeldungsverarbeitung verwendet werden, w&#228;hrend der OpenSSO-Sitzung beibehalten. Wenn sp&#228;ter die Abmeldung
+aufgerufen wird, wird die <tt>onLogout </tt>-Methode dieser Instanzen aufgerufen. Wenn dieses Attribut nicht
+aktiviert ist, werden die Nachverarbeitungsinstanzen aus dem Anmeldevorgang nicht beibehalten. Beim Aufrufen
+der Abmeldung werden neue Instanzen von Nachverarbeitungs-Plugins erstellt und die Methode <tt>onLogout</tt>
+wird aufgerufen. </p>
+
+<a name="gguji"></a><h5>Authentifizierungsmodulobjekte f&#252;r Abmeldungsverarbeitung beibehalten</h5>
+<p>Wenn diese Option aktiviert ist, werden alle Instanzen der Authentifizierungsmodule, die w&#228;hrend
+des Authentifizierungsvorgangs verwendet werden, w&#228;hrend der OpenSSO-Sitzung beibehalten. Wenn sp&#228;ter die Abmeldung
+aufgerufen wird, wird die Methode "logout/destroyModulestate" f&#252;r dieselben Instanzen aufgerufen. Wenn dieses
+Attribut nicht aktiviert ist, werden die Instanzen des Authentifizierungsmoduls aus dem Abmeldevorgang
+nicht beibehalten. Beim Abmelden wird keine Methode f&#252;r die Authentifizierungsmodule aufgerufen.</p>
+
+<a name="gcnks"></a><h5>Administrator-Authentifizierungskonfiguration</h5>
+<p>Legt den Authentifizierungsdienst f&#252;r Administratoren fest. Dieses Attribut kann verwendet werden, wenn
+f&#252;r Administratoren ein anderes Authentifizierungsmodul verwendet werden soll als f&#252;r Endbenutzer. Die
+in diesem Attribut konfigurierten Module werden beim Zugriff auf die OpenSSO-Konsole &#252;bernommen.
+Beispiel:</p><p><tt><b>http://</tt><i>servername.port/console_deploy_uri</i><tt></b></tt></p>
+
+<a name="gcnjw"></a><h5>Standardrollen f&#252;r dynamisches Erstellen von Benutzerprofilen</h5>
+<p>Dieses Feld gibt an, welche Rollen einem neuen Benutzer bei der Profilerstellung
+zugewiesen werden, wenn im Benutzerprofil die Option ";Dynamische Erstellung" gew&#228;hlt wurde. Es
+gibt keinen Standardwert. Der Administrator muss die DNs der Rollen angeben, die
+selbst-registrierten Benutzer zugewiesen werden sollen.  </p>
+<hr><p><b>Hinweis &#8211; </b>Die angegebene Rolle muss unter dem Bereich liegen, f&#252;r den die Authentifizierung
+konfiguriert wird. Diese Rolle kann eine OpenSSO- oder LDAP-Rolle, jedoch keine gefilterte
+Rolle sein.</p><p> Wenn dem Benutzer automatisch bestimmte Dienste zugewiesen werden sollen, m&#252;ssen Sie im
+Benutzerprofil das Attribut ";Erforderliche Dienste" konfigurieren.</p>
+<hr>
+
+
+<a name="gcnjn"></a><h5>Modus f&#252;r persistentes Cookie</h5>
+<p>Legt fest, ob Benutzer nach einem Browser-Neustart zu einer bereits authentifizierten Sitzung
+zur&#252;ckkehren k&#246;nnen. Wenn die Option ";Modus f&#252;r persistentes Cookie aktivieren" aktiviert ist,
+bleiben Benutzersitzungen erhalten. Konkret bewirkt das Aktivieren der Option ";Modus f&#252;r persistentes
+Cookie aktivieren", dass die Benutzersitzung erst dann abl&#228;uft, wenn das zugeh&#246;rige persistente
+Cookie ung&#252;ltig wird oder der Benutzer sich explizit abmeldet. Die Ablaufzeit ist
+unter ";Maximaler Zeitraum f&#252;r persistentes Cookie" festgelegt. In der Standardeinstellung ist der
+";Modus f&#252;r persistentes Cookie" deaktiviert und der Authentifizierungsdienst verwendet nur die im
+Speicher abgelegten Cookies.</p>
+<hr><p><b>Hinweis &#8211; </b>Ein persistentes Cookie muss vom Client unter Verwendung des Parameters <i>iPSPCookie=yes</i> 
+im Anmelde-URL explizit angefordert werden.</p>
+<hr>
+
+
+<a name="gcnke"></a><h5>Maximaler Zeitraum f&#252;r persistentes Cookie</h5>
+<p>Gibt an, nach wie vielen Sekunden ein persistentes Cookie abl&#228;uft. Der angegebene
+Zeitraum beginnt, sobald die Authentifizierung der Benutzersitzung erfolgreich abgeschlossen wurde. Der Maximalwert
+betr&#228;gt 2147483647 (Sekunden). In diesem Feld ist jede ganze Zahl unter dem
+Maximalwert zul&#228;ssig.</p>
+
+<a name="gcnlc"></a><h5>Attributname f&#252;r Aliassuche</h5>
+<p>Nach der erfolgreichen Authentifizierung eines Benutzers wird sein Profil abgerufen. In diesem
+Feld wird ein zweites LDAP-Attribut angegeben, das f&#252;r die Suche nach einem
+&#252;bereinstimmenden Benutzerprofil verwendet wird, wenn die Suche unter Verwendung des ersten LDAP-Attributs
+nicht erfolgreich ist.  Dieses Attribut wird in erster Linie verwendet, wenn die
+vom Authentifizierungsmodul ermittelte Benutzerkennung nicht mit der unter Benutzer-Namensattribut angegebenen Kennung &#252;bereinstimmt.
+Beispiel: Der RADIUS-Server gibt den Wert <tt>abc1234</tt>  zur&#252;ck, der Benutzername lautet
+jedoch <tt> abc</tt>. F&#252;r dieses Attribut gibt es keinen Standardwert.</p><p>In diesem Feld ist jedes g&#252;ltige LDAP-Attribut zul&#228;ssig (beispielsweise ";cn").</p>
+
+<a name="gcnkt"></a><h5>Standard-Authentifizierungs-L&#228;ndereinstellung</h5>
+<p>Gibt an, welchen Sprachenuntertyp der Authentifizierungsdienst standardm&#228;&#223;ig verwendet. Der Standardwert ist en_US.
+Eine Liste der g&#252;ltigen Sprachen finden Sie unter  <a href="supportedlang.html">Unterst&#252;tzte Sprach- bzw. L&#228;ndereinstellungen</a>.  </p><p>Um eine andere L&#228;ndereinstellung verwenden zu k&#246;nnen, m&#252;ssen zun&#228;chst alle Authentifizierungsvorlagen f&#252;r
+die betreffende L&#228;ndereinstellung erstellt werden. Anschlie&#223;end muss ein neues Verzeichnis f&#252;r diese
+Vorlagen angelegt werden. Weitere Informationen finden Sie im Administration Guide unter ";Login
+URL Parameters".</p>
+
+<a name="gcnjj"></a><h5>Konfiguration der Organisationsauthentifizierung</h5>
+<p>Legt das Authentifizierungsmodul der Organisation fest. Standardm&#228;&#223;ig wird das Authentifizierungsmodul LDAP verwendet.</p>
+
+<a name="gcnkl"></a><h5>Anmeldefehler Sperrmodus</h5>
+<p>Legt fest, ob ein Benutzer einen zweiten Authentifizierungsversuch erh&#228;lt, sollte der erste
+Versuch fehlschlagen. Mit diesem Attribut aktivieren Sie einen Sperrmodus, der dem Benutzer
+nur einen Authentifizierungsversuch einr&#228;umt. Der Sperrmodus ist standardm&#228;&#223;ig deaktiviert. Dieses Attribut wird
+in Kombination mit anderen Sperr- und Benachrichtigungsattributen verwendet.</p>
+
+<a name="gcnjz"></a><h5>Anmeldefehler Sperrz&#228;hlung</h5>
+<p>Legt die Anzahl der Authentifizierungsversuche fest, die dem Benutzer innerhalb des im
+Attribut Anmeldefehler Sperrintervall festgelegten Zeitraums einger&#228;umt werden, bevor der Benutzer gesperrt wird.</p>
+
+<a name="gcnko"></a><h5>Anmeldefehler Sperrintervall</h5>
+<p>Legt die Zeit fest, innerhalb der der Sperrz&#228;hler heraufgesetzt wird, wenn zwei
+aufeinanderfolgende Anmeldeversuche fehlschlagen. Wenn eine Anmeldung fehlschl&#228;gt und innerhalb des Sperrintervalls ein
+weiterer fehlgeschlagener Anmeldeversuch erfolgt, wird der Sperrz&#228;hler heraufgesetzt. Erfolgt innerhalb des Intervalls
+kein weiterer fehlgeschlagener Anmeldeversuch, wird der Sperrz&#228;hler zur&#252;ckgesetzt.</p>
+
+<a name="gcnkd"></a><h5>E-Mail-Adresse f&#252;r das Versenden der Sperrbenachrichtigung</h5>
+<p>Gibt die E-Mail-Adresse an, an die eine Nachricht gesendet wird, wenn ein
+Benutzer gesperrt wird. Mehrere Adressen, an die Nachrichten gesendet werden sollen, m&#252;ssen
+durch Leerzeichen getrennt werden. Bei einer nicht englischen L&#228;ndereinstellung gilt folgendes Format:</p><p><tt>email_address|locale|charset</tt> </p>
+
+<a name="gcnkr"></a><h5>Benutzer nach n Fehlern warnen</h5>
+<p>Legt die Anzahl der fehlgeschlagenen Authentifizierungsversuche fest, nach denen OpenSSO den Benutzer
+warnt, dass er gesperrt wird.</p>
+
+<a name="gcnkc"></a><h5>Anmeldefehler Sperrdauer</h5>
+<p>Aktiviert die Arbeitsspeichersperre. Standardm&#228;&#223;ig deaktiviert der Sperrmechanismus nach einem fehlgeschlagenen Anmeldeversuch das
+unter <i>Sperrattributname</i> angegebene Benutzerprofil. Wenn der Wert von ";Anmeldefehler Sperrdauer" gr&#246;&#223;er als
+0 ist, werden die Arbeitsspeichersperre und das Benutzerkonto f&#252;r die angegebene Dauer
+(in Minuten) gesperrt.</p>
+
+<a name="ggulj"></a><h5>Multiplikator f&#252;r Sperrdauer</h5>
+<p>Dieses Attribut definiert den Wert, mit dem die Sperrdauer bei Anmeldefehler f&#252;r
+jede auf einander folgende Sperrung multipliziert wird. Beispiel: Wenn "Anmeldefehler Sperrdauer" auf
+3 Minuten gesetzt ist und "Multiplikator f&#252;r Sperrdauer" auf 2, wird der
+das Konto 6 Minuten lang f&#252;r den Benutzer gesperrt. </p>
+
+<a name="gcnjy"></a><h5>Sperrattributname</h5>
+<p>Legt ein beliebiges LDAP-Attribut fest, das f&#252;r die Sperre eingerichtet werden soll.
+Um die Sperre f&#252;r diesen Attributnamen zu erm&#246;glichen, muss auch der Wert
+des Attributs Sperrattributwert ge&#228;ndert werden. Standardm&#228;&#223;ig ist das Attribut "Sperrattributname" in der
+OpenSSO-Konsole leer. Die Standard-Implementierungswerte sind <i>inetuserstatus</i>  (LDAP-Attribut) und <i>Inaktiv</i>, wenn der
+Benutzer gesperrt ist und ";Anmeldefehler Sperrdauer" auf 0 gesetzt ist.</p>
+
+<a name="gcnle"></a><h5>Sperrattributwert</h5>
+<p>Legt fest, ob die Sperre f&#252;r das in ";Sperrattributname" angegebene Attribut aktiviert
+oder deaktiviert ist. Standardm&#228;&#223;ig ist dieses Attribut f&#252;r <i>inetuserstatus</i> deaktiviert.</p>
+
+<a name="gcnkz"></a><h5>Standard-URL f&#252;r erfolgreiche Anmeldung</h5>
+<p>Hier k&#246;nnen Sie mehrere URLs eingeben, zu denen der Benutzer nach einer
+erfolgreichen Authentifizierung umgeleitet wird. Das Format dieses Attributs lautet <tt>clientType|URL</tt>. Sie k&#246;nnen
+auch nur den Wert des URL angeben, der einen HTML-Standardtyp annimmt. Der
+Standardwert lautet <i>/amserver/console</i> .</p>
+
+<a name="gcnlf"></a><h5>Standard-URL f&#252;r erfolglose Anmeldung</h5>
+<p>Hier k&#246;nnen Sie mehrere URLs eingeben, zu denen der Benutzer nach einer
+fehlgeschlagenen Authentifizierung umgeleitet wird. Das Format dieses Attributs lautet <tt>clientType|URL</tt>. Sie k&#246;nnen
+auch nur den Wert des URL angeben, der einen HTML-Standardtyp annimmt.</p>
+
+<a name="gcnlb"></a><h5>Nachverarbeitungs-Authentifizierungsklasse</h5>
+<p>Gibt den Namen der Java-Klasse an, die zur Anpassung der Nachverarbeitungsvorg&#228;nge nach
+einer erfolgreichen oder fehlgeschlagenen Anmeldung verwendet wird. Beispiel:</p><p><tt>com.abc.authentication.PostProcessClass</tt> </p><p>Die Java-Klasse muss folgende Java-Schnittstelle implementieren:</p><p><tt>com.sun.identity.authentication.spi.AMPostAuthProcessInterface </tt></p><p>Au&#223;erdem m&#252;ssen Sie im Java Classpath-Attribut des Web Servers den Pfad der
+Klasse angeben.</p>
+
+<a name="gcnjl"></a><h5>Modus f&#252;r UserID-Erzeugung</h5>
+<p>Dieses Attribut wird vom Mitgliedschafts-Authentifizierungsmodul verwendet. Wenn dieses Attributfeld aktiviert ist, kann
+das Mitgliedschaftsmodul f&#252;r Benutzer, die sich selbst registrieren, neue Benutzer-IDs generieren, falls
+deren Benutzer-IDs bereits vorhanden sind. Die Benutzer-IDs werden mit der im Attribut
+Plugf&#228;hige Generator-Klasse f&#252;r Benutzernamen angegebenen Java-Klasse generiert.</p>
+
+<a name="gcnjq"></a><h5>Plugf&#228;hige Generator-Klasse f&#252;r Benutzernamen</h5>
+<p>Gibt den Namen der Java-Klasse an, die f&#252;r die Generierung von Benutzer-IDs
+verwendet wird, wenn Generierung des UserID-Modus aktivieren aktiviert ist.</p>
+
+<a name="gcnki"></a><h5>Identit&#228;tstypen</h5>
+<p>Gibt den bzw. die Identit&#228;tstypen an, nach denen OpenSSO sucht.</p>
+
+<a name="gcnlh"></a><h5>Ersetzbare Benutzerstatus-Ereignisklassen</h5>
+<p>Erweitert die Authentifizierungs-SPIs um einen R&#252;ckruf-Mechanismus f&#252;r Benutzerstatus&#228;nderungen w&#228;hrend der Authentifizierung. Folgende
+Status&#228;nderungen werden unterst&#252;tzt:</p><dl><dt><tt>account lockout</tt></dt>
+<dd><p>Das Kontosperre-Ereignis ist f&#252;r alle Authentifizierungsmodule verf&#252;gbar. Die Funktion wird &#252;ber das Attribut <a href="#gcnkl">Anmeldefehler Sperrmodus</a> konfiguriert.</p></dd>
+<dt><tt>password change</tt></dt>
+<dd><p>Dieses Ereignis ist nur f&#252;r den LDAP-Authentifizierungsmodultyp verf&#252;gbar, da eine Passwort&#228;nderung nur von diesem Modul unterst&#252;tzt wird.</p></dd>
+</dl>
+
+
+<a name="gcnjv"></a><h5>Ung&#252;ltige Versuche im Data Store speichern</h5>
+<p>Wenn dieses Attribut aktiviert ist, ist die gemeinsame Nutzung fehlgeschlagener Anmeldeversuche in
+einem Identit&#228;ts-Repository m&#246;glich, das von mehreren OpenSSO-Instanzen gemeinsam genutzt wird. Wenn beispielsweise
+Directory Server als Identit&#228;ts-Repository f&#252;r eine bestimmte Bereitstellung verwendet wird, werden die
+ung&#252;ltigen Versuche in  <tt>sunAMAuthInvalidAttemptsData</tt> gespeichert (geh&#246;rt zur Objektklasse <tt>sunAMAuthAccountLockout). </tt> Das Format
+der Daten wird gespeichert als:</p><p><tt>&#60;InvalidPassword&#62;&#60;InvalidCount&#62;&#60;/InvalidCount&#62;&#60;LastInvalidAt&#62;&#60;/LastInvalidAt&#62; &#60;LockedoutAt&#62;&#60;/LockedoutAt&#62;&#60;ActualLockoutDuration&#62;&#60;/ActualLockoutDuration&#62;&#60;/InvalidPassword&#62; </tt></p><p>Diese Informationen werden f&#252;r jeden Benutzer im Directory Server aufrechterhalten. Beim Auftreten
+ung&#252;ltiger Versuche wird <tt>&#60;InvalidCount&#62;</tt> jeweils erh&#246;ht.</p>
+
+<a name="gcnjo"></a><h5>Modulbasierte Authentifizierung</h5>
+<p>Wenn dieses Attribut aktiviert ist, k&#246;nnen sich die Benutzer &#252;ber modulbasierte Authentifizierung
+anmelden. Wenn dieses Attribut nicht aktiviert ist, ist modulbasierte Anmeldung nicht zul&#228;ssig.
+S&#228;mtliche Anmeldeversuche mit <tt>module=&#60;</tt><i> Modulinstanzname</i><tt>&#62;</tt> schlagen fehl.</p>
+
+<a name="ggurt"></a><h5>Benutzerattributzuordnung zu Sitzungsattribut</h5>
+<p>Dadurch k&#246;nnen die Attribute als Sitzungseigenschaften vom authentifizierenden Benutzerprofil (im Datenspeicher gespeichert)
+f&#252;r das SSOToken des Benutzers festgelegt werden. Das Format lautet:</p><p><tt>Benutzerprofilattribut|Sitzungsattributname</tt></p><p>Wenn der <tt>Sitzungsattributname</tt> nicht angegeben wurde, wird der Eigenschaftsname f&#252;r die Sitzung
+als Wert des Benutzerprofilattributs abgerufen. Alle Sitzungsattribute enthalten das Pr&#228;fix am.<tt>protected </tt>, um
+sicherzustellen, dass sie nicht &#252;ber das Client-SDK bearbeitet werden k&#246;nnen.</p>
+
+<a name="fwbfn"></a><h5>Standard-Authentifizierungsebene</h5>
+<p>Mit dem Wert f&#252;r die Authentifizierungsebene wird angegeben, wie stark einer Authentifizierung
+vertraut wird. Sobald ein Benutzer authentifiziert wurde, wird der Wert im SSO-Token
+der aktuellen Sitzung gespeichert. Wird das SSO-Token einer Anwendung vorgelegt, auf die
+der Benutzer zugreifen m&#246;chte, kann die Anwendung anhand des gespeicherten Werts bestimmen,
+ob die Authentifizierungsebene ausreicht, um dem Benutzer Zugriff zu gew&#228;hren. Wenn die
+im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert aufweist, wird der Benutzer
+aufgefordert, sich erneut &#252;ber einen Dienst mit einer h&#246;heren Authentifizierungsebene zu authentifizieren.</p><p>Die Authentifizierungsebene sollte in der Authentifizierungsvorlage des jeweiligen Bereichs festgelegt sein. Der
+im Attribut ";Standard-Authentifizierungsebene" eingegebene Wert wird nur verwendet, wenn im Feld "Authentifizierungsebene"
+der Authentifizierungsvorlage eines Bereichs kein Wert angegeben wurde. The Default Authentication Level
+default value is 0. (Der Wert f&#252;r dieses Attribut wird nicht von
+OpenSSO, sondern von einer externen Anwendung, f&#252;r die es ausgew&#228;hlt werden kann,
+verwendet.)</p>
+<br/>
+
+</body>
+</html>

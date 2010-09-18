@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>인증 웹 서비스 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>인증 웹 서비스</h3>
+<a name="indexterm-159"></a><p>인증 웹 서비스는 SOAP를 사용하여 인증을 수행하는 방법을 정의합니다. 웹 서비스 사용자(WSC)와
+웹 서비스 공급자(WSP) 간의 인증 정보 교환은 SOAP 바운드 메시지를 사용하여 이루어집니다.
+메시지는 정의된 SASL(Simple Authentication and Security Layer) 기법(또는 인증 모드)과 관련된 일련의
+클라이언트 요청과 서버 응답입니다. 인증 요청(또는 WSC의 응답)을 받은 후에 WSP는 추가
+시도를 실행하거나 인증 실패 또는 성공을 표시할 수 있습니다. 인증 웹 서비스는
+서비스 대 서비스(사용자가 아님) 인증을 위한 것입니다. 다음 단계에서는 WSC와 WSP(인증 웹
+서비스) 간의 순서에 대해 자세히 설명합니다.</p>
+<ol><li><p>기본 사용자를 대신하여 WSC가 인증 웹 서비스로 SASL 인증 요청을 보내는 것과 함께 인증 교환이 시작됩니다. </p><p>요청 메시지는 기본에 대한 식별자를 포함하며 서비스가 선택할 수 있는 하나 이상의 SASL 메커니즘을 지정합니다.</p></li>
+<li><p>인증 웹 서비스가 사용할 방법을 선언하고 해당되는 경우 시도를 시작하여 응답합니다. </p><p>인증 웹 서비스가 언급된 방법 중 어느 것도 지원하지 않는 경우 교환을 중단하여 응답합니다. </p></li>
+<li><p>WSC가 선택한 인증 방법에 필요한 자격 증명을 사용하여 응답합니다.</p></li>
+<li><p>인증 웹 서비스는 인증을 승인 또는 거부하여 응답합니다. </p><p>승인되는 경우 응답에는 WSC가 다른 웹 서비스(예: 검색 서비스)를 호출하는 데 필요한 자격 증명이 포함됩니다. </p></li></ol>
+<p>다음의 인증 웹 서비스 전역 속성을 구성하여 구현할 수 있습니다.</p>
+<ul><li><p><a href="mechanismhandlerslist.html">메커니즘 처리기 목록</a></p></li>
+<li><p>시도 정리 간격 &#8212; 이 속성은 기본 CRAM-MD5 메커니즘 처리기 구현 클래스 <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler</tt>의 정리 간격(초)을 지정합니다. 내부 스레드는 이 값을 기준으로 시도 맵 정리를 시작합니다.</p></li>
+<li><p>변환 클래스 &#8212; 이 속성은 구현 클래스 매핑에 변환 이름을 지정합니다. 값은 쉼표로 구분하며, 변환 이름과 구현 클래스 이름의 구분자로는 파이프 기호("|")를 사용합니다. 예를 들어 <tt>name1|class1, name2|class2</tt>와 같습니다.</p></li></ul>
+<p>인증 웹 서비스 구성과 연관된 작업은 다음과 같습니다.</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">새 메커니즘 처리기 구성</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

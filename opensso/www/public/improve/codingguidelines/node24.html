@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Local variable declarations</TITLE>
+<META NAME="description" CONTENT="Local variable declarations">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="previous" HREF="node23.html">
+<LINK REL="up" HREF="node22.html">
+<LINK REL="next" HREF="node25.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html289"
+  HREF="node25.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html287"
+  HREF="node22.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html283"
+  HREF="node23.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html290"
+  HREF="node25.html">Compound statements</A>
+<B> Up:</B> <A NAME="tex2html288"
+  HREF="node22.html">Simple statements</A>
+<B> Previous:</B> <A NAME="tex2html284"
+  HREF="node23.html">Assignment and expression statements</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00091200000000000000">
+Local variable declarations</A>
+</H3>
+Generally local variable declarations should be on separate lines; however, an exception is allowable for temporary variables that do not require initializers. For example,
+<PRE>
+int i, j = 4, k; // WRONG
+int i, k;        // acceptable
+int j = 4;
+</PRE>
+
+<P>
+Use lazy-declaration of variables. Declare variables closest to their first point of use. For better readability and efficiency, you don’t have to declare all the local variables right at the beginning of a block ({}).
+<PRE>
+    int i = 0;
+    for (i = 0; i < 100; i++) {
+        boolean check = false;
+    }
+</PRE>
+should be
+<PRE>
+    for (int i = 0; i < 100; i++) {
+        boolean check = false;
+    }
+</PRE>
+
+<P>
+Whenever possible, do not separate the variable declaration and variable initialization. This is not possible for try/catch blocks.
+<PRE>
+        // WRONG
+        Set set;
+        set = new HashSet(); 
+
+        // RIGHT
+        Set set = new HashSet();
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

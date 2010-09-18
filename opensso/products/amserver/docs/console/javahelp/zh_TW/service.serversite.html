@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>伺服器與網站 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serversite"></a><h3>伺服器與網站</h3>
+<p>[伺服器與網站] 配置屬性可讓您對整個部署的網站和伺服器進行集中式配置管理。</p><p>可以在至少兩個不同的主機伺服器上部署多個 (兩個或以上) OpenSSO 實例。例如，您可以在一部伺服器上部署兩個實例，並且在另一部伺服器上部署第三個實例。或者，您可以在其他伺服器上部署所有實例。您也可以根據部署的需要，在階段作業容錯移轉模式中配置 OpenSSO 實例。</p><p>一個或一個以上的負載平衡器會將用戶端的請求路由至不同的 OpenSSO 實例。您根據部署需求 (例如，要使用循環或平均負載) 配置每一個負載平衡器，以分散 OpenSSO 實例之間的負載。負載平衡器可簡化部署，還可以解決如用戶端和後端 OpenSSO 伺服器之間的防火牆之類的問題。您可以搭配 OpenSSO 部署使用硬體或軟體負載平衡器。所有 OpenSSO
+實例都會存取相同的 Directory Server。</p>
+<br/>
+
+</body>
+</html>

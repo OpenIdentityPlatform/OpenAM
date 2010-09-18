@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>策略 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.policy"></a><h3>策略</h3>
+<p><a name="indexterm-20"></a><a name="indexterm-21"></a><b>策略</b>會定義若干規則，用來指定對範圍之受保護資源的存取權限。公司擁有需要保護、管理和監視的資源、應用程式和服務。策略透過定義使用者對特定資源行動的時機和方法，控制存取權限以及這些資源的用途。當套用策略到物件上時，可定義特定物件可以存取的資源。</p><p>單一策略可以定義二進位或非二進位決策。二進位決策為<b>是</b>/<b>否</b>、<b>true</b>/<b>false</b> 或<b>允許</b>/<b>拒絕</b>。非二進位決策代表屬性值。例如，郵件服務可能包含一個 <tt>mailboxQuota</tt> 屬性，並且為每位使用者設定了最大儲存值。一般來說，策略是配置為定義物件可以在什麼情況下對哪一個資源進行什麼動作。</p><p>有兩種可以使用 OpenSSO 配置的策略類型，它們是<a href="normalpolicy.html">一般策略</a>或<a href="fyfby.html">參照策略</a>。一般策略由<b>規則</b>、<b>主體</b>、<b>條件</b>及<b>回應提供者</b>組成。參照策略由組織的<b>規則</b>及<b>參照</b>組成。</p>
+<br/>
+
+</body>
+</html>

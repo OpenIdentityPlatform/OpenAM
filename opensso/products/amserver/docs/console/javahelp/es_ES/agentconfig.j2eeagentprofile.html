@@ -1,0 +1,657 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Agente de directivas J2EE - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.j2eeagentprofile"></a><h4>Agente de directivas J2EE</h4>
+<p>Se puede configurar una instancia de agente J2EE desde esta interfaz. 
+ Las propiedades descritas en este documento s&#243;lo se aplican si se
+ha elegido la configuraci&#243;n centralizada durante la creaci&#243;n de agentes.  Si
+se seleccion&#243; una configuraci&#243;n local, las propiedades relacionadas con este agente deber&#225;n
+editarse en el archivo <tt>OpenSSOAgentConfiguration.properites </tt> en el directorio de instalaci&#243;n del agente.</p><p>Los tipos de configuraci&#243;n disponibles se dividen en las siguientes categor&#237;as:</p>
+<ul><li><p><a href="#ggmvd">Global</a></p></li>
+<li><p><a href="#ggmwz">Aplicaci&#243;n</a></p></li>
+<li><p><a href="#ggmwl">SSO.</a></p></li>
+<li><p><a href="#ggmwi">Servicios OpenSSO</a></p></li>
+<li><p><a href="#ggmug">Miscel&#225;neo</a></p></li>
+<li><p><a href="#ggmud">Advanced (Avanzado)</a></p></li></ul>
+
+
+<a name="ggmvd"></a><h5>Global</h5>
+<p>Estas propiedades se aplican a todas las aplicaciones protegidas por un agente.</p>
+
+<a name="ggwrr"></a><h5>Grupo</h5>
+<p>Si resulta pertinente, seleccione un grupo de la lista desplegable para asignar
+este agente al grupo. La lista est&#225; compuesta por los grupos configurados
+anteriormente.</p>
+
+<a name="ggmqz"></a><h5>Mot de passe</h5>
+<p>La contrase&#241;a que se ha definido al crear el perfil de agente.
+No obstante, puede cambiar esta contrase&#241;a en cualquier momento.</p>
+
+<a name="ggmni"></a><h5>Confirmar contrase&#241;a</h5>
+<p>La confirmaci&#243;n de la contrase&#241;a se ha realizado al crear el perfil
+de agente. Si cambia la contrase&#241;a, debe confirmar el cambio.</p>
+
+<a name="ggmpc"></a><h5>Estado</h5>
+<p>La opci&#243;n <tt>Activo</tt> se selecciona al crear el agente. Seleccione <tt>Inactivo</tt> s&#243;lo
+si desea suprimir la protecci&#243;n que proporciona el agente.</p>
+
+<a name="ggmwm"></a><h5>URL de notificaci&#243;n de agente</h5>
+<p>La URL utilizada por el agente para registrar las escuchas de notificaci&#243;n.</p>
+
+<a name="ggmwr"></a><h5>Ubicaci&#243;n del dep&#243;sito de configuraci&#243;n de agentes</h5>
+<p>Si lo desea, cambie la ubicaci&#243;n de la configuraci&#243;n a una de
+las dos opciones disponibles: centralizada o local.   La primera ubicaci&#243;n
+permite controlar la configuraci&#243;n de forma centralizada, por ejemplo, desde la consola.</p><p>La opci&#243;n local proporciona compatibilidad con versiones anteriores. Si se selecciona la
+opci&#243;n de configuraci&#243;n local, el agente utilizar&#225; su configuraci&#243;n local en el
+archivo <tt>OpenSSOAgentConfiguration.properites </tt> en el directorio de instalaci&#243;n del agente. Adem&#225;s, la consola
+mostrar&#225; &#250;nicamente las siguientes propiedades: Contrase&#241;a, Contrase&#241;a (confirmaci&#243;n) y Estado.</p>
+
+<a name="ggmwk"></a><h5>Intervalo de recarga de la configuraci&#243;n</h5>
+<p>El intervalo, en segundos, entre recargas de la configuraci&#243;n. Si se establece
+este atributo en <tt>0</tt>, se inhabilita el mecanismo de intercambio en caliente.</p>
+
+<a name="ggwkv"></a><h5>Notificaci&#243;n de cambio de configuraci&#243;n del agente</h5>
+<p>Si se habilita, el agente recibe mensajes de notificaci&#243;n del servidor de
+OpenSSO sobre los cambios de configuraci&#243;n.</p>
+
+<a name="ggmvt"></a><h5>Modo de filtro del agente</h5>
+<p>El modo de funcionamiento del filtro. Para esta propiedad puede ajustarse un
+valor global para aplicarlo a todas las aplicaciones que no tengan su
+modo de filtro espec&#237;fico propio. </p><p>Introduzca un nombre de aplicaci&#243;n web para la Clave de asignaci&#243;n y
+un valor para los Valores de asignaci&#243;n correspondientes. Los valores v&#225;lidos son
+ALL, J2EE_POLICY, URL_POLICY, SSO_ONLY y NONE. Para definir ALL como el modo
+de filtro global: deje en blanco el campo Clave de asignaci&#243;n e
+introduzca ALL en el campo Valor de asignaci&#243;n correspondiente. </p>
+
+<a name="ggmvu"></a><h5>URI de acceso denegado al recurso:</h5>
+<p>La URL de la p&#225;gina de acceso denegado personalizada. Si no se
+especifica ning&#250;n valor, el agente devuelve el estado <tt>HTTP</tt> <tt> 403 (Prohibido)</tt>.</p>
+
+<a name="ggmxg"></a><h5>Enlace de sesi&#243;n HTTP</h5>
+<p>Si se habilita, se invalidar&#225; la sesi&#243;n <tt>HTTP</tt> si falla el inicio
+de sesi&#243;n.  El usuario no presenta ninguna sesi&#243;n SSO o el
+nombre de usuario principal no coincide con el nombre de usuario SSO.</p>
+
+<a name="ggmut"></a><h5>Nombre del par&#225;metro GOTO</h5>
+<p>Una cadena que representa el nombre del par&#225;metro <tt>goto</tt>, utilizado por el
+agente para redireccionar al usuario al servicio de autenticaci&#243;n adecuado.  El
+servicio de autenticaci&#243;n utiliza el valor de este par&#225;metro para redireccionar al
+usuario al destino original solicitado.</p>
+
+<a name="ggmuv"></a><h5>L&#237;mite de intentos de inicio de sesi&#243;n</h5>
+<p>El n&#250;mero de intentos de inicio de sesi&#243;n fallidos permitidos durante una
+&#250;nica sesi&#243;n del navegador antes de que se bloquee la solicitud del
+usuario. El valor <tt>0</tt> inhabilita esta funci&#243;n.</p>
+
+<a name="ggmtr"></a><h5>Encabezado de respuesta personalizado</h5>
+<p>Una lista de asignaciones de encabezados personalizados. El agente define los encabezados
+en el navegador cliente. Introduzca un nombre de encabezado para la Clave
+de asignaci&#243;n y el valor de encabezado para los Valores de asignaci&#243;n
+correspondientes.</p>
+
+<a name="ggmtt"></a><h5>L&#237;mite de reintentos de redirecci&#243;n</h5>
+<p>El n&#250;mero de redirecciones de punto &#250;nico sucesivas y permitidas durante una
+&#250;nica sesi&#243;n del navegador antes de que se bloquee la solicitud del
+usuario. El valor <tt>0</tt> inhabilita esta funci&#243;n.</p>
+
+<a name="ggmxd"></a><h5>Nivel de depuraci&#243;n del agente</h5>
+<p>El tipo de mensajes de depuraci&#243;n registrados. Esta configuraci&#243;n determina el nivel
+de registro de depuraci&#243;n guardado localmente en el host del agente.</p>
+
+<a name="ggmsk"></a><h5>Modo de asignaci&#243;n de usuarios</h5>
+<p>El mecanismo que utiliza el agente para determinar el Id. de usuario.</p>
+
+<a name="ggmts"></a><h5>Nombre de atributo de usuario</h5>
+<p>El nombre del atributo que contiene el Id. de usuario. No se
+utilizar&#225; el valor de esta propiedad si la propiedad con la etiqueta
+Modo de asignaci&#243;n de usuarios se ha establecido en <tt>USER_ID</tt>.</p>
+
+<a name="ggmuc"></a><h5>Indicador principal de usuario</h5>
+<p>Si se habilita, se utilizar&#225; el elemento principal del usuario autenticado para
+autenticar al usuario en lugar de usar &#250;nicamente el Id. de usuario.
+Se utilizar&#225; el valor de esta propiedad si la propiedad con la
+etiqueta Modo de asignaci&#243;n de usuarios se ha establecido en <tt>USER_ID</tt>.</p>
+
+<a name="ggmtm"></a><h5>Nombre de testigo de usuario</h5>
+<p>El nombre de la propiedad de sesi&#243;n del Id. del usuario autenticado
+en la sesi&#243;n.  Se utilizar&#225; el valor de esta propiedad si
+la propiedad con la etiqueta Modo de asignaci&#243;n de usuarios se ha
+establecido en <tt>USER_ID</tt> y no se ha habilitado la propiedad con la
+etiqueta Indicador principal de usuario.</p>
+
+<a name="ggmzk"></a><h5>Tipos de acceso de auditor&#237;a</h5>
+<p>Los tipos de mensajes que el agente registra en funci&#243;n de los
+intentos de acceso de URL del usuario.</p>
+
+<a name="ggmyk"></a><h5>Ubicaci&#243;n del registro de auditor&#237;a</h5>
+<p>Ubicaci&#243;n en el que se registran los mensajes de auditor&#237;a.</p>
+
+<a name="ggmxz"></a><h5>Nombre del archivo de registro remoto</h5>
+<p>El nombre del archivo de registro de OpenSSO en el que se
+registra cada acceso de URL a esta aplicaci&#243;n.</p>
+
+<a name="ggmxy"></a><h5>Girar el registro de auditor&#237;a local</h5>
+<p>Si se habilita, se girar&#225;n los archivos de registro de auditor&#237;a locales
+cuando alcancen el l&#237;mite especificado por la propiedad con la etiqueta Tama&#241;o
+de la rotaci&#243;n del registro de auditor&#237;a local.</p>
+
+<a name="ggmyc"></a><h5>Tama&#241;o de la rotaci&#243;n del registro de auditor&#237;a local</h5>
+<p>El tama&#241;o con el que se gira el archivo de registro de
+auditor&#237;a local para generar un nuevo archivo.</p>
+
+<a name="ggndh"></a><h5>Comprobaci&#243;n de FQDN</h5>
+<p>Si se habilita, se comprueban el valor predeterminado y los valores de
+asignaci&#243;n de FQDN.</p>
+
+<a name="ggnfn"></a><h5>FQDN predeterminado</h5>
+<p>El nombre de host completo que utilizan los usuarios para acceder a
+los recursos.</p>
+
+<a name="ggnft"></a><h5>Asignaci&#243;n de host virtual de FQDN</h5>
+<p>Una asignaci&#243;n a un nombre de host real o v&#225;lido. Esta asignaci&#243;n
+se realiza de un nombre de host no reconocido a uno reconocido.
+Esta asignaci&#243;n resulta &#250;til en las siguientes situaciones: cuando el usuario introduce
+una direcci&#243;n URL o una IP incorrecta, o cuando se utiliza un
+host virtual para recursos protegidos. </p><p>Introduzca valores para la clave de asignaci&#243;n y los valores de asignaci&#243;n
+correspondientes y haga clic en Agregar. </p>
+
+<a name="ggmwz"></a><h5>Aplicaci&#243;n</h5>
+<p>Estas propiedades tienden a ser espec&#237;ficas de cada aplicaci&#243;n.</p>
+
+<a name="ggmxm"></a><h5>URI del formulario de inicio de sesi&#243;n</h5>
+<p>La lista de URI absolutos correspondientes al elemento de p&#225;gina del formulario
+de inicio de sesi&#243;n <tt> web.xml</tt> de la aplicaci&#243;n.</p>
+
+<a name="ggmzf"></a><h5>URI de error de inicio de sesi&#243;n</h5>
+<p>La lista de URI absolutos correspondientes al elemento de p&#225;gina del formulario
+de error <tt> web.xml</tt> de la aplicaci&#243;n.</p>
+
+<a name="ggmyn"></a><h5>Utilizar inicio de sesi&#243;n interno</h5>
+<p>Si se habilita, el agente utiliza el contenido interno personalizado, seg&#250;n especifica
+la propiedad con la etiqueta Nombre del archivo de contenido de inicio
+de sesi&#243;n.  Si no se habilita, el agente utiliza el contenido
+interno personalizado.</p>
+
+<a name="ggmxs"></a><h5>Nombre del archivo de contenido de inicio de sesi&#243;n</h5>
+<p>La ruta completa y el nombre del archivo de contenido de inicio
+de sesi&#243;n personalizado.</p>
+
+<a name="ggmyw"></a><h5>Controlador de cierre de sesi&#243;n de aplicaci&#243;n</h5>
+<p>Asignaciones espec&#237;ficas de la aplicaci&#243;n; cada una de ellas identifica un controlador
+que se utilizar&#225; para el procesamiento del cierre de sesi&#243;n.</p><p>Introduzca el controlador de cierre de sesi&#243;n del campo Clave de asignaci&#243;n
+y el nombre de la clase del controlador de cierre de sesi&#243;n
+en el campo Valores de asignaci&#243;n correspondientes. Haga clic en Add. </p>
+
+<a name="ggmzp"></a><h5>URI de cierre de sesi&#243;n de aplicaci&#243;n</h5>
+<p>Asignaciones espec&#237;ficas de la aplicaci&#243;n; cada una de ellas identifica un URI
+de solicitud. La presencia del URI de solicitud especificado indica un evento
+de cierre de sesi&#243;n.</p><p>Introduzca el URI de cierre de sesi&#243;n del campo Clave de asignaci&#243;n
+y el URI de cierre de sesi&#243;n en el campo Valores de
+asignaci&#243;n correspondientes.  Haga clic en Add. </p>
+
+<a name="ggmxw"></a><h5>Par&#225;metro de solicitud de cierre de sesi&#243;n</h5>
+<p>Asignaciones espec&#237;ficas de la aplicaci&#243;n; cada una de ellas identifica un par&#225;metro.
+La presencia del par&#225;metro de la solicitud <tt>HTTP</tt> especificado indica un evento
+de cierre de sesi&#243;n.</p>
+
+<a name="ggmzu"></a><h5>Introspecci&#243;n de cierre de sesi&#243;n habilitada</h5>
+<p>Si se habilita, el agente busca en el cuerpo de la solicitud
+<tt>HTTP</tt> el par&#225;metro de cierre de sesi&#243;n.</p>
+
+<a name="ggmyj"></a><h5>URI de entrada de cierre de sesi&#243;n</h5>
+<p>Asignaciones espec&#237;ficas de la aplicaci&#243;n; cada una de ellas identifica un URI
+que se utilizar&#225; como punto de entrada tras un cierre de sesi&#243;n
+correcto y, si es pertinente, tras una posterior autenticaci&#243;n satisfactoria.</p><p>Introduzca el valor del campo Clave de asignaci&#243;n y el URI de
+introducci&#243;n de cierre de sesi&#243;n en el campo Valores de asignaci&#243;n correspondientes.
+Haga clic en Add. </p>
+
+<a name="ggmxn"></a><h5>URI no aplicados</h5>
+<p>Una lista de URI para los que no se ha realizado la
+autenticaci&#243;n. El agente no aplica la protecci&#243;n ni se solicitan las credenciales
+para cada URI de esta lista.</p>
+
+<a name="ggmyy"></a><h5>Invertir URI no aplicados</h5>
+<p>Si se habilita, la lista de URI no aplicados se convierte en
+la lista de URI aplicados. Por lo tanto, se aplicar&#225;n todos los
+URI mostrados como valores de la PROPIEDAD con la etiqueta Lista de
+URI no aplicados, mientras que todos los dem&#225;s URI no se aplicar&#225;n.</p>
+
+<a name="ggmyv"></a><h5>Cach&#233; de URI no aplicados habilitada</h5>
+<p>Si se habilita, los resultados de la evaluaci&#243;n se almacenar&#225;n en la
+cach&#233; para los URI no aplicados. Por lo tanto, los resultados de
+la evaluaci&#243;n se almacenan en la cach&#233; para la lista de valores
+asociados a la propiedad con la etiqueta URI no aplicados.</p>
+
+<a name="ggmzm"></a><h5>Tama&#241;o de la cach&#233; de URI no aplicados</h5>
+<p>Si se habilita la propiedad con la etiqueta Cach&#233; de URI no
+aplicados habilitada, el valor especificado para esta propiedad se utilizar&#225; para establecer
+el tama&#241;o de la cach&#233;.</p>
+
+<a name="ggmzd"></a><h5>Lista de IP de cliente no aplicadas</h5>
+<p>Las solicitudes de esta lista de direcciones IP de cliente no se
+someter&#225;n a ninguna autenticaci&#243;n o autorizaci&#243;n. Se concede acceso y no se
+solicitan las credenciales de autenticaci&#243;n o autorizaci&#243;n para cada direcci&#243;n IP de
+esta lista.</p>
+
+<a name="ggmzn"></a><h5>Invertir lista de IP no aplicadas</h5>
+<p>Si se habilita, la lista de direcciones IP de cliente no aplicadas
+se convierte en la lista de IP aplicadas. Por lo tanto, se
+aplicar&#225;n todas las direcciones IP mostradas como valores de la propiedad con
+la etiqueta Lista de IP de cliente no aplicadas, mientras que todas
+las dem&#225;s direcciones IP no se aplicar&#225;n.</p>
+
+<a name="ggmzh"></a><h5>Indicador de la cach&#233; de IP no aplicadas</h5>
+<p>Si se habilita, los resultados de la evaluaci&#243;n se almacenar&#225;n en la
+cach&#233; para las direcciones IP no aplicadas. Por lo tanto, los resultados
+de la evaluaci&#243;n se almacenan en la cach&#233; para la lista de
+valores asociados a la propiedad con la etiqueta Lista de IP de
+cliente no aplicadas.</p>
+
+<a name="ggmzs"></a><h5>Tama&#241;o de la cach&#233; de IP no aplicadas</h5>
+<p>Si se habilita la propiedad con la etiqueta Marcador de cach&#233; de
+IP no aplicada, el valor especificado para esta propiedad se utiliza para
+establecer el tama&#241;o de la cach&#233;.</p>
+
+<a name="ggmzi"></a><h5>Modo de recuperaci&#243;n de los atributos de perfiles</h5>
+<p>Los modos disponibles para obtener los atributos de perfiles de usuarios adicionales
+que se introducir&#225;n en una solicitud.</p>
+
+<a name="ggmzo"></a><h5>Asignaci&#243;n de atributos de perfiles</h5>
+<p>Lista de asignaciones de nombres de atributo de perfil a nombres de
+encabezado <tt>HTTP</tt>. Los nombres de encabezado <tt>HTTP</tt> se llenan bajo nombres espec&#237;ficos
+para el usuario actualmente autenticado. </p>
+
+<a name="ggmym"></a><h5>Modo de recuperaci&#243;n de los atributos de respuesta</h5>
+<p>Los modos disponibles para obtener los atributos de respuesta de usuarios adicionales
+que se introducir&#225;n en una solicitud.</p>
+
+<a name="ggmzg"></a><h5>Asignaci&#243;n de atributos de respuesta</h5>
+<p>Lista de asignaciones de nombres de atributo de respuesta a nombres de
+encabezado <tt>HTTP</tt>.  Los nombres de encabezado HTTP se llenan bajo nombres
+espec&#237;ficos para el usuario actualmente autenticado. </p>
+
+<a name="ggmxl"></a><h5>Car&#225;cter separador de cookies</h5>
+<p>El car&#225;cter que se utilizar&#225; para separar varios valores del mismo atributo
+cuando se establece como cookie.</p>
+
+<a name="ggmyl"></a><h5>Obtener el formato de fecha de los atributos</h5>
+<p>El formato de los valores de atributos de fecha que se utilizar&#225;
+cuando el atributo se establezca como encabezado <tt>HTTP</tt>.  El formato se
+basa en <tt>java.text.SimpleDateFormat</tt>.</p>
+
+<a name="ggmzq"></a><h5>Codificaci&#243;n de la cookie del atributo</h5>
+<p>Si se habilita, el valor del atributo se codifica mediante URL antes
+de establecerlo como cookie.</p>
+
+<a name="ggmyf"></a><h5>Modo de recuperaci&#243;n de los atributos de sesi&#243;n</h5>
+<p>Los modos disponibles para obtener los atributos de sesi&#243;n de usuarios adicionales
+que se introducir&#225;n en una solicitud.</p>
+
+<a name="ggmyu"></a><h5>Asignaci&#243;n de atributos de sesi&#243;n</h5>
+<p>Lista de asignaciones de nombres de atributo de sesi&#243;n a nombres de
+encabezado <tt>HTTP</tt>.   Los nombres de atributo de sesi&#243;n se llenan
+bajo nombres espec&#237;ficos para el usuario actualmente autenticado. </p>
+
+<a name="ggmyi"></a><h5>Atributo con privilegios predeterminado</h5>
+<p>Lista de atributos privilegiados para usuarios autenticados. Estos atributos se conceden a
+todos los usuarios que tengan una sesi&#243;n de OpenSSO v&#225;lida.</p>
+
+<a name="ggmxo"></a><h5>Tipo de atributo con privilegios</h5>
+<p>Una lista de los atributos con privilegios que se obtendr&#225;n para cada
+usuario.</p>
+
+<a name="ggmyb"></a><h5>Atributos con privilegios en min&#250;sculas</h5>
+<p>Una lista de asignaciones de tipos de atributo privilegiados a valores de
+<tt>true</tt> o <tt>false</tt>: <tt>true</tt> para indicar que el tipo de atributo se
+convierte a min&#250;sculas o <tt>false </tt> si no se convierte.</p>
+
+<a name="ggmyt"></a><h5>Atributo de sesi&#243;n con privilegios</h5>
+<p>Una lista de los nombres de propiedades de sesi&#243;n que contienen atributos
+con privilegios para el usuario autenticado.</p>
+
+<a name="ggmxk"></a><h5>Habilitar la asignaci&#243;n de los atributos con privilegios</h5>
+<p>Si se habilita, se aplicar&#225;n asignaciones de un valor original del atributo
+a un valor alternativo, seg&#250;n lo especificado en la propiedad con la
+etiqueta Asignaci&#243;n de atributos con privilegios.</p>
+
+<a name="ggmya"></a><h5>Asignaci&#243;n de atributos con privilegios</h5>
+<p>Una lista de las asignaciones de un valor original del atributo a
+un valor alternativo. Esta propiedad s&#243;lo se aplicar&#225; si se ha habilitado
+la propiedad con la etiqueta Habilitar la asignaci&#243;n de atributos con privilegios.</p>
+
+<a name="ggmyg"></a><h5>Controlador de autenticaci&#243;n personalizado</h5>
+<p>Una lista de las asignaciones de una aplicaci&#243;n al controlador de autenticaci&#243;n
+espec&#237;fico de esa aplicaci&#243;n. El agente utiliza cada controlador de autenticaci&#243;n para
+autenticar al usuario en el contenedor de la aplicaci&#243;n especificada.</p>
+
+<a name="ggmyq"></a><h5>Controlador de cierre de sesi&#243;n personalizado</h5>
+<p>Una lista de las asignaciones de una aplicaci&#243;n al controlador de cierre
+de sesi&#243;n espec&#237;fico de esa aplicaci&#243;n. El agente utiliza cada controlador de
+cierre de sesi&#243;n para cerrar la sesi&#243;n del usuario en el contenedor
+de la aplicaci&#243;n especificada.</p>
+
+<a name="ggmxv"></a><h5>Controlador de verificaci&#243;n personalizado</h5>
+<p>Una lista de las asignaciones de una aplicaci&#243;n al controlador de verificaci&#243;n
+local espec&#237;fico de esa aplicaci&#243;n. El agente utiliza los controladores de verificaci&#243;n
+local para validar las credenciales del usuario con el dep&#243;sito local.</p>
+
+<a name="ggmwl"></a><h5>SSO.</h5>
+<p>Estas propiedades le permiten configurar caracter&#237;sticas del agente relacionado con el inicio
+de sesi&#243;n &#250;nico (SSO) y el inicio de sesi&#243;n &#250;nico en varios
+dominios (CDSSO).</p>
+
+<a name="ggmyo"></a><h5>Nombre del cookie</h5>
+<p>El nombre de la cookie del token de SSO utilizada entre el
+servidor de OpenSSO y el agente.</p>
+
+<a name="ggmxu"></a><h5>Habilitar cach&#233; SSO</h5>
+<p>Si se habilita, la cach&#233; SSO estar&#225; activa para el agente y
+podr&#225; utilizarse mediante las API p&#250;blicas mostradas por el SDK del agente.</p>
+
+<a name="ggmza"></a><h5>SSO entre dominios</h5>
+<p>Si se habilita, el inicio de sesi&#243;n &#250;nico entre dominios (CDSSO) estar&#225;
+activo.</p>
+
+<a name="ggmzt"></a><h5>URI de redirecci&#243;n de CDSSO</h5>
+<p>Un URI intermedio utilizado por el agente para procesar las solicitudes de
+CDSSO.</p>
+
+<a name="ggmyd"></a><h5>URL de servlet de CDSSO</h5>
+<p>Lista de URL de los controladores CDSSO disponibles. El agente puede utilizar
+estas URL para procesamiento de CDSSO.</p>
+
+<a name="ggmzc"></a><h5>Desfase del reloj de CDSSO</h5>
+<p>El n&#250;mero de segundos que tardar&#225; el agente en determinar la validez
+de la aserci&#243;n de CDSSO <tt>AuthnResponse</tt>.</p>
+
+<a name="ggmyz"></a><h5>Proveedor de Id. de confianza de CDSSO</h5>
+<p>Una lista de los proveedores de Id./servidores de OpenSSO en los que
+puede confiar el agente al evaluar las respuestas CDC de Liberty. Es
+necesario establecer esta propiedad si hay un equilibrador de carga, un servidor
+de seguridad o ambos entre el agente y la instancia de OpenSSO.</p>
+
+<a name="ggmzj"></a><h5>Habilitar CDSSO seguro</h5>
+<p>Cuando se habilita, y cuando el canal de comunicaciones con el host
+es seguro, la cookie de token de SSO establecida por el agente
+en los diferentes dominios del modo CDSSO se marcan como seguros.</p>
+
+<a name="ggmze"></a><h5>Lista de dominios de CDSSO</h5>
+<p>Una lista de los dominios para los que se deben establecer las
+cookies en el caso de utilizar CDSSO.</p>
+
+<a name="ggmyx"></a><h5>Restablecimiento de cookies</h5>
+<p>Si se habilita, el agente restablece las cookies en la respuesta antes
+de redireccionar a la autenticaci&#243;n.</p>
+
+<a name="ggmys"></a><h5>Lista de nombres de restablecimiento de cookies</h5>
+<p>Una lista de los nombres de cookies que el agente restablecer&#225; si
+se ha habilitado la propiedad con la etiqueta Restablecimiento de cookies.</p>
+
+<a name="ggmye"></a><h5>Asignaci&#243;n de dominios de restablecimiento de cookies</h5>
+<p>Lista de asignaciones desde un nombre de cookie especificado por la propiedad
+Lista de nombre de restablecimiento de cookie al dominio de la cookie
+que se debe utilizar cuando tiene lugar un evento de restauraci&#243;n (el
+valor).</p>
+
+<a name="ggmzl"></a><h5>Asignaci&#243;n de rutas de restablecimiento de cookies</h5>
+<p>Lista de asignaciones desde un nombre de cookie especificado en la propiedad
+Lista de nombre de restablecimiento de cookie (la clave) a la ruta
+de la cookie que se debe utilizar cuando tiene lugar un evento
+de restauraci&#243;n (el valor).</p>
+
+<a name="ggmwi"></a><h5>Servicios OpenSSO</h5>
+<p>Estas propiedades configuran los servicios de OpenSSO que utiliza el agente como,
+por ejemplo, los servicios de directivas, sesi&#243;n, autenticaci&#243;n y administraci&#243;n de servicios
+(SM).</p>
+
+<a name="ggmxr"></a><h5>URL de inicio de sesi&#243;n de OpenSSO</h5>
+<p>Una lista de URL para la autenticaci&#243;n en OpenSSO. Si necesaria la
+autenticaci&#243;n, el agente redirige a los usuarios entrantes al servicio de autenticaci&#243;n
+adecuado, seg&#250;n se especifique en la URL.</p>
+
+<a name="ggmzr"></a><h5>URL de inicio de sesi&#243;n priorizadas</h5>
+<p>Si se habilita, se organiza por orden de prioridad la secuencia de
+conmutaci&#243;n por error de las URL de inicio de sesi&#243;n o CDSSO,
+seg&#250;n lo definido en la propiedad con la etiqueta URL de inicio
+de sesi&#243;n de OpenSSO.</p>
+
+<a name="ggmyh"></a><h5>An&#225;lisis de URL de inicio de sesi&#243;n</h5>
+<p>Si se habilita, el agente comprueba la disponibilidad de las URL definidas
+por la propiedad con la etiqueta URL de inicio de sesi&#243;n de
+OpenSSO antes de redireccionar a ellas.</p>
+
+<a name="ggmxq"></a><h5>Tiempo de espera del an&#225;lisis de URL de inicio de sesi&#243;n</h5>
+<p>Si se habilita la propiedad con la etiqueta An&#225;lisis de URL de
+inicio de sesi&#243;n, el valor especificado para esta propiedad determina el n&#250;mero
+de milisegundos del tiempo de espera de la conexi&#243;n.</p>
+
+<a name="ggmxx"></a><h5>URL de cierre de sesi&#243;n de OpenSSO</h5>
+<p>Una lista de las URL de la p&#225;gina de cierre de sesi&#243;n
+de OpenSSO.</p>
+
+<a name="ggmzv"></a><h5>URL de cierre de sesi&#243;n priorizadas</h5>
+<p>Si se habilita, se organiza por orden de prioridad la secuencia de
+conmutaci&#243;n por error de las URL de cierre de sesi&#243;n, seg&#250;n lo
+definido en la propiedad con la etiqueta URL de inicio de sesi&#243;n
+de OpenSSO.</p>
+
+<a name="ggmzx"></a><h5>An&#225;lisis de URL de cierre de sesi&#243;n</h5>
+<p>Si se habilita, el agente comprueba la disponibilidad de las URL de
+cierre de sesi&#243;n definidas por la propiedad con la etiqueta URL de
+inicio de sesi&#243;n de OpenSSO antes de redireccionar a ellas.</p>
+
+<a name="ggmzy"></a><h5>Tiempo de espera del an&#225;lisis de URL de cierre de sesi&#243;n</h5>
+<p>Si se habilita la propiedad con la etiqueta An&#225;lisis de URL de
+cierre de sesi&#243;n, el valor especificado para esta propiedad determina el n&#250;mero
+de milisegundos del tiempo de espera de la conexi&#243;n.</p>
+
+<a name="ggmzz"></a><h5>Protocolo del servicio de autenticaci&#243;n de OpenSSO</h5>
+<p>El protocolo que utilizar&#225; el servicio de autenticaci&#243;n de OpenSSO.</p>
+
+<a name="ggmzw"></a><h5>Nombre de host del servicio de autenticaci&#243;n de OpenSSO</h5>
+<p>El nombre de host que utilizar&#225; el servicio de autenticaci&#243;n de OpenSSO.</p>
+
+<a name="ggnaw"></a><h5>Puerto del servicio de autenticaci&#243;n de OpenSSO</h5>
+<p>El n&#250;mero de puerto que utilizar&#225; el servicio de autenticaci&#243;n de OpenSSO.</p>
+
+<a name="ggnak"></a><h5>Habilitar notificaciones de directivas</h5>
+<p>Si se habilita, las notificaciones estar&#225;n operativas para el cliente de directivas
+remoto.</p>
+
+<a name="ggnao"></a><h5>Intervalo de sondeo del cliente de directivas</h5>
+<p>La duraci&#243;n, en minutos, tras la que el cliente de directivas remoto
+actualizar&#225; las entradas almacenadas en la cach&#233;.</p>
+
+<a name="ggnaj"></a><h5>Modo de cach&#233; del cliente de directivas</h5>
+<p>El modo de almacenamiento en cach&#233; que utilizar&#225; el cliente de directivas
+remoto. Los valores v&#225;lidos son: <tt>subtree</tt> o <tt>self </tt>.</p>
+
+<a name="ggnat"></a><h5>Valores de acci&#243;n booleanos del cliente de directivas</h5>
+<p>Los valores de acci&#243;n booleanos disponibles para los nombres de acciones de
+directivas.</p><p>Ejemplo:</p><pre><i>serviceName</i>|<i>actionName</i>|<i>trueValue</i>|<i>falseValue</i></pre>
+
+<a name="ggnbg"></a><h5>Comparadores de recursos del cliente de directivas</h5>
+<p>Los comparadores de recursos que se utilizar&#225;n para los diferentes nombres de
+servicios.</p>
+
+<a name="ggnan"></a><h5>Desfase del reloj del cliente de directivas</h5>
+<p>El n&#250;mero de segundos permitido para adaptar la diferencia temporal entre el
+equipo del servidor de OpenSSO y el equipo del cliente de directivas
+remoto.</p>
+
+<a name="ggnbd"></a><h5>Par&#225;metros GET de entorno de directivas de URL</h5>
+<p>Una lista de los par&#225;metros de solicitudes <tt>HTTP GET</tt> cuyos nombres y valores
+se establecer&#225;n en la asignaci&#243;n de entorno para la evaluaci&#243;n de directivas
+de URL que se realizar&#225; en el servidor de OpenSSO.</p><p>La clave de la asignaci&#243;n presenta el formato <tt>GET</tt> <i> parameterName</i>, mientras que
+el valor de la asignaci&#243;n est&#225; compuesto por un conjunto de valores
+de cadena del par&#225;metro.</p>
+
+<a name="ggnax"></a><h5>Par&#225;metros POST de entorno de directivas de URL</h5>
+<p>Una lista de los par&#225;metros de solicitudes <tt>HTTP POST</tt> cuyos nombres y valores
+se establecer&#225;n en la asignaci&#243;n de entorno para la evaluaci&#243;n de directivas
+de URL que se realizar&#225; en el servidor de OpenSSO.</p><p>La clave de la asignaci&#243;n presenta el formato <tt>POST</tt> <i>parameterName</i>, mientras que
+el valor de la asignaci&#243;n est&#225; compuesto por un conjunto de valores
+de cadena del par&#225;metro.</p>
+
+<a name="ggnaa"></a><h5>Par&#225;metros jsession de entorno de directivas de URL</h5>
+<p>Una lista de atributos <tt>HTTP SESSION</tt> cuyos nombres y valores se establecer&#225;n en
+la asignaci&#243;n de entorno para la evaluaci&#243;n de directivas de URL que
+se realizar&#225; en el servidor de OpenSSO.</p><p>La clave de la asignaci&#243;n presenta el formato <tt>JSESSION </tt> <i>parameterName</i>, mientras que
+el valor de la asignaci&#243;n est&#225; compuesto por un conjunto de valores
+de cadena del par&#225;metro.</p>
+
+<a name="ggnai"></a><h5>Tiempo de sondeo de la cach&#233; de datos de usuarios</h5>
+<p>El tiempo de actualizaci&#243;n de la cach&#233;, en minutos, para los datos
+de administraci&#243;n de usuarios. Si se establece en <tt>0</tt>, no se realizar&#225;
+ninguna actualizaci&#243;n.</p>
+
+<a name="ggnaf"></a><h5>Habilitar la notificaci&#243;n de cach&#233;s de datos de servicios</h5>
+<p>Si se habilita, las notificaciones estar&#225;n operativas para las cach&#233;s de administraci&#243;n
+de servicios.</p>
+
+<a name="ggnam"></a><h5>Tiempo de la cach&#233; de datos de servicios</h5>
+<p>Tiempo de actualizaci&#243;n de la cach&#233;, en minutos, para los datos de
+configuraci&#243;n de servicios. Si se establece en <tt>0</tt>, no se realizar&#225; ninguna
+actualizaci&#243;n.</p><p>Esta propiedad s&#243;lo se aplicar&#225; si no se ha proporcionado ninguna URL
+de notificaci&#243;n como valor para la propiedad con la etiqueta URL de
+notificaci&#243;n del agente o si se han inhabilitado las notificaciones.</p>
+
+<a name="ggnaq"></a><h5>Habilitar sondeo de clientes</h5>
+<p>Cuando est&#225; habilitada, especifica si el cliente de sesi&#243;n debe utilizar el
+sondeo para actualizar la informaci&#243;n de sesi&#243;n sin depender de las notificaciones
+del servidor.</p>
+
+<a name="ggnar"></a><h5>Periodo de sondeo del cliente</h5>
+<p>El tiempo, en segundos, tras el que el cliente de sesi&#243;n solicita
+una actualizaci&#243;n de la informaci&#243;n de sesi&#243;n almacenada en la cach&#233; desde
+el servidor.</p>
+
+<a name="ggmug"></a><h5>Miscel&#225;neo</h5>
+<p>Estas propiedades no encajan correctamente en otras categor&#237;as.</p>
+
+<a name="ggnal"></a><h5>Idioma de la configuraci&#243;n regional </h5>
+<p>El c&#243;digo de idioma para identificar la configuraci&#243;n regional de la operaci&#243;n.</p>
+
+<a name="ggnae"></a><h5>Pa&#237;s de la configuraci&#243;n regional</h5>
+<p>El c&#243;digo de pa&#237;s para identificar la configuraci&#243;n regional de la operaci&#243;n.</p>
+
+<a name="ggnbc"></a><h5>Habilitar la comprobaci&#243;n de puertos</h5>
+<p>Si se habilita, la funci&#243;n de comprobaci&#243;n de puertos estar&#225; operativa.</p>
+
+<a name="ggnav"></a><h5>Archivo de comprobaci&#243;n de puertos</h5>
+<p>Nombre o ruta completa de un archivo que tiene el contenido necesario
+para gestionar solicitudes que necesitan correcci&#243;n de puerto.</p>
+
+<a name="ggnac"></a><h5>Configuraci&#243;n de la comprobaci&#243;n de puertos</h5>
+<p>Lista de asignaciones de n&#250;meros de puerto a protocolos. La clave es
+el n&#250;mero de puerto que recibe conexiones, mientras que el valor es
+el protocolo que recibe conexiones y que debe utilizar el agente para
+identificar solicitudes con n&#250;meros de puerto no v&#225;lidos.</p>
+
+<a name="ggnbf"></a><h5>Lista de omisi&#243;n de elementos principales</h5>
+<p>Lista de elementos principales que omitir&#225; el agente para la autenticaci&#243;n y
+las b&#250;squedas.</p>
+
+<a name="ggojq"></a><h5>Habilitar compatibilidad con el modo tradicional</h5>
+<p>Cuando est&#225; habilitada, se permiten agentes de usuario heredados (navegadores).</p>
+
+<a name="ggnad"></a><h5>Agente de usuario tradicional</h5>
+<p>Lista de valores de encabezado de agente de usuario. Cada valor identifica
+un navegador heredado.</p>
+
+<a name="ggnap"></a><h5>URI de redirecci&#243;n en el modo tradicional</h5>
+<p>Una URI intermedia que utiliza el agente para redirigir las solicitudes de
+agentes de usuarios tradicionales.</p>
+
+<a name="ggnay"></a><h5>Proveedor de cifrado</h5>
+<p>La implementaci&#243;n del proveedor de cifrado que utilizar&#225; el agente.</p>
+
+<a name="ggmud"></a><h5>Advanced (Avanzado)</h5>
+<p>Estas propiedades son o bien propiedades personalizadas o propiedades que tienden a
+utilizarse en implementaciones m&#225;s complejas o menos comunes.</p>
+
+<a name="ggmxt"></a><h5>Encabezado de la direcci&#243;n IP de cliente</h5>
+<p>El nombre de encabezado <tt>HTTP</tt> que contiene la direcci&#243;n IP del cliente.</p>
+
+<a name="ggmyp"></a><h5>Encabezado del nombre de host de cliente</h5>
+<p>El nombre de encabezado <tt>HTTP</tt> que contiene el nombre de host del
+cliente.</p>
+
+<a name="ggnbb"></a><h5>Habilitar servicio web</h5>
+<p>Si se habilita, se procesar&#225;n los servicios web.</p>
+
+<a name="ggnab"></a><h5>Puntos finales del servicio web</h5>
+<p>Lista de puntos finales de aplicaciones web. Cada punto final representa un
+servicio web.</p>
+
+<a name="ggnah"></a><h5>Habilitar proceso GET del servicio web</h5>
+<p>Si se habilita, se procesar&#225;n las solicitudes <tt>HTTP GET</tt> de los puntos finales
+de servicios web.</p>
+
+<a name="ggnba"></a><h5>Autenticador de servicio Web</h5>
+<p>Una clase de implementaci&#243;n que puede utilizarse para autenticar las solicitudes de
+servicios web.</p>
+
+<a name="ggnau"></a><h5>Archivo de contenido de error interno del servicio web</h5>
+<p>El nombre del archivo cuyo contenido utiliza el agente para generar un
+error interno para los clientes.</p>
+
+<a name="ggnag"></a><h5>Archivo de contenido de error de autorizaci&#243;n del servicio web</h5>
+<p>El nombre del archivo cuyo contenido utiliza el agente para generar un
+error interno para los clientes.</p>
+
+<a name="ggnfp"></a><h5>Nombre de host alternativo del agente</h5>
+<p>Nombre de host que identifica el servidor protegido por el agente a
+los navegadores cliente, si el nombre de host utilizado es diferente del
+nombre de host real.</p>
+
+<a name="ggnew"></a><h5>N&#250;mero de puerto alternativo del agente</h5>
+<p>El n&#250;mero de puerto que identifica al puerto de escucha del servidor
+protegido por el agente en los navegadores de cliente, si el n&#250;mero
+de puerto utilizado es diferente del puerto de escucha real.</p>
+
+<a name="ggnga"></a><h5>Protocolo alternativo del agente</h5>
+<p>El protocolo que utilizan los navegadores de cliente (<tt>HTTP</tt>/<tt>HTTPS</tt>) para comunicarse con
+el servidor protegido por el agente, si el protocolo utilizado es diferente
+del protocolo real que utiliza el servidor.</p>
+
+<a name="ggngg"></a><h5>Propiedades personalizadas</h5>
+<p>Propiedades adicionales que permiten a los usuarios aumentar el conjunto de propiedades
+admitidas por el usuario.</p><p>Ejemplo:</p><pre>customproperty=custom-value1
+customlist[0]=customlist-value-0
+customlist[1]=customlist-value-1
+custommap[key1]=custommap-value-1
+custommap[key2]=custommap-value-2</pre>
+<br/>
+
+</body>
+</html>

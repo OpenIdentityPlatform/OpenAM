@@ -1,0 +1,9 @@
+dn:ROOT_SUFFIX
+changetype:modify
+delete:aci
+aci: (targetattr = "objectclass || inetuserstatus || iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || iplanet-am-user-account-life || iplanet-am-session-max-session-time || iplanet-am-session-max-idle-time || iplanet-am-session-get-valid-sessions || iplanet-am-session-destroy-sessions || iplanet-am-session-add-session-listener-on-all-sessions || iplanet-am-user-admin-start-dn || iplanet-am-auth-post-login-process-class")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)))(version 3.0; acl "S1IS User status self modification denied"; deny (write) userdn ="ldap:///self";)
+
+dn:ROOT_SUFFIX
+changetype:modify
+add:aci
+aci: (targetattr = "objectclass || inetuserstatus || iplanet-am-user-login-status || iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || iplanet-am-user-account-life || iplanet-am-session-max-session-time || iplanet-am-session-max-idle-time || iplanet-am-session-get-valid-sessions || iplanet-am-session-destroy-sessions || iplanet-am-session-add-session-listener-on-all-sessions || iplanet-am-user-admin-start-dn || iplanet-am-auth-post-login-process-class")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)))(version 3.0; acl "S1IS User status self modification denied"; deny (write) userdn ="ldap:///self";)

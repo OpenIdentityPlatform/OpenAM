@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-FF Service Configuration - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Liberty ID-FF Service Configuration</h4>
+
+
+<a name="ggogr"></a><h5>Federation Cookie Name</h5>
+<p>This attribute specifies the name of the ID-FF Services cookie. The cookie is
+used to remember if the user is federated already. </p>
+
+<a name="ggohk"></a><h5>IDP Proxy Finder SPI Implementation Class</h5>
+<p>This attribute specifies the implementation class for finding a preferred identity provider to
+be proxied.</p>
+
+<a name="ggogp"></a><h5>Request Cache Cleanup Interval</h5>
+<p>This attribute specifies the cleanup interval (in seconds) for ID-FF internal request cleanup
+thread.</p>
+
+<a name="ggoii"></a><h5>Request Cache Timeout</h5>
+<p>This attribute specifies the timeout value (in seconds) for the ID-FF Authentication Request.
+Any<tt>AuthnRequest</tt> object will be purged from the memory if it exceeds the timeout
+value.</p>
+
+<a name="ggofu"></a><h5>IDP Login URl</h5>
+<p>This attribute specifies the login URL to which the IDP will redirect if
+a valid session is not found while processing the Authentication Request. If the
+key is not specified, a default login URL is used.</p>
+
+<a name="ggoih"></a><h5>XML Signing On</h5>
+<p>This attribute specifies the level of signature verification for Liberty requests and responses.</p>
+<br/>
+
+</body>
+</html>

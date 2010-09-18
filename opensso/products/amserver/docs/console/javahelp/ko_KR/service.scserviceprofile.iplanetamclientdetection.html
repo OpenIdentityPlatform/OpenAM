@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>클라이언트 검색 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>클라이언트 검색</h4>
+<p><a name="indexterm-200"></a>인증 프로세스의 초기 단계는 HTTP(S) 요청을 수행하는 클라이언트 유형을 식별하는 것입니다. 이
+OpenSSO 기능은 클라이언트 검색이라고도 합니다. URL 정보를 사용하여 클라이언트 특징을 검색하고이러한 특징을
+기초로 적절한 인증 페이지가 반환됩니다. 예를 들어, 웹 페이지를 요청하는 데 Netscape
+브라우저를 사용하면 OpenSSO 8.0에 HTML 로그인 페이지가 표시됩니다. 사용자가 검증되면 클라이언트 유형(Netscape
+브라우저)이 세션 토큰에 추가됩니다. 클라이언트 검색 서비스에 정의되는 속성은 전역 속성입니다.</p>
+<ul><li><p><a href="#fxcei">클라이언트 유형</a></p></li>
+<li><p><a href="#fxbxh">기본 클라이언트 유형</a></p></li>
+<li><p><a href="#fxccp">클라이언트 검색 클래스</a></p></li>
+<li><p><a href="#fxbvy">클라이언트 검색</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>클라이언트 유형</h5>
+<p>클라이언트 유형을 검색하려면 OpenSSO가 클라이언트를 식별하는 특징을 인식해야 합니다. 이러한 특징은 지원되는
+모든 유형의 등록 정보를 클라이언트 데이터 형식으로 식별합니다. 이 속성을 사용하면 클라이언트
+관리자 인터페이스를 통해 클라이언트 데이터를 수정할 수 있습니다. 클라이언트 관리자에 액세스하려면 [편집]
+링크를 누릅니다. OpenSSO에는 다음 클라이언트 유형이 포함되어 있습니다.</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>이러한 클라이언트 유형에 대한 설명은 <a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>을 참조하십시오.</p>
+
+<a name="gciwk"></a><h5>클라이언트 관리자</h5>
+<p><a name="indexterm-201"></a>클라이언트 관리자는 기본 클라이언트, 스타일 및 연결된 등록 정보를 나열하는 인터페이스이며 장치를
+추가 및 구성하는 데 사용할 수 있습니다. 기본 클라이언트 유형은 클라이언트 관리자의
+위쪽에 나열됩니다. 이러한 클라이언트 유형에는 해당 클라이언트 유형에 속하는 모든 장치가 상속할
+수 있는 기본 등록 정보가 포함됩니다.</p>
+
+<a name="gcivx"></a><h5>클라이언트 유형</h5>
+<p>클라이언트 관리자는 기본 클라이언트 유형을 포함하여 사용 가능한 모든 클라이언트를 클라이언트 유형
+목록에 그룹화합니다. 각 클라이언트의 경우 장치 이름을 눌러 클라이언트 등록 정보를 수정할
+수 있습니다. 그러면 등록 정보가 클라이언트 편집기 창에 표시됩니다. 등록 정보를 편집하려면
+풀다운 목록에서 다음 분류를 선택합니다.</p><dl><dt>하드웨어 플랫폼</dt>
+<dd><p>디스플레이 크기, 지원되는 문자 집합 등과 같은 장치 하드웨어 등록 정보를 포함합니다.</p></dd>
+<dt>소프트웨어 플랫폼</dt>
+<dd><p>장치의 응용 프로그램 환경, 운영 체제 및 설치된 소프트웨어의 등록 정보를 포함합니다. </p></dd>
+<dt>네트워크 특징</dt>
+<dd><p>지원되는 베어러를 포함하여 네트워크 환경을 설명하는 등록 정보를 포함합니다.</p></dd>
+<dt>BrowserUA</dt>
+<dd><p>장치에서 실행 중인 브라우저 사용자 에이전트 관련 속성을 포함합니다.</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>장치에서 지원하는 WAP(Wireless Application Protocol) 환경의 등록 정보를 포함합니다.</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>장치에서 지원하는 WAP 환경의 등록 정보를 포함합니다.</p></dd>
+<dt>추가 등록 정보</dt>
+<dd><p>장치에서 지원하는 WAP(Wireless Application Protocol) 환경의 등록 정보를 포함합니다.</p></dd>
+</dl>
+
+<hr><p><b>주 &#8211; </b>특정 등록 정보 정의에 대한 자세한 내용은 <b>Open Mobile Alliance Ltd. (OMA) Wireless Application Protocol, Version 20-Oct-2001</b>을 참조하십시오.</p><p>설명서를 보려면 먼저 WAP Forum<sup>TM</sup>에 등록해야 합니다. 자세한 내용은 <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm</a>을 참조하십시오.</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>기본 클라이언트 유형</h5>
+<p>이 속성은 클라이언트 유형 속성의 클라이언트 유형 목록에서 파생된 기본 클라이언트 유형을
+정의합니다. 기본값은 genericHTML입니다.</p>
+
+<a name="fxccp"></a><h5>클라이언트 검색 클래스</h5>
+<p>이 속성은 모든 클라이언트 검색 요청이 라우팅되는 클라이언트 검색 클래스를 정의합니다. 이
+속성이 반환하는 문자열은 클라이언트 유형 속성에 나열된 클라이언트 유형 중 하나와 일치해야
+합니다. 기본 클라이언트 검색 클래스는 <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>입니다. OpenSSO에는 <tt>com.iplanet.services.cdm.</tt><tt>ClientDetectionDefaultImpl</tt>도 있습니다.</p>
+
+<a name="fxbvy"></a><h5>클라이언트 검색</h5>
+<p>클라이언트 검색을 사용 가능하게 합니다. 클라이언트 검색이 사용 가능하면(기본값) 모든 요청이 클라이언트
+검색 클래스 속성에 지정된 클래스를 통해 라우팅됩니다. 기본적으로 클라이언트 검색 기능은 사용
+가능합니다. 이 속성을 선택하지 않은 경우 OpenSSO는 클라이언트가 genericHTML이고 HTML 브라우저를 통해
+액세스된다고 가정합니다.</p>
+<br/>
+
+</body>
+</html>

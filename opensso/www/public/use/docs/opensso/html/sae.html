@@ -1,0 +1,457 @@
+<div><table cellpadding="0" cellspacing="10" border="0" align="left" valign="top">
+   <col WIDTH=100%>
+    <tr><td><img src="../../../../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+
+<tr><td><font size="2">
+<i>You can post comments and questions regarding the documentation provided below on the <a href="http://wiki.java.net/bin/view/Projects/DocFeedback" target="_blank">Documentation Feedback Wiki Page</a>. The page will open in a new window.</i>
+</font></td></tr>
+
+    <tr><td><h2>Secure Attribute Exchange</h2>
+    
+<font size="2">
+<P>
+Secure Attribute Exchange (SAE) is a new OpenSSO feature that provides a mechanism for one application to communicate identity information to a second application in a different domain. In essence, SAE provides a secure gateway that enables legacy applications to communicate user attributes used for authentication without having to deal specifically with federation protocols and processing. An SAE interaction allows:
+<P></P>
+<UL>
+<LI>Identity provider applications to push user authentication, profile and transaction information to a local instance of OpenSSO. OpenSSO then passes the data to a remote instance of OpenSSO at the service provider using federation protocols.</LI>
+<LI>Service provider applications to consume the received information.</LI>
+</UL>
+<hr>
+<p><b>NOTE: </b>The scope of the implementation of SAE is currently limited to SAMLv2 based single sign-on.</p>
+<hr>
+<p></p>
+<P>SAE uses the SAMLv2-based protocols (based on the HTTP GET and POST methods as well as URL redirects) to transfer identity data between the communicating entities. The SAE client API (which includes Java and .NET interfaces) runs independently of OpenSSO and are used to enable existing applications, allowing them to handle SAMLv2 interactions. The components of a secure attribute exchange are listed and illustrated below.</P>
+
+<UL>
+<LI>Legacy identity provider application (blue IDP)</LI>
+<LI>Service provider application (blue SP)</LI>
+<LI>Independent instances of OpenSSO on both the identity provider and the service provider sides (green)</LI>
+<LI>A user agent</LI>
+</UL>
+<p></p>
+<img src="figures/sae.jpg">
+
+<P>More information is in the following sections:</P>
+
+<ul style="list-style-type: none">
+  <li><a href="sae.html#works">How Secure Attribute Exchange Works</a></li>
+  <li><a href="sae.html#secure">Securing the Attribute Exchange</a></li>
+  <li><a href="sae.html#cases">Use Cases</a></li>
+  <li><a href="sae.html#prep">Preparing to Use Secure Attribute Exchange</a></li>
+  <li><a href="sae.html#config">Configuration</a></li>
+  <li><a href="sae.html#sample">Using the Secure Attribute Exchange Sample</a></li>
+</ul>
+<p></p>  
+<a name="works"></a><h3>How Secure Attribute Exchange Works</h3>
+
+<P>This image illustrates the process behind a secure attribute exchange. Details follow.</P>
+
+<img src="figures/SAEprocess.jpg">
+
+<OL>
+<LI><b>A user authenticates.</b><br>
+This may be done by the identity provider application or it may be delegated to an authentication authority.</LI>
+<P></P>
+<LI><b>The authenticated user uses the identity provider application and, at some point, accesses a link representing a service provided by an application in a different domain.</b></LI>
+<P></P>
+<LI><b>The identity provider application assembles the appropriate user attributes (authentication and user profile data), encodes and signs it using the <TT>com.sun.identity.sae.api.SecureAttrs</TT> class, and posts the secure data to the local instance of OpenSSO.</b><br>
+This API is provided by OpenSSO and carries the user identifier and the service provider destination.</LI>
+<P></P>
+<LI><b>The SAE authentication module on the instance of OpenSSO local to the identity provider verifies the authenticity of the attributes also using the SAE API, and initiates the appropriate SAMLv2 single sign-on protocol to send the attributes to the instance of OpenSSO local to the service provider being accessed.</b></LI>
+<P></P>
+<LI><b>The instance of OpenSSO local to the service provider secures the user attributes, and sends them to the service provider application.</b><br>
+The service provider application uses interfaces supplied by OpenSSO to verify the authenticity of the attributes.
+<P></P>
+</LI>
+<P></P>
+<LI><b>The service provider application provides the service to the user based on the attributes previously received.</b></LI>
+</OL>
+<P></P>
+<hr>
+<p><b>NOTE: </b>It is not mandatory for the service provider end of the process to implement SAE. Since the attributes are carried in a SAML assertion, the service provider could choose another way to invoke the requested application. For example, the service provider can use standard SAMLv2 protocols to invoke a SAMLv2-compliant service provider that does not implement SAE. The <TT>RelayState</TT> element as defined in the SAMLv2 specification can be used to redirect to the local service provider application.</p>
+<hr>
+
+<a name="secure"></a><h3>Securing the Attribute Exchange</h3>
+
+SAE provides two ways to secure identity attributes between an instance of OpenSSO and an application:</P>
+
+<UL>
+<LI><b>Symmetric</b> involves the use of a <i>shared secret key</i> known only to the participants in the communication. The key is agreed upon beforehand and will be used to encrypt and decrypt the message.</LI>
+
+<P></P>
+
+<LI><b>Asymmetric</b> uses two separate keys for encryption and the corresponding decryption - one public and one private. The information is encrypted with a public key known to all and decrypted, by the recipient only, using a private key to which no one else has access. This process is known as a <i>public key infrastructure</i>. On the identity provider side, the public key must be added to the OpenSSO keystore. The private key must be stored in a protected keystore such as a <i>Hardware Security Module (HSM)</i> for access by the identity provider application. On the service provider side, the private key must be added to the OpenSSO keystore, and the public key stored in a keystore, local to the service provider application.</LI>
+</UL>
+
+<P>Both mechanisms result in an encrypted string (referred to as a <i>cryptostring</i>) generated for the asserted attributes. The symmetric cryptostring is a SHA-1 hash of the attributes. The asymmetric cryptostring is a digital signature of the attributes.</P>
+
+<hr>
+
+<p><b>NOTE: </b>As each pairing of application to OpenSSO instance is independent, different applications involved can use different security methods.</p>
+
+<hr>
+
+<a name="cases"></a><h3>Use Cases</h3>
+
+<P>The following use cases are applicable to SAE:</P>
+
+<ul style="list-style-type: none">
+  <li><a href="sae.html#authidp">Authentication at Identity Provider</a></li>
+  <li><a href="sae.html#saeidp">Secure Attribute Exchange at Identity Provider</a></li>
+  <li><a href="sae.html#saesp">Secure Attribute Exchange at Identity Provider</a></li>
+  <li><a href="sae.html#gsl">Global Single Logout</a></li>
+</ul>
+
+<a name="authidp"></a><h5>Authentication at Identity Provider</h5>
+
+<P>When a user is already authenticated in an enterprise, the legacy identity provider application sends a secure HTTP GET/POST message to OpenSSO asserting the identity of the user. OpenSSO verifies the authenticity of the message and establishes a session for the authenticated user. You can use SAE to transfer the user's authentication information to the local instance of OpenSSO in order to create a session.</P>
+
+<a name="saeidp"></a><h5>Secure Attribute Exchange at Identity Provider</h5>
+
+<P>When a user is already authenticated by, and attempts access to, a legacy identity provider application, the legacy application sends a secure HTTP POST message to the local instance of OpenSSO asserting the user's identity, and containing a set of attribute/value pairs related to the user (for example, data from the persistent store representing certain transactional states in the application). OpenSSO verifies the authenticity of the message, establishes a session for the authenticated user, and populates the session with the user attributes.</P>
+
+<a name="saesp"></a><h5>Secure Attribute Exchange at Service Provider</h5>
+
+<P>When a user is already authenticated by the instance of OpenSSO at the identity provider and invokes an identity provider application that calls for redirection to a service provider, the identity provider invokes one of the previous use cases and encodes a SAMLv2 single sign-on URL as a part of the request. The identity provider instance of OpenSSO then initiates SAMLv2 single sign-on with the instance of OpenSSO at the service provider. The service provider's instance of OpenSSO then verifies the SAMLv2 assertion and included attributes, and redirects to the service provider application, securely transferring the user attributes via a secure HTTP POST message. The service provider application consumes the attributes, establishes a session, and offers the service to the user.</P>
+
+<a name="gsl"></a><h5>Global Single Logout</h5>
+
+<P>When a user is already authenticated and has established, for example, single sign-on with the instance of OpenSSO at the service provider, the user might click on a Global Logout link. The identity provider will then invalidate its local session (if created) and trigger SAMLv2 single log out by invoking a provided OpenSSO URL. The OpenSSO identity provider executes the SAMLv2 single log out, terminating the session on both provider instances of OpenSSO.
+
+<hr>
+
+<p><b>NOTE: </b>An identity provider side application can initiate single logout by sending <TT>sun.cmd=logout</TT> attributes via an SAE interaction to a local instance of OpenSSO acting as the identity provider. In turn, this instance will execute SAMLv2 single logout based on the current session.</p>
+
+<hr>
+</P>
+
+<a name="prep"></a><h3>Preparing to Use Secure Attribute Exchange</h3>
+
+<p>Before configuring and using the SAE, you will need to make some decisions regarding security, applicable keys, and applications. This section lists what you will need to do before configuring for SAE.</p>
+
+<p><b>NOTE: </b>Because OpenSSO currently uses SAMLv2 for its implmentation of SAE, you should familiarize yourself with SAMLv2 concepts by running the <i>useCaseDemo</i> SAMLv2 sample included with OpenSSO.</p>
+
+<ol>
+<li>
+<p><b>Establish trust between the application(s) and the instance of OpenSSO on the identity provider side</b></P>
+<P>Decide the application(s) on the identity provider side that will use SAE to push identity attributes to the local instance of OpenSSO. You will need values for the following:</P>
+
+<table cellpadding="9" border="1">
+<tr valign="top">
+<td width="20%">Application Name</td>
+<td>This is used for easy identification and can be any string. <i>Use of the application's URL is recommended.</i></td>
+</tr>
+<tr valign="top">
+<td>CryptoType</td>
+<td>Can be <b>Symmetric</b> or <b>Asymmetric</b>.</td>
+</tr>
+<tr valign="top">
+<td>Shared Secret <b>or</b><br>Private and Public Keys</td>
+<td>You need the shared secret if using Symmetric, and the private and public keys if using Asymmetric.</td>
+</tr>
+</table>
+<p><b>NOTE: </b>Multiple applications can share the same application name only if they also share the same shared secret or key.</p>
+</li>
+<LI><p><b>Establish trust between the application(s) and the instance of OpenSSO on the service provider side</b></p>
+<p>Decide the applications on the service provider side that will receive the identity attributes from the local instance of OpenSSO using SAE. You will need the following:</P>
+
+<table cellpadding="9" border="1">
+<tr valign="top">
+<td width="20%">Application Name</td>
+<td>This is used for easy identification and can be any string. <i>Use of the application's URL is recommended</i> because the default implementation of the SAE on the service provider side uses a prefix string match from the requested application URL to determine the parameters used to secure the communication.</td>
+</tr>
+<tr valign="top">
+<td>CryptoType</td>
+<td>Can be <b>Symmetric</b> or <b>Asymmetric</b>.</td>
+</tr>
+<tr valign="top">
+<td>Shared Secret <b>or</b><br>Private and Public Keys</td>
+<td>You need the shared secret if using Symmetric, and the private and public keys if using Asymmetric. If Asymmetric is chosen, use the same keys defined when the SAMLv2 service provider was configured as an OpenSSO service provider. You can find these keys in the service provider's metadata.</td>
+</tr>
+</table>
+<p><b>NOTE: </b>Multiple applications can share the same application name only if they also share the same shared secret or key.</p>
+</LI>
+<LI><b>OPTIONAL:</B> The following steps are specific to using SAMLv2 and auto-federation.
+<OL type="a">
+<LI><p><b>Decide which identity attributes you want transferred as part of the SAMLv2 single sign-on interaction.</b></P>
+<P>We choose the <tt>branch</tt> and <tt>mail</tt> attributes.</p>
+<hr>
+<p><b>NOTE: </b>If any attribute needs to be supplied from a local user data store, you must first populate the data store.</p>
+<hr>
+</LI>
+<li><p><b>Decide which attribute will be used to identify the user on the service provider side.</b></P>
+<P>In this instance, we choose the <tt>branch</tt> attribute for user identification.</P>
+<hr>
+<p><b>NOTE: </b>The attribute may be one transferred in the SAMLv2 assertion or it can be configured statically at the service provider.</p>
+<hr>
+</li>
+</ol></li>
+
+<li><p><b>Decide which URL on the service provider side will be responsible for handling logout requests from the identity provider.</b></p>
+<P>The URL will be responsible for terminating the local session state. Only one is allowed per logical service provider configured on the service provider side.</p>
+</li>
+</OL>
+<p></p>
+
+<a name="config"></a><h3>Configuring Secure Attribute Exchange</h3>
+
+<p>Configuring for Secure Attribute Exchange communication involves modifications on two different OpenSSO installations: one that is local to the identity provider and one that is local to the service provider. The following sections assume that you have downloaded and deployed the OpenSSO WAR to a supported web container, and that you are ready to configure a SAMLv2 provider either by executing the included SAMLv2 sample, by running one of the Common Tasks using the Administration Console, by importing metadata using the Administration Console, or by using the <tt>famadm</tt> command line interface. SAE functionality is found in three places:
+<p></p>
+<ul>
+<li>deployable-war/opensso.war - for FAM8 side</li>
+<li>libraries/dll/openssosae.dll - for client application using .NET API</li>
+<li>libraries/jars/openssoclientsdk.jar - for client application using Java API</li>
+</ul>
+</p>
+<a href="sae.html#localidp">Configure the Instance of OpenSSO Local to the Identity Provider</a>
+<br>
+<a href="sae.html#localsp">Configure the Instance of OpenSSO Local to the Service Provider</a>
+<br>
+<a href="sae.html#remotesp">Configure the Instance of OpenSSO Local to the Identity Provider for the Remote Service Provider</a>
+<br>
+<a href="sae.html#remoteidp">Configure the Instance of OpenSSO Local to the Service Provider for the Remote Identity Provider</a>
+<p></p>
+<ul>
+<li>
+<P><a name="localidp"></a>Configure the Instance of OpenSSO Local to the Identity Provider</P>
+<ol>
+<li>Update the identity provider standard metadata.
+<p></p>
+<ul>
+<li>If you have existing identity provider standard metadata, export it using <tt>famadm export-entity</tt> and make your modifications. After updating, delete the original file using <tt>famadm delete-entity</tt> and re-load the modified metadata using <tt>famadm import-entity</tt>.</li>
+<li>If you have not yet configured identity provider standard metadata, use <tt>famadm</tt> to generate an identity provider metadata template. After updating the template, import the modified metadata using <tt>famadm import-entity</tt>.</li></ul>
+</li>
+<p></p>
+<li>Set up the keystore(s).
+<P>If using the <i>asymmetric</i> cryptotype, add the public and private keys to the application's keystore. Additionally, populate the identity provider's keystore with the application's public key.</p></li>
+<p></p>
+<li>Update the identity provider extended metadata.
+<p></p>
+<ol type="a">
+<li>Setup the application's security configuration as <i>symmetric</i> or <i>asymmetric</i>.
+<p></p>
+<ul>
+<li><b>Symmetric</b> : Encrypt each shared secret using <tt>ampassword</tt>.
+<p></p>
+<tt><i>famtools</i>/bin/ampassword -e <i>secretfile</i></tt>
+<p></p>
+For example, if <tt>ampassword</tt> returns a value of <tt>AQICHgRg...</tt>, populate the <tt>saeAppSecretList</tt> attribute in the extended metadata with this output as in:
+<p></p>
+<pre>
+&#60;Attribute name="saeAppSecretList"&#62;
+   &#60;Value&#62;url=<i>application_name</i>|type=symmetric|secret=AQICHgRg...&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>
+<p></p>
+<li><b>Asymmetric</b> : Obtain each application's public key and add it to the OpenSSO keystore.
+<p></p>
+For example, if the public key alias is <tt>testcert</tt>, populate the <tt>saeAppSecretList</tt> attribute.<br>
+<pre>
+&#60;Attribute name="saeAppSecretList"&#62;
+   &#60;Value&#62;url=<i>application_name</i>|type=asymmetric|pubkeyalias=testcert&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>
+</ul>
+</li>
+<p></p>
+<li><i>OPTIONAL:</i> Modify the <tt>saeIDPUrl</tt> attribute.
+<p></p>
+This attribute is populated with a value specific to your identity provider instance of OpenSSO. It can be changed if you want to use an alternatve or custom SAE landing URL. Modify the value of the <tt>saeIDPUrl</tt> attribute. For example:
+<p></p>
+<pre>
+&#60;Attribute name="saeIDPUrl"&#62;
+   &#60;Value&#62;http://<i>host</i>:<i>port</i>/idp/idpsaehandler&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>
+</ol>
+</ol>
+</li>
+<p></p>
+
+<li><P><a name="localsp"></a>Configure the Instance of OpenSSO Local to the Service Provider</P>
+<ol>
+<li>Update the service provider standard metadata.
+<p></p>
+<ul>
+<li>If you have existing service provider standard metadata, export it using <tt>famadm export-entity</tt> and make your modifications. After updating, delete the original file using <tt>famadm delete-entity</tt> and re-load the modified metadata using <tt>famadm import-entity</tt>.</li>
+<li>If you have not yet configured service provider standard metadata, use <tt>famadm</tt> to generate a service provider metadata template. After updating the template, import the modified metadata using <tt>famadm import-entity</tt>.</li></ul>
+</li>
+<p></p>
+<li>Set up the keystore.
+<p></p>
+If using the <b>asymmetric</b> cryptotype, add the public and private keys for the service provider application to the OpenSSO keystore. Additionally, populate the application's keystore with the service provider's public key.</li>
+<p></p>
+<li>Update the service provider extended metadata.
+<p></p>
+<ul type="a">
+<li>Turn on auto-federation and specify the attribute that will identify the user's identity.
+<p></p>
+<pre>
+&#60;Attribute name="autofedEnabled"&#62;
+   &#60;Value&#62;true&#60;/Value&#62;
+&#60;/Attribute>
+
+&#60;Attribute name="autofedAttribute"&#62;
+   &#60;Value&#62;branch&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>
+<p></p>
+<li>Specify attributes from the incoming SAMLv2 assertion to be used to populate the local OpenSSO session.
+<pre>
+&#60;Attribute name="attributeMap"&#62;
+   &#60;Value&#62;mail=mail&#60;/Value&#62;
+   &#60;Value&#62;branch=branch&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>   
+</li>
+<p></p>    
+<li>Setup the application's security configuration as <i>symmetric</i> or <i>asymmetric</i>.
+<p></p>
+
+<ul>
+<li><b>Symmetric</b> : Encrypt each shared secret using <tt>ampassword</tt>.
+<p></p>
+<tt><i>famtools</i>/bin/ampassword -i <i>staging_directory</i> -e <i>clearpassword</i></tt>
+<p></p>
+For example, if <tt>ampassword</tt> returns a value of <tt>AQICl...</tt>, populate the <tt>saeAppSecretList</tt> attribute in the extended metadata with this output as in:
+<p></p>
+<pre>
+&#60;Attribute name="saeAppSecretList"&#62;
+   &#60;Value&#62;url=<i>application_name</i>|type=symmetric|secret=AQICl...&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>
+<p></p>
+<li><b>Asymmetric</b> : Obtain each application's public key and add it to the OpenSSO keystore.
+<p></p>
+For example, if the public key alias is <tt>testcert</tt>, populate the <tt>saeAppSecretList</tt> attribute.
+<p></p>
+<pre>
+&#60;Attribute name="saeAppSecretList"&#62;
+   &#60;Value&#62;url=<i>application_name</i>|type=asymmetric|pubkeyalias=testcert&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>
+</ul>
+</li>      
+<p></p>
+<li><i>OPTIONAL:</i> Modify the value for the <tt>saeSPUrl</tt> attribute.
+<p></p>
+This attribute is populated with a value specific to your service provider instance of OpenSSO. It can be changed if you want to use an alternatve or custom SAE landing URL. For example:
+<p></p>
+<pre>
+&#60;Attribute name="saeSPUrl"&#62;
+   &#60;Value&#62;http://www.sp1.com:9080/sp/spsaehandler&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre>
+</li>         
+<p></p>
+<li>Configure the value of the <tt>saeSPLogoutURL</tt> attribute.
+<P></P>
+The value of this attribute is the URL that will receive global logout requests. For example:
+<P></P>
+<pre>
+&#60;Attribute name="saeSPLogoutURL"&#62;
+   &#60;Value&#62;http://www.sp1.com:9080/sp/samples/saml2/sae/saeIDPApp.jsp&#60;/Value&#62;
+&#60;/Attribute&#62;
+</pre> 
+<hr>
+<p><b>NOTE: </b>The configured URL must have a defined CryptoType (symmetric or asymmetric) and corresponding shared secret and certificates established.</p>
+<hr>
+</li>
+</ul>
+</li> 
+</ol>
+</li>
+<p></p>
+
+<li><a name="remotesp"></a>Configure the Instance of OpenSSO Local to the Identity Provider for the Remote Service Provider
+<p></p>
+<OL>
+<LI>Get the remote service provider metadata for import to the instance of OpenSSO local to the identity provider.
+<p></p> 
+<ul>
+<li>The standard metadata is the same as the one used in <a href="sae.html#localsp">Configure the Instance of OpenSSO Local to the Service Provider</a>.</li>
+<p></p>
+<li>The extended metadata used in <a href="sae.html#localsp">Configure the Instance of OpenSSO Local to the Service Provider</a> must be changed by the service provider before giving it to the identity provider as follows:
+<p></p>
+<ol type="a">
+<li>Remove all shared secrets</li>
+<p></p>
+<li>Set the <tt>hosted</tt> attribute to <i>0</i> (false)<br> 
+          <pre>&#60;EntityConfig .. hosted="0" ....&#62;<pre></li>
+          <p></p>
+<li>Remove the value for the <tt>saeSPLogoutURL</tt> attribute.
+<p></p>
+<li>Add the following attribute:
+<pre>
+&#60;Attribute name="attributeMap"&#62;
+   &#60;Value&#62;mail=mail&#60;/Value&#62;
+   &#60;Value&#62;branch=branch&#60;/Value&#62;
+&#60;/Attribute&#62;
+<pre>
+</li>
+</ol>
+</li>
+</ul>
+<p></p>
+<LI>Import both metadata files to the instance of OpenSSO local to the identity provider using <tt>famadm</tt>.</LI>
+</OL>
+</LI>
+<p></p>
+<li><a name="remoteidp"></a>Configure the Instance of OpenSSO Local to the Service Provider for the Remote Identity Provider
+<p></p>
+If the SAMLv2 sample has been executed on the instance of OpenSSO local to the service provider, nothing else needs to be done. If metadata has been manually configured on the instance of OpenSSO local to the service provider, do the following:
+<p></p>
+<OL>
+<li>Get the remote identity provider metadata for import to the instance of OpenSSO local to the service provider.
+<p></p>
+The standard metadata is the same as the one used in <a href="sae.html#localidp">Configure the Instance of OpenSSO Local to the Identity Provider</a>.
+</li>
+<p></p>
+<li>Import the standard metadata to the instance of OpenSSO local to the service provider using <tt>famadm</tt>.</li>
+<p></p>
+<li>Add the identity provider to the service provider's configured circle of trust.</li>
+</OL>
+<p></p>
+<b>NOTE:</b> If using a flat file for a datastore, both the instance of OpenSSO at the service provider and the instance at the identity provider must be restarted.
+</LI>
+</ul>
+
+<a name="sample"></a><h3>Using the Secure Attribute Exchange Sample</h3>
+
+<P>OpenSSO includes a sample that can be run for testing your configurations. It is located in <tt><i>container_context_root</i>/opensso/samples/saml2/sae</tt>. In the sample, auto-federation and transient name identifier, two features of SAMLv2, are used.
+
+<P></P>
+
+If there are no actual users on either the identity provider side or the service provider side, you need to change the authentication framework to ignore user profiles for these two features to work correctly. Before running the sample, do the following:</P>
+<ol>
+<LI>Login to OpenSSO administration console as administrator.
+<P></P> 
+By default, this is <tt>amadmin</tt>.</LI>
+<P></P> 
+<LI>Click the name of the realm you are modifying.</LI>
+<P></P> 
+<li>Click the Authentication tab.</li>
+<P></P> 
+<li>Click Advanced Properties.</li>
+<P></P> 
+<li>Select the Ignore Profile radio button under User Profile.</li>
+<P></P> 
+<li>Click Save.</li>
+<P></P> 
+<li>Log out of the console.</li>
+</ol>
+
+</font></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

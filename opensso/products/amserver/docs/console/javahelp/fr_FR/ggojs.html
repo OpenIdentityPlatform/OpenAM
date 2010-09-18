@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration d'un gestionnaire de demandes - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggojs"></a><h5>Configuration d'un gestionnaire de demandes</h5>
+<a name="indexterm-200"></a><a name="indexterm-201"></a><p>L'interface <tt>RequestHandler</tt> doit &#234;tre impl&#233;ment&#233;e c&#244;t&#233; serveur par chaque service d'identit&#233; Liberty
+utilisant Service de liaison SOAP. L'attribut Liste de gestionnaires de demandes stocke
+les informations sur les classes d'impl&#233;mentation des services Web qui impl&#233;mentent le
+gestionnaire de demandes. La liste des gestionnaires de demandes affiche les entr&#233;es
+qui contiennent des paires cl&#233;/valeur s&#233;par&#233;es par un tube comme dans :
+<tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>.</p><ol>
+<li><b>Cliquez sur Nouveau pour afficher les attributs Nouveau gestionnaire de demandes ou
+cliquez sur une valeur de cl&#233; configur&#233;e pour modifier les attributs existants.</b></li>
+<li><b>Fournissez les valeurs pour les attributs en vous basant sur les informations
+suivantes :</b><dl><dt>key</dt>
+<dd><p>Ce param&#232;tre obligatoire correspond &#224; la derni&#232;re partie du chemin d'URI vers une extr&#233;mit&#233; SOAP. Le point d'arriv&#233;e SOAP dans Access Manager est le servlet r&#233;cepteur SOAP. L'URI pointant le r&#233;cepteur SOAP est <tt><b></tt><i>protocol </i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt>. Si vous d&#233;finissez <tt><b>disco</b></tt> comme cl&#233;, le chemin d'URI vers l'extr&#233;mit&#233; SOAP du Service de d&#233;couverte correspondant est : <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>. Chaque client de service utilise une cl&#233; diff&#233;rente pour se connecter au r&#233;cepteur SOAP.</p></dd>
+<dt>class</dt>
+<dd><p>Ce param&#232;tre obligatoire d&#233;finit le nom de la classe d'impl&#233;mentation du gestionnaire de demandes pour ce service d'identit&#233;s particulier. Par exemple : <tt>class=com.exemple.identit&#233;.liberty.ws.disco.DiscoveryService</tt>.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur OK pour terminer la configuration du gestionnaire de demandes.</b></li>
+<li><b>Cliquez sur Enregistrer dans la page Service de liaison SOAP pour terminer
+la configuration du service.</b></li></ol>
+<br/>
+
+</body>
+</html>

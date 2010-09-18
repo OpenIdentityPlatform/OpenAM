@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs de r&#233;f&#233;rentiel Federated Access Manager - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="amrepoattrs"></a><h4>Attributs de r&#233;f&#233;rentiel Federated Access Manager</h4>
+<p><a name="indexterm-13"></a>Les attributs suivants permettent de configurer un plug-in du r&#233;f&#233;rentiel de Federated
+Access Manager :</p>
+
+<a name="gdlng"></a><h5>Nom de la classe</h5>
+<p>Sp&#233;cifie l'emplacement du fichier de classe qui impl&#233;mente le plug-in du r&#233;f&#233;rentiel
+Federated Access Manager.</p>
+
+<a name="gdopv"></a><h5>Types et op&#233;rations pris en charge du plug-in de Federated Access Manager</h5>
+<p>Sp&#233;cifie les op&#233;rations autoris&#233;es sur ce serveur LDAP. Les op&#233;rations par d&#233;faut
+sont les seules op&#233;rations prises en charge par ce plug-in du r&#233;f&#233;rentiel
+LDAPv3. Les op&#233;rations prises en charge par le plug-in du r&#233;f&#233;rentiel LDAPv3
+sont les suivantes :</p>
+<ul><li><p>agent : lecture, cr&#233;ation, modification, suppression</p></li>
+<li><p>groupe : lecture, cr&#233;ation, modification, suppression</p></li>
+<li><p>domaine&#8212; lecture, cr&#233;ation, modification, suppression, service</p></li>
+<li><p>utilisateur : lecture, cr&#233;ation, modification, suppression, service</p></li></ul>
+<p>Vous pouvez supprimer des autorisations de la liste ci-dessus en fonction des
+param&#232;tres du serveur LDAP et des t&#226;ches mais vous ne pouvez pas
+en ajouter d'autres. </p><p>Si le plug&#8212;in du r&#233;f&#233;rentiel LDAPv3 pointe vers une instance de Sun
+Java Systems Directory Server, des autorisations du type <tt>role</tt> peuvent &#234;tre ajout&#233;es.
+Sinon, cette autorisation peut ne pas &#234;tre ajout&#233;e car d'autres magasins de
+donn&#233;es peuvent ne pas prendre en charge les r&#244;les. L'autorisation du type
+r&#244;le est :</p>
+<ul><li><p>r&#244;le : lecture, cr&#233;ation, modification, suppression </p></li></ul>
+<p>Si <tt>user</tt> est pr&#233;sent en tant que type pris en charge pour
+le r&#233;f&#233;rentiel LDAPv3, les op&#233;rations de lecture, de cr&#233;ation, de modification et
+de suppression de service sont possibles pour cet utilisateur. En d'autres termes,
+si <tt>user</tt> est un type pris en charge, les op&#233;rations de lecture,
+de modification, de cr&#233;ation et de suppression vous permettent de lire, modifier,
+cr&#233;er et supprimer des entr&#233;es utilisateur dans le r&#233;f&#233;rentiel d'identit&#233;. L'op&#233;ration <tt>user=service</tt>
+permet aux services Federated Access Manager d'acc&#233;der aux attributs d'entr&#233;es utilisateur. L'utilisateur
+peut &#233;galement acc&#233;der aux attributs de service dynamiques si le service est
+affect&#233; au domaine ou au r&#244;le auquel l'utilisateur appartient. </p><p>L'utilisateur peut &#233;galement g&#233;rer les attributs utilisateur d'un quelconque service affect&#233;. Si
+l'utilisateur dispose de <tt>service</tt> en tant qu'op&#233;ration (<tt>user=service</tt>), ceci indique que toutes
+les op&#233;rations li&#233;es au service sont prises en charge. Ces op&#233;rations sont
+<tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes</tt> et <tt>modifyService.</tt></p>
+
+<a name="gdlnf"></a><h5>Valeur DN d'organisation</h5>
+<p>D&#233;finit le DN pointant vers une organisation de Directory Server qui doit
+&#234;tre g&#233;r&#233;e par Federated Access Manager. Ceci constituera le DN de base
+de toutes les op&#233;rations effectu&#233;es dans le magasin de donn&#233;es.</p>
+
+<a name="gdopu"></a><h5>Attribut d'affectation de nom du conteneur de personnes</h5>
+<p>Indique l'attribut de nommage du conteneur de personnes si un utilisateur r&#233;side
+dans un conteneur de personnes. Ce champ est laiss&#233; vide si l'utilisateur
+ne r&#233;side pas dans un conteneur de personnes.</p>
+
+<a name="gdopc"></a><h5>Valeur du conteneur de personnes</h5>
+<p>Indique la valeur du conteneur de personnes. La valeur par d&#233;faut est
+<tt>people</tt>.</p>
+
+<a name="gdopl"></a><h5>Attribut d'affectation de nom du conteneur d'agents</h5>
+<p>L'attribut de nommage du conteneur d'agents si l'agent r&#233;side dans un conteneur
+d'agents. Ce champ est laiss&#233; vide si l'agent ne r&#233;side pas dans
+un conteneur d'agents.</p>
+
+<a name="gdopi"></a><h5>Valeur du conteneur d'agents</h5>
+<p>Indique la valeur du conteneur d'agents. La valeur par d&#233;faut est <tt>agents</tt>.</p>
+
+<a name="gdoow"></a><h5>Recherche r&#233;cursive</h5>
+<p>Si activ&#233;e, la recherche effectu&#233;e dans le r&#233;f&#233;rentiel de Federated Access Manager
+entra&#238;ne une recherche r&#233;cursive pour les identit&#233;s sp&#233;cifi&#233;es. Par exemple, une recherche
+r&#233;cursive effectu&#233;e sur la structure de donn&#233;es suivante : </p>root realm1     subrealm11         user5     subrealm12         user6 realm2     user1     user2     subrealm21         user3         user4<p>donne les r&#233;sultats suivants :</p>
+<ul><li><p>Si une recherche est effectu&#233;e &#224; partir de la racine et qu'aucun utilisateur n'est d&#233;fini &#224; ce niveau (outre <tt>amadmin</tt> et <tt> anonymous</tt>), la recherche renvoie les utilisateurs 1&#8211;6.</p></li>
+<li><p>Si une recherche est effectu&#233;e &#224; partir de <tt>realm1</tt> et qu'aucun utilisateur n'est d&#233;fini, la recherche renvoie <tt>user5</tt> et <tt> user6</tt>.</p></li>
+<li><p>Si une recherche est effectu&#233;e &#224; partir de <tt>realm2</tt> (deux utilisateurs d&#233;finis), la recherche renvoie les utilisateurs 1&#8211;4.</p></li></ul>
+
+
+<a name="gdoox"></a><h5>Copier la configuration du domaine</h5>
+<p>Lorsque cet attribut est activ&#233; dans une installation en mode domaine, Federated
+Access Manager cr&#233;e une organisation et une sous-organisation &#233;quivalentes pour chaque domaine
+et sous-domaine existants dans le r&#233;f&#233;rentiel. Les services enregistr&#233;s dans le domaine/sous-domaine
+sont &#233;galement enregistr&#233;s dans la nouvelle organisation/sous-organisation. Les DIT de domaine et
+d'organisation sont pr&#233;sents dans le magasin de donn&#233;es.</p>
+<br/>
+
+</body>
+</html>

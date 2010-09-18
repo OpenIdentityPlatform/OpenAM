@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Bedingungen - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>Bedingungen</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>Mithilfe einer Bedingung k&#246;nnen Sie Beschr&#228;nkungen f&#252;r die Richtlinie definieren. Wenn Sie
+beispielsweise eine Richtlinie f&#252;r eine Gehaltsanwendung definieren, k&#246;nnen Sie eine Bedingung f&#252;r
+diese Aktion definieren, durch die der Zugriff auf die Anwendung nur zu
+bestimmten Zeiten gestattet ist. Zudem m&#246;chten Sie m&#246;glicherweise eine Bedingung definieren, die
+eine Aktion nur gew&#228;hrt, falls die Anforderung von einer bestimmten festgelegten IP-Adresse
+oder vom Intranet eines Unternehmens stammt.</p><p>Die Bedingung kann zus&#228;tzlich dazu verwendet werden, verschiedene Richtlinien auf verschiedenen URLs
+derselben Dom&#228;ne zu konfigurieren. Beispiel: Der Zugriff auf <tt>http://org.example.com/hr/&#42;jsp </tt> von <tt>org.example.net</tt> ist
+von 9 bis 17 Uhr m&#246;glich. Dies l&#228;sst sich durch die kombinierte
+Verwendung einer IP-Bedingung und einer Zeitbedingung erreichen. Wenn die Regelressource als <tt>http://org.example.com/hr/&#42;.jsp</tt>
+festgelegt wird, w&#252;rde die Richtlinie auf alle JSPS unter <tt>http://org.example.com/hr</tt> angewendet werden,
+einschlie&#223;lich derer in den Unterverzeichnissen.</p>
+<hr><p><b>Hinweis &#8211; </b>Die Begriffe Bezug, Regel, Ressource, Betreff, Bedingung, Aktion und Wert entsprechen den
+Elementen <b>Referral</b>, <b> Rule</b>, <b>ResourceName</b>, <b>Subject</b>, <b> Condition</b>, <b>Attribute</b> und <b>Value</b> in <tt>policy.dtd</tt>.</p>
+<hr>
+<p>Siehe <a href="policy.selectconditiontype.html">So f&#252;gen Sie einer Richtlinie eine Bedingung hinzu.</a>.</p>
+<br/>
+
+</body>
+</html>

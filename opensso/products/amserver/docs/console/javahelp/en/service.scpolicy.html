@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Policy Configuration - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>Policy Configuration</h4>
+<p><a name="indexterm-191"></a>The Policy Configuration attributes enable the administrator to set configuration global and realm
+properties used by the Policy service.</p>
+<ul><li><p><a href="#fufnk">Global Properties</a></p></li>
+<li><p><a href="#fufmb">Realm Attributes</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>Global Properties</h5>
+<p>The Global Properties are:</p>
+
+<a name="gciwg"></a><h5>Resource Comparator</h5>
+<p>Specifies the resource comparator information used to compare resources specified in a Policy
+rule definition. Resource comparison is used for both policy creation and evaluation.</p><p>Click the Add button and define the following attributes:</p><dl><dt>Service Type</dt>
+<dd><p>Specifies the service to which the comparator should be used.</p></dd>
+<dt>Class </dt>
+<dd><p>Defines the Java class that implements the resource comparison algorithm. </p></dd>
+<dt>Delimiter</dt>
+<dd><p>Specifies the delimiter to be used in the resource name. </p></dd>
+<dt>Wildcard</dt>
+<dd><p>Specifies the wildcard that can be defined in resource names.</p></dd>
+<dt>One Level Wildcard</dt>
+<dd><p>Matches zero or more characters, at the same delimiter boundary.</p></dd>
+<dt>Case Sensitive</dt>
+<dd><p>Specifies if the comparison of the two resources should consider or ignore case. False ignores case, True considers case.</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>Continue Evaluation on Deny Decision</h5>
+<p>Specifies whether or not the policy framework should continue evaluating subsequent policies, even
+if a DENY policy decision exists. If it is not selected (default), policy
+evaluation would skip subsequent policies once the DENY decision is recognized.</p>
+
+<a name="fufng"></a><h5>Advices Handleable by OpenSSO</h5>
+<p>Defines the names of policy advice keys for which the Policy Enforcement Point
+(Policy Agent) would redirect the user agent to OpenSSO. If the agent receives
+a policy decision that does not allow access to a resource, but does
+posses advices, the agent checks to see whether it has a advice key
+listed in this attribute.</p><p>If such an advice is found, the user agent is redirected to OpenSSO,
+potentially allowing  the access to the resource.</p>
+
+<a name="gdpdm"></a><h5>Organization Alias Referrals</h5>
+<p>When set to Yes, this attribute allows you to create policies in sub-realms
+without having to create referral policies from the top-level or parent realm. You
+can only create policies to protect HTTP or HTTPS resources whose fully qualified
+hostname matches the DNSAlias of the realm. By default, this attribute is defined
+as No. </p>
+
+<a name="fufmb"></a><h5>Realm Attributes</h5>
+<p>The LDAP Properties are:</p>
+
+<a name="fufmg"></a><h5>Primary LDAP Server</h5>
+<p>Specifies the host name and port number of the primary LDAP server specified
+during OpenSSO installation that will be used to search for Policy subjects, such
+as LDAP users, LDAP roles, LDAP groups, and so forth.</p><p>The format is <i>hostname:port</i>. For example: <tt>machine1.example.com:389</tt></p><p>For failover configuration to multiple LDAP server hosts, this value can be a
+space-delimited list of hosts. The format is  <i>hostname1:port1 hostname2:port2...</i></p><p>For example: <tt>machine1.example1.com:389 machine2.example1.com:389</tt></p><p>Multiple entries must be prefixed by the local server name. This is to
+allow specific OpenSSOs to be configured to talk to specific Directory Servers.</p><p>The format is <i>servername|hostname:port</i> For example:</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>For failover configuration:</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389</tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389</tt></p>
+
+<a name="fufmc"></a><h5>LDAP Base DN</h5>
+<p>Specifies the base DN in the LDAP server from which to begin the
+search. By default, it is the top-level realm of the OpenSSO installation.</p>
+
+<a name="fufmd"></a><h5>LDAP Users Base DN</h5>
+<p>This attribute specifies the base DN used by the LDAP Users subject in
+the LDAP server from which to begin the search. By default, it is
+the top-level realm of the OpenSSO installation base.</p>
+
+<a name="fufmz"></a><h5>OpenSSO Roles Base DN</h5>
+<p>Defines the DN of the realm or organization which is used as a
+base while searching for the values of OpenSSO Roles. This attribute is used
+by the <i>AccessManagerRoles</i> policy subject.</p>
+
+<a name="fufme"></a><h5>LDAP Bind DN</h5>
+<p>Specifies the bind DN in the LDAP server.</p>
+
+<a name="fufmf"></a><h5>LDAP Bind Password</h5>
+<p>Defines the password to be used for binding to the LDAP server. By
+default, the <tt>amldapuser</tt> password that was entered during installation is used as the
+bind user.</p>
+
+<a name="fufmn"></a><h5>LDAP Organization Search Filter</h5>
+<p>Specifies the search filter to be used to find organization entries. The default
+is <tt>(objectclass=sunMangagedOrganization)</tt>.</p>
+
+<a name="fufmm"></a><h5>LDAP Organizations Search Scope</h5>
+<p>Defines the scope to be used to find organization entries. The scope must
+be one of the following:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (default)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>LDAP Groups Search Scope</h5>
+<p>Defines the scope to be used to find group entries. The scope must
+be one of the following:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (default)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>LDAP Groups Search Filter</h5>
+<p>Specifies the search filter to be used to find group entries. The default
+is <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fufms"></a><h5>LDAP Users Search Filter</h5>
+<p>Specifies the search filter to be used to find user entries. The default
+is <tt>(objectclass=inetorgperson)</tt>.</p>
+
+<a name="fufmt"></a><h5>LDAP Users Search Scope</h5>
+<p>Defines the scope to be used to find user entries. The scope must
+be one of the following:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (default)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>LDAP Roles Search Filter</h5>
+<p>Specifies the search filter to be used to find entries for roles. The
+default is <tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions))</tt> .</p>
+
+<a name="fufmw"></a><h5>LDAP Roles Search Scope</h5>
+<p>This attribute defines the scope to be used to find entries for roles.
+The scope must be one of the following:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (default)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>OpenSSO Roles Search Scope</h5>
+<p>Defines the scope to be used to find entries for OpenSSO Roles subject.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (default)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>LDAP Organization Search Attribute</h5>
+<p>Defines the attribute type for which to conduct a search on an organization.
+The default is o.</p>
+
+<a name="fufmr"></a><h5>LDAP Groups Search Attribute</h5>
+<p>Defines the attribute type for which to conduct a search on a group.
+The default is <tt>cn</tt>.</p>
+
+<a name="fufmu"></a><h5>LDAP Users Search Attribute</h5>
+<p>Defines the attribute type for which to conduct a search on a user.
+The default is <tt>uid.</tt></p>
+
+<a name="fufmx"></a><h5>LDAP Roles Search Attribute</h5>
+<p>This field defines the attribute type for which to conduct a search on
+a role. The default is <tt>cn</tt>.</p>
+
+<a name="fufnj"></a><h5>Maximum Results Returned from Search</h5>
+<p>This field defines the maximum number of results returned from a search. The
+default value is 100. If the search limit exceeds the amount specified, the
+entries that have been found to that point will be returned.</p>
+
+<a name="fufnl"></a><h5>Search Timeout</h5>
+<p>Specifies the amount of time before a timeout on a search occurs. If
+the search exceeds the specified time, the entries that have been found to
+that point will be returned</p>
+
+<a name="fufmi"></a><h5>LDAP SSL</h5>
+<p>Specifies whether or not the LDAP server is running SSL. Selecting enables SSL,
+deselecting (default) disables SSL.</p><p>If the LDAP Server is running with SSL enabled (LDAPS), you must make
+sure that OpenSSO is configured with proper SSL-trusted certificates so that OpenSSO can
+connect to Directory server over LDAPS protocol.</p>
+
+<a name="fufmk"></a><h5>LDAP Connection Pool Minimum Size</h5>
+<p>Specifies the minimal size of connection pools to be used for connecting to
+the Directory Server, as specified in the LDAP server attribute. The default is
+1.</p>
+
+<a name="fufmj"></a><h5>Connection Pool Maximum Size</h5>
+<p>This attribute specifies the maximum size of connection pools to be used for
+connecting to the Directory Server, as specified in the LDAP server attribute. The
+default is 10.</p>
+
+<a name="fufna"></a><h5>Selected Policy Subjects</h5>
+<p>Allows you to select a set of subject types available to be used
+for policy definition in the realm.</p>
+
+<a name="fufnc"></a><h5>Selected Policy Conditions</h5>
+<p>Allows you to select a set of conditions types available to be used
+for policy definition in the realm.</p>
+
+<a name="fufnd"></a><h5>Selected Policy Referrals</h5>
+<p>Allows you to select a set of referral types available to be used
+for policy definition in the realm.</p>
+
+<a name="fufml"></a><h5>Subject Results Time To Live</h5>
+<p>This attribute specifies the amount of time (in minutes) that a cached subject
+result can be used to evaluate the same policy request based on the
+single sign-on token.</p><p>When a policy is initially evaluated for an SSO token, the subject instances
+in the policy are evaluated to determine whether the policy is applicable to
+a given user. The subject result, which is keyed by the SSO token
+ID, is cached in the policy. If another evaluation occurs for the same
+policy for the same SSO token ID within the time specified in the
+Subject Result Time To Live attribute, the policy framework retrieves the cached subjects
+result, instead of evaluating the subject instances. This significantly reduces the time for
+policy evaluation.</p>
+
+<a name="fufnm"></a><h5>User Alias</h5>
+<p>This attribute must be enabled if you create a policy to protect a
+resource whose subject's member in a remote Directory Server aliases a local user.
+This attribute must be enabled, for example, if you create <tt>uid=rmuser</tt> in the
+remote Directory Server and then add <tt>rmuser</tt> as an alias to a local
+user (such as <tt>uid=luser</tt>) in OpenSSO. When you login as <tt>rmuser</tt>, a session is
+created with the local user (<tt>luser</tt>) and policy enforcement is successful.</p>
+
+<a name="fufni"></a><h5>Selected Response Providers</h5>
+<p>Defines the policy response provider plug-ins that are enabled for the realm. Only
+the response provider plug-ins selected in this attribute can be added to policies
+defined in the realm.</p>
+
+<a name="fufnn"></a><h5>Selected Dynamic Response Attributes</h5>
+<p>Defines the dynamic response attributes that are enabled for the realm. Only a
+subset of names selected in this attribute can be defined in the dynamic
+attributes list in <i>IDResponseProvider</i> to be added to policies defined in the realm.</p>
+<br/>
+
+</body>
+</html>

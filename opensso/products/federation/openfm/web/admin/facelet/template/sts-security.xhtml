@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['sts-security.section-title.security']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['sts-security.section-details.security']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGrid columns="2" columnClasses="label-column,input-column">
+                <ice:outputLabel
+                    for="securityMechanisms"
+                    style="float: right;"
+                    value="#{resources['sts-security.securityMechanismsLabel']}" />
+                <ice:panelSeries
+                    styleClass="enhancedCheckboxGrp"
+                    var="securityMechanismPanel"
+                    value="#{wizardBean.stsProfileBean.securityMechanismPanels}">
+
+                    <ice:panelGrid 
+                        columns="2"
+                        columnClasses="checkbox-column, action-column"
+                        styleClass="checkboxPanel#{securityMechanismPanel.styleClass}">
+                        <ice:panelGroup>
+                            <ice:setEventPhase 
+                                events="ValueChangeEvent"
+                                phase="INVOKE_APPLICATION">
+                                <ice:selectBooleanCheckbox
+                                    immediate="true"
+                                    value="#{securityMechanismPanel.checked}" 
+                                    valueChangeListener="#{wizardHandler.securityMechanismPanelChangeListener}">
+                                    <f:attribute 
+                                        name="panelBean" 
+                                        value="#{securityMechanismPanel}" />
+                                </ice:selectBooleanCheckbox>
+                            </ice:setEventPhase>
+                            <ice:outputText 
+                                value="#{securityMechanismPanel.label}" />
+                        </ice:panelGroup>
+                        <ice:panelGroup>
+                            <ice:commandLink
+                                actionListener="#{wizardHandler.securityMechanismPanelActionListener}"
+                                rendered="#{securityMechanismPanel.expandable}">
+                                <f:attribute 
+                                    name="panelBean" 
+                                    value="#{securityMechanismPanel}" />
+                                <ice:outputText 
+                                    value="#{resources['sts-security.showSettings']}" />
+                            </ice:commandLink>
+                            <ice:commandLink
+                                actionListener="#{wizardHandler.securityMechanismPanelActionListener}"
+                                rendered="#{securityMechanismPanel.collapsible}">
+                                <f:attribute 
+                                    name="panelBean" 
+                                    value="#{securityMechanismPanel}" />
+                                <ice:outputText 
+                                    value="#{resources['sts-security.hideSettings']}" />
+                            </ice:commandLink>
+                        </ice:panelGroup>
+                    </ice:panelGrid>
+                    
+                    <ice:panelGroup
+                        rendered="#{securityMechanismPanel.expandable}"
+                        styleClass="spacerPanel"
+                        >
+                    </ice:panelGroup>
+                    
+                    <ice:panelGroup
+                        styleClass="settingsPanel"
+                        visible="#{securityMechanismPanel.collapsible}"
+                        >
+                        
+                        <ice:panelGroup
+                            rendered="#{securityMechanismPanel.settingsTemplate != null}">
+                            <ui:include src="wss-settings-template.xhtml">
+                                <ui:param
+                                    name="wizardBean"
+                                    value="#{wizardBean}"/>
+                                <ui:param
+                                    name="wizardHandler"
+                                    value="#{wizardHandler}"/>
+                                <ui:param
+                                    name="profileBean"
+                                    value="#{wizardBean.stsProfileBean}"/>
+                                <ui:param
+                                    name="settingsRendered"
+                                    value="#{securityMechanismPanel.collapsible}"/>
+                                <ui:param
+                                    name="settingsTemplate"
+                                    value="#{securityMechanismPanel.settingsTemplate}"/>
+                            </ui:include>
+                        </ice:panelGroup>
+
+                    </ice:panelGroup>
+                </ice:panelSeries>
+            </ice:panelGrid>
+
+        </ui:define>
+    </o:section>
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['sts-security.section-title.authChain']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['sts-security.section-details.authChain']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGrid columns="2" columnClasses="label-column,input-column">
+                <ice:outputLabel
+                    for="authenticationChain"
+                    style="float: right;"
+                    value="#{resources['sts-security.authenticationChainLabel']}" />
+                <ice:selectOneMenu
+                    id="authenticationChain"
+                    value="#{wizardBean.stsProfileBean.authenticationChain}">
+                    <f:selectItems
+                        value="#{wizardBean.authenticationChainList}" />
+                </ice:selectOneMenu>
+            </ice:panelGrid>
+
+        </ui:define>
+    </o:section>
+
+</span>

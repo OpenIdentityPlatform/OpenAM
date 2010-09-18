@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Globalisierungseinstellungen - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>Globalisierungseinstellungen</h4>
+<p><a name="indexterm-188"></a>Der Dienst "Globalisierungseinstellungen" enth&#228;lt globale Attribute, mit denen Sie OpenSSO f&#252;r verschiedene
+L&#228;ndereinstellungen und Zeichens&#228;tze konfigurieren k&#246;nnen. Es existieren folgende Attribute:</p>
+<ul><li><p><a href="#fsvdx">Von den einzelnen L&#228;ndereinstellungen unterst&#252;tzte Zeichens&#228;tze</a></p></li>
+<li><p><a href="#fsvec">Zeichensatz-Aliasnamen</a></p></li>
+<li><p><a href="#fsveb">Format f&#252;r allgemeinen Namen automatisch generiert</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>Von den einzelnen L&#228;ndereinstellungen unterst&#252;tzte Zeichens&#228;tze</h5>
+<p>Dieses Attribut listet die f&#252;r die einzelnen L&#228;ndereinstellungen unterst&#252;tzten Zeichens&#228;tze auf und
+gibt so die Zuordnung zwischen L&#228;ndereinstellung und Zeichensatz an. Das Attribut hat
+folgendes Format:</p><p>Um einen neuen unterst&#252;tzten Zeichensatz hinzuzuf&#252;gen, klicken Sie auf ";Hinzuf&#252;gen" und legen
+Sie folgende Parameter fest:</p><dl><dt>L&#228;ndereinstellung</dt>
+<dd><p>Die neue L&#228;ndereinstellung, die hinzugef&#252;gt werden soll. Weitere Informationen finden Sie unter <a href="supportedlang.html">Unterst&#252;tzte Sprach- bzw. L&#228;ndereinstellungen</a>.</p></dd>
+<dt>Unterst&#252;tzte Zeichens&#228;tze</dt>
+<dd><p>Geben Sie den f&#252;r die angegebene L&#228;ndereinstellung unterst&#252;tzten Zeichensatz ein. Zeichens&#228;tze werden durch ein Semikolon voneinander getrennt. Beispiel: <tt>charset=charset1;charset2;charset3;...;charsetn </tt></p></dd>
+</dl>
+<p>Um einen vorhandenen unterst&#252;tzten Zeichensatz zu bearbeiten, klicken Sie in der Tabelle
+mit den unterst&#252;tzten Zeichens&#228;tzen auf den entsprechenden Namen. Klicken Sie auf ";OK",
+wenn Sie fertig sind.</p>
+
+<a name="fsvec"></a><h5>Zeichensatz-Aliasnamen</h5>
+<p>Dieses Attribut listet die Namen der Codes&#228;tze (die IANA-Namen zugeordnet sind) auf,
+die f&#252;r das Senden der Antwort verwendet werden. Diese Codesatz-Namen m&#252;ssen nicht
+mit den Java-Codesatz-Namen &#252;bereinstimmen. Eine Hash-Tabelle f&#252;r das Zuordnen von Java-Zeichens&#228;tzen zu
+IANA-Zeichens&#228;tzen und umgekehrt steht derzeit zur Verf&#252;gung.</p><p>Um einen neuen Zeichensatz-Aliasnamen hinzuzuf&#252;gen, klicken Sie auf die Schaltfl&#228;che ";Hinzuf&#252;gen" und
+legen Sie folgende Parameter fest:</p><dl><dt>MIME-Name</dt>
+<dd><p>Der IANA-Zuordnungsname. Beispiel: <tt>Shift_JIS</tt></p></dd>
+<dt>Java-Name</dt>
+<dd><p>Der Java-Zeichensatz, der dem IANA-Zeichensatz zugeordnet werden soll. </p></dd>
+</dl>
+<p>Um einen vorhandenen unterst&#252;tzten Zeichensatz-Alias zu bearbeiten, klicken Sie in der Tabelle
+mit den unterst&#252;tzten Zeichens&#228;tzen auf den entsprechenden Namen. Klicken Sie auf ";OK",
+wenn Sie fertig sind.</p>
+
+<a name="fsveb"></a><h5>Format f&#252;r allgemeinen Namen automatisch generiert</h5>
+<p>Die Anzeigeoption erm&#246;glicht es Ihnen, festzulegen, auf welche Weise die automatische Namensgenerierung
+entsprechend den Namensformaten f&#252;r verschiedene L&#228;ndereinstellungen und Zeichens&#228;tze erfolgen soll. Die Standardsyntax
+lautet wie folgt (beachten Sie, dass in der Definition angegebene Kommata und/oder
+Leerzeichen im Namensformat angezeigt werden):</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>Wenn Sie beispielsweise ein neues Namesnformat f&#252;r einen Benutzer (Benutzer Eins) mit
+einer UID (1111) f&#252;r den chinesischen Zeichnsatz anzeigen m&#246;chten, legen Sie Folgendes
+fest:</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>Es wird Folgendes angezeigt:</p><p><tt>OneUser 11111</tt></p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新規グループを作成する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggobg"></a><h5>新規グループを作成する</h5>
+<p>必要に応じて、この作業を Federated Access Manager 管理コンソールで実行してください。この作業は、Web エージェントグループと J2EE エージェントグループに適用できます。</p><p>エージェントが特定のプロパティーをグループから継承するようにするには、グループを作成します。J2EE エージェントは J2EE エージェントグループからプロパティーを継承でき、Web エージェントは Web エージェントグループからプロパティーを継承できます。</p><ol>
+<li><b>「設定」タブの「エージェント」をクリックします。</b></li>
+<li><b>必要に応じて、適切なエージェントタイプのタブを選択します。</b><ul>
+<li><b>Web エージェント:</b><p>「Web」タブは Web エージェント用で、デフォルトで選択されています。これ以上の選択は必要ありません。</p></li>
+<li><b>J2EE エージェント:</b><p>「J2EE」タブは J2EE エージェント用です。該当する場合は、このタブをクリックします。</p></li></ul></li>
+<li><b>「グループ」セクションの「新規」をクリックします。</b><p>「名前」フィールドに新しいグループの名前を入力します。</p></li>
+<li><b>「サーバー URL」フィールドに Federated Access Manager サーバーの URL を入力します。</b></li>
+<li><b>「作成」をクリックします。</b><p>コンソールでエージェントグループが作成され、そのグループへのリンクを含んだエージェント (WebAgent または J2EEAgent) ページが再度表示されます。</p><p>グループに対して追加の設定を行うには、このリンクをクリックして「エージェントグループの編集」ページを表示します。</p><p>グループの設定に使用できる属性は個別のエージェントの属性と同じですが、相違点として、グループレベルでは「グループ」、「パスワード」、および「パスワードの確認」属性は使用できません。</p>
+<hr><p><b>注 &#8211; </b>また、一部のグループ属性にはすでに変数値が割り当てられており、多くの場合これらは変更すべきではありません。そのような値の一例を次に示します。</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Create a New Server Instance - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serveradd"></a><h4>To Create a New Server Instance</h4><p>An entry for each server is automatically created in the server list when
+the OpenSSO Configurator is run for server configuration. Under normal circumstances, these steps
+should not be required.</p><ol>
+<li><b>Log into the OpenSSO console as the top-level administrator.</b></li>
+<li><b>Click the Configuration tab and then click Sites and Servers.</b></li>
+<li><b>Click New in the Servers list.</b></li>
+<li><b>Enter the FQDN of the server that you wish to add and click
+OK.</b><p>The FQDN should be in the format of <tt>http</tt><i>(s)</i><tt>://</tt><i>host.domain</i><tt>:</tt><i>port</i><tt>/</tt><i>uri</i><tt></tt>.</p></li>
+<li><b>The newly created server instance appears in the list.</b></li>
+<li><b>To edit the server, click on the name of the server. The configuration
+attributes for the server are available for you to customize.</b><p>The Default Server Settings are the set of default values for server instances.
+Each server instance needs to have a minimum set of properties values and
+most of the properties values, depending on your deployment, can be the same
+for all server instance.  This setting allows you to enter the basic
+properties in one place, without having to change hem for each additional server
+instance. </p><p>These default values can be overwritten. This done by clicking on the Inheritance Settings
+button, located at the top of the server instance profile page. After this
+button is clicked, the console displays a page where you can select and
+deselect which values to inherit or overwrite. </p></li></ol>
+<br/>
+
+</body>
+</html>

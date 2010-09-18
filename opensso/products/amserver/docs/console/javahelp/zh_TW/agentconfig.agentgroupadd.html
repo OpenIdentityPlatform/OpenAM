@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立新群組 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentgroupadd"></a><h5>建立新群組</h5>
+<p>如果您要讓代理程式繼承群組的特定特性，則請建立群組。代理程式只能從其群組類型繼承特性。例如，Web 代理程式可以從 Web 代理程式群組繼承特性。</p><ol>
+<li><b>按一下 [存取控制] 標籤。</b></li>
+<li><b>按一下群組所屬的範圍的名稱。</b></li>
+<li><b>按一下 [代理程式] 標籤。</b></li>
+<li><b>如有必要，請選取適當代理程式類型的標籤。</b></li>
+<li><b>在 [群組] 區段中，按一下 [新建]。</b><p>在 [名稱] 欄位中，輸入新群組的名稱。</p></li>
+<li><b>只為 Web 代理程式和 J2EE 代理程式輸入 OpenSSO 伺服器 URL。</b><p>例如，<tt>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO </tt>。</p></li>
+<li><b>按一下 [建立]。</b><p>主控台會建立代理程式群組，並且再次顯示包含至群組的連結的代理程式頁面。</p><p>若要進行額外的群組配置，請按一下此連結，以顯示 [編輯] 代理程式群組頁面。</p><p>您可設定用來配置群組的特性與用於個別代理程式的特性相同，僅有的不同之處是 [群組]、[密碼] 和 [密碼確認] 特性無法在群組層級使用。</p>
+<hr><p><b>備註 &#8211; </b>同時，務必注意部份群組特性已指定了變數值，而且在大部分情況下不應該變更。以下為這類值的範例：</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

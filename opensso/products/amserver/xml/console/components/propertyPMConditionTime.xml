@@ -1,0 +1,164 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyPMConditionTime.xml,v 1.2 2008/06/25 05:45:12 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header" >
+    <property required="true">
+	<label name="lblName" defaultValue="policy.condition.attribute.label.name" labelFor="tfConditionName" />
+	<cc name="tfConditionName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="50" />
+	</cc>
+	<cc name="conditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+	<cc name="tfConditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+	<cc name="tfRealmName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+    <property span="true">
+        <cc name="lblHelp" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" >
+	    <attribute name="defaultValue" value="policy.condition.help" />
+        </cc>
+    </property>
+    </section>
+
+    <section name="sectionDate" defaultValue="policy.condition.section.date">
+    <property required="false">
+	 <label name="lblName" defaultValue="policy.condition.attribute.label.startdate" />
+	<cc name="StartDate" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+	<fieldhelp name="lblStartHelp"  defaultValue="policy.condition.startdate.help" />
+    </property>
+    <property required="false">
+	<label name="lblName" defaultValue="policy.condition.attribute.label.enddate" />
+	<cc name="EndDate" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+	<fieldhelp name="lblEndHelp"  defaultValue="policy.condition.enddate.help" />
+    </property>
+    </section>
+
+    <section name="sectionTime" defaultValue="policy.condition.section.time">
+    <property>
+	<label name="lblStartTime" defaultValue="policy.condition.attribute.label.starttime" labelFor="StartHour" />
+	<cc name="StartHour" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="2" />
+            <attribute name="maxLength" value="2" />
+	</cc>
+	<cc name="colon" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+	    <attribute name="defaultValue" value=":" />
+	</cc>
+	<cc name="StartMinute" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="2" />
+            <attribute name="maxLength" value="2" />
+	</cc>
+	<cc name="StartSession" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+	    <option value="am" label="policy.condition.attribute.time.option.am" />
+	    <option value="pm" label="policy.condition.attribute.time.option.pm" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblEndTime" defaultValue="policy.condition.attribute.label.endtime" labelFor="EndHour" />
+	<cc name="EndHour" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="2" />
+            <attribute name="maxLength" value="2" />
+	</cc>
+	<cc name="colon" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+	    <attribute name="defaultValue" value=":" />
+	</cc>
+	<cc name="EndMinute" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="2" />
+            <attribute name="maxLength" value="2" />
+	</cc>
+	<cc name="EndSession" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+	    <option value="am" label="policy.condition.attribute.time.option.am" />
+	    <option value="pm" label="policy.condition.attribute.time.option.pm" />
+	</cc>
+    </property>
+    </section>
+
+    <section name="sectionTime" defaultValue="policy.condition.section.day">
+    <property>
+	<label name="lblStartDay" defaultValue="policy.condition.attribute.label.startday" labelFor="StartDay" />
+	<cc name="StartDay" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+	    <option value="" label="" />
+	    <option value="sun" label="policy.condition.attribute.time.option.sunday" />
+	    <option value="mon" label="policy.condition.attribute.time.option.monday" />
+	    <option value="tue" label="policy.condition.attribute.time.option.tuesday" />
+	    <option value="wed" label="policy.condition.attribute.time.option.wednesday" />
+	    <option value="thu" label="policy.condition.attribute.time.option.thursday" />
+	    <option value="fri" label="policy.condition.attribute.time.option.friday" />
+	    <option value="sat" label="policy.condition.attribute.time.option.saturday" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblEndDay" defaultValue="policy.condition.attribute.label.endday" labelFor="EndDay" />
+	<cc name="EndDay" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+	    <option value="" label="" />
+	    <option value="sun" label="policy.condition.attribute.time.option.sunday" />
+	    <option value="mon" label="policy.condition.attribute.time.option.monday" />
+	    <option value="tue" label="policy.condition.attribute.time.option.tuesday" />
+	    <option value="wed" label="policy.condition.attribute.time.option.wednesday" />
+	    <option value="thu" label="policy.condition.attribute.time.option.thursday" />
+	    <option value="fri" label="policy.condition.attribute.time.option.friday" />
+	    <option value="sat" label="policy.condition.attribute.time.option.saturday" />
+	</cc>
+    </property>
+    </section>
+
+    <section name="sectionTime" defaultValue="policy.condition.section.timezone">
+    <property span="true">
+	<cc name="radioTimeZone" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option value="standard" label="policy.condition.attribute.label.standardtimezone" />
+	</cc>
+	<cc name="StandardTimeZone" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+    </property>
+    <property span="true">
+	<cc name="radioTimeZone" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option value="custom" label="policy.condition.attribute.label.customtimezone" />
+	</cc>
+	<cc name="CustomTimeZone" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+    </property>
+
+    </section>
+</propertysheet>

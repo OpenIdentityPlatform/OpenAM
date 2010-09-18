@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>搜索代理属性 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.discoveryagentprofile"></a><h4>搜索代理属性</h4>
+<p>“搜索代理”配置文件保留信任授权机构配置，Web 服务客户机/配置文件使用该配置与 Liberty 搜索服务进行通信，以进行 Web 服务查找、注册和获取安全凭证。</p>
+
+<a name="gglro"></a><h5>组</h5>
+<p>可通过“组”机制来定义相似代理类型的集合。组必须在将特定代理纳入集合之前进行定义。</p>
+
+<a name="gglpn"></a><h5>密码</h5>
+<p>定义“搜索代理”的密码。</p>
+
+<a name="ggloy"></a><h5>密码确认</h5>
+<p>确认密码。</p>
+
+<a name="ggtwd"></a><h5>状态</h5>
+<p>定义代理将在系统中处于“活动”状态还是“非活动”状态。默认情况下，该属性会设置为“活动”，即代理会参与保护 Web 服务客户机的出站 Web 服务请求，并验证 Web 服务提供者的 Web 服务响应。</p>
+
+<a name="ggloo"></a><h5>代理配置系统信息库的位置</h5>
+<p>此属性定义搜索代理配置系统信息库的代理位置。</p>
+
+<a name="gglqv"></a><h5>私钥别名</h5>
+<p>该属性定义用于签署 Web 服务请求（或者解密 Web 服务响应）的私有证书密钥别名。</p>
+
+<a name="gglny"></a><h5>搜索服务端点</h5>
+<p>此属性定义信任授权机构客户机为注册和查找服务而在其中建立通信的搜索服务端点。</p>
+
+<a name="gglra"></a><h5>验证 Web 服务端点</h5>
+<p>此属性定义验证服务端点， Web 服务客户机使用该端点进行验证，方法是使用最终用户的 SSOToken 来接收搜索服务资源提供（也称为引导资源提供）。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+ Use is subject to license terms.
+-->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name> OpenSSO J2EE Policy Agent Sample Application</display-name>
+    <description> An application to demonstrate the features of J2EE Policy Agents </description>
+    <filter>
+        <filter-name>Agent</filter-name>
+        <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Agent</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+    <context-param>
+        <param-name>org.mortbay.jetty.servlet.SessionURL</param-name>
+        <param-value>none</param-value>
+    </context-param>
+    <servlet>
+        <display-name>ProtectedServlet</display-name>
+        <servlet-name>ProtectedServlet</servlet-name>
+        <servlet-class>com.sun.identity.agents.sample.ProtectedServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <display-name>SecurityAwareServlet</display-name>
+        <servlet-name>SecurityAwareServlet</servlet-name>
+        <servlet-class>com.sun.identity.agents.sample.SecurityAwareServlet</servlet-class>
+        <security-role-ref>
+            <role-name>MANAGER_ROLE</role-name>
+            <role-link>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-link>
+        </security-role-ref>
+        <security-role-ref>
+            <role-name>EMPLOYEE_ROLE</role-name>
+            <role-link>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-link>
+        </security-role-ref>
+    </servlet>
+    <servlet>
+        <display-name>URLPolicyServlet</display-name>
+        <servlet-name>URLPolicyServlet</servlet-name>
+        <servlet-class>com.sun.identity.agents.sample.URLPolicyServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProtectedServlet</servlet-name>
+        <url-pattern>/protectedservlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SecurityAwareServlet</servlet-name>
+        <url-pattern>/securityawareservlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>URLPolicyServlet</servlet-name>
+        <url-pattern>/urlpolicyservlet</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>54</session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>/public/welcome.html</welcome-file>
+    </welcome-file-list>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/authentication/accessdenied.html</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/public/notfound.html</location>
+    </error-page>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Security Aware Servlet</web-resource-name>
+            <url-pattern>/SecurityAwareServlet</url-pattern>
+            <url-pattern>/securityawareservlet</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Protected Servlet</web-resource-name>
+            <url-pattern>/protectedservlet</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>Policy Agent Realm</realm-name>
+        <form-login-config>
+            <form-login-page>/authentication/login.html</form-login-page>
+            <form-error-page>/authentication/accessdenied.html</form-error-page>
+        </form-login-config>
+    </login-config>
+    <security-role id="SR_MANAGER_ROLE">
+        <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+    </security-role>
+    <security-role id="SR_EMPLOYEE_ROLE">
+        <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+    </security-role>
+</web-app>

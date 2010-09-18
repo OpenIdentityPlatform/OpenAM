@@ -1,0 +1,39 @@
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.7 2009/06/12 00:20:41 veiming Exp $
+
+--------------------------------------------------------------------------------
+Ant 1.7.0+ is required.
+
+Need these binaries in extlib directory
+
+1. opensso.war - for unwar to include entitlements.jar and resources
+2. ssoAdminTools.zip - for unzip to include entitlements related CLI
+3. testng-5.9-jdk15.jar - for unittest
+
+The first time the workspace is built, you must be on SWAN and have access to
+/net/policy. The directories .../war-lib and .../build-lib will be populated.
+After this, /net/policy connectivity is not required.
+
+Test on Glassfish v2, Tomcat 6. Does not work on Tomcat 5.5.

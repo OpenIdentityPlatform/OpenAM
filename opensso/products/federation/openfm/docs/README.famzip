@@ -1,0 +1,37 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.famzip,v 1.5 2008/08/29 20:51:19 kevinserwin Exp $
+
+-->
+
+Before installation or configuration of OpenSSO, please refer to the Release 
+Notes for Sun OpenSSO Enterprise 8.0 which can be downloaded from
+http://opensso.dev.java.net/public/use/docs/index.html
+
+Although written for the productized version of OpenSSO, the Release Notes
+contain information applicable to other versions of the open-source software.
+
+
+

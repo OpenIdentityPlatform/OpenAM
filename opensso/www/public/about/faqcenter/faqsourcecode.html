@@ -1,0 +1,154 @@
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="Open Federation"></td></tr>
+	<tr><td><h2>Source Code FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#related">How are the OpenSSO source code, Sun Java System Access Manager and Sun Java System Federation Manager related?</a></li>
+<li><a href="#comprises">What comprises the OpenSSO code base?</a></li>
+<li><a href="#amserver">What comprises the <code>amserver</code> source code?</a></li>
+<li><a href="#federation">What comprises the <code>federation</code> source code?</a></li>
+<li><a href="#standards">On what industry standards is the <code>federation</code> source code based?</a></li>
+<li><a href="#zip">What is <code>opensso.zip</code>?</a></li>
+<li><a href="#ossosamples">What samples are available for the <code>amserver</code> code?</a></li>
+<li><a href="#fedsamples">What samples are available for the <code>federation</code> code?</a></li>
+</ol>
+</font></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="related"></a> How are the OpenSSO source code, Sun Java System Access Manager and Sun Java System Federation Manager related?</b></b></p>
+
+<p>The OpenSSO source code is based on the code released as Sun Java<sup>TM</sup> System Access Manager 7.0 (including components under development for 7.1) and Sun Java System Federation Manager. Sun Microsystems, Inc. has provided the source code of these products to the Java developer community on a free right-to-use basis. (Prior to release, there were changes made because of third-party source code that cannot be redistributed but these changes were minimal.) The forthcoming Federated Access Manager 8.0 (the combined Access Manager and Federation Manager) will be built from the OpenSSO source - just as Sun Java System Application Server is built from <a href="https://glassfish.dev.java.net">Glassfish</a>). When Sun decides that OpenSSO contains the features we want to use in the next release, we will branch the code and stabilize the release branch, all in public. New feature development can and will continue on the trunk and fixes in the Sun release branch will be copied back to the OpenSSO trunk.</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="comprises"></a> What comprises the OpenSSO code base?</b></b></p>
+
+<p>When you browse the <a href="https://opensso.dev.java.net/source/browse/opensso/products/">products</a> branch of the source code, you see the following directories pertaining to the OpenSSO product code itself:
+
+<UL>
+<LI><code>amserver</code> contains the code for session management, policy, authentication, console, administration tools, auditing and other non-federation related features.</LI>
+<P></P>
+<LI><code>federation</code> contains the code for federation related features. This includes those based on the Liberty Alliance project protocols and SAML. There are two branches under <code>federation</code> that are used:
+<P></P>
+<ol>
+<li>The <code>library</code> branch contains the basic framework for identity federation and its associated web services. The code provides an extensible and pluggable infrastructure for integrating the functionality with existing systems. The <code>library</code> code is dependent on the <code>shared</code> branch for building.</li>
+<p></p>
+<li>The <code>openfm</code> branch provides an implementation of the framework in the <code>library</code> branch. It delivers a single WAR deployable on any J2EE web container as well as easy to setup samples for getting the system up and running.</li>
+</ol>
+</LI>
+<P></P>
+<LI><code>installtools</code> contains code for installation and configuration functions necessary for deployment of the web archive (WAR).</LI>
+<P></P>
+<LI><code>j2eeagents</code> contains code for the policy agents developed for J2EE containers.</LI>
+<P></P>
+<LI><code>legacy</code> contains code for the legacy command line interface. This code will be phased out over time.</LI>
+<P></P>
+<LI><code>shared</code> contains Java archive (JAR) files of third-party libraries. Any JAR placed in this directory is automatically included in the workspace compilation classpath.</LI>
+<P></P>
+<LI><code>webagents</code> contains code for the policy agents developed for web containers.</LI>
+<P></P>
+<LI><code>wssagents</code> contains code for the web services security agents.</LI>
+<P></P>
+</UL>
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="amserver"></a> What comprises the <code>amserver</code> source code?</b></b></p>
+
+<p>When you browse the <a href="https://opensso.dev.java.net/source/browse/opensso/products/amserver/">amserver</a> branch of the source code, you will see code for session management, policy, authentication, console, administration tools, auditing, the Client SDK, and the remote Distributed Authentication User Interface.
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="federation"></a> What comprises the <code>federation</code> source code?</b></b></p>
+
+<p>When you browse the <a href="https://opensso.dev.java.net/source/browse/opensso/products/federation/">federation</a> branch of the source code, you see the following directories:
+
+<UL>
+<li>The <code>library</code> branch contains the basic framework for identity federation and its associated web services. The code provides an extensible and pluggable infrastructure for integrating the functionality with existing systems. The <code>library</code> code is dependent on the <a href="#comprises"><code>shared</code></a> branch for building.</li>
+<p></p>
+<li>The <code>openfm</code> branch provides an implementation of the framework in the <code>library</code> branch. It delivers a single WAR deployable on any J2EE web container as well as easy to setup samples for getting the system up and running.</li>
+</UL>
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="standards"></a> On what industry standards is the <code>federation</code> source code based?</b></b></p>
+
+<ul>
+<li>Liberty Alliance Project Identity Federation Framework (Liberty ID-FF) v.1.1 and v.1.2 (including identity provider and service provider extended profiles)</li>
+<P></P>
+<li>Liberty Alliance Project Identity Web Services Framework (Liberty ID-WSF) v.1.0 and v.1.1</li>
+<P></P>
+<li>Organization for the Advancement of Structured Information Standards (OASIS) Security Assertion Markup Language (SAML) v.1.0 and v.1.1</li>
+<P></P>
+<li>OASIS SAML v.2.0 (Operational modes: <code>IdP</code> and <code>SP Complete</code>)</li>
+<P></P>
+<li>WS-Federation Passive Requestor Profile v1.1</li>
+</ul>
+
+<p>The following will be supported in future releases:</p>
+
+<ul>
+<li>Liberty ID-WSF v.2.0</li>
+<P></P>
+<li>Web Services Interoperability (WS-I) Basic Security Profile (BSP)</li>
+</ul></td></tr>
+
+<tr><td><p><b>Q:<b><a name="zip"></a> What is <code>opensso.zip</code>?</b></b></p>
+
+<P><code>opensso.zip</code> is the built download of the OpenSSO deliverable. After it is decompressed, you will find:
+
+<UL>
+<LI><code>opensso.war</code> - the deployable OpenSSO WAR including the applicable source code, images, localized files and the <code>federation</code> samples.</LI>
+<P></P>
+<LI>Instructions to create other deployable WARs including the Distributed Authentication WAR and the console WAR</LI>
+<P></P>
+<LI><code>famclientsdk.jar</code> - the Client SDK JAR including the <code>federation</code> library code which can be used to build a remote federation-based service provider</LI>
+<P></P>
+<LI><code>fam-client.zip</code> - Client SDK samples</LI>
+<P></P>
+<LI><code>fam-public-javadocs.jar</code> - public Java API reference comments</LI>
+<P></P>
+<LI><code>famSessionTools.zip</code> - session failover tools</LI>
+<P></P>
+<LI><code>famAdminTools.zip</code> - command line interface</LI>
+</ul></p></td></tr>
+
+							
+<tr><td><p><b>Q:<b><a name="ossosamples"></a> What samples are available for the <code>amserver</code> code?</b></b></p>
+
+<p>The following <code>amserver</code> samples are available:</p>
+<ol>
+<li>An authentication sample demonstrates logging in and out of the OpenSSO console.</li>
+<p></p>
+<li>The SSO command line sample creates a new SSO token and displays user attributes.</li>
+<p></p>
+<li>The SSOToken sample displays the attributes associated with a token ID. It also demonstrates how to set and get token properties.</li>
+<p></p>
+<li>The identity repository sample demonstrates the use of the <code>AMIdentityRepository</code> class.</li>
+<p></p>
+<li>The logging sample demonstrates logging to the OpenSSO server.</li>
+</ol>
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="fedsamples"></a> What samples are available for the <code>federation</code> code?</b></b></p>
+
+<p>The following <code>federation</code> samples are available:</p>
+<ol>
+<li>The Liberty ID-FF sample demonstrates the interactions involved when federating one user between two instances of Open Federation.</li>
+<p></p>
+<li>The SAMLv2 sample demonstrates the interactions involved when federating one user between two instances of Open Federation using SAMLv2 protocol.</li>
+<p></p>
+<li>The Multiple-Federation Protocols sample demonstrates the Single Sign-on and Single Logout use cases where there are multiple federation protocols (e.g. ID-FF, SAMLv2 and WS-Federation) in one circle of trust.</li>
+<p></p>
+<li>The Liberty ID-WSF sample demonstrates the interactions between a web service client (WSC) and a web service provider (WSP). Specifically, it demonstrates how to query and modify the discovery service, and how to query and modify the Personal Profile service. Additionally, policy driven interactions can be configured to access Personal Profile service attributes using this sample.</li>
+</ol>
+</p></td></tr>
+
+		   									      
+</table>
+
+
+</p>
+
+<!-- content boundary -->
+</div>
