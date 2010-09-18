@@ -1,0 +1,11 @@
+{
+    "totalRecords":$totalUsers,
+    "records":[
+            #foreach( $user in $users )
+            {
+                "firstName":"$user.firstName",
+                "lastName":"$user.lastName"
+            },
+            #end
+    ]
+}

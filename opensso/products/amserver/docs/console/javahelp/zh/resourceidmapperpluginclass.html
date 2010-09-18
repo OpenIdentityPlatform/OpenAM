@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>用于资源 ID 映射程序插件的类 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="resourceidmapperpluginclass"></a><h4>用于资源 ID 映射程序插件的类</h4>
+<a name="indexterm-134"></a><a name="indexterm-135"></a><p>此属性的值是类的列表，这些类用于为针对组织或角色配置的资源提供生成标识符。<tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>ResourceIDMapper</tt> 是用于将用户标识符映射到与其相关联的资源标识符的接口。搜索服务为此接口提供了两种实现：</p>
+<ul><li><p><tt>com.sun.identity.liberty.ws.</tt><tt>disco.plugins.</tt><tt>Default64ResourceIDMapper</tt>（格式：<i>提供者 ID</i> + "/" + <i>Base64 编码的用户 ID</i>）</p></li>
+<li><p><tt>com.sun.identity.liberty.ws.</tt><tt>disco.plugins.</tt><tt>DefaultHexResourceIDMapper</tt>（格式：<i>提供者 ID</i> + "/" + <i>用户 ID 的十六进制字符串</i>）</p></li></ul>
+<p>可以用实现类开发不同的实现方法，通过单击“新建”可以将其添加为该属性的值，使用的格式如下：</p><p><tt><b>providerid=</tt><i>providerID</i><tt>|</tt><i> class_name_and_path</i><tt></b></tt></p>
+<br/>
+
+</body>
+</html>

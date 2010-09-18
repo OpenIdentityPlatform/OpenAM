@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SecurID - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsecuridservice"></a><h4>SecurID</h4>
+<p><a name="indexterm-181"></a>This module allows for authentication using RSA ACE/Server software and RSA SecurID authenticators.
+the SecurID authentication module is not available for the Linux or Solaris x86 platforms
+and this should not be registered, configured, or enabled on these two platforms.
+It is only available for Solaris. The SecurID authentication attributes are realm attributes.
+The attributes are:</p>
+<ul><li><p><a href="#fwbpt">ACE/Server Configuration Path</a></p></li>
+<li><p><a href="#fwbma">Authentication Level</a></p></li></ul>
+
+
+<a name="fwbpt"></a><h5>ACE/Server Configuration Path</h5>
+<p>Specifies the directory in which the SecurID ACE/Server <tt>sdconf.rec</tt>  file is
+located, by default in <tt>/opt/ace/data</tt> If you specify a different directory in this
+field, the directory must exist before attempting SecurID authentication.</p>
+
+<a name="fwbma"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

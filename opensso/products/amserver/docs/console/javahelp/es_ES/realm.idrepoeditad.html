@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Atributos de Active Directory - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepoeditad"></a><h4>Atributos de Active Directory</h4>
+<p><a name="indexterm-13"></a>Durante la configuraci&#243;n de Microsoft Active Directory para que funcione con OpenSSO,
+tendr&#225; que asignar las propiedades predefinidas a las propiedades definidas en su
+instancia de Active Directory. A este proceso se le denomina asignaci&#243;n de
+atributos. A continuaci&#243;n se incluyen los atributos que deben definirse al agregar
+Active Directory a un dominio como almac&#233;n de datos.</p>
+
+<a name="fyfdo"></a><h5>Servidor LDAP</h5>
+<p>Introduzca el nombre del servidor LDAP con el que establecer&#225; conexi&#243;n. 
+Deber&#237;a tener el siguiente formato, <tt>hostname.domainname:portnumber</tt>.</p><p>Si se introducen varias entradas de <tt>host:portnumber</tt>, se intentar&#225; conectar con el
+primer host de la lista. Si este primer intento falla, se utilizar&#225;
+la siguiente entrada de la lista.</p>
+
+<a name="fyfdt"></a><h5>DN de conexi&#243;n de LDAP</h5>
+<p>Especifica el nombre DN que utilizar&#225; OpenSSO para autenticarse en el servidor
+LDAP al que est&#225; conectado actualmente. El usuario con el nombre DN
+utilizado para la conexi&#243;n debe disponer de los privilegios de adici&#243;n, modificaci&#243;n
+y eliminaci&#243;n correctos, configurados en el atributo <a href="#fyffb">Operaciones y tipos de complementos compatibles de LDAPv3</a>.</p>
+
+<a name="fyfds"></a><h5>Contrase&#241;a de conexi&#243;n de LDAP</h5>
+<p>Especifica la contrase&#241;a de DN que utilizar&#225; OpenSSO para autenticarse en el
+servidor LDAP al que est&#225; conectado actualmente.</p>
+
+<a name="fyfdu"></a><h5>Contrase&#241;a de conexi&#243;n de LDAP (confirmar)</h5>
+<p> Confirme la contrase&#241;a.</p>
+
+<a name="fyfdv"></a><h5>DN de organizaci&#243;n de LDAP</h5>
+<p>El DN al que se asignar&#225; este repositorio de almac&#233;n de datos.
+Se trata del DN base de todas las operaciones realizadas en este
+almac&#233;n de datos. </p>
+
+<a name="fyfdw"></a><h5>SSL de LDAP</h5>
+<p>Si se habilita esta opci&#243;n, OpenSSO se conectar&#225; al servidor principal con
+el protocolo HTTPS.</p>
+
+<a name="fyfej"></a><h5>Tama&#241;o m&#237;nimo de grupo de conexi&#243;n LDAP</h5>
+<p>Especifica el n&#250;mero inicial de conexiones del grupo de conexi&#243;n. Si se
+utiliza el grupo de conexi&#243;n, no es necesario crear una conexi&#243;n de
+forma individual.</p>
+
+<a name="fyfee"></a><h5>Tama&#241;o m&#225;ximo de grupo de conexi&#243;n LDAP</h5>
+<p>Especifica el n&#250;mero m&#225;ximo de conexiones que se permitir&#225;.</p>
+
+<a name="fyfdx"></a><h5>N&#250;mero m&#225;ximo de resultados de b&#250;squeda</h5>
+<p>Especifica el n&#250;mero m&#225;ximo de entradas devueltas por una operaci&#243;n de b&#250;squeda.
+Si se alcanza este l&#237;mite, Directory Server devuelve las entradas que coincidan
+con la solicitud de b&#250;squeda.</p>
+
+<a name="fyfen"></a><h5>Tiempo de espera de b&#250;squeda</h5>
+<p>Especifica el n&#250;mero m&#225;ximo de segundos asignado a la solicitud de b&#250;squeda.
+Si se alcanza este l&#237;mite, Directory Server devuelve las entradas de b&#250;squeda
+que coincidan con la solicitud de b&#250;squeda.</p>
+
+<a name="fyfdz"></a><h5>LDAP sigue la referencia</h5>
+<p>Si se habilita, esta opci&#243;n indica que se seguir&#225;n autom&#225;ticamente las referencias
+a otros servidores LDAP.</p>
+
+<a name="fyffh"></a><h5>Nombre de clase de complemento de repositorio LDAPv3</h5>
+<p>Especifica la ubicaci&#243;n del archivo de clase que implementa el repositorio LDAPv3.</p>
+
+<a name="fyfeu"></a><h5>Asignaci&#243;n de nombres de atributos</h5>
+<p>Permite asignar los atributos comunes reconocidos por la estructura al almac&#233;n de
+datos nativo. Por ejemplo, si la estructura utiliza <tt>inetUserStatus </tt> para determinar el
+estado del usuario, es posible que el almac&#233;n de datos nativo use
+realmente <tt>userStatus</tt>. Las definiciones de atributos distinguen entre may&#250;sculas y min&#250;sculas. Los
+valores predeterminados son:</p>
+<ul><li><p><tt>employeeNumber=distinguisheNDame</tt></p></li>
+<li><p><tt>iplanet-am-user-alias-list=objectGUID</tt></p></li>
+<li><p><tt>mail=userPrincipalName</tt></p></li>
+<li><p><tt>portalAddress=sAMAccountName</tt></p></li>
+<li><p><tt>telephonenumber=displayName</tt></p></li>
+<li><p><tt>uid=sAMAccountName</tt> </p></li></ul>
+
+
+<a name="fyffb"></a><h5>Operaciones y tipos de complementos compatibles de LDAPv3</h5>
+<p>Especifica las operaciones permitidas o que pueden realizadas en este servidor LDAP.
+Este complemento de repositorio LDAPv3 s&#243;lo admite las operaciones predeterminadas. A continuaci&#243;n,
+se muestran las operaciones admitidas por el complemento de repositorio LDAPv3:</p>
+<ul><li><p>agente: lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n.</p></li>
+<li><p>grupo: lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n.</p></li>
+<li><p>dominio: lectura, creaci&#243;n, edici&#243;n, eliminaci&#243;n y servicio.</p></li>
+<li><p>usuario: lectura, creaci&#243;n, edici&#243;n, eliminaci&#243;n y servicio.</p></li></ul>
+<p>Puede eliminar los permisos de la lista anterior en funci&#243;n de la
+configuraci&#243;n del servidor LDAP y las tareas, pero no puede agregar m&#225;s
+permisos.</p><p>Si el complemento de repositorio LDAPv3 configurado se&#241;ala a una instancia de
+Sun Directory Server, se pueden agregar permisos del tipo <tt> funci&#243;n</tt>. De lo
+contrario, este permiso no se puede agregar, ya que es posible que
+el resto de almacenes de datos no admitan roles. El permiso del
+tipo "rol" es:</p>
+<ul><li><p>rol: lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n. </p></li></ul>
+<p>Si tiene el tipo <tt>user</tt> admitido para el repositorio LDAPv3, las operaciones
+de lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n de servicios se pueden realizar para
+ese usuario. En otras palabras, si <tt>user</tt> es un tipo admitido, las
+operaciones de lectura, edici&#243;n, creaci&#243;n y eliminaci&#243;n le permiten leer, editar, crear
+y eliminar las entradas de usuario del repositorio de identidades. La operaci&#243;n
+<tt>user=service</tt> permite a los servicios de OpenSSO acceder a los atributos de
+las entradas de usuario. Adem&#225;s, el usuario puede acceder a los atributos
+de servicios din&#225;micos si se ha asignado el servicio al dominio o
+rol al que pertenece el usuario. </p><p>Tambi&#233;n se permite al usuario administrar los atributos de usuario de cualquier
+servicio asignado. Si el usuario tiene <tt>service</tt> como operaci&#243;n (<tt>user=service</tt>), &#233;ste especifica
+que se permiten todas las operaciones relacionadas con los servicios. Entre estas
+operaciones, se incluyen <tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes </tt> y <tt>modifyService.</tt></p>
+
+<a name="gdlmc"></a><h5>&#193;mbito de b&#250;squeda del complemento LDAPv3</h5>
+<p>Define el &#225;mbito que se va a utilizar para encontrar las entradas
+del complemento LDAPv3. El &#225;mbito debe ser uno de los siguientes:</p>
+<ul><li><p>SCOPE_BASE: busca s&#243;lo el ND de base.</p></li>
+<li><p>SCOPE_ONE: busca s&#243;lo las entradas que se encuentran bajo el ND de base.</p></li>
+<li><p>SCOPE_SUB (predeterminado): busca el ND de base y todas las entradas debajo de su sub&#225;rbol.</p></li></ul>
+
+
+<a name="fyffj"></a><h5>Atributo de b&#250;squeda de usuarios de LDAP</h5>
+<p>Este campo define el tipo de atributo para realizar la b&#250;squeda para
+un usuario.  Por ejemplo, si el ND de usuario es <tt>uid=user1, ou=people, dc=example, dc=com</tt>,
+en este campo tendr&#237;a que especificar <tt>uid</tt>.  </p>
+
+<a name="fyfeo"></a><h5>Filtro de b&#250;squeda de usuarios de LDAP</h5>
+<p>Especifica el filtro de b&#250;squeda que se va a utilizar para encontrar
+las entradas de usuario.</p>
+
+<a name="fyffi"></a><h5>Clase de objeto de usuario LDAP</h5>
+<p>Especifica las clases de objeto de un usuario. Al crear un usuario,
+la lista de clases de objeto se agregar&#225; a la lista de
+atributos del usuario.</p>
+
+<a name="fyfez"></a><h5>Atributos de usuarios de LDAP</h5>
+<p>Define la lista de atributos asociados al usuario. No se permite leer
+o escribir atributos de usuario que no se encuentren en la lista.
+Los atributos distinguen entre may&#250;sculas y min&#250;sculas. Las clases de objeto y
+el esquema de atributo deben definirse en Directory Server antes que en
+esta opci&#243;n.</p>
+
+<a name="gdlms"></a><h5>Crear asignaci&#243;n de atributos de usuario</h5>
+<p>Especifica los atributos necesarios al crear un usuario. Este atributo utiliza la
+siguiente sintaxis:</p><p><tt>DestinationAttributeName=SourceAttributeName</tt></p><p>Si falta el nombre de atributo de origen, el valor predeterminado es
+el Id. de usuario (<tt>uid</tt>). Por ejemplo:</p>cn sn=givenName<p><tt>cn</tt> y <tt>sn</tt> son necesarios para crear un perfil de usuario. <tt>cn</tt>
+obtiene el valor del atributo denominado <tt>uid</tt> y <tt>sn</tt> obtiene el valor
+del atributo denominado <tt>givenName.</tt></p>
+
+<a name="gdlmi"></a><h5>Nombre de atributo del estado del usuario</h5>
+<p>Especifica el nombre de atributo que permite indicar si el usuario est&#225;
+activo o inactivo.</p>
+
+<a name="gdopm"></a><h5>Valor Activo del estado de usuario</h5>
+<p>Este valor de atributo se asigna al usuario cuando se crea. Por
+ejemplo, para que un usuario est&#233; activo, el valor en Active Directory
+es 544. Por ejemplo, para que un usuario est&#233; inactivo, el valor
+en Active Directory es 546. </p>
+
+<a name="gdoqh"></a><h5>Valor Inactivo del estado de usuario</h5>
+<p>Este campo no se utiliza en Active Directory.</p>
+
+<a name="fyfeb"></a><h5>Atributo de b&#250;squeda de grupos de LDAP</h5>
+<p>Este campo define el tipo de atributo mediante el que se realiza
+la b&#250;squeda en un grupo. El valor predeterminado es <tt>cn</tt>.</p>
+
+<a name="fyfep"></a><h5>Filtro de b&#250;squeda de grupos de LDAP</h5>
+<p>Especifica el filtro de b&#250;squeda que se va a utilizar para encontrar
+las entradas de grupo. El valor predeterminado es <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fyfed"></a><h5>Atributo de asignaci&#243;n de nombre de contenedor de grupos LDAP</h5>
+<p>Especifica el atributo de asignaci&#243;n de nombre de un contenedor de grupos,
+siempre que el grupo resida en un contenedor. De lo contrario, este
+atributo se deja vac&#237;o. Por ejemplo, si el DN de grupo de
+<tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> reside en <tt>ou=groups</tt>, el atributo de asignaci&#243;n de nombre del contenedor
+de grupos es <tt>ou</tt>.</p>
+
+<a name="fyfec"></a><h5>Valor de contenedor de grupos LDAP</h5>
+<p>Especifica el valor del contenedor de grupos. Por ejemplo, si el DN
+de grupo de <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> reside en el nombre de contenedor <tt>ou=groups</tt>, el
+valor del contenedor de grupos ser&#225; <tt>groups</tt>.</p>
+
+<a name="fyffc"></a><h5>Clases de objeto de grupos LDAP</h5>
+<p>Especifica las clases de objeto de grupos. Al crear un grupo, la
+lista de clases de objeto se agregar&#225; a la lista de atributos
+del grupo.</p>
+
+<a name="fyfff"></a><h5>Atributos de grupos de LDAP</h5>
+<p>Define la lista de atributos asociados al grupo. No se permite leer
+o escribir atributos de grupo que no se encuentren en la lista.
+Los atributos distinguen entre may&#250;sculas y min&#250;sculas. Las clases de objeto y
+el esquema de atributo deben definirse en Directory Server antes que en
+esta opci&#243;n.</p>
+
+<a name="fyfea"></a><h5>Nombre de atributo para los miembros del grupos</h5>
+<p>Especifica el nombre del atributo cuyos valores son los nombres de todos
+los grupos a los que pertenece el DN. El valor predeterminado es
+<tt>memberOf</tt>.</p>
+
+<a name="fyfes"></a><h5>Nombre de atributo de miembro &#250;nico</h5>
+<p>Especifica el nombre del atributo cuyos valores consisten en un DN perteneciente
+a este grupo. El valor predeterminado es <tt>uniqueMember</tt>.</p>
+
+<a name="fyfev"></a><h5>Nombre de atributo de URL de miembro de grupo</h5>
+<p>Especifica el nombre del atributo cuyo valor es una direcci&#243;n URL de
+LDAP que representa a miembros pertenecientes a este grupo. El valor predeterminado
+es <tt>memberUrl</tt>.</p>
+
+<a name="fyfem"></a><h5>Atributo de asignaci&#243;n de nombre de contenedor de personas LDAP</h5>
+<p>Especifica el atributo de asignaci&#243;n de nombre de un contenedor de personas,
+siempre que el usuario resida en este tipo de contenedor. De lo
+contrario, este campo se deja en blanco.</p>
+
+<a name="fyffe"></a><h5>Valor de contenedor de personas LDAP</h5>
+<p>Especifica el valor del contenedor de personas. El valor predeterminado es <tt>people</tt>.</p>
+
+<a name="gdlns"></a><h5>Tipos de identidad que se pueden autenticar</h5>
+<p>Especifica que este almac&#233;n de datos puede autenticar los tipos de identidades
+de agentes y/o usuarios si el modo del m&#243;dulo de autenticaci&#243;n de
+este dominio se ha establecido en Almac&#233;n de datos.</p>
+
+<a name="ggtnu"></a><h5>Atributo de nombre de autenticaci&#243;n</h5>
+<p>Actualmente este valor no se utiliza.</p>
+
+<a name="fyfef"></a><h5>DN base de b&#250;squeda persistente</h5>
+<p>Define el DN base utilizado para la b&#250;squeda persistente. Algunos servidores LDAPv3
+s&#243;lo admiten la b&#250;squeda persistente en el nivel del sufijo ra&#237;z.</p>
+
+<a name="gdlmx"></a><h5>Filtro de b&#250;squeda persistente</h5>
+<p>Define el filtro que devolver&#225; los cambios espec&#237;ficos realizados en las entradas
+del servidor de directorios. El almac&#233;n de datos s&#243;lo recibir&#225; los cambios
+que coincidan con el filtro definido.</p>
+
+<a name="ggudj"></a><h5>&#193;mbito de b&#250;squeda persistente</h5>
+<p>Define el &#225;mbito que se debe utilizar en una b&#250;squeda persistente. El
+&#225;mbito debe ser uno de los siguientes:</p>
+<ul><li><p>SCOPE_BASE: busca s&#243;lo el ND de base.</p></li>
+<li><p>SCOPE_ONE: busca s&#243;lo las entradas que se encuentran bajo el ND de base.</p></li>
+<li><p>SCOPE_SUB (predeterminado): busca el ND de base y todas las entradas debajo de su sub&#225;rbol.</p></li></ul>
+
+
+<a name="fyffz"></a><h5>Tiempo de inactividad m&#225;ximo de b&#250;squeda persistente antes de reiniciar</h5>
+<p>Define el tiempo de inactividad m&#225;ximo antes de reiniciar la b&#250;squeda persistente.
+The value must be great than 1. Values less than or equal
+to 1 will restart the search irrespective of the idle time of
+the connection.</p><p>Si OpenSSO se implementa con un equilibrador de carga, se agotar&#225; el
+tiempo de espera de algunos de los equilibradores cuando haya permanecido inactivo
+durante un periodo de tiempo especificado. En este caso, deber&#237;a definir el
+Tiempo de inactividad m&#225;ximo de b&#250;squeda persistente antes de reiniciar con un
+valor inferior al tiempo especificado para el equilibrador de carga.</p>
+
+<a name="fyfgh"></a><h5>N&#250;mero m&#225;ximo de intentos tras un c&#243;digo de error</h5>
+<p>Define el n&#250;mero m&#225;ximo de reintentos para la operaci&#243;n de b&#250;squeda persistente
+si se encuentran los c&#243;digos de error especificados en C&#243;digos de error
+de excepci&#243;n LDAP para seguir intentando.</p>
+
+<a name="fyfge"></a><h5>El tiempo de retardo entre los intentos</h5>
+<p>Especifica el tiempo que se debe esperar antes de cada reintento. Esta
+opci&#243;n s&#243;lo se aplica a la conexiones de b&#250;squeda persistente.</p>
+
+<a name="fyffr"></a><h5>C&#243;digos de error de excepci&#243;n LDAP para seguir intentando</h5>
+<p>Especifica los c&#243;digos de error que provocan que se vuelva a intentar
+una operaci&#243;n de b&#250;squeda persistente. Este atributo s&#243;lo es v&#225;lido para la
+b&#250;squeda persistente y no para todas las operaciones de LDAP.</p>
+
+<a name="gdlnn"></a><h5>Almacenamiento en cach&#233;</h5>
+<p>Si est&#225; habilitado, permite a OpenSSO almacenar en la cach&#233; los datos
+recuperados del almac&#233;n de datos.</p>
+
+<a name="gdlnm"></a><h5>Antig&#252;edad m&#225;xima de los elementos almacenados en cach&#233;</h5>
+<p>Especifica el tiempo m&#225;ximo que los datos pueden permanecer almacenados en la
+cach&#233; antes de eliminarlos. Los valores se definen en segundos.</p>
+
+<a name="gdlnd"></a><h5>Tama&#241;o m&#225;ximo de la cach&#233;</h5>
+<p>Especifica el tama&#241;o m&#225;ximo de la cach&#233;. Cuanto mayor sea el valor,
+m&#225;s datos se pueden almacenar, pero ser&#225; necesaria una mayor cantidad de
+memoria. Los valores se definen en bytes.</p>
+<br/>
+
+</body>
+</html>

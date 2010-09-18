@@ -1,0 +1,52 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ *
+ */ 
+
+#pragma ident  "$Id: prototype,v 1.4 2008/08/04 19:22:10 huacui Exp $ Sun Microsystems"
+#
+
+i copyright
+i depend
+i pkginfo
+i request
+i preinstall
+i postinstall
+i preremove
+
+!default $def_file_perm $DEF_OWNER $DEF_GROUP
+
+!include $ws_dir/am/prototype
+
+d none $PRODUCT_DIR/config $def_dir_perm
+f none $PRODUCT_DIR/config/OpenSSOAgentBootstrap.properties.orig=$ws_dir/conf/OpenSSOAgentBootstrap.properties
+
+f none $PRODUCT_DIR/lib/comlib=comlib $def_exe_perm
+# libxml_license.txt
+f none $PRODUCT_DIR/THIRD_PARTY_LICENSE.TXT=THIRD_PARTY_LICENSE.TXT $def_exe_perm
+
+d none $VAR_DIR/opt/$PRODUCT_DIR $def_dir_perm
+d none $VAR_DIR/opt/$PRODUCT_DIR/debug $def_dir_perm
+

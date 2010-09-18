@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>記錄 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>記錄</h4>
+<p><a name="indexterm-203"></a>記錄服務提供與 OpenSSO 管理相關的狀態及錯誤訊息。管理員可以配置如記錄檔大小及位置的值。OpenSSO 可將事件記錄於純文字檔案或關聯資料庫中。記錄服務屬性為全域屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fxbsv">最大記錄大小</a></p></li>
+<li><p><a href="#fxbsg">歷史檔案數量</a></p></li>
+<li><p><a href="#fxbzh">記錄檔位置</a></p></li>
+<li><p><a href="#fxbwg">記錄類型</a></p></li>
+<li><p><a href="#fxbrd">資料庫使用者名稱</a></p></li>
+<li><p><a href="#fxcdf">資料庫使用者密碼</a></p></li>
+<li><p><a href="#fxcep">資料庫使用者密碼 (確認)</a></p></li>
+<li><p><a href="#fxbvb">資料庫驅動程式名稱</a></p></li>
+<li><p><a href="#fxbsb">可配置的記錄欄位</a></p></li>
+<li><p><a href="#fxccb">記錄確認頻率</a></p></li>
+<li><p><a href="#fxbxe">記錄簽名時間</a></p></li>
+<li><p><a href="#fxcbz">安全記錄</a></p></li>
+<li><p><a href="#fxbxt">最大記錄數</a></p></li>
+<li><p><a href="#fxbwp">各歸檔檔案的檔案數</a></p></li>
+<li><p><a href="#fxbyw">緩衝區大小</a></p></li>
+<li><p><a href="#fxbvh">DB 失敗記憶體緩衝區大小</a></p></li>
+<li><p><a href="#fxcea">緩衝區時間</a></p></li>
+<li><p><a href="#fxbsn">時間緩衝</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>最大記錄大小</h5>
+<p>此屬性接受 OpenSSO 記錄檔最大大小的值 (以位元組為單位)。預設值為 1000000。</p>
+
+<a name="fxbsg"></a><h5>歷史檔案數量</h5>
+<p>此屬性的值與用於歷程分析而保留的備份記錄檔數目相等。視本機系統分割區與可用磁碟空間大小而定，可以輸入任何整數。預設值為 3。</p><p>檔案僅套用至 FILE 記錄類型。當記錄類型設為 DB 時，就不會有歷史檔案，OpenSSO 也不會明顯設定其大小限制。</p>
+<hr><p><b>備註 &#8211; </b>輸入 0 值將被視為與輸入 1 值相同，這表示若您指定 0，將建立歷程記錄檔。</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>記錄檔位置</h5>
+<p>基於檔案的記錄功能需要可以儲存記錄檔的位置。預設位置為：</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt> 是一個標記，代表基底配置目錄和 OpenSSO 的伺服器 URI。在執行階段，記錄服務會判斷實例用於記錄的正確目錄。此屬性的值可以設定為明確的路徑，但是基底路徑應該是其配置目錄。</p><p>若指定了非預設目錄但是目錄不存在，OpenSSO 將建立此目錄。之後，您應對該目錄設定適當的權限 (例如，0700)。</p><p>為 DB (資料庫) 記錄 (如 Oracle 或 MySQL) 配置記錄位置時，記錄位置的某些部分區分大小寫。例如，如果您是記錄至 Oracle 資料庫，則記錄位置應為 (請注意大小寫需相符)：</p><p><tt>jdbc:oracle:thin:@machine.domain:port:DBName</tt></p><p>要配置 DB 記錄，將 JDBC 驅動程式檔案增加 Web 容器的 JVM 類別路徑。您必須手動將 JDBC 驅動程式檔案增加 <tt>amadmin</tt>
+程序檔的類別路徑，否則 <tt>amadmin</tt> 記錄將無法載入 JDBC 驅動程式。</p><p>對記錄屬性的變更通常於儲存後即生效。這不需要您重新啟動伺服器。若您變更至安全記錄，則您應重新啟動伺服器。</p>
+
+<a name="ggyhl"></a><h5>記錄狀態</h5>
+<p>指定記錄開啟 (使用中) 或關閉 (非使用中)。安裝期間，此值會設定為使用中。</p>
+
+<a name="ggydj"></a><h5>日誌記錄解析主機名稱</h5>
+<p>如果設定為 false，將不會執行主機查找以寫入 LogRecord 的 HostName 欄位。</p>
+
+<a name="fxbwg"></a><h5>記錄類型</h5>
+<p>可讓您指定平面檔記錄的檔案或資料庫記錄的 DB。</p><p>若資料庫使用者名稱或資料庫使用者密碼無效，將嚴重地影響 OpenSSO 處理過程。如果 OpenSSO 或主控台變得不穩定，您可以將 [記錄狀態] 屬性設定為 [非使用中]。</p><p>設定特性後，重新啟動伺服器。之後，您可登入主控台並重新啟動記錄屬性。然後，將 [記錄狀態] 特性變更為<i>使用中</i>，並重新啟動伺服器。</p>
+
+<a name="fxbrd"></a><h5>資料庫使用者名稱</h5>
+<p>在記錄類型屬性設定為 DB 時，此屬性接受將連接至資料庫的使用者名稱。</p>
+
+<a name="fxcdf"></a><h5>資料庫使用者密碼</h5>
+<p>記錄類型屬性設定為 DB 時，此屬性接受資料庫使用者密碼。</p>
+
+<a name="fxcep"></a><h5>資料庫使用者密碼 (確認)</h5>
+<p>確認資料庫密碼。</p>
+
+<a name="fxbvb"></a><h5>資料庫驅動程式名稱</h5>
+<p>此屬性可讓您指定用於記錄實作類別的驅動程式。</p>
+
+<a name="fxbsb"></a><h5>可配置的記錄欄位</h5>
+<p>代表將記錄的欄位清單。依預設，會記錄所有欄位。這些欄位包括：</p>
+<ul><li><p>CONTEXTID</p></li>
+<li><p>DOMAIN</p></li>
+<li><p>HOSTNAME</p></li>
+<li><p>IPADDRESS</p></li>
+<li><p>LOGGED BY</p></li>
+<li><p>LOGLEVEL</p></li>
+<li><p>LOGINID</p></li>
+<li><p>MESSAGEID</p></li>
+<li><p>MODULENAME</p></li></ul>
+<p>您最少需要記錄 [CONTEXTID]、[DOMAIN]、[HOSTNAME]、[LOGINID] 與 [MESSAGEID]。</p>
+
+<a name="fxccb"></a><h5>記錄確認頻率</h5>
+<p>此屬性設定伺服器為偵測竄改而應該驗證記錄的頻率 (以秒為單位)。預設時間為 3600 秒。此參數僅適用於安全記錄。</p>
+
+<a name="fxbxe"></a><h5>記錄簽名時間</h5>
+<p>此參數設定要對記錄進行簽名的頻率 (以秒為單位)。預設時間為 900 秒。此參數僅適用於安全記錄。</p>
+
+<a name="fxcbz"></a><h5>安全記錄</h5>
+<p>此屬性會啟用或停用安全記錄。依預設，安全記錄是關閉的。啟用安全記錄後，可以偵測對安全記錄進行的未授權變更或竄改。</p>
+<hr><p><b>備註 &#8211; </b>安全記錄僅可用於平面檔案。此選項不適用於資料庫 (DB) 的記錄。</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>安全記錄簽署演算法</h5>
+<p>此屬性會定義 RSA 與 DSA (Digital Signature Algorithm, 數位簽名演算法)，這兩種演算法具有用於簽署的私密金鑰，以及用於驗證的公開金鑰。您可從下列演算法中選擇：</p>
+<ul><li><p>MD2 w/RSA</p></li>
+<li><p>MD5 w/RSA</p></li>
+<li><p>SHA1 w/DSA</p></li>
+<li><p>SHA1 w/RSA</p></li></ul>
+<p>MD2、MD5 與 RSA 是單向雜湊。例如，如果您選擇簽署演算法 MD2 w/RSA，則安全記錄功能會使用 MD2 產生一組訊息，並使用 RSA 私密金鑰對值進行加密。此加密的值是原始日誌記錄的簽名，且會附加於最近簽名的最新記錄。在驗證方面，它會使用 RSA 公開金鑰來解密簽名，並比較已解密的值與日誌記錄群組。接著安全記錄功能會偵測任何對日誌記錄的修改。</p>
+
+<a name="ghaeg"></a><h5>記錄憑證存放區位置</h5>
+<p>啟用安全記錄時，記錄服務會在此屬性所指定的位置搜尋其憑證。實際的目錄路徑會在執行階段決定。此值可以設定為明確的路徑，但是 OpenSSO 實例應該能存取基底路徑。</p>
+
+<a name="fxbxt"></a><h5>最大記錄數</h5>
+<p>此屬性設定 Java  LogReader 介面傳回的最大記錄數，無論有多少記錄與讀取查詢相符。依預設，設定為 500。記錄 API 的呼叫者可以透過 <i>LogQuery</i> 類別置換此屬性。</p>
+
+<a name="fxbwp"></a><h5>各歸檔檔案的檔案數</h5>
+<p>此屬性僅適用於安全記錄。它指定對於後續的安全記錄，何時需要歸檔記錄檔與金鑰庫、何時重新產生安全金鑰庫。預設為每個記錄程式有五個檔案。</p>
+
+<a name="fxbyw"></a><h5>緩衝區大小</h5>
+<p>此屬性指定在記錄服務嘗試將其寫入記錄儲存庫前，記錄檔記錄在記憶體中緩衝的最大數目。預設為一條記錄。</p>
+
+<a name="fxbvh"></a><h5>DB 失敗記憶體緩衝區大小</h5>
+<p>此屬性定義當資料庫 (DB) 登入失敗時，記憶體中保存的記錄檔記錄最大數目。只有當 DB 登入指定後，才能使用這個屬性。當 OpenSSO 登入服務遺失與 DB 的連線時將會緩衝，最多可緩衝指定記錄的數目。此屬性的預設值為緩衝區大小屬性所定義之數值的兩倍。</p>
+
+<a name="fxcea"></a><h5>緩衝區時間</h5>
+<p>此屬性定義在傳送至記錄服務進行記錄前，記錄檔記錄要在記憶體中緩衝的時間。若 [啟用時間] 緩衝為開啟狀態，則此屬性適用。預設值為 3600 秒。</p>
+
+<a name="fxbsn"></a><h5>時間緩衝</h5>
+<p>選取此屬性，使之處於開啟狀態時，OpenSSO 將設定記錄檔記錄要在記憶體中緩衝的時間限制。該時間量會在緩衝區時間屬性中設定。</p>
+
+<a name="ghaer"></a><h5>記錄層級</h5>
+<p>透過選取其中一個選項來使用此屬性配置特定記錄檔中所包含資訊的詳細程度。OpenSSO 服務會在 INFO 層級記錄。SAML 和 Identity Federation 服務記錄詳細程度會更高，可以為 FINE、FINER、FINEST 記錄層級。此外，OFF 層級可用於關閉記錄，ALL 層級可用於啟用記錄所有訊息。</p>
+<br/>
+
+</body>
+</html>

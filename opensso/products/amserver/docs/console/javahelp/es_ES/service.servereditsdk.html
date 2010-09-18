@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SDK - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsdk"></a><h4>SDK</h4>
+<p>Los atributos de SDK establecen las definiciones de configuraci&#243;n para el almac&#233;n
+de datos "back-end".</p>
+
+<a name="ggkan"></a><h5>Almac&#233;n de datos </h5>
+<p>Estos atributos establecen la configuraci&#243;n b&#225;sica del almac&#233;n de datos:</p>
+
+<a name="ggkem"></a><h5>Habilitar notificaci&#243;n del almac&#233;n de datos</h5>
+<p>Especifica si se ha habilitado la notificaci&#243;n del almac&#233;n de datos "back-end".
+Si este valor se establece en "false" (falso), se establece la notificaci&#243;n
+de memoria.</p>
+
+<a name="ggkfc"></a><h5>Habilitar proxy del directorio</h5>
+<p>El valor predeterminado es falso. La finalidad de este indicador consiste en
+informar a la administraci&#243;n de servicios de que el proxy del directorio
+debe utilizarse para las operaciones de lectura, escritura o modificaci&#243;n en Directory
+Server. Este indicador determina tambi&#233;n si se deben utilizar las ACI o
+los privilegios de delegaci&#243;n. Este indicador debe establecerse en "true" (verdadero) cuando
+Access Manager SDK (a partir de la versi&#243;n 7 &#243; 7.1) se
+comunique con la versi&#243;n 6.3 de Access Manager. </p><p>Por ejemplo, en el modo de coexistencia/tradicional, este valor debe establecerse en
+"true" (verdadero). En el DIT tradicional, no se admiten las directivas de
+delegaci&#243;n. S&#243;lo se admiten las ACI. Por lo tanto, para garantizar una
+comprobaci&#243;n de delegaci&#243;n adecuada, este indicador debe establecerse en "true" (verdadero) en
+una instalaci&#243;n en el modo tradicional con el fin de utilizar las
+ACI para el control de acceso. Por lo tanto, la comprobaci&#243;n de
+delegaci&#243;n presentar&#225; errores.  </p><p>En el modo de dominio, este valor debe establecerse en "false" (falso),
+ya que s&#243;lo se utilizan las directivas de delegaci&#243;n para el control
+de acceso. En la versi&#243;n 7.0 y posterior, Access Manager u OpenSSO
+admite cualquier tipo de datos en una instalaci&#243;n en el modo de
+dominio. Por lo tanto, adem&#225;s de Directory Server, se pueden utilizar otros
+servidores para almacenar los datos de configuraci&#243;n del servidor. Adem&#225;s, este indicador
+informar&#225; a la funci&#243;n de administraci&#243;n de servicios de que no debe
+utilizarse el proxy del directorio para las operaciones de lectura, escritura o
+modificaci&#243;n en el almacenamiento "back-end". Esto se debe a que algunos almacenes
+de datos como, por ejemplo, Active Directory no admiten los servidores proxy.</p>
+
+<a name="ggkcv"></a><h5>Servicio de eventos</h5>
+<p>Los siguientes atributos definen la notificaci&#243;n del servicio de eventos para el
+almac&#233;n de datos:</p>
+
+<a name="ggkez"></a><h5>N&#250;mero de reintentos de las conexiones del servicio de eventos</h5>
+<p>El valor predeterminado es 3.      Especifica el
+n&#250;mero de intentos que se han llevado a cabo para volver a
+establecer satisfactoriamente las conexiones del servicio de eventos.</p>
+
+<a name="ggkdr"></a><h5>Retraso entre intentos de conexi&#243;n LDAP</h5>
+<p>El valor predeterminado es 3000.       Especifica
+el retraso en milisegundos entre los reintentos para volver a establecer las
+conexiones del servicio de eventos.  </p>
+
+<a name="ggkcq"></a><h5>C&#243;digos de error de los intentos de conexi&#243;n LDAP</h5>
+<p>Los valores predeterminados son 80,81,91. Especifica los c&#243;digos de error de las
+excepciones LDAP que desencadenar&#225;n los reintentos para volver a establecer las conexiones
+del servicio de eventos.</p>
+
+<a name="ggncc"></a><h5>Tiempo de espera inactivo</h5>
+<p>El valor predeterminado es 0.       
+Especifica el n&#250;mero de minutos tras los que se reiniciar&#225;n las b&#250;squedas
+persistentes.  </p><p>Esta propiedad se utiliza cuando un equilibrador de carga o un servidor
+de seguridad se encuentra entre los agentes de directivas y Directory Server,
+y se pierden las conexiones de la b&#250;squeda persistente al agotarse el
+tiempo de espera inactivo de TCP. El valor de esta propiedad deber&#237;a
+ser inferior al tiempo de espera de TCP del equilibrador de carga
+o el servidor de seguridad. De esta forma, se garantiza que las
+b&#250;squedas persistentes se reiniciar&#225;n antes de que se pierdan las conexiones. El
+valor 0 indica que no se reiniciar&#225;n las b&#250;squedas. S&#243;lo se restablecer&#225;n
+las conexiones cuyo tiempo de espera se haya agotado.</p>
+
+<a name="ggndm"></a><h5>Deshabilitar la conexi&#243;n del servicio de eventos</h5>
+<p>Especifica la conexi&#243;n de eventos que puede deshabilitarse. Los valores (no se
+distingue entre may&#250;sculas y min&#250;sculas) pueden ser: </p>
+<ul><li><p>aci: cambios en el atributo "aci" con la b&#250;squeda utilizando el filtro LDAP (aci=&#42;).</p></li>
+<li><p>sm: cambios en el &#225;rbol de informaci&#243;n de OpenSSO (o nodo de administraci&#243;n de servicios), que incluye objetos con la clase de objeto de marcador <tt>sunService </tt> o <tt>sunServiceComponent.</tt> Por ejemplo, puede crear una directiva que defina privilegios de acceso a un recurso protegido o puede modificar las reglas, temas, condiciones o proveedores de respuesta de una directiva existente.</p></li>
+<li><p>um: cambios en el directorio de usuario (o nodo de administraci&#243;n de usuarios). Por ejemplo, puede cambiar el nombre o la direcci&#243;n del usuario.</p></li></ul>
+<p>Por ejemplo, para deshabilitar las b&#250;squedas persistentes de cambios en el &#225;rbol
+de informaci&#243;n de OpenSSO (o nodo de administraci&#243;n de servicios):  </p><p><tt>com.sun.am.event.connection.disable.list=sm </tt></p>
+<hr><p><b>Precauci&#243;n &#8211; </b>Las b&#250;squedas persistentes causan una sobrecarga en el rendimiento en Directory Server.
+Si cree que el hecho de eliminar parte de esta sobrecarga en
+el rendimiento es muy importante en un entorno de producci&#243;n, puede deshabilitar
+una o m&#225;s b&#250;squedas persistentes utilizando esta propiedad.  </p><p>Sin embargo, antes de deshabilitar una b&#250;squeda persistente, debe comprender las limitaciones
+descritas anteriormente. Se recomienda que no se modifique esta propiedad a menos
+que sea absolutamente necesario. Esta propiedad fue introducida principalmente para evitar la
+sobrecarga en Directory Server cuando se utilizan varios agentes J2EE 2.1, porque
+cada uno de estos agentes establece estas b&#250;squedas persistentes. Los agentes J2EE
+2.2 ya no establecen estas b&#250;squedas persistentes, as&#237; que puede que no
+sea necesario utilizar esta propiedad.  </p><p>No es recomendable deshabilitar las b&#250;squedas persistentes de ninguno de estos componentes,
+ya que un componente con una b&#250;squeda persistente deshabilitada no recibe notificaciones
+de Directory Server. Por lo tanto, los cambios realizados en ese componente
+espec&#237;fico de Directory Server no se notificar&#225;n a la cach&#233; de componentes.
+Por ejemplo, si deshabilita las b&#250;squedas persistentes de cambios en el directorio
+de usuarios (<tt>um</tt>), OpenSSO no recibir&#225; notificaciones de Directory Server. Por lo
+tanto, un agente no recibir&#225; notificaciones de OpenSSO para que actualice su
+cach&#233; de usuario local con los nuevos valores de atributo de usuario.
+Si una aplicaci&#243;n solicita al agente los atributos de usuario, puede recibir
+el valor antiguo de ese atributo.  </p><p>Utilice esta propiedad s&#243;lo en circunstancias especiales cuando sea absolutamente necesario. Por
+ejemplo, si sabe que los cambios de la configuraci&#243;n del servicio (referente
+a los valores cambiantes de alguno de los servicios como, por ejemplo,
+los servicios de autenticaci&#243;n y el servicio de sesiones) no se producir&#225;n
+en el entorno de producci&#243;n, puede deshabilitarse la b&#250;squeda persistente en el
+componente (<tt>sm</tt>) de administraci&#243;n de servicios. Sin embargo, si se produce un
+cambio en alguno de los servicios, es necesario el reinicio de un
+servidor. Esto es tambi&#233;n aplicable a otras b&#250;squedas persistentes especificadas por los
+valores de <tt>aci </tt> y <tt>um</tt>. </p>
+<hr>
+
+
+<a name="ggnip"></a><h5>Conexi&#243;n LDAP</h5>
+<p>Los siguientes atributos establecen los datos de conexi&#243;n del almac&#233;n de datos
+"back-end".</p>
+
+<a name="ggnjl"></a><h5>N&#250;mero de reintentos de la conexi&#243;n LDAP.</h5>
+<p>El valor predeterminado es 1000. Especifica el n&#250;mero de milisegundos entre reintentos.</p>
+
+<a name="ggnhu"></a><h5>Retraso entre reintentos de conexi&#243;n LDAP</h5>
+<p>El valor predeterminado es 3.      Especifica el
+n&#250;mero de intentos que se han llevado a cabo para volver a
+establecer satisfactoriamente la conexi&#243;n LDAP.</p>
+
+<a name="ggnjt"></a><h5>C&#243;digos de error de los reintentos de conexi&#243;n LDAP</h5>
+<p>Los valores predeterminados son 80,81,91. Especifica los c&#243;digos de error de <tt>LDAPException</tt>
+para los que se desencadenar&#225;n reintentos para volver a establecer la conexi&#243;n
+LDAP.</p>
+
+<a name="ggkcx"></a><h5>Almacenamiento en cach&#233; y repetici&#243;n</h5>
+<p>Los siguientes atributos definen la configuraci&#243;n del almacenamiento en cach&#233; y la
+repetici&#243;n:</p>
+
+<a name="ggkcm"></a><h5>M&#225;x. de cach&#233; de SDK. Tama&#241;o</h5>
+<p>El valor predeterminado es 10000.       
+ Especifica el tama&#241;o de la cach&#233; de SDK si el almacenamiento
+en la cach&#233; se ha habilitado.  Utilice un entero superior a
+0. De lo contrario, se utilizar&#225; el tama&#241;o predeterminado (10.000 usuarios).</p>
+
+<a name="ggkdo"></a><h5>Reintentos de repetici&#243;n de SDK</h5>
+<p>El valor predeterminado es 0.       
+Especifica el n&#250;mero de reintentos.</p>
+
+<a name="ggker"></a><h5>Retraso entre reintentos de repetici&#243;n de SDK.</h5>
+<p>El valor predeterminado es 1000.       
+  Especifica el n&#250;mero de milisegundos entre reintentos.</p>
+<br/>
+
+</body>
+</html>

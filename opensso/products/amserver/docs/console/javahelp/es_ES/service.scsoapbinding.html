@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio de enlace de SOAP - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>Servicio de enlace de SOAP</h3>
+<a name="indexterm-150"></a><p>El Servicio de enlace de SOAP es una capa de transporte para
+enviar y recibir mensajes de SOAP. En el proceso del Servicio de
+enlace de SOAP, un servicio de identidad llama a la interfaz de
+programaci&#243;n de aplicaci&#243;n del cliente para crear un mensaje y enviarlo a
+la direcci&#243;n URL de punto final de SOAP; de hecho, un servlet
+de receptor de SOAP. El servlet de receptor de SOAP recibe el
+mensaje, verifica la firma y crea un segundo mensaje. A continuaci&#243;n, el
+servlet de receptor de SOAP invoca al administrador de solicitudes para enviar
+este segundo mensaje al servicio de identidades correspondiente y obtener una respuesta.
+El servicio de identidades procesa el segundo mensaje, genera una respuesta y
+la env&#237;a al servlet del receptor de SOAP. El receptor de SOAP,
+a su vez, env&#237;a la respuesta al servicio de identidades para su
+procesamiento. </p><p>Se pueden configurar los siguientes atributos globales del Servicio de enlace de
+SOAP para la implementaci&#243;n.</p>
+<ul><li><p><a href="requesthandlerlist.html">Lista de administradores de solicitudes</a></p></li>
+<li><p><a href="ggodb.html">Atributos de enlace SOAP</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">Para configurar un administrador de solicitudes</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>条件 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>条件</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>条件允许您定义对策略的限制。例如，为某个薪金应用程序定义策略时，可以为该操作定义一个条件，限定只能在特定的时间内访问该应用程序。另外，您还可以定义另一种条件，限定只有当请求是来自指定的一组 IP 地址或公司内部网时才允许执行该操作。</p><p>此外，条件还可以用于配置同一个域的不同 URI 上的不同策略。例如，<tt>http://org.example.com/hr/*jsp</tt> 只能通过 <tt>org.example.net</tt> 在 9 a.m. 到 5 p.m. 之间进行访问。同时使用“IP
+条件”和“时间条件”便可实现上述目的。将规则资源指定为 <tt>http://org.example.com/hr/*.jsp</tt>，策略将应用到 <tt>http://org.example.com/hr</tt> 下的所有 JSP 文件，包括子目录中的 JSP 文件。</p>
+<hr><p><b>注 &#8211; </b>引用、规则、资源、主体、条件、操作和值等术语分别对应于 <tt>policy.dtd</tt> 中的 <b>Referral</b>、<b>Rule</b>、<b>ResourceName</b>、<b>Subject</b>、<b>Condition</b>、<b>Attribute</b> 和 <b>Value</b> 等元素。</p>
+<hr>
+<p>参见<a href="policy.selectconditiontype.html">向策略添加条件</a>。</p>
+<br/>
+
+</body>
+</html>

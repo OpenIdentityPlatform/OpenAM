@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS </h4>
+<p><a name="indexterm-178"></a>此模块允许使用外部的远程验证拨入用户服务 (Remote Authentication Dial-In User Service, RADIUS) 服务器进行验证。RADIUS 验证属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwadp">服务器 1</a></p></li>
+<li><p><a href="#fwaom">服务器 2</a></p></li>
+<li><p><a href="#fwaka">共享密钥</a></p></li>
+<li><p><a href="#fwapc">共享密钥确认</a></p></li>
+<li><p><a href="#fwapn">端口号</a></p></li>
+<li><p><a href="#fwaad">超时</a></p></li>
+<li><p><a href="#fwabo">验证级别</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>服务器 1</h5>
+<p>显示主 RADIUS 服务器的 IP 地址或全限定主机名。默认 IP 地址为 127.0.0.1。该字段可接受任何有效的 IP 地址或主机名。如果指定多个条目，条目前面必须带有本地服务器名称，语法如下：</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaom"></a><h5>服务器 2</h5>
+<p>显示次 RADIUS 服务器的 IP 地址或全限定域名 (FQDN)。该服务器用于故障解决，当联系不上主服务器时将联系该服务器。默认 IP 地址为 127.0.0.1。如果指定了多个条目，则必须在条目前带有本地服务器名称，其语法如下：</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaka"></a><h5>共享密钥</h5>
+<p>指定 RADIUS 验证的共享密钥。共享密钥应与精选密码具有相同的地位。该字段不存在默认值。</p>
+
+<a name="fwapc"></a><h5>共享密钥确认</h5>
+<p>确认 RADIUS 验证的共享密钥。</p>
+
+<a name="fwapn"></a><h5>端口号</h5>
+<p>指定 RADIUS 服务器当前侦听的端口。默认值为 1645。</p>
+
+<a name="fwaad"></a><h5>超时</h5>
+<p>指定超时前等待 RADIUS 服务器响应所经过的时间间隔，以秒为单位。默认值为 3 秒。该字段接受使用任何以秒为单位的数值来指定超时。</p>
+
+<a name="fwabo"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

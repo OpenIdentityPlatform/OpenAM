@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sitzung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amsessionservice"></a><h4>Sitzung</h4>
+<p><a name="indexterm-196"></a>Der Sitzungsdienst definiert Werte f&#252;r die Sitzung eines authentifizierten Benutzers, wie beispielsweise
+die maximale Sitzungsdauer und die maximale Leerlaufzeit. Bei den Sitzungsattributen kann es
+sich um globale, um dynamische oder um Benutzerattribute handeln. Es existieren folgende
+Attribute:</p>
+<ul><li><p><a href="#fwfeu">Sekund&#228;re Konfigurationsinstanz</a></p></li>
+<li><p><a href="#fwfew">Maximale Anzahl an Suchergebnissen</a></p></li>
+<li><p><a href="#fwfex">Timeout f&#252;r Suche</a></p></li>
+<li><p><a href="#fwfez">Meldungen f&#252;r Eigenschafts&#228;nderungen aktivieren</a></p></li>
+<li><p><a href="#fwfey">Quotenbeschr&#228;nkungen aktivieren</a></p></li>
+<li><p><a href="#fwffa">Zeit&#252;berschreitung beim Lesen f&#252;r Quotenbeschr&#228;nkung</a></p></li>
+<li><p><a href="#fwffb">Admin-Benutzer der ersten Ebene von der Einschr&#228;nkungspr&#252;fung ausnehmen</a></p></li>
+<li><p><a href="#fwffc">Verhalten, wenn eine Sitzungsquote ersch&#246;pft ist</a></p></li>
+<li><p><a href="#fwffd">Eigenschaften f&#252;r Benachrichtigung</a></p></li>
+<li><p><a href="#fwffe">Maximale Sitzungsdauer</a></p></li>
+<li><p><a href="#fwfff">Maximale Leerlaufzeit</a></p></li>
+<li><p><a href="#fwffh">Maximale Caching-Zeit</a></p></li>
+<li><p><a href="#fwffi">Aktive Benutzersitzungen</a></p></li></ul>
+
+
+<a name="fwfeu"></a><h5>Sekund&#228;re Konfigurationsinstanz</h5>
+<p>Stellt die Verbindungsinformationen f&#252;r das Sitzungs-Repository bereit, das in OpenSSO f&#252;r die
+Sitzungs-Failover-Funktion verwendet wird. Als Bezeichner f&#252;r die sekund&#228;re Konfiguration sollte der URL
+des Lastenausgleichs angegeben werden. Wenn die sekund&#228;re Konfiguration auf diese Weise angegeben
+ist, wird die Sitzungs-Failover-Funktion automatisch aktiviert und nach dem Server-Neustart wirksam. Weitere
+Informationen finden Sie unter <a href="service.subconfigadd.html">So f&#252;gen Sie eine Subkonfiguration hinzu</a>.</p>
+
+<a name="fwfew"></a><h5>Maximale Anzahl an Suchergebnissen</h5>
+<p>Gibt an, wie viele Suchergebnisse bei einer Sitzungssuche maximal angezeigt werden. Der
+Standardwert ist 120.</p>
+
+<a name="fwfex"></a><h5>Timeout f&#252;r Suche</h5>
+<p>Gibt an, wie lange eine Sitzungssuche fortgesetzt wird, bevor sie wegen Zeit&#252;berschreitung
+abgebrochen wird. Der Standardwert ist 5 Sekunden.</p>
+
+<a name="fwfez"></a><h5>Meldungen f&#252;r Eigenschafts&#228;nderungen aktivieren</h5>
+<p>Aktiviert bzw. deaktiviert die Benachrichtigung bei einer &#196;nderung der Sitzungseigenschaften. In einer
+Single Sign-On-Umgebung (SSO) kann eine OpenSSO-Sitzung von mehreren Anwendungen verwendet werden. Wenn
+diese Funktion auf ";AKTIVIERT" gesetzt ist, wird eine Benachrichtigung an alle anderen
+Anwendungen gesendet, die an der gleichen SSO-Umgebung teilnehmen, sobald eine der teilnehmenden
+Anwendungen eine Sitzungseigenschaft der Liste Eigenschaften f&#252;r Benachrichtigung &#228;ndert (diese Liste ist
+in einem gesonderten Sitzungsdienst-Attribut definiert).</p>
+
+<a name="fwfey"></a><h5>Quotenbeschr&#228;nkungen aktivieren</h5>
+<p>Aktiviert bzw. deaktiviert Sitzungsquotenbeschr&#228;nkungen. Sitzungsquotenbeschr&#228;nkungen erm&#246;glichen es dem Administrator, einen Benutzer auf
+Basis globaler Beschr&#228;nkungseinstellungen bzw. auf Basis der Konfigurationen der einzelnen Entities (Bereich/Rolle/Benutzer),
+denen der jeweilige Benutzer angeh&#246;rt, auf eine bestimmte Anzahl aktiver bzw. gleichzeitiger
+Sitzungen einzuschr&#228;nken.</p><p>Die Standardeinstellung dieses Attributs ist ";DEAKTIVIERT". Nach einer &#196;nderung der Einstellungen muss
+der Server neu gestartet werden.</p>
+
+<a name="fwffa"></a><h5>Zeit&#252;berschreitung beim Lesen f&#252;r Quotenbeschr&#228;nkung</h5>
+<p>Bestimmt die Zeit (in Millisekunden), die eine Anfrage an das Sitzungs-Repository f&#252;r
+den Live-Benutzersitzungsz&#228;hler fortgesetzt wird, bevor sie wegen Zeit&#252;berschreitung abgebrochen wird.</p><p>Wenn das Zeitlimit f&#252;r die Anfrage erreicht ist, wird ein Fehler ausgegeben.
+Dieses Attribut wird nur verwendet, wenn die Sitzungsquotenbeschr&#228;nkung in der Sitzungs-Failover-Konfiguration aktiviert
+ist. Der Standardwert ist 6000 Millisekunden. Nach einer &#196;nderung der Einstellungen muss
+der Server neu gestartet werden.</p>
+
+<a name="fwffb"></a><h5>Admin-Benutzer der ersten Ebene von der Einschr&#228;nkungspr&#252;fung ausnehmen</h5>
+<p>Legt fest, ob Benutzer, die der Top-Level-Admin-Rolle angeh&#246;ren, von der Sitzungseinschr&#228;nkungspr&#252;fung ausgenommen
+werden. Wenn dieses Attribut aktiviert ist, findet f&#252;r Top-Level-Administratoren trotz aktivierter Sitzungsbeschr&#228;nkung
+keine &#220;berpr&#252;fung der Sitzungsquoten statt.</p><p>The default setting for this attribute is NO. Nach einer &#196;nderung der
+Einstellungen muss der Server neu gestartet werden. Dieses Attribut wird nur angewendet,
+wenn die Sitzungsquotenbeschr&#228;nkung aktiviert ist.</p>
+<hr><p><b>Hinweis &#8211; </b>Der f&#252;r OpenSSO in <tt>AMConfig.properties </tt> konfigurierte Superuser (<tt>com.sun.identity.authentication.super.user</tt>) ist auf jeden Fall
+von der &#220;berpr&#252;fung der Sitzungsquotenbeschr&#228;nkung ausgeschlossen. </p>
+<hr>
+
+
+<a name="fwffc"></a><h5>Verhalten, wenn eine Sitzungsquote ersch&#246;pft ist</h5>
+<p>Legt das Verhalten fest, wenn die Sitzungsquote eines Benutzers ersch&#246;pft ist. F&#252;r
+dieses Attribut stehen zwei Optionen zur Auswahl:</p><dl><dt>DESTROY_OLD_SESSION</dt>
+<dd><p>Die n&#228;chste ablaufende Sitzung wird beendet.</p></dd>
+<dt>DENY_ACCESS</dt>
+<dd><p>Die neue Sitzungserstellungsanforderung wird abgelehnt.</p></dd>
+</dl>
+<p>Dieses Attribut wird nur verwendet, wenn die Sitzungsquotenbeschr&#228;nkung aktiviert ist und die
+Standardeinstellung ";DESTROY_OLD_SESSION" lautet.</p>
+
+<a name="ggyer"></a><h5>Benutzeranmeldung verweigern, wenn Sitzungs-Repository heruntergefahren ist</h5>
+<p>Wenn dieses Attribut auf JA gesetzt ist, wird die Sperrung des Servers
+f&#252;r den Benutzer erzwungen, wenn das Sitzungs-Repository heruntergefahren ist. Dieses Attribut wird
+nur angewendet, wenn die "Quotenbeschr&#228;nkung aktivieren" f&#252;r die Sitzung ausgew&#228;hlt wurde.</p>
+
+<a name="fwffd"></a><h5>Eigenschaften f&#252;r Benachrichtigung</h5>
+<p>Sobald eine in der Liste aufgef&#252;hrte Sitzungseigenschaft ge&#228;ndert wird, wird an die
+registrierten Zielger&#228;te eine Benachrichtigung gesendet. Das Attribut wird nur verwendet, wenn die
+Funktion Benachrichtigung bei &#196;nderung der Sitzungseigenschaften aktiviert ist.</p>
+
+<a name="fwffe"></a><h5>Maximale Sitzungsdauer</h5>
+<p>Gibt an, nach wie vielen Minuten eine Sitzung abl&#228;uft. Der Benutzer muss
+sich danach erneut authentifizieren, um Zugriff zu erhalten. Zul&#228;ssig sind Werte von
+1 oder h&#246;her. Der Standardwert ist 120. (To balance the requirements of
+security and convenience, consider setting the Max Session Time interval to a
+higher value and setting the Max Idle Time interval to a relatively
+low value.) Max Session Time limits the validity of the session. Sie
+wird nicht &#252;ber den konfigurierten Wert hinaus ausgedehnt.</p>
+
+<a name="fwfff"></a><h5>Maximale Leerlaufzeit</h5>
+<p>Gibt an, nach wie vielen Minuten der Inaktivit&#228;t eine Sitzung abl&#228;uft. Der
+Benutzer muss sich danach erneut authentifizieren, um Zugriff zu erhalten. Zul&#228;ssig sind
+Werte von 1 oder h&#246;her. The default value is 30. (To balance
+the requirements of security and convenience, consider setting the Max Session Time
+interval to a higher value and setting the Max Idle Time interval
+to a relatively low value.)</p>
+
+<a name="fwffh"></a><h5>Maximale Caching-Zeit</h5>
+<p>Gibt entsprechend dem maximalen Intervall an, nach wie vielen Minuten der Client
+auf OpenSSO zugreift, um die zwischengespeicherten Sitzungsinformationen zu aktualisieren. Zul&#228;ssig sind Werte
+von 0 oder h&#246;her. Der Standardwert ist 3. It is recommended that
+the maximum caching time should always be less than the maximum idle
+time.</p>
+
+<a name="fwffi"></a><h5>Aktive Benutzersitzungen</h5>
+<p>Gibt die maximale Anzahl gleichzeitiger Sitzungen an, die f&#252;r einen Benutzer erlaubt
+sind.</p>
+<br/>
+
+</body>
+</html>

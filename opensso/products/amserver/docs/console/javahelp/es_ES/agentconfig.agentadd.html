@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear un nuevo agente - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>Para crear un nuevo agente</h5>
+<p>La creaci&#243;n de un nuevo agente tambi&#233;n recibe el nombre de creaci&#243;n
+de un nuevo perfil de agente. Puede realizar esta tarea en la
+consola de administraci&#243;n de OpenSSO. Algunos de los pasos concretos se aplican
+&#250;nicamente a los tipos de agente de directivas J2EE y web.</p><ol>
+<li><b>Haga clic en la ficha Control de acceso.</b></li>
+<li><b>Haga clic en el nombre del dominio al que pertenecer&#225; el agente.
+</b></li>
+<li><b>Haga clic en la ficha Agents (Agentes).</b></li>
+<li><b>Seleccione la ficha del tipo de agente adecuado.</b><ul>
+<li><b>Agentes web</b></li>
+<li><b>Agentes J2EE</b></li>
+<li><b>Agentes del proveedor de servicios web</b></li>
+<li><b>Agentes del cliente de servicios web</b></li>
+<li><b>Agente de cliente STS</b><p>El agente de cliente del Servicio de token de seguridad permite elegir
+entre dos tipos, Agente de detecci&#243;n y Agente STS. Para m&#225;s informaci&#243;n
+sobre estos tipos de agente, consulte <a href="agentconfig.stsclientedit.html">Cliente STS</a>.</p></li>
+<li><b>Agentes 2.2.</b><p>La ficha Agentes 2.2 se utiliza para los agentes del conjunto de
+software Policy Agent 2.2.</p></li>
+<li><b>Autenticador de agentes</b></li></ul></li>
+<li><b>En la secci&#243;n Agente, haga clic en Nuevo.</b></li>
+<li><b>En el campo Nombre, introduzca el nombre del nuevo perfil de agente.</b></li>
+<li><b>Introduzca y confirme la contrase&#241;a.</b>
+<hr><p><b>Precauci&#243;n &#8211; </b>Esta contrase&#241;a debe ser igual a la que se introduzca en el
+archivo de contrase&#241;as del perfil de agente especificado al ejecutar el programa
+<tt> agentadmin</tt> para instalar el agente.</p>
+<hr>
+<p><b>Pasos 8&#8211;10 Aplicar &#250;nicamente a agentes de directiva web y J2EE.</b></p></li>
+<li><b>Seleccione la configuraci&#243;n aplicable: local o centralizada</b><p>Cuando se selecciona la configuraci&#243;n local, las propiedades relacionadas a este agente
+no podr&#225;n editarse desde la consola. En un escenario como &#233;ste, el
+agente recupera la informaci&#243;n de configuraci&#243;n de los archivos locales, <tt>OpenSSOAgentBootstrap.properties</tt> y
+<tt>OpenSSOAgentConfiguration.properties </tt>, en el directorio de instalaci&#243;n del agente. Para un agente configurado
+de forma local, cambie los valores de la propiedad editando directamente el
+archivo <tt>OpenSSOAgentConfiguration.properties </tt>.</p></li>
+<li><b>En el campo URL del servidor, introduzca la URL del servidor de
+OpenSSO.</b><p>Por ejemplo:</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>En el campo URL del agente, introduzca la URL para la aplicaci&#243;n
+del agente, <tt> agentapp</tt> .</b><p>Por ejemplo:</p><dl><dt>Agentes web</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>Agentes J2EE</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Create (Crear).</b><p>La Consola crea el perfil del agente y muestra de nuevo la
+p&#225;gina del agente, con un v&#237;nculo al nuevo perfil del agente.</p><p>Si desea realizar la configuraci&#243;n adicional del perfil de agente, haga clic
+en este v&#237;nculo para que se muestre la p&#225;gina Editar agente.</p></li></ol>
+<br/>
+
+</body>
+</html>

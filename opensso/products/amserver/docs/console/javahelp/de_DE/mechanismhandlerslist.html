@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Mechanismus-Handler-Liste - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="mechanismhandlerslist"></a><h4>Mechanismus-Handler-Liste</h4>
+<a name="indexterm-160"></a><a name="indexterm-161"></a><p>In der Mechanismus-Handler-Liste werden Informationen &#252;ber den vom Authentifizierungs-Webdienst unterst&#252;tzten SASL-Mechanismus gespeichert.
+It displays entries that contain key/value pairs separated by a pipe as
+in: <tt>key=PLAIN|class=com.sun.identity.liberty.ws.authnsvc.mechanism.PlainMechanismHandler </tt>. Die Parameter werden in der folgenden Tabelle erl&#228;utert.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Parameter</p></th>
+<th align="left" valign="top" scope="column"><p>Wert</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>key</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Der erforderliche <tt>key</tt>-Parameter
+definiert den vom Authentifizierungs-Webdienst unterst&#252;tzten SASL-Mechanismus.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>class</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Der erforderliche <tt>class</tt>-Parameter gibt den Namen der
+Implementierungsklasse f&#252;r den SASL-Mechanismus an. Die Authentifizierungs-Webdienst-Schicht bietet eine Handler-Schnittstelle, die implementiert
+werden muss, damit jeder SASL-Mechanismus die angeforderte Meldung verarbeiten und eine Antwort
+zur&#252;ckgeben kann.</p></td>
+</tr>
+</table><p>Zum Hinzuf&#252;gen eines neuen Request-Handlers klicken Sie auf <b>Hinzuf&#252;gen</b>. Fahren Sie danach
+mit <a href="webservices.wsauthnserviceshandlersadd.html">So konfigurieren Sie einen neuen Mechanismus-Handler</a> fort.</p>
+<br/>
+
+</body>
+</html>

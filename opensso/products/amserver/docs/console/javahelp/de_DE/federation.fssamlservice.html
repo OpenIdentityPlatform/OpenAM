@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAML1.x - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlservice"></a><h3>SAML1.x</h3>
+<a name="indexterm-78"></a><p>Security Assertion Markup Language (SAML) ist ein offenes Standardprotokoll, das ein XML-Framework
+zum Austausch von Sicherheitsinformationen zwischen einer <b>Autorit&#228;t</b> und einer <b>vertrauensw&#252;rdigen</b> Partnersite verwendet.
+Die Sicherheitsinformationen befassen sich mit dem Authentifizierungsstatus, der Zugriffsautorisierung und den Attributinformationen
+eines Subjekts. (Subjekt kann in diesem Kontext sowohl eine Person sein, die
+sich durch eine E-Mail-Adresse auszeichnet, als auch ein Drucker.) Eine SAML-Autorit&#228;t (auch
+als <b>Assertions-Partei</b> bezeichnet) ist eine Plattform oder Anwendung, die in die SAML-API
+integriert wurde, um das Weiterleiten von Sicherheitsinformationen zu erm&#246;glichen. Ein Beispiel ist
+die Assertion, dass ein Subjekt f&#252;r das System authentifiziert wurde, indem die
+erforderlichen Attribute weitergeleitet wurden. Vertrauensw&#252;rdige Partner empfangen diese Sicherheitsinformationen und verlassen sich
+auf deren Authentizit&#228;t.</p><p>Die folgenden SAML-Attribute k&#246;nnen f&#252;r Ihre Implementierung konfiguriert werden, indem Sie auf
+die Schaltfl&#228;che "Lokale Site-Eigenschaften" klicken.</p>
+<ul><li><p><a href="targetspecifier.html">Zielangabe</a></p></li>
+<li><p><a href="siteidentifiers.html">Site-Bezeichner</a></p></li>
+<li><p><a href="trustedpartners.html">Vertrauensw&#252;rdige Partner</a></p></li>
+<li><p><a href="federation.fsssamltargeturlsadd.html">Ziel-URLs</a></p></li>
+<li><p><a href="assertiontimeout.html">Assertion-Zeit&#252;berschreitung</a></p></li>
+<li><p><a href="assertionskew.html">Verzerrungsfaktor der Assertion f&#252;r <tt>notBefore </tt>-Zeitangabe</a></p></li>
+<li><p><a href="artifacttimeout.html">Produktzeit&#252;berschreitung</a></p></li>
+<li><p><a href="samlartifactname.html">SAML-Produktname</a></p></li>
+<li><p><a href="signsamlassertion.html">SAML-Assertion signieren</a></p></li>
+<li><p><a href="signsamlrequest.html">SAML-Anforderung signieren</a></p></li>
+<li><p><a href="signsamlresponse.html">SAML-Antwort signieren</a></p></li></ul>
+<p>In Verbindung mit der Konfiguration von SAML m&#252;ssen die folgenden Aufgaben ausgef&#252;hrt
+werden:</p>
+<ul><li><p><a href="federation.fssamlsiteidadd.html">So konfigurieren Sie einen Site-Bezeichner</a></p></li>
+<li><p><a href="federation.fssamlselecttrustedpartnertype.html">Vertrauensw&#252;rdige Partner: Ausw&#228;hlen von Partnertyp und -profil</a></p></li>
+<li><p><a href="federation.fssamltrustedpartnersadd.html">Vertrauensw&#252;rdige Partner: Konfigurieren von Attributen f&#252;r vertrauensw&#252;rdige Partner</a></p></li>
+<li><p><a href="federation.fssamltargeturlsadd.html">So konfigurieren Sie einen Ziel-URL</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

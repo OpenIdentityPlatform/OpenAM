@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows 데스크탑 SSO - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>Windows 데스크탑 SSO</h4>
+<p><a name="indexterm-183"></a>이 모듈은 Windows 전용이며 커버로스 인증이라고도 합니다. 사용자는 SPNEGO(Simple and Protected GSS-API
+Negotiation Mechanism) 프로토콜을 통해 OpenSSO에 커버로스 토큰을 제공합니다. Windows 데스크탑 SSO 인증
+플러그인 모듈은 클라이언트(사용자)에게 데스크탑 단일 사인온을 제공합니다. 따라서 키 공급 센터에서 이미
+인증된 사용자는 로그인 정보를 다시 지정하지 않아도 OpenSSO에서 인증될 수 있습니다. Windows
+데스크탑 SSO 속성은 전역 속성입니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fwbfr">서비스 기본</a></p></li>
+<li><p><a href="#fwbfo">키탭 파일 이름</a></p></li>
+<li><p><a href="#fwbhy">커버로스 영역</a></p></li>
+<li><p><a href="#fwbid">커버로스 서버 이름</a></p></li>
+<li><p><a href="#fwbhw">도메인 이름과 함께 기본 반환</a></p></li>
+<li><p><a href="#fwbic">인증 수준</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>서비스 기본</h5>
+<p>인증에 사용되는 커버로스 기본을 지정합니다. 다음 형식을 사용합니다.</p><p><tt><b>HTTP/</tt><i>hostname.domainname@dc_domain_name</i><tt></b></tt></p><p><b>hostname</b> 및 <b>domainame</b>은 OpenSSO 인스턴스의 호스트 이름 및 도메인 이름을 나타냅니다. <b>dc_domain_name</b>은
+Windows 커버로스 서버(도메인 컨트롤러)가 있는 커버로스 도메인이며,OpenSSO의 도메인 이름과 다를 수 있습니다.</p>
+
+<a name="fwbfo"></a><h5>키탭 파일 이름</h5>
+<p>이 속성은 인증에 사용되는 커버로스 키탭 파일을 지정합니다. 다음 형식을 사용합니다(반드시 따라야
+하는 형식은 아님).</p><p><tt><b></tt><i>hostname</i><tt>.HTTP.keytab</b></tt></p><p><b>hostname</b>은 OpenSSO 인스턴스의 호스트 이름입니다.</p>
+
+<a name="fwbhy"></a><h5>커버로스 영역</h5>
+<p>이 속성은 커버로스 배포 센터(도메인 제어기)의 도메인 이름을 지정합니다. 구성에 따라 도메인
+제어기의 도메인 이름은 OpenSSO 도메인 이름과 다를 수 있습니다.</p>
+
+<a name="fwbid"></a><h5>커버로스 서버 이름</h5>
+<p>이 속성은 커버로스 배포 센터(도메인 제어기)의 호스트 이름을 지정합니다. 도메인 제어기의 정규화된
+도메인 이름(FQDN)을 입력해야 합니다.</p>
+
+<a name="fwbhw"></a><h5>도메인 이름과 함께 기본 반환</h5>
+<p>이 속성을 사용하면 OpenSSO가 인증 도중에 도메인 제어기의 도메인 이름과 함께 커버로스
+기본을 자동으로 반환할 수 있습니다.</p>
+
+<a name="fwbic"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

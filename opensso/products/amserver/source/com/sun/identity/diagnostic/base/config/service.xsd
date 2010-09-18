@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: service.xsd,v 1.1 2008/11/22 02:09:39 ak138937 Exp $
+
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <xs:element name="service">
+    <xs:complexType>
+    <xs:sequence>
+        <xs:element ref="typeofservice" />
+        <xs:element ref="realization" />
+        <xs:element ref="runtime" />
+    </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="clazz" type="xs:string" use="required" />
+        <xs:attribute name="id" type="xs:string" use="required" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="typeofservice">
+        <xs:complexType mixed="true" />
+    </xs:element>
+
+    <xs:element name="realization">
+    <xs:complexType>
+    <xs:sequence>
+        <xs:element ref="category" maxOccurs="unbounded" />
+    </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+  
+    <xs:element name="category">
+        <xs:complexType>
+            <xs:attribute name="operation" type="xs:string" use="required" />
+            <xs:attribute name="name" type="xs:string" use="required" />
+            <xs:attribute name="id" type="xs:string" use="required" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="runtime">
+    <xs:complexType>
+    <xs:sequence>
+        <xs:element ref="load-on-startup" />
+        <xs:element ref="libraries" />
+        <xs:element ref="resource-bundles" />
+    </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="load-on-startup">
+        <xs:complexType mixed="true" />
+    </xs:element>
+  
+    <xs:element name="libraries">
+    <xs:complexType>
+    <xs:sequence>
+        <xs:element ref="library" maxOccurs="unbounded" />
+    </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="library">
+        <xs:complexType mixed="true" />
+    </xs:element>
+
+    <xs:element name="resource-bundles">
+    <xs:complexType>
+    <xs:sequence>
+        <xs:element ref="resource" maxOccurs="unbounded" />
+    </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="resource">
+        <xs:complexType mixed="true" />
+    </xs:element>
+</xs:schema>

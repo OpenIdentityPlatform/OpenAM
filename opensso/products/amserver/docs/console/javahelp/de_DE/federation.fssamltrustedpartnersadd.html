@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Vertrauensw&#252;rdige Partner: Konfigurieren von Attributen f&#252;r vertrauensw&#252;rdige Partner - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamltrustedpartnersadd"></a><h5>Vertrauensw&#252;rdige Partner: Konfigurieren von Attributen f&#252;r vertrauensw&#252;rdige Partner</h5>
+<a name="indexterm-83"></a><p>Der zweite Teil der Konfiguration eines vertrauensw&#252;rdigen Partners umfasst die nachfolgend beschriebenen
+Schritte. Der Ausgangspunkt ist <a href="federation.fssamlselecttrustedpartnertype.html">Vertrauensw&#252;rdige Partner: Ausw&#228;hlen von Partnertyp und -profil</a>. Je nachdem, welche Rolle(n) im ersten Teil
+der Konfiguration ausgew&#228;hlt wurden, m&#252;ssen f&#252;r den vertrauensw&#252;rdigen Partner die nachfolgend aufgelisteten
+Unterattribute festgelegt werden.</p>
+<hr><p><b>Hinweis &#8211; </b>Wenn Sie diese Seite durch Klicken auf "Bearbeiten" oder "Duplizieren" im SAML-Konfigurationsbildschirm
+unter "Verbindung" aufgerufen haben, &#228;ndern Sie das Profil des vertrauensw&#252;rdigen Partners auf
+der Grundlage der unten angegebenen Schritte und klicken Sie auf "Speichern", um
+die Werte zu speichern. Klicken Sie auf der Seite "SAML-Profil" auf "Speichern",
+um die &#196;nderung abzuschlie&#223;en.</p>
+<hr>
+<ol>
+<li><b>Geben Sie die Werte f&#252;r die Unterattribute der allgemeinen Einstellungen ein.</b><dl><dt>Name</dt>
+<dd><p>Es kann jede Zeichenfolge verwendet werden, beispielsweise ein Unternehmensname.</p></dd>
+<dt>Quell-ID</dt>
+<dd><p>Hierbei handelt es sich um eine 20 Byte lange Sequenz (im Base64-Format kodiert), die von der Partner-Site stammt. Es handelt sich im Allgemeinen um denselben Wert, der bei der Konfiguration des Site-Bezeichner-Attributs f&#252;r das Site-ID-Attribut verwendet wird.</p></dd>
+<dt>Ziel</dt>
+<dd><p>Dies ist die Dom&#228;ne der Partnersite (mit oder ohne Portnummer). Wenn Sie eine Webseite dieser Dom&#228;ne kontaktieren m&#246;chten, wird der Umleitungs-URL aus den im Attribut f&#252;r vertrauensw&#252;rdige Partner definierten Werten abgerufen.</p>
+<hr><p><b>Hinweis &#8211; </b>Falls f&#252;r die gleiche Dom&#228;ne zwei Eintr&#228;ge definiert sind (eine mit Portnummer und eine ohne Portnummer), hat der Eintrag mit der Portnummer Vorrang. For example, assume the following two trusted partner definitions: <tt>target=sun.com</tt> and <tt>target=sun.com:8080</tt>. Wenn der Principal nach <tt>http://machine.sun.com:8080/index.html </tt> sucht, wird die zweite Definition ausgew&#228;hlt.</p>
+<hr>
+</dd>
+<dt>SAML-URL</dt>
+<dd><p> Der URL des Servlets, das das Webbrowser-Produktprofil implementiert.</p></dd>
+<dt>Host-Liste</dt>
+<dd><p>Eine Liste der IP-.Adressen, der DNS-Hostname oder der Alias des Client-Authentifizierungszertifkats, das vom Partner verwendet wird. Diese ist f&#252;r alle Hosts innerhalb der Partner-Site konfiguriert, die Anforderungen an diese Autorit&#228;t senden k&#246;nnen. Mit dieser Liste k&#246;nnen Sie sicherstellen, dass es sich bei dem Anforderer tats&#228;chlich um den vorgesehenen Empf&#228;nger des Produkts handelt. Wenn der Anforderer in der Liste enthalten ist, wird die Interaktion fortgesetzt. Stimmen die Informationen des Anforderers hingegen mit keinem der in der Host-Liste definierten Hosts &#252;berein, wird die Anforderung abgelehnt.</p></dd>
+<dt>Site-Attribut-Mapper</dt>
+<dd><p>Die Klasse, die zur R&#252;ckgabe einer Liste von Attributwerten verwendet wird, die in einer Authentifizierungs-Assertion als <tt>AttributeStatements</tt>-Elemente definiert sind Es muss ein Site-Attribut-Mapper aus der <tt>PartnerSiteAttributeMapper</tt>-Schnittstelle implementiert werden.</p><p>Wenn keine Klasse angegeben ist, werden keine Attribute in die Assertion eingeschlossen.</p></dd>
+<dt>Namensbezeichner-Zuordnung (Mapper)</dt>
+<dd><p>Die Klasse, die festlegt, in welchem Zusammenhang das Subjekt einer Assertion mit einer Identit&#228;t der Ziel-Site steht. An account mapper needs to be implemented from the <tt>com.sun.identity.saml.plugins.PartnerAccountMapper </tt> interface. The default is <tt>com.sun.identity.saml.plugins.DefaultAccountMapper </tt> .</p><p>Wenn keine Klasse angegeben ist, werden keine Attribute in die Assertion eingeschlossen.</p></dd>
+<dt>Version</dt>
+<dd><p>Die SAML-Version (<tt>1.0</tt> oder <tt> 1.1</tt>), die zum Senden von SAML-Anforderungen verwendet wird. Um die Version oder das Protokoll zu &#228;ndern, klicken Sie auf die Schaltfl&#228;che "Lokale Site-Eigenschaften" und &#228;ndern Sie die Protokoll- und Assertion-Attribute wie erforderlich. </p></dd>
+<dt>Zertifikat</dt>
+<dd><p>Ein Zertifikatalias, der zur &#220;berpr&#252;fung der Signatur einer Assertion verwendet wird, wenn die Assertion vom Partner signiert wurde und das Zertifikat nicht im <tt>KeyInfo</tt>-Teil der signierten Assertion gefunden wird.</p></dd>
+<dt>Aussteller</dt>
+<dd><p>Der Ersteller einer generierten Assertion. Die Standardsyntax lautet <i>hostname</i><tt>:</tt> <i> port</i>.</p></dd>
+</dl>
+</li>
+<li><b>Geben Sie die Werte f&#252;r die Ziel-Unterattribute ein.</b><dl><dt>Produkt: SAML URL</dt>
+<dd><p>Der URL des Servlets, das das Webbrowser-Produktprofil implementiert.</p></dd>
+<dt>Post: Post-URL</dt>
+<dd><p>Der URL des Servlets, das das Webbrowser-Post-Profil implementiert.</p></dd>
+<dt>SOAP-Anfrage: Attribut-Mapper</dt>
+<dd><p>Die Klasse, die verwendet wird, um Single Sign-On-Informationen von einer Anfrage abzurufen. Sie m&#252;ssen einen Attribut-Mapper aus der integrierten Schnittstelle implementieren. Wenn keine Klasse angegeben ist, wird <tt>DefaultAttributeMapper</tt> verwendet.</p></dd>
+<dt>SOAP-Anfrage: Aktions-Mapper</dt>
+<dd><p>Die Klasse, die zum Abrufen von Single Sign-On-Informationen und zum Zuordnen von Partneraktionen zu Autorisierungsentscheidungen verwendet wird. Sie m&#252;ssen einen Aktions-Mapper aus der integrierten Schnittstelle implementieren. Wenn keine Klasse angegeben ist, wird <tt>DefaultActionMapper</tt> verwendet.</p></dd>
+</dl>
+</li>
+<li><b>Geben Sie die Werte f&#252;r die Quellen-Unterattribute ein.</b><dl><dt>Produkt: SOAP-URL</dt>
+<dd><p>Der URL zum AML-SOAP-Empf&#228;nger.</p></dd>
+<dt>Authentifizierungstyp</dt>
+<dd><p>Folgende Authentifizierungstypen k&#246;nnen mit SAML verwendet werden:</p>
+<ul><li><p>Geben Sie <tt>NOAUTH</tt> an, wenn der Zugriff auf den URL zum SAML-SOAP-Empf&#228;nger &#252;ber HTTP erfolgt und der SAML-SOAP-Empf&#228;nger nicht durch HTTP-Basis-Authentifizierung und/oder SSL gesch&#252;tzt ist. </p></li>
+<li><p>Geben Sie <tt>BASICAUTH</tt> an, wenn der Zugriff auf den URL zum SAML-SOAP-Empf&#228;nger &#252;ber HTTP erfolgt und der SAML-SOAP-Empf&#228;nger durch HTTP-Basis-Authentifizierung gesch&#252;tzt ist.</p></li>
+<li><p>Geben Sie <tt>SSL</tt> an, wenn der Zugriff auf die URL zum SAML-SOAP-Empf&#228;nger &#252;ber HTTPS erfolgt und der SAML-SOAP-Empf&#228;nger nicht durch HTTP SSL gesch&#252;tzt ist.</p></li>
+<li><p>Geben Sie <tt>SSLWITHBASICAUTH</tt> an, wenn der Zugriff auf den URL zum SAML-SOAP-Empf&#228;nger &#252;ber HTTPS erfolgt und der SAML-SOAP-Empf&#228;nger durch <tt>HTTP-Basis-Authentifizierung mit SSL</tt> gesch&#252;tzt ist.</p></li></ul>
+
+<hr><p><b>Hinweis &#8211; </b>Wenn Sie die URL des SAML-SOAP-Empf&#228;ngers durch HTTP-Basis-Authentifizierung sch&#252;tzen, f&#252;hren Sie dies in der Webcontainer-Konfiguration und nicht in der OpenSSO-Konfiguration durch. Benutzer-ID und Passwort der HTTP-Basis-Authentifizierung geben Sie allerdings in der OpenSSO-Konfiguration an.</p>
+<hr>
+<p>Dieses Attribut ist optional. Wenn nicht anders angegeben, lautet der Standardwert <tt>NOAUTH</tt>. Wenn <tt>BASICAUTH</tt> oder <tt>SSLWITHBASICAUTH </tt> angegeben ist, ist das Attribut "Vertrauensw&#252;rdige Partner" mit dem Wert <tt>HTTPS</tt> erforderlich.</p></dd>
+<dt>Benutzer</dt>
+<dd><p>Wenn <tt>BASICAUTH</tt> als Authentifizierungstyp ausgew&#228;hlt wird, legt der Wert dieses Attributs die Benutzer-ID des Partners fest, die zum Schutz des SOAP-Empf&#228;ngers des Partners verwendet werden soll.</p></dd>
+<dt>Benutzerpasswort</dt>
+<dd><p>Wenn <tt>BASICAUTH</tt> als Authentifizierungstyp ausgew&#228;hlt wird, legt der Wert dieses Attributs das Passwort des Partners fest, das zum Schutz des SOAP-Empf&#228;ngers des Partners verwendet werden soll.</p></dd>
+<dt>Benutzerpasswort (erneute Eingabe)</dt>
+<dd><p>Geben Sie hier das zuvor festgelegte Passwort erneut ein.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "Fertig stellen".</b></li>
+<li><b>Klicken Sie auf der Seite "SAML-Profil" auf "Speichern", um die Konfiguration abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

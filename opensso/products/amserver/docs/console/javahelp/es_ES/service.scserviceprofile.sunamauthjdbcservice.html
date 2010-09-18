@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>JDBC - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthjdbcservice"></a><h4>JDBC</h4>
+<p><a name="indexterm-174"></a>El m&#243;dulo de autenticaci&#243;n Conectividad de base de datos de Java (JDBC,
+Java Database Connectivity) permite a OpenSSO autenticar usuarios mediante cualquier base de
+datos de Lenguaje de consulta estructurado (SQL, Structured Query Language) que proporcione
+controladores habilitados para JDBC. La conexi&#243;n a la base de datos SQL
+se puede realizar directamente mediante un controlador JDBC o mediante un grupo
+de conexi&#243;n JNDI. Los atributos de JDBC son atributos de dominio. Los
+atributos son:</p>
+<ul><li><p><a href="#fwajx">Tipo de conexi&#243;n</a></p></li>
+<li><p><a href="#fwafb">Nombre JNDI de grupo de conexi&#243;n</a></p></li>
+<li><p><a href="#fwaap">Controlador JDBC</a></p></li>
+<li><p><a href="#fwarc">URL de JDBC</a></p></li>
+<li><p><a href="#fwaum">Conectar este usuario a la base de datos</a></p></li>
+<li><p><a href="#fwaeu">Contrase&#241;a para conectarse a la base de datos</a></p></li>
+<li><p><a href="#fwavq">Contrase&#241;a para conectarse a la base de datos (confirmar)</a></p></li>
+<li><p><a href="#fwads">Cadena de la columna de contrase&#241;a</a></p></li>
+<li><p><a href="#fwapb">Declaraci&#243;n preparada</a></p></li>
+<li><p><a href="#fwapv">Clase para transformar la sintaxis de la contrase&#241;a</a></p></li>
+<li><p><a href="#fwavz">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwajx"></a><h5>Tipo de conexi&#243;n</h5>
+<p>Especifica el tipo de conexi&#243;n a la base de datos SQL, utilizando
+un grupo de conexi&#243;n JNDI (Java Naming and Directory Interface) o un
+controlador JDBC. Las opciones son:</p>
+<ul><li><p>El grupo de conexi&#243;n se recupera mediante JDNI</p></li>
+<li><p>Conexi&#243;n JDBC no persistente</p></li></ul>
+<p>El grupo de conexi&#243;n JNDI utiliza la configuraci&#243;n del contenedor Web subyacente.</p>
+
+<a name="fwafb"></a><h5>Nombre JNDI de grupo de conexi&#243;n</h5>
+<p>Si se selecciona JNDI en el tipo de conexi&#243;n, este campo especifica
+el nombre del grupo de conexi&#243;n. Debido a que la autenticaci&#243;n JDBC
+utiliza el grupo de conexi&#243;n JNDI que el contenedor Web proporciona, es
+posible que la configuraci&#243;n del grupo de conexi&#243;n JNDI no se adapte
+correctamente a otros contenedores Web. Consulte el documento "OpenSSO Administration Guide" para
+obtener ejemplos.</p>
+
+<a name="fwaap"></a><h5>Controlador JDBC</h5>
+<p>Si se selecciona JDBC en <a href="#fwajx">Tipo de conexi&#243;n</a>, este campo especifica el controlador JDBC
+que la base de datos SQL proporciona. Por ejemplo, <tt>com.mysql.jdbc.Driver</tt>.</p>
+
+<a name="fwarc"></a><h5>URL de JDBC</h5>
+<p>Especifica la direcci&#243;n URL de la base de datos si se selecciona
+JDBC en <a href="#fwajx">Tipo de conexi&#243;n</a>. Por ejemplo, la direcci&#243;n URL para mySQL es <tt>jdbc.mysql://hostname:port/databaseName</tt>.</p>
+
+<a name="fwaum"></a><h5>Conectar este usuario a la base de datos</h5>
+<p>Especifica el nombre de usuario desde el que se realiza la conexi&#243;n
+a la base de datos para la conexi&#243;n JDBC.</p>
+
+<a name="fwaeu"></a><h5>Contrase&#241;a para conectarse a la base de datos</h5>
+<p>Define la contrase&#241;a para el usuario especificado en User to Connect to
+Database (Usuario para conectarse a la base de datos).</p>
+
+<a name="fwavq"></a><h5>Contrase&#241;a para conectarse a la base de datos (confirmar)</h5>
+<p> Confirme la contrase&#241;a.</p>
+
+<a name="fwads"></a><h5>Cadena de la columna de contrase&#241;a</h5>
+<p>Especifica el nombre de la columna de contrase&#241;as en la base de
+datos SQL.</p>
+
+<a name="fwapb"></a><h5>Declaraci&#243;n preparada</h5>
+<p>Especifica la instrucci&#243;n SQL que recupera la contrase&#241;a del usuario que ha
+iniciado una sesi&#243;n. Por ejemplo:</p><pre> select Password from Employees where USERNAME = ?</pre>
+
+<a name="fwapv"></a><h5>Clase para transformar la sintaxis de la contrase&#241;a</h5>
+<p>Especifica el nombre de la clase que transforma la contrase&#241;a recuperada de
+la base de datos al formato de los datos introducidos por el
+usuario, para comparar las contrase&#241;as. Esta clase debe implementar la interfaz <tt>JDBCPasswordSyntaxTransform</tt>.</p>
+
+<a name="fwavz"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

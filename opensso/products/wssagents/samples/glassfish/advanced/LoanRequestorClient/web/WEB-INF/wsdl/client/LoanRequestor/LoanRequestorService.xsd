@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.5-hudson-218-. --><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://xml.netbeans.org/schema/LoanRequestor" targetNamespace="http://xml.netbeans.org/schema/LoanRequestor" elementFormDefault="qualified">
+    <xsd:complexType name="processApplicationType">
+        <xsd:sequence>
+            <xsd:element name="socialSecurityNumber" nillable="true" type="xsd:string" />
+            <xsd:element name="applicantName" nillable="true" type="xsd:string" />
+            <xsd:element name="applicantAddress" nillable="true" type="xsd:string" />
+            <xsd:element name="applicantEmailAddress" nillable="true" type="xsd:string" />
+            <xsd:element name="applicantAge" nillable="true" type="xsd:int" />
+            <xsd:element name="applicantGender" nillable="true" type="xsd:string" />
+            <xsd:element name="annualSalary" nillable="true" type="xsd:double" />
+            <xsd:element name="amountRequested" nillable="true" type="xsd:double" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="processApplicationResponseType">
+        <xsd:sequence>
+            <xsd:element name="return" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="processApplicationElement" type="tns:processApplicationType" />
+    <xsd:element name="processApplicationResponseElement" type="tns:processApplicationResponseType" />
+</xsd:schema>

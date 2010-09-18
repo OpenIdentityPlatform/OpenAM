@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAML1.x - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlservice"></a><h3>SAML1.x</h3>
+<a name="indexterm-78"></a><p>安全指定標記語言 (Security Assertion Markup Language, SAML) 是一種開放式標準協定，它使用 XML 架構在<b>授權</b>以及<b>信任</b>夥伴網站之間交換安全資訊。安全資訊涉及本身與主體的認證狀態、存取授權以及屬性資訊。(由電子郵件地址識別的個人，其主體可能會和印表機一樣。)SAML 授權機構 (亦稱為<b>指定方</b>) 是已與
+SAML API 整合的平台或應用程式，因此它可以中繼安全資訊。例如，假設已認證主體可藉由傳遞必要屬性進入其系統。信任夥伴網站會接收安全資訊並信任其確實性。</p><p>您可以透過按一下 [本機網站特性] 按鈕，為實作配置下列 SAML 屬性：</p>
+<ul><li><p><a href="targetspecifier.html">目標指定符號</a></p></li>
+<li><p><a href="siteidentifiers.html">網站識別碼</a></p></li>
+<li><p><a href="trustedpartners.html">可信任的合作夥伴</a></p></li>
+<li><p><a href="federation.fsssamltargeturlsadd.html">目標 URL</a></p></li>
+<li><p><a href="assertiontimeout.html">指定逾時</a></p></li>
+<li><p><a href="assertionskew.html"><tt>notBefore</tt> 時間的指定偏斜因素</a></p></li>
+<li><p><a href="artifacttimeout.html">Artifact 逾時</a></p></li>
+<li><p><a href="samlartifactname.html">SAML Artifact 名稱</a></p></li>
+<li><p><a href="signsamlassertion.html">簽名 SAML 指定</a></p></li>
+<li><p><a href="signsamlrequest.html">簽名 SAML 請求</a></p></li>
+<li><p><a href="signsamlresponse.html">簽名 SAML 回應</a></p></li></ul>
+<p>以下的作業與配置 SAML 相關聯：</p>
+<ul><li><p><a href="federation.fssamlsiteidadd.html">配置網站識別碼 </a></p></li>
+<li><p><a href="federation.fssamlselecttrustedpartnertype.html">可信任的合作夥伴：選取夥伴類型及設定檔</a></p></li>
+<li><p><a href="federation.fssamltrustedpartnersadd.html">可信任的合作夥伴：配置可信任的合作夥伴屬性</a></p></li>
+<li><p><a href="federation.fssamltargeturlsadd.html">配置目標 URL</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

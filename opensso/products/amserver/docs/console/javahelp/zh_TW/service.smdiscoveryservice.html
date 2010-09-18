@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>探索服務 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>探索服務</h3>
+<a name="indexterm-119"></a><p>存取識別資料的初始步驟是判定資訊所在的位置。(例如，哪一個識別服務保留主體的信用卡資訊，或哪一個伺服器儲存主體的行事曆服務)。通常，網路上有一或多個服務允許其他實體對識別資料執行動作。因為並未預期用戶端追蹤這些服務，或知道可以信任哪些服務，所以它們需要探索服務。<b>探索服務</b>實質上是探索資源的 Web 服務介面。<b>探索資源</b>是資源提供的登錄。<b>資源提供</b>定義識別資料片段與提供該資料存取權的服務實例之間的關聯。<b>資源識別碼</b>是在探索服務中註冊的唯一資源識別碼 (unique resource identifier, URI)，它指向特定探索資源。當用戶端傳送對某些類型資料的請求時，它會包括 OpenSSO 探索服務用來為尋找請求的屬性之 Web 服務提供者的資源識別碼。探索服務會傳回資源提供，其中包含尋找資料所需的資訊。</p>
+<hr><p><b>備註 &#8211; </b>為了進行存取，Liberty 個人設定檔服務 的代管提供者需要代表每一個識別主體註冊 探索服務。</p>
+<hr>
+<p>可以針對您的實作配置以下探索服務全域屬性。</p>
+<ul><li><p><a href="dsproviderid.html">提供者 ID</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">支援的認證機制</a></p></li>
+<li><p><a href="supporteddirectives.html">支援的指令</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">探索查找的策略評估</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">探索更新的策略評估</a></p></li>
+<li><p><a href="authorizerpluginclass.html">授權程式外掛程式類別：</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">項目處理程式外掛程式類別：</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">ResourceID 對映程式外掛程式類別</a></p></li>
+<li><p><a href="authresponsemessage.html">認證回應訊息</a></p></li>
+<li><p><a href="generatesessioncontext.html">啟動程式的階段作業環境敘述</a></p></li>
+<li><p><a href="encryptnameidentifier.html">為啟動程式加密階段作業環境中的名稱識別碼</a></p></li>
+<li><p><a href="useimpliedresource.html">隱含資源</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">啟動程式的資源提供</a></p></li></ul>
+<p>以下的作業與配置探索服務相關聯：</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">配置啟動程式的資源提供</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">配置服務描述</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

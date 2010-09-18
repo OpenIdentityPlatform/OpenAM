@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie einen SAMLv2-Entity-Anbieter: - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createsaml2"></a><h5>So erstellen Sie einen SAMLv2-Entity-Anbieter:</h5>
+<p>Mithilfe dieser Schritte k&#246;nnen Sie einen Entity-Anbieter auf der Grundlage des SAMLv2-Plugins
+f&#252;r die Verbindungsdienste erstellen. Sie k&#246;nnen der Entity eine, mehr als eine
+oder alle Anbieterrollen zuweisen, aber alle von Ihnen definierten Rollen geh&#246;ren dann
+zu demselben Entity-Anbieter. </p><ol>
+<li><b>Melden Sie sich als Administrator an.</b></li>
+<li><b>Gehen Sie zur Registerkarte "Verbindung" in der Konsole und klicken Sie in
+der Tabelle "Entity-Anbieter" auf "Neu".</b></li>
+<li><b>Wenn Sie dazu aufgefordert werden, w&#228;hlen Sie SAMLv2 als Entity-Anbieter.</b></li>
+<li><b>W&#228;hlen Sie den Bereich aus, zu dem der Entity-Anbieter geh&#246;ren soll.</b></li>
+<li><b>Geben Sie einen Namen in das Feld "Entity-Bezeichner" ein. </b></li>
+<li><b>W&#228;hlen Sie die Entity-Anbieterrolle aus, die Sie dem Entity-Anbieter zuweisen m&#246;chten.</b><p>Durch Eingabe der Daten in das Feld "Meta-Alias" wird automatisch die Entity-Anbieterrolle
+erstellt und anschlie&#223;end dem Entity-Anbieter zugewiesen.</p></li>
+<li><b>Geben Sie Werte f&#252;r die folgenden Attribute f&#252;r eine oder mehrere Rollen
+ein:</b><dl><dt>Meta-Alias</dt>
+<dd><p>Gibt einen <tt>metaAlias</tt> f&#252;r die zu konfigurierende Anbieterrolle an. Der <tt>metaAlias</tt> wird verwendet, um nach dem Entity-Bezeichner des Anbieters und dem entsprechenden Unternehmen zu suchen. Der Wert ist eine Zeichenfolge, die dem Bereich oder Unternehmensnamen entspricht, zusammen mit einem Schr&#228;gstrich und dem Anbieternamen. Z. B. <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Achtung &#8211; </b>Die im <tt>metaAlias</tt> verwendeten Namen d&#252;rfen keinen <tt>/</tt> enthalten.</p>
+<hr>
+</dd>
+<dt>Zertifikatsalias f&#252;r Signierung</dt>
+<dd><p>Gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Signaturzertifikat im Schl&#252;sselspeicher verwendet wird. </p></dd>
+<dt>Zertifikatsalias f&#252;r Verschl&#252;sselung</dt>
+<dd><p>Gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Verschl&#252;sselungszertifikat im Schl&#252;sselspeicher verwendet wird.</p></dd>
+<dt>Zuordnungsmitglieder (nur gehostete Zuordnung)</dt>
+<dd><p>Ein Anbieter muss Mitglied eines Circle of Trust sein, anderenfalls kann er nicht an SAMLv2-basierten Kommunikationen teilnehmen. Der Anbieter darf zu einer oder mehreren Zuordnungen geh&#246;ren. Das Attribut "Zuordnungsverbindung" muss f&#252;r den ausgew&#228;hlten Anbieter aktiviert sein. Geben Sie den Meta-Alias des Anbieters in das Feld "Neuer Wert" ein und klicken Sie auf "Hinzuf&#252;gen".</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "Erstellen".</b><p>Der Entity-Anbieter, seine zugewiesenen Anbieterrollen und der Speicherort werden in der Liste
+"Entity-Anbieter" angezeigt. </p></li>
+<li><b>Um das Verhalten der Rollen eines Entity-Anbieters anzupassen, klicken Sie auf den
+Namen des Entity-Anbieters und w&#228;hlen Sie die Registerkarte, die zu der anzupassenden
+Rolle geh&#246;rt.</b></li></ol>
+<br/>
+
+</body>
+</html>

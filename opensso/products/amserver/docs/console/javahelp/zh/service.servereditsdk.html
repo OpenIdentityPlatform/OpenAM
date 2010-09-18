@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SDK - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsdk"></a><h4>SDK</h4>
+<p>SDK 属性设置后端数据存储库的配置定义。</p>
+
+<a name="ggkan"></a><h5>数据存储库</h5>
+<p>“数据存储库”属性包含基本的数据储存库配置：</p>
+
+<a name="ggkem"></a><h5>启用数据存储库通知</h5>
+<p>指定是否启用后端数据存储库通知。如果将该值设置为“假”，则启用内存通知。</p>
+
+<a name="ggkfc"></a><h5>启用 Directory Proxy</h5>
+<p>默认值为“假”。该标志的目的在于向“服务管理”报告，必须使用 Directory Proxy 对 Directory Server 进行读取、写入和/或修改操作。该标志还决定是否使用 ACI 或委托权限。当 Access Manager SDK（版本
+7 或 7.1）与 Access Manger 版本 6.3 通信时，必须将该标志设置为“真”。</p><p>例如，在共存/传统模式中该值应为“真”。在传统 DIT 中，不支持委托策略。仅支持 ACI，因此为确保进行正确的委托检查，在传统模式安装中必须将该标志设置为“真”，以利用 ACI 进行访问控制。否则委托检查将失败。</p><p>在领域模式中，应将该值设置为“假”，以便仅使用委托策略进行访问控制。在 7.0 或更高版本中，Access Manager 或 OpenSSO 支持领域模式安装中的数据未知功能。因此，除 Directory Server 以外，也可能使用其他服务器来存储服务配置数据。此外，该标志会向“服务管理”功能报告，无需使用 Directory Proxy
+对后端存储进行读取、写入和/或修改操作。这是因为一些数据存储库（如 Active Directory）可能不支持代理服务器。</p>
+
+<a name="ggkcv"></a><h5>事件服务</h5>
+<p>以下属性定义数据存储库的事件服务通知：</p>
+
+<a name="ggkez"></a><h5>事件服务连接的重试次数</h5>
+<p>默认值为 3。指定为成功重新建立事件服务连接所进行的尝试次数。</p>
+
+<a name="ggkdr"></a><h5>LDAP 连接重试之间的延迟</h5>
+<p>默认值为 3000。指定为重新建立事件服务连接而进行的重试之间的延迟时间（以毫秒为单位）。</p>
+
+<a name="ggkcq"></a><h5>LDAP 连接重试的错误代码</h5>
+<p>默认值为 80、81 和 91。指定重试重新建立事件服务连接时会触发的 LDAP 异常错误代码。</p>
+
+<a name="ggncc"></a><h5>空闲超时</h5>
+<p>默认值为 0。指定经过多少时间后才能再次重新启动持久性搜索（以分钟为单位）。</p><p>此属性在负载平衡器或防火墙处于策略代理和 Directory Server 之间时使用，并在发生 TCP 空闲超时后会放弃持久性搜索连接。属性值应该低于负载平衡器或防火墙的 TCP 超时值。这确保在断开连接之前重新启动持久性搜索。值为 0 表示不会重新启动搜索。仅会重置超时的连接。</p>
+
+<a name="ggndm"></a><h5>禁用的事件服务连接</h5>
+<p>指定要禁用的事件连接。值（不区分大小写）可以为：</p>
+<ul><li><p>aci &#8212; 更改为 aci 属性，使用 LDAP 过滤器 (aci=*) 搜索。</p></li>
+<li><p>sm &#8212; OpenSSO 信息树（或服务管理节点）中的更改，包含具有 <tt>sunService</tt> 或 <tt>sunServiceComponent</tt> 标记对象类的对象。例如，您可以创建用于定义受保护资源的访问权限的策略，或者修改现有策略的规则、主体、条件或响应提供者。</p></li>
+<li><p>um &#8212; 用户目录（或用户管理节点）中的更改。例如，您可以更改用户的名称或地址。</p></li></ul>
+<p>例如，要禁用对 OpenSSO 信息树（或服务管理节点）更改的持久性搜索：</p><p><tt>com.sun.am.event.connection.disable.list=sm </tt></p>
+<hr><p><b>注意 &#8211; </b>持久性搜索会消耗 Directory Server 的部分性能。如果认为在产品环境中删除一些性能消耗十分重要，则可以利用该属性禁用一个或多个持久性搜索。</p><p>但是，在禁用持久性搜索之前，您应该了解如上所述的限制。除非绝对必要，否则强烈建议不要更改该属性。引入该属性主要用于在使用多个 2.1 J2EE 代理时避免消耗 Directory Server，因为每个代理都要建立这些持久性搜索。2.2 J2EE 代理不再建立这些持久性搜索，因此您可能无需使用该属性。</p><p>不建议禁用这些组件的持久性搜索，因为禁用了持久性搜索的组件无法从 Directory Server 接收通知。因此，不会通知组件高速缓存在 Directory Server 中对特定组件所作的更改。例如，如果您在用户目录 (<tt>um</tt>) 中禁用了对更改的持久性搜索，则 OpenSSO 不会从 Directory
+Server 接收通知。所以，代理不会从 OpenSSO 获得通知以通过用户属性的新值来更新其本地用户高速缓存。然后，如果应用程序查询用户属性代理，则可能会接收该属性的旧值。</p><p>仅在绝对需要时才会在特殊情况下使用该属性。例如，如果您知道不会在生产环境中更改“服务配置”（涉及更改“会话服务”和“验证服务”等服务的值），则可以禁用对“服务管理”(<tt>sm</tt>) 组件的持久性搜索。但是，如果任何服务发生任何更改，则需要重新启动服务器。同样的条件也适用于由 <tt>aci</tt> 和 <tt>um</tt> 值指定的其他持久性搜索。</p>
+<hr>
+
+
+<a name="ggnip"></a><h5>LDAP 连接</h5>
+<p>以下属性为后端数据存储库设置连接数据：</p>
+
+<a name="ggnjl"></a><h5>LDAP 连接的重试次数</h5>
+<p>默认值为 1000。指定重试操作之间的间隔时间（以毫秒为单位）。</p>
+
+<a name="ggnhu"></a><h5>LDAP 连接重试之间的延迟</h5>
+<p>默认值为 3。指定为成功重新建立 LDAP 连接的尝试次数。</p>
+
+<a name="ggnjt"></a><h5>LDAP 连接重试的错误代码</h5>
+<p>默认值为 80、81 和 91。指定重试重新建立 LDAP 连接时会触发的 <tt>LDAPException</tt> 错误代码。</p>
+
+<a name="ggkcx"></a><h5>高速缓存和副本</h5>
+<p>以下属性定义高速缓存和副本配置：</p>
+
+<a name="ggkcm"></a><h5>SDK 高速缓存的最大大小</h5>
+<p>默认值为 10000。指定启用高速缓存时 SDK 高速缓存的大小。使用大于 0 的整数，否则会使用默认大小（10000 个用户）。</p>
+
+<a name="ggkdo"></a><h5>SDK 副本重试次数</h5>
+<p>默认值为 0。指定重试次数。</p>
+
+<a name="ggker"></a><h5>SDK 副本尝试之间的延迟</h5>
+<p>默认值为 1000。指定重试操作之间的间隔时间（以毫秒为单位）。</p>
+<br/>
+
+</body>
+</html>

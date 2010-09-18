@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Active Directory - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthadservice"></a><h4>Active Directory</h4>
+<p><a name="indexterm-166"></a>Ce type de module fonctionne de mani&#232;re similaire au type de module
+d'authentification LDAP, &#224; la diff&#233;rence pr&#232;s qu'il utilise Microsoft Active Directory au
+lieu d'un annuaire LDAP. L'utilisation de ce type de module permet de
+faire coexister l'annuaire LDAP et Active Directory sous le m&#234;me domaine. Les
+attributs d'authentification Active Directory sont des attributs de domaine. Ces attributs sont
+les suivants :</p>
+<ul><li><p><a href="#fwfdx">Serveur Active Directory principal</a></p></li>
+<li><p><a href="#fwbmo">Serveur Active Directory secondaire</a></p></li>
+<li><p><a href="#fwfeb">DN o&#249; d&#233;marrer recherche util.</a></p></li>
+<li><p><a href="#fwbjl">DN pour liaison utilisateur root</a></p></li>
+<li><p><a href="#fwbix">Mot de passe pour liaison utilisateur root</a></p></li>
+<li><p><a href="#fwbnt">Mot de passe pour liaison utilisateur root (confirmer)</a></p></li>
+<li><p><a href="#fwblg">Attribut utilis&#233; pour r&#233;cup&#233;rer le profil utilisateur</a></p></li>
+<li><p><a href="#fwbpi">Attributs utilis&#233;s pour rechercher un utilisateur &#224; authentifier</a></p></li>
+<li><p><a href="#fwbmh">Filtre de recherche d'utilisateur</a></p></li>
+<li><p><a href="#fwbju">&#201;tendue de la recherche</a></p></li>
+<li><p><a href="#fwbmt">Acc&#232;s SSL au serveur Active Directory</a></p></li>
+<li><p><a href="#fwbpx">Renvoyer DN utilisateur &#224; authentifier</a></p></li>
+<li><p><a href="#fwbjb">Intervalle de recherche du serveur Active Directory</a></p></li>
+<li><p><a href="#fwbtk">Attributs de cr&#233;ation d'utilisateurs</a></p></li>
+<li><p><a href="#fwboz">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwfdx"></a><h5>Serveur Active Directory principal</h5>
+<p>Indique le nom d'h&#244;te et le num&#233;ro de port du serveur Active
+Directory principal d&#233;finis lors de l'installation d'OpenSSO. C'est le premier serveur contact&#233;
+pour l'authentification Active Directory. Le format est <tt></tt><i>nomh&#244;te:port</i><tt></tt>. Si aucun num&#233;ro de
+port n'est sp&#233;cifi&#233;, le port <tt>389</tt> est utilis&#233; par d&#233;faut.</p><p>Si OpenSSO est d&#233;ploy&#233; avec plusieurs domaines, vous pouvez sp&#233;cifier la liaison
+de communication entre des instances sp&#233;cifiques d'OpenSSO et de Directory Server dans
+le format suivant (les entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es du nom du
+serveur local)&#160;:</p><p><tt>nomserveur_local|serveur:port nomserveur_local2|serveur2:port2 ...</tt></p><p>Par exemple, si vous avez d&#233;ploy&#233; deux instances OpenSSO dans diff&#233;rents emplacements
+(L1-machine1-IS et L2- machine2-IS) qui communiquent avec diff&#233;rentes instances de Directory Server
+(L1-machine1-DS et L2-machine2-DS), la liaison de communication est la suivante&#160;:</p><p><tt>L1-machine1-IS.exemple.com|L1-machine1-DS.exemple.com:389 </tt></p><p><tt>L2-machine2-IS.exemple.com|L2-machine2-DS.exemple.com:389 </tt></p>
+
+<a name="fwbmo"></a><h5>Serveur Active Directory secondaire</h5>
+<p>Indique le nom d'h&#244;te et le num&#233;ro de port d'un serveur Active
+Directory secondaire disponible pour la plate-forme OpenSSO. Si le serveur Active Directory
+principal ne r&#233;pond pas &#224; une demande d'authentification, ce serveur sera contact&#233;.
+Si le serveur principal est en fonctionnement, OpenSSO rebascule vers ce serveur
+principal. Le format est &#233;galement <tt></tt><i>nomh&#244;te:port</i><tt></tt>. Les entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es
+du nom du serveur local.</p>
+<hr><p><b>Attention &#8211; </b>Lors de l'authentification d'utilisateurs &#224; partir d'un serveur Directory Server distant par
+rapport &#224; l'entreprise OpenSSO, il est important de sp&#233;cifier les ports primaires
+et secondaires LDAP. La valeur d'un seul emplacement de serveur Directory Server
+peut &#234;tre utilis&#233;e pour les deux champs.</p>
+<hr>
+
+
+<a name="fwfeb"></a><h5>DN o&#249; d&#233;marrer recherche util.</h5>
+<p>Sp&#233;cifie le DN du n&#339;ud &#224; partir duquel doit commencer la recherche
+d'un utilisateur. (Pour des raisons de performance, ce DN doit &#234;tre aussi
+sp&#233;cifique que possible.) La valeur par d&#233;faut est la racine de la
+structure de r&#233;pertoire. Tout DN valide sera reconnu. Si la valeur OBJECT
+est s&#233;lectionn&#233;e pour l'attribut &#201;tendue de la recherche, le DN doit indiquer
+le niveau sup&#233;rieur par rapport au niveau auquel figure le profil. Les
+entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es du nom du serveur local. Le format
+est <tt></tt><i>nomserveur|dn recherche</i><tt></tt>.</p><p>Lorsqu'il existe plusieurs entr&#233;es :</p><p><tt></tt><i>nomserveur1|dn recherche nomserveur2|dn recherche nomserveur3|dn recherche</i><tt>...</tt></p><p>Si plusieurs entr&#233;es ont le m&#234;me ID utilisateur dans l'organisation racine, ce
+param&#232;tre doit &#234;tre d&#233;fini de sorte qu'une seule entr&#233;e &#224; authentifier soit
+recherch&#233;e ou d&#233;tect&#233;e. Par exemple, au cas o&#249; l'ID d'agent et l'ID
+d'utilisateur seraient identiques &#224; la racine de l'organisation, ce param&#232;tre doit &#234;tre
+<tt>ou=Agents</tt> pour que l'organisation racine authentifie selon l'ID d'agent et <tt>ou=People, </tt> pour
+que l'organisation racine authentifie selon l'ID d'utilisateur.</p>
+
+<a name="fwbjl"></a><h5>DN pour liaison utilisateur root</h5>
+<p>Sp&#233;cifie le DN de l'utilisateur qui sera associ&#233; au serveur Directory Server
+indiqu&#233; dans le champ Serveur et port LDAP principaux en tant qu'administrateur.
+Le service d'authentification doit &#234;tre associ&#233; &#224; ce DN afin de pouvoir
+rechercher le DN utilisateur correspondant &#224; un ID de connexion utilisateur donn&#233;.
+La valeur par d&#233;faut est <tt>amldapuser.</tt> Tout DN valide est reconnu.</p><p>Assurez-vous que le mot de passe est correct avant de vous d&#233;connecter.
+S'il est incorrect, vous serez bloqu&#233;. Dans ce cas, vous pouvez vous
+connecter avec le DN du superutilisateur. Par d&#233;faut, il s'agit du compte
+<tt>amAdmin</tt> avec lequel vous vous connectez normalement, m&#234;me si vous allez utiliser
+le DN complet. Par exemple :</p><p><tt>uid_amAdmin,ou=People,</tt><i>base OpenSSO</i><tt></tt></p>
+
+<a name="fwbix"></a><h5>Mot de passe pour liaison utilisateur root</h5>
+<p>Contient le mot de passe du profil administrateur sp&#233;cifi&#233; dans le champ
+DN pour liaison utilisateur root. Il n'y a pas de valeur par
+d&#233;faut. Seul le mot de passe Active Directory valide de l'administrateur est
+reconnu.</p>
+
+<a name="fwbnt"></a><h5>Mot de passe pour liaison utilisateur root (confirmer)</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="fwblg"></a><h5>Attribut utilis&#233; pour r&#233;cup&#233;rer le profil utilisateur</h5>
+<p>Indique l'attribut utilis&#233; comme convention de nommage des entr&#233;es utilisateur. Par d&#233;faut,
+OpenSSO suppose que les entr&#233;es utilisateur sont identifi&#233;es par l'attribut uid. Si
+votre serveur Directory Server utilise un attribut diff&#233;rent (tel que <i>givenname</i>), indiquez
+son nom dans ce champ.</p>
+
+<a name="fwbpi"></a><h5>Attributs utilis&#233;s pour rechercher un utilisateur &#224; authentifier</h5>
+<p>R&#233;pertorie les attributs du filtre de recherche &#224; utiliser pour authentifier un
+utilisateur, et permet &#224; l'utilisateur de s'authentifier avec plusieurs attributs dans son
+entr&#233;e. Par exemple, si ce champ contient <i>uid</i>, <i>employeenumber</i> et <i>mail</i>, l'utilisateur
+peut s'authentifier avec chacun de ces noms.</p>
+
+<a name="fwbmh"></a><h5>Filtre de recherche d'utilisateur</h5>
+<p>Indique l&#8217;attribut &#224; utiliser pour trouver un utilisateur &#224; l'aide du champ
+DN duquel d&#233;marrer la recherche utilisateur. Il fonctionne avec l'attribut d'affectation de
+nom &#224; un utilisateur. Il n'y a pas de valeur par d&#233;faut.
+Tout attribut d'entr&#233;e utilisateur valide est reconnu.</p>
+
+<a name="fwbju"></a><h5>&#201;tendue de la recherche</h5>
+<p>Indique le nombre de niveaux du serveur Directory Server qui seront inspect&#233;s
+afin de trouver un profil utilisateur correspondant. La recherche commence &#224; partir
+du n&#339;ud sp&#233;cifi&#233; dans l'attribut DN duquel d&#233;marrer la recherche utilisateur. La
+valeur par d&#233;faut est SOUS-ARBORESCENCE. L'un des choix suivants peut &#234;tre s&#233;lectionn&#233;
+dans la liste :</p><dl><dt>OBJET</dt>
+<dd><p>Recherche uniquement sur le n&#339;ud sp&#233;cifi&#233;.</p></dd>
+<dt>UN_NIVEAU</dt>
+<dd><p>Recherche au niveau du n&#339;ud sp&#233;cifi&#233; et au niveau inf&#233;rieur.</p></dd>
+<dt>SOUS_ARBORESCENCE</dt>
+<dd><p>Recherche toutes les entr&#233;es au niveau du n&#339;ud sp&#233;cifi&#233; ainsi qu'&#224; tous les niveaux qui lui sont inf&#233;rieurs.</p></dd>
+</dl>
+
+
+<a name="fwbmt"></a><h5>Acc&#232;s SSL au serveur Active Directory</h5>
+<p>Active l'acc&#232;s SSL au serveur Directory Server indiqu&#233; dans le champ Serveur
+et port LDAP principaux et secondaires. Par d&#233;faut, cette case n'est pas
+coch&#233;e et le protocole SSL n'est pas utilis&#233; pour acc&#233;der &#224; Directory
+Server.</p><p>Si le serveur Active Directory fonctionne avec SSL activ&#233; (LDAPS), vous devez
+vous assurer que OpenSSO est configur&#233; avec les certificats de confiance SSL
+appropri&#233;s, afin qu'AM puisse se connecter au serveur Directory Server par le
+biais du protocole LDAPS.</p>
+
+<a name="fwbpx"></a><h5>Renvoyer DN utilisateur &#224; authentifier</h5>
+<p>Lorsque le r&#233;pertoire OpenSSO est identique &#224; celui configur&#233; pour Active Directory,
+cette option peut &#234;tre activ&#233;e. Dans ce cas, elle permet &#224; l'instance
+du module d'authentification Active Directory de renvoyer le DN au lieu de
+l'ID utilisateur et aucune recherche n'est n&#233;cessaire. Normalement, une instance du module
+d'authentification renvoie uniquement l'ID utilisateur et le service d'authentification recherche l'utilisateur dans
+l'instance locale d'OpenSSO. Si un serveur Active Directory externe est utilis&#233;, cette
+option n'est g&#233;n&#233;ralement pas activ&#233;e.</p>
+
+<a name="fwbjb"></a><h5>Intervalle de recherche du serveur Active Directory</h5>
+<p>Cet attribut est utilis&#233; pour le r&#233;tablissement du serveur Active Directory. Il
+d&#233;finit le d&#233;lai en minutes pendant lequel un thread reste en sommeil
+avant de v&#233;rifier que le serveur Active Directory principal est en cours
+d'ex&#233;cution.</p>
+
+<a name="fwbtk"></a><h5>Attributs de cr&#233;ation d'utilisateurs</h5>
+<p>Cet attribut est utilis&#233; par l'instance de module d'authentification Active Directory lorsque
+le serveur Active Directory est configur&#233; comme un serveur Active Directory externe.
+Il contient un mappage des attributs entre une instance de Directory Server
+locale et externe. Cet attribut a le format suivant :</p><p><i>attr1|attrexterne1</i></p><p><i>attr2|externalattr2</i></p><p>Lorsque cet attribut est renseign&#233;, les valeurs des attributs externes sont lues
+&#224; partir de l'instance de Directory Server externe et sont d&#233;finies pour
+les attributs internes de Directory Server. Les valeurs des attributs externes sont
+d&#233;finies dans les attributs internes uniquement si l'attribut <tt>Profil utilisateur</tt> (dans le type
+de module d'authentification principal) a pour valeur Cr&#233;&#233; dynamiquement et si l'utilisateur
+n'existe pas dans l'instance du serveur Directory Server local. L'utilisateur r&#233;cemment cr&#233;&#233;
+contiendra les valeurs des attributs internes, comme indiqu&#233; dans la Liste des
+attributs de cr&#233;ation d'utilisateurs, avec les valeurs des attributs externes avec lesquels
+ils sont mapp&#233;s. </p>
+
+<a name="fwboz"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

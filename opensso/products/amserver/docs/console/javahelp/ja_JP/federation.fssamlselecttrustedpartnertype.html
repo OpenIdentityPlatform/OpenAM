@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>信頼パートナー: パートナータイプおよびプロファイルを選択する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlselecttrustedpartnertype"></a><h5>信頼パートナー: パートナータイプおよびプロファイルを選択する</h5>
+<a name="indexterm-81"></a><a name="indexterm-82"></a><p>この属性は、OpenSSO と通信する信頼パートナー (OpenSSO がインストールされたサーバーに対してリモートにある) を定義します。</p>
+<hr><p><b>注 &#8211; </b>信頼パートナーサイトでは、「サイト ID」属性で設定された 1 つ以上のサイトと、事前に信頼関係が確立されている必要があります。</p>
+<hr>
+<p>信頼パートナーの設定の第 1 段階では、信頼関係でのパートナーのロールを決定します。信頼パートナーになり得るのは、ソースサイト (シングルサインオン表明を生成するサイト) か、または送信先サイト (シングルサインオン表明を消費するサイト) です。たとえば、パートナーがソースサイトである場合、この属性は表明の送信方法に基づいて設定されます。パートナーが送信先サイトである場合は、この属性は表明を受け取るプロファイルに基づいて設定されます。信頼パートナーを設定するための最初の手順は、次のとおりです。連携の「SAML」画面から作業を始めます。</p>
+<hr><p><b>注 &#8211; </b>信頼パートナープロファイルの属性を編集または複製するには、設定済みの信頼パートナー名の横にある「アクション」カラムの該当するボタンをクリックします。</p>
+<hr>
+<ol>
+<li><b>通信に使用する適切なプロファイルのチェックボックスをオンにして、設定するパートナーサイトのロール (「送信先」または「ソース」) を選択します。</b><p>「送信先」、「ソース」、またはその両方に、「<b>Web ブラウザのアーティファクトプロファイル</b>」または「<b>Web ブラウザの Post プロファイル</b>」を選択できます。あるいは、「送信先」にだけ「<b>SOAP クエリー</b>」を選択できます。選択した内容に応じて、次の手順でどの属性を設定する必要があるかが決まります。</p>
+<hr><p><b>注 &#8211; </b>既存の信頼パートナーを変更する場合は、「編集」をクリックしてパートナーサイトのロールを変更します。</p>
+<hr>
+</li>
+<li><b>「次へ」をクリックします。</b></li>
+<li><b>設定を完了するには、<a href="federation.fssamltrustedpartnersadd.html">「信頼パートナー: 信頼パートナー属性を設定する」</a>を参照してください。</b></li></ol>
+<br/>
+
+</body>
+</html>

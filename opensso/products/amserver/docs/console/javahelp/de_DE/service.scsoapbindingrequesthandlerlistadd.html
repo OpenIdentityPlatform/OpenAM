@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So konfigurieren Sie einen Anforderungs-Handler - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbindingrequesthandlerlistadd"></a><h5>So konfigurieren Sie einen Anforderungs-Handler</h5>
+<a name="indexterm-153"></a><a name="indexterm-154"></a><p>Die <tt>RequestHandler</tt>-Schnittstelle muss serverseitig von jedem Liberty-basierten Identit&#228;tsdienst implementiert sein, der den
+ SOAP Binding-Dienst nutzt. Das Attribut "Anforderungs-Handler-Liste" speichert Informationen &#252;ber die Implementierungsklassen
+der Webdienste, die den Anforderungs-Handler implementieren. The Request Handler List displays entries
+that contain key/value pairs separated by a pipe as in: <tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>.</p><ol>
+<li><b>Klicken Sie auf "Neu", um die neuen Anforderungshandler-Attribute anzuzeigen, oder klicken Sie
+auf einen konfigurierten Schl&#252;sselwert, um vorhandene Attribute zu bearbeiten.</b></li>
+<li><b>Legen Sie die Attributwerte entsprechend der folgenden Informationen fest:</b><dl><dt>key</dt>
+<dd><p>Dieser erforderliche Parameter ist der letzte Teil des URI-Pfads eines SOAP-Endpunkts. In OpenSSO ist der SOAP-Endpunkt das SOAP-Empf&#228;nger-Servlet. Die URI des SOAP-Empf&#228;ngers  lautet <tt><b></tt><i>protocol </i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt>. If you define <tt><b>disco</b></tt> as the key, the URI path to the SOAP endpoint for the corresponding Discovery-Dienst would be: <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>. Die einzelnen Dienstclients verwenden beim Verbindungsaufbau mit dem SOAP-Empf&#228;nger unterschiedliche Schl&#252;ssel.</p></dd>
+<dt>class</dt>
+<dd><p>Dieser erforderliche Parameter gibt den Namen der Implementierungsklasse des Anforderungs-Handlers f&#252;r den jeweiligen Identit&#228;tsdienst an. For example: <tt>class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>.</p></dd>
+<dt>SOAP-Vorgang</dt>
+<dd><p>Dieser Parameter enth&#228;lt einen optionalen SOAP-spezifischen URI.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "OK", um die Konfiguration des Anforderungs-Handlers abzuschlie&#223;en.</b></li>
+<li><b>Klicken Sie auf der SOAP Binding-Dienst-Seite auf "Speichern", um die Konfiguration des
+Dienstes abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

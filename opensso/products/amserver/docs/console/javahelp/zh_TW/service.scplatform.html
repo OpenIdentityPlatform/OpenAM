@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>平台 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>平台</h4>
+<p><a name="indexterm-205"></a>平台服務是可將其他伺服器增加至 OpenSSO 配置的位置，也是他在 OpenSSO 應用程式頂層套用的選項之位置。平台服務屬性為全域屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fxcgy">平台語言環境</a></p></li>
+<li><p><a href="#fxcpo">Cookie 網域</a></p></li>
+<li><p><a href="#fxcmi">可用的語言環境</a></p></li>
+<li><p><a href="#fxctg">用戶端字元集</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>平台語言環境</h5>
+<p>此平台語言環境值是安裝 OpenSSO 所使用的預設語言子類型。將在此值的語言環境中管理認證、記錄與管理服務。預設值為 en_US。請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得支援的語言子類型清單。</p>
+
+<a name="fxcpo"></a><h5>Cookie 網域</h5>
+<p>認證期間在使用者的瀏覽器中設置 Cookie 時，將在 Cookie 標頭中傳回網域清單。如果清單為空，則不會設定 Cookie 網域。換句話說，只會將 OpenSSO 階段作業轉寄至 OpenSSO 本身，並不會轉寄至網域中的其他伺服器。</p><p>如果此網域中的其他伺服器要求 SSO，則必須將此屬性設定為具有 Cookie 網域的屬性。如果在一個 OpenSSO 的不同網域中有兩個介面，則將需要在此屬性中設定兩個 Cookie 網域。如果使用負載平衡器，Cookie 網域必須屬於負載平衡器網域，而不是負載平衡器後面的伺服器網域。此欄位的預設值是已安裝 OpenSSO 的網域。</p>
+
+<a name="fxcmi"></a><h5>可用的語言環境</h5>
+<p>此屬性儲存為此平台配置的所有可用語言環境。請考量讓使用者選擇其各自語言環境的應用程式。此應用程式會從平台設定檔中取得此屬性，然後將語言環境清單展示給使用者。使用者將選擇某種語言環境，然後此應用程式會在使用者項目 <i>preferredLocale</i> 中設定此語言環境。</p>
+
+<a name="fxctg"></a><h5>用戶端字元集</h5>
+<p>此屬性指定平台層級的不同用戶端使用的字元集。包含用戶端類型及相應字元集的清單。請參閱<a href="service.scplatformclientcharsetsadd.html">建立新的字元集</a>，以取得更多資訊。</p>
+<br/>
+
+</body>
+</html>

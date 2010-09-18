@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>조건 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>조건</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>조건을 사용하여 정책에 대한 제약 조건을 정의할 수 있습니다. 예를 들어, 급여
+응용 프로그램에 대한 정책을 정의할 경우 지정된 시간 동안만 응용 프로그램에 대한
+액세스를 제한하는 조건을 현재 작업에서 정의할 수 있습니다. 또는 주어진 IP 주소
+집합이나 회사 인트라넷에서 요청을 보낸 경우에만 작업을 허가하는 조건을 정의할 수 있습니다.</p><p>조건을 추가로 사용하여 동일한 도메인에서 다른 URL에 대한 다른 정책을 구성할 수
+있습니다. 예를 들어 오전 9시에서 오후 5시까지만 <tt>org.example.net</tt>에서 <tt>http://org.example.com/hr/*jsp</tt>에 액세스할 수 있습니다.
+이 작업은 시간 조건과 함께 IP 조건을 사용하여 수행할 수 있습니다. 규칙
+자원을 <tt>http://org.example.com/hr/*.jsp</tt>로 지정할 경우 <tt>http://org.example.com/hr</tt> 및 하위 디렉토리에 있는 모든 JSP 정책이
+적용됩니다.</p>
+<hr><p><b>주 &#8211; </b>참조, 규칙, 자원, 주제, 조건, 작업 및 값 등의 용어는 policy.dtd의 <b>Referral</b>,
+<b>Rule</b>, <b>ResourceName</b>, <b>Subject</b>, <b>Condition</b>, <b>Attribute</b> 및 <b>Value</b> 요소에 해당합니다.</p>
+<hr>
+<p>자세한 내용은 <a href="policy.selectconditiontype.html">정책에 조건 추가</a>를 참조하십시오.</p>
+<br/>
+
+</body>
+</html>

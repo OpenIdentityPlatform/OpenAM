@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP 바인딩 속성 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggodb"></a><h4>SOAP 바인딩 속성</h4>
+
+
+<a name="ggocx"></a><h5>웹 서비스 인증자</h5>
+<a name="indexterm-155"></a><a name="indexterm-156"></a><p>이 속성은 웹 서비스 인증자 인터페이스에 대한 구현 클래스를 값으로 가집니다. 이
+클래스는 웹 서비스 사용자의 요청을 인증하고 자격 증명을 생성합니다.</p>
+
+<a name="ggock"></a><h5>지원되는 인증 기법</h5>
+<a name="indexterm-157"></a><a name="indexterm-158"></a><p>이 속성은 SOAP 수신자가 지원하는 인증 기법을 지정합니다. 인증 기법은 데이터 무결성
+및 암호화와 함께 사용자 인증을 제공합니다. 기본적으로 사용 가능한 모든 인증 기법이
+선택됩니다. 인증 방법을 선택하지 않은 경우 선택하지 않은 인증 방법을 사용하여 웹
+서비스 사용자(WSC)가 요청을 보내면 해당 요청이 거부됩니다. 다음은 지원되는 인증 기법의 목록입니다.
+</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+
+<a name="ggocn"></a><h5>알려진 공급자만 강제 실행</h5>
+<p>이 등록 정보를 사용하면 SOAP 메시지에서 전송된 <tt>ProviderID</tt> 헤더를 강제 실행하여 해당
+공급자가 시스템에 있는지 확인합니다. 이 등록 정보를 사용하지 않으면 요청이 거부됩니다. 또한
+이 속성을 사용하지 않는 경우 검사가 생략됩니다. </p>
+
+<a name="ggoci"></a><h5>SSL 클라이언트 인증을 위한 인증서 별칭 </h5>
+<p>이 값은 설치 중에 설정됩니다. 리버티 SOAP 바인딩을 위한 SSL 연결에서 사용하는
+클라이언트 인증서 별칭입니다.</p>
+
+<a name="ggocs"></a><h5>오래된 메시지의 시간 제한</h5>
+<p>기본값은 300000입니다. 메시지가 오래되어 더 이상 신뢰할 수 없는지 여부를 나타냅니다. 메시지
+타임스탬프가 현재 타임스탬프보다 지정된 시간(밀리초)만큼 이전이면 메시지가 오래된 것으로 간주합니다.</p>
+
+<a name="ggofw"></a><h5>메시지 아이디 캐시 정리 간격 </h5>
+<p>기본값은 60000입니다. 캐시 정리 이벤트가 시작되기 전까지의 경과 시간(밀리초)을 지정합니다. 중복 메시지를
+방지하기 위해 각 메시지는 자체 메시지 아이디와 함께 캐시에 저장됩니다. 메시지의 현재
+시간에서 받은 시간을 뺀 값이 thestaleTimeLimit 값보다 크면 이 메시지가 캐시에서 제거됩니다.</p>
+
+<a name="ggohr"></a><h5>지원되는 SOAP 행위자(actor)</h5>
+<p>기본값은 <tt>http://schemas.xmlsoap.org/soap/actor/next</tt>입니다. 지원되는 SOAP 행위자(actor)를 지정합니다. 각 행위자(actor)는 파이프 문자(|)로 구분해야 합니다.</p>
+
+<a name="ggofh"></a><h5>이름 공간 접두어 매핑</h5>
+<p>기본값은 다음과 같습니다.</p><pre>=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08
+|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/
+liberty/pp|is=urn:liberty:is:2003-08</pre><p>JAXB 컨텐트 트리를 DOM 트리로 마셜링할 때 사용하는 이름 공간 접두어 매핑을
+지정합니다. 구문은 <tt>prefix=namespace|prefix=namespace|...</tt>입니다.</p>
+
+<a name="ggoho"></a><h5>JAXB 패키지 목록</h5>
+<p><tt>JAXBContext</tt>를구성할 때 사용되는 JAXB 패키지 목록을 지정합니다. 각 패키지는 콜론(:)으로 구분해야 합니다.</p>
+
+<a name="ggogm"></a><h5>Liberty Identity 웹 서비스 버전</h5>
+<p>이 등록 정보는 OpenSSO가 WSC의 역할을 하는 경우 인바운드 메시지 또는 자원
+오퍼링에서 프레임워크를 확인할 수 없으면 Liberty ID-WSF 프레임워크를 확인합니다. 값으로는 1.0 또는
+1.1을 사용할 수 있으며 기본값은 1.1입니다.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Directives prises en charge - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>Directives prises en charge</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>Cet attribut vous permet de sp&#233;cifier une directive li&#233;e &#224; une strat&#233;gie
+pour une ressource. Si un fournisseur de services veut utiliser une directive
+non prise en charge, la demande &#233;chouera. Le tableau suivant d&#233;taille les
+options disponibles.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Directive</p></th>
+<th align="left" valign="top" scope="column"><p>Objectif</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Le Service de d&#233;couverte doit inclure une assertion SAML (contenant une
+instruction <tt>AuthenticationStatement </tt>) dans ses r&#233;ponses pour permettre au client d'authentifier l'instance de
+service h&#233;bergeant la ressource.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Le Service de d&#233;couverte doit inclure une assertion SAML
+(contenant une instruction <tt>SessionContextStatement </tt>) dans ses r&#233;ponses pour indiquer l'&#233;tat de la
+session.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p> Le Service de d&#233;couverte doit inclure une assertion SAML (contenant une
+instruction <tt>ResourceAccessStatement </tt>) dans ses r&#233;ponses pour indiquer si le client est autoris&#233;
+&#224; acc&#233;der &#224; la ressource.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Le Service de d&#233;couverte doit crypter l'identificateur de
+ressource dans les r&#233;ponses adress&#233;es &#224; tous les clients.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Pour &#234;tre utilis&#233; avec
+l'authentification de jeton de support (Bearer Token Authentication), le Service de d&#233;couverte
+doit g&#233;n&#233;rer un jeton accordant l'autorisation du support &#224; acc&#233;der &#224; la
+ressource.</p></td>
+</tr>
+</table>
+<hr><p><b>Attention &#8211; </b>Les directives <tt>AuthorizeRequestor</tt> et <tt>EncryptResourceID </tt> ne peuvent pas &#234;tre utilis&#233;es ensemble.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

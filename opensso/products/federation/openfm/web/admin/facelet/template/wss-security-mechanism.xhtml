@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wss-security-mechanism.xhtml,v 1.2 2009/10/16 19:38:46 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+<f:subview>
+
+    <ice:panelGroup>
+        <ice:panelGrid
+            columns="2"
+            columnClasses="label-column,input-column" >
+
+            <ice:outputLabel
+                for="securityMechanism"
+                value="#{resources['wss-security-mechanism.securityMechanismLabel']}"
+                style="float: right;" />
+            <ice:panelGroup>
+                <ice:selectOneMenu
+                    id="securityMechanism"
+                    value="#{profileBean.securityMechanism}" >
+                    <f:selectItems
+                        value="#{wizardBean.securityMechanismList}"/>
+                </ice:selectOneMenu>
+
+                <ice:panelStack
+                    selectedPanel="#{wizardBean.securityMechanismPanel}"
+                    style="margin-top: 5px;">
+
+                    <ice:panelGroup id="noSettingsPanel" />
+
+                    <ice:panelGroup id="x509TokenSettingsPanel">
+                        <ice:panelGrid columns="1">
+                            <ice:outputLabel
+                                for="x509TokenSigningReferenceType"
+                                value="#{resources['wss-security-mechanism.x509TokenSigningReferenceTypeLabel']}" />
+                            <ice:selectOneMenu
+                                id="x509TokenSigningReferenceType"
+                                value="#{profileBean.x509SigningRefType}">
+                                <f:selectItems
+                                    value="#{wizardBean.x509SigningRefTypeList}" />
+                            </ice:selectOneMenu>
+                        </ice:panelGrid>
+                    </ice:panelGroup>
+
+                    <ice:panelGroup id="userNameTokenSettingsPanel">
+                        <ice:outputText
+                            value="#{resources['wss-security-mechanism.userNameTokenSettingsLabel']}" />
+                        <ice:panelGrid columns="2">
+                            <ice:outputLabel
+                                for="userNameTokenUserName"
+                                effect="#{profileBean.userNameTokenUserNameMessageEffect}"
+                                value="#{resources['wss-security-mechanism.userNameTokenUserNameLabel']}"
+                                style="float: right;" />
+                            <ice:inputText
+                                id="userNameTokenUserName"
+                                effect="#{profileBean.userNameTokenUserNameInputEffect}"
+                                value="#{profileBean.userNameTokenUserName}"
+                                size="50"
+                                maxlength="50" />
+                            <ice:outputLabel
+                                for="userNameTokenPassword"
+                                effect="#{profileBean.userNameTokenPasswordMessageEffect}"
+                                value="#{resources['wss-security-mechanism.userNameTokenPasswordLabel']}"
+                                style="float: right;" />
+                            <ice:inputSecret
+                                id="userNameTokenPassword"
+                                effect="#{profileBean.userNameTokenPasswordInputEffect}"
+                                value="#{profileBean.userNameTokenPassword}"
+                                size="50"
+                                maxlength="50"
+                                redisplay="true" />
+                        </ice:panelGrid>
+                    </ice:panelGroup>
+
+                    <ice:panelGroup id="kerberosSettingsPanel">
+                        <ice:outputText
+                            value="#{resources['wss-security-mechanism.kerberosSettingsLabel']}" />
+                        <ice:panelGrid columns="2">
+                            <ice:outputLabel
+                                for="kerberosDomainServer"
+                                effect="#{profileBean.kerberosDomainServerMessageEffect}"
+                                value="#{resources['wss-security-mechanism.kerberosDomainServerLabel']}"
+                                style="float: right;"/>
+                            <ice:inputText
+                                id="kerberosDomainServer"
+                                effect="#{profileBean.kerberosDomainServerInputEffect}"
+                                value="#{profileBean.kerberosDomainServer}"
+                                size="50"
+                                maxlength="255" />
+                            <ice:outputLabel
+                                for="kerberosDomain"
+                                effect="#{profileBean.kerberosDomainMessageEffect}"
+                                value="#{resources['wss-security-mechanism.kerberosDomainLabel']}"
+                                style="float: right;" />
+                            <ice:inputText
+                                id="kerberosDomain"
+                                effect="#{profileBean.kerberosDomainInputEffect}"
+                                value="#{profileBean.kerberosDomain}"
+                                size="50"
+                                maxlength="255" />
+                            <ice:outputLabel
+                                for="kerberosServicePrincipal"
+                                effect="#{profileBean.kerberosServicePrincipalMessageEffect}"
+                                value="#{resources['wss-security-mechanism.kerberosServicePrincipalLabel']}"
+                                style="float: right;" />
+                            <ice:inputText
+                                id="kerberosServicePrincipal"
+                                effect="#{profileBean.kerberosServicePrincipalInputEffect}"
+                                value="#{profileBean.kerberosServicePrincipal}"
+                                size="50"
+                                maxlength="255"/>
+                            <ice:outputLabel
+                                for="kerberosTicketCache"
+                                effect="#{profileBean.kerberosTicketCacheMessageEffect}"
+                                value="#{resources['wss-security-mechanism.kerberosTicketCacheLabel']}"
+                                style="float: right;" />
+                            <ice:inputText
+                                id="kerberosTicketCache"
+                                effect="#{profileBean.kerberosTicketCacheInputEffect}"
+                                value="#{profileBean.kerberosTicketCache}"
+                                size="50"
+                                maxlength="255"/>
+                        </ice:panelGrid>
+                    </ice:panelGroup>
+
+                </ice:panelStack>
+
+            </ice:panelGroup>
+        </ice:panelGrid>
+    </ice:panelGroup>
+
+</f:subview>
+</span>

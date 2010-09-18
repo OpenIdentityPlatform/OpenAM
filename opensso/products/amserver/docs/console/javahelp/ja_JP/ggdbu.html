@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ポリシー設定サービス  - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>ポリシー設定サービス </h4>
+<p>各組織のポリシーに関連する属性の設定を Federated Access Manager コンソールから行うにはポリシー設定サービスを使用します。Federated Access Manager ポリシーフレームワークで使用するリソース名の実装および Directory Server データストアを定義することもできます。ポリシー設定サービスに指定した Directory
+Server は、LDAP ユーザー、LDAP グループ、LDAP ロール、および組織ポリシー対象のメンバーシップの評価に使用されます。</p>
+
+<a name="ggdbf"></a><h5>対象結果の有効時間</h5>
+<p>ポリシー評価のパフォーマンスを上げるため、ポリシー設定サービスの「対象結果の有効時間」属性で定義されるとおり、メンバーシップ評価を一定の時間キャッシュします。これらのキャッシュされたメンバーシップ決定は「対象結果の有効時間」属性で定義された時間が経つまで使用されます。この時間が経過したあとは、ディレクトリ内のユーザーの現在の状態を反映するために、メンバーシップ評価が使用されます。</p>
+
+<a name="ggday"></a><h5>動的属性</h5>
+<p>これらは使用可能な動的属性の名前であり、ポリシーの応答プロバイダの動的属性を定義する際に一覧表示され、選択されます。定義される名前は、データリポジトリ内に定義された属性名と同じである必要があります。</p>
+
+<a name="ggdcj"></a><h5>amldapuser の定義</h5>
+<p><tt>amldapuser</tt> はインストール時に作成されたユーザーで、ポリシー設定サービスに指定した Directory Server でデフォルトで使用されます。amldapuser は、レルムの管理者またはポリシー管理者が必要に応じて変更できます。</p>
+<br/>
+
+</body>
+</html>

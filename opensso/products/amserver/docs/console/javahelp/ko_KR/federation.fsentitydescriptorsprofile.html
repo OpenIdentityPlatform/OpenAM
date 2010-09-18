@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>공급자 엔티티 또는 계열사 엔티티의 일반 속성 수정 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsprofile"></a><h4>공급자 엔티티 또는 계열사 엔티티의 일반 속성 수정</h4><a name="indexterm-70"></a><a name="indexterm-71"></a><a name="indexterm-72"></a><p>엔티티를 작성한 후 해당 프로필을 편집할 수 있습니다. 프로필 편집 작업에는 속성
+수정, Identity 공급자 및 서비스 공급자 추가 또는 제휴 구성이 포함됩니다. 엔티티
+프로필의 일반 속성을 편집하면 이미 정의된 공통 속성이 수정되고 연락 담당자가 추가되거나
+선택 사항인 조직 정보가 제공됩니다. 다음은 일반 속성 편집을 위한 절차입니다. 시작
+위치는 연합 아래의 엔티티 화면입니다.</p><ol>
+<li><b>구성된 엔티티의 이름을 선택하여 해당 프로필을 수정합니다. </b><p>엔티티 프로필의 일반 속성 페이지가 기본적으로 표시됩니다. 일반 속성 페이지가 표시되지 않는
+경우 [보기] 메뉴에서 [일반]을 선택할 수 있습니다.</p></li>
+<li><b>엔티티 공통 속성의 값을 편집합니다.</b><dl><dt>엔티티 이름</dt>
+<dd><p>이 속성의 정적 값은 엔티티를 작성할 때 제공된 이름입니다.</p></dd>
+<dt>유형</dt>
+<dd><p>이 속성의 정적 값은 공급자 또는 계열사의 엔티티 유형입니다.</p></dd>
+<dt>설명</dt>
+<dd><p>이 속성 값은 엔티티를 작성할 때 제공되는 설명입니다. 이미 입력된 설명을 수정하거나 입력된 설명이 없는 경우 추가할 수 있습니다.</p></dd>
+</dl>
+</li>
+<li><b>엔티티 연락 담당자 프로필 속성의 값을 제공합니다. </b><p>엔티티 연락 담당자 프로필 속성은 엔티티와 관련하여 연락할 사람에 대한 정보를 제공합니다.
+이 속성은 선택 사항입니다.</p><dl><dt>이름</dt>
+<dd><p>엔티티 연락 담당자의 지정된 이름을 입력합니다.</p></dd>
+<dt>성</dt>
+<dd><p>엔티티 연락 담당자의 성을 입력합니다.</p></dd>
+<dt>유형</dt>
+<dd><p>드롭다운 메뉴에서 연락 유형을 선택합니다.</p>
+<ul><li><p>관리</p></li>
+<li><p>대금 청구</p></li>
+<li><p>기술</p></li>
+<li><p>기타</p></li></ul>
+</dd>
+<dt>회사</dt>
+<dd><p>이 사람을 고용한 회사의 이름을 입력합니다.</p></dd>
+<dt>리버티 기본 아이디</dt>
+<dd><p>연락 담당자의 개인 정보 프로필 인스턴스를 가리키는 URI(Uniform Resource Identifier)를 입력합니다.</p></dd>
+<dt>전자 메일</dt>
+<dd><p>연락 담당자의 전자 메일 주소를 하나 이상 입력하고 [추가]를 누릅니다.</p></dd>
+<dt>전화 번호</dt>
+<dd><p>연락 담당자의 전화 번호를 하나 이상 입력하고 [추가]를 누릅니다.</p></dd>
+</dl>
+</li>
+<li><b>조직 프로필 속성의 값을 제공합니다.</b><p>조직 프로필 속성에는 기본과 상호 작용할 때 필요할 수 있는 기본 정보가
+제공됩니다. 이 속성은 선택 사항입니다.</p>
+<hr><p><b>주 &#8211; </b>이름 속성에 값이 포함되어 있는 경우 디스플레이 이름 및 URL 속성에 값을
+추가해야 합니다.</p>
+<hr>
+<dl><dt>이름</dt>
+<dd><p>엔티티 조직에 대한 법적 이름을 입력하고 [추가]를 누릅니다. 이 값은 <i>locale</i>| <i> organization-name</i> 형식으로 정의됩니다. 예를 들어 <tt>en</tt>|<tt> example.com</tt> 형식입니다.</p></dd>
+<dt>디스플레이 이름</dt>
+<dd><p>기본에 표시하기 적절한 엔티티의 조직 이름을 입력하고 [추가]를 누릅니다. 이 값은 <i>locale</i>| <i> organization-display-name</i> 형식으로 정의됩니다. 예를 들어 <tt>en</tt>|<tt>example.com</tt> 형식입니다. </p></dd>
+<dt>URL</dt>
+<dd><p>조직의 URL을 입력하고 [추가]를 누릅니다. 이 값은 <i>locale</i>| <i> organization-URL</i> 형식으로 정의됩니다. 예를 들어 <tt>en</tt>|<tt> http://www.example.com</tt> 형식입니다.</p></dd>
+</dl>
+</li>
+<li><b>[저장]을 눌러 구성을 완료하거나 Identity 공급자, 서비스 공급자 및 계열사 속성의 값을
+계속 정의합니다.</b><p>구성을 계속하는 경우 다음을 참조하십시오.</p><ul>
+<li><b>Identity 공급자 속성의 값을 정의하는 경우 <a href="federation.fsidentityprovider.html">공급자 엔티티에 Identity 공급자 추가</a>를 참조하십시오.</b></li>
+<li><b>서비스 공급자 속성의 값을 정의하는 경우 <a href="federation.fsserviceprovider.html">공급자 엔티티에 서비스 공급자 추가</a>를 참조하십시오.</b></li>
+<li><b>계열사 엔티티에 구성원을 채우는 경우 <a href="federation.fsentitydescriptorsaffiliate.html">계열사 엔티티에 구성원 추가</a>를 참조하십시오.</b></li></ul></li></ol>
+<br/>
+
+</body>
+</html>

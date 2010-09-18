@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web サービスプロバイダ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceprovideredit"></a><h4>Web サービスプロバイダ</h4>
+<p>Web サービスプロバイダエージェントプロファイルは、Web サービスクライアントからの Web サービス要求を検証し、Web サービスプロバイダからの Web サービス応答をセキュリティー保護するために使用される設定を記述します。Web サービスプロバイダの名前は、すべてのエージェントを通じて一意である必要があります。</p>
+
+<a name="ggouz"></a><h5>一般</h5>
+<p>次の一般属性は、Web サービスプロバイダの基本的なプロパティーを定義します。</p>
+
+<a name="ggovu"></a><h5>グループ</h5>
+<p>「グループ」メカニズムを使用すると、類似のエージェントタイプのコレクションを定義できます。特定のエージェントをコレクションに追加する前に、グループを定義しておく必要があります。 </p>
+
+<a name="ggotz"></a><h5>パスワード</h5>
+<p>Web サービスプロバイダエージェントのパスワードを定義します。</p>
+
+<a name="ggotl"></a><h5>パスワードの確認</h5>
+<p>パスワードを確認します。</p>
+
+<a name="ggova"></a><h5>ステータス</h5>
+<p>Web サービスプロバイダエージェントがシステム内でアクティブになるかどうかを定義します。デフォルトではアクティブになります。つまり、エージェントは Web サービスクライアントからの Web サービス要求の検証と、Web サービスプロバイダからのサービス応答のセキュリティー保護に参加します。</p>
+
+<a name="ggowp"></a><h5>汎用識別子</h5>
+<p>Web サービスプロバイダエージェントを一意に定義する、基本的な LDAP プロパティーのリスト。</p>
+
+<a name="gglej"></a><h5>セキュリティー</h5>
+<p>次の属性は、Web サービスプロバイダのセキュリティー属性を定義します。 </p>
+
+<a name="gglhw"></a><h5>セキュリティーメカニズム</h5>
+<p>Web サービス要求を検証するために使用する、セキュリティー証明情報のタイプを定義します。セキュリティーメカニズムのタイプは、Web サービスクライアントからの Web サービス要求に含まれており、Web サービスプロバイダによって受け入れられます。次のタイプから選択します。 </p>
+<ul><li><p>Anonymous &#8212; 匿名セキュリティーメカニズムにはセキュリティー証明情報はありません。</p></li>
+<li><p>KerberosToken &#8212; Kerberos セキュリティートークンを使用します。</p></li>
+<li><p>LibertyBearerToken &#8212; Liberty で定義されたベアラートークンを使用します。</p></li>
+<li><p>LibertySAMLToken &#8212; Liberty で定義された SAML トークンを使用します。</p></li>
+<li><p>LibertyX509Token &#8212; Liberty で定義された X509 証明書を使用します。</p></li>
+<li><p>SAML-HolderOfKey &#8212; SAML 1.1 の表明タイプ Holder-Of-Key を使用します。</p></li>
+<li><p>SAML-SenderVouches &#8212; SAML 1.1 の表明タイプ Sender Vouches を使用します。</p></li>
+<li><p>SAML2-HolderOfKey &#8212; SAML 2.0 の表明トークンタイプ Holder-Of-Key を使用します。</p></li>
+<li><p>SAML2-SenderVouches &#8212; SAML 2.0 の表明トークンタイプ Sender Vouches を使用します。</p></li>
+<li><p>UserNameToken &#8212; ユーザー名トークンを使用します。</p></li>
+<li><p>UserNameToken-Plain &#8212; 平文パスワード付きのユーザー名トークンを使用します。</p></li>
+<li><p>X509Toekn &#8212; X509 証明書を使用します。</p></li></ul>
+
+
+<a name="gglfy"></a><h5>認証連鎖</h5>
+<p>OpenSSO の認証サービスで認証を受けるために使用できる認証連鎖またはサービス名を定義します。認証サービスは、受信した Web サービス要求のセキュリティートークンから得た証明情報を使用して OpenSSO の認証済み SSOToken を生成します。</p>
+
+<a name="ghbbd"></a><h5>トークン変換タイプ</h5>
+<p>Web サービスプロバイダがセキュリティートークンサービスからのトークン変換を要求したときに変換されるトークンの種類を定義します。トークンは指定された SAML または SSOToken (セッショントークン) に変換されます。アイデンティティーは同じですが、トークンの種類に固有の属性定義になります。この新しいトークンは、Web サービスプロバイダが別の Web サービスプロバイダに対する Web サービス呼び出しを行うために使用できます。定義できるトークンの種類は次のとおりです。</p>
+<ul><li><p>SAML 1.1 トークン</p></li>
+<li><p>SAML2 トークン</p></li>
+<li><p>SSOToken</p></li></ul>
+<p>この属性を使用するには、<a href="#gglhw">「セキュリティーメカニズム」</a>属性で SAML トークンが選択され、<a href="#gglfy">「認証連鎖」</a> が Web サービスプロバイダに対して定義される必要があります。</p>
+
+<a name="ggoum"></a><h5>メッセージにセキュリティーヘッダーを保存する</h5>
+<p>この属性が有効になっている場合、以降の処理で使用できるように SOAP セキュリティーヘッダーを Web サービスプロバイダで保持するように定義されます。</p>
+
+<a name="gglhq"></a><h5>非公開鍵のタイプ</h5>
+<p>Web サービスプロバイダが Web サービス要求の署名を確認する処理で使用する鍵のタイプを定義します。デフォルト値は <tt>PublicKey</tt> です。</p>
+
+<a name="ggovi"></a><h5>Liberty サービスタイプ URN</h5>
+<p>URN (Universal Resource Name) は、Web サービスプロバイダがサービス検索に使用する Liberty サービスタイプを記述します。</p>
+
+<a name="ggovn"></a><h5>ユーザートークンの資格情報</h5>
+<p>この属性は、Web サービスプロバイダが受信した Web サービス要求から得たユーザー名セキュリティートークンを検証するために使用するユーザー名/パスワード共有シークレットを表します。これらの証明情報は、受信した Web サービス要求から得たユーザー名セキュリティートークンから生成した証明情報と比較されます。</p>
+
+<a name="gglfz"></a><h5>SAML 設定</h5>
+<p>次の属性は、Web サービスプロバイダの SAML (Security Assertion Markup Language) を設定します。</p>
+
+<a name="gglfx"></a><h5>SAML 属性マッピング</h5>
+<p>この設定は、Web サービスプロバイダに対するセキュリティートークンサービスによって SAML 表明を作成するときに属性ステートメントとして生成する必要がある SAML 属性を表します。形式は <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i>Real_attr_name</i><tt></tt> です。</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> は、受信した Web サービス要求の SAML 表明の SAML 属性名です。<tt></tt><i>Real_attr_name</i><tt></tt> は、認証済みの SSOToken またはアイデンティティーリポジトリから取得した属性名です。</p>
+
+<a name="gglgf"></a><h5>SAML NameID マッパープラグイン</h5>
+<p>SAML アカウントマッピングに使用する NameID マッパープラグインクラスを定義します。</p>
+
+<a name="gglhk"></a><h5>SAML 属性名前空間</h5>
+<p>SAML 属性の生成に使用するネームスペースを定義します。</p>
+
+<a name="gglfv"></a><h5>包含メンバーシップ</h5>
+<p>この属性が有効になっている場合は、主体のメンバーシップを SAML 属性として含める必要があります。</p>
+
+<a name="ggovx"></a><h5>署名と暗号化</h5>
+<p>次の属性は、Web プロバイダのセキュリティーに関する署名と暗号化の設定を定義します。</p>
+
+<a name="ggowr"></a><h5>応答には署名が必要</h5>
+<p>これが有効になっている場合、Web サービスプロバイダは X509 証明書を使用して応答に署名します。</p>
+
+<a name="ggouo"></a><h5>応答の暗号化が必要</h5>
+<p>これが有効になっている場合は、Web サービスの応答が暗号化されます。</p>
+
+<a name="ggowz"></a><h5>リクエストの署名の確認が必要</h5>
+<p>これが有効になっている場合は、Web サービス要求の署名が確認されます。</p>
+
+<a name="ggouw"></a><h5>リクエストヘッダーの復号化が必要</h5>
+<p>これが有効になっている場合は、Web サービスクライアントの要求のセキュリティーヘッダーが復号化されます。</p>
+
+<a name="ggotr"></a><h5>リクエストの復号化が必要</h5>
+<p>これが有効になっている場合は、Web サービスクライアントの要求が復号化されます。</p>
+
+<a name="gglls"></a><h5>キーストア</h5>
+<p>次の属性は、証明書の格納と検索に使用するキーストアを設定します。 </p>
+
+<a name="gglld"></a><h5>Web サービスクライアントの公開鍵のエイリアス</h5>
+<p>この属性は、Web サービス応答の暗号化または Web サービス要求の署名の確認に使用される証明書公開鍵エイリアスを定義します。</p>
+
+<a name="gglmc"></a><h5>非公開鍵のエイリアス</h5>
+<p>この属性は、Web サービス応答の署名または Web サービス要求の復号化に使用される証明書非公開鍵エイリアスを定義します。</p>
+
+<a name="ggljf"></a><h5>キーストアの使用法</h5>
+<p>この設定は、デフォルトのキーストアを使用するかカスタムのキーストアを使用するかを定義します。カスタムキーストアを使用する場合は、次の値を定義する必要があります。</p>
+<ul><li><p>キーストアの場所</p></li>
+<li><p>キーストアのパスワード</p></li>
+<li><p>キーのパスワード</p></li></ul>
+
+
+<a name="gglko"></a><h5>エンドポイント</h5>
+<p>次の属性は、Web サービスエンドポイントを定義します。</p>
+
+<a name="gglmp"></a><h5>Web サービスプロキシエンドポイント</h5>
+<p>この属性は、Web サービスクライアントが要求を行う Web サービスエンドポイントを定義します。このエンドポイントは、Web セキュリティープロキシを使用するように設定されないかぎり、省略可能です。 </p>
+
+<a name="ghbed"></a><h5>Web サービスエンドポイント</h5>
+<p>この属性は、Web サービスクライアントが要求を行う Web サービスエンドポイントを定義します。</p>
+
+<a name="ghbay"></a><h5>Kerberos 設定</h5>
+<p>Kerberos は、Web サービスセキュリティーでサポートされるセキュリティープロファイルで、Web サービスクライアントと Web サービスプロバイダの間の Web サービス通信をセキュリティー保護します。一般に、ユーザーはデスクトップに対して認証し、Web サービスおよび Web サービスクライアントを呼び出します。このとき、主体を Kerberos
+トークンとして識別することにより Web サービスプロバイダに対する要求をセキュリティー保護するために、Kerberos チケットが必要です。通常、Kerberos ベースの Web サービスセキュリティーは、SAML ベースの Web サービスセキュリティーのように境界を越えるのではなく、Kerberos ドメイン (レルム)
+と同じコンテキストで使用されます。ただし Kerberos は、特に Windows ドメインコントローラ環境においてはもっとも強力な認証メカニズムの 1 つです。</p>
+
+<a name="ghbbv"></a><h5>Kerberos ドメインサーバー</h5>
+<p>この属性は、Kerberos Distribution Center (ドメインコントローラ) のホスト名を指定します。ドメインコントローラの完全修飾ドメイン名 (FQDN) を入力する必要があります。</p>
+
+<a name="ghbdx"></a><h5>Kerberos ドメイン</h5>
+<p>この属性は、Kerberos Distribution Center (ドメインコントローラ) のドメイン名を指定します。設定によっては、ドメインコントローラのドメイン名が OpenSSO のドメイン名とは異なる場合があります。</p>
+
+<a name="ghbcq"></a><h5>Kerberos サービス主体</h5>
+<p>生成されたセキュリティートークンの所有者として Kerberos 主体を指定します。</p><p>次の形式を使用します。 </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> と <tt>domainame</tt> はそれぞれ、OpenSSO インスタンスのホスト名とドメイン名を表します。<tt>dc_domain_name</tt> は、Windows Kerberos サーバー (ドメインコントローラ) が存在する Kerberos ドメインです。Kerberos
+サーバーを OpenSSO インスタンスのドメイン名と別にすることができます。</p>
+
+<a name="ghbae"></a><h5>Kerberos キータブファイル</h5>
+<p>この属性は、トークンの発行に使用される Kerberos keytab ファイルを指定します。次の形式を使用します。この形式は必須ではありません。</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> は、OpenSSO インスタンスのホスト名です。</p>
+
+<a name="ghbep"></a><h5>Kerberos 署名を検証する</h5>
+<p>この属性を有効にすると、Kerberos トークンが署名されていることを指定します。</p>
+<br/>
+
+</body>
+</html>

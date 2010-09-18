@@ -1,0 +1,453 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>J2EE 策略代理 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggmui"></a><h4>J2EE 策略代理</h4>
+<p>可通过此界面配置 J2EE 代理实例。可用的配置类型分为以下类别：</p>
+<ul><li><p><a href="#ggmvd">全局</a></p></li>
+<li><p><a href="#ggmwz">应用程序</a></p></li>
+<li><p><a href="#ggmwl">SSO</a></p></li>
+<li><p><a href="#ggmwi">FAM 服务</a></p></li>
+<li><p><a href="#ggmug">其他</a></p></li>
+<li><p><a href="#ggmud">高级</a></p></li></ul>
+
+
+<a name="ggmvd"></a><h5>全局</h5>
+<p>“全局”属性适用于所有 J2EE 代理和受代理保护的所有应用程序。</p>
+
+<a name="ggmph"></a><h5>组</h5>
+<p>如果适用，则从下拉列表中选择一个组。该列表由先前配置的组构成。</p>
+
+<a name="ggmqz"></a><h5>密码</h5>
+<p>密码在创建代理配置文件后设置。但是，您以后可以随时更改密码。</p>
+
+<a name="ggmni"></a><h5>密码确认</h5>
+<p>创建代理配置文件时执行密码确认。如果更改了密码，则必须确认更改。</p>
+
+<a name="ggmpc"></a><h5>状态</h5>
+<p>创建代理时选择“活动”选项。仅在要删除代理提供的保护时才选择“非活动”。</p>
+
+<a name="ggmwm"></a><h5>代理通知 URL</h5>
+<p>代理用来注册通知侦听器的 URL。</p>
+
+<a name="ggmwr"></a><h5>代理配置系统信息库的位置</h5>
+<p>如有必要，可将配置位置更改为以下两种可用选项之一：集中或本地。您可以通过集中位置来以集中方式控制配置，例如通过控制台。本地选项则是出于向后兼容目的而提供的。</p>
+
+<a name="ggmwj"></a><h5>配置重新载入的时间间隔</h5>
+<p>配置重新载入之间的时间间隔（以秒为单位）。将该属性设置为 0 以禁用热交换机制。</p>
+
+<a name="ggmsi"></a><h5>启用集中通知</h5>
+<p>启用后，代理会从 Federated Access Manager 接收配置更改的通知消息。</p>
+
+<a name="ggmvt"></a><h5>代理过滤器模式</h5>
+<p>过滤器的操作模式。</p>
+
+<a name="ggmvu"></a><h5>拒绝资源访问的 URI：</h5>
+<p>自定义的访问拒绝的页面的 URL。如果未指定值，代理会返回 HTTP 403 状态（禁止访问）。</p>
+
+<a name="ggmxg"></a><h5>HTTP 会话绑定</h5>
+<p>启用后，HTTP 会话会在登录失败后失效。用户没有 SSO 会话，或主要用户名与 SSO 用户名不匹配。</p>
+
+<a name="ggmut"></a><h5>com.sun.identity.agents.config.redirect.param</h5>
+<p>代表 goto 参数名的字符串，由代理用来将用户重定向到适当的验证服务。验证服务使用该参数的值将用户重定向到初始请求的目标。</p>
+
+<a name="ggmuv"></a><h5>登录尝试限制</h5>
+<p>阻塞用户请求之前，单一浏览器会话中允许的登录失败尝试次数。值为 0 表示禁用该功能。</p>
+
+<a name="ggmtr"></a><h5>自定义响应标头</h5>
+<p>代理在客户机浏览器中设置的自定义标头映射列表。关键字为标头名称，而值表示标头值。</p>
+
+<a name="ggmtt"></a><h5>重定向尝试限制</h5>
+<p>阻塞用户请求之前，单一浏览器会话期间允许的连续单点重定向次数。值为 0 表示禁用该功能。</p>
+
+<a name="ggmxd"></a><h5>代理调试级别</h5>
+<p>要记录的调试消息类型。该设置决定在代理主机上本地保存的调试日志级别。</p>
+
+<a name="ggmsk"></a><h5>用户映射模式</h5>
+<p>代理用来确定用户 ID 的机制。</p>
+
+<a name="ggmts"></a><h5>用户属性名称</h5>
+<p>包含用户 ID 的属性名称。如果将标为“用户映射模式”的属性设置为 <tt>USER_ID</tt>，则不使用该属性的值。</p>
+
+<a name="ggmuc"></a><h5>用户主体标志</h5>
+<p>启用后，使用验证用户的主体而不是仅使用用户 ID 来验证用户。如果将标为“用户映射模式”的属性设置为 <tt>USER_ID</tt>，则使用该属性的值。</p>
+
+<a name="ggmtm"></a><h5>用户令牌名称</h5>
+<p>会话中验证用户的用户 ID 的会话属性名称。当将标为“用户映射模式”的属性设置为 <tt>USER_ID</tt> 且未启用标为“用户主体标志”的属性时，使用该属性的值。</p>
+
+<a name="ggmzk"></a><h5>审计访问类型</h5>
+<p>代理根据用户 URL 访问尝试记录的消息类型。</p>
+
+<a name="ggmyk"></a><h5>审计日志位置</h5>
+<p>要记录审计消息的位置。</p>
+
+<a name="ggmxz"></a><h5>远程日志文件名</h5>
+<p>用于记录对 Federated Access Manager 的每个 URL 访问的 Federated Access Manager 日志文件的名称。</p>
+
+<a name="ggmxy"></a><h5>轮转本地审计日志</h5>
+<p>启用后，审计日志文件将在达到标为“本地审计日志轮转大小”的属性所指定的大小时进行轮转。</p>
+
+<a name="ggmyc"></a><h5>本地审计日志轮转大小</h5>
+<p>将本地审计日志文件轮转为新文件时的大小。</p>
+
+<a name="ggmxt"></a><h5>客户机 IP 地址标头</h5>
+<p>保留客户机 IP 地址的 HTTP 标头名称。</p>
+
+<a name="ggmyp"></a><h5>客户机主机名标头</h5>
+<p>保留客户机主机名的 HTTP 标头名称。</p>
+
+<a name="ggmwz"></a><h5>应用程序</h5>
+<p>应用程序属性往往是应用程序特定的。</p>
+
+<a name="ggmxm"></a><h5>登录表单 URI</h5>
+<p>与应用程序的 <tt>web.xml</tt> form-login-page 元素对应的绝对 URI 的列表。</p>
+
+<a name="ggmzf"></a><h5>登录错误 URI</h5>
+<p>与应用程序的 <tt>web.xml</tt> form-error-page 元素对应的绝对 URI 的列表。</p>
+
+<a name="ggmyn"></a><h5>使用内部登录</h5>
+<p>启用后，代理会使用标为“登录内容文件名”的属性所指定的自定义内部内容。未启用时，代理会使用默认的内部内容。</p>
+
+<a name="ggmxs"></a><h5>登录内容文件名</h5>
+<p>自定义登录内容文件的完整路径和名称。</p>
+
+<a name="ggmyw"></a><h5>注销应用程序处理器</h5>
+<p>应用程序特定映射，每个映射标识一个用于处理注销的处理器。</p>
+
+<a name="ggmzp"></a><h5>注销应用程序 URI</h5>
+<p>应用程序特定映射，每个映射标识一个请求 URI。如果存在指定请求 URI，则表示有注销事件。</p>
+
+<a name="ggmxw"></a><h5>注销请求参数</h5>
+<p>应用程序特定映射，每个映射标识一个参数。如果 HTTP 请求中存在指定参数，则表示有注销事件。</p>
+
+<a name="ggmzu"></a><h5>启用注销内省</h5>
+<p>启用后，代理能够搜索 HTTP 请求正文以查找注销参数。</p>
+
+<a name="ggmyj"></a><h5>注销入口 URI</h5>
+<p>应用程序特定映射，每个映射标识在成功注销且后续成功经过验证（如果适用）后用作入口点的 URI。</p>
+
+<a name="ggmxn"></a><h5>非强制执行的 URI</h5>
+<p>未执行验证的 URI 列表。对于该列表中的每个 URI，代理不会强制执行保护，也不需要证书。</p>
+
+<a name="ggmyy"></a><h5>反转非强制执行的 URI</h5>
+<p>启用后，非强制执行的 URI 列表变为强制执行列表。因此，所有列为标有“非强制执行的 URI 列表”的属性值的 URI 随后变为强制执行，而其他 URI 为非强制执行。</p>
+
+<a name="ggmyv"></a><h5>启用非强制执行的 URI 高速缓存</h5>
+<p>启用后，会高速缓存非强制执行的 URI 的评估结果。因此，会高速缓存与标为“非强制执行的 URI”属性相关的值列表的评估结果。</p>
+
+<a name="ggmzm"></a><h5>非强制执行的 URI 高速缓存大小</h5>
+<p>启用标为“启用非强制执行的 URI 高速缓存”的属性后，指定的该属性值用于设置高速缓存大小。</p>
+
+<a name="ggmzd"></a><h5>非强制执行的客户机 IP 列表</h5>
+<p>客户机 IP 地址列表，不会对来自该列表的请求进行验证或授权。对于该列表上的每个 IP 地址，均授予访问权限，进行验证或授权时无需证书。</p>
+
+<a name="ggmzn"></a><h5>非强制执行的 IP 反转列表</h5>
+<p>启用后，非强制执行的客户机 IP 列表变为强制执行列表。因此，所有列为标有“非强制执行的客户机 IP 列表”的属性值的 IP 地址随后变为强制执行，而其他 IP 地址为非强制执行。</p>
+
+<a name="ggmzh"></a><h5>非强制执行的 IP 高速缓存标志</h5>
+<p>启用后，会高速缓存非强制执行的 IP 地址的评估结果。因此，会高速缓存与标为“非强制执行的客户机 IP 列表”属性相关的值列表的评估结果。</p>
+
+<a name="ggmzs"></a><h5>非强制执行的 IP 高速缓存大小</h5>
+<p>启用标为“非强制执行的 IP 高速缓存标志”的属性后，指定的该属性值用于设置高速缓存大小。</p>
+
+<a name="ggmzi"></a><h5>配置文件属性获取模式</h5>
+<p>可用于获取要引入到请求中的其他用户配置文件属性的模式。</p>
+
+<a name="ggmzo"></a><h5>配置文件属性映射</h5>
+<p>从配置文件属性名称到 HTTP 标头的映射列表，根据当前已验证用户的特定名称填充。格式：[profile_attribute_name]=http_header_name。</p>
+
+<a name="ggmym"></a><h5>响应属性获取模式</h5>
+<p>可用于获取要引入到请求中的其他用户响应属性的模式。</p>
+
+<a name="ggmzg"></a><h5>响应属性映射</h5>
+<p>从响应属性名称到 HTTP 标头名称的映射列表，根据当前已验证用户的特定名称填充。格式：[response_attribute_name]=http_header_name。</p>
+
+<a name="ggmxl"></a><h5>Cookie 分隔符字符</h5>
+<p>在将属性设置为 Cookie 时，用于分隔同一属性的多个值的字符。</p>
+
+<a name="ggmyl"></a><h5>获取属性日期格式</h5>
+<p>属性设置为 HTTP 标头时所用的日期属性值格式。格式基于 <tt>java.text.SimpleDateFormat</tt>。</p>
+
+<a name="ggmzq"></a><h5>属性 Cookie 编码</h5>
+<p>启用后，将属性值设置为 cookie 之前对其进行 URL 编码。</p>
+
+<a name="ggmyf"></a><h5>会话属性获取模式</h5>
+<p>可用于获取要引入到请求中的其他用户会话属性的模式。</p>
+
+<a name="ggmyu"></a><h5>会话属性映射</h5>
+<p>从会话属性名称到 HTTP 标头名称的映射列表，根据当前已验证用户的特定名称填充。格式：[session_attribute_name]=http_header_name。</p>
+
+<a name="ggmyi"></a><h5>默认特权属性</h5>
+<p>将授予给所有具有有效 Federated Access Manager 会话的用户的特权属性列表。</p>
+
+<a name="ggmxo"></a><h5>特权属性类型</h5>
+<p>为每位用户获取的特权属性类型列表。</p>
+
+<a name="ggmyb"></a><h5>特权属性小写转换</h5>
+<p>值可为<tt>真</tt>或<tt>假</tt>的特权属性类型的映射列表：<tt>真</tt>表示将属性类型转换为小写，<tt>假</tt>表示不转换。</p>
+
+<a name="ggmyt"></a><h5>特权会话属性</h5>
+<p>保留已验证用户的特权属性的会话属性名称列表。</p>
+
+<a name="ggmxk"></a><h5>启用特权属性映射</h5>
+<p>启用后，映射适用于从属性的原始值到由标为“特权属性映射”的属性所指定的替代值。</p>
+
+<a name="ggmya"></a><h5>特权属性映射</h5>
+<p>从属性的原始值到替代值的映射列表。该属性仅在启用了标为“启用特权属性映射”的属性时有效。</p><p>示例：</p><pre>[id=manager,ou=group,dc=opensso,dc=java,dc=net]=am_manager_role
+[id=employee,ou=group,dc=opensso,dc=java,dc=net]=am_employee_role</pre>
+
+<a name="ggmyg"></a><h5>自定义验证处理器</h5>
+<p>应用程序到其特定验证处理器的映射列表。每个验证处理器均由代理用来验证指定应用程序容器中的用户。</p><p>示例：</p><pre>[BankApp]=BankAuthHandler</pre>
+
+<a name="ggmyq"></a><h5>自定义注销处理器</h5>
+<p>应用程序到其特定注销处理器的映射列表。每个注销处理器均由代理用来注销指定应用程序容器中的用户。</p><p>示例：</p><pre>[BankApp]=BankLogoutHandler</pre>
+
+<a name="ggmxv"></a><h5>自定义检验处理器</h5>
+<p>应用程序到其特定本地检验处理器的映射列表。本地检验处理器由代理用来验证使用本地系统信息库的用户证书。</p><p>示例：</p><pre>[BankApp]=BankVerificationHandler</pre>
+
+<a name="ggmwl"></a><h5>SSO</h5>
+<p>您可以通过 SSO 属性配置与单点登录 (Single Sign On, SSO) 相关的代理功能。与 SSO 相关的大多数属性按照 SSO 类别分组。但是，该组中可能不包含提供默认
+SSO 功能的属性。</p>
+
+<a name="ggmyo"></a><h5>Cookie 名称</h5>
+<p>Federated Access Manager 服务器和代理之间所用的 SSO 令牌 cookie 名称。</p>
+
+<a name="ggmxu"></a><h5>启用 SSO 高速缓存</h5>
+<p>启用后，SSO 高速缓存成为激活的高速缓存，并可由代理 SDK 公开的公共 API 使用。</p>
+
+<a name="ggmza"></a><h5>跨域 SSO</h5>
+<p>启用后，跨域单点登录 (Cross Domain Single Sign On, CDSSO) 被激活。</p>
+
+<a name="ggmzt"></a><h5>CDSSO 重定向 URI</h5>
+<p>代理用于处理 CDSSO 请求的中间 URI。</p>
+
+<a name="ggmyd"></a><h5>CDSSO Servlet URL</h5>
+<p>代理可用于处理 CDSSO 的可用 CDSSO 控制器的 URL 列表。</p><p>示例：</p><pre>[0]=http://host:port/opensso/cdcservlet</pre>
+
+<a name="ggmzc"></a><h5>CDSSO 时钟偏差</h5>
+<p>代理用于确定 CDSSO <tt>AuthnResponse</tt> 声明的有效性的时间（以秒为单位）。</p>
+
+<a name="ggmyz"></a><h5>CDSSO 信任的 ID 提供者</h5>
+<p>评估 CDC Liberty 响应时应受代理信任的 Federated Access Manager 服务器/ID 提供者列表。当代理和 Federated Access Manager
+实例之间存在负载平衡器、防火墙或二者皆有时，设置此属性十分必要。</p><p>示例：</p><pre>[0]=http://host:port/opensso/cdcservlet</pre>
+
+<a name="ggmzj"></a><h5>启用 CDSSO 安全</h5>
+<p>启用后，代理在不同域中以 CDSSO 模式设置的 SSO 令牌 cookie 将标记为安全。仅当与主机的通信通道是安全通道时才会传送。</p>
+
+<a name="ggmze"></a><h5>CDSSO 域列表</h5>
+<p>在 CDSSO 情景下必须为其设置 cookie 的域列表。</p><p>示例：</p><pre>[0]=.sun.com</pre>
+
+<a name="ggmyx"></a><h5>重置 Cookie</h5>
+<p>启用后，代理会在重定向至验证之前重置响应中的 cookie。</p>
+
+<a name="ggmys"></a><h5>重置 Cookie 名称列表</h5>
+<p>在启用标为“重置 Cookie”的属性后，代理会重置的 cookie 名称列表。</p>
+
+<a name="ggmye"></a><h5>重置 Cookie 域映射</h5>
+<p>从关键字到值的映射列表，该关键字是在标为“重置 Cookie 名称列表”属性中指定的 cookie 名称，而值是发生重置事件时相应 cookie 的域。</p>
+
+<a name="ggmzl"></a><h5>重置 Cookie 路径映射</h5>
+<p>从关键字到值的映射列表，该关键字是在标为“重置 Cookie 名称列表”属性中指定的 cookie 名称，而值是发生重置事件时相应 cookie 的路径。</p>
+
+<a name="ggmxp"></a><h5>SSO 解码</h5>
+<p>启用后，在使用 SSO 令牌之前，由代理对其进行 URL 解码。</p>
+
+<a name="ggmwi"></a><h5>FAM 服务</h5>
+<p>FAM 服务属性会启用代理使用的 Federated Access Manager 服务配置， 例如策略服务、会话服务、验证服务和服务管理 (SM) 服务。</p>
+
+<a name="ggmxr"></a><h5>FAM 登录 URL</h5>
+<p>Federated Access Manager 验证的 URL 列表。需要验证时，代理会将外来的用户重定向到由 URL 指定的适当验证服务。</p><p>示例：</p><pre>[0]=http://host:port/opensso/UI/Login</pre>
+
+<a name="ggmzr"></a><h5>按优先级排序登录 URL</h5>
+<p>启用后，将按照标为“FAM 登录 URL”的属性所定义的优先级，对登录 URL 或 CDSSO URL 的故障转移顺序排序。</p>
+
+<a name="ggmyh"></a><h5>登录 URL 探测</h5>
+<p>启用后，代理会在重定向至标为“FAM 登录 URL”的属性所定义的 URL 之前检查它们的可用性。</p>
+
+<a name="ggmxq"></a><h5>登录 URL 探测超时设置</h5>
+<p>启用标为“登录 URL 探测”的属性后，指定的该属性值确定连接超时时间（以毫秒为单位）。</p>
+
+<a name="ggmxx"></a><h5>FAM 注销 URL</h5>
+<p>Federated Access Manager 注销页面 URL 的列表。</p><p>示例：</p><pre>[0]=http://host:port/opensso/UI/Logout</pre>
+
+<a name="ggmzv"></a><h5>按优先级排序注销 URL</h5>
+<p>启用后，将按照标为“FAM 登录 URL”的属性所定义的优先级，对注销 URL 的故障转移顺序排序。</p>
+
+<a name="ggmzx"></a><h5>注销 URL 探测</h5>
+<p>指定代理是否在重定向至这些 URL 之前检查它们的可用性。</p>
+
+<a name="ggmzy"></a><h5>注销 URL 探测超时设置</h5>
+<p>启用标为“注销 URL 探测”的属性后，指定的该属性值确定连接超时时间（以毫秒为单位）。</p>
+
+<a name="ggmzz"></a><h5>FAM 验证服务协议</h5>
+<p>Federated Access Manager 验证服务使用的协议。</p>
+
+<a name="ggmzw"></a><h5>FAM 验证服务主机名</h5>
+<p>Federated Access Manager 验证服务使用的主机名。</p>
+
+<a name="ggnaw"></a><h5>FAM 验证服务端口</h5>
+<p>Federated Access Manager 验证服务使用的端口号。</p>
+
+<a name="ggnaz"></a><h5>策略远程日志文件名</h5>
+<p>用于将消息记录到 Federated Access Manager 服务器的日志文件名。</p>
+
+<a name="ggnas"></a><h5>策略日志级别</h5>
+<p>要记录的远程日志消息类型。有效值如下：<tt>ALLOW</tt>、<tt>DENY</tt>、<tt>BOTH</tt> 和 <tt>NONE</tt>。</p>
+
+<a name="ggnak"></a><h5>启用策略通知</h5>
+<p>启用后，可执行远程策略客户机通知。</p>
+
+<a name="ggnao"></a><h5>策略客户机轮询时间间隔</h5>
+<p>该时间过后，远程策略客户机会刷新高速缓存的条目（以分钟为单位）。</p>
+
+<a name="ggnaj"></a><h5>策略客户机高速缓存模式</h5>
+<p>远程策略客户机使用的高速缓存模式。有效值如下：<tt>subtree</tt> 或 <tt>self</tt>。</p>
+
+<a name="ggnat"></a><h5>策略客户机布尔行为值</h5>
+<p>策略行为名称可用的布尔行为值。</p><p>示例：</p><pre><i>serviceName</i>|<i>actionName</i>|<i>trueValue</i>|<i>falseValue</i></pre>
+
+<a name="ggnbg"></a><h5>策略客户机资源比较器</h5>
+<p>用于不同服务名称的资源比较器。</p>
+
+<a name="ggnan"></a><h5>策略客户机时钟偏差</h5>
+<p>允许 Federated Access Manager 服务器与远程策略客户机之间存在的时间差异（以秒为单位）。</p>
+
+<a name="ggnbd"></a><h5>URL 策略环境 GET 参数</h5>
+<p>HTTP GET 请求参数列表，这些参数的名称和值将在 Federated Access Manager 服务器端 URL 策略评估的环境映射中进行设置。</p><p>映射关键字采用 GET <i>parameterName</i> 格式，而映射值则为一组参数字符串值。</p><p>示例：</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnax"></a><h5>URL 策略环境 POST 参数</h5>
+<p>HTTP POST 请求参数列表，这些参数的名称和值将在 Federated Access Manager 服务器端 URL 策略评估的环境映射中进行设置。</p><p>映射关键字采用 POST <i>parameterName</i> 格式，而映射值则为一组参数字符串值。</p><p>示例：</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnaa"></a><h5>URL 策略环境 jsession 参数</h5>
+<p>HTTP SESSION 属性列表，这些属性的名称和值将在 Federated Access Manager 服务器端 URL 策略评估的环境映射中进行设置。</p><p>映射关键字采用 JSESSION <i>parameterName</i> 格式，而映射值则为一组参数字符串值。</p><p>示例：</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnai"></a><h5>用户数据高速缓存轮询时间</h5>
+<p>用户管理数据的高速缓存更新时间（以分钟为单位）。如果设置为 <tt>0</tt>，则不进行更新。</p>
+
+<a name="ggnaf"></a><h5>启用服务数据高速缓存通知</h5>
+<p>启用后，可以执行服务管理高速缓存通知。</p>
+
+<a name="ggnam"></a><h5>服务数据高速缓存时间</h5>
+<p>服务配置数据的高速缓存更新时间（以分钟为单位）。如果设置为 <tt>0</tt>，则不进行更新。</p><p>该属性仅在标为“代理通知 URL”的属性不提供通知 URL 或禁用通知时生效。</p>
+
+<a name="ggnaq"></a><h5>启用客户机轮询</h5>
+<p>指定会话客户机是否必须使用轮询来更新会话信息，而不依赖于服务器通知。</p>
+
+<a name="ggnar"></a><h5>客户机轮询周期</h5>
+<p>该时间过后，会话客户机将请求从服务器更新高速缓存的会话信息（以秒为单位）。</p>
+
+<a name="ggmug"></a><h5>其他</h5>
+<p>其他属性是指不适合划分到其他类别中的属性。</p>
+
+<a name="ggnal"></a><h5>语言环境（语言）</h5>
+<p>标识操作语言环境的语言代码。</p>
+
+<a name="ggnae"></a><h5>语言环境（国家/地区）</h5>
+<p>标识操作语言环境的国家/地区代码。</p>
+
+<a name="ggnbc"></a><h5>启用端口检查</h5>
+<p>启用后，可以使用端口检查功能。</p>
+
+<a name="ggnav"></a><h5>端口检查文件</h5>
+<p>包含处理需要端口修正的请求时所需必要内容的文件的名称或完整路径。</p>
+
+<a name="ggnac"></a><h5>端口检查设置</h5>
+<p>端口对协议条目的映射，其中关键字为侦听端口号，值为侦听协议，代理使用它标识端口号无效的请求。</p><p>示例：</p><pre>[80] = http
+[443] = https</pre>
+
+<a name="ggnbf"></a><h5>忽略主体列表</h5>
+<p>代理出于验证和搜索目的而绕过的主体列表。</p><p>示例：</p><pre>[0]=guest
+[1]=testuser</pre>
+
+<a name="ggojq"></a><h5>启用传统支持</h5>
+<p>启用传统用户代理（浏览器）支持。</p>
+
+<a name="ggnad"></a><h5>传统用户代理</h5>
+<p>标识传统浏览器的用户代理标头值列表。</p>
+
+<a name="ggnap"></a><h5>传统重定向 URI</h5>
+<p>代理用于重定向传统用户代理请求的中间 URI。</p>
+
+<a name="ggnay"></a><h5>加密提供者</h5>
+<p>指定代理使用的加密提供者实现。</p>
+
+<a name="ggmud"></a><h5>高级</h5>
+<p>对于 J2EE 代理，高级属性可以是自定义创建的属性，也可以是要在更复杂或较罕见的部署中使用的属性。</p>
+
+<a name="ggnbb"></a><h5>com.sun.identity.agents.config.webservice.enable </h5>
+<p>启用后，会处理 Web 服务。</p>
+
+<a name="ggnab"></a><h5>com.sun.identity.agents.config.webservice.endpoint </h5>
+<p>表示 Web 服务的 Web 应用程序端点列表。</p>
+
+<a name="ggnah"></a><h5>com.sun.identity.agents.config.webservice.process.get.enable </h5>
+<p>启用后，会处理 Web 服务端点的 <tt>HTTP GET</tt> 请求。</p>
+
+<a name="ggnba"></a><h5>com.sun.identity.agents.config.webservice.authenticator </h5>
+<p>可用于验证 Web 服务请求的实现类。</p>
+
+<a name="ggnau"></a><h5>com.sun.identity.agents.config.webservice.internalerror.content </h5>
+<p>代理利用其内容来为客户机生成内部错误故障的文件名称。</p>
+
+<a name="ggnag"></a><h5>com.sun.identity.agents.config.webservice.autherror.content </h5>
+<p>代理利用其内容来为客户机生成验证错误故障的文件名称。</p>
+
+<a name="ggnfp"></a><h5>替换代理主机名</h5>
+<p>向客户机浏览器标识代理保护服务器的主机名（如果其与实际主机名不同）。</p>
+
+<a name="ggnew"></a><h5>替换代理端口名称</h5>
+<p>向客户机浏览器标识代理保护服务器侦听端口的端口号（如果其与实际侦听端口不同）。</p>
+
+<a name="ggnga"></a><h5>替换代理协议</h5>
+<p>客户机浏览器用于与代理保护的服务器进行通信的协议 (HTTP/HTTPS)（如果其与服务器使用的实际协议不同）。  </p>
+
+<a name="ggndh"></a><h5>FQDN 检查</h5>
+<p>启用 FQDN 默认值和 fqdn 映射值检查。</p>
+
+<a name="ggnfn"></a><h5>FQDN 默认</h5>
+<p>用户为访问资源而使用的全限定主机名。</p>
+
+<a name="ggnft"></a><h5>FQDN 虚拟主机映射</h5>
+<p>指向实际或有效主机名的映射。此映射表示从未识别的主机名指向已识别的主机名。此映射在以下场合非常有用：当用户输入一个 IP 地址或错误的 URL 时，或者当虚拟主机用于受保护的资源时。</p>
+
+<a name="ggngg"></a><h5>自定义属性</h5>
+<p>允许用户增加代理支持的属性集的其他属性。</p><p>示例：</p><pre>customproperty=custom-value1
+customlist[0]=customlist-value-0
+customlist[1]=customlist-value-1
+custommap[key1]=custommap-value-1
+custommap[key2]=custommap-value-2</pre>
+<br/>
+
+</body>
+</html>

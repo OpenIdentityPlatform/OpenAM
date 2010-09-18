@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>エンティティー: プロバイダおよびアフィリエイト - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptors"></a><h3>エンティティー: プロバイダおよびアフィリエイト</h3>
+<a name="indexterm-62"></a><a name="indexterm-63"></a><a name="indexterm-64"></a><a name="indexterm-65"></a><p><b>メタデータ</b> (特定のアイデンティティーサービスアーキテクチャーを定義する設定情報) を使用して、1 つの個別のアイデンティティープロバイダ、1 つの個別のサービスプロバイダ、または両方のプロバイダ 1 つずつに対して 1 つの<b>エンティティー</b>を設定できます。それとは対照的に、エンティティーをアフィリエイト、つまりどちらかの種類から選択したプロバイダのグループとして設定することも可能です。プロバイダのエンティティーもアフィリエイトのエンティティーもともに、Federation Access Manager コンソールを使用して設定できます。</p>
+<hr><p><b>注 &#8211; </b>エンティティーは、いつでも作成できますが、プロバイダを設定してはじめてトラストサークルに割り当てることができます。</p>
+<hr>
+<p>次の表に、2 種類のエンティティーについて説明します。</p><a name="gbxxa"></a><h6>表&#160;1 エンティティーの種類</h6><table><col width="50%"><col width="50%"><tr><td align="left" valign="top" scope="row"><p><b>プロバイダエンティティー</b></p></td>
+<td align="left" valign="top" scope="row"><p><b>プロバイダエンティティー</b>は、どちらの種類の個別プロバイダのメタデータも保持します。すべてのアイデンティティープロバイダおよびサービスプロバイダは、まずプロバイダエンティティー内で設定する必要があります。その後、それらのプロバイダをトラストサークルに関連付けたり、プロバイダを選択して<b>アフィリエイトエンティティー</b>に組み込んだりすることができます。Access Manager コンソールに提供されている属性を使用して、1 つの個別アイデンティティープロバイダ、1 つの個別サービスプロバイダ、またはアイデンティティープロバイダとサービスプロバイダ 1 つずつをプロバイダエンティティー内に定義できます。プロバイダエンティティープロファイルには、次の属性グループがあります。</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">一般属性</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">アイデンティティープロバイダ</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">サービスプロバイダ</a></p></li></ul>
+</td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><b>アフィリエイトエンティティー</b></p></td>
+<td align="left" valign="top" scope="row"><p>設定済みの<b>アフィリエイト</b>を使用すると、ユーザーは関連するサイトのグループを連携させることができます。たとえば、サービスプロバイダがアフィリエイトを代表してユーザーの認証要求を発行し、認証がセキュリティー保護されている場合、ユーザーはアフィリエイトのすべてのメンバーとの間でシングルサインオンを実現できます。アフィリエイトはトラストサークルの境界に関係なく形成されます。</p><p><b>アフィリエイトエンティティー</b>は、アフィリエイトを構成する 1 つ以上のプロバイダエンティティーのグループ化を定義するメタデータを保持します。アフィリエイトにはどのプロバイダの設定情報も含まれず、アフィリエイト自身の設定情報だけが含まれます。アフィリエイトエンティティープロファイルには、次の属性グループがあります。</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">一般属性</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">アフィリエイト</a></p></li></ul>
+
+<hr><p><b>注 &#8211; </b>アフィリエイトのメンバーは、アフィリエイトのメンバーとしても、また個別にもサービスを起動できます。</p>
+<hr>
+</td>
+</tr>
+</table><p>どちらの種類もすべての設定済みエンティティーが、「エンティティー」に一覧表示されます。エンティティーに関連する作業は、次のとおりです。</p>
+<ul><li><p><a href="federation.fsentitydescriptorsadd.html">「プロバイダエンティティーまたはアフィリエイトエンティティーを作成する」</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsprofile.html">「プロバイダエンティティーまたはアフィリエイトエンティティーの一般属性を変更する」</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">「アイデンティティープロバイダをプロバイダエンティティーに追加する」</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedadd.html">「新しいホストアイデンティティープロバイダをプロバイダエンティティーに追加する」</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteadd.html">「新しいリモートアイデンティティープロバイダをプロバイダエンティティーに追加する」</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">「サービスプロバイダをプロバイダエンティティーに追加する」</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedadd.html">「新しいホストサービスプロバイダをプロバイダエンティティーに追加する」</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteadd.html">「新しいリモートサービスプロバイダをプロバイダエンティティーに追加する」</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedprofile.html">「プロバイダエンティティーに含まれるホストアイデンティティープロバイダ属性を変更する」</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteprofile.html">「プロバイダエンティティーに含まれるリモートアイデンティティープロバイダ属性を変更する」</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedprofile.html">「プロバイダエンティティーに含まれるホストサービスプロバイダ属性を変更する」</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteprofile.html">「プロバイダエンティティーに含まれるリモートサービスプロバイダ属性を変更する」</a></p></li>
+<li><p><a href="federation.fscreatecontactperson.html">「担当者をプロバイダエンティティーに含まれるプロバイダに追加する」</a></p></li>
+<li><p><a href="federation.fseditcontactperson.html">「プロバイダエンティティーに含まれる担当者プロファイルを変更する」</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">「アフィリエイトエンティティーにメンバーを追加する」</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

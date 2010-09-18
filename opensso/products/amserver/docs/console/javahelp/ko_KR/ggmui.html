@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>J2EE 정책 에이전트 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggmui"></a><h4>J2EE 정책 에이전트</h4>
+<p>이 인터페이스에서 J2EE 에이전트 인스턴스를 구성할 수 있습니다. 사용 가능한 구성 유형은
+다음 범주로 구분됩니다.</p>
+<ul><li><p><a href="#ggmvd">전역</a></p></li>
+<li><p><a href="#ggmwz">응용 프로그램</a></p></li>
+<li><p><a href="#ggmwl">SSO</a></p></li>
+<li><p><a href="#ggmwi">FAM 서비스</a></p></li>
+<li><p><a href="#ggmug">기타</a></p></li>
+<li><p><a href="#ggmud">고급</a></p></li></ul>
+
+
+<a name="ggmvd"></a><h5>전역</h5>
+<p>전역 속성은 모든 J2EE 에이전트 및 에이전트에서 보호하는 모든 응용 프로그램에 적용됩니다.</p>
+
+<a name="ggmph"></a><h5>그룹</h5>
+<p>해당되는 경우 드롭다운 목록에서 그룹을 선택합니다. 이 목록은 이전에 구성한 그룹으로 구성됩니다.</p>
+
+<a name="ggmqz"></a><h5>비밀번호</h5>
+<p>비밀번호는 에이전트 프로필을 만들 때 설정됩니다. 그러나 이후에 언제든지 비밀번호를 변경할 수
+있습니다.</p>
+
+<a name="ggmni"></a><h5>비밀번호 확인</h5>
+<p>비밀번호 확인은 에이전트 프로필을 만들 때 수행됩니다. 비밀번호를 변경하면 변경된 비밀번호를 확인해야
+합니다.</p>
+
+<a name="ggmpc"></a><h5>상태</h5>
+<p>에이전트를 만들면 [활성] 옵션이 선택됩니다. 에이전트가 제공하는 보호 기능을 제거하려는 경우에만 [비활성]을
+선택하십시오.</p>
+
+<a name="ggmwm"></a><h5>에이전트 알림 URL</h5>
+<p>에이전트가 알림 수신자를 등록하는 데 사용하는 URL입니다.</p>
+
+<a name="ggmwr"></a><h5>에이전트 구성 저장소 위치</h5>
+<p>필요한 경우 구성 위치를중앙 집중됨 또는 로컬 옵션 중에서 사용 가능한 옵션으로
+변경합니다. 중앙 집중화된 위치를 사용하면 콘솔 등과 같이 중앙 집중화된 방식으로 구성을
+제어할 수 있습니다. 로컬 옵션은 이전 버전과의 호환을 위해 제공됩니다.</p>
+
+<a name="ggmwj"></a><h5>구성 재로드 간격</h5>
+<p>구성 재로드 사이의 간격(초)입니다. 이 속성을 0으로 설정하면 핫스왑 메커니즘이 비활성화됩니다.</p>
+
+<a name="ggmsi"></a><h5>중앙 집중화된 알림 사용</h5>
+<p>이 속성을 사용하면 구성이 변경되는 경우 에이전트가 Federated Access Manager로부터 알림 메시지를
+받을 수 있습니다.</p>
+
+<a name="ggmvt"></a><h5>에이전트 필터 모드</h5>
+<p>필터의 작업 모드입니다.</p>
+
+<a name="ggmvu"></a><h5>자원 액세스 거부 URI</h5>
+<p>사용자 정의 액세스 거부 페이지의 URL입니다. 값을 지정하지 않으면 에이전트가  HTTP
+403(금지) 상태를 반환합니다.</p>
+
+<a name="ggmxg"></a><h5>HTTP 세션 바인딩</h5>
+<p>이 속성을 사용하면 로그인 실패 시 HTTP 세션이 무효화됩니다. 사용자에게 SSO 세션이
+없거나 기본 사용자 이름이 SSO 사용자 이름과 일치하지 않습니다.</p>
+
+<a name="ggmut"></a><h5>com.sun.identity.agents.config.redirect.param</h5>
+<p>goto 매개 변수 이름을 나타내는 문자열이며, 에이전트에서 사용자를 적절한 인증 서비스로 리디렉션하는
+데 사용됩니다. 이 매개 변수의 값은 인증 서비스에서 사용자를 원래 요청한 대상으로
+리디렉션하는 데 사용됩니다.</p>
+
+<a name="ggmuv"></a><h5>로그인 시도 한계</h5>
+<p>사용자 요청이 차단될 때가지 단일 브라우저 세션에서 허용되는 실패한 로그인 시도 횟수입니다.
+이 값이 0이면 이 기능이 비활성화됩니다.</p>
+
+<a name="ggmtr"></a><h5>사용자 정의 응답 헤더</h5>
+<p>클라이언트 브라우저에서 에이전트가 설정한 사용자 정의 헤더의 매핑 목록입니다. 키는 헤더 이름이고
+값은 헤더 값을 나타냅니다.</p>
+
+<a name="ggmtt"></a><h5>리디렉션 시도 한계</h5>
+<p>사용자 요청이 차단될 때까지 단일 브라우저 세션에서 허용되는 연속 단일 지점 리디렉션
+횟수입니다. 이 값이 0이면 이 기능이 비활성화됩니다.</p>
+
+<a name="ggmxd"></a><h5>에이전트 디버그 수준</h5>
+<p>로깅되는 디버그 메시지 유형입니다. 이 설정은 에이전트 호스트에 로컬로 저장되는 디버그 로그의
+수준을 결정합니다.</p>
+
+<a name="ggmsk"></a><h5>사용자 매핑 모드</h5>
+<p>에이전트가 사용자 아이디를 결정하는 데 사용하는 메커니즘입니다.</p>
+
+<a name="ggmts"></a><h5>사용자 속성 이름</h5>
+<p>사용자 아이디가 포함되는 속성의 이름입니다. 사용자 매핑 모드 속성이 <tt>USER_ID</tt>로 설정된 경우에는
+이 속성의 값을 사용하지 않습니다. </p>
+
+<a name="ggmuc"></a><h5>사용자 기본 플래그</h5>
+<p>이 속성을 사용하면 사용자 아이디만 단독으로 사용하는 것이 아니라 인증된 사용자의 기본을
+사용하여 사용자를 인증합니다. 사용자 매핑 모드 속성이 <tt>USER_ID</tt>로 설정된 경우 이 속성의
+값이 사용됩니다. </p>
+
+<a name="ggmtm"></a><h5>사용자 토큰 이름</h5>
+<p>세션에서 인증된 사용자의 사용자 아이디에 대한 세션 등록 정보 이름입니다. 이 속성의
+값은 사용자 매핑 모드 속성이 <tt>USER_ID</tt>로 설정되고 사용자 기본 플래그 속성을 사용하지
+않는 경우에 사용됩니다.</p>
+
+<a name="ggmzk"></a><h5>감사 액세스 유형</h5>
+<p>사용자 URL 액세스 시도에 따라 에이전트가 로깅하는 메시지 유형입니다.</p>
+
+<a name="ggmyk"></a><h5>감사 로그 위치</h5>
+<p>감사 메시지가 로깅되는 위치입니다.</p>
+
+<a name="ggmxz"></a><h5>원격 로그 파일 이름</h5>
+<p>Federated Access Manager에 대한 각 URL 액세스를 기록하는 Federated Access Manager 로그
+파일의 이름입니다.</p>
+
+<a name="ggmxy"></a><h5>로컬 감사 로그 회전</h5>
+<p>이 속성을 사용하면 로컬 감사 로그 회전 크기 속성에서 지정한 크기에 도달하는
+경우 감사 로그 파일이 회전됩니다.</p>
+
+<a name="ggmyc"></a><h5>로컬 감사 로그 회전 크기</h5>
+<p>로컬 감사 로그 파일이 새 파일로 회전되는 크기입니다.</p>
+
+<a name="ggmxt"></a><h5>클라이언트 IP 주소 헤더</h5>
+<p>클라이언트의 IP 주소가 있는 HTTP 헤더 이름입니다.</p>
+
+<a name="ggmyp"></a><h5>클라이언트 호스트 이름 헤더</h5>
+<p>클라이언트의 호스트 이름이 있는 HTTP 헤더 이름입니다.</p>
+
+<a name="ggmwz"></a><h5>응용 프로그램</h5>
+<p>응용 프로그램 속성은 응용 프로그램에 고유한 경향이 있습니다.</p>
+
+<a name="ggmxm"></a><h5>로그인 양식 URI</h5>
+<p>응용 프로그램의 <tt>web.xml</tt> form-login-page 요소에 해당하는 절대 URI 목록입니다.</p>
+
+<a name="ggmzf"></a><h5>로그인 오류 URI</h5>
+<p>응용 프로그램의 <tt>web.xml</tt> form-error-page 요소에 해당하는 절대 URI 목록입니다. </p>
+
+<a name="ggmyn"></a><h5>내부 로그인 사용</h5>
+<p>이 속성을 사용하면 에이전트가 로그인 컨텐트 파일 이름 속성에서 지정한 사용자 정의
+내부 컨텐트를 사용합니다. 이 속성을 사용하지 않으면 에이전트가 기본 내부 컨텐트를 사용합니다.</p>
+
+<a name="ggmxs"></a><h5>로그인 컨텐트 파일 이름</h5>
+<p>사용자 정의 로그인 컨텐트 파일의 전체 경로와 이름입니다.</p>
+
+<a name="ggmyw"></a><h5>로그아웃 응용 프로그램 처리기</h5>
+<p>응용 프로그램 전용 매핑이며, 각각 로그아웃 처리에 사용할 처리기를 식별하는 데 사용됩니다.</p>
+
+<a name="ggmzp"></a><h5>로그아웃 응용 프로그램 URI</h5>
+<p>응용 프로그램 전용 매핑이며, 각각 요청 URI를 식별하는 데 사용됩니다. 지정된 요청
+URI가 있는 경우에는 로그아웃 이벤트를 나타냅니다.</p>
+
+<a name="ggmxw"></a><h5>로그아웃 요청 매개 변수</h5>
+<p>응용 프로그램 전용 매핑이며, 각각 매개 변수를 식별하는 데 사용됩니다. HTTP 요청에
+지정된 매개 변수가 있는 경우에는 로그아웃 이벤트를 나타냅니다.</p>
+
+<a name="ggmzu"></a><h5>로그아웃 Introspect 사용</h5>
+<p>이 속성을 사용하면 에이전트가 HTTP 요청 본문을 검색하여 로그아웃 매개 변수를 찾습니다.</p>
+
+<a name="ggmyj"></a><h5>로그아웃 시작 URI</h5>
+<p>응용 프로그램 전용 매핑이며, 각각 성공적인 로그아웃 후 그리고 해당하는 경우 후속
+인증 성공 후 시작점으로 사용할 URI를 나타냅니다.</p>
+
+<a name="ggmxn"></a><h5>강제 적용되지 않는 URI</h5>
+<p>인증을 수행하지 않는 URI 목록입니다. 이 목록의 모든 URI에 대해 에이전트에서 보호를
+수행하지 않으며 자격 증명도 요청하지 않습니다.</p>
+
+<a name="ggmyy"></a><h5>강제 적용되지 않는 URI 반전</h5>
+<p>이 속성을 사용하면 강제 적용되지 않는 URI 목록이 강제 적용되는 목록으로 바뀝니다.
+따라서 강제 적용되지 않는 URI 목록 속성에 값으로 나열된 모든 URI가 적용되며
+다른 URI는 적용되지 않습니다.</p>
+
+<a name="ggmyv"></a><h5>강제 적용되지 않는 URI 캐시 사용</h5>
+<p>이 속성을 사용하면 평가 결과가 강제 적용되지 않는 URI에 대해 캐시됩니다. 따라서
+평가 결과가 강제 적용되지 않는 URI 속성과 연결된 값 목록에 대해 캐시됩니다.</p>
+
+<a name="ggmzm"></a><h5>강제 적용되지 않는 URI 캐시 크기 </h5>
+<p>강제 적용되지 않는 URI 캐시 사용 속성을 사용하는 경우 이 속성에 지정된
+값을 사용하여 캐시 크기를 설정합니다.</p>
+
+<a name="ggmzd"></a><h5>강제 적용되지 않는 클라이언트 IP 목록</h5>
+<p>인증이나 권한 부여를 거치지 않는 요청의 클라이언트 IP 주소 목록입니다. 이 목록의
+모든 IP 주소에 대해 액세스 권한이 부여되지만 인증 또는 권한 부여를 위한
+자격 증명을 요청하지는 않습니다.</p>
+
+<a name="ggmzn"></a><h5>강제 적용되지 않는 IP 반전 목록</h5>
+<p>이 속성을 사용하면 강제 적용되지 않는 클라이언트 IP 목록이 강제 적용되는 목록으로
+바뀝니다. 따라서 강제 적용되지 않는 클라이언트 IP 목록 속성에 값으로 나열된 모든
+IP 주소가 적용되며 다른 IP 주소는 적용되지 않습니다.</p>
+
+<a name="ggmzh"></a><h5>강제 적용되지 않는 IP 캐시 플래그</h5>
+<p>이 속성을 사용하면 평가 결과가 강제 적용되지 않는 IP 주소에 대해 캐시됩니다.
+따라서 평가 결과가 강제 적용되지 않는 클라이언트 IP 목록 속성과 연결된 값
+목록에 대해 캐시됩니다.</p>
+
+<a name="ggmzs"></a><h5>강제 적용되지 않는 IP 캐시 크기 </h5>
+<p>강제 적용되지 않는 IP 캐시 플래그 속성을 사용하는 경우 이 속성에 지정된
+값을 사용하여 캐시 크기를 설정합니다.</p>
+
+<a name="ggmzi"></a><h5>프로필 속성 불러오기 모드</h5>
+<p>이 모드에서는 요청에 사용할 추가 사용자 프로필 속성을 불러올 수 있습니다.</p>
+
+<a name="ggmzo"></a><h5>프로필 속성 매핑</h5>
+<p>프로필 속성 이름에서 HTTP 헤더로 매핑하는 목록이며, 현재 인증된 사용자의 특정 이름
+아래에 채워집니다. 형식: [profile_attribute_name]=http_header_name.</p>
+
+<a name="ggmym"></a><h5>응답 속성 불러오기 모드</h5>
+<p>이 모드에서는 요청에 사용할 추가 사용자 응답 속성을 불러올 수 있습니다.</p>
+
+<a name="ggmzg"></a><h5>응답 속성 매핑</h5>
+<p>응답 속성 이름에서 HTTP 헤더 이름으로 매핑하는 목록이며, 현재 인증된 사용자의 특정
+이름 아래에 채워집니다. 형식: [response_attribute_name]=http_header_name.</p>
+
+<a name="ggmxl"></a><h5>쿠키 구분 문자</h5>
+<p>동일한 속성을 가진 여러 값을 하나의 쿠기로 설정하는 경우 각 값을 구분하는
+데 사용하는 문자입니다.</p>
+
+<a name="ggmyl"></a><h5>불러오기 속성 날짜 형식</h5>
+<p>속성을 HTTP 헤더로 설정하는 경우 사용할 날짜 속성 값의 형식입니다. 이 형식은
+<tt>java.text.SimpleDateFormat</tt>을 기준으로 합니다.</p>
+
+<a name="ggmzq"></a><h5>속성 쿠키 인코딩</h5>
+<p>이 속성을 사용하면 이 속성의 값은 쿠키로 설정하기 전에 URL 인코딩됩니다.</p>
+
+<a name="ggmyf"></a><h5>세션 속성 불러오기 모드</h5>
+<p>이 모드에서는 요청에 사용할 추가 사용자 세션 속성을 불러올 수 있습니다.</p>
+
+<a name="ggmyu"></a><h5>세션 속성 매핑</h5>
+<p>세션 속성 이름에서 HTTP 헤더 이름으로 매핑하는 목록이며, 현재 인증된 사용자의 특정
+이름 아래에 채워집니다. 형식: [session_attribute_name]=http_header_name.</p>
+
+<a name="ggmyi"></a><h5>기본 권한 속성</h5>
+<p>유효한 Federated Access Manager 세션을 갖는 모든 사용자에게 부여되는 권한 있는 속성의
+목록입니다.</p>
+
+<a name="ggmxo"></a><h5>권한 있는 속성 유형</h5>
+<p>각 사용자에 대해 불러올 권한 있는 속성 유형의 목록입니다.</p>
+
+<a name="ggmyb"></a><h5>권한 있는 속성을 소문자로</h5>
+<p>권한이 있는 속성 유형을 <tt>true</tt> 또는 <tt>false</tt> 값과 매핑한 목록입니다. <tt>true</tt>는 속성
+유형을 소문자로 변환하며, 변환하지 않을 경우에는 <tt>false</tt>로 설정합니다.</p>
+
+<a name="ggmyt"></a><h5>권한 있는 세션 속성</h5>
+<p>인증된 사용자에 대해 권한 있는 속성을 가진 세션 등록 정보 이름의 목록입니다.</p>
+
+<a name="ggmxk"></a><h5>권한 있는 속성 매핑 사용</h5>
+<p>이 속성을 사용하면 권한 있는 속성 매핑 속성에서 지정한 대로 속성의 원래
+값에서 대체 값으로 매핑이 적용됩니다.</p>
+
+<a name="ggmya"></a><h5>권한 있는 속성 매핑</h5>
+<p>속성의 원래 값을 대체 값으로 매핑한 목록입니다. 이 속성은 권한 속성 매핑
+사용 속성을 사용할 경우에만 유효합니다.</p><p>예:</p><pre>[id=manager,ou=group,dc=opensso,dc=java,dc=net]=am_manager_role
+[id=employee,ou=group,dc=opensso,dc=java,dc=net]=am_employee_role</pre>
+
+<a name="ggmyg"></a><h5>사용자 정의 인증 처리기</h5>
+<p>응용 프로그램에서 해당 응용 프로그램 관련 인증 처리기로의 매핑 목록입니다. 에이전트에서 각
+인증 처리기를 사용하여 지정된 응용 프로그램의 컨테이너 내에서 사용자를 인증합니다.</p><p>예:</p><pre>[BankApp]=BankAuthHandler</pre>
+
+<a name="ggmyq"></a><h5>사용자 정의 로그아웃 처리기</h5>
+<p>응용 프로그램에서 해당 응용 프로그램 관련 로그아웃 처리기로의 매핑 목록입니다. 에이전트에서 각
+로그아웃 처리기를 사용하여 지정된 응용 프로그램의 컨테이너 내에서 사용자를 로그아웃합니다.</p><p>예:</p><pre>[BankApp]=BankLogoutHandler</pre>
+
+<a name="ggmxv"></a><h5>사용자 정의 검증 처리기</h5>
+<p>응용 프로그램에서 해당 응용 프로그램 관련 로컬 검증 처리기로의 매핑 목록입니다. 에이전트에서
+로컬 검증 처리기를 사용하여 로컬 저장소 내에서 사용자 자격 증명의 유효성을 검사합니다.</p><p>예:</p><pre>[BankApp]=BankVerificationHandler</pre>
+
+<a name="ggmwl"></a><h5>SSO</h5>
+<p>SSO 속성을 사용하면 단일 사인온(SSO)과 관련된 에이전트의 기능을 구성할 수 있습니다. SSO와
+관련된 대부분의 속성은 SSO 범주로 그룹화됩니다. 그러나 기본 SSO 기능을 제공하는 속성은
+이 그룹에 포함되지 않을 수 있습니다.</p>
+
+<a name="ggmyo"></a><h5>쿠키 이름</h5>
+<p>Federated Access Manager 서버와 에이전트 간에 사용하는 SSO 토큰 쿠키의 이름입니다.</p>
+
+<a name="ggmxu"></a><h5>SSO 캐시 사용</h5>
+<p>이 속성을 사용하면 SSO 캐시가 활성 캐시가 되며 에이전트 SDK가 제공하는 공용
+API를 통해 SSO 캐시를 사용할 수 있습니다.</p>
+
+<a name="ggmza"></a><h5>도메인 간 SSO</h5>
+<p>이 속성을 사용하면 CDSS(도메인 간 단일 사인온)가 활성화됩니다.</p>
+
+<a name="ggmzt"></a><h5>CDSSO 리디렉션 URI</h5>
+<p>에이전트가 CDSSO 요청을 처리하는 데 사용하는 중간 URI입니다.</p>
+
+<a name="ggmyd"></a><h5>CDSSO 서블릿 URL</h5>
+<p>에이전트가 CDSSO 처리에 사용할 수 있는 CDSSO 컨트롤러의 URL 목록입니다.</p><p>예:</p><pre>[0]=http://host:port/opensso/cdcservlet</pre>
+
+<a name="ggmzc"></a><h5>CDSSO 클럭 오차</h5>
+<p>에이전트가 CDSSO <tt>AuthnResponse</tt> 명제의 유효성을 검사하는 데 사용하는 시간(초)입니다.</p>
+
+<a name="ggmyz"></a><h5>CDSSO 신뢰할 수 있는 아이디 공급자</h5>
+<p>CDC 리버티 응답을 평가하는 경우 에이전트에서 신뢰할 수 있는 Federated Access Manager
+서버/아이디 공급자 목록입니다. 로드 밸런서, 방화벽 또는 둘 모두 에이전트와 Federated Access
+Manager 인스턴스 사이에 있는 경우 이 속성을 설정해야 합니다. </p><p>예:</p><pre>[0]=http://host:port/opensso/cdcservlet</pre>
+
+<a name="ggmzj"></a><h5>CDSSO 보안 사용</h5>
+<p>이 속성을 사용하면 CDSSO 모드의 서로 다른 도메인에서 에이전트가 설정한 SSO 토큰
+쿠키가 안전한 것으로 표시됩니다. 호스트와의 통신 채널이 안전한 경우에만 전송이 수행됩니다.</p>
+
+<a name="ggmze"></a><h5>CDSSO 도메인 목록</h5>
+<p>CDSSO 시나리오에서 쿠키를 설정해야 하는 도메인 목록입니다.</p><p>예:</p><pre>[0]=.sun.com</pre>
+
+<a name="ggmyx"></a><h5>쿠키 재설정</h5>
+<p>이 속성을 사용하면 에이전트가 인증하기 위해 리디렉션하기 전에 응답에서 쿠키를 재설정합니다.</p>
+
+<a name="ggmys"></a><h5>쿠키 재설정 이름 목록</h5>
+<p>쿠키 재설정 속성을 사용하는 경우 에이전트가 재설정할 쿠키 이름 목록입니다.</p>
+
+<a name="ggmye"></a><h5>쿠키 재설정 도메인 맵</h5>
+<p>쿠키 재설정 이름 목록 속성에서 지정한 쿠키 이름인 키에 값을 매핑한 목록이며,
+재설정 이벤트가 발생한 경우 사용할 쿠키의 도메인입니다.</p>
+
+<a name="ggmzl"></a><h5>쿠키 재설정 경로 맵</h5>
+<p>쿠키 재설정 이름 목록 속성에서 지정한 쿠키 이름인 키에 값을 매핑한 목록이며,
+재설정 이벤트가 발생한 경우 사용할 쿠키의 경로입니다.</p>
+
+<a name="ggmxp"></a><h5>SSO 디코딩</h5>
+<p>이 속성을 사용하면 에이전트가 SSO 토큰을 사용하기 전에 해당 토큰을 URL 디코딩합니다.</p>
+
+<a name="ggmwi"></a><h5>FAM 서비스</h5>
+<p>FAM 서비스 속성은 에이전트가 사용하는 Federated Access Manager 서비스(예: 정책 서비스, 세션
+서비스, 인증 서비스 및 서비스 관리(SM) 서비스)의 구성을 활성화합니다.</p>
+
+<a name="ggmxr"></a><h5>FAM 로그인 URL</h5>
+<p>Federated Access Manager 인증에 대한 URL 목록입니다. 인증이 필요한 경우에는 에이전트가 들어오는
+사용자를 해당 URL에서 지정한 적절한 인증 서비스로 리디렉션합니다.</p><p>예:</p><pre>[0]=http://host:port/opensso/UI/Login</pre>
+
+<a name="ggmzr"></a><h5>로그인 URL 우선 순위 지정</h5>
+<p>이 속성을 사용하면 FAM 로그인 URL 속성에서 정의한 대로 로그인 URL 또는
+CDSSO URL에 대한 페일오버 순서의 우선 순위가 지정됩니다.</p>
+
+<a name="ggmyh"></a><h5>로그인 URL 검사</h5>
+<p>이 속성을 사용하면 에이전트가 FAM 로그인 URL 속성에서 정의한 URL로 리디렉션하기 전에
+해당 URL의 가용성을 검사합니다.</p>
+
+<a name="ggmxq"></a><h5>로그인 URL 검사 시간 초과</h5>
+<p>로그인 URL 검사 속성을 사용하는 경우 이 속성에 지정한 값에 따라 연결
+시간 초과의 시간(밀리초)이 결정됩니다.</p>
+
+<a name="ggmxx"></a><h5>FAM 로그아웃 URL</h5>
+<p>Federated Access Manager 로그아웃 페이지 URL의 목록입니다.</p><p>예:</p><pre>[0]=http://host:port/opensso/UI/Logout</pre>
+
+<a name="ggmzv"></a><h5>로그아웃 URL 우선 순위 지정</h5>
+<p>이 속성을 사용하면 FAM 로그아웃 URL 속성에서 정의한 대로 로그아웃 URL에 대한
+페일오버 순서의 우선 순위가 지정됩니다.</p>
+
+<a name="ggmzx"></a><h5>로그아웃 URL 검사</h5>
+<p>에이전트가 URL로 리디렉션하기 전에 해당 URL의 가용성을 확인할지 여부를 지정합니다.</p>
+
+<a name="ggmzy"></a><h5>로그아웃 URL 검사 시간 초과</h5>
+<p>로그아웃 URL 검사 속성을 사용하는 경우 이 속성에 지정한 값에 따라 연결
+시간 초과의 시간(밀리초)이 결정됩니다.</p>
+
+<a name="ggmzz"></a><h5>FAM 인증 서비스 프로토콜</h5>
+<p>Federated Access Manager 인증 서비스에서 사용할 프로토콜입니다.</p>
+
+<a name="ggmzw"></a><h5>FAM 인증 서비스 호스트 이름</h5>
+<p>Federated Access Manager 인증 서비스에서 사용할 호스트 이름입니다.</p>
+
+<a name="ggnaw"></a><h5>FAM 인증 서비스 포트</h5>
+<p>Federated Access Manager 인증 서비스에서 사용할 포트의 번호입니다.</p>
+
+<a name="ggnaz"></a><h5>정책 원격 로그 파일 이름</h5>
+<p>Federated Access Manager 서버에 메시지를 로깅하는 데 사용할 로그 파일의 이름입니다.</p>
+
+<a name="ggnas"></a><h5>정책 로깅 수준</h5>
+<p>로깅할 원격 로깅 메시지 유형입니다. 유효한 값은 <tt>ALLOW</tt>, <tt>DENY</tt>, <tt>BOTH</tt> 및 <tt>NONE</tt>입니다.</p>
+
+<a name="ggnak"></a><h5>정책 알림 사용</h5>
+<p>이 속성을 사용하면 원격 정책 클라이언트에서 알림을 사용합니다.</p>
+
+<a name="ggnao"></a><h5>정책 클라이언트 폴링 간격</h5>
+<p>캐시된 항목을 원격 정책 클라이언트에서 새로 고친 후 다음 번에 새로 고칠
+때까지의 기간(분)입니다.</p>
+
+<a name="ggnaj"></a><h5>정책 클라이언트 캐시 모드</h5>
+<p>원격 정책 클라이언트에서 사용할 캐싱 모드입니다. 유효한 값은 <tt>subtree</tt> 또는 <tt>self</tt>입니다.</p>
+
+<a name="ggnat"></a><h5>정책 클라이언트 부울 작업 값</h5>
+<p>부울 작업 값은 정책 작업 이름에 사용할 수 있습니다.</p><p>예:</p><pre><i>serviceName</i>|<i>actionName</i>|<i>trueValue</i>|<i>falseValue</i></pre>
+
+<a name="ggnbg"></a><h5>정책 클라이언트 자원 비교기</h5>
+<p>서로 다른 서비스 이름에 사용할 자원 비교기입니다.</p>
+
+<a name="ggnan"></a><h5>정책 클라이언트 클럭 오차</h5>
+<p>Federated Access Manager 서버 시스템과 원격 정책 클라이언트 시스템 간의 시차를 조정할
+수 있도록 허용되는 시간(초)입니다.</p>
+
+<a name="ggnbd"></a><h5>URL 정책 환경 GET 매개 변수</h5>
+<p>Federated Access Manager 서버에서 URL 정책을 평가하기 위해 환경 맵에 이름과 값을
+설정한 HTTP GET 요청 매개 변수 목록입니다. </p><p>맵 키는 GET <i>parameterName</i> 형식이며 맵 값은 매개 변수의 문자열 값 집합입니다.</p><p>예:</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnax"></a><h5>URL 정책 환경 POST 매개 변수</h5>
+<p>Federated Access Manager 서버에서 URL 정책을 평가하기 위해 환경 맵에 이름과 값을
+설정한 HTTP POST 요청 매개 변수 목록입니다. </p><p>맵 키는 POST <i>parameterName</i> 형식이며 맵 값은 매개 변수의 문자열 값 집합입니다.</p><p>예:</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnaa"></a><h5>URL 정책 환경 jsession 매개 변수</h5>
+<p>Federated Access Manager 서버에서 URL 정책을 평가하기 위해 환경 맵에 이름과 값을
+설정한 HTTP SESSION 속성 목록입니다. </p><p>맵 키는 JSESSION <i>parameterName</i> 형식이며 맵 값은 매개 변수의 문자열 값 집합입니다.</p><p>예:</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnai"></a><h5>사용자 데이터 캐시 폴링 시간</h5>
+<p>사용자 관리 데이터에 대한 캐시 업데이트 시간(분)입니다. <tt>0</tt>으로 설정하면 업데이트가 수행되지 않습니다.</p>
+
+<a name="ggnaf"></a><h5>서비스 데이터 캐시 알림 사용</h5>
+<p>이 속성을 사용하면 서비스 관리 캐시에 대해 알림 기능이 작동됩니다.</p>
+
+<a name="ggnam"></a><h5>서비스 데이터 캐시 시간</h5>
+<p>서비스 구성 데이터에 대한 캐시 업데이트 시간(분)입니다. <tt>0</tt>으로 설정하면 업데이트가 수행되지 않습니다.</p><p>이 속성은 에이전트 알림 URL 속성에서 알림 URL을 제공하지 않았거나 알림이 비활성화된
+경우 유효하게 사용됩니다.</p>
+
+<a name="ggnaq"></a><h5>클라이언트 폴링 사용</h5>
+<p>세션 클라이언트가 세션 정보를 업데이트하기 위해 폴링을 사용해야 하며 서버 알림에 종속되지
+않아야 하는 경우 지정합니다.</p>
+
+<a name="ggnar"></a><h5>클라이언트 폴링 기간</h5>
+<p>세션 클라이언트가 서버에서 캐시된 세션 정보에 대한 업데이트를 요청하는 시간 간격(초)입니다.</p>
+
+<a name="ggmug"></a><h5>기타</h5>
+<p>기타 속성(등록 정보)은 다른 범주에 적합하지 않은 속성입니다.</p>
+
+<a name="ggnal"></a><h5>로켈 언어 </h5>
+<p>작업의 로켈을 식별하는 언어 코드입니다.</p>
+
+<a name="ggnae"></a><h5>로켈 국가</h5>
+<p>작업의 로켈을 식별하는 국가 코드입니다.</p>
+
+<a name="ggnbc"></a><h5>포트 확인 사용</h5>
+<p>이 속성을 사용하면 포트 확인 기능이 작동됩니다.</p>
+
+<a name="ggnav"></a><h5>포트 확인 파일</h5>
+<p>포트 수정이 필요한 요청을 처리하는 데 필요한 컨텐트가 있는 파일의 이름 또는
+전체 경로입니다. </p>
+
+<a name="ggnac"></a><h5>포트 확인 설정</h5>
+<p>에이전트가 잘못된 포트 번호가 있는 요청을 식별하는 데 사용하는 수신 포트 번호
+키와 수신 프로토콜 값이 있는 프로토콜 항목과 포트의 맵입니다.</p><p>예:</p><pre>[80] = http
+[443] = https</pre>
+
+<a name="ggnbf"></a><h5>우회 기본 목록</h5>
+<p>에이전트가 인증 및 검색 용도로 우회하는 기본의 목록입니다.</p><p>예:</p><pre>[0]=guest
+[1]=testuser</pre>
+
+<a name="ggojq"></a><h5>레거시 지원 사용</h5>
+<p>레거시 사용자 에이전트(브라우저)에 대한 지원을 사용합니다.</p>
+
+<a name="ggnad"></a><h5>레거시 사용자 에이전트</h5>
+<p>레거시 브라우저를 식별하는 사용자 에이전트 헤더 값의 목록입니다.</p>
+
+<a name="ggnap"></a><h5>레거시 리디렉션 URI</h5>
+<p>에이전트가 레거시 사용자 에이전트 요청을 리디렉션하는 데 사용하는 중간 URI입니다.</p>
+
+<a name="ggnay"></a><h5>암호화 공급자</h5>
+<p>에이전트에서 사용할 암호화 공급자 구현을 지정합니다. </p>
+
+<a name="ggmud"></a><h5>고급</h5>
+<p>J2EE 에이전트에서 고급 속성(등록 정보)은 사용자 정의를 통해 만든 속성이거나 보다 복잡한
+배포 환경 또는 덜 일반적인 배포 환경에서 사용하기 위한 속성입니다.</p>
+
+<a name="ggnbb"></a><h5>com.sun.identity.agents.config.webservice.enable </h5>
+<p>이 속성을 사용하면 웹 서비스를 처리합니다.</p>
+
+<a name="ggnab"></a><h5>com.sun.identity.agents.config.webservice.endpoint </h5>
+<p>웹 서비스를 나타내는 웹 응용 프로그램 엔드포인트의 목록입니다.</p>
+
+<a name="ggnah"></a><h5>com.sun.identity.agents.config.webservice.process.get.enable </h5>
+<p>이 속성을 사용하면 웹 서비스 엔드포인트에 대한 <tt>HTTP GET</tt> 요청을 처리합니다.</p>
+
+<a name="ggnba"></a><h5>com.sun.identity.agents.config.webservice.authenticator </h5>
+<p>웹 서비스 요청을 인증하는 데 사용할 수 있는 구현 클래스입니다.</p>
+
+<a name="ggnau"></a><h5>com.sun.identity.agents.config.webservice.internalerror.content </h5>
+<p>에이전트가 클라이언트에 대한 내부 오류를 생성하기 위해 컨텐트를 사용하는 파일의 이름입니다.</p>
+
+<a name="ggnag"></a><h5>com.sun.identity.agents.config.webservice.autherror.content </h5>
+<p>에이전트가 클라이언트에 대한 인증 오류를 생성하기 위해 컨텐트를 사용하는 파일의 이름입니다.</p>
+
+<a name="ggnfp"></a><h5>대체 에이전트 호스트 이름</h5>
+<p>실제 호스트 이름과 다른 경우 클라이언트 브라우저에서 에이전트 보호 서버를 식별하기 위한
+호스트 이름입니다.</p>
+
+<a name="ggnew"></a><h5>대체 에이전트 포트 이름</h5>
+<p>실제 수신 포트와 다른 경우 클라이언트 브라우저에서 에이전트 보호 서버의 수신 포트를
+식별하기 위한 포트 번호입니다.</p>
+
+<a name="ggnga"></a><h5>대체 에이전트 프로토콜</h5>
+<p>서버가 사용하는 실제 프로토콜과 다른 경우 클라이언트 브라우저에서 에이전트 보호 서버와 통신하는
+데 사용할 프로토콜(HTTP/HTTPS)입니다.</p>
+
+<a name="ggndh"></a><h5>FQDN 확인</h5>
+<p>FQDN 기본값 및 fqdn 맵 값을 확인합니다.</p>
+
+<a name="ggnfn"></a><h5>FQDN 기본값</h5>
+<p>사용자가 자원에 액세스하기 위해 사용하는 정규화된 호스트 이름입니다.</p>
+
+<a name="ggnft"></a><h5>FQDN 가상 호스트 맵</h5>
+<p>실제 또는 유효한 호스트 이름에 대한 매핑입니다. 이 매핑은 인식되지 않는 호스트
+이름을 인식되는 호스트 이름으로 매핑합니다. 이 매핑은사용자가 IP 주소 또는 잘못된 URL을
+입력했거나 보호되는 자원에 대해 가상 호스트를 사용하는 경우 유용합니다.</p>
+
+<a name="ggngg"></a><h5>사용자 정의 등록 정보</h5>
+<p>사용자가 에이전트에서 지원하는 등록 정보 집합을 확장할 수 있게 해주는 추가 등록
+정보입니다.</p><p>예:</p><pre>customproperty=custom-value1
+customlist[0]=customlist-value-0
+customlist[1]=customlist-value-1
+custommap[key1]=custommap-value-1
+custommap[key2]=custommap-value-2</pre>
+<br/>
+
+</body>
+</html>

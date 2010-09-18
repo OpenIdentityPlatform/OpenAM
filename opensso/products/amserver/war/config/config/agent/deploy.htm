@@ -1,0 +1,75 @@
+<style>
+	.OrangeSmall{
+		color:#ec9c2b;
+		font-family:Arial, Helvetica, sans-serif;
+		font-size:15px;
+	}
+	.bodySpace{
+		padding:10px;
+	}
+</style>
+
+<script language="javascript" type="text/javascript">
+    YAHOO.namespace("sun.container");
+    YAHOO.util.Event.onDOMReady(init);
+    var DOM = YAHOO.util.Dom;
+
+    function cancel(){
+        document.location = "$context/commonTasks.htm";
+    }
+
+    function init() {
+        DOM.get("deployAgentButton").disabled = true;
+        loadAgentTypeComboInfo();
+    }
+
+    function loadAgentTypeComboInfo() {
+        AjaxUtils.call("$context/config/agent/agentTypes.htm", paintAgentTypeCombo);
+    }
+
+    function paintAgentTypeCombo(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        var combo = DOM.get("agentType");
+        var length = combo.options.length;
+        combo.options.length = 0;
+        for (var i = 0; i < response.records.length; i++) {
+            var option = new Option(response.records[i].agentTypeName, response.records[i].agentTypeName);
+            combo.options.add(option, combo.options.length);
+        }
+    }
+</script>
+
+<div align="left">
+<div class="firsttitle">
+    <h2>Configure an Agent</h2>
+    <small>Si quaedam nimis antique, si peraque dure dicere credit eos, ignave multa fatetur, et sapit et mecum facit et Iova iudicat aequo.</small>
+</div>
+<br />
+<div class="bodywhite bodySpace">
+    <font class="commonTextblack">Where will this configuration be written to:</font><br />
+    <select id="agentType" name="agentType" style="width:200px">
+        <option value="0">Select ...</option>
+
+    </select><br /><br />
+    <font class="OrangeSmall">Deployment details</font><div align="right"><font class="OrangeSmall">* ALL Fields are Required</font></div><br />
+		<div id="createPanel" class="createpanel" align="left">
+        	<br />
+			<div class="bodywhite bodySpace">
+                <font class="OrangeSmall">OpenSSO Server URL:</font><br />
+                <input type="text" id="url" name="url"><br>
+                <a class="blue">Check URL</a><br /><br />
+
+                <font class="OrangeSmall">Agent Profile Name:</font><br />
+                <input type="text" id="profileName" name="profileName"><br><br />
+
+                <font class="OrangeSmall">Agent Profile Password:</font><br />
+                <input type="password" id="profilePassword" name="profilePassword"><br>
+                <a class="blue">Check Credentials</a><br />
+            </div>
+			<div style="padding:10px;" align="right">
+				<button type="button" value="cancel" onClick="javascript:cancel();">Cancel</button>&nbsp;&nbsp;&nbsp;&nbsp;
+				<button type="button" id="deployAgentButton" name="deployAgentButton" onClick="javascript:deployAgent();">Deploy Agent</button>
+			</div>
+			<br />
+		</div>
+</div>

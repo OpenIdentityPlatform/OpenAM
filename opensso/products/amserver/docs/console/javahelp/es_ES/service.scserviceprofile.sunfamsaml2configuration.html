@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuraci&#243;n del servicio SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>Configuraci&#243;n del servicio SAMLv2</h4>
+
+
+<a name="ggolz"></a><h5>Intervalo de vaciado de la cach&#233;</h5>
+<p>Este atributo especifica el periodo de tiempo (en segundos) entre cada vaciado
+de la cach&#233;.</p>
+
+<a name="ggokj"></a><h5>Nombre de atributo de la informaci&#243;n de Id. de nombre</h5>
+<p>Especifica el nombre de atributo utilizado para almacenar la informaci&#243;n del identificador
+de nombre en una entrada del usuario. Si no se especifica nada,
+se utilizar&#225; el atributo predeterminado (<tt>sun-fm-saml2-nameid-info</tt>). El usuario de enlace del almac&#233;n
+de datos correspondiente debe tener permisos de lectura/escritura/b&#250;squeda/comparaci&#243;n sobre este atributo.</p>
+
+<a name="ggolv"></a><h5>Nombre de atributo de la clave de informaci&#243;n de Id. de nombre</h5>
+<p>Especifica el nombre de atributo utilizado para almacenar la clave del identificador
+de nombre en una entrada del usuario. Si no se especifica, se
+utilizar&#225; el atributo predeterminado (<tt>sun-fm-saml2-nameid-infokey</tt>). El usuario de enlace del almac&#233;n de
+datos correspondiente debe tener permisos de lectura/escritura/b&#250;squeda/comparaci&#243;n sobre este atributo. Tambi&#233;n debe
+asegurarse de que se a&#241;ade el &#237;ndice de tipo <tt>igualdad</tt>.</p>
+
+<a name="ggojr"></a><h5>Dominio de cookie para el servicio de detecci&#243;n de IDP</h5>
+<p>Especifica el dominio de cookie para la cookie de detecci&#243;n SAMLv2 IDP.
+</p>
+
+<a name="ggomp"></a><h5>Tipo de cookie para el servicio de detecci&#243;n de IDP</h5>
+<p>Especifica el tipo de cookie (persistente o de sesi&#243;n) utilizado en el
+servicio de detecci&#243;n de SAMLv2 IDP. De forma predeterminada, se utiliza la
+cookie de sesi&#243;n.</p>
+
+<a name="ggomt"></a><h5>Esquema de URL del servicio de detecci&#243;n de IDP</h5>
+<p>Especifica el esquema de URL utilizado en el servicio de detecci&#243;n de
+SAMLv2 IDP. </p>
+
+<a name="ggoje"></a><h5>Clase de implementaci&#243;n de SPI de cifrado de XML</h5>
+<p>Especifica el nombre de la clase de implementaci&#243;n de la interfaz del
+proveedor de cifrado SAMLv2. Esta clase se utiliza para realizar el cifrado
+y descifrado XML en los perfiles de SAMLv2.</p>
+
+<a name="ggomb"></a><h5>Incluir clave cifrada en el elemento "KeyInfo"</h5>
+<p>Se utiliza en la clase <tt>com.sun.identity.saml2.xmlenc.FMEncProvider </tt>. Si se habilitar&#225;, incluir&#225; <tt>EncryptedKey</tt> dentro
+de <tt>KeyInfo</tt> en el elemento <tt>EncryptedData</tt> al realizar una operaci&#243;n de cifrado
+XML. Si, por el contrario, no se habilita, <tt> EncryptedKey</tt> se encuentra en
+el mismo nivel que el elemento <tt>EncryptedData. </tt> Se habilita de forma predeterminada.</p>
+
+<a name="ggoks"></a><h5>Clase de implementaci&#243;n de firma XML</h5>
+<p>Si se habilita, el certificado de firma utilizado por el proveedor de
+identidades y el proveedor de servicios se validar&#225; con la lista de
+revocaci&#243;n de certificados (CRL) configurada en la opciones de seguridad de la
+ficha Sitios y servidores. Si el certificado no se valida y acepta,
+se detendr&#225; y devolver&#225; un error de validaci&#243;n sin efectuar m&#225;s validaci&#243;n
+de la firma XML. </p>
+
+<a name="ggokx"></a><h5>Validaci&#243;n del certificado de firma XML</h5>
+<p>Si se habilita, el proveedor de servicios o identidades SAML validar&#225; el
+certificado que se est&#233; utilizando en la firma. Si se valida y
+acepta el certificado, el proveedor validar&#225; la firma. De lo contrario, se
+detendr&#225; y se devolver&#225; un error de validaci&#243;n. </p>
+
+<a name="ggoiv"></a><h5>Validaci&#243;n del certificado de CA</h5>
+<p>Si se habilita, el certificado de firma utilizado por el proveedor de
+identidades y el proveedor de servicios se validar&#225; con la lista de
+CA de confianza. Si el certificado no se valida y acepta, se
+detendr&#225; y devolver&#225; un error de validaci&#243;n sin efectuar m&#225;s validaci&#243;n de
+la firma XML. </p>
+<br/>
+
+</body>
+</html>

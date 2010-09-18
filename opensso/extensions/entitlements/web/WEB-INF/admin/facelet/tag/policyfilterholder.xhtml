@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policyfilterholder.xhtml,v 1.8 2009/06/23 18:43:48 farble1670 Exp $
+
+-->
+
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ice:panelGroup
+        styleClass="policy-filter-outer">
+        <o:box>
+            <ui:define name="body">
+                <ice:panelGroup
+                    style="padding-left: 5px"
+                    styleClass="inline-input">
+                    <ice:panelGrid
+                        styleClass="policy-filter"
+                        columnClasses="policy-filter-lead,policy-filter-actions"
+                        columns="2">
+                        <ice:panelGrid
+                            columns="3">
+                            <ice:panelGroup>
+                                <ice:selectOneMenu
+                                    id="filter-type-select"
+                                    valueChangeListener="#{handler.policyFilterChangedListener}"
+                                    value="#{policyFilterHolder.policyFilterTypeName}">
+                                    <f:selectItems
+                                        value="#{policyFilterHolder.policyFilterTypeNameItems}"/>
+                                </ice:selectOneMenu>
+                            </ice:panelGroup>
+                            <ui:include
+                                src="/admin/facelet/template/policy-filter-template-includer.xhtml">
+                                <ui:param
+                                    name="policyFilter"
+                                    value="#{policyFilterHolder.policyFilter}"/>
+                            </ui:include>
+                        </ice:panelGrid>
+                        <ice:panelGroup
+                            styleClass="float-right">
+                            <ice:commandLink
+                                actionListener="#{handler.removePolicyFilterListener}">
+                                <f:attribute
+                                    name="policyFilterHolder"
+                                    value="#{policyFilterHolder}"/>
+                                <ice:graphicImage
+                                    value="../image/remove-16.png"/>
+                            </ice:commandLink>
+                            <ice:commandLink
+                                actionListener="#{handler.addPolicyFilterListener}">
+                                <ice:graphicImage
+                                    value="../image/add-16.png"/>
+                            </ice:commandLink>
+                        </ice:panelGroup>
+                    </ice:panelGrid>
+                </ice:panelGroup>
+            </ui:define>
+        </o:box>
+    </ice:panelGroup>
+</ui:composition>

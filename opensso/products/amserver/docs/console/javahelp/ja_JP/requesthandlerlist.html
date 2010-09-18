@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>要求ハンドラリスト - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="requesthandlerlist"></a><h4>要求ハンドラリスト</h4>
+<a name="indexterm-151"></a><a name="indexterm-152"></a><p>SOAP バインドサービスは、要求メッセージを処理して応答を返信するための <tt>RequestHandler</tt> インタフェースを提供します。このインタフェースは、SOAP バインドサービスを使用している Liberty ベースの各アイデンティティーサービスによって、サーバー側に実装される必要があります。「要求ハンドラリスト」属性は、要求ハンドラを実装している Web サービスの実装クラスに関する情報を格納します。要求ハンドラリストには、キーと値のペアを含むエントリがパイプ文字で区切られて表示されます。たとえば、<tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService</tt> のように表示されます。次の表は各パラメータの説明です。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>パラメータ</p></th>
+<th align="left" valign="top" scope="column"><p>ヘッダー</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>キー</tt></p></td>
+<td align="left" valign="top" scope="row"><p>必須の<tt>キー</tt>パラメータは、SOAP エンドポイントに対する URI
+パスの最後の部分です。OpenSSO の SOAP エンドポイントは、SOAP 受信者サーブレットです。SOAP Receiver の URI は <tt><b></tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/key</b></tt> です。キーとして <tt><b>disco</b></tt>
+を定義する場合、対応するディスカバリサービスの SOAP エンドポイントへの URI パスは <tt><b></tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco</b></tt> のようになります。SOAP Receiver への接続時には、さまざまなサービスクライアントがそれぞれ別のキーを使用します。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>クラス</tt></p></td>
+<td align="left" valign="top" scope="row"><p>必須の<tt>クラス</tt>パラメータは、特定のアイデンティティーサービスの要求ハンドラ実装クラスの名前を指定します。次に例を示します。<tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt></p></td>
+</tr>
+</table><p>新しい要求ハンドラを追加するには、<a href="service.scsoapbindingrequesthandlerlistadd.html">「要求ハンドラを設定する」</a>を参照してください。</p>
+<br/>
+
+</body>
+</html>

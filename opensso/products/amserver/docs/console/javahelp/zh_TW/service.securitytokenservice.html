@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>安全性記號服務 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>安全性記號服務</h4>
+<p>此服務中所包含的屬性會定義 OpenSSO 安全性記號服務 (Security Token Service, STS) 的動態配置。這些屬性可定義以下配置：</p>
+<ul><li><p>發行與建立安全性記號</p></li>
+<li><p>STS 本身的 Web 服務安全性，用於保護 STS 服務端點。[簽署與加密] 屬性會配置內送 WS 信任請求的伺服器提供者驗證，並提供外寄 WS 信任回應的安全性。[安全機制] 屬性會定義安全性記號的安全性憑證。</p></li>
+<li><p>當將已配置的 STS 被指定為 Web 服務提供者，並收到由遠端 STS 所產生的 SAML 記號 (指定) 時，用於 (透過 SAML 指定) 請求安全性記號中 SAML 屬性對映的 SAML 配置。</p></li>
+<li><p>當由遠端 STS 產生記號時，從 Web 服務提供者接收到的安全性記號驗證。</p><p>您可在 [範圍] 標籤下的「<a href="agentconfig.agents.html">集中代理程式配置</a>」中為不同 OpenSSO Web 服務安全性提供者建立動態配置設定檔。</p></li></ul>
+
+
+<a name="ghatr"></a><h5>發行者</h5>
+<p>發行安全性記號的安全性記號服務名稱。</p>
+
+<a name="ghawa"></a><h5>端點</h5>
+<p>此欄位採用的值等於：</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>此語法允許基於特定的階段作業參數動態取代安全性記號服務端點 URL。</p>
+
+<a name="ghatv"></a><h5>加密發行的金鑰</h5>
+<p>啟用時，此屬性會加密由安全性記號服務所發行的金鑰。</p>
+
+<a name="ghauc"></a><h5>加密發行的記號</h5>
+<p>啟用時，此屬性會加密由安全性記號服務所發行的安全性記號。</p>
+
+<a name="ghavx"></a><h5>安全性記號的生命期</h5>
+<p>定義已發行記號的有效時間。</p>
+
+<a name="ghaud"></a><h5>記號實作類別</h5>
+<p>此屬性指定安全性記號提供者/發行者的實作類別。</p>
+
+<a name="ghaug"></a><h5>憑證別名名稱</h5>
+<p>定義憑證別名名稱，用於簽署由安全性記號服務發行之安全性記號。</p>
+
+<a name="ghauh"></a><h5>STS 一般使用者記號外掛程式類別</h5>
+<p>定義一般使用者記號轉換的實作類別。</p>
+
+<a name="ghawk"></a><h5>安全機制</h5>
+<p>定義用於提供安全性記號本身安全性的安全憑證類型，或安全性記號服務從用戶端傳送之內送 WS 信任請求所接受的安全憑證類型。您可以選擇下列安全類型：</p>
+<ul><li><p>匿名 &#8212; 匿名安全機制不包含安全憑證。</p></li>
+<li><p>KerberosToken &#8212; 使用 Kerberos 記號。</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; 使用基於 Liberty 的安全性記號。</p></li>
+<li><p>SAML-HolderOfKey &#8212; 使用 SAML 1.1 指定類型 Holder-Of-Key。</p></li>
+<li><p>SAML-SenderVouches &#8212; 使用 SAML 1.1 指定類型 Sender Vouches。</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; 使用 SAML 2.0 指定記號類型 Holder-Of-Key。</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; 使用 SAML 2.0 指定記號類型 Sender Vouches。</p></li>
+<li><p>STSSecurity &#8212; 定義「安全性記號」服務代理程式取得來自「安全性記號」服務的安全性記號。</p></li>
+<li><p>UserNameToken &#8212; 使用使用者名稱記號保護「安全性記號」服務請求。</p></li>
+<li><p>UserNameToken-Plain &#8212; 使用帶有明文密碼的使用者名稱記號保護「安全性記號」服務請求。</p></li>
+<li><p>X509Token &#8212; 使用 X509 憑證保護安全性記號。</p></li></ul>
+
+
+<a name="ghesm"></a><h5>認證鏈接</h5>
+<p>定義認證鏈接或服務名稱，它們可使用來自內送發行者請求之安全性記號的憑證認證至 OpenSSO 認證服務，以產生 OpenSSO 的認證安全性記號。</p>
+
+<a name="ghaup"></a><h5>使用者憑證</h5>
+<p>此屬性代表安全性記號服務用來驗證 UserName 記號 (由用戶端當作部分內送 WS 信任請求而傳送的記號) 的使用者名稱/密碼共用密碼。</p>
+
+<a name="ghauq"></a><h5>請求簽名是否已驗證</h5>
+<p>指定安全性記號服務必須驗證內送 WS 信任請求的簽名。</p>
+
+<a name="ghaui"></a><h5>請求標頭是否已解密</h5>
+<p>指定必須對安全性記號服務所收到的所有請求標頭進行解密。</p>
+
+<a name="ghauf"></a><h5>請求是否已解密</h5>
+<p>指定必須對安全性記號服務所收到的所有請求進行解密。</p>
+
+<a name="ghavc"></a><h5>回應是否已簽署</h5>
+<p>指定必須簽署安全性記號服務所收到的所有回應。</p>
+
+<a name="ghavo"></a><h5>回應是否已加密</h5>
+<p>指定必須加密安全性記號服務所傳送的所有回應。</p>
+
+<a name="ghdtd"></a><h5>簽署參照類型</h5>
+<p>定義當安全性記號服務簽署 WS 信任回應時所使用的參照類型。可用的參照類型有 <tt>DircectReference</tt>、<tt>KeyIdentifier</tt> 與 <tt>X509</tt>。</p>
+
+<a name="ghdss"></a><h5>加密演算法</h5>
+<p>定義安全性記號服務用來加密 WS 信任回應的加密演算法。</p>
+
+<a name="ghdru"></a><h5>加密強度</h5>
+<p>設定安全性記號服務用來加密 WS 信任回應的加密強度。選取的值越大，加密強度就越高。</p>
+
+<a name="ghavt"></a><h5>私有金鑰別名</h5>
+<p>此屬性會定義私有憑證金鑰別名，它會用來簽署 WS 信任回應或解密內送 WS 信任請求。</p>
+
+<a name="ghave"></a><h5>私有金鑰類型</h5>
+<p>此屬性會定義用於簽署 WS 信任回應或解密 WS 信任請求的憑證私有金鑰類型。可能的類型有 <tt>PublicKey</tt>、<tt>SymmetricKey </tt>或 <tt>NoProofKey</tt>。</p>
+
+<a name="ghaux"></a><h5>Web 服務 (WS 信任) 用戶端公開金鑰別名</h5>
+<p>定義用於驗證內送 WS 信任請求之簽名或解密 WS 信任回應的公開憑證金鑰別名。</p>
+
+<a name="ghbbv2"></a><h5>Kerberos 網域伺服器</h5>
+<p>此屬性指定 Kerberos 發行中心 (網域控制器) 主機名稱。您必須輸入網域控制器的完整網域名稱 (FQDN)。</p>
+
+<a name="ghbdx2"></a><h5>Kerberos 網域</h5>
+<p>此屬性指定 Kerberos 發行中心 (網域控制器) 網域名稱。依據您的配置，網域控制器的網域名稱可與 OpenSSO 網域名稱不同。</p>
+
+<a name="ghbcq2"></a><h5>Kerberos 服務主體</h5>
+<p>將 Kerberos 主體指定為產生之安全性記號的所有者。</p><p>請使用以下格式：</p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt></p><p><tt>hostname</tt> 與 <tt>domainame</tt> 代表 OpenSSO 實例的主機名稱與網域名稱。<tt>dc_domain_name</tt> 是 Windows Kerberos 伺服器 (網域控制器) 所在的
+Kerberos 網域。Kerberos 伺服器可能與 OpenSSO 實例的網域名稱不同。</p>
+
+<a name="ghbae2"></a><h5>Kerberos 金鑰標籤檔案</h5>
+<p>此屬性指定用於發行記號的 Kerberos keytab 檔案。雖然不要求格式，但是請使用以下格式：</p><p><tt>hostname.HTTP.keytab</tt></p><p><tt>hostname</tt> 是 OpenSSO 實例的主機名稱。</p>
+
+<a name="ghbep2"></a><h5>驗證 Kerberos 簽名</h5>
+<p>若啟用，此屬性會指定簽署 Kerberos 記號。</p>
+
+<a name="ghawg"></a><h5>SAML 屬性對映</h5>
+
+<hr><p><b>備註 &#8211; </b>以下所有與 SAML 相關的屬性都要用於特定配置，在該配置中，安全性記號服務的目前實例是做為 Web 服務提供者，而且該實例會從其他安全性記號服務實例接收產生的 SAML 記號。</p>
+<hr>
+<p>此配置代表一個 SAML 屬性，在建立 SAML 指定時， 需要 Web 服務提供者的安全性記號服務產生該屬性做為屬性敘述。格式為 <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>。</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> 是來自內送 Web 服務請求的 SAML 指定的 SAML 屬性名稱。<tt></tt><i>Real_attr_name</i><tt></tt> 是擷取自認證的 SSOToken 或身份識別儲存庫的屬性名稱。</p>
+
+<a name="ghawn"></a><h5>NameID 對映程式</h5>
+<p>為安全性記號服務而產生之指定的 SAML NameID 對映程式。</p>
+
+<a name="ghavl"></a><h5>應包含成員身份</h5>
+<p>啟用時，產生的指定會包含使用者成員身份以做為 SAML 屬性。</p>
+
+<a name="ghawo"></a><h5>屬性名稱空間</h5>
+<p>定義為安全性記號服務所產生之指定的 SAML 屬性名稱空間。</p>
+
+<a name="ghauj"></a><h5>可信任的發行者</h5>
+<p>定義可信任的發行者清單，這些發行者可被信任以向 OpenSSO 傳送安全性記號。OpenSSO 必須驗證安全性記號是否由此處其中一個發行者所傳送。</p>
+
+<a name="ghavy"></a><h5>可信任的 IP 位址</h5>
+<p>定義可被信任以傳送安全性記號至 OpenSSO 的 IP 位址清單。OpenSSO 必須驗證安全性記號是否由此處其中一台主機所傳送。</p>
+<br/>
+
+</body>
+</html>

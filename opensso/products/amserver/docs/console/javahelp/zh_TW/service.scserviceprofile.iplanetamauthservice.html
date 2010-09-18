@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>核心 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthservice"></a><h4>核心</h4>
+<p><a name="indexterm-170"></a>此模組是 OpenSSO 認證服務的一般配置基礎。它必須完成註冊及配置，才能使用任一個特定的認證模組實例。它可讓管理員定義預設值，當未在 OpenSSO 預設認證模組中特別設定值時，將使用這些值。核心屬性為全域和範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#gcnje">可插接式認證模組類別</a></p></li>
+<li><p><a href="#gcnjc">用戶端支援的認證模組</a></p></li>
+<li><p><a href="#gcnir">LDAP 連接儲存區大小</a></p></li>
+<li><p><a href="#gcnkh">預設 LDAP 連接儲存區大小</a></p></li>
+<li><p><a href="#gcnkq">使用者設定檔</a></p></li>
+<li><p><a href="#gcnks">管理員認證配置</a></p></li>
+<li><p><a href="#gcnjw">使用者設定檔動態建立預設角色</a></p></li>
+<li><p><a href="#gcnjn">永久性 Cookie 模式</a></p></li>
+<li><p><a href="#gcnke">永久性 Cookie 最長時間</a></p></li>
+<li><p><a href="#gcnlc">別名搜尋屬性名稱</a></p></li>
+<li><p><a href="#gcnkt">預設認證語言環境</a></p></li>
+<li><p><a href="#gcnjj">組織認證配置</a></p></li>
+<li><p><a href="#gcnkl">登入失敗封鎖模式</a></p></li>
+<li><p><a href="#gcnjz">登入失敗封鎖計數</a></p></li>
+<li><p><a href="#gcnko">登入失敗封鎖間隔時間</a></p></li>
+<li><p><a href="#gcnkd">接收封鎖通知的電子郵件地址</a></p></li>
+<li><p><a href="#gcnkr">N 次失敗後警告使用者</a></p></li>
+<li><p><a href="#gcnkc">登入失敗封鎖持續時間</a></p></li>
+<li><p><a href="#gcnjy">封鎖屬性名稱</a></p></li>
+<li><p><a href="#gcnle">封鎖屬性值</a></p></li>
+<li><p><a href="#gcnkz">預設成功登入 URL</a></p></li>
+<li><p><a href="#gcnlf">預設失敗登入 URL</a></p></li>
+<li><p><a href="#gcnlb">認證處理後類別</a></p></li>
+<li><p><a href="#gcnjl">產生使用者 ID 模式</a></p></li>
+<li><p><a href="#gcnjq">可插接式使用者名稱產生器類別</a></p></li>
+<li><p><a href="#gcnki">識別類型</a></p></li>
+<li><p><a href="#gcnlh">可插接式使用者狀態事件類別</a></p></li>
+<li><p><a href="#gcnjv">在資料存放區中儲存無效嘗試</a></p></li>
+<li><p><a href="#gcnjo">基於模組的認證</a></p></li>
+<li><p><a href="#fwbfn">預設認證層級</a></p></li></ul>
+
+
+<a name="gcnje"></a><h5>可插接式認證模組類別</h5>
+<p>指定 OpenSSO 平台內配置的所有範圍均可以使用的認證模組之 Java 類別。您可以透過實作 AMLoginModule SPI 或 JAAS LoginModule SPI 寫入自訂認證模組。如需詳細資訊，請參閱
+OpenSSO 開發者指南。若要定義新的服務，此欄位必須採用指定每個新認證服務之完整類別名稱 (包括套裝軟體名稱) 的文字字串。</p>
+
+<a name="gcnjc"></a><h5>用戶端支援的認證模組</h5>
+<p>指定特定用戶端支援的認證模組的清單。格式如下所示：</p><p><tt>clientType | module1,module2,module3</tt></p><p>此屬性在啟用了用戶端偵測時有效。</p>
+
+<a name="gcnir"></a><h5>LDAP 連接儲存區大小</h5>
+<p>指定在特定 LDAP 伺服器與連接埠上使用的最小與最大連線池。此屬性僅用於 LDAP 與成員身份認證服務。格式如下所示：</p><p><tt>host:port:min:max</tt></p>
+<hr><p><b>備註 &#8211; </b>此連線池不同於 <tt>serverconfig.xml</tt> 中配置的 SDK 連線池。</p>
+<hr>
+
+
+<a name="gcnkh"></a><h5>預設 LDAP 連接儲存區大小</h5>
+<p>設定與所有 LDAP 認證模組配置一同使用的連線池預設最小值與最大值。如果 LDAP 連線池大小屬性中存在主機與連接埠的項目，則不會使用 LDAP 預設連線池大小中的最小值與最大值設定。</p>
+
+<a name="gcnkq"></a><h5>使用者設定檔</h5>
+<p>此選項可讓您為使用者設定檔指定選項。選項如下：</p><dl><dt><b>必需</b></dt>
+<dd><p>此選項指定，對於成功認證，使用者在隨 OpenSSO 一同安裝的本機 Directory Server 中需要有設定檔，認證服務才可以發行 SSOToken。</p></dd>
+<dt><b>動態</b></dt>
+<dd><p>此選項指定，對於成功認證，如果尚不存在使用者設定檔，認證服務將建立一個使用者設定檔。然後將發行 SSOToken。在隨 OpenSSO 一同安裝的本機 Directory Server 中建立使用者設定檔。</p></dd>
+<dt><b>隨使用者別名動態變化</b></dt>
+<dd><p>此選項指定，對於成功認證，認證服務將使用使用者別名清單屬性來建立使用者設定檔。</p></dd>
+<dt><b>忽略</b></dt>
+<dd><p>此選項指定，對於成功認證，認證服務不需要使用者設定檔便可以發行 SSOToken。</p></dd>
+</dl>
+
+
+<a name="ggukq"></a><h5>遠端認證安全性</h5>
+<p>如果啟用，所有遠端認證要求都需要應用程式的 SSOToken 來驗證呼叫者的身份，因此 OpenSSO 的配置資訊可以取得與應用程式相關之使用者名稱和密碼的有效值。</p>
+
+<a name="ggull"></a><h5>保留登出處理的 Post 處理物件</h5>
+<p>如果啟用，登入處理期間使用之 Post 處理認證外掛程式的實例會保留在 OpenSSO 階段作業中。稍後叫用登出時，會呼叫這些實例的 <tt>onLogout </tt> 方法。如果未啟用此屬性，則不會保留登入處理中的 Post 處理實例。當叫用登出並呼叫 <tt>onLogout</tt> 方法時，會建立 Post
+處理外掛程式的新實例。</p>
+
+<a name="gguji"></a><h5>保留登出處理的認證模組物件</h5>
+<p>如果啟用，認證處理期間所使用之認證模組的所有實例都會保留在 OpenSSO 階段作業中。稍後叫用登出時，會在相同的實例上呼叫 logout/destroyModulestate 方法。如果未啟用此屬性，則不會保留登出處理中的認證模組實例。登出時不會呼叫認證模組中的任何方法。</p>
+
+<a name="gcnks"></a><h5>管理員認證配置</h5>
+<p>僅定義管理員的認證服務。如果需要管理員的認證模組與使用者的認證模組有所不同，則可以使用此屬性。在存取 OpenSSO 主控台時，將使用此屬性中配置的模組。例如：</p><p><tt><b>http://</tt><i>servername.port/console_deploy_uri</i><tt></b></tt></p>
+
+<a name="gcnjw"></a><h5>使用者設定檔動態建立預設角色</h5>
+<p>此欄位指定分配給新使用者的角色，當透過使用者設定檔選取 [動態建立] 時，會建立這些新使用者的設定檔。此欄位沒有預設值。管理員必須指定將分配給新使用者的角色之 DN。</p>
+<hr><p><b>備註 &#8211; </b>指定的角色必須位於欲配置認證之範圍下。這個角色可以是 OpenSSO 或 LDAP 角色，但不能是已篩選的角色。</p><p>若要自動指定特定服務給使用者，您必須在使用者設定檔中配置 [必須的服務] 屬性。</p>
+<hr>
+
+
+<a name="gcnjn"></a><h5>永久性 Cookie 模式</h5>
+<p>此選項確定使用者是否可以重新啟動瀏覽器，並且仍然返回至其經過認證的階段作業。可以透過啟用 [啟用永久性的 Cookie 模式] 保留使用者階段作業。啟用了 [啟用永久性的 Cookie 模式] 時，使用者階段作業在其永久性的 Cookie 過期或者該使用者明確登出後才會過期。過期時間是在 [永久性
+Cookie 最長時間] 中指定。預設值是未啟用永久性的 Cookie 模式，並且認證服務僅使用記憶體 Cookie。</p>
+<hr><p><b>備註 &#8211; </b>用戶端必須使用登入 URL 中的 <i>iPSPCookie=yes</i> 參數，明確請求永久性 Cookie。</p>
+<hr>
+
+
+<a name="gcnke"></a><h5>永久性 Cookie 最長時間</h5>
+<p>指定永久性 Cookie 多長時間後會過期。這一間隔時間在成功認證使用者階段作業後開始。最大值為 2147483647 (以秒為單位的時間)。欄位將接受小於最大值的任何整數值。</p>
+
+<a name="gcnlc"></a><h5>別名搜尋屬性名稱</h5>
+<p>使用者成功認證後，將擷取使用者設定檔。如果依據首選 LDAP 屬性執行的搜尋，無法找到相符的使用者設定檔，則此欄位會指定另一個要從中搜尋的 LDAP 屬性。此屬性將主要在從認證模組傳回的使用者識別不同於 [使用者命名屬性] 中指定的識別時使用。例如，RADIUS 伺服器可能會傳回 <tt>abc1234</tt>，但是使用者名稱卻為 <tt>abc</tt>。此屬性沒有預設值。</p><p>此欄位將接受任何有效的 LDAP 屬性 (例如，cn)。</p>
+
+<a name="gcnkt"></a><h5>預設認證語言環境</h5>
+<p>指定認證服務將使用的預設語言子類型。預設值為 en_US。請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得有效的語言子類型清單。</p><p>為了使用其他語言環境，必須首先建立此語言環境的所有認證範本。然後必須為這些範本建立新目錄。如需更多資訊，請參閱「管理指南」中的「登入 URL 參數」。</p>
+
+<a name="gcnjj"></a><h5>組織認證配置</h5>
+<p>設定組織的認證模組。預設認證模組為 LDAP。</p>
+
+<a name="gcnkl"></a><h5>登入失敗封鎖模式</h5>
+<p>指定使用者在首次認證嘗試失敗後是否可以再次嘗試。選取此屬性會啟用封鎖，使用者僅有一次認證的機會。依預設，封鎖功能是停用的。此屬性與封鎖相關的屬性以及通知屬性配合使用。</p>
+
+<a name="gcnjz"></a><h5>登入失敗封鎖計數</h5>
+<p>定義在登入失敗封鎖間隔時間所定義的時間間隔內，使用者在封鎖之前可以嘗試進行認證的次數。</p>
+
+<a name="gcnko"></a><h5>登入失敗封鎖間隔時間</h5>
+<p>定義兩次登入嘗試失敗之間的時間 (以分鍾為單位)。如果某次登入失敗，並且在封鎖間隔時間內再次登入失敗，則增加封鎖計數。否則重設封鎖計數。</p>
+
+<a name="gcnkd"></a><h5>接收封鎖通知的電子郵件地址</h5>
+<p>指定將接收使用者封鎖通知的電子郵件地址。若要將電子郵件通知傳送至多個位址，請使用空格分隔每個電子郵件地址。如果不是英文語言環境，其格式為：</p><p><tt>email_address|locale|charset</tt></p>
+
+<a name="gcnkr"></a><h5>N 次失敗後警告使用者</h5>
+<p>指定在 OpenSSO 傳送使用者將被封鎖的警告訊息之前，可以發生的認證失敗次數。</p>
+
+<a name="gcnkc"></a><h5>登入失敗封鎖持續時間</h5>
+<p>啟用記憶體鎖定。依預設，封鎖機制將使<i>封鎖屬性名稱</i>中定義的使用者設定檔處於非使用中 (登入失敗後)。如果 [登入失敗封鎖持續時間] 的值大於 0，則其記憶體鎖定和使用者帳號將被封鎖一段指定的時間 (分鐘)。</p>
+
+<a name="ggulj"></a><h5>封鎖持續時間乘數</h5>
+<p>此屬性會為每個連續封鎖定義與 [登入失敗封鎖持續時間] 相乘的值。例如，如果 [登入失敗封鎖持續時間] 設定為 3 分鐘，而且 [封鎖持續時間乘數] 設定為 2，使用者的帳號將會封鎖 6 分鐘。</p>
+
+<a name="gcnjy"></a><h5>封鎖屬性名稱</h5>
+<p>指定要被設定為封鎖的所有 LDAP 屬性。還必須變更封鎖屬性值中的值以啟用此屬性名稱的封鎖。依預設，在 OpenSSO 主控台中，封鎖屬性名稱為空。當使用者被封鎖且 [登入失敗封鎖持續時間] 設定為 0 時，預設實作值為 <i>inetuserstatus</i> (LDAP 屬性)
+和 <i>inactive</i>。</p>
+
+<a name="gcnle"></a><h5>封鎖屬性值</h5>
+<p>此屬性指定啟用還是停用封鎖屬性名稱中定義之屬性的封鎖。依預設，<i>inetuserstatus</i> 的值設定為非使用中。</p>
+
+<a name="gcnkz"></a><h5>預設成功登入 URL</h5>
+<p>此欄位接受多值清單，這些值指定認證成功後，會將使用者重新導向至哪一個 URL。此屬性格式為 <tt>clientType|URL</tt>，但您僅能指定假設為 HTML 預設類型的 URL 值。預設值為 <i>/amserver/console</i>。</p>
+
+<a name="gcnlf"></a><h5>預設失敗登入 URL</h5>
+<p>此欄位接受多值清單，這些值指定認證成功後，會將使用者重新導向至哪一個 URL。此屬性格式為 <tt>clientType|URL</tt>，但您僅能指定假設為 HTML 預設類型的 URL 值。</p>
+
+<a name="gcnlb"></a><h5>認證處理後類別</h5>
+<p>指定 Java 類別名稱，用於自訂登入成功或失敗的認證後程序。範例：</p><p><tt>com.abc.authentication.</tt><tt>PostProcessClass</tt></p><p>Java 類別必須實作以下 Java 介面：</p><p><tt>com.sun.identity.authentication.spi.AMPostAuthProcessInterface </tt></p><p>此外，您必須將此類別所在位置的路徑增加到 Web Server 的 [Java 類別路徑] 屬性中。</p>
+
+<a name="gcnjl"></a><h5>產生使用者 ID 模式</h5>
+<p>成員身份認證模組使用此屬性。如果啟用了此屬性欄位，則成員身份模組能夠在自行註冊過程中，產生特定使用者的多個使用者 ID (如果使用者 ID 已經存在)。這些使用者 ID 是從可插接式使用者名稱產生器類別中指定的 Java 類別產生的。</p>
+
+<a name="gcnjq"></a><h5>可插接式使用者名稱產生器類別</h5>
+<p>指定當使用 [啟用產生 UserID 模式] 時產生使用者 ID 所使用的 Java 類別名稱。</p>
+
+<a name="gcnki"></a><h5>識別類型</h5>
+<p>列出 OpenSSO 會搜尋的識別類型。</p>
+
+<a name="gcnlh"></a><h5>可插接式使用者狀態事件類別</h5>
+<p>延伸認證 SPI 以為使用者於認證程序中之狀態變更提供回呼機制。支援下列狀態的變更：</p><dl><dt><tt>帳號封鎖</tt></dt>
+<dd><p>帳號封鎖事件可用於任何認證模組。這些特性可以透過<a href="#gcnkl">登入失敗封鎖模式</a>屬性來配置。</p></dd>
+<dt><tt>密碼變更</tt></dt>
+<dd><p>僅可用於 LDAP 認證模組類型，因為密碼變更僅可用於該模組。</p></dd>
+</dl>
+
+
+<a name="gcnjv"></a><h5>在資料存放區中儲存無效嘗試</h5>
+<p>如果啟用的話，此屬性允許在多個 OpenSSO 實例共用的身份識別儲存庫中共用登入失敗嘗試。例如，若用於特定部署的識別儲存庫是 Directory Server，則無效的嘗試會儲存在 <tt>sunAMAuthInvalidAttemptsData</tt> (屬於 <tt>sunAMAuthAccountLockout</tt> 物件類別)。資料的格式會儲存為：</p><p><tt>&#60;InvalidPassword>&#60;InvalidCount>&#60;/InvalidCount>&#60;LastInvalidAt>&#60;/LastInvalidAt>&#60;LockedoutAt>&#60;/LockedoutAt>&#60;ActualLockoutDuration>&#60;/ActualLockoutDuration>&#60;/InvalidPassword> </tt></p><p>對於每一個使用者，此資訊皆在 Directory Server 中維護。當發生無效的嘗試時，<tt>&#60;InvalidCount></tt> 即會增加。</p>
+
+<a name="gcnjo"></a><h5>基於模組的認證</h5>
+<p>如果啟用的話，此屬性允許使用者透過基於模組的認證進行認證。如果未啟用此屬性，不允許基於模組的登入。使用 <tt>module=&#60; </tt><i> module_instance_name</i><tt>></tt> 進行的所有登入嘗試都會導致登入失敗。</p>
+
+<a name="ggurt"></a><h5>使用者屬性對映至階段作業屬性</h5>
+<p>這會讓屬性設定為從認證使用者設定檔 (儲存在資料存放區中) 到使用者 SSOToken 的階段作業特性。格式為：</p><p><tt>UserProfile_Attribute|Session_Attribute_name</tt></p><p>如果未指定 <tt>Session_Attribute_name</tt>，會擷取階段作業的特性名稱做為 [使用者設定檔] 屬性的值。所有階段作業屬性都包含 am.<tt>protected</tt> 前綴，以確保無法從用戶端 SDK 編輯它們。</p>
+
+<a name="fwbfn"></a><h5>預設認證層級</h5>
+<p>認證層級值指示信任認證的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，該應用程式可以使用儲存的值以確定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。</p><p>應該在範圍的特定認證範本中設定認證層級。只在未於 [認證層級] 欄位中為特定範圍的認證範本指定認證層級時，才會套用這裡描述的 [預設認證層級] 值。[預設認證層級] 預設值為 0。(OpenSSO 並不使用此屬性中的值，而是由可以選擇使用它的任何外部應用程式使用。)</p>
+<br/>
+
+</body>
+</html>

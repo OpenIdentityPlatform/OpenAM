@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Conditions - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>Conditions</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>Une condition vous permet de d&#233;finir des contraintes dans la strat&#233;gie. Par
+exemple, si vous d&#233;finissez une strat&#233;gie pour une application de paiement des
+salaires, vous pouvez d&#233;finir une condition sur cette action limitant l'acc&#232;s &#224;
+l'application &#224; des heures sp&#233;cifiques. Ou bien, vous pouvez d&#233;finir une condition
+qui autorise cette action uniquement si la demande &#233;mane d'un ensemble d'adresses
+IP particulier ou du r&#233;seau interne d'une entreprise.</p><p>La condition peut en outre &#234;tre utilis&#233;e pour configurer diff&#233;rentes strat&#233;gies sur
+diff&#233;rents URI du m&#234;me domaine. Par exemple, <tt>http://org.example.com/hr/&#42;jsp </tt> n'est accessible que via
+<tt>org.example.net</tt> de 9h &#224; 17h. Ceci est possible &#224; l'aide d'une condition
+IP et d'heure. Et en sp&#233;cifiant la ressource de r&#232;gle sous la
+forme <tt>http://org.example.com/hr/&#42;.jsp </tt>, la strat&#233;gie s'applique &#224; tous les JSP sous <tt>http://org.example.com/hr </tt>, y
+compris ceux dans les sous-r&#233;pertoires.</p>
+<hr><p><b>Remarque &#8211; </b>Les termes orientation, r&#232;gle, ressource, objet, condition, action et valeur correspondent aux
+&#233;l&#233;ments <b>Orientation</b>, <b> R&#232;gle</b>, <b>Nom de ressource</b>, <b>Objet</b>, <b> Condition</b>, <b>Attribut</b> et <b>Valeur</b> dans le fichier
+<tt>policy.dtd</tt>.</p>
+<hr>
+<p>Reportez-vous &#224; la rubrique <a href="policy.selectconditiontype.html">Ajout d'une condition &#224; une strat&#233;gie</a>.</p>
+<br/>
+
+</body>
+</html>

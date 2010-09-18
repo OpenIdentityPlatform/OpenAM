@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新しいリモートサービスプロバイダをプロバイダエンティティーに追加する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteadd"></a><h4>新しいリモートサービスプロバイダをプロバイダエンティティーに追加する</h4><p><b>リモートプロバイダ</b>は、Federated Access Manager と同じサーバーにはホストされません。「新規リモートサービスプロバイダ」属性を設定する際に、エンティティープロファイルにサービスプロバイダに関するメタデータを追加する必要があります。この手順は、<a href="federation.fsserviceprovider.html">「サービスプロバイダをプロバイダエンティティーに追加する」</a>ことから始めます。</p>
+<hr><p><b>注 &#8211; </b>このほかにも設定可能な属性がありますが、この初期設定ページには表示されません。<a href="federation.fsserviceproviderremoteprofile.html">「プロバイダエンティティーに含まれるリモートサービスプロバイダ属性を変更する」</a>を参照してください。</p>
+<hr>
+<ol>
+<li><b>「共通属性」に情報を設定します。</b><p>「共通属性」の値は、アイデンティティープロバイダ自体の一般的な定義です。</p><dl><dt>説明</dt>
+<dd><p>この属性の値は、エンティティーの作成時に入力した説明です。始めに入力した説明を変更するか、その説明がない場合は新たに説明を追加することができます。</p></dd>
+<dt>サポートされるプロトコルリスト</dt>
+<dd><p>このエンティティーによってサポートされる Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) リリースを選択します。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> は Liberty ID-FF version 1.2 を表します。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> は Liberty ID-FF version 1.1 を表します。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>利用可能なトラストサークルのいずれかを選択し、プロバイダに割り当てます。</b><p>プロバイダは 1 つまたは複数のトラストサークルに所属することができます。しかし、トラストサークルが指定されていないプロバイダは、Liberty Alliance Project 仕様に基づく通信に参加できません。トラストサークルがまだ作成されていない場合は、あとでこの属性を定義することができます。</p></li>
+<li><b>「サービスプロバイダ」属性に情報を設定します。</b><p>「サービスプロバイダ」属性は、サービスプロバイダに関する一般情報を定義します。</p><dl><dt>表明コンシューマ URL</dt>
+<dd><p>サービスプロバイダに送信されるすべての SAML 表明を受信し処理するエンドポイントの URL を入力します。</p></dd>
+<dt>表明コンシューマサービス URL ID</dt>
+<dd><p>「サポートされるプロトコルリスト」共通属性の値が <tt>urn:liberty:iff:2003-08</tt> の場合は、この必須 ID を入力します。</p></dd>
+<dt>表明コンシューマサービス URL をデフォルトとして設定</dt>
+<dd><p>要求に ID が指定されていない場合にデフォルト値として「表明コンシューマサービス URL」を使用するには、このチェックボックスをオンにします。</p></dd>
+</dl>
+</li>
+<li><b>「了解」をクリックして、プロバイダをエンティティーに追加します。</b></li>
+<li><b>「表示」メニューから別のオプションを選択してエンティティーの設定を続行するか、「保存」をクリックして設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ID-FF サービスプロバイダのカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffsp"></a><h4>ID-FF サービスプロバイダのカスタマイズ</h4>
+<p>ID-FF サービスプロバイダ属性は、次のように分類されます。</p>
+<ul><li><p><a href="#ggwvs">「共通属性」</a></p></li>
+<li><p><a href="#ggwvp">「通信 URL」</a></p></li>
+<li><p><a href="#ggwrw">「通信プロファイル」</a></p></li>
+<li><p><a href="#ggwud">「サービスプロバイダ設定 」</a></p></li>
+<li><p><a href="#ggwyd">「サービス URL」</a></p></li>
+<li><p><a href="#ggwsf">「プラグイン」</a></p></li>
+<li><p><a href="#ggwtb">「サービスプロバイダ属性マッパー」</a></p></li>
+<li><p><a href="#ggwtp">「自動連携 」</a></p></li>
+<li><p><a href="#ggwrv">「認証コンテキスト」</a></p></li>
+<li><p><a href="#ggwub">「プロキシ認証設定」</a></p></li></ul>
+
+
+<a name="ggwvs"></a><h5>共通属性</h5>
+
+<ul><li><p><a href="#ggwwh">「プロバイダタイプ」</a></p></li>
+<li><p><a href="#ggwrt">「説明」</a></p></li>
+<li><p><a href="#ggwuu">「サポートされるプロトコルリスト」</a></p></li>
+<li><p><a href="#ggwwn">「署名鍵」</a></p></li>
+<li><p><a href="#ggwuj">「暗号化鍵」</a></p></li>
+<li><p><a href="#ggwsc">「名前識別子の暗号化」</a></p></li>
+<li><p><a href="#ggwwa">「認証要求に署名」</a></p></li></ul>
+
+
+<a name="ggwwh"></a><h5>プロバイダタイプ</h5>
+<p>この属性の静的な値は、設定するプロバイダのタイプ (hosted または remote) です。</p>
+
+<a name="ggwrt"></a><h5>説明</h5>
+<p>この属性の値はサービスプロバイダの説明です。</p>
+
+<a name="ggwuu"></a><h5>サポートされるプロトコルリスト</h5>
+<p>このプロバイダによってサポートされる Liberty ID-FF リリースを選択します。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> は、Liberty Identity Federation Framework Version 1.2 を指します。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> は、Liberty Identity Federation Framework Version 1.1 を指します。</p></li></ul>
+
+
+<a name="ggwwn"></a><h5>署名鍵</h5>
+<p>要求および応答の署名に使用されるセキュリティー証明書エイリアスを定義します。証明書は Java キーストアファイルに格納されます。各証明書は、その証明書を取得するために使用されるエイリアスにマップされます。</p>
+
+<a name="ggwuj"></a><h5>暗号化鍵</h5>
+<p>暗号化に使用されるセキュリティー証明書エイリアスを定義します。証明書は Java キーストアファイルに格納されます。各証明書は、その証明書を取得するために使用されるエイリアスにマップされます。</p>
+
+<a name="ggwsc"></a><h5>名前識別子の暗号化</h5>
+<p>名前 ID の暗号化を有効にするには、このチェックボックスをオンにします。</p>
+
+<a name="ggwwa"></a><h5>認証要求に署名</h5>
+<p>これが有効になっている場合、サービスプロバイダはすべての認証要求に署名します。</p>
+
+<a name="ggwvp"></a><h5>通信 URL</h5>
+
+<ul><li><p><a href="#ggwrz">「SOAP エンドポイント」</a></p></li>
+<li><p><a href="#ggwun">「シングルログアウトサービス 」</a></p></li>
+<li><p><a href="#ggwrn">「シングルログアウトの戻り」</a></p></li>
+<li><p><a href="#ggwvg">「連携終了サービス」</a></p></li>
+<li><p><a href="#ggwup">「連携終了の戻り」</a></p></li>
+<li><p><a href="#ggwry">「名前登録サービス」</a></p></li>
+<li><p><a href="#ggwvd">「名前登録の戻り」</a></p></li>
+<li><p><a href="#ggwtq">「表明コンシューマ URL」</a></p></li>
+<li><p><a href="#ggwrh">「表明コンシューマサービス URL ID」</a></p></li>
+<li><p><a href="#ggwvi">「表明コンシューマサービス URL をデフォルトとして設定」</a></p></li></ul>
+
+
+<a name="ggwrz"></a><h5>SOAP エンドポイント</h5>
+<p>サービスプロバイダの SOAP メッセージの受信者の URI を定義します。この値により、ブラウザを使用しない通信で SOAP Receiver の場所が伝達されます。</p>
+
+<a name="ggwun"></a><h5>シングルログアウトサービス </h5>
+<p>アイデンティティープロバイダがログアウト要求を送信できる URL を定義します。シングルログアウトは、アイデンティティープロバイダが認証したすべてのセッションで、ログアウト機能の同期を取ります。</p>
+
+<a name="ggwrn"></a><h5>シングルログアウトの戻り</h5>
+<p>アイデンティティープロバイダがシングルログアウト応答を送信できる URL を定義します。</p>
+
+<a name="ggwvg"></a><h5>連携終了サービス</h5>
+<p>アイデンティティープロバイダが連携終了要求を送信する URL を定義します。</p>
+
+<a name="ggwup"></a><h5>連携終了の戻り</h5>
+<p>アイデンティティープロバイダが連携終了応答を送信できる URL を定義します。</p>
+
+<a name="ggwry"></a><h5>名前登録サービス</h5>
+<p>主体の新しい名前識別子を指定するためにアイデンティティープロバイダと通信するときに使用される URL を定義します。登録は、連携セッションが確立されたあとでのみ行われます。</p>
+
+<a name="ggwvd"></a><h5>名前登録の戻り</h5>
+<p>アイデンティティープロバイダが名前登録応答を送信できる URL を定義します。登録は、連携セッションが確立されたあとでのみ行われます。</p>
+
+<a name="ggwtq"></a><h5>表明コンシューマ URL</h5>
+<p>アイデンティティープロバイダが SAML 表明を送信できる URL を定義します。 </p>
+
+<a name="ggwrh"></a><h5>表明コンシューマサービス URL ID</h5>
+<p>「サポートされるプロトコルリスト」共通属性の値が <tt>urn:liberty:iff:2003-08</tt> の場合は、この必須 ID を入力します。</p>
+
+<a name="ggwvi"></a><h5>表明コンシューマサービス URL をデフォルトとして設定</h5>
+<p>要求に ID が指定されていない場合にデフォルト値として「表明コンシューマサービス URL」を使用するには、このチェックボックスをオンにします。</p>
+
+<a name="ggwrw"></a><h5>通信プロファイル</h5>
+
+<ul><li><p><a href="#ggwwg">「連携終了」</a></p></li>
+<li><p><a href="#ggwuc">「シングルログアウト」</a></p></li>
+<li><p><a href="#ggwsy">「名前登録」</a></p></li>
+<li><p><a href="#ggwuk">「サポート SSO プロファイル」</a></p></li></ul>
+
+
+<a name="ggwwg"></a><h5>連携終了</h5>
+<p>主体の連携終了をほかのプロバイダに通知するためのプロファイルを選択します。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuc"></a><h5>シングルログアウト</h5>
+<p>主体のログアウトをほかのプロバイダに通知するためのプロファイルを選択します。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>HTTP GET</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwsy"></a><h5>名前登録</h5>
+<p>主体の名前登録をほかのプロバイダに通知するためのプロファイルを選択します。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuk"></a><h5>サポート SSO プロファイル</h5>
+<p>認証要求を送信するためのプロファイルを選択します。</p>
+<ul><li><p>ブラウザ POST (ブラウザベースの HTTP POST プロトコルを指定)</p></li>
+<li><p>ブラウザアーティファクト (ブラウザを使用しない SOAP ベースのプロトコルを指定)</p></li>
+<li><p>WML (WML (Wireless Markup Language) プロトコルを指定)</p></li>
+<li><p>LECP (Liberty 対応クライアントプロキシを指定)</p>
+<hr><p><b>注 &#8211; </b>OpenSSO は、Liberty 対応クライアントのプロキシプロファイルに含まれる要求を処理できますが、そのためには、このマニュアルの範囲を超える追加設定が必要です。</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwud"></a><h5>サービスプロバイダ設定 </h5>
+
+<ul><li><p><a href="#ggwtx">「プロバイダエイリアス」</a></p></li>
+<li><p><a href="#ggwuf">「認証タイプ」</a></p></li>
+<li><p><a href="#ggwvl">「アイデンティティープロバイダ強制認証」</a></p></li>
+<li><p><a href="#ggwrk">「アイデンティティープロバイダをパッシブにするように要求」</a></p></li>
+<li><p><a href="#ggwwi">「連携後の名前登録」</a></p></li>
+<li><p><a href="#ggwsq">「名前 ID ポリシー」</a></p></li>
+<li><p><a href="#ggwvr">「アフィリエイト連携」</a></p></li>
+<li><p><a href="#ggwwp">「プロバイダの状態」</a></p></li>
+<li><p><a href="#ggwti">「応答方法」</a></p></li></ul>
+
+
+<a name="ggwtx"></a><h5>プロバイダエイリアス</h5>
+<p>ローカルサービスプロバイダのエイリアス名を定義します。</p>
+
+<a name="ggwuf"></a><h5>認証タイプ</h5>
+<p>ローカルホストプロバイダからの認証要求に使用するプロバイダを選択します。</p>
+<ul><li><p>「<b>リモート</b>」を選択すると、ローカルホストプロバイダは、認証要求を受け取ったらすぐにリモートアイデンティティープロバイダに接続するように指定されます。</p></li>
+<li><p>「<b>ローカル</b>」を選択すると、ローカルホストプロバイダは、認証要求を受け取ったらすぐにローカルアイデンティティープロバイダに接続するように指定されます。実質的に自らに接続することになります。</p></li></ul>
+
+
+<a name="ggwvl"></a><h5>アイデンティティープロバイダ強制認証</h5>
+<p>アイデンティティープロバイダが認証要求を受け取ったときに、セッションが継続中でも再認証する必要がある場合は、このチェックボックスをオンにします。この属性はデフォルトで有効です。</p>
+
+<a name="ggwrk"></a><h5>アイデンティティープロバイダをパッシブにするように要求</h5>
+<p>アイデンティティープロバイダが主体と対話せずに、ユーザーと対話する必要があることを指定するには、このチェックボックスをオンにします。</p>
+
+<a name="ggwwi"></a><h5>連携後の名前登録</h5>
+<p>このオプションを有効にすると、サービスプロバイダが連携後に名前登録に参加できるようになります。</p>
+
+<a name="ggwsq"></a><h5>名前 ID ポリシー</h5>
+<p>アイデンティティープロバイダの名前識別子ポリシーに対する影響を要求者に許可する列挙。 </p>
+
+<a name="ggwvr"></a><h5>アフィリエイト連携</h5>
+<p>アフィリエイト連携を有効にするには、このチェックボックスをオンにします。</p>
+
+<a name="ggwwp"></a><h5>プロバイダの状態</h5>
+<p>サービスプロバイダがアクティブか非アクティブかを定義します。デフォルトはアクティブです。これは、サービスプロバイダが要求を処理し、応答を生成できることを意味します。 </p>
+
+<a name="ggwti"></a><h5>応答方法</h5>
+<p>サービスプロバイダが生成できるステートメントのタイプを指定します。たとえば、<tt>lib:AuthenticationStatement</tt> などです。</p>
+
+<a name="ggwyd"></a><h5>サービス URL</h5>
+
+<ul><li><p><a href="#ggwro">「COT リストのページ URL」</a></p></li>
+<li><p><a href="#ggwri">「連携ページ URL」</a></p></li>
+<li><p><a href="#ggwtf">「ホームページ URL」</a></p></li>
+<li><p><a href="#ggwsa">「シングルサインオンエラー時のリダイレクト URL」</a></p></li>
+<li><p><a href="#ggwta">「終了完了 URL」</a></p></li>
+<li><p><a href="#ggwrd">「エラーページ URL」</a></p></li>
+<li><p><a href="#ggwth">「ログアウト完了 URL」</a></p></li></ul>
+
+
+<a name="ggwro"></a><h5>COT リストのページ URL</h5>
+<p>プロバイダが属するすべてのトラストサークルを一覧表示する URL を定義します。</p>
+
+<a name="ggwri"></a><h5>連携ページ URL</h5>
+<p>連携操作を実行する URL を指定します。 </p>
+
+<a name="ggwtf"></a><h5>ホームページ URL</h5>
+<p>アイデンティティープロバイダのホームページの URL を定義します。</p>
+
+<a name="ggwsa"></a><h5>シングルサインオンエラー時のリダイレクト URL</h5>
+<p>シングルサインオンに失敗した場合に主体がリダイレクトされる URL を定義します。</p>
+
+<a name="ggwta"></a><h5>終了完了 URL</h5>
+<p>連携終了の完了後に主体がリダイレクトされる URL を定義します。</p>
+
+<a name="ggwrd"></a><h5>エラーページ URL</h5>
+<p>エラー発生時に主体を誘導する URL を定義します。 </p>
+
+<a name="ggwth"></a><h5>ログアウト完了 URL</h5>
+<p>ログアウト後に主体を誘導する URL を定義します。</p>
+
+<a name="ggwsf"></a><h5>プラグイン</h5>
+
+<ul><li><p><a href="#ggwuh">「サービスプロバイダアダプタ」</a></p></li>
+<li><p><a href="#ggwtd">「連携 SP アダプタ環境」</a></p></li>
+<li><p><a href="#ggwuv">「ユーザープロバイダクラス」</a></p></li>
+<li><p><a href="#ggwsu">「名前識別子の実装」</a></p></li></ul>
+
+
+<a name="ggwuh"></a><h5>サービスプロバイダアダプタ</h5>
+<p><tt>com.sun.identity.federation.plugins.FSSPAdapter</tt> インタフェースの実装クラスを定義します。デフォルト値は次のとおりです。 </p><p><tt>com.sun.identity.federation.plugins.FSDefaultSPAdapter</tt> </p>
+
+<a name="ggwtd"></a><h5>連携 SP アダプタ環境</h5>
+<p>サービスプロバイダアダプタ SPI の実装クラスで使用される環境プロパティーのリストを定義します。</p>
+
+<a name="ggwuv"></a><h5>ユーザープロバイダクラス</h5>
+<p>ユーザーの検索やユーザー属性の取得などのユーザー操作を提供するために使用されるプラグイン可能なクラスを指定します。デフォルト値は次のとおりです。 </p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider</tt> </p>
+
+<a name="ggwsu"></a><h5>名前識別子の実装</h5>
+<p>このフィールドは、サービスプロバイダが名前登録に参加するために使用するクラスを定義します。名前登録とは、サービスプロバイダが主体の名前 ID を指定するためのプロファイルです。名前 ID は、アイデンティティープロバイダがサービスプロバイダと通信する際に使用します。値は <tt>com.sun.identity.federation.services.util.FSNameIdentifierImpl</tt> です。</p>
+
+<a name="ggwtb"></a><h5>サービスプロバイダ属性マッパー</h5>
+
+<ul><li><p><a href="#ggwvz">「属性マッパークラス」</a></p></li>
+<li><p><a href="#ggwsh">「サービスプロバイダ属性マッピング」</a></p></li></ul>
+
+
+<a name="ggwvz"></a><h5>属性マッパークラス</h5>
+<p>ローカルで定義されたユーザー属性を SAML 表明の属性にマップするために使用されるクラス。デフォルトのクラスはありません。 </p>
+
+<a name="ggwsh"></a><h5>サービスプロバイダ属性マッピング</h5>
+<p>上で指定したデフォルトの属性マッパープラグインによって使用されるマッピングを定義する値を指定します。マッピングは次の形式で設定してください。</p><p><i>SAML 属性</i>=<i>ローカル属性</i></p><p>たとえば、<tt>Email=emailaddress</tt>、<tt>Address=postaladdress</tt> などとします。「新しい値」としてマッピングを入力し、「追加」をクリックします。</p>
+
+<a name="ggwtp"></a><h5>自動連携 </h5>
+
+<ul><li><p><a href="#ggwrl">「自動連携」</a></p></li>
+<li><p><a href="#ggwsd">「自動連携共通属性名」</a></p></li></ul>
+
+
+<a name="ggwrl"></a><h5>自動連携</h5>
+<p>自動連携を有効にするには、このチェックボックスをオンにします。</p>
+
+<a name="ggwsd"></a><h5>自動連携共通属性名</h5>
+<p>「<tt>電話番号</tt>」などのユーザーの共通 LDAP 属性名を定義します。自動連携属性ステートメントの作成用。自動連携の属性ステートメントを作成すると、この属性の値が使用されます。ステートメントには、値として属性要素とこの共通属性が含まれます。 </p>
+
+<a name="ggwrv"></a><h5>認証コンテキスト</h5>
+<p>この属性は、サービスプロバイダのデフォルトの認証コンテキストクラス (認証方法) を定義します。サービスプロバイダが認証要求を送信したときは、常にこの方法が呼び出されます。この値は、保護されたリソースに未知のユーザーがアクセスしようとした場合に、サービスプロバイダが使用する認証コンテキストも指定します。オプションは次のとおりです。</p><dl><dt>サポート</dt>
+<dd><p>サービスプロバイダによるサポートがある場合は、認証コンテキストクラスの横にあるチェックボックスをオンにします。</p></dd>
+<a name="indexterm-74"></a><a name="indexterm-75"></a><a name="indexterm-76"></a><dt>コンテキスト参照</dt>
+<dd><p>Liberty で定義されている認証コンテキストクラスは次のとおりです。</p>
+<ul><li><p>Mobile Contract</p></li>
+<li><p>Mobile Digital ID</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Password</p></li>
+<li><p>PasswordProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Time-Sync-Token</p></li></ul>
+</dd>
+<dt>レベル</dt>
+<dd><p>複数のコンテキストがある場合の優先順位レベルを選択します。</p></dd>
+</dl>
+
+
+<a name="ggwub"></a><h5>プロキシ認証設定</h5>
+
+<ul><li><p><a href="#ggwur">「プロキシ認証」</a></p></li>
+<li><p><a href="#ggwrs">「プロキシのアイデンティティープロバイダのリスト」</a></p></li>
+<li><p><a href="#ggwsr">「プロキシの最大数」</a></p></li>
+<li><p><a href="#ggwtu">「プロキシ用に Introduction Cookie を使用」</a></p></li></ul>
+<p>「プロキシ認証設定」属性は、動的プロバイダプロキシの値を定義します。</p>
+
+<a name="ggwur"></a><h5>プロキシ認証</h5>
+<p>サービスプロバイダのプロキシ認証を有効にするには、このチェックボックスをオンにします。</p>
+
+<a name="ggwrs"></a><h5>プロキシのアイデンティティープロバイダのリスト</h5>
+<p>「新しい値」にプロキシ認証で使用できるアイデンティティープロバイダの識別子を入力し、「追加」をクリックします。値は、プロバイダの識別子として定義された URI です。</p>
+
+<a name="ggwsr"></a><h5>プロキシの最大数</h5>
+<p>プロキシ認証に使用できるアイデンティティープロバイダの最大数を入力します。</p>
+
+<a name="ggwtu"></a><h5>プロキシ用に Introduction Cookie を使用</h5>
+<p>プロキシとして機能しているアイデンティティープロバイダを検索するために Introduction Cookie を使用するには、このチェックボックスをオンにします。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,167 @@
+------------------------------------------------------------------------
+README file for OpenSSO OAuth Token Service
+------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright (c) 2010 Sun Microsystems Inc. All Rights Reserved
+
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.4 2010/01/20 17:51:36 huacui Exp $
+
+------------------------------------------------------------------------
+
+
+I. Overview
+------------
+
+OpenSSO OAuth Token Service (Early Access) supports OAuth Core 1.0a spec 
+http://oauth.net/core/1.0a in terms of OAuth token management, 
+including OAuth Consumer registration, OAuth Request Token 
+management/authorization, and OAuth Access Token management. The 
+OpenSSO OAuth Token Service is embedded within the OpenSSO server. 
+
+
+II. Use OAuth Token Service in OpenSSO 
+--------------------------------------
+
+The OpenSSO OAuth Token Service supports Consumer registration, 
+Request Token request, Request Token authorization, and Access Token
+request. The signature methods supported are HMAC-SHA1, RSA-SHA1,
+and PLAINTEXT.
+The following URLs can be used to access the services (The host, port, 
+and deploy-uri are the fully qualified host name, port number, and 
+deployment URI of OpenSSO server):
+
+Consumer Registration/Deletion URL:
+http(s)://host:port/deploy-uri/oauth/index.jsp
+
+Request Token URL: 
+http(s)://host:port/deploy-uri/resources/1/oauth/get_request_token
+
+Request Token Authorization URL: 
+http(s)://host:port/deploy-uri/oauth/userconsole.jsp
+
+Access Token URL: 
+http(s)://host:port/deploy-uri/resources/1/oauth/get_access_token
+
+
+1). Register An OAuth Consumer
+An OAuth Consumer needs to register to OpenSSO OAuth Token Service first
+before it can request for OAuth tokens.
+The registration can be done using the OAuth Consumer Registation URL 
+http(s)://host:port/deploy-uri/oauth/index.jsp
+Enter a Service Consumer Name and an optional Service Consumer 
+X509 certificate in PEM format. The certificate is required for RSA-SHA1
+signature method. Then Click on the Register button to register the 
+consumer.
+Upon successful registration, the Oauth Service sends back a response:
+  Service Consumer registered.
+  consumer_key=http(s)://host:port/deploy-uri/resources/1/oauth/consumer/7faf3762e2b048e2b4998f3e65c376b4
+  consumer_secret=5fe61f1ad7f445f9b63793916c561dd7
+The consumer key and secret need to be kept securely and they will be 
+used to identify this particular consumer later on.
+
+The same URL can be used to delete an existing consumer. Simply enter 
+the consumer key of the consumer to be deleted in the Service Consumer 
+Key field and click the Delete button to delete the consumer.
+
+
+2). Request for OAuth Request Token
+A registered consumer can request for an OAuth request token using URL
+http(s)://host:port/deploy-uri/resources/1/oauth/get_request_token
+
+The request should use HTTP POST. It must be signed and contains the
+following parameters:
+oauth_consumer_key  --- The Consumer Key.
+oauth_signature_method --- The signature method the Consumer used to
+                           sign the request.
+oauth_signature --- The signature
+oauth_timestamp --- The timestamp
+oauth_nonce --- The nonce
+oauth_version --- OPTIONAL. If present, value must be 1.0.
+oauth_callback -- An absolute URL to which the Service Provider will 
+                  redirect the User back when the User Authorization 
+                  step (step 3) is completed.
+
+Please refer to OAuth Core 1.0a spec for definitions and formats of 
+oauth_signature, oauth_timestamp, and oauth_nonce.
+
+The response contains the following parameters:
+oauth_token --- The Request Token.
+oauth_token_secret --- The Token Secret.
+oauth_callback_confirmed --- Must be present and set to true. The 
+                             Consumer may use this to confirm that the 
+                             Service Provider received the callback value.
+
+
+3). Authorize or Revoke An OAuth Request Token
+A user authorizes an OAuth request token using OpenSSO OAuth Token
+Authorization Console at: 
+http(s)://host:port/deploy-uri/oauth/userconsole.jsp
+
+The user will be redirected to the OpenSSO login page if he or she has 
+not been authenticated. Once the user successfully authenticates to the
+OpenSSO, the user is given a choice to authorize or revoke the request
+token. 
+
+The request should use HTTP GET (in many cases, the user is redirected
+to this URL by the consumer). It contains the following parameter:
+oauth_token --- The Request Token to be authorized.
+
+The Oauth Service constructs a HTTP GET request URL with oauth_callback
+and redirects the user to the URL with the following parameter:
+oauth_token --- The Request Token the user authorized.
+oauth_verifier --- The verification code.
+
+
+4). Request for OAuth Access Token
+A registered consumer can request for an OAuth access token after a 
+user authorizes the corresponding request token. The following URL is
+used by the consumer to obtain an access token:
+http(s)://host:port/deploy-uri/resources/1/oauth/get_access_token
+
+The request should use HTTP POST. It must be signed and contains the
+following parameters:
+oauth_consumer_key  --- The Consumer Key.
+oauth_token --- The Request Token obtained previously.
+oauth_signature_method --- The signature method the Consumer used to
+                           sign the request.
+oauth_signature --- The signature
+oauth_timestamp --- The timestamp
+oauth_nonce --- The nonce
+oauth_version --- OPTIONAL. If present, value must be 1.0.
+oauth_verifier --- The verification code received from the Service 
+                   Provider in the User Authorization step (step 3).
+Please refer to OAuth Core 1.0a spec for definitions and formats of 
+oauth_signature, oauth_timestamp, and oauth_nonce.
+
+The response contains the following parameters:
+oauth_token --- The Access Token.
+oauth_token_secret --- The Token Secret.
+
+
+III. Use OAuth Token Service Samples
+------------------------------------
+In OpenSSO source, there are two samples that can be used to try out
+the OpenSSO OAuth Token Service. The samples are located in 
+opensso/products/oauth/samples directory. Please refer to its README 
+file for details.
+

@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE index PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 2.0//EN" "index_1_0.dtd">
+<index version="2.0">
+
+ <indexitem target="accesscontrol" text="Access Control, Introduction"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="affiliate entity"></indexitem>
+ <indexitem target="alternateendpoint" text="alternate endpoint"></indexitem>
+ <indexitem target="alternatesecuritymechanisms" text="alternate security mechanisms"></indexitem>
+ <indexitem target="attributemapper" text="attribute mapper"></indexitem>
+ <indexitem text="attributes">
+    <indexitem target="federation.samlv2spassertioncontent" text="context reference"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="context reference"></indexitem><indexitem target="federation.idffidp" text="context reference"></indexitem><indexitem target="federation.idffsp" text="context reference"></indexitem></indexitem>
+ <indexitem target="authresponsemessage" text="authenticate response message"></indexitem>
+ <indexitem text="Authentication attributes">
+    <indexitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="Anonymous"></indexitem>
+    <indexitem target="authentication.authconfig" text="Authentication Configuration"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthcertservice" text="Certificate"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthservice" text="Core"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthdatastoreservice" text="Data Store"></indexitem>
+    <indexitem target="ggulh" text="Federation"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP Basic"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="Membership"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows Desktop SSO"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT"></indexitem></indexitem>
+ <indexitem text="authentication context">
+    <indexitem target="federation.samlv2spassertioncontent" text="attribute"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="attribute"></indexitem><indexitem target="federation.idffidp" text="attribute"></indexitem><indexitem target="federation.idffsp" text="attribute"></indexitem></indexitem>
+ <indexitem target="webservices.wsauthnservices" text="authentication web service"></indexitem>
+ <indexitem target="authorizer" text="authorizer"></indexitem>
+ <indexitem target="authorizerpluginclass" text="authorizer plug-in class"></indexitem>
+ <indexitem target="federation.fsauthdomains" text="circle of trust">
+    <indexitem target="federation.fsauthdomainsselectprovider" text="add providers"></indexitem>
+    <indexitem target="federation.createcot" text="create"></indexitem>
+    <indexitem target="deleteauthdomain" text="delete"></indexitem>
+    <indexitem target="federation.fsauthdomainsedit" text="modify"></indexitem></indexitem>
+ <indexitem target="service.mapcreatedevice" text="Client Detection, To add a new client"></indexitem>
+ <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="Client Manager"></indexitem>
+ <indexitem target="policy.selectcondition" text="Conditions">
+    <indexitem target="policy.authtoserviceadd" text="Authentication by Module Chain"></indexitem>
+    <indexitem target="policy.pmdefaultauthschemeconditionadd" text="Authentication by Module Instance"></indexitem>
+    <indexitem target="policy.pmdefaultauthlevelconditionadd" text="Authentication Level"></indexitem>
+    <indexitem target="policy.authtorealmadd" text="Authentication to a Realm"></indexitem>
+    <indexitem target="policy.pmdefaultipcondition" text="IP Address/DNS Name"></indexitem>
+    <indexitem target="policy.conditionadd" text="LDAP Filter"></indexitem>
+    <indexitem target="policy.pmdefaultsessioncondtionadd" text="Session"></indexitem>
+    <indexitem target="policy.sessionpropertyconditionadd" text="Session Property"></indexitem>
+    <indexitem target="policy.pmdefaulttimeconditionadd" text="Time"></indexitem></indexitem>
+ <indexitem target="service.scconfig" text="Configuration">
+    <indexitem target="service.scconfigauth" text="Authentication"></indexitem>
+    <indexitem target="service.scconfigconsole" text="Console Properties"></indexitem>
+    <indexitem target="servic.scconfigglobal" text="Global Properties"></indexitem>
+    <indexitem target="service.scfonfigsystem" text="System Properties"></indexitem></indexitem>
+ <indexitem text="Console Properties">
+    <indexitem target="service.scserviceprofile.amadminconsoleservice" text="Administration"></indexitem>
+    <indexitem target="service.smg11n" text="Globalization Settings"></indexitem></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="context reference attribute"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="context reference attribute"></indexitem><indexitem target="federation.idffidp" text="context reference attribute"></indexitem><indexitem target="federation.idffsp" text="context reference attribute"></indexitem>
+ <indexitem target="realm.idrepo" text="Data Stores">
+    <indexitem target="realm.idrepoeditad" text="Active Directory attributes"></indexitem>
+    <indexitem target="realm.idrepoeditldapv3" text="LDPAv3 repository plug-in attributes"></indexitem>
+    <indexitem target="realm.idrepoeditfamschema" text="Sun Directory Server with AM schema attributes"></indexitem>
+    <indexitem target="realm.idreposelecttype" text="To create a new data store"></indexitem></indexitem>
+ <indexitem target="dirmang" text="Directory Management"></indexitem>
+ <indexitem target="service.smdiscoveryservice" text="discovery service">
+    <indexitem target="authresponsemessage" text="authenticate response message"></indexitem>
+    <indexitem target="authorizerpluginclass" text="authorizer plug-in class"></indexitem>
+    <indexitem target="encryptnameidentifier" text="encrypt name identifier in session context for bootstrapping"></indexitem>
+    <indexitem target="entryhandlerpluginclass" text="entry handler plug-in class"></indexitem>
+    <indexitem target="useimpliedresource" text="implied resource"></indexitem>
+    <indexitem target="policyevaldiscolookup" text="policy evaluation for discovery lookup"></indexitem>
+    <indexitem target="policyevaldiscoupdate" text="policy evaluation for discovery update"></indexitem>
+    <indexitem target="dsproviderid" text="provider ID"></indexitem>
+    <indexitem target="resourceofferingsbootstrapping" text="resource offerings for bootstrapping"></indexitem><indexitem target="service.smdiscoverybootstraprefoffadd" text="resource offerings for bootstrapping"></indexitem>
+    <indexitem target="resourceidmapperpluginclass" text="resourceID mapper plug-in class"></indexitem>
+    <indexitem target="service.smdiscoverydescriptionadd" text="service description"></indexitem>
+    <indexitem target="generatesessioncontext" text="session context statement for bootstrapping"></indexitem>
+    <indexitem target="supportedauthmechanisms" text="supported authentication mechanisms"></indexitem>
+    <indexitem target="supporteddirectives" text="supported directives"></indexitem></indexitem>
+ <indexitem target="encryptnameidentifier" text="encrypt name identifier in session context for bootstrapping"></indexitem>
+ <indexitem text="entities">
+    <indexitem target="federation.createsaml2metadata" text="affiliate"></indexitem>
+    <indexitem target="federation.createsaml2metadata" text="provider"></indexitem></indexitem>
+ <indexitem target="entryhandlerpluginclass" text="entry handler plug-in class"></indexitem>
+ <indexitem target="extensionattributesnamespaceprefix" text="extension attributes namespace prefix"></indexitem>
+ <indexitem target="extensioncontainerattributes" text="extension container attributes"></indexitem>
+ <indexitem text="Global Properties">
+    <indexitem target="service.scserviceprofile.iplanetampasswordresetservice" text="Password Reset"></indexitem>
+    <indexitem target="service.scpolicy" text="Policy Configuration"></indexitem>
+    <indexitem target="service.scserviceprofile.amsessionservice" text="Session"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamuserservice" text="User"></indexitem></indexitem>
+ <indexitem text="Identity Management">
+    <indexitem text="Users">
+        <indexitem target="idm.entitymembership" text="Adding to Services, Roles and Groups"></indexitem></indexitem></indexitem>
+ <indexitem target="useimpliedresource" text="implied resource"></indexitem>
+ <indexitem target="invalidatesession" text="Invalidating a Session"></indexitem>
+ <indexitem target="mechanismhandlerslist" text="mechanism handlers list">
+    <indexitem target="webservices.wsauthnserviceshandlersadd" text="configure"></indexitem></indexitem>
+ <indexitem target="namescheme" text="name scheme"></indexitem>
+ <indexitem target="namespaceprefix" text="namespace prefix"></indexitem>
+ <indexitem target="webservices.wspersonalprofileservice" text="personal profile service">
+    <indexitem target="alternateendpoint" text="alternate endpoint"></indexitem>
+    <indexitem target="alternatesecuritymechanisms" text="alternate security mechanisms"></indexitem>
+    <indexitem target="attributemapper" text="attribute mapper"></indexitem>
+    <indexitem target="authorizer" text="authorizer"></indexitem>
+    <indexitem target="extensionattributesnamespaceprefix" text="extension attributes namespace prefix"></indexitem>
+    <indexitem target="extensioncontainerattributes" text="extension container attributes"></indexitem>
+    <indexitem target="namescheme" text="name scheme"></indexitem>
+    <indexitem target="namespaceprefix" text="namespace prefix"></indexitem>
+    <indexitem target="ppldapattributemaplist" text="PPLDAP attribute map list"></indexitem>
+    <indexitem target="ppproviderid" text="provider ID"></indexitem>
+    <indexitem target="requiremodify" text="require modify policyeval"></indexitem>
+    <indexitem target="requirequery" text="require query policyeval"></indexitem>
+    <indexitem target="resourceidmapper" text="resourceID mapper"></indexitem>
+    <indexitem target="serviceinstanceupdateclass" text="service instance update class"></indexitem>
+    <indexitem target="serviceupdateenabled" text="service update"></indexitem>
+    <indexitem target="supportedcontainers" text="supported containers"></indexitem></indexitem>
+ <indexitem target="service.scplatformclientcharsetsadd" text="Platform, To create a new character set"></indexitem>
+ <indexitem target="policy.policy" text="Policies">
+    <indexitem target="policy.selectcondition" text="Conditions"></indexitem>
+    <indexitem target="normalpolicy" text="Normal policies"></indexitem>
+    <indexitem target="fyfby" text="Referral Policies"></indexitem>
+    <indexitem target="responseprovider" text="Response Providers"></indexitem>
+    <indexitem target="policy.selectservicetype" text="Rules"></indexitem>
+    <indexitem target="policy.selectsubjecttype" text="Subjects"></indexitem>
+    <indexitem target="policy.selectconditiontype" text="To add a condition to"></indexitem>
+    <indexitem target="policy.responseprovideradd" text="To add a response provider to"></indexitem>
+    <indexitem target="policy.ruleadd" text="To add a rule to"></indexitem>
+    <indexitem target="policy.subjectadd" text="To add a subject to"></indexitem>
+    <indexitem target="policy.policyreferraladd" text="To create a new referral policy"></indexitem></indexitem>
+ <indexitem target="policy.selectreferraltype" text="Policy, To add referrals to"></indexitem>
+ <indexitem target="policyevaldiscolookup" text="policy evaluation for discovery lookup"></indexitem>
+ <indexitem target="policyevaldiscoupdate" text="policy evaluation for discovery update"></indexitem>
+ <indexitem target="ppldapattributemaplist" text="PPLDAP attribute map list"></indexitem>
+ <indexitem target="delegation.delegation" text="Privileges"></indexitem><indexitem target="delegation.delegationproperties" text="Privileges"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="provider entity"></indexitem>
+ <indexitem target="ppproviderid" text="provider ID"></indexitem>
+ <indexitem target="dsproviderid" text="provider ID (discovery service)"></indexitem>
+ <indexitem target="realm.rmrealm" text="Realms">
+    <indexitem target="authentication.authproperties" text="Authentication"></indexitem>
+    <indexitem target="realm.idrepo" text="Data Stores"></indexitem>
+    <indexitem target="realm.realmproperties" text="General Properties"></indexitem>
+    <indexitem target="policy.policy" text="Policies"></indexitem>
+    <indexitem target="delegation.delegation" text="Privileges"></indexitem><indexitem target="delegation.delegationproperties" text="Privileges"></indexitem>
+    <indexitem target="realm.services" text="Services"></indexitem>
+    <indexitem target="idm.entities" text="Subjects"></indexitem>
+    <indexitem target="realm.servicesadd" text="To add a service to"></indexitem>
+    <indexitem target="realm.rmrealmadd" text="To create a new"></indexitem>
+    <indexitem target="authentication.newauthconfig" text="To create a new authentication chain"></indexitem>
+    <indexitem target="authentication.newauthinstance" text="To create a new authentication module"></indexitem></indexitem>
+ <indexitem target="fyfby" text="Referral Policies"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="RelayState"></indexitem><indexitem target="federation.wsfedsp" text="RelayState"></indexitem>
+ <indexitem target="requesthandlerlist" text="request handler list"></indexitem><indexitem target="service.scsaml2soapbinding" text="request handler list">
+    <indexitem target="service.scsoapbindingrequesthandlerlistadd" text="configure"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="configure"></indexitem></indexitem>
+ <indexitem target="requiremodify" text="require modify policyeval"></indexitem>
+ <indexitem target="requirequery" text="require query policyeval"></indexitem>
+ <indexitem target="resourceofferingsbootstrapping" text="resource offerings for bootstrapping">
+    <indexitem target="service.smdiscoverybootstraprefoffadd" text="configure"></indexitem></indexitem>
+ <indexitem target="resourceidmapper" text="resourceID mapper"></indexitem>
+ <indexitem target="resourceidmapperpluginclass" text="resourceID mapper plug-in class"></indexitem>
+ <indexitem target="policy.selectservicetype" text="Rules"></indexitem>
+ <indexitem target="federation.fssamlservice" text="SAML">
+    <indexitem text="site identifiers">
+        <indexitem target="federation.fssamlsiteidadd" text="configure"></indexitem></indexitem>
+    <indexitem target="federation.fssamltargeturlsadd" text="target URL"></indexitem>
+    <indexitem text="trusted partner">
+        <indexitem target="federation.fssamlselecttrustedpartnertype" text="configure step 1"></indexitem>
+        <indexitem target="federation.fssamltrustedpartnersadd" text="configure step 2"></indexitem></indexitem></indexitem>
+ <indexitem target="sessionsearch" text="Search"></indexitem>
+ <indexitem target="service.smdiscoverydescriptionadd" text="service description, configure"></indexitem>
+ <indexitem target="serviceinstanceupdateclass" text="service instance update class"></indexitem>
+ <indexitem target="serviceupdateenabled" text="service update"></indexitem>
+ <indexitem target="generatesessioncontext" text="session context statement for bootstrapping"></indexitem>
+ <indexitem target="sessions" text="Session module"></indexitem>
+ <indexitem target="service.subconfigadd" text="Session Properties, To add a sub-configuration"></indexitem>
+ <indexitem target="session.smprofile" text="Session Window"></indexitem>
+ <indexitem target="federation.fssamlsiteidadd" text="site identifiers"></indexitem>
+ <indexitem target="service.scsoapbinding" text="SOAP binding service">
+    <indexitem target="mechanismhandlerslist" text="mechanism handlers list"></indexitem><indexitem target="webservices.wsauthnserviceshandlersadd" text="mechanism handlers list"></indexitem>
+    <indexitem target="requesthandlerlist" text="request handler list"></indexitem><indexitem target="service.scsoapbindingrequesthandlerlistadd" text="request handler list"></indexitem><indexitem target="service.scsaml2soapbinding" text="request handler list"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="request handler list"></indexitem>
+    <indexitem target="ggodb" text="supported authentication mechanisms"></indexitem>
+    <indexitem target="ggodb" text="web service authenticator"></indexitem></indexitem>
+ <indexitem target="policy.selectsubjecttype" text="Subjects"></indexitem><indexitem target="idm.entities" text="Subjects">
+    <indexitem target="idm.entitiesgroup" text="Groups"></indexitem>
+    <indexitem target="subjectuser" text="User"></indexitem></indexitem>
+ <indexitem target="supportedauthmechanisms" text="supported authentication mechanisms (discovery service)"></indexitem>
+ <indexitem target="ggodb" text="supported authentication mechanisms (SOAP binding)"></indexitem>
+ <indexitem target="supportedcontainers" text="supported containers"></indexitem>
+ <indexitem target="supporteddirectives" text="supported directives (discovery service)"></indexitem>
+ <indexitem target="supportedlang" text="Supported Language Locales"></indexitem>
+ <indexitem text="System Properties">
+    <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="Client Detection"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamloggingservice" text="Logging"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamnamingservice" text="Naming"></indexitem>
+    <indexitem target="service.scplatform" text="Platform"></indexitem></indexitem>
+ <indexitem target="federation.fssamltargeturlsadd" text="target URLs"></indexitem>
+ <indexitem target="federation.fssamlselecttrustedpartnertype" text="trusted partners"></indexitem>
+ <indexitem target="dm.home" text="User Management"></indexitem>
+ <indexitem target="idm.entitymembership" text="Users, Adding to Services, Roles, and Groups"></indexitem>
+ <indexitem target="viewsession" text="View Session"></indexitem>
+ <indexitem target="ggodb" text="web service authenticator"></indexitem>
+</index>

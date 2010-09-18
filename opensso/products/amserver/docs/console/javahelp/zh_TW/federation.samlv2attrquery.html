@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 屬性查詢 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>自訂 SAMLv2 屬性查詢</h4>
+<p>SAMLv2 屬性查詢包含下列用於自訂的屬性：</p>
+<ul><li><p><a href="#ggwht">名稱 ID 格式</a></p></li>
+<li><p><a href="#ggwgs">憑證別名</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>名稱 ID 格式</h5>
+<p>定義屬性查詢提供者支援的名稱識別碼格式。提供者可透過名稱識別碼就使用者進行通訊。單次登入互動支援三種類型的識別碼：</p>
+<ul><li><p><b>X509SubjectName</b> 定義 X509 加密類型的主體名稱。</p></li>
+<li><p><b>永久識別碼</b>會做為兩個屬性的值儲存到特定使用者的資料存放區項目中。</p></li>
+<li><p><b>暫態識別碼</b>是臨時的，不會有任何資料寫入使用者的永久資料存放區。</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>憑證別名</h5>
+<p>此屬性會定義提供者的憑證別名元素。<tt>簽署</tt>會指定用來尋找金鑰庫中正確的簽署憑證的提供者憑證別名。<tt>加密</tt>會指定用來尋找金鑰庫中正確的加密憑證的提供者憑證別名。</p>
+<br/>
+
+</body>
+</html>

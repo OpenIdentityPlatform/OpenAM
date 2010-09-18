@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>This module allows for users to authenticate using Secure Computing's SafeWord or SafeWord
+PremierAccess authentication servers. The SafeWord Authentication Attributes are realm attributes. The attributes are:</p>
+<ul><li><p><a href="#fwafv">Server</a></p></li>
+<li><p><a href="#fwajv">Server Verification Files Directory</a></p></li>
+<li><p><a href="#fwarb">Logging Enable</a></p></li>
+<li><p><a href="#fwahi">Logging Level</a></p></li>
+<li><p><a href="#fwabd">Log File</a></p></li>
+<li><p><a href="#fwacu">Authentication Connection Timeout</a></p></li>
+<li><p><a href="#fwanv">Client Type</a></p></li>
+<li><p><a href="#fwafs">EASSP Version</a></p></li>
+<li><p><a href="#fwaob">Minimum Authenticator Strength</a></p></li>
+<li><p><a href="#fwatz">Authentication Level</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>Server</h5>
+<p>Specifies the SafeWord or SafeWord PremiereAccess server name and port. Port 7482 is
+set as the default for a SafeWord server. The default port number for
+a SafeWord PremierAccess server is 5030.</p>
+
+<a name="fwajv"></a><h5>Server Verification Files Directory</h5>
+<p>Specifies the directory into which the SafeWord client library places its verification files.
+The default is as follows:</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>If a different directory is specified in this field, the directory must exist
+before attempting SafeWord authentication.</p>
+
+<a name="fwarb"></a><h5>Logging Enable</h5>
+<p>Enables SafeWord logging. By default, SafeWord logging is enabled.</p>
+
+<a name="fwahi"></a><h5>Logging Level</h5>
+<p>Specifies the SafeWord logging level. Select a level in the Drop-down menu. The
+levels are DEBUG, ERROR, INFO and NONE .</p>
+
+<a name="fwabd"></a><h5>Log File</h5>
+<p>Specifies the directory path and log file name for SafeWord client logging. The
+default path is<tt>/var/opt/SUNWam/auth/safeword/safe.log</tt> .</p><p>If a different path or filename is specified, it must exist before attempting
+SafeWord authentication. If more than one realm is configured for SafeWord authentication, and
+different SafeWord servers are used, then different paths must be specified or only
+the first realm where SafeWord authentication occurs will work. Likewise, if an realm changes
+SafeWord servers, the <tt>swec.dat</tt> file in the specified directory must be deleted before
+authentications to the newly configured SafeWord server will work.</p>
+
+<a name="fwacu"></a><h5>Authentication Connection Timeout</h5>
+<p>Defines the timeout period (in seconds) between the SafeWord client (OpenSSO) and the
+SafeWord server. The default is 120 seconds.</p>
+
+<a name="fwanv"></a><h5>Client Type</h5>
+<p>Defines the Client Type that the SafeWord server uses to communicate with different
+clients, such as Mobile Client, VPN, Fixed Password, Challenge/Response, and so forth.</p>
+
+<a name="fwafs"></a><h5>EASSP Version</h5>
+<p>This attribute specifies the Extended Authentication and Single Sign-on Protocol (EASSP) version. This
+field accepts either the standard (101), SSL-encrypted premier access (200), or premier access
+(201) protocol versions.</p>
+
+<a name="fwaob"></a><h5>Minimum Authenticator Strength</h5>
+<p>Defines the minimum authenticator strength for the client/SafeWord server authentication. Each client type
+has a different authenticator value, and the higher the value, the higher the
+authenticator strength. 20 is the highest value possible. 0 is the lowest value
+possible.</p>
+
+<a name="fwatz"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

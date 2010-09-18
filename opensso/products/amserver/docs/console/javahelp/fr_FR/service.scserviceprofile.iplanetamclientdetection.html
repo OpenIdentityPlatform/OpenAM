@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>D&#233;tection de client - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>D&#233;tection de client</h4>
+<p><a name="indexterm-200"></a>L'&#233;tape initiale du processus d'authentification consiste &#224; identifier le type du client
+qui &#233;met la demande HTTP(S). Cette fonctionnalit&#233; est connue sous le nom
+de d&#233;tection de client. Les informations d'URL sont utilis&#233;es pour r&#233;cup&#233;rer les
+caract&#233;ristiques du client. Sur la base de ces caract&#233;ristiques, les pages d'authentification
+appropri&#233;es sont retourn&#233;es. Par exemple, lorsqu'un navigateur Netscape est utilis&#233; pour demander
+une page Web, OpenSSO 8.0 affiche une page de connexion HTML. Une
+fois que l'utilisateur est valid&#233;, le type de client (navigateur Netscape) est
+ajout&#233; au jeton de session. Les attributs d&#233;finis dans le service D&#233;tection
+de client sont des attributs globaux.</p>
+<ul><li><p><a href="#fxcei">Types de client</a></p></li>
+<li><p><a href="#fxbxh">Type de client par d&#233;faut</a></p></li>
+<li><p><a href="#fxccp">Classe de d&#233;tection de client</a></p></li>
+<li><p><a href="#fxbvy">D&#233;tection de client</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>Types de client</h5>
+<p>Pour pouvoir d&#233;tecter les types de client, OpenSSO doit reconna&#238;tre leurs caract&#233;ristiques
+d'identification. Ces caract&#233;ristiques identifient les propri&#233;t&#233;s de tous les types pris en
+charge dans le formulaire des donn&#233;es client. Cet attribut vous permet de
+modifier les donn&#233;es client par l'interm&#233;diaire de l'interface Gestionnaire de clients. Pour
+acc&#233;der au Gestionnaire de clients, cliquez sur le lien Modifier. Par d&#233;faut,
+OpenSSO contient les types de client suivants&#160;:</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>Vous trouverez ici des descriptions de ces types de client : 
+<a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>.</p>
+
+<a name="gciwk"></a><h5>Gestionnaire de clients</h5>
+<p><a name="indexterm-201"></a>Le gestionnaire de clients est l'interface qui r&#233;pertorie les clients de base,
+leurs styles et leurs propri&#233;t&#233;s, et qui permet d'ajouter et de configurer
+des p&#233;riph&#233;riques. Les types de client de base sont r&#233;pertori&#233;s en haut
+du gestionnaire de clients. Ces types de client contiennent les propri&#233;t&#233;s par
+d&#233;faut dont peuvent h&#233;riter tous les p&#233;riph&#233;riques faisant partie de ce type
+de client.</p>
+
+<a name="gcivx"></a><h5>Type de client</h5>
+<p>Profil de style : le Gestionnaire de clients regroupe tous les clients
+disponibles, y compris le client de base, dans la liste des types
+de client. Vous pouvez modifier les propri&#233;t&#233;s de chaque client en cliquant
+sur le nom du p&#233;riph&#233;rique. Les propri&#233;t&#233;s sont ensuite affich&#233;es dans la
+fen&#234;tre &#201;diteur du client. Pour modifier les propri&#233;t&#233;s, s&#233;lectionnez les classifications suivantes
+dans la liste d&#233;roulante :</p><dl><dt>Plate-forme mat&#233;rielle</dt>
+<dd><p>Contient les propri&#233;t&#233;s concernant le mat&#233;riel du p&#233;riph&#233;rique, par exemple la taille de l'&#233;cran, les jeux de caract&#232;res pris en charge, etc.</p></dd>
+<dt>Plate-forme logicielle</dt>
+<dd><p>Contient les propri&#233;t&#233;s de l'environnement d'application du p&#233;riph&#233;rique, du syst&#232;me d'exploitation et des logiciels install&#233;s. </p></dd>
+<dt>Caract&#233;ristiques du r&#233;seau</dt>
+<dd><p>Contient les propri&#233;t&#233;s d&#233;crivant l'environnement r&#233;seau, notamment les services support pris en charge.</p></dd>
+<dt>BrowserUA</dt>
+<dd><p>Contient les attributs li&#233;s &#224; l'agent utilisateur du navigateur ex&#233;cut&#233; sur le p&#233;riph&#233;rique.</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>Contient les propri&#233;t&#233;s de l'environnement WAP (Wireless Application Protocol) pris en charge par le p&#233;riph&#233;rique.</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>Contient les propri&#233;t&#233;s de l'environnement WAP pris en charge par le p&#233;riph&#233;rique.</p></dd>
+<dt>Autres propri&#233;t&#233;s</dt>
+<dd><p>Contient les propri&#233;t&#233;s de l'environnement WAP (Wireless Application Protocol) pris en charge par le p&#233;riph&#233;rique.</p></dd>
+</dl>
+
+<hr><p><b>Remarque &#8211; </b>Pour obtenir des d&#233;finitions de propri&#233;t&#233;s sp&#233;cifiques, reportez-vous au <b>protocole WAP OMA (Open Mobile Alliance Ltd.), version 20-Oct-2001</b>.</p><p>Pour acc&#233;der &#224; ce document, vous devez vous enregistrer dans le WAP Forum<sup>TM</sup>.
+For information, please visit <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm </a>.</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>Type de client par d&#233;faut</h5>
+<p>Cet attribut d&#233;finit le type de client par d&#233;faut extrait de la
+liste des types de client dans l'attribut Types de client. La valeur
+par d&#233;faut est genericHTML.</p>
+
+<a name="fxccp"></a><h5>Classe de d&#233;tection de client</h5>
+<p>Cet attribut d&#233;finit la classe de d&#233;tection de client pour laquelle toutes
+les demandes de d&#233;tection de client sont achemin&#233;es. La cha&#238;ne retourn&#233;e par
+cet attribut doit correspondre &#224; l'un des types de client r&#233;pertori&#233;s dans
+l'attribut Types de client. La classe de d&#233;tection de client par d&#233;faut
+est <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>. OpenSSO contient &#233;galement <tt>com.iplanet.services.cdm.ClientDetectionDefaultImpl </tt>.</p>
+
+<a name="fxbvy"></a><h5>D&#233;tection de client</h5>
+<p>Active la d&#233;tection de client. Si la d&#233;tection de client est activ&#233;e
+(valeur par d&#233;faut), toutes les demandes sont achemin&#233;es par l'interm&#233;diaire de la
+classe d&#233;finie dans l'attribut Classe de d&#233;tection de client. Par d&#233;faut, la
+fonction de d&#233;tection de client est activ&#233;e. Si cet attribut n'est pas
+s&#233;lectionn&#233;, OpenSSO suppose que le client est genericHTML et qu'il est accessible
+&#224; partir d'un navigateur HTML.</p>
+<br/>
+
+</body>
+</html>

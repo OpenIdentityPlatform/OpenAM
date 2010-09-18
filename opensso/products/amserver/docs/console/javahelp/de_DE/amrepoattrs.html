@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Federated Access Manager-Repository-Attribute - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="amrepoattrs"></a><h4>Federated Access Manager-Repository-Attribute</h4>
+<p><a name="indexterm-13"></a>Folgende Attribute werden zur Konfiguration eines Access Manager-Repository-Plugins verwendet:</p>
+
+<a name="gdlng"></a><h5>Klassenname</h5>
+<p>Gibt den Speicherort der Klassendatei an, die das Federated Access Manager-Repository-Plugin implementiert.</p>
+
+<a name="gdopv"></a><h5>Unterst&#252;tzte Federated Access Manager-Typen und -Vorg&#228;nge</h5>
+<p>Gibt die Vorg&#228;nge an, die f&#252;r diesen LDAP-Server zugelassen sind. Die Standardvorg&#228;nge
+sind die einzigen Vorg&#228;nge, die von diesem LDAPv3-Repository-Plugin unterst&#252;tzt werden. Folgende Vorg&#228;nge
+werden vom LDAPv3-Repository-Plugin unterst&#252;tzt:</p>
+<ul><li><p>Agent: Lesen, Erstellen, Bearbeiten, L&#246;schen</p></li>
+<li><p>Gruppe: Lesen, Erstellen, Bearbeiten, L&#246;schen</p></li>
+<li><p>Bereich: Lesen, Erstellen, Bearbeiten, L&#246;schen, Dienst</p></li>
+<li><p>Benutzer: Lesen, Erstellen, Bearbeiten, L&#246;schen, Dienst</p></li></ul>
+<p>Basierend auf Ihren LDAP-Servereinstellungen und den entsprechenden Aufgaben k&#246;nnen Sie Berechtigungen aus
+der obigen Liste entfernen, jedoch keine weiteren Berechtigungen hinzuf&#252;gen. </p><p>Wenn das konfigurierte LDAPv3-Repository-Plugin auf eine Instanz von Sun Java Systems Directory
+Server verweist, k&#246;nnen Berechtigungen f&#252;r den Typ <tt>role</tt> hinzugef&#252;gt werden. Anderenfalls kann
+diese Berechtigung nicht hinzugef&#252;gt werden, da Rollen von anderen Data Stores m&#246;glicherweise
+nicht unterst&#252;tzt werden. Die Berechtigungen f&#252;r den Typ "role" lauten wie folgt:</p>
+<ul><li><p>Rolle: Lesen, Erstellen, Bearbeiten, L&#246;schen </p></li></ul>
+<p>Wenn <tt>user</tt> ein unterst&#252;tzer Typ f&#252;r das LDAPv3-Repository ist, sind die Vorg&#228;nge
+Lesen, Erstellen, Bearbeiten und L&#246;schen f&#252;r diesen Benutzer m&#246;glich. Anders ausgedr&#252;ckt: Wenn
+<tt>user</tt> ein unterst&#252;tzter Typ ist, k&#246;nnen Sie dank der Vorg&#228;nge zum Lesen,
+Bearbeiten, Erstellen und L&#246;schen Benutzereintr&#228;ge im Identit&#228;ts-Repository lesen, bearbeiten, erstellen und l&#246;schen.
+&#220;ber den Vorgang <tt>user=service</tt> k&#246;nnen Federated Access Manager-Dienste auf Attribute in Benutzereintr&#228;gen
+zugreifen. Zudem darf der Benutzer auf die dynamischen Dienstattribute zugreifen, wenn der
+Dienst dem Bereich bzw. der Rolle zugewiesen ist, der der Benutzer zugeh&#246;rig
+ist. </p><p>Der Benutzer darf auch die Benutzerattribute s&#228;mtlicher zugewiesener Dienste verwalten. Wenn der
+Vorgang des Benutzers <tt>service</tt> lautet (<tt>user=service</tt>), gibt dies an, dass s&#228;mtliche dienstbezogene
+Vorg&#228;nge unterst&#252;tzt werden. Diese Vorg&#228;nge sind <tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes</tt> und <tt>modifyService.</tt></p>
+
+<a name="gdlnf"></a><h5>Organisations-DN-Wert</h5>
+<p>Definiert den DN einer Organisation in Directory Server, die von Federated Access
+Manager verwaltet werden soll. Dieser DN wird als Basis-DN f&#252;r alle im
+Data Store ausgef&#252;hrten Vorg&#228;nge verwendet.</p>
+
+<a name="gdopu"></a><h5>Namensattribut f&#252;r Personen-Container</h5>
+<p>Gibt das Namensattribut des Personen-Containers an, falls der Benutzer einem Personen-Container zugeordnet
+ist. Wenn sich der Benutzer nicht in einem Personen-Container befindet, bleibt das
+Feld leer.</p>
+
+<a name="gdopc"></a><h5>Personen-Containerwert</h5>
+<p>Gibt den Wert des Personen-Containers an. Der Standardwert ist <tt>people</tt>.</p>
+
+<a name="gdopl"></a><h5>Agentencontainer-Namensattribut</h5>
+<p>Gibt das Namensattribut des Agentencontainers an, falls der Agent einem Agentencontainer zugeordnet
+ist. Wenn sich der Agent nicht in einem Agentencontainer befindet, bleibt das
+Feld leer.</p>
+
+<a name="gdopi"></a><h5>Agentencontainerwert</h5>
+<p>Gibt den Wert des Agentencontainers an. Der Standardwert ist <tt> agents</tt>.</p>
+
+<a name="gdoow"></a><h5>Rekursive Suche</h5>
+<p>Wenn diese Option aktiviert ist, wird im Federated Access Manager-Repository mithilfe eines
+rekursiven Suchvorgangs nach den angegebenen Identit&#228;ten gesucht. Beispiel: Ein rekursiver Suchvorgang in
+folgender Datenstruktur: </p>root realm1     subrealm11         user5     subrealm12         user6 realm2     user1     user2     subrealm21         user3         user4<p>f&#252;hrt zu folgenden Ergebnissen:</p>
+<ul><li><p>Wenn ein Suchvorgang vom Root aus durchgef&#252;hrt wird und auf dieser Ebene keine Benutzer definiert sind (abgesehen von <tt>amadmin</tt> und <tt> anonymous</tt>), gibt der Suchvorgang Benutzer (user) 1&#8211;6 zur&#252;ck.</p></li>
+<li><p>Wenn der Suchvorgang von <tt>realm1</tt> aus durchgef&#252;hrt wird und keine Benutzer definiert sind, gibt der Suchvorgang <tt>user5</tt> und <tt> user6</tt> zur&#252;ck.</p></li>
+<li><p>Wenn der Suchvorgang von <tt>realm2</tt> aus durchgef&#252;hrt wird (zwei Benutzer definiert), gibt der Suchvorgang Benutzer (user) 1&#8211;4 zur&#252;ck.</p></li></ul>
+
+
+<a name="gdoox"></a><h5>Bereichskonfiugration kopieren</h5>
+<p>Wenn dieses Attribut bei der Installation im Bereichsmodus aktiviert ist, erstellt Federated
+Access Manager eine entsprechende Organisation und Unterorganisation f&#252;r s&#228;mtliche Bereiche und Unterbereiche,
+die im Repository vorhanden sind. Zudem werden die Dienste, die im Bereich/Unterbereich
+(Realm/untergeordneten Realm) registriert werden, in der neu erstellten Organisation/Unterorganisation registriert. Sowohl der
+Bereichs-Verzeichnisinformationsbaum (Directory Infomration Tree, DIT) als auch der Organisations-Verzeichnisinformationsbaum sind im Data
+Store vorhanden.</p>
+<br/>
+
+</body>
+</html>

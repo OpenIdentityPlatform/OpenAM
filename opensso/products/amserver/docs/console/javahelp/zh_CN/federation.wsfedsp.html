@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自定义 WS-FED 服务提供者 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>自定义 WS-FED 服务提供者</h4>
+<p>以下属性应用于 WS-FED 服务提供者角色：</p>
+
+<a name="ggwtj"></a><h5>已签署声明</h5>
+<p>必须签署此服务提供者接收的所有声明。</p>
+
+<a name="ggwsg"></a><h5>帐户映射程序</h5>
+<p>此属性指定 <tt>AccountMapper</tt> 接口的实现，该接口用于将远程用户帐户映射到本地用户帐户以进行单点登录。默认值为 <tt>com.sun.identity.wsfed.plugins.</tt></p><p><tt>DefaultADFSPartnerAccountMapper</tt> 为默认实现。</p>
+
+<a name="ggwrf"></a><h5>属性映射程序</h5>
+<p>此属性定义一个类，该类用于将声明中的属性映射到身份认证提供者本地定义的用户属性。默认类为 <tt>com.sun.identity.wsfederation.plugins.</tt><tt>DefaultSPAttributeMapper</tt>。</p>
+
+<a name="ggwrq"></a><h5>属性映射</h5>
+<p>指定定义默认属性映射程序插件所使用的映射的值。映射应该按以下格式配置：</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>例如，<tt>EmailAddress=mail</tt> 或 <tt>Address=postaladdress</tt>。将映射作为“新值”键入，并单击“添加”。</p>
+
+<a name="ggwvn"></a><h5>声明有效时间</h5>
+<p>声明在一段时间内有效，在这之前或之后都无效。</p><p><tt>有效时间</tt>指定从声明的发出时间开始计算的声明有效时间（以秒为单位）。默认值为 <tt>600</tt> 秒。</p>
+
+<a name="ggwsk"></a><h5>声明偏差时间</h5>
+<p>声明在一段时间内有效，在这之前或之后都无效。此属性为 <tt>notBefore</tt> 值指定宽限期（以秒为单位）。默认值为 <tt>300</tt>。它与 <tt>notAfter</tt> 值无关。</p>
+
+<a name="ggwts"></a><h5>默认中继状态</h5>
+<p><a name="indexterm-77"></a>在 WS-FED 操作（单点登录、单点注销或联合终止）成功之后，会显示一个页面。此页面通常为原始请求资源，在初始请求中使用 <tt>RelayState</tt> 元素来指定。如果没有指定 <tt>RelayState</tt>，则会显示此 <tt>defaultRelayState</tt> 属性的值。</p>
+<hr><p><b>注意 &#8211; </b>当 <tt>RelayState</tt> 或 <tt>defaultRelayState</tt> 含有特殊字符（例如 <tt>&#38;</tt>）时，它必须进行 URL 编码。例如，如果 <tt>RelayState</tt> 的值为 <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt>，那么它必须 URL
+编码为：</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz</tt></p><p>然后附加到 URL。例如，服务提供者启动的单点登录 URL 将会是：</p><p><tt>http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz</tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>主领域搜索</h5>
+<p>指定服务，以便服务提供者能标识首选身份认证提供者。服务提供者将服务 URL 指定为联系端点。</p>
+
+<a name="ggwwb"></a><h5>帐户领域选择</h5>
+<p>指定身份认证提供者选择机制和配置。<tt>cookie</tt> 或 <tt>HTTP Request</tt> 标头属性都可以用于查找身份认证提供者。</p>
+<br/>
+
+</body>
+</html>

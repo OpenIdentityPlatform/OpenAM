@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP バインドサービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>SOAP バインドサービス</h3>
+<a name="indexterm-150"></a><p>SOAP バインドサービスは、SOAP メッセージを送受信するためのトランスポート層です。SOAP バインドサービスのプロセスでは、アイデンティティーサービスがクライアント側のアプリケーションプログラミングインタフェースを呼び出してメッセージを作成し、SOAP エンドポイント URL (実質的には、SOAP Receiver (受信者) サーブレット) に送信します。SOAP Receiver
+サーブレットはメッセージを受信して、署名を確認してから、次のメッセージを作成します。次に、SOAP Receiver サーブレットは正しい要求ハンドラを起動して、この 2 番目のメッセージを対応するアイデンティティーサービスに送信し、応答を待ちます。アイデンティティーサービスは 2 番目のメッセージを処理し、応答を生成して、SOAP Receiver サーブレットに返信します。今度は、SOAP Receiver が応答をアイデンティティーサービスに返信し、応答はそこで処理されます。 </p><p>実装環境には、次の SOAP バインドサービスのグローバル属性を設定できます。</p>
+<ul><li><p><a href="requesthandlerlist.html">「要求ハンドラリスト」</a></p></li>
+<li><p><a href="ggodb.html">「SOAP バインド属性」</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">「要求ハンドラを設定する」</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

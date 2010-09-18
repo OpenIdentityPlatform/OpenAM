@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2-Authentifizierungsautorit&#228;tsanpassung  - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2authnauthority"></a><h4>SAMLv2-Authentifizierungsautorit&#228;tsanpassung </h4>
+<p>Die SAMLv2-Authentifizierungsautorit&#228;t enth&#228;lt die folgenden Attribute f&#252;r die Anpassung:</p>
+<ul><li><p><a href="#ggwfq">Signierung und Verschl&#252;sselung</a></p></li>
+<li><p><a href="#ggwim">Authn-Abfragedienst</a></p></li>
+<li><p><a href="#ggwmk">AssertionID-Anforderung</a></p></li>
+<li><p><a href="#ggwqw">Cert-Alias</a></p></li></ul>
+
+
+<a name="ggwfq"></a><h5>Signierung und Verschl&#252;sselung</h5>
+<dl><dt>Schl&#252;sselgr&#246;&#223;e</dt>
+<dd><p>Die L&#228;nge von Schl&#252;sseln, die von der Attributsautorit&#228;ts-Entity bei der Interaktion mit einer anderen Entity verwendet werden.</p></dd>
+<dt>Algorithmus</dt>
+<dd><p>Der Verschl&#252;sselungsalgorithmus, der f&#252;r die Interaktion mit einer anderen Entity verwendet wird.</p></dd>
+</dl>
+
+
+<a name="ggwim"></a><h5>Authn-Abfragedienst</h5>
+<p>Dieses Attribut definiert den URL, an die Authentifizierungsabfragen gesendet werden.</p>
+
+<a name="ggwmk"></a><h5>AssertionID-Anforderung</h5>
+<p>Definiert die URLs, an die AssertionIDs von einem Client an einen Identity-Anbieter
+gesendet werden, um die entsprechende Assertion abzurufen. <tt>Speicherort</tt> gibt den URL des
+Anbieters an, an den die Anforderung gesendet wird. Die AssertionID-Anforderungstypen sind:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwqw"></a><h5>Cert-Alias</h5>
+<p>Dieses Attribut definiert die Zertifikatalias-Elemente f&#252;r den Anbieter. <tt>Signieren</tt>Gibt den Anbieterzertifikatalias an,
+der f&#252;r die Suche nach dem richtigen Signaturzertifikat im Schl&#252;sselspeicher verwendet wird.
+<tt>Verschl&#252;sselung</tt>Gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Verschl&#252;sselungszertifikat
+im Schl&#252;sselspeicher verwendet wird.</p>
+<br/>
+
+</body>
+</html>

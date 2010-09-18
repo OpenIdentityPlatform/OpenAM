@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows Desktop SSO - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>Windows Desktop SSO</h4>
+<p><a name="indexterm-183"></a>此模組是 Windows 專用的，也稱為 Kerberos 認證。使用者透過簡單且受保護的 GSS-API 交涉機制 (Simple and Protected GSS-API Negotiation
+Mechanism, SPNEGO) 協定向 OpenSSO 提出 Kerberos 記號。Windows Desktop SSO 認證外掛程式模組提供用戶端 (使用者) 桌面單次登入。這表示已通過金鑰發行中心認證的使用者可以利用
+OpenSSO 進行認證，而無需再次提供登入資訊。Windows Desktop SSO 屬性為全域屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwbfr">服務主體</a></p></li>
+<li><p><a href="#fwbfo">Keytab 檔案名稱</a></p></li>
+<li><p><a href="#fwbhy">Kerberos 範圍</a></p></li>
+<li><p><a href="#fwbid">Kerberos 伺服器名稱</a></p></li>
+<li><p><a href="#fwbhw">使用網域名稱傳回主體</a></p></li>
+<li><p><a href="#fwbic">認證級別</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>服務主體</h5>
+<p>指定用於認證的 Kerberos 主體。請使用以下格式：</p><p><tt><b>HTTP/</tt><i>hostname.domainname@dc_domain_name</i><tt></b></tt></p><p><b>hostname</b> 及 <b>domainame</b> 代表 OpenSSO 實例的主機名稱及網域名稱。<b>dc_domain_name</b> 是 Windows Kerberos 伺服器 (網域控制器) 所在的
+Kerberos 網域。它可能會與 OpenSSO 的網域名稱不同。</p>
+
+<a name="fwbfo"></a><h5>Keytab 檔案名稱</h5>
+<p>此屬性指定用於認證的 Kerberos keytab 檔案。雖然不要求格式，但是請使用以下格式：</p><p><tt><b></tt><i>hostname</i><tt>.HTTP.keytab</b></tt></p><p><b>hostname</b> 是 OpenSSO 實例的主機名稱。</p>
+
+<a name="fwbhy"></a><h5>Kerberos 範圍</h5>
+<p>此屬性指定 Kerberos 發行中心 (網域控制器) 網域名稱。依據您的配置，網域控制器的網域名稱可與 OpenSSO 網域名稱不同。</p>
+
+<a name="fwbid"></a><h5>Kerberos 伺服器名稱</h5>
+<p>此屬性指定 Kerberos 發行中心 (網域控制器) 主機名稱。您必須輸入網域控制器的完整網域名稱 (FQDN)。</p>
+
+<a name="fwbhw"></a><h5>使用網域名稱傳回主體</h5>
+<p>如果啟用，此屬性可讓 OpenSSO 在認證期間自動傳回帶有網域控制器之網域名稱的 Kerberos 主體。</p>
+
+<a name="fwbic"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

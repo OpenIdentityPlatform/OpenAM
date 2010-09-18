@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>JDBC - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthjdbcservice"></a><h4>JDBC</h4>
+<p><a name="indexterm-174"></a>Java Database Connectivity (JDBC) 認證模組允許 OpenSSO 透過任何提供啟用 JDBC 之驅動程式的結構化查詢語言 (SQL) 資料庫來認證使用者。SQL 資料庫的連線可以直接透過
+JDBC 驅動程式或透過 JNDI 連線池。這些 JDBC 屬性為範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwajx">連線類型</a></p></li>
+<li><p><a href="#fwafb">連接儲存區 JNDI 名稱</a></p></li>
+<li><p><a href="#fwaap">JDBC 驅動程式</a></p></li>
+<li><p><a href="#fwarc">JDBC URL</a></p></li>
+<li><p><a href="#fwaum">將這個使用者連接到資料庫</a></p></li>
+<li><p><a href="#fwaeu">連接至資料庫使用的密碼</a></p></li>
+<li><p><a href="#fwavq">連接至資料庫使用的密碼確認</a></p></li>
+<li><p><a href="#fwads">密碼欄字串</a></p></li>
+<li><p><a href="#fwapb">準備的描述</a></p></li>
+<li><p><a href="#fwapv">變換密碼語法的類別</a></p></li>
+<li><p><a href="#fwavz">認證級別</a></p></li></ul>
+
+
+<a name="fwajx"></a><h5>連線類型</h5>
+<p>使用 JNDI (Java 命名與目錄介面) 連線池或 JDBC 驅動程式，指定 SQL 資料庫的連線類型。選項如下：</p>
+<ul><li><p>透過 JNDI 擷取的連線池</p></li>
+<li><p>非永久性的 JDBC 連線</p></li></ul>
+<p>JNDI 連線池利用基礎 Web 容器中的配置。</p>
+
+<a name="fwafb"></a><h5>連接儲存區 JNDI 名稱</h5>
+<p>如果選取 JNDI 連線類型，此欄位將指定連線池名稱。由於 JDBC 認證是使用 Web 容器所提供的 JNDI 連線池，JNDI 連線池的設定可能與其他 Web 容器不一致。如需範例，請參閱「OpenSSO
+管理指南」。</p>
+
+<a name="fwaap"></a><h5>JDBC 驅動程式</h5>
+<p>如果在<a href="#fwajx">連線類型</a>中選取了 JDBC，此欄位將指定 SQL 資料庫所提供的 JDBC 驅動程式。例如，<tt>com.mysql.jdbc.Driver</tt>。</p>
+
+<a name="fwarc"></a><h5>JDBC URL</h5>
+<p>如果在<a href="#fwajx">連線類型</a>中選取了 JDBC，請指定資料庫 URL。例如，mySQL 的 URL 是 <tt>jdbc.mysql://hostname:port/databaseName</tt>。</p>
+
+<a name="fwaum"></a><h5>將這個使用者連接到資料庫</h5>
+<p>指定以 JDBC 連線為資料庫連線的使用者名稱。</p>
+
+<a name="fwaeu"></a><h5>連接至資料庫使用的密碼</h5>
+<p>為 [連接至資料庫的使用者] 中所指定的使用者定義密碼。</p>
+
+<a name="fwavq"></a><h5>連接至資料庫使用的密碼確認</h5>
+<p>確認密碼。</p>
+
+<a name="fwads"></a><h5>密碼欄字串</h5>
+<p>指定 SQL 資料庫中的密碼欄名稱。</p>
+
+<a name="fwapb"></a><h5>準備的描述</h5>
+<p>指定可以擷取正在登入之使用者密碼的 SQL 敘述。例如：</p><pre> select Password from Employees where USERNAME = ?</pre>
+
+<a name="fwapv"></a><h5>變換密碼語法的類別</h5>
+<p>指定將擷取自資料庫之密碼變換為使用者輸入格式的類別名稱，以供密碼比較之用。此類別必須實作 <tt>JDBCPasswordSyntaxTransform</tt> 介面。</p>
+
+<a name="fwavz"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

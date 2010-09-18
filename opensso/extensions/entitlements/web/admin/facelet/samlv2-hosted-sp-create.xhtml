@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: samlv2-hosted-sp-create.xhtml,v 1.9 2009/07/07 01:27:32 asyhuang Exp $
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+    <ui:define name="panel-title">
+        <ice:outputText value="#{resources['samlv2-hosted-sp-create.panelTitle']}"/>
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText value="#{resources['samlv2-hosted-sp-create.panelDetails']}"/>
+    </ui:define>
+
+    <ui:define name="panel-body">
+        <o:wizard
+            steps="5"
+            wizardHandler="#{samlV2HostedSpCreateWizardHandler}"
+            wizardBean="#{samlV2HostedSpCreateWizardBean}">
+            <ui:define name="wizard-steps">
+                <o:wstep
+                    step="0"
+                    label="#{resources['samlv2-hosted-sp-create.selectRealmPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+                        <o:section>
+                            <ui:define name="section-title">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.selectRealmPanelLabel.section-title']}"/>
+                            </ui:define>
+                            <ui:define name="section-details">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.selectRealmPanelLabel.section-details']}"/>
+                            </ui:define>
+                            <ui:define name="section-body">
+
+                                <ui:include src="template/samlv2-hosted-select-realm.xhtml">
+                                    <ui:param
+                                        name="wizardBean"
+                                        value="#{samlV2HostedSpCreateWizardBean}"/>
+                                    <ui:param
+                                        name="wizardHandler"
+                                        value="#{samlV2HostedSpCreateWizardHandler}"/>
+                                </ui:include>
+                            </ui:define>
+                        </o:section>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="1"
+                    label="#{resources['samlv2-hosted-sp-create.entityNamePanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <o:section>
+                            <ui:define name="section-title">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.entityNamePanelLabel.section-title']}"/>
+                            </ui:define>
+                            <ui:define name="section-details">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.entityNamePanelLabel.section-details']}"/>
+                            </ui:define>
+                            <ui:define name="section-body">
+                                <!-- Metadata -->
+                                <ice:panelGroup>
+                                    <ice:panelGroup
+                                        visible="#{samlV2HostedSpCreateWizardBean.meta}">
+                                        <ui:include src="template/samlv2-hosted-meta-upload.xhtml">
+                                            <ui:param
+                                                name="wizardBean"
+                                                value="#{samlV2HostedSpCreateWizardBean}"/>
+                                            <ui:param
+                                                name="wizardHandler"
+                                                value="#{samlV2HostedSpCreateWizardHandler}"/>
+                                        </ui:include>
+                                    </ice:panelGroup>
+                                    <ice:panelGroup
+                                        visible="#{!samlV2HostedSpCreateWizardBean.meta}">
+                                        <ice:outputLabel
+                                            value="#{resources['samlv2-hosted-sp-create.entityNamePanelLabel.newEntityNameLabel']}"/>
+                                        <ice:inputText
+                                            id="newEntityName"
+                                            value="#{samlV2HostedSpCreateWizardBean.newEntityName}"
+                                            styleClass="inline-input"
+                                            size="70"
+                                            maxlength="128"/>
+                                    </ice:panelGroup>
+                                </ice:panelGroup>
+                                <!-- Metadata -->
+                            </ui:define>
+                        </o:section>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="2"
+                    label="#{resources['samlv2-hosted-sp-create.selectCotPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/samlv2-select-cot.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{samlV2HostedSpCreateWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{samlV2HostedSpCreateWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="3"
+                    label="#{resources['samlv2-hosted-sp-create.attributeMappingPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <o:section>
+                            <ui:define name="section-title">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.attributeMapping.title']}"/>
+                            </ui:define>
+                            <ui:define name="section-details"/>
+                            <ui:define name="section-body">
+                                <ice:panelGroup>
+                                    <ice:outputLabel
+                                        value="#{resources['samlv2-hosted-sp-create.attributeMapping.useDefaultAttributeMapping']}"/>
+                                    <ice:selectBooleanCheckbox
+                                        id="defAttrMappings"
+                                        value="#{samlV2HostedSpCreateWizardBean.defAttrMappings}"/>
+                                </ice:panelGroup>
+                            </ui:define>
+                        </o:section>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="4"
+                    label="#{resources['samlv2-hosted-sp-create.summaryPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <o:section>
+                            <ui:define name="section-title">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.summaryPanelLabel.section-title']}"/>
+                            </ui:define>
+                            <ui:define name="section-details">
+                                <ice:outputText
+                                    value="#{resources['samlv2-hosted-sp-create.summaryPanelLabel.section-details']}"/>
+                            </ui:define>
+                            <ui:define name="section-body">
+                                <!-- summary -->
+                                <o:summarypanel
+                                    summary="#{samlV2HostedSpCreateWizardBean.realmSamlV2CreateSummary}"
+                                    visible="#{!samlV2HostedSpCreateWizardBean.meta}"/>
+                                <o:summarypanel
+                                    summary="#{samlV2HostedSpCreateWizardBean.entityNameSamlV2CreateSummary}"
+                                    visible="#{!samlV2HostedSpCreateWizardBean.meta}"/>
+                                <o:summarypanel
+                                    summary="#{samlV2HostedSpCreateWizardBean.stdMetadataNameSamlV2CreateSummary}"
+                                    visible="#{samlV2HostedSpCreateWizardBean.meta}"/>
+                                <o:summarypanel
+                                    summary="#{samlV2HostedSpCreateWizardBean.extMetadataNameSamlV2CreateSummary}"
+                                    visible="#{samlV2HostedSpCreateWizardBean.meta}"/>
+                                <o:summarypanel
+                                    summary="#{samlV2HostedSpCreateWizardBean.cotSamlV2CreateSummary}"/>
+                                <o:summarypanel
+                                    summary="#{samlV2HostedSpCreateWizardBean.defAttrMappingsSamlV2CreateSummary}"/>
+                                <!-- summary -->
+                            </ui:define>
+                        </o:section>
+
+                    </ui:define>
+                </o:wstep>
+            </ui:define>
+        </o:wizard>
+    </ui:define>
+</ui:composition>

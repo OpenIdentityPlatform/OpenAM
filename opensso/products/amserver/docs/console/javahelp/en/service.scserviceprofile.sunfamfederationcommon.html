@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Common Federation Configuration - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamfederationcommon"></a><h4>Common Federation Configuration</h4>
+
+
+<a name="ggoir"></a><h5>Datastore SPI Implementation Class</h5>
+<p>This attribute specifies the implementation class for the default datastore provider,</p>
+
+<a name="ggogw"></a><h5>Configuration Instance SPI Implementation Class</h5>
+<p>This attribute specifies the implementation class for managing configuration data.</p>
+
+<a name="ggofp"></a><h5>Logger SPI Implementation Class</h5>
+<p>This attribute specifies the implementation class for the log provider.</p>
+
+<a name="ggofy"></a><h5>Session Provider SPI Implementation Class</h5>
+<p>This specifies the implementation class for the session provider.</p>
+
+<a name="ggogv"></a><h5>Maximum Allowed Content Length</h5>
+<p>This attribute specifies the maximum allowed content length for an HTTP Request that
+will be used in federation services. Any request whose content exceeds the specified
+maximum content length will be rejected.</p>
+
+<a name="ggogu"></a><h5>Password Decoder SPI Implementation Class</h5>
+<p>This attribute specifies the implementation class for the <tt>com.sun.identity.saml.xmlsig.PasswordDecoder</tt> interface which is used
+to decode stored password for XML signing keystore and password for basic authentication
+under SAML 1.x.</p>
+
+<a name="ggohx"></a><h5>Signature Provider SPI Implementation Class</h5>
+<p>This attribute specifies the SAML XML signature provider class. The default SPI is
+<tt>com.sun.identity.saml.xmlsig.AMSignatureProvider</tt>.</p>
+
+<a name="ggohm"></a><h5>Key Provider SPI Implementation Class</h5>
+<p>This attribute specifies the XML signature key provider class. The default SPI is
+<tt>com.sun.identity.saml.xmlsig.JKSKeyProvider</tt>.</p>
+
+<a name="ggofo"></a><h5>Check Presence of Certificates</h5>
+<p>If set to <tt>on</tt>, the certificate must be presented to the keystore for
+XML signature validation. If set to <tt>off</tt>, presence checking of the certificate is
+skipped. This applies to SMAL1.x only.</p>
+
+<a name="ggohn"></a><h5>XML Cannonicalization Algorithm</h5>
+<p>This attribute specifies XML cannonicalization algorithm used for SAML XML signature generation and
+verification. The default value is <tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>.</p>
+
+<a name="ggohp"></a><h5>XML Signature Algorithm</h5>
+<p>This attribute specifies XML signature algorithm used for SAML XML Signature generation and
+verification. When not specified or value is empty, the default value (<tt>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tt>) is
+used.</p>
+
+<a name="ggoie"></a><h5>XML Transformation Algorithm</h5>
+<p>This attribute specifies transformation algorithm used for SAML XML signature generation and verification.
+When not specified or the value is empty, the default value (<tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>) is
+used.</p>
+<br/>
+
+</body>
+</html>

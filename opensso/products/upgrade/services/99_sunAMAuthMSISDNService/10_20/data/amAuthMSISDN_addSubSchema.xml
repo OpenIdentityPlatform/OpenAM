@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amAuthMSISDN_addSubSchema.xml,v 1.2 2008/06/25 05:54:01 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+"jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  this file is referenced by:
+
+  amadmin -u "xxx" -w "yyy" -t amAuthMSISDN_mod.xml
+
+-->
+
+<Requests>
+    <SubSchema name="serverconfig" inheritance="multiple">
+	<AttributeSchema name="sunAMAuthMSISDNTrustedGatewayList"
+	    type="list"
+	    syntax="string"
+	    i18nKey="a101">
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNParameterNameList"
+	    type="list"
+	    syntax="string"
+	    i18nKey="a102">
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNLdapProviderUrl"
+	    type="list"
+	    syntax="string"
+	    i18nKey="a103">
+	    <DefaultValues>
+	        <Value>DIRECTORY_SERVER:DIRECTORY_PORT</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNBaseDn"
+	    type="list"
+	    syntax="dn"
+	    i18nKey="a104">
+       	    <DefaultValues>
+	        <Value>NORMALIZED_ORGBASE</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNUserSearchAttribute"
+	    type="single"
+	    syntax="string"
+	    i18nKey="a105">
+	    <DefaultValues>
+		<Value>sunIdentityMSISDNNumber</Value>
+  	    </DefaultValues>
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNPrincipalUser"
+	    type="single"
+	    syntax="string"
+	    i18nKey="a106">
+	    <DefaultValues>
+		<Value>cn=amldapuser,ou=DSAME Users,NORMALIZED_ORGBASE</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNPrincipalPasswd"
+	    type="single"
+	    syntax="password"
+	    i18nKey="a107">
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNUseSsl"
+	    type="single"
+	    syntax="boolean"
+	    i18nKey="a108">
+	    <DefaultValues>
+	        <Value>false</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNHeaderSearch"
+	    type="multiple_choice"
+	    syntax="string"
+	    i18nKey="a109">
+	    <ChoiceValues>
+	        <ChoiceValue i18nKey="SearchCookieHeader">searchCookie</ChoiceValue>
+		<ChoiceValue i18nKey="SearchRequestHeader">searchRequest</ChoiceValue>
+		<ChoiceValue i18nKey="SearchRequestParameter">searchParam</ChoiceValue>
+	    </ChoiceValues>
+	    <DefaultValues>
+		<Value>searchCookie</Value>
+		<Value>searchRequest</Value>
+		<Value>searchParam</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+        <AttributeSchema name="sunAMAuthMSISDNUserNamingAttribute"
+	    type="single"
+	    syntax="string"
+	    i18nKey="a110">
+	    <DefaultValues>
+		<Value>USER_NAMING_ATTR</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+        <AttributeSchema name="sunAMAuthMSISDNReturnUserDN"
+	    type="single"
+	    syntax="boolean"
+	    i18nKey="a111">
+	    <DefaultValues>
+		<Value>true</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+	<AttributeSchema name="sunAMAuthMSISDNAuthLevel"
+	    type="single"
+	    syntax="number"
+	    i18nKey="a500">
+	    <DefaultValues>
+		<Value>0</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+    </SubSchema>
+</Requests>

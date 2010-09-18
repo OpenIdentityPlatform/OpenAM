@@ -1,0 +1,413 @@
+<link href="$context/assets/css/Specific/protectResource.css" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+
+    #usersTable {
+        height:25em;
+    }
+
+    #usersPaginator {
+        text-align:right;
+    }
+
+     /* customized css for scrolling */
+    .yui-dt-scrollable  {
+      width:20em; /* SET OVERALL WIDTH HERE for ie (make sure columns add up to this total) */
+      height:22em; /* SET HEIGHT HERE for ie */
+    }
+    .yui-dt-scrollbody {
+      height:22em; /* SET HEIGHT HERE for non-ie */
+      *height:auto; /* for ie */
+    }
+    .yui-dt-scrollable  thead {
+      background:#696969; /*dark gray*/ /* ie needs a background color */
+      color:#fff;
+    }
+    /* SET WIDTHS FOR EACH TH TO HELP ALIGN COLUMNS */
+    /* IF ALL COLS CAN BE SAME WIDTH USE THIS: */
+    .yui-dt-scrollable th, .yui-dt-scrollbody td {
+      width:10em;
+    }
+
+</style>
+
+
+
+<script language="javascript">
+/*remenber validate the system have a condition, this page have a two parts, but the page 181 is hidden in the div
+"haveCondition" and for dafault "donthavecondition"*/
+    YAHOO.namespace("sun.container");
+    YAHOO.util.Event.onDOMReady(init);
+    var DOM = YAHOO.util.Dom;
+    var pageURI = "$context$path";
+
+    function closed(){
+        document.location = "$context/config/commonTasks.htm";
+    }
+
+    function next(){
+        AjaxUtils.load('container', '$context/config/resource/summary.htm');
+    }
+
+    function changeSubject(){
+        document.getElementById("divUser").style.display = (document.getElementById("subject").options[document.getElementById("subject").selectedIndex].value=="1") ? "" : "none";
+        evaluateNextEnabling();
+    }
+
+    function changeChecks(type){
+        document.getElementById("option"+type).style.display = (document.getElementById("condition"+type).checked) ? "" : "none";
+    }
+
+    function changeChecksAddCondition(){
+        if(document.getElementById("conditionNew9").checked){
+            document.getElementById("option10").style.display = "";
+            document.getElementById("contentTabs2").style.top = "-692px";
+        }else{
+            document.getElementById("option10").style.display = "none";
+            document.getElementById("contentTabs2").style.top = "-472px";
+        }
+    }
+
+    /*Add New*/
+    function show(type,element,name){
+        document.getElementById(name).style.display = (type==1) ? "none" : "";
+        document.getElementById(name).style.left=element.offsetLeft+"px";
+    }
+
+    function cancelPopUp(name){
+        document.getElementById(name).style.display = "none";
+    }
+
+    function resetAfterAddUrlPattern(field) {
+        document.getElementById("contentTabs1").style.display = "none";
+        field.value = "";
+    }
+
+    function resetAfterAddCondition() {
+        var field = DOM.get("name");
+        field.value = "";
+        field = DOM.get("fromIP1");
+        field.value = "";
+        field = DOM.get("fromIP2");
+        field.value = "";
+        field = DOM.get("fromIP3");
+        field.value = "";
+        field = DOM.get("fromIP4");
+        field.value = "";
+        field = DOM.get("toIP1");
+        field.value = "";
+        field = DOM.get("toIP2");
+        field.value = "";
+        field = DOM.get("toIP3");
+        field.value = "";
+        field = DOM.get("toIP4");
+        field.value = "";
+        field = DOM.get("dnsName");
+        field.value = "";
+        var parameterTypes = document.getElementsByName("parameterType");
+        for(var i = 0; i < parameterTypes.length; i++) {
+            parameterTypes[i].checked = false;
+        }
+    }
+
+    function init() {
+        DOM.get("nextButton").disabled = true;
+        loadUrlPatterns();
+        loadExistentConditions();
+    }
+
+    function loadUrlPatterns() {
+        AjaxUtils.call("$context/config/resource/urlPatterns.htm", paintUrlPatternCombo);
+    }
+
+    function loadExistentConditions() {
+        AjaxUtils.call("$context/config/resource/existentConditions.htm", paintExistentConditionsCombo);
+    }
+
+    function paintUrlPatternCombo(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        var combo = DOM.get("urlPattern");
+        combo.options.length = 0;
+        for (var i = 0; i < response.records.length; i++) {
+            var option = new Option(response.records[i].urlPattern, response.records[i].id);
+            combo.options.add(option, combo.options.length);
+        }
+    }
+
+    function paintExistentConditionsCombo(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        var combo = DOM.get("existentConditions");
+        combo.options.length = 0;
+        for (var i = 0; i < response.records.length; i++) {
+            var option = new Option(response.records[i].name, response.records[i].id);
+            combo.options.add(option, combo.options.length);
+        }
+    }
+
+    function evaluateNextEnabling() {
+        var patterns = DOM.get("urlPattern");
+        var conditions = DOM.get("existentConditions");
+        var subject = DOM.get("subject");
+        DOM.get("nextButton").disabled = !(patterns.options.length > 0 && subject.selectedIndex > 0 && conditions.options.length > 0);
+    }
+
+    function addUrlPattern() {
+        var field = DOM.get("newUrlPattern");
+        var callUrl = pageURI + "?actionLink=addUrlPattern&newUrlPattern=" + field.value;
+        AjaxUtils.call(callUrl, loadUrlPatterns);
+        resetAfterAddUrlPattern(field);
+        document.getElementById("contentTabs1").style.display = "none";
+        evaluateNextEnabling();
+    }
+
+    function addCondition() {
+        var callUrl = pageURI + "?actionLink=addCondition&conditionType=" + prepareConditionValues(document.getElementsByName("conditionType"));
+        AjaxUtils.call(callUrl, loadExistentConditions);
+        resetAfterAddCondition();
+        document.getElementById("contentTabs2").style.display = "none";
+        evaluateNextEnabling();
+    }
+
+    function removeUrlPattern() {
+        var callUrl = pageURI + "?actionLink=removeUrlPattern&urlPattern=" + prepareDropDownValues(DOM.get("urlPattern"));
+        AjaxUtils.call(callUrl, loadUrlPatterns);
+        evaluateNextEnabling();
+    }
+
+    function removeCondition() {
+        var callUrl = pageURI + "?actionLink=removeCondition&condition=" + prepareDropDownValues(DOM.get("existentConditions"));
+        AjaxUtils.call(callUrl, loadExistentConditions);
+        evaluateNextEnabling();
+    }
+
+    function prepareDropDownValues(dropDown) {
+        var result = "";
+        for(var i = 0; i < dropDown.options.length; i++) {
+            if (dropDown.options[i].selected) {
+                result += (result == "" ? "" : ",") + dropDown.options[i].value;
+            }
+        }
+        return result;
+    }
+
+    function prepareConditionValues(checkboxes) {
+        var result = "";
+        var extraData = "";
+        for(var i = 0; i < checkboxes.length; i++) {
+            var checkbox = checkboxes[i];
+            if (checkbox.checked) {
+                result += (result == "" ? "" : ",") + checkbox.value;
+                if (checkbox.value == "ipAddress") {
+                    extraData += getIPAddressData();
+                }
+            }
+        }
+        return result + extraData;
+    }
+
+    function getIPAddressData() {
+        var result = "";
+        var field = DOM.get("name");
+        if (field.value.trim != "") {
+            result += "&name=" + field.value;
+        }
+        field = DOM.get("fromIP1");
+        if (field.value.trim != "") {
+            result += "&fromIP1=" + field.value;
+        }
+        field = DOM.get("fromIP2");
+        if (field.value.trim != "") {
+            result += "&fromIP2=" + field.value;
+        }
+        field = DOM.get("fromIP3");
+        if (field.value.trim != "") {
+            result += "&fromIP3=" + field.value;
+        }
+        field = DOM.get("fromIP4");
+        if (field.value.trim != "") {
+            result += "&fromIP4=" + field.value;
+        }
+        field = DOM.get("toIP1");
+        if (field.value.trim != "") {
+            result += "&toIP1=" + field.value;
+        }
+        field = DOM.get("toIP2");
+        if (field.value.trim != "") {
+            result += "&toIP2=" + field.value;
+        }
+        field = DOM.get("toIP3");
+        if (field.value.trim != "") {
+            result += "&toIP3=" + field.value;
+        }
+        field = DOM.get("toIP4");
+        if (field.value.trim != "") {
+            result += "&toIP4=" + field.value;
+        }
+        field = DOM.get("dnsName");
+        if (field.value.trim != "") {
+            result += "&dnsName=" + field.value;
+        }
+        return result + getParameterType(document.getElementsByName("parameterType"));
+    }
+
+    function getParameterType(parameterTypes) {
+        var result = "&";
+        for(var i = 0; i < parameterTypes.length; i++) {
+            var parameterType = parameterTypes[i];
+            if (parameterType.checked) {
+                result += "parameterType=" + parameterType.value;
+            }
+        }
+        return result;
+    }
+
+
+    var tableColumnDefs = [
+        {key:"firstName", label:"First Name", sortable:true},
+        {key:"lastName", label:"Last Name", sortable:true}
+    ];
+    var responseSchema = {
+        resultsList: "records",
+        fields: ["firstName", "lastName"]
+    };
+    // Users Table
+    var usersTable = new APP.util.PaginatedTable("usersTable", "$context/config/realm/users.htm?", "realmName=&filter=*", tableColumnDefs, responseSchema, null, null);
+    usersTable.paginator = new APP.util.Paginator("usersPaginator", "$context/assets/images/");
+    usersTable.loadData();
+
+
+    function reloadRealmUsersTable() {
+        var searchValue = YAHOO.util.Dom.get("search").value;
+        var realmName = "realmName=";
+        var filter = "filter=" + searchValue;
+        var usersTable = new APP.util.PaginatedTable("usersTable", "$context/config/realm/users.htm?", realmName + "&" + filter, tableColumnDefs, responseSchema, null);
+        usersTable.paginator = new APP.util.Paginator("usersPaginator", "$context/assets/images/");
+        usersTable.loadData();
+    }
+
+
+</script>
+
+<div id="mainPanel" align="center">
+    <div id="createPanel" class="createpanel">
+        <br />
+            <div class="bodywhite">
+            <h2>$page.getLocalizedString("configuration.protect.title")</h2>
+            <small>$page.getLocalizedString("configuration.protect.comment")</small>
+        </div>
+        <br />
+        <div class="bodywhite">
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.protect.instructionsLabel"):</p>
+            <select multiple size="3" name="urlPattern" id="urlPattern"></select><br>
+            <!--<p class="blue links"><a class="pointer">Delete</a>&nbsp;|&nbsp;<a class="pointer">Add New</a></p-->
+			<div id="options1" class="yui-navset links">
+				<div id="contentTabs1" class="yui-content" style="z-index:20;display:none;position:absolute;top:-86px;">
+					<div id="tabOption1">
+					</div>
+					<div id="tabOption2" style="width:220px">
+						<p align="left"><b>$page.getLocalizedString("configuration.protect.newURL")</b><br />
+						<input id="newUrlPattern" name="newUrlPattern" style="width:200px"/></p>
+						<p align="right" style="color:#000066"><a class="pointer" onclick="cancelPopUp('contentTabs1');">$page.getLocalizedString("configuration.protect.cancel")</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="pointer" onclick="addUrlPattern();">$page.getLocalizedString("configuration.protect.save")</a></p>
+					</div>
+				</div>
+				<ul class="yui-nav" style="text-align:right">
+					<li><a href="javascript:void(0);" onclick="removeUrlPattern();"><em>$page.getLocalizedString("configuration.protect.delete")</em></a></li>
+					<li><a href="#tab2" onclick="show(2,this,'contentTabs1')"><em>$page.getLocalizedString("configuration.protect.addNew")</em></a></li>
+				</ul>
+			</div>
+        </div>
+        <div class="bodywhite">
+            <font class="OrangeSmall">$page.getLocalizedString("configuration.protect.subject")</font><br />
+            <font class="OrangeSmall">$page.getLocalizedString("configuration.protect.subjectType"):</font><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+            <select id="subject" onchange="changeSubject()">
+                <option value="0">$page.getLocalizedString("configuration.protect.select")</option>
+                <option value="1">$page.getLocalizedString("configuration.protect.users")</option>
+                <option value="2">$page.getLocalizedString("configuration.protect.group")</option>
+                <option value="3">$page.getLocalizedString("configuration.protect.role")</option>
+            </select><br><br />
+            <div id="divUser" style="display:none" class="bodySpace" align="left">
+                <div id="demo" class="yui-navset widthTab">
+                    <ul class="yui-nav">
+                        <li class="selected"><a href="#tab1"><em>$page.getLocalizedString("configuration.protect.selectUser")</em></a></li>
+                    </ul>
+                    <div class="yui-content" style="height:485px">
+                        <div>
+                            <div class="bodywhite">
+                            <input type="text" id="search" value="*"/><button type="button" onclick="reloadRealmUsersTable();">$page.getLocalizedString("configuration.protect.search")</button>
+                            </div>
+                            <div class="bodywhite">
+                                $page.getLocalizedString("configuration.protect.displaying") <span id="usersTable_startIndex"></span> - <span id="usersTable_endIndex"></span> of <span id="usersTable_ofTotal"></span> $page.getLocalizedString("configuration.protect.realmUsers")
+                             </div>
+                            <div id="realmUsersContentSearch" >
+                                <div id="usersTable"></div>
+                                <div id="usersPaginator"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bodywhite" id="haveCondition" >
+			<p class="OrangeSmall">$page.getLocalizedString("configuration.protect.conditions"):</p>
+                <select multiple id="existentConditions" name="existentConditions" size="3" style="width:200px"></select><br>
+                <!--<p class="blue links"><a class="pointer">Delete</a>&nbsp;|&nbsp;<a class="pointer">Add New</a></p>-->
+				<div id="options2" class="yui-navset links">
+					<div id="contentTabs2" class="yui-content" style="z-index:20;display:none;position:absolute;top:-472px">
+						<div id="tabOption1">
+						</div>
+						<div id="tabOption2" style="width:300px" align="left">
+							<p class="OrangeSmall">$page.getLocalizedString("configuration.protect.conditions.type"):</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew1" value="activeSessionTime"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.moduleChain")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew2" value="authByModuleChain"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.moduleChain")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew3" value="authByType"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.minimunLevel")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew4" value="minAuthLevel"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.minimunLevel")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew5" value="maxAuthLEvel"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.MaximunLevel")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew6" value="authToRealm"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.realm")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew7" value="currentSessionProperties"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.Identity")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew8" value="identityMembership"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.Identity")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew9" value="ipAddress" onclick="changeChecksAddCondition();"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.ipAddress")</p>
+							<div id="option10" style="display:none">
+								<p class="OrangeSmall">$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.info"):<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></p>
+								<p><font>$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.name"):</font><input name="name" id="name" type="text"/></p>
+								<p>$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.from")&nbsp;
+								<input type="text" name="fromIP1" id="fromIP1" style="width:30px;"/>
+								<input type="text" name="fromIP2" id="fromIP2" style="width:30px;"/>
+								<input type="text" name="fromIP3" id="fromIP3" style="width:30px;"/>
+								<input type="text" name="fromIP4" id="fromIP4" style="width:30px;"/></p>
+								<p>$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.to")&nbsp;
+								<input type="text" name="toIP1" id="toIP1" style="width:30px;"/>&nbsp;
+								<input type="text" name="toIP2" id="toIP2" style="width:30px;"/>&nbsp;
+								<input type="text" name="toIP3" id="toIP3" style="width:30px;"/>
+								<input type="text" name="toIP4" id="toIP4" style="width:30px;"/></p>
+								<p>$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.dns")&nbsp;
+								<input  type="text" name="dnsName" id="dnsName"/></p>
+								<p class="OrangeSmall">$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.parameter"):</p>
+								<input type="radio" id="staticType" name="paramterType" value="static"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.static")&nbsp;&nbsp;
+								<input type="radio" id="dynamicType" name="parameterType" value="dynamic"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.ipAddress.dynamic")<br/>
+							</div>
+							<p><input type="checkbox" name="conditionType" id="conditionNew10" value="dnsName"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.dnsName")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew11" value="ldapFilter"/>&nbsp;$page.getLocalizedString("configuration.protect.conditions.type.ldap")</p>
+							<p><input type="checkbox" name="conditionType" id="conditionNew12" value="time"/>&nbsp$page.getLocalizedString("configuration.protect.conditions.type.time");</p>
+							<p align="right" style="color:#000066"><a class="pointer" onclick="cancelPopUp('contentTabs2');">$page.getLocalizedString("configuration.protect.conditions.type.cancel")</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="pointer" onclick="addCondition();">$page.getLocalizedString("configuration.protect.conditions.type.save")</a></p>
+						</div>
+					</div>
+					<ul class="yui-nav" style="text-align:right">
+						<li><a href="javascript:void(0);" onclick="removeCondition(1,this,'contentTabs2');"><em>$page.getLocalizedString("configuration.protect.delete")</em></a></li>
+						<li><a href="#tab2" onclick="show(2,this,'contentTabs2')"><em>$page.getLocalizedString("configuration.protect.addNew")</em></a></li>
+					</ul>
+				</div>
+            </div>
+        <div class="subbody">
+            <button type="button" name="closeButton" id="closeButton" value="close" onClick="javascript:closed();">$page.getLocalizedString("configuration.protect.conditions.type.close")</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" name="nextButton" id="nextButton" value="next" onClick="javascript:next();">$page.getLocalizedString("configuration.protect.conditions.type.next")</button>
+        </div>
+    </div>
+</div>
+<!--Tabs-->
+<script>
+(function() {
+    var tabView = new YAHOO.widget.TabView('demo');
+	var tabView2 = new YAHOO.widget.TabView('search1');
+})();
+
+</script>

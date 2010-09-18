@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio de testigos de seguridad - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>Servicio de testigos de seguridad</h4>
+<p>Los atributos incluidos en este servicio definen la configuraci&#243;n din&#225;mica del servicio
+de token de seguridad (STS) de OpenSSO. Estos atributos definen la siguiente
+configuraci&#243;n:</p>
+<ul><li><p>Emisi&#243;n y creaci&#243;n de tokens de seguridad</p></li>
+<li><p> Seguridad de servicios web para el propio servicio STS con el fin de proteger los puntos finales de STS. Los atributos de firma y cifrado configuran la validaci&#243;n de solicitudes WS-Trust por parte del proveedor del servidor y protegen las respuestas WS-Trust salientes. El atributo de mecanismo de seguridad define las credenciales de los tokens de seguridad.</p></li>
+<li><p>La configuraci&#243;n SAML para la asignaci&#243;n de atributos de solicitudes SAML del token de seguridad (mediante una aserci&#243;n SAML) cuando se configura STS se especifica como proveedor de servicios web y recibe un token (aserci&#243;n) SAML generado por un STS remoto.</p></li>
+<li><p> La validaci&#243;n de tokens de seguridad recibida por un proveedor de servicios web cuando el token se ha generado mediante un servicio STS remoto.</p><p>Puede crear perfiles de configuraci&#243;n din&#225;micos para diferentes proveedores de servicios web de OpenSSO en la <a href="agentconfig.agents.html">configuraci&#243;n de agente centralizada</a> ubicada en la ficha Dominios.</p></li></ul>
+
+
+<a name="ghatr"></a><h5>Emisor</h5>
+<p>El nombre del servicio de token de seguridad que emite los tokens
+de seguridad.</p>
+
+<a name="ghawa"></a><h5>Punto final</h5>
+<p>Este campo contiene un valor igual a: </p><p><tt>%protocolo://%host:%puerto%uri/sts</tt> </p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del punto
+final del servicio token de seguridad en funci&#243;n de los par&#225;metros de
+sesi&#243;n espec&#237;ficos.</p>
+
+<a name="ghatv"></a><h5>Clave de cifrado emitida</h5>
+<p>Si se habilita, el atributo cifra la clave emitida por el servicio
+de token de seguridad.</p>
+
+<a name="ghauc"></a><h5>Token de cifrado emitido</h5>
+<p>Si se habilita, el atributo cifra el token de seguridad emitido por
+el servicio de token de seguridad.</p>
+
+<a name="ghavx"></a><h5>Duraci&#243;n del token de seguridad</h5>
+<p>Define el periodo de tiempo durante el que es v&#225;lido un token
+emitido.</p>
+
+<a name="ghaud"></a><h5>Clase de implementaci&#243;n del token</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n del proveedor/emisor del token de
+seguridad.</p>
+
+<a name="ghaug"></a><h5>Nombre de alias del certificado</h5>
+<p>Define el nombre de alias del certificado utilizado para firmar el token
+de seguridad emitido por el servicio de token de seguridad.</p>
+
+<a name="ghauh"></a><h5>Clase de complemento de token de usuario final de STS</h5>
+<p>Define la clase de implementaci&#243;n para la conversi&#243;n del token de usuario
+final.</p>
+
+<a name="ghawk"></a><h5>Mecanismo de seguridad</h5>
+<p>Define el tipo de credenciales de seguridad utilizado para proteger el propio
+token de seguridad o las credenciales de seguridad aceptadas por el servicio
+de token de seguridad desde la solicitud WS-Trust entrante enviada por el
+cliente. Puede elegir entre los siguientes tipos de seguridad:</p>
+<ul><li><p>Anonymous: el mecanismo de seguridad an&#243;nimo no contiene ninguna credencial de seguridad.</p></li>
+<li><p>KerberosToken: utiliza los tokens de Kerberos.</p></li>
+<li><p>LibertyDiscoverySecurity: utiliza tokens de seguridad basados en Liberty.</p></li>
+<li><p>SAML-HolderOfKey: utiliza el portador de clave tipo aserci&#243;n SAML 1.1.</p></li>
+<li><p>SAML-SenderVouches: utiliza los vales de remitente de tipo aserci&#243;n SAML 1.1.</p></li>
+<li><p>SAML2&#8211;HolderOfKey: utiliza el soporte de clave de tipo token de aserci&#243;n SAML 2.0.</p></li>
+<li><p>SAML2&#8211;SenderVouches: utiliza los vales de remitente tipo token de aserci&#243;n SAML 2.0.</p></li>
+<li><p>STSSecurity: establece que el agente del servicio de testigos de seguridad debe obtener el testigo de seguridad de este servicio.</p></li>
+<li><p>UserNameToken: utiliza un testigo de nombre de usuario para proteger las solicitudes del servicio de testigos de seguridad.</p></li>
+<li><p>UserNameToken-Plain: utiliza un testigo de nombre de usuario con una contrase&#241;a de texto sin formato para proteger las solicitudes del servicio de testigos de seguridad.</p></li>
+<li><p>X509Token: utiliza el certificado X509 para proteger el token de seguridad.</p></li></ul>
+
+
+<a name="ghesm"></a><h5>Cadena de autenticaci&#243;n</h5>
+<p>Define la cadena de autenticaci&#243;n o el nombre de servicio que puede
+utilizarse para autenticarse en el servicio de autenticaci&#243;n de OpenSSO mediante la
+utilizaci&#243;n de credenciales procedentes del token de seguridad de la solicitud del
+emisor entrante para generar el token de seguridad autenticado de OpenSSO.</p>
+
+<a name="ghaup"></a><h5>Credenciales de usuario</h5>
+<p>Este atributo representa los secretos compartidos de nombre de usuario/contrase&#241;a que utilizar&#225;
+el servicio de token de seguridad para validar un token de nombre
+de usuario enviado por el cliente como parte de una solicitud WS-Trust
+entrante.</p>
+
+<a name="ghauq"></a><h5>Se ha verificado la firma de la solicitud</h5>
+<p>Especifica que el servicio de token de seguridad debe verificar la firma
+de la solicitud WS-Trust entrante.</p>
+
+<a name="ghaui"></a><h5>Especifique si se ha descifrado el encabezado de la solicitud</h5>
+<p>Indica que deben descifrarse todos los encabezados de solicitud recibidos por el
+servicio de token de seguridad.</p>
+
+<a name="ghauf"></a><h5>Se ha descifrado la solicitud</h5>
+<p>Indica que deben descifrarse todas las solicitudes recibidas por el servicio de
+token de seguridad.</p>
+
+<a name="ghavc"></a><h5>Especifique si se ha firmado la respuesta</h5>
+<p>Indica que deben firmarse todas las respuestas recibidas por el servicio de
+token de seguridad.</p>
+
+<a name="ghavo"></a><h5>Se ha cifrado la respuesta</h5>
+<p>Indica que deben descifrarse todas las respuestas enviadas por el servicio de
+token de seguridad.</p>
+
+<a name="ghdtd"></a><h5>Tipo de referencia de firma</h5>
+<p>Define los tipos de referencia utilizados cuando el servicio de token de
+seguridad firma la respuesta WS-Trust. Los posibles tipos de referencias son: <tt>DircectReference </tt>,
+<tt>KeyIdentifier</tt> y<tt>X509</tt>.</p>
+
+<a name="ghdss"></a><h5>Algoritmo de cifrado</h5>
+<p>Define el algoritmo de cifrado utilizado por el servicio de token de
+seguridad para cifrar la respuesta WS-Trust.</p>
+
+<a name="ghdru"></a><h5>Intensidad de cifrado</h5>
+<p>Establece la intensidad de cifrado utilizada por el servicio de token de
+seguridad para cifrar la respuesta WS-Trust. Seleccione un valor superior para obtener
+una mayor intensidad de cifrado.</p>
+
+<a name="ghavt"></a><h5>Alias de clave privada</h5>
+<p>Este atributo define el alias de clave privada del certificado que se
+ha utilizado para firmar la respuesta WS-Trust o descifrar la solicitud WS-Trust
+entrante.</p>
+
+<a name="ghave"></a><h5>Tipo de clave privada</h5>
+<p>Este atributo define el tipo de clave privada del certificado que se
+ha utilizado para firmar las respuestas WS-Trust o descifrar las solicitudes WS-Trust.
+Los tipos posibles son: <tt>PublicKey</tt>, <tt>SymmetricKey </tt> o <tt>NoProofKey</tt>.</p>
+
+<a name="ghaux"></a><h5>Alias de la clave p&#250;blica del cliente de servicios web (WS-Trust)</h5>
+<p>Define el alias de certificado p&#250;blico utilizado para verificar la firma de
+la solicitud WS-Trust entrante o cifrar la respuesta WS-Trust.</p>
+
+<a name="ghbbv2"></a><h5>Servidor de dominios Kerberos</h5>
+<p>Este atributo especifica el nombre de host del centro de distribuci&#243;n Kerberos
+(controlador de dominio). Debe introducir el nombre de dominio completo (FQDN) del
+controlador de dominio.</p>
+
+<a name="ghbdx2"></a><h5>Dominio Kerberos</h5>
+<p>Este atributo especifica el nombre de dominio del centro de distribuci&#243;n Kerberos
+(controlador de dominio). En funci&#243;n de la configuraci&#243;n, el nombre de dominio
+del controlador de dominio puede ser distinto del nombre de dominio de
+OpenSSO.</p>
+
+<a name="ghbcq2"></a><h5>Principal del servicio Kerberos</h5>
+<p>Especifica el principal de Kerberos como el propietario del token de seguridad
+generado.</p><p>Use el siguiente formato: </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> y <tt>domainame</tt> representan el nombre de host y el nombre de
+dominio de la instancia de OpenSSO. <tt>dc_domain_name </tt> es el dominio de Kerberos
+en el que reside el servidor Windows Kerberos (controlador de dominio). Es
+posible que el servidor de Kerberos sea diferente al nombre de dominio
+de la instancia de OpenSSO.</p>
+
+<a name="ghbae2"></a><h5>Archivo de ficha de claves Kerberos</h5>
+<p>Este atributo especifica el archivo Keytab de Kerberos que se utiliza para
+emitir el token. Puede utilizar el siguiente formato, aunque no es necesario:</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> es el nombre de host de la instancia de OpenSSO.</p>
+
+<a name="ghbep2"></a><h5>Verificar firma Kerberos</h5>
+<p>Si se habilita, este atributo indica que se ha firmado el token
+de Kerberos.</p>
+
+<a name="ghawg"></a><h5>Asignaci&#243;n de atributos de SAML</h5>
+
+<hr><p><b>Nota &#8211; </b>Todos los siguientes atributos relacionados con SAML deben utilizarse en la configuraci&#243;n
+en la que la instancia actual del servicio de token de seguridad
+se ha especificado como proveedor de servicios web y recibe un token
+SAML generado desde otra instancia del servicio de token de seguridad.</p>
+<hr>
+<p>Esta configuraci&#243;n representa un atributo SAML que necesita generarse como instrucci&#243;n de
+atributo durante la creaci&#243;n de aserci&#243;n SAML por el servicio de token
+de seguridad para un proveedor de servicios web. El formato es <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>.</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> es el nombre de atributo SAML de una aserci&#243;n SAML procedente
+de una solicitud de servicio web entrante. <tt></tt><i>Real_attr_name</i><tt></tt> es el nombre de
+atributo que se recupera del SSOToken autenticado o del dep&#243;sito de identidad.</p>
+
+<a name="ghawn"></a><h5>Asignador de Id. de nombre</h5>
+<p>El asignador de Id. de nombre de SAML para una aserci&#243;n que
+se genera para el servicio de token de seguridad.</p>
+
+<a name="ghavl"></a><h5>Debe incluir los miembros</h5>
+<p>Si se habilita, la aserci&#243;n generada contiene miembros de usuario como atributos
+SAML. </p>
+
+<a name="ghawo"></a><h5>Nombre de espacio de atributo</h5>
+<p>Define el nombre de espacio de atributo de SAML para una aserci&#243;n
+que se genera para el servicio de token de seguridad.</p>
+
+<a name="ghauj"></a><h5>Emisores de confianza</h5>
+<p>Define una lista de los emisores de confianza para enviar tokens de
+seguridad a OpenSSO. OpenSSO debe verificar si el token de seguridad se
+ha enviado desde uno de estos emisores. </p>
+
+<a name="ghavy"></a><h5>Direcciones IP de confianza</h5>
+<p>Define una lista de direcciones IP de confianza para enviar tokens de
+seguridad a OpenSSO. OpenSSO debe verificar si el token de seguridad se
+ha enviado desde uno de estos hosts. </p>
+<br/>
+
+</body>
+</html>

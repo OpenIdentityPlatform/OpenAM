@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wsc-summary-sign-encrypt.xhtml,v 1.2 2009/10/16 19:38:45 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ice:panelGroup>
+        <ice:panelGrid columns="1" styleClass="summary-strings">
+            <ice:panelGroup 
+                visible="#{summary.wscCreateWizardBean.usingSts}"
+                style="margin-bottom: 10px;">
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.stsSettings']}" />
+                <ice:panelGrid columns="2">
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.affectedElementsLabel']}" />
+                <ice:outputText value="#{summary.formattedStsMessageFlags}" />
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.encryptionLabel']}" />
+                <ice:outputText value="#{summary.formattedStsEncryption}" />
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.privateKeyAliasLabel']}" />
+                <ice:outputText value="#{summary.stsPrivateKeyAlias}" />
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.publicKeyAliasLabel']}" />
+                <ice:outputText value="#{summary.stsPublicKeyAlias}" />
+                </ice:panelGrid>
+            </ice:panelGroup>
+            <ice:panelGroup>
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.wscSettings']}" />
+                <ice:panelGrid columns="2">
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.affectedElementsLabel']}" />
+                <ice:outputText value="#{summary.formattedWscMessageFlags}" />
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.encryptionLabel']}" />
+                <ice:outputText value="#{summary.formattedWscEncryption}" />
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.privateKeyAliasLabel']}" />
+                <ice:outputText value="#{summary.wscPrivateKeyAlias}" />
+                <ice:outputText value="#{resources['wsc-summary-sign-encrypt.publicKeyAliasLabel']}" />
+                <ice:outputText value="#{summary.wscPublicKeyAlias}" />
+                </ice:panelGrid>
+            </ice:panelGroup>
+
+        </ice:panelGrid>
+    </ice:panelGroup>
+</span>

@@ -1,0 +1,46 @@
+DIESER LEISTUNGSANSPRUCH UND DIE DAZUGEHÖRIGE(N) RECHNUNG(EN) SIND DER BELEG FÜR DEN KAUF VON LIZENZRECHTEN FÜR DIE HIER AUFGEFÜHRTE SUN-SOFTWARE GEMÄSS DEN BEDINGUNGEN DER SOFTWARE-LIZENZVEREINBARUNG ("SLV").
+
+Datum des Inkrafttretens:  Rechnungsdatum plus 5 Geschäftstage.
+
+Name von Lizenznehmer/Firma:  Entsprechend den jeweiligen Rechnungen.
+
+Software: OpenSSO Enterprise 8.  
+
+Bestellnummer(n):  OPS1F-LCO-9929, OPS2F-LCO-9929, OPS3F-LCO-9929, OPS4F-LCO-9929, OPS5F-LCO-9929, OPS6F-LCO-9929
+
+Lizenzdauer: Unbegrenzt (unterliegt Beendigungsbestimmungen gemäß SLV).
+
+Lizenzierte Einheit: Die lizenzierte Einheit für die Software gilt pro Benutzer, wobei "Benutzer" für eine Einzelperson (keine Gesellschaft oder andere Rechtssubjekte) steht, die zum Zugriff auf die Software gemäß den von der Software aufgezeichneten Berechtigungsnachweisen berechtigt ist.
+
+Anzahl der lizenzierten Einheiten:  Entsprechend den jeweiligen Rechnungen.
+
+Genehmigte Verwendung: Sie sind berechtigt, die Software unter Einhaltung der nachfolgend aufgeführten zusätzlichen Vertragsbedingungen für eigene kommerzielle, Forschungs- und Lehr-Zwecke oder zum Anbieten von Diensten zu nutzen. 
+
+Zusätzliche Bedingungen: 
+
+(1) Sun gewährt Ihnen eine Lizenz zur Nutzung von OpenSSO in Übereinstimmung mit der Common Development and Distribution License Version 1.0 ("CDDL"). Ihre Verwendung von OpenSSO unterliegt ausschließlich der CDDL, und diese Lizenzvereinbarung und der Leistungsanspruch oder etwaige sonstige maßgebliche Bestimmungen, denen Sie zugestimmt haben, sind nicht gültig. Den Wortlaut der CDDL finden Sie unter http://www.sun.com/cddl/cddl.html. 
+
+(2) Sie können einen Support-Plan erwerben, der sowohl die Software als auch OpenSSO gemäß der Definition in der Service-Liste unter http://www.sun.com/service/servicelist/ abdeckt. 
+
+(3) Sie dürfen keine Dienste für verbundene Unternehmen betreuen, es sei denn, deren Mitarbeiter sind in Ihrer Anzahl an lizenzierten Einheiten enthalten. "Verbundene Unternehmen" sind juristische Personen, über die Sie eine Führungskontrolle ausüben, oder die mit Ihnen einer gemeinsamen Kontrolle unterliegen, oder die eine Führungskontrolle über Sie ausüben.
+
+(4) Regierungseinheiten sind nicht zur Dienstanbieter-Verwendung berechtigt.
+
+(5) Sie dürfen die Sample-Java-Klassen, Header-Dateien, Klassenbibliotheken, Quelldateien und Datendateien, die in der Software enthalten sind (ganz oder Teile daraus, den "Entwicklungscode") ausschließlich zur Erstellung und Verteilung von Programmen als Schnittstelle für die APIs, SPIs und SDKs der Software verwenden.  Sie dürfen den Entwicklungscode nicht verändern.
+
+(6) Sie dürfen die Vorlagen-Java Server Pages der Administrationskonsole, die Vorlagen-Java Server Pages der Authentifizierungs-Benutzeroberfläche sowie die in der Software enthaltenen XML-Dateien (alle oder einen Teil der "Dateien der grafischen Oberfläche") ausschließlich zur Erstellung von Anpassungen verwenden, die für die Zusammenarbeit mit der Software und Erweiterung der beabsichtigten Umgebung zur Verwendung der Software konzipiert sind. 
+
+(7) Sie verpflichten sich dazu, Sun sowie seine Lizenzgeber gegenüber Forderungen nach einer Schadensbehebung oder Entschädigungen aus Forderungen schadlos zu halten, die aus der Ausübung Ihrer Rechte gemäß der Zusätzlichen Bedingungen 5 und 6 oben entstanden sind, einschließlich aber nicht beschränkt auf Forderungen infolge eines Ausfalls der Leistung oder Funktionsfähigkeit der Software in Fällen, in denen ein solcher Ausfall mit der Ausübung dieser Rechte verbunden ist.
+
+(8) Gemäß dieses Leistungsanspruchs dürfen Sie die Federation Management-Funktionalität ausschließlich zum Zwecke des Austauschs von Sicherheitsbestätigungen mit Identitätsanbietern verwenden.
+
+(9) Gemäß dieses Leistungsanspruchs dürfen Sie Sun Java System Directory Server Enterprise Edition ("DSEE") und OpenDS Standard Edition ("OpenDS") verwenden zum Speichern von:  
+
+(a) maximal eintausend (1.000) Einträgen, ausschließlich zum Speichern von Benutzernamen, Passwörtern und Gruppen-IDs, auf die durch die Funktionen der Software zur Benutzerauthentifizierung und Autorisierung zugegriffen wird; 
+
+(b) maximal eintausend (1.000) Einträgen zum Speichern der für die Software erforderlichen Konfigurationsinformationen.  
+
+Die Speicherung von Informationen (einschließlich ohne Einschränkung Kontaktinformationen und Benutzereinstellungen), sofern nicht anderweitig ausdrücklich in diesem Leistungsanspruch vorgesehen, oder der Zugriff auf DSEE oder OpenDS über andere Softwareprodukte auf eigenständiger Basis erfordern den Erwerb eines angemessenen Leistungsanspruch für DSEE oder OpenDS.
+
+(10) Für die in der Zusätzlichen Bedingung 9 vorgesehenen Zwecke sind unter "Einträge" jeweils ein einzelner Distinguished Name (DN) und die mit diesem verbundenen Attribute zu verstehen.
+

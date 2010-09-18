@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>검색 서비스 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>검색 서비스</h3>
+<a name="indexterm-119"></a><p>Identity 데이터 액세스의 첫 단계는 정보가 있는 위치를 결정하는 것입니다. 예를 들어
+기본의 신용 카드 정보가 보관된 Identity 서비스나 기본의 달력 서비스가 저장된 서버
+등을 결정합니다. 일반적으로 네트워크에는 다른 엔티티가 Identity 데이터에 대한 작업을 수행할 때
+사용할 수 있는 하나 이상의 서비스가 있습니다. 클라이언트는 이런 서비스를 추적하지 않거나
+신뢰할 수 있는 서비스를 알지 못하므로 검색 서비스가 필요합니다. <b>검색 서비스</b>는 기본적으로 검색
+자원에 대한 웹 서비스 인터페이스입니다. <b>검색 자원</b>은 자원 오퍼링의 레지스트리입니다. <b>자원 오퍼링</b>은 Identity 데이터와
+해당 데이터에 대한 액세스를 제공하는 서비스 인스턴스 간의 연관을 정의합니다. <b>자원 식별자</b>는 특정
+검색 자원을 가리키는 고유한 자원 식별자(URI)이며 검색 서비스와 함께 등록됩니다. 클라이언트는 일부
+데이터 유형에 대한 요청을 보낼 때 OpenSSO 검색 서비스가 요청된 속성의 웹
+서비스 공급자를 찾는 데 사용하는 자원 식별자를 함께 보냅니다. 검색 서비스는 데이터를
+찾는 데 필요한 정보가 포함된 자원 오퍼링을 반환합니다.</p>
+<hr><p><b>주 &#8211; </b>액세스하기 위해서는 리버티 개인 프로필 서비스의 호스팅 공급자가 각 Identity 기본을 대신하여
+검색 서비스에 등록되어야 합니다.</p>
+<hr>
+<p>다음의 검색 서비스 전역 속성을 구성하여 구현할 수 있습니다.</p>
+<ul><li><p><a href="dsproviderid.html">공급자 아이디</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">지원되는 인증 기법</a></p></li>
+<li><p><a href="supporteddirectives.html">지원되는 지시문</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">검색 조회에 대한 정책 평가</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">검색 업데이트에 대한 정책 평가</a></p></li>
+<li><p><a href="authorizerpluginclass.html">인증자 플러그인 클래스</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">항목 처리기 플러그인 클래스</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">자원 아이디 매퍼 플러그인 클래스 </a></p></li>
+<li><p><a href="authresponsemessage.html">응답 메시지 인증</a></p></li>
+<li><p><a href="generatesessioncontext.html">부트스트랩용 세션 컨텍스트 문</a></p></li>
+<li><p><a href="encryptnameidentifier.html">부트스트랩용 세션 컨텍스트에서 NameIdentifier 암호화</a></p></li>
+<li><p><a href="useimpliedresource.html">함축된 자원</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">부트스트랩용 자원 오퍼링</a></p></li></ul>
+<p>검색 서비스 구성과 연관된 작업은 다음과 같습니다.</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">부트스트랩용 자원 오퍼링 구성</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">서비스 설명 구성</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

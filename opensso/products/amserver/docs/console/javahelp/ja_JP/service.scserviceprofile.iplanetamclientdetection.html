@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>クライアントディテクション - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>クライアントディテクション</h4>
+<p><a name="indexterm-200"></a>認証プロセスの初期のステップでは、HTTP(S) 要求を行なっているクライアントの種類が識別されます。OpenSSO のこの機能は、クライアントディテクションと呼ばれます。クライアントの特性を取得するために、URL 情報が使用されます。この特性に基づいて、適切な認証ページが返されます。たとえば、Netscape ブラウザ経由で Web ページを要求した場合、OpenSSO 8.0 は HTML ログインページを表示します。ユーザーの検証が完了すると、そのクライアントタイプ (Netscape
+ブラウザ) がセッショントークンに追加されます。クライアントディテクションサービスに定義されている属性は、グローバル属性です。</p>
+<ul><li><p><a href="#fxcei">「クライアントタイプ」</a></p></li>
+<li><p><a href="#fxbxh">「デフォルトクライアントタイプ」</a></p></li>
+<li><p><a href="#fxccp">「クライアントディテクションクラス」</a></p></li>
+<li><p><a href="#fxbvy">「クライアントディテクション」</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>クライアントタイプ</h5>
+<p>クライアントタイプをディテクトするには、OpenSSO がその識別特性を認識する必要があります。これらの特性によって、クライアントデータの形式でサポートされているすべてのタイプのプロパティーが識別されます。この属性により、クライアントマネージャーインタフェースを通じてクライアントデータを変更できます。クライアントマネージャーにアクセスするには、「編集」リンクをクリックします。初期状態では、OpenSSO のクライアントタイプには次のタイプがあります。</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>これらのクライアントタイプについては、<a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a> を参照してください。</p>
+
+<a name="gciwk"></a><h5>クライアントマネージャー</h5>
+<p><a name="indexterm-201"></a>クライアントマネージャーは、ベースクライアント、スタイル、関連プロパティーを一覧表示するインタフェースであり、デバイスの追加と設定を行うことができます。ベースクライアントタイプが、クライアントマネージャーの最上部に一覧表示されます。これらのクライアントタイプには、クライアントタイプに属するすべてのデバイスが継承できるデフォルトプロパティーが含まれます。</p>
+
+<a name="gcivx"></a><h5>クライアントタイプ</h5>
+<p>スタイルプロファイル。クライアントマネージャーは、「基本のクライアントタイプ」自体を含む利用可能なすべてのクライアントを「クライアントタイプ」リストにグループ化します。各クライアントのプロパティーは、デバイス名をクリックすると変更することができます。プロパティーが「クライアント編集」ウィンドウに表示されます。プロパティーを編集するには、プルダウンリストから次の分類を選択します。</p><dl><dt>ハードウェアプラットフォーム</dt>
+<dd><p>表示サイズ、サポートされている文字セットなどのデバイスのハードウェアプロパティーです。</p></dd>
+<dt>ソフトウェアプラットフォーム</dt>
+<dd><p>デバイスのアプリケーション環境、オペレーティングシステム、およびインストールされているソフトウェアのプロパティーです。 </p></dd>
+<dt>ネットワーク特性</dt>
+<dd><p>サポートされているベアラーなどのネットワーク環境を説明するプロパティーです。</p></dd>
+<dt>ブラウザユーザーエージェント</dt>
+<dd><p>デバイス上で実行するブラウザユーザーエージェントに関連する属性です。</p></dd>
+<dt>WAP 特性</dt>
+<dd><p>デバイスがサポートする WAP (Wireless Application Protocol) 環境のプロパティーです。</p></dd>
+<dt>Push 特性名</dt>
+<dd><p>デバイスがサポートする WAP 環境のプロパティーです。</p></dd>
+<dt>追加プロパティー</dt>
+<dd><p>デバイスがサポートする WAP (Wireless Application Protocol) 環境のプロパティーです。</p></dd>
+</dl>
+
+<hr><p><b>注 &#8211; </b>具体的なプロパティーの定義については、次の場所にある Open Mobile Alliance Ltd. (OMA) の『Wireless Application Protocol, Version 20-Oct-2001』を参照してください。<b></b></p><p>このドキュメントにアクセスするには、まず WAP Forum<sup>TM</sup> に登録する必要があります。詳細については、<a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm</a> を参照してください。</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>デフォルトクライアントタイプ</h5>
+<p>この属性は、クライアントタイプ属性のクライアントタイプのリストの中からデフォルトクライアントタイプを定義します。デフォルトは genericHTML です。</p>
+
+<a name="fxccp"></a><h5>クライアントディテクションクラス</h5>
+<p>この属性は、クライアントディテクション要求のすべてが送信されるクライアントディテクションクラスを定義します。この属性によって返される文字列は、クライアントタイプ属性に指定されているクライアントタイプのいずれかと一致します。デフォルトのクライアントディテクションクラスは <tt>com.sun.mobile.cdm.FEDIClientDetector</tt> です。OpenSSO には、<tt>com.iplanet.services.cdm.ClientDetectionDefaultImpl</tt> も含まれています。</p>
+
+<a name="fxbvy"></a><h5>クライアントディテクション</h5>
+<p>クライアントディテクション機能を有効にします。クライアントディテクションが有効になっている場合 (デフォルト)、すべての要求はクライアントディテクションクラス属性で指定されているクラスを使って送信されます。デフォルトでは、クライアントディテクション機能は有効になっています。この属性が選択されていない場合は、OpenSSO では、クライアントが genericHTML で、HTML ブラウザからアクセスしているものと判断されます。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN</h4>
+<p><a name="indexterm-177"></a>Das Authentifizierungsmodul "Mobile Station Integrated Services Digital Network (MSISDN)" erm&#246;glicht die Authentifizierung
+mithilfe einer Mobilabonnenten-ISDN, die einem Mobiltelefon oder einem &#228;hnlichen Ger&#228;t zugeordnet ist.
+Es handelt sich dabei nicht um ein interaktives Modul. Das Modul erh&#228;lt
+die Abonnenten-ISDN und &#252;berpr&#252;ft diese anhand des Directory Server, um einen mit
+der Nummer &#252;bereinstimmenden Benutzer zu suchen. Bei den Attributen f&#252;r die MSISDN-Authentifizierung
+handelt es sich um Bereichsattribute. Zu den MSISDN-Authentifizierungsattributen z&#228;hlen folgende Attribute:</p>
+<ul><li><p><a href="#fumxe">Vertrauensw&#252;rdige Gateway-IP-Adresse</a></p></li>
+<li><p><a href="#fumxg">MSISDN-Nummernargument</a></p></li>
+<li><p><a href="#fumxf">LDAP-Server und -Anschluss</a></p></li>
+<li><p><a href="#fumxi">LDAP-DN f&#252;r Start der Suche</a></p></li>
+<li><p><a href="#fumxk">Attribut f&#252;r Durchsuchen von LDAP</a></p></li>
+<li><p><a href="#fumxl">Principal-Benutzer f&#252;r LDAP-Server</a></p></li>
+<li><p><a href="#fumxn">Principal-Passwort f&#252;r LDAP-Server</a></p></li>
+<li><p><a href="#fumxm">Principal-Passwort f&#252;r LDAP-Server (Best&#228;tigung)</a></p></li>
+<li><p><a href="#fumxo">SSL f&#252;r LDAP-Zugriff aktivieren</a></p></li>
+<li><p><a href="#fumxp">Zum Abrufen des Benutzerprofils verwendetes LDAP-Attribut</a></p></li>
+<li><p><a href="#fumxr">Benutzer-DN bei Authentifizierung zur&#252;ckgeben</a></p></li>
+<li><p><a href="#fumxs">Authentifizierungsebene</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>Vertrauensw&#252;rdige Gateway-IP-Adresse</h5>
+<p>Gibt eines Liste mit IP-Adressen von vertrauensw&#252;rdigen Clients an, die Zugriff auf
+das MSISDN-Modul haben. You can set the IP addresses of all clients
+allows to access the MSISDN module by entering the address (for example,
+<tt>123.456.123.111</tt>) in the entry field and clicking Add. By default, the list
+is empty. Wenn das Attribut leer ist, wird der Zugriff f&#252;r alle
+Clients erlaubt. Wenn Sie ";Keine" angeben, ist der Zugriff f&#252;r keinen der
+Clients erlaubt.</p>
+
+<a name="fumxg"></a><h5>MSISDN-Nummernargument</h5>
+<p>Gibt eine Liste mit Parameternamen an, nach denen im Anforderungs- oder Cookie-Header
+bei der Suche nach der MSISDN gesucht wird. Wenn Sie beispielsweise <i>x-Cookie-Param</i>,
+<i> AM_NUMBER</i> und <i>COOKIE-ID</i> festlegen, suchen die MSISDN-Authentifizierungsdienste anhand dieser Parameter nach der
+MSISDN-Nummer.</p>
+
+<a name="fumxf"></a><h5>LDAP-Server und -Anschluss</h5>
+<p>Gibt den Hostnamen und die Anschlussnummer f&#252;r den Directory Server an, auf
+dem die Suche nach Benutzern mit einer MSISDN durchgef&#252;hrt wird. Das Format
+lautet <tt></tt><i> hostname:port</i><tt></tt>. Wenn keine Portnummer angegeben wurde, kann in der Regel <tt>389</tt>
+verwendet werden.</p><p>Wenn Sie OpenSSO in mehreren Dom&#228;nen bereitstellen, k&#246;nnen Sie den Kommunikationslink zwischen
+bestimmten Instanzen von OpenSSO und Directory Server in folgendem Format angeben (bei
+Mehrfacheingaben muss der Name des lokalen Servers vorangestellt werden):</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>Wenn beispielsweise zwei OpenSSO-Instanzen an unterschiedlichen Standorten bereitgestellt wurden (L1-machine1-IS und L2-
+machine2-IS), die mit unterschiedlichen Instanzen von Directory Server kommunizieren (L1-machine1-DS und L2-machine2-DS),
+w&#252;rde dies wie folgt aussehen:</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fumxi"></a><h5>LDAP-DN f&#252;r Start der Suche</h5>
+<p>Gibt den DN des Knotens an, bei dem die Suche nach der
+MSISDN eines Benutzers beginnen soll. Es gibt keinen Standardwert. Das Feld erkennt
+jede beliebige g&#252;ltige DN. Bei Mehrfacheingaben muss der lokale Servername vorangestellt werden.
+Das Format lautet <tt></tt><i>servername|search dn</i><tt></tt>.</p><p>F&#252;r Mehrfacheingaben:</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>Wenn unter der Root-Organisation mehrere Eintr&#228;ge mit derselben Benutzer-ID vorhanden sind, sollte
+dieser Parameter so festgelegt werden, dass nur nach einem einzigen Eintrag zur
+Authentifizierung gesucht bzw. nur ein einziger gefunden werden kann. Wenn beispielsweise die
+Agenten-ID und die Benutzer-ID unter der Root-Organisation identisch sind, sollte dieser Parameter
+<tt>ou=Agents</tt> (f&#252;r die Authentifizierung der Root-Organisation mithilfe der Agenten-ID) und <tt>ou=People, </tt> (f&#252;r
+die Authentifizierung der Root-Organisation mithilfe der Benutzer-ID) lauten.</p>
+
+<a name="fumxk"></a><h5>Attribut f&#252;r Durchsuchen von LDAP</h5>
+<p>Gibt den Namen des Attributs im Benutzerprofil an, der die MSISDN enth&#228;lt,
+anhand der ein bestimmter Benutzer gesucht werden soll. Der Standardwert lautet <i> sunIdentityMSISDNNumber</i>.
+Dieser Wert sollte nicht ge&#228;ndert werden. &#196;ndern Sie den Wert nur dann,
+wenn Sie sicher sind, dass ein anderen Attribut im Benutzerprofil die selbe
+MSISDN enth&#228;lt.</p>
+
+<a name="fumxl"></a><h5>Principal-Benutzer f&#252;r LDAP-Server</h5>
+<p>Gibt die DN f&#252;r den BIND-Vorgang mit LDAP an, um die MSISDN-Suche
+im Directory Server zu erm&#246;glichen. Die standardm&#228;&#223;ige BIND-DN lautet <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com </tt>.</p>
+
+<a name="fumxn"></a><h5>Principal-Passwort f&#252;r LDAP-Server</h5>
+<p>Gibt das LDAP-BIND-Passwort f&#252;r die BIND-DN an, wie in ";Principal-Benutzer f&#252;r LDAP-Server"
+angegeben.</p>
+
+<a name="fumxm"></a><h5>Principal-Passwort f&#252;r LDAP-Server (Best&#228;tigung)</h5>
+<p> Best&#228;tigen Sie das Passwort.</p>
+
+<a name="fumxo"></a><h5>SSL f&#252;r LDAP-Zugriff aktivieren</h5>
+<p>Aktiviert den SSL-Zugriff auf den im Attribut ";LDAP-Server und -Anschluss" angegebenen Directory
+Server. Der SSL-Zugriff ist standardm&#228;&#223;ig nicht aktiviert und das SSL-Protokoll wird f&#252;r
+den Zugriff auf den Directory Server nicht verwendet. Wenn dieses Attribut jedoch
+aktiviert ist, k&#246;nnen Sie den BIND-Vorgang zu einem Nicht-SSL-Server durchf&#252;hren.</p>
+
+<a name="fumxp"></a><h5>Zum Abrufen des Benutzerprofils verwendetes LDAP-Attribut</h5>
+<p>Gibt die Header an, die bei der Suchanforderung nach der MSISDN verwendet
+wird. Folgende Werte werden unterst&#252;tzt:</p><dl><dt>Cookie-Header</dt>
+<dd><p>F&#252;hrt die Suche in dem Cookie aus.</p></dd>
+<dt>Anforderungsheader</dt>
+<dd><p>F&#252;hrt die Suche im Anforderungsheader aus. </p></dd>
+<dt>Anforderungsparameter</dt>
+<dd><p>F&#252;hrt die Suche im Anforderungsparameter aus. Standardm&#228;&#223;ig sind alle Optionen ausgew&#228;hlt.</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>Benutzer-DN bei Authentifizierung zur&#252;ckgeben</h5>
+<p>Wenn das OpenSSO-Verzeichnis mit dem f&#252;r MSDISN konfigurierten Verzeichnis &#252;bereinstimmt, ist diese
+Option m&#246;glicherweise aktiviert. Wenn diese Option aktiviert ist, l&#228;sst das Authentifizierungsmodul die
+R&#252;ckgabe des DN anstelle der Benutzer-ID zu, sodass kein Suchlauf erforderlich ist.
+Normalerweise gibt ein Authentifizierungsmodul nur die Benutzer-ID zur&#252;ck, und der Authentifizierungsdienst sucht
+im lokalen OpenSSO nach dem Benutzer. Wenn eine externes Verzeichnis verwendet wird,
+ist diese Option &#252;blicherweise deaktiviert.</p>
+
+<a name="fumxs"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Hinweis: Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut
+<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a> angegebene Wert verwendet.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

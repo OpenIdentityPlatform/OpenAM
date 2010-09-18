@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-FF 服務配置 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Liberty ID-FF 服務配置</h4>
+
+
+<a name="ggogr"></a><h5>聯合 Cookie 名稱</h5>
+<p>此屬性會指定 ID-FF 服務 Cookie 的名稱。Cookie 用於記住使用者是否已經聯合。</p>
+
+<a name="ggohk"></a><h5>IDP 代理程式尋找器 SPI 實作類別</h5>
+<p>此屬性指定用於尋找要代理的喜好身份識別提供者的實作類別。</p>
+
+<a name="ggogp"></a><h5>請求快取清除間隔</h5>
+<p>此屬性指定 ID-FF 內部請求清除執行緒的清除間隔 (以秒為單位)。</p>
+
+<a name="ggoii"></a><h5>請求快取逾時</h5>
+<p>此屬性指定 ID-FF 認證請求的逾時值 (以秒為單位)。任何 <tt>AuthnRequest</tt> 物件只要超過逾時值，就會從記憶體中清除。</p>
+
+<a name="ggofu"></a><h5>IDP 登入 URl</h5>
+<p>此屬性指定登入 URL，如果處理認證請求時找不到有效的階段作業，則會將 IDP 重新導向至此登入 URL。如果未指定金鑰，則會使用預設的登入 URL。</p>
+
+<a name="ggoih"></a><h5>XML 登入</h5>
+<p>此屬性指定 Liberty 請求和回應的簽名驗證層級。</p>
+<br/>
+
+</body>
+</html>

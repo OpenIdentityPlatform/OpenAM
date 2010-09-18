@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>使用者 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamuserservice"></a><h4>使用者</h4>
+<p><a name="indexterm-198"></a>預設使用者喜好設定是透過使用者服務來定義的。這些喜好設定包括時區、語言環境及 DN 啟動檢視。使用者服務屬性是動態屬性。</p>
+<ul><li><p><a href="#fxckn">使用者喜好的語言</a></p></li>
+<li><p><a href="#fxcnb">使用者喜好的時區</a></p></li>
+<li><p><a href="#fxcte">繼承的語言環境</a></p></li>
+<li><p><a href="#fxcpk">管理員啟動檢視</a></p></li>
+<li><p><a href="#fxciz">預設使用者狀態</a></p></li></ul>
+
+
+<a name="fxckn"></a><h5>使用者喜好的語言</h5>
+<p>此欄位會指定使用者對 OpenSSO 主控台中所顯示文字語言的選擇。預設值為 en。此值會將本土化鍵集對映至使用者階段作業，從而螢幕文字會以適於使用者使用的語言顯示。</p>
+
+<a name="fxcnb"></a><h5>使用者喜好的時區</h5>
+<p>此欄位會指定使用者存取 OpenSSO 主控台時所處的時區。此欄位沒有預設值。</p>
+
+<a name="fxcte"></a><h5>繼承的語言環境</h5>
+<p>此欄位指定使用者的語言環境。預設值為 en_US。請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得語言環境的清單。</p>
+
+<a name="fxcpk"></a><h5>管理員啟動檢視</h5>
+<p>如果使用者是 OpenSSO 管理員，此欄位指定的節點是使用者登入時 OpenSSO 主控台中顯示的啟動點。此欄位沒有預設值。可以使用該使用者至少具有讀取權限的有效 DN。</p>
+
+<a name="fxciz"></a><h5>預設使用者狀態</h5>
+<p>此選項指示任何新建使用者的預設狀態。此狀態會由「使用者項目」狀態取代。僅有使用中的使用者可透過 OpenSSO 認證。預設值為使用中。可以從下拉式功能表中選取以下任一選項：</p><dl><dt>使用中</dt>
+<dd><p>使用者可透過 OpenSSO 認證。</p></dd>
+<dt>非使用中</dt>
+<dd><p>使用者無法透過 OpenSSO 進行認證，但使用者設定檔仍儲存在該目錄。</p></dd>
+</dl>
+<p>個別使用者狀態的設定方法如下：註冊使用者服務，選擇此值並將其套用於某種角色，然後將此角色增加到使用者設定檔。</p>
+<br/>
+
+</body>
+</html>

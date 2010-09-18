@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>Este m&#243;dulo permite a los usuarios autenticarse mediante los servidores de autenticaci&#243;n
+SafeWord o SafeWord PremierAccess de Secure Computing. Los atributos de autenticaci&#243;n de
+SafeWord son atributos de dominio. Los atributos son:</p>
+<ul><li><p><a href="#fwafv">Servidor</a></p></li>
+<li><p><a href="#fwajv">Directorio de archivos de verificaci&#243;n del servidor</a></p></li>
+<li><p><a href="#fwarb">Activar registro</a></p></li>
+<li><p><a href="#fwahi">Nivel de registro</a></p></li>
+<li><p><a href="#fwabd">Archivo de registro</a></p></li>
+<li><p><a href="#fwacu">Tiempo de espera de conexi&#243;n de autenticaci&#243;n</a></p></li>
+<li><p><a href="#fwanv">Tipo de cliente</a></p></li>
+<li><p><a href="#fwafs">Versi&#243;n EASSP</a></p></li>
+<li><p><a href="#fwaob">Fortaleza m&#237;nima del autenticador</a></p></li>
+<li><p><a href="#fwatz">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>Servidor</h5>
+<p>Especifica el puerto y nombre del servidor SafeWord o SafeWord PremiereAccess. El
+puerto 7482 se define como el predeterminado para un servidor SafeWord. El
+n&#250;mero de puerto predeterminado para un servidor SafeWord PremierAccess es 5030.</p>
+
+<a name="fwajv"></a><h5>Directorio de archivos de verificaci&#243;n del servidor</h5>
+<p>Especifica el directorio en el que la biblioteca de cliente SafeWord incluye
+sus archivos de verificaci&#243;n. El valor predeterminado es el siguiente:</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>Si se especifica un directorio distinto en este campo, el directorio debe
+existir antes de intentar la autenticaci&#243;n con SafeWord.</p>
+
+<a name="fwarb"></a><h5>Activar registro</h5>
+<p>Habilita el registro de SafeWord. El registro de SafeWord est&#225; habilitado de
+forma predeterminada.</p>
+
+<a name="fwahi"></a><h5>Nivel de registro</h5>
+<p>Especifica el nivel de registro de SafeWord. Seleccione un nivel en el
+men&#250; desplegable. Los niveles son DEBUG (depurar), ERROR, INFO y NONE (ninguno).</p>
+
+<a name="fwabd"></a><h5>Archivo de registro</h5>
+<p>Especifica la ruta del directorio y el nombre de archivo de registro
+para el registro de cliente SafeWord. La ruta predeterminada es <tt>/var/opt/SUNWam/auth/safeword/safe.log</tt>.</p><p>Si se especifica un nombre de archivo o ruta distinta, debe existir
+antes de intentar la autenticaci&#243;n con SafeWord. Si se configuran varios dominio
+para la autenticaci&#243;n de SafeWord, y se utilizan diferentes servidores SafeWord, entonces
+se deben especificar las distintas rutas o s&#243;lo el primer dominio en
+el que se realizar&#225; la autenticaci&#243;n con SafeWord. Igualmente, si un dominio
+cambia los servidores SafeWord, el archivo <tt>swec.dat</tt> incluido en el directorio especificado
+debe eliminarse antes de que se realicen las autenticaciones en el nuevo
+servidor SafeWord configurado.</p>
+
+<a name="fwacu"></a><h5>Tiempo de espera de conexi&#243;n de autenticaci&#243;n</h5>
+<p>Define el per&#237;odo de tiempo de espera (en segundos) entre el cliente
+SafeWord (OpenSSO) y el servidor SafeWord. El valor predeterminado es 120 segundos.</p>
+
+<a name="fwanv"></a><h5>Tipo de cliente</h5>
+<p>Define el tipo de cliente que utiliza el servidor SafeWord para comunicarse
+con los distintos clientes, como Mobile Client, VPN, Fixed Password, Challenge/Response, etc.</p>
+
+<a name="fwafs"></a><h5>Versi&#243;n EASSP</h5>
+<p>Este atributo especifica la versi&#243;n del protocolo de firma &#250;nica y autenticaci&#243;n
+ampliada (EASSP). Este campo acepta las versiones del protocolo est&#225;ndar (101), de
+acceso premier cifrado mediante SSL (200) o de acceso premier (201).</p>
+
+<a name="fwaob"></a><h5>Fortaleza m&#237;nima del autenticador</h5>
+<p>Define la fortaleza m&#237;nima del autenticador para la autenticaci&#243;n de cliente/ servidor
+con SafeWord. Cada tipo de cliente tiene un valor de autenticador distinto
+y cuanto mayor sea el valor, mayor la fortaleza del autenticador. 20
+es el mayor valor posible, mientras que 0 es el menor valor
+posible.</p>
+
+<a name="fwatz"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

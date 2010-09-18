@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amAuthMembership_addSubSchema.xml,v 1.2 2008/06/25 05:53:26 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+"jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  this file is referenced by:
+
+  amadmin -u "xxx" -w "yyy" -t amAuthMembership_mod.xml
+
+-->
+
+<Requests>
+    <SubSchema name="serverconfig" inheritance="multiple">
+	<AttributeSchema name="iplanet-am-auth-membership-min-password-length"
+	    type="single"
+	    syntax="number"
+	    i18nKey="a101">
+	    <DefaultValues>
+		<Value>8</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-default-roles"
+	    type="list"
+	    syntax="dn"
+	    i18nKey="a102">
+        </AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-default-user-status"
+	    type="single_choice"   
+	    syntax="string"    
+	    i18nKey="a103">
+	    <ChoiceValues>
+		<ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
+		<ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
+	    </ChoiceValues>
+	    <DefaultValues>
+		<Value>Active</Value> 
+	    </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-server"
+	    type="list"
+	    syntax="string"
+	    i18nKey="a104">
+	    <DefaultValues>
+		<Value>DIRECTORY_SERVER:DIRECTORY_PORT</Value>
+	    </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-server2"
+	    type="list"
+	    syntax="string"
+	    i18nKey="a105">
+	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-base-dn"
+	    type="list"
+	    syntax="dn"
+	    i18nKey="a106">
+    	    <DefaultValues>
+		<Value>NORMALIZED_ORGBASE</Value>
+   	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-bind-dn"
+	    type="single"
+	    syntax="dn"
+	    i18nKey="a107">
+	    <DefaultValues>
+	 	<Value>cn=amldapuser,ou=DSAME Users,NORMALIZED_ORGBASE</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-bind-passwd"
+	    type="single"
+	    syntax="password"
+	    i18nKey="a108">
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-user-naming-attribute"
+	    type="single"
+	    syntax="string"
+	    i18nKey="a109">
+            <DefaultValues>
+		<Value>USER_NAMING_ATTR</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-user-search-attributes"
+	    type="list"
+	    syntax="string"
+	    i18nKey="a110">
+    	    <DefaultValues>
+		<Value>USER_NAMING_ATTR</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-search-filter"
+	    type="single"
+	    syntax="xml"
+	    i18nKey="a111">
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-search-scope"
+	    type="single_choice"
+	    syntax="string"
+	    i18nKey="a112">
+	    <ChoiceValues>
+		<ChoiceValue i18nKey="choiceObject">OBJECT</ChoiceValue>
+	        <ChoiceValue i18nKey="choiceOneLevel">ONELEVEL</ChoiceValue>
+		<ChoiceValue i18nKey="choiceSubTree">SUBTREE</ChoiceValue>
+	    </ChoiceValues>
+	    <DefaultValues>
+		<Value>SUBTREE</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-ssl-enabled"
+	    type="single"
+	    syntax="boolean"
+	    i18nKey="a113">
+	    <DefaultValues>
+		<Value>false</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-return-user-dn"
+	    type="single"
+	    syntax="boolean"
+	    i18nKey="a114">
+	    <DefaultValues>
+		<Value>true</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-auth-level"
+	    type="single"
+	    syntax="number"
+	    i18nKey="a115">
+	    <DefaultValues>
+		<Value>0</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+        <AttributeSchema name="iplanet-am-auth-membership-invalid-chars"
+	    type="single"
+	    syntax="string"
+	    i18nKey="">
+    	    <DefaultValues>
+		<Value>*|(|)|&amp;|!</Value>
+	    </DefaultValues>
+    	</AttributeSchema>
+    </SubSchema>
+</Requests>

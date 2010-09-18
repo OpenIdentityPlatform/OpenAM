@@ -1,0 +1,1675 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: amAdmin.dtd,v 1.2 2008/06/25 05:52:41 qcheng Exp $
+
+-->
+
+
+<!-- This DTD defines the document structure that will be used by amadmin
+command line tool to provide user management features. This DTD does
+NOT define the service schema deployment features. SMS DTD (sms.dtd) serves that purpose.
+
+Unique Declaration name for DOCTYPE tag: "Sun Java System Access Manager 2006Q3 Admin CLI DTD"
+
+The DTD reflects the structure of the Sun Java System Access Manager SDK. The DTD is
+designed to follow a request-based paradigm. Note that neither the DTD
+nor the amadmin command line tool is meant to fully replicate the
+Admin Console (GUI) functionality available through the amadmin CLI tool. 
+
+The purpose of this DTD and amadmin is to provide bulk 
+processing to create and delete the Sun Java System Access Manager objects.
+-->
+
+<!-- Requests element is the root element of the input XML document to
+amadmin. It must contain at least one child element. The child
+elements are designed to follow an object-oriented model where the
+actual requests are performed on the high level Sun Java System Access Manager objects
+such as Organization, Container, People Container, Role 
+and Group. To enable bulk processing, the root element can take more 
+than one set of requests.
+-->
+
+<!ELEMENT Requests (
+    OrganizationRequests |
+    SchemaRootNodeRequests |
+    SchemaRequests |
+    ServiceConfigurationRequests |
+    ContainerRequests |
+    PeopleContainerRequests |
+    RoleRequests |
+    GroupRequests |
+    UserRequests |
+    ListAccts |
+    RealmRequests |
+    IdentityRequests |
+    DelegationRequests )+
+>
+
+<!-- ======================== OrganizationRequests ===================
+OrganizationRequests element aggregates all the requests that are to
+be perfomed on Organization type objects. To enable bulk processing,
+this element can have one or more child elements. The child elements,
+as suggested by their intuitive names, represent the various requests.
+Note that all the child elements operate on the same instance of
+Organization object. If different Organization objects are to be
+manipulated, different OrganizationRequests elements can be included
+in the root element Requests.
+-->
+<!ELEMENT OrganizationRequests (
+    (CreateSubOrganization)*,
+    (CreateContainer)*,
+    (CreatePeopleContainer)*,
+    (CreateGroupContainer)*,
+    (CreateRole)*,
+    (CreateUser)*,
+    (CreateGroup)*,
+    (CreatePolicy)?,
+    (RegisterServices)?,
+    (ModifySubOrganization)?,
+    (ModifyServiceTemplate)?,
+    (AddServiceTemplateAttributeValues)?,
+    (RemoveServiceTemplateAttributeValues)?,
+    (GetServiceTemplate)?,
+    (DeleteServiceTemplate)?,
+    (ModifyPeopleContainer)?,
+    (ModifyRole)?,
+    (GetSubOrganizations)?,
+    (GetPeopleContainers)?,
+    (GetRoles)?,
+    (GetGroups)?,
+    (GetUsers)?,
+    (CreateServiceTemplate)?,
+    (UnregisterServices)?,
+    (GetRegisteredServiceNames)?,
+    (GetNumberOfServices)?,
+    (DeleteRoles)?,
+    (DeleteGroups)?,
+    (DeletePolicy)?,
+    (CreateEntity)?,
+    (ModifyEntity)?,
+    (DeleteEntities)?,
+    (GetEntities)?,
+    (DeletePeopleContainers)?,
+    (DeleteSubOrganizations)?,
+    (AddSubConfiguration)*,
+    (ModifySubConfiguration)*,
+    (DeleteSubConfiguration)*,
+    (CreateAuthenticationDomain)*,
+    (CreateHostedProvider)*,
+    (CreateRemoteProvider)*,
+    (DeleteAuthenticationDomain)*,
+    (DeleteProvider)*,
+    (GetProvider)*,
+    (GetAuthenticationDomain)*,
+    (ModifyHostedProvider)*,
+    (ModifyRemoteProvider)*,
+    (ModifyAuthenticationDomain)*,
+    (GetPolicies)?
+  )
+>
+
+<!-- The DN attribute of the element, OrganizationRequests, specifies
+the DN of the Organization object on which all of the requests
+(specified by the child elements) shall be made.
+-->
+
+<!ATTLIST OrganizationRequests
+    DN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- Note that CreateSubOrganization element can have zero or more
+AttributeValuePairs.
+-->
+
+<!ELEMENT CreateSubOrganization    (AttributeValuePair)* >
+<!ATTLIST CreateSubOrganization
+    createDN    CDATA    #REQUIRED
+>
+<!ELEMENT AttributeValuePair (Attribute, (Value)*) >
+<!ELEMENT Attribute EMPTY >
+
+<!-- Attribute must be all one word without spaces. Hence, it is
+indicated as NMTOKEN below.
+-->
+
+<!ATTLIST Attribute
+    name    NMTOKEN        #REQUIRED
+>
+<!ELEMENT Value (#PCDATA) >
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreatePeopleContainer (AttributeValuePair)* >
+<!ATTLIST CreatePeopleContainer
+    createDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreateGroupContainer (AttributeValuePair)* >
+<!ATTLIST CreateGroupContainer
+    createDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreateContainer (AttributeValuePair)* >
+<!ATTLIST CreateContainer
+    createDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreateGroup (AttributeValuePair)* >
+<!ATTLIST CreateGroup
+    createDN    CDATA    #REQUIRED
+    groupType   (static|dynamic|assignableDynamic) "static"
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreateServiceTemplate (Service_Name)+ >
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreateRole (AttributeValuePair)* >
+<!ATTLIST CreateRole
+    createDN    CDATA    #REQUIRED
+    roleType    (static|filtered) "static"
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT CreatePolicy (Policy)+ >
+<!ATTLIST CreatePolicy
+    createDN    CDATA    #REQUIRED
+>
+
+
+<!-- Policy is the root element that defines a named policy rule.
+The attribute "name" provides the policy name, "description" gives
+a brief description for the policy, "active" specifies the
+fact whether this policy is currently active or not. Default
+value is "true". If this value is set to "true" only then 
+this policy is considered during policy evaluation.
+"serviceName" identifies the service name for which the policy is
+applicable. The attribute "referralPolicy" is used to flag the
+policy as a referral policy. A referral policy is used for
+delegation. All action/values defined in the referral policy are
+ignored during policy evaluation. Conversely, all referrals
+defined in a non referral policy are ignored during policy
+evaluation.
+The policy element can have one or more rules (Rule)
+and subjects (Subject) to whom the policy is applied. If the
+subject is empty, the policy does not apply any users. 
+Referrals is collection of Referral(s). Referral is used 
+to facilitate delegating policy definition and/or policy evaluation 
+to a different point such as PeerOrg, SubOrg or a custom plugin.
+Conditions is collection of Condition(s). Condition is used 
+to sepcify restrictions such as time range, auth levels 
+for which the policy applies. ResponseProviders are a collection
+of ResponseProvider(s). ResponseProvider is used to specify the
+response attributes which would be returned as part of the PolicyDecision
+provided the policy applies for the given Subject, ResourceName under
+the specified Conditions(s).Conditions, Subjects, ResponseProviders and 
+Referrals are containers.They can have 0 or more elements. 
+It enables modifying the policies such as removing one elment and adding 
+another element to that container in the policy.
+ -->
+
+<!ELEMENT	Policy		( Rule+, Subjects?, Conditions?, Referrals?, ResponseProviders? ) >
+<!ATTLIST	Policy
+	name		CDATA		#REQUIRED
+	description	CDATA		#IMPLIED
+	version		CDATA		"2.0"
+	referralPolicy  (true | false)   "false"
+	active  	(true | false)   "true"
+>
+
+<!-- Rule element defines a policy rule that contains a service
+name, resource name and its action names and corresponding action
+values. The attribute "name" provides a user friendly name for
+the rule. The sub-element "ServiceName" gives the name of the
+service, "ResourceName" give the resource name, and "AttributeValuePair"
+provides the action names and corresponding action values. A rule can be
+defined without any actions. A referral policy rule doesn't have any actions.
+ -->
+<!ELEMENT	Rule		( ServiceName, ResourceName?,
+				  AttributeValuePair*  ) >
+<!ATTLIST	Rule
+	name		CDATA		#REQUIRED
+>
+
+<!-- ServiceName provides the name of the service for which a
+rule has been created. The attribute "name" provides the service
+name. -->
+<!ELEMENT	ServiceName		EMPTY>
+<!ATTLIST	ServiceName
+	name		CDATA		#REQUIRED
+>
+
+<!-- ResourceName provides the name of the resource for which
+a rule has been created. If the service does not have resource,
+this element will not be there for the rule. The attribute "name"
+provides the resoruce name. -->
+<!ELEMENT	ResourceName		EMPTY>
+<!ATTLIST	ResourceName
+	name		CDATA		#REQUIRED
+>
+
+<!-- Subjects element identifies a collection of users, identified
+based on their roles, group membership or by listing individual
+users. The attribute "name" gives a user friendly name for this
+collection of users. The attribute "includeType" is ignored at 
+present.  The policies can be defined without a Subject. 
+For example, referral policy doesn't have a Subject -->
+<!ELEMENT	Subjects	( Subject* ,RealmSubject*) >
+<!ATTLIST	Subjects
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+	includeType	(inclusive | exclusive)  "inclusive"
+>
+
+<!-- Subject element identifies a user collection plugin
+written by the customer, in which the attribute "type" giving
+the plugin name. The attribute "name" gives a user friendly
+name for this instance of the plugin.
+The attribue "includeType" indicates whether the subject is
+a normal (non exclusive) subject or exclusive subject.
+If subject is exclusive, policy applies to users who are not
+members of the  subject.  Otherwise, policy applies to users
+who are members of the subject.   -->
+<!ELEMENT	Subject		( AttributeValuePair? ) >
+<!ATTLIST	Subject
+	name		CDATA		#IMPLIED
+	type		CDATA		#REQUIRED
+        includeType     (inclusive | exclusive)  "inclusive"
+>
+
+
+<!-- RealmSubject element is a reference to a Subject object 
+defined at the realm level.
+The attribue "name" is the name of the Subject object defined
+at the realm.
+The attribue "includeType" indicates whether the subject is
+a normal (non exclusive) subject or exclusive subject.
+If subject is exclusive, policy applies to users who are not
+members of the  subject.  Otherwise, policy applies to users
+who are members of the subject.   -->
+<!ELEMENT	RealmSubject		EMPTY>
+<!ATTLIST	RealmSubject
+	name		CDATA		#IMPLIED
+        includeType     (inclusive | exclusive)  "inclusive"
+>
+
+<!-- Referrals element identifies a collection of referrals. A policy can
+be defined without a referral. This facilitates modification of a referral
+policy such as removing one referral and adding a another referral. -->
+<!ELEMENT	Referrals	( Referral* ) >
+<!ATTLIST	Referrals
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+>
+
+<!-- Referral element identifies a referral. Referral is used 
+to facilitate delegating policy definition and/or policy evaluation 
+to a different point such as PeerOrg, SubOrg or a custom plugin -->
+<!ELEMENT	Referral		( AttributeValuePair ) >
+<!ATTLIST	Referral
+	name		CDATA		#IMPLIED
+	type		CDATA		#REQUIRED
+>
+
+<!-- Conditions element identifies a collection of conditions. The policy can
+be defined without a Condition. For example, referral policy doesn't have
+condition. -->
+<!ELEMENT	Conditions	( Condition* ) >
+<!ATTLIST	Conditions
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+>
+
+<!-- Condition element identifies a condition. Condition is used 
+to specify restrictions such as time range, auth levels 
+for which the policy applies -->
+<!ELEMENT	Condition		( AttributeValuePair* ) >
+<!ATTLIST	Condition
+	name		CDATA		#IMPLIED
+	type		CDATA		#REQUIRED
+>
+
+<!-- ResponseProviders element identifies a collection of responseprovider(s). 
+The policy can be defined without a ResponseProvider. -->
+<!ELEMENT       ResponseProviders       ( ResponseProvider* ) >
+<!ATTLIST       ResponseProviders
+        name            CDATA           #IMPLIED
+        description     CDATA           #IMPLIED
+>
+
+<!-- ResponseProvider element identifies a ResponseProvider. 
+ResponseProvider providers response attributes to be returned in the policy decision if the policy applies given the Subject, Resource and Conditions. -->
+<!ELEMENT       ResponseProvider                ( AttributeValuePair* ) >
+<!ATTLIST       ResponseProvider
+        name            CDATA           #IMPLIED
+        type            CDATA           #REQUIRED
+>
+
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT ModifySubOrganization (AttributeValuePair)* >
+<!ATTLIST ModifySubOrganization
+    modifyDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT ModifyServiceTemplate (AttributeValuePair)* >
+<!ATTLIST ModifyServiceTemplate
+    serviceName    CDATA    #REQUIRED
+    schemaType     CDATA    #REQUIRED
+    level    (SCOPE_ONE | SCOPE_SUB) "SCOPE_ONE"
+    roleTemplate  (true | false) "false"
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT RemoveServiceTemplateAttributeValues (AttributeValuePair)* >
+<!ATTLIST RemoveServiceTemplateAttributeValues
+    serviceName    CDATA    #REQUIRED
+    schemaType     CDATA    #REQUIRED
+    level    (SCOPE_ONE | SCOPE_SUB) "SCOPE_ONE"
+    roleTemplate  (true | false) "false"
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT AddServiceTemplateAttributeValues (AttributeValuePair)* >
+<!ATTLIST AddServiceTemplateAttributeValues
+    serviceName    CDATA    #REQUIRED
+    schemaType     CDATA    #REQUIRED
+    level    (SCOPE_ONE | SCOPE_SUB) "SCOPE_ONE"
+    roleTemplate  (true | false) "false"
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT GetServiceTemplate EMPTY >
+<!ATTLIST GetServiceTemplate
+    serviceName    CDATA    #REQUIRED
+    schemaType     CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT DeleteServiceTemplate EMPTY >
+<!ATTLIST DeleteServiceTemplate
+    serviceName    CDATA    #REQUIRED
+    schemaType     CDATA  #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+
+<!ELEMENT ModifyPeopleContainer (AttributeValuePair)* >
+<!ATTLIST ModifyPeopleContainer
+    modifyDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT ModifySubContainer (AttributeValuePair)* >
+<!ATTLIST ModifySubContainer
+    modifyDN    CDATA    #REQUIRED
+>
+
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT ModifyRole (AttributeValuePair)* >
+<!ATTLIST ModifyRole
+    modifyDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- If there are no child elements (no DNs) specified, then ALL
+subOrganizations at all levels within this Organization are returned.
+-->
+
+<!ELEMENT GetSubOrganizations (DN)* >
+
+<!-- For those objects that may have LDAP attributes, all get operations in
+this DTD follow the same design pattern: If the element has an XML
+attribute DNsOnly set to true or doesn't have that XML attribute, only
+the DNs of the corresponding Sun Java System Access Manager objects shall be
+returned. If DNsOnly="false", the entire object (with the LDAP
+attribute value pairs) shall be returned.
+However, the behavior of DNsOnly is valid ONLY if there are no child
+elements (DNs) specified; if the DNs are specified, the entire
+object shall always be returned.
+-->
+
+<!ATTLIST GetSubOrganizations
+    DNsOnly    (true | false) "true"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- If there are no child elements (no DNs) specified, then ALL
+PeopleContainers at all levels within this Organization are returned.
+-->
+
+<!ELEMENT GetPeopleContainers (DN)* >
+<!ATTLIST GetPeopleContainers
+    DNsOnly    (true | false) "true"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT GetGroups EMPTY >
+<!ATTLIST GetGroups
+    level      (SCOPE_ONE | SCOPE_SUB) "SCOPE_SUB"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT GetRoles EMPTY >
+<!ATTLIST GetRoles
+    level      (SCOPE_ONE | SCOPE_SUB) "SCOPE_SUB"        
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- For those objects that may have LDAP attributes, all get operations in
+this DTD follow the same design pattern: If the element has an XML
+attribute DNsOnly set to true or doesn't have that XML attribute, only
+the DNs of the corresponding Sun Java System Access Manager objects shall be
+returned. If DNsOnly="false", the entire object (with the LDAP
+attribute value pairs) shall be returned.
+However, the behavior of DNsOnly is valid ONLY if there are no child
+elements (DNs) specified; if the DNs are specified, the entire
+object shall always be returned.
+-->
+
+<!ELEMENT GetUsers (DN)* >
+<!ATTLIST GetUsers
+    DNsOnly    (true | false) "true"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- Before a service is registered, the service schema for the service must
+have been loaded using the CLI. Multiple services can be registered using this
+tag.
+-->
+
+<!ELEMENT RegisterServices (Service_Name)+ >
+<!ELEMENT Service_Name (#PCDATA) >
+
+<!-- __________________________________________________________________  -->
+
+<!-- Unregister a previously registered service. If the service was not
+previously registered, the request is simply ignored for that service. Multiple
+services can be unregistered using this tag. If no Service_Name tag is
+specified, then no registered service will be unregistered, the request is 
+simply ignored.
+-->
+
+<!ELEMENT UnregisterServices (Service_Name)* >
+
+<!-- __________________________________________________________________  -->
+
+<!-- ALL registered services within this object are returned.
+-->
+
+<!ELEMENT GetRegisteredServiceNames EMPTY >
+
+<!-- __________________________________________________________________  -->
+
+
+<!-- Total number of services within this object are returned.
+-->
+
+<!ELEMENT GetNumberOfServices EMPTY >
+
+<!-- __________________________________________________________________  -->
+
+<!-- For those objects that may have children objects (such as containers, 
+organizations, people containers), all delete operations 
+in this DTD follow the same design pattern: If deleteRecursively="false", 
+then accidental deletion of entire subtrees is avoided.
+It can be disastrous if deleteRecursively="true". The default value is 'false' 
+to avoid accidental and unintentional deletions.
+-->
+
+<!ELEMENT DeleteSubOrganizations (DN)+ >
+<!ATTLIST DeleteSubOrganizations
+    deleteRecursively (true | false) "false"
+>
+
+<!-- For those objects that may have children objects (such as containers, 
+organizations, people containers), all delete operations 
+in this DTD follow the same design pattern: If deleteRecursively="false", 
+then accidental deletion of entire subtrees is avoided.
+It can be disastrous if deleteRecursively="true". The default value is 'false' 
+to avoid accidental and unintentional deletions.
+-->
+
+<!ELEMENT DeletePeopleContainers (DN)+ >
+<!ATTLIST DeletePeopleContainers
+    deleteRecursively (true | false) "false"
+>
+
+<!-- For those objects that may have children objects (such as containers, 
+organizations, people containers), all delete operations 
+in this DTD follow the same design pattern: If deleteRecursively="false", 
+then accidental deletion of entire subtrees is avoided.
+It can be disastrous if deleteRecursively="true". The default value is 'false' 
+to avoid accidental and unintentional deletions.
+-->
+
+<!ELEMENT DeleteGroups (DN)+ >
+<!ATTLIST DeleteGroups
+    deleteRecursively (true | false) "false"
+>
+
+<!ELEMENT DeleteRoles (DN)+ >
+
+<!-- DeletePolicy element deletes the Policy applicable to a service
+given the DN.
+-->
+
+<!ELEMENT DeletePolicy (PolicyName)+ >
+<!ATTLIST DeletePolicy
+    deleteDN    CDATA    #REQUIRED
+>
+
+<!-- PolicyName element provides the name of the Policy applicable to
+a service.
+-->
+
+<!ELEMENT       PolicyName             EMPTY>
+<!ATTLIST       PolicyName
+        name            CDATA           #REQUIRED
+>
+
+<!-- ======================== SchemaRequests =================== 
+-->
+ <!ELEMENT SchemaRootNodeRequests (
+    (SetI18nKey)*,
+    (SetPropertiesViewBeanURL)*,
+    (GetServiceRevisionNumber)*,
+    (SetServiceRevisionNumber)*
+    )
+ >
+
+ <!ATTLIST SchemaRootNodeRequests
+     serviceName    CDATA  #REQUIRED
+ >
+
+ <!ELEMENT SetI18nKey EMPTY>
+ <!ATTLIST SetI18nKey
+     i18nKey        CDATA  #REQUIRED
+ >
+
+ <!ELEMENT SetPropertiesViewBeanURL EMPTY>
+ <!ATTLIST SetPropertiesViewBeanURL
+     url            CDATA  #REQUIRED
+ >
+
+ <!ELEMENT GetServiceRevisionNumber EMPTY>
+
+ <!ELEMENT SetServiceRevisionNumber EMPTY>
+ <!ATTLIST SetServiceRevisionNumber
+     number     CDATA  #REQUIRED
+ >
+
+ <!ELEMENT SchemaRequests (
+     (RemoveDefaultValues)*,
+     (RemovePartialDefaultValues)*,
+     (AddDefaultValues)*,
+     (ModifyDefaultValues)*, 
+     (GetServiceDefaultValues)*,
+     (AddChoiceValues)*,
+     (SetChoiceValues)*,
+     (RemoveChoiceValues)?, 
+     (SetBooleanValues)*,
+     (ModifyType)*,
+     (ModifyUIType)*,
+     (Modifyi18nKey)*,
+     (ModifySyntax)*,
+     (ModifyAny)*,
+     (AddPropertiesViewBean)*,
+     (ModifyInheritanceAttribute)*,
+     (AddStartRange)*,
+     (AddEndRange)*,
+     (SetValidator)*,
+     (AddSubSchema)*,
+     (AddAttributeSchema)*,
+     (RemoveSubSchema)*, 
+     (RemoveAttributeSchema)*,
+     (AddPluginInterface)*,
+     (SetPropertiesViewBeanURLForPluginSchema)*)
+ >
+
+ <!ATTLIST SchemaRequests
+     serviceName    CDATA  #REQUIRED
+     SchemaType     CDATA  #REQUIRED
+     i18nKey        CDATA  #IMPLIED
+     SubSchema      CDATA  #IMPLIED
+ >
+
+
+ <!-- The serviceName attribute of the element, SchemaRequests, specifies
+ the serviceName of the Schema object on which all of the requests
+ (specified by the child elements) shall be made.
+ -->
+ <!-- The SubSchema attribute of the element specifies the
+ complete hierarchy of the SubSchema separated by "/"
+ -->
+
+
+ <!ELEMENT RemoveDefaultValues    (Attribute)+>
+ <!ELEMENT RemovePartialDefaultValues    (AttributeValuePair)+>
+ <!ELEMENT ModifyDefaultValues    (AttributeValuePair)+>
+ <!ELEMENT AddDefaultValues    (AttributeValuePair)+>
+ <!ELEMENT GetServiceDefaultValues (Attribute)*>
+ <!ELEMENT AddChoiceValues (AttributeValuePair | ChoiceValue)+>
+ <!ELEMENT SetChoiceValues (ChoiceValue)+>
+ <!ELEMENT ModifyType (AttributeValuePair)+>
+ <!ELEMENT ModifyUIType (AttributeValuePair)+>
+ <!ELEMENT Modifyi18nKey (AttributeValuePair)+>
+ <!ELEMENT ModifySyntax (AttributeValuePair)+>
+ <!ELEMENT ModifyAny (AttributeValuePair)+>
+ <!ELEMENT AddStartRange (AttributeValuePair)+>
+ <!ELEMENT AddEndRange (AttributeValuePair)+>
+ <!ELEMENT AddPropertiesViewBean (AttributeValuePair)+>
+ <!ELEMENT SetValidator (AttributeValuePair) >
+
+ <!ELEMENT ModifyInheritanceAttribute EMPTY>
+ <!ATTLIST ModifyInheritanceAttribute
+     inheritance   (single|multiple)	"single"
+ >
+
+ <!ELEMENT RemoveChoiceValues    (AttributeValuePair)+>
+ <!ELEMENT AddSubSchema EMPTY>
+ <!ATTLIST AddSubSchema
+	 fileName		CDATA #REQUIRED
+ >
+ <!ELEMENT AddAttributeSchema EMPTY>
+ <!ATTLIST AddAttributeSchema
+	 fileName		CDATA #REQUIRED
+ >
+ <!ELEMENT RemoveSubSchema    (Attribute)+>
+ <!ELEMENT RemoveAttributeSchema    (Attribute)+>
+
+ <!ELEMENT AddPluginInterface    EMPTY>
+ <!ATTLIST AddPluginInterface    
+	 name		        CDATA #REQUIRED
+	 interface		CDATA #REQUIRED
+	 i18nKey		CDATA #IMPLIED
+ >
+
+ <!ELEMENT SetPropertiesViewBeanURLForPluginSchema    EMPTY>
+ <!ATTLIST SetPropertiesViewBeanURLForPluginSchema    
+	 pluginSchemaName       CDATA #REQUIRED
+	 pluginInterfaceName    CDATA #REQUIRED
+	 propertiesViewBeanURL	CDATA #REQUIRED
+ >
+
+ <!ELEMENT SetBooleanValues EMPTY>
+ <!ATTLIST SetBooleanValues
+        name            CDATA #REQUIRED
+        trueValue       CDATA #REQUIRED
+        trueI18nKey     CDATA #REQUIRED
+        falseValue      CDATA #REQUIRED
+        falseI18nKey    CDATA #REQUIRED
+ >
+
+<!-- ======================== ServiceConfigurationRequests ===================
+-->
+
+ <!ELEMENT ServiceConfigurationRequests (
+     (AddSubConfiguration)*,
+     (GetSubConfiguration)*,
+     (ModifySubConfiguration)*,
+     (DeleteSubConfiguration)?,
+     (DeleteAllServiceConfiguration)? )
+ >
+ <!ATTLIST ServiceConfigurationRequests
+     serviceName    CDATA  #REQUIRED
+     realm	    CDATA  #IMPLIED
+ >
+ <!-- The serviceName attribute of the element, ServiceConfigRequests, specifies
+ the serviceName of the Schema object on which all of the requests
+ (specified by the child elements) shall be made.
+ -->
+
+ <!ELEMENT AddSubConfiguration  (AttributeValuePair)*>
+ <!ATTLIST AddSubConfiguration
+         subConfigName   CDATA    #REQUIRED
+         subConfigId     CDATA    #REQUIRED
+         priority        CDATA    #REQUIRED
+         serviceName     CDATA    #IMPLIED
+ >
+
+ <!ELEMENT GetSubConfiguration EMPTY>
+ <!ATTLIST GetSubConfiguration
+         subConfigName   CDATA    #REQUIRED
+ >
+
+ <!ELEMENT ModifySubConfiguration  (AttributeValuePair)*>
+ <!ATTLIST ModifySubConfiguration
+    operation   (set | add | delete) "set"
+    subConfigName  CDATA   #REQUIRED
+    serviceName    CDATA   #IMPLIED
+ >
+
+ <!ELEMENT DeleteSubConfiguration  EMPTY>
+ <!ATTLIST DeleteSubConfiguration
+         subConfigName   CDATA    #REQUIRED
+         serviceName     CDATA    #IMPLIED 
+ >
+
+<!-- The Element DeleteAllServiceConfiguration deletes all the Configuration
+ related to this service and removes the service from the data store.
+ The userAtt Attribute of the element DeleteAllServiceConfiguration, specifies
+ wheather to delete all the user Attirbutes related to the service or not.
+ once deleted config cannot be retrived so if you are not sure of this operation
+ use the command line deleteService option.
+-->
+ <!ELEMENT DeleteAllServiceConfiguration EMPTY>
+ <!ATTLIST DeleteAllServiceConfiguration
+	 userAtt   (true | false)   "false"
+ >
+	 
+
+
+<!-- ======================== ContainerRequests ===================
+ContainerRequests element aggregates all the requests that are to
+be perfomed on Container type objects. To enable bulk processing,
+this element can have one or more child elements. The child elements,
+as suggested by their intuitive names, represent the various requests.
+Note that all the child elements operate on the same instance of
+Container object. If different Container objects are to be
+manipulated, different ContainerRequests elements can be included
+in the root element Requests.
+-->
+
+<!ELEMENT ContainerRequests (
+    (CreateSubContainer)*,
+    (CreatePeopleContainer)*,
+    (CreateGroupContainer)*,
+    (CreateRole)*,
+    (CreateGroup)*,
+    (CreateServiceTemplate)?,
+    (ModifyServiceTemplate)?,
+    (AddServiceTemplateAttributeValues)?,
+    (RemoveServiceTemplateAttributeValues)?,
+    (GetServiceTemplate)?,
+    (ModifySubContainer)?,
+    (ModifyPeopleContainer)?,
+    (ModifyRole)?,
+    (GetSubContainers)?,
+    (GetPeopleContainers)?,
+    (GetRoles)?,
+    (GetGroups)?,
+    (GetUsers)?,
+    (CreateUser)*,
+    (RegisterServices)?,
+    (UnregisterServices)?,
+    (DeleteServiceTemplate)?,
+    (GetRegisteredServiceNames)?,
+    (GetNumberOfServices)?,
+    (DeleteRoles)?,
+    (DeleteGroups)?,
+    (DeletePeopleContainers)?,
+    (DeleteSubContainers)?,
+    (CreateEntity)?,
+    (ModifyEntity)?,
+    (DeleteEntities)?,
+    (GetEntities)?)
+>
+
+<!-- The DN attribute of the element, ContainerRequests, specifies
+the DN of the Container object on which all of the requests
+(specified by the child elements) shall be made.
+-->
+
+<!ATTLIST ContainerRequests
+    DN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- Note that CreateSubContainer element can have zero or more
+AttributeValuePairs.
+-->
+
+<!ELEMENT CreateSubContainer    (AttributeValuePair)* >
+<!ATTLIST CreateSubContainer
+    createDN    CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- If there are no child elements (no DNs) specified, then ALL
+subContainers at all levels within this Container are returned.
+-->
+
+<!ELEMENT GetSubContainers (DN)* >
+
+<!-- For those objects that may have LDAP attributes, all get operations in
+this DTD follow the same design pattern: If the element has an XML
+attribute DNsOnly set to true or doesn't have that XML attribute, only
+the DNs of the corresponding Sun Java System Access Manager objects shall be
+returned. If DNsOnly="false", the entire object (with the LDAP
+attribute value pairs) shall be returned.
+However, the behavior of DNsOnly is valid ONLY if there are no child
+elements (DNs) specified; if the DNs are specified, the entire
+object shall always be returned.
+-->
+
+<!ATTLIST GetSubContainers
+    DNsOnly    (true | false) "true"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+<!-- __________________________________________________________________  -->
+
+<!-- For those objects that may have children objects (such as containers,
+organizations, people containers), all delete operations 
+in this DTD follow the same design pattern: If deleteRecursively="false", 
+then accidental deletion of entire subtrees is avoided.
+It can be disastrous if deleteRecursively="true". The default value is 'false' 
+to avoid accidental and unintentional deletions.
+-->
+
+<!ELEMENT DeleteSubContainers (DN)+ >
+<!ATTLIST DeleteSubContainers
+    deleteRecursively (true | false) "false"
+>
+
+<!-- ======================== PeopleContainerRequests =================== -->
+
+<!ELEMENT PeopleContainerRequests (
+    (CreateSubPeopleContainer)*,
+    (ModifyPeopleContainer)?,
+    (CreateUser)*,
+    (ModifyUser)*,
+    (GetNumberOfUsers)?,
+    (GetUsers)?,
+    (GetSubPeopleContainers)?,
+    (DeleteUsers)?,
+    (DeleteSubPeopleContainers)? )
+>
+
+<!-- The DN attribute of the element, PeopleContainerRequests, specifies
+the DN of the PeopleContainerRequests object on which all of the requests
+(specified by the child elements) shall be made.
+-->
+
+<!ATTLIST PeopleContainerRequests
+    DN    CDATA    #REQUIRED
+>
+
+<!ELEMENT CreateSubPeopleContainer (AttributeValuePair)* >
+<!ATTLIST CreateSubPeopleContainer
+    createDN    CDATA    #REQUIRED
+>
+
+<!ELEMENT CreateUser (AttributeValuePair)* >
+<!ATTLIST CreateUser
+    createDN    CDATA    #REQUIRED
+>
+
+<!ELEMENT ModifyUser (AttributeValuePair)* >
+<!ATTLIST ModifyUser
+    modifyDN    CDATA    #REQUIRED
+>
+
+<!-- For those objects that may have children objects (such as containers, 
+organizations, people containers), all delete operations 
+in this DTD follow the same design pattern: If deleteRecursively="false", 
+then accidental deletion of entire subtrees is avoided.
+It can be disastrous if deleteRecursively="true". The default value is 'false' 
+to avoid accidental and unintentional deletions.
+-->
+
+<!ELEMENT DeleteSubPeopleContainers (DN)+ >
+<!ATTLIST DeleteSubPeopleContainers
+    deleteRecursively (true | false) "false"
+>
+
+<!ELEMENT DeleteUsers (DN)+ >
+
+<!ELEMENT GetSubPeopleContainers (DN)* >
+<!ATTLIST GetSubPeopleContainers
+    level      (SCOPE_ONE | SCOPE_SUB) "SCOPE_SUB"
+    DNsOnly    (true | false) "true"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+>
+
+
+<!-- ======================== UserRequests ===================
+UserRequests element aggregates all the requests that are to
+be perfomed on User type objects. To enable bulk processing,
+this element can have one or more child elements. The child elements,
+as suggested by their intuitive names, represent the various requests.
+If different User objects are to be manipulated, different UserRequests 
+elements can be included in the root element Requests.
+-->
+
+<!ELEMENT UserRequests (
+    (RegisterServices)?,
+    (UnregisterServices)?
+    )
+>
+<!-- The DN attribute of the element, UserRequests, specifies
+the DN of the User object on which all of the requests
+(specified by the child elements) shall be made.
+-->
+
+<!ATTLIST UserRequests
+    DN    CDATA    #REQUIRED
+>
+
+
+<!-- ======================== RoleRequests =================== -->
+
+<!ELEMENT RoleRequests (
+    (CreateServiceTemplate)?,
+    (ModifyServiceTemplate)?,
+    (GetServiceTemplate)?,
+    (GetNumberOfUsers)?, 
+    (GetUsers)?, 
+    (RemoveUsers)*,
+    (AddUsers)?
+    )
+>
+
+<!-- The DN attribute of the element, RoleRequests, specifies
+the DN of the RoleRequests object on which all of the requests
+(specified by the child elements) shall be made.
+-->
+
+<!ATTLIST RoleRequests
+    DN    CDATA    #REQUIRED
+>
+
+<!ELEMENT GetNumberOfUsers EMPTY >
+
+<!ELEMENT RemoveUsers (DN)+ >
+
+<!ELEMENT AddUsers (DN)+ >
+<!ELEMENT DN (#PCDATA) >
+
+<!-- ======================== GroupRequests =================== -->
+
+<!ELEMENT GroupRequests (
+    (CreateSubGroup)*,
+    (GetSubGroups)?,
+    (GetNumberOfUsers)?, 
+    (GetUsers)?, 
+    (ModifySubGroups)?,
+    (AddUsers)?, 
+    (RemoveUsers)*,
+    (DeleteSubGroups)?,
+    (AddNestedGroups)?,
+    (GetNestedGroups)?,
+    (GetNumberOfNestedGroups)?,
+    (RemoveNestedGroups)?)
+>
+
+<!-- The DN attribute of the element, GroupRequests, specifies
+the DN of the GroupRequests object on which all of the requests
+(specified by the child elements) shall be made.
+-->
+
+<!ATTLIST GroupRequests
+    DN    CDATA    #REQUIRED
+>
+
+<!-- For those objects that may have LDAP attributes, all get operations in
+this DTD follow the same design pattern: If the element has an XML
+attribute DNsOnly set to true or doesn't have that XML attribute, only
+the DNs of the corresponding Sun Java System Access Manager objects shall be
+returned. If DNsOnly="false", the entire object (with the LDAP
+attribute value pairs) shall be returned.
+However, the behavior of DNsOnly is valid ONLY if there are no child
+elements (DNs) specified; if the DNs are specified, the entire
+object shall always be returned.
+SCOPE_ONE returns sub group DNs of one level and SCOPE_SUB returns subgroup
+DNs of all levels under the specified DN
+-->
+
+<!ELEMENT GetSubGroups (DN)* >
+<!ATTLIST GetSubGroups
+    level      (SCOPE_ONE | SCOPE_SUB) "SCOPE_SUB"
+    DNsOnly    (true | false) "true"
+>
+
+<!ELEMENT CreateSubGroup (AttributeValuePair)* >
+<!ATTLIST CreateSubGroup
+    createDN    CDATA    #REQUIRED
+    groupType   (static|dynamic|assignableDynamic) "static"
+>
+
+<!ELEMENT AddNestedGroups (DN)+ >
+
+<!ELEMENT GetNestedGroups (DN)* >
+<!ATTLIST GetNestedGroups
+    DNsOnly    (true | false) "true"
+>
+
+<!ELEMENT GetNumberOfNestedGroups EMPTY >
+
+<!ELEMENT RemoveNestedGroups (DN)+ >
+
+<!-- __________________________________________________________________  -->
+
+<!ELEMENT ModifySubGroups (AttributeValuePair)* >
+<!ATTLIST ModifySubGroups
+    modifyDN    CDATA    #REQUIRED
+>
+
+<!-- For those objects that may have children objects (such as containers, 
+organizations, people containers), all delete operations 
+in this DTD follow the same design pattern: If deleteRecursively="false", 
+then accidental deletion of entire subtrees is avoided.
+It can be disastrous if deleteRecursively="true". The default value is 'false' 
+to avoid accidental and unintentional deletions.
+-->
+
+<!ELEMENT DeleteSubGroups (DN)+ >
+<!ATTLIST DeleteSubGroups
+    deleteRecursively (true | false) "false"
+>
+
+<!ELEMENT CreateEntity (AttributeValuePair)* >
+<!ATTLIST CreateEntity
+    createDN    CDATA    #REQUIRED
+    entityType CDATA     #REQUIRED
+>
+
+<!ELEMENT ModifyEntity (AttributeValuePair)* >
+<!ATTLIST ModifyEntity
+    modifyDN    CDATA    #REQUIRED
+    entityType CDATA     #REQUIRED
+>
+
+<!ELEMENT DeleteEntities (DN)+ >
+<!ATTLIST DeleteEntities
+    entityType CDATA  #REQUIRED
+>
+
+
+<!ELEMENT GetEntities  (DN)* >
+<!ATTLIST GetEntities
+    DNsOnly    (true | false) "true"
+    filter     CDATA  #IMPLIED 
+    sizeLimit  CDATA  #IMPLIED
+    timeLimit  CDATA  #IMPLIED
+    entityType CDATA  #REQUIRED
+>
+
+<!-- The following are the additions done to
+  take care of the entities pertaining to Federation Services.
+  The various operations that are specified have been declared as 
+  organization Requests. But still, the organization can only be the
+  root organization. 
+
+-->
+
+<!ELEMENT CreateAuthenticationDomain (AttributeValuePair)* >
+
+<!ATTLIST CreateAuthenticationDomain
+name   CDATA    #REQUIRED
+>
+
+
+<!ELEMENT DeleteAuthenticationDomain EMPTY>
+
+<!ATTLIST DeleteAuthenticationDomain
+name   CDATA    #REQUIRED
+>
+
+
+<!ELEMENT GetAuthenticationDomain EMPTY>
+
+<!ATTLIST GetAuthenticationDomain
+name   CDATA    #REQUIRED
+>
+
+
+<!ELEMENT ModifyAuthenticationDomain (AttributeValuePair)* >
+
+<!ATTLIST ModifyAuthenticationDomain
+name   CDATA    #REQUIRED
+>
+
+
+
+<!ELEMENT CreateRemoteProvider (AttributeValuePair)* >
+
+<!ATTLIST CreateRemoteProvider
+id   CDATA    #REQUIRED
+role (IDP|SP|both) "SP"
+>
+
+<!-- The defaultUrlPrefix when specified autopopulates the
+ Hosted provider.
+-->
+<!ELEMENT CreateHostedProvider (AttributeValuePair| SPAuthContextInfo | IDPAuthContextInfo)* >
+
+<!ATTLIST CreateHostedProvider
+id   CDATA    #REQUIRED
+role (IDP|SP|both) "SP"
+defaultUrlPrefix CDATA #IMPLIED
+>
+
+<!ELEMENT DeleteProvider EMPTY>
+
+<!ATTLIST DeleteProvider
+id   CDATA    #REQUIRED
+>
+
+<!ELEMENT ModifyRemoteProvider (AttributeValuePair)* >
+
+<!ATTLIST ModifyRemoteProvider
+id   CDATA    #REQUIRED
+role (IDP|SP|both) "SP"
+>
+
+<!ELEMENT ModifyHostedProvider (AttributeValuePair | SPAuthContextInfo | IDPAuthContextInfo )* >
+
+<!ATTLIST ModifyHostedProvider
+id   CDATA    #REQUIRED
+role (IDP|SP|both) "SP"
+>
+
+<!ELEMENT IDPAuthContextInfo (AuthMethodQueryString)?>
+
+<!ATTLIST IDPAuthContextInfo
+AuthContext (Previous-Session| Time-Sync-Token| Smartcard|MobileUnregistered|Smartcard-PKI|MobileContract|Password|
+Password-ProtectedTransport|MobileDigitalID|Software-PKI) #REQUIRED
+Priority CDATA    #REQUIRED
+IsSupported (true|false) "true"
+>
+
+<!ELEMENT AuthMethodQueryString (module|level|user|service|role)?>
+
+<!ELEMENT module (#PCDATA) >
+<!ELEMENT level (#PCDATA) >
+<!ELEMENT user (#PCDATA) >
+<!ELEMENT service (#PCDATA) >
+<!ELEMENT role (#PCDATA) >
+
+
+<!ELEMENT SPAuthContextInfo EMPTY>
+
+<!ATTLIST SPAuthContextInfo
+AuthContext (Previous-Session| Time-Sync-Token| Smartcard|MobileUnregistered|Smartcard-PKI|MobileContract|Password|
+Password-ProtectedTransport|MobileDigitalID|Software-PKI) #REQUIRED
+AuthLevel CDATA    #REQUIRED
+>
+
+
+<!ELEMENT GetProvider EMPTY>
+<!ATTLIST GetProvider
+id   CDATA    #REQUIRED
+>
+
+<!-- Lists the security domains, the user account has 
+  been federated with.
+-->
+<!ELEMENT ListAccts EMPTY>
+
+<!ATTLIST ListAccts
+dn   CDATA    #REQUIRED
+>
+
+<!-- __________________________________________________________________  -->
+<!-- ChoiceValue defines the i18nKey and value of choice value. -->
+
+<!ELEMENT ChoiceValue EMPTY>
+<!ATTLIST ChoiceValue
+    AttributeName   CDATA   #REQUIRED
+    I18NKey         CDATA   #REQUIRED
+    value           CDATA   #REQUIRED
+>
+
+<!-- GetPolicies element would print the policies defined in the 
+Organization  in XML format, on standard output 
+
+AttributeValuePair child element is optional.
+"name" attribute of nested Attribute element needs to have value "policyName".
+Values for nested Value elements need to be names of policies
+that need to be printed.
+
+If AttributeValuePair element is missing or the nested "name" attribute 
+does not have value "policyName" all the policies in the Organization
+would be printed
+-->
+<!ELEMENT GetPolicies (AttributeValuePair?)>
+<!-- ======================== RealmRequests ===================
+RealmRequests elements aggregates all the requests that are
+associated with the OrganizationConfigManager object.  To enable
+bulk processing, this element can have one or more child elements.
+The child elements, as suggested by their names, represent the
+various requests.
+-->
+
+
+<!ELEMENT RealmRequests (
+    (CreateRealm)* ,
+    (DeleteRealm)*,
+    (AssignService)*,
+    (UnassignService)*,
+    (ModifyService)*,
+    (RemoveAttribute)*,
+    (AddAttributeValues)*,
+    (RemoveAttributeValues)*,
+    (SetAttributes)*,
+    (GetAssignableServices)*,
+    (GetAssignedServices)*,
+    (GetAttributes)*,
+    (GetServiceAttributes)*,
+    (GetSubRealmNames)*,
+    (RealmCreatePolicy)*,
+    (RealmDeletePolicy)*,
+    (RealmGetPolicies)*
+  )
+>
+
+
+
+<!ELEMENT CreateRealm    (ServiceAttributes)* >
+<!ATTLIST CreateRealm
+    realm  CDATA    #REQUIRED
+>
+<!ELEMENT ServiceAttributes    (AttributeValuePair)* >
+<!ATTLIST ServiceAttributes
+    serviceName  CDATA    #REQUIRED
+>
+
+
+
+<!ELEMENT DeleteRealm EMPTY>
+<!ATTLIST DeleteRealm
+    realm   CDATA    #REQUIRED
+    deleteRecursively (true | false) "false"
+>
+
+
+
+<!ELEMENT AssignService    (ServiceAttributes)* >
+<!ATTLIST AssignService
+    realm  CDATA    #REQUIRED
+>
+
+<!ELEMENT UnassignService EMPTY>
+<!ATTLIST UnassignService
+    realm        CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+
+
+<!ELEMENT AddAttributeValues (Value)+ >
+<!ATTLIST AddAttributeValues
+    realm         CDATA    #REQUIRED
+    serviceName   CDATA    #REQUIRED
+    attrName      CDATA    #REQUIRED
+>
+
+<!ELEMENT RemoveAttributeValues (Value)+ >
+<!ATTLIST RemoveAttributeValues
+    realm         CDATA    #REQUIRED
+    serviceName   CDATA    #REQUIRED
+    attrName      CDATA    #REQUIRED
+>
+
+<!ELEMENT ModifyService (AttributeValuePair)* >
+<!ATTLIST ModifyService
+    realm        CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+<!ELEMENT SetAttributes (AttributeValuePair)+ >
+<!ATTLIST SetAttributes
+    realm        CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+<!ELEMENT RemoveAttribute EMPTY>
+<!ATTLIST RemoveAttribute
+    realm        CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+    attrName     CDATA    #REQUIRED
+>
+
+<!ELEMENT GetAssignableServices EMPTY>
+<!ATTLIST GetAssignableServices
+    realm        CDATA    #REQUIRED
+>
+
+<!ELEMENT GetAssignedServices EMPTY>
+<!ATTLIST GetAssignedServices
+    realm        CDATA    #REQUIRED
+    includeMandatory (true | false) "false"
+>
+
+<!ELEMENT GetAttributes EMPTY>
+<!ATTLIST GetAttributes
+    realm        CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+<!ELEMENT GetServiceAttributes EMPTY>
+<!ATTLIST GetServiceAttributes
+    realm        CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+<!ELEMENT GetSubRealmNames EMPTY>
+<!ATTLIST GetSubRealmNames
+    realm        CDATA    #REQUIRED
+    pattern      CDATA    ""
+    recursive (true | false) "false"
+>
+
+<!ELEMENT RealmCreatePolicy (Policy)+ >
+<!ATTLIST RealmCreatePolicy
+    realm    CDATA    #REQUIRED
+>
+
+<!ELEMENT RealmDeletePolicy (PolicyName)+ >
+<!ATTLIST RealmDeletePolicy
+    realm    CDATA    #REQUIRED
+>
+
+<!ELEMENT RealmGetPolicies (AttributeValuePair?)>
+<!ATTLIST RealmGetPolicies
+    realm        CDATA    #REQUIRED
+>
+
+
+<!-- ======================== IdentityRequests ===================
+IdentityRequests elements aggregates all the requests that are
+associated with the AMIdentityRepository and AMIdentity objects.
+To enable bulk processing, this element can have one or more child elements.
+The child elements, as suggested by their names, represent the
+various requests.
+-->
+
+<!ELEMENT IdentityRequests (
+    (CreateIdentity)* ,
+    (CreateIdentities)* ,
+    (DeleteIdentities)* ,
+    (SearchIdentities)* ,
+    (GetAllowedIdOperations)* ,
+    (GetSupportedIdTypes)* ,
+    (IdGetAssignableServices)* ,
+    (IdGetAssignedServices)* ,
+    (IdGetServiceAttrs)* ,
+    (IdGetAttributes)* ,
+    (IdGetMemberships)* ,
+    (IdIsMember)* ,
+    (IdIsActive)* ,
+    (IdGetMembers)* ,
+    (IdAddMember)* ,
+    (IdRemoveMember)* ,
+    (IdAssignService)* ,
+    (IdUnassignService)* ,
+    (IdModifyService)* ,
+    (IdSetAttributes)*
+  )
+>
+
+
+<!ELEMENT CreateIdentity    (AttributeValuePair)* >
+<!ATTLIST CreateIdentity
+    realm  CDATA    #REQUIRED
+    idName CDATA    #REQUIRED
+    idType CDATA    #REQUIRED
+>
+
+
+<!-- IdentityAttributes are just like ServiceAttributes, except  -->
+<!-- there's an IdName, rather than a ServiceName                -->
+
+<!ELEMENT CreateIdentities    (IdentityAttributes)* >
+<!ATTLIST CreateIdentities
+    realm  CDATA    #REQUIRED
+    idType CDATA    #REQUIRED
+>
+
+<!ELEMENT IdentityAttributes    (AttributeValuePair)* >
+<!ATTLIST IdentityAttributes
+    idName  CDATA    #REQUIRED
+>
+
+<!ELEMENT DeleteIdentities    (IdName)+ >
+<!ATTLIST DeleteIdentities
+    realm   CDATA    #REQUIRED
+    idType  CDATA    #REQUIRED
+>
+
+<!ELEMENT IdName (#PCDATA) >
+
+
+<!ELEMENT SearchIdentities EMPTY >
+<!ATTLIST SearchIdentities
+    realm   CDATA    #REQUIRED
+    idType  CDATA    #REQUIRED
+    pattern CDATA    #REQUIRED
+    recursive (true | false) "false"
+>
+
+
+<!ELEMENT GetAllowedIdOperations EMPTY >
+<!ATTLIST GetAllowedIdOperations
+    realm   CDATA    #REQUIRED
+    idType  CDATA    #REQUIRED
+>
+
+<!ELEMENT GetSupportedIdTypes EMPTY >
+<!ATTLIST GetSupportedIdTypes
+    realm   CDATA    #REQUIRED
+>
+
+<!ELEMENT IdGetAssignableServices EMPTY>
+<!ATTLIST IdGetAssignableServices
+    realm	CDATA	#REQUIRED
+    idType	CDATA	#REQUIRED
+    idName	CDATA	#REQUIRED
+>
+
+<!ELEMENT IdGetAssignedServices EMPTY>
+<!ATTLIST IdGetAssignedServices
+    realm	CDATA	#REQUIRED
+    idType	CDATA	#REQUIRED
+    idName	CDATA	#REQUIRED
+>
+
+<!ELEMENT IdGetServiceAttrs EMPTY >
+<!ATTLIST IdGetServiceAttrs
+    realm	CDATA	#REQUIRED
+    idType	CDATA	#REQUIRED
+    idName	CDATA	#REQUIRED
+    serviceName	CDATA	#REQUIRED
+>
+
+
+<!-- if no Attribute specified, then getAttributes() -->
+<!-- else <Attribute name="xxx" /> -->
+
+<!ELEMENT IdGetAttributes (Attribute)* >
+<!ATTLIST IdGetAttributes
+    realm	CDATA	#REQUIRED
+    idType	CDATA	#REQUIRED
+    idName	CDATA	#REQUIRED
+>
+
+
+<!ELEMENT IdGetMemberships EMPTY >
+<!ATTLIST IdGetMemberships
+    realm	  CDATA	  #REQUIRED
+    idType	  CDATA	  #REQUIRED
+    idName	  CDATA	  #REQUIRED
+    targetIdType  CDATA	  #REQUIRED
+>
+
+<!ELEMENT IdIsMember EMPTY >
+<!ATTLIST IdIsMember
+    realm	  CDATA	  #REQUIRED
+    idType	  CDATA	  #REQUIRED
+    idName	  CDATA	  #REQUIRED
+    targetIdType  CDATA	  #REQUIRED
+    targetIdName  CDATA	  #REQUIRED
+>
+
+<!ELEMENT IdIsActive EMPTY>
+<!ATTLIST IdIsActive
+    realm	CDATA	#REQUIRED
+    idType	CDATA	#REQUIRED
+    idName	CDATA	#REQUIRED
+>
+
+<!ELEMENT IdGetMembers EMPTY >
+<!ATTLIST IdGetMembers
+    realm	  CDATA	  #REQUIRED
+    idType	  CDATA	  #REQUIRED
+    idName	  CDATA	  #REQUIRED
+    targetIdType  CDATA	  #REQUIRED
+>
+
+<!ELEMENT IdAddMember EMPTY >
+<!ATTLIST IdAddMember
+    realm	   CDATA	#REQUIRED
+    idType	   CDATA	#REQUIRED
+    idName	   CDATA	#REQUIRED
+    subjectIdType  CDATA	#REQUIRED
+    subjectIdName  CDATA	#REQUIRED
+>
+
+<!ELEMENT IdRemoveMember EMPTY >
+<!ATTLIST IdRemoveMember
+    realm	   CDATA	#REQUIRED
+    idType	   CDATA	#REQUIRED
+    idName	   CDATA	#REQUIRED
+    subjectIdType  CDATA	#REQUIRED
+    subjectIdName  CDATA	#REQUIRED
+>
+
+<!ELEMENT IdAssignService    (AttributeValuePair)* >
+<!ATTLIST IdAssignService
+    realm	 CDATA    #REQUIRED
+    idName	 CDATA    #REQUIRED
+    idType	 CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+<!ELEMENT IdUnassignService EMPTY >
+<!ATTLIST IdUnassignService
+    realm	 CDATA    #REQUIRED
+    idName	 CDATA    #REQUIRED
+    idType	 CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+<!ELEMENT IdModifyService    (AttributeValuePair)* >
+<!ATTLIST IdModifyService
+    realm	 CDATA    #REQUIRED
+    idName	 CDATA    #REQUIRED
+    idType	 CDATA    #REQUIRED
+    serviceName  CDATA    #REQUIRED
+>
+
+
+<!ELEMENT IdSetAttributes    (AttributeValuePair)* >
+<!ATTLIST IdSetAttributes
+    realm	 CDATA    #REQUIRED
+    idName	 CDATA    #REQUIRED
+    idType	 CDATA    #REQUIRED
+>
+
+<!-- ======================== DelegationRequests ===================
+DelegationRequests are used to add/remove privileges of role.
+-->
+
+<!ELEMENT DelegationRequests (
+    (GetPrivileges)*,
+    (AddPrivileges)*,
+    (RemovePrivileges)*
+  )
+>
+
+<!ELEMENT GetPrivileges EMPTY >
+<!ATTLIST GetPrivileges
+    realm        CDATA    #REQUIRED
+    idName       CDATA    #REQUIRED
+    idType       CDATA    #REQUIRED
+>
+
+<!ELEMENT AddPrivileges (name)+ >
+<!ATTLIST AddPrivileges
+    realm        CDATA    #REQUIRED
+    idName       CDATA    #REQUIRED
+    idType       CDATA    #REQUIRED
+>
+
+<!ELEMENT RemovePrivileges (name)+ >
+<!ATTLIST RemovePrivileges
+    realm        CDATA    #REQUIRED
+    idName       CDATA    #REQUIRED
+    idType       CDATA    #REQUIRED
+>
+
+<!ELEMENT name (#PCDATA) >
+

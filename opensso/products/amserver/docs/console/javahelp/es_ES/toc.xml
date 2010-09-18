@@ -1,0 +1,204 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "toc_1_0.dtd">
+<toc version="2.0">
+
+ <tocitem target="aawelcome" text="Ayuda en línea de SunTM OpenSSO 8.0" expand="false">
+    <tocitem target="intro" text="Introducción" expand="false"></tocitem></tocitem>
+ <tocitem target="commontasks" text="Tareas comunes" expand="false">
+    <tocitem target="task.home" text="Componentes de Tarea común" expand="false"></tocitem></tocitem>
+ <tocitem target="accesscontrol" text="Control de acceso" expand="false">
+    <tocitem target="realm.rmrealm" text="Dominios" expand="false">
+        <tocitem target="realm.rmrealmadd" text="Para crear un nuevo dominio" expand="false"></tocitem>
+        <tocitem target="realm.realmproperties" text="Propiedades generales" expand="false"></tocitem></tocitem>
+    <tocitem target="authentication.authproperties" text="Autenticación" expand="false">
+        <tocitem target="authentication.newauthinstance" text="Para crear una nueva instancia de módulo de autenticación" expand="false"></tocitem>
+        <tocitem target="authentication.newauthconfig" text="Para crear un nuevo encadenamiento de autenticación" expand="false"></tocitem></tocitem>
+    <tocitem target="realm.services" text="Servicios" expand="false">
+        <tocitem target="realm.servicesadd" text="Para agregar un servicio a un dominio" expand="false"></tocitem></tocitem>
+    <tocitem target="realm.idrepo" text="Almacenes de datos" expand="false">
+        <tocitem target="realm.idreposelecttype" text="Para crear un nuevo almacén de datos" expand="false"></tocitem>
+        <tocitem target="idrepoadd" text="Tipos de almacenes de datos de OpenSSO" expand="false"></tocitem>
+        <tocitem target="realm.idrepoedit" text="Configuración de un almacén de datos" expand="false"></tocitem>
+        <tocitem target="realm.idrepoeditad" text="Atributos de Active Directory" expand="false"></tocitem>
+        <tocitem target="realm.idrepoeditldapv3" text="Atributos LDAPv3 genéricos" expand="false"></tocitem>
+        <tocitem target="realm.idrepoeditfamschema" text="Sun Directory Server con los atributos de esquema de OpenSSO" expand="false"></tocitem></tocitem>
+    <tocitem target="delegation.delegation" text="Privilegios" expand="false">
+        <tocitem target="delegation.delegationproperties" text="Propiedades de los privilegios" expand="false"></tocitem></tocitem>
+    <tocitem target="policy.policy" text="Normas" expand="false">
+        <tocitem target="normalpolicy" text="Políticas normales" expand="false"></tocitem>
+        <tocitem target="policy.selectservicetype" text="Reglas" expand="false"></tocitem>
+        <tocitem target="policy.selectsubjecttype" text="Asuntos" expand="false"></tocitem>
+        <tocitem target="policy.selectcondition" text="Condiciones" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultsessioncondtionadd" text="Tiempo de sesión activa" expand="false"></tocitem>
+        <tocitem target="policy.authtoserviceadd" text="Autenticación por encadenamiento del módulo" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultauthlevelconditionadd" text="Nivel de autenticación (superior o igual a)" expand="false"></tocitem>
+        <tocitem target="gdovl" text="Nivel de autenticación (inferior o igual a)" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultauthschemeconditionadd" text="Autenticación por instancia del módulo" expand="false"></tocitem>
+        <tocitem target="policy.sessionpropertyconditionadd" text="Propiedades de la sesión actual" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultipcondition" text="Dirección IP/nombre DNS" expand="false"></tocitem>
+        <tocitem target="policy.membershipconditionadd" text="Miembros de la identidad" expand="false"></tocitem>
+        <tocitem target="policy.conditionadd" text="Condición de filtro LDAP" expand="false"></tocitem>
+        <tocitem target="policy.authtorealmadd" text="Autenticación en un dominio" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaulttimeconditionadd" text="Tiempo (día, fecha, hora y zona horaria)" expand="false"></tocitem>
+        <tocitem target="responseprovider" text="Proveedores de respuesta" expand="false"></tocitem>
+        <tocitem target="fyfby" text="Políticas de referencia" expand="false"></tocitem>
+        <tocitem target="referrals" text="Referencias" expand="false"></tocitem></tocitem>
+    <tocitem target="idm.entities" text="Asuntos" expand="false">
+        <tocitem target="idm.entityadd" text="Creación de asuntos" expand="false"></tocitem>
+        <tocitem target="subjectuser" text="Usuario" expand="false"></tocitem>
+        <tocitem target="idm.entitiesgroup" text="Grupo" expand="false"></tocitem></tocitem>
+    <tocitem target="agentconfig.agents" text="Agentes" expand="false">
+        <tocitem target="ggobs" text="Creación de nuevos grupos y agentes" expand="false"></tocitem>
+        <tocitem target="agentconfig.genericagentprofile" text="Configuración de agentes" expand="false"></tocitem>
+        <tocitem target="agentconfig.webagentprofile" text="Agente de directivas web" expand="false"></tocitem>
+        <tocitem target="agentconfig.j2eeagentprofile" text="Agente de directivas J2EE" expand="false"></tocitem>
+        <tocitem target="agentconfig.webserviceprovideredit" text="Proveedor de servicios web" expand="false"></tocitem>
+        <tocitem target="agentconfig.webserviceclientedit" text="Atributos de clientes de servicios web" expand="false"></tocitem>
+        <tocitem target="agentconfig.stsclientedit" text="Cliente STS" expand="false"></tocitem>
+        <tocitem target="agentconfig.discoveryagentprofile" text="Atributos del Agente de detección" expand="false"></tocitem>
+        <tocitem target="agentconfig.webservicestsedit" text="Atributos del agente del servicio de token de seguridad" expand="false"></tocitem>
+        <tocitem target="agentconfig.22agentprofile" text="Agente de directivas 2.2" expand="false"></tocitem>
+        <tocitem target="ghfif" text="Autenticador de agentes" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="dirmang" text="Administración de directorios" expand="false">
+    <tocitem target="dm.home" text="Administración de directorios" expand="false"></tocitem></tocitem>
+ <tocitem target="federation.federation" text="Federación" expand="false">
+    <tocitem target="federation.fsauthdomains" text="Círculo de confianza." expand="false">
+        <tocitem target="federation.createcot" text="Para crear un nuevo círculo de confianza" expand="false"></tocitem>
+        <tocitem target="federation.fsauthdomainsedit" text="Para modificar un perfil de círculo de confianza" expand="false"></tocitem>
+        <tocitem target="federation.fsauthdomainsselectprovider" text="Para agregar proveedores a un círculo de confianza" expand="false"></tocitem>
+        <tocitem target="deleteauthdomain" text="Para eliminar un perfil de círculo de confianza" expand="false"></tocitem></tocitem>
+    <tocitem target="federation.createsaml2metadata" text="Proveedores de identidades" expand="false">
+        <tocitem target="ggwxp" text="Entidad de proveedor SAMLv2" expand="false"></tocitem>
+        <tocitem target="ggwwz" text="Entidad de proveedor ID-FF " expand="false"></tocitem>
+        <tocitem target="federation.createwsfedprovider" text="Entidad de proveedor WS-FED" expand="false"></tocitem>
+        <tocitem target="federation.samlv2spassertioncontent" text="Personalización de proveedores de servicio SAMLv2 " expand="false"></tocitem>
+        <tocitem target="federation.samlv2idpassertioncontent" text="Personalización de proveedor de identidades SAMLv2" expand="false"></tocitem>
+        <tocitem target="federation.samlv2pdp" text="Personalización de SAMLv2 XACML PDP " expand="false"></tocitem>
+        <tocitem target="federation.samlv2pep" text="Personalización de SAMLv2 XACML PEP" expand="false"></tocitem>
+        <tocitem target="federation.samlv2attrauthority" text="Personalización de autoridad de atributos SAMLv2" expand="false"></tocitem>
+        <tocitem target="federation.samlv2attrquery" text="Personalización de consultas de atributos SAMLv2" expand="false"></tocitem>
+        <tocitem target="federation.samlv2authnauthority" text="Personalización de autoridad de autenticación SAMLv2" expand="false"></tocitem>
+        <tocitem target="federation.samlv2affiliate" text="Personalización de afiliación alojada SAMLv2" expand="false"></tocitem>
+        <tocitem target="federation.idffidp" text="Personalización del proveedor de identidades ID-FF" expand="false"></tocitem>
+        <tocitem target="federation.idffsp" text="Personalización del proveedor de servicios ID-FF" expand="false"></tocitem>
+        <tocitem target="federation.wsfedgeneral" text="Atributos generales WS-FED" expand="false"></tocitem>
+        <tocitem target="federation.wsfedidp" text="Personalización de proveedores de identidad WS-FED" expand="false"></tocitem>
+        <tocitem target="federation.wsfedsp" text="Personalización del proveedor de servicios WS-FED" expand="false"></tocitem></tocitem>
+    <tocitem target="federation.fssamlservice" text="SAML1.x" expand="false">
+        <tocitem target="targetspecifier" text="Especificador de destino" expand="false"></tocitem>
+        <tocitem target="siteidentifiers" text="Identificadores de sitio" expand="false"></tocitem>
+        <tocitem target="trustedpartners" text="Socios de confianza" expand="false"></tocitem>
+        <tocitem target="federation.fsssamltargeturlsadd" text="URL de destino" expand="false"></tocitem>
+        <tocitem target="assertiontimeout" text="Tiempo de espera de aserción" expand="false"></tocitem>
+        <tocitem target="assertionskew" text="Factor de contracción de aserción para hora notBefore" expand="false"></tocitem>
+        <tocitem target="artifacttimeout" text="Tiempo de espera de artefacto" expand="false"></tocitem>
+        <tocitem target="samlartifactname" text="Nombre de artefacto SAML" expand="false"></tocitem>
+        <tocitem target="signsamlassertion" text="Firmar aserción SAML" expand="false"></tocitem>
+        <tocitem target="signsamlrequest" text="Firmar solicitud SAML" expand="false"></tocitem>
+        <tocitem target="signsamlresponse" text="Firmar respuesta SAML" expand="false"></tocitem>
+        <tocitem target="ggyfk" text="Consulta de atributo" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="webservices" text="Servicios web" expand="false">
+    <tocitem target="webservices.wspersonalprofileservice" text="Servicio de perfil personal de Liberty" expand="false">
+        <tocitem target="resourceidmapper" text="Asignador de ID de recursos" expand="false"></tocitem>
+        <tocitem target="authorizer" text="Autorizador" expand="false"></tocitem>
+        <tocitem target="attributemapper" text="Asignador de atributos" expand="false"></tocitem>
+        <tocitem target="ppproviderid" text="Id. de proveedor" expand="false"></tocitem>
+        <tocitem target="namescheme" text="Esquema de nombres" expand="false"></tocitem>
+        <tocitem target="namespaceprefix" text="Prefijo de espacio de nombre" expand="false"></tocitem>
+        <tocitem target="supportedcontainers" text="Contenedores admitidos" expand="false"></tocitem>
+        <tocitem target="ppldapattributemaplist" text="Lista de asignación de atributos PPLDAP" expand="false"></tocitem>
+        <tocitem target="requirequery" text="Requerir evaluación de políticas de consultas:" expand="false"></tocitem>
+        <tocitem target="requiremodify" text="Requerir evaluación de políticas de modificaciones:" expand="false"></tocitem>
+        <tocitem target="extensioncontainerattributes" text="Atributos de contenedor de extensiones" expand="false"></tocitem>
+        <tocitem target="extensionattributesnamespaceprefix" text="Prefijo de espacio de nombre de atributos de extensión" expand="false"></tocitem>
+        <tocitem target="serviceupdateenabled" text="Actualización del servicio" expand="false"></tocitem>
+        <tocitem target="serviceinstanceupdateclass" text="Clase de actualización de Service Instance" expand="false"></tocitem>
+        <tocitem target="alternateendpoint" text="Punto final alternativo" expand="false"></tocitem>
+        <tocitem target="alternatesecuritymechanisms" text="Mecanismos de seguridad alternativos" expand="false"></tocitem></tocitem>
+    <tocitem target="service.smdiscoveryservice" text="Servicio de detección" expand="false">
+        <tocitem target="dsproviderid" text="Id. de proveedor" expand="false"></tocitem>
+        <tocitem target="supportedauthmechanisms" text="Mecanismos de autenticación admitidos" expand="false"></tocitem>
+        <tocitem target="supporteddirectives" text="Directivas admitidas" expand="false"></tocitem>
+        <tocitem target="policyevaldiscolookup" text="Evaluación de directivas para la búsqueda de detección" expand="false"></tocitem>
+        <tocitem target="policyevaldiscoupdate" text="Evaluación de directivas para la actualización de detección" expand="false"></tocitem>
+        <tocitem target="authorizerpluginclass" text="Clase de complemento del autorizador:" expand="false"></tocitem>
+        <tocitem target="entryhandlerpluginclass" text="Clase de complemento del administrador de entradas:" expand="false"></tocitem>
+        <tocitem target="resourceidmapperpluginclass" text="Clases de complemento del asignador de Id. de recursos" expand="false"></tocitem>
+        <tocitem target="authresponsemessage" text="Mensaje de respuesta de autenticación" expand="false"></tocitem>
+        <tocitem target="generatesessioncontext" text="Instrucción de contexto de sesión de bootstrapping" expand="false"></tocitem>
+        <tocitem target="encryptnameidentifier" text="Cifrar el identificador de nombre en el contexto de sesión para Bootstrapping" expand="false"></tocitem>
+        <tocitem target="useimpliedresource" text="Recurso implícito" expand="false"></tocitem>
+        <tocitem target="resourceofferingsbootstrapping" text="Ofertas de recursos para bootstrapping" expand="false"></tocitem></tocitem>
+    <tocitem target="service.scsoapbinding" text="Servicio de enlace de SOAP" expand="false">
+        <tocitem target="requesthandlerlist" text="Lista de administradores de solicitudes" expand="false"></tocitem>
+        <tocitem target="ggodb" text="Atributos de enlace SOAP" expand="false"></tocitem></tocitem>
+    <tocitem target="webservices.wsauthnservices" text="Servicio Web de autenticación" expand="false">
+        <tocitem target="mechanismhandlerslist" text="Lista de administradores de mecanismos" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="service.scconfig" text="Atributos de configuración" expand="false">
+    <tocitem target="service.scconfigauth" text="Autenticación" expand="false">
+        <tocitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="Anónimo" expand="false"></tocitem>
+        <tocitem target="authentication.authconfig" text="Configuración de autenticación" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="Certificado" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthservice" text="Principal" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthdatastoreservice" text="Almacén de datos" expand="false"></tocitem>
+        <tocitem target="ggulh" text="Fédération" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP básico" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="Condición de miembro" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="SSO de Windows Desktop" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT" expand="false"></tocitem>
+        <tocitem target="supportedlang" text="Idiomas admitidos" expand="false"></tocitem></tocitem>
+    <tocitem target="service.scconfigconsole" text="Propiedades de la consola" expand="false">
+        <tocitem target="service.scserviceprofile.amadminconsoleservice" text="Administración" expand="false"></tocitem>
+        <tocitem target="service.smg11n" text="Preferencias de globalización" expand="false"></tocitem></tocitem>
+    <tocitem target="servic.scconfigglobal" text="Propiedades globales" expand="false">
+        <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="Configuración de la federación común" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="Configuración del servicio ID-FF de Liberty" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="Servicio de seguridad ID-WSF de Liberty" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="Servicio de interacción de Liberty" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunmultifederationprotocol" text="Protocolo de federación múltiple" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="Reinicialización de contraseña" expand="false"></tocitem>
+        <tocitem target="service.scpolicy" text="Configuración de políticas" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="Configuración del servicio SAMLv2" expand="false"></tocitem>
+        <tocitem target="service.scsaml2soapbinding" text="Enlace SOAP de SAMLv2" expand="false"></tocitem>
+        <tocitem target="service.securitytokenservice" text="Servicio de testigos de seguridad" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.amsessionservice" text="Sesión" expand="false"></tocitem>
+        <tocitem target="service.subconfigadd" text="Para agregar una configuración secundaria" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamuserservice" text="Usuario" expand="false"></tocitem></tocitem>
+    <tocitem target="service.scfonfigsystem" text="Propiedades del sistema" expand="false">
+        <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="Detección de cliente" expand="false"></tocitem>
+        <tocitem target="service.mapcreatedevice" text="Para agregar un cliente nuevo" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="Registros" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="Asignación de nombres" expand="false"></tocitem>
+        <tocitem target="service.scplatform" text="Plataforma" expand="false"></tocitem>
+        <tocitem target="service.scplatformclientcharsetsadd" text="Para crear un conjunto de caracteres nuevo" expand="false"></tocitem></tocitem>
+    <tocitem target="service.serversite" text="Servidores y sitios" expand="false">
+        <tocitem target="service.serveradd" text="Para crear una nueva instancia del servidor" expand="false"></tocitem>
+        <tocitem target="service.serverconfiginherit" text="Configuración de la herencia" expand="false"></tocitem>
+        <tocitem target="service.servereditgeneral" text="General" expand="false"></tocitem>
+        <tocitem target="service.servereditsecurity" text="Seguridad" expand="false"></tocitem>
+        <tocitem target="service.servereditsession" text="Sesión" expand="false"></tocitem>
+        <tocitem target="service.servereditsdk" text="SDK" expand="false"></tocitem>
+        <tocitem target="service.serverconfigxml" text="Configuración de directorio" expand="false"></tocitem>
+        <tocitem target="ggwyq" text="Advanced (Avanzado)" expand="false"></tocitem>
+        <tocitem target="service.siteadd" text="Para crear una nueva instancia del sitio" expand="false"></tocitem>
+        <tocitem target="service.siteedit" text="Para editar una instancia del sitio" expand="false"></tocitem>
+        <tocitem target="ggvwi" text="Mapas de atributo de consola de servidores y sitios" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="sessions" text="Sesiones" expand="false">
+    <tocitem target="sessionpage" text="Página de sesión" expand="false">
+        <tocitem target="sessionsearch" text="Buscar" expand="false"></tocitem>
+        <tocitem target="viewsession" text="Ver sesión" expand="false"></tocitem>
+        <tocitem target="session.smprofile" text="Ventana de sesión" expand="false"></tocitem>
+        <tocitem target="invalidatesession" text="Invalidación de una sesión" expand="false"></tocitem>
+</tocitem>
+</tocitem>
+</toc>

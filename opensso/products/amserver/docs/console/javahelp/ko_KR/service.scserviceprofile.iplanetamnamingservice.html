@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>이름 지정  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamnamingservice"></a><h4>이름 지정 </h4>
+<p><a name="indexterm-204"></a>이름 지정 서비스는 세션, 인증, 로깅, SAML 및 연합과 같은 다양한 기타
+OpenSSO 서비스에 대한 요청 알림뿐만 아니라 URL,플러그인 및 구성을 가져오고 설정하는 데
+사용됩니다.</p><p>플랫폼이 둘 이상의 OpenSSO를 실행 중인 경우 이 서비스를 사용하여 클라이언트가 올바른
+서비스 URL을 찾을 수 있습니다. 이름 지정 URL이 발견되면 이름 지정 서비스는
+사용자 세션을 해독하고 프로토콜, 호스트 및 포트를 세션의 매개 변수로 동적으로 대체합니다.
+이는 서비스에 대해 반환된 URL이 사용자 세션이 만들어진 호스트에 대한 URL이 되도록
+합니다. 이름 지정 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fwfgc">프로필 서비스 URL</a></p></li>
+<li><p><a href="#fwfgg">세션 서비스 URL</a></p></li>
+<li><p><a href="#fwfgf">로깅 서비스 URL</a></p></li>
+<li><p><a href="#fwfgh">정책 서비스 URL</a></p></li>
+<li><p><a href="#fwfge">인증 서비스 URL</a></p></li>
+<li><p><a href="#fwfgl">SAML 웹 프로필/아티팩트 서비스 URL</a></p></li>
+<li><p><a href="#fwfgm">SAML SOAP 서비스 URL</a></p></li>
+<li><p><a href="#fwfgk">SAML 웹 프로필/POST 서비스 URL</a></p></li>
+<li><p><a href="#fwfgi">SAML 명제 관리자 서비스 URL</a></p></li>
+<li><p><a href="#fwfgn">연합 명제 관리자 서비스 URL</a></p></li>
+<li><p><a href="#fwfgp">보안 토큰 관리자 URL</a></p></li>
+<li><p><a href="#fwfgo">JAXRPC 종점 URL</a></p></li></ul>
+
+
+<a name="fwfgc"></a><h5>프로필 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/profileservice</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 프로필 URL을 동적으로 대체할 수
+있게 합니다.</p>
+
+<a name="fwfgg"></a><h5>세션 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/sessionservice</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 세션 URL을 동적으로 대체할 수
+있게 합니다.</p>
+
+<a name="fwfgf"></a><h5>로깅 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/loggingservice</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 로깅 URL을 동적으로 대체할 수
+있게 합니다.</p>
+
+<a name="fwfgh"></a><h5>정책 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다. </p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/policyservice</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 정책 URL을 동적으로 대체할 수
+있게 합니다.</p>
+
+<a name="fwfge"></a><h5>인증 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/authservice</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 인증 URL을 동적으로 대체할 수
+있게 합니다.</p>
+
+<a name="fwfgl"></a><h5>SAML 웹 프로필/아티팩트 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLAwareServlet </tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 SAML 웹 프로필/아티팩트 URL을 동적으로
+대체할 수 있게 합니다. </p>
+
+<a name="fwfgm"></a><h5>SAML SOAP 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLSOAPReceiver </tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 SAML SOAP URL을 동적으로 대체할
+수 있게 합니다.</p>
+
+<a name="fwfgk"></a><h5>SAML 웹 프로필/POST 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLPOSTProfileServlet </tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 SAML 웹 프로필/POST URL을 동적으로
+대체할 수 있게 합니다. </p>
+
+<a name="fwfgi"></a><h5>SAML 명제 관리자 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/AssertionManagerServlet/AssertionM anagerIF</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 SAML 명제 관리자 서비스 URL을
+동적으로 대체할 수 있게 합니다. </p>
+
+<a name="fwfgn"></a><h5>연합 명제 관리자 서비스 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/amserver/FSAssertionManagerServlet/FSAssertionMana gerIF</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 연합 명제 관리자 서비스 URL을
+동적으로 대체할 수 있게 합니다. </p>
+
+<a name="fwfgp"></a><h5>보안 토큰 관리자 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/amserver/SecurityTokenManagerServlet/SecurityToken ManagerIF/</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 보안 토큰 관리자 URL을 동적으로
+대체할 수 있게 합니다. </p>
+
+<a name="fwfgo"></a><h5>JAXRPC 종점 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port/amserver/jaxrpc/</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 JAXRPC 종점 URL을 동적으로 대체할
+수 있게 합니다.</p>
+
+<a name="gguep"></a><h5>Identity 웹 서비스 엔드포인트 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port%uri/identityservices/</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 Identity 웹 서비스 엔드포인트 URL을
+동적으로 대체할 수 있게 합니다.</p>
+
+<a name="ggudo"></a><h5>Identity REST 서비스 엔드포인트 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port%uri/identity//</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 Identity REST 서비스 엔드포인트 URL을
+동적으로 대체할 수 있게 합니다.</p>
+
+<a name="ggueo"></a><h5>보안 토큰 서비스 엔드포인트 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 보안 토큰 서비스 엔드포인트 URL을
+동적으로 대체할 수 있게 합니다.</p>
+
+<a name="gguff"></a><h5>보안 토큰 서비스 MEX 엔드포인트 URL</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다.</p><p><tt>%protocol://%host:%port%uri/sts/mex</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 보안 토큰 서비스 MEX 엔드포인트
+URL을 동적으로 대체할 수 있게 합니다.</p>
+<br/>
+
+</body>
+</html>

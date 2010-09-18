@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Protokollierung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>Protokollierung</h4>
+<p><a name="indexterm-203"></a>Der Protokollierungsdienst bietet Status- und Fehlermeldungen in Bezug auf die OpenSSO-Administration. Als
+Administrator k&#246;nnen Sie bestimmte Werte, wie bespielsweise die Gr&#246;&#223;e und den Speicherort
+der Protokolldatei, konfigurieren. OpenSSO kann Ereignisse in linearen Textdateien oder in einer
+relationalen Datenbank aufzeichnen. Die Attribute des Protokollierungsdienstes sind allgemeine Attribute. Es existieren
+folgende Attribute:</p>
+<ul><li><p><a href="#fxbsv">Maximale Protokollgr&#246;&#223;e</a></p></li>
+<li><p><a href="#fxbsg">Anzahl der Verlaufsdateien</a></p></li>
+<li><p><a href="#fxbzh">Protokolldateispeicherort</a></p></li>
+<li><p><a href="#fxbwg">Protokollierungstyp</a></p></li>
+<li><p><a href="#fxbrd">Name des Datenbankbenutzers</a></p></li>
+<li><p><a href="#fxcdf">Passwort des Datenbankbenutzers</a></p></li>
+<li><p><a href="#fxcep">Passwort des Datenbankbenutzers (Best&#228;tigung)</a></p></li>
+<li><p><a href="#fxbvb">Name des Datenbanktreibers</a></p></li>
+<li><p><a href="#fxbsb">Konfigurierbare Protokollfelder</a></p></li>
+<li><p><a href="#fxccb">H&#228;ufigkeit der Protokoll&#252;berpr&#252;fung</a></p></li>
+<li><p><a href="#fxbxe">Protokoll-Signaturzeit</a></p></li>
+<li><p><a href="#fxcbz">Sichere Protokollierung</a></p></li>
+<li><p><a href="#fxbxt">Maximale Anzahl an Datens&#228;tzen</a></p></li>
+<li><p><a href="#fxbwp">Anzahl an Dateien pro Archiv</a></p></li>
+<li><p><a href="#fxbyw">Puffergr&#246;&#223;e</a></p></li>
+<li><p><a href="#fxbvh">DB-Fehler bei Gr&#246;&#223;e von Speicherpuffer</a></p></li>
+<li><p><a href="#fxcea">Pufferzeitspanne</a></p></li>
+<li><p><a href="#fxbsn">Pufferzeitspanne</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>Maximale Protokollgr&#246;&#223;e</h5>
+<p>Der Wert dieses Attributs gibt die maximale Gr&#246;&#223;e (in Bytes) einer OpenSSO-Protokolldatei
+an. Der Standardwert ist 1000000.</p>
+
+<a name="fxbsg"></a><h5>Anzahl der Verlaufsdateien</h5>
+<p>Der Wert dieses Attributs gibt die Anzahl der gesicherte Protokolldateien an, die
+zu Verlaufsanalysezwecken festgehalten werden. Es kann eine ganze Zahl, abh&#228;ngig von Partitionsgr&#246;&#223;e
+und verf&#252;gbarem Festplattenspeicher im lokalen System, eingegeben werden. Der Standardwert ist 3.</p><p>Die Dateien betreffen nur den Protokollierungstyp FILE. Wenn der Protokollierungstyp auf DB
+eingestellt ist, werden keine Verlaufsdateien erstellt, und die von OpenSSO festgelegte Dateigr&#246;&#223;enbeschr&#228;nkung
+trifft nicht zu.</p>
+<hr><p><b>Hinweis &#8211; </b> Der Wert 0 wird als Wert 1 interpretiert. Das hei&#223;t, auch
+wenn Sie eine 0 eingeben, wird eine Verlaufsdatei erstellt.</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>Protokolldateispeicherort</h5>
+<p>F&#252;r die dateibasierte Protokollierung muss ein Speicherort f&#252;r die Protokolldateien angegeben werden.
+Das Standardverzeichnis lautet:</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt> ist ein Tag, der das Basiskonfigurationsverzeichnis und den URI des OpenSSO-Servers
+angibt. Zur Laufzeit bestimmt der Protokollierungsdienst das entsprechende Verzeichnis f&#252;r die Protokollierung.
+Der Wert dieses Attributs kan als expliziter Pfad angegeben werden, der Basispfad
+sollte jedoch das zugeh&#246;rige Konfigurationsverzeichnis sein.</p><p>Wenn ein nicht standardm&#228;&#223;iges Verzeichnis angegeben wird, das noch nicht existiert, erstellt
+OpenSSO das Verzeichnis. Sie sollten in diesem Fall die entsprechenden Berechtigungen f&#252;r
+dieses Verzeichnis einrichten (z.B. 0700).</p><p>Beachten Sie, dass bei der Angabe des Speicherorts f&#252;r die Protokollierung in
+einer Datenbank (DB), zum Beispiel Oracle oder MySQL, teilweise Gro&#223;- und Kleinschreibung
+ber&#252;cksichtigt wird. Wenn Sie als Speicherort der Protokolldaten beispielsweise eine Oracle-Datenbank festlegen,
+muss der Speicherort wie folgt lauten (Gro&#223;-/Kleinschreibung wird nicht ber&#252;cksichtigt):</p><p><tt>jdbc:oracle:thin:&#64;machine.domain:port:DBName</tt></p><p>Um die DB-Protokollierung zu konfigurieren, f&#252;gen Sie die JDBC-Treiberdateien dem JVM-Klassenpfad des
+Webcontainers hinzu. Sie m&#252;ssen die JDBC-Treiberdateien manuell zum Klassenpfad des <tt>amadmin</tt>-Skripts hinzuf&#252;gen,
+anderenfalls kann die <tt>amadmin</tt> -Protokollierung den JDBC-Treiber nicht laden.</p><p>&#196;nderungen an Protokollierungsattributen treten in der Regel erst nach dem Speichern in
+Kraft. Ein Neustart des Servers ist jedoch nicht erforderlich. Nur wenn Sie
+die sichere Protokollierung aktivieren, sollten Sie den Server anschlie&#223;end neu starten.</p>
+
+<a name="ggyhl"></a><h5>Protokollstatus</h5>
+<p>Gibt an, ob die Protokollierung eingeschaltet (AKTIV) oder ausgeschaltet (INAKTIV) ist. Der
+Wert wird w&#228;hrend der Installation auf AKTIV gesetzt. </p>
+
+<a name="ggydj"></a><h5>Protokolldatensatz - Hostname aufl&#246;sen</h5>
+<p>Wenn auf false eingestellt, werden keine Hostsuchvorg&#228;nge durchgef&#252;hrt, um das Feld HostName
+im LogRecord zu f&#252;llen.</p>
+
+<a name="fxbwg"></a><h5>Protokollierungstyp</h5>
+<p>Sie k&#246;nnen entweder ";Datei" (Protokollierung in linearen Dateien) oder "DB" (Protokollierung in
+Datenbank) festlegen.</p><p>Ein ung&#252;ltiger Datenbank-Benutzername oder ein ung&#252;ltiges Datenbank-Benutzerpasswort beeintr&#228;chtigen die Verarbeitung von OpenSSO
+erheblich. Wenn OpenSSO oder die Konsole instabil wird, sollten Sie das Attribut
+f&#252;r den Protokollstatus auf "Inaktiv" setzen. </p><p>Anschlie&#223;end sollten Sie den Server neu starten. Melden Sie sich danach bei
+der Konsole an und setzen Sie das Protokollierungsattribut zur&#252;ck. Setzen Sie die
+Eigenschaft "Protokollstatus" danach wieder auf <i>AKTIV </i>  und starten Sie den Server
+neu.</p>
+
+<a name="fxbrd"></a><h5>Name des Datenbankbenutzers</h5>
+<p>Dieses Attribut akzeptiert als Wert den Namen des Benutzers, der die Datenbankverbindung
+herstellt, wenn als Protokollierungstyp ";DB" festgelegt wurde.</p>
+
+<a name="fxcdf"></a><h5>Passwort des Datenbankbenutzers</h5>
+<p>Dieses Attribut akzeptiert als Wert das Passwort des Datenbankbenutzers, wenn als Protokollierungstyp
+";DB" festgelegt wurde.</p>
+
+<a name="fxcep"></a><h5>Passwort des Datenbankbenutzers (Best&#228;tigung)</h5>
+<p>Best&#228;tigen Sie das Datenbankpasswort.</p>
+
+<a name="fxbvb"></a><h5>Name des Datenbanktreibers</h5>
+<p>Mit diesem Attribut k&#246;nnen Sie den f&#252;r die Protokoll-Implementierungsklasse verwendeten Treiber festlegen.</p>
+
+<a name="fxbsb"></a><h5>Konfigurierbare Protokollfelder</h5>
+<p>Gibt eine Liste der zu protokollierenden Felder an. Standardm&#228;&#223;ig werden alle Felder
+protokolliert. Die Felder sind:</p>
+<ul><li><p>CONTEXTID</p></li>
+<li><p>DOMAIN</p></li>
+<li><p>HOSTNAME</p></li>
+<li><p>IPADDRESS</p></li>
+<li><p>LOGGED BY</p></li>
+<li><p>LOGLEVEL</p></li>
+<li><p>LOGINID</p></li>
+<li><p>MESSAGEID</p></li>
+<li><p>MODULENAME</p></li></ul>
+<p>Sie sollten wenigstens die Felder CONTEXTID, DOMAIN, HOSTNAME, LOGINID und MESSAGEID protokollieren.</p>
+
+<a name="fxccb"></a><h5>H&#228;ufigkeit der Protokoll&#252;berpr&#252;fung</h5>
+<p>Dieses Attribut legt die H&#228;ufigkeit (in Sekunden) fest, in der der Server
+die Protokolle auf unerlaubte &#196;nderungen &#252;berpr&#252;ft. Das Standardintervall ist 3600 Sekunden. Dieser
+Parameter wird nur auf die sichere Protokollierung angewendet.</p>
+
+<a name="fxbxe"></a><h5>Protokoll-Signaturzeit</h5>
+<p>Dieser Parameter legt die H&#228;ufigkeit (in Sekunden) fest, in der das Protokoll
+signiert wird. Das Standardintervall ist 900 Sekunden. Dieser Parameter wird nur auf
+die sichere Protokollierung angewendet.</p>
+
+<a name="fxcbz"></a><h5>Sichere Protokollierung</h5>
+<p>Mit diesem Attribut wird die sichere Protokollierung aktiviert bzw. deaktiviert. Standardm&#228;&#223;ig ist
+die Sicherheitsprotokollierung deaktiviert. Die sichere Protokollierung aktiviert die &#220;berpr&#252;fung auf unerlaubte &#196;nderungen
+bzw. Manipulationen in Sicherheitsprotokollen.</p>
+<hr><p><b>Hinweis &#8211; </b>Die sichere Protokollierung kann nur f&#252;r Flat Files verwendet werden. Diese Option
+funktioniert f&#252;r die Datenbankprotokollierung nicht.</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>Signaturalgorithmus f&#252;r sichere Protokollierung</h5>
+<p>Dieses Attribut definiert RSA und DSA (Digital Signature Algorithm), welche &#252;ber private
+Schl&#252;ssel f&#252;r Signierung sowie einen &#246;ffentlichen Schl&#252;ssel f&#252;r &#220;berpr&#252;fung verf&#252;gen. Sie k&#246;nnen
+einen der folgenden Typen ausw&#228;hlen:</p>
+<ul><li><p>MD2 w/RSA</p></li>
+<li><p>MD5 w/RSA</p></li>
+<li><p>SHA1 w/DSA</p></li>
+<li><p>SHA1 w/RSA</p></li></ul>
+<p>MD2, MD5 und RSA sind Einweg-Hashes. Wenn Sie beispielsweise den Signaturalgorithmus MD2
+w/RSA ausw&#228;hlen, generiert die sichere Protokollierung eine Gruppe von Meldungen mit MD2
+und verschl&#252;sselt den Wert mit dem RSA-Privatschl&#252;ssel. Dieser verschl&#252;sselte Wert ist die
+Signatur der urspr&#252;nglichen protokollierten Datens&#228;tze und wird an den letzten Datensatz der
+neuesten Signatur angeh&#228;ngt. Zur &#220;berpr&#252;fung wird die Signatur mit dem &#246;ffentlichen RSA-Schl&#252;ssel
+entschl&#252;sselt, und der entschl&#252;sselte Wert wird mit der Gruppe von protokollierten Datens&#228;tzen
+verglichen. Die sichere Protokollierung entdeckt dann alle &#196;nderungen an protokollierten Datens&#228;tzen.</p>
+
+<a name="ghaeg"></a><h5>Protokollierung des Zertifikatsspeicher-Standorts</h5>
+<p>Wenn sichere Protokollierung aktiviert ist, sucht der Protokollierungsdienst an dem durch dieses
+Attribut angegebenen Speicherort nach seinem Zertifikat. Der tats&#228;chliche Verzeichnispfad wird zur Laufzeit
+festgelegt. Der Wert kann auf einen expliziten Pfad gesetzt sein, die OpenSSO-Instanz
+sollte jedoch Zugriff auf den Basispfad haben.</p>
+
+<a name="fxbxt"></a><h5>Maximale Anzahl an Datens&#228;tzen</h5>
+<p>Dieses Attribut legt die maximale Anzahl an Datens&#228;tzen fest, die von den
+Java  LogReader-Schnittstellen zur&#252;ckgeben wird, unabh&#228;ngig davon, wie viele der Datens&#228;tze der Leseanforderung
+entsprechen. By default, it is set to 500. This attribute can be
+overridden by the caller of the Logging API through the <i> LogQuery</i> class.</p>
+
+<a name="fxbwp"></a><h5>Anzahl an Dateien pro Archiv</h5>
+<p>Dieses Attribut wird nur auf die sichere Protokollierung angewendet. Es gibt an,
+wann die Protokolldateien und der Schl&#252;sselspeicher archiviert und der Sicherheitsschl&#252;sselspeicher neu generiert
+werden muss, um die anschlie&#223;ende sichere Protokollierung fortf&#252;hren zu k&#246;nnen. Standardm&#228;&#223;ig sind
+f&#252;nf Dateien je Protokoll festgelegt.</p>
+
+<a name="fxbyw"></a><h5>Puffergr&#246;&#223;e</h5>
+<p>Dieses Attribut legt die maximale Anzahl der Protokolldatens&#228;tze fest, die im Arbeitsspeicher
+zwischengespeichert werden, bevor sie vom Protokollierungsdienst in das Protokollierungs-Repository geschrieben werden. Der
+Standardwert ist ein Datensatz.</p>
+
+<a name="fxbvh"></a><h5>DB-Fehler bei Gr&#246;&#223;e von Speicherpuffer</h5>
+<p>Dieses Attribut legt die maximale Anzahl der Protokolldatens&#228;tze fest, die im Speicher
+verbleiben, wenn die Datenbank (DB)-Protokollierung fehlschl&#228;gt. Dieses Attribut wird nur angewendet, wenn
+die DB-Protokollierung festgelegt wurde. Wenn die Verbindung vom OpenSSO-Protokollierungsdienst zur DB unterbrochen
+wird, wird die hier angegebene Anzahl an Datens&#228;tzen zwischengespeichert. Der Standardwert dieses
+Attributs entspricht dem doppelten f&#252;r die Puffergr&#246;&#223;e angegebenen Wert.</p>
+
+<a name="fxcea"></a><h5>Pufferzeitspanne</h5>
+<p>Dieses Attribut gibt die Zeit an, die die Protokolldatens&#228;tze im Zwischenspeicher verbleiben,
+bevor diese zur Protokollierung an den Protokollierungsdienst gesendet werden. Dieses Attribut wird
+nur angewendet, wenn ";Pufferzeitspanne aktivieren" aktiviert ist. Das Standardwert ist 3600 Sekunden.</p>
+
+<a name="fxbsn"></a><h5>Pufferzeitspanne</h5>
+<p>Wenn f&#252;r dieses Attribut der Wert EIN festgelegt wird, wendet OpenSSO ein
+Zeitlimit f&#252;r die Zwischenspeicherung der Protokolldatens&#228;tze an. Das Zeitlimit wird im Attribut
+";Pufferzeitspanne" festgelegt.</p>
+
+<a name="ghaer"></a><h5>Protokollebene</h5>
+<p>Mit diesem Attribut k&#246;nnen Sie die Detailgenauigkeit in einer bestimmten Protokolldatei konfigurieren,
+indem Sie eine verf&#252;gbaren Optionen ausw&#228;hlen. Die Protokollierung f&#252;r die OpenSSO-Dienste erfolgt
+auf INFO-Ebene. SAML- und Identity Federation-Dienste protokolliern auch auf detaillierteren Ebenen (GENAU,
+GENAUER, SEHR GENAU). Zus&#228;tzlich gibt es die Ebene OFF (AUS), die zum
+Ausschalten der Protokollierung dient, sowie die Ebene ALL (ALLES), mit der die
+Protokollierung aller Nachrichten aktiviert wird.</p>
+<br/>
+
+</body>
+</html>

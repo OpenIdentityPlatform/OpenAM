@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear un rol filtrado - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subject.createfiltrole"></a><h5>Para crear un rol filtrado</h5>
+<ol>
+<li><b>En el panel de navegaci&#243;n, despl&#225;cese a la organizaci&#243;n en la que
+se crear&#225; el rol.</b></li>
+<li><b>Haga clic en Nuevo.</b></li>
+<li><b>Introduzca un nombre para el rol filtrado.</b></li>
+<li><b>Introduzca la informaci&#243;n para los criterios de b&#250;squeda.</b><p>Por ejemplo:</p><pre>(&#38;(uid=user1)(|(inetuserstatus=active)(!(inetuserstatus=*))))</pre><p>Si se deja en blanco el filtro, se crear&#225; el siguiente rol
+de forma predeterminada:</p><pre>(objectclass = inetorgperson)</pre></li>
+<li><b>Haga clic en Aceptar para iniciar la b&#250;squeda basada en los criterios
+del filtro. Las identidades definidas por los criterios del filtro se asignan
+autom&#225;ticamente al rol.</b></li>
+<li><b>Una vez creado el rol filtrado, haga clic en su nombre para
+ver los usuarios que pertenecen a dicho rol. Puede hacer clic en
+la ficha Services (Servicios) para agregar servicios al rol. Consulte <a href="idm.entityservices.html">Para agregar servicios a una identidad</a>.</b></li></ol>
+<br/>
+
+</body>
+</html>

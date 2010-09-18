@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liste de gestionnaires de demandes - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="requesthandlerlist"></a><h4>Liste de gestionnaires de demandes</h4>
+<a name="indexterm-151"></a><a name="indexterm-152"></a><p>Service de liaison SOAP fournit l'interface <tt>RequestHandler</tt> pour traiter le messages de
+demande et renvoyer une r&#233;ponse. Cette interface doit &#234;tre impl&#233;ment&#233;e c&#244;t&#233; serveur
+par chaque service d'identit&#233; bas&#233; sur Liberty utilisant Service de liaison SOAP.
+L'attribut Liste de gestionnaires de demandes stocke les informations sur les classes
+d'impl&#233;mentation des services Web qui impl&#233;mentent le gestionnaire de demandes. The Request
+Handler List displays entries that contain key/value pairs separated by a pipe
+as in: <tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>. Ces param&#232;tres sont expliqu&#233;s dans le tableau suivant.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Param&#232;tre</p></th>
+<th align="left" valign="top" scope="column"><p>En-t&#234;te</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>key</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Le param&#232;tre
+obligatoire <tt>key</tt> est la derni&#232;re partie du chemin de l'URI vers une
+extr&#233;mit&#233; SOAP. Le point d'arriv&#233;e SOAP dans OpenSSO est le servlet r&#233;cepteur
+SOAP. The URI to the SOAP Receiver is: <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/key</b></tt> If you define
+<tt><b>disco</b></tt> as the key, the URI path to the SOAP endpoint for
+the corresponding Service de d&#233;couverte would be: <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>. Des clients de services
+diff&#233;rents utilisent des cl&#233;s diff&#233;rentes pour la connexion au r&#233;cepteur SOAP.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>class</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Le param&#232;tre
+obligatoire <tt>class</tt> sp&#233;cifie le nom de la classe d'impl&#233;mentation RequestHandler du service
+d'identit&#233;. For example: <tt>class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>.</p></td>
+</tr>
+</table><p>Pour ajouter un nouveau gestionnaire de demandes, reportez-vous &#224; <a href="service.scsoapbindingrequesthandlerlistadd.html">Configuration d'un gestionnaire de demandes</a>.</p>
+<br/>
+
+</body>
+</html>

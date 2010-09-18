@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Usuario - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamuserservice"></a><h4>Usuario</h4>
+<p><a name="indexterm-198"></a>Las preferencias de usuario predeterminadas se definen mediante el servicio de usuario.
+&#201;stas incluyen la zona horaria, el idioma y la vista de inicio
+de DN. Los atributos del servicio de usuario son atributos din&#225;micos.</p>
+<ul><li><p><a href="#fxckn">Idioma preferido por el usuario</a></p></li>
+<li><p><a href="#fxcnb">Zona horaria preferida por el usuario</a></p></li>
+<li><p><a href="#fxcte">Idioma heredado</a></p></li>
+<li><p><a href="#fxcpk">Vista de inicio de administrador</a></p></li>
+<li><p><a href="#fxciz">Estado de usuario predeterminado</a></p></li></ul>
+
+
+<a name="fxckn"></a><h5>Idioma preferido por el usuario</h5>
+<p>Este campo especifica el idioma del texto seleccionado por el usuario, que
+se muestra en la consola de OpenSSO. El valor predeterminado es en.
+Este valor asigna un conjunto de claves de localizaci&#243;n a la sesi&#243;n
+de usuario de forma que el texto en pantalla aparece en el
+idioma adecuado para el usuario.</p>
+
+<a name="fxcnb"></a><h5>Zona horaria preferida por el usuario</h5>
+<p>Este campo especifica la zona horaria en la que el usuario accede
+a la consola de OpenSSO. No hay ning&#250;n valor predeterminado.</p>
+
+<a name="fxcte"></a><h5>Idioma heredado</h5>
+<p>Este campo especifica la configuraci&#243;n regional del usuario. El valor predeterminado es
+en_US. Consulte <a href="supportedlang.html">Idiomas admitidos</a> pata obtener una lista de las configuraciones regionales.</p>
+
+<a name="fxcpk"></a><h5>Vista de inicio de administrador</h5>
+<p>Si el usuario es un administrador de OpenSSO, este campo especifica el
+nodo que ser&#225; el punto de inicio y se mostrar&#225; en la
+consola de OpenSSO cuando el usuario inicie una sesi&#243;n. No hay ning&#250;n
+valor predeterminado. Se puede utilizar un DN v&#225;lido para el que el
+usuario tenga, al menos, acceso de lectura.</p>
+
+<a name="fxciz"></a><h5>Estado de usuario predeterminado</h5>
+<p>Esta opci&#243;n indica el estado predeterminado para un usuario que se acaba
+de crear. El estado de entrada de usuario anula este estado. S&#243;lo
+los usuarios activos se pueden autenticar mediante OpenSSO. El valor predeterminado es
+Activo. Se puede seleccionar cualquiera de estas opciones en el men&#250; desplegable:</p><dl><dt>Activo</dt>
+<dd><p>El usuario se puede autenticar mediante OpenSSO.</p></dd>
+<dt>Inactivo</dt>
+<dd><p>El usuario no puede autenticarse mediante OpenSSO, pero el perfil de usuario permanece almacenado en el directorio.</p></dd>
+</dl>
+<p>Para definir el estado de un usuario individual, debe registrarse el servicio
+de usuario, seleccionar el valor, asignarle un rol y agregar este rol
+al perfil del usuario.</p>
+<br/>
+
+</body>
+</html>

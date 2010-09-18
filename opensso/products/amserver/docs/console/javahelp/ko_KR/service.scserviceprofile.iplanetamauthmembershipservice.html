@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>구성원 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>구성원</h4>
+<p><a name="indexterm-176"></a>구성원 인증 모듈은 개별화된 사이트에 대해 구현됩니다. 구성원 인증이 사용 가능한 경우
+사용자가 직접 등록할 수 있습니다. 즉, 사용자가 관리자의 도움 없이 계정을 만들어
+사용자 설정하고 등록된 사용자로 이 계정에 액세스할 수 있습니다. 이 속성은 영역
+속성입니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fumys">최소 비밀번호 길이</a></p></li>
+<li><p><a href="#fumyr">기본 사용자 역할</a></p></li>
+<li><p><a href="#fumyt">등록 후 사용자 상태</a></p></li>
+<li><p><a href="#fumzm">인증 수준</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>최소 비밀번호 길이</h5>
+<p>직접 등록 중에 비밀번호 집합에 필요한 최소 문자 수를 지정합니다. 기본값은 8입니다.</p><p>이 값이 변경되면 다음 파일의 등록 및 오류 텍스트에서도 값을 변경해야 합니다.</p><p><tt></tt><i>AcessManager-base</i><tt>/locale/amAuthMembership.properties</tt> (<i>PasswdMinChars</i> 항목)</p>
+
+<a name="fumyr"></a><h5>기본 사용자 역할</h5>
+<p>직접 등록을 통해 프로필이 만들어지는 새 사용자에 할당할 역할을 지정합니다. 기본값은 없습니다.
+관리자는 새 사용자에게 할당할 역할의 DN을 지정해야 합니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 역할은 인증을 구성 중인 영역 아래에 있어야 합니다. 사용자에게 할당될 수
+있는 역할만 직접 등록 중에 추가됩니다. 다른 DN은 모두 무시됩니다. 역할은 OpenSSO
+역할 또는 LDAP 역할 중 하나일 수 있지만 필터링된 역할은 허용되지 않습니다.</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>등록 후 사용자 상태</h5>
+<p>직접 등록된 사용자가 서비스를 즉시 사용할 수 있는지 여부를 지정합니다. 기본값은 활성이며
+이 경우 새 사용자가 서비스를 사용할 수 있습니다. 관리자는 비활성을 선택하여 새
+사용자가 서비스를 사용할 수 없게 할 수 있습니다.</p>
+
+<a name="fumzm"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

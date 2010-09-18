@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SSO Bureau Windows - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>SSO Bureau Windows</h4>
+<p><a name="indexterm-183"></a>Ce module est propre &#224; Windows et connu sous le nom d'authentification
+Kerberos. L'utilisateur pr&#233;sente un jeton Kerberos &#224; OpenSSO par l'interm&#233;diaire du protocole
+SPNEG (Simple and Protected GSS-API Negotiation Mechanism). Le plug-in d'authentification SSO Bureau
+Windows fournit &#224; un client (utilisateur) le fonction de connexion unique sur
+le bureau. Cela signifie qu'un utilisateur qui s'est d&#233;j&#224; authentifi&#233; &#224; l'aide
+d'un KDC peut &#234;tre authentifi&#233; avec OpenSSO sans fournir de nouveau les
+informations de connexion. Les attributs SSO Bureau Windows sont des attributs globaux.
+Ces attributs sont les suivants :</p>
+<ul><li><p><a href="#fwbfr">Principe de service</a></p></li>
+<li><p><a href="#fwbfo">Nom de fichier keytab</a></p></li>
+<li><p><a href="#fwbhy">Domaine Kerberos</a></p></li>
+<li><p><a href="#fwbid">Nom du serveur Kerberos</a></p></li>
+<li><p><a href="#fwbhw">Principe de retour avec nom de domaine</a></p></li>
+<li><p><a href="#fwbic">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>Principe de service</h5>
+<p>Indique le principe Kerberos qui est utilis&#233; pour l'authentification. Utilisez le format
+suivant :</p><p><tt><b>HTTP/</tt><i>nomh&#244;te.nomdomaine&#64;nom_domaine_dc</i><tt></b></tt></p><p><b>nomh&#244;te</b> et <b>nomdomaine</b> repr&#233;sentent le nom d'h&#244;te et le nom de domaine
+de l'instance OpenSSO. <b>nom_domaine_dc</b> est le domaine Kerberos dans lequel le serveur
+Kerberos Windows  (contr&#244;leur de domaine) r&#233;side. Il peut &#234;tre diff&#233;rent du
+nom de domaine d'OpenSSO.</p>
+
+<a name="fwbfo"></a><h5>Nom de fichier keytab</h5>
+<p>Cet attribut sp&#233;cifie le fichier keytab Kerberos utilis&#233; pour l'authentification. Utilisez de
+pr&#233;f&#233;rence le format suivant :</p><p><tt><b></tt><i>nomh&#244;te</i><tt>.HTTP.keytab</b></tt></p><p><b>nom_h&#244;te</b> est le nom d'h&#244;te de l'instance OpenSSO.</p>
+
+<a name="fwbhy"></a><h5>Domaine Kerberos</h5>
+<p>Cet attribut indique le nom de domaine de Kerberos Distribution Center (contr&#244;leur
+de domaine). Selon votre configuration, le nom de domaine du contr&#244;leur de
+domaine peut &#234;tre diff&#233;rent du nom de domaine OpenSSO.</p>
+
+<a name="fwbid"></a><h5>Nom du serveur Kerberos</h5>
+<p>Cet attribut indique le nom d'h&#244;te de Kerberos Distribution Center (contr&#244;leur de
+domaine). Vous devez entrer le nom de domaine complet (FQDN) du contr&#244;leur
+de domaine.</p>
+
+<a name="fwbhw"></a><h5>Principe de retour avec nom de domaine</h5>
+<p>S'il est activ&#233;, cet attribut permet &#224; OpenSSO de retourner automatiquement le
+Principal Kerberos avec le nom de domaine du contr&#244;leur de domaine lors
+de l'authentification.</p>
+
+<a name="fwbic"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

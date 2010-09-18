@@ -1,0 +1,94 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.6 2009/07/09 17:04:24 veiming Exp $
+
+-->
+
+<project name="opensso-legacy" default="usage">
+    <description>Open Web Single Sign-On (Legacy)</description>
+    <import file="../products.xml" />
+    <import file="legacy.xml" />
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- user specific properties -->
+    <property file="${user.home}/.opensso"/>
+
+    <!-- overridable properties -->
+    <property name="build.debug" value="on"/>
+    <property name="build.debuglevel" value="lines,vars,source"/>
+    
+    <path id="legacy.build.class.path">
+        <pathelement location="${amserver.classes.dir}"/>
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <pathelement location="${fedlib.classes.dir}"/>
+        <pathelement location="${openfm.classes.dir}"/>
+        <fileset dir="${extlib.dir}">
+            <include name="j2ee.jar"/>
+        </fileset>
+    </path>
+
+    <target name="build" depends="preparebuild">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${legacy.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${legacy.src.dir}"/>
+            <classpath refid="legacy.build.class.path"/>
+        </javac>
+        <copy file="${legacy.base.dir}/xml/dtd/amAdmin.dtd"
+            tofile="${legacy.classes.dir}/com/iplanet/am/admin/cli/amAdmin.dtd" />
+        <copy file="${legacy.base.dir}/xml/log/Amadmin_CLILogMessageIDs.xml"
+            tofile="${legacy.classes.dir}/com/sun/identity/log/messageid/Amadmin_CLILogMessageIDs.xml" />
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${legacy.built.dir}"/>
+        <mkdir dir="${legacy.classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${legacy.classes.dir}"/>
+        <delete dir="${legacy.built.dir}"/>
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" build      : compiles the sources"/>
+        <echo message=" clean      : deletes the generated files"/>
+        <echo message=" usage      : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+</project>

@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>UNIX - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthunixservice"></a><h4>UNIX</h4>
+<p><a name="indexterm-182"></a>この Solaris 専用モジュールにより、ユーザーの UNIX ID とパスワードを使用した認証が可能になります。UNIX 認証属性が変更された場合、OpenSSO と amunixd ヘルパーはともに再起動する必要があります。UNIX 認証属性にはグローバル属性とレルム属性があります。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwbsy">「設定ポート」</a></p></li>
+<li><p><a href="#fwbqv">「認証ポート」</a></p></li>
+<li><p><a href="#fwbrv">「タイムアウト」</a></p></li>
+<li><p><a href="#fwbls">「スレッド」</a></p></li>
+<li><p><a href="#fwbra">「認証レベル」</a></p></li>
+<li><p><a href="#fwbky">「PAM サービス名」</a></p></li></ul>
+
+
+<a name="fwbsy"></a><h5>設定ポート</h5>
+<p>UNIX ヘルパー認証ポート、UNIX ヘルパーのタイムアウト、および UNIX ヘルパースレッドの各属性に含まれる設定情報を UNIX ヘルパーが起動直後からどのポート上で待機するかを指定します。デフォルトは 58946 です。</p>
+
+<a name="fwbqv"></a><h5>認証ポート</h5>
+<p>この属性は、設定後に UNIX ヘルパーがどのポート上で認証要求を待機するかを指定します。デフォルトは 57946 です。</p>
+
+<a name="fwbrv"></a><h5>タイムアウト</h5>
+<p>この属性は、認証の制限時間を分単位で指定します。指定された時間を超えると、認証は自動的に失敗します。デフォルトでは 3 分に設定されています。</p>
+
+<a name="fwbls"></a><h5>スレッド</h5>
+<p>この属性は、同時に可能な UNIX 認証セッションの最大数を指定します。ある時点でこの最大数に達すると、いずれかのセッションが解放されるまで、認証を試みても認証は行われません。デフォルトは 5 に設定されています。</p>
+
+<a name="fwbra"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+
+<a name="fwbky"></a><h5>PAM サービス名</h5>
+<p>使用するオペレーティングシステムに付属する PAM (Pluggable Authentication Module) 設定またはスタックのうち、UNIX 認証で使用するものを定義します。この名前は通常、Solaris の場合は <tt>other</tt>、Linux の場合は <tt>password</tt> になります。</p>
+<br/>
+
+</body>
+</html>

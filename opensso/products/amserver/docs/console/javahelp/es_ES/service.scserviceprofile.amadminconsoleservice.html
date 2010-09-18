@@ -1,0 +1,519 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Administraci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amadminconsoleservice"></a><h4>Administraci&#243;n</h4>
+<p><a name="indexterm-187"></a>El servicio Administraci&#243;n permite configurar la consola de OpenSSO tanto en el
+nivel global como en el nivel del dominio configurado (las preferencias u
+opciones espec&#237;ficas de un dominio configurado). Los atributos del servicio Administraci&#243;n son
+globales y de dominio. </p>
+<hr><p><b>Nota &#8211; </b>Parte de los atributos que aparecen en esta secci&#243;n s&#243;lo se aplican
+a la instalaci&#243;n en Modo heredado.</p>
+<hr>
+<p>Los atributos son:</p>
+<ul><li><p><a href="#fufly">Administraci&#243;n de federaci&#243;n</a></p></li>
+<li><p><a href="#fsvge">Administraci&#243;n de usuarios</a></p></li>
+<li><p><a href="#fsvgj">Contenedores de personas</a></p></li>
+<li><p><a href="#fsvgm">Contenedores de unidades organizativas</a></p></li>
+<li><p><a href="#fsvgq">Contenedores de grupos</a></p></li>
+<li><p><a href="#fsvgh">Tipo de grupo administrado</a></p></li>
+<li><p><a href="#fsvgr">Permisos de rol predeterminados</a> </p></li>
+<li><p><a href="#fsvgt">&#193;rbol de componente de dominio</a></p></li>
+<li><p><a href="#fsvgs">Grupos administrativos</a></p></li>
+<li><p><a href="#fsvgv">Eliminaci&#243;n de usuario de compatibilidad</a></p></li>
+<li><p><a href="#fsvgu">ACI de roles administrativos din&#225;micos</a></p></li>
+<li><p><a href="#ftbxa">Clases de servicio de perfil de usuario</a></p></li>
+<li><p><a href="#fsvgw">Lista de atributos de nodo DC</a></p></li>
+<li><p><a href="#fsvgx">Filtros de b&#250;squeda para los objetos eliminados</a></p></li>
+<li><p><a href="#fsvgy">Contenedor de personas predeterminado</a></p></li>
+<li><p><a href="#fsvhe">Contenedor de grupos predeterminado</a></p></li>
+<li><p><a href="#fsvhd">Contenedor de agentes predeterminado</a></p></li>
+<li><p><a href="#fsvhb">Contenedor de personas predeterminado de grupos</a></p></li>
+<li><p><a href="#fsvha">Lista de contenedores de personas de grupos</a></p></li>
+<li><p><a href="#fsvhc">Clase de visualizaci&#243;n de perfiles de usuario</a></p></li>
+<li><p><a href="#fsvhh">Clase de visualizaci&#243;n de perfiles de usuario final</a></p></li>
+<li><p><a href="#fsvhi">Mostrar roles en la p&#225;gina de perfil de usuario</a></p></li>
+<li><p><a href="#fsvhj">Mostrar grupos en la p&#225;gina de perfil de usuario</a></p></li>
+<li><p><a href="#fsvhf">Autosuscripci&#243;n del usuario al grupo</a></p></li>
+<li><p><a href="#fsvhk">Opciones de visualizaci&#243;n de perfiles de usuario</a></p></li>
+<li><p><a href="#fsvhl">Roles predeterminados de creaci&#243;n de usuarios</a></p></li>
+<li><p><a href="#fsvhm">Fichas de consola administrativa</a></p></li>
+<li><p><a href="#fsvho">N&#250;mero m&#225;ximo de resultados de b&#250;squeda</a></p></li>
+<li><p><a href="#fsvhp">Tiempo de espera para b&#250;squeda</a></p></li>
+<li><p><a href="#fsvhs">Nombre de directorio JSP</a></p></li>
+<li><p><a href="#fsvhr">Documentos de la ayuda en l&#237;nea</a></p></li>
+<li><p><a href="#fsvhq">Servicios necesarios</a></p></li>
+<li><p><a href="#fsvhu">Clave de b&#250;squeda de usuario</a></p></li>
+<li><p><a href="#fsvht">Atributo de devoluci&#243;n de b&#250;squeda de usuario</a></p></li>
+<li><p><a href="#fsvhv">Lista de notificaci&#243;n de creaci&#243;n de usuarios</a></p></li>
+<li><p><a href="#fsvhw">Lista de notificaci&#243;n de eliminaci&#243;n de usuarios</a></p></li>
+<li><p><a href="#fsvhx">Lista de notificaci&#243;n de modificaci&#243;n de usuarios</a></p></li>
+<li><p><a href="#fsvia">N&#250;mero m&#225;ximo de entradas por p&#225;gina</a></p></li>
+<li><p><a href="#fsvhz">Clases de escuchas de eventos</a></p></li>
+<li><p><a href="#fsvhy">Clases de procesamiento previo y posterior</a></p></li>
+<li><p><a href="#fsvic">B&#250;squeda de atributos externos</a></p></li>
+<li><p><a href="#fsvib">Caracteres del ID de usuario no v&#225;lidos</a></p></li>
+<li><p><a href="#fsvie">Clase de complemento de validaci&#243;n de Id. de usuario y contrase&#241;a</a></p></li></ul>
+
+
+<a name="fufly"></a><h5>Administraci&#243;n de federaci&#243;n</h5>
+<p>Habilita la administraci&#243;n de federaci&#243;n. Est&#225; seleccionada de forma predeterminada. Para deshabilitar
+esta funci&#243;n, anule la selecci&#243;n del campo. La ficha Federation Management (Administraci&#243;n
+de federaci&#243;n) no aparecer&#225; en la consola.</p>
+
+<a name="fsvge"></a><h5>Administraci&#243;n de usuarios</h5>
+<p>Habilita la administraci&#243;n de usuarios. De forma predeterminada, esta opci&#243;n est&#225; habilitada.
+Este atributo es v&#225;lido si se instala OpenSSO en el modo tradicional.
+</p>
+
+<a name="fsvgj"></a><h5>Contenedores de personas</h5>
+<p>La selecci&#243;n de este atributo se anula de forma predeterminada y s&#243;lo
+es v&#225;lido si se instala OpenSSO en el modo tradicional. Al seleccionar
+este atributo, se mostrar&#225;n los contenedores de personas en la ficha Directory
+Management (Administraci&#243;n de directorio). Se recomienda utilizar un &#250;nico contenedor de personas
+en el DIT y usar los roles para administrar las cuentas y
+servicios. El comportamiento predeterminado de la consola de OpenSSO consiste en ocultar
+los contenedores de personas. Sin embargo, si cuenta con varios contenedores de
+personas en el DIT, seleccione este atributo para que se muestren como
+objetos administrados.</p>
+
+<a name="fsvgm"></a><h5>Contenedores de unidades organizativas</h5>
+<p>La selecci&#243;n de este atributo se anula de forma predeterminada y s&#243;lo
+es v&#225;lido si se instala OpenSSO en el modo tradicional. Al seleccionar
+este atributo, se mostrar&#225;n los contenedores en la ficha Directory Management (Administraci&#243;n
+de directorio).</p>
+
+<a name="fsvgq"></a><h5>Contenedores de grupos</h5>
+<p>La selecci&#243;n de este atributo se anula de forma predeterminada y s&#243;lo
+es v&#225;lido si se instala OpenSSO en el modo tradicional. Al seleccionar
+este atributo, se mostrar&#225;n los contenedores de grupo en la ficha Directory
+Management (Administraci&#243;n de directorio).</p>
+
+<a name="fsvgh"></a><h5>Tipo de grupo administrado</h5>
+<p>Especifica si los grupos de suscripci&#243;n creados mediante la consola son est&#225;ticos
+o din&#225;micos. La consola crear&#225; o mostrar&#225; grupos de suscripci&#243;n est&#225;ticos o
+din&#225;micos, pero no ambos (los grupos filtrados siempre son compatibles independientemente del
+valor especificado en este atributo). El valor predeterminado es din&#225;mico.</p>
+<ul><li><p>Un grupo est&#225;tico muestra expl&#237;citamente cada miembro del grupo utilizando la clase de objeto <tt>groupOfNames</tt> o <tt>groupOfUniqueNames. </tt> La entrada de grupo contiene el atributo <i>uniqueMember</i> para cada miembro del grupo. Los miembros de los grupos est&#225;ticos se agregan manualmente; la entrada del usuario permanece inalterada. Los grupos est&#225;ticos son adecuados para grupos con pocos miembros. </p></li>
+<li><p>Un grupo din&#225;mico utiliza un atributo <tt>memberOf</tt> en la entrada de cada miembro del grupo. Los miembros de los grupos din&#225;micos se generan mediante la utilizaci&#243;n de un filtro LDAP que busca y muestra todas las entradas que contengan el atributo <tt>memberOf. </tt> Los grupos din&#225;micos son adecuados para grupos con un gran n&#250;mero de miembros. </p></li>
+<li><p>Un grupo filtrado utiliza un filtro LDAP para buscar y mostrar los miembros que satisfacen los requisitos definidos en el filtro. Por ejemplo, el filtro puede generar los miembros con un uid (<tt>uid=g&#42;</tt>) o direcci&#243;n de correo electr&#243;nico (<tt>mail=&#42;&#64;example.com</tt>) espec&#237;fica. </p></li></ul>
+<p>En los ejemplos mostrados anteriormente, el filtro LDAP deber&#237;a mostrar todos los
+usuarios cuyo uid comienza por <tt>g</tt> o cuyas direcciones de correo electr&#243;nico
+terminasen en <tt>example.com</tt>, respectivamente. Los grupos filtrados s&#243;lo se pueden crear en
+la vista User Management (Administraci&#243;n de usuarios) seleccionando Membership by Filter (Miembros
+por filtro).</p><p>Un administrador puede seleccionar una de las siguientes opciones:</p>
+<ul><li><p>Din&#225;mico: los grupos creados mediante la opci&#243;n Miembros por suscripci&#243;n ser&#225;n din&#225;micos.</p></li>
+<li><p>Est&#225;tico: los grupos creados mediante la opci&#243;n Miembros por suscripci&#243;n ser&#225;n est&#225;ticos.</p></li></ul>
+
+
+<a name="fsvgr"></a><h5>Permisos de rol predeterminados</h5>
+<p>Define una lista de las instrucciones de control de acceso (ACI) predeterminadas
+o los <b>permisos</b> que se utilizan para conceder privilegios de administrador al
+crear nuevos roles. Seleccione una de estas ACI para el nivel de
+privilegio que desee. OpenSSO incluye cuatro permisos de rol predeterminados:</p><p>Sin permisos: no se definen permisos en el rol.</p><p>Administrador de organizaci&#243;n: el administrador de la organizaci&#243;n tiene acceso de lectura
+y escritura a todas las entradas en la organizaci&#243;n configurada.</p><p>Administrador del servicio de atenci&#243;n al cliente de la organizaci&#243;n: este administrador
+tiene acceso de lectura a todas las entradas en la organizaci&#243;n configurada
+y de escritura al atributo <tt>userPassword</tt>.</p><p>Administrador de pol&#237;ticas de la organizaci&#243;n: este administrador tiene acceso de lectura
+y escritura a todas las pol&#237;ticas del dominio. Este administrador no puede
+crear una pol&#237;tica de referencia.  </p>
+
+<a name="fsvgt"></a><h5>&#193;rbol de componente de dominio</h5>
+<p>El &#225;rbol de componente de dominio (&#225;rbol DC) es una estructura DIT
+espec&#237;fica que utilizan muchos componentes de Sun Java System para asignar nombres
+de DNS y entradas del dominio.</p><p>Cuando se habilita esta opci&#243;n, se crea la entrada del &#225;rbol DC
+para un dominio, siempre que el nombre de DNS del dominio se
+introduzca en el momento en que se crea el dominio. El campo
+del nombre de DNS aparecer&#225; en la p&#225;gina de creaci&#243;n de dominios.
+Esta opci&#243;n s&#243;lo es v&#225;lida para las organizaciones de nivel superior y
+no se mostrar&#225; para los subdominios.</p><p>Cualquier cambio de estado realizado en el atributo <i>inetdomainstatus</i> con OpenSSO SDK
+en el &#225;rbol de dominio actualizar&#225; el estado de la entrada correspondiente
+en el &#225;rbol DC. (Las actualizaciones en el estado que no se
+realicen con OpenSSO SDK no se sincronizar&#225;n). Por ejemplo, si se crea
+un nuevo dominio, sun, con el atributo de nombre de DNS <tt>sun.com </tt>,
+se crear&#225; la siguiente entrada en el &#225;rbol DC:</p><p><tt>dc=sun,dc=com,o=internet,root suffix</tt></p><p>De forma predeterminada, se establece en la ra&#237;z de OpenSSO. Si se
+desea un sufijo distinto, &#233;ste se debe crear utilizando los comandos LDAP.
+Las ACI para los administradores que crean los dominios deben modificarse, por
+lo que tienen un acceso sin restricciones a la nueva ra&#237;z del
+&#225;rbol DC.</p>
+
+<a name="fsvgs"></a><h5>Grupos administrativos</h5>
+<p>Especifica si se deben crear los grupos DomainAdministrators y DomainHelpDeskAdministrators. Si se
+habilita, estos grupos se crean y asocian con Organization Admin Role (Rol
+de administrador de organizaci&#243;n) y Organization Help Desk Admin Role (Rol de
+administrador del servicio de atenci&#243;n al cliente de la organizaci&#243;n), respectivamente. Una
+vez creados, la adici&#243;n o eliminaci&#243;n de un usuario en uno de
+estos roles asociados, agrega o elimina autom&#225;ticamente al usuario del grupo correspondiente.
+Sin embargo, este comportamiento no funciona en sentido contrario. La adici&#243;n o
+eliminaci&#243;n de un usuario de uno de estos grupos no agregar&#225; o
+eliminar&#225; al usuario en los roles asociados.</p><p>Los grupos DomainAdministrators y DomainHelpDeskAdministrators s&#243;lo se crean en los dominos creados
+despu&#233;s de habilitar esta opci&#243;n.  </p>
+<hr><p><b>Nota &#8211; </b>Esta opci&#243;n no es v&#225;lida para los subdominios, con la excepci&#243;n del
+dominio root. En el dominio ra&#237;z, los grupos ServiceAdministrators y ServiceHelpDesk Administrators
+se crean y asocian con los roles Top-level Admin (Administrador de nivel
+superior) y Top-level Help Desk Admin (Administrador del servicio de atenci&#243;n al
+cliente de nivel superior), respectivamente. Se aplica el mismo comportamiento.</p>
+<hr>
+
+
+<a name="fsvgv"></a><h5>Eliminaci&#243;n de usuario de compatibilidad</h5>
+<p>Especifica si se eliminar&#225; la entrada de un usuario, o simplemente se
+marcar&#225; como eliminada, del directorio. Este atributo s&#243;lo es v&#225;lido si se
+instala OpenSSO en el modo tradicional.</p><p>Cuando se elimina la entrada de un usuario y esta opci&#243;n est&#225;
+seleccionada (true), la entrada del usuario existir&#225; en el directorio, pero se
+marcar&#225; como eliminada. Las entradas de usuario marcadas para su eliminaci&#243;n no
+se muestran en las b&#250;squedas de Directory Server. Si esta opci&#243;n no
+est&#225; seleccionada, la entrada del usuario se eliminar&#225; del directorio.</p>
+
+<a name="fsvgu"></a><h5>ACI de roles administrativos din&#225;micos</h5>
+<p>Este atributo define las instrucciones de control de acceso para los roles
+de administrador que se crean din&#225;micamente cuando se configura un grupo o
+dominio con OpenSSO. Estos roles se utilizan para conceder privilegios administrativos para
+los grupos espec&#237;ficos de entradas creadas. Las ACI predeterminadas se puede modificar
+&#250;nicamente en esta lista de atributos.</p>
+<hr><p><b>Nota &#8211; </b>Los administradores en el nivel de dominio tienen un campo de acceso
+mayor que los administradores de grupo. Sin embargo, de forma predeterminada, cuando
+se agrega un usuario a un rol de administrador de grupos, dicho
+usuario puede cambiar la contrase&#241;a para cualquier componente del grupo. Esto incluye
+a cualquier administrador de dominio que sea miembro de dicho grupo.</p>
+<hr>
+<p>El rol Administrador del servicio de atenci&#243;n al cliente del contenedor tiene acceso de lectura a todas las entradas de
+un dominio y acceso de escritura al atributo <i>userPassword</i> s&#243;lo en las
+entradas de usuario de esta unidad de contenedor.</p><p>El Administrador del servicio de atenci&#243;n al cliente del dominio tiene acceso
+de lectura a todas las entradas de un dominio y acceso de
+escritura al atributo <i>userPassword. </i> Al crear un subdominio, recuerde que los roles
+de administraci&#243;n se crean en este subdominio, no en el dominio principal.</p><p>El rol Container Admin (Administrador de contenedores) tiene acceso de lectura y
+escritura a todas las entradas en la unidad organizativa LDAP. En OpenSSO,
+la unidad organizativa LDAP se indica a menudo como un contenedor.</p><p>El Administrador de directivas de la organizaci&#243;n tiene acceso de escritura y
+lectura a todas las directivas, y puede crear, asignar, modificar y eliminar
+todas las directivas de un dominio.</p><p>El Administrador de contenedores de personas es de forma predeterminada cualquier entrada
+de usuario en un dominio creado recientemente, que es miembro de dicho
+contenedor de personas del dominio. El Administrador de contenedores de personas tiene
+acceso de lectura y escritura a todas las entradas de usuario en
+el contenedor de personas del dominio. Tenga en cuenta que este rol
+NO tiene acceso de lectura y escritura a los atributos que contienen
+los nombres DN de grupo y rol y, por tanto, no se
+pueden modificar los atributos o eliminar un usuario de un grupo o
+rol.</p><p>Se pueden configurar otros contenedores con OpenSSO para que guarden las entradas
+de usuario, las entradas de grupos o incluso otros contenedores. Para aplicar
+un rol de administrador a un contenedor creado una vez configurado el
+dominio, se utilizar&#225;n los valores predeterminados del rol de Administrador de contenedores
+o el Administrador del servicio de atenci&#243;n al cliente del contenedor.</p><p>El Administrador de grupos tiene acceso de lectura y escritura a todos
+los miembros de un grupo espec&#237;fico, y puede crear nuevos usuarios, asignar
+usuarios a los grupos que administran y eliminar los usuarios creados. Cuando
+se crea un grupo, el rol de Administrador de grupos se genera
+autom&#225;ticamente con los privilegios necesarios para administrar el grupo. Este rol no
+se asigna autom&#225;ticamente a un miembro del grupo. El creador del grupo,
+o cualquier persona que tenga acceso al rol de Administrador de grupos,
+debe asignarlo.</p><p>El Administrador de nivel superior tiene acceso de lectura y escritura a
+todas las entradas en el dominio de nivel superior. En otras palabras,
+este rol tiene privilegios para todas las configuraciones principales en la aplicaci&#243;n
+OpenSSO.</p><p>El Administrador de organizaci&#243;n tiene acceso de lectura y escritura a todas
+las entrada de un dominio. Al crear un dominio, el rol de
+Administrador de organizaci&#243;n se genera autom&#225;ticamente con los privilegios necesarios para administrar
+el dominio.</p>
+
+<a name="ftbxa"></a><h5>Clases de servicio de perfil de usuario</h5>
+<p>Indica los servicios que tendr&#225;n una visualizaci&#243;n personalizada en la p&#225;gina User
+Profile (Perfil de usuario). Es posible que la pantalla predeterminada que genera
+la consola para algunos servicios no sea suficiente. Este atributo crea una
+pantalla personalizada para cualquier servicio y otorga un control completo de la
+informaci&#243;n del servicio que se muestra y c&#243;mo se muestra. La sintaxis
+es la siguiente:</p><p><tt>nombre servicio | url relativa()</tt></p><p>Los servicios que se muestran en este atributo no se mostrar&#225;n en
+las p&#225;ginas User Create (Crear usuario). La configuraci&#243;n de los datos de
+una pantalla de servicio personalizada debe realizarse en las p&#225;ginas User Profile
+(Perfil de usuario).</p>
+
+<a name="fsvgw"></a><h5>Lista de atributos de nodo DC</h5>
+<p>Define el conjunto de atributos que se definir&#225;n en la entrada del
+&#225;rbol DC cuando se crea un objeto. Los par&#225;metros predeterminados son:</p><table><tr><td align="left" valign="top" scope="row"><p>maildomainwelcomemessage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailhost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailclientattachmentquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutingsmarthost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailaccessproxyreplay</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredlanguage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>domainuidseparator</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainmsgquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainallowedserviceaccess</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailmessagestore</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>objectclass=maildomain</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutinghosts</p></td>
+</tr>
+</table>
+
+<a name="fsvgx"></a><h5>Filtros de b&#250;squeda para los objetos eliminados</h5>
+<p>Define los filtros de b&#250;squeda para los objetos que se eliminar&#225;n cuando
+se habilite el modo User Compliance Deletion (Eliminaci&#243;n de usuario de compatibilidad).</p>
+
+<a name="fsvgy"></a><h5>Contenedor de personas predeterminado</h5>
+<p>Especifica el contenedor de personas predeterminado en el que se crea el
+usuario.</p>
+
+<a name="fsvhe"></a><h5>Contenedor de grupos predeterminado</h5>
+<p>Especifica el contenedor de grupos predeterminado en el que se crea el
+grupo.</p>
+
+<a name="fsvhd"></a><h5>Contenedor de agentes predeterminado</h5>
+<p>Especifica el contenedor de agentes predeterminado en el que se crea el
+agente. El valor predeterminado es <tt>Agents</tt>.</p>
+
+<a name="fsvhb"></a><h5>Contenedor de personas predeterminado de grupos</h5>
+<p>Especifica el contenedor de personas predeterminado en el que se colocar&#225;n los
+usuarios al crearlos. No hay ning&#250;n valor predeterminado. Un valor v&#225;lido es
+el DN de un contenedor de personas. Consulte la nota en el
+atributo Groups People Container List (Lista de contenedores de personas de grupos)
+para el orden de retroceso (fallback) de contenedor de personas.</p>
+
+<a name="fsvha"></a><h5>Lista de contenedores de personas de grupos</h5>
+<p>Especifica una lista de los contenedores de personas que un Administrador de
+grupos puede seleccionar al crear un usuario nuevo. Esta lista se puede
+utilizar si hay varios contenedores de personas en el &#225;rbol de directorio.
+(Si no se especifica ning&#250;n contenedor de personas en esta lista o
+en el campo Contenedor de personas predeterminado de grupos, los usuarios se
+crean en el contenedor de personas predeterminado de OpenSSO, <tt>ou=people</tt>.) No existe
+ning&#250;n valor predeterminado para este campo.</p><p>La sintaxis para este atributo es:</p><p><tt></tt><i>dn of group</i><tt> | </tt><i>dn of people container</i><tt></tt>   </p><p>Cuando se crea un usuario, este atributo se activa para un contenedor
+en el que colocar la entrada. Si el atributo est&#225; vac&#237;o, el
+atributo Groups Default People Container (Contenedor de personas predeterminado de grupos) se
+activa para un contenedor. Si el &#250;ltimo atributo est&#225; vac&#237;o, la entrada
+se crea en <tt>ou=people</tt>.</p><p>Este atributo s&#243;lo es v&#225;lido si se instala OpenSSO en el modo
+tradicional. No hay ning&#250;n valor predeterminado.</p>
+
+<a name="fsvhc"></a><h5>Clase de visualizaci&#243;n de perfiles de usuario</h5>
+<p>Especifica la clase de Java que la consola de OpenSSO utiliza cuando
+muestra las p&#225;ginas de perfil de usuario.</p>
+
+<a name="fsvhh"></a><h5>Clase de visualizaci&#243;n de perfiles de usuario final</h5>
+<p>Especifica la clase de Java que la consola de OpenSSO utiliza cuando
+muestra las p&#225;ginas de perfil de usuario final.</p>
+
+<a name="fsvhi"></a><h5>Mostrar roles en la p&#225;gina de perfil de usuario</h5>
+<p>Especifica si se muestra una lista de los roles asignados a un
+usuario como parte de la p&#225;gina User Profile (Perfil de usuario) de
+dicho usuario. Si el par&#225;metro no est&#225; habilitado (opci&#243;n predeterminada), la p&#225;gina
+User Profile muestra los roles del usuario s&#243;lo para los administradores.</p>
+
+<a name="fsvhj"></a><h5>Mostrar grupos en la p&#225;gina de perfil de usuario</h5>
+<p>Especifica si se muestra una lista de los grupos asignados a un
+usuario como parte de la p&#225;gina User Profile (Perfil de usuario) de
+dicho usuario. Si el par&#225;metro no est&#225; habilitado (opci&#243;n predeterminada), la p&#225;gina
+User Profile muestra los grupos del usuario s&#243;lo para los administradores.</p>
+
+<a name="fsvhf"></a><h5>Autosuscripci&#243;n del usuario al grupo</h5>
+<p>Este par&#225;metro especifica si los usuarios pueden agregarse a s&#237; mismos a
+grupos con suscripci&#243;n abierta. Si el par&#225;metro no est&#225; habilitado (opci&#243;n predeterminada),
+la p&#225;gina del perfil de usuario permite que s&#243;lo un administrador pueda
+modificar la pertenencia al grupo del usuario. Este par&#225;metro s&#243;lo es v&#225;lido
+cuando la opci&#243;n Show Groups on User Profile Page (Mostrar grupos en
+la p&#225;gina Perfil de usuario) est&#225; seleccionada.</p>
+
+<a name="fsvhk"></a><h5>Opciones de visualizaci&#243;n de perfiles de usuario</h5>
+<p>Este men&#250; especifica los atributos de servicio que se mostrar&#225;n en la
+p&#225;gina del perfil del usuario. Un administrador puede seleccionar una de las
+siguientes opciones:</p><dl><dt>S&#243;lo usuario</dt>
+<dd><p>Muestra los atributos de esquema del usuario visibles para los servicios asignados al usuario. El usuario puede ver los valores de los atributos del servicio de usuario cuando el atributo contiene la palabra clave Display (Ver). Consulte el documento "OpenSSO Developer's Guide" para obtener informaci&#243;n.</p></dd>
+<dt>Combinado</dt>
+<dd><p>Muestra los atributos de esquema din&#225;micos y del usuario visibles para los servicios asignados al usuario.</p></dd>
+</dl>
+
+
+<a name="fsvhl"></a><h5>Roles predeterminados de creaci&#243;n de usuarios</h5>
+<p>Esta lista define los roles que se asignar&#225;n autom&#225;ticamente a los nuevos
+reci&#233;n creados. No hay ning&#250;n valor predeterminado. Un administrador puede introducir el
+DN de uno o varios roles.  </p><p>Este campo s&#243;lo acepta una direcci&#243;n de Distinguished Name (DN, nombre distinguido)
+completa, no un nombre de rol. Estos roles s&#243;lo pueden ser roles
+de OpenSSO, no de LDAP (Directory Server).</p>
+
+<a name="fsvhm"></a><h5>Fichas de consola administrativa</h5>
+<p>Este campo muestra las clases de Java de los m&#243;dulos que se
+mostrar&#225;n en la parte superior de la consola. La sintaxis es <tt>i18N key | java class name</tt>.</p><p>La clave i18N se utiliza para el nombre traducido de la entrada
+en la consola.</p>
+
+<a name="fsvho"></a><h5>N&#250;mero m&#225;ximo de resultados de b&#250;squeda</h5>
+<p>Este campo define el n&#250;mero m&#225;ximo de resultados que muestra la b&#250;squeda.
+El valor predeterminado es 200.  </p><p>No establezca un valor grande para este atributo (superior a 1000) a
+menos que se asignen suficientes recursos de sistema.</p>
+<hr><p><b>Nota &#8211; </b>OpenSSO se ha configurado previamente para que devuelva un tama&#241;o m&#225;ximo de
+4.000 entradas de b&#250;squeda. Este valor puede cambiarse mediante la consola o
+utilizando <tt>ldapmodify</tt>. If you wish to change it using <tt>ldapmodify,</tt>create a <tt>newConfig.xml </tt>,
+with the following values (in this example, <tt>nsSizeLimit </tt>: -1 means unlimited):</p>dn: cn=puser,ou=DSAME Users,ORG_ROOT_SUFFIX changetype: modify replace:nsSizeLimit nsSizeLimit: -1<p>A continuaci&#243;n, ejecute <tt>ldapmodify</tt>. Por ejemplo:</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f newConfig.xml<p>Las modificaciones realizadas en este atributo con <tt>LDAPModify</tt> tendr&#225;n preferencia sobre las
+realizadas con la consola de OpenSSO. </p>
+<hr>
+
+
+<a name="fsvhp"></a><h5>Tiempo de espera para b&#250;squeda</h5>
+<p>Define el tiempo (en segundos) que continuar&#225; una b&#250;squeda antes de que
+se agote el tiempo de espera. Se utiliza para detener b&#250;squedas potencialmente
+largas. Una vez alcanzado el tiempo m&#225;ximo de b&#250;squeda, se finalizar&#225; la
+b&#250;squeda y se devolver&#225; un error. El valor predeterminado es 5 segundos.</p>
+<hr><p><b>Nota &#8211; </b>Directory Server se ha configurado previamente con un valor de tiempo de
+espera de 120 segundos. Este valor puede cambiarse mediante la consola de
+Directory Server o utilizando <tt>ldapmodify</tt>. Si desea cambiarlo mediante <tt>ldapmodify</tt>, cree un
+archivo <tt> newConfig.xml</tt> con los siguientes valores (en este ejemplo, se cambia el
+valor de tiempo de espera de 120 segundos por 3.600 segundos):</p>dn: cn=config changetype: modify replace:nsslapd-timelimit nsslapd-timelimit: 3600<p>A continuaci&#243;n, ejecute <tt>ldapmodify </tt>. Por ejemplo:</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f newConfig.xml
+<hr>
+
+
+<a name="fsvhs"></a><h5>Nombre de directorio JSP</h5>
+<p>Especifica el nombre del directorio que contiene los archivos JSP de un
+dominio. Permite al administrador tener una apariencia diferente (personalizaci&#243;n) para un dominio
+distinto. El valor predeterminado para este atributo es <tt>console</tt>. Este atributo s&#243;lo
+es v&#225;lido si se instala OpenSSO en el modo tradicional. </p>
+
+<a name="fsvhr"></a><h5>Documentos de la ayuda en l&#237;nea</h5>
+<p>Este campo muestra los v&#237;nculos de la ayuda en l&#237;nea que se
+crear&#225;n en la p&#225;gina principal de ayuda de OpenSSO. Esto permite que
+otras aplicaciones agreguen sus v&#237;nculos de ayuda en l&#237;nea en la p&#225;gina
+de OpenSSO. El formato para este atributo es:</p><p><tt>linki18nkey | html page to load | i18n properties file | remote server</tt>  </p><p>El atributo remote server (servidor remoto) es un argumento opcional que permite
+especifica el servidor remoto en el que se encuentra el documento de
+la ayuda en l&#237;nea. El valor predeterminado es:</p><p><tt>DSAME Help|/contents.html|amAdminModlueMsgs</tt></p><p>Este atributo s&#243;lo es v&#225;lido si se instala OpenSSO en el modo
+tradicional.</p>
+
+<a name="fsvhq"></a><h5>Servicios necesarios</h5>
+<p>Este campo muestra los servicios que se agregan din&#225;micamente a las entradas
+de los usuarios al crearlos. Los administradores pueden seleccionar los servicios que
+se agregan en el momento de la creaci&#243;n. La consola no utiliza
+este atributo, sino OpenSSO SDK. A los usuarios que se hayan creado
+din&#225;micamente mediante la utilidad de l&#237;nea de comandos <tt>amadmin</tt>, se les asignar&#225;n
+los servicios que se indican en este atributo.</p>
+
+<a name="fsvhu"></a><h5>Clave de b&#250;squeda de usuario</h5>
+<p>Este atributo define el nombre de atributo que se buscar&#225; cuando se
+realice una b&#250;squeda sencilla en la p&#225;gina Navigation (Navegaci&#243;n). El valor predeterminado
+para este atributo es <tt>cn</tt>.</p><p>Por ejemplo, si escribe <tt> j&#42;</tt>en el campo Nombre, en el cuadro Navegaci&#243;n,
+se mostrar&#225;n los usuarios cuyos nombres comiencen con "j" o "J".</p>
+
+<a name="fsvht"></a><h5>Atributo de devoluci&#243;n de b&#250;squeda de usuario</h5>
+<p>Este campo define el nombre de atributo que se utiliza cuando se
+muestran los usuarios encontrados en una b&#250;squeda sencilla. El valor predeterminado para
+este atributo es uid cn. Esto mostrar&#225; el Id. y el nombre
+completo del usuario.</p><p>El nombre de atributo que se indica en primer lugar tambi&#233;n se
+utiliza como clave para ordenar el conjunto de usuarios que se mostrar&#225;.
+Para evitar una disminuci&#243;n del rendimiento, utilice un atributo cuyo valor est&#233;
+definido en una entrada del usuario.</p>
+
+<a name="fsvhv"></a><h5>Lista de notificaci&#243;n de creaci&#243;n de usuarios</h5>
+<p>Este campo define una lista de las direcciones de correo electr&#243;nico a
+las que se enviar&#225; una notificaci&#243;n cuando se cree un nuevo usuario.
+Se pueden especificar varias direcciones de correo electr&#243;nico, de acuerdo con la
+siguiente sintaxis:</p><p> <tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt></p><p>La lista de notificaci&#243;n tambi&#233;n acepta diferentes configuraciones regionales mediante la opci&#243;n
+<tt>-|locale</tt>.</p><p>Consulte <a href="supportedlang.html">Idiomas admitidos</a> pata obtener una lista de las configuraciones regionales.  </p><p>El Id. del correo electr&#243;nico del remitente puede cambiarse si se modifica
+la propiedad 497 de <tt>amProfile.properties</tt>, ubicado de forma predeterminada en <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale </tt>.</p>
+
+<a name="fsvhw"></a><h5>Lista de notificaci&#243;n de eliminaci&#243;n de usuarios</h5>
+<p>Este campo define una lista de las direcciones de correo electr&#243;nico a
+las que se enviar&#225; una notificaci&#243;n cuando se elimine un nuevo usuario.
+Se pueden especificar varias direcciones de correo electr&#243;nico, de acuerdo con la
+siguiente sintaxis:</p><p> <tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt></p><p>La lista de notificaci&#243;n tambi&#233;n acepta diferentes configuraciones regionales mediante la opci&#243;n
+<tt>-|locale</tt>.</p><p>Para obtener una lista de las configuraciones regionales, consulte <a href="supportedlang.html">Idiomas admitidos</a>.  </p><p>El Id. del correo electr&#243;nico del remitente puede cambiarse si se modifica
+la propiedad 497 de <tt>amProfile.properties</tt>, ubicado de forma predeterminada en <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale </tt>.</p><p>El Id. predeterminado del remitente es <tt>DSAME</tt>.</p>
+
+<a name="fsvhx"></a><h5>Lista de notificaci&#243;n de modificaci&#243;n de usuarios</h5>
+<p>Define una lista de los atributos y direcciones de correo electr&#243;nico asociadas
+con el atributo. Cuando un usuario realiza una modificaci&#243;n en un atributo
+definido en la lista, se enviar&#225; una notificaci&#243;n a la direcci&#243;n de
+correo electr&#243;nico asociada con el atributo. Cada atributo puede tener un conjunto
+distinto de direcciones asociado. Se pueden especificar varias direcciones de correo electr&#243;nico,
+de acuerdo con la siguiente sintaxis:</p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt> </p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt> </p><p>La palabra clave <tt>-self</tt> se puede usar en el lugar de una
+de las direcciones. De esta forma, se env&#237;a un mensaje de correo
+electr&#243;nico al usuario cuyo perfil se ha modificado. Por ejemplo, supongamos que
+se utiliza la siguiente instrucci&#243;n:</p><p><tt>manager someuser&#64;sun.com|self|admin&#64;sun.com</tt></p><p>Se enviar&#225; un mensaje de correo electr&#243;nico a la direcci&#243;n especificada en
+el atributo de administrador, <tt>someuser&#64;sun.com</tt>, <tt>admin&#64;sun</tt>, la persona que modific&#243; el usuario
+(self).</p><p>La lista de notificaci&#243;n tambi&#233;n acepta diferentes configuraciones regionales mediante la opci&#243;n
+<tt>-|locale. </tt> Por ejemplo, para enviar la notificaci&#243;n a un administrador en Francia:</p><p><tt>manager someuser&#64;sun.com|self|admin&#64;sun.com|fr</tt> Consulte <a href="supportedlang.html">Idiomas admitidos</a> para obtener una lista de las configuraciones regionales.  </p><p>El nombre de atributo es el mismo que aparece en el esquema
+de Directory Server y no el nombre que se muestra en la
+consola.</p>
+
+<a name="fsvia"></a><h5>N&#250;mero m&#225;ximo de entradas por p&#225;gina</h5>
+<p>Este atributo permite definir el n&#250;mero m&#225;ximo de filas que se puede
+mostrar por p&#225;gina. The default is 25. For example, if a user
+search returns 100 rows, there will be 4 pages with 25 rows
+displayed in each page.</p>
+
+<a name="fsvhz"></a><h5>Clases de escuchas de eventos</h5>
+<p>Este atributo contiene una lista de las escuchas que reciben los eventos
+de creaci&#243;n, modificaci&#243;n, y eliminaci&#243;n de la consola de OpenSSO.</p>
+
+<a name="fsvhy"></a><h5>Clases de procesamiento previo y posterior</h5>
+<p>This field defines a list of implementation classes through plug-ins that extend
+the <tt>com.iplanet.am.sdk.AMCallBack</tt> class to receive callbacks during pre and post processing operations
+for users, realm, roles and groups. Las operaciones son:</p>
+<ul><li><p>creaci&#243;n</p></li>
+<li><p>delete</p></li>
+<li><p>modificar</p></li>
+<li><p>agregar usuarios a los roles/grupos</p></li>
+<li><p>eliminar usuarios de los roles/grupos</p></li></ul>
+<p>Deber&#225; introducir el nombre de clase completo del complemento y luego cambiar
+la ruta de clase del contenedor web (a partir del directorio base
+de instalaci&#243;n de OpenSSO) para incluir la ruta completa a la ubicaci&#243;n
+de la clase de complemento</p>
+
+<a name="fsvic"></a><h5>B&#250;squeda de atributos externos</h5>
+<p>Esta opci&#243;n permite que las devoluciones de llamadas para los complementos recuperen
+atributos externos (cualquier atributo espec&#237;fico de una aplicaci&#243;n externa). Los atributos externos
+no se almacenan en la cach&#233; en OpenSSO SDK, por lo que
+este atributo permite recuperar los atributos por nivel de dominio. De forma
+predeterminada, esta opci&#243;n no est&#225; habilitada.</p>
+
+<a name="fsvib"></a><h5>Caracteres del ID de usuario no v&#225;lidos</h5>
+<p>Este atributo define una lista de los caracteres que no se permiten
+en un nombre de usuario. Cada car&#225;cter debe estar separado por el
+car&#225;cter |. Por ejemplo:</p><p><tt>&#42;|(|)|&#38;|!</tt></p>
+
+<a name="fsvie"></a><h5>Clase de complemento de validaci&#243;n de Id. de usuario y contrase&#241;a</h5>
+<p>Esta clase proporciona un mecanismo de complemento de validaci&#243;n de Id. de
+usuario y contrase&#241;a. Los m&#243;dulos de complementos de implementaci&#243;n que validan el
+Id. de usuario y/o la contrase&#241;a del usuario deben anular los m&#233;todos
+de esta clase. Se llamar&#225; a los m&#243;dulos de complementos de implementaci&#243;n
+siempre que un valor de Id. de usuario o contrase&#241;a se est&#233;
+agregando o modificando con la consola de OpenSSO, la interfaz de l&#237;nea
+de comandos <tt>amadmin</tt> o el SDK.</p><p>Los complementos que ampl&#237;an esta clase se pueden configurar por dominio. Si
+un complemento no se ha configurado para un dominio, se utilizar&#225; el
+complemento configurado en el nivel global.</p><p>Si se produce un error en la validaci&#243;n del complemento, el m&#243;dulo
+del complemento puede mostrar una excepci&#243;n para notificar a la aplicaci&#243;n un
+error en el Id. de usuario o contrase&#241;a proporcionado por el usuario.</p>
+<br/>
+
+</body>
+</html>
