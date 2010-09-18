@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>信頼パートナー: 信頼パートナー属性を設定する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamltrustedpartnersadd"></a><h5>信頼パートナー: 信頼パートナー属性を設定する</h5>
+<a name="indexterm-83"></a><p>信頼パートナーを設定するための後半の手順は、次のとおりです。<a href="federation.fssamlselecttrustedpartnertype.html">「信頼パートナー: パートナータイプおよびプロファイルを選択する」</a>ことから始めます。第 1 段階で選択したロールに基づいて、次のセクションに一覧表示された副属性を定義することが必要になる場合があります。</p>
+<hr><p><b>注 &#8211; </b>連携の「SAML」設定画面で「編集」または「複製」をクリックしてこのページが表示された場合は、次の手順に従って信頼パートナープロファイルを変更し、「保存」をクリックして値を変更します。「SAML プロファイル」ページで「保存」をクリックして、変更を完了します。</p>
+<hr>
+<ol>
+<li><b>「共通設定」副属性の値を入力します。</b><dl><dt>名前</dt>
+<dd><p>組織名などの任意の文字列を入力できます。</p></dd>
+<dt>ソース ID</dt>
+<dd><p>これは、パートナーサイトから受け取る、Base64 フォーマットでエンコードされた 20 バイトのシーケンスです。通常この値は、サイト ID 属性を設定したときに「サイト ID」属性に使用した値と同じにします。</p></dd>
+<dt>ターゲット</dt>
+<dd><p>これはパートナーサイトのドメインです (ポート番号の有無は任意)。このドメインにホストされる Web ページにアクセスする場合は、リダイレクト URL が、「信頼パートナー」属性に定義された値から選択されます。</p>
+<hr><p><b>注 &#8211; </b>同じドメインに定義されたエントリが 2 つある (1 つにはポート番号が含まれ、もう 1 つにはポート番号が含まれていない) 場合は、ポート番号を含むエントリが優先されます。たとえば、<tt>target=sun.com</tt> と <tt>target=sun.com:8080</tt> の 2 つの信頼パートナー定義があるとします。主体が <tt>http://machine.sun.com:8080/index.html</tt> をシークしている場合は、2 番目の定義が選択されます。</p>
+<hr>
+</dd>
+<dt>SAML URL</dt>
+<dd><p> Web ブラウザのアーティファクトプロファイルを実装するサーブレットを指す URL。</p></dd>
+<dt>ホストリスト</dt>
+<dd><p>パートナーが使用する、IP アドレス、DNS ホスト名、またはクライアント認証証明書のエイリアスのリスト。このオーソリティーに要求を送信することができるパートナーサイト内のすべてのホストに対して設定されます。このリストは、要求者が本当にアーティファクトの意図した受信者であるかを確かめるのに役立ちます。要求者がこのリストに定義されている場合、対話が継続されます。要求者の情報がホストリストに定義されたどのホストにも一致しない場合は、要求は拒否されます。</p></dd>
+<dt>サイト属性マッパー</dt>
+<dd><p>このクラスは、「認証表明」の <tt>AttributeStatements</tt> 要素として定義される属性値のリストを返すために使用されます。サイト属性マッパーを <tt>PartnerSiteAttributeMapper</tt> インタフェースから実装する必要があります。</p><p>クラスが 1 つも定義されていない場合、表明に属性は含められません。</p></dd>
+<dt>名前識別子マッパー</dt>
+<dd><p>表明の対象と送信先サイト側のアイデンティティーとを関連付ける方法を定義するクラス。アカウントマッパーを <tt>com.sun.identity.saml.plugins.PartnerAccountMapper</tt> インタフェースから実装する必要があります。デフォルトは <tt>com.sun.identity.saml.plugins.DefaultAccountMapper</tt> です。</p><p>クラスが 1 つも定義されていない場合、表明に属性は含められません。</p></dd>
+<dt>バージョン</dt>
+<dd><p>SAML 要求の送信に使用する SAML バージョン (<tt>1.0</tt> または <tt>1.1</tt>)。バージョンまたはプロトコルを変更するには、「ローカルサイトのプロパティー」ボタンをクリックし、必要に応じて「プロトコル」属性および「表明」属性を変更します。 </p></dd>
+<dt>証明書</dt>
+<dd><p>パートナーが表明に署名しているのに、署名された表明の <tt>KeyInfo</tt> 部分にパートナーの証明書が見つからない場合に、表明の署名を検証するために使用する証明書エイリアス。</p></dd>
+<dt>発行者</dt>
+<dd><p>生成される表明の作成者。デフォルトの構文は <i>ホスト名</i><tt>:</tt><i>ポート</i> です。</p></dd>
+</dl>
+</li>
+<li><b>「送信先」副属性の値を入力します。</b><dl><dt>アーティファクト: SAML URL</dt>
+<dd><p>Web ブラウザのアーティファクトプロファイルを実装するサーブレットを指す URL。</p></dd>
+<dt>Post: Post URL</dt>
+<dd><p>Web ブラウザの POST プロファイルを実装するサーブレットを指す URL。</p></dd>
+<dt>SOAP クエリー: 属性マッパー</dt>
+<dd><p>クエリーからシングルサインオン情報を取得するために使用するクラス。組み込まれているインタフェースから属性マッパーを実装する必要があります。クラスが 1 つも指定されていない場合は、<tt>DefaultAttributeMapper</tt> が使用されます。</p></dd>
+<dt>SOAP クエリー: アクションマッパー</dt>
+<dd><p>シングルサインオン情報を取得し、パートナーアクションを認証決定内容にマップするために使用されるクラス。組み込まれているインタフェースからアクションマッパーを実装する必要があります。クラスが 1 つも指定されていない場合は、<tt>DefaultActionMapper</tt> が使用されます。</p></dd>
+</dl>
+</li>
+<li><b>「ソース」副属性の値を入力します。</b><dl><dt>アーティファクト: SOAP URL</dt>
+<dd><p>SAML SOAP Receiver を指す URL。</p></dd>
+<dt>Authentication Type</dt>
+<dd><p>SAML で使用可能な認証タイプ。次のものがあります。</p>
+<ul><li><p>SAML SOAP Receiver を指す URL へのアクセスに HTTP が使用され、かつ SAML SOAP Receiver が HTTP 基本認証、SSL、またはその両方で保護されない場合は、<tt>なし</tt>を指定します。</p></li>
+<li><p>SAML SOAP Receiver を指す URL へのアクセスに HTTP が使用され、かつ SAML SOAP Receiver が HTTP 基本認証で保護される場合は、<tt>基本</tt>を指定します。</p></li>
+<li><p>SAML SOAP 受信者を指す URL へのアクセスに HTTPS が使用され、かつ SAML SOAP 受信者が HTTP SSL で保護されない場合は、<tt>SSL</tt> を指定します。</p></li>
+<li><p>SAML SOAP Receiver を指す URL へのアクセスに HTTPS が使用され、かつ SAML SOAP Receiver が <tt>SSL を使用した基本認証</tt>で保護されない場合は、<tt>SSLWITHBASICAUTH</tt> を指定します。</p></li></ul>
+
+<hr><p><b>注 &#8211; </b>SAML SOAP 受信者の URL を HTTP 基本認証で保護する場合、この保護設定は、OpenSSO 設定ではなく Web コンテナ設定で行います。ただし、HTTP 基本認証のユーザー ID とパスワードは OpenSSO 設定で指定します。</p>
+<hr>
+<p>この属性はオプションです。指定されていない場合、デフォルトは「<tt>なし</tt>」です。<tt>基本</tt>または <tt>SSLWITHBASICAUTH</tt> が指定されている場合は、「信頼パートナー」属性が必須となり <tt>HTTPS</tt> にする必要があります。</p></dd>
+<dt>ユーザー</dt>
+<dd><p>「認証タイプ」に<tt>基本</tt>を選択すると、パートナーの SOAP Receiver を保護するために使用されるパートナーのユーザー ID が、この属性の値によって定義されます。</p></dd>
+<dt>ユーザーのパスワード</dt>
+<dd><p>「認証タイプ」に<tt>基本</tt>を選択すると、パートナーの SOAP Receiver を保護するために使用されるパートナーのユーザー ID のパスワードが、この属性の値によって定義されます。</p></dd>
+<dt>ユーザーのパスワード (再入力)</dt>
+<dd><p>定義したパスワードをもう一度入力します。</p></dd>
+</dl>
+</li>
+<li><b>「完了」をクリックします。</b></li>
+<li><b>「SAML プロファイル」ページで「保存」をクリックして、設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

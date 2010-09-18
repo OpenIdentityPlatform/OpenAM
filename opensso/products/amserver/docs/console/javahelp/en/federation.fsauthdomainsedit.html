@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Modify a Circle of Trust Profile - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsauthdomainsedit"></a><h4>To Modify a Circle of Trust Profile</h4><a name="indexterm-57"></a><p>Follow this procedure to edit the configured General attributes of an existing circle
+of trust, or to add providers to it. The starting point is Circle
+of Trust under the Federation interface.</p><ol>
+<li><b>Click the name of a configured circle of trust to modify its profile,
+or to add providers to it.</b><p>The Edit Circle of Trust page is displayed.</p></li>
+<li><b>Type new values or edit existing values for the circle of trust's General
+attributes:</b><dl><dt>Name</dt>
+<dd><p>The static value of this attribute is the name provided when you created the circle of trust.</p></dd>
+<dt>Description</dt>
+<dd><p>The value of this attribute is a description of the circle of trust. You may modify the description already entered, if applicable.</p></dd>
+<dt>IDFF Writer Service URL</dt>
+<dd><p>This attribute specifies the location of the service that writes the common domain cookie. The URL is in the format <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/idffwriter</b></tt> .</p></dd>
+<dt>IDFF Reader Service URL</dt>
+<dd><p>This attribute specifies the location of the service that reads the common domain cookie. The URL is in the format <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/idffreader</b></tt> .</p></dd>
+<dt>SAML2 Writer URL</dt>
+<dd><p>This attribute specifies the location of the SAML2 Writer service that writes the cookie to the Common Domain. The URL is in the format <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/saml2writer</b></tt></p></dd>
+<dt>SAML2 Reader URL</dt>
+<dd><p>This attribute specifies the location of the SAML2 Writer service that writes the cookie to the Common Domain. The URL is in the format <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/saml2reader</b></tt></p></dd>
+<dt>Status</dt>
+<dd><p>The default status is Active. Selecting Inactive disables communication within the circle of trust.</p></dd>
+</dl>
+</li>
+<li><b>Choose one or more of the available providers and click the Add arrow
+to select them.</b><p>The list provided contains the names of entities that have been created and
+populated with providers. For more information, see <a href="federation.fsauthdomainsselectprovider.html">To Add Providers to a Circle of Trust</a>.</p></li>
+<li><b>Click Save to complete the operation.</b></li></ol>
+<br/>
+
+</body>
+</html>

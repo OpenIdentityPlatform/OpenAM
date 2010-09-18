@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建过滤的角色 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subject.createfiltrole"></a><h5>创建过滤的角色</h5>
+<ol>
+<li><b>在“浏览”窗格中，找到要在其中创建角色的组织。</b></li>
+<li><b>单击“新建”。</b></li>
+<li><b>输入过滤的角色的名称。</b></li>
+<li><b>输入搜索条件信息。</b><p>例如：</p><pre>(&#38;(uid=user1)(|(inetuserstatus=active)(!(inetuserstatus=*))))</pre><p>如果过滤器保留为空，将默认创建以下角色：</p><pre>(objectclass = inetorgperson)</pre></li>
+<li><b>单击“确定”根据过滤条件启动搜索。由过滤条件定义的身份将会自动指定给角色。</b></li>
+<li><b>创建过滤的角色后，单击角色的名称来查看属于该角色的“用户”。此外，还可以通过单击“服务”选项卡将服务添加到角色。参见<a href="idm.entityservices.html">向身份添加服务</a>。</b></li></ol>
+<br/>
+
+</body>
+</html>

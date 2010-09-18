@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Autenticador de agentes - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ghfif"></a><h4>Autenticador de agentes</h4>
+<p>Un autenticador de agentes es un tipo de agente que, una vez
+autenticado, puede obtener los datos de s&#243;lo lectura de los perfiles de
+agente seleccionados para que el autenticador los lea. Los perfiles de agentes
+pueden ser de cualquier tipo (J2EE, WSP, detecci&#243;n, etc.), pero deben encontrarse
+en el mismo dominio. Los usuarios que dispongan de las credenciales del
+autenticador de agentes (el nombre de usuario y la contrase&#241;a) pueden leer
+los datos del perfil del agente, pero no pueden crear, actualizar ni
+eliminar los permisos del administrador del agente. </p><p>El autenticador de agentes contiene los siguientes atributos:</p>
+
+<a name="ghfjj"></a><h5>Mot de passe</h5>
+<p>La contrase&#241;a que se ha definido al crear el perfil del autenticador
+de agentes. No obstante, puede cambiar esta contrase&#241;a en cualquier momento.</p>
+
+<a name="ghfiu"></a><h5>Confirmar contrase&#241;a</h5>
+<p>La confirmaci&#243;n de la contrase&#241;a se ha realizado al crear el perfil
+del autenticador de agentes. Si cambia la contrase&#241;a, debe confirmar el cambio.</p>
+
+<a name="ghfka"></a><h5>Estado</h5>
+<p>La opci&#243;n <tt>Activo</tt> se selecciona al crear el autenticador de agentes. Seleccione
+<tt>Inactivo</tt> s&#243;lo si desea suprimir la protecci&#243;n que proporciona el agente.</p>
+
+<a name="ghfig"></a><h5>Perfiles de agentes que se pueden leer</h5>
+<p>Este atributo define una lista de agentes de OpenSSO cuyos perfiles de
+datos puede leer el autenticador de agentes. Los agentes pueden ser de
+cualquier tipo (J2EE, WSP, detecci&#243;n, etc.), pero deben encontrarse en el mismo
+dominio. Para agregar una agente a la lista, seleccione su nombre y
+haga clic en Agregar.</p>
+<br/>
+
+</body>
+</html>

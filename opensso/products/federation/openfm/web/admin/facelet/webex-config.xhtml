@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: webex-config.xhtml,v 1.1 2009/12/08 01:46:30 babysunil Exp $
+
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText value="#{resources['webex-create.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText value="#{resources['webex-create.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <o:wizard
+            steps="5"
+            wizardHandler="#{webExConfigWizardHandler}"
+            wizardBean="#{webExConfigWizardBean}">
+            <ui:define name="wizard-steps">
+                <o:wstep
+                    step="0"
+                    label="#{resources['webex-create.step1PanelLabel']}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/webex-config-questions.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{webExConfigWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{webExConfigWizardHandler}"/>
+                        </ui:include>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="1"
+                    label="#{resources['webex-create.step2PanelLabel']}">
+
+                    <ui:define name="wizard-step-body">
+                        <o:section>
+                            <ui:define name="section-title">
+                                <ice:outputText
+                                    value="#{resources['webex-configuration.opensso.siteurl.section-title']}"/>
+                            </ui:define>
+                            <ui:define name="section-details">
+                                <ice:outputText
+                                    value="#{resources['webex-configuration.opensso.sieurl.section-details']}"/>
+                                <ice:outputLink value="http://www.webex.com" target="_blank">
+                                    <ice:outputText
+                                        styleClass="link-for-html-text"
+                                        value="#{resources['webex-create.step2Details-part2']}"/>
+                                </ice:outputLink>
+                                <ice:outputText
+                                    value="#{resources['webex-create.step2Details-part3']}"/>
+                            </ui:define>
+                            <ui:define name="section-body">
+                                <ice:panelGrid columns="2" columnClasses="label-column,input-column">
+                                    <ice:outputLabel
+                                        for="webexSiteUrl"
+                                        effect="#{webExConfigWizardBean.webexSiteUrlMessageEffect}"
+                                        value="#{resources['webex-create.siteUrlLabel']}"
+                                        style="float: right;" />
+                                    <ice:inputText
+                                        id="webexSiteUrl"
+                                        effect="#{webExConfigWizardBean.webexSiteUrlNameInputEffect}"
+                                        value="#{webExConfigWizardBean.webexSiteUrl}"
+                                        style="width: 250px;"
+                                        maxlength="256"/>
+                                </ice:panelGrid>
+                            </ui:define>
+                        </o:section>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="2"
+                    label="#{resources['webex-create.step3PanelLabel']}">
+                    <ui:define name="section-details">
+                        <ice:outputText value="#{resources['webex-create.step3Details']}" />
+                    </ui:define>
+                    <ui:define name="wizard-step-body">
+
+                        <ui:include src="template/webex-config-opensso.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{webExConfigWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{webExConfigWizardBean}"/>
+                        </ui:include>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="3"
+                    label="#{resources['webex-create.step4PanelLabel']}">
+                    <ui:define name="section-details">
+                        <ice:outputText value="#{resources['webex-create.step4Details']}" />
+                    </ui:define>
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/webex-config-webex.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{webExConfigWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{webExConfigWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="4"
+                    label="#{resources['webex-create.step5PanelLabel']}">
+                    <ui:define name="section-details">
+                        <ice:outputText value="#{resources['webex-create.step5Details']}" />
+                    </ui:define>
+                    <ui:define name="wizard-step-body">
+
+                        <ui:include src="template/webex-config-validate.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{webExConfigWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{webExConfigWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+            </ui:define>
+        </o:wizard>
+
+    </ui:define>
+</ui:composition>

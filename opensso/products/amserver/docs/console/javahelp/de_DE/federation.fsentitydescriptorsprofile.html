@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So &#228;ndern Sie die allgemeinen Attribute einer Anbieter-Entity oder einer Partner-Entity - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsprofile"></a><h4>So &#228;ndern Sie die allgemeinen Attribute einer Anbieter-Entity oder einer Partner-Entity</h4><a name="indexterm-70"></a><a name="indexterm-71"></a><a name="indexterm-72"></a><p>Nachdem Sie eine Entity erstellt haben, k&#246;nnen Sie deren Profil bearbeiten. Dazu
+kann die &#196;nderung von Attributen, das Hinzuf&#252;gen von Identity-Anbietern und Dienstanbietern bzw.
+das Konfigurieren von Partnerschaften geh&#246;ren. Das Bearbeiten der allgemeinen Attribute eines Entity-Profils
+kann eine &#196;nderung der bereits festgelegten allgemeinen Attribute, das Hinzuf&#252;gen einer Kontaktperson
+oder die Eingabe optionaler Organisationsinformationen umfassen. Folgendes Verfahren dient zur Bearbeitung der
+allgemeinen Attribute. Der Ausgangspunkt ist der Bildschirm "Entities" unter "Verbindung".</p><ol>
+<li><b>W&#228;hlen Sie den Namen einer konfigurierten Entity, um deren Profil zu &#228;ndern.
+</b><p>Standardm&#228;&#223;ig wird die Seite f&#252;r die allgemeinen Attribute des Profils der Entity
+angezeigt. Wenn Sie sich nicht auf der Seite f&#252;r die allgemeinen Attribute
+befinden, k&#246;nnen Sie im Men&#252; "Ansicht" die Option "Allgemein" ausw&#228;hlen.</p></li>
+<li><b>Bearbeiten Sie die Werte einer der allgemeinen Entity-Attribute.</b><dl><dt>Entity-Name</dt>
+<dd><p>Der statische Wert dieses Attributs ist der Name, den Sie bei der Erstellung der Entity eingegeben haben.</p></dd>
+<dt>Typ</dt>
+<dd><p>Der statische Wert dieses Attributs ist der Entity-Typ, "Anbieter" bzw. "Partner".</p></dd>
+<dt>Beschreibung</dt>
+<dd><p>Der Wert dieses Attributs ist die Beschreibung, die Sie bei der Erstellung der Entity eingegeben haben. Sie k&#246;nnen die urspr&#252;nglich eingegebene Beschreibung &#228;ndern bzw. eine hinzuf&#252;gen, wenn noch keine vorhanden ist.</p></dd>
+</dl>
+</li>
+<li><b>Geben Sie die Werte f&#252;r die Attribute von "Profil der Entity-Kontaktperson" an.
+</b><p>Die Attribute von "Profil der Entity-Kontaktperson" bieten Informationen dazu, an wen man
+sich in Bezug auf die Entity wenden kann. Diese Attribute sind optional.</p><dl><dt>Vorname</dt>
+<dd><p>Geben Sie den Vornamen der Entity-Kontaktperson ein.</p></dd>
+<dt>Nachname</dt>
+<dd><p>Geben Sie den Nachnamen der Entity-Kontaktperson ein.</p></dd>
+<dt>Typ</dt>
+<dd><p>W&#228;hlen Sie den Kontakttyp im Dropdown-Men&#252; aus:</p>
+<ul><li><p>Administrativ</p></li>
+<li><p>Rechnungswesen</p></li>
+<li><p>Technisch</p></li>
+<li><p>Weitere</p></li></ul>
+</dd>
+<dt>Firma</dt>
+<dd><p>Geben Sie den Namen der Firma ein, bei der diese Person besch&#228;ftigt ist.</p></dd>
+<dt>Liberty-Haupt-ID</dt>
+<dd><p>Geben Sie einen URI (Uniform Resource Identifier) ein, der auf eine Instanz des (URI) Profils mit den personenbezogenen Informationen zu der Kontaktperson verweist.</p></dd>
+<dt>E-Mails</dt>
+<dd><p>Geben Sie mindestens eine E-Mail-Adresse f&#252;r die Kontaktperson ein und klicken Sie dann auf "Hinzuf&#252;gen".</p></dd>
+<dt>Telefonnummern</dt>
+<dd><p>Geben Sie mindestens eine Telefonnumer f&#252;r die Kontaktperson ein und klicken Sie dann auf "Hinzuf&#252;gen".</p></dd>
+</dl>
+</li>
+<li><b>Geben Sie die Werte f&#252;r die Organisationsprofilattribute an.</b><p>Die Attribute des Organisationsprofils beinhalten grundlegende Informationen, die bei der Interaktion mit
+einem Principal verlangt werden k&#246;nnen. Diese Attribute sind optional.</p>
+<hr><p><b>Hinweis &#8211; </b>Wenn das Namensattribut einen Wert enth&#228;lt, m&#252;ssen Werte zu den Anzeigenamen- und
+URL-Attributen hinzugef&#252;gt werden.</p>
+<hr>
+<dl><dt>Namen</dt>
+<dd><p>Geben Sie den zul&#228;ssigen Namen f&#252;r die Organisation der Entity ein und klicken Sie dann auf "Hinzuf&#252;gen". Der Wert wird im Format <i>locale</i>| <i> organization-name</i> definiert. Beispiel: <tt>en</tt>|<tt> example.com</tt>.</p></dd>
+<dt>Anzeigename</dt>
+<dd><p>Geben Sie einen Namen f&#252;r die Organisation der Entity ein, der sich f&#252;r die Anzeige f&#252;r einen Principal eignet, und klicken Sie dann auf "Hinzuf&#252;gen". Der Wert wird im Format <i>locale</i>|<i>organization-display-name</i> definiert. Beispiel: <tt>en</tt>|<tt>example.com</tt>. </p></dd>
+<dt>URL</dt>
+<dd><p>Geben Sie den URL der Organisation ein und klicken Sie dann auf "Hinzuf&#252;gen". Der Wert wird im Format <i>locale</i>|<i>organization-URL</i> definiert. Beispiel: <tt>en</tt>|<tt>http://www.example.com</tt>.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "Speichern", um die Konfiguration abzuschlie&#223;en, oder legen Sie weitere
+Werte f&#252;r Identity-Anbieter, Dienstanbieter oder Partner fest.</b><p>Wenn Sie Ihre Konfiguration fortsetzen m&#246;chten, beachten Sie folgende Informationen:</p><ul>
+<li><b><a href="federation.fsidentityprovider.html">So f&#252;gen Sie einer Anbieter-Entity einen Identity-Anbieter hinzu</a> zur Definition von Werten f&#252;r Identity-Anbieter-Attribute.</b></li>
+<li><b><a href="federation.fsserviceprovider.html">So f&#252;gen Sie einer Anbieter-Entity einen Dienstanbieter hinzu</a> zur Definition von Werten f&#252;r Dienstanbieter-Attribute.</b></li>
+<li><b><a href="federation.fsentitydescriptorsaffiliate.html">So f&#252;gen Sie Mitglieder zu einer Partner-Entity hinzu</a> zum F&#252;llen einer Partner-Entity mit Mitgliedern.</b></li></ul></li></ol>
+<br/>
+
+</body>
+</html>

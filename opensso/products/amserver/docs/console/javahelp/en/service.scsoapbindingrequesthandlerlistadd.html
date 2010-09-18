@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a Request Handler - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbindingrequesthandlerlistadd"></a><h5>To Configure a Request Handler</h5>
+<a name="indexterm-153"></a><a name="indexterm-154"></a><p>The <tt>RequestHandler</tt> interface must be implemented on the server side by each Liberty-based
+identity service that uses the SOAP Binding Service. The Request Handler List attribute
+stores information about the implementation classes of the web services that implement the Request
+Handler. The Request Handler List displays entries that contain key/value pairs separated by
+a pipe as in: <tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>.</p><ol>
+<li><b>Click New to display the New Request Handler attributes or click on a
+configured key value to modify existing attributes.</b></li>
+<li><b>Provide values for the attributes based on the following information:</b><dl><dt>key</dt>
+<dd><p>This required parameter is the last part of the URI path to a SOAP endpoint. The SOAP endpoint in OpenSSO is the SOAP Receiver servlet. The URI to the SOAP Receiver is <tt><b></tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt>. If you define <tt><b>disco</b></tt> as the key, the URI path to the SOAP endpoint for the corresponding Discovery Service would be: <tt><b></tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco</b></tt>. Different service clients use different keys when connecting to the SOAP Receiver.</p></dd>
+<dt>class</dt>
+<dd><p>This required parameter specifies the name of the Request Handler implementation class for the particular identity service. For example: <tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>.</p></dd>
+<dt>SOAP Action</dt>
+<dd><p>This parameter carries an optional SOAP-specific URI.</p></dd>
+</dl>
+</li>
+<li><b>Click OK to complete the Request Handler configuration.</b></li>
+<li><b>Click Save on the SOAP Binding Service page to complete the service configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

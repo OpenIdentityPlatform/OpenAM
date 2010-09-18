@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Import declaration</TITLE>
+<META NAME="description" CONTENT="Import declaration">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="node2.html">
+<LINK REL="next" HREF="node6.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html87"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html85"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html81"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html88"
+  HREF="node6.html">Naming Convention</A>
+<B> Up:</B> <A NAME="tex2html86"
+  HREF="node2.html">Source Files</A>
+<B> Previous:</B> <A NAME="tex2html82"
+  HREF="node4.html">Organization of source file</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00023000000000000000">
+Import declaration</A>
+</H2>
+Use explicit import statements i.e. use
+<PRE>
+    import java.util.Map;
+    import java.util.Set;
+</PRE>
+and not
+<PRE>
+    import java.util.*;
+</PRE>
+And, ordered them in alphabetic order so that we easily locate them.
+
+<BR>
+We discourage wildcard type-import-on-demand declarations for several reasons:
+
+<OL>
+<LI>Someone can later add a new unexpected class file to the same package that you are importing. This new class can conflict with a type you are using from another package, thereby turning a previously correct program into an incorrect one.
+</LI>
+<LI>Explicit class imports clearly convey to a reader the exact classes that are being used (and which classes are not being used).
+</LI>
+<LI>Explicit class imports provide better compile performance. While type-import-on-demand declarations are convenient for the programmer and save a little bit of time initially, this time is paid for in increased compile time every time the file is compiled.
+<BR>
+The -verboseflag in the javac compiler can be used to discover which types are actually being imported, in order to convert type-import-on-demand declarations to fully qualified ones. 
+</LI>
+</OL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html87"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html85"
+  HREF="node2.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html81"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html88"
+  HREF="node6.html">Naming Convention</A>
+<B> Up:</B> <A NAME="tex2html86"
+  HREF="node2.html">Source Files</A>
+<B> Previous:</B> <A NAME="tex2html82"
+  HREF="node4.html">Organization of source file</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,37 @@
+<test name="FedletTests-AttrQuery-nsrole">
+    <parameter name="ptestName" value="FedletTests-AttrQuery-nsrole"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.fedlet.FedletAttributeQueryTests"/>
+    </classes>
+</test>
+<test name="FedletTests-AttrQuery-SessionQuota">
+    <parameter name="ptestName" value="FedletTests-AttrQuery-SessionQuota"/>
+    <parameter name="pAttribute" value="iplanet-am-session-quota-limit"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.fedlet.FedletAttributeQueryTests"/>
+    </classes>
+</test>
+<test name="FedletTests-AttrQuery-EntryDN">
+    <parameter name="ptestName" value="FedletTests-AttrQuery-EntryDN"/>
+    <parameter name="pAttribute" value="entrydn"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.fedlet.FedletAttributeQueryTests"/>
+    </classes>
+</test>
+

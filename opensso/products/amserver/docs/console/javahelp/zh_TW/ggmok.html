@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web 策略代理程式 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggmok"></a><h4>Web 策略代理程式</h4>
+<p>Web 代理程式實例可從此介面配置。所述的屬性只有在代理程式建立期間選擇了 [集中式] 配置的情況下才會套用。如果選取 [本機] 配置，則與此代理程式相關的屬性只能從代理程式中的檔案進行編輯。</p><p>可用的配置類型分成下列種類：</p>
+<ul><li><p><a href="#ggmrx">全域</a></p></li>
+<li><p><a href="#ggmna">應用程式</a></p></li>
+<li><p><b>Broken Link (Target ID: GGMUQ)</b></p></li>
+<li><p><a href="#ggmtu">進階</a></p></li></ul>
+
+
+<a name="ggmrx"></a><h5>全域</h5>
+<p>[全域] 屬性會套用至所有 Web 代理程式。</p>
+
+<a name="ggmvp"></a><h5>群組</h5>
+<p>如果適用，請從下拉式清單選取一個群組。此清單由之前配置的群組組成。</p>
+
+<a name="ggmtk"></a><h5>密碼</h5>
+<p>密碼是在您建立代理程式設定檔時設定的。不過，您以後隨時可以變更密碼。</p>
+
+<a name="ggmvm"></a><h5>密碼確認</h5>
+<p>密碼確認是在您建立代理程式設定檔時執行。如果您變更密碼，則必須確認變更。</p>
+
+<a name="ggmsp"></a><h5>狀態</h5>
+<p>建立代理程式時，選取 [使用中] 選項。只有在您要移除代理程式提供的保護時，才選擇 [非使用中]。</p>
+
+<a name="ggmpq"></a><h5>代理程式配置儲存庫的位置</h5>
+<p>如有需要，請將配置的位置變更為兩個選項之一：集中或本機。集中位置可讓您以集中的方式控制配置，例如透過主控台。提供本機選項是用於向下相容。</p>
+
+<a name="ggmqt"></a><h5>FAM 登入 URL</h5>
+<p>Federated Access Manager 認證的 URL 清單。需要認證時，代理程式會將連入的使用者重新導向至 URL 所指定的適當認證服務。</p>
+
+<a name="ggmqe"></a><h5>代理程式部署 URI 前綴</h5>
+<p>通用資源識別碼 (Universal Resource Identifier, URI) 的值。預設值為 <tt>/amagent</tt>。</p>
+
+<a name="ggmrt"></a><h5>代理程式語言環境</h5>
+<p>語言環境的值。</p>
+
+<a name="ggmpt"></a><h5>自動重建代理程式本機記錄檔</h5>
+<p>啟用記錄檔自動重建。如果啟用，記錄檔便會在達到指示的記錄檔大小時自動重建，如下列屬性所設定：代理程式本機記錄檔大小。</p>
+
+<a name="ggmmw"></a><h5>代理程式本機記錄檔大小</h5>
+<p>記錄檔達到此大小 (以百萬位元組為單位) 時會自動重建為新檔案。</p>
+
+<a name="ggmno"></a><h5>代理程式遠端記錄檔案名稱</h5>
+<p>Federated Access Manager 記錄檔的名稱，其中會記錄每個存取 Federated Access Manager 的 URL。</p>
+
+<a name="ggmof"></a><h5>URL 存取遠端記錄類型</h5>
+<p>URL 存取記錄等級設定。此設定涉及儲存至 Federated Access Manager 記錄檔的 URL 存取，該記錄檔的名稱是由標示為 [代理程式遠端記錄檔名稱] 的屬性指定。</p>
+
+<a name="ggmoy"></a><h5>代理程式除錯等級</h5>
+<p>記錄的除錯訊息類型。此設定決定儲存在代理程式主機本機上的除錯記錄等級。</p>
+
+<a name="ggmnb"></a><h5>FQDN 檢查</h5>
+<p>啟用時，會檢查 FQDN 預設值和 FQDN 對映值。</p>
+
+<a name="ggmoc"></a><h5>FQDN 預設</h5>
+<p>供使用者存取資源的完全合格的主機名稱。此主機名稱是在代理程式安裝期間設定。如非必要，請勿修改此設定。</p>
+
+<a name="ggmod"></a><h5>FQDN 虛擬主機對映</h5>
+<p>與實際或有效主機名稱的對映。此對映是從無法識別的主機名稱至可識別的主機名稱。此對映在下列情況中十分有用：使用者輸入 IP 位址或不正確的 URL 時，或是針對受保護的資源使用虛擬主機時。</p>
+
+<a name="ggmox"></a><h5>忽略伺服器檢查</h5>
+<p>啟用則表示「忽略」，則代理程式<b>不會</b>在執行 302 重新導向之前先確認 Federated Access Manager 是否在執行。</p>
+
+<a name="ggmqs"></a><h5>忽略命名請求中的喜好命名 URL</h5>
+<p>啟用則表示「忽略」，代理程式「不會」將喜好的命名 URL 當作命名請求中的屬性傳送。</p>
+
+<a name="ggmql"></a><h5>遠端記錄失敗時拒絕資源存取</h5>
+<p>啟用且遠端記錄失敗時，資源存取會遭拒。</p>
+
+<a name="ggmpw"></a><h5>拒絕資源存取 URL</h5>
+<p>自訂拒絕存取的頁面的 URL。如果未提供任何值，代理程式便會傳回 HTTP 狀態 403 (禁止)。</p>
+
+<a name="ggmrk"></a><h5>設定檔屬性的原生編碼</h5>
+<p>啟用時，代理程式會以作業系統語言環境的預設編碼來編碼 LDAP 標頭值。未啟用時，會以 UTF-8 編碼 LDAP 標頭值。</p>
+
+<a name="ggmqr"></a><h5>非強制 URL 清單</h5>
+<p>未對其執行任何認證的 URL 清單。對於此清單上的每個 URL，都不會請求憑證以進行認證。</p>
+
+<a name="ggmon"></a><h5>反向檢查非強制 URL 清單</h5>
+<p>啟用時，非強制清單會變成強制清單。因此，做為標示為 [非強制 URL 清單] 的屬性值而列示的所有 URL 都是強制，而所有其他 URL 則為非強制。</p>
+
+<a name="ggmom"></a><h5>非強制用戶端 IP 清單</h5>
+<p>用戶端 IP 位址清單，來自該清單的請求不會經過認證或授權。因此會對列為此屬性值的每個 IP 位址授予存取權。不需要憑證以進行認證或授權。</p>
+
+<a name="ggmov"></a><h5>擷取非強制 URL 的屬性</h5>
+<p>啟用時，代理程式會透過執行策略評估，擷取非強制清單上 URL 的設定檔屬性。</p>
+
+<a name="ggmna"></a><h5>應用程式</h5>
+<p>[應用程式] 屬性為應用程式專用。</p>
+
+<a name="ggnej"></a><h5>代理程式連線逾時：</h5>
+<p>與 Federated Access Manager 認證伺服器連線的代理程式逾時期間，以秒為單位。預設值為 2 秒。與此設定相關的錯誤如下：<tt>unable to find active Access Manager Auth server。</tt></p>
+
+<a name="ggmnd"></a><h5>策略快取輪詢期</h5>
+<p>重新整理代理程式的策略快取的輪詢間隔，以分鐘為單位。預設值為 3 分鐘。</p>
+
+<a name="ggmqk"></a><h5>SSO 快取輪詢期</h5>
+<p>重新整理代理程式的 SSO 快取的輪詢間隔，以分鐘為單位。預設值為 3 分鐘。</p>
+
+<a name="ggmrr"></a><h5>使用者 ID 參數</h5>
+<p>代理程式會用使用者 ID 的值設定 <tt>REMOTE_USER</tt> 伺服器變數的值。依預設，此參數設為 <tt>UserToken</tt>。</p>
+
+<a name="ggmpf"></a><h5>使用者 ID 參數類型</h5>
+<p>搭配標示為 [使用者 ID 參數] 的屬性使用，此設定決定從哪一種屬性類型擷取使用者 ID。可能的值為 <tt>session</tt> 和 <tt>ldap</tt>。</p>
+
+<a name="ggmor"></a><h5>根資源的擷取策略</h5>
+<p>啟用時 (此為預設設定)，代理程式快取資源的策略決策以及來自資源根目錄的所有資源。若要讓代理程式只快取資源的策略決策，以改善回應時間，請確保不啟用此設定。</p>
+
+<a name="ggmoa"></a><h5>策略時鐘偏差</h5>
+<p>用來調整代理程式機器與 Federated Access Manager 之間時差的時間，以秒為單位。時鐘偏差 (以秒為單位) 相當於代理程式時間減去 Federated Access Manager 時間。</p>
+
+<a name="ggmpk"></a><h5>設定檔屬性 Cookie 前綴</h5>
+<p>在設定檔屬性標頭中使用的 Cookie 前綴。</p>
+
+<a name="ggmqv"></a><h5>設定檔屬性 Cookie 最長存在時間</h5>
+<p>設定檔屬性 Cookie 標頭的最長存在時間，以秒為單位。</p>
+
+<a name="ggmri"></a><h5>啟用通知</h5>
+<p>啟用時，通知會幫助維護下列代理程式快取：sso、策略和配置。</p>
+
+<a name="ggmpe"></a><h5>代理程式通知 URL</h5>
+<p>[啟用通知] 屬性設為 [啟用] 時，代理程式會使用指定為此屬性值的 URL 來註冊通知偵聽程式。</p>
+
+<a name="ggmnh"></a><h5>主伺服器的輪詢期</h5>
+<p>代理程式輪詢主伺服器以確保其正常執行的間隔，以分鐘為單位。預設值為 5。</p>
+
+<a name="ggmtg"></a><h5>代理程式配置擷取輪詢期</h5>
+<p>代理程式從 Federated Access Manager 擷取代理程式配置的間隔，以分鐘為單位。預設值為 60。</p>
+
+<a name="ggmvs"></a><h5>代理程式配置清除輪詢期</h5>
+<p>更新舊的代理程式配置項目 (只要目前沒有任何請求參考這些項目) 的間隔，以分鐘為單位。這是熱交換架構的一部份。</p>
+
+<a name="ggmtz"></a><h5>用戶端 IP 驗證</h5>
+<p>啟用時，瀏覽器請求會經過驗證，確認其來源 IP 位址與 SSO 記號初次發出至的 IP 位址相同。</p>
+
+<a name="ggmwv"></a><h5>擷取用戶端主機名稱</h5>
+<p>啟用時，用戶端主機名稱可透過 DNS 反向查找取得，以便用於策略評估。</p>
+
+<a name="ggmve"></a><h5>負載平衡器設定</h5>
+<p>啟用時，負載平衡器會用於 Federated Access Manager 服務。</p>
+
+<a name="ggmxj"></a><h5>置換請求 URL 協定</h5>
+<p>如果代理程式位於 SSL 卸載器、負載平衡器或代理伺服器後方，則將此屬性 (以及下列屬性：[置換請求 URL 主機]、[置換請求 URL 連接埠]、[置換通知 URL] ) 設為 true。</p>
+
+<a name="ggmwb"></a><h5>置換請求 URL 主機</h5>
+<p>如果代理程式位於 SSL 卸載器、負載平衡器或代理伺服器後方，則將此屬性 (以及下列屬性：[置換請求 URL 協定]、[置換請求 URL 連接埠]、[置換通知 URL] ) 設為 true。</p>
+
+<a name="ggmvo"></a><h5>置換請求 URL 連接埠</h5>
+<p>如果代理程式位於 SSL 卸載器、負載平衡器或代理伺服器後方，則將此屬性 (以及下列屬性：[置換請求 URL 協定]、[置換請求 URL 主機]、[置換通知 URL] ) 設為 true。</p>
+
+<a name="ggmxi"></a><h5>置換通知 URL</h5>
+<p>如果代理程式位於 SSL 卸載器、負載平衡器或代理伺服器後方，則將此屬性 (以及下列屬性：[置換請求 URL 協定]、[置換請求 URL 主機]、[置換請求 URL 連接埠] ) 設為
+true。</p>
+
+<a name="ggmtx"></a><h5>URL 比較大小寫相符檢查</h5>
+<p>啟用時，同時在策略和非強制 URL 評估中強制大小寫相符。</p>
+
+<a name="ggmta"></a><h5>編碼 URL 的特殊字元</h5>
+<p>啟用時，會在策略評估之前先編碼含特殊字元的 URL。</p>
+
+<a name="ggmse"></a><h5>忽略請求 URL 中的路徑資訊</h5>
+<p>啟用時，即使非強制清單或策略 URL 中有萬用字元，也不會從請求 URL 中刪除路徑資訊。</p>
+<hr><p><b>注意 &#8211; </b>為避免安全迴圈，當此屬性啟用時，請確保非強制清單或策略中的萬用字元 "*" 後面沒有任何資訊。</p>
+<hr>
+
+
+<a name="ggmty"></a><h5>登出 URL 清單</h5>
+<p>應用程式的登出 URL 的清單。</p>
+
+<a name="ggmsu"></a><h5>要重設的登出 Cookie 清單</h5>
+<p>登出時要重設的 Cookie 清單。此清單的格式與 [要重設的 Cookie 清單] 相同。</p>
+
+<a name="ggmun"></a><h5>POST 資料保留</h5>
+<p>啟用時，會保留 POST 資料快取項目，保留的時間是由標示為 [POST 資料項目快取期間] 的屬性指定。此屬性並非所有的代理程式都可使用。</p>
+
+<a name="ggmsv"></a><h5>POST 資料項目快取期間</h5>
+<p>POST 快取項目被丟棄之前存在的時間 (以分鐘為單位)。</p>
+
+<a name="ggmuh"></a><h5>設定檔屬性擷取模式</h5>
+<p>適用於擷取將納入請求中的額外使用者設定檔屬性的模式。</p>
+
+<a name="ggmst"></a><h5>設定檔屬性對映</h5>
+<p>設定檔屬性名稱與 HTTP 標頭名稱的對映清單，該清單會以目前認證使用者的特定名稱填入。格式：[profile_attribute_name]=http_header_name。</p>
+
+<a name="ggmvb"></a><h5>階段作業屬性擷取模式</h5>
+<p>適用於擷取將納入請求中的額外使用者階段作業屬性的模式。</p>
+
+<a name="ggmub"></a><h5>階段作業屬性對映</h5>
+<p>階段作業屬性名稱與 HTTP 標頭名稱的對映清單，該清單會以目前認證使用者的特定名稱填入。格式：[session_attribute_name]=http_header_name。</p>
+
+<a name="ggmwy"></a><h5>回應屬性擷取模式</h5>
+<p>適用於擷取將納入請求中的額外使用者回應屬性的模式。</p>
+
+<a name="ggmvw"></a><h5>回應屬性對映</h5>
+<p>回應屬性名稱與 HTTP 標頭名稱的對映清單，該清單會以目前認證使用者的特定名稱填入。格式：[response_attribute_name]=http_header_name。</p>
+
+<a name="ggphk"></a><h5>SSO</h5>
+<p>[SSO] 屬性可讓您配置與單次登入 (single sign-on, SSO) 相關的代理程式功能。大部分與 SSO 相關的屬性都會分到 SSO 種類中。不過，可能不會包括提供預設 SSO 功能的屬性。</p>
+
+<a name="ggmwx"></a><h5>僅 SSO</h5>
+<p>啟用時，代理程式只會強制認證 (SSO)，不會強制策略授權。</p>
+
+<a name="ggmuz"></a><h5>匿名使用者預設值</h5>
+<p>用於未經認證使用者的使用者 ID。</p>
+
+<a name="ggmup"></a><h5>匿名使用者</h5>
+<p>啟用時，會對匿名使用者執行 REMOTE_USER 處理。此屬性與標示為 [匿名使用者預設值] 的屬性相關聯。</p>
+
+<a name="ggmsf"></a><h5>Cookie 名稱</h5>
+<p>Federated Access Manager 和代理程式之間所使用的 SSO Cookie 記號的名稱。</p>
+<hr><p><b>注意 &#8211; </b>若變更代理程式中的這個屬性，但是未對應變更 Federated Access Manager，則會停用 SDK。</p>
+<hr>
+
+
+<a name="ggmva"></a><h5>Cookie 安全性</h5>
+<p>啟用時，代理程式會在通訊安全時傳送安全 Cookie。</p>
+
+<a name="ggmwn"></a><h5>重設 Cookie</h5>
+<p>啟用時，代理程式會先重設回應中的 Cookie，再重新導向至 Federated Access Manager 進行認證。依預設，不啟用此屬性。</p>
+
+<a name="ggmwt"></a><h5>要重設的 Cookie 清單</h5>
+<p>要包含在 Federated Access Manager 的重新導向回應中的 Cookie 清單，格式為：name[=value][;Domain=value]。此清單只有在啟用 [重設 Cookie] 屬性時才會使用。</p>
+
+<a name="ggmth"></a><h5>Cookie 網域清單</h5>
+<p>當 CDSSO 啟用時，此網域清單會指出必須設定的 Cookie。</p>
+
+<a name="ggmvi"></a><h5>CDSSO</h5>
+<p>啟用時，跨網域單次登入就能運作。依預設，不啟用此屬性。</p>
+
+<a name="ggmtp"></a><h5>CDSSO Servlet URL 清單</h5>
+<p>啟用時，此清單會指出哪些可用 CDSSO 控制器的 URL 可供代理程式用來處理 CDSSO。</p>
+
+<a name="ggmtu"></a><h5>進階</h5>
+<p>對於 Web 代理程式，進階屬性 (特性) 為自訂建立的屬性或部署容器專用的屬性。</p>
+
+<a name="ggnjs"></a><h5>自訂特性</h5>
+<p>代理程式支援的自訂屬性清單。這些是由網站建立的屬性。</p>
+
+<a name="ggmus"></a><h5>置換代理伺服器的主機和連接埠</h5>
+<p>容器專用：Sun Java System Proxy Server</p><p>啟用時，Sun Java System Proxy Server 主機名稱和連接埠號碼會被置換。</p>
+
+<a name="ggmwc"></a><h5>認證類型</h5>
+<p>容器專用：Microsoft IIS Server</p>
+
+<a name="ggmvx"></a><h5>重送密碼金鑰</h5>
+<p>容器專用：Microsoft IIS Server</p><p>DES 金鑰，用來解密階段作業中的基本認證密碼。</p>
+
+<a name="ggmtj"></a><h5>篩選器優先順序</h5>
+<p>容器專用：Microsoft IIS Server</p><p>可用於載入代理程式篩選器優先順序的選項。</p>
+
+<a name="ggmsz"></a><h5>使用 OWA 配置的篩選器</h5>
+<p>容器專用：Microsoft IIS Server</p><p>當此屬性已啟用而且為 Outlook Web Access (OWA) 配置了 Microsoft IIS 代理程式篩選器時，代理程式就能依預期運作。</p>
+
+<a name="ggmue"></a><h5>將 URL 協定變更為 https</h5>
+<p>容器專用：Microsoft IIS Server</p><p>當此屬性已啟用而且為 Outlook Web Access (OWA) 配置了 Microsoft IIS 代理程式篩選器時，使用 Internet Explorer 6
+瀏覽器的使用者可能會遇到快顯訊息遭阻止的情形。</p>
+
+<a name="ggmws"></a><h5>閒置階段作業逾時頁面 URL</h5>
+<p>容器專用：Microsoft IIS Server</p><p>此屬性只有在為 Outlook Web Access (OWA) 配置了 Microsoft IIS 代理程式篩選器時才可使用。此屬性的值為本機閒置階段作業逾時頁面的 URL。</p>
+
+<a name="ggmsr"></a><h5>檢查 Domino 資料庫中的使用者</h5>
+<p>容器專用：IBM Lotus Domino Server</p><p>啟用時，代理程式會檢查使用者是否存在於 IBM Lotus Domino 名稱資料庫中。</p>
+
+<a name="ggmvy"></a><h5>使用 LTPA 記號</h5>
+<p>容器專用：IBM Lotus Domino Server</p><p>啟用時，代理程式使用 LTPA 記號。因此，如果代理程式需要使用 LTPA 記號，則啟用此屬性。</p>
+
+<a name="ggmto"></a><h5>LTPA 記號 Cookie 名稱</h5>
+<p>容器專用：IBM Lotus Domino Server</p><p>包含 LTPA 記號的 Cookie 名稱。</p>
+
+<a name="ggmss"></a><h5>LTPA 記號配置名稱</h5>
+<p>容器專用：IBM Lotus Domino Server</p><p>代理程式為採用 LTPA 記號機制而使用的配置名稱。</p>
+
+<a name="ggmxf"></a><h5>LTPA 記號配置名稱</h5>
+<p>容器專用：IBM Lotus Domino Server</p><p>LTPA 記號所屬的組織名稱。</p>
+<br/>
+
+</body>
+</html>

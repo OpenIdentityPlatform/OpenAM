@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>可信赖的伙伴：选择伙伴类型和配置文件 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlselecttrustedpartnertype"></a><h5>可信赖的伙伴：选择伙伴类型和配置文件</h5>
+<a name="indexterm-81"></a><a name="indexterm-82"></a><p>此属性定义了即将与 OpenSSO 进行通信的任何可信赖伙伴（位于安装 OpenSSO 的服务器的远程位置）。</p>
+<hr><p><b>注 &#8211; </b>必须预先在可信赖的伙伴站点与“站点标识符”属性中配置的一个或多个站点之间安排某种信赖关系。</p>
+<hr>
+<p>配置可信赖伙伴的第一步是确定伙伴在信赖关系中的角色。可信赖伙伴可以是源站点（生成单点登录声明）或目标站点（使用单点登录声明）。例如，如果该伙伴是源站点，则根据它发送声明的方式来配置此属性。如果该伙伴是目标站点，则根据它接收声明的配置文件来配置此属性。以下是配置可信赖伙伴的步骤的第一部分。起点是联合下的 "SAML" 屏幕。</p>
+<hr><p><b>注 &#8211; </b>要编辑或复制可信赖伙伴配置文件的属性，请在已配置的可信赖伙伴名称旁边的“操作”列中单击相应的按钮。</p>
+<hr>
+<ol>
+<li><b>通过选择与其通信所使用的相应配置文件，为您要配置的伙伴站点选择角色（目标站点或源站点）。</b><p>可为目标站点、源站点或两者选择 <b>Web 浏览器工件配置文件</b>或 <b>Web 浏览器 Post 配置文件</b>，或者仅为目标站点选择 <b>SOAP 查询</b>。所做的选择指明在以下步骤中需要对哪些属性进行配置。</p>
+<hr><p><b>注 &#8211; </b>如果要修改现有的可信赖伙伴，请单击“编辑”，更改伙伴站点的角色。</p>
+<hr>
+</li>
+<li><b>单击“下一步”。</b></li>
+<li><b>要完成配置，请参见<a href="federation.fssamltrustedpartnersadd.html">可信赖的伙伴：配置可信赖的伙伴属性</a>。</b></li></ol>
+<br/>
+
+</body>
+</html>

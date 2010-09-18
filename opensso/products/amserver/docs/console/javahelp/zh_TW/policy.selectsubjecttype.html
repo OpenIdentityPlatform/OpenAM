@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>主體 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>主體</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a><b>主體</b>定義策略將影響的使用者或使用者集合 (例如，群組或擁有特定角色的使用者)。主體的一般原則是，只有當使用者為策略中至少一個主體的成員時，策略才適用。預設主體為：</p><dl><dt>OpenSSO 身份識別主體</dt>
+<dd><p>此主體暗指您於 [範圍主體] 標籤下建立與管理的識別可做為主體的一個成員增加。</p></dd>
+<dt>經認證的使用者</dt>
+<dd><p>此主體類型表示具有有效 SSOToken 的任何使用者均為此主體的成員。</p><p>所有認證的使用者都將成為此主體的成員，即使這些使用者已在與定義策略之組織不同的範圍內進行認證。如果資源所有者想要將存取權限授與其他組織的使用者所管理的資源，這個功能很有用。若要限制對特定組織的成員存取保護的資源，請使用組織主體。</p></dd>
+<dt>Web 服務用戶端</dt>
+<dd><p>此主體類型表示，如果包含在 SSOToken 中的任何主體之 DN 與此主體的任意所選值相符，則由 SSOToken 識別的 Web 服務用戶端 (WSC) 為此主體的成員。有效值為本機 JKS 鍵值儲存區中可信任憑證的 DN (與可信任 WSC 的憑證相對應)。此主體取決於 Liberty Web 服務架構，並且僅應該由 Liberty 服務提供者用來授權 WSC。</p><p>確定建立鍵值儲存區後再將此主體增加策略。以下位置可以找到設定鍵值儲存區的資訊：</p><p><tt></tt><i>OpenSSO-base</i><tt></tt> <tt> /SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>在範圍的<a href="service.scpolicy.html">策略配置</a>服務中選取下列的附加主體後，便可使用它們：</p><dl><dt>OpenSSO 角色</dt>
+<dd><p>此主體類型表示任何 OpenSSO 角色的成員都是此主體的成員。OpenSSO 角色使用舊有模式中執行的 OpenSSO 建立。</p></dd>
+<dt>LDAP 群組</dt>
+<dd><p>此主體類型表示 LDAP 群組的任何成員均為此主體的成員。</p></dd>
+<dt>LDAP 角色</dt>
+<dd><p>此主體類型表示 LDAP 角色的任何成員均為此主體的成員。LDAP 角色是使用 Directory Server 角色功能定義的任何角色。這些角色具有 Directory Server 角色定義代管的物件類別。可以在<a href="service.scpolicy.html">策略配置</a>服務中修改 LDAP 角色搜尋篩選器，以縮小範圍和改善效能。</p></dd>
+<dt>LDAP 使用者</dt>
+<dd><p>此主體類型表示任何 LDAP 使用者均為此主體的成員。</p></dd>
+<dt>組織</dt>
+<dd><p>此主體類型表示範圍的任何成員均為此主體的成員。</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+
+     <test name="PolicyPeerRealmReferral_P4_E0 ">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest4"/>
+        <parameter name="referringPeerOrg" value="realmForTest4"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+    <test name="PolicyPeerRealmReferral_P4_E1 ">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest4"/>
+        <parameter name="referringPeerOrg" value="realmForTest4"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test> 
+    <test name="PolicyPeerRealmReferral_P4_E2 ">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest4"/>
+        <parameter name="referringPeerOrg" value="realmForTest4"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+    <test name="PolicyPeerRealmReferral_P4_E3 ">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="3"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest4"/>
+        <parameter name="referringPeerOrg" value="realmForTest4"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+     <test name="PolicyPeerRealmReferral_P9_E0 ">
+        <parameter name="policyIdx" value="9"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest9"/>
+        <parameter name="referringPeerOrg" value="realmForTest9"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+     <test name="PolicyPeerRealmReferral_P9_E1 ">
+        <parameter name="policyIdx" value="9"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest9"/>
+        <parameter name="referringPeerOrg" value="realmForTest9"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+     <test name="PolicyPeerRealmReferral_P9_E2 ">
+        <parameter name="policyIdx" value="9"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest9"/>
+        <parameter name="referringPeerOrg" value="realmForTest9"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+     <test name="PolicyPeerRealmReferral_P9_E3 ">
+        <parameter name="policyIdx" value="9"/>
+        <parameter name="evaluationIdx" value="3"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest9"/>
+        <parameter name="referringPeerOrg" value="realmForTest9"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+    <test name="PolicyPeerRealmReferral_P10_E0 ">
+        <parameter name="policyIdx" value="10"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest10"/>
+        <parameter name="referringPeerOrg" value="realmForTest10"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+    <test name="PolicyPeerRealmReferral_P10_E1 ">
+        <parameter name="policyIdx" value="10"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest10"/>
+        <parameter name="referringPeerOrg" value="realmForTest10"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+    <test name="PolicyPeerRealmReferral_P10_E2 ">
+        <parameter name="policyIdx" value="10"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest10"/>
+        <parameter name="referringPeerOrg" value="realmForTest10"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>
+    <test name="PolicyPeerRealmReferral_P10_E3 ">
+        <parameter name="policyIdx" value="10"/>
+        <parameter name="evaluationIdx" value="3"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <parameter name="peAtOrg" value="PeerrealmForTest10"/>
+        <parameter name="referringPeerOrg" value="realmForTest10"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyPeerRealmReferral"/>
+        </classes>
+    </test>

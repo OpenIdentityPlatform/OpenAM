@@ -1,0 +1,585 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>J2EE-Richtlinien-Agent - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.j2eeagentprofile"></a><h4>J2EE-Richtlinien-Agent</h4>
+<p>&#220;ber diese Schnittstelle kann eine J2EE-Agenteninstanz konfiguriert werden.  Die beschriebenen Eigenschaften
+gelten nur, wenn w&#228;hrend der Agentenerstellung die Konfiguration "Zentralisiert" ausgew&#228;hlt wurde. 
+ Wenn die Konfiguration "Lokal" ausgew&#228;hlt wurde, m&#252;ssen die zu diesem Agenten
+geh&#246;renden Eigenschaften in der Datei <tt>OpenSSOAgentConfiguration.properites </tt> im Installationsverzeichnis des Agenten bearbeitet werden.</p><p>Die verf&#252;gbaren Konfigurationstypen untergliedern sich in folgende Kategorien:</p>
+<ul><li><p><a href="#ggmvd">Global</a></p></li>
+<li><p><a href="#ggmwz">Anwendung</a></p></li>
+<li><p><a href="#ggmwl">SSO</a></p></li>
+<li><p><a href="#ggmwi">OpenSSO-Dienste</a></p></li>
+<li><p><a href="#ggmug">Sonstiges</a></p></li>
+<li><p><a href="#ggmud">Erweitert</a></p></li></ul>
+
+
+<a name="ggmvd"></a><h5>Global</h5>
+<p>Diese Eigenschaften gelten f&#252;r alle Anwendungen, die durch einen Agenten gesch&#252;tzt sind.</p>
+
+<a name="ggwrr"></a><h5>Gruppe</h5>
+<p>W&#228;hlen Sie gegebenenfalls eine Gruppe aus der Dropdown-Liste aus, um diesen Agenten
+der Gruppe zuzuweisen. Diese Liste besteht aus zuvor konfigurierten Gruppen.</p>
+
+<a name="ggmqz"></a><h5>Password</h5>
+<p>Das Passwort wurde bei der Erstellung des Agentenprofils festgelegt. Sie k&#246;nnen das
+Passwort jedoch jederzeit sp&#228;ter &#228;ndern.</p>
+
+<a name="ggmni"></a><h5>Passwortbest&#228;tigung</h5>
+<p>Die Best&#228;tigung des Passworts wurde bei der Erstellung des Agentenprofils durchgef&#252;hrt. Wenn
+Sie das Passwort &#228;ndern, m&#252;ssen Sie die &#196;nderung best&#228;tigen.</p>
+
+<a name="ggmpc"></a><h5>Status</h5>
+<p>Die Option <tt>Active</tt>  (Aktiv) wird bei der Erstellung des Agenten ausgew&#228;hlt.
+   W&#228;hlen Sie <tt>Inactive</tt> (Inaktiv) nur aus, wenn Sie den
+Schutz, den der Agent bietet, aufheben m&#246;chten.</p>
+
+<a name="ggmwm"></a><h5>URL f&#252;r Agentenbenachrichtigung</h5>
+<p>Die vom Agenten zur Registrierung von Benachrichtigungs-Listenern verwendete URL.</p>
+
+<a name="ggmwr"></a><h5>Speicherort des Repository f&#252;r die Agentenkonfiguration</h5>
+<p>&#196;ndern Sie bei Bedarf den Konfigurationsspeicherort auf die andere der beiden Optionen:
+"Zentralisiert" oder "Lokal". Der zentralisierte Speicherort erm&#246;glicht die zentralisierte Steuerung der Konfiguration,
+beispielsweise &#252;ber die Konsole.</p><p>Die lokale Option wurde bereitgestellt, um Abw&#228;rtskompatibilit&#228;t zu erm&#246;glichen. Wenn die Konfiguration
+"Lokal" ausgew&#228;hlt wurde, verwendet der Agent seine lokale Konfiguration in der Datei
+<tt>OpenSSOAgentConfiguration.properites </tt> im Installationsverzeichnis des Agenten. Au&#223;erdem werden in der Konsole nur folgende
+Eigenschaften angezeigt: Passwort, Passwort (Best&#228;tigung) und Status.</p>
+
+<a name="ggmwk"></a><h5>Neulade-Intervall f&#252;r Konfiguration</h5>
+<p>Das Intervall in Sekunden zwischen den einzelnen Vorg&#228;ngen zum erneuten Laden der
+Konfiguration. Wenn Sie diese Eigenschaft auf <tt>0</tt> setzen, wird der Hotswap-Mechanismus deaktiviert.</p>
+
+<a name="ggwkv"></a><h5>Benachrichtigung &#252;ber &#196;nderungen an der Agentenkonfiguration</h5>
+<p>Wenn diese Option aktiviert ist, erh&#228;lt der Agent vom OpenSSO-Server Benachrichtigungsmitteilungen zu
+Konfigurations&#228;nderungen.</p>
+
+<a name="ggmvt"></a><h5>Agentenfiltermodus</h5>
+<p>Der Betriebsmodus f&#252;r den Filter. Bei dieser Eigenschaft kann ein globaler Wert
+f&#252;r alle Anwendungen festgelegt werden, die nicht &#252;ber einen eigenen speziellen Filtermodus
+verf&#252;gen. </p><p>Geben Sie einen Webanwendungsnamen f&#252;r den Zuordnungsschl&#252;ssel und einen Wert f&#252;r die
+zugeh&#246;rigen Zuordnungswerte ein. Folgende Werte sind g&#252;ltig: ALL, J2EE_POLICY, URL_POLICY, SSO_ONLY und
+NONE. So legen Sie "ALL" als Modus f&#252;r den globalen Filter fest:
+Lassen Sie das Feld f&#252;r den Zuordnungsschl&#252;ssel leer und geben Sie im
+Feld f&#252;r den zugeh&#246;rigen Zuordnungswert "ALL" ein. </p>
+
+<a name="ggmvu"></a><h5>URI f&#252;r Ressourcenzugriffsverweigerung:</h5>
+<p>Der URL der benutzerspezifisch angepassten Seite f&#252;r die Zugriffsverweigerung. Wenn kein Wert
+angegeben wird, gibt der Agent den <tt>HTTP</tt> -Status <tt> 403 (Forbidden)</tt> (Verboten) zur&#252;ck.</p>
+
+<a name="ggmxg"></a><h5>HTTP-Sitzungs-Binding</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird die <tt>HTTP</tt>-Sitzung au&#223;er Kraft gesetzt, wenn
+die Anmeldung fehlschl&#228;gt.  Der Benutzer verwendet keine SSO-Sitzung, oder der Name
+des Principal-Benutzers stimmt nicht mit dem Namen des SSO-Benutzers &#252;berein.</p>
+
+<a name="ggmut"></a><h5>Name des GOTO-Parameters</h5>
+<p>Eine Zeichenkette, die f&#252;r den Namen des <tt>goto</tt>-Parameters steht. Dieser Parameter wird
+vom Agenten verwendet, um den Benutzer zu dem entsprechenden Authentifizierungsdienst weiterzuleiten. 
+Anhand des Werts dieses Parameters leitet der Authentifizierungsdienst den Benutzer an das
+urspr&#252;nglich angeforderte Ziel weiter.</p>
+
+<a name="ggmuv"></a><h5>Obergrenze f&#252;r Anmeldeversuche</h5>
+<p>Die Anzahl fehlgeschlagener Anmeldeversuche, die w&#228;hrend einer einzelnen Browser-Sitzung zul&#228;ssig sind, bis
+die Benutzeranforderung blockiert wird. Mit dem Wert <tt>0</tt> wird diese Funktion deaktiviert.</p>
+
+<a name="ggmtr"></a><h5>Benutzerdefinierter Antwort-Header</h5>
+<p>Eine Liste der Zuordnungen benutzerdefinierter Header. Die Header werden von dem Agenten
+auf dem Client-Browser festgelegt. Geben Sie einen Header-Namen f&#252;r den Zuordnungsschl&#252;ssel und
+den Header-Wert f&#252;r die zugeh&#246;rigen Zuordnungswerte ein</p>
+
+<a name="ggmtt"></a><h5>Obergrenze f&#252;r Umleitungsversuche</h5>
+<p>Die Anzahl aufeinanderfolgender Einzelpunktumleitungen, die w&#228;hrend einer einzelnen Browser-Sitzung zul&#228;ssig sind, bis
+die Benutzeranforderung blockiert wird. Mit dem Wert <tt>0</tt> wird diese Funktion deaktiviert.</p>
+
+<a name="ggmxd"></a><h5>Fehlersuchebene f&#252;r Agenten</h5>
+<p>Der Typ der protokollierten Fehlermeldungen. Diese Einstellung legt die Protokollierungsebene des lokal
+auf dem Agentenhost gespeicherten Fehlersuchprotokolls fest.</p>
+
+<a name="ggmsk"></a><h5>Benutzerzuordnungsmodus</h5>
+<p>Der Mechanismus, mit dem der Agent die Benutzer-ID bestimmt.</p>
+
+<a name="ggmts"></a><h5>Benutzerattributname</h5>
+<p>Der Name des Attributs, das die Benutzer-ID enth&#228;lt. Der Wert f&#252;r diese
+Eigenschaft wird nicht verwendet, wenn die Eigenschaft "Benutzerzuordnungsmodus" auf <tt>USER_ID</tt> gesetzt ist.</p>
+
+<a name="ggmuc"></a><h5>Benutzer-Principal-Flag</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird anstatt der Benutzer-ID allein der Principal
+des authentifizierten Benutzers zur Authentifizierung des Benutzers verwendet. Der Wert f&#252;r diese
+Eigenschaft wird verwendet, wenn die Eigenschaft "Benutzerzuordnungsmodus" auf <tt>USER_ID</tt> gesetzt ist.</p>
+
+<a name="ggmtm"></a><h5>Name des Benutzertokens</h5>
+<p>Der Sitzungseigenschaftenname der Benutzer-ID des authentifizierten Benutzers in der Sitzung.  Der
+Wert f&#252;r diese Eigenschaft wird verwendet, wenn die Eigenschaft "Benutzerzuordnungsmodus" auf <tt>USER_ID</tt>
+gesetzt und die Eigenschaft "Benutzer-Principal-Flag" nicht aktiviert ist.</p>
+
+<a name="ggmzk"></a><h5>&#220;berwachungszugriffstypen</h5>
+<p>Die Meldungstypen, die der Agent auf der Grundlage der URL-Zugriffsversuche protokolliert.</p>
+
+<a name="ggmyk"></a><h5>Speicherort des &#220;berwachungsprotokolls</h5>
+<p>Der Speicherort, an dem &#220;berwachungsmeldungen protokolliert werden.</p>
+
+<a name="ggmxz"></a><h5>Name der entfernten Protokolldatei</h5>
+<p>Name der OpenSSO-Protokolldatei, in der jeder URL-Zugriff auf OpenSSO aufgezeichnet wird.</p>
+
+<a name="ggmxy"></a><h5>Lokales &#220;berwachungsprotokoll rotieren</h5>
+<p>Wenn diese Option aktiviert ist, werden &#220;berwachungsprotokolldateien rotiert, wenn sie die von
+der Eigenschaft "Rotationsgrenze f&#252;r lokales &#220;berwachungsprotokoll" angegebene Gr&#246;&#223;e erreichen.</p>
+
+<a name="ggmyc"></a><h5>Rotationsgrenze f&#252;r lokales &#220;berwachungsprotokoll</h5>
+<p>Die Gr&#246;&#223;e, bei der das lokale &#220;berwachungsprotokoll in eine neue Datei rotiert
+wird.</p>
+
+<a name="ggndh"></a><h5>FQDN-Pr&#252;fung</h5>
+<p>Wenn dieses Attribut aktiviert ist, werden der FQDN-Standardwert und die FQDN-Zuordnungswerte &#252;berpr&#252;ft.</p>
+
+<a name="ggnfn"></a><h5>FQDN-Standard</h5>
+<p>Der vollst&#228;ndige Hostname, mit dem die Benutzer auf Ressourcen zugreifen k&#246;nnen.</p>
+
+<a name="ggnft"></a><h5>FQDN-Zuordnung zu virtuellem Host</h5>
+<p>Eine Zuordnung zu einem tats&#228;chlichen oder g&#252;ltigen Hostnamen. Hierbei wird einem nicht
+erkannten Hostnamen ein erkannter Hostname zugeordnet. Diese Zuordnung ist in folgenden Situationen
+n&#252;tzlich: Wenn eine IP-Adresse oder eine falsche URL vom Benutzer eingegeben oder
+wenn ein virtueller Host f&#252;r gesch&#252;tzte Ressourcen verwendet wird.</p><p>Geben Sie Werte f&#252;r den Zuordnungsschl&#252;ssel und die zugeh&#246;rigen Zuordnungswerte ein und
+klicken Sie auf "Hinzuf&#252;gen". </p>
+
+<a name="ggmwz"></a><h5>Anwendung</h5>
+<p>Diese Eigenschaften sind normalerweise anwendungsspezifisch.</p>
+
+<a name="ggmxm"></a><h5>URI des Anmeldeformulars</h5>
+<p>Die Liste der absoluten URIs, die dem form-login-page-Element <tt> web.xml</tt> einer Anwendung entsprechen.</p>
+
+<a name="ggmzf"></a><h5>Anmeldefehler-URI</h5>
+<p>Die Liste der absoluten URIs, die dem form-error-page-Element <tt> web.xml</tt> einer Anwendung entsprechen.</p>
+
+<a name="ggmyn"></a><h5>Interne Anmeldung verwenden</h5>
+<p>Wenn diese Option aktiviert ist, verwendet der Agent den angepassten internen Inhalt,
+wie von der Eigenschaft "Name der Anmeldungsinhaltsdatei" angegeben.  Wenn dieses Attribut
+nicht aktiviert ist, verwendet der Agent den standardm&#228;&#223;igen internen Inhalt.</p>
+
+<a name="ggmxs"></a><h5>Name der Anmeldungsinhaltsdatei</h5>
+<p>Der vollst&#228;ndige Pfad und Name der benutzerdefinierten Anmeldinhaltsdatei.</p>
+
+<a name="ggmyw"></a><h5>Abmelde-Handler der Anwendung</h5>
+<p>Anwendungsspezifische Zuordnungen, die jeweils einen Handler zur Verwendung f&#252;r die Abmeldeverarbeitung identifizieren.</p><p>Geben Sie den Abmelde-Handler f&#252;r das Feld f&#252;r die Schl&#252;sselzuordnung und den
+Klassennamen des Abmelde-Handlers der Anwendung in das Feld f&#252;r die zugeh&#246;rigen Zuordnungswerte
+ein. Klicken Sie auf &#8222;Hinzuf&#252;gen&#8220;. </p>
+
+<a name="ggmzp"></a><h5>Abmelde-URI der Anwendung</h5>
+<p>Anwendungsspezifische Zuordnungen, die jeweils einen Anforderungs-URI identifizieren. Das Vorliegen des angegebenen Anforderungs-URI
+zeigt einen Abmeldevorgang an.</p><p>Geben Sie den Abmelde-URI f&#252;r das Feld f&#252;r die Schl&#252;sselzuordnung und den
+Abmelde-URI der Anwendung in das Feld f&#252;r die zugeh&#246;rigen Zuordnungswerte ein. Klicken
+Sie auf &#8222;Hinzuf&#252;gen&#8220;. </p>
+
+<a name="ggmxw"></a><h5>Anforderungsparameter f&#252;r Abmeldung</h5>
+<p>Anwendungsspezifische Zuordnungen, die jeweils einen Parameter identifizieren. Das Vorliegen des angegebenen Parameters
+in der <tt>HTTP</tt>-Anforderung zeigt ein Abmeldeereignis an.</p>
+
+<a name="ggmzu"></a><h5>Abmelde-Introspektion aktiviert</h5>
+<p>Wenn dieses Attribut aktiviert ist, durchsucht der Agent den Hauptteil der <tt>HTTP</tt>-Anforderung,
+um den Abmeldeparameter ausfindig zu machen.</p>
+
+<a name="ggmyj"></a><h5>URI des Abmeldeeintrags</h5>
+<p>Anwendungsspezifische Zuordnungen, die jeweils einen URI identifizieren, der als Einsprungstelle nach dem
+erfolgreichen Abmelden und ggf. nach der anschlie&#223;enden erfolgreichen Authentifizierung verwendet werden soll.</p><p>Geben Sie den Wert f&#252;r das Feld f&#252;r die Schl&#252;sselzuordnung und den
+URI f&#252;r den Abmeldeeintrag in das Feld f&#252;r die zugeh&#246;rigen Zuordnungswerte ein.
+ Klicken Sie auf &#8222;Hinzuf&#252;gen&#8220;. </p>
+
+<a name="ggmxn"></a><h5>Nicht erzwungene URIs</h5>
+<p>Eine URI-Liste, f&#252;r die keine Authentifizierung durchgef&#252;hrt wird. F&#252;r jeden URI in
+dieser Liste, wird kein Schutz vom Agenten erzwungen, und es werden keine
+Berechtigungsnachweise angefordert.</p>
+
+<a name="ggmyy"></a><h5>Nicht erzwungene URIs umkehren</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird die Liste der nicht erzwungenen URIs
+zur Liste der erzwungenen URIs. Somit werden alle URIs, die als Werte
+f&#252;r die Eigenschaft  "Nicht erzwungene URIs" aufgef&#252;hrt sind, ab diesem Zeitpunkt
+erzwungen, w&#228;hrend alle anderen URIs nicht erzwungen werden</p>
+
+<a name="ggmyv"></a><h5>Cache f&#252;r nicht erzwungene URIs aktiviert</h5>
+<p>Wenn dieses Attribut aktiviert ist, werden die Auswertungsergebnisse f&#252;r nicht erzwungene URIs
+im Cache gespeichert. Daher werden die Auswertungsergebnisse f&#252;r die Liste der Werte,
+die der Eigenschaft "Nicht erzwungene URIs" zugeordnet sind, im Cache gespeichert.</p>
+
+<a name="ggmzm"></a><h5>Cache-Gr&#246;&#223;e f&#252;r nicht erzwungene URIs</h5>
+<p>Wenn die Eigenschaft "Cache f&#252;r nicht erzwungene URIs aktiviert" aktiviert ist, wird
+der f&#252;r diese Eigenschaft angegebene Wert zur Festlegung der Cache-Gr&#246;&#223;e verwendet.</p>
+
+<a name="ggmzd"></a><h5>Liste der nicht erzwungenen Client-IPs</h5>
+<p>Die Liste der Client-IP-Adressen, deren Anforderungen keiner Authentifizierung oder Autorisierung unterzogen werden.
+F&#252;r jede IP-Adresse in dieser Liste wird der Zugriff gew&#228;hrt, und es
+werden keine Berechtigungsnachweise f&#252;r Authentifizierung bzw. Autorisierung angefordert.</p>
+
+<a name="ggmzn"></a><h5>Liste nicht erzwungener IPs umkehren</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird die Liste der nicht erzwungenen Client-IPs
+zur Liste der erzwungenen Client-IPs. Somit werden alle IP-Adressen, die als Werte
+f&#252;r die Eigenschaft "Liste der nicht erzwungenen Client-IPs" aufgef&#252;hrt sind, ab diesem
+Zeitpunkt erzwungen, w&#228;hrend alle anderen IP-Adressen nicht erzwungen werden.</p>
+
+<a name="ggmzh"></a><h5>Cache-Flag f&#252;r nicht erzwungene IPs</h5>
+<p>Wenn dieses Attribut aktiviert ist, werden die Auswertungsergebnisse f&#252;r nicht erzwungene IP-Adressen
+im Cache gespeichert. Daher werden die Auswertungsergebnisse f&#252;r die Liste der Werte,
+die der Eigenschaft "Liste der nicht erzwungenen Client-IPs" zugeordnet sind, im Cache
+gespeichert.</p>
+
+<a name="ggmzs"></a><h5>Cache-Gr&#246;&#223;e f&#252;r nicht erzwungene IPs</h5>
+<p>Wenn die Eigenschaft "Cache-Flag f&#252;r nicht erzwungene IPs" aktiviert ist, wird der
+f&#252;r diese Eigenschaft angegebene Wert zur Festlegung der Cache-Gr&#246;&#223;e verwendet.</p>
+
+<a name="ggmzi"></a><h5>Abrufmodus f&#252;r Profilattribute</h5>
+<p>Die verf&#252;gbaren Modi zum Abrufen zus&#228;tzlicher Benutzerprofilattribute zur Aufnahme in eine Anforderung.</p>
+
+<a name="ggmzo"></a><h5>Zuordnung der Profilattribute</h5>
+<p>Eine Liste der Zuordnungen zwischen Profilattributnamen und <tt>HHTP</tt>-Header-Namen. Die <tt>HTTP</tt>-Header-Namen werden unter
+bestimmten Namen f&#252;r den aktuell authentifizierten Benutzer ausgef&#252;llt. </p>
+
+<a name="ggmym"></a><h5>Abrufmodus f&#252;r Antwortattribute</h5>
+<p>Die verf&#252;gbaren Modi zum Abrufen zus&#228;tzlicher Benutzerantwortattribute zur Aufnahme in eine Anforderung.</p>
+
+<a name="ggmzg"></a><h5>Zuordnung der Antwortattribute</h5>
+<p>Eine Liste der Zuordnungen zwischen Antwortattributnamen und <tt>HHTP</tt>-Header-Namen.  Die HTTP-Header-Namen werden
+unter bestimmten Namen f&#252;r den aktuell authentifizierten Benutzer ausgef&#252;llt.   </p>
+
+<a name="ggmxl"></a><h5>Cookie-Trennzeichen</h5>
+<p>Das Zeichen, mit dem mehrere Werte desselben Attributs voneinander getrennt werden, wenn
+das Attribut als Cookie festgelegt wird.</p>
+
+<a name="ggmyl"></a><h5>Datenformat des Abrufattributs</h5>
+<p>Das Format der Datumsattributwerte, das verwendet werden soll, wenn das Attribut als
+<tt>HTTP</tt>-Header festgelegt wird.  Das Format beruht auf <tt>java.text.SimpleDateFormat</tt>.</p>
+
+<a name="ggmzq"></a><h5>Kodierung f&#252;r Attribut-Cookie</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird der Wert des Attributs vor der
+Festlegung als Cookie URL-kodiert.</p>
+
+<a name="ggmyf"></a><h5>Abrufmodus f&#252;r Sitzungsattribute</h5>
+<p>Die verf&#252;gbaren Modi zum Abrufen zus&#228;tzlicher Benutzersitzungsattribute zur Aufnahme in eine Anforderung.</p>
+
+<a name="ggmyu"></a><h5>Zuordnung der Sitzungsattribute</h5>
+<p>Eine Liste der Zuordnungen zwischen Sitzungsattributnamen und <tt>HHTP</tt>-Header-Namen.  Die Sitzungsattributnamen werden
+unter bestimmten Namen f&#252;r den aktuell authentifizierten Benutzer ausgef&#252;llt.   </p>
+
+<a name="ggmyi"></a><h5>Standardm&#228;&#223;iges privilegiertes Attribut</h5>
+<p>Eine Liste der privilegierten Attribute f&#252;r authentifizierte Benutzer. Diese Attribute werden allen
+Benutzern mit einer g&#252;ltigen OpenSSO-Sitzung gew&#228;hrt.</p>
+
+<a name="ggmxo"></a><h5>Typ des privilegierten Attributs</h5>
+<p>Eine Liste mit Typen privilegierter Attribute, die f&#252;r die einzelnen Benutzer abgerufen
+werden sollen.</p>
+
+<a name="ggmyb"></a><h5>Privilegierte Attribute in Kleinbuchstaben</h5>
+<p>Eine Liste der Zuordnungen von privilegierten Attributtypen zu den Werten <tt>true</tt> (wahr)
+bzw. <tt>false</tt> (falsch): <tt>true</tt> (wahr) gibt an, dass der Attributtyp in Kleinbuchstaben
+umgewandelt wird; <tt>false </tt> (falsch) wird verwendet, wenn er nicht umgewandelt wird.</p>
+
+<a name="ggmyt"></a><h5>Privilegiertes Sitzungsattribut</h5>
+<p>Eine Liste mit Sitzungseigenschaftsnamen, die privilegierte Attribute f&#252;r den authentifizierten Benutzer enthalten.</p>
+
+<a name="ggmxk"></a><h5>Zuordnung privilegierter Attribute aktivieren</h5>
+<p>Wenn diese Option aktiviert ist, werden Zuordnungen vom urspr&#252;nglichen Wert eines Attributs
+zu einem alternativen Wert vorgenommen, der in der Eigenschaft  "Zuordnung privilegierter
+Attribute" angegeben ist.</p>
+
+<a name="ggmya"></a><h5>Zuordnung privilegierter Attribute</h5>
+<p>Eine Liste von Zuordnungen zwischen dem urspr&#252;nglichen Wert eines Attributs und einem
+alternativen Wert. Diese Eigenschaft ist nur wirksam, wenn die Eigenschaft "Zuordnung privilegierter
+Attribute" aktiviert ist.</p>
+
+<a name="ggmyg"></a><h5>Benutzerdefinierter Authentifizierungs-Handler</h5>
+<p>Eine Liste von Zuordnungen zwischen einer Anwendung und dem zu dieser Anwendung
+geh&#246;renden Authentifizierungs-Handler. Jeder Authentifizierungs-Handler wird vom Agenten verwendet, um den Benutzer in
+dem Container f&#252;r die angegebene Anwendung zu authentifizieren.</p>
+
+<a name="ggmyq"></a><h5>Benutzerdefinierter Abmelde-Handler</h5>
+<p>Eine Liste von Zuordnungen zwischen einer Anwendung und dem zu dieser Anwendung
+geh&#246;renden Abmelde-Handler. Jeder Abmelde-Handler wird vom Agenten verwendet, um den Benutzer in
+dem Container f&#252;r die angegebene Anwendung zu abzumelden.</p>
+
+<a name="ggmxv"></a><h5>Benutzerdefinierter Verifizierungs-Handler</h5>
+<p>Eine Liste von Zuordnungen zwischen einer Anwendung und dem zu dieser Anwendung
+geh&#246;renden lokalen Verifizierungs-Handler. Lokale Verifizierungs-Handler werden vom Agenten zur Validierung der Benutzer-Berechtigungsnachweise
+beim lokalen Repository verwendet.</p>
+
+<a name="ggmwl"></a><h5>SSO</h5>
+<p>Mit diesen Eigenschaften k&#246;nnen Sie Funktionen des Agenten konfigurieren, die sich auf
+ Single Sign-on (SSO) und dom&#228;nen&#252;bergreifendes (Cross Domain) Single Sign-on (CDSSO) beziehen.</p>
+
+<a name="ggmyo"></a><h5>Cookie-Name</h5>
+<p>Der Name des SSO-Cookie-Tokens, das zwischen dem OpenSSO-Server und dem Agenten verwendet
+wird.</p>
+
+<a name="ggmxu"></a><h5>Aktivierung des SSO-Cache</h5>
+<p>Wenn diese Option aktiviert ist, ist der SSO-Cache f&#252;r den Agenten aktiv
+und kann &#252;ber &#246;ffentliche APIs verwendet werden, die vom Agenten-SDK bekannt gegeben
+werden.</p>
+
+<a name="ggmza"></a><h5>Dom&#228;nen&#252;bergreifendes SSO</h5>
+<p>Wenn diese Option aktiviert ist, ist dom&#228;nen&#252;bergreifendes Single Sign-On (Cross-Domain Single Sign
+On) aktiv.</p>
+
+<a name="ggmzt"></a><h5>CDSSO-Umleitungs-URI</h5>
+<p>Ein Zwischen-URI, der vom Agenten f&#252;r die Verarbeitung von CDSSO-Anforderungen verwendet wird.</p>
+
+<a name="ggmyd"></a><h5>CDSSO-Servlet-URL</h5>
+<p>Eine Liste der URLs der verf&#252;gbaren CDSSO-Kontroller. Diese URLs k&#246;nnen vom Agenten
+f&#252;r die CDSSO-Verarbeitung verwendet werden.</p>
+
+<a name="ggmzc"></a><h5>CDSSO-Zeitabweichung</h5>
+<p>Gibt an, wie viele Sekunden der Agent darauf verwendet, die G&#252;ltigkeit der
+CDSSO <tt>AuthnResponse</tt>-Behauptung zu ermitteln.</p>
+
+<a name="ggmyz"></a><h5>Anbieter vertrauensw&#252;rdiger IDs f&#252;r CDSSO</h5>
+<p>Eine Liste von OpenSSO-Server/ID-Anbietern, die vom Agenten bei der Auswertung der CDC
+Liberty-Antworten als vertrauensw&#252;rdig erachtet werden. Die Festlegung dieser Eigenschaft ist erforderlich, wenn
+ein Lastenausgleichssystem, eine Firewall oder beides zwischen dem Agenten und der OpenSSO-Instanz
+vorhanden ist.</p>
+
+<a name="ggmzj"></a><h5>Sichere CDSSO-Aktivierung</h5>
+<p>Wenn diese Option aktiviert und der Kommunikationskanal mit dem Host sicher ist,
+wird das SSO-Token-Cookie, das vom Agenten in den verschiedenen Dom&#228;nen im CDSSO-Modus
+festgelegt wird, als sicher gekennzeichnet.</p>
+
+<a name="ggmze"></a><h5>Liste der CDSSO-Dom&#228;nen</h5>
+<p>Eine Liste von Dom&#228;nen, f&#252;r die in einem CDSSO-Szenario Cookies festgelegt werden
+m&#252;ssen.</p>
+
+<a name="ggmyx"></a><h5>Cookie-Zur&#252;cksetzung</h5>
+<p>Wenn dieses Attribut aktiviert ist, setzt der Agent Cookies in der Antwort
+zur&#252;ck, bevor die Umleitung zum Zwecke der Authentifizierung erfolgt.</p>
+
+<a name="ggmys"></a><h5>Namensliste der zur&#252;ckzusetzenden Cookies</h5>
+<p>Eine Liste der Cookie-Namen, die vom Agenten zur&#252;ckgesetzt werden, wenn die Eigenschaft
+"Cookie-Zur&#252;cksetzung" aktiviert ist.</p>
+
+<a name="ggmye"></a><h5>Dom&#228;nenzuordnung f&#252;r Cookie-Zur&#252;cksetzung</h5>
+<p>Eine Liste der Zuordnungen von einem in der Eigenschaft "Namensliste der zur&#252;ckzusetzenden
+Cookies" angegebenen Cookie-Namen zu der Dom&#228;ne des Cookies, die verwendet werden soll,
+wenn ein Zur&#252;cksetzungsereignis eintritt (Wert).</p>
+
+<a name="ggmzl"></a><h5>Pfadzuordnung f&#252;r Cookie-Zur&#252;cksetzung</h5>
+<p>Eine Liste der Zuordnungen von einem in der Eigenschaft "Namensliste der zur&#252;ckzusetzenden
+Cookies" angegebenen Cookie-Namen (Schl&#252;ssel) zum Pfad des Cookies, er verwendet werden soll,
+wenn ein Zur&#252;cksetzungsereignis eintritt (Wert).</p>
+
+<a name="ggmwi"></a><h5>OpenSSO-Dienste</h5>
+<p>Diese Eigenschaften konfigurieren die OpenSSO-Dienste, die der Agent verwendet, wie beispielsweise Richtliniendienst,
+Sitzungsdienst, Authentifizierungsdienst und Service Management-(SM-)Dienst.</p>
+
+<a name="ggmxr"></a><h5>OpenSSO-Anmelde-URL</h5>
+<p>Eine Liste der URLs f&#252;r die OpenSSO-Authentifizierung. Wenn Authentifizierung erforderlich ist, leitet
+der Agent die eingehenden Benutzer an den entsprechenden Authentifizierungsdienst weiter, der in
+der URL angegeben ist.</p>
+
+<a name="ggmzr"></a><h5>Anmelde-URL priorisiert</h5>
+<p>Wenn diese Option aktiviert ist, wird die Failover-Sequenz f&#252;r Anmelde-URLs oder CDSSO-URLs
+priorisiert, die in der Eigenschaft "OpenSSO-Anmelde-URL" definiert ist.</p>
+
+<a name="ggmyh"></a><h5>Anmelde-URL-Test</h5>
+<p>Wenn diese Option aktiviert ist, &#252;berpr&#252;ft der Agent die Verf&#252;gbarkeit der von
+der Eigenschaft "OpenSSO-Anmelde-URL" definierten URLs, bevor er die Umleitung an diese URLs
+durchf&#252;hrt.</p>
+
+<a name="ggmxq"></a><h5>Zeit&#252;berschreitung bei Anmelde-URL-Test</h5>
+<p>Wenn die Eigenschaft "Anmelde-URL-Test" aktiviert ist, bestimmt der f&#252;r diese Eigenschaft angegebene
+Wert die Anzahl der Millisekunden f&#252;r die Verbindungs-Zeit&#252;berschreitung.</p>
+
+<a name="ggmxx"></a><h5>OpenSSO-Abmelde-URL</h5>
+<p>Eine Liste der URLs f&#252;r die OpenSSO-Abmeldeseiten.</p>
+
+<a name="ggmzv"></a><h5>Abmelde-URL priorisiert</h5>
+<p>Wenn diese Option aktiviert ist, wird die Failover-Sequenz f&#252;r Abmelde-URLs priorisiert, die
+in der Eigenschaft "OpenSSO-Anmelde-URL" definiert ist.</p>
+
+<a name="ggmzx"></a><h5>Abmelde-URL-Test</h5>
+<p>Wenn diese Option aktiviert ist, &#252;berpr&#252;ft der Agent die Verf&#252;gbarkeit der von
+der Eigenschaft "OpenSSO-Anmelde-URL" definierten URLs, bevor er die Umleitung an diese URLs
+durchf&#252;hrt.</p>
+
+<a name="ggmzy"></a><h5>Zeit&#252;berschreitung bei Abmelde-URL-Test</h5>
+<p>Wenn die Eigenschaft "Abmelde-URL-Test" aktiviert ist, bestimmt der f&#252;r diese Eigenschaft angegebene
+Wert die Anzahl der Millisekunden f&#252;r die Verbindungs-Zeit&#252;berschreitung.</p>
+
+<a name="ggmzz"></a><h5>Protokoll f&#252;r OpenSSO-Authentifizierungsdienst</h5>
+<p>Das vom OpenSSO-Authentifizierungsdienst verwendete Protokoll.</p>
+
+<a name="ggmzw"></a><h5>Hostname des OpenSSO-Authentifizierungsdiensts</h5>
+<p>Der vom OpenSSO-Authentifizierungsdienst zu verwendende Hostname.</p>
+
+<a name="ggnaw"></a><h5>Anschluss f&#252;r OpenSSO-Authentifizierungsdienst</h5>
+<p>Die Nummer des vom OpenSSO-Authentifizierungsdienst zu verwendenden Anschlusses.</p>
+
+<a name="ggnak"></a><h5>Richtlinienbenachrichtigungen aktivieren</h5>
+<p>Wenn dieses Attribut aktiviert ist, sind Benachrichtigungen f&#252;r den entfernten Richtlinien-Client funktionsf&#228;hig.</p>
+
+<a name="ggnao"></a><h5>Abrufintervall f&#252;r Richtlinien-Client</h5>
+<p>Die Zeitdauer in Minuten, nach der die im Cache gespeicherten Eintr&#228;ge vom
+entfernten Richtlinien-Client aktualisiert werden.</p>
+
+<a name="ggnaj"></a><h5>Cache-Modus f&#252;r Richtlinien-Client</h5>
+<p>Der vom entfernten Richtlinien-Client zu verwendende Caching-Modus. Die g&#252;ltigen Werte lauten: <tt>subtree</tt>
+(Unterstruktur) oder <tt>self </tt> (selbst)</p>
+
+<a name="ggnat"></a><h5>Boolesche Aktionswerte f&#252;r Richtlinien-Client</h5>
+<p>Die f&#252;r Richtlinienaktionsnamen verf&#252;gbaren booleschen Aktionswerte.</p><p>Beispiel:</p><pre><i>serviceName</i>|<i>actionName</i>|<i>trueValue</i>|<i>falseValue</i></pre>
+
+<a name="ggnbg"></a><h5>Ressourcen-Vergleichsoperatoren f&#252;r Richtlinien-Client</h5>
+<p>Die f&#252;r verschiedene Dienstnamen zu verwendenden Ressourcen-Vergleichsoperatoren.</p>
+
+<a name="ggnan"></a><h5>Zeitabweichung f&#252;r Richtlinien-Client</h5>
+<p>Die Anzahl von Sekunden, die als Zeitdifferenz zwischen dem OpenSSO-Servercomputer und dem
+entfernten Richtlinien-Client zul&#228;ssig sind.</p>
+
+<a name="ggnbd"></a><h5>GET-Parameter f&#252;r URL-Richtlinienumgebung</h5>
+<p>Eine Liste von <tt>HTTP GET</tt>-Anforderungsparametern, deren Namen und Werte in der Umgebungszuordnung f&#252;r
+die URL-Richtlinienauswertung auf dem OpenSSO-Server festgelegt werden sollen.</p><p>Der Zuordnungsschl&#252;ssel weist das Format<tt>GET</tt> <i> parameterName</i> auf, w&#228;hrend der Zuordnungswert ein Satz
+von Zeichenkettenwerten des Parameters ist.</p>
+
+<a name="ggnax"></a><h5>POST-Parameter f&#252;r URL-Richtlinienumgebung</h5>
+<p>Eine Liste von <tt>HTTP POST</tt>-Anforderungsparametern, deren Namen und Werte in der Umgebungszuordnung f&#252;r
+die URL-Richtlinienauswertung auf dem OpenSSO-Server festgelegt werden sollen.</p><p>Der Zuordnungsschl&#252;ssel weist das Format <tt>POST</tt><i>parameterName</i> auf, w&#228;hrend der Zuordnungswert ein Satz
+von Zeichenkettenwerten des Parameters ist.</p>
+
+<a name="ggnaa"></a><h5>jsession-Parameter f&#252;r URL-Richtlinienumgebung</h5>
+<p>Eine Liste von <tt>HTTP SESSION</tt>-Attributen, deren Namen und Werte in der Umgebungszuordnung f&#252;r
+die URL-Richtlinienauswertung auf dem OpenSSO-Server festgelegt werden sollen.</p><p>Der Zuordnungsschl&#252;ssel weist das Format <tt>JSESSION </tt><i>parameterName</i> auf, w&#228;hrend der Zuordnungswert ein Satz
+von Zeichenkettenwerten des Parameters ist.</p>
+
+<a name="ggnai"></a><h5>Abrufzeit f&#252;r Benutzerdaten-Cache</h5>
+<p>Die Cache-Aktualisierungszeit in Minuten f&#252;r Benutzerverwaltungsdaten. Wenn dieser Wert auf <tt>0</tt> gesetzt
+ist, werden keine Aktualisierungen vorgenommen.</p>
+
+<a name="ggnaf"></a><h5>Benachrichtigung von Dienstdaten-Caches aktivieren</h5>
+<p>Wenn dieses Attribut aktiviert ist, sind Benachrichtigungen f&#252;r Dienstverwaltungs-Caches funktionsf&#228;hig.</p>
+
+<a name="ggnam"></a><h5>Cache-Zeit f&#252;r Dienstdaten</h5>
+<p>Cache-Aktualisierungszeit in Minuten f&#252;r Dienstkonfigurationsdaten. Wenn dieser Wert auf <tt>0</tt> gesetzt ist,
+werden keine Aktualisierungen vorgenommen.</p><p>Diese Eigenschaft ist nur wirksam, wenn keine Benachrichtigungs-URL als Wert f&#252;r die
+Eigenschaft "URL f&#252;r Agentenbenachrichtigung" bereitgestellt wurde oder wenn die Benachrichtigungen deaktiviert wurden.</p>
+
+<a name="ggnaq"></a><h5>Client-Abruf aktivieren</h5>
+<p>Wenn diese Option aktiviert ist, muss der Sitzungsclient die Sitzungsinformationen durch Polling
+aktualisieren und darf nicht auf Server-Benachrichtigungen angewiesen sein.</p>
+
+<a name="ggnar"></a><h5>Client-Abrufzeitraum</h5>
+<p>Die Zeit in Sekunden, nach der der Sitzungs-Client eine Aktualisierung der im
+Cache gespeicherten Sitzungsinformationen vom Server abruft.</p>
+
+<a name="ggmug"></a><h5>Sonstiges</h5>
+<p>Diese Eigenschaften lassen sich schlecht in andere Kategorien einordnen.</p>
+
+<a name="ggnal"></a><h5>Sprache des Gebietsschemas </h5>
+<p>Der Sprachencode zur Identifizierung des Gebietsschemas des Vorgangs.</p>
+
+<a name="ggnae"></a><h5>Land des Gebietsschemas</h5>
+<p>Der L&#228;ndercode zur Identifizierung des Gebietsschemas des Vorgangs.</p>
+
+<a name="ggnbc"></a><h5>Anschlusspr&#252;fung aktivieren</h5>
+<p>Wenn dieses Attribut aktiviert ist, ist die Funktion zur Anschlusspr&#252;fung funktionsf&#228;hig.</p>
+
+<a name="ggnav"></a><h5>Anschlusspr&#252;fungsdatei</h5>
+<p>Name oder vollst&#228;ndiger Pfad einer Datei, die den erforderlichen Inhalt zur Verarbeitung
+von Anforderungen enth&#228;lt, die eine Korrektur des Anschlusses erfordern.</p>
+
+<a name="ggnac"></a><h5>Einstellung f&#252;r Anschlusspr&#252;fung</h5>
+<p>Eine Liste von Zuordnungen von Anschlussnummern zu Protokollen. Der Schl&#252;ssel ist die
+Nummer des abh&#246;renden Anschlusses und der Wert ist das Abh&#246;rprotokoll, mit dem
+der Agent Anforderungen mit ung&#252;ltigen Anschlussnummern identifizieren soll.</p>
+
+<a name="ggnbf"></a><h5>Liste der Umgehungs-Principals</h5>
+<p>Liste der Principals, die der Agent f&#252;r Authentifizierungs- und Suchzwecke umgeht.</p>
+
+<a name="ggojq"></a><h5>Legacy-Unterst&#252;tzung aktivieren</h5>
+<p>Wenn diese Option aktiviert ist, werden Legacy-Benutzeragenten (Browser) unterst&#252;tzt.</p>
+
+<a name="ggnad"></a><h5>Legacy-Benutzeragent</h5>
+<p>Eine Liste von Header-Werten f&#252;r Benutzeragenten. Jeder Wert steht f&#252;r einen Legacy-Browser.</p>
+
+<a name="ggnap"></a><h5>URI f&#252;r Legacy-Umleitung</h5>
+<p>Ein Zwischen-URI, der vom Agenten zur Umleitung der Anforderungen von Benutzeragenten verwendet
+wird.</p>
+
+<a name="ggnay"></a><h5>Verschl&#252;sselungsanbieter</h5>
+<p>Die vom Agenten zu verwendende Verschl&#252;sselungsanbieter-Implementierung.</p>
+
+<a name="ggmud"></a><h5>Erweitert</h5>
+<p>Bei diesen Eigenschaften handelt es sich entweder um benutzerdefinierte Eigenschaften oder Eigenschaften,
+die normalerweise in komplexeren oder weniger &#252;blichen Bereitstellungen verwendet werden.</p>
+
+<a name="ggmxt"></a><h5>Header der Client-IP-Adresse</h5>
+<p>Der Name des <tt>HTTP</tt>-Headers, der die IP-Adresse des Client enth&#228;lt.</p>
+
+<a name="ggmyp"></a><h5>Client-Hostname-Header</h5>
+<p>Der Name des <tt>HTTP</tt>-Headers, der den Hostnamen des Client enth&#228;lt.</p>
+
+<a name="ggnbb"></a><h5>Webdienst-Aktivierung</h5>
+<p>Wenn dieses Attribut aktiviert ist, werden Webdienste verarbeitet.</p>
+
+<a name="ggnab"></a><h5>Webdienst-Endpunkte</h5>
+<p>Eine Liste von Webanwendungs-Endpunkten. Jeder Endpunkt steht f&#252;r einen Webdienst.</p>
+
+<a name="ggnah"></a><h5>Aktivierung von Webdienst-GET-Verarbeitung</h5>
+<p>Wenn dieses Attribut aktiviert ist, werden <tt>HTTP GET</tt>-Anforderungen f&#252;r Webdienst-Endpunkte verarbeitet.</p>
+
+<a name="ggnba"></a><h5>Webdienst-Authentifizierung</h5>
+<p>Eine Implementierungsklasse, die zur Authentifizierung von Webdienstanforderungen verwendet werden kann.</p>
+
+<a name="ggnau"></a><h5>Webdienst - Inhaltsdatei f&#252;r internen Fehler</h5>
+<p>Der Name der Datei, deren Inhalte der Agent zur Generierung eines internen
+Fehlers f&#252;r Clients verwendet.</p>
+
+<a name="ggnag"></a><h5>Webdienst - Inhaltsdatei f&#252;r Autorisierungsfehler</h5>
+<p>Der Name der Datei, deren Inhalte der Agent zur Generierung eines Autorisierungsfehlers
+f&#252;r Clients verwendet.</p>
+
+<a name="ggnfp"></a><h5>Alternativer Agenten-Hostname</h5>
+<p>Der Hostname der den vom Agenten gesch&#252;tzten Server f&#252;r die Client-Browser identifiziert,
+wenn der verwendete Hostname vom tats&#228;chlichen Hostnamen abweicht.</p>
+
+<a name="ggnew"></a><h5>Alternativer Agenten-Anschlussname</h5>
+<p>Die Anschlussnummer, die den abh&#246;renden Anschluss des vom Agenten gesch&#252;tzten Servers f&#252;r
+die Client-Browser identifiziert, wenn die verwendete Anschlussnummer vom der tats&#228;chlichen Nummer des
+abh&#246;renden Anschlusses abweicht.</p>
+
+<a name="ggnga"></a><h5>Alternatives Agentenprotokoll</h5>
+<p>Das Protokoll (<tt>HTTP</tt>/<tt>HTTPS</tt>), das die Client-Browser zur Kommunikation mit dem vom Agenten
+gesch&#252;tzten Server verwenden, wenn sich das verwendete Protokoll von dem tats&#228;chlich vom
+Server verwendeten Protokoll unterscheidet.</p>
+
+<a name="ggngg"></a><h5>Benutzerdefinierte Eigenschaften</h5>
+<p>Zus&#228;tzliche Eigenschaften, mit denen die Benutzer den Satz der vom Agenten unterst&#252;tzten
+Eigenschaften erweitern k&#246;nnen.</p><p>Beispiel:</p><pre>customproperty=custom-value1
+customlist[0]=customlist-value-0
+customlist[1]=customlist-value-1
+custommap[key1]=custommap-value-1
+custommap[key2]=custommap-value-2</pre>
+<br/>
+
+</body>
+</html>

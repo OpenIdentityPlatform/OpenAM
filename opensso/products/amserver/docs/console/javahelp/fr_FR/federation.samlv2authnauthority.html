@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'une autorit&#233; d'authentification SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2authnauthority"></a><h4>Personnalisation d'une autorit&#233; d'authentification SAMLv2</h4>
+<p>L'autorit&#233; d'authentification SAMLv2 contient les attributs personnalisables suivants&#160;:</p>
+<ul><li><p><a href="#ggwfq">Signature et codage</a></p></li>
+<li><p><a href="#ggwim">Service de requ&#234;te d'autorisation</a></p></li>
+<li><p><a href="#ggwmk">Demande d'AssertionID</a></p></li>
+<li><p><a href="#ggwqw">Alias cert</a></p></li></ul>
+
+
+<a name="ggwfq"></a><h5>Signature et codage</h5>
+<dl><dt>Taille de la cl&#233;</dt>
+<dd><p>Longueur des cl&#233;s utilis&#233;es par l'entit&#233; Autorit&#233; d'attributs lors de son interaction avec une autre entit&#233;.</p></dd>
+<dt>Algorithme</dt>
+<dd><p>Algorithme de chiffrement utilis&#233; pour interagir avec une autre entit&#233;.</p></dd>
+</dl>
+
+
+<a name="ggwim"></a><h5>Service de requ&#234;te d'autorisation</h5>
+<p>Cet attribut d&#233;finit l'URL auquel les demandes d'authentification sont envoy&#233;es.</p>
+
+<a name="ggwmk"></a><h5>Demande d'AssertionID</h5>
+<p>D&#233;finit les URL auxquels les ID d'assertion sont envoy&#233;s par un client
+&#224; un fournisseur d'identit&#233;s pour r&#233;cup&#233;rer l'assertion correspondante. <tt>Location</tt> sp&#233;cifie l'URL du
+fournisseur auquel la demande est envoy&#233;e. Les types de demande d'ID d'assertion
+sont les suivants&#160;:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwqw"></a><h5>Alias cert</h5>
+<p>Cet attribut d&#233;finit les &#233;l&#233;ments de l'alias du certificat pour le fournisseur.
+<tt>signing</tt> sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le certificat
+de signature correct dans le keystore. <tt>Encryption</tt> sp&#233;cifie l'alias du certificat du
+fournisseur, utilis&#233; pour trouver le certificat de chiffrement correct dans le keystore.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Agent d'autorisation - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authorizer"></a><h4>Agent d'autorisation</h4>
+<a name="indexterm-89"></a><a name="indexterm-90"></a><p>Avant de traiter une demande, Service de profil personnel Liberty v&#233;rifie l'autorisation
+du WSC ayant &#233;mis cette demande. Le contr&#244;le d'autorisation peut &#234;tre effectu&#233;
+&#224; deux niveaux :</p>
+<ol><li><p>L'entit&#233; demandeuse est-elle autoris&#233;e &#224; acc&#233;der aux informations de profil de la ressource requise ?</p></li>
+<li><p>La ressource requise est-elle publi&#233;e pour le demandeur ?</p></li></ol>
+<p>Authorization occurs via a plug-in to the Service de profil personnel Liberty:
+an implementation of the <tt>com.sun.identity.liberty.ws.interfaces.Authorizer</tt> interface. Bien qu'une nouvelle impl&#233;mentation puisse &#234;tre
+d&#233;velopp&#233;e, OpenSSO fournit la classe par d&#233;faut <tt>com.sun.identity.liberty.ws.idpp.plugin.IDPPAuthorizer</tt>. Ce plug-in d&#233;finit quatre
+valeurs d'action de strat&#233;gie pour les op&#233;rations de requ&#234;te et de modification
+:</p>
+<ul><li><p>Autoriser</p></li>
+<li><p>Refuser</p></li>
+<li><p>Interaction pour l'acceptation</p></li>
+<li><p>Interaction pour la valeur</p></li></ul>
+<p>Les valeurs de ressource pour les r&#232;gles sont similaires aux expressions <tt>x-path</tt>
+d&#233;finies par Service de profil personnel Liberty.</p>/PP/CommonName/AnalyzedName/FN     Demande     Interaction pour l'acceptation /PP/CommonName/&#42;                          Modification     Interaction pour la valeur /PP/InformalName                            Demande     Refus <p>L'autorisation peut &#234;tre d&#233;sactiv&#233;e en annulant la s&#233;lection d'un ou plusieurs des
+attributs suivants, &#233;galement d&#233;finis dans le service de profil personnel Liberty :</p>
+<ul><li><p><a href="requirequery.html">Requ&#234;te de PolicyEval n&#233;cessaire :</a></p></li>
+<li><p><a href="requiremodify.html">Modification de PolicyEval n&#233;cessaire :</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

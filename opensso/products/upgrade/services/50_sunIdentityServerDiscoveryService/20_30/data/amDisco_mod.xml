@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amDisco_mod.xml,v 1.3 2008/06/25 05:53:53 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+    "jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+
+<!--
+  apply this file by:
+
+  amadmin -u "xxx" -w "yyy" \-\-data amDisco_mod.xml
+
+-->
+
+<Requests>
+    <SchemaRequests serviceName="sunIdentityServerDiscoveryService"
+	SchemaType="Global">
+        <AddChoiceValues>
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2004-04:ClientTLS:Bearer"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey="" value="urn:liberty:security:2003-08:ClientTLS:SAML"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey="" value="urn:liberty:security:2005-02:null:X509"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:null:SAML"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:null:Bearer"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:TLS:X509"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:TLS:SAML"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:TLS:Bearer"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:ClientTLS:X509"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:ClientTLS:SAML"/> 
+             <ChoiceValue AttributeName="sunIdentityServerDiscoSupportedAuthnMechs" I18NKey=""  value="urn:liberty:security:2005-02:ClientTLS:Bearer"/> 
+        </AddChoiceValues>
+    </SchemaRequests>
+    <SchemaRequests serviceName="sunIdentityServerDiscoveryService"
+        SchemaType="Global">
+        <AddDefaultValues>
+            <AttributeValuePair>
+                 <Attribute name="sunIdentityServerDiscoSupportedAuthnMechs" />
+                     <Value>urn:liberty:security:2005-02:null:X509</Value>
+                     <Value>urn:liberty:security:2005-02:TLS:X509</Value>
+                     <Value>urn:liberty:security:2005-02:ClientTLS:X509</Value>
+                     <Value>urn:liberty:security:2005-02:null:SAML</Value>
+                     <Value>urn:liberty:security:2005-02:TLS:SAML</Value>
+                     <Value>urn:liberty:security:2005-02:ClientTLS:SAML</Value>
+                     <Value>urn:liberty:security:2005-02:null:Bearer</Value>
+                     <Value>urn:liberty:security:2005-02:TLS:Bearer</Value>
+                     <Value>urn:liberty:security:2005-02:ClientTLS:Bearer</Value>
+            </AttributeValuePair>
+        </AddDefaultValues>
+    </SchemaRequests>
+    <SchemaRequests serviceName="sunIdentityServerDiscoveryService"
+       SchemaType="Global">
+       <ModifyDefaultValues>
+            <AttributeValuePair>
+               <Attribute name="sunIdentityServerDiscoEntryHandler"/>
+               <Value>com.sun.identity.liberty.ws.disco.plugins.UserDynamicDiscoEntryHandler</Value>
+             </AttributeValuePair>
+       </ModifyDefaultValues>
+    </SchemaRequests>
+    <SchemaRequests serviceName="sunIdentityServerDiscoveryService"
+        SchemaType="User"
+        i18nKey="">
+        <AddAttributeSchema fileName="BASEDIR/upgrade/services/50_sunIdentityServerDiscoveryService/20_30/data/amDisco_addAttr.xml" />
+    </SchemaRequests>
+</Requests>   

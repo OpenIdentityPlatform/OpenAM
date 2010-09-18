@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: StockService.wsdl,v 1.5 2008/06/30 18:09:20 mrudul_uchil Exp $
+
+-->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://sun.com/stockquote.wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://sun.com/stockquote.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://sun.com/stockquote.wsdl">
+<types>
+        <xsd:schema>
+            <xsd:import namespace="http://sun.com/stockquote.xsd" schemaLocation="stock.xsd"/>
+        </xsd:schema>
+</types>
+<message name="QuoteRequest">
+        <part name="body" element="xsd1:QuoteRequest"/>
+    </message>
+<message name="QuoteResponse">
+        <part name="body" element="xsd1:QuoteResponse"/>
+    </message>
+<portType name="StockQuotePortType">
+        <operation name="GetStockQuote">
+            <input message="tns:QuoteRequest"/>
+            <output message="tns:QuoteResponse"/>
+        </operation>
+     </portType>
+<binding name="StockQuoteBinding" type="tns:StockQuotePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="GetStockQuote">
+           <soap:operation soapAction="http://sun.com/GetStockQuote"/>
+           <input>
+               <soap:body use="literal"/>
+           </input>
+           <output>
+               <soap:body use="literal"/>
+           </output>
+        </operation>
+    </binding>
+<wsdl:service xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="StockService">
+<wsdl:port name="StockQuotePortTypePort" binding="tns:StockQuoteBinding">
+<soap:address location="http://localhost:8080/StockService/StockService"/>
+</wsdl:port>
+</wsdl:service>
+</definitions>

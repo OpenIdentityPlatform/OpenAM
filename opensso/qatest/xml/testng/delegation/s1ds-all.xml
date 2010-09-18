@@ -1,0 +1,85 @@
+   <test name="DelegationTest35">
+        <parameter name="testNum" value="1"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    <test name="DelegationTest5">
+        <parameter name="testNum" value="5"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    <test name="DelegationTest6">
+        <parameter name="testNum" value="6"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    <test name="DelegationTest7">
+        <parameter name="testNum" value="7"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    <test name="DelegationTest8">
+        <parameter name="testNum" value="8"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    <test name="DelegationTest13">
+        <parameter name="testNum" value="13"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    <test name="DelegationTest36">
+        <parameter name="testNum" value="34"/>
+    	<parameter name="testName" value="DelegationTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.delegation.DelegationTest"/>
+        </classes>
+    </test>
+    

@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Atributos de repositorio de Federated Access Manager - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="amrepoattrs"></a><h4>Atributos de repositorio de Federated Access Manager</h4>
+<p><a name="indexterm-13"></a>Los siguientes atributos se utilizan para configurar un complemento de repositorio de
+Federated Access Manager:</p>
+
+<a name="gdlng"></a><h5>Nombre de clase</h5>
+<p>Especifica la ubicaci&#243;n del archivo de clase que implementa el complemento de
+repositorio de Federated Access Manager.</p>
+
+<a name="gdopv"></a><h5>Tipos y operaciones admitidos de Federated Access Manager</h5>
+<p>Especifica las operaciones permitidas o que pueden realizadas en este servidor LDAP.
+Este complemento de repositorio LDAPv3 s&#243;lo admite las operaciones predeterminadas. A continuaci&#243;n,
+se muestran las operaciones admitidas por el complemento de repositorio LDAPv3:</p>
+<ul><li><p>agente: lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n.</p></li>
+<li><p>grupo: lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n.</p></li>
+<li><p>dominio: lectura, creaci&#243;n, edici&#243;n, eliminaci&#243;n y servicio.</p></li>
+<li><p>usuario: lectura, creaci&#243;n, edici&#243;n, eliminaci&#243;n y servicio.</p></li></ul>
+<p>Puede eliminar los permisos de la lista anterior en funci&#243;n de la
+configuraci&#243;n del servidor LDAP y las tareas, pero no puede agregar m&#225;s
+permisos. </p><p>Si el complemento de repositorio LDAPv3 se&#241;ala a una instancia de Sun
+Java System Directory Server, se pueden agregar permisos del tipo <tt>role</tt>. De
+lo contrario, este permiso no se puede agregar, ya que es posible
+que el resto de almacenes de datos no admitan roles. El permiso
+del tipo "rol" es:</p>
+<ul><li><p>rol: lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n. </p></li></ul>
+<p>Si tiene el tipo <tt>user</tt> admitido para el repositorio LDAPv3, las operaciones
+de lectura, creaci&#243;n, edici&#243;n y eliminaci&#243;n de servicios se pueden realizar para
+ese usuario. En otras palabras, si <tt>user</tt> es un tipo admitido, las
+operaciones de lectura, edici&#243;n, creaci&#243;n y eliminaci&#243;n le permiten leer, editar, crear
+y eliminar las entradas de usuario del repositorio de identidades. La operaci&#243;n
+<tt>user=service</tt> permite a los servicios de Federated Access Manager acceder a los
+atributos de las entradas de usuario. Adem&#225;s, el usuario puede acceder a
+los atributos de servicios din&#225;micos si se ha asignado el servicio al
+dominio o rol al que pertenece el usuario. </p><p>Tambi&#233;n se permite al usuario administrar los atributos de usuario de cualquier
+servicio asignado. Si el usuario tiene <tt>service</tt> como operaci&#243;n (<tt>user=service</tt>), &#233;ste especifica
+que se permiten todas las operaciones relacionadas con los servicios. Entre estas
+operaciones, se incluyen <tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes </tt> y <tt>modifyService.</tt></p>
+
+<a name="gdlnf"></a><h5>Valor de DN de la organizaci&#243;n</h5>
+<p>Define el DN que se&#241;ala a la organizaci&#243;n de Directory Server que
+Federated Access Manager administrar&#225;. Se trata del DN base de todas las
+operaciones realizadas en este almac&#233;n de datos.</p>
+
+<a name="gdopu"></a><h5>Atributo de asignaci&#243;n de nombre de contenedor de personas</h5>
+<p>Especifica el atributo de asignaci&#243;n de nombre de un contenedor de personas,
+siempre que el usuario resida en este tipo de contenedor. De lo
+contrario, este campo se deja en blanco.</p>
+
+<a name="gdopc"></a><h5>Valor de contenedor de personas</h5>
+<p>Especifica el valor del contenedor de personas. El valor predeterminado es <tt>people</tt>.</p>
+
+<a name="gdopl"></a><h5>Atributo de asignaci&#243;n de nombre de contenedor de agentes</h5>
+<p>Especifica el atributo de asignaci&#243;n de nombre del contenedor de agente, siempre
+que el agente resida en un contenedor de este tipo. De lo
+contrario, este campo se deja en blanco.</p>
+
+<a name="gdopi"></a><h5>Valor de contenedor de agentes</h5>
+<p>Especifica el valor del contenedor de agentes. El valor predeterminado es <tt> agents</tt>.</p>
+
+<a name="gdoow"></a><h5>B&#250;squeda recursiva</h5>
+<p>Si est&#225; habilitada, se realizar&#225; una b&#250;squeda recursiva de las identidades especificadas
+al realizar una b&#250;squeda en el repositorio de Federated Access Manager. Por
+ejemplo, una b&#250;squeda recursiva realizada en la siguiente estructura de datos: </p>root realm1     subrealm11         user5     subrealm12         user6 realm2     user1     user2     subrealm21         user3         user4<p>generar&#237;a los siguientes resultados:</p>
+<ul><li><p>Si se realiza una b&#250;squeda desde root y no se define ning&#250;n usuario en este nivel (a excepci&#243;n de <tt>amadmin</tt> y <tt> anonymous</tt>), la b&#250;squeda devolver&#225; los usuarios 1&#8211;6.</p></li>
+<li><p>Si se realiza una b&#250;squeda desde <tt>realm1</tt> y no se define ning&#250;n usuario, la b&#250;squeda devolver&#225; <tt>user5</tt> y <tt> user6</tt>.</p></li>
+<li><p>Si se realiza una b&#250;squeda desde <tt>realm2</tt> (dos usuarios definidos), la b&#250;squeda devolver&#225; los usuarios 1&#8211;4.</p></li></ul>
+
+
+<a name="gdoox"></a><h5>Copiar configuraci&#243;n de dominio</h5>
+<p>Al habilitar este atributo en una instalaci&#243;n en modo de dominio, Federated
+Access Manager crear&#225; una organizaci&#243;n y suborganizaci&#243;n equivalentes para cada dominio y
+subdominio que haya en el repositorio. Adem&#225;s, los servicios registrados en el
+dominio/subdominio se registrar&#225;n en la nueva organizaci&#243;n/suborganizaci&#243;n creada. Tanto el DIT de
+dominio como el DIT de organizaci&#243;n se encuentran en el almac&#233;n de
+datos.</p>
+<br/>
+
+</body>
+</html>

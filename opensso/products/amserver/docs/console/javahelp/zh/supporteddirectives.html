@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>支持的指令 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>支持的指令</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>该属性允许您为资源指定与策略相关的指令。如果服务提供者要使用不支持的指令，请求将失败。以下表格详细列出了可用选项。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>指令</p></th>
+<th align="left" valign="top" scope="column"><p>目的</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>搜索服务 的响应中应包括 SAML 声明（包含 <tt> AuthenticationStatement</tt>），以使客户机能够向托管资源的服务实例进行验证。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>搜索服务 应在其指示会话状态的响应中包括 SAML 声明（包含 <tt> SessionContextStatement</tt>）。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p> 搜索服务 应在其指示是否允许客户机访问资源的响应中包括 SAML
+声明（包含 <tt> ResourceAccessStatement</tt>）。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>搜索服务应该在其对所有客户机的响应中加密资源标识符。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>为了使用载体令牌验证，搜索服务应生成用于授权载体访问资源的令牌。</p></td>
+</tr>
+</table>
+<hr><p><b>注意 &#8211; </b><tt>AuthorizeRequestor</tt> 和 <tt>EncryptResourceID</tt> 指令不能一起使用。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

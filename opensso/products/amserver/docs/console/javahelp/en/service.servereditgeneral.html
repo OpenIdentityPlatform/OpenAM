@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>General - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>General</h4>
+<p>The General attributes configure basic configuration data for your centralized server management.</p>
+
+<a name="ggjyg"></a><h5>Site Attributes</h5>
+<p>The site attribute is:</p>
+
+<a name="ggjxc"></a><h5>Parent Site</h5>
+<p>This attribute maps the load balancer Site Name (site ID) to the OpenSSO
+server. Note that the site must be created before you can add the
+site.  </p>
+
+<a name="ggjwl"></a><h5>System Attributes</h5>
+<p>The system attributes list location information for the server instance:</p>
+
+<a name="ggjyj"></a><h5>Base Installation Directory</h5>
+<p>Specifies the base directory where product's data resides. </p>
+
+<a name="ggjxz"></a><h5>Default Locale</h5>
+<p>The locale value is the default language subtype that OpenSSO was installed with.
+The default is <tt>en_us</tt>.</p>
+
+<a name="ggjwq"></a><h5>Notification URL</h5>
+<p>The location of notification service end point. This value is set during installation.</p>
+
+<a name="ggjzq"></a><h5>XML Validation</h5>
+<p>Default value is no. Determines if validation is required when parsing XML documents
+using the OpenSSO <tt>XMLUtils</tt> class. This property is in effect only when value
+for the Debug Level attribute is set to warning or message. Allowable values
+are yes and no. The XML document validation is turned on only if
+the value for this property yes, and if value for Debug Level attribute
+is set to warning or message.</p>
+
+<a name="ggjzy"></a><h5>Debugging Attributes</h5>
+<p>The Debugging attributes list basic error checking information:</p>
+
+<a name="ggjzc"></a><h5>Debug Level</h5>
+<p>Specifies debug level. Default value is error. Possible values are:</p>
+<ul><li><p>off &#8212; No debug file is created.</p></li>
+<li><p>error &#8212; Only error messages are logged.</p></li>
+<li><p>warning &#8212; Only warning messages are logged.</p></li>
+<li><p>message &#8212; Error, warning, and informational messages are logged.</p></li></ul>
+
+
+<a name="ggjze"></a><h5>Debug Directory</h5>
+<p>Specifies the output directory where debug files will be created. Value is set
+during installation. Example: <tt></tt><i>OpenSSO-base</i><tt>/</tt><i>debug_URI</i><tt>/debug</tt>.</p>
+
+<a name="ggjwr"></a><h5>Mail Server</h5>
+<p>The Mail Server attributes list the host name and port for the mail
+server:</p>
+
+<a name="ggkax"></a><h5>Mail Server Host Name</h5>
+<p>Default value is <tt>localhost</tt>. Specifies the mail server host.</p>
+
+<a name="ggkbx"></a><h5>Mail Server Port Number</h5>
+<p>Default value is 25. Specifies the mail server port.</p>
+<br/>
+
+</body>
+</html>

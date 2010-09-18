@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So f&#252;gen Sie einer Richtlinie eine Regel hinzu. - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.ruleadd"></a><h5>So f&#252;gen Sie einer Richtlinie eine Regel hinzu.</h5>
+<ol>
+<li><b><a name="indexterm-25"></a>Wenn Sie die Richtlinie bereits erstellt haben, klicken Sie auf den Namen
+der Richtlinie, f&#252;r die Sie die Regel hinzuf&#252;gen m&#246;chten. Falls die Richtlinie
+noch nicht erstellt wurde, ziehen Sie <a href="policy.policynormaladd.html">So erstellen Sie eine neue normale Richtlinie</a> zurate.</b></li>
+<li><b>Klicken Sie unter dem Men&#252; "Regeln" auf "Neu".</b></li>
+<li><b>W&#228;hlen Sie f&#252;r die Regel einen der folgenden Standard-Diensttypen aus. Wenn f&#252;r
+die Richtlinie weitere Dienste aktiviert sind, ist die Liste eventuell l&#228;nger:</b><dl><dt>Discovery-Dienst</dt>
+<dd><p>Legt die Autorisierungsaktionen f&#252;r Discovery-Dienstanfrage- und Protokoll&#228;nderungsaufrufe von Webdienst-Clients f&#252;r eine bestimmte Ressource fest.</p></dd>
+<dt>Pers&#246;nlicher Liberty-Profildienst</dt>
+<dd><p>Legt die Autorisierungsaktionen f&#252;r pers&#246;nliche Liberty-Profildienstanfrage- und Protokoll&#228;nderungsaufrufe von Webdienst-Clients f&#252;r eine bestimmte Ressource fest.</p></dd>
+<dt>URL-Richtlinien-Agent</dt>
+<dd><p>Definiert Autorisierungsaktionen f&#252;r den URL-Richtlinien-Agent-Dienst. Dieser Typ kommt bei der Definition von Richtlinien zum Schutz von HTTP- und HTTPS-URLs zum Einsatz. Dies ist die gebr&#228;uchlichste Verwendung von OpenSSO-Richtlinien.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "Weiter".</b></li>
+<li><b>Geben Sie einen Namen und einen Ressourcennamen f&#252;r die Regel ein.</b><p>Gegenw&#228;rtig unterst&#252;tzen OpenSSO-Richtlinien-Agenten nur <tt>http://</tt>- und <tt>https://</tt>-Ressourcen und keine IP-Adressen anstelle des
+Hostnamens.</p><p>Platzhalter werden f&#252;r Protokoll, Host, Port und Ressourcenname unterst&#252;tzt. Beispiel:</p><pre>http*://*:*/*.html</pre><p>Der URL-Richtlinien-Agent-Dienst verwendet die Standardportnummer 80 f&#252;r <tt>http://</tt> und 443 f&#252;r <tt>https://</tt>,
+falls keine Portnummern angegeben werden.</p>
+<hr><p><b>Hinweis &#8211; </b>Schritt 6 und 7 gelten nicht f&#252;r Bezugsrichtlinien.</p>
+<hr>
+</li>
+<li><b>W&#228;hlen Sie die Aktion f&#252;r diese Regel aus. Abh&#228;ngig vom Diensttyp stehen
+folgende Aktionen zur Auswahl:</b>
+<ul><li><p>LOOKUP (Discovery-Dienst)</p></li>
+<li><p>UPDATE (Discovery-Dienst)</p></li>
+<li><p>MODIFY (Pers&#246;nlicher Liberty-Profildienst)</p></li>
+<li><p>QUERY (Pers&#246;nlicher Liberty-Profildienst)</p></li>
+<li><p>GET (URL-Richtlinien-Agent)</p></li>
+<li><p>POST (URL-Richtlinien-Agent)</p></li></ul>
+</li>
+<li><b>W&#228;hlen Sie die Aktionswerte aus.</b>
+<ul><li><p>Interaktion f&#252;r Zustimmung: Ruft f&#252;r eine Ressource das Liberty-Interaktionsprotokoll f&#252;r Zustimmung auf. Diese Aktion ist nur auf den pers&#246;nlichen Liberty-Profildienst anwendbar.</p></li>
+<li><p>Interaktion f&#252;r Wert: Ruft f&#252;r eine Ressource das Liberty-Interaktionsprotokoll f&#252;r einen Wert auf. Diese Aktion ist nur auf den pers&#246;nlichen Liberty-Profildienst anwendbar.</p></li>
+<li><p>Zulassen: Erm&#246;glicht den Zugriff auf die Ressource, die mit der in der Regel definierten Ressource &#252;bereinstimmt.</p></li>
+<li><p>Verweigern: Verweigert den Zugriff auf die Ressource, die mit der in der Regel definierten Ressource &#252;bereinstimmt.</p><p>Verweigerungsregeln haben stets Vorrang vor Zulassungsregeln in einer Richtlinie. Wenn Sie beispielsweise zwei Richtlinien f&#252;r eine bestimmte Ressource haben, von denen eine den Zugriff verweigert und die andere den Zugriff erlaubt, dann wird der Zugriff verweigert (vorausgesetzt, dass die Bedingungen f&#252;r beide Richtlinien erf&#252;llt sind). Es wird empfohlen, die Verweigerungsrichtlinien mit &#228;u&#223;erster Vorsicht zu verwenden, da sie zu m&#246;glichen Konflikten zwischen den Richtlinien f&#252;hren k&#246;nnen. In der Regel sollte der Richtliniendefinitionsprozess nur Zulassungsregeln verwenden und standardm&#228;&#223;ig die Verweigerung anwenden, wenn keine Richtlinien vorhanden sind, um den Verweigerungsfall zu erf&#252;llen.</p><p>Wenn explizite Verweigerungsregeln verwendet werden, k&#246;nnen Richtlinien, die einem bestimmten Benutzer &#252;ber verschiedene Betreffe zugewiesen wurden (wie Rollen- und/oder Gruppenmitgliedschaft) zu einem verweigerten Zugriff auf eine Ressource f&#252;hren, auch wenn mindestens eine der Richtlinien den Zugriff erlaubt. Wenn beispielsweise eine Verweigerungsrichtlinie f&#252;r eine auf eine Mitarbeiterrolle anwendbare Ressource vorhanden ist und eine Zulassungsrichtlinie f&#252;r die gleiche Ressource f&#252;r eine Managerrolle existiert, werden Richtlinienentscheidungen f&#252;r Benutzer, denen sowohl eine Mitarbeiter- als auch eine Managerrolle zugewiesen wurde, verweigert.</p><p>Eine M&#246;glichkeit, das Problem zu beheben, besteht darin, Richtlinien mit Bedingungs-Plugins zu entwickeln. Im obigen Beispiel w&#252;rde eine ?Rollenbedingung&#8220;, die die Verweigerungsrichtlinie auf Benutzer, die sich f&#252;r die Mitarbeiterrolle authentifizieren, und die Zulassungsrichtlinie auf Benutzer anwendet, die sich f&#252;r die Managerrolle authentifizieren, helfen, die beiden Richtlinien zu unterscheiden. Eine andere M&#246;glichkeit besteht darin, die <tt>authentication level</tt>-Bedingung zu verwenden, bei der die Managerrolle auf einer h&#246;heren Authentifizierungsebene authentifiziert wird.</p></li></ul>
+</li>
+<li><b>Klicken Sie auf "Fertig stellen".</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio de interacci&#243;n de Liberty - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Servicio de interacci&#243;n de Liberty</h4>
+
+
+<a name="ggofj"></a><h5>WSP de redirecci&#243;n de usuarios para la interacci&#243;n</h5>
+<p>Indica si el proveedor de servicios web redirigir&#225; al usuario para obtener
+su consentimiento.  El valor predeterminado es yes.</p>
+
+<a name="ggofq"></a><h5>WSP de redirecci&#243;n de usuarios para la interacci&#243;n de datos</h5>
+<p>Esta propiedad inicia una interacci&#243;n para obtener el consentimiento del usuario o
+recopilar datos adicionales. Indica si el proveedor de servicios web redirigir&#225; al
+usuario para recopilar datos adicionales.  El valor predeterminado es yes.</p>
+
+<a name="ggogl"></a><h5>Duraci&#243;n prevista de WSP para la interacci&#243;n</h5>
+<p>Este atributo indica el periodo de tiempo (en segundos) previsto por el
+proveedor de servicios web para completar una interacci&#243;n y devolver el control
+al cliente del servicio web. Por ejemplo, el proveedor de servicios web
+recibe una solicitud en la que se indica que el cliente del
+servicio web esperar&#225; un m&#225;ximo de 30 de segundos (establecido en Duraci&#243;n
+prevista del WSP para la interacci&#243;n) a que se realice la interacci&#243;n.
+Si este atributo se establece en 40 segundos, el proveedor de servicios
+web devolver&#225; un error de SOAP (<tt>timeNotSufficient </tt>), en el que se indica
+que no hay suficiente tiempo para la interacci&#243;n.</p>
+
+<a name="ggogn"></a><h5>WSP para forzar que "returnToURL" sea SSL</h5>
+<p>Este atributo indica si el proveedor de servicios web debe aplicar el
+elemento <tt>returnToURL</tt>HTTPS especificado por el cliente del servicio web. Las especificaciones de
+Liberty Alliance Project indican que el valor de esta propiedad es siempre
+"yes" (s&#237;). El valor "false" (falso) se utiliza principalmente para simplificar la
+implementaci&#243;n de forma escalonada.</p>
+
+<a name="ggoib"></a><h5>WSP para forzar que la devoluci&#243;n al host sea igual al host solicitado</h5>
+<p> Este atributo indica si el proveedor de servicios web debe aplicar los
+valores de direcci&#243;n de <tt>returnToHost</tt> y <tt> requestHost</tt> en el caso de que
+sean iguales. Las especificaciones de Liberty Alliance Project indican que el valor
+de esta propiedad es siempre "yes" (s&#237;). El valor "false" (falso) se
+utiliza principalmente para simplificar la implementaci&#243;n de forma escalonada.</p>
+
+<a name="ggoha"></a><h5>Ubicaci&#243;n de la hoja de estilo HTML</h5>
+<p>Este atributo se&#241;ala la ubicaci&#243;n de la hoja de estilo utilizada para
+procesar la p&#225;gina de interacci&#243;n con el formato HTML.</p>
+
+<a name="ggohi"></a><h5>Ubicaci&#243;n de la hoja de estilo WML</h5>
+<p>Este atributo se&#241;ala la ubicaci&#243;n de la hoja de estilo utilizada para
+procesar la p&#225;gina de interacci&#243;n con el formato WML.</p>
+
+<a name="ggogg"></a><h5>URL de interacci&#243;n de WSP</h5>
+<p>Este atributo indica la URL en la que se ha implementado el
+servlet <tt>WSPRedirectHandler </tt>. El servlet administra la parte de las interacciones del proveedor
+de servicios para las redirecciones de usuarios.</p>
+
+<a name="ggoft"></a><h5>URL de interacci&#243;n de WSP si se encuentra tras un equilibrador de carga</h5>
+<p>Define la URL del controlador de redirecci&#243;n de WSP mostrada por el
+equilibrador de carga.</p>
+
+<a name="ggogq"></a><h5>Lista de URL de interacci&#243;n del cl&#250;ster de WSP (sitio) tras el equilibrador de carga</h5>
+<p>Define las URL del controlador de redirecci&#243;n de WSP de los servidores
+de confianza del cl&#250;ster.</p>
+
+<a name="ggogx"></a><h5>Clase de configuraci&#243;n de la interacci&#243;n</h5>
+<p>Este atributo especifica la clase que proporciona m&#233;todos de acceso para leer
+las configuraciones de la interacci&#243;n.</p>
+
+<a name="ggogj"></a><h5>Opciones de WSC para participar en la interacci&#243;n</h5>
+<p>Este atributo indica el nivel de la interacci&#243;n en la que participar&#225;
+WSC si se configura para participar en las redirecciones de usuarios. Los
+posibles valores son los siguientes: "interactIfNeeded", "doNotInteract" y "doNotInteractForData". El valor "interactIfNeeded"
+afirmativo se utiliza de forma predeterminada.</p>
+
+<a name="ggogs"></a><h5>WSC para incluir "userInteractionHeader"</h5>
+<p>Este atributo indica si el cliente del servicio web incluir&#225; un encabezado
+SOAP para indicar determinadas preferencias de la interacci&#243;n en funci&#243;n de las
+especificaciones de Liberty. El valor predeterminado es yes.</p>
+
+<a name="ggofn"></a><h5>WSC de redirecci&#243;n de usuarios para la interacci&#243;n</h5>
+<p>Este atributo establece si WSC participar&#225; en las redirecciones de usuarios. El
+valor predeterminado es yes.</p>
+
+<a name="ggoim"></a><h5>Duraci&#243;n prevista de WSC para la interacci&#243;n</h5>
+<p>Este atributo define el periodo de tiempo m&#225;ximo en segundos que el
+cliente del servicio web est&#225; dispuesto a esperar al proveedor de servicios
+web para que complete su parte de la interacci&#243;n. El proveedor de
+servicios web no iniciar&#225; ninguna interacci&#243;n si es posible que &#233;sta tarde
+m&#225;s tiempo del que se ha establecido. Por ejemplo, el proveedor de
+servicios web recibe una solicitud con esta propiedad establecida en un m&#225;ximo
+de 30 segundos. Si la propiedad "Duraci&#243;n prevista de WSP para la
+interacci&#243;n" del proveedor de servicios web se ha establecido en 40 segundos,
+el proveedor de servicios web devolver&#225; un error de SOAP (<tt>timeNotSufficient</tt>), en
+el que se indica que no hay suficiente tiempo para la interacci&#243;n.</p>
+
+<a name="ggofx"></a><h5>WSC para forzar que la URL de redirecci&#243;n sea SSL</h5>
+<p>Este atributo especifica si el cliente del servicio web aplicar&#225; HTTPS en
+las URL de redirecci&#243;n. Las especificaciones de Liberty Alliance Project indican que
+el valor de esta propiedad es siempre "yes" (s&#237;), lo que implica
+que el proveedor de servicios web no redirigir&#225; al usuario cuando el
+valor de <tt>redirectURL</tt> (especificado por el proveedor de servicios web) no sea
+una URL HTTPS. El valor "false" (falso) se utiliza principalmente para realizar
+una implementaci&#243;n sencilla y escalonada.</p>
+<br/>
+
+</body>
+</html>

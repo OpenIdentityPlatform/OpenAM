@@ -1,0 +1,4 @@
+document.write("[<A HREF=\"http://forgerock.org/downloads/openam/openam_@ZIPNAME@.zip\">Nightly Build</A>]");
+document.write("[<A HREF=\"http://forgerock.org/downloads/openam/openam_@ZIPNAME@.zip.sha\">SHA</A>]");
+document.write("[<A HREF=\"http://forgerock.org/downloads/openam/openam.war\">WAR</A>]");
+document.write("[<A HREF=\"http://forgerock.org/downloads/openam/ssoAdminTools.zip\">TOOLS</A>]");

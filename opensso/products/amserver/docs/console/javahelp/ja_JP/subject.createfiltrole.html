@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>フィルタロールを作成する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subject.createfiltrole"></a><h5>フィルタロールを作成する</h5>
+<ol>
+<li><b>ナビゲーション区画内で、ロールを作成する組織に移動します。</b></li>
+<li><b>「新規」をクリックします。</b></li>
+<li><b>フィルタロールの名前を入力します。</b></li>
+<li><b>検索条件の情報を入力します。</b><p>次に例を示します。</p><pre>(&#38;(uid=user1)(|(inetuserstatus=active)(!(inetuserstatus=*))))</pre><p>フィルタが空白のままになっている場合、デフォルトで次のロールが作成されます。</p><pre>(objectclass = inetorgperson)</pre></li>
+<li><b>「了解」をクリックすることで、フィルタ条件に基づく検索を開始します。フィルタ条件によって決まるアイデンティティーが、自動的にロールに割り当てられます。</b></li>
+<li><b>フィルタロールの作成が完了したら、そのロール名をクリックすることで、そのロールに属しているユーザーを表示します。また、サービスをロールに追加することもできます。それには、「サービス」タブをクリックします。<a href="idm.entityservices.html">「サービスをアイデンティティーに追加する」</a>を参照してください。</b></li></ol>
+<br/>
+
+</body>
+</html>

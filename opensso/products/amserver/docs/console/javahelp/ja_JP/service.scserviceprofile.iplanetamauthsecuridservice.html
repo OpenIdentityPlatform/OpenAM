@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SecurID - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsecuridservice"></a><h4>SecurID</h4>
+<p><a name="indexterm-181"></a>このモジュールにより、RSA ACE/Server ソフトウェアおよび RSA SecurID 認証を使用した認証が可能になります。SecurID 認証モジュールは Linux または Solaris x86 プラットフォームでは利用できません。これら
+2 つのプラットフォーム上ではこのモジュールを登録、設定、または有効化しないでください。このモジュールは Solaris でのみ使用できます。SecurID 認証属性はレルム属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwbpt">「ACE/サーバー設定パス」</a></p></li>
+<li><p><a href="#fwbma">「認証レベル」</a></p></li></ul>
+
+
+<a name="fwbpt"></a><h5>ACE/サーバー設定パス</h5>
+<p>SecurID ACE/サーバーの <tt>sdconf.rec</tt> ファイルを配置するディレクトリを指定します。デフォルトでは <tt>/opt/ace/data</tt> です。このフィールドで別のディレクトリを指定する場合は、SecurID 認証を試みる前にそのディレクトリが存在している必要があります。</p>
+
+<a name="fwbma"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

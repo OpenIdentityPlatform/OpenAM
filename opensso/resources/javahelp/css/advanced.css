@@ -1,0 +1,34 @@
+/*
+######################################
+
+ #  SUN.COM ADVANCED.CSS V1.5.1  #
+
+COPYRIGHT SUN MICROSYSTEMS INC. 2003
+
+    QUESTIONS?  webdesign@sun.com
+
+######################################
+*/
+
+/* FONT TAG OVERWRITE */
+font {font-size:12px !important}
+
+/* ALL OTHER FONT SIZES */
+.smaller,.smaller a,small,.small,small span,.small span,.small a,small a,div.sitelinks,div.sitelinks a,.breadcrumb,div.footlinks,div.footlinks a{font-size:11px !important}
+body,th,td,p,div,span,a,ul,ol,dl,li,select,input,textarea,kbd,pre,kbd a,pre a,code span,kbd span,pre span{font-size:12px !important}
+div.pagetitle{font-size:21px !important}
+div.smallpagetitle{font-size:20px !important}
+
+/* FORMS */
+input.buttonblue,input.buttonred{cursor:hand;font-family:lucida,arial,sans-serif;color:#FFF;height:1.4em;font-weight:bold;font-size:11px;padding:0px;margin:0px;border:0px none #000}
+input.buttonblue{background:#594FBF}
+input.buttonred{background:#D12124}
+input.error, select.error, textarea.error{border:2px solid;background:#FEE;border-top-color:#C00;border-left-color:#C00;border-right-color:#F00;border-bottom-color:#F00}
+input.medium{width:120px;height:18px}
+input.mediumlarge{width:130px;height:18px}
+input.large{width:200px;height:18px}
+select.rightmodule{width:129px;height:20px}
+
+/* MISC */
+hr.light{background:#E3E3E3;color:#E3E3E3;height:4px;padding:0px;border:0px}
+hr{background:#333;color:#333;height:2px;padding:0px;border:0px}

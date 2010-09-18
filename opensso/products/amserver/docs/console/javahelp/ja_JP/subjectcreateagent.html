@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>エージェントを作成または変更する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>エージェントを作成または変更する</h5>
+<ol>
+<li><b>「エージェント」タブをクリックします。</b></li>
+<li><b>「新規」をクリックします。</b></li>
+<li><b>次のフィールドに値を入力します。</b><p><b>名前</b>:  エージェントの名前またはアイデンティティーを入力します。これは、エージェントが Federated Access Manager へのログイン時に使用する名前です。マルチバイトの名前は入力できません。</p><p><b>パスワード</b>: エージェントのパスワードを入力します。このパスワードは、エージェントが LDAP 認証時に使用するパスワードとは異なっている必要があります。</p><p><b>パスワードの確認</b>: パスワードを確認します。</p><p><b>デバイスの状態</b>: エージェントのデバイスの状態を入力します。これが「アクティブ」に設定された場合、エージェントは、Federated Access Manager に対して認証や通信を行えます。これが「非アクティブ」に設定された場合、エージェントは、Federated Access Manager への認証を行えません。</p></li>
+<li><b>「了解」をクリックします。</b></li>
+<li><b>エージェントの作成が完了すると、さらに次のフィールドを編集できます。</b><p><b>説明</b>: エージェントの簡単な説明を入力します。たとえば、エージェントのインスタンス名や保護対象アプリケーションの名前などを入力できます。</p><p><b>エージェントキー値</b>: エージェントのプロパティーをキーと値のペアで設定します。このプロパティーは、Federated Access Manager がユーザーに関する証明情報表明の要求をエージェントから受信する際に使用されます。現在のところ、有効になるプロパティーは 1 つだけであり、その他のプロパティーはすべて無視されます。次の形式を使用します。</p><p><tt></tt><i> agentRootURL</i><tt>=http://</tt><i>server_name:port</i><tt>/ </tt></p></li></ol>
+<br/>
+
+</body>
+</html>

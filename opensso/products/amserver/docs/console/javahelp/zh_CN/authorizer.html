@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>授权者 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authorizer"></a><h4>授权者</h4>
+<a name="indexterm-89"></a><a name="indexterm-90"></a><p>在处理请求前，Liberty 个人配置文件服务会检验发出该请求的 WSC 的授权。可以进行两个级别的授权检查：</p>
+<ol><li><p>请求实体是否已获授权访问其所请求的资源配置文件信息？</p></li>
+<li><p>请求者所请求的资源对其公开吗？</p></li></ol>
+<p>通过 Liberty 个人配置文件服务的插件进行授权：<tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>Authorizer</tt> 接口的实现。尽管可开发新的实现，OpenSSO 仍提供了默认实现：<tt>com.sun.identity.liberty.ws.idpp.plugin.</tt><tt>IDPPAuthorizer</tt>。此插件为“查询”和“修改”操作定义了如下四种策略操作值：</p>
+<ul><li><p>允许</p></li>
+<li><p>拒绝</p></li>
+<li><p>进行交互以获得同意</p></li>
+<li><p>进行交互以获得值</p></li></ul>
+<p>规则的资源值与 Liberty 个人配置文件服务定义的 <tt>x-path</tt> 表达式类似。</p>/PP/CommonName/AnalyzedName/FN     查询     同意交互式操作 /PP/CommonName/*                          修改     交互式操作值 /PP/InformalName                            查询     拒绝<p>取消选择同在 Liberty 个人配置文件服务中定义的以下一项或两项属性，可以取消授权：</p>
+<ul><li><p><a href="requirequery.html">要求查询策略评估：</a></p></li>
+<li><p><a href="requiremodify.html">要求修改策略评估：</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

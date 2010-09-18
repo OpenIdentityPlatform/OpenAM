@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>Windows NT 認証モジュールにより、Microsoft Windows NT サーバーに対する認証が可能になります。この属性はレルム属性です。サービス設定の下で Windows NT 属性に適用される値は、Windows NT 認証テンプレートのデフォルト値になります。レルムにサービスを登録したあと、サービステンプレートを作成する必要があります。デフォルト値は、登録後にレルムの管理者によって変更できます。レルム属性はレルムのサブツリー内のエントリによって継承されません。</p><p>Windows NT 認証モジュールを有効にするには、Samba Client 2.2.2 をダウンロードして次のディレクトリにインストールする必要があります。</p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>Samba Client は、別個の Windows NT Server または Windows 2000 Server を必要とせずに、Windows マシンと
+UNIX マシンを融合するファイルおよびプリントサーバーです。</p><p>Red Hat Linux には Samba クライアントが同梱されており、これは <tt>/usr/bin</tt> ディレクトリにあります。</p><p>Linux 用の Windows NT 認証サービスを使用して認証するには、クライアントバイナリを <tt></tt><i>OpenSSO-base</i><tt>/identity/bin</tt> にコピーします。</p><p>Windows NT 属性は次のとおりです。</p>
+<ul><li><p><a href="#fumve">「認証ドメイン」</a></p></li>
+<li><p><a href="#fumvp">「認証ホスト」</a></p></li>
+<li><p><a href="#fumvq">「Samba 設定ファイル名」</a></p></li>
+<li><p><a href="#fumwi">「認証レベル」</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>認証ドメイン</h5>
+<p>ユーザーが属するドメイン名を定義します。</p>
+
+<a name="fumvp"></a><h5>認証ホスト</h5>
+<p>Windows NT 認証ホスト名を定義します。ホスト名は、完全指定のドメイン名 (FQDN) ではなく、netBIOS 名にする必要があります。デフォルトでは、FQDN の先頭部は netBIOS 名です。</p><p>DHCP (動的ホスト構成プロトコル) を使用している場合、Windows 2000 マシンの HOSTS ファイルに適切なエントリを設定します。</p><p>名前解決は、netBIOS 名に基づいて行われます。サブネット上で NetBIOS 名の名前解決をするサーバーがない場合、マッピングはハードコードされている必要があります。たとえば、ホスト名は <tt>example1.company1.com</tt> ではなく <tt>example1</tt> とする必要があります。</p>
+
+<a name="fumvq"></a><h5>Samba 設定ファイル名</h5>
+<p>Samba の設定ファイル名を定義して、<tt>-smbclient</tt> コマンドの <tt>-s</tt> オプションをサポートします。この値は、Samba の設定ファイルがある場所の完全なディレクトリパスである必要があります。次に例を示します。<tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

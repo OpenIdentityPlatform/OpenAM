@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wstep.xhtml,v 1.10 2009/07/13 19:42:44 farble1670 Exp $
+
+-->
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <a name="wstep#{step}"/>
+    <ice:panelCollapsible
+        expanded="#{wizardBean.wizardStepBeans[step].expanded}"
+        disabled="#{!wizardBean.wizardStepBeans[step].enabled}"
+        actionListener="#{wizardHandler.expandStepListener}"
+        visible="#{true}">
+
+        <f:attribute name="step" value="#{step}"/>
+
+        <f:facet name="header">
+            <ice:panelGroup>
+                <ice:outputText value="#{label}"/>
+            </ice:panelGroup>
+        </f:facet>
+        <ui:insert name="wizard-step-body"/>
+        <ice:panelGroup
+            styleClass="button-container">
+            <ice:panelGrid
+                columns="4"
+                styleClass="button-group">
+                <o:wbuttons
+                    bean="#{wizardBean}"
+                    handler="#{wizardHandler}"
+                    step="#{step}"/>
+            </ice:panelGrid>
+        </ice:panelGroup>
+        <script type="text/javascript">
+            focusWizardStep('#{step}');
+        </script>
+    </ice:panelCollapsible>
+</ui:composition>

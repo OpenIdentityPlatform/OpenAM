@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sicherheitstoken-Dienst - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>Sicherheitstoken-Dienst</h4>
+<p>Mit den in diesem Dienst enthaltenen Attributen wird die dynamische Konfiguration f&#252;r
+den Sicherheitstoken-Dienst (Security Token Service, STS) von OpenSSO definiert. Mit diesen Attributen
+wird die folgende Konfiguration definiert:</p>
+<ul><li><p>Ausgeben und Erstellen von Sicherheitstoken</p></li>
+<li><p> Webdienstsicherheit f&#252;r den STS selbst zur Sicherung der Endpunkte des STS-Diensts. Die Signierungs- und Verschl&#252;sselungsattribute konfigurieren die Serveranbieter-&#220;berpr&#252;fung eingehender WS-Trust-Anforderungen und sichern die ausgehenden WS-Trust-Antworten. Das Attribut f&#252;r den Sicherheitsmechanismus definiert den Sicherheitsnachweis der Sicherheitstokens.</p></li>
+<li><p>SAML-Konfiguration zum Anfordern der SAML-Attributzuordnung im Sicherheitstoken (&#252;ber eine SAML-Anweisung), wenn der konfigurierte STS als Webdienstanbieter angegeben ist und ein von einem Remote-STS generiertes SAML-Token (Anweisung) erh&#228;lt.</p></li>
+<li><p> Sicherheitstoken-&#220;berpr&#252;fung, die bei Generierung des Tokens durch einen Remote-STS von einem Webdienstanbieter empfangen wurde.</p><p>Sie k&#246;nnen Profile f&#252;r die dynamische Konfiguration f&#252;r verschiedene OpenSSO-Webdienstsicherheit-Anbieter in der <a href="agentconfig.agents.html">Centralized Agent configuration</a> auf der Registerkarte f&#252;r Bereiche erstellen.</p></li></ul>
+
+
+<a name="ghatr"></a><h5>Aussteller</h5>
+<p>Der Name des Sicherheitstoken-Diensts, der die Sicherheitstoken ausstellt.</p>
+
+<a name="ghawa"></a><h5>Endpunkt des </h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig: </p><p><tt>%protocol://%host:%port%uri/sts</tt> </p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Sicherheitstoken-Dienst-Endpunkt, basierend
+auf den sitzungsspezifischen Parametern.</p>
+
+<a name="ghatv"></a><h5>Ausgestellten Schl&#252;ssel verschl&#252;sseln</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird der vom Sicherheitstoken-Dienst ausgestellte Schl&#252;ssel verschl&#252;sselt.</p>
+
+<a name="ghauc"></a><h5>Ausgestelltes Token verschl&#252;sseln</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird das vom Sicherheitstoken-Dienst ausgestellte Sicherheitstoken verschl&#252;sselt.</p>
+
+<a name="ghavx"></a><h5>Lebensdauer f&#252;r Sicherheitstoken</h5>
+<p>Definiert die Zeit, f&#252;r die das ausgestellte Token g&#252;ltig ist.</p>
+
+<a name="ghaud"></a><h5>Token-Implementierungsklasse</h5>
+<p>Dieses Attribut gibt die Implementierungsklasse f&#252;r den Sicherheitstokenanbieter/-aussteller an.</p>
+
+<a name="ghaug"></a><h5>Name des Zertifikatsalias</h5>
+<p>Definiert den Aliasnamen f&#252;r das Zertifikat, das der Sicherheitstoken-Dienst zur Signierung der
+vom Sicherheitstoken-Dienst ausgestellten Sicherheitstoken verwendet.</p>
+
+<a name="ghauh"></a><h5>Plugin f&#252;r STS-Endbenutzer-TokenKlasse</h5>
+<p>Definiert die Implementierungsklasse f&#252;r die Konvertierung des Endbenutzer-Tokens.</p>
+
+<a name="ghawk"></a><h5>Sicherheitsmechanismus</h5>
+<p>Definiert den Typ des Sicherheitsnachweises, der zur Sicherung des Tokens selbst verwendet
+wird, oder des Sicherheitsnachweises, den der Sicherheitstoken-Dienst von der vom Client gesendeten
+WS-Trust-Anforderung &#252;bernommen hat. Folgende Sicherheitstypen stehen zur Auswahl:</p>
+<ul><li><p>Anonymous (Anonym) &#8211; Der anonyme Sicherheitsmechanismus enth&#228;lt keine Sicherheitsnachweise.</p></li>
+<li><p>KerberosToken &#8211; Es werden Kerberos-Token verwendet.</p></li>
+<li><p>LibertyDiscoverySecurity &#8211; Verwendet Liberty-basierte Sicherheitstoken.</p></li>
+<li><p>SAML-HolderOfKey &#8211; Verwendet den SAML 1.1-Behauptungstyp "Holder-Of-Key".</p></li>
+<li><p>SAML-SenderVouches &#8211; Verwendet den SAML 1.1-Behauptungstyp "Sender Vouches".</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; Verwendet den SAML 2.0-Behauptungstoken-Typ "Holder-Of-Key".</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; Verwendet den SAML 2.0-Behauptungstoken-Typ " Sender Vouches".</p></li>
+<li><p>STSSecurity &#8211; Definiert, dass der Sicherheitstoken-Dienstagent das Sicherheitstoken vom Sicherheitstoken-Dienst abruft.</p></li>
+<li><p>UserNameToken &#8211; Verwendet ein Benutzernamens-Token zur Sicherung der Anforderungen an den Sicherheitstoken-Dienst.</p></li>
+<li><p>UserNameToken-Plain &#8211; Verwendet ein Benutzernamens-Token mit einem Klartextpasswort zur Sicherung der Anforderungen an den Sicherheitstoken-Dienst.</p></li>
+<li><p>X509Token &#8211;Verwendet das X509-Zertifikat zur Sicherung des Sicherheitstokens.</p></li></ul>
+
+
+<a name="ghesm"></a><h5>Authentifizierungskette</h5>
+<p>Definiert den Namen der Authentifizierungskette bzw. des Authentifizierungsdiensts, der zur Authentifizierung beim
+OpenSSO-Authentifizierungsdienst mithilfe des Berechtigungsnachweises aus dem Sicherheitstoken einer eingehenden Ausstelleranforderung verwendet werden
+kann, um das authentifizierte Sicherheitstoken von OpenSSO zu erstellen.</p>
+
+<a name="ghaup"></a><h5>Benutzer-Berechtigungsnachweis</h5>
+<p>Das Attribut steht f&#252;r die Shared Secrets des Benutzernamens/Passworts, die vom Sicherheitstoken-Dienst
+zur &#220;berpr&#252;fung eines vom Client als Teil einer eingehenden WS-Trust-Anforderung gesendeten Benutzernamen-Tokens
+verwendet werden.</p>
+
+<a name="ghauq"></a><h5>Ist die Anforderungssignatur verifiziert</h5>
+<p>Gibt an, dass der Sicherheitstoken-Dienst die Signatur der eingehenden WS-Trust-Anforderung &#252;berpr&#252;fen muss.</p>
+
+<a name="ghaui"></a><h5>Ist Anforderungskopfzeile entschl&#252;sselt</h5>
+<p>Gibt an, dass alle vom Sicherheitstoken-Dienst eingehenden Anforderungskopfzeilen entschl&#252;sselt sein m&#252;ssen.</p>
+
+<a name="ghauf"></a><h5>Ist Anforderung entschl&#252;sselt</h5>
+<p>Gibt an, dass alle vom Sicherheitstoken-Dienst eingehenden Anforderungen entschl&#252;sselt sein m&#252;ssen.</p>
+
+<a name="ghavc"></a><h5>Ist Antwort signiert</h5>
+<p>Gibt an, dass alle vom Sicherheitstoken-Dienst eingehenden Antworten signiert sein m&#252;ssen.</p>
+
+<a name="ghavo"></a><h5>Ist Antwort verschl&#252;sselt</h5>
+<p>Gibt an, dass alle vom Sicherheitstoken-Dienst gesendeten Antworten verschl&#252;sselt sein m&#252;ssen.</p>
+
+<a name="ghdtd"></a><h5>Referenztyp f&#252;r Signatur</h5>
+<p>Definiert die Referenztypen, die verwendet werden, wenn der Sicherheitstoken-Dienst die WS-Trust-Antwort signiert.
+Die m&#246;glichen Referenztypen sind <tt>DircectReference </tt>, <tt>KeyIdentifier</tt> und <tt>X509</tt>.</p>
+
+<a name="ghdss"></a><h5>Verschl&#252;sselungsalgorithmus</h5>
+<p>Definiert den Verschl&#252;sselungsalgorithmus, den der Sicherheitstoken-Dienst zur Verschl&#252;sselung der WS-Trust-Antwort verwendet.</p>
+
+<a name="ghdru"></a><h5>Verschl&#252;sselungsst&#228;rke</h5>
+<p>Definiert die St&#228;rke der Verschl&#252;sselung, die der Sicherheitstoken-Dienst zur Verschl&#252;sselung der WS-Trust-Antwort
+verwendet. W&#228;hlen Sie einen gr&#246;&#223;eren Wert f&#252;r eine h&#246;here Verschl&#252;sselungsst&#228;rke aus.</p>
+
+<a name="ghavt"></a><h5>Alias des privaten Schl&#252;ssels</h5>
+<p>Dieses Attribut definiert den Alias des privaten Zertifikatschl&#252;ssels, der verwendet wird, um
+die WS-Trust-Antwort zu signieren oder die eingehende WS-Trust-Anforderung zu entschl&#252;sseln.</p>
+
+<a name="ghave"></a><h5>Typ des privaten Schl&#252;ssels</h5>
+<p>Dieses Attribut definiert den Typ des privaten Zertifikatschl&#252;ssels, der zur Signierung der
+WS-Trust-Antworten oder Entschl&#252;sselung der WS-Trust-Anforderungen verwendet wird. Die m&#246;glichen Typen sind <tt>PublicKey</tt>,
+<tt>SymmetricKey </tt> und <tt>NoProofKey</tt>.</p>
+
+<a name="ghaux"></a><h5>Alias von &#246;ffentlichem Schl&#252;ssel des Webdienst-(WS-Trust-)Client</h5>
+<p>Definiert den Alias des &#246;ffentlichen Zertifikatschl&#252;ssels, mit dem die Signatur der eingehenden
+WS-Trust-Anforderung &#252;berpr&#252;ft oder die WS-Trust-Antwort verschl&#252;sselt wird.</p>
+
+<a name="ghbbv2"></a><h5>Kerberos-Domain-Server</h5>
+<p>Gibt den Hostnamen des Kerberos-Verteilungscenters (Dom&#228;nencontroller) an. Hier ist der vollst&#228;ndig qualifizierte
+Dom&#228;nenname (FQDN) des Dom&#228;nencontrollers erforderlich.</p>
+
+<a name="ghbdx2"></a><h5>Kerberos-Domain</h5>
+<p>Gibt den Dom&#228;nennamen des Kerberos-Verteilungscenters (Dom&#228;nencontroller) an. Je nach Konfiguration ist der
+Dom&#228;nenname des Dom&#228;nencontrollers nicht identisch mit dem Dom&#228;nennamen von OpenSSO.</p>
+
+<a name="ghbcq2"></a><h5>Kerberos-Dienstprincipal</h5>
+<p>Legt den Kerberos-Principal als Eigent&#252;mer des generierten Sicherheitstokens fest.</p><p>Verwenden Sie die folgende Syntax: </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> und <tt>domainame</tt> stehen f&#252;r den Hostnamen und den Dom&#228;nennamen der OpenSSO-Instanz.
+<tt>dc_domain_name</tt> is the Kerberos domain in which the Windows Kerberos server (domain
+controller) resides. Der Kerberos-Server unterscheidet sich m&#246;glicherweise vom Dom&#228;nennamen der OpenSSO-Instanz.</p>
+
+<a name="ghbae2"></a><h5>Kerberos-Schl&#252;ssel-Tabdatei</h5>
+<p>Gibt die zur Ausgabe des Tokens verwendete Kerberos-Keytab-Datei an. Folgendes Format wird
+empfohlen, auch wenn es nicht vorgeschrieben ist:</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> ist der Hostname der OpenSSO-Instanz.</p>
+
+<a name="ghbep2"></a><h5>Kerberos-Signatur verifizieren</h5>
+<p>Wenn es aktiviert ist, wird mit diesem Attribut angegeben, dass das Kerberos-Token
+signiert ist.</p>
+
+<a name="ghawg"></a><h5>SAML-Attributzuordnung</h5>
+
+<hr><p><b>Hinweis &#8211; </b>Alle folgenden SAML-bezogenen Attribute m&#252;ssen f&#252;r die Konfiguration verwendet werden, wenn die
+aktuelle Instanz des Sicherheitstoken-Diensts als Webdienstanbieter fungiert  und ein von einer
+anderen Instanz des Sicherheitstoken-Dients generiertes SAML-Token erh&#228;lt.</p>
+<hr>
+<p>Diese Konfiguration stellt ein SAML-Attribut dar, das w&#228;hrend der Erstellung einer SAML-Anweisung
+durch den Sicherheitstoken-Dienst f&#252;r einen Webdienstanbieter als Attributanweisung generiert werden muss. Das
+Format lautet: <tt></tt><i>SAML_Attributname</i><tt></tt>=<tt></tt><i> Tats&#228;chlicher_Attributname</i><tt></tt>.</p><p><tt></tt><i>SAML_Attributname</i><tt></tt> ist der SAML-Attributname aus einer SAML-Behauptung, die aus einer eingehenden Webdienstanforderung
+stammt. <tt></tt><i>Tats&#228;chlicher_Attributname</i><tt></tt> ist der Attributname der entweder aus dem authentifizierten SSOToken oder
+aus dem Identit&#228;ts-Repository abgerufen wird.</p>
+
+<a name="ghawn"></a><h5>NameID-Zuordnung</h5>
+<p>Der Mapper f&#252;r SAML-NameID f&#252;r eine vom Sicherheitstoken-Dienst generierte Anweisung.</p>
+
+<a name="ghavl"></a><h5>Sollte Mitgliedschaften enthalten</h5>
+<p>Wenn diese Option aktiviert ist, enth&#228;lt die generierte Anweisung Benutzermitgliedschaften als SAML-Attribute.
+</p>
+
+<a name="ghawo"></a><h5>Attribut-Namespace</h5>
+<p>Definiert den SAML-Attribut-Namespace f&#252;r eine vom Sicherheitstoken-Dienst generierte Anweisung.</p>
+
+<a name="ghauj"></a><h5>Vertrauensw&#252;rdige Aussteller</h5>
+<p>Legt eine Liste der vertrauensw&#252;rdigen Aussteller fest, denen die Versendung von Sicherheitstoken
+an OpenSSO anvertraut wird. OpenSSO muss &#252;berpr&#252;fen, ob das Sicherheitstoken von einem
+dieser Aussteller gesendet wurde. </p>
+
+<a name="ghavy"></a><h5>Vertrauensw&#252;rdige IP-Adressen</h5>
+<p>Legt eine Liste der vertrauensw&#252;rdigen IP-Adressen fest, denen die Versendung von Sicherheitstoken
+an OpenSSO anvertraut wird. OpenSSO muss &#252;berpr&#252;fen, ob das Sicherheitstoken von einem
+dieser Hosts gesendet wurde. </p>
+<br/>
+
+</body>
+</html>

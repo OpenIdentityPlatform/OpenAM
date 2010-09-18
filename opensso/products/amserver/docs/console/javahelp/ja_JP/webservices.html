@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web サービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="webservices"></a><h3>Web サービス</h3><p>Web サービスモジュールは、Liberty Alliance Project の <b>Identity Web Services Framework</b> (ID-WSF) 仕様の OpenSSO における実装です。ID-WSF は、Liberty ID-FF
+(<b>Identity Federation Framework</b>) に基づいて、連携ネットワーク環境でのアイデンティティーデータに対して検索、更新、またはアクションを実行する Web サービスを構築するための仕様を提供しています。この仕様には、カレンダサービス、ウォレットサービス、アラートサービスなどの Web サービスの構築に必要な技術的要素の概要がまとめられています。</p>
+<hr><p><b>注 &#8211; </b>「アイデンティティーデータ」には、姓、名、自宅住所、勤務先住所、および緊急連絡先を定義する属性が含まれていますが、これらに限定されるわけではありません。<b></b></p>
+<hr>
+<p>Web サービスは、インターネット全体での分散コンピューティングの土台となっています。Web サービスコンシューマ (WSC) は Web サービスを見つけ、要求を出すことによってそのサービスが提供する処理を引き出します。Web サービスプロバイダ (WSP) は、要求に基づいて Web サービスを実装するアプリケーションです。WSP
+は WSC と同じ Java&#8482; 仮想マシンに配置することも、何千マイルも離れた場所に配置することもできます。WSC が WSP からアイデンティティー属性を取得する必要がある場合、特定の属性が格納されている場所を見つけるために WSC は最初にディスカバリサービスに接続する必要があります。この情報が返されると、WSC は WSP
+(個人プロファイルサービスなど) に接続して必要な属性を取得します。</p><p>OpenSSO コンソールの Web サービスモジュールは、次のサービスを設定するためのインタフェースを提供します。</p>
+<ul><li><p><a href="webservices.wspersonalprofileservice.html">「Liberty 個人プロファイルサービス」</a></p></li>
+<li><p><a href="service.smdiscoveryservice.html">「ディスカバリサービス」</a></p></li>
+<li><p><a href="service.scsoapbinding.html">「SOAP バインドサービス」</a></p></li>
+<li><p><a href="webservices.wsauthnservices.html">「認証 Web サービス」</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

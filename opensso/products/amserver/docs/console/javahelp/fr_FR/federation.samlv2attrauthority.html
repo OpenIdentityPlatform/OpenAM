@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'une autorit&#233; d'attributs SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>Personnalisation d'une autorit&#233; d'attributs SAMLv2</h4>
+<p>L'autorit&#233; d'attributs SAMLv2 contient les attributs personnalisables suivants&#160;:</p>
+<ul><li><p><a href="#ggwhl">Signature et codage</a></p></li>
+<li><p><a href="#ggwgh">Service d'attribut</a></p></li>
+<li><p><a href="#ggwjy">Demande d'AssertionID</a></p></li>
+<li><p><a href="#ggwju">Profil d'attribut</a></p></li>
+<li><p><a href="#ggwha">Alias cert</a></p></li>
+<li><p><a href="#ggwjj">Magasin de donn&#233;es d'objet</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>Signature et codage</h5>
+<dl><dt>Taille de la cl&#233;</dt>
+<dd><p>Longueur des cl&#233;s utilis&#233;es par l'entit&#233; Autorit&#233; d'attributs lors de son interaction avec une autre entit&#233;.</p></dd>
+<dt>Algorithme</dt>
+<dd><p>Algorithme de chiffrement utilis&#233; pour interagir avec une autre entit&#233;.</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>Service d'attribut</h5>
+<p>Cet attribut d&#233;finit les extr&#233;mit&#233;s d'URL qui vont recevoir les demandes de
+requ&#234;te d'attributs. <tt>Location</tt> sp&#233;cifie l'URL du fournisseur auquel la demande est envoy&#233;e.
+<tt>Mapper</tt> d&#233;finit le SPI qui trouve l'autorit&#233; de mappage des attributs, pour
+renvoyer la liste des attributs qui sera incluse dans une r&#233;ponse. Les
+profils de requ&#234;te d'attributs SAMLv2 sont les suivants&#160;:</p>
+<ul><li><p>Basic</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>Demande d'AssertionID</h5>
+<p>D&#233;finit les URL auxquels les ID d'assertion sont envoy&#233;s par un client
+&#224; un fournisseur d'identit&#233;s pour r&#233;cup&#233;rer l'assertion correspondante. <tt>Location</tt> sp&#233;cifie l'URL du
+fournisseur auquel la demande est envoy&#233;e. <tt>Mapperr</tt> d&#233;finit le SPI qui trouve
+l'autorit&#233; de mappage des ID d'assertion, pour renvoyer la liste des attributs
+qui sera incluse dans une r&#233;ponse. Les liaisons sont les suivantes&#160;:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>Profil d'attribut</h5>
+<p>D&#233;finit le type de profil d'attributs SAMLv2 pris en charge. Le type
+par d&#233;faut est <tt>Basic</tt>.</p>
+
+<a name="ggwha"></a><h5>Alias cert</h5>
+<p>D&#233;finit les &#233;l&#233;ments de l'alias du certificat. <tt>Signing</tt> sp&#233;cifie l'alias du certificat
+du fournisseur, utilis&#233; pour trouver le certificat de signature correct dans le
+keystore. <tt>Encryption</tt> sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le
+certificat de chiffrement correct dans le keystore.</p>
+
+<a name="ggwjj"></a><h5>Magasin de donn&#233;es d'objet</h5>
+<p>Sp&#233;cifie le nom d'attribut du magasin de donn&#233;es, qui contient le DN
+d'objet X509. Il permet de trouver un utilisateur dont l'attribut correspond au
+DN d'objet X.509. Ce champ n'est utilis&#233; dans le profil de requ&#234;te
+d'attributs que pour l'objet X.509. </p>
+<br/>
+
+</body>
+</html>

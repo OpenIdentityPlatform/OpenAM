@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Add a Rule to a Policy - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.ruleadd"></a><h5>To Add a Rule to a Policy</h5>
+<ol>
+<li><b><a name="indexterm-25"></a>If you have already created the policy, click the name of the policy
+for which you wish to add the rule. If not, see <a href="policy.policynormaladd.html">To Create a New Normal Policy</a>.</b></li>
+<li><b>Under the Rules menu, click New.</b></li>
+<li><b>Select one of the following default service types for the rule. You may
+see a larger list if more services are enabled for the policy:</b><dl><dt>Discovery Service</dt>
+<dd><p>Defines the authorization actions for Discovery service query and modify protocol invocations by web services clients for a specified resource.</p></dd>
+<dt>Liberty Personal Profile Service</dt>
+<dd><p>Defines the authorization actions for Liberty Personal Profile service query and modify protocol invocations by web services clients for a specified resource.</p></dd>
+<dt>URL Policy Agent</dt>
+<dd><p>Defines authorization actions for the URL Policy Agent service. This is used to define policies that protect HTTP and HTTPS URLs. This is the most common use case of OpenSSO policies.</p></dd>
+</dl>
+</li>
+<li><b>Click Next.</b></li>
+<li><b>Enter a name and resource name for the rule.</b><p>Currently, OpenSSO Policy Agents only support <tt>http://</tt> and <tt>https://</tt>  resources and do
+not support IP addresses in place of the hostname.</p><p>Wildcards are supported for protocol, host, port and resource name. For example:</p><pre>http*://*:*/*.html</pre><p>For the URL Policy Agent service, if a port number is not
+entered, the default port number is 80 for <tt>http://</tt>, and 443 for <tt>https://.</tt></p>
+<hr><p><b>Note &#8211; </b>Steps 6 and 7 are not applicable for a referral policy.</p>
+<hr>
+</li>
+<li><b>Select the action for the rule. Depending on the service type, you can
+select the following:</b>
+<ul><li><p>LOOKUP (Discovery Service)</p></li>
+<li><p>UPDATE (Discovery Service)</p></li>
+<li><p>MODIFY (Liberty Personal Profile Service)</p></li>
+<li><p>QUERY (Liberty Personal Profile Service)</p></li>
+<li><p>GET (URL Policy Agent)</p></li>
+<li><p>POST (URL Policy Agent)</p></li></ul>
+</li>
+<li><b>Select the Action Values.</b>
+<ul><li><p>Interaction for Consent &#8212; Invokes the Liberty interaction protocol for consent on a resource. This is for the Liberty Personal Profile service type only.</p></li>
+<li><p>Interaction for Value &#8212; Invokes the Liberty interaction protocol for a value on a resource. This is for the Liberty Personal Profile service type only.</p></li>
+<li><p>Allow &#8212; Enables you access the resource matching the resource defined in the rule.</p></li>
+<li><p>Deny &#8212; Denies access to the resource matching the resource defined in the rule.</p><p>Denial rules always take precedence over allow rules in a policy. For example, if you have two policies for a given resource, one denying access and the other allowing access, the result is a deny access (provided that the conditions for both policies are met). It is recommended that deny policies be used with extreme caution as they may lead to potential conflicts between the policies. Typically, the policy definition process should only use allow rules, and use the default deny when no policies apply to accomplish the deny case.</p><p>If explicit deny rules are used, policies that are assigned to a given user through different subjects (such as role and/or group membership) may result in denied access to a resource even if one or more of the policies allow access. For example, if there is a deny policy for a resource applicable to an Employee role and there is another allow policy for the same resource applicable to Manager role, policy decisions for users assigned both Employee and Manager roles would be denied.</p><p>One way to resolve such problems is to design policies using Condition plug-ins. In the case above, a &#8220;role condition&#8221; that applies the deny policy to users authenticated to the Employee role and applies the allow policy to users authenticated to the Manager role helps differentiate the two policies. Another way could be to use the <tt>authentication level</tt> condition, where the Manager role authenticates at a higher authentication level.</p></li></ul>
+</li>
+<li><b>Click Finish.</b></li></ol>
+<br/>
+
+</body>
+</html>

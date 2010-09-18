@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration d'une offre de ressource pour l'amor&#231;age - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverybootstraprefoffadd"></a><h5>Configuration d'une offre de ressource pour l'amor&#231;age</h5>
+<a name="indexterm-146"></a><a name="indexterm-147"></a><p>Une seule offre de ressources est autoris&#233;e pour l'amor&#231;age ; par d&#233;faut,
+cette offre contient des informations concernant le Service de d&#233;couverte. Si une
+offre de ressource est d&#233;j&#224; d&#233;finie, vous pouvez modifier les attributs en
+cliquant sur son nom. Vous pouvez &#233;galement cocher la case en regard
+du nom et supprimer l'offre de ressource existante. Pour configurer une nouvelle
+offre de ressources, cliquez sur Nouveau.</p><ol>
+<li><b>Cliquez sur Nouveau pour afficher les attributs du nouveau mappeur ou cliquez
+sur le nom d'un mappeur configur&#233; pour le modifier.</b></li>
+<li><b>Saisissez en option une description de l'offre de ressource.</b></li>
+<li><b>Fournissez les valeurs pour les attributs d'instance de service en vous basant
+sur les informations suivantes :</b><dl><dt>Type de service</dt>
+<dd><p>Cet attribut accepte comme valeur un URI d&#233;finissant le type de service impl&#233;ment&#233; par l'offre de services. Par exemple, <tt><b>urn:liberty:disco:2003-08</b></tt>.</p>
+<hr><p><b>Remarque &#8211; </b>Il est recommand&#233; que cet URI soit identique &#224; l'URI <tt>targetNamespace</tt> de la description WSDL abstraite du service.</p>
+<hr>
+</dd>
+<dt>ID fournisseur</dt>
+<dd><p>Cet attribut accepte la valeur d'un URI du fournisseur de l'instance du service. Par exemple, <tt><b>http://daiquiri.sun.com:80/amserver/Liberty/disco</b></tt>.</p></dd>
+<dt>Description du service</dt>
+<dd><p>Cet attribut d&#233;finit un service Web en cours d'ex&#233;cution au niveau d'une extr&#233;mit&#233; de protocole distincte. Les informations sur les instances de service doivent &#234;tre communiqu&#233;es dans diff&#233;rents contextes. Par exemple, le Service de d&#233;couverte d&#233;fini dans cette sp&#233;cification est un service d'identit&#233; qui fournit une liste d'offres de ressource (dont chacune inclut une description d'instance de service). Reportez-vous &#224; <a href="service.smdiscoverydescriptionadd.html">Configuration d'une description de service</a>.</p></dd>
+</dl>
+</li>
+<li><b>Fournissez les valeurs pour les attributs d'options d'offre de ressource en vous
+basant sur les informations suivantes :</b><dl><dt>Options</dt>
+<dd><p>Cochez cette case si ce service ne fournit aucune option pour l'offre de ressource. Les options fournissent au demandeur potentiel des indications sur la disponibilit&#233; de certaines donn&#233;es ou op&#233;rations avec une offre de ressource particuli&#232;re. Par exemple, une option indiquant que des informations de contact sont disponibles peut &#234;tre fournie.</p></dd>
+<dt>Liste des options</dt>
+<dd><p>Cet attribut contient une liste d'options pour l'instance de service. Cette option est d&#233;finie comme un URI. L'ensemble des URI possibles est g&#233;n&#233;ralement standardis&#233; par le type de service.</p></dd>
+</dl>
+</li>
+<li><b>Activez des directives bas&#233;es sur les informations suivantes :</b><dl><dt>R&#233;f. d'ID de description pour : GenerateBearerToken</dt>
+<dd><p>Toutes les <a href="supporteddirectives.html">Directives prises en charge</a> peuvent contenir une r&#233;f&#233;rence descriptive. Si l'attribut R&#233;f. d'ID n'est pas activ&#233; pour une directive, la directive est appliqu&#233;e &#224; tous les m&#233;canismes d'authentification fournis dans l'offre de ressources. Si l'attribut R&#233;f. d'ID est activ&#233; pour une directive, il DOIT contenir la liste des ID de r&#233;f&#233;rence qui font r&#233;f&#233;rence au m&#233;canisme d'authentification auquel la directive est associ&#233;e. Si l'attribut est pr&#233;sent, la directive DOIT &#234;tre appliqu&#233;e uniquement aux descriptions r&#233;f&#233;renc&#233;es dans la liste des ID de r&#233;f&#233;rence. Ceci peut &#234;tre utile si certaines directives sont incompatibles avec certains m&#233;canismes de s&#233;curit&#233;.</p></dd>
+<dt>R&#233;f. d'ID de description pour : Authentifier le demandeur</dt>
+<dd><p>Toutes les <a href="supporteddirectives.html">Directives prises en charge</a> peuvent contenir une r&#233;f&#233;rence descriptive. Si l'attribut R&#233;f. d'ID n'est pas activ&#233; pour une directive, la directive est appliqu&#233;e &#224; tous les m&#233;canismes d'authentification fournis dans l'offre de ressources. Si l'attribut R&#233;f. d'ID est activ&#233; pour une directive, il DOIT contenir la liste des ID de r&#233;f&#233;rence qui font r&#233;f&#233;rence au m&#233;canisme d'authentification auquel la directive est associ&#233;e. Si l'attribut est pr&#233;sent, la directive DOIT &#234;tre appliqu&#233;e uniquement aux descriptions r&#233;f&#233;renc&#233;es dans la liste des ID de r&#233;f&#233;rence. Ceci peut &#234;tre utile si certaines directives sont incompatibles avec certains m&#233;canismes de s&#233;curit&#233;.</p></dd>
+<dt>R&#233;f. d'ID de description pour : Crypter l'ID de ressource</dt>
+<dd><p>Toutes les <a href="supporteddirectives.html">Directives prises en charge</a> peuvent contenir une r&#233;f&#233;rence descriptive. Si l'attribut R&#233;f. d'ID n'est pas activ&#233; pour une directive, la directive est appliqu&#233;e &#224; tous les m&#233;canismes d'authentification fournis dans l'offre de ressources. Si l'attribut R&#233;f. d'ID est activ&#233; pour une directive, il DOIT contenir la liste des ID de r&#233;f&#233;rence qui font r&#233;f&#233;rence au m&#233;canisme d'authentification auquel la directive est associ&#233;e. Si l'attribut est pr&#233;sent, la directive DOIT &#234;tre appliqu&#233;e uniquement aux descriptions r&#233;f&#233;renc&#233;es dans la liste des ID de r&#233;f&#233;rence. Ceci peut &#234;tre utile si certaines directives sont incompatibles avec certains m&#233;canismes de s&#233;curit&#233;.</p></dd>
+<dt>R&#233;f. d'ID de description pour : AuthenticateSessionContext</dt>
+<dd><p>Toutes les <a href="supporteddirectives.html">Directives prises en charge</a> peuvent contenir une r&#233;f&#233;rence descriptive. Si l'attribut R&#233;f. d'ID n'est pas activ&#233; pour une directive, la directive est appliqu&#233;e &#224; tous les m&#233;canismes d'authentification fournis dans l'offre de ressources. Si l'attribut R&#233;f. d'ID est activ&#233; pour une directive, il DOIT contenir la liste des ID de r&#233;f&#233;rence qui font r&#233;f&#233;rence au m&#233;canisme d'authentification auquel la directive est associ&#233;e. Si l'attribut est pr&#233;sent, la directive DOIT &#234;tre appliqu&#233;e uniquement aux descriptions r&#233;f&#233;renc&#233;es dans la liste des ID de r&#233;f&#233;rence. Ceci peut &#234;tre utile si certaines directives sont incompatibles avec certains m&#233;canismes de s&#233;curit&#233;.</p></dd>
+<dt>R&#233;f. d'ID de description pour : Autoriser le demandeur</dt>
+<dd><p>Toutes les <a href="supporteddirectives.html">Directives prises en charge</a> peuvent contenir une r&#233;f&#233;rence descriptive. Si l'attribut R&#233;f. d'ID n'est pas activ&#233; pour une directive, la directive est appliqu&#233;e &#224; tous les m&#233;canismes d'authentification fournis dans l'offre de ressources. Si l'attribut R&#233;f. d'ID est activ&#233; pour une directive, il DOIT contenir la liste des ID de r&#233;f&#233;rence qui font r&#233;f&#233;rence au m&#233;canisme d'authentification auquel la directive est associ&#233;e. Si l'attribut est pr&#233;sent, la directive DOIT &#234;tre appliqu&#233;e uniquement aux descriptions r&#233;f&#233;renc&#233;es dans la liste des ID de r&#233;f&#233;rence. Ceci peut &#234;tre utile si certaines directives sont incompatibles avec certains m&#233;canismes de s&#233;curit&#233;.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Enregistrer pour terminer la configuration.</b></li>
+<li><b>Cliquez sur Enregistrer dans la page du Service de d&#233;couverte pour terminer
+la configuration du service.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.sun.identity</groupId>
+	<artifactId>seraph-provider</artifactId>
+	<version>1.0.0</version>
+	<name>${pom.artifactId}</name>
+	<description>OpenSSO authenticator for Atlassian JIRA and Confluence</description>
+	<dependencies>
+		<dependency>
+			<groupId>com.atlassian.seraph</groupId>
+			<artifactId>atlassian-seraph</artifactId>
+			<version>0.38</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.confluence</groupId>
+			<artifactId>confluence</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.identity</groupId>
+			<artifactId>openssoclientsdk</artifactId>
+			<version>8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>atlassian-public</id>
+			<url>https://maven.atlassian.com/repository/public</url>
+			<snapshots><enabled>true</enabled></snapshots>
+			<releases><enabled>true</enabled></releases>
+		</repository>
+	</repositories>
+</project>

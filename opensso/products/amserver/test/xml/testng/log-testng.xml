@@ -1,0 +1,59 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+ 
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+ 
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+ 
+   $Id: log-testng.xml,v 1.2 2008/06/25 05:44:24 qcheng Exp $
+ 
+-->
+
+
+<suite name="OpenSSO_API_Log" verbose="1">
+    <parameter name="logtest-realm" value="/" />
+
+    <test name="Log_API_Write">
+        <parameter name="logtest-log-location" value="/export1/opensso/amserver/log" />
+        <parameter name="logtest-logname" value="amLogWriteTest" />
+        <parameter name="logwrite-data" value="Log record data1|and data2" />
+        <parameter name="logwrite-modulename" value="LogTestWrite" />
+        <parameter name="logwrite-domain" value="" />
+        <parameter name="logwrite-log-level" value="INFO" />
+        <parameter name="logwrite-login-id" value="" />
+        <parameter name="logwrite-ip-addr" value="" />
+        <parameter name="logwrite-host-name" value="" />
+        <parameter name="logwrite-message-id" value="MSG-ID-TestXX" />
+        <parameter name="logwrite-number-of-records" value="5" />
+        <groups>
+            <run>
+                <include name="api-adminwrite" />
+                <include name="api-adminread" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.log.AMLogTest"/>
+        </classes>
+    </test>
+
+</suite>
+

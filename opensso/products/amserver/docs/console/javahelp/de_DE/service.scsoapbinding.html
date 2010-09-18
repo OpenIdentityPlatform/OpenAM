@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP Binding-Dienst - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>SOAP Binding-Dienst</h3>
+<a name="indexterm-150"></a><p>Der SOAP Binding-Dienst  ist eine Transportschicht f&#252;r das Senden und Empfangen
+von SOAP-Nachrichten. Beim SOAP Binding-Dienst-Vorgang ruft ein Identity-Dienst die clientbasierte Anwendungsprogrammierschnittstelle auf,
+um eine Nachricht zu erstellen und diese und die SOAP-Endpunkt-URL, das SOAP-Empf&#228;nger-Servlet,
+zu senden. Das SOAP-Empf&#228;nger-Servlet empf&#228;ngt die Nachricht, &#252;berpr&#252;ft die Signatur und erstellte
+eine zweite Nachricht. Anschlie&#223;end ruft das SOAP-Empf&#228;nger-Servlet den jeweiligen Anfoderungs-Handler auf, um
+diese zweite Nachricht and den entsprechenden Identity-Dienst zu senden und eine Antwort
+anzufordern. Der Identity-Dienst verarbeitet die zweite Nachricht, erzeugt eine Antwort und sendet
+diese Antwort zur&#252;ck an das SOAP-Empf&#228;nger-Servlet. Der SOAP-Empf&#228;nger widerum sendet die Antwort
+zur Verarbeitung zur&#252;ck an den Identity-Dienst. </p><p>Folgende allgemeine  SOAP Binding-Dienst -Attribute k&#246;nnen f&#252;r eine Implementierung konfiguriert werden.</p>
+<ul><li><p><a href="requesthandlerlist.html">Anforderungs-Handler-Liste</a></p></li>
+<li><p><a href="ggodb.html">SOAP Binding-Attribute</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">So konfigurieren Sie einen Anforderungs-Handler</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

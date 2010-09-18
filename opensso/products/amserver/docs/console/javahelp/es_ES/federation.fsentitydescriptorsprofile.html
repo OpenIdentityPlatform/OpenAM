@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para modificar los atributos generales de una entidad de proveedores o una entidad de afiliaci&#243;n - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsprofile"></a><h4>Para modificar los atributos generales de una entidad de proveedores o una entidad de afiliaci&#243;n</h4><a name="indexterm-70"></a><a name="indexterm-71"></a><a name="indexterm-72"></a><p>Despu&#233;s de crear una entidad, puede editar su perfil. Esta tarea puede
+incluir la modificaci&#243;n de atributos, la adici&#243;n de proveedores de identidades y
+servicios, y la configuraci&#243;n de afiliaciones. La edici&#243;n de los atributos generales
+del perfil de una entidad puede llevar consigo la modificaci&#243;n de atributos
+comunes ya definidos, la adici&#243;n de una persona de contacto o la
+especificaci&#243;n opcional de informaci&#243;n organizativa. El siguiente procedimiento permite editar los atributos
+generales. El punto de partida es la pantalla Entidades en Federaci&#243;n.</p><ol>
+<li><b>Seleccione el nombre de una entidad configurada para modificar su perfil. </b><p>La p&#225;gina de atributos generales del perfil de identidad se muestra de
+forma predeterminada. Si no se encuentra en esta p&#225;gina, puede seleccionar General
+en el men&#250; Ver.</p></li>
+<li><b>Edite los valores de cualquiera de los atributos comunes de la entidad.</b><dl><dt>Nombre de entidad</dt>
+<dd><p>El valor est&#225;tico de este atributo es el nombre proporcionado al crear la entidad.</p></dd>
+<dt>Tipo</dt>
+<dd><p>El valor est&#225;tico de este atributo es el tipo de entidad, Proveedor o Afiliado.</p></dd>
+<dt>Descripci&#243;n</dt>
+<dd><p>El valor de este atributo es la descripci&#243;n proporcionada al crear la entidad. Puede modificar la descripci&#243;n introducida originalmente y agregar una si no hay ninguna.</p></dd>
+</dl>
+</li>
+<li><b>Proporcione valores para los atributos del perfil de persona de contacto de
+la entidad. </b><p>Estos atributos proporcionan informaci&#243;n sobre la persona con la que se debe
+poner en contacto en relaci&#243;n con la entidad. Son atributos opcionales.</p><dl><dt>Nombre</dt>
+<dd><p>Escriba el nombre espec&#237;fico de la persona de contacto de la entidad.</p></dd>
+<dt>Apellidos</dt>
+<dd><p>Escriba los apellidos de la persona de contacto de la entidad.</p></dd>
+<dt>Tipo</dt>
+<dd><p>Seleccione el tipo de contacto en el men&#250; desplegable.</p>
+<ul><li><p>Administrative (Administrativo)</p></li>
+<li><p>Billing (Facturaci&#243;n)</p></li>
+<li><p>Technical (T&#233;cnico)</p></li>
+<li><p>Otro</p></li></ul>
+</dd>
+<dt>Compa&#241;&#237;a</dt>
+<dd><p>Escriba el nombre de la compa&#241;&#237;a en la que trabaja esta persona.</p></dd>
+<dt>Id. principal de Liberty</dt>
+<dd><p>Escriba un identificador de recursos uniformes (URI) que se&#241;ale a una instancia del perfil de informaci&#243;n personal de la persona de contacto.</p></dd>
+<dt>Correos electr&#243;nicos</dt>
+<dd><p>Escriba una o varias direcciones de correo electr&#243;nico de la persona de contacto y haga clic en Agregar.</p></dd>
+<dt>N&#250;meros de tel&#233;fono</dt>
+<dd><p>Escriba uno o varios n&#250;meros de tel&#233;fono de la persona de contacto y haga clic en Agregar.</p></dd>
+</dl>
+</li>
+<li><b>Proporcione valores para los atributos de perfiles de organizaciones.</b><p>Los atributos de perfiles de organizaciones ofrecen informaci&#243;n b&#225;sica que puede ser
+necesaria al interactuar con un principal. Son atributos opcionales.</p>
+<hr><p><b>Nota &#8211; </b>Si el atributo Nombres contiene un valor, es necesario agregar valores a
+los atributos Nombres de visualizaci&#243;n y URL.</p>
+<hr>
+<dl><dt>Nombres</dt>
+<dd><p>Introduzca el nombre legal de la organizaci&#243;n de la entidad y haga clic en Agregar. El valor se define con el formato <i>locale</i>| <i>organization-name</i>. Por ejemplo, <tt>en</tt>| <tt> example.com</tt>.</p></dd>
+<dt>Nombres de visualizaci&#243;n</dt>
+<dd><p>Introduzca un nombre para la organizaci&#243;n de la entidad que sea adecuado para mostrarlo en un principal y haga clic en Agregar. El valor se define con el formato <i>locale</i>|<i>organization-display-name </i> . Por ejemplo, <tt>en</tt>|<tt>example.com</tt>. </p></dd>
+<dt>URL</dt>
+<dd><p>Introduzca la URL de la organizaci&#243;n y haga clic en Agregar. El valor se define con el formato <i>locale</i>|<i> organization-URL</i> . Por ejemplo, <tt>en</tt>|<tt> http://www.example.com</tt> .</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Guardar para completar la configuraci&#243;n o siga definiendo los
+valores del proveedor de identidades o de servicios, o los atributos de
+afiliados.</b><p>Si contin&#250;a con la configuraci&#243;n, consulte:</p><ul>
+<li><b><a href="federation.fsidentityprovider.html">Para agregar un proveedor de identidades a una entidad de proveedores</a> para definir los valores de los atributos del proveedor de identidades.</b></li>
+<li><b><a href="federation.fsserviceprovider.html">Para agregar un proveedor de servicios a una entidad de proveedores</a> para definir los valores de los atributos del proveedor de servicios.</b></li>
+<li><b><a href="federation.fsentitydescriptorsaffiliate.html">Para agregar miembros a una entidad de afiliaci&#243;n</a> para rellenar una entidad de afiliaci&#243;n con miembros.</b></li></ul></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para configurar un administrador de solicitudes - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggojs"></a><h5>Para configurar un administrador de solicitudes</h5>
+<a name="indexterm-200"></a><a name="indexterm-201"></a><p>La interfaz <tt>RequestHandler</tt> debe implementarse en el servidor por parte de cada
+servicio de identidad basado en Liberty que utilice el Servicio de enlace
+de SOAP. El atributo âLista de administradores de solicitudesâ guarda informaci&#243;n sobre
+las clases de implementaci&#243;n de los servicios Web que implementa el administrador
+de solicitudes. La lista de administradores de solicitudes muestra entradas que contienen
+pares clave-valor separados por una l&#237;nea vertical como en: <tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>.</p><ol>
+<li><b>Haga clic en Nuevo para ver los atributos del nuevo administrador de
+solicitudes o haga clic en un valor de clave configurado para modificar
+los atributos existentes.</b></li>
+<li><b>Proporcione los valores de los atributos seg&#250;n la siguiente informaci&#243;n:</b><dl><dt>key</dt>
+<dd><p>El par&#225;metro requerido es la &#250;ltima parte de la ruta del URI a un punto final de SOAP. El punto final de SOAP en Access Manager es el servlet del receptor de SOAP. El URI al receptor de SOAP es <tt><b></tt><i>protocol </i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt>. Si define <tt><b>disco</b></tt> como clave, la ruta del URI al punto final de SOAP para el Servicio de detecci&#243;n correspondiente ser&#225;: <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>. Distintos clientes de servicios utilizan distintas claves al conectarse al receptor de SOAP.</p></dd>
+<dt>class</dt>
+<dd><p>El par&#225;metro requerido especifica el nombre de la clase de implementaci&#243;n del administrador de solicitudes para un determinado servicio de identidades. Por ejemplo: <tt>class=com.example.identity.liberty.ws.disco.DiscoveryService </tt>.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Aceptar para completar la configuraci&#243;n del administrador de solicitudes.</b></li>
+<li><b>Haga clic en Guardar en la p&#225;gina del Servicio de enlace de
+SOAP para completar la configuraci&#243;n del servicio.</b></li></ol>
+<br/>
+
+</body>
+</html>

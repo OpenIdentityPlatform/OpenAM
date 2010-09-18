@@ -1,0 +1,347 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyCreateSAML2Entity.xml,v 1.3 2008/08/12 17:12:15 babysunil Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="sectionGeneral" defaultValue="samlv2.create.provider.title.general">
+        <property span="true">
+            <cc name="txtDesc"
+                tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue"
+                    value="samlv2.create.provider.desc" />
+            </cc>
+        </property>
+        <property required="true">
+            <label name="lblRealm" defaultValue="samlv2.create.provider.realm"
+                labelFor="singleChoiceRealm" />
+             <cc name="singleChoiceRealm"
+                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+        </property>
+        <property required="true">
+            <label name="lblEntityId"
+                defaultValue="samlv2.create.provider.entityId"
+                labelFor="tfEntityId" />
+            <cc name="tfEntityId" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionIDP" defaultValue="samlv2.create.provider.title.idp">
+        <property>
+            <label name="lblidentityprovider"
+                defaultValue="samlv2.create.provider.identityprovider"
+                labelFor="tfidentityprovider" />
+            <cc name="tfidentityprovider"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblidpscertalias"
+                defaultValue="samlv2.create.provider.idpscertalias"
+                labelFor="tfidpscertalias" />
+            <cc name="tfidpscertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblidpecertalias"
+                defaultValue="samlv2.create.provider.idpecertalias"
+                labelFor="tfidpecertalias" />
+            <cc name="tfidpecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionSP" defaultValue="samlv2.create.provider.title.sp">
+        <property>
+            <label name="lblserviceprovider"
+                defaultValue="samlv2.create.provider.serviceprovider"
+                labelFor="tfserviceprovider" />
+            <cc name="tfserviceprovider"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblspscertalias"
+                defaultValue="samlv2.create.provider.spscertalias"
+                labelFor="tfspscertalias" />
+            <cc name="tfspscertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblspecertalias"
+                defaultValue="samlv2.create.provider.specertalias"
+                labelFor="tfspecertalias" />
+            <cc name="tfspecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionAttrQueryProvider"
+        defaultValue="samlv2.create.provider.title.attr.query.provider">
+        <property>
+            <label name="lblattrqueryprovider"
+                defaultValue="samlv2.create.provider.attrqueryprovider"
+                labelFor="tfattrqueryprovider" />
+            <cc name="tfattrqueryprovider"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblattrqscertalias"
+                defaultValue="samlv2.create.provider.attrqscertalias"
+                labelFor="tfattrqscertalias" />
+            <cc name="tfattrqscertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblattrqecertalias"
+                defaultValue="samlv2.create.provider.attrqecertalias"
+                labelFor="tfattrqecertalias" />
+            <cc name="tfattrqecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionAttrAuthority"
+        defaultValue="samlv2.create.provider.title.attr.authority">
+        <property>
+            <label name="lblattrauthority"
+                defaultValue="samlv2.create.provider.attrauthority"
+                labelFor="tfattrauthority" />
+            <cc name="tfattrauthority"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblattrascertalias"
+                defaultValue="samlv2.create.provider.attrascertalias"
+                labelFor="tfattrascertalias" />
+            <cc name="tfattrascertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblattraecertalias"
+                defaultValue="samlv2.create.provider.attraecertalias"
+                labelFor="tfattraecertalias" />
+            <cc name="tfattraecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionAuthAuthority"
+        defaultValue="samlv2.create.provider.title.auth.authority">
+        <property>
+            <label name="lblauthnauthority"
+                defaultValue="samlv2.create.provider.authnauthority"
+                labelFor="tfauthnauthority" />
+            <cc name="tfauthnauthority"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblauthnascertalias"
+                defaultValue="samlv2.create.provider.authnascertalias"
+                labelFor="tfauthnascertalias" />
+            <cc name="tfauthnascertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblauthnaecertalias"
+                defaultValue="samlv2.create.provider.authnaecertalias"
+                labelFor="tfauthnaecertalias" />
+            <cc name="tfauthnaecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionXACMLPep"
+        defaultValue="samlv2.create.provider.title.xacml.pep">
+        <property>
+            <label name="lblxacmlpep"
+                defaultValue="samlv2.create.provider.xacmlpep"
+                labelFor="tfxacmlpep" />
+            <cc name="tfxacmlpep"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblxacmlpepscertalias"
+                defaultValue="samlv2.create.provider.xacmlpepscertalias"
+                labelFor="tfxacmlpepscertalias" />
+            <cc name="tfxacmlpepscertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblxacmlpepecertalias"
+                defaultValue="samlv2.create.provider.xacmlpepecertalias"
+                labelFor="tfxacmlpepecertalias" />
+            <cc name="tfxacmlpepecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionXACMLPdp"
+        defaultValue="samlv2.create.provider.title.xacml.pdp">
+        <property>
+            <label name="lblxacmlpdp"
+                defaultValue="samlv2.create.provider.xacmlpdp"
+                labelFor="tfxacmlpdp" />
+            <cc name="tfxacmlpdp"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblxacmlpdpscertalias"
+                defaultValue="samlv2.create.provider.xacmlpdpscertalias"
+                labelFor="tfxacmlpdpscertalias" />
+            <cc name="tfxacmlpdpscertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblxacmlpdpecertalias"
+                defaultValue="samlv2.create.provider.xacmlpdpecertalias"
+                labelFor="tfxacmlpdpecertalias" />
+            <cc name="tfxacmlpdpecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="sectionAffiliation"
+        defaultValue="samlv2.create.provider.title.affiliation">
+        <property>
+            <label name="lblaffiliation"
+                defaultValue="samlv2.create.provider.affiliation"
+                labelFor="tfaffiliation" />
+            <cc name="tfaffiliation"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblaffiscertalias"
+                defaultValue="samlv2.create.provider.affiscertalias"
+                labelFor="tfaffiscertalias" />
+            <cc name="tfaffiscertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblaffiecertalias"
+                defaultValue="samlv2.create.provider.affiecertalias"
+                labelFor="tfaffiecertalias" />
+            <cc name="tfaffiecertalias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblaffilownerid"
+                defaultValue="samlv2.create.provider.affilownerid"
+                labelFor="affiOwnerID" />
+            <cc name="affiOwnerID"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblaffimembers" defaultValue="samlv2.create.provider.affimembers" />
+            <cc name="affimembers" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpaffimembers"
+                defaultValue="samlv2.create.provider.help.affimembers" />
+        </property>
+    </section>
+</propertysheet>

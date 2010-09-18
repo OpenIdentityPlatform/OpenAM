@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: referral-manage-view-options-popup.xhtml,v 1.1 2009/06/23 18:05:31 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:popup
+        width="300"
+        type="question"
+        closeImmediate="false"
+        handler="#{referralManageHandler}"
+        title="View Options"
+        visible="#{referralManageBean.viewOptionsPopupVisible}"
+        closeListenerMethod="viewOptionsPopupCancelListener">
+        <ui:define name="body">
+            <ice:panelGroup
+                style="text-align: left; padding-bottom: 10px">
+                <ice:outputFormat
+                    escape="false"
+                    value="#{resources['referral-manage-view-options-popup.columns.info']}"/>
+            </ice:panelGroup>
+            <ice:panelGroup>
+                <ice:selectManyCheckbox
+                    id="columns-visible"
+                    layout="spread"
+                    rendered="#{referralManageBean.viewOptionsPopupVisible}"
+                    partialSubmit="false"
+                    value="#{referralManageBean.viewOptionsPopupColumnsVisible}">
+                    <f:selectItem
+                        itemValue="description"
+                        itemLabel="#{resources['referral-manage-view-options-popup.description']}"/>
+                    <f:selectItem 
+                        itemValue="author"
+                        itemLabel="#{resources['referral-manage-view-options-popup.author']}"/>
+                    <f:selectItem 
+                        itemValue="birth"
+                        itemLabel="#{resources['referral-manage-view-options-popup.birth']}"/>
+                    <f:selectItem 
+                        itemValue="modifier"
+                        itemLabel="#{resources['referral-manage-view-options-popup.modifier']}"/>
+                    <f:selectItem 
+                        itemValue="modified"
+                        itemLabel="#{resources['referral-manage-view-options-popup.modified']}"/>
+                    <f:selectItem 
+                        itemValue="resources"
+                        itemLabel="#{resources['referral-manage-view-options-popup.resources']}"/>
+                    <f:selectItem 
+                        itemValue="subjects"
+                        itemLabel="#{resources['referral-manage-view-options-popup.subjects']}"/>
+                </ice:selectManyCheckbox>
+                <ice:panelGrid
+                    columns="2"
+                    styleClass="view-options-table">
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="0"/>
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="1"/>
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="2"/>
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="3"/>
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="4"/>
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="5"/>
+                    <ice:checkbox 
+                        for="columns-visible"
+                        index="6"/>
+                </ice:panelGrid>
+            </ice:panelGroup>
+            <ice:panelGroup>
+                <ice:panelGroup
+                    style="text-align: left; padding-bottom: 10px;">
+                    <ice:outputFormat
+                        escape="false"
+                        value="#{resources['referral-manage-view-options-popup.rows.info']}"/>
+                </ice:panelGroup>
+                <ice:panelGrid
+                    columns="2">
+                    <ice:outputLabel
+                        for="referral-manage-rows"
+                        value="Policies per page"/>
+                    <ice:inputText
+                        id="referral-manage-rows"
+                        size="3"
+                        value="#{referralManageBean.viewOptionsPopupRows}"/>
+                </ice:panelGrid>
+            </ice:panelGroup>
+            <ice:panelGrid
+                styleClass="button-group"
+                columns="2">
+                <o:button
+                    type="cancel"
+                    handler="#{referralManageHandler}"
+                    listenerMethod="viewOptionsPopupCancelListener"/>
+                <o:button
+                    type="ok"
+                    handler="#{referralManageHandler}"
+                    listenerMethod="viewOptionsPopupOkListener">
+                    <ui:define name="attributes">
+                    </ui:define>
+                </o:button>
+            </ice:panelGrid>
+
+        </ui:define>
+    </o:popup>
+</span>

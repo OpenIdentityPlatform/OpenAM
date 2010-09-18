@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen oder &#228;ndern Sie einen Agenten - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>So erstellen oder &#228;ndern Sie einen Agenten</h5>
+<ol>
+<li><b>Klicken Sie auf die Registerkarte "Agenten".</b></li>
+<li><b>Klicken Sie auf "Neu".</b></li>
+<li><b>Geben Sie in den folgenden Feldern Werte ein.</b><p><b>Name:</b>  Geben Sie den Namen oder die Identit&#228;t des Agenten ein.
+Mit diesem Namen meldet sich der Agent bei Federated Access Manager an.
+Multi-Byte-Namen werden nicht unterst&#252;tzt.</p><p><b>Password:</b>  Geben Sie das Agentenpasswort ein. Dieses Passwort muss sich von
+dem Passwort unterscheiden, das der Agent f&#252;r die LDAP-Authentifizierung verwendet.</p><p><b>Passwort best&#228;tigen </b>.  Best&#228;tigen Sie das Passwort.</p><p><b>Ger&#228;testatus.</b>  Geben Sie den Ger&#228;testatus des Agenten ein. Bei Einstellung auf
+"Aktiv" wird dem Agenten die Authentifizierung und Kommunikation mit Federated Access Manager
+erm&#246;glicht. Bei Einstellung auf "Inaktiv" kann sich der Agent nicht bei Federated
+Access Manager authentifizieren.</p></li>
+<li><b>Klicken Sie auf &#8222;OK&#8220;.</b></li>
+<li><b>Nachdem Sie den Agenten erstellt haben, k&#246;nnen Sie zus&#228;tzlich die folgenden Felder
+bearbeiten:</b><p><b>Description:</b>  Geben Sie eine kurze Beschreibung des Agenten ein. Sie k&#246;nnen
+beispielsweise den Instanzennamen des Agenten oder den Namen der Anwendung eingeben, die
+dieser sch&#252;tzt.</p><p><b>Agent-Schl&#252;sselwert.</b>  Legen Sie die Agenteneigenschaften &#252;ber ein Schl&#252;ssel/Wert-Paar fest. Diese Eigenschaft
+verwendet Federated Access Manager f&#252;r den Empfang von Agentenanforderungen f&#252;r Benutzerberechtigungsbest&#228;tigungen. Gegenw&#228;rtig
+ist nur eine Eigenschaft g&#252;ltig. Alle anderen werden ignoriert. Verwenden Sie die
+folgende Syntax:</p><p><tt></tt><i> agentRootURL</i><tt>=http://</tt><i>server_name:port</i><tt>/ </tt></p></li></ol>
+<br/>
+
+</body>
+</html>

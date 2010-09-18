@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Session - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>Session</h4>
+<p>The session attributes allow you to configure session information for a additional site
+and server instances.</p>
+
+<a name="ggkab"></a><h5>Session Limits</h5>
+<p>The following attributes set server session limits:</p>
+
+<a name="ggkat"></a><h5>Maximum Sessions</h5>
+<p>Default value is 5000. Specify the maximum number of allowable concurrent sessions. 
+Login sends a Maximum Sessions error if the maximum concurrent sessions value exceeds
+this number.</p>
+
+<a name="ggkac"></a><h5>Invalidate Session Max Time</h5>
+<p>Default value is 10. Specifies the number of minutes after which the invalid
+session will be removed from the session table if it is created and
+the user does not login. This value should always be greater than the
+timeout value in the Authentication module properties file.</p>
+
+<a name="ggkaf"></a><h5>Session Purge Delay</h5>
+<p>Default value is 60. Specifies the number of minutes to delay the purge
+session operation.  After a session times out, this is an extended time
+period during which the session continues to reside in the session server. This
+property is used by the client application to check if the session has
+timed out through SSO APIs. At the end of this extended time period,
+the session is destroyed. The session is not sustained during the extended time
+period if the user logs out or if the session is explicitly destroyed
+by an OpenSSO component. The session is in the INVALID state during this
+extended period.</p>
+
+<a name="ggkbl"></a><h5>Statistics</h5>
+<p>The following attributes set statistical configuration:</p>
+
+<a name="ggkbf"></a><h5>Logging Interval</h5>
+<p>Default value is 60. Specifies number of minutes to elapse between statistics logging.
+Minimum is 5 seconds to avoid CPU saturation. OpenSSO assumes any value less
+than 5 seconds to be 5 seconds.</p>
+
+<a name="ggkbn"></a><h5>State</h5>
+<p>Default value is file. Specifies location of statistics log. Possible values are: 
+</p>
+<ul><li><p>off &#8212; No statistics are logged.</p></li>
+<li><p>file &#8212; Statistics are written to a file under the specified directory.</p></li>
+<li><p>console &#8212; Statistics are written into Web Server log files.</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>Directory</h5>
+<p>Value is set during installation. Example: <tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server-URI</i><tt>/stats</tt>. Specifies directory where debug files are
+created.</p>
+
+<a name="ggkca"></a><h5>Enable Host Lookup</h5>
+<p>Default value is false. Enables or disables host lookup during session logging.</p>
+
+<a name="ggkas"></a><h5>Notification</h5>
+<p>The following attributes set notification configuration:</p>
+
+<a name="ggkbz"></a><h5>Notification Pool Size</h5>
+<p>Default value is 10. Defines the size of the pool by specifying the
+total number of threads.</p>
+
+<a name="ggkao"></a><h5>Notification Thread Pool Threshold</h5>
+<p>Default value is 100. Specifies the maximum task queue length.  When a
+notification task comes in, it is sent to the task queue for processing.
+If the queue reaches the maximum length, further incoming requests will be rejected
+along with a <tt>ThreadPoolException</tt>, until the queue has a vacancy.</p>
+
+<a name="ggkar"></a><h5>Validation</h5>
+<p>The following attribute sets validation configuration:</p>
+
+<a name="ggkcg"></a><h5>Case Insensitive Client DN Comparison</h5>
+<p>Default value is true. Compares the Agent DN. If the value is false,
+the comparison is case-sensitive. </p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Method naming</TITLE>
+<META NAME="description" CONTENT="Method naming">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node6.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html139"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html137"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html133"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html140"
+  HREF="node11.html">White Space Usage</A>
+<B> Up:</B> <A NAME="tex2html138"
+  HREF="node6.html">Naming Convention</A>
+<B> Previous:</B> <A NAME="tex2html134"
+  HREF="node9.html">Field Naming</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00034000000000000000">
+Method naming</A>
+</H2>
+
+<P>
+Method name should use the infixCaps style. Start with a lower-case letter, and capitalize the first letter of any subsequent word in the name, as well as any letters that are part of an acronym. All other characters in the name are lower-case. Do not use underscores to separate words. Note that this is identical to the naming convention for non-constant fields; however, it should always be easy to distinguish the two from context. Method names should be verbs or verb phrases. Examples:
+
+<P>
+<PRE>
+    // GOOD method names:
+    showStatus(),
+    drawCircle(),
+    addLayoutComponent()
+
+    // BAD method names:
+    mouseButton()          // noun phrase; doesn't describe function
+    DrawCircle()           // starts with upper-case letter
+    add_layout_component() //underscores
+</PRE>
+
+<P>
+A method to get or set some property of the class should be called getProperty() or setProperty() respectively, where Property is the name of the property. Examples:
+
+<P>
+<PRE>
+    getHeight()
+    setHeight()
+</PRE>
+
+<P>
+A method to test some boolean property of the class should be called isProperty(), where Property is the name of the property. Examples:
+<PRE>
+    isResizable()
+    isVisible()
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

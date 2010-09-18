@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>共通連携設定 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamfederationcommon"></a><h4>共通連携設定</h4>
+
+
+<a name="ggoir"></a><h5>データストア SPI 実装クラス</h5>
+<p>この属性は、デフォルトのデータストアプロバイダの実装クラスを指定します。</p>
+
+<a name="ggogw"></a><h5>構成インスタンス SPI 実装クラス</h5>
+<p>この属性は、構成データを管理するための実装クラスを指定します。</p>
+
+<a name="ggofp"></a><h5>ロガー SPI 実装クラス</h5>
+<p>この属性は、ログプロバイダの実装クラスを指定します。</p>
+
+<a name="ggofy"></a><h5>セッションプロバイダ SPI 実装クラス</h5>
+<p>この属性は、セッションプロバイダの実装クラスを指定します。</p>
+
+<a name="ggogv"></a><h5>許可されるコンテンツ最大長</h5>
+<p>この属性は、連携サービスで使用される HTTP 要求の許可されるコンテンツ最大長を指定します。要求のコンテンツ長が指定されたコンテンツ最大長を超える場合、その要求は拒否されます。</p>
+
+<a name="ggogu"></a><h5>パスワードデコーダ SPI 実装クラス</h5>
+<p>この属性は、<tt>com.sun.identity.saml.xmlsig.PasswordDecoder</tt> インタフェースの実装クラスを指定します。このインタフェースは、XML 署名キーストア用の保存されたパスワードと SAML 1.x の基本認証用のパスワードの復号化に使用されます。</p>
+
+<a name="ggohx"></a><h5>署名プロバイダ SPI 実装クラス</h5>
+<p>この属性は、SAML XML 署名プロバイダクラスを指定します。デフォルトの SPI は <tt>com.sun.identity.saml.xmlsig.AMSignatureProvider</tt> です。</p>
+
+<a name="ggohm"></a><h5>キープロバイダ SPI 実装クラス</h5>
+<p>この属性は、XML 署名キープロバイダクラスを指定します。デフォルトの SPI は <tt>com.sun.identity.saml.xmlsig.JKSKeyProvider</tt> です。</p>
+
+<a name="ggofo"></a><h5>証明書の存在を確認する</h5>
+<p><tt>on</tt> に設定した場合、XML 署名検証のための証明書がキーストアに存在する必要があります。<tt>off</tt> に設定した場合、証明書の存在チェックはスキップされます。これは、SMAL 1.x にのみ適用されます。</p>
+
+<a name="ggohn"></a><h5>XML 正規化アルゴリズム</h5>
+<p>この属性は、SAML XML 署名の生成および検証に使用する XML 正規化アルゴリズムを指定します。デフォルト値は <tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt> です。</p>
+
+<a name="ggohp"></a><h5>XML 署名アルゴリズム</h5>
+<p>この属性は、SAML XML 署名の生成および検証に使用する XML 署名アルゴリズムを指定します。指定されていない場合または値が空の場合は、デフォルト値 (<tt>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tt>) が使用されます。</p>
+
+<a name="ggoie"></a><h5>XML 変換アルゴリズム</h5>
+<p>この属性は、SAML XML 署名の生成および検証に使用する変換アルゴリズムを指定します。指定されていない場合または値が空の場合は、デフォルト値 (<tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>) が使用されます。</p>
+<br/>
+
+</body>
+</html>

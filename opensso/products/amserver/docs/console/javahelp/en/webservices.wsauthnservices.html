@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Authentication Web Service - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>Authentication Web Service</h3>
+<a name="indexterm-159"></a><p>The Authentication Web Service defines how to perform authentication using SOAP. The exchange
+of authentication information between a web service consumer (WSC) and the web service
+provider (WSP) is accomplished using SOAP-bound messages. The messages are a series of
+client requests and server responses specific to the defined Simple Authentication and Security Layer
+(SASL) mechanism (or mode of authentication). After receiving a request for authentication (or
+any response from the WSC), the WSP may issue additional challenges, or indicate
+authentication failure or success. The Authentication Web Service is for service-to-service (non-user) authentication. The
+following steps detail the sequence between the WSC and the Authentication Web
+Service (a WSP).</p>
+<ol><li><p>The authentication exchange begins with a WSC sending an SASL authentication request to the Authentication Web Service on behalf of a principal.</p><p>The request message contains an identifier for the principal and indicates one or more SASL mechanisms from which the service can choose.</p></li>
+<li><p>The Authentication Web Service responds by asserting the method to use and, if applicable, initiating a challenge.</p><p> If the Authentication Web Service does not support any of the cited methods, it responds by aborting the exchange. </p></li>
+<li><p>The WSC responds with the necessary credentials for the chosen method of authentication.</p></li>
+<li><p>The Authentication Web Service replies by approving or disproving the authentication.</p><p> If approved, the response includes the credentials the WSC needs to invoke other web services (like the Discovery Service). </p></li></ol>
+<p>The following Authentication Web Service global attributes can be configured for your implementation.</p>
+<ul><li><p><a href="mechanismhandlerslist.html">Mechanism Handlers List</a></p></li>
+<li><p>Challenge Cleanup Interval &#8212; This specifies cleanup interval (in seconds) in the default CRAM-MD5 mechanism handler implementation class <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler</tt>. The internal thread will start to cleanup the challenge map based on this value.</p></li>
+<li><p>Transform Classes &#8212; This specifies the transform name to the implementation class mapping. Values are comma separated with "|" as delimiter for the transform name and implementation class name. For example, <tt>name1|class1, name2|class2</tt>.</p></li></ul>
+<p>The following task is associated with configuring the Authentication Web Service:</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">To Configure a New Mechanism Handler</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

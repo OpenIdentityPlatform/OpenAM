@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>支援的指令 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>支援的指令</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>此屬性可讓您為資源指定策略相關指令。如果服務提供者想要使用不支援的指令，請求將失敗。下表詳述可用的選項。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>指令</p></th>
+<th align="left" valign="top" scope="column"><p>目的</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>探索服務應該在其回應中包括 SAML 指定 (包含 <tt>AuthenticationStatement</tt>)，以讓用戶端認證到代管資源之服務實例。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>探索服務應該在其指出階段作業狀態的回應中包括 SAML 指定 (包含 <tt>SessionContextStatement</tt>)。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p>探索服務應該在其指出是否允許用戶端存取資源的回應中包括 SAML 指定 (包含
+<tt>ResourceAccessStatement</tt>)。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>探索服務應該加密資源識別碼以回應所有用戶端。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>若要與 Bearer 記號認證搭配使用，探索服務應該產生一個記號，授予 Bearer 存取資源的權限。</p></td>
+</tr>
+</table>
+<hr><p><b>注意 &#8211; </b><tt>AuthorizeRequestor</tt> 與 <tt>EncryptResourceID</tt> 指令不能一起使用。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

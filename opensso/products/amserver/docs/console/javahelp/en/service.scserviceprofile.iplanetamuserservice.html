@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>User - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamuserservice"></a><h4>User</h4>
+<p><a name="indexterm-198"></a>The default user preferences are defined through the user service. These include time
+zone, locale and DN starting view. The User service attributes are dynamic attributes.</p>
+<ul><li><p><a href="#fxckn">User Preferred Language</a></p></li>
+<li><p><a href="#fxcnb">User Preferred Timezone</a></p></li>
+<li><p><a href="#fxcte">Inherited Locale</a></p></li>
+<li><p><a href="#fxcpk">Administrator Starting View</a></p></li>
+<li><p><a href="#fxciz">Default User Status</a></p></li></ul>
+
+
+<a name="fxckn"></a><h5>User Preferred Language</h5>
+<p>This field specifies the user's choice for the text language displayed in the
+OpenSSO console. The default value is en. This value maps a set of
+localization keys to the user session so that the on-screen text appears in
+a language appropriate for the user.</p>
+
+<a name="fxcnb"></a><h5>User Preferred Timezone</h5>
+<p>This field specifies the time zone in which the user accesses the OpenSSO
+console. There is no default value.</p>
+
+<a name="fxcte"></a><h5>Inherited Locale</h5>
+<p>This field specifies the locale for the user. The default value is en_US.
+See <a href="supportedlang.html">Supported Language Locales</a> for a list of locales.</p>
+
+<a name="fxcpk"></a><h5>Administrator Starting View</h5>
+<p>If this user is a OpenSSO administrator, this field specifies the node that
+would be the starting point displayed in the OpenSSO console when this user
+logs in. There is no default value. A valid DN for which the
+user has, at the least, read access can be used.</p>
+
+<a name="fxciz"></a><h5>Default User Status</h5>
+<p>This option indicates the default status for any newly created user. This status
+is superseded by the User Entry status. Only active users can authenticate through
+OpenSSO. The default value is Active. Either of the following can be selected
+from the pull-down menu:</p><dl><dt>Active</dt>
+<dd><p>The user can authenticate through OpenSSO.</p></dd>
+<dt>Inactive</dt>
+<dd><p>The user cannot authenticate through OpenSSO, but the user profile remains stored in the directory.</p></dd>
+</dl>
+<p>The individual user status is set by registering the User service, choosing the
+value, applying it to a role and adding the role to the user's
+profile.</p>
+<br/>
+
+</body>
+</html>

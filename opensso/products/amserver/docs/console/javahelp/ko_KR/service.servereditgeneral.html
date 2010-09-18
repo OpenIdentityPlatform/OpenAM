@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>일반 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>일반</h4>
+<p>일반 속성은 중앙 집중화된 서버 관리를 위한 기본 구성 데이터를 구성합니다.</p>
+
+<a name="ggjyg"></a><h5>사이트 속성</h5>
+<p>사이트 속성은 다음과 같습니다.</p>
+
+<a name="ggjxc"></a><h5>상위 사이트</h5>
+<p>이 속성은 로드 밸런서 사이트 이름(사이트 아이디)을 OpenSSO 서버에 매핑합니다. 사이트를 추가하기
+전에 먼저 사이트를 만들어야 합니다. </p>
+
+<a name="ggjwl"></a><h5>시스템 속성</h5>
+<p>시스템 속성은 서버 인스턴스의 위치 정보를 나열합니다.</p>
+
+<a name="ggjyj"></a><h5>기본 설치 디렉토리</h5>
+<p>제품 데이터가 있는 기본 디렉토리를 지정합니다. </p>
+
+<a name="ggjxz"></a><h5>기본 로켈</h5>
+<p>로켈 값은 OpenSSO를 설치할 때 사용한 기본 언어 하위 유형입니다. 기본값은 <tt>en_us</tt>입니다.</p>
+
+<a name="ggjwq"></a><h5>알림 URL</h5>
+<p>알림 서비스 엔드포인트의 위치입니다. 이 값은 설치 중에 설정됩니다.</p>
+
+<a name="ggjzq"></a><h5>XML 유효성 검사</h5>
+<p>기본값은 no입니다. OpenSSO <tt>XMLUtils</tt> 클래스를 사용하여 XML 문서를 구문 분석할 때 유효성을
+검사해야 할지 여부를 결정합니다. 이 등록 정보는 [디버그 수준] 속성 값이 경고
+또는 메시지로 설정된 경우에만 유효합니다. 허용되는 값은  yes 및 no입니다. XML
+문서 유효성 검사는 이 등록 정보 값이 yes이고 [디버그 수준] 속성 값이
+경고 또는 메시지로 설정된 경우에만 설정됩니다. </p>
+
+<a name="ggjzy"></a><h5>디버깅 속성</h5>
+<p>디버깅 속성은 기본 오류 검사 정보를 나열합니다.</p>
+
+<a name="ggjzc"></a><h5>디버그 수준</h5>
+<p>디버그 수준을 지정합니다. 기본값은 오류입니다. 사용 가능한 값은 다음과 같습니다.</p>
+<ul><li><p>해제 &#8212; 디버그 파일을 만들지 않습니다.</p></li>
+<li><p>오류 &#8212; 오류 메시지만 기록합니다.</p></li>
+<li><p>경고 &#8212; 경고 메시지만 기록합니다.</p></li>
+<li><p>메시지 &#8212; 오류, 경고 및 정보 메시지를 기록합니다.</p></li></ul>
+
+
+<a name="ggjze"></a><h5>디버그 디렉토리</h5>
+<p>디버그 파일을 만들 출력 디렉토리를 지정합니다. 이 값은 설치 중에 설정됩니다. 예:
+<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>debug_URI</i><tt>/debug</tt></p>
+
+<a name="ggjwr"></a><h5>메일 서버</h5>
+<p>메일 서버 속성은 메일 서버의 호스트 이름과 포트를 나열합니다.</p>
+
+<a name="ggkax"></a><h5>메일 서버 호스트 이름</h5>
+<p>기본값은 <tt>localhost</tt>입니다. 메일 서버 호스트를 지정합니다.</p>
+
+<a name="ggkbx"></a><h5>메일 서버 포트 번호</h5>
+<p>기본값은 25이며 메일 서버 포트를 지정합니다.</p>
+<br/>
+
+</body>
+</html>

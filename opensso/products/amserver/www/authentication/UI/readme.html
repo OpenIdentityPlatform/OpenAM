@@ -1,0 +1,79 @@
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: readme.html,v 1.2 2008/06/25 05:44:31 qcheng Exp $
+
+-->
+
+
+
+
+
+<html>
+<head>
+<title>Readme</title>
+</head>
+
+<body>
+
+<p align="center"><b><font face="Arial">Readme.html</font></b></p>
+<p align="left">Instructions on how to write <b>authentication module specific JSP templates
+</b> as required in the module properties XML file.</p>
+<p align="left">After you copy the 'module_template.jsp (sample JSP file) from
+/&lt;dsame_install_dir&gt;/SUNWam/web-apps/services/config/auth/default to write your own module specific
+template JSP, you need to do following things :</p>
+<p align="left">1) Change &lt;%@page info="Module Template Page".... to give your template
+specific page name.<br>
+2) Change &lt;TITLE>Module Template Page&lt;/TITLE>.... to display your template specific title.<br>
+3) Change 'charset' to the appropriate one in &lt;%@ page contentType="text/html; charset=ISO-8859-1" %></p>
+<p align="left">In<br>
+    &lt;td><br>
+        &lt;p>&lt;B>Your static message goes here...&lt;/B>&lt;/p><br>
+<br>
+        &lt;p>&lt;a href="/amserver/UI/Login?Login.Href=10345">&lt;%=<br>
+viewBean.rb.getString("gotoLoginAfterFail") %>&lt;/a>&lt;/p><br>
+<br>
+        &lt;p><br>
+            &lt;input type="submit" name="Login.ButtonLogin" value="&lt;%=<br>
+viewBean.rb.getString("&lt;your button1>") %>"><br>
+            &lt;input type="submit" name="Login.ButtonLogin" value="&lt;%=<br>
+viewBean.rb.getString("&lt;your button2>") %>"><br>
+<br>
+            &lt;input type="submit" name="Login.ButtonLogin" value="&lt;%=<br>
+viewBean.rb.getString("&lt;your buttonN>") %>"><br>
+        &lt;/p><br>
+    &lt;/td><br>
+block,<br>
+<br>
+4) Change "Your static message goes here..." to display your template specific message.<br>
+5) Keep &lt;p>.... href......&lt;/p>  if you need as it is or remove it.<br>
+6) Keep &lt;p>.... buttons......&lt;/p> if you need or remove it.<br>
+7) Change "&lt;your button1...N&gt;&quot; strings with your button value localized keys
+from the '/&lt;dsame_install_dir&gt;/SUNWam/locale/en_US/amAuthUI.properties' file ( first add all those required
+'keys' and 'values' in this file ).</p>
+
+</body>
+
+</html>

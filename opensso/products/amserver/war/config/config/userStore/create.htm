@@ -1,0 +1,200 @@
+<script type="text/javascript">
+    /*Windows pop up Upgrade options*/
+    YAHOO.namespace("sun.container");
+
+    var pageURI = "$context/config/userStore/create.htm";
+    var DOM = YAHOO.util.Dom;
+
+    var userStoreNameValid = false;
+    var userHostNameValid = false;
+    var userHostPortValid = true;
+    var userLoginValid = false;
+    var userPasswordValid = false;
+    var userBaseDNValid = false;
+
+
+    function init() {
+        AjaxUtils.load('confirmation', '$context/config/userStore/adding.htm');
+        YAHOO.sun.container.confirmation = new YAHOO.widget.Panel("confirmation", { width:"320px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
+        YAHOO.sun.container.confirmation.render();
+
+        AjaxUtils.load('status', '$context/config/userStore/added.htm');
+        YAHOO.sun.container.status = new YAHOO.widget.Panel("status", { width:"500px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true });
+        YAHOO.sun.container.status.render();
+
+        DOM.get("addStoreButton").disabled = true;
+    }
+
+    YAHOO.util.Event.onDOMReady(init);
+
+    function AddUserStore() {
+        AjaxUtils.doPost("container", "$context/config/userStore/create.htm", AjaxUtils.serializeForm("userStoreForm"), AfterAddUserStore, null);
+    }
+
+    function AfterAddUserStore() {
+        YAHOO.sun.container.confirmation.show();
+        setTimeout("YAHOO.sun.container.confirmation.hide()", 1250);
+        setTimeout("YAHOO.sun.container.status.show()", 1250);
+    }
+
+    function Cancel() {
+        document.location = "$context/config/commonTasks.htm";
+    }
+
+    function validateUserStoreName() {
+        var callUrl = pageURI + "?actionLink=validateStoreName&storeName=" + DOM.get("user_storeName").value;
+        AjaxUtils.call(callUrl, userStoreNameValidated);
+    }
+
+    function validateUserHostName() {
+        var callUrl = pageURI + "?actionLink=validateHost&hostName=" + DOM.get("user_hostName").value;
+        AjaxUtils.call(callUrl, userHostNameValidated);
+    }
+
+    function validateUserHostPort() {
+        var callUrl = pageURI + "?actionLink=validatePort&hostPort=" + DOM.get("user_hostPort").value;
+        AjaxUtils.call(callUrl, userHostPortValidated);
+    }
+
+    function validateUserLogin() {
+        var callUrl = pageURI + "?actionLink=validateLogin&login=" + DOM.get("user_login").value;
+        AjaxUtils.call(callUrl, userLoginValidated);
+    }
+
+    function validateUserPassword() {
+        var callUrl = pageURI + "?actionLink=validatePassword&password=" + DOM.get("user_password").value;
+        AjaxUtils.call(callUrl, userPasswordValidated);
+    }
+
+    function validateUserBaseDN() {
+        var callUrl = pageURI + "?actionLink=validateBaseDN&baseDN=" + DOM.get("user_baseDN").value;
+        AjaxUtils.call(callUrl, userBaseDNValidated);
+    }
+
+    function userStoreNameValidated(response) {
+        userStoreNameValid = (response.responseText == "true");
+        if (userStoreNameValid) {
+            DOM.get("user_storeNameStatus").innerHTML = "<img class='hand' src='$context/assets/images/check_true.JPG'>&nbsp;<small>Store name provided</small>";
+       }
+        else {
+            DOM.get("user_storeNameStatus").innerHTML = "<small>" + response.responseText + "</small>";
+        }
+        adjustAddStoreButton();
+    }
+
+    function userHostNameValidated(response) {
+        userHostNameValid = (response.responseText == "true");
+        if (userHostNameValid) {
+            DOM.get("user_hostNameStatus").innerHTML = "<img class='hand' src='$context/assets/images/check_true.JPG'>&nbsp;<small>Located Directory</small>";
+       }
+        else {
+            DOM.get("user_hostNameStatus").innerHTML = "<small>" + response.responseText + "</small>";
+        }
+        adjustAddStoreButton();
+    }
+
+    function userHostPortValidated(response) {
+        userHostPortValid = (response.responseText == "true");
+        if (userHostPortValid) {
+            DOM.get("user_hostPortStatus").innerHTML = "";
+       }
+        else {
+            DOM.get("user_hostPortStatus").innerHTML = "<small>" + response.responseText + "</small>";
+        }
+        adjustAddStoreButton();
+    }
+
+    function userLoginValidated(response) {
+        userLoginValid = (response.responseText == "true");
+        if (userLoginValid) {
+            DOM.get("user_loginStatus").innerHTML = "<img class='hand' src='$context/assets/images/check_true.JPG'>&nbsp;<small>Logged in</small>";
+       }
+        else {
+            DOM.get("user_loginStatus").innerHTML = "<small>" + response.responseText + "</small>";
+        }
+        adjustAddStoreButton();
+    }
+
+    function userPasswordValidated(response) {
+        userPasswordValid = (response.responseText == "true");
+        if (userPasswordValid) {
+            DOM.get("user_passwordStatus").innerHTML = "";
+       }
+        else {
+            DOM.get("user_passwordStatus").innerHTML = "<small>" + response.responseText + "</small>";
+        }
+        adjustAddStoreButton();
+    }
+
+    function userBaseDNValidated(response) {
+        userBaseDNValid = (response.responseText == "true");
+        if (userBaseDNValid) {
+            DOM.get("user_baseDNStatus").innerHTML = "<img alt='info' class='hand' src='$context/assets/images/check_true.JPG'>&nbsp;<small>Located Base DN</small><br/>";
+       }
+        else {
+            DOM.get("user_baseDNStatus").innerHTML = "<small>" + response.responseText + "</small>";
+        }
+        adjustAddStoreButton();
+    }
+
+    function adjustAddStoreButton() {
+        var allValid = (userStoreNameValid && userHostNameValid  && userHostPortValid
+                        && userLoginValid && userPasswordValid && userBaseDNValid);
+        DOM.get("addStoreButton").disabled = !allValid;
+    }
+
+</script>
+<div id="mainPanel" align="center">
+	<div id="createPanel" class="createpanel" style="width:550px">
+		<form id="userStoreForm" >
+			<br />
+			<div class="bodywhite">
+				<h2>$page.getLocalizedString("configuration.userStore.create.title")</h2>
+				<small>$page.getLocalizedString("configuration.userStore.create.comment")</small>
+			</div>
+			<div class="bodywhite">
+				<div class="OrangeSmall" style="float:left">$page.getLocalizedString("configuration.userStore.create.storeDetails")</div><div class="OrangeVerySmall" id="allfields">* $page.getLocalizedString("configuration.userStore.create.allFields")</div><br />
+				<div class="width_160"><p>$page.getLocalizedString("configuration.userStore.create.storeName"):</p></div>
+				<p><input type="text" id="user_storeName" name="user_storeName" class="inputsBlue" style="width:150px" value="$!userStore.name" onkeyup="APP.callDelayed(this, validateUserStoreName);"/>
+                <span id="user_storeNameStatus"></span></p>
+            </div>
+			<div class="bodywhite">
+				<div class="width_160">
+				<p>$page.getLocalizedString("configuration.userStore.create.hostName"):</p>
+				<p>$page.getLocalizedString("configuration.userStore.create.port"):</p>
+				<p>$page.getLocalizedString("configuration.userStore.create.securePort"):</p>
+				</div>
+				<p><input type="text" id="user_hostName" name="user_hostName" class="inputsBlue" style="width:150px" value="$!userStore.hostName" onkeyup="APP.callDelayed(this, validateUserHostName);"/>
+                <span id="user_hostNameStatus"></span></p>
+				<p><input type="text" id="user_hostPort" name="user_hostPort" class="inputsBlue" style="width:40px" value="$!userStore.hostPort" onkeyup="APP.callDelayed(this, validateUserHostPort);"/>
+                <span id="user_hostPortStatus"></span></p>
+                <p><input type="radio" id="user_hostPortSecureNo" name="user_hostPortSecure" checked="checked" value="false"/>&nbsp;$page.getLocalizedString("configuration.userStore.create.noOption")&nbsp;
+                <input type="radio" id="user_hostPortSecureYes" name="user_hostPortSecure" value="true"/>$page.getLocalizedString("configuration.userStore.create.yesOption")</p>
+			</div>
+			<div class="bodywhite">
+				<div class="width_160">
+					<p>$page.getLocalizedString("configuration.userStore.create.loginID"):</p>
+					<p>$page.getLocalizedString("configuration.userStore.create.password"):</p>
+				</div>
+				<p><input type="text" id="user_login" name="user_login" class="inputsBlue" style="width:150px" value="$!userStore.login" onkeyup="APP.callDelayed(this, validateUserLogin);"/>
+                <span id="user_loginStatus"></span></p>
+				<p><input type="text" id="user_password" name="user_password" class="inputsBlue" style="width:150px" onkeyup="APP.callDelayed(this, validateUserPassword);"/>
+                <span id="user_passwordStatus"></span></p>
+            </div>
+			<div class="bodywhite">
+				<div class="width_160">
+				<p>$page.getLocalizedString("configuration.userStore.create.baseDN"):</p>
+				</div>
+				<p><input type="text" id="user_baseDN" name="user_baseDN" class="inputsBlue" style="width:150px" value="$!userStore.baseDN" onkeyup="APP.callDelayed(this, validateUserBaseDN);"/>
+                <span id="user_baseDNStatus"></span></p>
+			</div>
+			<div class="subbody">
+				<button id="btnCancel" class="buttonBlue" type="button" value="Cancel" onclick="Cancel();">$page.getLocalizedString("configuration.userStore.create.cancel")</button>
+				<button id="addStoreButton" class="buttonBlue" type="button" value="ADD THIS STORE" onclick="AddUserStore();">$page.getLocalizedString("configuration.userStore.create.addStore")</button>
+			</div>
+		</form>
+	</div>
+</div>
+<!--Pop Up-->
+<div id="confirmation" style="visibility:hidden;width:600px;height:200px"></div>
+<div id="status" style="visibility:hidden;width:600px;height:200px"></div>

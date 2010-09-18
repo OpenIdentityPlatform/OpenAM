@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amClientDetection.xml,v 1.3 2008/06/25 05:45:41 qcheng Exp $
+  
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMClientDetection" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetAMClientDetection"
+            i18nFileName="amClientDetection"
+            i18nKey="iplanet-am-client-detection-service-description">
+             <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-client-detection-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-client-detection-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-client-detection-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102">
+                    <DefaultValues>
+                        <Value>com.iplanet.services.cdm.ClientDetectionDefaultImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-client-detection-client-types"
+                    type="single"
+                    syntax="url"
+                    uitype="link"
+                    propertiesViewBeanURL="../service/MAPClientManager"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value/>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-client-detection-default-client-type"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>genericHTML</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-client-types-manager-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>com.iplanet.services.cdm.DefaultClientTypesManager</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

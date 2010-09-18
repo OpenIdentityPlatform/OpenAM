@@ -1,0 +1,87 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: importEntityPropertySheet.xml,v 1.5 2009/03/24 17:16:27 babysunil Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="">
+        <property name="realmProperty" required="true">
+            <label name="lblName" 
+                defaultValue="import.entity.realm.name.label" 
+                labelFor="realmName" />
+            <cc name="realmName" 
+                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+         </property>
+
+        <property>
+            <label name="lblMetaRadio" defaultValue="configure.provider.label.meta.question" labelFor="radioMeta" />
+            <cc name="radioMeta" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+                <option label="configure.provider.option.url" value="url" />
+                <option label="configure.provider.option.uploadfile" value="file" />
+                <attribute name="layout" value="horizontal" />
+                <attribute name="onClick" value="metaOptionSelect(this);" />
+            </cc>
+        </property>
+        <property required="true">
+            <label name="lblMetadataFileURL" defaultValue="configure.provider.label.metadata" labelFor="tfMetadataFileURL" />
+            <cc name="tfMetadataFileURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="localizeDisplayFieldValue" value="false" />
+                <attribute name="size" value="70" />
+            </cc>
+            <cc name="btnMetadata"
+                tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+                <attribute name="OnClick" value="openWindow('tfMetadataFile_metadatafilename'); return false;" />
+                    <attribute name="defaultValue" value="button.upload" />
+            </cc>
+            <cc name="tfMetadataFile" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+        </property>
+
+        <property>
+            <label name="lblExtendedRadio" defaultValue="configure.provider.label.extendeddata.question" labelFor="radioExtended" />
+            <cc name="radioExtended" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+                <option label="configure.provider.option.url" value="url" />
+                <option label="configure.provider.option.uploadfile" value="file" />
+                <attribute name="layout" value="horizontal" />
+                <attribute name="onClick" value="extendedOptionSelect(this);" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblExtendeddataFileURL" defaultValue="configure.provider.label.extendeddata" labelFor="tfExtendeddataFileURL" />
+            <cc name="tfExtendeddataFileURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="localizeDisplayFieldValue" value="false" />
+                <attribute name="size" value="70" />
+            </cc>
+            <cc name="btnExtendeddata"
+                tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+                <attribute name="OnClick" value="openWindow('tfExtendeddataFile_extendeddatafilename'); return false;" />
+                    <attribute name="defaultValue" value="button.upload" />
+            </cc>
+            <cc name="tfExtendeddataFile" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+        </property>
+    </section>
+</propertysheet>

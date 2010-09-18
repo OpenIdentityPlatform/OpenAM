@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Atributos de repositorio de archivos sin formato - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>Atributos de repositorio de archivos sin formato</h4>
+<p><a name="indexterm-15"></a>Los siguientes atributos se utilizan para configurar un repositorio de archivos sin
+formato:</p>
+
+<a name="gdokj"></a><h5>Nombre de clase del complemento de repositorio de archivos</h5>
+<p>Este atributo especifica el archivo de clase de Java que proporciona la
+implementaci&#243;n para los archivos sin formato. Este atributo no debe modificarse.</p>
+
+<a name="gdojs"></a><h5>Directorio del repositorio de archivos</h5>
+<p>Define el directorio base en el que se almacenan las identidades y
+sus atributos.</p>
+
+<a name="gdoke"></a><h5>Cach&#233;</h5>
+<p>Si est&#225; habilitado (valor predeterminado), las identidades y sus atributos se almacenar&#225;n
+en la cach&#233;. Las siguientes solicitudes no tendr&#225;n acceso al sistema de
+archivos.</p>
+
+<a name="gdokm"></a><h5>Tiempo para actualizar la cach&#233;</h5>
+<p>Si el almacenamiento en cach&#233; est&#225; habilitado, este atributo determina el intervalo
+de tiempo (en minutos) tras el que se comprueban las entradas de
+la cach&#233; para detectar los cambios realizados en el sistema de archivos.
+El mecanismo de comprobaci&#243;n se basa en marcas de tiempo.</p>
+
+<a name="gdojw"></a><h5>Clases de objeto de usuarios de archivos</h5>
+<p>Define las clases de objeto que se agregan autom&#225;ticamente a los usuarios
+durante su creaci&#243;n.</p>
+
+<a name="gdojt"></a><h5>Atributo de contrase&#241;a</h5>
+<p>Proporciona el nombre de atributo que contiene la contrase&#241;a utilizada para la
+autenticaci&#243;n. Este atributo se utiliza para autenticar el usuario cuando se encuentra
+habilitado el m&#243;dulo de autenticaci&#243;n de almac&#233;n de datos.</p>
+
+<a name="gdokq"></a><h5>Atributo de estado</h5>
+<p>Proporciona el nombre de atributo que almacena el estado de la identidad.
+Los valores del atributo de estado son <tt>active</tt> o <tt> inactive</tt>. Se utiliza
+durante la autenticaci&#243;n de la identidad. Si una identidad es <tt>inactive</tt>, no
+se autenticar&#225; el usuario.</p>
+
+<a name="gdojk"></a><h5>Atributos de hash</h5>
+<p>Proporciona una lista de los atributos cuyos valores tendr&#225;n un algoritmo hash
+y se almacenar&#225;n en los archivos. Una vez que tengan un algoritmo
+hash, no se pueden obtener los valores originales. S&#243;lo es posible recuperar
+los valores con un algoritmo hash. Se utiliza para garantizar la privacidad
+cuando determinados atributos no deben almacenarse de forma permanente, pero se utilizan
+para la verificaci&#243;n. Un ejemplo de este tipo de atributo es el
+atributo de contrase&#241;a de la identidad.</p>
+
+<a name="gdojb"></a><h5>Atributos cifrados</h5>
+<p>Proporciona una lista de los atributos cuyos valores se cifrar&#225;n y almacenar&#225;n
+en los archivos. Aunque se hayan cifrado y almacenado, al llamar a
+las API del repositorio de identidades, se devolver&#225;n los valores originales no
+cifrados De esta forma, se impide que los usuarios accedan directamente al
+sistema de archivos y lean atributos confidenciales.</p>
+<br/>
+
+</body>
+</html>

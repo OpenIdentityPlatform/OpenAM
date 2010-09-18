@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAP  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthldapservice"></a><h4>LDAP </h4>
+<p><a name="indexterm-175"></a>이 모듈은 사용자 아이디 비밀번호를 특정 LDAP 항목과 연결하는 Directory Server 작업인
+LDAP 바인드를 사용하여 인증을 허용합니다. 한 영역에 대해 여러 개의 LDAP 인증
+구성을 정의할 수 있습니다. LDAP 인증 속성은 영역 속성입니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fwazv">기본 LDAP 서버</a></p></li>
+<li><p><a href="#fwbac">보조 LDAP 서버</a></p></li>
+<li><p><a href="#fwazx">사용자 검색을 시작할 DN</a></p></li>
+<li><p><a href="#fwazz">루트 사용자 바인드용 DN</a></p></li>
+<li><p><a href="#fwazq">루트 사용자 바인드용 비밀번호</a></p></li>
+<li><p><a href="#fwazu">루트 사용자 바인드용 비밀번호(확인)</a></p></li>
+<li><p><a href="#fwazs">사용자 프로필 검색 시 사용되는 속성</a></p></li>
+<li><p><a href="#fwazy">인증될 사용자 검색 시 사용되는 속성</a></p></li>
+<li><p><a href="#fwazw">사용자 검색 필터</a></p></li>
+<li><p><a href="#fwbai">검색 범위</a></p></li>
+<li><p><a href="#fwbal">SSL이 LDAP 서버에 액세스 가능</a></p></li>
+<li><p><a href="#fwbak">인증할 사용자 DN 반환</a></p></li>
+<li><p><a href="#fwbaf">LDAP 서버 확인 간격</a></p></li>
+<li><p><a href="#fwbah">사용자 작성 속성 목록</a></p></li>
+<li><p><a href="#fwbaj">인증 수준</a></p></li></ul>
+
+
+<a name="fwazv"></a><h5>기본 LDAP 서버</h5>
+<p>OpenSSO 설치 중에 지정된 주 LDAP 서버의 호스트 이름과 포트 번호를 지정합니다.
+이 서버는 인증을 위해 연결되는 첫 번째 서버입니다. 형식은 <tt></tt><i>hostname:port</i><tt></tt>입니다. 포트 번호가
+없는 경우 포트 번호를 <tt>389</tt>라고 가정합니다.</p><p>OpenSSO를 여러 도메인으로 배포한 경우 OpenSSO의 특정 인스턴스와 Directory Server의 특정 인스턴스
+간의 통신 링크를 다음 형식으로 지정할 수 있습니다(항목이 여러 개이면 로컬 서버
+이름을 접두어로 사용해야 함).</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>예를 들어, 서로 다른 위치(L1-machine1-IS 및 L2-machine2-IS)에 배포된 두 개의 OpenSSO 인스턴스가
+Directory Server(L1-machine1-DS 및 L2-machine2-DS)의 여러 인스턴스와 통신하는 경우 다음과 같이 지정할 수
+있습니다.</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fwbac"></a><h5>보조 LDAP 서버</h5>
+<p>OpenSSO 플랫폼에 사용할 수 있는 보조 LDAP 서버의 호스트 이름과 포트 번호를
+지정합니다. 주 LDAP 서버가 인증 요청에 응답하지 않을 경우 이 서버에 연결됩니다.
+주 서버가 작동되면 OpenSSO는 다시 주 서버로 전환됩니다. 마찬가지로 형식은 <tt></tt><i>hostname:port</i><tt></tt>입니다. 여러
+항목이 있을 경우 로컬 서버 이름을 접두어로 지정해야 합니다.</p>
+<hr><p><b>주의 &#8211; </b>OpenSSO와 떨어져 있는 원격 Directory Server에서 사용자를 인증하는 경우 주 LDAP 서버
+포트와 보조 LDAP 서버 포트 모두에 값이 있어야 합니다. 하나의 디렉토리 서버
+위치에 대한 값을 두 필드 모두에 사용할 수 있습니다.</p>
+<hr>
+
+
+<a name="fwazx"></a><h5>사용자 검색을 시작할 DN</h5>
+<p>사용자 검색이 시작되는 노드의 DN을 지정합니다. (성능상의 이유 때문에 이 DN은 가능한
+구체적이어야 합니다.) 기본값은 디렉토리 트리의 루트입니다. 유효한 모든 DN이 인식됩니다. 검색 범위
+속성에서 객체를 선택한 경우에는 DN에서 프로필이 있는 수준보다 하나 위의 수준을 지정해야
+합니다. 여러 항목이 있을 경우 로컬 서버 이름을 접두어로 지정해야 합니다. 형식은
+<tt></tt><i>servername|search dn</i><tt></tt>입니다.</p><p>여러 항목이 있는 경우:</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>같은 사용자 아이디의 루트 조직 아래에 여러 항목이 있는 경우 인증을 위해
+한 항목만 검색하거나 찾을 수 있도록 이 매개 변수를 설정해야 합니다. 예를
+들어, 루트 조직 아래의 에이전트 아이디와 사용자 아이디가 같으면 이 매개 변수는
+루트 조직의 경우 에이전트 아이디를 사용하여 인증하도록 <tt>ou=Agents</tt>로 설정하고 루트 사용자의 경우
+사용자 아이디를 사용하여 인증하도록 <tt>ou=People</tt>로 설정해야 합니다.</p>
+
+<a name="fwazz"></a><h5>루트 사용자 바인드용 DN</h5>
+<p>주 LDAP 서버 및 포트 필드에 지정된 디렉토리 서버에 관리자로 바인드하는 데
+사용되는 사용자의 DN을 지정합니다. 사용자 로그인 아이디에 기초하여 일치하는 사용자 DN을 검색하려면
+인증 서비스가 이 DN으로 바인드되어야 합니다. 기본값은 <tt>amldapuser</tt>입니다. 유효한 DN이 인식됩니다.</p>
+
+<a name="fwazq"></a><h5>루트 사용자 바인드용 비밀번호</h5>
+<p>루트 사용자 바인드용 DN 필드에 지정된 관리자 프로필의 비밀번호를 포함합니다. 기본값은 없습니다.
+관리자의 유효한 LDAP 비밀번호만 인식됩니다.</p>
+
+<a name="fwazu"></a><h5>루트 사용자 바인드용 비밀번호(확인)</h5>
+<p>비밀번호를 확인합니다.</p>
+
+<a name="fwazs"></a><h5>사용자 프로필 검색 시 사용되는 속성</h5>
+<p>사용자 항목의 이름 지정 규칙에 사용되는 속성을 지정합니다. 기본적으로 OpenSSO는 사용자 항목이
+UID 속성에 의해 식별된다고 가정합니다. 디렉토리 서버가 다른 속성(예: <i>givenname</i>)을 사용할 경우
+이 필드에 속성 이름을 지정합니다.</p>
+
+<a name="fwazy"></a><h5>인증될 사용자 검색 시 사용되는 속성</h5>
+<p>인증될 사용자에 대한 검색 필터를 구성하는 데 사용되는 속성을 나열하며 사용자 항목에
+있는 둘 이상의 속성을 사용하여 사용자를 인증할 수 있게 합니다. 예를 들어,
+이 필드를 <i>uid</i>, <i>employeenumber</i> 및 <i>mail</i>로 설정하면 이 이름 중 하나를 사용하여
+사용자를 인증할 수 있습니다. 이러한 속성은 별도로 설정해야 합니다. </p>
+
+<a name="fwazw"></a><h5>사용자 검색 필터</h5>
+<p>사용자 검색을 시작할 DN 필드에서 사용자를 찾는 데 사용할 속성을 지정합니다. 아이디
+지정 속성과 함께 작동합니다. 기본값은 없습니다. 유효한 모든 사용자 항목 속성이 인식됩니다.</p>
+
+<a name="fwbai"></a><h5>검색 범위</h5>
+<p>일치하는 사용자 프로필을 검색할 디렉토리 서버의 수준 수를 나타냅니다. 검색은 <a href="#fwazx">사용자 검색을 시작할 DN</a> 속성에
+지정된 노드에서 시작됩니다. 기본값은 SUBTREE입니다. 다음 항목 중 하나를 목록에서 선택할 수
+있습니다.</p><dl><dt>객체</dt>
+<dd><p>지정된 노드만 검색합니다.</p></dd>
+<dt>한 수준</dt>
+<dd><p>지정된 노드 수준과 한 수준 아래에서 검색합니다.</p></dd>
+<dt>하위 트리</dt>
+<dd><p>지정된 노드와 그 아래 수준에 있는 모든 항목을 검색합니다.</p></dd>
+</dl>
+
+
+<a name="fwbal"></a><h5>SSL이 LDAP 서버에 액세스 가능</h5>
+<p>주 LDAP 서버, 보조 LDAP 서버 및 포트 필드에 지정된 디렉토리 서버에
+대한 SSL 액세스를 사용 가능하게 합니다. 기본적으로 이 상자는 선택되어 있지 않으므로
+디렉토리 서버에 액세스하는 데 SSL 프로토콜이 사용되지 않습니다.</p><p>LDAP 서버가 SSL을 사용할 수 있는 상태에서 실행 중(LDAPS)이면, AM이 LDAPS 프로토콜을
+통해 Directory Server에 연결될 수 있도록 OpenSSO가 적절한 SSL로 신뢰된 인증서로 구성되었는지
+확인해야만 합니다.</p>
+
+<a name="fwbak"></a><h5>인증할 사용자 DN 반환</h5>
+<p>OpenSSO 디렉토리가 LDAP용으로 구성된 디렉토리와 동일하면 이 옵션을 사용할 수 있습니다. 이
+옵션을 사용 가능하게 하면 LDAP 인증 모듈은 사용자 아이디 대신 DN을 반환할
+수 있으며 검색이 필요하지 않습니다. 일반적으로 인증 모듈은 사용자 아이디만 반환하고 인증
+서비스는 로컬 OpenSSO LDAP에서 사용자를 검색합니다. 외부 LDAP 디렉토리가 사용될 경우 일반적으로
+이 옵션은 사용 가능하지 않습니다.</p>
+
+<a name="fwbaf"></a><h5>LDAP 서버 확인 간격</h5>
+<p>이 속성은 LDAP 서버 페일백에 사용됩니다. 이 속성은 LDAP 주 서버가 실행
+중인지 확인하기 전에 스레드가 "일시 정지"되는 시간(분)을 정의합니다.</p>
+
+<a name="fwbah"></a><h5>사용자 작성 속성 목록</h5>
+<p>이 속성은 LDAP 서버가 외부 LDAP 서버로 구성된 경우에 LDAP 인증 모듈에서
+사용됩니다. 이 속성은 로컬 디렉토리 서버와 외부 디렉토리 서버 간의 속성 매핑을
+포함합니다. 이 속성의 형식은 다음과 같습니다.</p><p><i>attr1|externalattr1</i></p><p><i>attr2|externalattr2</i></p><p>이 속성을 채우면 외부 디렉토리 서버에서 외부 속성 값을 읽은 다음 내부
+디렉토리 서버 속성 값을 설정합니다. 외부 속성 값은 <tt>사용자 프로필</tt> 속성(핵심 인증 모듈에
+있음)이 "동적으로 작성"으로 설정되고 사용자가 로컬 디렉토리 서버 인스턴스에 없는 경우에만 내부
+속성에 설정됩니다. 새로 작성된 사용자는 사용자 작성 속성 목록에 지정된 대로 매핑되는
+외부 속성 값이 있는 내부 속성 값을 포함합니다.</p>
+
+<a name="fwbaj"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

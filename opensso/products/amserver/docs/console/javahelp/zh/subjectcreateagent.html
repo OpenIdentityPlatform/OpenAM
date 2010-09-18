@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建或修改代理 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>创建或修改代理</h5>
+<ol>
+<li><b>单击“代理”选项卡。</b></li>
+<li><b>单击“新建”。</b></li>
+<li><b>输入以下字段的值：</b><p><b>名称。</b>输入代理的名称或身份。此名称是代理用来登录 Federated Access Manager 的名称。不接受多字节用户名称。</p><p><b>密码。</b>输入代理的密码。此密码必须与在验证过程中代理所使用的密码不同。</p><p><b>确认密码</b>。确认密码。</p><p><b>设备状态。</b>输入代理的设备状态。如果设置为“活动”，则代理可以通过 Federated Access Manager 的验证并与其进行通信。如果设置为“不活动”，则代理不能通过 Federated Access Manager 的验证。</p></li>
+<li><b>单击“确定”。</b></li>
+<li><b>创建代理之后，您可以另外编辑以下字段：</b><p><b>说明。</b>输入代理的简短说明。例如，可以输入代理实例名称或其保护的应用程序的名称。</p><p><b>代理关键字值。</b>使用关键字/值对设置代理属性。Federated Access Manager 使用此属性接收有关用户的证书声明的代理请求。通常仅一个属性有效，所有其他属性都将被忽略。请使用以下格式：</p><p><tt></tt><i>agentRootURL</i><tt>=http://</tt><i>server_name:port</i><tt>/</tt></p></li></ol>
+<br/>
+
+</body>
+</html>

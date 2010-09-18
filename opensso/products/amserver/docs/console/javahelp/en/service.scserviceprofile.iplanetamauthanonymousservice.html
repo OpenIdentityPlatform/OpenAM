@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Anonymous - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthanonymousservice"></a><h4>Anonymous</h4>
+<p><a name="indexterm-167"></a>This module type allows a user to log in without specifying credentials. You
+can create an Anonymous user so that anyone can log in as Anonymous
+without having to provide a password. Anonymous connections are usually customized by the
+OpenSSO administrator so that Anonymous users have limited access to the server. The
+Anonymous authentication attributes are realm attributes. The attributes are:</p>
+<ul><li><p><a href="#fwblp">Valid Anonymous Users</a></p></li>
+<li><p><a href="#fwbnz">Default Anonymous User Name</a></p></li>
+<li><p><a href="#fwbto">Case Sensitive User IDs</a></p></li>
+<li><p><a href="#fwbli">Authentication Level</a></p></li></ul>
+
+
+<a name="fwblp"></a><h5>Valid Anonymous Users</h5>
+<p>Contains a list of user IDs that have permission to login without providing
+credentials. If a user's login name matches a user ID in this list,
+access is granted and the session is assigned to the specified user ID.</p><p>If this list is empty, accessing the following default module instance login URL
+will be authenticated as the Default Anonymous User Name:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name</tt></p><p>If this list is not empty, accessing Default module instance login URL (same
+as above) will prompt the user to enter any valid Anonymous user name.
+If this list is not empty, the user can log in without seeing
+the login page by accessing the following URL:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1=&#60;valid Anonymous username></tt> </p>
+
+<a name="fwbnz"></a><h5>Default Anonymous User Name</h5>
+<p>Defines the user ID that a session is assigned to if Valid
+Anonymous User List is empty and the following default module instance login URL is
+accessed:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name</tt></p><p>The default value is anonymous. An Anonymous user must also be created in
+the realm.</p>
+<hr><p><b>Note &#8211; </b>If Valid Anonymous User List is not empty, you can login without accessing
+the login page by using the user defined in Default Anonymous User Name.
+This can be done by accessing the following URL:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1=</tt> <tt></tt><i>DefaultAnonymous User Name</i><tt></tt></p>
+<hr>
+
+
+<a name="fwbto"></a><h5>Case Sensitive User IDs</h5>
+<p>If enabled, this option allows for case-sensitivity for user IDs. By default, this
+attribute is not enabled.</p>
+
+<a name="fwbli"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

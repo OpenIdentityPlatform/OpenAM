@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=gb2312">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>数据存储库
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="datastore"></A><h2>数据存储库</h2>
+<p><A NAME="indexterm-10"></A><A NAME="indexterm-11"></A>数据存储库是一个可以存储用户属性和用户配置数据的数据库。</p>
+<p>Access Manager 提供一个身份系统信息库插件，此插件可连接到 LDAPv3 身份系统信息库框架。使用这一新的模型可以不必在现有的用户数据库中做任何更改，便能查看和搜索 Access Manager 用户信息。Access Manager 框架将来自身份系统信息库插件的数据和其他 Access Manager 插件里的数据整合在一起，为每个用户形成了一个虚拟身份。而后，Access Manager 能使用通用身份在多个身份系统信息库之间进行验证和授权过程。在用户会话结束后将会销毁虚拟用户身份。</p>
+<p>有关创建新数据存储库和配置系统信息库插件的信息，参见<A HREF="datastore.html#realm.idrepo">创建新的 LDAPv3 数据存储库</A>。</p>
+<p>如果已在“领域模式”下安装了 Access Manager，可以配置 Access Manager SDK 来管理 Directory Server 数据。参见<A HREF="amsdkrepo.html#amsdkrepo">创建新的 Access Manager 系统信息库插件</A>。</p>
+<A NAME="realm.idrepo"></A><h3><IMG border="0" alt="Procedure" src="graphics/procedure.gif">创建新的 LDAPv3 数据存储库</h3>
+<ol><li><p><b><A NAME="indexterm-12"></A>选择要为其添加新的数据存储库的领域。</b></p></li>
+<li><p><b>单击数据存储库选项卡。</b></p></li>
+<li><p><b>在“数据存储库”列表中单击“新建”。</b></p></li>
+<li><p><b>请输入数据存储库的名称。</b></p></li>
+<li><p><b>定义 LDAPv3 系统信息库插件的属性。关于这些属性的说明，参见<A HREF="realm.idrepoadd.html#realm.idrepoadd">LDAPv3 系统信息库插件属性</A>。</b></p></li>
+<li><p><b>单击"完成"。</b></p></li>
+</ol>
+<br />
+
+</body>
+</html>

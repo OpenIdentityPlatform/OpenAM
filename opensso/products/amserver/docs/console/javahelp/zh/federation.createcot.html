@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建新的信任环 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createcot"></a><h4>创建新的信任环</h4><a name="indexterm-56"></a><p>按照以下步骤创建新的信任环。起点是联合界面下的“新建信任环”。</p><ol>
+<li><b>单击“新建”显示信任环属性。</b><p>随即显示“新建信任环配置文件”页面。</p></li>
+<li><b>键入信任环的名称。</b></li>
+<li><b>在“说明”字段中键入信任环的说明。</b></li>
+<li><b>键入“IDFF 记录器服务 URL”的值。</b><p>IDFF 记录器服务 URL 用于指定写入通用域 cookie 的 servlet 的位置。其格式为 <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/idffwriter</tt>。</p></li>
+<li><b>键入“IDFF 读取器服务 URL”的值。</b><p>IDFF 读取器服务 URL 用于指定读取通用域 cookie 的 servlet 的位置。其格式为 <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/idffreader</tt>。</p></li>
+<li><b>键入“SAML2 记录器服务 URL”的值。</b><p>该值指定将 cookie 写入通用域的 SAML2 记录器服务的位置。其格式为 <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/saml2writer</tt>。</p></li>
+<li><b>键入“SAML2 读取器服务 URL”的值。</b><p>该值指定从通用域读取 cookie 的 SAML2 读取器服务的位置。其格式为 <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/saml2reader</tt>。</p></li>
+<li><b>选择“活动”或“不活动”。</b><p>默认值为活动。选择“不活动”将禁用验证域内的通信。</p></li>
+<li><b>选择要在其中创建信任环的领域。</b></li>
+<li><b>选择一个或多个可用的提供者并单击“添加”箭头来选定它们。</b><p>所提供的列表包含已创建并填充了提供者的实体的名称 。有关详细信息，参见<a href="federation.fsauthdomainsselectprovider.html">添加提供者到信任环</a>。</p></li>
+<li><b>单击“确定”完成配置操作。</b><p>新的信任环会显示在“信任环”列表中。</p></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Create an ID-FF Entity Provider - Sun Federated Access Manager 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggvfv"></a><h5>To Create an ID-FF Entity Provider</h5>
+<p>Use these steps to create to create an entity provider based on the
+ID-FF protocol for Federation Services. You can assign the identity provider or service
+provider (or both) role to the entity, but multiple roles will belong to
+the same entity provider.</p><ol>
+<li><b>Select the Realm to which the entity provider will belong.</b></li>
+<li><b>Type a name in the Entity Identifier field. </b></li>
+<li><b>Choose the entity provider role you wish to assign to the entity provider.</b><p>Entering data in the Meta Alias field will automatically create and assign the
+entity provider role to the entity provider upon completion.</p></li>
+<li><b>Enter values for the following attributes for one or more roles:</b><dl><dt>Meta Alias</dt>
+<dd><p>Specifies a <tt>metaAlias</tt> for the provider role being configured. The <tt>metaAlias</tt> is used to locate the provider's entity identifier and the organization in which it is located. The value is a string equal to the realm or organization name coupled with a forward slash and the provider name. For example, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Caution &#8211; </b>The names used in the <tt>metaAlias</tt> must not contain a <tt>/</tt>.</p>
+<hr>
+</dd>
+<dt>Signing Certificate Alias</dt>
+<dd><p>Specifies the provider certificate alias used to find the correct signing certificate in the keystore. </p></dd>
+<dt>Encryption Certificate alias</dt>
+<dd><p>Specifies the provider certificate alias used to find the correct encryption certificate in the keystore.</p></dd>
+</dl>
+</li>
+<li><b>Click Create.</b><p>The entity provider, its assigned provider roles, and location will be displayed in
+the Entity Providers list. </p></li>
+<li><b>To customize the entity providers' roles behavior, click on the name of the
+entity provider and choose the tab that corresponds to the role you wish
+to customize.</b></li></ol>
+<br/>
+
+</body>
+</html>

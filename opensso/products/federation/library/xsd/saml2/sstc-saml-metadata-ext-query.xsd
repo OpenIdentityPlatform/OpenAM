@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sstc-saml-metadata-ext-query.xsd,v 1.2 2008/06/25 05:48:43 qcheng Exp $
+
+-->
+
+<schema 
+  targetNamespace="urn:oasis:names:tc:SAML:metadata:ext:query"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+  xmlns:query="urn:oasis:names:tc:SAML:metadata:ext:query"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified"
+  blockDefault="substitution"
+  version="2.0">
+
+  <annotation>
+    <documentation>
+      Document title: SAML Metadata Extension Schema for SAML V2.0 and V1.x Query Requesters
+      Document identifier: sstc-saml-metadata-ext-query.xsd
+      Location: http://www.oasis-open.org/committees/documents.php?wg_abbrev=security
+      Revision history:
+      V1.0 (September 2006):
+        Initial version.
+    </documentation>
+  </annotation>
+
+  <import namespace="urn:oasis:names:tc:SAML:2.0:metadata"
+    schemaLocation="saml-schema-metadata-2.0.xsd"/>
+
+  <complexType name="QueryDescriptorType" abstract="true">
+    <complexContent>
+      <extension base="md:RoleDescriptorType">
+        <sequence>
+          <element ref="md:NameIDFormat" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="WantAssertionsSigned" type="boolean" use="optional"/>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="AuthnQueryDescriptorType">
+    <complexContent>
+      <extension base="query:QueryDescriptorType"/>
+    </complexContent>
+  </complexType>
+
+  <element name="AttributeQueryDescriptor" type="query:AttributeQueryDescriptorType"/>
+  <complexType name="AttributeQueryDescriptorType">
+    <complexContent>
+      <extension base="query:QueryDescriptorType">
+        <sequence>
+          <element ref="md:AttributeConsumingService" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="ActionNamespace" type="anyURI"/>
+    
+  <complexType name="AuthzDecisionQueryDescriptorType">
+    <complexContent>
+      <extension base="query:QueryDescriptorType">
+        <sequence>
+          <element ref="query:ActionNamespace" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+</schema>

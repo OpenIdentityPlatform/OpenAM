@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Certificat - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthcertservice"></a><h4>Certificat</h4>
+<p><a name="indexterm-169"></a>Ce module permet &#224; un utilisateur de se connecter gr&#226;ce &#224; un
+certificat num&#233;rique personnel (CNP). Cette instance de module peut exiger l'utilisation du
+protocole OCSP (Online Certificate Status Protocol) pour d&#233;terminer l'&#233;tat d'un certificat. L'utilisation
+du protocole OCSP est facultatif. L'utilisateur se voit accorder ou refuser l'acc&#232;s
+&#224; une ressource en fonction de la validit&#233; du certificat. Les attributs
+d'authentification du certificat sont des attributs de domaine. Ces attributs sont les
+suivants :</p>
+<ul><li><p><a href="#fwbia">Faire correspondre le certificat avec LDAP</a></p></li>
+<li><p><a href="#fwbiq">Attribut DN de l'objet utilis&#233; pour une recherche LDAP des certificats</a></p></li>
+<li><p><a href="#fwbim">Faire correspondre le certificat avec CRL</a></p></li>
+<li><p><a href="#fwbik">Attribut DN de l'&#233;metteur utilis&#233; pour une recherche LDAP des CRL</a></p></li>
+<li><p><a href="#fwbin">Param&#232;tres HTTP pour la mise &#224; jour des CRL</a></p></li>
+<li><p><a href="#fwbil">Validation OCSP</a></p></li>
+<li><p><a href="#fwbij">Serveur LDAP o&#249; les certificats sont conserv&#233;s</a></p></li>
+<li><p><a href="#fwbtp">D&#233;marrage recherche de nom de domaine LDAP</a></p></li>
+<li><p><a href="#fwbqp">Utilisateur principal du serveur LDAP</a></p></li>
+<li><p><a href="#fwbst">Mot de passe principal du serveur LDAP</a></p></li>
+<li><p><a href="#fwbiu">Mot de passe principal du serveur LDAP (confirmer)</a></p></li>
+<li><p><a href="#fwblm">Utiliser SSL pour l'acc&#232;s LDAP</a></p></li>
+<li><p><a href="#fwbof">Champ de certificat utilis&#233; pour acc&#233;der au profil utilisateur</a></p></li>
+<li><p><a href="#fwbna">Autre champ de certificat utilis&#233; pour acc&#233;der au profil utilisateur</a></p></li>
+<li><p><a href="#fwbiw">H&#244;tes distants approuv&#233;s</a></p></li>
+<li><p><a href="#fwbkd">Num&#233;ro du port SSL</a></p></li>
+<li><p><a href="#fwblx">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwbia"></a><h5>Faire correspondre le certificat avec LDAP</h5>
+<p>Sp&#233;cifie si une v&#233;rification doit &#234;tre effectu&#233;e pour savoir si le certificat
+utilisateur pr&#233;sent&#233; &#224; la connexion est enregistr&#233; sur le serveur LDAP. Si
+aucune correspondance n'est trouv&#233;e, l'acc&#232;s est refus&#233;. Si une correspondance est trouv&#233;e
+et qu'aucune autre validation n'est requise, l'acc&#232;s est autoris&#233;. La valeur par
+d&#233;faut est que le service d'authentification de certificat ne recherche pas le
+certificat utilisateur.</p>
+<hr><p><b>Remarque &#8211; </b>Un certificat stock&#233; dans le serveur Directory Server n'est pas n&#233;cessairement valide.
+Il peut figurer dans la liste des certificats r&#233;voqu&#233;s. Reportez-vous &#224; <a href="#fwbim">Faire correspondre le certificat avec CRL</a>.
+Toutefois, le conteneur Web peut v&#233;rifier la validit&#233; du certificat utilisateur pr&#233;sent&#233;
+&#224; la connexion.</p>
+<hr>
+
+
+<a name="fwbiq"></a><h5>Attribut DN de l'objet utilis&#233; pour une recherche LDAP des certificats</h5>
+<p>Sp&#233;cifie l'attribut de la valeur <i>SubjectDN</i> du certificat, qui sera utilis&#233;e pour
+rechercher les certificats sur LDAP. Cet attribut doit identifier une entr&#233;e utilisateur
+de mani&#232;re unique. La valeur r&#233;elle sera utilis&#233;e pour la recherche. La
+valeur par d&#233;faut est <tt>cn</tt>.</p>
+
+<a name="fwbim"></a><h5>Faire correspondre le certificat avec CRL</h5>
+<p>Indique si le certificat utilisateur doit &#234;tre compar&#233; &#224; la liste de
+r&#233;vocations de certificat (CRL) sur le serveur LDAP. La CRL est localis&#233;e
+&#224; l'aide de l'un des noms d'attribut du <i>SubjectDN</i> de l'&#233;metteur. Si
+le certificat figure dans la CRL, l'acc&#232;s est refus&#233; ; sinon, l'utilisateur
+est autoris&#233; &#224; poursuivre. Par d&#233;faut, cet attribut n'est pas activ&#233;.</p><p>Les certificats doivent &#234;tre r&#233;voqu&#233;s lorsque le propri&#233;taire du certificat a chang&#233;
+de statut et n'a plus le droit d'utiliser le certificat ou lorsque
+la cl&#233; priv&#233;e d'un d&#233;tenteur de certificat a &#233;t&#233; compromise.</p>
+
+<a name="fwbik"></a><h5>Attribut DN de l'&#233;metteur utilis&#233; pour une recherche LDAP des CRL</h5>
+<p>Sp&#233;cifie l'attribut de la valeur <i>subjectDN</i> de l'&#233;metteur du certificat re&#231;u, qui
+sera utilis&#233;e pour rechercher les certificats r&#233;voqu&#233;s sur LDAP. Ce champ n'est
+utilis&#233; que si l'attribut Faire correspondre le certificat avec CRL est activ&#233;.
+La valeur r&#233;elle sera utilis&#233;e pour la recherche. La valeur par d&#233;faut
+est <tt>cn</tt>.</p>
+
+<a name="fwbin"></a><h5>Param&#232;tres HTTP pour la mise &#224; jour des CRL</h5>
+<p>Sp&#233;cifie les param&#232;tres HTTP pour l'obtention d'une CRL &#224; partir d'un servlet
+pour une mise &#224; jour des CRL. Pour obtenir ces param&#232;tres, contactez
+l'administrateur de votre autorit&#233; de certification.</p>
+
+<a name="fwbil"></a><h5>Validation OCSP</h5>
+<p>Permet l'ex&#233;cution de la validation OCSP par contact avec le r&#233;pondeur OCSP
+correspondant. Le r&#233;pondeur OCSP est d&#233;termin&#233; comme suit lors de l'ex&#233;cution&#160;: Les
+attributs mentionn&#233;s se trouvent dans la console sous Configuration &#62; Serveurs et
+sites &#62; S&#233;curit&#233;&#160;:</p>
+<ul><li><p>Si cette valeur est activ&#233;e (true) et que le r&#233;pondeur OCSP est d&#233;fini par l'attribut <a href="service.servereditsecurity.html#ggkav">URL de r&#233;pondeur</a>, la valeur de ce dernier est utilis&#233;e comme r&#233;pondeur OCSP.</p></li>
+<li><p>Si l'attribut <a href="service.servereditsecurity.html#ggkaa">V&#233;rification du protocole OCSP</a> est activ&#233; et si sa valeur n'est pas d&#233;finie, le r&#233;pondeur OCSP affich&#233; dans votre certification client est utilis&#233; comme r&#233;pondeur OCSP. </p></li>
+<li><p>Si l'attribut <a href="service.servereditsecurity.html#ggkaa">V&#233;rification du protocole OCSP</a> n'est pas activ&#233; ou si <a href="service.servereditsecurity.html#ggkaa">V&#233;rification du protocole OCSP</a> est activ&#233; sans qu'aucun r&#233;pondeur OCSP ne soit d&#233;tect&#233;, aucune validation OCSP n'a lieu.</p></li></ul>
+<p>Avant d'activer la validation OCSP, assurez-vous que l'heure de la machine OpenSSO
+et celle de la machine r&#233;pondeur OCSP sont aussi synchronis&#233;es que possible.
+Par ailleurs, l'heure de la machine OpenSSO ne doit en aucun cas
+&#234;tre post&#233;rieure &#224; celle du r&#233;pondeur OCSP. Par exemple :</p><p><tt>Machine r&#233;pondeur OCSP - 12:00:00 pm</tt></p><p><tt>Machine OpenSSO - 12:00:30 pm</tt> </p>
+
+<a name="fwbij"></a><h5>Serveur LDAP o&#249; les certificats sont conserv&#233;s</h5>
+<p>Sp&#233;cifie le nom et le num&#233;ro de port du serveur LDAP sur
+lequel les certificats sont enregistr&#233;s. La valeur par d&#233;faut est le nom
+d'h&#244;te et le port sp&#233;cifi&#233;s lors de l'installation d'OpenSSO. Vous pouvez utiliser
+le nom d'h&#244;te et le port de tout serveur LDAP contenant les
+certificats. Le format est <tt>nomh&#244;te:port</tt>.</p>
+
+<a name="fwbtp"></a><h5>D&#233;marrage recherche de nom de domaine LDAP</h5>
+<p>Sp&#233;cifie le DN du n&#339;ud &#224; partir duquel doit commencer la recherche
+du certificat de l'utilisateur. Il n'y a pas de valeur par d&#233;faut.
+Ce champ accepte tout DN valide.</p><p>Les entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es du nom du serveur local. Le
+format est le suivant :</p><p><tt>nomserveur|recherche dn</tt> </p><p>Lorsqu'il existe plusieurs entr&#233;es :</p><p><tt>nomserveur1|dn recherche nomserveur2|dn recherche nomserveur3|dn recherche...</tt></p><p>Si plusieurs entr&#233;es ont le m&#234;me ID utilisateur dans l'organisation racine, ce
+param&#232;tre doit &#234;tre d&#233;fini de sorte qu'une seule entr&#233;e &#224; authentifier soit
+recherch&#233;e ou d&#233;tect&#233;e. Par exemple, au cas o&#249; l'ID d'agent et l'ID
+d'utilisateur seraient identiques &#224; la racine de l'organisation, ce param&#232;tre doit &#234;tre
+<tt>ou=Agents</tt> pour que l'organisation racine authentifie selon l'ID d'agent et <tt>ou=People, </tt> pour
+que l'organisation racine authentifie selon l'ID d'utilisateur.</p>
+
+<a name="fwbqp"></a><h5>Utilisateur principal du serveur LDAP</h5>
+<p>Ce champ accepte le DN de l'utilisateur principal du serveur LDAP sur
+lequel sont conserv&#233;s les certificats. Il n'y a pas de valeur par
+d&#233;faut pour ce champ qui reconna&#238;t tout DN valide. L'utilisateur principal doit
+&#234;tre autoris&#233; &#224; lire et rechercher les informations de certificat enregistr&#233;es dans
+Directory Server.</p>
+
+<a name="fwbst"></a><h5>Mot de passe principal du serveur LDAP</h5>
+<p>Ce champ contient le mot de passe LDAP associ&#233; &#224; l'utilisateur sp&#233;cifi&#233;
+dans le champ Utilisateur principal du serveur LDAP. Il n'y a pas
+de valeur par d&#233;faut pour ce champ qui reconna&#238;t le mot de
+passe LDAP valide de l'utilisateur principal sp&#233;cifi&#233;. Cette valeur est enregistr&#233;e sous
+la forme de texte lisible dans l'annuaire.</p>
+
+<a name="fwbiu"></a><h5>Mot de passe principal du serveur LDAP (confirmer)</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="fwblm"></a><h5>Utiliser SSL pour l'acc&#232;s LDAP</h5>
+<p>Indique si la fonction SSL doit &#234;tre utilis&#233;e pour acc&#233;der au serveur
+LDAP. La valeur par d&#233;faut est que le service d'authentification de certificat
+n'utilise pas la fonction SSL pour l'acc&#232;s LDAP.</p>
+
+<a name="fwbof"></a><h5>Champ de certificat utilis&#233; pour acc&#233;der au profil utilisateur</h5>
+<p>Sp&#233;cifie le champ du DN objet du certificat qui doit &#234;tre utilis&#233;
+pour rechercher un profil utilisateur correspondant. Par exemple, si vous choisissez le
+champ d'adresse e-mail, le service d'authentification de certificat recherche le profil utilisateur
+correspondant &#224; l'attribut <i>emailAddr</i> dans le certificat utilisateur. L'utilisateur qui se connecte
+utilise alors le profil correspondant. Le champ par d&#233;faut est <i>CN objet</i>. La
+liste contient :</p>
+<ul><li><p>adresse e-mail</p></li>
+<li><p>CN objet</p></li>
+<li><p>DN objet</p></li>
+<li><p>UID objet</p></li>
+<li><p>autre</p></li></ul>
+
+
+<a name="fwbna"></a><h5>Autre champ de certificat utilis&#233; pour acc&#233;der au profil utilisateur</h5>
+<p>Si la valeur de l'attribut Champ de certificat utilis&#233; pour acc&#233;der au
+profil utilisateur a pour valeur autres, ce champ sp&#233;cifie l'attribut qui sera
+s&#233;lectionn&#233; &#224; partir de la valeur de <i>DN objet</i> pour le certificat re&#231;u.
+Le service d'authentification recherchera alors le profil utilisateur correspondant &#224; la valeur
+de cet attribut.</p>
+
+<a name="ggumk"></a><h5>Type de valeur SubjectAltNameExt utilis&#233; pour acc&#233;der au profil utilisateur</h5>
+<p>Si une valeur autre que <tt>none</tt> est s&#233;lectionn&#233;e, cet attribut a priorit&#233;
+sur les attributs <tt>Certificate Field Used to Access User Profile</tt> et <tt>Other Certificate Field Used to Access User Profile</tt>.</p>
+<ul><li><p>RFC822Name</p></li></ul>
+
+<ul><li><p>UPN</p></li></ul>
+
+
+<a name="fwbiw"></a><h5>H&#244;tes distants approuv&#233;s</h5>
+<p>D&#233;finit une liste d'h&#244;tes approuv&#233;s pouvant &#234;tre utilis&#233;s pour l'envoi de certificats
+&#224; OpenSSO. OpenSSO doit v&#233;rifier que le certificat &#233;mane bien de l'un
+de ces h&#244;tes. Cet attribut est utilis&#233; pour Portal Server Gateway, pour
+un &#233;quilibreur de charge avec terminaison SSL et pour l'authentification distribu&#233;e. </p><dl><dt>none</dt>
+<dd><p>D&#233;sactive l'attribut. Ceci est la valeur par d&#233;faut.</p></dd>
+<dt>all</dt>
+<dd><p>Accepte l'authentification de certificat de style Portal Server Gateway de la part de n'importe quelle adresse IP client.</p></dd>
+<dt>IP ADDR</dt>
+<dd><p>R&#233;pertorie les adresses IP &#224; partir desquelles accepter les demandes d'authentification de certificat de style Portal Server Gateway (adresses IP des passerelles). Cet attribut peut &#234;tre configur&#233; pour chaque domaine.</p></dd>
+</dl>
+
+
+<a name="fwbkd"></a><h5>Num&#233;ro du port SSL</h5>
+<p>Sp&#233;cifie le num&#233;ro du port pour la fonction SSL (secure socket layer).
+Actuellement, cet attribut n'est utilis&#233; que par le servlet Gateway. Avant d'ajouter
+ou de modifier un num&#233;ro de port SSL, reportez-vous &#224; la section
+"Policy-Based Resource Management" dans le manuel OpenSSO Administration Guide.</p>
+
+<a name="gcabp"></a><h5>Nom d'en-t&#234;te HTTP pour le certificat du client</h5>
+<p>Cet attribut n'est utilis&#233; que lorsque l'attribut H&#244;tes distants approuv&#233;s est d&#233;fini
+sur tous ou si un nom d'h&#244;te sp&#233;cifique est sp&#233;cifi&#233;. L'administrateur doit
+sp&#233;cifier le nom d'en-t&#234;te http du certificat client ins&#233;r&#233; par l'&#233;quilibreur de
+charge ou le SRA. </p>
+
+<a name="fwblx"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233; dans le module d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

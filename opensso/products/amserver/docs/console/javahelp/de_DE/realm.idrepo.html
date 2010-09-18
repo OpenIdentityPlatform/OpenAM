@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Data Stores - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepo"></a><h3>Data Stores</h3>
+<p><a name="indexterm-10"></a><a name="indexterm-11"></a>Als Data Store wird eine Datenbank bezeichnet, in der Benutzerattribute und Benutzerkonfigurationsdaten
+gespeichert werden k&#246;nnen.</p><p>OpenSSO bietet ein Identit&#228;ts-Repository-Plugin, das eine Verbindung zu einem LDAPv3-Identit&#228;ts-Repository-Framework herstellt. Auf
+diese Weise k&#246;nnen Sie OpenSSO-Benutzerinformationen anzeigen und abrufen, ohne &#196;nderungen an Ihrer
+vorhandenen Benutzerdatenbank vornehmen zu m&#252;ssen. Das OpenSSO-Framework fasst die Daten des Identit&#228;ts-Repository-Plugins
+mit den Daten anderer OpenSSO-Plugins zusammen und bildet so eine virtuelle Identit&#228;t
+jedes einzelnen Benutzers. Diese universelle Identit&#228;t kann OpenSSO bei der Authentifizierung und
+Autorisierung f&#252;r mehrere Identit&#228;ts-Repositories gemeinsam verwenden. Die virtuelle Benutzeridentit&#228;t wird vernichtet, sobald
+die Benutzersitzung endet.</p><p>OpenSSO unterst&#252;tzt die folgenden Data Stores:</p>
+<ul><li><p>Active Directory</p></li>
+<li><p>Generisches LDAPv3</p></li>
+<li><p>Sun Directory Server mit OpenSSO-Schema</p></li></ul>
+<p>Informationen zur Erstellung eines neuen Data Stores und zur Konfiguration des Repository-Plugins
+finden Sie unter <a href="realm.idreposelecttype.html">So erstellen Sie einen neuen Data Store</a>.</p>
+<br/>
+
+</body>
+</html>

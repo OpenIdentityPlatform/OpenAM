@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Naming - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamnamingservice"></a><h4>Naming</h4>
+<p><a name="indexterm-204"></a>The Naming service is used to get and set URLs, plug-ins and configurations
+as well as request notifications for various other OpenSSO services such as session,
+authentication, logging, SAML and Federation.</p><p>This service enables clients to find the correct service URL if the platform
+is running more than one OpenSSO. When a naming URL is found, the
+naming service will decode the session of the user and dynamically replace the
+protocol, host, and port with the parameters from the session. This ensures that
+the URL returned for the service is for the host that the user
+session was created on. The Naming attributes are:</p>
+<ul><li><p><a href="#fwfgc">Profile Service URL</a></p></li>
+<li><p><a href="#fwfgg">Session Service URL</a></p></li>
+<li><p><a href="#fwfgf">Logging Service URL</a></p></li>
+<li><p><a href="#fwfgh">Policy Service URL</a></p></li>
+<li><p><a href="#fwfge">Authentication Service URL</a></p></li>
+<li><p><a href="#fwfgl">SAML Web Profile/Artifact Service URL</a></p></li>
+<li><p><a href="#fwfgm">SAML SOAP Service URL</a></p></li>
+<li><p><a href="#fwfgk">SAML Web Profile/POST Service URL</a></p></li>
+<li><p><a href="#fwfgi">SAML Assertion Manager Service URL</a></p></li>
+<li><p><a href="#fwfgn">Federation Assertion Manager Service URL</a></p></li>
+<li><p><a href="#fwfgp">Security Token Manager URL</a></p></li>
+<li><p><a href="#fwfgo">JAXRPC Endpoint URL</a></p></li></ul>
+
+
+<a name="fwfgc"></a><h5>Profile Service URL</h5>
+<p>This field takes a value equal to :</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/profileservice</tt></p><p>This syntax allows for dynamic substitution of the profile URL based on the
+specific session parameters.</p>
+
+<a name="fwfgg"></a><h5>Session Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/sessionservice</tt></p><p>This syntax allows for dynamic substitution of the session URL based on the
+specific session parameters.</p>
+
+<a name="fwfgf"></a><h5>Logging Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/loggingservice</tt></p><p>This syntax allows for dynamic substitution of the logging URL based on the
+specific session parameters.</p>
+
+<a name="fwfgh"></a><h5>Policy Service URL</h5>
+<p>This field takes a value equal to:</p><p> <tt>%protocol://%host:%port/Server_DEPLOY_URI/policyservice</tt></p><p>This syntax allows for dynamic substitution of the policy URL based on the
+specific session parameters.</p>
+
+<a name="fwfge"></a><h5>Authentication Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/authservice</tt></p><p>This syntax allows for dynamic substitution of the authentication URL based on the
+specific session parameters.</p>
+
+<a name="fwfgl"></a><h5>SAML Web Profile/Artifact Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLAwareServlet</tt></p><p>This syntax allows for dynamic substitution of the SAML web profile/artifact URL based
+on the specific session parameters. </p>
+
+<a name="fwfgm"></a><h5>SAML SOAP Service URL</h5>
+<p>This field takes a value equal to</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLSOAPReceiver</tt></p><p>This syntax allows for dynamic substitution of the SAML SOAP URL based on
+the specific session parameters.</p>
+
+<a name="fwfgk"></a><h5>SAML Web Profile/POST Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLPOSTProfileServlet</tt></p><p>This syntax allows for dynamic substitution of the SAML web profile/POST URL based
+on the specific session parameters. </p>
+
+<a name="fwfgi"></a><h5>SAML Assertion Manager Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/AssertionManagerServlet/AssertionM anagerIF</tt></p><p>This syntax allows for dynamic substitution of the SAML Assertion Manager Service URL
+based on the specific session parameters. </p>
+
+<a name="fwfgn"></a><h5>Federation Assertion Manager Service URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/amserver/FSAssertionManagerServlet/FSAssertionMana gerIF</tt></p><p>This syntax allows for dynamic substitution of the Federation Assertion Manager Service URL
+based on the specific session parameters. </p>
+
+<a name="fwfgp"></a><h5>Security Token Manager URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/amserver/SecurityTokenManagerServlet/SecurityToken ManagerIF/</tt></p><p>This syntax allows for dynamic substitution of the Security Token Manager URL based
+on the specific session parameters. </p>
+
+<a name="fwfgo"></a><h5>JAXRPC Endpoint URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port/amserver/jaxrpc/</tt></p><p>This syntax allows for dynamic substitution of the JAXRPC Endpoint URL based on
+the specific session parameters.</p>
+
+<a name="gguep"></a><h5>Identity Web Services Endpoint URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port%uri/identityservices/</tt></p><p>This syntax allows for dynamic substitution of the Identity Web Services Endpoint URL
+based on the specific session parameters.</p>
+
+<a name="ggudo"></a><h5>Identity REST Services Endpoint URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port%uri/identity//</tt></p><p>This syntax allows for dynamic substitution of the Identity REST Services Endpoint URL
+based on the specific session parameters.</p>
+
+<a name="ggueo"></a><h5>Security Token Service Endpoint URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>This syntax allows for dynamic substitution of the Security Token Service Endpoint URL
+based on the specific session parameters.</p>
+
+<a name="gguff"></a><h5>Security Token Service MEX Endpoint URL</h5>
+<p>This field takes a value equal to:</p><p><tt>%protocol://%host:%port%uri/sts/mex</tt></p><p>This syntax allows for dynamic substitution of the Security Token Service MEX Endpoint
+URL based on the specific session parameters.</p>
+<br/>
+
+</body>
+</html>

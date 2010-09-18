@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ポリシー設定 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>ポリシー設定</h4>
+<p><a name="indexterm-191"></a>「ポリシー設定」属性により、管理者はポリシーサービスによって使用されるグローバル属性およびレルム属性を設定できます。</p>
+<ul><li><p><a href="#fufnk">「グローバル属性」</a></p></li>
+<li><p><a href="#fufmb">「レルム属性」</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>グローバル属性</h5>
+<p>グローバル属性には次のものがあります。</p>
+
+<a name="gciwg"></a><h5>リソースコンパレータ</h5>
+<p>「ポリシー」ルール定義で指定されたリソースの比較に使用されるリソースコンパレータ情報を指定します。リソースの比較は、ポリシーの作成と評価の両方に使用します。</p><p>「追加」ボタンをクリックして、次の属性を定義します。</p><dl><dt>サービスタイプ</dt>
+<dd><p>コンパレータを使用するサービスを指定します。</p></dd>
+<dt>クラス</dt>
+<dd><p>リソース比較アルゴリズムを実装する Java クラスを定義します。 </p></dd>
+<dt>区切り文字</dt>
+<dd><p>リソース名に使用する区切り記号を指定します。 </p></dd>
+<dt>ワイルドカード</dt>
+<dd><p>リソース名に使用可能なワイルドカードを指定します。</p></dd>
+<dt>1 レベルのワイルドカード</dt>
+<dd><p>同じ区切り文字境界に位置する 0 個以上の文字に一致します。</p></dd>
+<dt>大文字と小文字を区別</dt>
+<dd><p>リソースを比較する際に、大文字と小文字を区別するかどうかを指定します。このオプションのチェックボックスを選択しない場合は区別せず、選択した場合は区別します。</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>拒否決定時の評価継続</h5>
+<p>DENY のポリシー決定が存在する場合でも、ポリシーフレームワークが後続のポリシーの評価を継続するかどうかを指定します。この属性が選択されていない場合 (デフォルト)、ポリシー評価は DENY が認識された後続のポリシーをスキップします。</p>
+
+<a name="fufng"></a><h5>OpenSSO により処理できるアドバイス</h5>
+<p>ポリシー適用ポイント (ポリシーエージェント) がユーザーエージェントを OpenSSO にリダイレクトするポリシーアドバイスキーの名前を定義します。エージェントが、あるリソースへのアクセスを許可しないというポリシー決定を受け取っても、アドバイスを間違いなく所有している場合は、この属性に一覧表示されているアドバイスキーを所有しているかどうかを確認します。</p><p>そのようなアドバイスが見つかった場合、ユーザーエージェントは OpenSSO にリダイレクトされ、その結果、そのリソースへのアクセスが許可されることもあります。</p>
+
+<a name="gdpdm"></a><h5>組織エイリアス参照</h5>
+<p>この属性を「はい」に設定すると、最上位レルムまたは親レルムから参照ポリシーを作成することなく、サブレルムにポリシーを作成できます。作成できるのは、完全修飾ホスト名がレルムの DNS エイリアスに一致する HTTP リソースまたは HTTPS リソースを保護するポリシーだけです。デフォルトでは、この属性は「いいえ」として定義されています。 </p>
+
+<a name="fufmb"></a><h5>レルム属性</h5>
+<p>LDAP プロパティーは次のとおりです。</p>
+
+<a name="fufmg"></a><h5>プライマリ LDAP サーバー</h5>
+<p>OpenSSO インストール時に指定されたプライマリ LDAP サーバーのホスト名とポート番号を指定します。このホスト名とポート番号は、LDAP ユーザー、LDAP ロール、LDAP グループなどのポリシー対象を検索する際に使用します。</p><p>形式は <i>hostname:port</i> です。次に例を示します。<tt>machine1.example.com:389</tt></p><p>複数の LDAP サーバーホストに対してフェイルオーバーを設定する場合は、この値をスペース区切りのホストのリストとすることができます。形式は <i>hostname1:port1 hostname2:port2...</i> です。</p><p>次に例を示します。<tt>machine1.example1.com:389 machine2.example1.com:389</tt></p><p>複数のエントリの場合は、ローカルサーバー名をプレフィックスとして付ける必要があります。これによって、特定の OpenSSO を、特定の Directory Server と接続するように設定できます。</p><p>形式は <i>servername|hostname:port</i> です。次に例を示します。</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>フェイルオーバー設定の場合は次のようになります。</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389 </tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>LDAP ベース DN</h5>
+<p>検索を開始する LDAP サーバー内のベース DN を指定します。デフォルトでは、OpenSSO インストールの最上位レルムです。</p>
+
+<a name="fufmd"></a><h5>LDAP ユーザーベース DN</h5>
+<p>この属性は、LDAP サーバーの LDAP ユーザー対象が使用するベース DN を指定します。そこから検索が開始されます。デフォルトでは、OpenSSO インストールベースの最上位レルムです。</p>
+
+<a name="fufmz"></a><h5>OpenSSO ロールベース DN</h5>
+<p>OpenSSO ロールの値の検索時にベースとして使用するレルムまたは組織の DN を定義します。この属性は <i>AccessManagerRoles</i> ポリシー対象によって使用されます。</p>
+
+<a name="fufme"></a><h5>LDAP バインド DN</h5>
+<p>LDAP サーバー内のバインド DN を指定します。</p>
+
+<a name="fufmf"></a><h5>LDAP バインドパスワード</h5>
+<p>LDAP サーバーへのバインドに使用するパスワードを定義します。デフォルトでは、インストール時に入力された <tt>amldapuser</tt> パスワードが、バインドユーザーとして使用されます。</p>
+
+<a name="fufmn"></a><h5>LDAP 組織検索フィルタ</h5>
+<p>組織エントリの検索に使用する検索フィルタを指定します。デフォルトは <tt>(objectclass=sunMangagedOrganization)</tt> です。</p>
+
+<a name="fufmm"></a><h5>LDAP 組織検索範囲</h5>
+<p>組織エントリの検索範囲を定義します。範囲は次のいずれかにする必要があります。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (デフォルト)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>LDAP グループ検索範囲</h5>
+<p>グループエントリの検索範囲を定義します。範囲は次のいずれかにする必要があります。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (デフォルト)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>LDAP グループの検索フィルタ</h5>
+<p>グループエントリの検索に使用する検索フィルタを指定します。デフォルトは、<tt>(objectclass=groupOfUniqueNames)</tt> です。</p>
+
+<a name="fufms"></a><h5>LDAP ユーザー検索フィルタ</h5>
+<p>ユーザーエントリの検索に使用する検索フィルタを指定します。デフォルトは、<tt>(objectclass=inetorgperson)</tt> です。</p>
+
+<a name="fufmt"></a><h5>LDAP ユーザー検索範囲</h5>
+<p>ユーザーエントリの検索範囲を定義します。範囲は次のいずれかにする必要があります。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (デフォルト)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>LDAP ロール検索フィルタ</h5>
+<p>ロールのエントリ検索に使用する検索フィルタを指定します。デフォルトは、<tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions))</tt> です。</p>
+
+<a name="fufmw"></a><h5>LDAP ロール検索範囲</h5>
+<p>この属性は、ロールのエントリ検索範囲を定義します。範囲は次のいずれかにする必要があります。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (デフォルト)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>OpenSSO ロール検索範囲</h5>
+<p>OpenSSO ロール対象のエントリ検索範囲を定義します。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (デフォルト)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>LDAP 組織検索属性</h5>
+<p>組織に対して検索を行うための属性タイプを定義します。デフォルトは o です。</p>
+
+<a name="fufmr"></a><h5>LDAP グループ検索属性</h5>
+<p>グループに対して検索を行うための属性タイプを定義します。デフォルトは <tt>cn</tt> です。</p>
+
+<a name="fufmu"></a><h5>LDAP ユーザー検索属性</h5>
+<p>ユーザーに対して検索を行うための属性タイプを定義します。デフォルトは <tt>uid</tt> です。</p>
+
+<a name="fufmx"></a><h5>LDAP ロール検索属性</h5>
+<p>このフィールドは、ロールに対して検索を行うための属性タイプを定義します。デフォルトは <tt>cn</tt> です。</p>
+
+<a name="fufnj"></a><h5>検索で返される結果の最大数</h5>
+<p>このフィールドは検索で返される結果の最大数を定義します。デフォルト値は 100 です。指定された最大数を検索結果が上回った場合、その時点までに検索されたエントリが返されます。</p>
+
+<a name="fufnl"></a><h5>検索タイムアウト</h5>
+<p>検索タイムアウトが発生するまでの時間を指定します。指定した時間を過ぎた場合は、その時点までに検索されたエントリが返されます。</p>
+
+<a name="fufmi"></a><h5>LDAP SSL</h5>
+<p>LDAP サーバーが SSL を実行するかどうかを指定します。選択した場合、SSL は有効になり、選択しない場合 (デフォルト)、SSL は無効になります。</p><p>LDAP サーバーが SSL 有効 (LDAPS) で実行中の場合、OpenSSO が LDAPS プロトコルで Directory Server に接続できるように、適切な
+SSL 信頼証明書で設定されていることを確認する必要があります。</p>
+
+<a name="fufmk"></a><h5>LDAP 接続プールの最小サイズ</h5>
+<p>LDAP サーバー属性に指定されたとおり、Directory Server への接続に使用する接続プールの最小サイズを指定します。デフォルトは 1 です。</p>
+
+<a name="fufmj"></a><h5>LDAP 接続プールの最大サイズ</h5>
+<p>この属性は、LDAP サーバー属性に指定されたとおり、Directory Server への接続に使用する接続プールの最大サイズを指定します。デフォルトは 10 です。</p>
+
+<a name="fufna"></a><h5>選択したポリシー対象</h5>
+<p>この属性を使用すると、レルム内のポリシー定義に使用できる対象タイプのセットを選択できます。</p>
+
+<a name="fufnc"></a><h5>選択したポリシー条件</h5>
+<p>この属性を使用すると、レルム内のポリシー定義に使用できる条件タイプのセットを選択できます。</p>
+
+<a name="fufnd"></a><h5>選択したポリシー参照</h5>
+<p>この属性を使用すると、レルム内のポリシー定義に使用できる参照タイプのセットを選択できます。</p>
+
+<a name="fufml"></a><h5>対象結果の有効時間</h5>
+<p>この属性は、キャッシュされた対象結果を使用してシングルサインオントークンに基づく同じポリシー要求を評価できる時間 (分単位) を指定します。</p><p>ポリシーが SSO トークンに対して最初に評価される場合に、そのポリシー内の対象インスタンスが評価され、ポリシーを特定のユーザーに適用できるかどうかが判別されます。対象結果は SSO トークン ID で (検索できるように) キーが付加され、ポリシーにキャッシュされます。「対象結果の有効時間」属性で指定された時間内に、再び同一の SSO トークン ID
+に対して同一のポリシーを評価するときには、ポリシーフレームワークは対象インスタンスを再評価せずに、キャッシュされている対象結果を検索します。これにより、ポリシー評価の時間が大幅に短縮されます。</p>
+
+<a name="fufnm"></a><h5>ユーザーエイリアス</h5>
+<p>リモート Directory Server で、リソースの対象メンバーがローカルユーザーのエイリアスの場合、リソースを保護するためにポリシーを作成し、この属性を有効にする必要があります。たとえば、リモート Directory Server で <tt>uid=rmuser</tt> を作成してから、OpenSSO で (<tt>uid=luser</tt> などの)
+ローカルユーザーにエイリアスとして <tt>rmuser</tt> を追加する場合、この属性を有効にする必要があります。<tt>rmuser</tt> としてログインすると、ローカルユーザー (<tt>luser</tt>) によってセッションが作成され、ポリシー適用が成功します。</p>
+
+<a name="fufni"></a><h5>選択した応答プロバイダ</h5>
+<p>そのレルムで有効にされているポリシー応答プロバイダのプラグインを定義します。そのレルムに定義されているポリシーに追加できるのは、この属性で選択された応答プロバイダプラグインのみです。</p>
+
+<a name="fufnn"></a><h5>選択した動的応答属性</h5>
+<p>そのレルムで有効にされている動的応答属性を定義します。そのレルムに定義されているポリシーに追加する <i>IDResponseProvider</i> の動的属性リストに定義できるのは、この属性で選択された名前のサブセットのみです。</p>
+<br/>
+
+</body>
+</html>

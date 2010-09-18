@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>实体：提供者和联合提供者 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptors"></a><h3>实体：提供者和联合提供者</h3>
+<a name="indexterm-62"></a><a name="indexterm-63"></a><a name="indexterm-64"></a><a name="indexterm-65"></a><p>可使用<b>元数据</b>（用于定义特殊身份服务体系结构的配置信息）为单个身份认证提供者和/或单个服务提供者配置<b>实体</b>。反之，也可将实体配置为联合提供者，即任一类型的一组选定提供者。可使用 Federation Access Manager 控制台配置提供者和联合提供者实体。</p>
+<hr><p><b>注 &#8211; </b>可以创建实体，但是在以提供者填充它之前，无法将其分配给信任环。</p>
+<hr>
+<p>以下表格介绍了两种类型的实体。</p><a name="gbxxa"></a><h6>表&#160;1 实体类型</h6><table><col width="50%"><col width="50%"><tr><td align="left" valign="top" scope="row"><p><b>提供者实体</b></p></td>
+<td align="left" valign="top" scope="row"><p><b>提供者实体</b>可存放任一类型的单个提供者的元数据。必须在提供者实体内配置所有的身份认证提供者和服务提供者，然后才能将这些提供者与信任环相关联或选择将它们加入到<b>联合提供者实体</b>中。使用 Access Manager 控制台中提供的属性，可在提供者实体内定义单个身份认证提供者和单个服务提供者或其中之一。提供者实体配置文件包括以下几组属性：</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">常规属性</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">身份认证提供者</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">服务提供者</a></p></li></ul>
+</td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><b>联合提供者实体</b></p></td>
+<td align="left" valign="top" scope="row"><p>已配置的<b>联合提供者</b>使得用户能够与一组关联站点进行联合。例如，当服务提供者代表联合提供者为某个用户发出验证请求，且验证受到安全保护时，该用户可以与联合提供者的所有成员一同实现单点登录。构成联合提供者时不考虑信任环的边界。</p><p><b>联合提供者实体</b>中存放的元数据定义了组成联合提供者的一个或多个提供者实体的分组。该实体不包含任何提供者的配置信息，只包含联合提供者本身的配置信息。联合提供者实体配置文件包括以下几组属性：</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">常规属性</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">联合提供者</a></p></li></ul>
+
+<hr><p><b>注 &#8211; </b>联合提供者成员既可以联合提供者成员身份调用服务，也可个别地调用服务。</p>
+<hr>
+</td>
+</tr>
+</table><p>任一类型的所有已配置实体都将列在实体下。以下任务与实体相关联：</p>
+<ul><li><p><a href="federation.fsentitydescriptorsadd.html">创建提供者实体或联合提供者实体</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsprofile.html">修改提供者实体或联合提供者实体的常规属性</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">向提供者实体添加身份认证提供者</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedadd.html">向提供者实体添加新的托管身份认证提供者</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteadd.html">向提供者实体添加新的远程身份认证提供者</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">向提供者实体添加服务提供者</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedadd.html">向提供者实体添加新的托管服务提供者</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteadd.html">向提供者实体添加新的远程服务提供者</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedprofile.html">修改提供者实体中的托管身份认证提供者属性</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteprofile.html">修改提供者实体中的远程身份认证提供者属性</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedprofile.html">修改提供者实体中的托管服务提供者属性</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteprofile.html">修改提供者实体中的远程服务提供者属性</a></p></li>
+<li><p><a href="federation.fscreatecontactperson.html">向提供者实体中的提供者添加联系人</a></p></li>
+<li><p><a href="federation.fseditcontactperson.html">修改提供者实体中的联系人配置文件</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">向联合提供者实体添加成员</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

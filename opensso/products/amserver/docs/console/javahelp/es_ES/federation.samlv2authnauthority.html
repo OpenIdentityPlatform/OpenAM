@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de autoridad de autenticaci&#243;n SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2authnauthority"></a><h4>Personalizaci&#243;n de autoridad de autenticaci&#243;n SAMLv2</h4>
+<p>La autoridad de autenticaci&#243;n SAMLv2 contiene los siguientes atributos que se pueden
+personalizar:</p>
+<ul><li><p><a href="#ggwfq">Firma y cifrado</a></p></li>
+<li><p><a href="#ggwim">Servicio de consultas de autenticaci&#243;n</a></p></li>
+<li><p><a href="#ggwmk">Solicitud de AssertionID</a></p></li>
+<li><p><a href="#ggwqw">Alias de certificado</a></p></li></ul>
+
+
+<a name="ggwfq"></a><h5>Firma y cifrado</h5>
+<dl><dt>Tama&#241;o de clave</dt>
+<dd><p>Longitud de las claves utilizadas por la entidad Autoridad de atributos al interactuar con otra entidad.</p></dd>
+<dt>Algoritmo</dt>
+<dd><p>El algoritmo de cifrado utilizado para interactuar con otra entidad.</p></dd>
+</dl>
+
+
+<a name="ggwim"></a><h5>Servicio de consultas de autenticaci&#243;n</h5>
+<p>Este atributo define la URL a la que se env&#237;an las consultas
+de autenticaci&#243;n.</p>
+
+<a name="ggwmk"></a><h5>Solicitud de AssertionID</h5>
+<p>Define las URL a las que se env&#237;an las AssertionID desde un
+cliente a un proveedor de identidades para recuperar la aserci&#243;n correspondiente. <tt>Ubicaci&#243;n</tt>
+especifica la URL del proveedor al que se env&#237;a la solicitud. 
+Los tipos de solicitud AssertionID son:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwqw"></a><h5>Alias de certificado</h5>
+<p>Este atributo define los elementos de alias de certificado para el proveedor.
+  La <tt>firma</tt> especifica el alias de certificado de proveedor utilizado
+para encontrar el certificado firmante correcto en el almac&#233;n de claves. 
+ El <tt>cifrado</tt> especifica el alias de certificado de proveedor utilizado para
+encontrar en el almac&#233;n de claves el certificado de cifrado correcto.</p>
+<br/>
+
+</body>
+</html>

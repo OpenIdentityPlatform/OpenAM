@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>证书  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthcertservice"></a><h4>证书 </h4>
+<p><a name="indexterm-169"></a>该模块允许用户通过个人数字证书 (personal digital certificate, PDC) 进行登录。该模块实例可能需要使用“联机证书状态协议 (OCSP)”来确定证书的状态。使用 OCSP 是可选的。基于证书是否有效来允许或拒绝用户访问某种资源。证书验证属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwbia">在 LDAP 中匹配证书</a></p></li>
+<li><p><a href="#fwbiq">用于在 LDAP 中搜索证书的主体 DN 属性</a></p></li>
+<li><p><a href="#fwbim">将证书与 CRL 匹配</a></p></li>
+<li><p><a href="#fwbik">用于在 LDAP 中搜索 CRL 的发送者 DN 属性</a></p></li>
+<li><p><a href="#fwbin">用于 CRL 更新的 HTTP 参数</a></p></li>
+<li><p><a href="#fwbil">OCSP 验证</a></p></li>
+<li><p><a href="#fwbij">存储证书的 LDAP 服务器</a></p></li>
+<li><p><a href="#fwbtp">LDAP 起始搜索 DN</a></p></li>
+<li><p><a href="#fwbqp">LDAP Server 主体用户</a></p></li>
+<li><p><a href="#fwbst">LDAP Server 主体密码</a></p></li>
+<li><p><a href="#fwbiu">LDAP Server 主体密码（确认）</a></p></li>
+<li><p><a href="#fwblm">使用 SSL 进行 LDAP 访问</a></p></li>
+<li><p><a href="#fwbof">用于访问用户配置文件的证书字段</a></p></li>
+<li><p><a href="#fwbna">用于访问用户配置文件的其他证书字段</a></p></li>
+<li><p><a href="#fwbiw">可信赖的远程主机</a></p></li>
+<li><p><a href="#fwbkd">SSL 端口号</a></p></li>
+<li><p><a href="#fwblx">验证级别</a></p></li></ul>
+
+
+<a name="fwbia"></a><h5>在 LDAP 中匹配证书</h5>
+<p>指定是否检查用户登录时提交的证书是否存储在 LDAP Server 中。如果没有找到匹配的证书，用户将被拒绝访问。如果找到匹配的证书，且不需要其他验证，则允许用户访问。在默认情况下，“证书验证”服务不会检查用户证书。</p>
+<hr><p><b>注 &#8211; </b>Directory Server 中存储的证书不一定是有效的，证书撤回列表中也可能存在该证书。参见<a href="#fwbim">将证书与 CRL 匹配</a>。但是，Web 容器可以在登录时检查用户提交的证书的有效性。</p>
+<hr>
+
+
+<a name="fwbiq"></a><h5>用于在 LDAP 中搜索证书的主体 DN 属性</h5>
+<p>指定证书的 <i>SubjectDN</i> 值的属性，该属性用于在 LDAP 中搜索证书。该属性必须唯一标识用户条目。搜索将使用实际值。默认值为 <tt>cn</tt>。</p>
+
+<a name="fwbim"></a><h5>将证书与 CRL 匹配</h5>
+<p>指定是否将用户证书与 LDAP Server 中的证书撤回列表 (CRL) 进行对照。通过发布者的 <i>SubjectDN</i> 中的一个属性名查找 CRL。如果 CRL 中存在该证书，用户将被拒绝访问；如果不存在，则允许用户继续进行操作。在默认情况下，该属性被禁用。</p><p>发生以下情况时，应该撤销证书：证书所有者的状态发生变化，不再拥有使用证书的权限；或证书所有者的专用密钥已经损坏。</p>
+
+<a name="fwbik"></a><h5>用于在 LDAP 中搜索 CRL 的发送者 DN 属性</h5>
+<p>指定所接收证书的发送者 <i>subjectDN</i> 值的属性，该属性用于在 LDAP 中搜索 CRL。仅在启用“将证书与 CRL 匹配”属性时，才能使用该字段。搜索将使用实际值。默认值为 <tt>cn</tt>。</p>
+
+<a name="fwbin"></a><h5>用于 CRL 更新的 HTTP 参数</h5>
+<p>指定 HTTP 参数以从 servlet 获得 CRL 用于 CRL 更新。要获得这些参数，请与 CA 管理员联系。</p>
+
+<a name="fwbil"></a><h5>OCSP 验证</h5>
+<p>通过与相应的 OCSP 响应器联系来启用要执行的 OCSP 验证。运行时，将按照以下步骤确定 OCSP 响应器。提到的属性位于控制台中，可通过“配置”>“服务器和站点”>“安全”进行访问：</p>
+<ul><li><p>如果将该值设置为“真”，并且在<a href="service.servereditsecurity.html#ggkav">响应器 URL</a>属性中设置了 OCSP 响应器，则该属性的值将用作 OCSP 响应器。</p></li>
+<li><p>如果启用了<a href="service.servereditsecurity.html#ggkaa">联机证书状态协议检查</a>并且未设置该属性的值，则会将客户机证书中提供的 OCSP 响应器用作 OCSP 响应器。</p></li>
+<li><p>如果没有启用<a href="service.servereditsecurity.html#ggkaa">联机证书状态协议检查</a>，或者启用了<a href="service.servereditsecurity.html#ggkaa">联机证书状态协议检查</a>但找不到 OCSP 响应器，则不会执行 OCSP 验证。</p></li></ul>
+<p>在启用 OCSP 验证之前，请确保 OpenSSO 计算机与 OCSP 响应器计算机的时间尽可能同步。另外，OpenSSO 计算机的时间不得晚于 OCSP 响应器的时间。例如：</p><p><tt>OCSP responder machine - 12:00:00 pm</tt></p><p><tt>OpenSSO machine - 12:00:30 pm</tt></p>
+
+<a name="fwbij"></a><h5>存储证书的 LDAP 服务器</h5>
+<p>指定存储证书的 LDAP 服务器的名称和端口号。默认值为安装 OpenSSO 时指定的主机名和端口。可以使用存储证书的任意 LDAP 服务器的主机名和端口号。格式为 <tt>hostname:port</tt>。</p>
+
+<a name="fwbtp"></a><h5>LDAP 起始搜索 DN</h5>
+<p>指定节点的 DN，应从该 DN 开始搜索用户证书。该字段没有默认值。它接受任何有效的 DN。</p><p>如果指定多个条目，条目前面必须带有本地服务器名称。格式如下所示：</p><p><tt>servername|search dn</tt></p><p>对于多个条目：</p><p><tt>servername1|search dn servername2|search dn servername3|search dn...</tt></p><p>如果根组织下存在多个具有相同用户 ID 的条目，则要进行验证，应设置此参数以便仅能搜索或查找到一个条目。例如，当代理 ID 与用户 ID 均位于根组织下，该参数在根组织使用代理 ID 进行验证时应为 <tt>ou=Agents</tt>，根组织使用用户 ID 进行验证时则应为
+<tt>ou=People</tt>。</p>
+
+<a name="fwbqp"></a><h5>LDAP Server 主体用户</h5>
+<p>该字段用于指定存储证书的 LDAP Server 的主体用户的 DN。该字段没有默认值，它接受任何有效的 DN。需要向主体用户授予读取和搜索 Directory Server 中存储的信息的权限。</p>
+
+<a name="fwbst"></a><h5>LDAP Server 主体密码</h5>
+<p>该字段用于指定与“LDAP Server 主体用户”字段中指定的用户相关联的 LDAP 密码。该字段没有默认值，它接受指定主体用户的有效 LDAP 密码。目录中该值将存储为可读文本。</p>
+
+<a name="fwbiu"></a><h5>LDAP Server 主体密码（确认）</h5>
+<p>确认密码。</p>
+
+<a name="fwblm"></a><h5>使用 SSL 进行 LDAP 访问</h5>
+<p>指定是否使用 SSL 来访问 LDAP 服务器。在默认情况下，证书验证服务不使用 SSL 进行 LDAP 访问。</p>
+
+<a name="fwbof"></a><h5>用于访问用户配置文件的证书字段</h5>
+<p>指定应使用证书的“主体 DN”中的哪个字段来搜索匹配的用户配置文件。例如，如果选择电子邮件地址，证书验证服务将搜索与用户证书中 <i>emailAddr</i> 属性相匹配的用户配置文件。用户将使用匹配的配置文件进行登录。默认字段为 <i>subject CN</i>。该列表包含以下内容：</p>
+<ul><li><p>email address</p></li>
+<li><p>subject CN</p></li>
+<li><p>subject DN</p></li>
+<li><p>subject UID</p></li>
+<li><p>other</p></li></ul>
+
+
+<a name="fwbna"></a><h5>用于访问用户配置文件的其他证书字段</h5>
+<p>如果“用于访问用户配置文件的证书字段”属性的值设置为 "other"，则该字段会指定将要从已接收证书的 <i>subjectDN</i> 值中所选择的属性。验证服务将搜索与该属性值匹配的用户配置文件。</p>
+
+<a name="ggumk"></a><h5>用于访问用户配置文件的 SubjectAltNameExt 值类型</h5>
+<p>如果选择了除<tt>无</tt>以外的任何值类型，则该属性优先于<tt>用于访问用户配置文件的证书字段</tt>或<tt>用于访问用户配置文件的其他证书字段</tt>属性。</p>
+<ul><li><p>RFC822Name</p></li></ul>
+
+<ul><li><p>UPN</p></li></ul>
+
+
+<a name="fwbiw"></a><h5>可信赖的远程主机</h5>
+<p>定义一系列可信赖的主机，这些主机可向 OpenSSO 发送证书。OpenSSO 必须检验该证书是否由这些主机中的某一台发送。该属性用于 Portal Server 网关、具有 SSL 终止的负载平衡器以及分布式验证。</p><dl><dt>无</dt>
+<dd><p>禁用该属性。这是默认设置。</p></dd>
+<dt>所有</dt>
+<dd><p>接受来自任意客户机 IP 地址的 Portal Server 网关式证书验证。</p></dd>
+<dt>IP ADDR</dt>
+<dd><p>列出要从该处接受 Portal Server 网关式证书验证请求的 IP 地址（网关的 IP 地址）。可以基于领域对该属性进行配置。</p></dd>
+</dl>
+
+
+<a name="fwbkd"></a><h5>SSL 端口号</h5>
+<p>指定安全套接字层的端口号。目前，该属性只由网关 servlet 使用。在添加或更改 SSL 端口号之前，请参阅 OpenSSO Administration Guide 中的“Policy-Based Resource Management”一节。</p>
+
+<a name="gcabp"></a><h5>客户机证书的 HTTP 标头名称</h5>
+<p>仅当“可信赖的远程主机”属性设置为“所有”或拥有已定义的特定主机名时，才使用该属性。管理员必须为负载平衡器或 SRA 所插入的客户机证书指定 http 标头名称。</p>
+
+<a name="fwblx"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

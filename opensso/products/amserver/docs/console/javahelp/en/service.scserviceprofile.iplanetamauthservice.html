@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Core - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthservice"></a><h4>Core</h4>
+<p><a name="indexterm-170"></a>This module is the general configuration base for the OpenSSO authentication services. It
+must be registered and configured to use any of the specific authentication module
+instances. It enables the administrator to define default values that will be picked up
+for the values that are not specifically set in the OpenSSO default authentication
+modules. The Core attributes are global and realm. The attributes are:</p>
+<ul><li><p><a href="#gcnje">Pluggable Authentication Module Classes</a></p></li>
+<li><p><a href="#gcnjc">Supported Authentication Module for Clients</a></p></li>
+<li><p><a href="#gcnir">LDAP Connection Pool Size</a></p></li>
+<li><p><a href="#gcnkh">Default LDAP Connection Pool Size</a></p></li>
+<li><p><a href="#gcnkq">User Profile</a></p></li>
+<li><p><a href="#gcnks">Administrator Authentication Configuration</a></p></li>
+<li><p><a href="#gcnjw">User Profile Dynamic Creation Default Roles</a></p></li>
+<li><p><a href="#gcnjn">Persistent Cookie Mode</a></p></li>
+<li><p><a href="#gcnke">Persistent Cookie Maximum Time</a></p></li>
+<li><p><a href="#gcnlc">Alias Search Attribute Name</a></p></li>
+<li><p><a href="#gcnkt">Default Authentication Locale</a></p></li>
+<li><p><a href="#gcnjj">Organization Authentication Configuration</a></p></li>
+<li><p><a href="#gcnkl">Login Failure Lockout Mode</a></p></li>
+<li><p><a href="#gcnjz">Login Failure Lockout Count</a></p></li>
+<li><p><a href="#gcnko">Login Failure Lockout Interval</a></p></li>
+<li><p><a href="#gcnkd">Email Address to Send Lockout Notification</a></p></li>
+<li><p><a href="#gcnkr">Warn User After N Failures</a></p></li>
+<li><p><a href="#gcnkc">Login Failure Lockout Duration</a></p></li>
+<li><p><a href="#gcnjy">Lockout Attribute Name</a></p></li>
+<li><p><a href="#gcnle">Lockout Attribute Value</a></p></li>
+<li><p><a href="#gcnkz">Default Success Login URL</a></p></li>
+<li><p><a href="#gcnlf">Default Failure Login URL</a></p></li>
+<li><p><a href="#gcnlb">Authentication Post Processing Class</a></p></li>
+<li><p><a href="#gcnjl">Generate UserID Mode</a></p></li>
+<li><p><a href="#gcnjq">Pluggable User Name Generator Class</a></p></li>
+<li><p><a href="#gcnki">Identity Types</a></p></li>
+<li><p><a href="#gcnlh">Pluggable User Status Event Classes</a></p></li>
+<li><p><a href="#gcnjv">Store Invalid Attempts in Data Store</a></p></li>
+<li><p><a href="#gcnjo">Module-based Authentication</a></p></li>
+<li><p><a href="#fwbfn">Default Authentication Level</a></p></li></ul>
+
+
+<a name="gcnje"></a><h5>Pluggable Authentication Module Classes</h5>
+<p>Specifies the Java classes of the authentication modules available to any realm configured
+within the OpenSSO platform. You can write custom authentication modules by implementing the
+AMLoginModule SPI or the JAAS LoginModule SPI. For more information, see the OpenSSO Developer's
+Guide. To define new services, this field must take a text string specifying
+the full class name (including package name) of each new authentication service.</p>
+
+<a name="gcnjc"></a><h5>Supported Authentication Module for Clients</h5>
+<p>Specifies a list of supported authentication modules for a specific client. The format
+is as follows:</p><p><tt>clientType | module1,module2,module3</tt></p><p>This attribute is in effect when Client Detection is enabled.</p>
+
+<a name="gcnir"></a><h5>LDAP Connection Pool Size</h5>
+<p>Specifies the minimum and maximum connection pool to be used on a specific
+LDAP server and port. This attribute is for LDAP and Membership authentication services
+only. The format is as follows:</p><p><tt>host:port:min:max</tt></p>
+<hr><p><b>Note &#8211; </b>This connection pool is different than the SDK connection pool configured in <tt>serverconfig.xml</tt>.</p>
+<hr>
+
+
+<a name="gcnkh"></a><h5>Default LDAP Connection Pool Size</h5>
+<p>Sets the default minimum and maximum connection pool to be used with all
+LDAP authentication module configurations. If an entry for the host and port exists
+in the LDAP Connection Pool Size attribute, the minimum and maximum settings will
+not be used from LDAP Connection Default Pool Size.</p>
+
+<a name="gcnkq"></a><h5>User Profile</h5>
+<p>This option enables you to specify options for a user profile. The options
+are:</p><dl><dt><b>Required</b></dt>
+<dd><p>This specifies that on successful authentication, the user needs to have a profile in the local Directory Server installed with OpenSSO for the authentication service to issue an SSOToken.</p></dd>
+<dt><b>Dynamic</b></dt>
+<dd><p>This specifies that on successful authentication, the authentication service will create the user profile if one does not already exist. The SSOToken will then be issued. The user profile is created in the local Directory Server installed with OpenSSO.</p></dd>
+<dt><b>Dynamic With User Alias</b></dt>
+<dd><p>This specifies that on successful authentication, the authentication services will create the user profile with the User Alias List attribute. </p></dd>
+<dt><b>Ignore</b></dt>
+<dd><p>This specifies that the user profile is not required by the authentication service to issue the SSOToken for a successful authentication.</p></dd>
+</dl>
+
+
+<a name="ggukq"></a><h5>Remote Auth Security</h5>
+<p>If enabled, all remote authentication requests require the application's SSOToken to validate the
+identity of the caller, so OpenSSO's configuration information can obtain the valid values
+of the username and password associated with the application.</p>
+
+<a name="ggull"></a><h5>Keep Post Process Objects for Logout Processing</h5>
+<p>If enabled, the instances of the post-process authentication plug-ins used during the log
+in process are preserved in the OpenSSO session. When log out is later
+invoked, the <tt>onLogout</tt> method of these instances are called. If this attribute is
+not enabled, the post-process instances from the log in process are not preserved. New
+instances of post process plug-ins are created when logout is invoked and the
+<tt>onLogout</tt> method is called. </p>
+
+<a name="gguji"></a><h5>Keep Authentication Module Objects for Logout Processing</h5>
+<p>If enabled, all of the instances of authentication modules used during the authentication
+process are preserved in the OpenSSO session. Later, when log out is invoked,
+the logout/destroyModulestate method is called on the same instances. If this attribute is
+not enabled, the authentication module instances from the log out process are not preserved.
+No method on the authentication modules is called upon log out.</p>
+
+<a name="gcnks"></a><h5>Administrator Authentication Configuration</h5>
+<p>Defines the authentication service for administrators only. This attribute can be used if
+the authentication module for administrators needs to be different from the module for
+end users. The modules configured in this attribute are picked up when the
+OpenSSO console is accessed. For example:</p><p><tt><b>http://</tt><i>servername.port/console_deploy_uri</i><tt></b></tt></p>
+
+<a name="gcnjw"></a><h5>User Profile Dynamic Creation Default Roles</h5>
+<p>This field specifies the roles assigned to a new user whose profiles are
+created if Dynamic Creation is selected through the User Profile. There is no
+default value. The administrator must specify the DNs of the roles that will
+be assigned to the new user.  </p>
+<hr><p><b>Note &#8211; </b>The role specified must be under the realm for which authentication is being
+configured. This role can be either an OpenSSO or LDAP role, but it
+cannot be a filtered role.</p><p>If you wish to automatically assign specific services to the user, you have
+to configure the Required Services attribute in the User Profile.</p>
+<hr>
+
+
+<a name="gcnjn"></a><h5>Persistent Cookie Mode</h5>
+<p>This option determines whether users can restart the browser and still return to
+their authenticated session. User sessions can be retained by enabling Enable Persistent Cookie
+Mode. When Enable Persistent Cookie Mode is enabled, a user session does not
+expire until its persistent cookie expires, or the user explicitly logs out. The expiration
+time is specified in Persistent Cookie Maximum Time. The default value is that
+Persistent Cookie Mode is not enabled and the authentication service uses only memory
+cookies.</p>
+<hr><p><b>Note &#8211; </b>A persistent cookie must be explicitly requested by the client using the <i>iPSPCookie=yes</i>
+parameter in the login URL.</p>
+<hr>
+
+
+<a name="gcnke"></a><h5>Persistent Cookie Maximum Time</h5>
+<p>Specifies the interval after which a persistent cookie expires. The interval begins when
+the user's session is successfully authenticated. The maximum value is 2147483647 (time in
+seconds). The field will accept any integer value less than the maximum.</p>
+
+<a name="gcnlc"></a><h5>Alias Search Attribute Name</h5>
+<p>After successful authentication by a user, the user's profile is retrieved. This field
+specifies a second LDAP attribute to search from if a search on the
+first LDAP attribute fails to locate a matching user profile. Primarily, this attribute
+will be used when the user identification returned from an authentication module is
+not the same as that specified in User Naming Attribute. For example, a
+RADIUS server might return <tt>abc1234</tt> but the user name is  <tt>abc</tt>. There is
+no default value for this attribute.</p><p>The field will take any valid LDAP attribute (for example, cn).</p>
+
+<a name="gcnkt"></a><h5>Default Authentication Locale</h5>
+<p>Specifies the default language subtype to be used by the authentication service. The
+default value is en_US. See  <a href="supportedlang.html">Supported Language Locales</a> for a listing of valid language
+subtypes.  </p><p>In order to use a different locale, all authentication templates for that locale
+must first be created. A new directory must then be created for these
+templates. See "Login URL Parameters" in the Administration Guide for more information.</p>
+
+<a name="gcnjj"></a><h5>Organization Authentication Configuration</h5>
+<p>Sets the authentication module for the organization. The default authentication module is LDAP.</p>
+
+<a name="gcnkl"></a><h5>Login Failure Lockout Mode</h5>
+<p>Specifies whether a user can attempt a second authentication if the first attempt
+failed. Selecting this attribute enables a lockout and the user will have only
+one chance at authentication. By default, the lockout feature is not enabled. This
+attribute works in conjunction with Lockout-related and notification attributes.</p>
+
+<a name="gcnjz"></a><h5>Login Failure Lockout Count</h5>
+<p>Defines the number of attempts that a user may try to authenticate, within
+the time interval defined in Login Failure Lockout Interval, before being locked out.</p>
+
+<a name="gcnko"></a><h5>Login Failure Lockout Interval</h5>
+<p>Defines (in minutes) the time between two failed login attempts. If a login
+fails and is followed by another failed login that occurs within the lockout
+interval, then the lockout count is incremented. Otherwise, the lockout count is reset.</p>
+
+<a name="gcnkd"></a><h5>Email Address to Send Lockout Notification</h5>
+<p>Specifies an email address that will receive notification if a user lockout occurs.
+To send email notification to multiple addresses, separate each email address with a
+space. For non-English locales, the format is:</p><p><tt>email_address|locale|charset</tt> </p>
+
+<a name="gcnkr"></a><h5>Warn User After N Failures</h5>
+<p>Specifies the number of authentication failures that can occur before OpenSSO sends a
+warning message that the user will be locked out.</p>
+
+<a name="gcnkc"></a><h5>Login Failure Lockout Duration</h5>
+<p>Enables memory locking. By default, the lockout mechanism will inactivate the User Profile
+(after a login failure) defined in  <i>Lockout Attribute Name</i>. If the value of
+Login Failure Lockout Duration is greater than 0, then its memory locking and
+the user account will be locked for the number of minutes specified.</p>
+
+<a name="ggulj"></a><h5>Lockout Duration Multiplier</h5>
+<p>This attribute defines the value multiplied to the Login Failure Lockout Duration for
+each successive lockout. For example, if Login Failure Lockout Duration is set to
+3 minutes, and the Lockout Duration Multiplier is set to 2, the user
+will be locked out of the account for 6 minutes.</p>
+
+<a name="gcnjy"></a><h5>Lockout Attribute Name</h5>
+<p>Designates any LDAP attribute that is to be set for lockout. The value
+in Lockout Attribute Value must also be changed to enable lockout for this
+attribute name. By default, Lockout Attribute Name is empty in the OpenSSO Console.
+The default implementation values are <i>inetuserstatus</i> (LDAP attribute) and <i>inactive</i> when the user
+is locked out and Login Failure Lockout Duration is set to 0.</p>
+
+<a name="gcnle"></a><h5>Lockout Attribute Value</h5>
+<p>This attribute specifies whether lockout is enabled or disabled for the attribute defined
+in Lockout Attribute Name. By default, the value is set to inactive for
+<i>inetuserstatus</i>.</p>
+
+<a name="gcnkz"></a><h5>Default Success Login URL</h5>
+<p>This field accepts a list of multiple values that specify the URL to
+which users are redirected after successful authentication. The format of this attribute is
+<tt>clientType|URL</tt>, although you can specify only the value of the URL which assumes
+a default type of HTML.  The default value is <i>/amserver/console</i> .</p>
+
+<a name="gcnlf"></a><h5>Default Failure Login URL</h5>
+<p>This field accepts a list of multiple values that specify the URL to
+which users are redirected after an unsuccessful authentication. The format of this attribute
+is <tt>clientType|URL</tt>, although you can specify only the value of the URL which
+assumes a default type of HTML.</p>
+
+<a name="gcnlb"></a><h5>Authentication Post Processing Class</h5>
+<p>Specifies the name of the Java class used to customize post authentication processes
+for successful or unsuccessful logins. Example:</p><p><tt>com.abc.authentication.PostProcessClass</tt> </p><p>The Java class must implement the following Java interface:</p><p><tt>com.sun.identity.authentication.spi.AMPostAuthProcessInterface</tt></p><p>Additionally, you must add the path to where the class is located to
+the Web Server's Java Classpath attribute.</p>
+
+<a name="gcnjl"></a><h5>Generate UserID Mode</h5>
+<p>This attribute is used by the Membership authentication module. If this attribute field
+is enabled, the Membership module is able to generate user IDs, during the
+Self Registration process, for a specific user if the user ID already exists.
+The user IDs are generated from the Java class specified in Pluggable User
+Name Generator Class.</p>
+
+<a name="gcnjq"></a><h5>Pluggable User Name Generator Class</h5>
+<p>Specifies the name of the Java class is used to generate User IDs
+when Enable Generate UserID Mode is used.</p>
+
+<a name="gcnki"></a><h5>Identity Types</h5>
+<p>Lists the type or types of identities for which OpenSSO will search.</p>
+
+<a name="gcnlh"></a><h5>Pluggable User Status Event Classes</h5>
+<p>Extends the authentication SPIs to provide a callback mechanism for user status changes
+during the authentication process. The following status changes are supported:</p><dl><dt><tt>account lockout</tt></dt>
+<dd><p>The account lockout event is available for any authentication module. The features is configurable through the <a href="#gcnkl">Login Failure Lockout Mode</a> attribute.</p></dd>
+<dt><tt>password change</tt></dt>
+<dd><p>Only available through the LDAP authentication module type, as the password change feature is only available for that module.</p></dd>
+</dl>
+
+
+<a name="gcnjv"></a><h5>Store Invalid Attempts in Data Store</h5>
+<p>If enabled, this attribute allows the sharing of login failure attempts in a
+identity repository that is shared by multiple OpenSSO instances. For example, if the
+identity repository that is used for a specific deployment is Directory Server, the
+invalid attempts are stored in the <tt>sunAMAuthInvalidAttemptsData</tt> (which belongs to <tt>sunAMAuthAccountLockout</tt>objectclass). The format of the
+data is stored as:</p><p><tt>&#60;InvalidPassword>&#60;InvalidCount>&#60;/InvalidCount>&#60;LastInvalidAt>&#60;/LastInvalidAt>&#60;LockedoutAt>&#60;/LockedoutAt>&#60;ActualLockoutDuration>&#60;/ActualLockoutDuration>&#60;/InvalidPassword></tt></p><p>This information is maintained in the Directory Server for each user. As the
+invalid attempts occur, <tt>&#60;InvalidCount></tt> is increased.</p>
+
+<a name="gcnjo"></a><h5>Module-based Authentication</h5>
+<p>If enabled, this attribute allows users to authenticate through module-based authentication. If this
+attribute is not enabled, module-based login is not allowed. All login attempts with
+<tt>module=&#60; </tt><i>module_instance_name</i><tt>></tt> will result in login failure.</p>
+
+<a name="ggurt"></a><h5>User Attribute Mapping to Session Attribute</h5>
+<p>This enables the attributes to be set as session properties from the authenticating
+user profile (stored in a data store) to the user's SSOToken. The format
+is:</p><p><tt>UserProfile_Attribute|Session_Attribute_name</tt></p><p>If the <tt>Session_Attribute_name</tt> is not specified, the property name for the session is
+retrieved as the value of the User Profile attribute. All session attributes contain
+the am.<tt>protected</tt> prefix to ensure that they cannot be edited from the
+client SDK.</p>
+
+<a name="fwbfn"></a><h5>Default Authentication Level</h5>
+<p>The authentication level value indicates how much to trust authentications. Once a user
+has authenticated, this value is stored in the SSO token for the session.
+When the SSO token is presented to an application the user wants to
+access, the application can use the stored value to determine whether the level
+is sufficient to grant the user access. If the authentication level stored in
+an SSO token does not meet the minimum value required, the application can
+prompt the user to authenticate again through a service with a higher authentication
+level.</p><p>The authentication level should be set within the realm's specific authentication template. The
+Default Authentication Level value described here will apply only when no authentication level
+has been specified in the Authentication Level field for a specific realm's authentication template.
+The Default Authentication Level default value is 0. (The value in this attribute
+is not used by OpenSSO but by any external application that may chose
+to use it.)</p>
+<br/>
+
+</body>
+</html>

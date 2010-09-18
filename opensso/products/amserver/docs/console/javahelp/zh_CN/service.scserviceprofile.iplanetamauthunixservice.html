@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>UNIX  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthunixservice"></a><h4>UNIX </h4>
+<p><a name="indexterm-182"></a>此模块是 Solaris 的独有模块，它允许使用用户的 UNIX 标识和密码进行验证。如果对任何 UNIX 验证属性进行了修改，则必须重新启动 OpenSSO 和 amunixd 帮助器。UNIX 验证属性包括全局属性和领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwbsy">配置端口</a></p></li>
+<li><p><a href="#fwbqv">验证端口</a></p></li>
+<li><p><a href="#fwbrv">超时</a></p></li>
+<li><p><a href="#fwbls">线程</a></p></li>
+<li><p><a href="#fwbra">验证级别</a></p></li>
+<li><p><a href="#fwbky">服务名称</a></p></li></ul>
+
+
+<a name="fwbsy"></a><h5>配置端口</h5>
+<p>该属性用于指定启动时 Unix 帮助器为获得“Unix 帮助器验证端口”、“Unix 帮助器超时”和“Unix 帮助器线程”属性中包含的配置信息所“侦听”的端口。默认值为 58946。</p>
+
+<a name="fwbqv"></a><h5>验证端口</h5>
+<p>该属性用于指定配置之后 Unix 帮助器为获取验证请求所“侦听”的端口。默认端口为 57946。</p>
+
+<a name="fwbrv"></a><h5>超时</h5>
+<p>该属性指定用户为完成验证而花费的时间（分钟）。如果用户超过分配的时间，验证将自动失败。默认时间为 3 分钟。</p>
+
+<a name="fwbls"></a><h5>线程</h5>
+<p>该属性用于指定允许同时进行的 Unix 验证会话的最大数目。如果在给定时间内达到了最大数目，将不再允许随后的验证尝试，直到有会话被释放。默认值为 5。</p>
+
+<a name="fwbra"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+
+<a name="fwbky"></a><h5>服务名称</h5>
+<p>定义为您的操作系统发行并用于 UNIX 验证的 PAM （可插接的验证模块） 配置或栈。对于 Solaris，名称通常为 <tt>other</tt>；而对于 Linux，名称为 <tt>password</tt>。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP 绑定服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>SOAP 绑定服务</h3>
+<a name="indexterm-150"></a><p>SOAP 绑定服务是用于发送和接收 SOAP 消息的传输层。在 SOAP 绑定服务过程中，身份服务呼叫客户端应用编程接口，以构建消息并将其发送至 SOAP 端点 URL；实际上是 SOAP 接收方 servlet。SOAP
+接收方 servlet 接收消息，检验签名，并构建第二条消息。然后，SOAP 接收方 servlet 调用正确的请求处理程序，以将此第二条消息发送给相应的身份服务作为响应。身份服务处理第二条消息，生成响应，并将该响应发送回 SOAP 接收方 servlet。SOAP 接收方又将响应发送回身份服务进行处理。</p><p>可为您的实现配置以下 SOAP 绑定服务全局属性。</p>
+<ul><li><p><a href="requesthandlerlist.html">请求处理程序列表</a></p></li>
+<li><p><a href="ggodb.html">SOAP 绑定属性</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">配置请求处理程序</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

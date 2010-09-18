@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuraci&#243;n de directorio - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serverconfigxml"></a><h4>Configuraci&#243;n de directorio</h4>
+<p>Los atributos de configuraci&#243;n del directorio definen la informaci&#243;n de configuraci&#243;n b&#225;sica
+para el almac&#233;n de directorio incrustado:</p>
+
+<a name="ggkdy"></a><h5>Configuraci&#243;n de directorio</h5>
+<p>Los atributos de configuraci&#243;n del directorio son:</p>
+
+<a name="ggkeu"></a><h5>Conjunto m&#237;nimo de conexiones</h5>
+<p>Especifica el tama&#241;o m&#237;nimo de los grupos  de conexiones que se
+van a utilizar para conectarse a Directory Server, como se especifica en
+el atributo del servidor LDAP. El valor predeterminado es 1.</p>
+
+<a name="ggkdx"></a><h5>Conjunto m&#225;ximo de conexiones</h5>
+<p>Este atributo especifica el tama&#241;o m&#225;ximo de los grupos de conexiones que
+se van a utilizar para conectarse a Directory Server, como se especifica
+en el atributo del servidor LDAP. El valor predeterminado es 10.</p>
+
+<a name="ggket"></a><h5>DN de conexi&#243;n</h5>
+<p>Especifica el DN de conexi&#243;n del servidor LDAP.</p>
+
+<a name="ggkdn"></a><h5>Contrase&#241;a de conexi&#243;n</h5>
+<p>Define la contrase&#241;a que se va a utilizar para la conexi&#243;n con
+el servidor LDAP. La contrase&#241;a amldapuser que se introdujo durante la instalaci&#243;n
+se utiliza de forma predeterminada como usuario de conexi&#243;n.</p>
+
+<a name="ghama"></a><h5>Servidor</h5>
+<p>Este atributo define el servidor de directorios que actuar&#225; como almac&#233;n de
+datos de configuraci&#243;n para la instancia de OpenSSO. Para agregar un servidor
+de configuraci&#243;n, haga clic en el bot&#243;n Agregar y facilite valores para
+los siguientes atributos:</p><dl><dt>Nom</dt>
+<dd><p>Introduzca un nombre para el servidor.</p></dd>
+<dt>Nombre de host</dt>
+<dd><p>Especifica el nombre de host completo del servidor de directorios. Por ejemplo:</p><p><tt></tt><i>Hostservidordirectorios.nombredominio</i><tt>.com </tt></p></dd>
+<dt>Port Number</dt>
+<dd><p>Especifica el n&#250;mero de puerto del servidor de directorios.</p></dd>
+<dt>Connection Type</dt>
+<dd><p>Define el tipo de conexi&#243;n para el servidor de directorios. De forma predeterminada est&#225; seleccionado el valor SIMPLE. Tiene la posibilidad de elegir tambi&#233;n SSL.</p></dd>
+</dl>
+
+
+<a name="ggkdu"></a><h5>Configuraci&#243;n tradicional</h5>
+<p>Los siguientes atributos definen las configuraciones b&#225;sicas del servidor de directorios para
+las instancias de OpenSSO en el modo tradicional. Estos atributos aparecer&#225;n &#250;nicamente
+en una instalaci&#243;n en modo heredado.</p>
+
+<a name="ggkej"></a><h5>Conjunto m&#237;nimo de conexiones</h5>
+<p>Especifica el tama&#241;o m&#237;nimo de los grupos  de conexiones que se
+van a utilizar para conectarse a Directory Server, como se especifica en
+el atributo del servidor LDAP. El valor predeterminado es 1.</p>
+
+<a name="ggkdw"></a><h5>Conjunto m&#225;ximo de conexiones</h5>
+<p>Este atributo especifica el tama&#241;o m&#225;ximo de los grupos de conexiones que
+se van a utilizar para conectarse a Directory Server, como se especifica
+en el atributo del servidor LDAP. El valor predeterminado es 10.</p>
+
+<a name="ggkey"></a><h5>Servidor</h5>
+<p>Este atributo muestra el nombre de host, el puerto y el protocolo
+del equilibrador de carga. Por ejemplo: <tt>http://lb.ejemplo.com:80</tt>.</p>
+<br/>
+
+</body>
+</html>

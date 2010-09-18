@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de autoridad de atributos SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>Personalizaci&#243;n de autoridad de atributos SAMLv2</h4>
+<p>La Autoridad de atributos SAMLv2 contiene los siguientes atributos que se pueden
+personalizar:</p>
+<ul><li><p><a href="#ggwhl">Firma y cifrado</a></p></li>
+<li><p><a href="#ggwgh">Servicio de atributos</a></p></li>
+<li><p><a href="#ggwjy">Solicitud de AssertionID</a></p></li>
+<li><p><a href="#ggwju">Perfil de atributo</a></p></li>
+<li><p><a href="#ggwha">Alias de certificado</a></p></li>
+<li><p><a href="#ggwjj">Almac&#233;n de datos de asunto</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>Firma y cifrado</h5>
+<dl><dt>Tama&#241;o de clave</dt>
+<dd><p>Longitud de las claves utilizadas por la entidad Autoridad de atributos al interactuar con otra entidad.</p></dd>
+<dt>Algoritmo</dt>
+<dd><p>El algoritmo de cifrado utilizado para interactuar con otra entidad.</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>Servicio de atributos</h5>
+<p>Este atributo define los puntos finales de URL que recibir&#225;n solicitudes de
+consulta de atributo. <tt>Ubicaci&#243;n</tt> especifica la URL del proveedor al que se
+env&#237;a la solicitud. <tt>Asignador</tt> define el SPI que busca la autoridad de
+asignaci&#243;n de atributos para devolver una lista de los atributos que se
+incluir&#225;n en una respuesta. Los perfiles de consulta de atributo definidos por
+SAMLv2 son:</p>
+<ul><li><p>B&#225;sico</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>Solicitud de AssertionID</h5>
+<p>Define las URL a las que se env&#237;an las AssertionID desde un
+cliente a un proveedor de identidades para recuperar la aserci&#243;n correspondiente. <tt>Ubicaci&#243;n</tt>
+especifica la URL del proveedor al que se env&#237;a la solicitud. 
+<tt>Asignador</tt> define el SPI que busca la autoridad de asignaci&#243;n de AssertionID
+para devolver una lista de los atributos que se incluir&#225;n en una
+respuesta.  Los enlaces son:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>Perfil de atributo</h5>
+<p>Define el tipo de perfil de atributo compatible definido por SAMLv2. <tt>B&#225;sico</tt>
+es el tipo predeterminado.</p>
+
+<a name="ggwha"></a><h5>Alias de certificado</h5>
+<p>Define los elementos de alias de certificado. La <tt>firma</tt> especifica el alias
+de certificado de proveedor utilizado para encontrar el certificado firmante correcto en
+el almac&#233;n de claves.  El <tt>cifrado</tt> especifica el alias de certificado
+de proveedor utilizado para encontrar en el almac&#233;n de claves el certificado
+de cifrado correcto.</p>
+
+<a name="ggwjj"></a><h5>Almac&#233;n de datos de asunto</h5>
+<p>Especifica el nombre de atributo del almac&#233;n de datos que contiene el
+ND de asunto X509. Se utiliza para buscar un usuario cuyo valor
+de atributo coincida con el ND de asunto X. 509. Este campo
+se utiliza en el Perfil de consulta de atributo &#250;nicamente para el
+asunto X. 509. </p>
+<br/>
+
+</body>
+</html>

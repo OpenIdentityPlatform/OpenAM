@@ -1,0 +1,768 @@
+<div><table cellpadding="0" cellspacing="10" border="0" align="left" valign="top">
+  <col WIDTH=100%>
+
+    <tr><td><img src="../../../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+
+    <tr><td><font size="2"><i>You can post comments and questions regarding the documentation provided below on the <a href="http://wiki.java.net/bin/view/Projects/DocFeedback" target="_blank">Documentation Feedback Wiki Page</a>. The page will open in a new window.</i>
+</font></td></tr>
+
+    <tr><td><h2>Authentication Login URLs and Redirection URL Precedence</h2></td></tr>
+    
+    <tr><td>
+    
+<p>The Authentication Service provides different ways in which authentication can be configured and
+applied. These types of authentication are accessed by specifying login URL parameters, or using the authentication APIs. The types of authentication include:</p>
+
+<ul>
+<li>
+<p><a href="#gespb">Realm-based Authentication</a></p></li>
+<li>
+<p><a href="#gespu">Role-based Authentication</a></p></li>
+<li>
+<p><a href="#gesqf">Service-based Authentication</a></p></li>
+<li>
+<p><a href="#gesof">User-based Authentication</a></p></li>
+<li>
+<p><a href="#gespy">Authentication Level-based Authentication</a></p></li>
+<li>
+<p><a href="#gesok">Module-based Authentication</a></p></li>
+</ul>
+
+<p>For each of these types of authentication, the user can either pass or fail. If the user is successfully authenticated, OpenSSO does the following:</p>
+
+<ol>
+<li>
+<p>Confirms that the authenticated user has a profile defined in the data store and whether that profile is active.</p>
+<p>The User Profile attribute in the Core Authentication module can be defined as Required, Dynamic, Dynamic with User Alias, or Ignored. If the value is Required, the profile is active. (This is the default case.) If the value is Dynamic or Dynamic with User Alias, the Authentication Service will create the user profile in the Data Store. If the value is Ignore, the user validation will not be done.</p></li>
+<li>
+<p>Executes the Authentication Post Processing service provider interface (SPI), if applicable.</p>
+<p>To accomplish any post processing, the <tt>AMPostAuthProcessInterface</tt> must be implemented. If the Authentication Post Processing Classes attribute in the Core Authentication module contains a value, the SPI is executed. It can be executed on either successful or failed authentication or on logout.</p></li>
+<li>
+<p>The following properties are added to, or updated in, the session token and the user's session is activated.</p><dl><dt><b>realm</b></dt>
+<dd>
+<p>This is the DN of the realm to which the user belongs.</p></dd>
+<dt><b>Principal</b></dt>
+<dd>
+<p>This is the DN of the user.</p></dd>
+<dt><b>Principals</b></dt>
+<dd>
+<p>This is a list of names to which the user has authenticated. All Principals must map to the same user. The User Alias List in the user's profile contains this list. (This property may have more then one value defined as a pipe separated list.)</p>
+<hr><p><b>Note - </b>This is a function of <a href="authchain.html">authentication chaining</a>.</p>
+<hr>
+</dd>
+<dt><b>UserId</b></dt>
+<dd>
+<p>This is the user&rsquo;s DN as returned by the module, or in the case of modules other than LDAP or Membership, the user name. (All Principals must map to the same user. The UserId is the user DN to which they map.)</p>
+<hr><p><b>Note - </b>This property may be a non-DN value.</p>
+<hr>
+</dd>
+<dt><b>UserToken</b></dt>
+<dd>
+<p>This is a user name. (All Principals must map to the same user. The UserToken is the user name to which they map.)</p></dd>
+<dt><b>Host</b></dt>
+<dd>
+<p>This is the host name or IP address for the client.</p></dd>
+<dt><b>authLevel</b></dt>
+<dd>
+<p>This is the highest level to which the user has authenticated.</p></dd>
+<dt><b>AuthType</b></dt>
+<dd>
+<p>This is a pipe separated list of authentication modules to which the user has authenticated (for example, <tt>module1|module2|module3</tt>).</p></dd>
+<dt><b>clientType</b></dt>
+<dd>
+<p>This is the device type of the client browser.</p></dd>
+<dt><b>Locale</b></dt>
+<dd>
+<p>This is the locale of the client.</p></dd>
+<dt><b>CharSet</b></dt>
+<dd>
+<p>This is the determined character set for the client.</p></dd>
+<dt><b>Role</b></dt>
+<dd>
+<p>Applicable for role-based authentication only, this is the role to which the user belongs.</p></dd>
+<dt><b>Service</b></dt>
+<dd>
+<p>Applicable for service-based authentication only, this is the service to which the user belongs.</p></dd>
+</dl>
+</li>
+<li>
+<p>Redirects the user.</p>
+<p>The user can be redirected to either a Federation Manager page or a URL. The redirection is based on the authentication type's order of precedence as explained in the appropriate section:</p>
+<ul><li>
+<p><a href="#gesog">Successful Realm-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gespd">Successful Role-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesqc">Successful Service-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesoq">Successful User-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesnu">Successful Authentication Level-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gbara">Successful Module-based Authentication Redirection Precedence</a></p></li></ul>
+</li></ol>
+
+<p>If the user has failed authentication, Federation Manager simply redirects the user based
+on the authentication type's order of precedence. See the appropriate section for more
+information.</p>
+
+<ul>
+<li>
+<p><a href="#gespv">Failed Realm-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gespi">Failed Role-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#geson">Failed Service-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gespk">Failed User-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesob">Failed Authentication Level-based Authentication Redirection URLs</a></p></li>
+<li>
+<p><a href="#gbarz">Failed Module-based Authentication Redirection Precedence</a></p></li>
+</ul>
+
+<a name="gespb"></a><h4>Realm-based Authentication</h4>
+<p>This type of authentication allows a user to authenticate as a member of
+a specified realm or sub-realm. The authentication method for a realm is set
+by adding the Core authentication module to the realm and defining the Authentication
+attributes.</p>
+<hr><p><b>Note - </b>The Core authentication module is added to the top-level realm during installation. As
+all new realms are configured under the top-level realm, the Core module is
+dynamically added and enabled for these realms when created.</p>
+<hr>
+
+<p>The following sections contain additional information regarding realm-based authentication.</p>
+<ul><li>
+<p><a href="#gesnt">Realm-based Authentication Login URLs</a></p></li>
+<li>
+<p><a href="#gesox">Realm-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesqh">To Configure Realm-based Authentication</a></p></li></ul>
+<a name="gesnt"></a><h5>Realm-based Authentication Login URLs</h5>
+<p>To access the Authentication Service user interface for realm-based authentication, enter a login
+URL in the Location Bar of a web browser using the <tt><b>realm=</tt><i>realmName</i><tt></b></tt>
+parameter as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?realm=sun</pre>
+<p>Realm-based authentication is the default method of authentication for Federation Manager. Thus, </p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login</pre>
+<p>will also access the Authentication Service user interface for realm-based authentication. Additionally, the
+<tt>org</tt> or <tt>domain</tt> parameter can be used as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?domain=sun</pre>
+<hr><p><b>Tip - </b>The value of the <tt>org</tt> or <tt>domain</tt> parameter must match the value defined
+as the Realm Name in the realm's profile.</p>
+<hr>
+
+<p>The realm of a request for authentication is determined by checking the following, in
+order of precedence:</p>
+<ol><li>
+<p>The <tt>domain</tt> parameter</p></li>
+<li>
+<p>The <tt>realm</tt> parameter</p></li>
+<li>
+<p>The <tt>org</tt> parameter</p></li>
+<li>
+<p>The value of the DNS Alias Names attribute in the Administration serviceXXXXX</p></li></ol>
+
+<p>After calling the correct realm, the authentication module(s) to which the user will
+authenticate are retrieved. If there is no defined realm, it will be determined
+from the server name and domain specified in the login URL.</p>
+<hr><p><b>Note - </b>If a user is a member of (and authenticated to) one realm, and
+tries to authenticate to a different realm, the only two parameters that are
+passed are <tt>realm</tt> and <tt>module</tt>. For example, assume Ann is a member of,
+and authenticated to, Realm A. After she tries to authenticate to Realm B,
+Ann receives a request to do one of the following: start a new
+authentication process using the module specified for Realm B, or return to her
+existing authenticated session with Realm A. If Ann chooses to authenticate to Realm
+B, only the realm name and module name (if specified) are passed and
+honored for determining authentication in Realm B.</p>
+
+<hr>
+
+<a name="gesox"></a><h5>Realm-based Authentication Redirection Precedence</h5>
+<p>Upon a successful or failed realm-based authentication, Federation Manager looks for information on
+where to redirect the user. Following is the order of precedence in which
+the application will look for this information.</p>
+<ul><li>
+<p><a href="#gesog">Successful Realm-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gespv">Failed Realm-based Authentication Redirection Precedence</a></p></li></ul>
+<a name="gesog"></a><h5>Successful Realm-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for successful realm-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm to which the user is a member specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the realm to which the user is a member.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gespv"></a><h5>Failed Realm-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for failed realm-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>gotoOnFail</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gesqh"></a><h4>To Configure Realm-based Authentication</h4><ol>
+<li><b>Login as the realm's administrator.</b></li>
+<li><b>Click the name of the realm you are configuring.</b></li>
+<li><b>Click the Authentication tab.</b></li>
+<li><b>Select an authentication chain from pull down menu of the Default Authentication Chain
+attribute.</b></li>
+<li>(Optional) <b>Select an authentication chain from pull down menu of the Administrator Authentication Chain
+attribute.</b><p>This attribute can be used if the authentication module for administrators must be
+different from the module for users.</p></li>
+<li><b>Click Save.</b></li>
+<li><b>Log out.</b></li>
+<li><b>Access the Authentication Service user interface as described in <a href="p9.html#gesnt">Realm-based Authentication Login URLs</a>.</b></li></ol><a name="gespu"></a><h4>Role-based Authentication</h4>
+<a name="indexterm-72"></a><a name="indexterm-73"></a>
+<p>This type of authentication allows a user to authenticate as a member of
+a specified role (either static or filtered) configured within a realm or sub-realm.
+The authentication method for a role is set by adding the Authentication Configuration
+Service to the role and choosing the appropriate authentication chain from the displayed choices.
+For authentication to be successful, the user must belong to the role and
+they must authenticate to each module defined in the authentication chain selected for
+that role. The following sections contain additional information regarding role-based authentication.</p>
+<ul><li>
+<p><a href="#gesot">Role-based Authentication Login URLs</a></p></li>
+<li>
+<p><a href="#gesnw">Role-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesqi">To Configure Role-based Authentication</a></p></li></ul>
+<a name="gesot"></a><h5>Role-based Authentication Login URLs</h5>
+<p>To access the Authentication Service user interface for role-based authentication, enter a login
+URL in the Location Bar of a web browser using the <tt><b>role=</tt><i>roleName</i><tt></b></tt>
+parameter as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?role=manager</pre>
+<p>The parameter sends the user to the authentication configuration defined for the specified
+role. A user who is not already a member of the specified role
+will receive an error message when they attempt to authenticate with this parameter.</p><a name="gesnw"></a><h5>Role-based Authentication Redirection Precedence</h5>
+<p>Upon a successful or failed role-based authentication, Federation Manager looks for information on
+where to redirect the user. Following is the order of precedence in which
+the application will look for this information.</p>
+<ul><li>
+<p><a href="#gespd">Successful Role-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gespi">Failed Role-based Authentication Redirection Precedence</a></p></li></ul>
+<a name="gespd"></a><h5>Successful Role-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for successful role-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in another role entry of the user's profile specific to the client type from which the request was received.</p>
+<hr><p><b>Note - </b>This option is a fallback if the previous redirection URL fails.</p>
+<hr>
+</li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm to which the user is a member specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in another role entry of the user's profile.</p>
+<hr><p><b>Note - </b>This option is a fallback if the previous redirection URL fails.</p>
+<hr>
+</li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm to which the user is a member.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gespi"></a><h5>Failed Role-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for failed role-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in another role entry of the user's profile specific to the client type from which the request was received.</p>
+<hr><p><b>Note - </b>This option is a fallback if the previous redirection URL fails.</p>
+<hr>
+</li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in another role entry of the user's profile.</p>
+<hr><p><b>Note - </b>This option is a fallback if the previous redirection URL fails.</p>
+<hr>
+</li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm.</p></li></ol>
+
+<a name="gesqi"></a><h4>To Configure Role-based Authentication</h4>
+<p>To configure role-based authentication, you add the Authentication Configuration Service to a role
+within a realm and choose a configured authentication chain. If you are creating
+a new role, the Authentication Configuration Service is not automatically assigned to it.</p><ol>
+<li><b>Login as the administrator for the realm under which the role is configured.</b></li>
+<li><b>Click the name of the realm you are configuring.</b></li>
+<li><b>Click the Subjects tab.</b></li>
+<li><b>Click the Roles tab.</b></li>
+<li><b>Click the name of the role you are configuring.</b></li>
+<li><b>Click the Services tab.</b></li>
+<li><b>Click Add.</b></li>
+<li><b>Select Authentication Configuration.</b></li>
+<li><b>Click Next.</b></li>
+<li><b>Select the appropriate authentication chain from those displayed.</b></li>
+<li><b>Click Finish.</b></li>
+<li><b>Log out.</b></li>
+<li><b>Access the Authentication Service user interface as described in <a href="#gesot">Role-based Authentication Login URLs</a>.</b></li></ol><a name="gesqf"></a><h4>Service-based Authentication</h4>
+<a name="indexterm-82"></a><a name="indexterm-83"></a>
+<p>This type of authentication allows a user to authenticate to a specified authentication
+chain in a realm or sub realm. For authentication to be successful, the
+user must authenticate to each module defined in the chain. The following sections
+contain additional information regarding service-based authentication.</p>
+<ul><li>
+<p><a href="#gesny">Service-based Authentication Login URLs</a></p></li>
+<li>
+<p><a href="#gesoy">Service-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesnx">To Configure Service-based Authentication</a></p></li></ul>
+<a name="gesny"></a><h5>Service-based Authentication Login URLs</h5>
+<a name="indexterm-84"></a><a name="indexterm-85"></a><a name="indexterm-86"></a><a name="indexterm-87"></a>
+<p>To access the Authentication Service user interface for service-based authentication, enter a login
+URL in the Location Bar of a web browser using the <tt><b>service=</tt><i>AuthChainName</i><tt></b></tt>
+parameters as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?service=ldapService</pre>
+<p>Additionally, you can add the <tt><b>realm=</tt><i>realmName</i><tt></b></tt> attribute as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?realm=opensso&amp;service=ldapService</pre>
+<hr><p><b>Note - </b>If there is no defined <tt>realm</tt> parameter, the realm will be determined from
+the server name and domain specified in the login URL.</p>
+<hr>
+<a name="gesoy"></a><h5>Service-based Authentication Redirection Precedence</h5>
+<a name="indexterm-88"></a><a name="indexterm-89"></a><a name="indexterm-90"></a><a name="indexterm-91"></a>
+<p>Upon a successful or failed service-based authentication, Federation Manager looks for information on
+where to redirect the user. Following is the order of precedence in which
+the application will look for this information.</p>
+<ul><li>
+<p><a href="#gesqc">Successful Service-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#geson">Failed Service-based Authentication Redirection Precedence</a></p></li></ul>
+<a name="gesqc"></a><h5>Successful Service-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for successful service-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the service to which the user is authenticated specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute of the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the service to which the user is authenticated.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute of the top-level realm.</p></li></ol>
+<a name="geson"></a><h5>Failed Service-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for failed service-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute of the service to which the user has authenticated specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute of the service to which the user has authenticated.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gesnx"></a><h4>To Configure Service-based Authentication</h4>
+<p>To configure for service-based authentication, you create an authentication chain within a realm
+and force authentication with that chain by accessing the Authentication Service user interface
+with the appropriate login URL.</p><ol>
+<li><b>Login as the administrator for the realm under which you are creating an
+authentication chain.</b></li>
+<li><b>Click the name of the realm.</b></li>
+<li><b>Click the Authentication tab.</b></li>
+<li>(Optional) <b>Create the appropriate authentication module instances.</b></li>
+<li><b>Create an authentication chain.</b></li>
+<li><b>Click Save.</b></li>
+<li><b>Log out.</b></li>
+<li><b>Access the Authentication Service user interface as described in <a href="#gesny">Service-based Authentication Login URLs</a>.</b></li></ol>
+
+<a name="gesof"></a><h4>User-based Authentication</h4>
+<p>This type of authentication allows a user to authenticate using an authentication chain
+defined as the value of the User Authentication Configuration attribute in the user's
+profile. For authentication to be successful, the user must authenticate to each module
+defined in the chain. The following sections contain additional information regarding user-based authentication.</p>
+<ul><li>
+<p><a href="#gesns">User-based Authentication Login URLs</a></p></li>
+<li>
+<p><a href="#gesoj">User-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesqa">To Configure User-Based Authentication</a></p></li></ul>
+<a name="gesns"></a><h5>User-based Authentication Login URLs</h5>
+<p>To access the Authentication Service user interface for user-based authentication, enter a login
+URL in the Location Bar of a web browser using the <tt><b>user=</tt><i>userName</i><tt></b></tt>
+parameter as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?user=eileenA</pre>
+<p>Additionally, you can add the <tt><b>realm=</tt><i>realmName</i><tt></b></tt> attribute as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?realm=opensso&amp;user=eileenA</pre>
+<p>If there is no defined <tt>realm</tt> parameter, the realm will be determined from
+the server name and domain specified in the login URL.</p>
+<hr><p><b>Caution - </b><a name="indexterm-98"></a>On receiving a request for user-based authentication, the Authentication Service first verifies that
+the user is a valid user and then retrieves the User Authentication Configuration
+data. In the case where there is more then one valid user profile
+associated with the value passed by the Login URL, all profiles must map
+to the specified user. The User Alias List attribute is where mappings to
+the user's other profiles are defined. If mapping fails, the user is denied
+a valid session. An exception would be if one of the users is
+a top-level administrator; in this case, user mapping validation is not done and the
+user is given top-level administrator rights.</p>
+<hr>
+
+<a name="gesoj"></a><h5>User-based Authentication Redirection Precedence</h5>
+<p>Upon a successful or failed user&mdash;based authentication, Federation Manager looks for information on
+where to redirect the user. Following is the order of precedence in which
+the application will look for this information.</p>
+<ul><li>
+<p><a href="#gesoq">Successful User-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gespk">Failed User-based Authentication Redirection Precedence</a></p></li></ul>
+<a name="gesoq"></a><h5>Successful User-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for successful user-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gespk"></a><h5>Failed User-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for failed user-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>gotoOnFail</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the realm entry of the user's profile</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm.</p></li></ol>
+
+<a name="gesqa"></a><h4>To Configure User-Based Authentication</h4><ol>
+<li><b>Login as the administrator for the realm under which the user is configured.</b></li>
+<li><b>Click the name of the realm.</b></li>
+<li><b>Click the Subjects tab and click Users.</b></li>
+<li><b>Click the name of the user you wish to modify.</b><p>The User Profile is displayed.</p></li>
+<li><b>Select the authentication chain you want the user to use for the User
+Authentication Configuration attribute.</b></li>
+<li><b>Click Save.</b></li>
+<li><b>Log out.</b></li>
+<li><b>Access the Authentication Service user interface as described in <a href="#gesns">User-based Authentication Login URLs</a>.</b></li></ol>
+
+<a name="gespy"></a><h4>Authentication Level-based Authentication</h4>
+<p>Each authentication module can be associated with an integer that defines its <b>authentication level</b>.
+A higher authentication level value indicates a higher level of trust for the user
+once successful authentication has occurred. Once authenticated, the authentication level is stored in
+the user's session token. When a user requests access to a service, the
+service can determine if the user is allowed by checking the authentication level
+set in the user's session token. If the level does not reach the
+level of trust needed by the service, the user is redirected to complete
+an authentication process with the appropriate authentication level.</p>
+<hr><p><b>Note - </b>If the user is required to authenticate to multiple authentication modules, and does
+so successfully, the highest authentication level value will be set in the session
+token.</p>
+<hr>
+
+<p>The following sections contain additional information regarding authentication level-based authentication.</p>
+<ul><li>
+<p><a href="#gesqk">Authentication Level-based Authentication Login URLs</a></p></li>
+<li>
+<p><a href="#gesos">Authentication Level-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesql">To Configure for Authentication Level-based Authentication</a></p></li></ul>
+<a name="gesqk"></a><h5>Authentication Level-based Authentication Login URLs</h5>
+<p>To access the Authentication Service user interface for authentication level-based authentication, enter a
+login URL in the Location Bar of a web browser using the <tt><b>authlevel=</tt><i>authlevelValue</i><tt></b></tt>
+parameter as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?authlevel=7</pre>
+<p>With this URL, all authentication modules whose authentication level is larger or equal
+to the value defined (in this case, 7) will be displayed as a
+menu from which the user can choose. (If only one matching module is
+found, the login page for that authentication module will be displayed.) After viewing
+the relevant list of modules, the user must choose one with which to
+authenticate.</p>
+<hr><p><b>Note - </b>Once the user selects the module, the authentication process is the same as
+that described in <a href="#gesok">Module-based Authentication</a>.</p>
+<hr>
+
+<p>Additionally, you can add the <tt><b>realm=</tt><i>realmName</i><tt></b></tt> attribute as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?realm=opensso&amp;authlevel=7</pre>
+<hr><p><b>Note - </b>If there is no defined <tt>realm</tt> parameter, the realm will be determined from
+the server name and domain specified in the login URL.</p>
+<hr>
+<a name="gesos"></a><h5>Authentication Level-based Authentication Redirection Precedence</h5>
+<p>Upon a successful or failed authentication level-based authentication, Federation Manager looks for information
+on where to redirect the user. Following is the order of precedence in
+which the application will look for this information.</p>
+<ul><li>
+<p><a href="#gesnu">Successful Authentication Level-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gesob">Failed Authentication Level-based Authentication Redirection URLs</a></p></li></ul>
+<a name="gesnu"></a><h5>Successful Authentication Level-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for successful authentication level-based authentication is determined by checking the
+following places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gesob"></a><h5>Failed Authentication Level-based Authentication Redirection URLs</h5>
+
+<p>The redirection URL for failed authentication level-based authentication is determined by checking the
+following places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>gotoOnFail</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm.</p></li></ol>
+
+<a name="gesql"></a><h4>To Configure for Authentication Level-based Authentication</h4>
+<p>Authentication levels are assigned when creating an Authentication Module Instance.</p>
+
+<ol>
+<li><b>Click the name of the realm to which you will add the new
+authentication module instance.</b></li>
+<li><b>Select the Authentication tab.</b>
+<hr><p><b>Note - </b>The Administrator Authentication Configuration button under Advanced Properties defines the authentication module instance for
+administrators only. This attribute can be used if the authentication module for administrators
+needs to be different from the module for end users. The modules configured
+in this attribute are picked up when the Federation Manager administrator interface is
+accessed.</p>
+<hr>
+</li>
+<li><b>Click New under Module Instances.</b></li>
+<li><b>Enter a unique Name for the authentication module instance.</b></li>
+<li><b>Select the Type of authentication module for this instance.</b></li>
+<li><b>Click OK.</b></li>
+<li><b>Click the name of the newly created module instance and edit the properties
+for that module.</b><p>The Authentication Level attribute is a property.</p></li>
+<li><b>Click Save and Back to Authentication, respectively.</b></li>
+<li><b>Access the Authentication Service user interface as described in <a href="#gesqk">Authentication Level-based Authentication Login URLs</a>.</b></li>
+</ol>
+
+<a name="gesok"></a><h4>Module-based Authentication</h4>
+
+<p>This type of authentication allows an administrator to specify the authentication module to
+which a user will authenticate. The specified module must be registered to the
+realm or sub-realm that the user is accessing and the realm's Module-based Authentication
+attribute (found in the Core Authentication Service) must be enabled. The following sections contain
+additional information regarding module-based authentication.</p>
+<ul><li>
+<p><a href="#gesoi">Module-based Authentication Login URLs</a></p></li>
+<li>
+<p><a href="#gbarb">Module-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gessv">To Configure for Module-based Authentication</a></p></li></ul>
+<a name="gesoi"></a><h5>Module-based Authentication Login URLs</h5>
+<p>To access the Authentication Service user interface for module-based authentication, enter a login
+URL in the Location Bar of a web browser using the <tt><b>module=</tt><i>authModuleName</i><tt></b></tt>
+parameter as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?module=LDAP</pre>
+<p>Additionally, you can add the <tt><b>realm=</tt><i>realmName</i><tt></b></tt> attribute as in:</p><pre>http://<i>server_name</i>.<i>domain_name</i>:<i>port</i>/amserver/UI/Login?realm=opensso&amp;module=LDAP</pre>
+<hr><p><b>Note - </b>If there is no defined <tt>realm</tt> parameter, the realm will be determined from
+the server name and domain specified in the login URL.</p>
+<hr>
+<a name="gbarb"></a><h5>Module-based Authentication Redirection Precedence</h5>
+<p>Upon a successful or failed module-based authentication, Federation Manager looks for information on
+where to redirect the user. Following is the order of precedence in which
+the application will look for this information.</p>
+<ul><li>
+<p><a href="#gbara">Successful Module-based Authentication Redirection Precedence</a></p></li>
+<li>
+<p><a href="#gbarz">Failed Module-based Authentication Redirection Precedence</a></p></li></ul>
+<a name="gbara"></a><h5>Successful Module-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for successful module-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>goto</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Success URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Success URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the realm entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Success Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gbarz"></a><h5>Failed Module-based Authentication Redirection Precedence</h5>
+
+<p>The redirection URL for failed module-based authentication is determined by checking the following
+places in order of precedence:</p>
+<ol><li>
+<p>A URL set by the authentication module.</p></li>
+<li>
+<p>A URL set by a <tt>gotoOnFail</tt> Login URL parameter.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm specific to the client type from which the request was received.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the user's profile.</p></li>
+<li>
+<p>The value of the Failure URL attribute in the role entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the realm entry of the user's profile.</p></li>
+<li>
+<p>The value of the Default Failure Login URL attribute in the top-level realm.</p></li></ol>
+<a name="gessv"></a><h4>To Configure for Module-based Authentication</h4><ol>
+<li><b>Login as the administrator for the realm you are modifying.</b></li>
+<li><b>Click the name of the realm.</b></li>
+<li><b>Click the Authentication tab.</b></li>
+<li><b>Enable Module-based Authentication if not already.</b></li>
+<li><b>Click Save.</b></li>
+<li><b>Log out.</b></li>
+<li><b>Access the Authentication Service user interface as described in <a href="#gesoi">Module-based Authentication Login URLs</a>.</b></li></ol>
+</font></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

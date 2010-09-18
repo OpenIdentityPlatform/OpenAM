@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>具有 OpenSSO 模式的 Sun Directory Server 屬性 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepoeditfamschema"></a><h4>具有 OpenSSO 模式的 Sun Directory Server 屬性</h4>
+<p><a name="indexterm-15"></a>下列屬性用於配置具有 OpenSSO 模式的 Directory Server：</p>
+
+<a name="gdosl"></a><h5>LDAP 伺服器</h5>
+<p>輸入您要連接的 LDAP 伺服器名稱。格式應為 <tt>hostname.domainname:portnumber</tt>。</p><p>如果輸入了多個 <tt>host:portnumber</tt> 項目，則會嘗試連接清單中的第一個主機。僅當連接至目前主機失敗時，才會嘗試清單中的下一個項目。</p>
+
+<a name="gdors"></a><h5>LDAP 連結 DN</h5>
+<p>指定 OpenSSO 將用來認證至您目前所連接之 LDAP 伺服器的 DN 名稱。具有連結所用之 DN 名稱的使用者應具有您配置於 <a href="realm.idrepoeditad.html#fyffb">LDAPv3 外掛程式支援的類型和作業</a>屬性中的正確的新增/修改/刪除權限。</p>
+
+<a name="gdorp"></a><h5>LDAP 連結密碼</h5>
+<p>指定 OpenSSO 將用來認證至您目前所連接之 LDAP 伺服器的 DN 密碼。</p>
+
+<a name="gdorv"></a><h5>LDAP 連結密碼 (確認)</h5>
+<p>確認密碼。</p>
+
+<a name="gdosh"></a><h5>LDAP 組織 DN</h5>
+<p>此資料存放區將對映的 DN 。此將為於此資料存放區中執行之所有作業的基底 DN。</p>
+
+<a name="gdorr"></a><h5>LDAP SSL</h5>
+<p>啟用時，OpenSSO 會使用 HTTPS 協定連線至主伺服器。</p>
+
+<a name="gdorl"></a><h5>LDAP 連接儲存區最小大小</h5>
+<p>指定連接儲存區中的初始連線數目。使用連線池就不必每次都建立新的連線。</p>
+
+<a name="gdosj"></a><h5>LDAP 連接儲存區最大大小</h5>
+<p>指定允許的最大連線數目。</p>
+
+<a name="gdosp"></a><h5>從搜尋傳回的最多結果</h5>
+<p>指定搜尋作業傳回項目的最大數目。若已達到上限，Directory Server 會傳回任何符合搜尋請求的項目。</p>
+
+<a name="gdori"></a><h5>搜尋逾時</h5>
+<p>指定搜尋請求所分配的最大秒數。若已達到上限，Directory Server 會傳回任何符合搜尋請求的搜尋項目。</p>
+
+<a name="gdosg"></a><h5>LDAP 依照參照</h5>
+<p>若啟用，此選項指定自動跟隨其他 LDAP 伺服器的參照。</p>
+
+<a name="gdorh"></a><h5>LDAPv3 儲存庫外掛程式類別名稱</h5>
+<p>指定實作 Access Manager 儲存庫外掛程式的類別檔案位置。</p>
+
+<a name="gdorx"></a><h5>屬性名稱對映</h5>
+<p>啟用將對映至本機資料存放區的架構所知的通用屬性。例如，若架構使用 <tt>inetUserStatus</tt> 來決定使用者狀態，則本機資料存放區可能實際使用 <tt>userStatus</tt>。屬性定義區分大小寫。</p>
+
+<a name="gdose"></a><h5>LDAPv3 外掛程式支援的類型和作業</h5>
+<p>指定 LDAP 伺服器允許的或可執行的作業。預設作業是僅限於此 LDAPv3 儲存庫外掛程式支援的作業。以下是「LDAPv3 儲存庫外掛程式」支援的作業：</p>
+<ul><li><p>篩選的角色 &#8211; 讀取、建立、編輯、刪除</p></li>
+<li><p>群組 &#8212; 讀取、建立、編輯、刪除</p></li>
+<li><p>範圍 &#8211; 讀取、建立、編輯、刪除、服務</p></li>
+<li><p>使用者 &#8212; 讀取、建立、編輯、刪除、服務</p></li></ul>
+<p>可根據您的 LDAP 伺服器設定及作業從上述清單中移除權限，但您不能新增更多權限。</p><p>如果所配置的 LDAPv3 儲存庫外掛程式指向 Sun Directory Server 的實例，則可以增加<tt>角色</tt>類型權限。否則，由於其他資料存放區可能不支援角色，從而不能增加此權限。「角色」類型的權限為：</p>
+<ul><li><p>角色 &#8212; 讀取、建立、編輯、刪除</p></li></ul>
+<p>如果將<tt>使用者</tt>做為 LDAPv3 儲存庫支援的類型，則該使用者可以進行讀取、建立、編輯及刪除服務作業。換句話說，如果<tt>使用者</tt>是受支援的類型，則讀取、編輯、建立及刪除作業可讓您讀取、編輯、建立及刪除身份識別儲存庫中的使用者項目。<tt>user=service</tt> 作業可讓 OpenSSO 服務存取使用者項目中的屬性。此外，如果為使用者所屬的範圍或角色指定了動態服務，則使用者也可以存取動態服務屬性。</p><p>使用者還能管理所有指定服務的使用者屬性。如果使用者將<tt> service </tt>做為作業 (<tt>user=service</tt>)，則它會指定所有服務相關的作業均受支援。這些作業包括 <tt>assignService</tt>、<tt>unassignService</tt>、<tt>getAssignedServices</tt>、<tt>getServiceAttributes、removeServiceAttributes</tt> 及 <tt>modifyService</tt>。</p>
+
+<a name="gdoqv"></a><h5>LDAPv3 外掛程式搜尋範圍</h5>
+<p>定義用於尋找 LDAPv3 外掛程式項目的範圍。此範圍必須為以下一種：</p>
+<ul><li><p>SCOPE_BASE &#8211; 僅搜尋基底 DN。</p></li>
+<li><p>SCOPE_ONE &#8211; 僅搜尋基底 DN 下的項目。</p></li>
+<li><p>SCOPE_SUB (預設值) &#8211; 搜尋基底 DN 及其子樹內的所有項目。</p></li></ul>
+
+
+<a name="gguen"></a><h5>LDAP 使用者搜尋屬性</h5>
+<p>此欄位定義進行使用者搜尋的屬性類型。例如，如果使用者的 DN 為 <tt>uid=user1, ou=people, dc=example, dc=com</tt>，則需要在此欄位中指定 <tt>uid</tt>。</p>
+
+<a name="gdoru"></a><h5>LDAP 使用者搜尋篩選器</h5>
+<p>指定用於尋找使用者項目的搜尋篩選器。</p>
+
+<a name="gdorb"></a><h5>LDAP 使用者物件類別</h5>
+<p>指定使用者的物件類別。當建立了一個使用者時，本使用者物件類別清單將增加至使用者的屬性清單。</p>
+
+<a name="gdoro"></a><h5>LDAP 使用者屬性</h5>
+<p>定義與使用者相關聯的屬性清單。任何不在本清單上的讀取/寫入使用者屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+
+<a name="gdosa"></a><h5>建立使用者屬性對映</h5>
+<p>指定建立使用者時需要哪些屬性。此屬性使用下列語法：</p><p><tt>DestinationAttributeName=SourceAttributeName</tt></p><p>如果缺少來源屬性名稱，則預設值是使用者 ID (<tt>uid</tt>)。例如：</p>cn sn=givenName<p>若要建立使用者設定檔，則 <tt>cn</tt> 和 <tt>sn</tt> 都是必要的。<tt>cn</tt> 取得屬性 <tt>uid</tt> 的值，而 <tt>sn</tt> 取得屬性 <tt>givenName</tt> 的值。</p>
+
+<a name="gdora"></a><h5>使用者狀態的屬性名稱</h5>
+<p>指定可指示使用者狀態的屬性名稱。</p>
+
+<a name="gdorq"></a><h5>LDAP 群組搜尋屬性</h5>
+<p>此欄位定義對群組進行搜尋的屬性類型。預設值為 <tt>cn</tt>。</p>
+
+<a name="gdoqy"></a><h5>LDAP 群組搜尋篩選器</h5>
+<p>指定用於尋找群組項目的搜尋篩選器。預設值為 <tt>(objectclass=groupOfUniqueNames)</tt>。</p>
+
+<a name="gdoqr"></a><h5>LDAP 群組容器命名屬性</h5>
+<p>若群組存在於容器中，請指定群組容器的命名屬性。否則，此屬性將為空白。例如，若 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的群組 DN 位於 <tt>ou=groups</tt> 之中，則群組容器命名屬性為 <tt>ou</tt>。</p>
+
+<a name="gdorg"></a><h5>LDAP 群組容器值</h5>
+<p>指定群組容器值。例如，如果 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的群組 DN 位於容器名稱 <tt>ou=groups</tt> 之中，則群組容器值應為 <tt>groups</tt>。</p>
+
+<a name="gdoqx"></a><h5>LDAP 群組物件類別</h5>
+<p>指定群組的物件類別。當建立了一個群組時，本群組物件類別清單將增加至群組的屬性清單。</p>
+
+<a name="gdoty"></a><h5>LDAP 群組屬性</h5>
+<p>定義與群組相關聯的屬性清單。任何不在本清單上的讀取/寫入群組屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+
+<a name="gdotx"></a><h5>群組成員身份的屬性名稱</h5>
+<p>指定屬性名稱，其值為 DN 所屬之所有群組的名稱。預設值為 <tt>memberOf</tt>。</p>
+
+<a name="gdouc"></a><h5>唯一成員的屬性名稱</h5>
+<p>指定屬性名稱，其值為屬於此群組的 DN。預設值為 <tt>uniqueMember</tt>。</p>
+
+<a name="gdotd"></a><h5>群組成員 URL 的屬性名稱</h5>
+<p>指定屬性名稱，其值為一個 LDAP URL，可解析為此群組的成員。預設值為 <tt>memberUrl</tt>。</p>
+
+<a name="gdotr"></a><h5>LDAP 角色搜尋屬性</h5>
+<p>此欄位定義對角色進行搜尋的屬性類型。預設值為 <tt>cn</tt>。</p>
+
+<a name="gdost"></a><h5>LDAP 角色搜尋篩選</h5>
+<p>定義用來搜尋角色的篩選器。LDAP 角色搜尋屬性置於此欄位之前以形成實際角色搜尋篩選器。</p><p>例如，若 LDAP 角色搜尋屬性為 <tt>CN</tt>，而 LDAP 角色搜尋篩選為 <tt>(objectClass=sunIdentityServerDevice)</tt>，則實際使用者搜尋篩選器將為：<tt>(&#38;(cn=*)(objectClass=sunIdentityServ erDevice))</tt></p>
+
+<a name="gdotq"></a><h5>LDAP 角色物件類別</h5>
+<p>定義角色的物件類別。建立角色時，使用者物件類別清單將會增加到角色的屬性清單。</p>
+
+<a name="gdote"></a><h5>LDAP 角色屬性</h5>
+<p>定義與角色相關聯的屬性清單。任何不在本清單上的讀取/寫入代理程式屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+
+<a name="ggtnw"></a><h5>LDAP 篩選角色搜尋屬性</h5>
+<p>此欄位定義搜尋篩選角色的屬性類型。預設值為 <tt>cn</tt>。</p>
+
+<a name="ggtrt"></a><h5>LDAP 篩選角色搜尋篩選</h5>
+<p>定義用來搜尋篩選的角色的篩選器。LDAP 篩選器角色搜尋屬性置於此欄位之前以形成實際的篩選的角色搜尋篩選器。</p><p>例如，若 LDAP 篩選角色搜尋屬性為 <tt>CN</tt>，而 LDAP 篩選角色搜尋篩選為 <tt>(objectClass=sunIdentityServerDevice)</tt>，則實際使用者搜尋篩選器將為：<tt>(&#38;(cn=*)(objectClass=sunIdentityServ erDevice))</tt></p>
+
+<a name="ggtoc"></a><h5>LDAP 篩選角色物件類別</h5>
+<p>定義篩選的角色的物件類別。建立篩選的角色時，使用者物件類別清單將會增加到篩選的角色的屬性清單。</p>
+
+<a name="ggtmu"></a><h5>LDAP 篩選角色屬性</h5>
+<p>定義與篩選的角色相關聯的屬性清單。任何不在本清單上的讀取/寫入代理程式屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+
+<a name="gdoue"></a><h5>LDAP 使用者容器命名屬性</h5>
+<p>若使用者存在於容器中，請指定使用者容器的命名屬性。若使用者並未位於使用者容器中，此欄位應為空白。</p>
+
+<a name="gdotl"></a><h5>LDAP 使用者容器值</h5>
+<p>指定使用者容器值。預設值為 <tt>people</tt>。</p>
+
+<a name="gdosy"></a><h5>可認證的識別類型</h5>
+<p>指定當範圍的認證模組模式設定為「資料存放區」時，資料存放區可以認證使用者及/或代理程式識別類型。</p>
+
+<a name="gdotf"></a><h5>持續搜尋基底 DN</h5>
+<p>定義用於持續搜尋的基底 DN。某些 LDAPv3 伺服器僅在根尾碼層次上支援持續搜尋。</p>
+
+<a name="gdotu"></a><h5>持續搜尋篩選器</h5>
+<p>定義可傳回目錄伺服器項目之特定變更的篩選器。資料存放區只會接收與定義的篩選器相符的變更。</p>
+
+<a name="ggueg"></a><h5>持續搜尋範圍</h5>
+<p>定義持續搜尋中使用的範圍。此範圍必須為以下一種：</p>
+<ul><li><p>SCOPE_BASE &#8211; 僅搜尋基底 DN。</p></li>
+<li><p>SCOPE_ONE &#8211; 僅搜尋基底 DN 下的項目。</p></li>
+<li><p>SCOPE_SUB (預設值) &#8211; 搜尋基底 DN 及其子樹內的所有項目。</p></li></ul>
+
+
+<a name="gdoub"></a><h5>重新啟動前持續搜尋最長閒置時間</h5>
+<p>重新啟動持續搜尋前，請定義最大閒置時間。此值必須大於 1。若值小於或等於 1，則無論連線的閒置時間為何，皆將重新啟動搜尋。</p><p>若 OpenSSO 與負載平衡器同時部署，則某些負載平衡器將在閒置一段特定時間後逾時。於此條件中，您應該將重新啟動前持續搜尋最長閒置時間設定為一個小於負載平衡器之特定時間的值。</p>
+
+<a name="gdoua"></a><h5>出現錯誤碼後的最大重試次數</h5>
+<p>若遇到需要重試的 LDAPException 錯誤碼中指定的錯誤碼，定義持續搜尋作業的最大重試次數。</p>
+
+<a name="gdotg"></a><h5>重試之間的延遲時間</h5>
+<p>指定每次重試前的等待時間。僅適用於持續搜尋連線。</p>
+
+<a name="gdoti"></a><h5>需要重試的 LDAPException 錯誤碼</h5>
+<p>指定需要重新啟動持續搜尋作業的錯誤碼。此屬性僅適用於持續搜尋，並不適用於所有 LDAP 作業。</p>
+
+<a name="gdosw"></a><h5>快取</h5>
+<p>若啟用，可讓 OpenSSO 快取從資料存放區中擷取的資料。</p>
+
+<a name="gdotn"></a><h5>快取項目的最長保留時間</h5>
+<p>指定資料在被移除之前要儲存在快取中的最長時間。以秒為單位定義值。</p>
+
+<a name="gdouf"></a><h5>快取的最大大小</h5>
+<p>指定快取的最大大小。值越大，可儲存的資料越多，但也需要更多記憶體。以位元組為單位定義值。</p>
+<br/>
+
+</body>
+</html>

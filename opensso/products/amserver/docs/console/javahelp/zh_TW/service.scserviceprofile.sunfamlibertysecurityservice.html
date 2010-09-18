@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-WSF 安全性服務 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Liberty ID-WSF 安全性服務</h4>
+
+
+<a name="ggohs"></a><h5>安全性屬性外掛程式類別</h5>
+<p>此屬性指定 <tt> com.sun.identity.liberty.ws.security.SecurityAttributePlugin</tt> 介面的實作類別名稱。類別會傳回要包含在「探索服務」所產生憑證中的 SAML 屬性清單。</p>
+
+<a name="ggoia"></a><h5>金鑰資訊類型</h5>
+<p>此屬性中設定的值會用於 <tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider</tt> 實作類別中。它會指定放入 XML 簽名內 <tt>KeyInfo</tt> 區塊中的資料類型。如果值為 <tt>certificate</tt>，則簽署人的 X059 憑證將包含在 <tt>KeyInfo</tt> 內。否則，對應的
+DSA/RSA 金鑰將包含在 <tt>KeyInfo</tt> 中。</p>
+
+<a name="ggoin"></a><h5>安全性記號提供者類別</h5>
+<p>此屬性指定安全性記號提供者的實作類別。</p>
+
+<a name="ggohw"></a><h5>預設 WSC 憑證別名</h5>
+<p>此屬性指定預設憑證別名，用於此 Web 服務用戶端的發行 Web 服務安全記號。</p>
+
+<a name="ggohz"></a><h5>信任的授權單位簽署憑證別名</h5>
+<p>此屬性指定信任的授權單位的憑證別名，用於簽署回應訊息的 SAML 或 SAML BEARER 記號。</p>
+
+<a name="ggohd"></a><h5>信任的 CA 簽名憑證別名</h5>
+<p>此屬性指定傳入請求的受信任 CA. SAML 或 SAML BEARER 記號的憑證別名。訊息必須由此清單中信任的 CA 簽署。語法為 <tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|..... </tt></p><p>範例：<tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>。</p><p>當記號的簽名內沒有 <tt>KeyInfo</tt> 時，會使用值發行者。記號的發行者必須在此清單中，而且將使用對應的憑證別名來驗證簽名。如果 <tt>KeyInfo</tt> 存在，則金鑰庫必須包含與 <tt>KeyInfo</tt> 相符的憑證別名，且憑證別名必須在此清單中。</p>
+<br/>
+
+</body>
+</html>

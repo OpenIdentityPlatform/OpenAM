@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>條件 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>條件</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>條件可讓您定義對策略的限制。例如，如果您在為薪津應用程式定義策略，可以定義僅在特定幾小時限制此動作存取應用程式的條件。或者，如果請求來自給定 IP 位址集或企業內部網路，可能希望定義僅允許此動作存取的條件。</p><p>此條件可能還用於在同一網域的不同 URL 中配置不同的策略。例如，<tt>http://org.example.com/hr/*jsp</tt> 僅可以藉由 <tt>org.example.net</tt> 在上午 9 時至下午 5 時之間進行存取。配合使用 IP 條件與時間條件便可達此目的。將規則資源指定為
+<tt>http://org.example.com/hr/*.jsp</tt>，此策略會套用於 <tt>http://org.example.com/hr</tt> 下的所有 JSP (包括子目錄中的 JSP)。</p>
+<hr><p><b>備註 &#8211; </b>參照、規則、資源、主體、條件、動作及值等術語分別對應於 <tt>policy.dtd</tt> 中的元素 <b>Referral</b>、<b>Rule</b>、<b>ResourceName</b>、<b>Subject</b>、<b>Condition</b>、<b>Attribute</b> 及 <b>Value</b>。</p>
+<hr>
+<p>請參閱<a href="policy.selectconditiontype.html">將條件增加至策略</a>。</p>
+<br/>
+
+</body>
+</html>

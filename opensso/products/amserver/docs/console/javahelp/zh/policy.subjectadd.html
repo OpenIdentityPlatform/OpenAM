@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>向策略添加主体 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.subjectadd"></a><h5>向策略添加主体</h5>
+<ol>
+<li><b><a name="indexterm-28"></a>如果已创建了策略，请单击要为其添加主体的策略的名称。如果尚未创建策略，请参见<a href="policy.policynormaladd.html">创建新的常规策略</a>。</b></li>
+<li><b>在“主体”列表中单击“新建”。</b></li>
+<li><b>选择以下任一默认主体类型。有关主体类型的说明，参见<a href="policy.selectsubjecttype.html">主体</a></b></li>
+<li><b>单击“下一步”。</b></li>
+<li><b>输入主体的名称。</b></li>
+<li><b>选择或取消选择“排除”字段。</b><p>如果未选择该字段（默认），策略将应用到属于该主体的成员的身份。如果选择该字段，策略将应用到<b>不</b>属于该主体的成员的身份。</p><p>如果该策略中存在多个主体，至少要有一个主体表明该策略适用于给定的身份，策略才能应用到该身份。</p></li>
+<li><b>执行搜索以显示要添加到主体的身份。此步骤不适用于“验证的用户”主体或“Web 服务客户机”主体。 </b><p>默认 (*) 搜索模式将显示所有符合条件的条目。</p></li>
+<li><b>选择要为主体添加的各个身份，或单击“全部添加”一次添加所有身份。单击“添加”将这些身份移至“选定”列表中。 此步骤不适用于“已验证用户”主体。</b></li>
+<li><b>单击“完成”。</b></li>
+<li><b>要从策略中删除主体，请选择相应主体并单击“删除”。您可以通过单击主体名称来编辑任何主体定义。</b></li></ol>
+<br/>
+
+</body>
+</html>

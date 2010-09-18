@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Policies - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.policy"></a><h3>Policies</h3>
+<p><a name="indexterm-20"></a><a name="indexterm-21"></a>A <b>policy</b> defines rules that specify access privileges to a realm&#8217;s protected resources.
+Businesses posses resources, applications and services that they need to protect, manage and
+monitor. Policies control the access permissions and usage of these resources by defining when
+and how a user can perform an action on a given resource. A
+policy, when applied to an object, defines the resources that a particular object
+can access.</p><p>A single policy can define either binary or non-binary decisions. A binary decision
+is <b>yes</b>/<b>no</b>,  <b>true</b>/<b>false</b> or <b>allow</b>/ <b>deny</b>. A non-binary decision represents the value
+of an attribute. For example, a mail service might include a <tt>mailboxQuota</tt> 
+attribute with a maximum storage value set for each user. In general, a
+policy is configured to define what an object can do to which resource
+and under what conditions.</p><p>There are two types of policies that can be configured using OpenSSO; <a href="normalpolicy.html">Normal Policies</a>
+or <a href="fyfby.html">Referral Policies</a>. A normal policy consists of <b>rules</b>, <b>subjects</b>, <b>conditions</b>, and <b>response providers</b>. A
+referral policy consists of <b>rules</b> and  <b>referrals</b> to organizations.</p>
+<br/>
+
+</body>
+</html>

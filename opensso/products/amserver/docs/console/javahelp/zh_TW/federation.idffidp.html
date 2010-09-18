@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 ID-FF 身份識別提供者 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffidp"></a><h4>自訂 ID-FF 身份識別提供者</h4>
+<p>ID-FF 身份識別提供者屬性的分組如下：</p>
+<ul><li><p><a href="#ggwkz">共用屬性</a></p></li>
+<li><p><a href="#ggwne">通訊 URL</a></p></li>
+<li><p><a href="#ggwms">通訊設定檔</a></p></li>
+<li><p><a href="#ggwnv">身份識別提供者配置</a></p></li>
+<li><p><a href="#ggwmr">服務 URL</a></p></li>
+<li><p><a href="#ggwqu">外掛程式</a></p></li>
+<li><p><a href="#ggwow">身份識別提供者屬性對映程式</a></p></li>
+<li><p><a href="#ggwmp">啟動程式</a></p></li>
+<li><p><a href="#ggwor">自動聯合</a></p></li>
+<li><p><a href="#ggwnn">認證環境</a></p></li>
+<li><p><a href="#ggwmz">SAML 屬性</a></p></li></ul>
+
+
+<a name="ggwkz"></a><h5>共用屬性</h5>
+
+<ul><li><p><a href="#ggwqt">提供者類型</a></p></li>
+<li><p><a href="#ggwpg">描述</a></p></li>
+<li><p><a href="#ggwqp">協定支援列舉</a></p></li>
+<li><p><a href="#ggwra">簽署金鑰</a></p></li>
+<li><p><a href="#ggwob">加密金鑰</a></p></li>
+<li><p><a href="#ggwmo">名稱識別碼加密</a></p></li></ul>
+
+
+<a name="ggwqt"></a><h5>提供者類型</h5>
+<p>此屬性的靜態值是正在配置的提供者類型：代管或遠端。</p>
+
+<a name="ggwpg"></a><h5>描述</h5>
+<p>此屬性的值為身份識別提供者的描述。</p>
+
+<a name="ggwqp"></a><h5>協定支援列舉</h5>
+<p>選擇此提供者支援的 Liberty ID-FF 發行版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 是指 Liberty Identity Federation Framework 1.2 版。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 是指 Liberty Identity Federation Framework 1.1 版。</p></li></ul>
+
+
+<a name="ggwra"></a><h5>簽署金鑰</h5>
+<p>定義用來簽署請求和回應的安全性憑證別名。</p>
+
+<a name="ggwob"></a><h5>加密金鑰</h5>
+<p>定義用於加密簽署金鑰與加密金鑰的安全性憑證別名。憑證儲存在 Java 金鑰庫檔案中。每一個特定憑證都會對映到用來擷取憑證的別名。</p>
+
+<a name="ggwmo"></a><h5>名稱識別碼加密</h5>
+<p>選取核取方塊以啟用名稱識別碼的加密。</p>
+
+<a name="ggwne"></a><h5>通訊 URL</h5>
+
+<ul><li><p><a href="#ggwqz">SOAP 端點</a></p></li>
+<li><p><a href="#ggwls">單次登入服務 URL</a></p></li>
+<li><p><a href="#ggwoh">單一登出服務</a></p></li>
+<li><p><a href="#ggwln">單一登出回傳</a></p></li>
+<li><p><a href="#ggwpl">聯合終止服務</a></p></li>
+<li><p><a href="#ggwna">聯合終止回傳</a></p></li>
+<li><p><a href="#ggwqn">名稱註冊服務</a></p></li>
+<li><p><a href="#ggwmy">名稱註冊回傳</a></p></li></ul>
+
+
+<a name="ggwqz"></a><h5>SOAP 端點</h5>
+<p>定義身份識別提供者的 SOAP 訊息收件者的 URI。此值以非瀏覽器通訊的方式傳送 SOAP 收件者位置。</p>
+
+<a name="ggwls"></a><h5>單次登入服務 URL</h5>
+<p>定義服務提供者可以向其傳送單次登入及聯合請求的 URL。</p>
+
+<a name="ggwoh"></a><h5>單一登出服務</h5>
+<p>定義服務提供者可以向其傳送登出請求的 URL。單一登出會同步處理所有由身份識別提供者所認證的階段作業之登出功能。</p>
+
+<a name="ggwln"></a><h5>單一登出回傳</h5>
+<p>定義服務提供者可以向其傳送單一登出回應的 URL。</p>
+
+<a name="ggwpl"></a><h5>聯合終止服務</h5>
+<p>定義服務提供者會將聯合終止請求傳送到的 URL。</p>
+
+<a name="ggwna"></a><h5>聯合終止回傳</h5>
+<p>定義服務提供者會將聯合終止回應傳送到的 URL。</p>
+
+<a name="ggwqn"></a><h5>名稱註冊服務</h5>
+<p>定義一個 URL，服務提供者將會向這一 URL 傳送請求，以指定與身份識別提供者就主體進行通訊時所用的新名稱識別碼。只有在建立聯合階段作業之後，才能使用此服務。</p>
+
+<a name="ggwmy"></a><h5>名稱註冊回傳</h5>
+<p>定義服務提供者會將名稱註冊回應傳送到的 URL。</p>
+
+<a name="ggwms"></a><h5>通訊設定檔</h5>
+
+<ul><li><p><a href="#ggwol">聯合終止</a></p></li>
+<li><p><a href="#ggwlm">單一登出</a></p></li>
+<li><p><a href="#ggwng">名稱註冊</a></p></li>
+<li><p><a href="#ggwoo">單次登入/聯合</a></p></li></ul>
+
+
+<a name="ggwol"></a><h5>聯合終止</h5>
+<p>選取要通知其他提供者主體聯合終止的設定檔：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwlm"></a><h5>單一登出</h5>
+<p>選取通知其他提供者主體登出的設定檔：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>HTTP 取得</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwng"></a><h5>名稱註冊</h5>
+<p>選取要通知其他提供者主體名稱註冊的設定檔：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwoo"></a><h5>單次登入/聯合</h5>
+<p>選取傳送認證請求的設定檔：</p>
+<ul><li><p>瀏覽器 Post (指定基於瀏覽器的 HTTP POST 協定)</p></li>
+<li><p>瀏覽器 Artifact (指定一個基於 (非瀏覽器) SOAP 的協定)</p></li>
+<li><p>LECP (指定一個啟用 Liberty 的用戶端代理)</p>
+<hr><p><b>備註 &#8211; </b>OpenSSO 可處理來自啟用了 Liberty 的用戶端代理伺服器設定檔的請求，但是它需要的某些配置不在本手冊討論範圍內。</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwnv"></a><h5>身份識別提供者配置</h5>
+
+<ul><li><p><a href="#ggwpf">提供者別名</a></p></li>
+<li><p><a href="#ggwoz">認證類型</a></p></li>
+<li><p><a href="#ggwmt">指定發行者</a></p></li>
+<li><p><a href="#ggwys">回應內容</a></p></li>
+<li><p><a href="#ggwmv">提供者狀態</a></p></li></ul>
+
+
+<a name="ggwpf"></a><h5>提供者別名</h5>
+<p>定義本機身份識別提供者的別名名稱。</p>
+
+<a name="ggwoz"></a><h5>認證類型</h5>
+<p>選擇用於本機代管的提供者之認證請求的提供者：</p>
+<ul><li><p><b>遠端</b>指定本機代管的提供者在接收認證請求時將連絡遠端身份識別提供者。</p></li>
+<li><p><b>本機</b>指定本機代管的提供者在接收認證請求時應連絡本機身份識別提供者 (實質上就是本身)。</p></li></ul>
+
+
+<a name="ggwmt"></a><h5>指定發行者</h5>
+<p>定義發行指定的主機之名稱。如果 OpenSSO 位於負載平衡器後，則此值可能是負載平衡器的主機名稱。</p>
+
+<a name="ggwys"></a><h5>回應內容</h5>
+<p>指定身份識別提供者可產生的敘述類型。例如 <tt>lib:AuthenticationStatement</tt>。</p>
+
+<a name="ggwmv"></a><h5>提供者狀態</h5>
+<p>定義身份識別提供者為使用中或非使用中。預設值為使用中，表示身份識別提供者可以處理請求並產生回應。</p>
+
+<a name="ggwmr"></a><h5>服務 URL</h5>
+
+<ul><li><p><a href="#ggwlo">首頁 URL</a></p></li>
+<li><p><a href="#ggwnh">單一登入失敗重新導向 URL</a></p></li>
+<li><p><a href="#ggwnq">聯合頁面 URL</a></p></li>
+<li><p><a href="#ggwqh">註冊完成 URL</a></p></li>
+<li><p><a href="#ggwmu">COT 頁面 URL 的清單</a></p></li>
+<li><p><a href="#ggwqk">終止 URL</a></p></li>
+<li><p><a href="#ggwqb">終止完成 URL</a></p></li>
+<li><p><a href="#ggwme">錯誤頁面 URL</a></p></li>
+<li><p><a href="#ggwon">登出完成 URL</a></p></li></ul>
+
+
+<a name="ggwlo"></a><h5>首頁 URL</h5>
+<p>定義身份識別提供者的首頁的 URL。</p>
+
+<a name="ggwnh"></a><h5>單一登入失敗重新導向 URL</h5>
+<p>定義當單次登入失敗時，將主體重新導向到的 URL。</p>
+
+<a name="ggwnq"></a><h5>聯合頁面 URL</h5>
+<p>指定執行聯合作業的 URL。</p>
+
+<a name="ggwqh"></a><h5>註冊完成 URL</h5>
+<p>定義聯合註冊成功時主體將導向到的 URL。</p>
+
+<a name="ggwmu"></a><h5>COT 頁面 URL 的清單</h5>
+<p>定義列出提供者所屬的所有信任圈的 URL。</p>
+
+<a name="ggwqk"></a><h5>終止 URL</h5>
+<p>定義聯合終止時將主體導向到的 URL。</p>
+
+<a name="ggwqb"></a><h5>終止完成 URL</h5>
+<p>定義聯合終止完成後，將主體重新導向到的 URL。</p>
+
+<a name="ggwme"></a><h5>錯誤頁面 URL</h5>
+<p>定義發生錯誤時將主體導向到的 URL。</p>
+
+<a name="ggwon"></a><h5>登出完成 URL</h5>
+<p>定義登出後將主體導向到的 URL。</p>
+
+<a name="ggwqu"></a><h5>外掛程式</h5>
+
+<ul><li><p><a href="#ggwmm">名稱識別碼完成</a></p></li>
+<li><p><a href="#ggwlq">屬性敘述外掛程式</a></p></li>
+<li><p><a href="#ggwpm">使用者提供者類別</a></p></li></ul>
+
+
+<a name="ggwmm"></a><h5>名稱識別碼完成</h5>
+<p>此欄位定義身份識別提供者用來參加名稱註冊的類別。名稱註冊是一種設定檔，服務提供者透過它指定身份識別提供者在與服務提供者進行通訊時使用的主體名稱識別碼。值為 <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt>。</p>
+
+<a name="ggwlq"></a><h5>屬性敘述外掛程式</h5>
+<p>指定可外掛的類別，用於將屬性敘述增加至在基於 Liberty 的單次登入過程中產生的指定。</p>
+
+<a name="ggwpm"></a><h5>使用者提供者類別</h5>
+<p>指定可外掛的類別，用來提供使用者作業，例如尋找使用者、取得使用者屬性等。預設值為：</p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider </tt></p>
+
+<a name="ggwow"></a><h5>身份識別提供者屬性對映程式</h5>
+
+<ul><li><p><a href="#ggwpa">屬性對映程式類別</a></p></li>
+<li><p><a href="#ggwmn">身份識別提供者屬性對映</a></p></li></ul>
+
+
+<a name="ggwpa"></a><h5>屬性對映程式類別</h5>
+<p>用來將本機上定義的使用者屬性對映至 SAML 指定中屬性的類別。沒有預設類別。</p>
+
+<a name="ggwmn"></a><h5>身份識別提供者屬性對映</h5>
+<p>指定值，以定義預設屬性對映程式外掛程式所使用的對映。對映應以下列格式配置：</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>例如 <tt>Email=emailaddress</tt> 或 <tt>Address=postaladdress</tt>。鍵入對映做為 [新的值]，然後按一下 [增加]。</p>
+
+<a name="ggwmp"></a><h5>啟動程式</h5>
+<p>啟動程式屬性為：</p>
+
+<a name="ggwqa"></a><h5>產生探索啟動程式資源提供</h5>
+<p>如果要在基於 Liberty 的單次登入過程中產生探索服務資源提供用於啟動程式，則選取此核取方塊。</p>
+
+<a name="ggwor"></a><h5>自動聯合</h5>
+
+<ul><li><p><a href="#ggwpc">自動聯合</a></p></li>
+<li><p><a href="#ggwqf">自動聯合共用屬性名稱</a></p></li></ul>
+
+
+<a name="ggwpc"></a><h5>自動聯合</h5>
+<p>選取核取方塊以啟用自動聯合。</p>
+
+<a name="ggwqf"></a><h5>自動聯合共用屬性名稱</h5>
+<p>建立自動聯合屬性敘述時，將會使用此屬性的值。敘述將包含屬性元素及此共用屬性做為其值。</p>
+
+<a name="ggwnn"></a><h5>認證環境</h5>
+<p>此屬性會定義身份識別提供者的預設認證環境類別 (認證方法)。總是在服務提供者傳送認證請求時呼叫此方法。這個值還指定在未知使用者嘗試存取受保護資源時，服務提供者使用的認證環境。</p><dl><dt>支援的</dt>
+<dd><p>如果身份識別提供者支援認證環境類別，請選取它旁邊的核取方塊。</p></dd>
+<a name="indexterm-71"></a><a name="indexterm-72"></a><a name="indexterm-73"></a><dt>環境參照</dt>
+<dd><p>Liberty 定義的認證環境類別包括：</p>
+<ul><li><p>Mobile Contract</p></li>
+<li><p>Mobile Digital ID</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Time-Sync-Token</p></li></ul>
+</dd>
+<dt>金鑰</dt>
+<dd><p>選擇與環境對映的 OpenSSO 認證類型。</p></dd>
+<dt>值</dt>
+<dd><p>鍵入 OpenSSO 認證選項。</p></dd>
+<dt>層級</dt>
+<dd><p>選擇有多個環境時的優先層級。</p></dd>
+</dl>
+
+
+<a name="ggwmz"></a><h5>SAML 屬性</h5>
+
+<ul><li><p><a href="#ggwnd">指定間隔</a></p></li>
+<li><p><a href="#ggwqq">清除間隔</a></p></li>
+<li><p><a href="#ggwlp">Artifact 逾時</a></p></li>
+<li><p><a href="#ggwoe">指定限制</a></p></li></ul>
+
+
+<a name="ggwnd"></a><h5>指定間隔</h5>
+<p>鍵入由身份識別提供者所核發之指定將保持有效的時間間隔 (以秒為單位)。</p>
+
+<a name="ggwqq"></a><h5>清除間隔</h5>
+<p>鍵入對過期的指定執行清除之前經過的時間間隔 (以秒為單位)。</p>
+
+<a name="ggwlp"></a><h5>Artifact 逾時</h5>
+<p>鍵入可指出指定 artifact 逾時的時間間隔 (以秒為單位)。</p>
+
+<a name="ggwoe"></a><h5>指定限制</h5>
+<p>鍵入數字以定義身份識別提供者可以核發的指定數目，或是可以儲存的指定數目。</p>
+<br/>
+
+</body>
+</html>

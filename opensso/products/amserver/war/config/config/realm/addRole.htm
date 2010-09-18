@@ -1,0 +1,58 @@
+<style>
+	#panel{
+		background:#FFFFFF;
+		padding:10px;
+		border:1px solid #000000;
+	}
+
+    p{
+		padding-left:10px;
+		padding-right:10px;
+	}
+
+    #links{
+		color:#000099;
+		text-align:right;
+	}
+</style>
+
+<script language="javascript">
+
+    YAHOO.namespace("sun.container");
+
+    var pageURI = "$context$path";
+
+    function saveRole() {
+        var requestData = AjaxUtils.serializeForm("roleForm");
+        AjaxUtils.doPost(null, pageURI, requestData, closePanel, null);
+    }
+
+    function cancel() {
+		closePanel();
+	}
+
+    function closePanel() {
+	    YAHOO.sun.container.createRolePanel.hide();
+        loadRoleComboInfo();
+    }
+</script>
+
+<div id="panel">
+	<div id="mainPanel" align="center">
+        <form id="roleForm">
+            <div id="createPanel bodySpace" class="createpanel" align="left" style="width:370px;">
+                <p><strong>$page.getLocalizedString("configuration.realm.addRole.newRole"):</strong><br />
+                <input type="text" id="roleName" name="roleName"/></p>
+                <p>$page.getLocalizedString("configuration.realm.addRole.privileges"):</p>
+                <div class="bodywhite">
+                    <p><input type="checkbox" id="read_write_log_files" name="read_write_log_files"/>&nbsp;$page.getLocalizedString("configuration.realm.addRole.privileges.rwAll")</p>
+                    <p><input type="checkbox" id="read_log_files" name="read_log_files"/>&nbsp;$page.getLocalizedString("configuration.realm.addRole.privileges.rAll")</p>
+                    <p><input type="checkbox" id="write_log_files" name="write_log_files"/>&nbsp;$page.getLocalizedString("configuration.realm.addRole.privileges.wAll")</p>
+                    <p><input type="checkbox" id="read_write_policy_properties_only" name="read_write_policy_properties_only"/>&nbsp;$page.getLocalizedString("configuration.realm.addRole.privileges.rwPoliciesOnly")</p>
+                    <p><input type="checkbox" id="read_write_access_all_realms_and_policy_properties" name="read_write_access_all_realms_and_policy_properties"/>&nbsp;$page.getLocalizedString("configuration.realm.addRole.privileges.rwAllPoliciesReam")</p>
+                </div>
+                <p id="links"><a class="pointer" onclick="cancel();">$page.getLocalizedString("configuration.realm.addRole.cancel")</a>&nbsp;|&nbsp;<a class="pointer" onclick="saveRole();">$page.getLocalizedString("configuration.realm.addRole.save")</a><p>
+            </div>
+        </form>
+    </div>
+</div>

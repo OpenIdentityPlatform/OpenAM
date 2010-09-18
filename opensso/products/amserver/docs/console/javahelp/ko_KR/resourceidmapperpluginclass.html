@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>자원 아이디 매퍼 플러그인 클래스  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="resourceidmapperpluginclass"></a><h4>자원 아이디 매퍼 플러그인 클래스 </h4>
+<a name="indexterm-134"></a><a name="indexterm-135"></a><p>이 속성 값은 조직 또는 역할에 대해 구성된 자원 오퍼링의 식별자를 생성하는
+클래스 목록입니다. <tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>ResourceIDMapper</tt>는 사용자 아이디를 연관된 자원 아이디에 매핑하는 데 사용하는 인터페이스입니다.
+검색 서비스는 이 인터페이스에 대한 두 가지 구현을 제공합니다.</p>
+<ul><li><p><tt>com.sun.identity.liberty.ws.</tt><tt>disco.plugins.</tt><tt>Default64ResourceIDMapper</tt>(형식: <i>providerID</i> + "/" + <i>Base64 인코딩 사용자 아이디</i>)</p></li>
+<li><p><tt>com.sun.identity.liberty.ws.</tt><tt>disco.plugins.</tt><tt>DefaultHexResourceIDMapper</tt>(형식: <i>providerID</i> + "/" + <i>사용자 아이디의 16진 문자열</i>)</p></li></ul>
+<p>[새로 만들기]를 누르고 다음 형식을 사용하여 해당 구현 클래스에 서로 다른 구현을
+개발할 수 있으며 이 속성의 기본값으로 추가할 수 있습니다.</p><p><tt><b>providerid=</tt><i>providerID</i><tt>|</tt><i> class_name_and_path</i><tt></b></tt></p>
+<br/>
+
+</body>
+</html>

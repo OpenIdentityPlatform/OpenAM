@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>エージェント認証 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ghfif"></a><h4>エージェント認証</h4>
+<p>エージェント認証は、エージェントの一種で、認証されると、エージェント認証が読み取るように選択されたエージェントプロファイルの読み取り専用データを取得できます。エージェントプロファイルは、任意の種類 (J2EE、WSP、ディスカバリなど) を指定できますが、同じレルム内に存在する必要があります。エージェント認証の証明情報 (ユーザー名およびパスワード) を持つユーザーは、エージェントプロファイルデータを読み取ることができますが、エージェント管理の作成、更新、または削除権限は持っていません。 </p><p>エージェント認証には、次の属性が含まれています。</p>
+
+<a name="ghfjj"></a><h5>Password</h5>
+<p>パスワードはエージェント認証プロファイルの作成時に設定済みです。ただし、あとでいつでもパスワードを変更できます。</p>
+
+<a name="ghfiu"></a><h5>パスワードの確認</h5>
+<p>パスワードの確認はエージェント認証プロファイルの作成時に実行済みです。パスワードを変更する場合は、変更を確認する必要があります。</p>
+
+<a name="ghfka"></a><h5>ステータス</h5>
+<p>エージェント認証の作成時には「<tt>アクティブ</tt>」オプションが選択されます。エージェントで提供されている保護を取り除く場合のみ、「<tt>非アクティブ</tt>」を選択してください。</p>
+
+<a name="ghfig"></a><h5>読み取りが許容されたエージェントプロファイル</h5>
+<p>この属性は、プロファイルデータがエージェント認証によって読み取られる OpenSSO エージェントのリストを定義します。エージェントは、任意の種類 (J2EE、WSP、ディスカバリなど) を指定できますが、同じレルム内に存在する必要があります。エージェントをリストに追加するには、エージェント名を選択して「追加」を選択します。</p>
+<br/>
+
+</body>
+</html>

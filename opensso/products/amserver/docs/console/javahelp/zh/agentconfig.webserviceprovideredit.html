@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web 服务提供者 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceprovideredit"></a><h4>Web 服务提供者</h4>
+<p>Web 服务提供者代理配置文件描述用于验证 Web 服务客户机的 Web 服务请求，以及保护 Web 服务提供者的 Web 服务响应的配置。在所有代理中，Web 服务提供者名称必须是唯一的。</p>
+
+<a name="ggouz"></a><h5>常规</h5>
+<p>以下“常规”属性定义 Web 服务提供者的基本属性：</p>
+
+<a name="ggovu"></a><h5>组</h5>
+<p>可通过“组”机制来定义相似代理类型的集合。组必须在将特定代理纳入集合之前进行定义。</p>
+
+<a name="ggotz"></a><h5>密码</h5>
+<p>定义 Web 服务提供者代理的密码。</p>
+
+<a name="ggotl"></a><h5>密码确认</h5>
+<p>确认密码。</p>
+
+<a name="ggova"></a><h5>状态</h5>
+<p>定义 Web 服务提供者代理将在系统中处于“活动”状态还是“非活动”状态。默认情况下，它会设置为“活动”，即代理会参与验证 Web 服务客户机的 Web 服务请求，以及保护 Web 服务提供者的服务响应。</p>
+
+<a name="ggowp"></a><h5>通用标识符</h5>
+<p>列出用于唯一定义 Web 服务提供者代理的基本 LDAP 属性。</p>
+
+<a name="gglej"></a><h5>安全</h5>
+<p>以下属性定义 Web 服务提供者的安全属性：</p>
+
+<a name="gglhw"></a><h5>安全机制</h5>
+<p>定义用于验证 Web 服务请求的安全凭证的类型。安全机制类型是 Web 服务客户机的 Web 服务请求的一部分，并被 Web 服务提供者所接受。可选择以下类型：</p>
+<ul><li><p>匿名 &#8212; 匿名安全机制不包含安全凭证。</p></li>
+<li><p>KerberosToken &#8212; 使用 Kerberos 安全令牌。</p></li>
+<li><p>LibertyBearerToken &#8211; 使用 Liberty 定义的 Bearer 令牌。</p></li>
+<li><p>LibertySAMLToken &#8211; 使用 Libery 定义的 SAML 令牌。</p></li>
+<li><p>LibertyX509Token &#8211; 使用 Libery 定义的 X509 证书。</p></li>
+<li><p>SAML-HolderOfKey - 使用 SAML 1.1 声明类型 Holder-Of-Key。</p></li>
+<li><p>SAML-SenderVouches - 使用 SAML 1.1 声明类型 Sender Vouches。</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; 使用 SAML 2.0 声明令牌类型 Holder-Of-Key。</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; 使用 SAML 2.0 声明令牌类型 Sender Vouches。</p></li>
+<li><p>UserNameToken &#8211; 使用用户名令牌。</p></li>
+<li><p>UserNameToken-Plain &#8211; 使用带有明文密码的用户名令牌。</p></li>
+<li><p>X509Token &#8211; 使用 X509 证书。</p></li></ul>
+
+
+<a name="gglfy"></a><h5>验证链</h5>
+<p>定义验证链或服务名称，它们可使用传入的 Web 服务请求的安全令牌的证书验证到 OpenSSO 验证服务，以生成 OpenSSO 验证的 SSOToken。</p>
+
+<a name="ghbbd"></a><h5>令牌转换类型</h5>
+<p>定义当 Web 服务提供者向安全令牌服务请求令牌转换时要转换的令牌的类型。令牌转换成具有相同身份的特定 SAML 或 SSOToken（会话令牌），但属性定义则特定于令牌类型。Web 服务提供者可使用该新令牌调用其他 Web 服务提供者的 Web 服务。可定义的令牌类型有：</p>
+<ul><li><p>SAML 1.1 令牌</p></li>
+<li><p>SAML2 令牌</p></li>
+<li><p>SSOToken</p></li></ul>
+<p>要使用该属性，必须在<a href="#gglhw">安全机制</a>属性中选择任意 SAML 令牌，而且必须为 Web 服务提供者定义任意<a href="#gglfy">验证链</a>。</p>
+
+<a name="ggoum"></a><h5>保留消息中的安全标头</h5>
+<p>启用后，该属性定义由 Web 服务提供者保留 SOAP 安全标头，以进行进一步处理。</p>
+
+<a name="gglhq"></a><h5>私钥类型</h5>
+<p>定义 Web 服务提供者在 Web 服务请求签名验证过程中使用的密钥类型。默认值为 <tt>PublicKey</tt>。</p>
+
+<a name="ggovi"></a><h5>Liberty 服务类型 URN</h5>
+<p>URN（Universal Resource Name，通用资源名称）描述 Web 服务提供者用于服务查找的 Liberty 服务类型。</p>
+
+<a name="ggovn"></a><h5>用户令牌的证书</h5>
+<p>该属性代表用户名/密码共享密钥，Web 服务提供者使用这些密钥来验证传入的 Web 服务请求中的用户名安全令牌。系统会比较这些证书与传入的 Web 服务请求中的用户名安全令牌的证书。</p>
+
+<a name="gglfz"></a><h5>SAML 配置</h5>
+<p>以下属性配置 Web 服务提供者的安全声明标记语言 (Security Assertion Markup Language, SAML)。</p>
+
+<a name="gglfx"></a><h5>SAML 属性映射</h5>
+<p>该配置代表特定的 SAML 属性，需要在创建 SAML 声明的过程中由 Web 服务提供者的安全令牌服务生成该属性，并将其作为属性语句。格式为 <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>。</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> 是传入的 Web 服务请求中的 SAML 声明的 SAML 属性名称。<tt></tt><i>Real_attr_name</i><tt></tt> 是通过已验证的 SSOToken 或身份库获取的属性名称。</p>
+
+<a name="gglgf"></a><h5>SAML NameID 映射器插件</h5>
+<p>定义用于 SAML 帐户映射的 NameID 映射器插件类。</p>
+
+<a name="gglhk"></a><h5>SAML 属性名称空间</h5>
+<p>定义用于生成 SAML 属性的名称空间。</p>
+
+<a name="gglfv"></a><h5>包含成员资格</h5>
+<p>如果启用，该属性定义主要成员资格必须包含作为 SAML 属性。</p>
+
+<a name="ggovx"></a><h5>签署和加密</h5>
+<p>以下属性定义 Web 提供者安全的签署和加密配置：</p>
+
+<a name="ggowr"></a><h5>签署响应</h5>
+<p>启用后，Web 服务提供者使用其 X509 证书签署响应。</p>
+
+<a name="ggouo"></a><h5>加密响应</h5>
+<p>启用后，将加密 Web 服务响应。</p>
+
+<a name="ggowz"></a><h5>验证请求签名</h5>
+<p>启用后，会验证 Web 服务请求签名。</p>
+
+<a name="ggouw"></a><h5>解密请求标头</h5>
+<p>启用后，将解密 Web 服务客户机请求的安全标头。</p>
+
+<a name="ggotr"></a><h5>解密请求</h5>
+<p>启用后，将解密 Web 服务客户机请求。</p>
+
+<a name="gglls"></a><h5>密钥库</h5>
+<p>以下属性配置用于证书存储和检索的密钥库：</p>
+
+<a name="gglld"></a><h5>Web 服务客户机的公钥别名</h5>
+<p>该属性定义用于加密 Web 服务响应（或者验证 Web 服务请求签名）的公共证书密钥别名。</p>
+
+<a name="gglmc"></a><h5>私钥别名</h5>
+<p>该属性定义用于签署 Web 服务响应（或者解密 Web 服务请求）的私有证书密钥别名。</p>
+
+<a name="ggljf"></a><h5>密钥存储库用法</h5>
+<p>该配置定义是使用默认的密钥库，还是使用自定义的密钥库。必须为自定义密钥库定义以下值：</p>
+<ul><li><p>密钥库位置</p></li>
+<li><p>密钥库密码</p></li>
+<li><p>密钥密码</p></li></ul>
+
+
+<a name="gglko"></a><h5>端点</h5>
+<p>以下属性定义 Web 服务端点：</p>
+
+<a name="gglmp"></a><h5>Web 服务代理服务器端点</h5>
+<p>该属性定义 Web 服务客户机发送请求的 Web 服务端点。除非配置为使用 Web 安全代理服务器，否则此端点可选。</p>
+
+<a name="ghbed"></a><h5>Web 服务端点</h5>
+<p>该属性定义 Web 服务客户机发送请求的 Web 服务端点。</p>
+
+<a name="ghbay"></a><h5>Kerberos 配置</h5>
+<p>Kerberos 是 Web 服务安全支持的安全配置文件，用以保护 Web 服务客户机和 Web 服务提供者之间的 Web 服务通信。一般情况下，用户会验证到桌面，并调用 Web 服务和
+Web 服务客户机。这需要 Kerberos 票证将发送给 Web 服务提供者的请求的主体标识为 Kerberos 令牌，以保证该请求的安全。通常，基于 Kerberos 的 Web 服务安全用在与
+Kerberos 域（领域）相同的环境中，这与跨边界的情况（例如基于 SAML 的 Web 服务安全）相反。不过，Kerberos 是功能最强的验证机制之一，特别是在 Windows 域控制器环境中。</p>
+
+<a name="ghbbv"></a><h5>Kerberos 域服务器</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）主机名。必须输入该域控制器的全限定域名。</p>
+
+<a name="ghbdx"></a><h5>Kerberos 域</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）域名。域控制器的域名可能与 OpenSSO 域名不同，这取决于具体的配置。</p>
+
+<a name="ghbcq"></a><h5>Kerberos 服务主体</h5>
+<p>指定 Kerberos 主体作为生成的安全令牌的所有者。</p><p>请使用以下格式：</p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt></p><p><tt>hostname</tt> 和 <tt>domainame</tt> 表示 OpenSSO 实例的主机名和域名。<tt>dc_domain_name</tt> 是 Windows Kerberos 服务器（域控制器）所在的 Kerberos 域。Kerberos
+服务器可能与 OpenSSO 实例的域名不同。</p>
+
+<a name="ghbae"></a><h5>Kerberos 密钥表文件</h5>
+<p>此属性指定用来发布令牌的 Kerberos keytab 文件。使用以下格式（尽管该格式不是必需的）：</p><p><tt>hostname.HTTP.keytab</tt></p><p><tt>hostname</tt> 是 OpenSSO 实例的主机名。</p>
+
+<a name="ghbep"></a><h5>检验 Kerberos 签名</h5>
+<p>如果启用，该属性会指定已签署 Kerberos 令牌。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新しいホストアイデンティティープロバイダをプロバイダエンティティーに追加する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderhostedadd"></a><h4>新しいホストアイデンティティープロバイダをプロバイダエンティティーに追加する</h4><p><b>ホストプロバイダ</b>は、Access Manager と同じサーバーにホストされます。「新規ホストアイデンティティープロバイダ」属性を設定する際に、エンティティープロファイルにアイデンティティープロバイダに関するメタデータを追加する必要があります。この手順は、<a href="federation.fsidentityprovider.html">「アイデンティティープロバイダをプロバイダエンティティーに追加する」</a>ことから始めます。</p>
+<hr><p><b>注 &#8211; </b>このほかにも設定可能な属性がありますが、この初期設定ページには表示されません。<a href="federation.fsidentityproviderhostedprofile.html">「プロバイダエンティティーに含まれるホストアイデンティティープロバイダ属性を変更する」</a>を参照してください。</p>
+<hr>
+<ol>
+<li><b>「共通属性」に情報を設定します。</b><p>「共通属性」の値は、アイデンティティープロバイダ自体の一般的な定義です。</p><dl><dt>説明</dt>
+<dd><p>この属性の値は、エンティティーの作成時に入力した説明です。始めに入力した説明を変更するか、その説明がない場合は新たに説明を追加することができます。</p></dd>
+<dt>サポートされるプロトコルリスト</dt>
+<dd><p>このエンティティーによってサポートされる Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) リリースを選択します。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> は Liberty ID-FF version 1.2 を表します。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> は Liberty ID-FF version 1.1 を表します。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>「通信 URL」属性に情報を設定します。</b><p>「通信 URL」属性には、プロバイダがこのアイデンティティープロバイダ専用で伝送できる場所が入ります。</p><dl><dt>シングルサインオンサービス URL</dt>
+<dd><p>サービスプロバイダがシングルサインオン要求と連携要求を送信できる URL を入力します。</p></dd>
+</dl>
+</li>
+<li><b>「通信プロファイル」属性に情報を設定します。</b><p>Liberty Alliance Project <b>プロファイル</b>は、メッセージの内容とメッセージの移動に使用するメカニズムとの組み合わせを定義します。次の「通信プロファイル」属性は、アイデンティティープロバイダが各機能に使用するプロファイルを定義します。</p><dl><dt>シングルサインオン/連携</dt>
+<dd><p>このアイデンティティープロバイダが認証要求または連携要求への応答を送信するときに使用するプロファイルを選択します。</p>
+<ul><li><p>ブラウザ POST (ブラウザベースの HTTP POST プロトコルを指定)</p></li>
+<li><p>ブラウザアーティファクト (ブラウザを使用しない SOAP ベースのプロトコルを指定)</p></li>
+<li><p>LECP (Liberty 対応クライアントプロキシを指定)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>利用可能なトラストサークルのいずれかを選択し、プロバイダに割り当てます。</b><p>プロバイダは 1 つまたは複数のトラストサークルに所属することができます。しかし、トラストサークルが指定されていないプロバイダは、Liberty Alliance Project 仕様に基づく通信に参加できません。トラストサークルがまだ作成されていない場合は、あとでこの属性を定義することができます。</p></li>
+<li><b>「Federated Access Manager 設定」属性に情報を設定します。</b><p>「Access Manager 設定」属性は、このホストされている Federated Access Manager インスタンスに関する情報を定義します。</p><dl><dt>プロバイダ URL</dt>
+<dd><p>ローカルホストプロバイダの URL を入力します。</p></dd>
+<dt>プロバイダエイリアス</dt>
+<dd><p>「プロバイダエイリアス」は、エンティティープロファイル内でホストプロバイダを識別し、サービスプロバイダとアイデンティティープロバイダのどちらの設定であるかを見分けるために使用される名前です。値は一意で、URL で表すことができる必要があります。たとえば、<tt>sunAlias</tt> とすることができます。</p></dd>
+<dt>認証タイプ</dt>
+<dd><p>ローカルホストプロバイダからの認証要求に使用するプロバイダのタイプを選択します。</p>
+<ul><li><p>「<b>ローカル</b>」を選択すると、ローカルホストプロバイダは、認証要求を受け取ったらすぐにローカルアイデンティティープロバイダに接続するように指定されます。実質的に自らに接続することになります。</p></li>
+<li><p>「<b>リモート</b>」を選択すると、ローカルホストプロバイダは、認証要求を受け取ったらすぐにリモートアイデンティティープロバイダに接続するように指定されます。</p></li></ul>
+</dd>
+<dt>デフォルト認証コンテキスト</dt>
+<dd><p>情報をサービスプロバイダ要求の一部として受信していない場合に、このアイデンティティープロバイダが使用する認証コンテキストクラス (認証の方法) を選択します。この値で指定された認証コンテキストクラスは、不明なユーザーがサービスプロバイダの保護リソースにアクセスしようとしたために、サービスプロバイダが認証要求を送信するときにも使用されます。オプションは次のとおりです。</p>
+<ul><li><p>パスワード</p></li>
+<li><p>Mobile Digital ID</p></li>
+<li><p>スマートカード</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>ソフトウェア PKI</p></li>
+<li><p>以前のセッション</p></li>
+<li><p>Mobile Contract</p></li>
+<li><p>時間同期トークン</p></li>
+<li><p>PasswordProtectedTransport</p></li></ul>
+</dd>
+<dt>レルム</dt>
+<dd><p>このプロバイダが設定されているレルムを指す値を入力します。たとえば、<tt>/sp</tt> です。</p></dd>
+<dt>Liberty バージョン URI</dt>
+<dd><p>使用する Liberty Alliance Project 仕様のバージョンを規定する URI を入力します。デフォルト値は <tt>http://projectliberty.org/specs/v1</tt> です。</p></dd>
+<dt>名前 ID の実装</dt>
+<dd><p>このフィールドは、サービスプロバイダが名前登録に参加するために使用するクラスを定義します。名前登録とは、サービスプロバイダが主体の名前 ID を指定するためのプロファイルです。名前 ID は、アイデンティティープロバイダがサービスプロバイダと通信する際に使用します。値は <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt> です。</p></dd>
+<dt>ホームページ URL</dt>
+<dd><p>ローカルホストプロバイダのホームページの URL を入力します。</p></dd>
+<dt>シングルサインオンエラー時のリダイレクト URL</dt>
+<dd><p>シングルサインオンに失敗した場合に主体がリダイレクトされる URL を入力します。</p></dd>
+</dl>
+</li>
+<li><b>「SAML 属性」に情報を設定します。</b><p>「SAML 属性」はアイデンティティープロバイダが SAML 表明を送信する方法に関する一般的な値を定義します。</p><dl><dt>表明間隔</dt>
+<dd><p>アイデンティティープロバイダが発行した表明が有効である期間を秒単位で入力します。表明が期限切れになるまで、主体の認証は維持されます。</p></dd>
+<dt>クリーンアップ間隔</dt>
+<dd><p>アイデンティティープロバイダに格納されている表明がクリアされるまでの期間を秒単位で入力します。</p></dd>
+<dt>アーティファクトのタイムアウト</dt>
+<dd><p>表明アーティファクトがタイムアウトになる時点を決める経過時間を秒単位で入力します。</p></dd>
+<dt>表明限界</dt>
+<dd><p>アイデンティティープロバイダが発行または格納できる表明の数を入力して定義します。</p></dd>
+</dl>
+</li>
+<li><b>「了解」をクリックして、プロバイダをエンティティーに追加します。</b></li>
+<li><b>「表示」メニューから別のオプションを選択してエンティティーの設定を続行するか、「保存」をクリックして設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para agregar miembros a una entidad de afiliaci&#243;n - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsaffiliate"></a><h4>Para agregar miembros a una entidad de afiliaci&#243;n</h4><a name="indexterm-83"></a><a name="indexterm-84"></a><p>Despu&#233;s de crear una entidad de afiliaci&#243;n, puede agregar miembros a la
+afiliaci&#243;n. El punto de partida es Entidades en la interfaz Federaci&#243;n. </p>
+<hr><p><b>Nota &#8211; </b>Tambi&#233;n puede modificar los atributos comunes en esta pantalla.</p>
+<hr>
+<ol>
+<li><b>Seleccione el nombre de una entidad de afiliaci&#243;n configurada para modificar su
+perfil.</b><p>Aparece la p&#225;gina de perfil de la entidad.</p></li>
+<li><b>Elija Affiliate (Afiliado) en el men&#250; View (Ver).</b></li>
+<li><b>Seleccione cualquiera de las entidades disponibles para asignarla a la afiliaci&#243;n.</b></li>
+<li><b>Modifique los valores de los atributos comunes.</b><p>Los atributos comunes contienen valores que definen generalmente el propio proveedor de
+identidades.</p><dl><dt>Nombre</dt>
+<dd><p>Escriba un nuevo URI para la afiliaci&#243;n si es necesario. El valor actual de este atributo es el URI asignado al atributo Nombre de afiliado al crear la entidad. Cualquier valor nuevo debe ser exclusivo entre los nombres de afiliados.</p></dd>
+<dt>Propietario</dt>
+<dd><p>Escriba un nuevo URI para definir un operador principal o propietario diferente para la afiliaci&#243;n. El valor actual de este atributo es el URI asignado al atributo Propietario de afiliado al crear la entidad. El nuevo valor de este atributo es un URI que coincidir&#225; con el valor definido en el atributo Nombre de entidad de la entidad a la que pertenece el nuevo proveedor/propietario. Cualquier valor nuevo debe ser exclusivo entre los nombres de afiliados.</p>
+<hr><p><b>Nota &#8211; </b>Si se define un proveedor como propietario de afiliado, esto no implica que se incluya autom&#225;ticamente como miembro de la afiliaci&#243;n. Si un propietario es tambi&#233;n miembro, el URI debe definirse en esta ubicaci&#243;n como propietario y, dentro de la propia entidad de afiliaci&#243;n, como miembro.</p>
+<hr>
+</dd>
+<dt>Clave de firma: alias de clave</dt>
+<dd><p>Los certificados se guardan en un archivo de almac&#233;n de claves de Java. Cada certificado del archivo se asigna a un alias para recuperarlo. Escriba el alias de clave asociado al certificado que se utiliza para firmar las solicitudes y las respuestas.</p></dd>
+<dt>Clave de cifrado: alias de clave</dt>
+<dd><p>Los certificados se guardan en un archivo de almac&#233;n de claves de Java. Cada certificado del archivo se asigna a un alias para recuperarlo. Escriba el alias de clave asociado al certificado de seguridad del proveedor.</p></dd>
+<dt>Clave de cifrado: tama&#241;o de clave</dt>
+<dd><p>Escriba la longitud de las claves que utiliza el consumidor del servicio Web al interactuar con otra entidad.</p></dd>
+<dt>Clave de cifrado: m&#233;todo de cifrado</dt>
+<dd><p>Escriba un URI que se&#241;ale a la preferencia de m&#233;todo de cifrado</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Guardar.</b></li></ol>
+<br/>
+
+</body>
+</html>

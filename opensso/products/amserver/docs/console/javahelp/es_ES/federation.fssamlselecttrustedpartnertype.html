@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Socios de confianza: selecci&#243;n del tipo de socio y el perfil - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlselecttrustedpartnertype"></a><h5>Socios de confianza: selecci&#243;n del tipo de socio y el perfil</h5>
+<a name="indexterm-81"></a><a name="indexterm-82"></a><p>Este atributo define cualquier socio de confianza (remoto para el servidor en
+el que est&#225; instalado OpenSSO) que se comunicar&#225; con OpenSSO.</p>
+<hr><p><b>Nota &#8211; </b>El sitio del socio de confianza debe disponer de una relaci&#243;n de
+confianza preestablecida con uno o varios de los sitios configurados en el
+atributo Identificadores de sitio.</p>
+<hr>
+<p>El primer paso para la configuraci&#243;n de un socio de confianza consiste
+en determinar el rol de dicho socio dentro de la relaci&#243;n de
+confianza. El socio de confianza puede ser un sitio de origen (genera
+una aserci&#243;n de inicio de sesi&#243;n &#250;nico) o un sitio de destino
+(consume una aserci&#243;n de inicio de sesi&#243;n &#250;nico). Por ejemplo, si el
+socio es un sitio de origen, este atributo se configurar&#225; en funci&#243;n
+del modo en que &#233;ste env&#237;e las aserciones. Si, por el contrario,
+el socio es un sitio de destino, el atributo se configurar&#225; en
+funci&#243;n del perfil en el que &#233;ste reciba las aserciones. A continuaci&#243;n,
+se muestra la primera parte del proceso de configuraci&#243;n de un socio
+de confianza. El punto de partida es la pantalla SAML en Federaci&#243;n.</p>
+<hr><p><b>Nota &#8211; </b>Para editar o duplicar los atributos del perfil de un socio de
+confianza, haga clic en el bot&#243;n correspondiente de la columna Acciones situada
+junto al nombre del socio de confianza configurado.</p>
+<hr>
+<ol>
+<li><b>Seleccione el rol (destino u origen) del sitio del socio que est&#225;
+configurando mediante la selecci&#243;n de los perfiles adecuados que se utilizan para
+comunicarse con &#233;l.</b><p>Puede elegir un <b>Perfil de artefacto de explorador Web</b> o un <b>Perfil de env&#237;o de explorador Web</b> para el destino, el origen
+o ambos, o una <b>Consulta SOAP</b> s&#243;lo para el destino. Las opciones seleccionadas
+indican los atributos que deben configurarse en los siguientes pasos.</p>
+<hr><p><b>Nota &#8211; </b>Haga clic en Editar para cambiar el rol del sitio del socio
+si est&#225; modificando un socio de confianza existente.</p>
+<hr>
+</li>
+<li><b>Haga clic en Siguiente.</b></li>
+<li><b>Para completar la configuraci&#243;n, consulte <a href="federation.fssamltrustedpartnersadd.html">Socios de confianza: configuraci&#243;n de los atributos de socios de confianza.</a>.</b></li></ol>
+<br/>
+
+</body>
+</html>

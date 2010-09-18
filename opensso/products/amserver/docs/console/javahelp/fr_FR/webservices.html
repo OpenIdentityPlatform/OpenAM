@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Services Web - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="webservices"></a><h3>Services Web</h3><p>Le module Services Web est l'impl&#233;mentation OpenSSO des sp&#233;cifications Liberty Alliance Project
+<b>Identity Web Services Framework</b> (ID-WSF). Bas&#233;e sur la sp&#233;cification <b>Liberty Identity Federation Framework</b> (ID-FF), ID-WSF fournit les sp&#233;cifications
+n&#233;cessaires pour impl&#233;menter les services Web qui r&#233;cup&#232;rent, mettent &#224; jour ou
+ex&#233;cutent une action sur les donn&#233;es d'identit&#233; dans un environnement de r&#233;seau
+f&#233;d&#233;r&#233;. Ces sp&#233;cifications pr&#233;sentent les composants techniques n&#233;cessaires pour mettre en oeuvre
+les services Web, tels qu'un service de calendrier, un service de portefeuille
+ou un service d'alerte.</p>
+<hr><p><b>Remarque &#8211; </b>Les <b>donn&#233;es d'identit&#233;</b> incluent, entre autres, les attributs qui d&#233;finissent le pr&#233;nom, le
+nom, l'adresse personnelle, l'adresse professionnelle et une personne &#224; contacter en cas
+d'urgence.</p>
+<hr>
+<p>Les services Web constituent la base de l'informatique distribu&#233;e via Internet. Un
+consommateur de service Web (WSC) localise un service Web et appelle les
+op&#233;rations propos&#233;es par ce service en transmettant une demande. Un fournisseur de
+services Web (WSP) est une application qui impl&#233;mente le service Web en
+fonction de la demande ; celle-ci peut se trouver sur la m&#234;me
+machine virtuelle Java&#8482; que le WSC ou &#224; plusieurs milliers de kilom&#232;tres.
+Lorsqu'un WSC a besoin de r&#233;cup&#233;rer des attributs d'identit&#233; aupr&#232;s d'un WSP,
+il doit d'abord contacter un service de d&#233;couverte afin de localiser l'emplacement
+sp&#233;cifique des attributs. Une fois ces informations retourn&#233;es, le WSC peut alors
+contacter le WSP (par exemple, un service de profil personnel) afin de
+r&#233;cup&#233;rer les attributs n&#233;cessaires.</p><p>Le module Services Web de la console d'OpenSSO fournit une interface permettant
+de configurer les &#233;l&#233;ments suivants :</p>
+<ul><li><p><a href="webservices.wspersonalprofileservice.html">Service de profil personnel Liberty</a></p></li>
+<li><p><a href="service.smdiscoveryservice.html">Service de d&#233;couverte</a></p></li>
+<li><p><a href="service.scsoapbinding.html">Service de liaison SOAP</a></p></li>
+<li><p><a href="webservices.wsauthnservices.html">Service Web d'authentification</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

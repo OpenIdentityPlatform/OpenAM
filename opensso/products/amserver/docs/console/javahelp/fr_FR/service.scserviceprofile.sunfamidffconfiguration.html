@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration du service Liberty ID-FF - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Configuration du service Liberty ID-FF</h4>
+
+
+<a name="ggogr"></a><h5>Nom de cookie de f&#233;d&#233;ration</h5>
+<p>Cet attribut sp&#233;cifie le nom du cookie des services ID-FF. Ce cookie
+permet de m&#233;moriser si l'utilisateur est d&#233;j&#224; f&#233;d&#233;r&#233;. </p>
+
+<a name="ggohk"></a><h5>Classe d'impl&#233;mentation SPI de m&#233;canisme de recherche de proxy IDP</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation pour rechercher un fournisseur d'identit&#233;s pr&#233;f&#233;r&#233;
+&#224; utiliser comme proxy.</p>
+
+<a name="ggogp"></a><h5>Intervalle de nettoyage de cache de demande</h5>
+<p>Cet attribut sp&#233;cifie l'intervalle de nettoyage (en secondes) du thread de nettoyage
+de demande interne ID-FF.</p>
+
+<a name="ggoii"></a><h5>Temporisation de cache de demande</h5>
+<p>Cet attribut sp&#233;cifie la valeur de temporisation (en secondes) de la demande
+d'authentification ID-FF. Tout objet <tt>AuthnRequest</tt> est purg&#233; de la m&#233;moire s'il d&#233;passe
+la valeur de temporisation.</p>
+
+<a name="ggofu"></a><h5>URl de connexion IDP</h5>
+<p>Cet attribut sp&#233;cifie l'URL de connexion vers laquelle l'IDP redirige l'utilisateur si
+aucune session valide n'est trouv&#233;e pendant le traitement de la demande d'authentification.
+Si la cl&#233; n'est pas sp&#233;cifi&#233;e, une URL de connexion par d&#233;faut
+est utilis&#233;e.</p>
+
+<a name="ggoih"></a><h5>Connexion XML</h5>
+<p>Cet attribut sp&#233;cifie le niveau de v&#233;rification de signature des demandes et
+des r&#233;ponses Liberty.</p>
+<br/>
+
+</body>
+</html>

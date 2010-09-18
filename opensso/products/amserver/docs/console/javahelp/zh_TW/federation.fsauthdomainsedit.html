@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>修改信任圈設定檔 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsauthdomainsedit"></a><h4>修改信任圈設定檔</h4><a name="indexterm-57"></a><p>遵循此程序以編輯現有信任圈中配置的一般屬性，或是新增提供者至其中。起點為聯合介面下的信任圈。</p><ol>
+<li><b>按一下配置的信任圈名稱以修改其設定檔，或是新增提供者至其中。</b><p>[編輯信任圈] 頁面隨即顯示。</p></li>
+<li><b>為信任圈的一般屬性鍵入新值或編輯現有值：</b><dl><dt>名稱</dt>
+<dd><p>此屬性的靜態值為您建立信任圈時提供的名稱。</p></dd>
+<dt>描述</dt>
+<dd><p>此屬性的值為信任圈的描述。如果適當的話，您可以修改已輸入的說明。</p></dd>
+<dt>IDFF 寫入器服務 URL</dt>
+<dd><p>此屬性指定寫入共用網域 cookie 的服務位置。URL 的格式為<tt><b> http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/idffwriter</b></tt>。</p></dd>
+<dt>IDFF 讀取器服務 URL</dt>
+<dd><p>此屬性指定讀取共用網域 cookie 的服務位置。URL 的格式為<tt><b> http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/idffreader</b></tt>。</p></dd>
+<dt>SAML2 寫入器 URL</dt>
+<dd><p>此屬性會指定將 Cookie 寫入共用網域的 SAML2 寫入器服務位置。URL 的格式為 <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i> port</i><tt>/common/saml2writer</b></tt>。</p></dd>
+<dt>SAML2 讀取器 URL</dt>
+<dd><p>此屬性會指定將 Cookie 寫入共用網域的 SAML2 寫入器服務位置。URL 的格式為 <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i> port</i><tt>/common/saml2reader</b></tt>。</p></dd>
+<dt>狀態</dt>
+<dd><p>預設狀態為使用中。選取 [非使用中] 會停用信任圈內的通訊。</p></dd>
+</dl>
+</li>
+<li><b>選擇一個或多個可用的提供者，然後按一下 [新增] 箭頭以選取它們。</b><p>提供的清單包含已建立並寫入提供者的實體名稱。如需詳細資訊，請參閱 <a href="federation.fsauthdomainsselectprovider.html">將提供者新增到信任圈</a>。</p></li>
+<li><b>按一下 [儲存] 以完成作業。</b></li></ol>
+<br/>
+
+</body>
+</html>

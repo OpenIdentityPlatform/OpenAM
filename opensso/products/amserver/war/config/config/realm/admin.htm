@@ -1,0 +1,259 @@
+<link href="$context/assets/css/Specific/adminRealm.css" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+    #realmUsersTable {
+        height:25em;
+    }
+
+    #realmUsersPaginator {
+        text-align:right;
+    }
+
+    #adminsTable {
+        height:25em;
+    }
+
+    #adminsTablePaginator {
+        text-align:right;
+    }
+</style>
+
+<script>
+
+    YAHOO.namespace("sun.container");
+    YAHOO.util.Event.onDOMReady(init);
+
+    var DOM = YAHOO.util.Dom;            
+
+    var isRealmSelected = false;
+    var selectedRealm = null;
+    var selectedRole = null;
+
+    var realmsTableColumnDefs = [
+        {key:"realmName", label:"Realms", sortable:true}
+    ];
+    var realmsResponseSchema = {
+        resultsList: "records",
+        fields: ["realmName"]
+    };
+    var realmsTable = new APP.util.SimpleTable("realmsTable", "$context/config/authc/realmList.htm", null, realmsTableColumnDefs, realmsResponseSchema, true);
+
+
+    var tableChanges = {
+        realmUsers: {},
+        admins: {}
+    };
+    var tableColumnDefs = [
+        {key:"firstName", label:"$page.getLocalizedString('configuration.realm.admin.firstName')", sortable:true},
+        {key:"lastName", label:"$page.getLocalizedString('configuration.realm.admin.lastName')", sortable:true}
+    ];
+    var responseSchema = {
+        resultsList: "records",
+        fields: ["firstName", "lastName"]
+    };
+    // Realm Users Table
+    var realmUsersTable = new APP.util.PaginatedTable("realmUsersTable", "$context/config/realm/users.htm?", "realmName=&filter=*", tableColumnDefs, responseSchema, "G1", tableChanges);
+    realmUsersTable.paginator = new APP.util.Paginator("realmUsersPaginator", "$context/assets/images/");            
+    realmUsersTable.loadData();
+    // Administrators Table
+    var adminsTable = new APP.util.PaginatedTable("adminsTable", "$context/config/realm/users.htm?", "realmName=&getAdmins=true&roleName=", tableColumnDefs, responseSchema, "G2", tableChanges);
+    adminsTable.paginator = new APP.util.Paginator("adminsTablePaginator", "$context/assets/images/");
+    adminsTable.loadData();
+
+    new YAHOO.util.DDTarget("realmUsersTable", "G2");
+    new YAHOO.util.DDTarget("adminsTable", "G1");
+
+
+    function reloadRealmUsersTable() {
+        var searchValue = YAHOO.util.Dom.get("search").value;
+        var realmName = "realmName=" + (selectedRealm ? selectedRealm : "");
+        var filter = "filter=" + searchValue;
+        var realmUsersTable = new APP.util.PaginatedTable("realmUsersTable", "$context/config/realm/users.htm?", realmName + "&" + filter, tableColumnDefs, responseSchema, "G1");
+        realmUsersTable.paginator = new APP.util.Paginator("realmUsersPaginator", "$context/assets/images/");
+        realmUsersTable.loadData();
+    }
+
+    function reloadAdminsTable() {
+        var searchValue = YAHOO.util.Dom.get("search").value;
+        var realmName = "realmName=" + (selectedRealm ? selectedRealm : "");
+        var getAdmins = "getAdmins=true";
+        var roleName = "roleName=" + (selectedRole ? selectedRole : "");
+        var adminsTable = new APP.util.PaginatedTable("adminsTable", "$context/config/realm/users.htm?", realmName + "&" + getAdmins + "&" + roleName, tableColumnDefs, responseSchema, "G2", tableChanges);
+        adminsTable.paginator = new APP.util.Paginator("adminsTablePaginator", "$context/assets/images/");
+        adminsTable.loadData();
+    }
+
+    function init() {
+        DOM.get("saveButton").disabled = true;
+        realmsTable.dataTable.subscribe("rowSelectEvent", selectRealm, false);
+
+        loadRoleComboInfo();
+    }
+
+    function selectRealm() {
+        var selectedRow = realmsTable.dataTable.getSelectedTrEls()[0];
+        var value = DOM.getChildren(selectedRow)[0].innerHTML;
+        selectedRealm = value;
+        isRealmSelected = (value != null);
+        adjustSaveButton();
+    }
+
+    function cancel() {
+        document.location = "$context/config/commonTasks.htm";
+    }
+
+    function save() {
+        //var selectedRealm = "hehe";
+        //var selectedRole = "hoho";
+        var pageURI = "$context$path";
+        var adminsArray = "";
+        for (var element in tableChanges.admins) {
+            if (element != "toJSONString") {
+                adminsArray += element + ",";
+            }
+        }
+        var realmUsersArray = "";
+        for (var element in tableChanges.realmUsers) {
+            if (element != "toJSONString") {
+                realmUsersArray += element + ",";
+            }
+        }
+        var requestData = "realmName=" + selectedRealm;
+        requestData += "&roleName=" + selectedRole;
+        requestData += "&adminsArray=" + adminsArray;
+        requestData += "&realmUsersArray=" + realmUsersArray;
+
+        AjaxUtils.doPost(null, pageURI, requestData, null, null);
+    }
+
+    function changeRole(select){
+        if (select.value == "_create_new_role_") {
+            AjaxUtils.load("createRolePanel", "$context/config/realm/addRole.htm");
+            YAHOO.sun.container.createRolePanel = new YAHOO.widget.Panel("createRolePanel", { width:"390px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true});
+            YAHOO.sun.container.createRolePanel.render();
+            YAHOO.sun.container.createRolePanel.show();
+        }
+        else {
+            selectedRole = select.value;
+            reloadAdminsTable();            
+        }
+    }
+
+    function adjustSaveButton() {
+        var allValid = (isRealmSelected);
+        DOM.get("saveButton").disabled = !allValid;
+    }
+
+    function loadRoleComboInfo() {
+        AjaxUtils.call("$context/config/realm/roles.htm", paintRoleCombo);
+    }
+
+    function paintRoleCombo(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        var combo = DOM.get("role");
+        var length = combo.options.length;
+
+        for (var i = 0; i < length; i++) {
+            combo.remove(0);
+        }
+
+        var option = document.createElement('OPTION');
+        option.value = "administrators";
+        option.text = "Administrators";
+        option.selected = "selected";
+        combo.options.add(option, combo.options.length);
+
+        for (var i = 0; i < response.records.length; i++) {
+            option = document.createElement('OPTION');
+            option.value = response.records[i].roleName;
+            option.text = response.records[i].roleName;
+            combo.options.add(option, combo.options.length);            
+        }
+
+        option = document.createElement('OPTION');
+        option.value = "_create_new_role_";
+        option.text = "Create a New Role";
+        combo.options.add(option, combo.options.length);
+    }
+
+
+
+
+</script>
+
+
+
+<div id="mainPanel" align="center">
+	<div id="createPanel" class="createpanel" align="left">
+		<br />
+		<div class="bodywhite">
+			<h2>$page.getLocalizedString("configuration.realm.admin.title")</h2>
+			<small>$page.getLocalizedString("configuration.realm.admin.comment")</small>
+		</div>
+
+        <div class="bodywhite">
+            $page.getLocalizedString("configuration.realm.admin.realmLabel")
+            <div id="realmsTable"></div>
+            <br/><br/>
+        </div>
+
+        <div class="bodySpace">
+			<div id="demo" class="yui-navset tab">
+				<ul class="yui-nav">
+					<li class="selected"><a href="#tab1"><em>$page.getLocalizedString("configuration.realm.admin.realmsGridTitle")</em></a></li>
+				</ul>
+				<div class="yui-content" style="height:465px">
+					<div>
+						<div class="bodywhite">
+						<input type="text" id="search" value="*"/><button type="button" onclick="reloadRealmUsersTable();">$page.getLocalizedString("configuration.realm.admin.search")</button>
+						</div>
+						<div class="bodywhite">
+                            $page.getLocalizedString("configuration.realm.admin.displaying")<span id="realmUsersTable_startIndex"></span> - <span id="realmUsersTable_endIndex"></span> $page.getLocalizedString("configuration.realm.admin.of") <span id="realmUsersTable_ofTotal"></span> $page.getLocalizedString("configuration.realm.admin.realmUsers")
+						 </div>
+						<div id="realmUsersContentSearch" >
+                            <div id="realmUsersTable"></div>
+                            <div id="realmUsersPaginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div style="width:20px;float:left">&nbsp;</div>
+			<div id="demo" class="yui-navset tab">
+				<ul class="yui-nav">
+					<li class="selected"><a href="#tab1"><em>$page.getLocalizedString("configuration.realm.admin.realmAdminTitle")</em></a></li>
+				</ul>
+				<div class="yui-content" style="height:465px">
+					<div>
+						<div class="bodywhite">
+							<font class="commonblack">$page.getLocalizedString("configuration.realm.admin.administrators.selectRole")</font>&nbsp;
+							<select id="role" name="role" style="width:150px" onchange="changeRole(this);">
+							</select>
+						</div>
+						<div class="bodywhite">
+                            $page.getLocalizedString("configuration.realm.admin.displaying") <span id="adminsTable_startIndex"></span> - <span id="adminsTable_endIndex"></span> $page.getLocalizedString("configuration.realm.admin.of") <span id="adminsTable_ofTotal"></span> $page.getLocalizedString("configuration.realm.admin.administrators") 
+						</div>
+						<div id="contentSearch">
+                            <div id="adminsTable"></div>
+                            <div id="adminsTablePaginator"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="subbody">
+			<button type="button" value="Cancel" onClick="javascript:cancel();">$page.getLocalizedString("configuration.realm.admin.cancel")</button>&nbsp;&nbsp;&nbsp;&nbsp;
+			<button type="button" id="saveButton" onclick="save();">$page.getLocalizedString("configuration.realm.admin.save")</button>
+		</div>
+		<br />
+	</div>
+</div>
+
+<div id="createRolePanel"></div>
+<script>
+(function() {
+    var tabView = new YAHOO.widget.TabView('demo');
+	var tabView2 = new YAHOO.widget.TabView('search1');
+	var tabView3 = new YAHOO.widget.TabView('search2');
+})();
+
+</script>

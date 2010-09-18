@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attribute des Flat File-Repositorys - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>Attribute des Flat File-Repositorys</h4>
+<p><a name="indexterm-15"></a>Folgende Attribute werden zur Konfiguration eines Flat File-Repositorys verwendet:</p>
+
+<a name="gdokj"></a><h5>Klassenname f&#252;r Datei-Repository-Plugins</h5>
+<p>Dieses Attribut gibt die Java-Klassendatei an, die die Implementierung f&#252;r Flat Files
+bereitstellt. Dieses Attribut sollte unver&#228;ndert bleiben.</p>
+
+<a name="gdojs"></a><h5>Verzeichnis f&#252;r das Datei-Repository</h5>
+<p>Definiert das Basisverzeichnis, in dem die Identit&#228;ten mit ihren zugeh&#246;rigen Attributen gespeichert
+werden.</p>
+
+<a name="gdoke"></a><h5>Cache</h5>
+<p>Wenn diese Option aktiviert ist (Standardeinstellung), werden die Identit&#228;ten und die zugeh&#246;rigen
+Attribute im Cache gespeichert, also zwischengespeichert. Bei nachfolgenden Anforderungen erfolgt kein Zugriff
+auf das Dateisystem.</p>
+
+<a name="gdokm"></a><h5>Zeit bis zur Cache-Aktualisierung</h5>
+<p>Wenn die Caching-Funktion aktiviert ist, bestimmt dieses Attribut das Zeitintervall (in Minuten),
+nach dem Eintr&#228;ge im Cache auf &#196;nderungen hin &#252;berpr&#252;ft werden, die am
+Dateisystem vorgenommen wurden. Der &#220;berpr&#252;fungsmechanismus basiert auf Zeitstempeln.</p>
+
+<a name="gdojw"></a><h5>Dateibenutzer-Objektklassen</h5>
+<p>Definiert die Objektklassen, die den Benutzern bei der Erstellung automatisch hinzugef&#252;gt werden.</p>
+
+<a name="gdojt"></a><h5>Passwortattribut</h5>
+<p>Gibt den Namen des Attributs an, das das zur Authentifizierung verwendete Passwort
+enth&#228;lt. Dieses Attribut wird zur Authentifzierung des Benutzers verwendet, wenn das Data
+Store-Authentifizierungsmodul aktiviert ist.</p>
+
+<a name="gdokq"></a><h5>Statusattribut</h5>
+<p>Gibt den Namen des Attributs an, das den Status der Identit&#228;t speichert.
+Das Statusattribut kann entweder den Wert <tt>active</tt> oder den Wert <tt> inactive</tt> aufweisen.
+Es kommt bei der Authentifizierung der Identit&#228;t zum Einsatz. Wenn eine Identit&#228;t
+<tt>inactive</tt> ist, wird der Benutzer nicht authentifiziert.</p>
+
+<a name="gdojk"></a><h5>Attribute, f&#252;r die Hash-Funktion ausgef&#252;hrt wurde</h5>
+<p>Stellt eine Liste mit Attributen bereit, f&#252;r deren Werte die Hash-Funktion ausgef&#252;hrt
+wird; die Werte werden in den Dateien gespeichert. Nach Ausf&#252;hrung des Hash-Vorgangs
+sind die urspr&#252;nglichen Werte nicht mehr verf&#252;gbar. Es werden nur Werte abgerufen,
+f&#252;r die die Hash-Funktion ausgef&#252;hrt wurde. Auf diese Weise wird in F&#228;llen,
+in denen bestimmte Attribute f&#252;r die Verifizierung verwendet werden, jedoch nicht dauerhaft
+gespeichert werden sollten, die Vertraulichkeit gew&#228;hrleistet. Ein Beispiel f&#252;r diese Art von
+Attribut ist das Passwortattribut einer Identit&#228;t.</p>
+
+<a name="gdojb"></a><h5>Verschl&#252;sselte Attribute</h5>
+<p>Stellt eine Liste mit Attributen bereit, deren Werte verschl&#252;sselt und in den
+Dateien gespeichert werden. Obwohl sie verschl&#252;sselt und gespeichert werden, werden beim Aufruf
+der Identit&#228;ts-Repository-APIs die urspr&#252;nglichen entschl&#252;sselten Werte zur&#252;ckgegeben. Auf diese Weise werden Benutzer
+daran gehindert, direkt auf das Dateisystem zuzugreifen und vertrauliche Attribute zu lesen.</p>
+<br/>
+
+</body>
+</html>

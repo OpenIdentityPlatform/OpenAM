@@ -1,0 +1,46 @@
+a       { color: #003399; text-decoration: none; }
+a:hover { color: #003399; text-decoration: underline; }
+
+body { color: #555; font-family: Arial, Helvetica, Sans-Serif; font-size: 75%; margin: 0px; }
+h1   { color: #EF6F00; font-size: 120%; margin-top: 20px; }
+h2   { font-size: 110%; margin-top: 20px; }
+h3   { font-size: 100%; margin-top: 20px; }
+
+ol.instructions li { margin-top: .5em; margin-bottom: .5em; }
+ol.instructions ol.summary  { list-style-type: lower-alpha;  }
+ol.instructions ol.detailed { list-style-type: lower-roman; }
+
+
+.header  {  }
+.header .primary   { background-image: url('../images/masthead-background.jpg'); padding: 20px 10px  5px 10px; text-align: left; }
+.header .secondary { background-image: url('../images/masthead-background.jpg'); padding:  0px  5px  0px  5px; text-align: right; }
+
+.content { padding: 5px 20px 5px 20px; }
+
+.resource 
+{ 
+    color: #555; 
+    font-weight: bold; 
+} 
+
+.code 
+{ 
+    border-color: #999; 
+    border-width: 1px; 
+    border-style: solid; 
+    color: #555; 
+    margin: 1em 2em 1em 2em; 
+    padding: .5em; 
+    white-space: pre;
+}
+
+table.output    { border-collapse: collapse; border-color: #999; border-style: solid; border-width: 1px; margin: 1em 2em 1em 2em; }
+table.output tr { vertical-align: top; }
+table.output th { background-color: #999; color: #eee; font-style: italic; padding: 3px 20px 3px 3px; text-align: left; }
+table.output td { border-color: #eee; border-style: solid; border-width: 1px 0px 0px 0px; padding: 3px 20px 3px 3px; text-align: left; }
+
+table.samlAttributes    { border-collapse: collapse; }
+table.samlAttributes tr { vertical-align: top; }
+table.samlAttributes th { background: #eee; border: solid 1px #eee; color: #999; font-size: smaller; font-weight: normal; }
+table.samlAttributes td { background: #fff; border: solid 1px #eee; color: #000; }
+
