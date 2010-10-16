@@ -1,0 +1,51 @@
+<script type="text/javascript">
+YAHOO.namespace("sun.container");
+
+function init() {
+    AjaxUtils.load( 'createNew', '$context/config/dlg/popupCreatingProvider.htm');
+    YAHOO.sun.container.createNew = new YAHOO.widget.Panel("createNew", { width:"320px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true } );
+    YAHOO.sun.container.createNew.render();
+
+}
+YAHOO.util.Event.onDOMReady( init );
+
+function configureclick(){
+	if (document.getElementById("serviceNo").checked){
+	 	document.getElementById('btnCreate').disabled=true;
+		document.getElementById('optionYes').style.display="none"
+	}
+	else{
+		document.getElementById('btnCreate').disabled=false;
+		document.getElementById('optionYes').style.display=""
+	}
+}
+function createProvider(){
+	YAHOO.sun.container.createNew.show();
+	setTimeout("YAHOO.sun.container.createNew.hide()",1250);
+	setTimeout(" AjaxUtils.load('container', '$context/config/serviceProvider/remoteIdentityProvider.htm');",1250);
+}
+function Exit(){
+	document.location = "$context/commonTasks.htm";
+}
+</script>
+<div id="mainPanel" align="center">
+	<div id="createPanel" class="createpanel">
+		<br />
+		<div class="bodywhite" align="left">
+			<h2>Do you want to configure a remote service provider now?</h2>
+			<input type="radio" name="service" id="serviceYes" value="Yes" onclick="configureclick();" checked="checked"/>Yes
+			<input type="radio" name="service" id="serviceNo" value="No" onclick="configureclick();" />No
+			<div id="optionYes">
+				<br />
+				<p class="OrangeSmall">Is the metadata available in a file or at a URL?</p>
+				<p><input type="radio" name="url" id="url1"/>&nbsp;File&nbsp;&nbsp;<input type="text"/>&nbsp;<button id="btnbrowser" type="button">Browse</button></p>
+				<p><input type="radio" name="url" id="url2"/>&nbsp;URL&nbsp;<input type="text"/></p>
+			</div>
+		</div>
+		<div class="subbody">
+			<button id="btnExit" type="button" value="Exit" onclick="Exit();">Exit</button>
+			<button id="btnCreate" type="button" value="CREATE PROVIDER" onclick="createProvider();">CREATE PROVIDER</button>
+		</div>
+	</div>
+</div>
+<div id="createNew"></div>

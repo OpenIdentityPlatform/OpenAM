@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>UNIX - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthunixservice"></a><h4>UNIX</h4>
+<p><a name="indexterm-182"></a>Dieses Modul gilt nur f&#252;r Solaris und erm&#246;glicht die Authentifizierung mithilfe der
+UNIX-Identifikation und des UNIX-Passworts eines Benutzers. Nach einer &#196;nderung der UNIX-Authentifizierungsattribute m&#252;ssen
+sowohl OpenSSO als auch der amunixd Helper neu gestartet werden. Bei den UNIX-Authentifizierungsattributen
+handelt es sich sowohl um globale als auch um Bereichsattribute. Es existieren
+folgende Attribute:</p>
+<ul><li><p><a href="#fwbsy">Konfigurationsanschluss</a></p></li>
+<li><p><a href="#fwbqv">Authentifizierungsanschluss</a></p></li>
+<li><p><a href="#fwbrv">Zeit&#252;berschreitung</a></p></li>
+<li><p><a href="#fwbls">Threads</a></p></li>
+<li><p><a href="#fwbra">Authentifizierungsebene</a></p></li>
+<li><p><a href="#fwbky">Name des PAM-Dienstes</a></p></li></ul>
+
+
+<a name="fwbsy"></a><h5>Konfigurationsanschluss</h5>
+<p>Gibt den Anschluss an, an dem UNIX-Helper nach dem Starten die Konfigurationsinformationen
+der Attribute ";UNIX-Helper-Authentifizierungsanschluss", "UNIX-Helper Zeit&#252;berschreitung" und "UNIX-Helper-Threads" empf&#228;ngt. Der Standardanschluss ist 58946.</p>
+
+<a name="fwbqv"></a><h5>Authentifizierungsanschluss</h5>
+<p>Gibt den Anschluss an, an dem UNIX-Helper nach der Konfiguration Authentifizierungsanforderungen empf&#228;ngt.
+Der Standardanschluss ist 57946.</p>
+
+<a name="fwbrv"></a><h5>Zeit&#252;berschreitung</h5>
+<p>Gibt die Zeit in Minuten an, die Benutzern zum Abschluss der Authentifizierung
+zur Verf&#252;gung steht. &#220;berschreitet ein Benutzer diesen Zeitraum, schl&#228;gt die Authentifizierung automatisch
+fehl. Der Standardwert ist 3 Minuten.</p>
+
+<a name="fwbls"></a><h5>Threads</h5>
+<p>Gibt die maximale Anzahl an gleichzeitig zugelassenen UNIX-Authentifizierungssitzungen an. Ist der maximale
+Wert erreicht, werden alle nachfolgenden Authentifizierungsversuche so lange verweigert, bis eine andere
+Sitzung beendet wird. Der Standardwert ist 5.</p>
+
+<a name="fwbra"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Hinweis: Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut
+<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a> angegebene Wert verwendet.</p>
+<hr>
+
+
+<a name="fwbky"></a><h5>Name des PAM-Dienstes</h5>
+<p>Definiert die PAM-Konfiguration bzw. den PAM-Stapel (Pluggable Authentication Module), der f&#252;r Ihr
+Betriebssystem ausgeliefert und f&#252;r die UNIX-Authentifizierung verwendet wird. F&#252;r Solaris l&#228;uft die
+Konfiguration in der Regel unter der Bezeichnung <tt>other</tt> und f&#252;r Linux unter
+der Bezeichnung <tt>password</tt>.</p>
+<br/>
+
+</body>
+</html>

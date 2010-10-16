@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>管理 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amadminconsoleservice"></a><h4>管理</h4>
+<p><a name="indexterm-187"></a>管理服務讓您在全域層級以及配置的範圍層級 ( [喜好設定] 或 [選項] 特定於配置的範圍) 配置 OpenSSO 主控台。管理服務屬性為全域及範圍屬性。</p>
+<hr><p><b>備註 &#8211; </b>本節所列出的某些屬性僅適用於「舊有模式」安裝。</p>
+<hr>
+<p>這些屬性包括：</p>
+<ul><li><p><a href="#fufly">聯合管理</a></p></li>
+<li><p><a href="#fsvge">使用者管理</a></p></li>
+<li><p><a href="#fsvgj">使用者容器</a></p></li>
+<li><p><a href="#fsvgm">組織單元容器</a></p></li>
+<li><p><a href="#fsvgq">群組容器</a></p></li>
+<li><p><a href="#fsvgh">受管理群組類型</a></p></li>
+<li><p><a href="#fsvgr">預設角色權限</a></p></li>
+<li><p><a href="#fsvgt">網域元件樹</a></p></li>
+<li><p><a href="#fsvgs">管理群組</a></p></li>
+<li><p><a href="#fsvgv">相容性使用者刪除</a></p></li>
+<li><p><a href="#fsvgu">動態管理角色 ACI</a></p></li>
+<li><p><a href="#ftbxa">使用者設定檔服務類別</a></p></li>
+<li><p><a href="#fsvgw">DC 節點屬性清單</a></p></li>
+<li><p><a href="#fsvgx">用於已刪除物件的搜尋篩選器</a></p></li>
+<li><p><a href="#fsvgy">預設使用者容器</a></p></li>
+<li><p><a href="#fsvhe">預設群組容器</a></p></li>
+<li><p><a href="#fsvhd">預設代理程式容器</a></p></li>
+<li><p><a href="#fsvhb">群組預設使用者容器</a></p></li>
+<li><p><a href="#fsvha">群組使用者容器清單</a></p></li>
+<li><p><a href="#fsvhc">使用者設定檔顯示類別</a></p></li>
+<li><p><a href="#fsvhh">一般使用者設定檔顯示類別</a></p></li>
+<li><p><a href="#fsvhi">在 [使用者設定檔] 頁面上顯示角色</a></p></li>
+<li><p><a href="#fsvhj">在 [使用者設定檔] 頁面上顯示群組</a></p></li>
+<li><p><a href="#fsvhf">使用者自我訂閱群組</a></p></li>
+<li><p><a href="#fsvhk">使用者設定檔顯示選項</a></p></li>
+<li><p><a href="#fsvhl">使用者建立預設角色</a></p></li>
+<li><p><a href="#fsvhm">管理主控台標籤</a></p></li>
+<li><p><a href="#fsvho">從搜尋傳回的最多結果</a></p></li>
+<li><p><a href="#fsvhp">搜尋逾時</a></p></li>
+<li><p><a href="#fsvhs">JSP 目錄名稱</a></p></li>
+<li><p><a href="#fsvhr">線上說明文件</a></p></li>
+<li><p><a href="#fsvhq">需要的服務</a></p></li>
+<li><p><a href="#fsvhu">使用者搜尋關鍵字</a></p></li>
+<li><p><a href="#fsvht">使用者搜尋傳回屬性</a></p></li>
+<li><p><a href="#fsvhv">使用者建立通知清單</a></p></li>
+<li><p><a href="#fsvhw">使用者刪除通知清單</a></p></li>
+<li><p><a href="#fsvhx">使用者修改通知清單</a></p></li>
+<li><p><a href="#fsvia">每頁顯示的最大項目數</a></p></li>
+<li><p><a href="#fsvhz">事件偵聽程式類別</a></p></li>
+<li><p><a href="#fsvhy">處理前和處理後的類別</a></p></li>
+<li><p><a href="#fsvic">外部屬性擷取</a></p></li>
+<li><p><a href="#fsvib">無效的使用者 ID 字元</a></p></li>
+<li><p><a href="#fsvie">使用者 ID 及密碼驗證外掛程式類別</a></p></li></ul>
+
+
+<a name="fufly"></a><h5>聯合管理</h5>
+<p>啟用聯合管理。依預設會選取此欄位。若要停用此功能，請取消選取該欄位，主控台中將不會顯示 [聯合管理] 標籤。</p>
+
+<a name="fsvge"></a><h5>使用者管理</h5>
+<p>啟用使用者管理。依預設會啟用使用者管理。該屬性適用於當以舊有模式安裝 OpenSSO 時。</p>
+
+<a name="fsvgj"></a><h5>使用者容器</h5>
+<p>此屬性依預設取消選取，且僅適用於當 OpenSSO 以舊有模式安裝時。選取此屬性將於 [目錄管理] 標籤下顯示使用者容器。建議您在 DIT 中使用單一使用者容器，並使用角色來管理帳號與服務。OpenSSO 主控台的預設行為是隱藏使用者容器。不過，如果您在 DIT 有多個使用者容器，請選取此屬性，將 [使用者容器] 顯示為受管理物件。</p>
+
+<a name="fsvgm"></a><h5>組織單元容器</h5>
+<p>此屬性依預設取消選取，且適用於當 OpenSSO 以舊有模式安裝時。選取此屬性將顯示 [目錄管理] 標籤中的容器。</p>
+
+<a name="fsvgq"></a><h5>群組容器</h5>
+<p>此屬性依預設取消選取，且適用於當 OpenSSO 以舊有模式安裝時。選取此屬性將顯示 [目錄管理] 標籤中的群組容器。</p>
+
+<a name="fsvgh"></a><h5>受管理群組類型</h5>
+<p>指定透過主控台建立的是靜態訂閱群組還是動態訂閱群組。主控台將建立並顯示靜態訂閱群組或動態訂閱群組，但不能兩者皆選。(無論此屬性給定何值，將始終支援篩選群組。)預設值為動態。</p>
+<ul><li><p>靜態群組會使用 <tt>groupOfNames</tt> 或 <tt>groupOfUniqueNames</tt> 物件類別明確列出每個群組成員。群組項目包含此群組每個成員的 <i>uniqueMember</i> 屬性。可以手動增加靜態群組成員，使用者項目本身保持不變。靜態群組適用於成員較少的群組。</p></li>
+<li><p>動態群組使用每個群組成員項目中的 <tt>memberOf</tt> 屬性。LDAP 篩選器可以搜尋並傳回包含 <tt>memberOf</tt> 屬性的所有項目。透過使用該篩選器，可以產生動態群組成員。動態群組適用於具有很多成員的群組。</p></li>
+<li><p>已篩選群組使用 LDAP 篩選搜尋並傳回滿足篩選要求的成員。例如，篩選器可以產生具有特定 uid (<tt>uid=g*</tt>) 或電子郵件地址 (<tt>mail=*@example.com</tt>) 的成員。</p></li></ul>
+<p>在上述範例中，LDAP 篩選器會分別傳回 uid 以 <tt>g</tt> 開頭或電子郵件地址以 <tt>example.com</tt> 結尾的所有使用者。在 [使用者管理] 檢視內，只能透過選擇 [依篩選器確定成員身份] 來建立篩選群組。</p><p>管理員可以選取以下選項之一：</p>
+<ul><li><p>[動態] - 透過 [依訂閱的成員身份] 選項建立的群組將是動態群組。</p></li>
+<li><p>[靜態] - 透過 [依訂閱的成員身份] 選項建立的群組將是靜態群組。</p></li></ul>
+
+
+<a name="fsvgr"></a><h5>預設角色權限</h5>
+<p>定義在建立新角色時，用來授予管理員權限的預設存取控制指令 (ACI) 或<b>權限</b>的清單。選取這些 ACI 之一以取得您想要的特權層級。OpenSSO 隨附了四種預設角色權限：</p><p>[沒有權限] &#8212; 對角色不設定權限。</p><p>[組織管理員] &#8212; 組織管理員對已配置組織中的所有項目均具有讀取及寫入權限。</p><p>[組織說明桌面管理員] &#8212; 組織說明桌面管理員具有對已配置組織中所有項目的讀取權限，以及對 <tt>userPassword</tt> 屬性的寫入權限。</p><p>[組織策略管理員] &#8212; 組織策略管理員對範圍中的所有策略都具有讀取及寫入權限。組織策略管理員無法建立參照策略。</p>
+
+<a name="fsvgt"></a><h5>網域元件樹</h5>
+<p>網域程式元件樹 (DC 樹狀結構) 是許多 Sun Java System 元件使用的特定 DIT 結構，用於在 DNS 名稱與範圍項目之間建立對映。</p><p>如果在建立範圍時輸入了範圍的 DNS 名稱，則啟用此選項會建立範圍的 DC 樹狀結構項目。建立範圍頁面中將顯示 [DNS 名稱] 欄位。此選項僅適用於頂層範圍，對於子範圍將不會顯示此選項。</p><p>透過 OpenSSO SDK 對範圍樹狀結構中的 <i>inetdomainstatus</i> 屬性所做的任何狀態變更都將更新對映的 DC 樹狀結構項目狀態。(狀態更新若不是透過 OpenSSO SDK 進行，將不會同步。)例如，若建立一個 DNS
+名稱屬性為 <tt>sun.com</tt> 的新範圍 sun，則將在 DC 樹狀結構中建立以下項目：</p><p><tt>dc=sun,dc=com,o=internet,root suffix</tt></p><p>依預設，這將被設定為 OpenSSO 根尾碼。如果需要其他尾碼，則必須使用 LDAP 指令建立此尾碼。需要修改建立範圍的管理員 ACI，以便它們能夠無限制地存取新的 DC 樹根。</p>
+
+<a name="fsvgs"></a><h5>管理群組</h5>
+<p>指定是否要建立 DomainAdministrators 和 DomainHelpDeskAdministrators 群組。如果啟用，會建立這些群組，並分別與組織管理員角色和組織說明桌面管理員角色相關聯。一旦建立了這些群組，在某個關聯角色中增加或移除使用者時，相應的群組中也會增加或移除該使用者。但是，該運作方式不可反向進行。在某個群組中增加或移除使用者時，將不會在使用者關聯角色中增加或移除此使用者。</p><p>僅在啟用此選項後所建立的範圍中，才會建立 DomainAdministrators 和 DomainHelpDeskAdministrators 群組。</p>
+<hr><p><b>備註 &#8211; </b>此選項不適用於子範圍，但根範圍除外。在根範圍中，會建立 ServiceAdministrators 與 ServiceHelpDesk Administrators 群組，並將它們分別與頂層管理員角色與頂層說明桌面管理員角色相關聯。同樣的運作方式在此也適用。</p>
+<hr>
+
+
+<a name="fsvgv"></a><h5>相容性使用者刪除</h5>
+<p>指定是否從目錄中刪除使用者的項目，還是僅將其標記為已刪除。此屬性僅適用於當以舊有模式安裝 OpenSSO 時。</p><p>如果在選取此選項 (true) 的情況下刪除使用者項目，使用者項目仍將存在於此目錄中，但是將會標記為已刪除。Directory Server 搜尋時不會傳回標記為已刪除的使用者項目。如果未選取此選項，則將從目錄中刪除使用者的項目。</p>
+
+<a name="fsvgu"></a><h5>動態管理角色 ACI</h5>
+<p>此屬性定義管理員角色 (使用 OpenSSO 配置群組或範圍時動態建立的角色) 的存取控制指令。這些角色用於為所建立的特定項目群組授與管理權限。僅在此屬性清單中才可修改預設 ACI。</p>
+<hr><p><b>備註 &#8211; </b>範圍層級管理員的存取權限比群組管理員大。但是，依預設，使用者增加至群組管理員角色後，該使用者可以變更此群組中的任何成員密碼。其中包括做為該群組成員的任何範圍管理員。</p>
+<hr>
+<p>容器說明桌面管理員角色對範圍中的所有項目均具有讀取權限，但是僅對此容器單元中使用者項目的 <i>userPassword</i> 屬性具有寫入權限。</p><p>範圍說明桌面管理員具有對範圍中所有項目的讀取權限，以及對 <i>userPassword</i> 屬性的寫入權限。建立子範圍時，請記住在子範圍中建立管理角色，而不是在父系範圍中建立。</p><p>容器管理員角色對 LDAP 組織單元中的所有項目均具有讀取寫入權限。在 OpenSSO 中，LDAP 的組織單位通常稱為容器。</p><p>組織策略管理員具有對所有策略的讀取寫入權限，可以建立、指定、修改和刪除此範圍內的所有策略。</p><p>預設值為使用者容器管理員，新建立範圍內的所有使用者項目都是該範圍的使用者容器成員。使用者容器管理員具有對範圍的使用者容器中所有使用者項目的讀取寫入權限。請記住，此角色對包含角色與群組 DN 的屬性「並不」具有讀取寫入權限，因此，它們不能修改角色或群組的屬性，也不能從中移除使用者。</p><p>可以透過 OpenSSO 配置其他容器，使其具有使用者項目、群組項目甚至是其他容器。若要將管理員角色套用於配置範圍後建立的容器，請使用預設的容器管理員角色或容器說明桌面管理員。</p><p>群組管理員對特定群組的所有成員均具有讀取寫入權限，可以建立新的使用者、將使用者指定給其管理的群組以及刪除已建立的使用者。建立群組時將自動產生群組管理員角色，其具有管理群組的必要權限。不會自動將此角色指定給群組成員。角色必須由群組建立者或任何具有群組管理員角色存取權限的人員指定。</p><p>頂層管理員對頂層範圍中的所有項目均具有讀取寫入權限。換句話說，此頂層管理員角色具有 OpenSSO 應用程式中每個配置主體所擁有的權限。</p><p>組織管理員對範圍中的所有項目均具有讀取寫入權限。建立群組時將自動產生範圍管理員角色，其具有管理範圍的必要權限。</p>
+
+<a name="ftbxa"></a><h5>使用者設定檔服務類別</h5>
+<p>列出將在 [使用者設定檔] 頁面中具有自訂顯示的服務。對於某些服務，主控台產生的預設顯示可能無法滿足需要。此屬性為任何服務建立自訂顯示，並完全控制顯示服務資訊的內容與方式。語法如下所示：</p><p><tt>service name | relative url()</tt></p><p>[建立使用者] 頁面中將不會顯示此屬性中列出的服務。必須在 [使用者設定檔] 頁面中執行自訂服務顯示的所有資料配置。</p>
+
+<a name="fsvgw"></a><h5>DC 節點屬性清單</h5>
+<p>定義建立物件時將在 DC 樹狀結構項目中設定的一組屬性。預設參數包括：</p><table><tr><td align="left" valign="top" scope="row"><p>maildomainwelcomemessage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailhost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailclientattachmentquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutingsmarthost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailaccessproxyreplay</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredlanguage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>domainuidseparator</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainmsgquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainallowedserviceaccess</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailmessagestore</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>objectclass=maildomain</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutinghosts</p></td>
+</tr>
+</table>
+
+<a name="fsvgx"></a><h5>用於已刪除物件的搜尋篩選器</h5>
+<p>定義啟用 [使用者相容性刪除] 模式時用於要刪除物件的搜尋篩選器。</p>
+
+<a name="fsvgy"></a><h5>預設使用者容器</h5>
+<p>指定在其中建立使用者的預設使用者容器。</p>
+
+<a name="fsvhe"></a><h5>預設群組容器</h5>
+<p>指定在其中建立群組的預設群組容器。</p>
+
+<a name="fsvhd"></a><h5>預設代理程式容器</h5>
+<p>指定在其中建立代理程式的預設代理程式容器。預設值為 <tt>Agents</tt>。</p>
+
+<a name="fsvhb"></a><h5>群組預設使用者容器</h5>
+<p>指定預設的使用者容器 (使用者建立後將放置於其中的容器)。此欄位沒有預設值。有效值為使用者容器 DN。請參閱群組使用者容器清單屬性下的備註，以取得使用者容器的退回順序。</p>
+
+<a name="fsvha"></a><h5>群組使用者容器清單</h5>
+<p>指定使用者容器的清單，群組管理員在建立新使用者時可以從中選擇使用者容器。如果在目錄樹狀結構中有多個使用者容器，則可以使用此清單。(如果未在此清單或 [群組預設使用者容器] 欄位中指定任何使用者容器，則將在預設的 OpenSSO 使用者容器 <tt>ou=people</tt> 中建立使用者。)此欄位沒有預設值。</p><p>此屬性的語法如下：</p><p><tt></tt><i>dn of group</i><tt> | </tt><i>dn of people container</i><tt></tt></p><p>建立使用者時，會檢查此屬性中是否有放置此項目的容器。如果此屬性為空，將會檢查 [群組預設使用者容器] 屬性是否存在容器。如果後一個屬性為空，則將在 <tt>ou=people</tt> 下建立項目。</p><p>此屬性僅適用於當以舊有模式安裝 OpenSSO 時。此欄位沒有預設值。</p>
+
+<a name="fsvhc"></a><h5>使用者設定檔顯示類別</h5>
+<p>指定顯示 [使用者設定檔] 頁面時，OpenSSO 主控台所使用的 Java 類別。</p>
+
+<a name="fsvhh"></a><h5>一般使用者設定檔顯示類別</h5>
+<p>指定顯示 [一般使用者設定檔] 頁面時，OpenSSO 主控台所使用的 Java 類別。</p>
+
+<a name="fsvhi"></a><h5>在 [使用者設定檔] 頁面上顯示角色</h5>
+<p>指定是否要將指定給使用者的角色清單顯示為使用者的 [使用者設定檔] 頁面的一部份。如果未啟用參數 (預設值)，[使用者設定檔] 頁面將顯示只適用於管理員的使用者角色。</p>
+
+<a name="fsvhj"></a><h5>在 [使用者設定檔] 頁面上顯示群組</h5>
+<p>指定是否要將指定給使用者的群組清單顯示為使用者的 [使用者設定檔] 頁面的一部份。如果未啟用此參數 (預設值)，[使用者設定檔] 頁面將顯示只適用於管理員的使用者群組。</p>
+
+<a name="fsvhf"></a><h5>使用者自我訂閱群組</h5>
+<p>此參數指定使用者是否可以將自己增加至可自由訂閱的群組。如果未啟用參數 (預設值)，[使用者設定檔] 頁面允許只能由管理員修改使用者的群組成員資格。僅在選取了 [在使用者設定檔頁面顯示群組] 選項時，才能套用此參數。</p>
+
+<a name="fsvhk"></a><h5>使用者設定檔顯示選項</h5>
+<p>此功能表指定將顯示在 [使用者設定檔] 頁面中的服務屬性。管理員可以選取以下選項：</p><dl><dt>僅使用者</dt>
+<dd><p>顯示指定給使用者的服務之可檢視使用者模式屬性。使用者服務屬性包含關鍵字「Display」時，使用者可以檢視此屬性值。請參閱 OpenSSO 開發者指南以取得詳細資訊。</p></dd>
+<dt>組合的</dt>
+<dd><p>顯示指定給使用者的服務之可檢視使用者與動態模式屬性。</p></dd>
+</dl>
+
+
+<a name="fsvhl"></a><h5>使用者建立預設角色</h5>
+<p>此清單定義將自動指定給新建使用者的角色。此欄位沒有預設值。管理員可以輸入一個或多個角色的 DN。</p><p>此欄位僅採用完整的識別名稱位址，不採用角色名稱。角色只能是 OpenSSO 角色，而不能是 LDAP (Directory Server) 角色。</p>
+
+<a name="fsvhm"></a><h5>管理主控台標籤</h5>
+<p>此欄位列出將在主控台頂端顯示的 Java 模組類別。語法為 <tt>i18N key | java class name</tt>。</p><p>i18N 金鑰做為主控台中項目的本土化名稱。</p>
+
+<a name="fsvho"></a><h5>從搜尋傳回的最多結果</h5>
+<p>此欄位定義搜尋傳回的最大結果數。預設值為 200。</p><p>除非已分配了足夠的系統資源，否則請勿將此屬性設定為一個較大的數值 (大於 1000)。</p>
+<hr><p><b>備註 &#8211; </b>OpenSSO 預先配置為傳回最多 4000 筆搜尋項目。透過主控台或使用 <tt>ldapmodify</tt> 可以變更此值。如果您想使用 <tt>ldapmodify</tt> 來變更它，請使用下列值來建立 <tt>newConfig.xml</tt> (此範例中，<tt>nsSizeLimit</tt>: -1 表示無限制)：</p>dn: cn=puser,ou=DSAME Users,ORG_ROOT_SUFFIX changetype: modify replace:nsSizeLimit nsSizeLimit: -1<p>然後，執行 <tt>ldapmodify</tt>。例如：</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml<p>經由 <tt>LDAPModify</tt> 對此屬性所做的修改優先於經由 OpenSSO 主控台所做的修改。</p>
+<hr>
+
+
+<a name="fsvhp"></a><h5>搜尋逾時</h5>
+<p>定義搜尋在逾時之前所執行的時間 (秒數)。可以使用它終止潛在的長時間搜尋。達到最大搜尋時間後，則終止搜尋並傳回一個錯誤。預設值為 5 秒。</p>
+<hr><p><b>備註 &#8211; </b>Directory Server 已預先配置為使用 120 秒的逾時值。透過 Directory Server 主控台或使用 <tt>ldapmodify</tt> 可以變更此值。如果您想使用 <tt>ldapmodify</tt> 來變更它，請使用下列值來建立
+<tt>newConfig.xml</tt> (此範例將逾時值從 120 秒變更為 3600 秒)：</p>dn: cn=config changetype: modify replace:nsslapd-timelimit nsslapd-timelimit: 3600<p>然後，執行 <tt>ldapmodify</tt>。例如：</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml
+<hr>
+
+
+<a name="fsvhs"></a><h5>JSP 目錄名稱</h5>
+<p>指定一個目錄名稱，該目錄用於包含範圍的 JSP 檔案。這可讓管理員為不同的範圍設定不同的外觀 (自訂)。此屬性的預設值為 <tt>console</tt>。該屬性僅適用於當以舊有模式安裝 OpenSSO 時。</p>
+
+<a name="fsvhr"></a><h5>線上說明文件</h5>
+<p>此欄位列出將在主 OpenSSO 說明頁面上建立的線上說明連結。這可讓其他應用程式在 OpenSSO 頁面上增加其線上說明連結。此屬性的格式如下：</p><p><tt>linki18nkey | html page to load | i18n properties file | remote server</tt></p><p>遠端伺服器屬性為選用引數，可讓您指定線上說明文件所在的遠端伺服器。預設值為：</p><p><tt>DSAME Help|/contents.html|amAdminModlueMsgs</tt></p><p>此屬性僅適用於當以舊有模式安裝 OpenSSO 時。</p>
+
+<a name="fsvhq"></a><h5>需要的服務</h5>
+<p>此欄位列出在建立使用者項目時動態增加其中的服務。管理員可以選擇建立時要增加的服務。主控台不會使用這個屬性，但 OpenSSO SDK 會使用它。對於由 <tt>amadmin</tt> 指令行公用程式動態建立的使用者，會為其指定此屬性中列出的服務。</p>
+
+<a name="fsvhu"></a><h5>使用者搜尋關鍵字</h5>
+<p>此屬性定義在 [瀏覽] 頁面中執行簡單搜尋時要依據的屬性名稱。此屬性的預設值為 <tt>cn</tt>。</p><p>例如，如果在 [瀏覽] 框架的 [名稱] 欄位中輸入 <tt>j*</tt>，將顯示名稱以 j 或 J 開頭的使用者。</p>
+
+<a name="fsvht"></a><h5>使用者搜尋傳回屬性</h5>
+<p>此欄位定義顯示簡單搜尋傳回的使用者時所使用的屬性名稱。此屬性的預設值為 uid cn。這將顯示使用者 ID 和使用者的全名。</p><p>列在最前面的屬性名稱還會做為關鍵字來排序將被傳回的一組使用者。若要避免效能降低，請使用在使用者的項目中設定值的屬性。</p>
+
+<a name="fsvhv"></a><h5>使用者建立通知清單</h5>
+<p>此欄位定義建立新使用者時要將通知傳送至的電子郵件地址清單。可以指定多個電子郵件地址，如以下語法中所示：</p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p>藉由使用 <tt>-|locale</tt> 選項，通知清單還可以接受不同的語言環境。</p><p>請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得語言環境的清單。</p><p>藉由修改 <tt>amProfile.properties</tt> (依預設位於 <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt>) 中的特性 497，可以變更寄件者電子郵件 ID。</p>
+
+<a name="fsvhw"></a><h5>使用者刪除通知清單</h5>
+<p>此欄位定義刪除使用者時要將通知傳送至的電子郵件地址清單。可以指定多個電子郵件地址，如以下語法中所示：</p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p>藉由使用 <tt>-|locale</tt> 選項，通知清單還可以接受不同的語言環境。</p><p>請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得語言環境的清單。</p><p>藉由修改 <tt>amProfile.properties</tt> (依預設位於 <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt>) 中的特性 497，可以變更寄件者電子郵件 ID。</p><p>預設寄件者 ID 為 <tt>DSAME</tt>。</p>
+
+<a name="fsvhx"></a><h5>使用者修改通知清單</h5>
+<p>定義屬性及其關聯的電子郵件地址清單。如果修改了清單中定義的使用者屬性，通知將會傳送至與此屬性關聯的電子郵件地址。每個屬性都可以具有不同的關聯位址集。可以指定多個電子郵件地址，如以下語法中所示：</p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt></p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt></p><p>可以使用 <tt>-self</tt> 關鍵字來取代其中一個位址。這時將向其設定檔已修改的使用者傳送電子郵件。例如，假設如下：</p><p><tt>manager someuser@sun.com|self|admin@sun.com</tt></p><p>電子郵件將傳送至 manager 屬性中指定的位址，亦即 <tt>someuser@sun.com</tt>、<tt>admin@sun</tt> 以及修改了使用者的人員 (self)。</p><p>藉由使用 <tt>-|locale</tt> 選項，通知清單還可以接受不同的語言環境。例如，將通知傳送至在法國的管理員：</p><p><tt>manager someuser@sun.com|self|admin@sun.com|fr</tt> 請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得語言環境的清單。</p><p>此屬性名稱與 Directory Server 模式中顯示的名稱相同，但與主控台中顯示的名稱不同。</p>
+
+<a name="fsvia"></a><h5>每頁顯示的最大項目數</h5>
+<p>此屬性允許您定義每頁可顯示的最大列數。預設值為 25。例如，如果使用者搜尋傳回 100 列，則會顯示 4 頁，每頁顯示 25 列。</p>
+
+<a name="fsvhz"></a><h5>事件偵聽程式類別</h5>
+<p>此屬性包含接收 OpenSSO 主控台中建立、修改和刪除等事件的偵聽程式清單。</p>
+
+<a name="fsvhy"></a><h5>處理前和處理後的類別</h5>
+<p>此欄位透過一些外掛程式定義實作類別的清單。這些外掛程式可將 <tt>com.iplanet.am.sdk.</tt><tt>AMCallBack</tt> 類別擴充為在使用者、範圍、角色及群組的處理前和處理後作業期間接收回呼。這些作業包括：</p>
+<ul><li><p>建立</p></li>
+<li><p>刪除</p></li>
+<li><p>修改</p></li>
+<li><p>將使用者增加角色/群組</p></li>
+<li><p>從角色/群組中刪除使用者</p></li></ul>
+<p>您必須輸入外掛程式的完整類別名稱，然後變更 Web 容器的類別路徑 (從 OpenSSO 安裝基底目錄)，以併入外掛程式類別位置的完整路徑。</p>
+
+<a name="fsvic"></a><h5>外部屬性擷取</h5>
+<p>此選項可讓外掛程式的回呼擷取外部屬性 (任何特定於外部應用程式的屬性)。外部屬性並不在 OpenSSO SDK 中進行快取，因此該屬性可讓您按範圍層級啟用屬性擷取。依預設，不啟用此選項。</p>
+
+<a name="fsvib"></a><h5>無效的使用者 ID 字元</h5>
+<p>此屬性定義使用者名稱中不允許使用字元的清單。每個字元必須以 | 字元分隔。例如：</p><p><tt>*|(|)|&#38;|!</tt></p>
+
+<a name="fsvie"></a><h5>使用者 ID 及密碼驗證外掛程式類別</h5>
+<p>此類別提供使用者 ID 與密碼驗證外掛程式機制。此類別的方法需要透過實作驗證使用者 ID 和/或使用者密碼的外掛程式模組來置換。無論何時使用 OpenSSO 主控台、<tt>amadmin</tt> 指令行介面或 SDK 增加或修改使用者 ID 或密碼值，都將呼叫實作外掛程式模組。</p><p>可以根據每個範圍配置延伸此類別的外掛程式。如果沒有為範圍配置外掛程式，將使用在全域層級上配置的外掛程式。</p><p>如果驗證外掛程式失敗，外掛程式模組可拋出異常，以通知應用程式指示使用者所提供之使用者 ID 或密碼中的錯誤。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+dn: cn=iplanet-am-user-federation-info-key,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: iplanet-am-user-federation-info-key
+nsIndexType: eq
+
+dn: cn=sun-fm-saml2-nameid-infokey,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: sun-fm-saml2-nameid-infokey
+nsIndexType: eq

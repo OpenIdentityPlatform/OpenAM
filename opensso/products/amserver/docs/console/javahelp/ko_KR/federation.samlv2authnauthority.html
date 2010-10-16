@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 인증 권한 사용자 정의 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2authnauthority"></a><h4>SAMLv2 인증 권한 사용자 정의</h4>
+<p>SAMLv2 인증 권한에는 사용자 정의에 필요한 다음과 같은 속성이 포함되어 있습니다.</p>
+<ul><li><p><a href="#ggwfq">서명 및 암호화</a></p></li>
+<li><p><a href="#ggwim">인증 쿼리 서비스</a></p></li>
+<li><p><a href="#ggwmk">AssertionID 요청</a></p></li>
+<li><p><a href="#ggwqw">인증서 별칭</a></p></li></ul>
+
+
+<a name="ggwfq"></a><h5>서명 및 암호화</h5>
+<dl><dt>키 크기</dt>
+<dd><p>다음 엔티티와 상호 작용할 때 속성 권한 엔티티에서 사용하는 키의 길이입니다.</p></dd>
+<dt>알고리즘</dt>
+<dd><p>다른 엔티티와 상호 작용하는 데 사용되는 암호화 알고리즘입니다.</p></dd>
+</dl>
+
+
+<a name="ggwim"></a><h5>인증 쿼리 서비스</h5>
+<p>이 속성은 인증 쿼리를 보낼 URL을 정의합니다.</p>
+
+<a name="ggwmk"></a><h5>AssertionID 요청</h5>
+<p>해당 명제를 검색하기 위해 클라이언트에서 Identity 공급자로 AssertionID를 보내는 URL을 정의합니다. <tt>위치</tt>는
+요청을 보낼 대상 공급자의 URL을 지정합니다. AssertionID 요청 유형은 다음과 같습니다.</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwqw"></a><h5>인증서 별칭</h5>
+<p>이 속성은 공급자의 인증서 별칭 요소를 정의합니다. <tt>서명</tt>은 키 저장소에서 올바른 서명
+인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다. <tt>암호화</tt>는 키 저장소에서 올바른
+암호화 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다.</p>
+<br/>
+
+</body>
+</html>

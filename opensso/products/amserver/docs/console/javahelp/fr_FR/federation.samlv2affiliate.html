@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'une affiliation h&#233;berg&#233;e SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2affiliate"></a><h4>Personnalisation d'une affiliation h&#233;berg&#233;e SAMLv2</h4>
+<p>Une affiliation h&#233;berg&#233;e regroupe plusieurs fournisseurs de services. L'affiliation est form&#233;e et
+g&#233;r&#233;e par un propri&#233;taire qui choisit les fournisseurs membres parmi les entit&#233;s
+d&#233;j&#224; configur&#233;es. L'affiliation permet &#224; un utilisateur de se f&#233;d&#233;rer au groupe
+des sites associ&#233;s. Les fournisseurs choisis peuvent invoquer des services en tant
+que membres de l'affiliation ou &#224; titre individuel. Si les services sont
+invoqu&#233;s en tant que membre de l'affiliation, un fournisseur de services peut
+envoyer une demande d'authentification d'un utilisateur pour le compte d'une affiliation. Lorsque
+l'authentification est s&#233;curis&#233;e, l'utilisateur peut effectuer une connexion unique avec tous les
+membres de l'affiliation. </p><p>Une affiliation h&#233;berg&#233;e contient les m&#233;tadonn&#233;es qui d&#233;finissent le regroupement d'une ou
+plusieurs entit&#233;s de fournisseur composant l'affiliation. Elle ne contient pas les informations
+de configuration des fournisseurs (qui sont d&#233;finies dans une entit&#233; de fournisseur),
+mais uniquement les informations de configuration de l'affiliation. Si un cercle de
+confiance contient plusieurs fournisseurs de services et fournisseurs d'identit&#233;s, utilisez une entit&#233;
+affili&#233;e afin de ne pas avoir &#224; g&#233;n&#233;rer diff&#233;rents identificateurs de nom
+pour les services partag&#233;s. </p><p>L'affiliation h&#233;berg&#233;e contient les attributs personnalisables suivants&#160;:</p>
+<ul><li><p><a href="#ggwxt">M&#233;ta alias</a></p></li>
+<li><p><a href="#ggwxj">Membres</a></p></li>
+<li><p><a href="#ggwww">Alias cert</a></p></li></ul>
+
+
+<a name="ggwxt"></a><h5>M&#233;ta alias</h5>
+<p>Sp&#233;cifie la propri&#233;t&#233; <tt>metaAlias</tt> du fournisseur en cours de configuration. La propri&#233;t&#233;
+<tt>metaAlias</tt> permet de localiser l'identificateur de l'entit&#233; du fournisseur et l'organisation dans
+laquelle il se trouve. La valeur est une cha&#238;ne comprenant le nom
+de domaine ou d'organisation (selon le SAML v2 Plug-in for Federation Services
+install&#233; dans OpenSSO), suivi d'une barre oblique et du nom du fournisseur.
+Par exemple, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Attention &#8211; </b>Les noms utilis&#233;s dans la propri&#233;t&#233; <tt>metaAlias</tt> ne doivent pas contenir de
+barre oblique (<tt>/</tt>).</p>
+<hr>
+
+
+<a name="ggwxj"></a><h5>Membres</h5>
+<p>Un fournisseur doit &#234;tre membre d'un cercle de confiance pour prendre part
+&#224; des communications Liberty. Il peut avoir une ou plusieurs affiliations. Saisissez
+l'ID d'entit&#233; du fournisseur dans le champ Nouvelle valeur et cliquez sur
+Ajouter.</p>
+
+<a name="ggwww"></a><h5>Alias cert</h5>
+<p>Cet attribut d&#233;finit les &#233;l&#233;ments de l'alias du certificat pour le fournisseur.
+<tt>Signing</tt> sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le certificat
+de signature correct dans le keystore. <tt>Encryption</tt> sp&#233;cifie l'alias du certificat du
+fournisseur, utilis&#233; pour trouver le certificat de chiffrement correct dans le keystore.</p>
+<br/>
+
+</body>
+</html>

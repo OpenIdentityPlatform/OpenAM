@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>アフィリエイトエンティティーにメンバーを追加する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsaffiliate"></a><h4>アフィリエイトエンティティーにメンバーを追加する</h4><a name="indexterm-83"></a><a name="indexterm-84"></a><p>アフィリエイトエンティティーの作成後に、そのアフィリエイトにメンバーを追加できます。連携インタフェースの「エンティティー」から作業を始めます。</p>
+<hr><p><b>注 &#8211; </b>この画面から定義済みの「共通属性」を変更することもできます。</p>
+<hr>
+<ol>
+<li><b>プロファイルを変更する設定済みアフィリエイトエンティティーの名前をクリックします。</b><p>エンティティーのプロファイルページが表示されます。</p></li>
+<li><b>「表示」メニューから「アフィリエイト」を選択します。</b></li>
+<li><b>利用可能な任意のエンティティーを選択して、アフィリエイトに割り当てます。</b></li>
+<li><b>「共通属性」の値を変更します。</b><p>「共通属性」の値は、アイデンティティープロバイダ自体の一般的な定義です。</p><dl><dt>名前</dt>
+<dd><p>適切な場合は、アフィリエイトの新規 URI を入力します。この属性の現在の値は、エンティティーを作成したときに「アフィリエイト名」属性に割り当てた URI です。新規の値は、アフィリエイト名の間で一意でなければなりません。</p></dd>
+<dt>所有者</dt>
+<dd><p>新規 URI を入力して、アフィリエイトに別の所有者または親オペレータを定義します。この属性の現在の値は、エンティティーを作成したときに「アフィリエイト所有者」属性に割り当てた URI です。この属性の新規の値は、新しい所有者/プロバイダが属するエンティティーの「エンティティー名」属性に定義された値と一致する URI です。新規の値は、アフィリエイト名の間で一意でなければなりません。</p>
+<hr><p><b>注 &#8211; </b>プロバイダを「アフィリエイト所有者」として定義しても、そのプロバイダがアフィリエイトのメンバーとして自動的に組み込まれることはありません。所有者がメンバーでもある場合は、URI をここでは所有者として定義し、エンティティー内部ではメンバーとして定義する必要があります。</p>
+<hr>
+</dd>
+<dt>署名鍵: 鍵のエイリアス</dt>
+<dd><p>証明書は Java キーストアファイルに格納されます。ファイル内の各証明書はエイリアスにマップされ、証明書をフェッチするときにはそのエイリアスが使用されます。要求や応答の署名に使用する証明書に関連付けられているキーエイリアスを入力します。</p></dd>
+<dt>暗号化鍵: 鍵のエイリアス</dt>
+<dd><p>証明書は Java キーストアファイルに格納されます。ファイル内の各証明書はエイリアスにマップされ、証明書をフェッチするときにはそのエイリアスが使用されます。プロバイダのセキュリティー証明書に関連付けられているキーエイリアスを入力します。</p></dd>
+<dt>暗号化鍵: キーサイズ</dt>
+<dd><p>Web サービスコンシューマが別のエンティティーと対話するときに使用するキーの長さを入力します。</p></dd>
+<dt>暗号化鍵: 暗号化方式</dt>
+<dd><p>暗号化方式設定を指す URI を入力します。</p></dd>
+</dl>
+</li>
+<li><b>「保存」をクリックします。</b></li></ol>
+<br/>
+
+</body>
+</html>

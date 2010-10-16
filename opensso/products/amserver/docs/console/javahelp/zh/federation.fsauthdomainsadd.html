@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建新的验证域 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsauthdomainsadd"></a><h4>创建新的验证域</h4><a name="indexterm-59"></a><p>按照以下步骤创建新的验证域。起点是联合界面下的“验证域”。</p><ol>
+<li><b>单击“新建”以显示验证域属性。</b><p>随即显示“新建验证域”配置文件页面。</p></li>
+<li><b>键入验证域的名称。</b></li>
+<li><b>在“说明”字段中键入对验证域的说明。</b></li>
+<li><b>键入“记录器服务 URL”的值。</b><p>记录器服务 URL 用于指定记录通用域 cookie 的 servlet 的位置。其格式为 <tt>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/writer</tt>。</p></li>
+<li><b>键入“读取器服务 URL”的值。</b><p>读取器服务 URL 用于指定读取通用域 cookie 的 servlet 的位置。其格式为 <tt>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/transfer</tt>。</p></li>
+<li><b>选择“活动”或“不活动”。</b><p>默认值为活动。选择“不活动”将禁用验证域内的通信。</p></li>
+<li><b>单击“确定”完成配置操作。</b><p>“验证域”屏幕上将显示新的验证域。</p></li></ol>
+<br/>
+
+</body>
+</html>

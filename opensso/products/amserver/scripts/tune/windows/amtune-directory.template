@@ -1,0 +1,1236 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-directory.template,v 1.4 2008/08/19 19:08:34 veiming Exp $
+#
+#
+#############################################################################
+use File::Basename;
+use File::Find;
+use File::Copy;
+
+
+require "amtune-utils.pl";
+#require "amtune-env.pl";
+
+$SCRIPT_LOCATION=dirname($0);
+$SCRIPT_BASENAME=basename($0);
+
+sub stopLDAP
+{
+    if( $isDS5rOlderVersion == 1)
+	{
+		@args=("$DS_INSTANCE_DIR/stop-sladp");
+		system("@args") == 0 or die "Command @args execution failed\n";
+    }
+    else 
+    {
+		$DS_STOP="stop";
+		my $DS_INSTANCE_DIRS="\"$DS_INSTANCE_DIR\"";  
+		@args=($DSADMIN,$DS_STOP,$DS_INSTANCE_DIRS);
+		system(@args) == 0 or die "Command @args execution failed\n";
+    }
+}
+
+sub startLDAP
+{
+    if( $isDS5OrOlderVersion eq -1)
+    {
+		@args=("$DS_INSTANCE_DIR/start-slapd");
+		system("@args")== 0 or die "Command @args execution failed\n";
+    }
+    else 
+    {
+		$DS_START="start";
+		my $DS_INSTANCE_DIRS="\"$DS_INSTANCE_DIR\"";  
+		@args=($DSADMIN,$DS_START,$DS_INSTANCE_DIRS);
+		system(@args)== 0 or die "Command @args execution failed\n";
+    }
+}
+
+
+sub calculateDBCacheSize
+{
+    my @array1=();
+    $db_cache_size=0;
+    foreach $db_dir(@db_dirs)
+    {
+		$dir_path = "\"$db_dir\"";
+		$dir_path =~ s/\\/\//g;
+		@args=("dir","/s/w",$dir_path,">temp.txt");
+		system("@args")==0 or die "Cannot execute command @args\n";
+		open(FP,"temp.txt");
+		@array=<FP>;
+		close(FP);
+
+		$array[$#array-1] =~ s/,//g;
+		@array_match=split(m/\s+/,$array[$#array-1]);
+		$array_match[3]=$array_match[3]/1024;
+		$db_cache_size=removeDecimals($array_match[3]);
+		$db_cache_size=$db_cache_size+$db_size;
+		$db_cache_size=($db_cache_size*1024*1.2)/1;
+		$db_cache_size=removeDecimals($db_cache_size);
+		push(@array1,$db_cache_size);
+    }
+	
+    return @array1;
+}
+
+
+
+
+sub availableDBdirs
+{
+    @new_array=();
+    @array=();
+    find(\&wanted, "$DS_INSTANCE_DIR/db");
+    sub wanted 
+    {
+		if(-d $_)
+		{
+	    	push(@new_array,$File::Find::name);
+		}
+    }
+	
+    for($i=1;$i<=$#new_array;$i++)
+    {
+		push(@array,$new_array[$i]);
+    }
+    return @array;
+	
+}
+
+sub printCacheSize
+{
+    ($db_dir)=@_;
+    $db_base=basename($db_dir);
+    $dir_path = "$db_dir";
+    @args=("dir","/s/w",$dir_path,">temp.txt");
+    system("@args")==0 or die "Command execution failed @args\n";;
+	
+    open(FP,"temp.txt");
+    @array=<FP>;
+    close(FP);
+	
+    $array[$#array-1] =~ s/,//g;
+    @array_match=split(m/\s+/,$array[$#array-1]);
+    $array_match[3]=$array_match[3]/1024;
+    $db_size=removeDecimals($array_match[3]);
+    $db_size=$db_size*1024;
+    print $db_size;
+}
+	
+ 
+
+sub existingCacheSize
+{
+    foreach $db_dir(@db_dirs)
+    {
+		printCacheSize($db_dir);
+    }
+}
+
+sub suggestDBEntryCacheSize
+{
+    @array1=();
+    @array=();
+    foreach $db_dir(@db_dirs)
+    {
+		if( -d $db_dir)
+		{
+	    	opendir(FP,"$db_dir");
+	    	@dir=readdir(FP);
+	    	closedir(FP);
+	    	@array=grep(m/(.)id2entry(.)/,@dir);
+	
+	    	foreach $i(@array)
+	    	{	
+				$dir_path = "\"$db_dir/$i\"";
+				$dir_path =~ s/\//\\/g;
+				@args=("dir","/s/w",$dir_path,">temp.txt");
+				system("@args")==0 or die "Cannot execute command @args\n";
+				
+				open(FP,"temp.txt");
+				@array=<FP>;
+				close(FP);
+			
+				$array[$#array-1] =~ s/,//g;
+				@array_match=split(m/\s+/,$array[$#array-1]);
+				$array_match[3]=$array_match[3]/1024;
+				$db_size=removeDecimals($array_match[3]);
+				
+				$db_size=($db_size*1024*1.2);
+				#$db_sizes=removeDecimals($db_size);
+				push(@array1,$db_size);
+	    	}
+		}
+    }
+
+    return @array1;
+}
+
+
+sub suggestDBEntryCacheSizebyBackend
+{
+    ($backend_name)=@_;
+    $db_dir="$DS_INSTANCE_DIR\\db\\$backend_name";
+ 
+    if ( -d $db_dir)
+    {
+		$dir_path = "$db_dir";
+		$dir_path =~ s/\\/\//g;
+		@args=("dir","/s/w","\"$dir_path\"",">temp.txt");
+		system("@args")==0 or die "Command execution failed @args\n";;
+		open(FP,"temp.txt");
+		@array=<FP>;
+		close(FP);
+		
+		$array[$#array-1] =~ s/,//g;
+		@array_match=split(m/\s+/,$array[$#array-1]);
+		$array_match[3]=$array_match[3]/1024;
+		$db_size=removeDecimals($array_match[3]);
+		$db_size=$db_size*1024;
+		return $db_size;
+    }
+}
+
+
+sub tuneUsingDSE
+{
+	$tune_file="$DS_INSTANCE_DIR/config/dse.ldif";
+	
+	&echo_msg("$LINE_SEP\n");
+	&echo_msg("Tuning $tune_file...\n");
+	&echo_msg("File		: $tune_file\n");
+	&echo_msg("Parameter tuning : \n\n");
+	&echo_msg(" 1. DB Home Directory in RAM Disk\n");
+	&echo_msg(" Current Value       : nsslapd-db-home-directory : $cur_db_home_location\n");
+	&echo_msg(" Recommended Value   : nsslapd-db-home-directory : $new_db_home_location\n");
+	&echo_msg("\n");
+	
+	if($AMTUNE_MODE eq REVIEW)
+	{
+		return ;
+	}
+
+	if( $cur_db_home_location eq $new_db_home_location)
+	{
+		return;
+	}
+	
+	#Stop the DS Server before doing all the same
+	&stopLDAP;
+	
+    #backup DS
+    #&backUpDS;
+	
+    #if( $? != 0)
+    #{
+    #	&echo_msg("Database cannot be backed up. Tuning will not be applied\n");
+ 
+    #	&startLDAP;	
+    #	return;
+    #}
+	
+    &check_file_for_write($tune_file);
+    if($? == 100)
+    {
+		&startLDAP;
+		return;
+    }
+	
+
+    &delete_inbetween_line($tune_file,"nsslapd-db-home-directory:\n");
+    &insert_inbetween_line($tune_file,"nsslapd-dbcachesize: ","nsslapd-db-home-directory: $new_db_home_location");
+	
+    #Start the DS Server
+    &startLDAP;
+    &echo_msg("Server started\n");
+}
+
+sub tuneUsingLdapModify
+{
+    &echo_msg("$LINE_SEP\n");
+    &echo_msg("Tuning Directory Server using command line tool (ldapmodify)\n");
+    &echo_msg("Parameter tuning     :\n");
+    &echo_msg("Root Suffix                               : $ROOT_SUFFIX\n");
+    foreach $item(@db_suffix)
+    {
+		$value=&getDBDNbyBackend($item);
+		&echo_msg("                                          : $value\n");
+    }
+	
+    &echo_msg("DB Directory for Root Suffix              : $db_dir\n");
+	
+    &echo_msg("DB DN for Root Suffix                     : $db_dn\n");
+    &echo_msg("1.   DS Worker Threads\n");
+    &echo_msg("DN                   : cn=config\n");
+    &echo_msg("Attribute            : nsslapd-threadnumber\n");
+    &echo_msg("Current Value        : $cur_number_worker_threads\n");
+    &echo_msg("Recommended Value    : $new_number_worker_threads\n\n");
+    &echo_msg("2.   DS Access Log\n");
+    &echo_msg("DN                   : cn=config\n");
+    &echo_msg("Attribute            : nsslapd-accesslog-logging-enabled\n");
+    &echo_msg("Current Value        : $cur_access_log_status\n");
+    &echo_msg("Recommended Value    : on\n\n");
+    &echo_msg("3.   DB Cache Size\n");
+    &echo_msg("DN                   : cn=config,cn=ldbm database,cn=plugins,cn=config\n");
+    &echo_msg("Attribute            : nsslapd-dbcachesize\n");
+    &echo_msg("Current Value        : $cur_db_cache_size\n");
+    &echo_msg("Recommended Value    : $new_db_cache_size[0]\n\n");
+    &echo_msg("4.   DB Entry Cache Size \n");
+	
+    foreach $item(@db_suffix)
+    {
+		$cur_db_entry_cache_size=&getDBEntryCacheSizebyBackend($item);
+		if($cur_db_entry_cache_size == "")
+		{	
+	    	&echo_msg("Failed to obtain directory configuration : DB Entry Cache Size for $item\n");
+	    	&echo_msg("Invalid configuration. Cannot proceed\n");
+	    	exit;
+		}
+		
+		$new_db_entry_cache_size=&suggestDBEntryCacheSizebyBackend($item);
+		if($new_db_entry_cache_size == "")
+		{
+	    	&echo_msg("Cannot compute recommend DB Cache Size for $item. Cannot proceed\n");
+	    	exit;
+		}
+		
+		$suffix=&getSuffixbyBackend($item);
+			
+		&echo_msg("Suffix		: $suffix\n");
+		$dn=&getDBDNbyBackend($item);
+		&echo_msg("DN			: $dn\n");
+		&echo_msg("Attribute	 	: nsslapd-cachememsize\n");
+		&echo_msg("Current Value	: $cur_db_entry_cache_size\n");
+		&echo_msg("Recommended Value	: $new_db_entry_cache_size\n");
+    }
+	
+    ###############################DO NOT MODIFY#########################################
+    #
+    #if($ENABLE_MODE eq enabled)
+    #{
+    #	&echo_msg("In realm mode, since delegation privileges are used to determine permissions,\n");
+    #	&echo_msg("we recommend to remove the ACIs that are not used to improve the performance.\n");
+    #	&echo_msg("A list of unused ACIs can be found in $SCRIPT_LOCATION/remacis.ldif file.\n");
+    #}
+    #####################################################################################
+	
+	
+    if($AMTUNE_MODE eq REVIEW)
+    {
+		return;
+    }
+	
+    $is_change_made="false";
+		
+    $tmp_ldif_file="$ENV{TEMP}/dir.ldif";
+    open(FP,">$tmp_ldif_file");
+    print FP "# amtune ldif file\n";
+    close(FP);
+    open(FP,$tmp_ldif_file);
+    while(<FP>)
+    {
+		print $_;
+		print "\n";
+    }
+    close(FP);
+	
+    $temporary_file="$ENV{TEMP}/temp";
+    open(FP1,">$temporary_file");
+    if($cur_number_worker_threads < $new_number_worker_threads)
+    {
+		print "\nPreparing LDIF file to modifying Number of Worker Threads\n";
+		print FP1 "dn:   cn=config\n";
+		print FP1 "changetype: modify\n";
+		print FP1 "replace: nsslapd-threadmaker\n";
+		print FP1 "nsslapd-threadmaker: 24\n";
+    }
+    else 
+    {
+		&echo_msg("There are enough DS Worker Threads\n");
+    }
+    close(FP1);
+	
+    open(FP,">>$tmp_ldif_file");
+    open(FP1,"$temporary_file");
+    while(<FP1>)
+    {
+		print FP $_;
+		print $_;
+    }
+    close(FP);close(FP1);
+	
+    open(FP1,">$temporary_file");
+	
+    if($cur_access_log_status ne on)
+    {
+		print "\nPreparing LDIF file to modifying access log status\n";
+		print FP1 "dn:   cn=config\n";
+		print FP1 "changetype: modify\n";
+		print FP1 "replace: nsslapd-accesslog-logging-enabled\n";
+		print FP1 "nsslapd-accesslog-logging-enables: on\n";
+    }
+    else
+    {
+		&echo_msg("Access Log is already on\n");
+    }
+    close(FP1);
+		
+    open(FP,">>$tmp_ldif_file");
+    open(FP1,"$temporary_file");
+    while(<FP1>)
+    {
+		print FP $_;
+		print $_;
+    }
+    close(FP);close(FP1);
+	
+    open(FP1,">$temporary_file");
+    if($new_db_cache_size[0] > $cur_db_cache_size)
+    {
+		print "\nPreparing LDIF file to modify DB Cache Size=\n";
+		print FP1 "dn : cn=config,cn=ldbm database,cn=plugins,cn=config\n";
+		print FP1 "changetype : modify\n";
+		print FP1 "replace: nsslapd-dbcachesize\n";
+		print FP1 "nsslapd-dbcachesize: $new_db_cache_size[0]\n";
+    }
+    else
+    {
+		&echo_msg("DB Cache Size is already large enough\n");
+    }
+    close(FP);
+	
+    open(FP,">>$tmp_ldif_file");
+    open(FP1,"$temporary_file");
+    while(<FP1>)
+    {
+		print FP $_;
+		print $_;
+    }
+    close(FP);close(FP1);
+		
+    foreach $item(@db_suffix)
+    {
+		$cur_db_entry_cache_size=&getDBEntryCacheSizebyBackend($item);
+		$new_db_entry_cache_size=&suggestDBEntryCacheSizebyBackend($item);
+       		
+		open(FP1,">$temporary_file");
+		if($new_db_entry_cache_size > $cur_db_entry_cache_size)
+		{
+	    	print "\nPreparing LDIF file to modify DB Entry Cache Size\n";
+	    	print FP1 "dn: $db_dn\n";
+	    	print FP1 "changetype: modify\n";
+	    	print FP1 "replace: nsslapd-cachememsize\n";
+	    	print FP1 "nsslapd-cachememsize: $new_db_cache_size[0]\n";
+		}
+		else
+		{
+	    	&echo_msg("DB Entry Cache Size is already large enough\n");
+		}
+		close(FP1);
+	
+		open(FP,">>$tmp_ldif_file");
+		open(FP1,"$temporary_file");
+		while(<FP1>)
+		{
+	    	print FP $_;
+	    	print $_;
+		}
+		close(FP);close(FP1);
+    }
+	
+    open(FP, $tmp_ldif_file);
+    @file_content=<FP>;
+    close(FP);
+	
+    if((-f $tmp_ldif_file) && (@filecontent ne "# amtune ldif file"))
+    {
+		if( $isDS5OrOlderVersion == 0)
+		{
+	    	#Stop the DS server before doing all of these
+	    	stopLDAP;
+		}
+		
+		#backup DS
+		&backUpDS;
+			
+		if($? != 0)
+		{
+	    	&echo_msg("Database cannot be backed up. Tuning will not be applied\n");
+	    	if( $isDS5OrOlderVersion == 0)
+	    	{
+				#Start the DS Server
+				startLDAP;
+	    	}
+	    	return;
+		}
+		
+		
+		if( $isDS5OrOlderVersion == 0)
+		{
+	    	#Start the DS Server
+	    	startLDAP;
+		}
+		
+		@args=($LDAPMODIFY,"-h",$DS_HOST,"-p",$DS_PORT,"-D","\"$DIRMGR_UID\"","-w","\"$DIRMGR_PASSWORD\"","-f",$tmp_ldif_file);
+		system("@args")==0 or die "Command @args failed\n";
+		#`$LDAPMODIFY -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -w "$DIRMGR_PASSWORD" -f $tmp_ldif_file`;
+		unlink($tmp_ldif_file);
+		$is_change_made=true;
+		
+		# Only restart the server if DS is modified
+		if($is_change_made eq true)
+		{
+	    	# Stop the DS server before doing all of these
+	    	stopLDAP;
+			 
+	    	#Start the server 
+	    	startLDAP;
+        }
+
+    }
+}
+
+sub get_list_index
+{
+    if($isDS5OrOlderVersion == 1)
+    {
+	@variable=getDBDN;
+	foreach $i(@variable)
+	{
+	    @data=split(m/,/,$i);
+	    @data1=split(m/=/,$data[0]);
+	    push(@DB_NAME,$data[1]);
+	}
+		
+	@args=($LDAPSEARCH,"-h",$DS_HOST,"-p",$DS_PORT,"-D","\"$DIRMGR_UID\"","-w","\"$DIRMGR_PASSWORD\"","-b","\"cn=index,cn=@DB_NAME,cn=ldbm database,cn=plugins,cn=config\"","\"(objectclass=*)\"",">temp");
+	system(@args) == 0 or die " Command @args execution failed\n";
+	open(FP,"temp");
+	@variable=<FP>;
+	close(FP);
+	unlink("temp");
+	@dataone=grep(m/dn:/,@variable);
+	foreach $i(@dataone)
+	{
+	    @data=split(m/=/,$i);
+	    @data1=split(m/,/,$data[0]);
+	    push(@array,$data[1]);
+	}
+		
+	return @array;
+    }
+    else
+    {
+		@args=($DSCFG,"list-indexes","--port",$DS_PORT,"--no-inter","--unsecured","--pwd-file","\"$TEMP_PASSWORD_FILE\"","$ROOT_SUFFIX",">temp");
+		system("@args") == 0 or die "Command @args failed\n";
+		open(FP, "temp");
+		@filecontent=<FP>;
+		close(FP);
+		unlink("temp");
+		return @filecontent;
+		# added --unsecured option
+		#print `$DSCFG list-indexes --port $DS_PORT --no-inter --pwd-file $TEMP_PASSWORD_FILE $ROOT_SUFFIX`;
+    }
+}
+
+sub getDBName
+{
+    @LDAPSEARCH_OPTIONS=("-h",$DS_HOST,"-p",$DS_PORT,"-D","$DIRMGR_UID","-w",$DIRMGR_PASSWORD,"-b","cn=config","(&(|(cn=$ROOT_SUFFIX)(cn=\"$ROOT_SUFFIX\"))(nsslapd-backend=*))",">ldapsearch.tmp");
+    @args=($LDAPSEARCH,@LDAPSEARCH_OPTIONS);
+    system("@args")==0 or die "\n Error executing command @args\n";
+    #open(FP,">ldapsearch.tmp");
+    #print FP `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -w "$DIRMGR_PASSWORD" -b "cn=config" "(&(|(cn=$ROOT_SUFFIX)(cn=\"$ROOT_SUFFIX\"))(nsslapd-backend=*))" | $GREP "nsslapd-backend:" | $CUT -f2 -d ":" | sed -e 's/ //g'`;
+    #close(FP);
+    open(FP,"ldapsearch.tmp");
+    @filecontent=<FP>;
+    close(FP);
+    @array=grep(m/nsslapd-backend:/,@filecontent);
+    @data=split(m/:\s*/,$array[0],2);
+    return $data[1];
+}
+
+sub createIndex
+{
+	($attr_name)=@_;
+	if($isDS5OrOlderVersion eq 1)
+    {
+		$DB_NAME=getDBName;
+		$tmp_ldif_name="amtune-$DB_NAME-$CUR_DATE.ldif";
+		open(FP,">>tmp_ldif_file");
+		print FP "dn: cn=$attr_name,cn=index,cn=$DB_NAME,cn=ldbm database,cn=plugins,cn=config";
+		print FP "objectClass:top";
+		print FP "objectClass:nsIndex";
+		print FP "cn:$attr_name";
+		print FP "nsSystemIndex:false";
+		print FP "nsIndexType:pres";
+		print FP "nsIndexType:eq";
+		print FP "nsIndexType:sub";
+		close(FP);
+		
+		@args=($LADPMIDIFY,"-h",$DS_HOST,"-p",$DS_PORT,"-D",$DIRMGR_UID,"-w",$DIRMGR_PASSWORD,"-a","-f",$tmp_ldif_file);
+		system(@args)==0 or die "Command @args failed\n";
+		#`$LDAPMODIFY -D "$DIRMGR_UID" -w "$DIRMGR_PASSWORD" -a -f $tmp_ldif_file`;
+		
+		unlink($tmp_ldif_file);
+		
+		@args=("perl",$DB2INDEX,"-D",$DIRMGR_UID,"-w",$DIRMGR_PASSWORD,"-n",$DB_NAME,"-t",$attr_name,">temp.file");
+		system("@args") == 0 or die "Command @args failed\n";
+		open(FP,"temp.file");
+		@file_content=<FP>;
+		close(FP);
+		return @file_content;
+		unlink("temp.file");
+		#return `perl $DB2INDEX -D "$DIRMGR_UID" -w "$DIRMGR_PASSWORD" -n $DB_NAME -t $attr_name`;
+    }
+    else
+    {
+		# added --unsecured option
+		@args=($DSCFG,"create-index","--port",$DS_PORT,"--no-inter","--unsecured","--pwd-file","\"$TEMP_PASSWORD_FILE\"","\"$ROOT_SUFFIX\"",$attr_name,">temp.file");
+		system("@args") == 0 or die "Command @args failed\n";
+		open(FP,"temp,file");
+		@file_content=<FP>;
+		close(FP);
+		print @file_content;
+		unlink("temp.file");
+		return 0;
+		#return `$DSCFG create-index --port $DS_PORT  --no-inter --pwd-file $TEMP_PASSWORD_FILE $ROOT_SUFFIX $attr_name`;
+    }
+	
+}
+
+sub verify_index
+{
+    (@list_index)=@_;
+    &echo_msg("Index Exists?		Attributes\n");
+    &echo_msg("-------------		-------------\n");
+    foreach $attr_item(@list_index)
+    {
+		@grep_array=grep(m/$attr_item/i,@list_existing_index);
+		if($#grep_array != -1)
+		{
+	    	&echo_msg("Yes			$attr_item\n");
+		}
+		else
+		{
+	    	&echo_msg("No 			$attr_item\n");
+	    	push(@list_attributes_not_index,$attr_item);
+		}
+    }
+
+}
+
+sub tuneDSIndex
+{
+    $temp=$ENV{HOME};
+    $TEMP_PASSWORD_FILE="$temp/temppassword.txt";
+    open(FP,">$TEMP_PASSWORD_FILE");
+    print FP $DIRMGR_PASSWORD;
+    close(FP);
+	
+    @list_attributes_not_index=();
+
+    @list_existing_index=&get_list_index;
+	
+    @list_am_default_index=();
+	
+    # change the dc 
+    @args=($LDAPSEARCH,"-h",$DS_HOST,"-p",$DS_PORT,"-D","\"$DIRMGR_UID\"","-w","$DIRMGR_PASSWORD","-b","ou=default,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthLDAPService,ou=services,$ROOT_SUFFIX","(objectclass=*)",">temp");
+    system("@args") == 0 or die " Command @args failed\n";
+    open(FP,"temp");
+    @list_am_search_attr=<FP>;
+    close(FP);
+    unlink("temp");
+	
+    @list_am_search_atr=grep(m/sunkeyvalue: iplanet-am-auth-ldap-user-search-attributes=/,@list_am_search_attr);
+	
+    @list_am_search_attributes=();		
+    foreach $i(@list_am_search_atr)
+    {
+	@data=split(m/=/,$i);
+	push(@list_am_search_attributes,$data[1]);
+    }
+	
+    # Default value of search attribute
+    if($#list_am_search_attributes == -1)
+    {
+	push(@list_am_search_attributes,"uid");
+    }
+	
+    &echo_msg("$LINE_SEP\n");
+    &echo_msg("Tuning Directory Server Index\n");
+    &echo_msg("Parameter tuning     :\n");
+    &echo_msg("Root Suffix                               : $ROOT_SUFFIX\n");
+    &echo_msg("1. The following attributes are used to search for a user to be authenticated\n");
+    &echo_msg("We recommend to create index(es) for them.\n");
+    verify_index(@list_am_search_attributes);
+    &echo_msg("2. Verify OpenSSO indexes\n");
+    verify_index(@list_am_default_index);
+		
+    if($AMTUNE_MODE eq "REVIEW")
+    {
+		unlink($TEMP_PASSWORD_FILE);
+		return;
+    }
+		
+    if($#list_attributes_not_index == -1)
+    {
+		&echo_msg("All indexes exist.  No index is created.\n");
+    }
+    else
+    {
+		&echo_msg("Creating index(es) for the following attributes $list_attributes_not_index...\n");
+		foreach $attr_item(@list_attributes_not_index)
+		{
+			&echo_msg("Create index for attribute $attr_item\n");
+	    	createIndex($attr_item);
+	    	if($? == 0)
+	    	{
+				&echo_msg("Done.\n");
+	    	}		
+			else
+	    	{
+				&echo_msg("ERROR: Problem create index for attribute $attr_name\n");
+	    	}
+		}
+		&echo_msg("\n");
+    }
+	
+    unlink($TEMP_PASSWORD_FILE);
+}
+
+sub tuneFuture
+{
+	&echo_msg("$LINE_SEP\n");
+	&echo_msg("Further DS tuning recommendations:\n");
+	&echo_msg("You will find detailed description of these parameters in Directory Server\n");
+	&echo_msg("tuning guide.\n");
+	&echo_msg("1. Tune the following for dn: db_dn\n");
+	&echo_msg("	 a. nsslapd-sizelimit\n");
+	&echo_msg("	 b. nsslapd-timelimit\n");
+	&echo_msg("	 c. nsslapd-lookthroughlimit\n");
+	&echo_msg("	 d. nslapd-require-index\n");
+	&echo_msg("2. Tune the following for dn: cn=config,cn=ldbm database,cn=plugins,cn=config\n");
+	&echo_msg("	 a. nsslapd-db-transaction-batch-val\n");
+	&echo_msg("	 b. nsslapd-db-logbuf-size\n");
+	&echo_msg("3. Tune the following for dn: cn=referential integrity postoperation,cn=plugins,cn=config\n"); 
+	&echo_msg("	 a. nsslapd-pluginarg0\n");
+	&echo_msg("4. Consider splitting the various components of the server onto different filesystems.\n");
+	&echo_msg("   The database, transaction logs and logs(access, error) generates a significant I/O activity.\n");
+	&echo_msg("	 Isolating these different physical disks will help.\n");
+	&echo_msg("5. ACI tuning:\n");
+	&echo_msg("   AM uses Proxy User (puser/dsame user) to perform its searches.\n");
+	&echo_msg("   If you are benchmarking DS, make sure you run your search benchmarks\n");
+	&echo_msg("   using puser as opposed to Directory Manager. Directory Manager is a super user\n");
+	&echo_msg("   and no ACIs are evaluated.\n");
+	&echo_msg("   Also, some ACIs generated by AM are not optimal. Typically, ACIs containing \n");
+	&echo_msg("   wildcards (* for instance) in the target field of the ACIs are potential tunables.\n");
+	&echo_msg("6. If you are not using Delegated Admin features of AM, please remove unused Roles from AM console.\n");
+	&echo_msg("   Roles might have ACIs associated with it and may impact performance.\n");
+}
+
+sub backUpDS
+{
+	$DB_BACKUP_SUCCESS_FILE="$DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR/SUCCESS.donotdelete";
+	
+	if( -f $DB_BACKUP_SUCCESS_FILE)
+	{
+		return;
+	}
+	
+	
+	# Make sure that the bak directory exists.
+	# if not, db2bak will fail badly. db2bak does not create more than one level directory structure
+	# we assume that there is a bak directory under DS_INSTANCE_DIR. Its there under default install
+
+	if(! -d "$DS_INSTANCE_DIR/bak")
+	{
+		mkdir "$DS_INSTANCE_DIR/bak";
+	}
+	
+	if($isDS5OrOlderVersion == 1)
+	{
+		@args=($DB2BAK,"$DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR");
+		system("@args") ==0 or die "Command @args excution failed\n";
+		#`$DB2BAK $DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR`;
+	}
+	else
+	{
+		@args=($DB2BAK,"\"$DS_INSTANCE_DIR\"","\"$DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR\"");
+		system("@args") == 0 or die "Command @args execution failed\n";
+		#`$DB2BAK $DS_INSTANCE_DIR $DS_INSTANCE_DIR/bak/$DB_BACKUP_DIR`;
+	}
+	#Check for the status for return code from db2bak. If its not 0, then there was a problem
+	#backing up the db. In this case, should not proceed with changes
+    
+    $return_status=$?;
+    	
+    if($return_status ne "0")
+    {
+    	return $return_status;
+    }
+
+	copy("$DS_INSTANCE_DIR\\config\\dse.ldif","$DS_INSTANCE_DIR\\bak\\$DB_BACKUP_DIR");
+	
+	open(FP,">>$DB_BACKUP_SUCCESS_FILE");
+	close(FP);
+
+	return $?;
+}
+
+sub getUsage
+{
+	print "Mandatory Parameter for amtune-directory:\n";
+	print "1. Directory Manager ($DIRMGR_UID) Password\n";
+	print "Sample Command Line:\n";
+	print "amtune-directory <dirmanager_password>\n";
+}
+
+sub insert_inbetween_line
+{
+	($file,$match,$new)=@_;
+	if(! -f "$file-orig.tmp")
+	{
+		if( -f $file)
+		{
+			copy($file,"$file-orig.tmp");
+		}
+	}
+		
+	open(FP,$file);
+	@filecontent=<FP>;
+	close(FP);
+	foreach $i(@filecontent)
+	{
+		$i =~ s/(.*)($match)(.*)\n/$new\n$i/g;
+		open(FP,">>$file.tmp");
+		print FP $i;
+		close(FP);
+	}	
+	copy("$file.tmp",$file);
+	unlink("$file.tmp");
+}
+
+sub delete_inbetween_line
+{
+	($file,$match)=@_;
+	if(! -f "$file-orig.tmp")
+	{
+		if(-f $file)
+		{
+			copy($file,"$file-orig.tmp");
+		}
+	}
+
+	open(FP,$file);
+	@filecontent=<FP>;
+	close(FP);
+	foreach $i(@filecontent)
+	{
+		$i =~ s/(.*)($match)(.*)\n//g;
+		open(FP,">>$file.tmp");
+		print FP $i;
+		close(FP);
+	}	
+
+	copy("$file.tmp",$file);
+	@file_delete=("$file.tmp");
+	unlink @file_delete;
+}
+
+
+
+
+#############################################################################
+# Start of main program
+#############################################################################
+
+($DIRMGR_PASSWORD)=@_;
+
+#-------------------------------------------------------------------------------
+# Parameter     :   BASEDIR
+# Value         :   Java Enterprise System base directory
+#
+# Description   :   Other install directories are constructed from this.
+#                    Ex: c:/sun 
+#-------------------------------------------------------------------------------
+$BASEDIR="";
+if("$BASEDIR" eq "")
+{
+	print "Please Enter Base directory value and run the script again\n";
+	exit (1);
+}
+
+
+
+$DIRMGR_PASSWORD=$ARGV[0];
+
+$LDAPSEARCH="$BASEDIR/share/bin/ldapsearch.exe";
+$LDAPMODIFY="$BASEDIR/share/bin/ldapmodify.exe";
+
+
+$DS_BASE_DIR="$BASEDIR/DSEE/ds6";
+
+$INSTALL_FILE_NOT_REQUIRED=true;
+$PERL_COMMAND ="perl";
+@args=($PERL_COMMAND,"$SCRIPT_LOCATION/amtune-utils.pl");
+system(@args) == 0 or die "Command @args failed\n";
+#`perl $SCRIPT_LOCATION/amtune-utils.pl`;
+
+#---------------------------------------------------------------------------
+# PLEASE DO NOT MODIFY ANYTHING IN THIS FILE except for
+# the customizable parameters
+#   
+# You can customize the following parameters:
+#   1. AMTUNE_MODE (REVIEW/CHANGE)
+#   2. AMTUNE_LOG_LEVEL ( NONE, TERM, or FILE (default) ) - this value is set to not display
+#		 	    the output, display on the terminal, or display on both terminal and 
+#			    output file.	
+#   3. AMTUNE_DEBUG_FILE_PREFIX  (any valid filename prefix) - this will be suffixed with 
+#                           timestamp and pid.
+#                       -   A log of all recommendations/changes with be placed in the file
+#   4. DB_BACKUP_DIR_PREFIX (any valid filename prefix) - this will be suffixed with 
+#                           timestamp and pid.
+#                       -   The directory server instance database will be backed up before
+#                           amtune-directory changes anything. Also, a copy of dse.ldif
+#                           will be placed in the same location. 
+#
+#                           The actual DB backup directory name can be obtained from the 
+#                           debug file
+# 
+#                           Note that db2bak does not copy over dse.ldif file.
+#
+# If you cannot start DS after running amtune in CHANGE mode, you will need to do the following
+# to get back to the original state.
+#   a. Stop Directory Server
+#   b. Copy over dse.ldif from the backup directory to the config directory
+#   c. Run bak2db <backup directory name> for DS 5.2 or dsadm backup for DS 6.0 and later.
+#   
+#---------------------------------------------------------------------------
+# Please take extra care before running Directory tuning in change mode. 
+# Backup all DB files, schemas, configs before running this utility in CHANGE mode
+# Its not recommended to use this utility to tune large databases
+#---------------------------------------------------------------------------
+$AMTUNE_MODE="REVIEW";
+$AMTUNE_LOG_LEVEL="FILE";
+$AMTUNE_DEBUG_FILE_PREFIX=amtune;
+$DB_BACKUP_DIR_PREFIX=amtune;
+#---------------------------------------------------------------------------
+
+$DS_HOST=;
+$DS_PORT=;
+$ROOT_SUFFIX=;
+$DIRMGR_UID=;
+$RAM_DISK=$ENV{TEMP};
+$DS_INSTANCE_DIR=;
+$DS_VERSION=;
+
+if(($DS_HOST eq "")||($DS_PORT eq "")||($ROOT_SUFFIX eq "")||($DIRMGR_UID eq "")||($RAM_DISK eq "")||($DS_INSTANCE_DIR eq ""))
+{
+	&echo_msg("Invalid configuration. Cannot proceed\n");
+	exit;
+}
+
+@ds_ver=split(m/\//,$DS_VERSION);
+@ds_version=split(m/\./,$ds_ver[1]);
+
+if($ds_version[0] le 5)
+{
+	$isDS5OrOlderVersion=1;
+}
+else
+{
+	$isDS5OrOlderVersion=0;
+}
+
+
+#-------------------------------------------------------------------------------
+#Parameter Validation
+#-------------------------------------------------------------------------------
+# To check for $#
+if($#ARGV lt 0)
+{
+	getUsage;
+	exit ;
+}
+
+$LDAP_WORKER_THREADS=24;
+if($isDS5OrOlderVersion == 1)
+{
+	$LDAPSEARCH="$DS_INSTANCE_DIR/../share/bin/ldapsearch";
+	$LDAPMODIFY="$DS_INSTANCE_DIR/../shared/bin/ldapmodify";
+	$DB2BAK="$DS_INSTANCE_DIR/db2bak";
+	$DB2INDEX="$DS_INSTANCE_DIR/db2index.pl";
+  	$LD_LIBRARY_PATH="$DS_INSTANCE_DIR/../lib:$LD_LIBRARY_PATH";
+}
+else
+{
+	# Command to start, stop, and back up Directory Server 6 or later
+	$DSADMIN="$DS_BASE_DIR/bin/dsadm";
+	$DSCFG="$DS_BASE_DIR/bin/dsconf";
+	$DB2BAK="$DSADMIN backup";
+  	$LD_LIBRARY_PATH="$DS_BASE_DIR/lib:$LD_LIBRARY_PATH";
+}
+
+
+#CUR_DATE=`$DATE +'%Y%m%d'`
+$date_variable=localtime();
+@day=split(m/\s+/,$date_variable);
+$CUR_DATE="$day[2]-$day[1]-$day[4]";
+
+$cur_number_worker_threads=&getNumberOfWorkerThreads;
+chomp($cur_number_worker_threads);
+
+$cur_access_log_status=&getAccessLogStatus;
+chomp($cur_access_log_status);
+
+$cur_db_cache_size=&getDBCacheSize;
+chomp($cur_db_cache_size);
+
+$db_dn=&getDBDN;
+chomp($db_dn);
+
+@db_suffix=&getBackend;
+#chomp($db_suffix);
+
+$cur_db_home_location=&getDBHomeLocation;
+chomp($cur_db_home_location);
+
+$db_dir=&getDBDirectory;
+chomp($db_dir);
+
+if($cur_number_worker_threads eq "")
+{
+	&echo_msg("Failed to obtain directory configuration: Number of Worker Threads\n");
+   	&echo_msg("Invalid configuration. Cannot proceed\n");
+   	exit;
+}
+
+if($cur_access_log_status eq "")
+{
+	&echo_msg("Failed to obtain directory configuration: Access Log Status\n");
+	&echo_msg("Invalid configuration. Cannot proceed\n");
+	exit;
+}
+
+if($cur_db_cache_size eq "")
+{
+	&echo_msg("Failed to obtain directory configuration: DB Cache Size\n");
+	&echo_msg("Invalid configuration. Cannot proceed\n");
+    exit;
+}
+
+if($#db_suffix == -1)
+{
+	&echo_msg("Failed to obtain directory configuration: Backend for the DB\n");
+    &echo_msg("Invalid configuration. Cannot proceed\n");
+    exit;
+}
+
+if($cur_db_home_location eq "")
+{
+	&echo_msg("Failed to obtain directory configuration: DB Home Location\n");
+    &echo_msg("Invalid configuration. Cannot proceed\n");
+    exit;
+}
+
+
+if($db_dir eq "")
+{
+	&echo_msg("Failed to obtain directory configuration: DB Directory\n");
+    &echo_msg("Invalid configuration. Cannot proceed\n");
+    exit;
+}
+
+$g=localtime();
+@date=split(m/\s+/,$g);
+$SCRIPT_BASENAME="$SCRIPT_LOCATION/$SCRIPT_BASENAME : $g";
+
+@amt_mode=grep(m/CHANGE/,$AMTUNE_MODE);
+if($#amt_mode > -1)
+{
+	$AMTUNE_MODE="CHANGE";
+}
+else
+{
+	$AMTUNE_MODE="REVIEW";
+}
+
+if($AMTUNE_DEBUG_FILE_PREFIX eq "")
+{
+	$AMTUNE_DEBUG_FILE_PREFIX=amtune;
+}
+
+$debug_dir="$SCRIPT_LOCATION";
+setLogOutput($debug_dir);
+
+if($DB_BACKUP_DIR_PREFIX eq "")
+{
+	$DB_BACKUP_DIR_PREFIX=amtune;
+}
+
+$DB_BACKUP_DIR="$DB_BACKUP_DIR_PREFIX-$CUR_DATE";
+
+&echo_msg("$CHAPTER_SEP\n");
+&echo_msg("$SCRIPT_BASENAME\n");
+&echo_msg("$CHAPTER_SEP\n"); 
+&echo_msg("Initializing...\n");
+
+
+&echo_msg("$LINE_SEP\n");
+
+# check system env
+&echo_msg("Checking System Environment...\n");
+&check_env;
+
+
+# Print mode and components to tune
+&echo_msg("$LINE_SEP\n");
+&echo_msg("amtune-directory Information...\n");
+&echo_msg("$LINE_SEP\n");
+&echo_msg("amtune Mode      : $AMTUNE_MODE\n");
+
+&echo_msg("$LINE_SEP\n"); 
+&echo_msg("Detecting System Environment...\n");
+&echo_msg("$LINE_SEP\n");
+
+$numCPUS=&getNumberOfCPUS;
+&echo_msg("Number of CPUs in the system:", "$numCPUS\n");
+if($numCPUS eq "")
+{
+	&echo_msg("Unable to obtain available CPUs. Cannot proceed.\n");
+   	exit;
+}
+
+$memAvail=&getSystemMemory;
+if($memAvail eq "")
+{
+	&echo_msg("Unable to obtain available memory. Cannot proceed.\n");
+	exit;
+}
+
+
+$memAvail=$memAvail * 1024 * 1024;
+
+if($memAvail eq "")
+{	
+	&echo_msg("Unable to obtain available memory. Cannot proceed.\n");
+	exit;
+}
+
+&echo_msg("Calculating memory needs for DS Caching...\n");
+
+@db_dirs=&availableDBdirs;
+
+if(@db_dirs eq "")
+{	
+	&echo_msg("Error locating DB directories. Cannot proceed.\n");
+    exit;
+}
+
+@new_db_cache_size=&calculateDBCacheSize;
+
+if($#new_db_cache_size == -1)
+{	
+	&echo_msg("Cannot compute recommended DB Cache Size. Cannot proceed.\n");
+	exit;
+}
+
+$total_new_db_cache_size=0;
+
+foreach $item(@db_suffix)
+{	
+	chomp($item);
+	$new_db_entry_cache_size=&suggestDBEntryCacheSizebyBackend($item);
+	if($new_db_entry_cache_size == "")
+	{
+		&echo_msg("Cannot compute recommended DB Cache Size for $item. Cannot proceed.\n");
+		exit;
+	}
+	
+	$total_new_db_entry_cache_size=$total_new_db_entry_cache_size + $new_db_entry_cache_size;
+	$total_new_db_entry_cache_size=removeDecimals($total_new_db_entry_cache_size);
+}
+
+$total_memory=0;
+
+foreach $i(@new_db_cache_size)
+{
+	$total_memory=$total_memory+$i;
+}
+
+$total_mem=$total_memory + $total_new_db_entry_cache_size;
+
+
+if($total_mem == 0)
+{
+	&echo_msg("Unable to compute memory requirements. Cannot proceed.\n");
+	exit;
+}
+
+
+&echo_msg("Memory Available (bytes)             : ","$memAvail\n");
+&echo_msg("Memory Needed for DS Caching (bytes) : ","$total_mem\n");
+
+if($memAvail >= $total_mem)
+{
+	&echo_msg("There is enough memory.\n");
+}
+else
+{
+	&echo_msg("There is not enough memory.\n");
+	exit;
+}
+
+$dir_instance_dir_variable=basename($DS_INSTANCE_DIR);
+
+$new_db_home_location="$RAM_DISK/$dir_instance_dir_variable";
+
+if($new_db_home_location eq "")
+{
+	&echo_msg("Cannot compute new DB Home. Cannot proceed.\n");
+    exit;
+}
+
+$new_number_worker_threads=$LDAP_WORKER_THREADS;
+
+if($new_number_worker_threads eq "")
+{
+	&echo_msg("Cannot compute optimum number of DS worker threads. Cannot proceed.\n");
+	exit;
+}
+
+
+&echo_msg($PARA_SEP);
+&echo_msg("OpenSSO - Directory Server Tuning Script");
+
+#determine physical memory limitations
+#determine application size (32-bits, 64-bits)
+&tuneUsingLdapModify; 
+&tuneUsingDSE; 		
+&tuneDSIndex;		
+&tuneFuture;		
+
+&echo_msg($PARA_SEP);

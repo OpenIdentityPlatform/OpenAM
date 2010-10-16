@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+ 
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+ 
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+ 
+   $Id: policyevaluationtest_rules.xml,v 1.1 
+   2007/04/26 20:27:30 arunav Exp $ 
+
+   Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<!DOCTYPE Policies
+PUBLIC "-//Sun Java System Access Manager 7.1 2006Q3 Admin CLI DTD//EN"
+"jar://com/sun/identity/policy/policyAdmin.dtd"
+>
+
+<Policies>
+    <Policy name="policyevaluationtest_rules0"
+            referralPolicy="false"
+            active="true" >
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.google.com:80/*.html" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+        </Rule>
+        
+        <Subjects name="Subjects1" description="">
+            <Subject name="ruleuser0" type="AuthenticatedUsers" 
+            includeType="inclusive" />
+        </Subjects>
+        
+    </Policy>
+    <Policy name="policyevaluationtest_rules1"
+            referralPolicy="false"
+            active="true" >
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.c*.com:80/*.html" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+        </Rule>
+        
+        <Subjects name="Subjects1" description="">
+            <Subject name="ruleuser0" type="AuthenticatedUsers" 
+            includeType="inclusive" />
+        </Subjects>
+    </Policy>
+    
+    <Policy name="policyevaluationtest_rules2"
+            referralPolicy="false"
+            active="true" >
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.shopping.com:8*/*.html" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+        </Rule>
+        
+        <Subjects name="Subjects1" description="">
+            <Subject name="ruleuser0" type="AuthenticatedUsers" 
+            includeType="inclusive" />
+        </Subjects>
+        
+    </Policy>
+    
+    <Policy name="policyevaluationtest_rules3"
+            referralPolicy="false"
+            active="true" >
+        <Rule name="r1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http*://www.cooking.com:8*/*.html" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+        </Rule>
+        
+        <Subjects name="Subjects1" description="">
+            <Subject name="ruleuser0" type="AuthenticatedUsers" 
+            includeType="inclusive" />
+        </Subjects>
+        
+    </Policy>
+    
+</Policies>
+

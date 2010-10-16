@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Authentifizierungs-Webdienst - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>Authentifizierungs-Webdienst</h3>
+<a name="indexterm-159"></a><p>Mit dem Authentifizierungs-Webdienst wird die Durchf&#252;hrung der Authentifizierung &#252;ber SOAP definiert. Der
+Austausch von Authtentifizierungsinformationen zwischen einem Webdienstbenutzer (WSC) und dem Webdienstanbieter (WSP) erfolgt
+&#252;ber SOAP-gebundene Nachrichten. Die Nachrichten bestehen aus Client-Anforderungen und Server-Antworten entsprechend dem
+festgelegten Simple Authentication and Security Layer (SASL)-Mechansimus (oder Authentifizierungsmodus). Nachdem der WSP
+eine Authentifizierungsanforderung (oder eine Antwort vom WSC) erhalten hat, gibt der der
+WSP gegebenenfalls zus&#228;tzliche Challenges aus oder meldet die erfolgreiche bzw. fehlgeschlagene Authentifizierung.
+Der Authentifizierungs-Webdienst dient der Dienst-zu-Dienst-Authentifizierung (nicht benutzerbezogen). Die folgende Sequenz beschreibt die
+einzelnen Schritte zwischen dem WSC und dem Authentifizierungs-Webdienst (ein WSP).</p>
+<ol><li><p>Der Informationsaustausch f&#252;r die Authentifizierung beginnt mit einer vom WSC gesendeten SASL-Authentifizierungsanforderung im Namen des Principals an den Authentifizierungs-Webdienst.</p><p>Die Anforderungsnachricht enth&#228;lt einen Bezeichner f&#252;r den Principal und zeigt einen oder mehrere SASL-Mechanismen an, aus denen der Dienst w&#228;hlen kann.</p></li>
+<li><p>Der Authentifizierungs-Webdienst antwortet mit einer Best&#228;tigung der anzuwendenden Methode und startet gegebenenfalls einen Challenge.</p><p> Wenn der Authentifizierungs-Webdienst eine der genannten Methoden nicht unterst&#252;tzt, wird der Austausch abgebrochen. </p></li>
+<li><p>Der WSC antwortet mit den erforderlichen Anmeldeinformationen f&#252;r die ausgew&#228;hlte Authentifizierungsmethode.</p></li>
+<li><p>Der Authentifizierungs-Webdienst antwortet mit der Genehmigung oder Ablehnung der Authentifizierung.</p><p> Wenn der Authentifizierung zugestimmt wird, enth&#228;lt die Antwort die Anmeldeinformationen, die der WSC zum Aufrufen anderer Webdienste (wie des Discovery-Dienst) ben&#246;tigt. </p></li></ol>
+<p>Die folgenden allgemeinen  Authentifizierungs-Webdienst-Attribute k&#246;nnen f&#252;r eine Implementierung konfiguriert werden.</p>
+<ul><li><p><a href="mechanismhandlerslist.html">Mechanismus-Handler-Liste</a></p></li>
+<li><p>Challenge-Bereinigungsintervall - Gibt das Bereinigungsintervall (in Sekunden) in der Standard-Implementierungsklasse des CRAM-MD5-Mechanismus-Handler <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler </tt> an. Der interne Thread beginnt anhand dieses Werts mit der Bereinigung der Challenge-Zuordnung.</p></li>
+<li><p>Klassen umwandeln &#8211; Gibt dem Umwandlungsnamen f&#252;r die Implementierungsklassenzuordnung an. Die Werte sind durch Komma getrennt. Dabei fungiert "|" als Trennzeichen zwischen dem Umwandlungsnamen und dem Namen der Implementierungsklasse. Beispiel: <tt>name1|class1, name2|class2</tt>.</p></li></ul>
+<p>In Verbindung mit der Konfiguration von Authentifizierungs-Webdienst muss die folgende Aufgabe ausgef&#252;hrt
+werden:</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">So konfigurieren Sie einen neuen Mechanismus-Handler</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

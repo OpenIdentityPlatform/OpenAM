@@ -1,0 +1,10 @@
+{
+    "records":[
+            #foreach( $circleOfTrust in $circlesOfTrust )
+            {
+                "circleName":"$circleOfTrust.name",
+                "circleDisplayName":"$circleOfTrust.name in $circleOfTrust.realm.name"
+            },
+            #end
+    ]
+}

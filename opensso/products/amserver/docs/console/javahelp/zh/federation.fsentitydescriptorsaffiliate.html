@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>向联合提供者实体添加成员 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsaffiliate"></a><h4>向联合提供者实体添加成员</h4><a name="indexterm-83"></a><a name="indexterm-84"></a><p>创建联合提供者实体后，可为联合提供者添加成员。起点是联合界面下的“实体”。</p>
+<hr><p><b>注 &#8211; </b>也可在该屏幕上修改已定义的“公共属性”。</p>
+<hr>
+<ol>
+<li><b>单击已配置的联合提供者实体的名称，对其配置文件进行修改。</b><p>随即显示实体的配置文件页面。</p></li>
+<li><b>从“查看”菜单中选择“联合提供者”。</b></li>
+<li><b>选择要指定给联合提供者的任意可用实体。</b></li>
+<li><b>修改“公共属性”的值。</b><p>一般而言，“公共属性”所含的值定义了身份认证提供者本身。</p><dl><dt>名称</dt>
+<dd><p>为联合提供者键入一个新的 URI（如果适用）。此属性的当前值是您在创建实体时为“联合提供者名称”属性指定的 URI。任何新值在联合提供者名称间均必须唯一。</p></dd>
+<dt>拥有者</dt>
+<dd><p>键入一个新的 URI，为联合提供者定义另一不同的拥有者或父操作员。此属性的当前值是您在创建实体时为“联合提供者拥有者”属性指定的 URI。此属性的新值是一个 URI，它应当与新的拥有者/提供者所属实体的“实体名称”属性中定义的值相匹配。任何新值在联合提供者名称间均必须唯一。</p>
+<hr><p><b>注 &#8211; </b>将提供者定义为“联合提供者拥有者”时，并不会自动将其作为成员加入到联合提供者中。如果某个拥有者也是成员，则必须在此处将该 URI 定义为拥有者并在联合提供者实体本身之内将其定义为成员。</p>
+<hr>
+</dd>
+<dt>签署密钥：密钥别名</dt>
+<dd><p>证书存储在 Java 密钥库文件中。 文件中的每个证书均被映射到用于获取证书的别名。键入与用于签署请求和响应的证书相关联的密钥别名。</p></dd>
+<dt>加密密钥：密钥别名</dt>
+<dd><p>证书存储在 Java 密钥库文件中。文件中的每个证书均被映射到用于获取证书的别名。键入与提供者的安全证书相关联的密钥别名。</p></dd>
+<dt>加密密钥：密钥大小</dt>
+<dd><p>键入 Web 服务使用方与另一个实体交互时所用密钥的长度。</p></dd>
+<dt>加密密钥：加密方法</dt>
+<dd><p>键入一个指向加密方法首选项的 URI。</p></dd>
+</dl>
+</li>
+<li><b>单击“保存”。</b></li></ol>
+<br/>
+
+</body>
+</html>

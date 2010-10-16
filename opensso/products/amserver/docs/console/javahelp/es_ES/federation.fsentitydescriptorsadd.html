@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear una entidad de proveedores o una entidad de afiliaci&#243;n - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsadd"></a><h4>Para crear una entidad de proveedores o una entidad de afiliaci&#243;n</h4><a name="indexterm-66"></a><a name="indexterm-67"></a><a name="indexterm-68"></a><a name="indexterm-69"></a><p>El proceso de establecimiento de una entidad est&#225; compuesto por dos pasos.
+En primer lugar, debe crear la entidad. (Es el momento de determinar
+si va a ser una <b>entidad de proveedores</b> o una <b>entidad de afiliaci&#243;n</b>.) Despu&#233;s de crear
+la entidad, debe rellenarla con proveedores. El siguiente procedimiento permite crear una
+nueva entidad. El punto de partida es Entidades en la interfaz Federaci&#243;n.</p>
+<hr><p><b>Nota &#8211; </b>Se puede crear una entidad, pero no estar&#225; disponible para asignarla a
+un c&#237;rculo de confianza hasta que se hayan agregado los proveedores.</p>
+<hr>
+<ol>
+<li><b>Haga clic en Nuevo para que se muestren los atributos de la
+entidad.</b><p>Aparece la p&#225;gina Nueva entidad.</p></li>
+<li><b>Escriba un nombre para la entidad.</b><p>El atributo Nombre de entidad define un identificador de recursos uniformes (URI)
+para la entidad. Este valor debe ser exclusivo entre los nombres de
+entidades.</p></li>
+<li><b>Escriba una descripci&#243;n para la entidad.</b></li>
+<li><b>Seleccione un tipo de entidad.</b>
+<ul><li><p>Si va a crear una entidad de proveedores, seleccione <b>Proveedor</b>.</p></li>
+<li><p>Si va a crear una entidad de afiliaci&#243;n, seleccione <b>Afiliado</b>, y defina los valores para los atributos Nombre de afiliado y Propietario de afiliado.</p>
+<ul><li><p>El nombre de afiliado define un URI para la entidad de afiliaci&#243;n. Este valor debe ser exclusivo entre los nombres de afiliados.</p></li>
+<li><p>El propietario de afiliado especifica un proveedor como administrador principal de la afiliaci&#243;n. El valor de este atributo es un URI que coincidir&#225; con el valor definido en el atributo Nombre de entidad de la entidad a la que pertenece el proveedor/propietario de afiliado.</p></li></ul>
+
+<hr><p><b>Nota &#8211; </b>Si se define un proveedor como propietario de afiliado, esto no implica que se incluya autom&#225;ticamente como miembro de la afiliaci&#243;n. Si un propietario es tambi&#233;n miembro, el URI debe definirse en esta ubicaci&#243;n como propietario y, dentro de la propia entidad de afiliaci&#243;n, como miembro. Para agregar miembros a una afiliaci&#243;n, consulte <a href="federation.fsentitydescriptorsaffiliate.html">Para agregar miembros a una entidad de afiliaci&#243;n</a>.</p>
+<hr>
+</li></ul>
+</li>
+<li><b>Haga clic en Aceptar.</b><p>La nueva entidad aparece en la pantalla Entidades.</p></li></ol>
+<br/>
+
+</body>
+</html>

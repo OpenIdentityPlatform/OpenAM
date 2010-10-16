@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS  - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS </h4>
+<p><a name="indexterm-178"></a>此模組允許使用外部「遠端驗證撥入使用者服務 (Remote Authentication Dial-In User Service, RADIUS)」伺服器來進行認證。RADIUS 認證屬性是範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwadp">伺服器 1</a></p></li>
+<li><p><a href="#fwaom">伺服器 2</a></p></li>
+<li><p><a href="#fwaka">共用密碼</a></p></li>
+<li><p><a href="#fwapc">共用密碼確認</a></p></li>
+<li><p><a href="#fwapn">連接埠號</a></p></li>
+<li><p><a href="#fwaad">逾時</a></p></li>
+<li><p><a href="#fwabo">認證級別</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>伺服器 1</h5>
+<p>顯示主 RADIUS 伺服器的 IP 位址或完全合格的主機名稱。預設 IP 位址為 127.0.0.1。此欄位將識別任何有效的 IP 位址或主機名稱。輸入多項時必須先輸入本機伺服器名稱，如以下語法中所示：</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaom"></a><h5>伺服器 2</h5>
+<p>顯示輔助 RADIUS 伺服器的 IP 位址或完全合格的網域名稱 (FQDN)。此伺服器是在無法聯絡主伺服器時，將會聯絡的容錯移轉伺服器。預設 IP 位址為 127.0.0.1。多個項目必須以本機伺服器名稱為字首，如下列語法所示：</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaka"></a><h5>共用密碼</h5>
+<p>帶有 RADIUS 認證的共用密碼。共用密碼應該與相適的密碼具有相同的權限。此欄位沒有預設值。</p>
+
+<a name="fwapc"></a><h5>共用密碼確認</h5>
+<p>對 RADIUS 認證的共用密碼進行確認。</p>
+
+<a name="fwapn"></a><h5>連接埠號</h5>
+<p>指定 RADIUS 伺服器正在偵聽的連接埠。預設值為 1645。</p>
+
+<a name="fwaad"></a><h5>逾時</h5>
+<p>指定在逾時之前等待 RADIUS 伺服器回應的時間間隔 (以秒計算)。預設值為 3 秒。此欄位將辨識指定逾時 (以秒計算) 的任何數字。</p>
+
+<a name="fwabo"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

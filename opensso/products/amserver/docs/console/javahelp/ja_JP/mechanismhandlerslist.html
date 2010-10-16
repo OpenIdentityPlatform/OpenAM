@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>メカニズムハンドラリスト - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="mechanismhandlerslist"></a><h4>メカニズムハンドラリスト</h4>
+<a name="indexterm-160"></a><a name="indexterm-161"></a><p>「メカニズムハンドラリスト」属性には、認証 Web サービスがサポートする SASL メカニズムについての情報が格納されます。この属性には、キーと値のペアを含むエントリがパイプ文字で区切られて表示されます。たとえば、<tt>key=PLAIN|class=com.sun.identity.liberty.ws.authnsvc.mechanism.PlainMechanismHandler</tt> のように表示されます。次の表は各パラメータの説明です。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>パラメータ</p></th>
+<th align="left" valign="top" scope="column"><p>値</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>キー</tt></p></td>
+<td align="left" valign="top" scope="row"><p>必須の<tt>キー</tt>パラメータは、認証 Web サービスでサポートされている SASL メカニズムを定義します。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>クラス</tt></p></td>
+<td align="left" valign="top" scope="row"><p>必須の<tt>クラス</tt>パラメータは、SASL メカニズムの実装クラス名を指定します。認証 Web
+サービスレイヤーは、ハンドラインタフェースを提供します。これは、各 SASL メカニズムが要求されたメッセージを処理して応答を返すために実装される必要があります。</p></td>
+</tr>
+</table><p>新しい要求ハンドラを追加するには、「<b>追加</b>」をクリックし、<a href="webservices.wsauthnserviceshandlersadd.html">「新規メカニズムハンドラを設定する」</a>を参照してください。</p>
+<br/>
+
+</body>
+</html>

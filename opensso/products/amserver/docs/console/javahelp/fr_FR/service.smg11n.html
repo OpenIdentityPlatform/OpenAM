@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Param&#232;tres de globalisation - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>Param&#232;tres de globalisation</h4>
+<p><a name="indexterm-188"></a>Le service Param&#232;tres de globalisation contient des attributs g&#233;n&#233;raux qui vous permettent
+de configurer OpenSSO pour diff&#233;rents param&#232;tres r&#233;gionaux et jeux de caract&#232;res. Ces
+attributs sont les suivants :</p>
+<ul><li><p><a href="#fsvdx">Jeux de caract&#232;res compatibles par version des param&#232;tres locaux</a></p></li>
+<li><p><a href="#fsvec">D&#233;signation des jeux de caract&#232;res</a></p></li>
+<li><p><a href="#fsveb">Format de nom commun g&#233;n&#233;r&#233; automatiquement</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>Jeux de caract&#232;res compatibles par version des param&#232;tres locaux</h5>
+<p>Cet attribut r&#233;pertorie les jeux de caract&#232;res pris en charge pour chaque
+langue, indiquant le mappage entre la langue et le jeu de caract&#232;res.
+Le format est le suivant :</p><p>Pour ajouter un nouveau jeu de caract&#232;res pris en charge, cliquez sur
+Ajouter et d&#233;finissez les param&#232;tres suivants :</p><dl><dt>Param&#232;tres locaux</dt>
+<dd><p>Les nouveaux param&#232;tres locaux que vous souhaitez ajouter. Pour plus d'informations, reportez-vous &#224; <a href="supportedlang.html">Environnements linguistiques pris en charge</a>.</p></dd>
+<dt>Jeux de caract&#232;res support&#233;s</dt>
+<dd><p>Entrez le jeu de caract&#232;res support&#233; pour la langue sp&#233;cifi&#233;e. Les jeux de caract&#232;res sont d&#233;limit&#233;s par un point-virgule. Par exemple, <tt>charset=jeu_caract&#232;res1;jeu_caract&#232;res2;jeu_caract&#232;res3;...;jeu_caract&#232;resn </tt></p></dd>
+</dl>
+<p>Pour modifier tout jeu de caract&#232;res support&#233;, cliquez sur le nom voulu
+dans le tableau des jeux de caract&#232;res support&#233;s. Cliquez sur OK lorsque
+vous avez termin&#233;.</p>
+
+<a name="fsvec"></a><h5>D&#233;signation des jeux de caract&#232;res</h5>
+<p>Cet attribut r&#233;pertorie les noms de jeu de codes (mapp&#233;s sur des
+noms IANA) qui seront utilis&#233;s pour envoyer la r&#233;ponse. Ces noms de
+jeu de codes ne doivent pas n&#233;cessairement correspondre &#224; des noms de
+jeu de codes Java. Actuellement, il existe une table de hachage qui
+fournit la correspondance entre les jeux de caract&#232;res Java et les jeux
+de caract&#232;res IANA.</p><p>Pour ajouter une nouvelle d&#233;signation de jeu de caract&#232;re, cliquez sur le
+bouton Ajouter, puis d&#233;finissez les param&#232;tres suivants :</p><dl><dt>Nom MIME</dt>
+<dd><p>Nom de mappage IANA. Par exemple, <tt>Shift_JIS</tt></p></dd>
+<dt>Nom Java</dt>
+<dd><p>Jeu de caract&#232;res Java &#224; mapper sur le jeu de caract&#232;res IANA. </p></dd>
+</dl>
+<p>Pour modifier toute d&#233;signation de jeu de caract&#232;res, cliquez sur le nom
+voulu dans le tableau. Cliquez sur OK lorsque vous avez termin&#233;.</p>
+
+<a name="fsveb"></a><h5>Format de nom commun g&#233;n&#233;r&#233; automatiquement</h5>
+<p>Cette option d'affichage vous permet de d&#233;finir la mani&#232;re dont un nom
+est automatiquement g&#233;n&#233;r&#233; pour adapter les formats de nom &#224; diff&#233;rents param&#232;tres
+locaux et jeux de caract&#232;res. La syntaxe par d&#233;faut est la suivante
+(notez que les virgules et/ou les espaces inclus dans la d&#233;finition s'afficheront
+dans le format du nom) :</p><p><tt>en_us = {nomdonn&#233;} {initiales} {sn}</tt></p><p>Par exemple, si vous voulez afficher un nouveau format de nom pour
+un utilisateur (Utilisateur Un) avec un uid (11111) pour le jeu de
+caract&#232;res chinois, d&#233;finissez :</p><p><tt>zh = {sn}{nomdonn&#233;}({uid})</tt></p><p>L'affichage est le suivant :</p><p><tt>Utilisateur 11111</tt></p>
+<br/>
+
+</body>
+</html>

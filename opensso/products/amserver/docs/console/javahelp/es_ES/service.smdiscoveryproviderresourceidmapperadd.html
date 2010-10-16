@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para configurar un asignador de Id. de recursos - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryproviderresourceidmapperadd"></a><h5>Para configurar un asignador de Id. de recursos</h5>
+<p><tt>com.sun.identity.liberty.ws.interfaces.ResourceIDMapper</tt> is an interface used to map a user identifier to the
+resource identifier associated with it. Las distintas implementaciones se pueden desarrollar con
+la clase implementada y agregarse al atributo. A continuaci&#243;n, se muestra el
+procedimiento para agregar un nuevo asignador de Id. de recursos al Servicio
+de detecci&#243;n. El punto de partida es la pantalla de configuraci&#243;n del
+Servicio de detecci&#243;n en el m&#243;dulo Servicios Web.</p><ol>
+<li><b>Haga clic en &#8220;Nuevo&#8221; (New) para mostrar los nuevos atributos del asignador
+o seleccione el nombre de un asignador configurado para modificarlo.</b></li>
+<li><b>Proporcione los valores de los atributos del asignador seg&#250;n la siguiente informaci&#243;n:</b><dl><dt>Provider ID</dt>
+<dd><p>Este atributo toma como valor un URI que se&#241;ala al Servicio de detecci&#243;n. The value is written in the format: <tt><b>http://</tt><i> host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco </b></tt></p></dd>
+<dt>Asignador de Id.</dt>
+<dd><p>Introduzca el nombre para la clase implementada.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en "Aceptar" para completar la configuraci&#243;n del asignador.</b></li>
+<li><b>Haga clic en Guardar en la p&#225;gina del Servicio de detecci&#243;n para
+completar la configuraci&#243;n del servicio.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>지원되는 지시문 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>지원되는 지시문</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>이 속성을 사용하면 자원에 대한 정책 관련 지시문을 지정할 수 있습니다. 서비스
+공급자가 지원되지 않는 지시문을 사용하려고 하면 요청이 실패합니다. 다음 표는 사용 가능한
+옵션에 대해 자세히 설명합니다.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>지시문</p></th>
+<th align="left" valign="top" scope="column"><p>용도</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>검색 서비스는 클라이언트가 자원을 호스트하는 서비스 인스턴스에 대해 인증될
+수 있도록 응답에 SAML 명제(<tt>AuthenticationStatement</tt> 포함)를 포함해야 합니다.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>검색 서비스는 세션 상태를 표시하는
+응답에 SAML 명제(<tt>SessionContextStatement</tt> 포함)를 포함해야 합니다.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p>검색 서비스는 클라이언트가 자원에 액세스할 수 있는지
+여부를 나타내는 응답에 SAML 명제(<tt>ResourceAccessStatement</tt> 포함)를 포함해야 합니다.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>검색 서비스는 모든 클라이언트에 대한
+응답에서 자원 식별자를 암호화해야 합니다.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>베어러 토큰 인증을 사용하려면 검색 서비스가 자원에 액세스할
+수 있는 무기명 권한을 부여하는 토큰을 생성해야 합니다. </p></td>
+</tr>
+</table>
+<hr><p><b>주의 &#8211; </b><tt>AuthorizeRequestor</tt> 및 <tt>EncryptResourceID</tt> 지시문은 함께 사용할 수 없습니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

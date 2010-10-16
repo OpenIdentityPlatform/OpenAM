@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de SAMLv2 XACML PDP  - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pdp"></a><h4>Personalizaci&#243;n de SAMLv2 XACML PDP </h4>
+<p>XACML PDP contiene los siguientes atributos que pueden personalizarse:</p>
+<ul><li><p><a href="#ggwgo">Enumeraci&#243;n de la compatibilidad del protocolo</a></p></li>
+<li><p><a href="#ggwjh">Alias de la clave firmada</a></p></li>
+<li><p><a href="#ggwjx">Alias de la clave de cifrado</a></p></li>
+<li><p><a href="#ggwhi">Autorizaci&#243;n b&#225;sica</a></p></li>
+<li><p><a href="#ggwgk">Consulta sobre la decisi&#243;n de autorizaci&#243;n firmada</a></p></li>
+<li><p><a href="#ggwhp">Servicio de autorizaci&#243;n</a></p></li></ul>
+
+
+<a name="ggwgo"></a><h5>Enumeraci&#243;n de la compatibilidad del protocolo</h5>
+<p>Muestra la versi&#243;n de XACML PDP compatible con este proveedor. </p><p><tt>urn:liberty:iff:2003-08</tt> hace referencia a Liberty Identity Federation Framework versi&#243;n 1.2.</p><p><tt>urn:liberty:iff:2002-12</tt> hace referencia a Liberty Identity Federation Framework versi&#243;n 1.1. </p>
+
+<a name="ggwjh"></a><h5>Alias de la clave firmada</h5>
+<p>Define el alias de clave que se utiliza para firmar solicitudes y
+respuestas.</p>
+
+<a name="ggwjx"></a><h5>Alias de la clave de cifrado</h5>
+<p>Define el alias de clave para el cifrado XACML. </p>
+
+<a name="ggwhi"></a><h5>Autorizaci&#243;n b&#225;sica</h5>
+<p>Para proteger los puntos finales SOAP puede habilitarse la autorizaci&#243;n b&#225;sica. Todo
+proveedor que acceda a estos puntos finales deber&#225; tener el usuario y
+la contrase&#241;a definidas en las siguientes dos propiedades: <tt>Nombre de usuario</tt> y <tt> Contrase&#241;a</tt>.</p>
+
+<a name="ggwgk"></a><h5>Consulta sobre la decisi&#243;n de autorizaci&#243;n firmada</h5>
+<p>Cuando est&#225; habilitado, este atributo obliga que todas las consultas se firmen
+para la decisi&#243;n de autorizaci&#243;n XACML.</p>
+
+<a name="ggwhp"></a><h5>Servicio de autorizaci&#243;n</h5>
+<p>Este atributo define el tipo (enlace) de la solicitud de autorizaci&#243;n, as&#237;
+como el punto final de URL para recibir la solicitud. De forma
+predeterminada, el tipo de enlace es SOAP.</p>
+<br/>
+
+</body>
+</html>

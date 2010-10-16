@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAP - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthldapservice"></a><h4>LDAP</h4>
+<p><a name="indexterm-175"></a>This module enables authentication using LDAP bind, a Directory Server operation which associates
+a user ID password with a particular LDAP entry. You can define multiple
+LDAP authentication configurations for a realm. The LDAP authentication attributes are realm attributes. The
+attributes are:</p>
+<ul><li><p><a href="#fwazv">Primary LDAP Server</a></p></li>
+<li><p><a href="#fwbac">Secondary LDAP Server</a></p></li>
+<li><p><a href="#fwazx">DN to Start User Search</a></p></li>
+<li><p><a href="#fwazz">DN for Root User Bind</a></p></li>
+<li><p><a href="#fwazq">Password for Root User Bind</a></p></li>
+<li><p><a href="#fwazu">Password for Root User Bind (confirm)</a></p></li>
+<li><p><a href="#fwazs">Attribute Used to Retrieve User Profile</a></p></li>
+<li><p><a href="#fwazy">Attributes Used to Search for a User to be Authenticated</a></p></li>
+<li><p><a href="#fwazw">User Search Filter</a></p></li>
+<li><p><a href="#fwbai">Search Scope</a></p></li>
+<li><p><a href="#fwbal">Enable SSL to Access LDAP Server</a></p></li>
+<li><p><a href="#fwbak">Return User DN to Authenticate</a></p></li>
+<li><p><a href="#fwbaf">LDAP Server Check Interval</a></p></li>
+<li><p><a href="#fwbah">User Creation Attribute List</a></p></li>
+<li><p><a href="#fwbaj">Authentication Level</a></p></li></ul>
+
+
+<a name="fwazv"></a><h5>Primary LDAP Server</h5>
+<p>Specifies the host name and port number of the primary LDAP server specified
+during OpenSSO installation. This is the first server contacted for authentication. The format
+is<tt></tt><i>hostname:port</i><tt></tt>. If there is no port number, assume <tt>389</tt>.</p><p>If you have OpenSSO deployed with multiple domains, you can specify the communication
+link between specific instances of OpenSSO and Directory Server in the following format
+(multiple entries must be prefixed by the local server name):</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>For example, if you have two OpenSSO instances deployed in different locations (L1-machine1-IS
+and L2- machine2-IS) communicating with different instances of Directory Server (L1-machine1-DS and L2-machine2-DS), it
+would look the following:</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389</tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389</tt></p>
+
+<a name="fwbac"></a><h5>Secondary LDAP Server</h5>
+<p>Specifies the host name and port number of a secondary LDAP server available
+to the OpenSSO platform. If the primary LDAP server does not respond to
+a request for authentication, this server would then be contacted. If the primary
+server is up, OpenSSO will switch back to the primary server. The format
+is also <tt></tt><i>hostname:port</i><tt></tt>. Multiple entries must be prefixed by the local server name.</p>
+<hr><p><b>Caution &#8211; </b>When authenticating users from a Directory Server that is remote from the OpenSSO,
+it is important that both the Primary and Secondary LDAP Server Ports have
+values. The value for one Directory Server location can be used for both
+fields.</p>
+<hr>
+
+
+<a name="fwazx"></a><h5>DN to Start User Search</h5>
+<p>Specifies the DN of the node where the search for a user
+would start. (For performance reasons, this DN should be as specific as possible.) The
+default value is the root of the directory tree. Any valid DN will
+be recognized. If OBJECT is selected in the Search Scope attribute, the DN
+should specify one level above the level in which the profile exists. Multiple
+entries must be prefixed by the local server name. The format is <tt></tt><i>servername|search dn</i><tt></tt>.</p><p>For multiple entries:</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>If multiple entries exist under the root organization with the same user ID,
+then this parameter should be set so that the only one entry can
+be searched for or found in order to be authenticated. For example, in
+the case where the agent ID and user ID is same under root
+org, this parameter should be <tt>ou=Agents</tt> for the root organization to authenticate using
+Agent ID and <tt>ou=People,</tt> for the root organization to authenticate using User
+ID.</p>
+
+<a name="fwazz"></a><h5>DN for Root User Bind</h5>
+<p>Specifies the DN of the user that will be used to bind
+to the Directory Server specified in the Primary LDAP Server and Port field as
+administrator. The authentication service needs to bind as this DN in order to
+search for a matching user DN based on the user login ID. The
+default is <tt>amldapuser.</tt> Any valid DN will be recognized.</p>
+
+<a name="fwazq"></a><h5>Password for Root User Bind</h5>
+<p>Carries the password for the administrator profile specified in the DN for Root
+User Bind field. There is no default value. Only the administrator's valid LDAP
+password will be recognized.</p>
+
+<a name="fwazu"></a><h5>Password for Root User Bind (confirm)</h5>
+<p>Confirm the password.</p>
+
+<a name="fwazs"></a><h5>Attribute Used to Retrieve User Profile</h5>
+<p>Specifies the attribute used for the naming convention of user entries. By default,
+OpenSSO assumes that user entries are identified by the uid attribute. If your
+Directory Server uses a different attribute (such as <i>givenname</i>) specify the attribute name in
+this field.</p>
+
+<a name="fwazy"></a><h5>Attributes Used to Search for a User to be Authenticated</h5>
+<p>Lists the attributes to be used to form the search filter for a
+user that is to be authenticated, and allows the user to authenticate with
+more than one attribute in the user's entry. For example, if this field
+is set to <i>uid</i>, <i>employeenumber</i> , and <i>mail</i>, the user could authenticate with
+any of these names. These attributes must be set separately. </p>
+
+<a name="fwazw"></a><h5>User Search Filter</h5>
+<p>Specifies an attribute to be used to find the user under the DN
+to Start User Search field. It works with the User Naming Attribute. There
+is no default value. Any valid user entry attribute will be recognized.</p>
+
+<a name="fwbai"></a><h5>Search Scope</h5>
+<p>Indicates the number of levels in the Directory Server that will be searched
+for a matching user profile. The search begins from the node specified in
+the <a href="#fwazx">DN to Start User Search</a> attribute. The default value is SUBTREE. One of the following choices
+can be selected from the list:</p><dl><dt>OBJECT</dt>
+<dd><p>Searches only the specified node.</p></dd>
+<dt>ONELEVEL</dt>
+<dd><p>Searches at the level of the specified node and one level down.</p></dd>
+<dt>SUBTREE</dt>
+<dd><p>Search all entries at and below the specified node.</p></dd>
+</dl>
+
+
+<a name="fwbal"></a><h5>Enable SSL to Access LDAP Server</h5>
+<p>Enables SSL access to the Directory Server specified in the Primary and Secondary
+LDAP Server and Port field. By default, the box is not checked and
+the SSL protocol will not be used to access the Directory Server.</p><p>If the LDAP Server is running with SSL enabled (LDAPS), you must make
+sure that OpenSSO is configured with proper SSL trusted certificates so that AM
+could connect to Directory server over LDAPS protocol</p>
+
+<a name="fwbak"></a><h5>Return User DN to Authenticate</h5>
+<p>When the OpenSSO directory is the same as the directory configured for LDAP,
+this option may be enabled. If enabled, this option allows the LDAP authentication
+module to return the DN instead of the User ID, and no search
+is necessary. Normally, an authentication module returns only the User ID, and the
+authentication service searches for the user in the local OpenSSO LDAP. If an
+external LDAP directory is used, this option is typically not enabled.</p>
+
+<a name="fwbaf"></a><h5>LDAP Server Check Interval</h5>
+<p>This attribute is used for LDAP Server failback. It defines the number of
+minutes in which a thread will &#8220;sleep&#8221; before verifying that the LDAP primary
+server is running.</p>
+
+<a name="fwbah"></a><h5>User Creation Attribute List</h5>
+<p>This attribute is used by the LDAP authentication module when the LDAP server
+is configured as an external LDAP server. It contains a mapping of attributes
+between a local and an external Directory Server. This attribute has the following
+format:</p><p><i>attr1|externalattr1</i></p><p><i>attr2|externalattr2</i></p><p>When this attribute is populated, the values of the external attributes are read
+from the external Directory Server and are set for the internal Directory Server
+attributes. The values of the external attributes are set in the internal attributes
+only when the <tt>User Profile</tt>attribute (in the Core Authentication module) is set to Dynamically
+Created and the user does not exist in local Directory Server instance. The
+newly created user will contain the values for internal attributes, as specified in
+User Creation Attributes List, with the external attribute values to which they map.</p>
+
+<a name="fwbaj"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

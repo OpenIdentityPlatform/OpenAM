@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para agregar un nuevo proveedor de identidades alojado a una entidad de proveedores - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderhostedadd"></a><h4>Para agregar un nuevo proveedor de identidades alojado a una entidad de proveedores</h4><p>Un <b>proveedor alojado</b> reside en el mismo servidor que Access Manager. La configuraci&#243;n
+de los atributos del nuevo proveedor de identidades alojado incluye la adici&#243;n
+de metadatos relacionados con el proveedor de identidades al perfil de la
+entidad. El punto de partida de este procedimiento es <a href="federation.fsidentityprovider.html">Para agregar un proveedor de identidades a una entidad de proveedores</a>.</p>
+<hr><p><b>Nota &#8211; </b>Los atributos adicionales se pueden configurar, pero no est&#225;n visibles en la
+p&#225;gina de configuraci&#243;n inicial. Consulte <a href="federation.fsidentityproviderhostedprofile.html">Para modificar atributos de un proveedor de identidades alojado en una entidad de proveedores</a>.</p>
+<hr>
+<ol>
+<li><b>Proporcione informaci&#243;n para los atributos comunes.</b><p>Los atributos comunes contienen valores que definen generalmente el propio proveedor de
+identidades.</p><dl><dt>Descripci&#243;n</dt>
+<dd><p>El valor de este atributo es la descripci&#243;n proporcionada al crear la entidad. Puede modificar la descripci&#243;n introducida originalmente y agregar una si no hay ninguna.</p></dd>
+<dt>Enumeraci&#243;n de compatibilidad de protocolos</dt>
+<dd><p>Seleccione la versi&#243;n del Marco de federaci&#243;n de identidades Liberty (ID-FF de Liberty) de Liberty Alliance Project admitida por esta entidad.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> hace referencia a la versi&#243;n 1.2 de ID-FF de Liberty.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> hace referencia a la versi&#243;n 1.1 de ID-FF de Liberty.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>Proporcione informaci&#243;n para los atributos de URL de comunicaci&#243;n.</b><p>Las direcciones URL de comunicaci&#243;n contienen ubicaciones a las que los proveedores
+pueden enviar transmisiones.designadas para este proveedor de identidades.</p><dl><dt>URL de servicio de inicio de sesi&#243;n &#250;nico</dt>
+<dd><p>Escriba una URL a la que los proveedores de servicios pueden enviar solicitudes de inicio de sesi&#243;n &#250;nico y federaci&#243;n.</p></dd>
+</dl>
+</li>
+<li><b>Proporcione informaci&#243;n para los atributos de perfiles de comunicaci&#243;n. </b><p>Un <b>perfil</b> de Liberty Alliance Project define una combinaci&#243;n de contenido del
+mensaje y el mecanismo utilizado para transportarlo. Los siguientes atributos de perfiles
+de comunicaci&#243;n definen los perfiles utilizados por el proveedor de identidades para
+la funci&#243;n correspondiente.</p><dl><dt>Inicio de sesi&#243;n &#250;nico/federaci&#243;n</dt>
+<dd><p>Seleccione el perfil que utilizar&#225; este proveedor de identidades al enviar las repuestas a las solicitudes de autenticaci&#243;n o federaci&#243;n.</p>
+<ul><li><p>Env&#237;o de explorador (especifica un protocolo HTTP POST basado en explorador)</p></li>
+<li><p>Artefacto de explorador (especifica un protocolo basado en SOAP sin explorador)</p></li>
+<li><p>LECP, proxy de cliente habilitado para Liberty.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>Seleccione cualquier c&#237;rculo de confianza para asignarlo al proveedor.</b><p>Un proveedor puede pertenecer a uno o varios c&#237;rculos de confianza. Sin
+embargo, un proveedor sin un c&#237;rculo de confianza especificado no puede participar
+en las comunicaciones basadas en las especificaciones de Liberty Alliance Project. Si
+no se ha creado ning&#250;n c&#237;rculo de confianza, puede definir este atributo
+m&#225;s adelante.</p></li>
+<li><b>Proporcione informaci&#243;n para los atributos de configuraci&#243;n de Federated Access Manager.</b><p>Los atributos de configuraci&#243;n de Access Manager definen la informaci&#243;n sobre esta
+instancia alojada de Federated Access Manager.</p><dl><dt>URL de proveedor</dt>
+<dd><p>Escriba la URL del proveedor alojado localmente.</p></dd>
+<dt>Alias del proveedor</dt>
+<dd><p>El alias del proveedor es el nombre utilizado para identificar el proveedor alojado en un perfil de identidad y definir si se trata de una configuraci&#243;n del proveedor de servicios o del proveedor de identidades. Este valor debe ser exclusivo y puede representarse en forma de URL. Por ejemplo, <tt>sunAlias</tt>.</p></dd>
+<dt>Tipo de autenticaci&#243;n</dt>
+<dd><p>Seleccione el tipo de proveedor que debe utilizarse para las solicitudes de autenticaci&#243;n procedentes de un proveedor alojado localmente.</p>
+<ul><li><p><b>Local</b> significa que el proveedor alojado localmente se pondr&#225; en contacto con un proveedor de identidades local tras recibir una solicitud de autenticaci&#243;n (b&#225;sicamente, &#233;l mismo).</p></li>
+<li><p><b>Remoto</b> significa que el proveedor alojado localmente se pondr&#225; en contacto con un proveedor de identidades remoto tras recibir una solicitud de autenticaci&#243;n.</p></li></ul>
+</dd>
+<dt>Contexto de autenticaci&#243;n predeterminado</dt>
+<dd><p>Seleccione la clase de contexto de autenticaci&#243;n (m&#233;todo de autenticaci&#243;n que utilizar&#225; este proveedor de identidades si la informaci&#243;n no se recibe como parte de una solicitud del proveedor de servicios. Este valor tambi&#233;n especifica la clase de contexto de autenticaci&#243;n que se utilizar&#225; cuando un usuario desconocido intente acceder a un recurso protegido del proveedor de servicios y &#233;ste env&#237;e una solicitud de autenticaci&#243;n. Las opciones son:</p>
+<ul><li><p>Password (Contrase&#241;a)</p></li>
+<li><p>ID digital m&#243;vil</p></li>
+<li><p>Smartcard (Tarjeta inteligente)</p></li>
+<li><p>Smartcard-PKI (Tarjeta inteligente - PKI)</p></li>
+<li><p>MobileUnregistered (M&#243;vil no registrado)</p></li>
+<li><p>Software-PKI (Software - PKI)</p></li>
+<li><p>Previous-Session (Sesi&#243;n previa)</p></li>
+<li><p>Contrato m&#243;vil</p></li>
+<li><p>Time-Sync-Token (Token de sincronizaci&#243;n de tiempo)</p></li>
+<li><p>Password-ProtectedTransport (Transporte protegido con contrase&#241;a)</p></li></ul>
+</dd>
+<dt>Dominio</dt>
+<dd><p>Introduzca un valor que se&#241;ale al dominio en el que est&#225; configurado el proveedor. Por ejemplo, <tt>/sp</tt>.</p></dd>
+<dt>URI de versi&#243;n Liberty</dt>
+<dd><p>Escriba un URI que especifique la versi&#243;n de la especificaci&#243;n de Liberty Alliance Project que se est&#225; utilizando. El valor predeterminado es <tt>http://projectliberty.org/specs/v1</tt>.</p></dd>
+<dt>Implementaci&#243;n del identificador de nombre</dt>
+<dd><p>Este campo define la clase que utilizar&#225; un proveedor de servicios para participar en el registro de nombres. El registro de nombres es un perfil mediante el que los proveedores de servicios especifican el identificador del nombre de un principal que un proveedor de identidades utilizar&#225; cuando se comunique con el proveedor de servicios. El valor es <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl </tt> .</p></dd>
+<dt>URL de p&#225;gina principal</dt>
+<dd><p>Escriba la URL de la p&#225;gina principal del proveedor alojado localmente.</p></dd>
+<dt>URL de redirecci&#243;n por fallo de inicio de sesi&#243;n &#250;nico</dt>
+<dd><p>Escriba la URL a la que se redirigir&#225; un principal si falla un inicio de sesi&#243;n &#250;nico.</p></dd>
+</dl>
+</li>
+<li><b>Proporcione informaci&#243;n para los atributos SAML.</b><p>Los atributos SAML definen valores generales en relaci&#243;n con c&#243;mo el proveedor
+de identidades env&#237;a las aserciones SAML.</p><dl><dt>Intervalo de aserci&#243;n</dt>
+<dd><p>Escriba el intervalo de tiempo (en segundos) durante el que permanecer&#225; como v&#225;lida una aserci&#243;n emitida por el proveedor de identidades. Una entidad principal permanecer&#225; autenticada hasta que caduque el intervalo de aserci&#243;n.</p></dd>
+<dt>Intervalo de limpieza</dt>
+<dd><p>Escriba el intervalo de tiempo (en segundos) que debe transcurrir antes de que se eliminen las aserciones almacenadas en el proveedor de identidades.</p></dd>
+<dt>Tiempo de espera de artefacto</dt>
+<dd><p>Escriba el intervalo de tiempo (en segundos) para especificar cu&#225;ndo se agotar&#225; el tiempo de espera de los artefactos de la aserci&#243;n.</p></dd>
+<dt>L&#237;mite de aserci&#243;n</dt>
+<dd><p>Escriba un n&#250;mero para definir la cantidad de aserciones que puede emitir un proveedor de identidades o la cantidad de aserciones que pueden almacenarse.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Aceptar para agregar el proveedor a la entidad.</b></li>
+<li><b>Seleccione otra opci&#243;n del men&#250; Ver para continuar con la configuraci&#243;n de
+la entidad o haga clic en Guardar para completar la configuraci&#243;n.</b></li></ol>
+<br/>
+
+</body>
+</html>

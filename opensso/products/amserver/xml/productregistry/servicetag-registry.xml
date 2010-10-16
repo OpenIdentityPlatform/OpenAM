@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry>
+  <service_tag>
+    <instance_urn></instance_urn>
+    <product_name>OpenSSO</product_name>
+    <product_version>8.0</product_version>
+    <product_urn>urn:uuid:58a2bfb9-03bf-11dc-b7cf-080020a9ed93</product_urn>
+    <product_parent_urn/>
+    <product_parent/>
+    <product_defined_inst_id></product_defined_inst_id>
+    <product_vendor>Sun Microsystems Inc.</product_vendor>
+    <platform_arch>sparc</platform_arch>
+    <container>global</container>
+    <source>OpenSSO Native Packages</source>
+    <status>NOT_TRANSFERRED</status>
+    <registration_status>NOT_REGISTERED</registration_status>
+  </service_tag>
+  <registration_reminder>ASK_FOR_REGISTRATION</registration_reminder>
+</registry>

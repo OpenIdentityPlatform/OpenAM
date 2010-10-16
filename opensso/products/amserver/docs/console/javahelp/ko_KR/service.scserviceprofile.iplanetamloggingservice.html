@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>로깅  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>로깅 </h4>
+<p><a name="indexterm-203"></a>로깅 서비스는 OpenSSO 관리와 관련된 상태 및 오류 메시지를 제공합니다. 관리자는 로그
+파일 크기, 로그 파일 위치 등의 값을 구성할 수 있습니다. OpenSSO는 이벤트를
+플랫 텍스트 파일이나 관계형 데이터베이스에 기록할 수 있습니다. 로깅 서비스 속성은 전역
+속성입니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fxbsv">최대 로그 크기</a></p></li>
+<li><p><a href="#fxbsg">내역 파일 수</a></p></li>
+<li><p><a href="#fxbzh">로그 파일 위치</a></p></li>
+<li><p><a href="#fxbwg">로깅 유형</a></p></li>
+<li><p><a href="#fxbrd">데이터베이스 사용자 이름</a></p></li>
+<li><p><a href="#fxcdf">데이터베이스 사용자 비밀번호</a></p></li>
+<li><p><a href="#fxcep">데이터베이스 사용자 비밀번호(확인)</a></p></li>
+<li><p><a href="#fxbvb">데이터베이스 드라이버 이름</a></p></li>
+<li><p><a href="#fxbsb">구성 가능한 로그 필드</a></p></li>
+<li><p><a href="#fxccb">로그 확인 빈도</a></p></li>
+<li><p><a href="#fxbxe">로그 서명 시간</a></p></li>
+<li><p><a href="#fxcbz">보안 로깅</a></p></li>
+<li><p><a href="#fxbxt">최대 레코드 수</a></p></li>
+<li><p><a href="#fxbwp">아카이브당 파일 수</a></p></li>
+<li><p><a href="#fxbyw">버퍼 크기</a></p></li>
+<li><p><a href="#fxbvh">DB 실패 메모리 버퍼 크기</a></p></li>
+<li><p><a href="#fxcea">버퍼 시간</a></p></li>
+<li><p><a href="#fxbsn">시간 버퍼링</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>최대 로그 크기</h5>
+<p>이 속성에는 OpenSSO 로그 파일의 최대 크기(바이트) 값을 지정할 수 있습니다. 기본값은
+1000000입니다.</p>
+
+<a name="fxbsg"></a><h5>내역 파일 수</h5>
+<p>이 속성은 기록 분석을 위해 보유되는 백업 로그 파일의 수에 해당하는 값을
+가집니다. 로컬 시스템의 분할 영역 크기와 사용 가능한 디스크 공간에 따라 임의의
+정수를 입력할 수 있습니다. 기본값은 3입니다.</p><p>이 파일은 FILE 로깅 유형에만 적용됩니다. 로깅 유형이 DB로 설정된 경우 내역
+파일이 없으며 OpenSSO에 의해 파일 크기에 대한 제한이 명시적으로 설정됩니다.</p>
+<hr><p><b>주 &#8211; </b>0을 입력하는 것은 1 값과 같은 것으로 해석되며, 0을 지정하면 내역 로그
+파일이 만들어지는 것을 의미합니다.</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>로그 파일 위치</h5>
+<p>파일 기반 로깅 기능에는 로그 파일을 저장할 수 있는 위치가 필요합니다. .
+기본 위치는 다음과 같습니다.</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt>는 기본 구성 디렉토리와 OpenSSO의 서버 URI를 나타내는 태그입니다. 런타임 시 로깅
+서비스가 인스턴스의 적절한 로깅 디렉토리를 결정합니다. 이 속성의 값을 명시적인 경로로 설정할
+수 있지만 구성 디렉토리는 기본 경로여야 합니다.</p><p>기본 디렉토리가 아닌 디렉토리가 지정된 경우 해당 디렉토리가 없으면 OpenSSO가 디렉토리를 만듭니다.
+해당 디렉토리에 적절한 사용 권한을 설정해야 합니다(예: 0700).</p><p>DB(데이터베이스) 로깅을 위한 로그 위치(예: Oracle 또는 MySQL)를 구성할 때 로그 위치
+부분은 대소문자 구분이 있습니다. 예를 들어, Oracle 데이터베이스에 로깅하는 경우 로그 위치는
+다음과 같습니다(대소문자 구분).</p><p><tt>jdbc:oracle:thin:@machine.domain:port:DBName</tt></p><p>DB에 로깅하도록 구성하려면 웹 컨테이너의 JVM 클래스 경로에 JDBC 드라이버 파일을 추가하십시오.
+<tt>amadmin</tt> 스크립트의 클래스 경로에 수동으로 JDBC 드라이버 파일을 추가해야 합니다. 그렇지 않으면
+<tt>amadmin</tt> 로깅이 JDBC 드라이버를 로드할 수 없습니다.</p><p>일반적으로 로깅 속성에 대한 변경 내용은 저장한 후에 적용됩니다. 서버를 다시 시작할
+필요는 없습니다. 그러나 보안 로깅을 변경한 경우에는 서버를 다시 시작해야 합니다.</p>
+
+<a name="ggyhl"></a><h5>로그 상태</h5>
+<p>로깅을 설정(ACTIVE)할 것인지, 해제(INACTIVE)할 것인지 지정합니다. 설치 중에 이 값은 ACTIVE로 설정됩니다.
+</p>
+
+<a name="ggydj"></a><h5>로그 레코드에서 호스트 이름 확인</h5>
+<p>이 값을 false로 설정하면 LogRecord의 HostName 필드를 채우는 데 필요한 호스트 조회가
+수행되지 않습니다.</p>
+
+<a name="fxbwg"></a><h5>로깅 유형</h5>
+<p>파일(플랫 파일 로깅의 경우) 또는 DB(데이터베이스 로깅의 경우)를 지정할 수 있습니다.</p><p>데이터베이스 사용자 이름 또는 데이터베이스 사용자 비밀번호가 잘못된 경우 OpenSSO 처리에 나쁜
+영향을 줍니다. OpenSSO 또는 콘솔이 불안정해지면 [로그 상태] 속성을 비활성으로 설정하십시오. </p><p>등록 정보를 설정한 후 서버를 다시 시작합니다. 그런 다음 콘솔에 로그인하여 로깅
+속성을 재설정할 수 있습니다. 그런 다음 로그 상태 등록 정보를 <i>ACTIVE </i>로 변경하고
+서버를 다시 시작합니다.</p>
+
+<a name="fxbrd"></a><h5>데이터베이스 사용자 이름</h5>
+<p>이 속성은 로깅 유형 속성이 DB로 설정된 경우 데이터베이스에 연결하는 사용자의 이름을
+가집니다.</p>
+
+<a name="fxcdf"></a><h5>데이터베이스 사용자 비밀번호</h5>
+<p>이 속성은 로깅 유형 속성이 DB로 설정된 경우 데이터베이스 사용자 비밀번호를 가집니다.</p>
+
+<a name="fxcep"></a><h5>데이터베이스 사용자 비밀번호(확인)</h5>
+<p>데이터베이스 비밀번호를 확인합니다.</p>
+
+<a name="fxbvb"></a><h5>데이터베이스 드라이버 이름</h5>
+<p>이 속성을 사용하면 로깅 구현 클래스에 사용할 드라이버를 지정할 수 있습니다.</p>
+
+<a name="fxbsb"></a><h5>구성 가능한 로그 필드</h5>
+<p>기록할 필드 목록을 나타냅니다. 기본적으로 모든 필드가 로깅됩니다. 필드는 다음과 같습니다.</p>
+<ul><li><p>CONTEXTID</p></li>
+<li><p>DOMAIN</p></li>
+<li><p>HOSTNAME</p></li>
+<li><p>IPADDRESS</p></li>
+<li><p>LOGGED BY</p></li>
+<li><p>LOGLEVEL</p></li>
+<li><p>LOGINID</p></li>
+<li><p>MESSAGEID</p></li>
+<li><p>MODULENAME</p></li></ul>
+<p>최소한 CONTEXTID, DOMAIN, HOSTNAME, LOGINID 및 MESSAGEID를 로깅해야 합니다.</p>
+
+<a name="fxccb"></a><h5>로그 확인 빈도</h5>
+<p>이 속성은 서버가 손상을 감지하기 위해 로그를 확인해야 하는 빈도(초)를 설정합니다. 기본
+시간은 3600초입니다. 이 매개 변수는 보안 로깅에만 적용됩니다.</p>
+
+<a name="fxbxe"></a><h5>로그 서명 시간</h5>
+<p>이 매개 변수는 로그가 서명되는 빈도(초)를 설정합니다. 기본 시간은 900초입니다. 이 매개
+변수는 보안 로깅에만 적용됩니다.</p>
+
+<a name="fxcbz"></a><h5>보안 로깅</h5>
+<p>이 속성은 보안 로깅을 활성화 또는 비활성화합니다. 기본적으로 보안 로깅은 사용되지 않습니다.
+보안 로깅은 보안 로그의 인증되지 않은 변경이나 손상을 감지할 수 있게 합니다.</p>
+<hr><p><b>주 &#8211; </b>보안 로깅은 플랫 파일에만 사용할 수 있습니다. 이 옵션은 데이터베이스(DB) 로깅에는 적용되지
+않습니다.</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>보안 로깅 서명 알고리즘</h5>
+<p>이 속성은 서명에 개인 키를 사용하고 확인에 공개 키를 사용하는 RSA 및
+DSA(Digital Signature Algorithm)를 정의합니다. 다음 중에서 선택할 수 있습니다.</p>
+<ul><li><p>MD2 w/RSA</p></li>
+<li><p>MD5 w/RSA</p></li>
+<li><p>SHA1 w/DSA</p></li>
+<li><p>SHA1 w/RSA</p></li></ul>
+<p>MD2, MD5 및 RSA는 단방향 해시입니다. 예를 들어, MD2 w/RSA 서명 알고리즘을
+선택하는 경우 보안 로깅 기능이 MD2를 사용하여 메시지 그룹을 생성하고 RSA 개인
+키를 사용하여 값을 암호화합니다. 이 암호화된 값은 원래 로깅된 레코드의 서명이며 가장
+최근 서명의 마지막 레코드에 추가됩니다. 유효성을 검사하는 경우에는 RSA 공개 키를 사용하여
+서명을 해독하고 해독된 값과 로깅된 레코드 그룹을 비교합니다. 그런 다음 보안 로깅
+기능에서 로깅된 레코드에 수정된 사항이 있는지 검사합니다.</p>
+
+<a name="ghaeg"></a><h5>로깅 인증서 저장소 위치</h5>
+<p>보안 로깅을 사용하는 경우 로깅 서비스가 이 속성으로 지정한 위치에서 인증서를 찾습니다.
+실제 디렉토리 경로는 런타임 시에 결정됩니다. 이 값을 명시적 경로로 설정할 수
+있지만 OpenSSO 인스턴스에서 기본 경로에도 액세스할 수 있어야 합니다.</p>
+
+<a name="fxbxt"></a><h5>최대 레코드 수</h5>
+<p>이 속성은 읽기 쿼리와 일치하는 레코드 수에 상관 없이 Java LogReader 인터페이스가
+반환하는 최대 레코드 수를 설정합니다. 기본적으로 이 속성은 500으로 설정되며 로깅 API의
+호출자가 <i>LogQuery</i> 클래스를 통해 이 속성을 대체할 수 있습니다.</p>
+
+<a name="fxbwp"></a><h5>아카이브당 파일 수</h5>
+<p>이 속성은 보안 로깅에만 적용됩니다. 이 속성은 로그 파일과 키 저장소를 아카이브해야
+하는 시점과 후속 보안 로깅을 위해 보안 키 저장소를 다시 생성해야 하는
+시점을 지정합니다. 기본값은 로거당 파일 5개입니다.</p>
+
+<a name="fxbyw"></a><h5>버퍼 크기</h5>
+<p>이 속성은 로깅 서비스가 로깅 저장소에 레코드를 기록하기 전에 메모리에서 버퍼링할 로그
+레코드의 최대 수를 지정합니다. 기본값은 레코드 한 개입니다.</p>
+
+<a name="fxbvh"></a><h5>DB 실패 메모리 버퍼 크기</h5>
+<p>이 속성은 데이터베이스(DB) 로깅이 실패하는 경우 메모리에 보존된 로그 레코드의 최대 수를
+정의합니다. 이 속성은 DB 로깅이 지정되어 있을 때만 적용할 수 있습니다. OpenSSO
+로깅 서비스에서 DB에 대한 연결이 끊어지면 지정된 레코드 수만큼 버퍼링됩니다. 이 속성의
+기본값은 버퍼 크기 속성에서 정의한 값의 두 배입니다.</p>
+
+<a name="fxcea"></a><h5>버퍼 시간</h5>
+<p>이 속성은 기록할 로깅 서비스에 보내지기 전에 로그 레코드가 메모리에 버퍼되는 시간을
+정의합니다. 이 속성은 시간 버퍼링 사용이 ON으로 설정된 경우 적용됩니다. 기본값은 3600초입니다.</p>
+
+<a name="fxbsn"></a><h5>시간 버퍼링</h5>
+<p>이 속성에서 ON을 선택하면 OpenSSO가 로그 레코드를 메모리에 버퍼링하는 시간 제한을 설정합니다.
+시간은 버퍼 시간 속성에 설정됩니다.</p>
+
+<a name="ghaer"></a><h5>로깅 수준</h5>
+<p>이 속성을 사용하면 사용 가능한 옵션 중 하나를 선택하여 특정 로그 파일에
+포함할 세부 정보 수준을 구성할 수 있습니다. OpenSSO 서비스는 INFO 수준으로 로깅합니다.
+SAML 및 Identity Federation 서비스는 좀더 세부적인 수준(FINE, FINER, FINEST)으로 로깅합니다. 또한
+로깅을 해제하는 데 사용할 수 있는 OFF 수준이 있으며 ALL 수준을 사용하면
+모든 메시지를 로깅할 수 있습니다.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration d'un gestionnaire de demandes - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>Configuration d'un gestionnaire de demandes</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p>L'interface <tt>RequestHandler</tt> doit &#234;tre impl&#233;ment&#233;e c&#244;t&#233; serveur par chaque service SAMLv2 utilisant
+le protocole Service de liaison SOAP. L'attribut Liste du gestionnaire de demandes
+stocke les informations sur les classes qui impl&#233;mentent le gestionnaire de demandes.
+Les entr&#233;es de la liste du gestionnaire de demandes contiennent des paires
+cl&#233;/valeur.</p><ol>
+<li><b>Cliquez sur Nouveau pour afficher les attributs Nouveau gestionnaire de demandes ou
+cliquez sur une valeur de cl&#233; configur&#233;e pour modifier les attributs existants.</b></li>
+<li><b>Fournissez les valeurs pour les attributs en vous basant sur les informations
+suivantes :</b><dl><dt>key</dt>
+<dd><p>Le param&#232;tre <i>Key</i> est le m&#233;ta-alias du point de d&#233;cision de strat&#233;gie. </p></dd>
+<dt>class</dt>
+<dd><p>Le param&#232;tre <i>Class</i> est le nom de la classe Java qui impl&#233;mente l'interface RequestHandler capable de traiter les demandes XACML. </p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur OK pour terminer la configuration du gestionnaire de demandes.</b></li>
+<li><b>Cliquez sur Enregistrer dans la page Liaison SOAP SQMLv2 pour terminer la
+configuration du service.</b></li></ol>
+<br/>
+
+</body>
+</html>

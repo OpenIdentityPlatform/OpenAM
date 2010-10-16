@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Utilisateur - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamuserservice"></a><h4>Utilisateur</h4>
+<p><a name="indexterm-198"></a>Les pr&#233;f&#233;rences utilisateur par d&#233;faut sont d&#233;finies gr&#226;ce au service d'utilisateur. Ces
+pr&#233;f&#233;rences incluent le fuseau horaire, la langue et la vue initiale du
+DN. Les attributs de service utilisateur sont des attributs dynamiques.</p>
+<ul><li><p><a href="#fxckn">Langue de pr&#233;f&#233;rence de l'utilisateur</a></p></li>
+<li><p><a href="#fxcnb">Fuseau horaire favori de l'utilisateur</a></p></li>
+<li><p><a href="#fxcte">Langue h&#233;rit&#233;e</a></p></li>
+<li><p><a href="#fxcpk">Vue initiale de l'administrateur</a></p></li>
+<li><p><a href="#fxciz">Statut utilisateur par d&#233;faut</a></p></li></ul>
+
+
+<a name="fxckn"></a><h5>Langue de pr&#233;f&#233;rence de l'utilisateur</h5>
+<p>Ce champ sp&#233;cifie le choix de l'utilisateur concernant la langue d'affichage du
+texte sur la console OpenSSO. La valeur par d&#233;faut est en. Cette
+valeur mappe un ensemble de cl&#233;s de localisation sur la session utilisateur
+de mani&#232;re &#224; ce que le texte apparaisse &#224; l'&#233;cran dans une
+langue adapt&#233;e &#224; l'utilisateur.</p>
+
+<a name="fxcnb"></a><h5>Fuseau horaire favori de l'utilisateur</h5>
+<p>Ce champ sp&#233;cifie le fuseau horaire dans lequel l'utilisateur acc&#232;de &#224; la
+console d'OpenSSO. Il n'y a pas de valeur par d&#233;faut.</p>
+
+<a name="fxcte"></a><h5>Langue h&#233;rit&#233;e</h5>
+<p>Ce champ sp&#233;cifie la langue de l'utilisateur. La valeur par d&#233;faut est
+en_US (anglais am&#233;ricain). Pour consulter la liste des langues, reportez-vous &#224; <a href="supportedlang.html">Environnements linguistiques pris en charge</a>.</p>
+
+<a name="fxcpk"></a><h5>Vue initiale de l'administrateur</h5>
+<p>Si l'utilisateur est un administrateur d'OpenSSO, ce champ sp&#233;cifie le n&#339;ud servant
+de point de d&#233;part affich&#233; sur la console d'OpenSSO lorsque cet utilisateur
+se connecte. Il n'y a pas de valeur par d&#233;faut. Il est
+possible d'utiliser un DN valide pour lequel l'utilisateur dispose au minimum de
+l'acc&#232;s en lecture.</p>
+
+<a name="fxciz"></a><h5>Statut utilisateur par d&#233;faut</h5>
+<p>Cette option indique le statut par d&#233;faut de tout utilisateur r&#233;cemment cr&#233;&#233;.
+Ce statut est remplac&#233; par le statut de l'entr&#233;e utilisateur. Seuls les
+utilisateurs actifs peuvent s'authentifier via OpenSSO. La valeur par d&#233;faut est Actif.
+Vous pouvez s&#233;lectionner l'une ou l'autre de ces options dans le menu
+d&#233;roulant :</p><dl><dt>Actif</dt>
+<dd><p>L'utilisateur peut s'authentifier via OpenSSO.</p></dd>
+<dt>Inactif</dt>
+<dd><p>L'utilisateur ne peut pas s'authentifier par l'interm&#233;diaire d'OpenSSO, mais le profil utilisateur reste stock&#233; dans le r&#233;pertoire.</p></dd>
+</dl>
+<p>Pour d&#233;finir le statut de l'utilisateur individuel par l'enregistrement du service utilisateur,
+vous devez choisir la valeur, l'appliquer &#224; un r&#244;le et l'ajouter au
+profil de cet utilisateur.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>인증서  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthcertservice"></a><h4>인증서 </h4>
+<p><a name="indexterm-169"></a>이 모듈을 사용하면 사용자는 PDC(Personal Digital Certificate)를 통해 로그인할 수 있습니다. 이
+모듈 인스턴스에서는 인증서 상태를 결정하기 위해 OCSP(Online Certificate Status Protocol)를 사용해야 할
+수 있습니다. OCSP 사용은 선택 사항입니다. 인증서가 유효한지 여부에 따라 자원에 대한
+사용자의 액세스 권한이 부여되거나 거부됩니다. 인증서 인증 속성은 영역 속성입니다. 속성은 다음과
+같습니다.</p>
+<ul><li><p><a href="#fwbia">LDAP에서 인증서 일치</a></p></li>
+<li><p><a href="#fwbiq">LDAP에서 인증서 검색 시 사용되는 주제 DN 속성</a></p></li>
+<li><p><a href="#fwbim">CRL에 인증서 일치</a></p></li>
+<li><p><a href="#fwbik">LDAP에서 CRL 검색 시 사용되는 발급자 DN 속성</a></p></li>
+<li><p><a href="#fwbin">CRL 업데이트용 HTTP 매개 변수</a></p></li>
+<li><p><a href="#fwbil">OCSP 검증</a></p></li>
+<li><p><a href="#fwbij">인증서가 저장되는 LDAP 서버</a></p></li>
+<li><p><a href="#fwbtp">LDAP 시작 검색 DN</a></p></li>
+<li><p><a href="#fwbqp">LDAP 서버 기본 사용자</a></p></li>
+<li><p><a href="#fwbst">LDAP 서버 기본 비밀번호</a></p></li>
+<li><p><a href="#fwbiu">LDAP 서버 기본 비밀번호(확인)</a></p></li>
+<li><p><a href="#fwblm">LDAP 액세스에 SSL 사용</a></p></li>
+<li><p><a href="#fwbof">사용자 프로필 액세스에 사용되는 인증서 필드</a></p></li>
+<li><p><a href="#fwbna">사용자 프로필 액세스에 사용되는 기타 인증서 필드</a></p></li>
+<li><p><a href="#fwbiw">신뢰할 수 있는 원격 호스트</a></p></li>
+<li><p><a href="#fwbkd">SSL 포트 번호</a></p></li>
+<li><p><a href="#fwblx">인증 수준</a></p></li></ul>
+
+
+<a name="fwbia"></a><h5>LDAP에서 인증서 일치</h5>
+<p>로그인 시 제공되는 사용자 인증서가 LDAP 서버에 저장되어 있는지에 대한 검사 여부를
+지정합니다. 일치하는 항목이 발견되지 않을 경우 사용자는 액세스가 거부됩니다. 일치하는 항목이 발견되고
+다른 검증이 필요하지 않을 경우 사용자는 액세스가 허가됩니다. 기본값은 인증서 인증 서비스가
+사용자 인증서를 검사하지 않는 것입니다.</p>
+<hr><p><b>주 &#8211; </b>디렉토리 서버에 저장된 인증서는 반드시 유효할 필요는 없으며 인증서 해지 목록에 있어도
+됩니다. <a href="#fwbim">CRL에 인증서 일치</a>를 참조하십시오. 그러나 웹 컨테이너는 로그인할 때 제공되는 사용자 인증서의 유효성을
+확인할 수 있습니다.</p>
+<hr>
+
+
+<a name="fwbiq"></a><h5>LDAP에서 인증서 검색 시 사용되는 주제 DN 속성</h5>
+<p>LDAP에서 인증서를 검색하는 데 사용할 인증서의 <i>SubjectDN</i> 속성 값을 지정합니다. 이 속성은
+사용자 항목을 고유하게 식별해야 합니다. 실제 값이 검색에 사용됩니다. 기본값은 <tt>cn</tt>입니다.</p>
+
+<a name="fwbim"></a><h5>CRL에 인증서 일치</h5>
+<p>사용자 인증서를 LDAP 서버의 인증서 해지 목록(CRL)과 비교할 것인지 여부를 지정합니다. CRL은
+발급자의 <i>SubjectDN</i>에 있는 속성 이름 중 하나를 사용하여 찾습니다. 인증서가 CRL에 있는
+경우 사용자는 액세스가 거부되고 그렇지 않은 경우에는 액세스가 허용됩니다. 기본적으로 이 속성은
+사용 불가능합니다.</p><p>인증서 소유자가 상태를 변경했고 더 이상 인증서 사용 권한을 갖고 있지 않거나,
+인증서 소유자의 개인 키가 손상된 경우 인증서를 해지해야 합니다.</p>
+
+<a name="fwbik"></a><h5>LDAP에서 CRL 검색 시 사용되는 발급자 DN 속성</h5>
+<p>LDAP에서 CRL을 검색하는 데 사용할 수신된 인증서의 발급자 <i>subjectDN</i> 속성 값을 지정합니다.
+이 필드는 CRL에 인증서 일치 속성이 사용 가능한 경우에만 사용됩니다. 실제 값이
+검색에 사용됩니다. 기본값은 <tt>cn</tt>입니다.</p>
+
+<a name="fwbin"></a><h5>CRL 업데이트용 HTTP 매개 변수</h5>
+<p>CRL 업데이트를 위해 서블릿에서 CRL을 얻기 위한 HTTP 매개 변수를 지정합니다. 이러한
+매개 변수에 대한 자세한 내용은 해당 CA의 관리자에게 문의하십시오. </p>
+
+<a name="fwbil"></a><h5>OCSP 검증</h5>
+<p>해당 OCSP 응답자에 연결하여 OCSP 검증을 수행할 수 있게 합니다. OCSP 응답자는
+다음과 같이 런타임 도중에 결정됩니다. 여기서 설명하는 속성은 콘솔의 구성 > 서버
+및 사이트 > 보안에서 찾을 수 있습니다.</p>
+<ul><li><p>이 값을 true로 설정하고 OCSP 응답자를 <a href="service.servereditsecurity.html#ggkav">응답자 URL</a> 속성에서 설정하면 해당 속성의 값이 OCSP 응답자로 사용됩니다.</p></li>
+<li><p><a href="service.servereditsecurity.html#ggkaa">온라인 인증서 상태 프로토콜 확인</a>을 활성화한 경우 및 이 속성의 값이 설정되지 않은 경우에는 클라이언트 인증서에 나와 있는 OCSP 응답자가 OCSP 응답자로 사용됩니다. </p></li>
+<li><p><a href="service.servereditsecurity.html#ggkaa">온라인 인증서 상태 프로토콜 확인</a>를 활성화하지 않은 경우 또는 <a href="service.servereditsecurity.html#ggkaa">온라인 인증서 상태 프로토콜 확인</a>를 활성화한 경우 및 OCSP 응답자를 찾을 수 없는 경우에는 OCSP 유효성 검사가 수행되지 않습니다.</p></li></ul>
+<p>OCSP 검증을 사용할 수 있도록 하기 전에 OpenSSO 시스템과 OCSP 응답자 시스템의
+시간이 최대한 동기화되어 있는지 확인합니다. 또한 OpenSSO 시스템의 시간이 OCSP 응답자의 시간보다
+느려서는 안 됩니다. 예를 들면 다음과 같습니다.</p><p><tt>OCSP 응답자 시스템 - 오후 12:00:00</tt></p><p><tt>OpenSSO 시스템 -오후 12:00:30</tt></p>
+
+<a name="fwbij"></a><h5>인증서가 저장되는 LDAP 서버</h5>
+<p>인증서가 저장되는 LDAP 서버의 이름과 포트 번호를 지정합니다. 기본값은 OpenSSO를 설치할 때
+지정한 호스트 이름과 포트입니다. 인증서가 저장되는 모든 LDAP 서버의 호스트 이름과 포트를
+사용할 수 있습니다. 형식은 <tt>hostname:port</tt>입니다.</p>
+
+<a name="fwbtp"></a><h5>LDAP 시작 검색 DN</h5>
+<p>사용자 인증서에 대한 검색을 시작해야 하는 노드의 DN을 지정합니다. 기본값은 없습니다. 이
+필드는 모든 유효한 DN을 인식합니다.</p><p>여러 항목이 있을 경우 로컬 서버 이름을 접두어로 지정해야 합니다. 형식은 다음과
+같습니다.</p><p><tt>servername|search dn</tt></p><p>여러 항목이 있는 경우:</p><p><tt>servername1|search dn servername2|search dn servername3|search dn...</tt></p><p>같은 사용자 아이디의 루트 조직 아래에 여러 항목이 있는 경우 인증을 위해
+한 항목만 검색하거나 찾을 수 있도록 이 매개 변수를 설정해야 합니다. 예를
+들어, 루트 조직 아래의 에이전트 아이디와 사용자 아이디가 같으면 이 매개 변수는
+루트 조직의 경우 에이전트 아이디를 사용하여 인증하도록 <tt>ou=Agents</tt>로 설정하고 루트 사용자의 경우
+사용자 아이디를 사용하여 인증하도록 <tt>ou=People</tt>로 설정해야 합니다.</p>
+
+<a name="fwbqp"></a><h5>LDAP 서버 기본 사용자</h5>
+<p>이 필드는 인증서가 저장되는 LDAP 서버에 대한 기본 사용자의 DN을 지정합니다. 이
+필드에는 기본값이 없으며 유효한 모든 DN이 인식됩니다. 디렉토리 서버에 저장된 인증서 정보를
+읽고 검색할 수 있는 권한이 기본 사용자에게 허가되어야 합니다.</p>
+
+<a name="fwbst"></a><h5>LDAP 서버 기본 비밀번호</h5>
+<p>이 필드에는 LDAP 서버 기본 사용자 필드에 지정된 사용자와 연관된 LDAP 비밀번호를
+지정합니다. 이 필드에는 기본값이 없으며 지정된 기본 사용자에 대한 유효한 LDAP 비밀번호가
+인식됩니다. 이 값은 읽을 수 있는 텍스트로 디렉토리에 저장됩니다.</p>
+
+<a name="fwbiu"></a><h5>LDAP 서버 기본 비밀번호(확인)</h5>
+<p>비밀번호를 확인합니다.</p>
+
+<a name="fwblm"></a><h5>LDAP 액세스에 SSL 사용</h5>
+<p>LDAP 서버에 액세스하기 위해 SSL을 사용할지 여부를 지정합니다. 기본값은 인증서 인증 서비스가
+LDAP 액세스에 SSL을 사용하지 않는 것입니다.</p>
+
+<a name="fwbof"></a><h5>사용자 프로필 액세스에 사용되는 인증서 필드</h5>
+<p>일치하는 사용자 프로필을 검색하는 데 사용해야 할 인증서 주제 DN의 필드를 지정합니다.
+예를 들어, 전자 메일 주소를 선택하는 경우 인증서 인증 서비스는 사용자 인증서의
+<i>emailAddr</i> 속성과 일치하는 사용자 프로필을 검색합니다. 그런 다음, 로그인하는 사용자는 일치하는 프로필을
+사용하게 됩니다. 기본값은 <i>subject CN</i>입니다. 목록에는 다음 항목이 포함되어 있습니다.</p>
+<ul><li><p>전자 메일 주소</p></li>
+<li><p>주제 CN</p></li>
+<li><p>주제 DN</p></li>
+<li><p>주제 UID</p></li>
+<li><p>기타</p></li></ul>
+
+
+<a name="fwbna"></a><h5>사용자 프로필 액세스에 사용되는 기타 인증서 필드</h5>
+<p>사용자 프로필 액세스에 사용하는 인증서 필드 속성 값이 기타로 설정된 경우 이
+필드는 수신된 인증서의 <i>subjectDN</i> 값에서 선택되는 속성을 지정합니다. 그런 다음, 인증 서비스는
+해당 속성의 값과 일치하는 사용자 프로필을 검색합니다.</p>
+
+<a name="ggumk"></a><h5>사용자 프로필에 액세스하는 데 필요한 SubjectAltNameExt 값 유형</h5>
+<p><tt>none</tt>이 아닌 다른 값 유형을 선택하면 이 속성이 <tt>Certificate Field Used to Access User Profile</tt> 또는 <tt>Other Certificate Field Used to Access User Profile</tt> 속성보다
+높은 우선 순위를 갖습니다.</p>
+<ul><li><p>RFC822Name</p></li></ul>
+
+<ul><li><p>UPN</p></li></ul>
+
+
+<a name="fwbiw"></a><h5>신뢰할 수 있는 원격 호스트</h5>
+<p>OpenSSO에 인증서를 보내도 되는 신뢰할 수 있는 호스트의 목록을 정의합니다. OpenSSO는 인증서가
+신뢰할 수 있는 호스트 중 하나에서 온 것인지 확인해야 합니다. 이 속성은
+Portal Server 게이트웨이, SSL 종료를 사용하는 로드 밸런서 및 분산 인증에 사용됩니다.
+</p><dl><dt>none</dt>
+<dd><p>이 속성을 사용 불가능하게 합니다. 기본적으로 이 값이 설정됩니다.</p></dd>
+<dt>all</dt>
+<dd><p>모든 클라이언트 IP 주소로부터 Portal Server 게이트웨이 스타일의 인증서 인증을 허용합니다.</p></dd>
+<dt>IP ADDR</dt>
+<dd><p>Portal Server 게이트웨이 스타일의 인증서 인증 요청을 허용할 IP 주소를 나열합니다(게이트웨이의 IP 주소). 이 속성은 영역별로 구성할 수 있습니다.</p></dd>
+</dl>
+
+
+<a name="fwbkd"></a><h5>SSL 포트 번호</h5>
+<p>Secure Socket Layer의 포트 번호를 지정합니다. 현재 이 속성은 게이트웨이 서블릿에서만 사용됩니다.
+SSL 포트 번호를 추가하거나 변경하기 전에 OpenSSO 관리 설명서의 "정책 기반 자원
+관리" 절을 참조하십시오.</p>
+
+<a name="gcabp"></a><h5>클라이언트 인증서의 HTTP 헤더 이름</h5>
+<p>이 속성은 [신뢰할 수 있는 원격 호스트] 속성이 all로 설정되거나 특정 호스트
+이름이 정의된 경우에만 사용할 수 있습니다. 관리자는 로드 밸런서 또는 SRA가 삽입한
+클라이언트 인증서에 대해 http 헤더 이름을 지정해야 합니다. </p>
+
+<a name="fwblx"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰은 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값을 저장합니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

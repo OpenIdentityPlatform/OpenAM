@@ -1,0 +1,99 @@
+#!/bin/sh
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: ssoupgrade,v 1.4 2009/09/30 17:32:12 goodearth Exp $
+#
+
+DEF_UMASK=022
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+OS=`uname`
+if [ $OS = "Linux" ]; then
+    DATE=/bin/date
+    ECHO="/bin/echo -n"
+    NECHO="/bin/echo"
+else
+    DATE=/usr/bin/date
+    ECHO=/usr/bin/echo
+    NECHO=/usr/bin/echo
+fi
+
+gettext=/usr/bin/gettext
+LOG_DIR=/tmp/logs
+LOGSUFFIX=`$DATE '+%m%d%H%M'`
+LOG=/var/sadm/install/logs/Sun_Java_System_Access_Manager_upgrade_log.$LOGSUFFIX
+
+
+##############################################################################
+#
+#  get config dir
+#
+get_sso_config_dir() {
+
+    $ECHO ""
+    $NECHO "OpenSSO 8.0 Configuration Directory is the directory where "
+    $NECHO "the deployed OpenSSO 8.0 configuration files reside."
+    $NECHO "eg., /amserver"
+    $ECHO ""
+    eval $ECHO "`$gettext 'Enter OpenSSO 8.0 Configuration Directory: ${OMIT} '`"
+    while [ "$tmp" = "" ]; do
+        read tmp
+        file=`find $tmp -name AMConfig.properties -print`  >> $LOG_DIR 2>&1
+        if [ x = x${file} ]; then
+            tmp=""
+            eval $ECHO "`gettext 'Incorrect config directory specified. Re-enter the correct value'${OMIT}` "
+            eval $ECHO "`$gettext 'Enter OpenSSO 8.0 Configuration Directory: ${OMIT} '`"
+        fi
+    done
+    if [ "$tmp" != "" ]
+    then
+        FAM_CONFIG_DIR="$tmp"
+    fi
+    $NECHO "getOpenSSOConfigDir: CONFIG_DIR= $FAM_CONFIG_DIR" >> $LOG
+}
+
+get_sso_config_dir
+
+CONFIG_DIR=$FAM_CONFIG_DIR
+
+# These are replaced by the ssopreupgrade script.
+LIB_DIR=STAGING_DIR
+UPGRADE_DIR=FAM_UPGRADE_DIR
+
+$NECHO "THINGS TO REMEMBER"
+$ECHO ""
+$NECHO "OpenSSO Upgrade base Directory is the directory where the "
+$NECHO "upgrade/scripts/ files are (extracted from opensso.war)."
+$NECHO "eg., if extracted in /opt then Upgrade Directory is /opt/opensso"
+$ECHO ""
+$NECHO "OpenSSO 8.0 Configuration Directory is the directory where "
+$NECHO "the deployed OpenSSO 8.0 configuration files reside."
+$NECHO "eg., /amserver"
+$ECHO ""
+$NECHO "OpenSSO Staging Directory is the directory where the "
+$NECHO "opensso.war is extracted. 'opensso/deployable_war/opensso.war'"
+$NECHO "eg., if extracted in /staging then Staging Directory is /staging"
+$ECHO ""
+
+${JAVA_HOME}/bin/java -Xms64m -Xmx256m -cp "${UPGRADE_DIR}/lib/amadm_setup.jar:${UPGRADE_DIR}/lib/upgrade.jar:${UPGRADE_DIR}/lib/legacy.jar:${CONFIG_DIR}:${CONFIG_DIR}:${UPGRADE_DIR}/locale:${LIB_DIR}/locale:${LIB_DIR}/lib/jdmkrt.jar:${LIB_DIR}/lib/jdmktk.jar:${LIB_DIR}/lib/OpenDS.jar:${LIB_DIR}/classes:${LIB_DIR}/lib/mail.jar:${LIB_DIR}/lib/j2ee.jar:${LIB_DIR}/lib/webservices-api.jar:${LIB_DIR}/lib/webservices-rt.jar:${LIB_DIR}/lib/webservices-tools.jar:${LIB_DIR}/lib/xsdlib.jar:${LIB_DIR}/lib/xmlsec.jar:${LIB_DIR}/lib/amserver.jar:${LIB_DIR}/lib/opensso-sharedlib.jar:${LIB_DIR}/lib/opensso.jar:${LIB_DIR}/lib/openfedlib.jar" -D"com.sun.identity.security.amadmin=true" -D"com.iplanet.am.serverMode=true" -D"bootstrap.dir=${CONFIG_DIR}" -D"definitionFiles=com.sun.identity.cli.AccessManager,com.sun.identity.federation.cli.FederationManager" -D"amconfig=AMConfig" -D"java.util.logging.manager=com.sun.identity.log.LogManager" -D"java.util.logging.config.class=com.sun.identity.log.s1is.LogConfigReader" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+" -D"am.version.current=com.iplanet.am.version" -D"configDir=${CONFIG_DIR}" -D"am.version.expected=8.0" com.sun.identity.upgrade.FAMUpgrade "$@"

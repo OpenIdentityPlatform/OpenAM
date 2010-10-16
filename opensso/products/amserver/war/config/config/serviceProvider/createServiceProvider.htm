@@ -1,0 +1,269 @@
+<link href="$context/assets/css/Specific/identityService.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+YAHOO.namespace("sun.container");
+YAHOO.util.Event.onDOMReady( init );
+var DOM = YAHOO.util.Dom;
+
+function init() {
+    loadFederalProtocols();
+}
+
+function createProvider() {
+    var postData = AjaxUtils.serializeForm("serviceProviderForm");
+    AjaxUtils.doPost("container", "$context$path", postData);
+}
+
+function cancel(){
+	window.location = '$context/config/commonTasks.htm';
+}
+
+function activateMetadataFileSection(activate){
+    activateSection(activate, "metadataFileSection");
+}
+
+function activateIdentityProviderMetadataFileSection(activate){
+    activateSection(activate, "identityProviderMetadataFileSection");
+}
+
+function activateIdentityProviderMetadataSection(activate){
+    activateSection(activate, "identityProviderMetadataSection");
+}
+
+function activateCirclesOfTrustSection(activate){
+    activateSection(activate, "circlesOfTrustSection");
+}
+
+function activateOutgoingAssertionsSignatureSection(activate){
+    activateSection(activate, "outgoingAssertionsSignatureSection");
+}
+
+function activateKeyAliasSection(activate){
+    activateSection(activate, "keyAliasSection");
+}
+
+function activateIdentityExtraInfo(activate){
+    activateSection(activate, "identityExtraInfo");
+}
+
+function activateSection(activate, elementId){
+    var section = DOM.get(elementId);
+    if (activate)
+		section.style.display="";
+	else
+		section.style.display="none";
+}
+
+
+function enableFileMetadata(){
+    DOM.get('metadataFile').disabled='';
+    DOM.get('metadataUrl').disabled='disabled';
+}
+
+function enableUrlMetadata(){
+    DOM.get('metadataFile').disabled='disabled';
+    DOM.get('metadataUrl').disabled='';
+}
+
+function enableIdentityProviderFileMetadata(){
+    DOM.get('identityProviderMetadataFile').disabled='';
+    DOM.get('identityProviderMetadataUrl').disabled='disabled';
+}
+
+function enableIdentityProviderUrlMetadata(){
+    DOM.get('identityProviderMetadataFile').disabled='disabled';
+    DOM.get('identityProviderMetadataUrl').disabled='';
+}
+
+
+function appearOption(element,name,div){
+	if (document.getElementById(name+"1").checked)
+		document.getElementById(div).style.display="";
+	else
+		document.getElementById(div).style.display="none";
+}
+function federalProtocolChange(combo){
+    var selectedValue = combo.value;
+    if (selectedValue != "none"){
+        DOM.get("btnConfigure").disabled=false;
+        DOM.get("metadataSection").style.display="";
+        DOM.get("federalProtocolNameSpan").innerHTML = selectedValue;
+        DOM.get("federalProtocolNameSpan2").innerHTML = selectedValue;
+        loadCirclesOfTrust();
+    }
+}
+function next(){
+	if (document.getElementById("sam1").checked)
+		setTimeout(" AjaxUtils.load('container', '$context/config/dlg/popupConfigureRemoteIdentity.htm');",1250);
+	else
+		setTimeout(" AjaxUtils.load('container', '$context/config/serviceProvider/configureSystem.htm');",1250);
+}
+/*Add New*/
+function addNewCircle(){
+    AjaxUtils.load('newCircleSection', '$context/config/circle/createCircle.htm', addNewCircleCallback);
+}
+
+function deleteCircle(){
+    var circleName = DOM.get('circlesOfTrust').value;
+    AjaxUtils.doPost(null, '$context/config/circle/deleteCircle.htm','circleName='+circleName, loadCirclesOfTrust);
+}
+
+function addNewCircleCallback(){
+    CreateCircle.onCancel = onCancelCreateCircle;
+    CreateCircle.onSave = onSaveCreateCircle;
+    DOM.get('newCircleSection').style.display = '';
+}
+
+function onCancelCreateCircle(){
+    DOM.get('newCircleSection').style.display = 'none';
+}
+
+function onSaveCreateCircle(){
+    DOM.get('newCircleSection').style.display = 'none';
+    loadCirclesOfTrust();
+}
+
+function loadFederalProtocols() {
+    AjaxUtils.call("$context/config/serviceProvider/federalProtocols.htm", paintFederalProtocolsCombo);
+}
+
+function paintFederalProtocolsCombo(pResponse) {
+    var response = pResponse.responseText.parseJSON();
+    var combo = DOM.get("federalProtocol");
+    var length = combo.options.length;
+
+    for (var i = 0; i < length; i++) {
+        combo.remove(0);
+    }
+
+    var option = document.createElement('OPTION');
+    option.value = 'none';
+    option.text = '$page.getLocalizedString("configuration.serviceProvider.create.input.selectLabel")';
+    combo.options.add(option, combo.options.length);
+    for (var i = 0; i < response.records.length; i++) {
+        option = document.createElement('OPTION');
+        option.value = response.records[i].protocolName;
+        option.text = response.records[i].protocolName;
+        combo.options.add(option, combo.options.length);
+    }
+
+}
+
+function loadCirclesOfTrust() {
+    AjaxUtils.call("$context/config/circle/circlesOfTrust.htm", paintCirclesOfTrustCombo);
+}
+
+function paintCirclesOfTrustCombo(pResponse) {
+    var response = pResponse.responseText.parseJSON();
+    var combo = DOM.get("circlesOfTrust");
+    var length = combo.options.length;
+
+    for (var i = 0; i < length; i++) {
+        combo.remove(0);
+    }
+
+    var option = null;
+    for (var i = 0; i < response.records.length; i++) {
+        option = document.createElement('OPTION');
+        option.value = response.records[i].circleName;
+        option.text = response.records[i].circleDisplayName;
+        combo.options.add(option, combo.options.length);
+    }
+
+
+    
+}
+
+</script>
+<form name="serviceProviderForm" id="serviceProviderForm">
+<div id="ServiceProvider">
+	<div id="mainPanel" align="center">
+		<div id="createPanel" class="createpanel">
+			<br />
+			<div class="bodywhite">
+				<h2>$page.getLocalizedString("configuration.serviceProvider.create.title")</h2>
+				<small>$page.getLocalizedString("configuration.serviceProvider.create.comment")</small>
+			</div>
+			<div class="bodywhite">
+				<p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.label")<br />
+				<select name="federalProtocolName" id="federalProtocol" onchange="federalProtocolChange(this);">
+				</select></p>
+				<div id="metadataSection" style="display:none">
+					<p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.metadataFile.part1") <span id="federalProtocolNameSpan">SAML 2.0</span> $page.getLocalizedString("configuration.serviceProvider.create.metadataFile.part2")</p>
+					<input type="radio" name="metadata" value="true" onclick="activateCirclesOfTrustSection(true);activateMetadataFileSection(true);activateIdentityProviderMetadataSection(false);"/>$page.getLocalizedString("configuration.serviceProvider.create.yesOption")&nbsp;&nbsp;
+                    <input type="radio" name="metadata" value="false" onclick="activateMetadataFileSection(false);activateCirclesOfTrustSection(false);activateIdentityProviderMetadataSection(true);"/>$page.getLocalizedString("configuration.serviceProvider.create.noOption")
+					<div id="metadataFileSection" style="display:none">
+						<p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.fileOrTemplate")</p>
+						<p><input type="radio" name="metadataType" value="file" onclick="enableFileMetadata()"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.file")&nbsp;&nbsp;<input type="file" value="$page.getLocalizedString(&quot;configuration.serviceProvider.create.browse&quot;)" name="metadataFile" id="metadataFile" disabled="disabled"/></p>
+						<p><input type="radio" name="metadataType" value="url" onclick="enableUrlMetadata()"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.url")&nbsp;<input type="text" id="metadataUrl" name="metadataUrl" disabled="disabled"/></p>
+					</div>
+                    <div id="identityProviderMetadataSection" style="display:none">
+                        <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.metadataTemplate.part1")<span id="federalProtocolNameSpan2">SAML 2.0</span>$page.getLocalizedString("configuration.serviceProvider.create.metadataTemplate.part2")</p>
+                        <input type="radio" name="identityProviderMetadata" value="true" onclick="activateCirclesOfTrustSection(true);activateIdentityProviderMetadataFileSection(true);activateIdentityExtraInfo(true)"/>$page.getLocalizedString("configuration.serviceProvider.create.yesOption")&nbsp;&nbsp;
+                        <input type="radio" name="identityProviderMetadata" value="false" onclick="activateIdentityProviderMetadataFileSection(false);activateCirclesOfTrustSection(true);activateIdentityExtraInfo(true)"/>$page.getLocalizedString("configuration.serviceProvider.create.noOption")
+                        <div id="identityProviderMetadataFileSection" style="display:none">
+                            <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.fileOrTemplate")</p>
+                            <p><input type="radio" name="identityProviderMetadataType" value="file"
+                                      onclick="enableIdentityProviderFileMetadata()"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.file")&nbsp;&nbsp;
+                                <input type="file" value="$page.getLocalizedString(&quot;configuration.serviceProvider.create.browse&quot;)" name="identityProviderMetadataFile" id="identityProviderMetadataFile" disabled="disabled"/></p>
+                            <p><input type="radio" name="identityProviderMetadataType" value="url"
+                                      onclick="enableIdentityProviderUrlMetadata()"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.url")&nbsp;
+                                <input type="text" id="identityProviderMetadataUrl" name="identityProviderMetadataUrl" disabled="disabled"/></p>
+                        </div>
+                    </div>
+                    <div id="circlesOfTrustSection" style="display:none">
+                        <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.circleOfTrust")</p>
+                        <select name="circleName" id="circlesOfTrust" size="3"></select>
+
+                        <!--<div class="links blue"><a class="pointer">Delete</a>&nbsp;|&nbsp;<a class="pointer">Create New</a></div>-->
+                        <div id="options1" class="yui-navset links">
+                            <div id="newCircleSection" class="yui-content" style="z-index:20;display:none;position:absolute;top:-168px;"></div>
+                            <ul class="yui-nav" style="text-align:right">
+                                <li><a href="#tab1" onclick="deleteCircle()"><em>$page.getLocalizedString("configuration.serviceProvider.create.addCircle")</em></a></li>
+                                <li><a href="#tab2" onclick="addNewCircle()"><em>$page.getLocalizedString("configuration.serviceProvider.create.deleteCircle")</em></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+				<div id="identityExtraInfo" style="display:none">
+					<p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.displayName")<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+					<input type="text" name="displayName"/></p>
+					<p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.metaAlias")<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+					<input type="text" name="metaAlias"/></p>
+
+
+                    <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.binding")</p>
+					<input type="checkbox" name="postBinding" value="true" onclick="activateOutgoingAssertionsSignatureSection(this.checked);"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.binding.post")t&nbsp;&nbsp;&nbsp;
+					<input type="checkbox" name="artifactBinding" value="true" onclick="activateKeyAliasSection(this.checked);"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.binding.artifact")&nbsp;<br />
+
+                    <div id="incomingAssertionsSignatureSection" style="display:none">
+                        <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.incomingAssertions")</p>
+                        <input type="radio" name="incomingAssertionsSignature" value="true" />&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.yesOption")&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="incomingAssertionsSignature" value="false"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.noOption")&nbsp;<br />
+                    </div>
+
+                    <div id="keyAliasSection" style="display:none">
+                        <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.signatureKeyAlias")<br />
+                            <select name="keyAlias" id="keyAlias">
+                                <option value="-1">$page.getLocalizedString("configuration.serviceProvider.create.signatureKeyAlias.select.default")</option>
+                                <option value="1">$page.getLocalizedString("configuration.serviceProvider.create.signatureKeyAlias.select.keyAlias1")</option>
+                                <option value="2">$page.getLocalizedString("configuration.serviceProvider.create.signatureKeyAlias.select.keyAlias2")</option>
+                            </select></p>
+                    </div>
+
+                    <div id="outgoingAssertionsSignatureSection" style="display:none">
+                        <p class="OrangeSmall">$page.getLocalizedString("configuration.serviceProvider.create.signatureAssertions")<br />
+                            $page.getLocalizedString("configuration.serviceProvider.create.signatureAssertions.metadata")</p>
+                        <input type="radio" name="outgoingAssertionSignature" value="true"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.signatureAssertions.yesOption")&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="outgoingAssertionSignature" value="false"/>&nbsp;$page.getLocalizedString("configuration.serviceProvider.create.signatureAssertions.noOption")&nbsp;<br />
+                    </div>
+
+				</div>
+			</div>
+			<div class="subbody">
+					<button id="btnCancel" type="button" onclick="cancel();">$page.getLocalizedString("configuration.serviceProvider.create.cancel")</button>
+					<button id="btnConfigure" type="button" onclick="createProvider();" disabled="disabled">$page.getLocalizedString("configuration.serviceProvider.create.configureServiceProvider")</button>
+			</div>
+		</div>
+	</div>
+</div>
+</form>

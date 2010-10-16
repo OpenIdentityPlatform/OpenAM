@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>一般 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>一般</h4>
+<p>[一般] 屬性配置了集中式伺服器管理的基本配置資料。</p>
+
+<a name="ggjyg"></a><h5>網站屬性</h5>
+<p>網站屬性為：</p>
+
+<a name="ggjxc"></a><h5>父系網站</h5>
+<p>此屬性會將負載平衡器 [網站名稱] (網站 ID) 對映至 OpenSSO 伺服器。請注意，您必須先建立網站，才能新增該網站。</p>
+
+<a name="ggjwl"></a><h5>系統屬性</h5>
+<p>系統屬性會列出伺服器實例的位置資訊：</p>
+
+<a name="ggjyj"></a><h5>基底安裝目錄</h5>
+<p>指定產品資料所在的基底目錄。</p>
+
+<a name="ggjxz"></a><h5>預設語言環境</h5>
+<p>語言環境值是安裝 OpenSSO 所使用的預設語言子類型。預設值為 <tt>en_us</tt>。</p>
+
+<a name="ggjwq"></a><h5>通知 URL</h5>
+<p>通知服務端點的位置。此值會在安裝期間設定。</p>
+
+<a name="ggjzq"></a><h5>XML 驗證</h5>
+<p>預設值為 [否]。決定在使用 OpenSSO <tt>XMLUtils</tt> 類別剖析 XML 文件時是否需要驗證。此特性只有在 [除錯等級] 屬性設為「警告」或「訊息」時才會生效。允許的值為「是」和「否」。只有在此特性的值為「是」，且 [除錯等級] 屬性的值設為警告或訊息時 XML
+文件驗證才會啟用。</p>
+
+<a name="ggjzy"></a><h5>除錯屬性</h5>
+<p>[除錯] 屬性會列出基本的錯誤檢查資訊：</p>
+
+<a name="ggjzc"></a><h5>除錯等級</h5>
+<p>指定除錯等級。預設值為「錯誤」。可能的值包括：</p>
+<ul><li><p>關閉 &#8212; 不會建立除錯檔案。</p></li>
+<li><p>錯誤 &#8212; 只會記錄錯誤訊息。</p></li>
+<li><p>警告 &#8212; 只會記錄警告訊息。</p></li>
+<li><p>訊息 &#8212; 錯誤、警告和資訊訊息都會記錄。</p></li></ul>
+
+
+<a name="ggjze"></a><h5>除錯目錄</h5>
+<p>指定將在其中建立除錯檔案的輸出目錄。值會在安裝期間設定。範例：<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>debug_URI</i><tt>/debug</tt>。</p>
+
+<a name="ggjwr"></a><h5>郵件伺服器</h5>
+<p>[郵件伺服器] 屬性會列出郵件伺服器的主機名稱和連接埠：</p>
+
+<a name="ggkax"></a><h5>郵件伺服器主機名稱</h5>
+<p>預設值為 <tt>localhost</tt>。指定郵件伺服器主機。</p>
+
+<a name="ggkbx"></a><h5>郵件伺服器連接埠號碼</h5>
+<p>預設值為 25。指定郵件伺服器連接埠。</p>
+<br/>
+
+</body>
+</html>

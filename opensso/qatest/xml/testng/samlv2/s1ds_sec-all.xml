@@ -1,0 +1,151 @@
+<parameter name="groupName" value="@mode@"/>
+<test name="AttributeQueryTestNoAttrNSRoleFRYes">
+    <parameter name="ptestName" value="attrqNANSRoleFRYes"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="filteredrole"/>
+    <parameter name="pnsRoleexist" value="yes"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrNSRoleRYes">
+    <parameter name="ptestName" value="attrqNANSRoleRYes"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="role"/>
+    <parameter name="pnsRoleexist" value="yes"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestNoAttrNSRoleFRNo">
+    <parameter name="ptestName" value="attrqNANSRoleFRNo"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="filteredrole"/>
+    <parameter name="pnsRoleexist" value="no"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrNSRoleRNo">
+    <parameter name="ptestName" value="attrqNANSRoleRNo"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="role"/>
+    <parameter name="pnsRoleexist" value="no"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestValAttrNSRoleFRYes">
+    <parameter name="ptestName" value="attrqValNSRoleFRYes"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="filteredrole"/>
+    <parameter name="pnsRoleexist" value="yes"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrNSRoleRYes">
+    <parameter name="ptestName" value="attrqValNSRoleRYes"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="role"/>
+    <parameter name="pnsRoleexist" value="yes"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>    
+<test name="AttributeQueryTestNamedAttrNSRoleFRYes">
+    <parameter name="ptestName" value="attrqNMDNSRoleFRYes"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="filteredrole"/>
+    <parameter name="pnsRoleexist" value="yes"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrNSRoleRYes">
+    <parameter name="ptestName" value="attrqNMDNSRoleRYes"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="role"/>
+    <parameter name="pnsRoleexist" value="yes"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrNSRoleFRNo">
+    <parameter name="ptestName" value="attrqNMDNSRoleFRNo"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="filteredrole"/>
+    <parameter name="pnsRoleexist" value="no"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrNSRoleRNo">
+    <parameter name="ptestName" value="attrqNMDNSRoleRNo"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="nsrole"/>
+    <parameter name="pnsRoleType" value="role"/>
+    <parameter name="pnsRoleexist" value="no"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>

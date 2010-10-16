@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>정책 구성 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>정책 구성</h4>
+<p><a name="indexterm-191"></a>정책 구성 속성을 사용하여 관리자는 정책 서비스에 의해 사용되는 구성 전역 및
+영역 등록 정보를 설정할 수 있습니다.</p>
+<ul><li><p><a href="#fufnk">전역 등록 정보</a></p></li>
+<li><p><a href="#fufmb">영역 속성</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>전역 등록 정보</h5>
+<p>전역 등록 정보는 다음과 같습니다.</p>
+
+<a name="gciwg"></a><h5>자원 비교기</h5>
+<p>정책 규칙 정의에 지정된 자원을 비교하는 데 사용되는 자원 비교기 정보를 지정합니다.
+자원 비교는 정책 작성과 평가에 모두 사용됩니다.</p><p>[추가] 버튼을 누르고 다음 속성을 정의합니다.</p><dl><dt>서비스 유형</dt>
+<dd><p>비교기를 사용해야 하는 서비스를 지정합니다.</p></dd>
+<dt>클래스</dt>
+<dd><p>자원 비교 알고리즘을 구현하는 Java 클래스를 정의합니다. </p></dd>
+<dt>분리자</dt>
+<dd><p>자원 이름에 사용되는 분리자를 지정합니다. </p></dd>
+<dt>와일드카드</dt>
+<dd><p>자원 이름에 정의할 수 있는 와일드카드를 지정합니다.</p></dd>
+<dt>한 수준 와일드카드</dt>
+<dd><p>0자 이상의 문자를 같은 분리자 경계에서 일치시킵니다.</p></dd>
+<dt>대소문자 구분</dt>
+<dd><p>두 자원의 비교에서 대소문자를 구분하는지 아니면 무시하는지 여부를 지정합니다. False인 경우 대소문자를 무시하며 True인 경우 대소문자를 구분합니다.</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>거부 결정에 대한 평가 계속</h5>
+<p>DENY 정책 결정이 존재하는 경우에도 정책 프레임워크가 계속해서 후속 정책을 평가해야 하는지
+여부를 지정합니다. 이 옵션을 선택하지 않은 경우(기본값) DENY 결정이 인식되고 나면 정책
+평가가 후속 정책을 건너뜁니다.</p>
+
+<a name="fufng"></a><h5>OpenSSO에서 처리 가능한 권고</h5>
+<p>정책 적용 지점(정책 에이전트)이 사용자 에이전트를 OpenSSO로 리디렉션할 대상 정책 권고 키
+이름을 정의합니다. 에이전트가 자원에 대한 액세스를 허용하지 않는 정책 결정을 수신했으나 권고가
+있을 경우, 에이전트는 이 속성에 나열된 권고 키가 있는지를 확인합니다.</p><p>해당 권고가 있을 경우 사용자 에이전트는 OpenSSO로 리디렉션되고 잠재적으로 자원에 대한 액세스를
+허용합니다.</p>
+
+<a name="gdpdm"></a><h5>조직 별칭 참조</h5>
+<p>[예]로 설정한 경우 최상위 수준 또는 상위 영역에서 참조 정책을 만들지 않고도
+이 속성을 사용하여 하위 영역에 정책을 만들 수 있습니다. 정규화된 호스트 이름이
+영역의 DNSAlias와 일치하는 HTTP 또는 HTTPS 자원을 보호하는 정책만 만들 수 있습니다.
+기본적으로 이 속성은 [아니요]로 정의됩니다. </p>
+
+<a name="fufmb"></a><h5>영역 속성</h5>
+<p>LDAP 등록 정보는 다음과 같습니다.</p>
+
+<a name="fufmg"></a><h5>기본 LDAP 서버</h5>
+<p>정책 주제(예: LDAP 사용자, LDAP 역할, LDAP 그룹 등)를 검색하는 데 사용할
+OpenSSO를 설치하는 동안 지정된 주 LDAP 서버의 호스트 이름과 포트 번호를 지정합니다.</p><p>형식은 <i>hostname:port</i>입니다. 예를 들면 다음과 같습니다. <tt>machine1.example.com:389</tt>입니다.</p><p>여러 LDAP 서버 호스트에 대한 페일오버 구성의 경우 이 값은 공백으로 구분된
+호스트 목록일 수 있습니다. 형식은 <i> hostname1:port1 hostname2:port2...</i>입니다.</p><p>예를 들면 다음과 같습니다. <tt>machine1.example1.com:389 machine2.example1.com:389 </tt></p><p>여러 항목이 있을 경우 로컬 서버 이름을 접두어로 지정해야 합니다. 이렇게 지정해야
+특정 OpenSSO가 특정 디렉토리 서버와 통신하도록 구성할 수 있습니다.</p><p>형식은 <i>servername|hostname:port</i>입니다. 예를 들면 다음과 같습니다.</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>페일오버 구성의 경우 예를 들면 다음과 같습니다.</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389 </tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>LDAP 기본 DN</h5>
+<p>검색을 시작할 LDAP 서버에서 기본 DN을 지정합니다. 기본값은 설치된 OpenSSO의 최상위 수준
+영역입니다. </p>
+
+<a name="fufmd"></a><h5>LDAP 사용자 기본 DN</h5>
+<p>이 속성은 검색을 시작할 LDAP 서버의 LDAP 사용자 주제에 사용되는 기본 DN을
+지정합니다. 기본값은 OpenSSO 설치 기본의 최상위 수준 영역입니다.</p>
+
+<a name="fufmz"></a><h5>OpenSSO 역할 기본 DN</h5>
+<p>OpenSSO 역할의 값을 검색할 때 기본으로 사용되는 영역 또는 조직의 DN을 정의합니다.
+이 속성은 <i>AccessManagerRoles</i> 정책 주제에서 사용합니다.</p>
+
+<a name="fufme"></a><h5>LDAP 바인드 DN</h5>
+<p>LDAP 서버의 바인드 DN을 지정합니다.</p>
+
+<a name="fufmf"></a><h5>LDAP 바인드 비밀번호</h5>
+<p>LDAP 서버에 바인드하는 데 사용되는 비밀번호를 정의합니다. 기본적으로 설치하는 동안 입력된 <tt>amldapuser</tt>
+비밀번호가 바인드 사용자로 사용됩니다.</p>
+
+<a name="fufmn"></a><h5>LDAP 조직 검색 필터</h5>
+<p>조직 항목을 찾는 데 사용되는 검색 필터를 지정합니다. 기본값은 <tt>(objectclass=sunMangagedOrganization)</tt>입니다. </p>
+
+<a name="fufmm"></a><h5>LDAP 조직 검색 범위</h5>
+<p>조직 항목을 찾는 데 사용되는 범위를 정의합니다. 이 범위는 다음 중 하나가
+되어야 합니다.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB(기본값)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>LDAP 그룹 검색 범위</h5>
+<p>그룹 항목을 찾는 데 사용되는 범위를 정의합니다. 이 범위는 다음 중 하나가
+되어야 합니다.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB(기본값)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>LDAP 그룹 검색 필터</h5>
+<p>그룹 항목을 찾는 데 사용되는 검색 필터를 지정합니다. 기본값은 <tt>(objectclass=groupOfUniqueNames)</tt>입니다.</p>
+
+<a name="fufms"></a><h5>LDAP 사용자 검색 필터</h5>
+<p>사용자 항목을 찾는 데 사용되는 검색 필터를 지정합니다. 기본값은 <tt>(objectclass=inetorgperson)</tt>입니다.</p>
+
+<a name="fufmt"></a><h5>LDAP 사용자 검색 범위</h5>
+<p>사용자 항목을 찾는 데 사용되는 범위를 정의합니다. 이 범위는 다음 중 하나가
+되어야 합니다.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB(기본값)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>LDAP 역할 검색 필터</h5>
+<p>역할에 대한 항목을 찾는 데 사용되는 검색 필터를 지정합니다. 기본값은 <tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions))</tt>입니다.</p>
+
+<a name="fufmw"></a><h5>LDAP 역할 검색 범위</h5>
+<p>이 속성은 역할에 대한 항목을 찾는 데 사용되는 범위를 정의합니다. 이 범위는
+다음 중 하나가 되어야 합니다.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB(기본값)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>OpenSSO 역할 검색 범위</h5>
+<p>OpenSSO 역할 주제의 항목을 검색하는 데 사용할 범위를 정의합니다.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB(기본값)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>LDAP 조직 검색 속성</h5>
+<p>조직에서 검색을 수행하는 속성 유형을 정의합니다. 기본값은 o입니다.</p>
+
+<a name="fufmr"></a><h5>LDAP 그룹 검색 속성</h5>
+<p>그룹에서 검색을 수행하는 속성 유형을 정의합니다. 기본값은 <tt>cn</tt>입니다.</p>
+
+<a name="fufmu"></a><h5>LDAP 사용자 검색 속성</h5>
+<p>사용자에서 검색을 수행하는 속성 유형을 정의합니다. 기본값은 <tt>uid</tt>입니다.</p>
+
+<a name="fufmx"></a><h5>LDAP 역할 검색 속성</h5>
+<p>이 필드는 역할에서 검색을 수행하는 속성 유형을 정의합니다. 기본값은 <tt>cn</tt>입니다.</p>
+
+<a name="fufnj"></a><h5>검색에서 반환되는 최대 결과 수</h5>
+<p>이 필드는 검색에서 반환되는 최대 결과 수를 정의합니다. 기본값은 100입니다. 검색 제한이
+지정된 양을 초과할 경우 해당 지점까지 발견된 항목이 반환됩니다.</p>
+
+<a name="fufnl"></a><h5>검색 시간 초과</h5>
+<p>검색 시간 초과가 발생하기 전까지의 시간을 지정합니다. 검색이 지정된 시간을 초과할 경우
+해당 시점까지 발견된 항목이 반환됩니다.</p>
+
+<a name="fufmi"></a><h5>LDAP SSL</h5>
+<p>LDAP 서버가 SSL을 실행 중인지 여부를 지정합니다. 선택할 경우 SSL이 사용 가능하고
+선택하지 않을 경우(기본값) SSL이 사용 불가능합니다.</p><p>LDAP 서버가 SSL을 사용할 수 있는 상태에서 실행 중(LDAPS)이면, OpenSSO가 LDAPS 프로토콜을
+통해 Directory Server에 연결될 수 있도록 OpenSSO가 적절한 SSL로 신뢰된 인증서로 구성되었는지
+확인해야만 합니다.</p>
+
+<a name="fufmk"></a><h5>LDAP 연결 풀 최소 크기</h5>
+<p>LDAP 서버 속성에 지정된 대로 디렉토리 서버에 연결하는 데 사용되는 연결 풀의
+최소 크기를 지정합니다. 기본값은 1입니다.</p>
+
+<a name="fufmj"></a><h5>연결 풀 최대 크기</h5>
+<p>이 속성은 LDAP 서버 속성에 지정된 대로 디렉토리 서버에 연결하는 데 사용되는
+연결 풀의 최대 크기를 지정합니다. 기본값은 10입니다.</p>
+
+<a name="fufna"></a><h5>선택한 정책 주제</h5>
+<p>영역의 정책 정의에 사용할 수 있는 일련의 주제 유형 집합을 선택할 수
+있습니다.</p>
+
+<a name="fufnc"></a><h5>선택한 정책 조건</h5>
+<p>영역의 정책 정의에 사용할 수 있는 일련의 조건 유형 집합을 선택할 수
+있습니다.</p>
+
+<a name="fufnd"></a><h5>선택한 정책 참조</h5>
+<p>영역의 정책 정의에 사용할 수 있는 일련의 참조 유형 집합을 선택할 수
+있습니다.</p>
+
+<a name="fufml"></a><h5>주제 결과 유지 시간</h5>
+<p>이 속성은 단일 사인온(SSO) 토큰에 기반한 동일한 정책 요청을 평가하기 위해 캐시된
+주제 결과를 사용할 수 있는 시간(분)을 지정합니다.</p><p>초기에 SSO 토큰에 대해 정책을 평가할 때 주어진 사용자에 정책을 적용할 수
+있는지 여부를 확인하기 위해 해당 정책의 주제 인스턴스를 평가합니다. SSO 토큰 아이디가
+키로 사용되는 주제 결과는 정책에 캐시됩니다. 주제 결과 유지 시간 속성에 지정된
+시간 내에 동일한 SSO 토큰 아이디의 동일한 정책에 대해 다른 평가가 수행되면
+정책 프레임워크는 주제 인스턴스를 평가하는 대신 캐시된 주제 결과를 검색합니다. 따라서 정책
+평가를 위한 시간이 크게 줄어듭니다.</p>
+
+<a name="fufnm"></a><h5>사용자 별칭</h5>
+<p>원격 디렉토리 서버에서 자원 대상 구성원이 로컬 사용자의 별칭을 지정하는 자원을 보호하는
+정책을 만들 경우에 이 속성을 사용 가능으로 지정해야 합니다. 예를 들어, 원격
+디렉토리 서버에서 <tt>uid=rmuser</tt>를 만든 다음 <tt>rmuser</tt>를 OpenSSO의 로컬 사용자(예: <tt>uid=luser</tt>)에 별칭으로 추가할
+경우에 이 속성을 사용 가능으로 지정해야 합니다. <tt>rmuser</tt>로 로그인하면 로컬 사용자(<tt>luser</tt>)에 대한
+세션이 만들어지고 정책이 성공적으로 적용됩니다.</p>
+
+<a name="fufni"></a><h5>선택한 응답 공급자</h5>
+<p>영역에 대해 사용 가능으로 설정된 정책 응답 공급자 플러그인을 정의합니다. 이 속성에
+선택된 응답 공급자 플러그인만 해당 영역에서 정의되어 있는 정책에 추가할 수 있습니다.</p>
+
+<a name="fufnn"></a><h5>선택한 동적 응답 속성</h5>
+<p>영역에 대해 사용 가능으로 설정된 동적 응답 속성을 정의합니다. 이 속성에 선택된
+이름의 일부만 <i>IDResponseProvider</i>의 동적 속성 목록에 정의하여 해당 영역에서 정의되어 있는 정책에
+추가할 수 있습니다.</p>
+<br/>
+
+</body>
+</html>

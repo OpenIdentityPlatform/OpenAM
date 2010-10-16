@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policy-attributes-static.xhtml,v 1.9 2009/06/04 11:49:27 veiming Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ice:panelSeries
+        var="attributesBean"
+        value="#{attributesBeans}">
+        <o:section
+            rendered="#{attributesBean.attributeType.toString == 'STATIC'}">
+            <ui:define name="section-title">
+                <ice:outputText
+                    value="#{resources['policy-attributes-static.sectionTitle']}"/>
+            </ui:define>
+            <ui:define name="section-details">
+                <ice:outputText
+                    value="#{resources['policy-attributes-static.sectionDetails']}"/>
+            </ui:define>
+            <ui:define name="section-links">
+                <ice:panelGrid
+                    columns="1">
+                    <o:clink
+                        handler="#{attributesBean.attributesHandler}"
+                        listenerMethod="addListener"
+                        type="add"/>
+                </ice:panelGrid>
+            </ui:define>
+            <ui:define name="section-body">
+                <ice:panelGroup
+                    visible="#{o:size(attributesBean.viewAttributes) == 0}">
+                    <ice:outputText
+                        value="#{resources['policy-attributes-static.noResources']}"/>
+                </ice:panelGroup>
+                <ice:dataTable
+                    visible="#{o:size(attributesBean.viewAttributes) > 0}"
+                    styleClass="attributes"
+                    columnClasses="attributesCol1,attributesCol2,attributesCol3"
+                    value="#{attributesBean.viewAttributes}"
+                    var="attribute">
+                    <ice:column>
+                        <f:facet name="header">
+                            <ice:outputText 
+                                value="#{resources['policy-attributes-static.name']}"/>
+                        </f:facet>
+                        <ice:panelGroup
+                            visible="#{!attribute.nameEditable}">
+                            <ice:commandLink
+                                styleClass="command-link"
+                                actionListener="#{attributesBean.attributesHandler.editNameListener}">
+                                <f:attribute
+                                    name="viewAttribute"
+                                    value="#{attribute}"/>
+                                <ice:outputText
+                                    value="#{attribute.title}"/>
+                            </ice:commandLink>
+                        </ice:panelGroup>
+                        <ice:panelGroup
+                            visible="#{attribute.nameEditable}">
+                            <ice:inputText
+                                style="width: 100%"
+                                styleClass="inline-input"
+                                valueChangeListener="#{attributesBean.attributesHandler.nameEditedListener}"
+                                value="#{attribute.name}">
+                                <f:attribute
+                                    name="viewAttribute"
+                                    value="#{attribute}"/>
+                            </ice:inputText>
+                        </ice:panelGroup>
+                    </ice:column>
+                    <ice:column>
+                        <f:facet name="header">
+                            <ice:outputText 
+                                value="#{resources['policy-attributes-static.value']}"/>
+                        </f:facet>
+                        <ice:panelGroup
+                            visible="#{!attribute.valueEditable}">
+                            <ice:commandLink
+                                styleClass="command-link"
+                                actionListener="#{attributesBean.attributesHandler.editValueListener}">
+                                <f:attribute
+                                    name="viewAttribute"
+                                    value="#{attribute}"/>
+                                <ice:outputText
+                                    value="#{attribute.value}"/>
+                            </ice:commandLink>
+                        </ice:panelGroup>
+                        <ice:panelGroup
+                            visible="#{attribute.valueEditable}">
+                            <ice:inputText
+                                styleClass="inline-input"
+                                style="width: 100%"
+                                valueChangeListener="#{attributesBean.attributesHandler.valueEditedListener}"
+                                value="#{attribute.value}">
+                                <f:attribute
+                                    name="viewAttribute"
+                                    value="#{attribute}"/>
+                            </ice:inputText>
+                        </ice:panelGroup>
+                    </ice:column>
+                    <ice:column>
+                        <f:facet name="header">
+                            <ice:outputText 
+                                value="#{resources['policy-attributes-static.remove']}"/>
+                        </f:facet>
+                        <ice:panelGroup>
+                            <ice:commandLink
+                                actionListener="#{attributesBean.attributesHandler.removeListener}">
+                                <f:attribute
+                                    name="viewAttribute"
+                                    value="#{attribute}"/>
+                                <ice:graphicImage
+                                    value="../image/remove-16.png"/>
+                            </ice:commandLink>
+                        </ice:panelGroup>
+                    </ice:column>
+                </ice:dataTable>
+            </ui:define>
+        </o:section>
+    </ice:panelSeries>
+</span>

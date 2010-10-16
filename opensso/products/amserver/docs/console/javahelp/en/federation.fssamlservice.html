@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAML1.x - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlservice"></a><h3>SAML1.x</h3>
+<a name="indexterm-78"></a><p>Security Assertion Markup Language (SAML) is an open-standard protocol that uses an XML
+framework to exchange security information between an <b>authority</b> and a <b>trusted</b> partner site. The
+security information concerns itself with a subject's authentication status, access authorization and attribute
+information. (A person identified by an email address is a subject as might
+be a printer.) A SAML authority (also referred to as the <b>asserting party</b>) is a
+platform or application that has been integrated with SAML API, allowing it to
+relay security information. For example, asserting that a subject has been authenticated into
+its system by passing the required attributes. Trusted partner sites receive the security
+information and rely on its authenticity.</p>
+<hr><p><b>Note &#8211; </b>By default character escaping is enabled so that you can use the following
+special characters in SAML 1.x attributes in the OpenSSO console:</p>
+<ul><li><p>&#38;</p></li>
+<li><p>&#60;</p></li>
+<li><p>></p></li>
+<li><p>&#8220;</p></li>
+<li><p>'</p></li>
+<li><p>/</p></li></ul>
+<p>To disable character escaping:</p>
+<ol><li><p>In the OpenSSO Console, go to Configuration>Servers and Sites>Default Server Setting>Advanced.</p></li>
+<li><p>Enter the <tt>com.sun.identity.saml.escapeattributevalue</tt> as the key, and <tt>false</tt> as the value.</p></li>
+<li><p>Restart the server.</p></li></ol>
+<p>If you wish to enable character escaping, change the value to <tt>true</tt>
+and restart the server.</p>
+<hr>
+<p>The following SAML attributes can be configured for your implementation by clicking the
+Local Site Properties button:</p>
+<ul><li><p><a href="targetspecifier.html">Target Specifier</a></p></li>
+<li><p><a href="siteidentifiers.html">Site Identifiers</a></p></li>
+<li><p><a href="trustedpartners.html">Trusted Partners</a></p></li>
+<li><p><a href="federation.fsssamltargeturlsadd.html">Target URLs</a></p></li>
+<li><p><a href="assertiontimeout.html">Assertion Timeout</a></p></li>
+<li><p><a href="assertionskew.html">Assertion Skew Factor for <tt>notBefore</tt> Time</a></p></li>
+<li><p><a href="artifacttimeout.html">Artifact Timeout</a></p></li>
+<li><p><a href="samlartifactname.html">SAML Artifact Name</a></p></li>
+<li><p><a href="signsamlassertion.html">Sign SAML Assertion</a></p></li>
+<li><p><a href="signsamlrequest.html">Sign SAML Request</a></p></li>
+<li><p><a href="signsamlresponse.html">Sign SAML Response</a></p></li></ul>
+<p>The following tasks are associated with configuring SAML:</p>
+<ul><li><p><a href="federation.fssamlsiteidadd.html">To Configure a Site Identifier</a></p></li>
+<li><p><a href="federation.fssamlselecttrustedpartnertype.html">Trusted Partners: Selecting Partner Type and Profile</a></p></li>
+<li><p><a href="federation.fssamltrustedpartnersadd.html">Trusted Partners: Configuring Trusted Partner Attributes</a></p></li>
+<li><p><a href="federation.fssamltargeturlsadd.html">To Configure a Target URL</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

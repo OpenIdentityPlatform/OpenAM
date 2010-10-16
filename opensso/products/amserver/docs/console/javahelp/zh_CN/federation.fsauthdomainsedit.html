@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>修改信任环配置文件 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsauthdomainsedit"></a><h4>修改信任环配置文件</h4><a name="indexterm-57"></a><p>按照以下步骤编辑现有信任环已配置的常规属性，或向其中添加提供者。起点是联合界面下的“信任环”。</p><ol>
+<li><b>单击已配置信任环的名称，修改其配置文件，或向其中添加提供者。</b><p>随即显示“编辑信任环”页面。</p></li>
+<li><b>键入信任环“常规”属性的新值或编辑其现有值：</b><dl><dt>名称</dt>
+<dd><p>该属性的静态值是您创建信任环时提供的名称。</p></dd>
+<dt>说明</dt>
+<dd><p>该属性的值是信任环的说明。可以修改已输入的说明（如果适用）。</p></dd>
+<dt>IDFF 记录器服务 URL</dt>
+<dd><p>该属性指定了记录通用域 cookie 的服务的位置。该 URL 的格式为 <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/idffwriter</b></tt>。</p></dd>
+<dt>IDFF 读取器服务 URL</dt>
+<dd><p>该属性指定了读取通用域 cookie 的服务的位置。该 URL 的格式为 <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/idffreader</b></tt>。</p></dd>
+<dt>SAML2 记录器 URL</dt>
+<dd><p>该属性用于指定将 cookie 写入到通用域的 SAML2 记录器服务的位置。该 URL 的格式为 <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/saml2writer</b></tt>。</p></dd>
+<dt>SAML2 读取器 URL</dt>
+<dd><p>该属性用于指定将 cookie 写入到通用域的 SAML2 记录器服务的位置。该 URL 的格式为 <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt>/common/saml2reader</b></tt>。</p></dd>
+<dt>状态</dt>
+<dd><p>默认值为活动。选中“不活动”会禁用信任环内的通信。</p></dd>
+</dl>
+</li>
+<li><b>选择一个或多个可用的提供者并单击“添加”箭头来选定它们。</b><p>所提供的列表包含已创建并填充了提供者的实体的名称 。有关详细信息，参见<a href="federation.fsauthdomainsselectprovider.html">添加提供者到信任环</a>。</p></li>
+<li><b>单击“保存”完成该操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

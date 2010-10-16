@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE index PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 2.0//EN" "index_1_0.dtd">
+<index version="2.0">
+
+ <indexitem target="ppldapattributemaplist" text="PPLDAP 屬性對映清單"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="RelayState"></indexitem><indexitem target="federation.wsfedsp" text="RelayState"></indexitem>
+ <indexitem target="resourceidmapper" text="resourceID 對映程式"></indexitem>
+ <indexitem target="resourceidmapperpluginclass" text="resourceID 對映程式外掛程式類別"></indexitem>
+ <indexitem target="federation.fssamlservice" text="SAML">
+    <indexitem text="可信任的合作夥伴">
+        <indexitem target="federation.fssamlselecttrustedpartnertype" text="配置步驟 1"></indexitem>
+        <indexitem target="federation.fssamltrustedpartnersadd" text="配置步驟 2"></indexitem></indexitem>
+    <indexitem target="federation.fssamltargeturlsadd" text="目標 URL"></indexitem>
+    <indexitem text="網站識別碼">
+        <indexitem target="federation.fssamlsiteidadd" text="配置"></indexitem></indexitem></indexitem>
+ <indexitem target="ggodb" text="SOAP 連接服務, 支援的認證機制"></indexitem>
+ <indexitem target="service.scsoapbinding" text="SOAP 連結服務">
+    <indexitem target="ggodb" text="Web 服務認證程式"></indexitem>
+    <indexitem target="requesthandlerlist" text="請求處理程式清單"></indexitem><indexitem target="service.scsoapbindingrequesthandlerlistadd" text="請求處理程式清單"></indexitem><indexitem target="service.scsaml2soapbinding" text="請求處理程式清單"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="請求處理程式清單"></indexitem>
+    <indexitem target="mechanismhandlerslist" text="機制處理程式清單"></indexitem><indexitem target="webservices.wsauthnserviceshandlersadd" text="機制處理程式清單"></indexitem></indexitem>
+ <indexitem target="ggodb" text="Web 服務認證程式"></indexitem>
+ <indexitem target="supporteddirectives" text="支援的指令 (探索服務)"></indexitem>
+ <indexitem target="supportedcontainers" text="支援的容器"></indexitem>
+ <indexitem target="supportedlang" text="支援的語言環境"></indexitem>
+ <indexitem target="ggodb" text="支援的認證機制 (SOAP 連結)"></indexitem>
+ <indexitem target="supportedauthmechanisms" text="支援的認證機制 (探索服務)"></indexitem>
+ <indexitem target="federation.fssamlselecttrustedpartnertype" text="可信任的合作夥伴"></indexitem>
+ <indexitem target="service.mapcreatedevice" text="用戶端偵測, 新增用戶端"></indexitem>
+ <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="用戶端管理程式"></indexitem>
+ <indexitem target="federation.fssamltargeturlsadd" text="目標 URL"></indexitem>
+ <indexitem target="dirmang" text="目錄管理"></indexitem>
+ <indexitem text="主控台特性">
+    <indexitem target="service.smg11n" text="全域化設定"></indexitem>
+    <indexitem target="service.scserviceprofile.amadminconsoleservice" text="管理"></indexitem></indexitem>
+ <indexitem target="policy.selectsubjecttype" text="主體"></indexitem><indexitem target="idm.entities" text="主體">
+    <indexitem target="subjectuser" text="使用者"></indexitem>
+    <indexitem target="idm.entitiesgroup" text="群組"></indexitem></indexitem>
+ <indexitem target="service.scplatformclientcharsetsadd" text="平台, 建立新的字元集"></indexitem>
+ <indexitem text="全域特性">
+    <indexitem target="service.scserviceprofile.iplanetamuserservice" text="使用者"></indexitem>
+    <indexitem target="service.scserviceprofile.amsessionservice" text="階段作業"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密碼重設"></indexitem>
+    <indexitem target="service.scpolicy" text="策略配置"></indexitem></indexitem>
+ <indexitem target="accesscontrol" text="存取控制, 簡介"></indexitem>
+ <indexitem target="extensioncontainerattributes" text="延伸容器屬性"></indexitem>
+ <indexitem target="extensionattributesnamespaceprefix" text="延伸屬性名稱空間前綴"></indexitem>
+ <indexitem target="namescheme" text="名稱方案"></indexitem>
+ <indexitem target="namespaceprefix" text="名稱空間前綴"></indexitem>
+ <indexitem text="系統特性">
+    <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="用戶端偵測"></indexitem>
+    <indexitem target="service.scplatform" text="平台"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamnamingservice" text="命名"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamloggingservice" text="記錄"></indexitem></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="附屬提供者實體"></indexitem>
+ <indexitem target="serviceupdateenabled" text="服務更新"></indexitem>
+ <indexitem target="service.smdiscoverydescriptionadd" text="服務描述, 配置"></indexitem>
+ <indexitem target="serviceinstanceupdateclass" text="服務實例更新類別"></indexitem>
+ <indexitem target="idm.entitymembership" text="使用者, 增加至服務、角色和群組"></indexitem>
+ <indexitem target="dm.home" text="使用者管理"></indexitem>
+ <indexitem target="invalidatesession" text="使階段作業無效"></indexitem>
+ <indexitem target="encryptnameidentifier" text="為啟動程式加密階段作業環境中的名稱識別碼"></indexitem>
+ <indexitem target="federation.fsauthdomains" text="信任圈">
+    <indexitem target="deleteauthdomain" text="刪除"></indexitem>
+    <indexitem target="federation.createcot" text="建立"></indexitem>
+    <indexitem target="federation.fsauthdomainsedit" text="修改"></indexitem>
+    <indexitem target="federation.fsauthdomainsselectprovider" text="新增提供者"></indexitem></indexitem>
+ <indexitem target="requirequery" text="要求查詢策略評估"></indexitem>
+ <indexitem target="requiremodify" text="要求修改策略評估"></indexitem>
+ <indexitem target="service.scconfig" text="配置">
+    <indexitem target="service.scconfigconsole" text="主控台特性"></indexitem>
+    <indexitem target="servic.scconfigglobal" text="全域特性"></indexitem>
+    <indexitem target="service.scfonfigsystem" text="系統特性"></indexitem>
+    <indexitem target="service.scconfigauth" text="認證"></indexitem></indexitem>
+ <indexitem target="webservices.wspersonalprofileservice" text="個人設定檔服務">
+    <indexitem target="ppldapattributemaplist" text="PPLDAP 屬性對映清單"></indexitem>
+    <indexitem target="resourceidmapper" text="resourceID 對映程式"></indexitem>
+    <indexitem target="supportedcontainers" text="支援的容器"></indexitem>
+    <indexitem target="extensioncontainerattributes" text="延伸容器屬性"></indexitem>
+    <indexitem target="extensionattributesnamespaceprefix" text="延伸屬性名稱空間前綴"></indexitem>
+    <indexitem target="namescheme" text="名稱方案"></indexitem>
+    <indexitem target="namespaceprefix" text="名稱空間前綴"></indexitem>
+    <indexitem target="serviceupdateenabled" text="服務更新"></indexitem>
+    <indexitem target="serviceinstanceupdateclass" text="服務實例更新類別"></indexitem>
+    <indexitem target="requirequery" text="要求查詢策略評估"></indexitem>
+    <indexitem target="requiremodify" text="要求修改策略評估"></indexitem>
+    <indexitem target="authorizer" text="授權程式"></indexitem>
+    <indexitem target="ppproviderid" text="提供者 ID"></indexitem>
+    <indexitem target="alternatesecuritymechanisms" text="替代安全機制"></indexitem>
+    <indexitem target="alternateendpoint" text="替代端點"></indexitem>
+    <indexitem target="attributemapper" text="屬性對映程式"></indexitem></indexitem>
+ <indexitem target="fyfby" text="參照策略"></indexitem>
+ <indexitem target="service.subconfigadd" text="階段作業特性, 新增子配置"></indexitem>
+ <indexitem target="session.smprofile" text="階段作業視窗"></indexitem>
+ <indexitem target="sessions" text="階段作業模組"></indexitem>
+ <indexitem target="policy.selectservicetype" text="規則"></indexitem>
+ <indexitem target="policyevaldiscoupdate" text="探索更新的策略評估"></indexitem>
+ <indexitem target="service.smdiscoveryservice" text="探索服務">
+    <indexitem target="resourceidmapperpluginclass" text="resourceID 對映程式外掛程式類別"></indexitem>
+    <indexitem target="supporteddirectives" text="支援的指令"></indexitem>
+    <indexitem target="supportedauthmechanisms" text="支援的認證機制"></indexitem>
+    <indexitem target="service.smdiscoverydescriptionadd" text="服務描述"></indexitem>
+    <indexitem target="encryptnameidentifier" text="為啟動程式加密階段作業環境中的名稱識別碼"></indexitem>
+    <indexitem target="policyevaldiscoupdate" text="探索更新的策略評估"></indexitem>
+    <indexitem target="policyevaldiscolookup" text="探索查找的策略評估"></indexitem>
+    <indexitem target="authorizerpluginclass" text="授權程式外掛程式類別"></indexitem>
+    <indexitem target="generatesessioncontext" text="啟動程式的階段作業環境敘述"></indexitem>
+    <indexitem target="resourceofferingsbootstrapping" text="啟動程式的資源提供"></indexitem><indexitem target="service.smdiscoverybootstraprefoffadd" text="啟動程式的資源提供"></indexitem>
+    <indexitem target="dsproviderid" text="提供者 ID"></indexitem>
+    <indexitem target="entryhandlerpluginclass" text="項目處理程式外掛程式類別"></indexitem>
+    <indexitem target="authresponsemessage" text="認證回應訊息"></indexitem>
+    <indexitem target="useimpliedresource" text="隱含資源"></indexitem></indexitem>
+ <indexitem target="policyevaldiscolookup" text="探索查找的策略評估"></indexitem>
+ <indexitem target="authorizer" text="授權程式"></indexitem>
+ <indexitem target="authorizerpluginclass" text="授權程式外掛程式類別"></indexitem>
+ <indexitem target="policy.selectcondition" text="條件">
+    <indexitem target="policy.pmdefaultipcondition" text="IP 位址/DNS 名稱"></indexitem>
+    <indexitem target="policy.conditionadd" text="LDAP 篩選器"></indexitem>
+    <indexitem target="policy.pmdefaultauthschemeconditionadd" text="按模組實例認證"></indexitem>
+    <indexitem target="policy.authtoserviceadd" text="按模組鏈認證"></indexitem>
+    <indexitem target="policy.pmdefaulttimeconditionadd" text="時間"></indexitem>
+    <indexitem target="policy.pmdefaultsessioncondtionadd" text="階段作業"></indexitem>
+    <indexitem target="policy.sessionpropertyconditionadd" text="階段作業特性"></indexitem>
+    <indexitem target="policy.pmdefaultauthlevelconditionadd" text="認證層級"></indexitem>
+    <indexitem target="policy.authtorealmadd" text="範圍認證"></indexitem></indexitem>
+ <indexitem target="generatesessioncontext" text="啟動程式的階段作業環境敘述"></indexitem>
+ <indexitem target="resourceofferingsbootstrapping" text="啟動程式的資源提供">
+    <indexitem target="service.smdiscoverybootstraprefoffadd" text="配置"></indexitem></indexitem>
+ <indexitem target="policy.policy" text="策略">
+    <indexitem target="normalpolicy" text="一般策略"></indexitem>
+    <indexitem target="policy.selectsubjecttype" text="主體"></indexitem>
+    <indexitem target="responseprovider" text="回應提供者"></indexitem>
+    <indexitem target="policy.policyreferraladd" text="若要建立新參照策略"></indexitem>
+    <indexitem target="policy.subjectadd" text="若要增加主體"></indexitem>
+    <indexitem target="policy.responseprovideradd" text="若要增加回應提供者"></indexitem>
+    <indexitem target="policy.selectreferraltype" text="若要增加參照"></indexitem>
+    <indexitem target="policy.ruleadd" text="若要增加規則"></indexitem>
+    <indexitem target="policy.selectconditiontype" text="若要增加條件"></indexitem>
+    <indexitem target="fyfby" text="參照策略"></indexitem>
+    <indexitem target="policy.selectservicetype" text="規則"></indexitem>
+    <indexitem target="policy.selectcondition" text="條件"></indexitem></indexitem>
+ <indexitem target="ppproviderid" text="提供者 ID"></indexitem>
+ <indexitem target="dsproviderid" text="提供者 ID (探索服務)"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="提供者實體"></indexitem>
+ <indexitem target="entryhandlerpluginclass" text="項目處理程式外掛程式類別"></indexitem>
+ <indexitem target="alternatesecuritymechanisms" text="替代安全機制"></indexitem>
+ <indexitem target="alternateendpoint" text="替代端點"></indexitem>
+ <indexitem target="realm.idrepo" text="資料存放區">
+    <indexitem target="realm.idrepoeditad" text="Active Directory 屬性"></indexitem>
+    <indexitem target="realm.idrepoeditldapv3" text="LDPAv3 儲存庫外掛程式屬性"></indexitem>
+    <indexitem target="realm.idrepoeditfamschema" text="具有 AM 模式的 Sun Directory Server 屬性"></indexitem>
+    <indexitem target="realm.idreposelecttype" text="建立新的資料存放區"></indexitem></indexitem>
+ <indexitem target="sessionsearch" text="搜尋"></indexitem>
+ <indexitem target="federation.fssamlsiteidadd" text="網站識別碼"></indexitem>
+ <indexitem text="實體">
+    <indexitem target="federation.createsaml2metadata" text="附屬提供者"></indexitem>
+    <indexitem target="federation.createsaml2metadata" text="提供者"></indexitem></indexitem>
+ <indexitem target="webservices.wsauthnservices" text="認證 Web 服務"></indexitem>
+ <indexitem target="authresponsemessage" text="認證回應訊息"></indexitem>
+ <indexitem text="認證環境">
+    <indexitem target="federation.samlv2spassertioncontent" text="屬性"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="屬性"></indexitem><indexitem target="federation.idffidp" text="屬性"></indexitem><indexitem target="federation.idffsp" text="屬性"></indexitem></indexitem>
+ <indexitem text="認證屬性">
+    <indexitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP Basic"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows Desktop SSO"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="成員身份"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthservice" text="核心"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="匿名"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthdatastoreservice" text="資料存放區"></indexitem>
+    <indexitem target="authentication.authconfig" text="認證配置"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthcertservice" text="憑證"></indexitem>
+    <indexitem target="ggulh" text="聯合"></indexitem></indexitem>
+ <indexitem target="realm.rmrealm" text="範圍">
+    <indexitem target="realm.realmproperties" text="一般特性"></indexitem>
+    <indexitem target="idm.entities" text="主體"></indexitem>
+    <indexitem target="realm.services" text="服務"></indexitem>
+    <indexitem target="realm.rmrealmadd" text="建立新的"></indexitem>
+    <indexitem target="authentication.newauthinstance" text="建立新的認證模組"></indexitem>
+    <indexitem target="authentication.newauthconfig" text="建立新的認證鏈接"></indexitem>
+    <indexitem target="realm.servicesadd" text="將服務增加至"></indexitem>
+    <indexitem target="policy.policy" text="策略"></indexitem>
+    <indexitem target="realm.idrepo" text="資料存放區"></indexitem>
+    <indexitem target="authentication.authproperties" text="認證"></indexitem>
+    <indexitem target="delegation.delegation" text="權限"></indexitem><indexitem target="delegation.delegationproperties" text="權限"></indexitem></indexitem>
+ <indexitem target="requesthandlerlist" text="請求處理程式清單"></indexitem><indexitem target="service.scsaml2soapbinding" text="請求處理程式清單">
+    <indexitem target="service.scsoapbindingrequesthandlerlistadd" text="配置"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="配置"></indexitem></indexitem>
+ <indexitem target="mechanismhandlerslist" text="機制處理程式清單">
+    <indexitem target="webservices.wsauthnserviceshandlersadd" text="配置"></indexitem></indexitem>
+ <indexitem target="useimpliedresource" text="隱含資源"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="環境參照屬性"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="環境參照屬性"></indexitem><indexitem target="federation.idffidp" text="環境參照屬性"></indexitem><indexitem target="federation.idffsp" text="環境參照屬性"></indexitem>
+ <indexitem target="viewsession" text="檢視階段作業"></indexitem>
+ <indexitem text="識別管理">
+    <indexitem text="使用者">
+        <indexitem target="idm.entitymembership" text="增加至服務、角色和群組"></indexitem></indexitem></indexitem>
+ <indexitem text="屬性">
+    <indexitem target="federation.samlv2spassertioncontent" text="環境參照"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="環境參照"></indexitem><indexitem target="federation.idffidp" text="環境參照"></indexitem><indexitem target="federation.idffsp" text="環境參照"></indexitem></indexitem>
+ <indexitem target="attributemapper" text="屬性對映程式"></indexitem>
+ <indexitem target="delegation.delegation" text="權限"></indexitem><indexitem target="delegation.delegationproperties" text="權限"></indexitem>
+</index>

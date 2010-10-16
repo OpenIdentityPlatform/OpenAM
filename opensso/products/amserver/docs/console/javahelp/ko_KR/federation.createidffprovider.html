@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ID-FF 엔티티 공급자를 만들려면 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createidffprovider"></a><h5>ID-FF 엔티티 공급자를 만들려면</h5>
+<p>다음 단계를 사용하여  Federation Service용 ID-FF 프로토콜에 기반한 엔티티 공급자를 만들
+수 있습니다. Identity 공급자 또는 서비스 공급자(또는 둘 다) 역할을 엔티티에 할당할
+수 있지만 여러 역할이 동일한 엔티티 공급자에 속하게 됩니다.</p><ol>
+<li><b>관리자로 로그인합니다.</b></li>
+<li><b>콘솔의 [연합] 탭으로 이동하고 [엔티티 공급자] 테이블에서 [새로 만들기]를 누릅니다.</b></li>
+<li><b>확인 메시지가 표시되면 엔티티 공급자로 [ID-FF]를 선택합니다.</b></li>
+<li><b>엔티티 공급자가 속할 영역을 선택합니다.</b></li>
+<li><b>[엔티티 식별자] 필드에 이름을 입력합니다. </b></li>
+<li><b>엔티티 공급자에 할당할 엔티티 공급자 역할을 선택합니다.</b><p>[메타 별칭] 필드에 데이터를 입력하면 완료 시 해당 엔티티 공급자 역할을 자동으로
+만들어 엔티티 공급자에 추가합니다.</p></li>
+<li><b>하나 이상의 역할에 대해 다음 속성의 값을 입력합니다.</b><dl><dt>메타 별칭</dt>
+<dd><p>구성할 공급자 역할의 <tt>메타 별칭</tt>을 지정합니다. <tt>메타 별칭</tt>은 공급자의 엔티티 식별자 및 해당 공급자가 있는 조직을 찾는 데 사용됩니다. 이 값은 영역 또는 조직 이름에 슬래시가 연결되어 있고 공급자 이름이 조합된 문자열입니다. 예를 들어 <tt>/suncorp/travelprovider</tt>와 같습니다.</p>
+<hr><p><b>주의 &#8211; </b><tt>메타 별칭</tt>에 사용되는 이름에는 <tt>/</tt>를 사용할 수 없습니다.</p>
+<hr>
+</dd>
+<dt>서명 인증서 별칭</dt>
+<dd><p>키 저장소에서 올바른 서명 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다. </p></dd>
+<dt>암호화 인증서 별칭</dt>
+<dd><p>키 저장소에서 올바른 암호화 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다.</p></dd>
+</dl>
+</li>
+<li><b>[만들기]를 누릅니다.</b><p>엔티티 공급자, 할당된 공급자 역할 및 위치가 [엔티티 공급자] 목록에 표시됩니다. </p></li>
+<li><b>엔티티 공급자의 역할 동작을 사용자 정의하려면 해당 엔티티 공급자의 이름을 누르고 사용자
+정의할 역할에 해당하는 탭을 선택합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Pour cr&#233;er un nouveau groupe - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggobg"></a><h5>Pour cr&#233;er un nouveau groupe</h5>
+<p>Si vous le souhaitez, effectuez cette t&#226;che dans la console d'administration de
+Federated Access Manager . Cette t&#226;che s'applique aux groupes d'agents Web et J2EE.</p><p>Cr&#233;ez un groupe si vous souhaitez que les agents h&#233;ritent de propri&#233;t&#233;s
+sp&#233;cifiques du groupe. Les agents J2EE peuvent h&#233;riter des propri&#233;t&#233;s d'un groupe
+d'agents J2EE et les agents Web des propri&#233;t&#233;s d'un groupe d'agents Web.</p><ol>
+<li><b>Cliquez sur Agents dans l'onglet Configuration.</b></li>
+<li><b>Si n&#233;cessaire, s&#233;lectionnez l'onglet correspondant au type d'agent appropri&#233;.</b><ul>
+<li><b>Agents Web&#160;:</b><p>L'onglet Web est destin&#233; aux agents Web et est s&#233;lectionn&#233; par d&#233;faut.
+Aucune autre s&#233;lection n'est n&#233;cessaire.</p></li>
+<li><b>Agents J2EE&#160;:</b><p>L'onglet J2EE est destin&#233; aux agents J2EE. Le cas &#233;ch&#233;ant, cliquez sur
+cet onglet.</p></li></ul></li>
+<li><b>Dans la section Groupe, cliquez sur Nouveau.</b><p>Dans le champ Nom, entrez le nom du nouveau groupe.</p></li>
+<li><b>Dans le champ URL de serveur, entrez l'URL du serveur de Federated
+Access Manager.</b></li>
+<li><b>Cliquez sur Cr&#233;er.</b><p>La console cr&#233;e le groupe d'agents et affiche la page des agents
+(Web ou J2EE) avec un lien vers le groupe.</p><p>Pour effectuer d'autres t&#226;ches de configuration du groupe, cliquez sur ce lien
+afin d'afficher la page Modification de groupe d'agents.</p><p>Les attributs que vous pouvez d&#233;finir pour configurer un groupe sont les
+m&#234;mes que ceux correspondant &#224; un agent individuel, &#224; la diff&#233;rence que
+les attributs Groupe, Mot de passe et Confirmation de mot de passe
+ne sont pas disponibles au niveau du groupe.</p>
+<hr><p><b>Remarque &#8211; </b>En outre, sachez que certains attributs de groupes sont d&#233;j&#224; affect&#233;s &#224;
+des valeurs de variables qui, dans la plupart des cas, ne doivent
+pas &#234;tre chang&#233;es. Voici un exemple d'une de ces valeurs&#160;:</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

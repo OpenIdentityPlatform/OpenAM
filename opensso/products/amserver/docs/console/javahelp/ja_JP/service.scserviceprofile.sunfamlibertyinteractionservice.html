@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty 対話サービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Liberty 対話サービス</h4>
+
+
+<a name="ggofj"></a><h5>ユーザーを対話のためにリダイレクトする WSP</h5>
+<p>この属性は、Web サービスプロバイダが同意を得るためにユーザーをリダイレクトするかどうかを示します。デフォルト値は yes です。</p>
+
+<a name="ggofq"></a><h5>ユーザーをデータの対話のためにリダイレクトする WSP</h5>
+<p>ユーザーの同意を得るため、または追加データを収集するための対話を開始します。このプロパティーは、Web サービスプロバイダが追加データを収集するためにユーザーをリダイレクトするかどうかを示します。デフォルト値は yes です。</p>
+
+<a name="ggogl"></a><h5>WSP の対話予想持続時間</h5>
+<p>この属性は、Web サービスプロバイダが対話を完了して Web サービスクライアントに制御を戻すまでにかかると想定される時間を、秒単位で示します。たとえば、Web サービスクライアントが最大 30 秒まで対話を待機するという要求 (「WSC の対話予想持続時間」に設定) を Web サービスプロバイダが受け取ったとします。この属性が
+40 秒に設定されている場合、Web サービスプロバイダは SOAP エラー (<tt>timeNotSufficient</tt>) を返して、対話のための時間が不十分であることを示します。</p>
+
+<a name="ggogn"></a><h5>returnToURL が SSL を要件とするように強制する WSP</h5>
+<p>この属性は、Web サービスクライアントによって指定される <tt>returnToURL</tt> が HTTPS であることを Web サービスプロバイダで強制するかどうかを示します。Liberty Alliance Project の仕様では、このプロパティーの値は常に yes
+であると記述されています。false (いいえ) の値は主に、段階的な配備を容易にするために使用します。</p>
+
+<a name="ggoib"></a><h5>ホストへの戻りが要求ホストと同じになるように強制する WSP</h5>
+<p> この属性は、<tt>returnToHost</tt> および <tt>requestHost</tt> のアドレス値が同一であることを Web サービスプロバイダで強制するかどうかを示します。Liberty Alliance Project の仕様では、このプロパティーの値は常に yes であると記述されています。false (いいえ)
+の値は主に、段階的な配備を容易にするために使用します。</p>
+
+<a name="ggoha"></a><h5>HTML スタイルシートの場所</h5>
+<p>この属性は、対話ページを HTML で描画するために使用するスタイルシートの場所を指定します。</p>
+
+<a name="ggohi"></a><h5>WML スタイルシートの場所</h5>
+<p>この属性は、対話ページを WML で描画するために使用するスタイルシートの場所を指定します。</p>
+
+<a name="ggogg"></a><h5>WSP 対話 URL</h5>
+<p>この属性は、<tt>WSPRedirectHandler</tt> サーブレットが配備されている URL を指定します。このサーブレットは、ユーザーをリダイレクトするための対話のサービスプロバイダ側を処理します。</p>
+
+<a name="ggoft"></a><h5>ロードバランサの背後にある場合の WSP 対話 URL</h5>
+<p>ロードバランサによって公開される WSP リダイレクトハンドラ URL を定義します。</p>
+
+<a name="ggogq"></a><h5>ロードバランサの背後にある WSP クラスタ (サイト) の対話 URL のリスト</h5>
+<p>クラスタ内の信頼できるサーバーの WSP リダイレクトハンドラ URL を定義します。</p>
+
+<a name="ggogx"></a><h5>対話設定クラス</h5>
+<p>この属性は、対話設定を読み取るためのアクセス方式を提供するクラスを指定します。</p>
+
+<a name="ggogj"></a><h5>対話に参加する WSC のオプション</h5>
+<p>この属性は、WSC がユーザーのリダイレクトに参加するように設定されている場合に、どのレベルの対話に参加するかを示します。指定可能な値は、interactIfNeeded、doNotInteract、および doNotInteractForData です。デフォルトは、対話を可能にする interactIfNeeded です。</p>
+
+<a name="ggogs"></a><h5>userInteractionHeader を含む WSC</h5>
+<p>この属性は、Liberty 仕様に基づく対話の特定の設定を示すために Web サービスクライアントで SOAP ヘッダーを含めるかどうかを示します。デフォルト値は yes です。</p>
+
+<a name="ggofn"></a><h5>ユーザーを対話のためにリダイレクトする WSC</h5>
+<p>この属性は、WSC がユーザーのリダイレクトに参加するかどうかを定義します。デフォルト値は yes です。</p>
+
+<a name="ggoim"></a><h5>WSC の対話予想持続時間</h5>
+<p>この属性は、Web サービスプロバイダがその対話の部分を完了するまで Web サービスクライアントが待機する最長時間を、秒単位で定義します。設定されている値より長い時間がかかる可能性が高い場合、Web サービスプロバイダは対話を開始しません。たとえば、Web サービスプロバイダが要求を受け取り、そこではこのプロパティーが最大 30 秒に設定されているとします。Web サービスプロバイダのプロパティー「WSP の対話予想持続時間」が 40 秒に設定されている場合、Web
+サービスプロバイダは SOAP エラー (<tt>timeNotSufficient</tt>) を返して、対話のための時間が不十分であることを示します。</p>
+
+<a name="ggofx"></a><h5>リダイレクト URL が SSL を要件とするように強制する WSC</h5>
+<p>この属性は、Web サービスクライアントがリダイレクト URL に HTTPS を強制するかどうかを指定します。Liberty Alliance Project の仕様では、このプロパティーの値は常に yes であると記述されています。つまり、Web サービスプロバイダによって指定される
+<tt>redirectURL</tt> の値が HTTPS URL でない場合、Web サービスプロバイダはユーザーをリダイレクトしません。false (いいえ) の値は主に、段階的な配備を容易にするために使用します。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sicherheit - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>Sicherheit</h4>
+<p>Die Sicherheitsattribute definieren Verschl&#252;sselungs-, Validierungs- und Cookie-Informationen zur Festlegung der Sicherheitsebene f&#252;r
+die Serverinstanz.</p>
+
+<a name="ggkbi"></a><h5>Verschl&#92;u00fcsselung</h5>
+<p>Es gibt folgende Verschl&#252;sselungsattribute:</p>
+
+<a name="ggkcb"></a><h5>Passwort-Verschl&#252;sselungsschl&#252;ssel</h5>
+<p>Gibt den zum Ver- und Entschl&#252;sseln von Passw&#246;rtern verwendeten Schl&#252;ssel an und
+wird in der Konfiguration des Service Management-Systems gespeichert. Der  Wert wird
+w&#228;hrend der Installation festgelegt. Beispiel: <tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd </tt></p>
+
+<a name="ggkbg"></a><h5> Shared Secret f&#252;r Authentifizierungsdienst</h5>
+<p>Der gemeinsame Grundschl&#252;ssel (Shared Secret) f&#252;r das Anwendungsauthentifizierungsmodul. Der  Wert wird
+w&#228;hrend der Installation festgelegt. Beispiel: <tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl </tt></p>
+
+<a name="ggkbd"></a><h5>Verschl&#252;sselungsklasse</h5>
+<p>Standardwert: <tt>com.iplanet.services.util.JCEEncryption</tt>. Gibt die Implementierung der Verschl&#252;sselungsklasse an. Verf&#252;gbare Klassen: <tt> com.iplanet.services.util.JCEEncryption</tt> und
+<tt>com.iplanet.services.util.JSSEncryption </tt>.</p>
+
+<a name="ggkby"></a><h5>Sichere Random Factory-Klasse</h5>
+<p>Standardwert: <tt>com.iplanet.am.util.JSSSecureRandomFactoryImp </tt>l. Gibt den Namen der Factory-Klasse f&#252;r <tt>SecureRandomFactory </tt> an. Folgende Implementierungsklassen
+sind verf&#252;gbar:: <tt>com.iplanet.am.util.JSSSecureRandomFactoryImpl </tt>, die JSS verwendet, und <tt>com.iplanet.am.util.SecureRandomFactoryImpl </tt>, die reines Java verwendet.
+  </p>
+
+<a name="ggkbr"></a><h5>Validierung</h5>
+<p>Es gibt folgende Validierungsattribute:</p>
+
+<a name="ggkay"></a><h5>Plattform-Low-Level-Comm. Max. Inhaltsl&#228;nge</h5>
+<p>Standardwert: 16384 bzw. 16 k. Gibt die maximale Inhaltsl&#228;nge f&#252;r eine <tt>HttpRequest</tt>
+an, die OpenSSO akzeptiert.</p>
+
+<a name="ggkbb"></a><h5>&#220;berpr&#252;fung der Client-IP-Adresse</h5>
+<p>Der Standardwert ist "NO" (NEIN). Gibt an, ob die IP-Adresse des Client
+in allen  <tt>SSOToken</tt>-Erstellungen bzw. -Validierungen &#252;berpr&#252;ft wird oder nicht.</p>
+
+<a name="ggkba"></a><h5>Cookie</h5>
+<p>Es gibt folgende Cookie-Attribute:</p>
+
+<a name="ggkad"></a><h5>Cookie-Name</h5>
+<p>Standardwert: <tt>iPlanetDirectoryPro</tt>. Der Name, den der Authentifizierungsdienst zur Festlegung der g&#252;ltigen Sitzungs-Handler-ID
+verwendet. Der Wert dieses Cookie-Namens dient zum Abrufen der g&#252;ltigen Sitzungsinformationen.</p>
+
+<a name="ggkaw"></a><h5>Sicheres Cookie</h5>
+<p>Erm&#246;glicht die Festlegung des OpenSSO-Cookies in einem sicheren Modus, in dem der
+Browser das Cookie nur zur&#252;ckgibt, wenn ein sicheres Protokoll, wie beispielsweise <tt>HTTP(s)</tt>,
+verwendet wird. Der Standardwert lautet "false". </p>
+
+<a name="ggkbk"></a><h5>Kodierter Cookie-Wert</h5>
+<p>Mit dieser Eigenschaft kann OpenSSO den Vorgang <tt>URLencode</tt> f&#252;r den Cookie-Wert durchf&#252;hren,
+wodurch die Zeichen so umgewandelt werden, dass sie von HTTP verstanden werden
+k&#246;nnen.</p>
+
+<a name="ggkbc"></a><h5>Schl&#252;sselspeicher</h5>
+<p>Mit den folgenden Attributen k&#246;nnen Sie Schl&#252;sselspeicherinformationen f&#252;r zus&#228;tzliche Sites und Servers
+konfigurieren, die Sie erstellen:</p>
+
+<a name="ggkbj"></a><h5>Schl&#252;sselspeicher-Datei</h5>
+<p>Der  Wert wird w&#228;hrend der Installation festgelegt. Beispiel: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/keystore.jks</tt>. Gibt den
+Namen zur Passwortdatei f&#252;r den SAML XML-Schl&#252;sselspeicher an.</p>
+
+<a name="ggkbu"></a><h5>Schl&#252;sselspeicher-Passwortdatei</h5>
+<p>Der  Wert wird w&#228;hrend der Installation festgelegt. Beispiel: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.storepass</tt>. Gibt den
+Namen zur storepass-Datei f&#252;r den SAML XML-Schl&#252;ssel an.</p>
+
+<a name="ggkbs"></a><h5>Passwortdatei f&#252;r privaten Schl&#252;ssel</h5>
+<p>Der  Wert wird w&#228;hrend der Installation festgelegt. Beispiel: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.keypass</tt> Gibt den
+Pfad zur Passwortdatei f&#252;r den SAML XML-Schl&#252;ssel an.</p>
+
+<a name="ggkaq"></a><h5>Zertifikat-Alias</h5>
+<p>Der Standardwert ist "test" (Test).</p>
+
+<a name="ggkbw"></a><h5>Caching der Liste zur&#252;ckgezogener Zertifikate </h5>
+<p>Diese Attribute definieren das lokale Caching-Repository der Liste zur&#252;ckgezogener Zertifikate (Certificate Revocation
+List, CRL), das zur Aufbewahrung der CRL von Zertifikatsautorit&#228;ten dient. Jeder Dienst,
+der eine CRL f&#252;r die Zertifikatvalidierung ben&#246;tigt, erh&#228;lt die CRL auf der
+Grundlage dieser Informationen. </p>
+
+<a name="ggkch"></a><h5>LDAP-Server-Hostname</h5>
+<p>Gibt den Namen des LDAP-Servers an, auf dem die Zertifikate gespeichert sind.
+Der Standardwert ist der bei der Installation von OpenSSO angegebene Hostname. Es
+kann der Hostname jedes LDAP-Servers verwendet werden, auf dem die Zertifikate gespeichert
+werden. </p>
+
+<a name="ggkau"></a><h5>LDAP-Server-Anschlussnummer</h5>
+<p>Gibt die Anschlussnummer des LDAP-Servers an, auf dem die Zertifikate gespeichert sind.
+Der Standardwert ist der bei der Installation von OpenSSO angegebene Anschluss. Es
+kann die Anschlussnummer jedes LDAP-Servers verwendet werden, auf dem die Zertifikate gespeichert
+werden. </p>
+
+<a name="ggkam"></a><h5>SSL aktiviert</h5>
+<p>Legt fest, ob SSL f&#252;r den Zugriff auf den LDAP-Server eingesetzt werden
+soll. In der Standardeinstellung greift der Dienst f&#252;r die Zertifikatauthentifizierung ohne SSL
+auf den LDAP-Server zu.</p>
+
+<a name="ggkbv"></a><h5>Bind-Benutzer-Name f&#252;r LDAP-Server</h5>
+<p>Dieses Attribut gibt den BIND-DN des LDAP-Servers an. </p>
+
+<a name="ggkaj"></a><h5>Bind-Passwort f&#252;r LDAP-Server</h5>
+<p>Dieses Attribut legt das Passwort fest, dass f&#252;r die Verbindung zum LDAP-Server
+verwendet wird. Standardm&#228;&#223;ig wird das Passwort amldapuser, das w&#228;hrend der Installation eingegeben
+wurde, als BIND-Passwort verwendet.</p>
+
+<a name="ggkce"></a><h5>Basis-DN der LDAP-Suche</h5>
+<p>Dieses Attribut legt den vom LDAP-Benutzer-Betreff verwendeten Basis-DN des LDAP-Servers fest, bei
+dem die Suche beginnt. Standardm&#228;&#223;ig ist dies der oberste Bereich der OpenSSO-Installationsbasis.</p>
+
+<a name="ggkbp"></a><h5>Such-Attribute</h5>
+<p>Jede beliebige DN-Komponente des <tt>subjectDN</tt> des Ausstellers kann zum Abrufen einer CRL
+von einem lokalen LDAP-Server verwendet werden. Es handelt sich um einen String
+mit einem einzigen Wert wie z. B. "cn".  Alle Root CAs
+m&#252;ssen dasselbe Suchattribut verwenden.</p>
+
+<a name="ggkaa"></a><h5>&#220;berpr&#252;fung des Online Certificate Status Protocol</h5>
+<p>Das Online Certificate Status Protocol (OCSP) erm&#246;glicht OpenSSO-Diensten, den (Widerruf-)Status eines bestimmten
+Zertifikats zu bestimmen. OCSP kann verwendet werden, um einige der Betriebsvoraussetzungen zu
+erf&#252;llen, die darin bestehen, zeitn&#228;here Widerrufinformationen bereitzustellen, als mit CRLs m&#246;glich ist.
+Au&#223;erdem k&#246;nnen sie zum Abrufen weiterer Statusinformationen verwendet werden. Ein OCSP-Client gibt
+eine Statusanforderung an einen OCSP-Empf&#228;nger aus und wartet mit dem Akzeptieren des
+fraglichen Zertifikats, bis der Empf&#228;nger eine Antwort bereitstellt. </p>
+
+<a name="ggkal"></a><h5>Pr&#252;fung aktiviert</h5>
+<p>Mit diesem Attribut wird die OCSP-Pr&#252;fung aktiviert. Standardm&#228;&#223;ig aktiviert.</p>
+
+<a name="ggkav"></a><h5>Empf&#228;nger-URL</h5>
+<p>Dieses Attribut definiert eine URL, die den Standort des OCSP-Empf&#228;ngers angibt. Beispiel:
+<tt>http://ocsp.example.net:80</tt>.</p><p>Standardm&#228;&#223;ig wird der Standort des OCSP-Empf&#228;ngers implizit aus dem zu validierenden Zertifikat
+ermittelt. Die Eigenschaft wird verwendet, wenn die Erweiterung f&#252;r den Zugriff auf
+Autorit&#228;tsinformationen (in RFC 3280 definiert) im Zertifikat fehlt oder &#252;berschrieben werden muss.
+</p>
+
+<a name="ggkai"></a><h5>Zertifikatspseudonym</h5>
+<p>Das Pseudonym f&#252;r den OCSP-Empf&#228;nger ist das Pseudonym des CA-Zertifikats f&#252;r den
+betreffenden Empf&#228;nger, beispielsweise <tt>Certificate Manager - sun</tt>.  Wenn dieses Attribut festgelegt ist, muss das
+CA-Zertifikat in der Zertifikatsdatenbank des Webservers vorgelegt werden. Wenn die OCSP-URL festgelegt
+ist, muss auch das Pseudonym des OCSP-Empf&#228;ngers festgelegt sein. Anderenfalls werden beide
+ignoriert. Wenn sie nicht festgelegt sind, wird die im Zertifikat des Benutzers
+angegebene OCSP-Empf&#228;nger-URL f&#252;r die OCSP-Validierung verwendet. Falls die OCSP-Empf&#228;nger-URL nicht im Zertifikat
+des Benutzers angegeben ist, wird keine OCSP-Validierung durchgef&#252;hrt. </p>
+
+<a name="ggkag"></a><h5>Federal Information Processing Standards</h5>
+<p>Laut Information Technology Management Reform Act (Public Law 104-106) genehmigt das US-amerikanische
+Handelsministerium Standards und Richtlinien, die vom National Institute of Standards and Technology
+(NIST) entwickelt wurden, f&#252;r auf Bundesebene eingesetzte Computersysteme. Diese Standards und Richtlinien
+wurden vom NIST als Federal Information Processing Standards (FIPS) zur regierungsweiten Verwendung
+herausgegeben. NIST entwickelt FIPS, wenn es zwingende Anforderungen seitens der Bundesregierung gibt,
+wie beispielsweise in Bezug auf Sicherheit und Interoperabilit&#228;t, und keine brauchbaren Branchenstandards
+oder -l&#246;sungen vorliegen. </p>
+
+<a name="ggkap"></a><h5>FIPS-Modus</h5>
+<p>Diese Eigenschaft kann "true" (wahr) oder "false" (falsch) sein. Alle Kryptographievorg&#228;nge werden
+nur dann im FIPS-konformen Modus ausgef&#252;hrt, wenn die Eigenschaft "true" ("wahr") ist.
+</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Active Directory 属性 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepoeditad"></a><h4>Active Directory 属性</h4>
+<p><a name="indexterm-13"></a>配置 Microsoft Active Directory 以使其与 OpenSSO 协同工作时，必须将预定义的属性映射到在 Active Directory 实例中定义的属性；这称作属性映射。以下是需要在将 Active Directory
+作为数据存储库添加到领域时定义的属性。</p>
+
+<a name="fyfdo"></a><h5>LDAP 服务器</h5>
+<p>输入要连接的 LDAP 服务器的名称。格式应为 <tt>hostname.domainname:portnumber</tt>。</p><p>如果输入多个 <tt>host:portnumber</tt> 条目，则会尝试连接到列表中的第一个主机。仅当尝试连接当前主机失败时，才会尝试列表中的下一个条目。</p>
+
+<a name="fyfdt"></a><h5>LDAP 绑定 DN</h5>
+<p>指定 OpenSSO 将用来验证到您当前连接的 LDAP 服务器的 DN 名称。拥有用于绑定的 DN 名称的用户应具有在<a href="#fyffb">LDAPv3 插件支持的类型和操作</a>属性中配置的正确添加/修改/删除权限。</p>
+
+<a name="fyfds"></a><h5>LDAP 绑定密码</h5>
+<p>指定 OpenSSO 将用来验证到您当前连接的 LDAP 服务器的 DN 密码。</p>
+
+<a name="fyfdu"></a><h5>LDAP 绑定密码（确认）</h5>
+<p>确认密码。</p>
+
+<a name="fyfdv"></a><h5>LDAP 组织 DN</h5>
+<p>该数据存储库将映射到的 DN。它将成为在此数据存储库内执行的所有操作的基 DN。</p>
+
+<a name="fyfdw"></a><h5>LDAP SSL</h5>
+<p>启用后，OpenSSO 将使用 HTTPS 协议连接到主服务器。</p>
+
+<a name="fyfej"></a><h5>LDAP 连接池的最小尺寸</h5>
+<p>指定连接池中连接的初始数量。使用连接池可避免每次都必须创建新的连接。</p>
+
+<a name="fyfee"></a><h5>LDAP 连接池的最大尺寸</h5>
+<p>指定允许的最大连接数。</p>
+
+<a name="fyfdx"></a><h5>搜索返回的结果的最大数目</h5>
+<p>指定搜索操作所返回的最大条目数。如果满足该限制，Directory Server 将返回与搜索请求相匹配的任何条目。</p>
+
+<a name="fyfen"></a><h5>搜索超时</h5>
+<p>指定分配给搜索请求的最长时间（以秒计）。如果满足该限制，Directory Server 将返回与搜索请求相匹配的任何搜索条目。</p>
+
+<a name="fyfdz"></a><h5>LDAP 遵循引用</h5>
+<p>如果启用，该选项将指定自动遵循其他 LDAP 服务器的引用。</p>
+
+<a name="fyffh"></a><h5>LDAPv3 系统信息库插件类名称</h5>
+<p>指定实现 LDAPv3 系统信息库的类文件的位置。</p>
+
+<a name="fyfeu"></a><h5>属性名称映射</h5>
+<p>将框架已知的公共属性映射到本地数据存储库。例如，如果框架使用 <tt>inetUserStatus </tt>确定用户状态，则本机数据存储库实际可能会使用 <tt>userStatus</tt>。属性定义区分大小写。默认值为：</p>
+<ul><li><p><tt>employeeNumber=distinguishedName</tt></p></li>
+<li><p><tt>iplanet-am-user-alias-list=objectGUID</tt></p></li>
+<li><p><tt>mail=userPrincipalName</tt></p></li>
+<li><p><tt>portalAddress=sAMAccountName</tt></p></li>
+<li><p><tt>telephonenumber=displayName</tt></p></li>
+<li><p><tt>uid=sAMAccountName</tt></p></li></ul>
+
+
+<a name="fyffb"></a><h5>LDAPv3 插件支持的类型和操作</h5>
+<p>指定允许对或可以在该 LDAP 服务器上执行的操作。默认操作仅为此 LDAPv3 系统信息库插件所支持的操作。LDAPv3 系统信息库插件支持以下操作：</p>
+<ul><li><p>代理 -- 读取、创建、编辑、删除</p></li>
+<li><p>组 -- 读取、创建、编辑、删除</p></li>
+<li><p>领域 -- 读取、创建、编辑、删除、服务</p></li>
+<li><p>用户 -- 读取、创建、编辑、删除、服务</p></li></ul>
+<p>可根据 LDAP 服务器设置和任务从上述列表删除权限，但不能添加其他权限。</p><p>如果已配置的 LDAPv3 系统信息库插件指向 Sun Directory Server 的实例，则可添加<tt>角色</tt>类型的权限。否则，由于其他数据存储库可能不支持角色，从而无法添加该权限。“角色”类型的权限为：</p>
+<ul><li><p>角色 &#8212; 读取、创建、编辑、删除</p></li></ul>
+<p>如果<tt>用户</tt>类型是 LDAPv3 系统信息库所支持的类型，则可对该用户执行读取、创建、编辑和删除服务操作。换句话说，如果支持<tt>用户</tt>类型，则通过读取、编辑、创建和删除操作便可分别从身份库中读取、编辑、创建和删除用户条目。<tt>user=service</tt> 操作会使 OpenSSO 服务访问用户条目中的属性。此外，如果将动态服务指定给用户所属的领域或角色，则用户可以访问动态服务属性。</p><p>用户也可以管理任意指定服务的用户属性。如果用户将<tt> service </tt>作为操作 (<tt>user=service</tt>)，则指定了对所有与服务相关的操作提供支持。这些操作是：<tt>assignService、</tt><tt>unassignService、</tt><tt>getAssignedServices、</tt><tt>getServiceAttributes、removeServiceAttributes</tt> 和 <tt>modifyService。</tt></p>
+
+<a name="gdlmc"></a><h5>LDAPv3 插件搜索范围</h5>
+<p>定义用于查找 LDAPv3 插件条目的范围。该范围必须为以下值之一：</p>
+<ul><li><p>SCOPE_BASE &#8211; 只搜索基 DN。</p></li>
+<li><p>SCOPE_ONE &#8211; 只搜索基 DN 下的条目。</p></li>
+<li><p>SCOPE_SUB（默认值）&#8211; 搜索基 DN 及其子树内的所有条目。</p></li></ul>
+
+
+<a name="fyffj"></a><h5>LDAP 用户搜索属性</h5>
+<p>该字段定义用于用户搜索的属性类型。例如，如果用户的 DN 是 <tt>uid=user1, ou=people, dc=example, dc=com</tt>，则需要在该字段指定 <tt>uid</tt>。</p>
+
+<a name="fyfeo"></a><h5>LDAP 用户搜索过滤器</h5>
+<p>指定用于查找用户条目的搜索过滤器。</p>
+
+<a name="fyffi"></a><h5>LDAP 用户对象类</h5>
+<p>指定用户的对象类。创建用户之后，其用户对象类列表将被添加到该用户的属性列表中。</p>
+
+<a name="fyfez"></a><h5>LDAP 用户属性</h5>
+<p>定义与用户相关的属性列表。禁止对不在列表之内的用户属性进行任何读写尝试。属性区分大小写。在这里定义对象类和属性模式之前，必须先在 Directory Server 中定义对象类和属性模式。</p>
+
+<a name="gdlms"></a><h5>创建用户属性映射</h5>
+<p>指定创建用户时需要哪些属性。此属性使用下列语法：</p><p><tt>DestinationAttributeName=SourceAttributeName</tt></p><p>如果缺少源属性名，则默认为用户 ID (<tt>uid</tt>)。例如：</p>cn sn=givenName<p>创建用户配置文件时，<tt>cn</tt> 和 <tt>sn</tt> 都是必需的。<tt>cn</tt> 获取名为 <tt>uid</tt> 的属性的值，<tt>sn</tt> 则获取名为 <tt>givenName</tt> 的属性的值。</p>
+
+<a name="gdlmi"></a><h5>用户状态的属性名</h5>
+<p>指定指示用户处于活动状态还是非活动状态的属性名。</p>
+
+<a name="gdopm"></a><h5>用户状态活动值</h5>
+<p>该属性值在创建用户时指定给用户。活动用户的 Active Directory 值为 544。非活动用户的 Active Directory 值为 546。</p>
+
+<a name="gdoqh"></a><h5>用户状态不活动值</h5>
+<p>Active Directory 不使用该字段。</p>
+
+<a name="fyfeb"></a><h5>LDAP 组搜索属性</h5>
+<p>该字段用于定义搜索组时使用的属性类型。默认值为 <tt>cn</tt>。</p>
+
+<a name="fyfep"></a><h5>LDAP 组搜索过滤器</h5>
+<p>指定用于查找组条目的搜索过滤器。默认值为 <tt>(objectclass=groupOfUniqueNames)</tt>。</p>
+
+<a name="fyfed"></a><h5>LDAP 组容器命名属性</h5>
+<p>如果组驻留在容器中，则指定组容器的命名属性。否则，该属性保留为空。例如，如果 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的组 DN 位于 <tt>ou=groups</tt> 中，则组容器命名属性为 <tt>ou</tt>。</p>
+
+<a name="fyfec"></a><h5>LDAP 组容器值</h5>
+<p>指定组容器的值。例如，如果 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的组 DN 位于容器名 <tt>ou=groups</tt> 中，则组容器值应为 <tt>groups</tt>。</p>
+
+<a name="fyffc"></a><h5>LDAP 组对象类</h5>
+<p>指定组的对象类。创建组之后，在组属性列表中添加此组对象类列表。</p>
+
+<a name="fyfff"></a><h5>LDAP 组属性</h5>
+<p>定义与组相关的属性列表。禁止对不在列表之内的组属性进行任何读写尝试。属性区分大小写。在这里定义对象类和属性模式之前，必须先在 Directory Server 中定义对象类和属性模式。</p>
+
+<a name="fyfea"></a><h5>组成员资格的属性名称</h5>
+<p>指定属性名称，该属性的值为包含 DN 的所有组的名称。默认值为 <tt>memberOf</tt>。</p>
+
+<a name="fyfes"></a><h5>唯一成员的属性名称</h5>
+<p>指定属性名称，该属性的值为该组所包含的某个 DN。默认值为 <tt>uniqueMember</tt>。</p>
+
+<a name="fyfev"></a><h5>组成员 URL 的属性名称</h5>
+<p>指定属性名称，该属性的值为解析为该组所包含成员的某 LDAP URL。默认值为 <tt>memberUrl</tt>。</p>
+
+<a name="fyfem"></a><h5>LDAP 人员容器命名属性</h5>
+<p>如果用户驻留在人员容器中，则指定该人员容器的命名属性。如果用户没有驻留在人员容器中，则将该字段保留为空。</p>
+
+<a name="fyffe"></a><h5>LDAP 人员容器值</h5>
+<p>指定人员容器的值。默认值为 <tt>people</tt>。</p>
+
+<a name="gdlns"></a><h5>可验证的身份类型</h5>
+<p>当领域的验证模块模式设置为“数据存储库”时，指定该数据存储库可验证用户和/或代理身份类型。 </p>
+
+<a name="ggtnu"></a><h5>验证命名属性</h5>
+<p>当前未使用该值。</p>
+
+<a name="fyfef"></a><h5>持久搜索基 DN</h5>
+<p>定义用于持久搜索的基 DN。某些 LDAPv3 服务器仅在根后缀级别上支持持久搜索。</p>
+
+<a name="gdlmx"></a><h5>持久搜索过滤器</h5>
+<p>定义可返回目录服务器条目的特定更改的过滤器。数据存储库只接收与所定义过滤器相匹配的更改。</p>
+
+<a name="ggudj"></a><h5>持久搜索范围</h5>
+<p>定义持久搜索中使用的范围。该范围必须为以下值之一：</p>
+<ul><li><p>SCOPE_BASE &#8211; 只搜索基 DN。</p></li>
+<li><p>SCOPE_ONE &#8211; 只搜索基 DN 下的条目。</p></li>
+<li><p>SCOPE_SUB（默认值）&#8211; 搜索基 DN 及其子树内的所有条目。</p></li></ul>
+
+
+<a name="fyffz"></a><h5>重新启动前的持久搜索最长空闲时间</h5>
+<p>定义重新启动持久搜索前的最长空闲时间。该值必须大于 1。如果小于或等于 1，重新启动搜索时将不会考虑连接的空闲时间。</p><p>如果 OpenSSO 与负载平衡器一起部署，则某些负载平衡器会在空闲指定的时间后超时。在这种情况下， 您为重新启动持久搜索前的最长空闲时间设置的值应该小于为负载平衡器指定的空闲时间。</p>
+
+<a name="fyfgh"></a><h5>出现错误代码后的最大重试次数</h5>
+<p>定义持久搜索操作遇到在需要重试的 LDAP 异常错误代码中指定的错误代码时，可以重试的最大次数。</p>
+
+<a name="fyfge"></a><h5>重试之间的延时</h5>
+<p>指定每次重试之前的等待时间。仅适用于持久搜索连接。</p>
+
+<a name="fyffr"></a><h5>需要重试的 LDAP 异常错误代码</h5>
+<p>指定可以重试持久搜索操作的错误代码。该属性仅适用于持久搜索，而非所有 LDAP 操作。</p>
+
+<a name="gdlnn"></a><h5>高速缓存</h5>
+<p>如果启用，OpenSSO 便可对数据存储库中检索到的数据进行高速缓存。</p>
+
+<a name="gdlnm"></a><h5>高速缓存项的最大生存期</h5>
+<p>指定在高速缓存上删除数据之前，数据的最长存储时间。按秒来定义该值。</p>
+
+<a name="gdlnd"></a><h5>高速缓存的最大大小</h5>
+<p>指定高速缓存的最大大小。值越大，可存储的数据越多，但是这也需要更多的内存。按字节来定义该值。</p>
+<br/>
+
+</body>
+</html>

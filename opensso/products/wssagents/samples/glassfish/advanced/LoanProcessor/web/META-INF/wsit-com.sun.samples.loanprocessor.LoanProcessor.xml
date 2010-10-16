@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+ <definitions 
+ xmlns="http://schemas.xmlsoap.org/wsdl/" 
+ xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="LoanProcessorService" targetNamespace="http://loanprocessor.samples.sun.com/" xmlns:tns="http://loanprocessor.samples.sun.com/" 
+ >
+    <message name="processApplication"/>
+    <message name="processApplicationResponse"/>
+    <portType name="LoanProcessor">
+        <operation name="processApplication">
+            <input message="tns:processApplication"/>
+            <output message="tns:processApplicationResponse"/>
+        </operation>
+    </portType>
+    <binding name="LoanProcessorPortBinding" type="tns:LoanProcessor">
+        <operation name="processApplication">
+            <input/>
+            <output/>
+        </operation>
+    </binding>
+    <service name="LoanProcessorService">
+        <port name="LoanProcessorPort" binding="tns:LoanProcessorPortBinding"/>
+        <soap:address location="http://localhost:8080/LoanProcessorService/LoanProcessor"/>
+    </service>
+</definitions>

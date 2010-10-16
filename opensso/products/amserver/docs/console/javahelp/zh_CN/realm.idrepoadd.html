@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=gb2312">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAPv3 系统信息库插件属性
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="realm.idrepoadd"></A><h3>LDAPv3 系统信息库插件属性</h3>
+<p><A NAME="indexterm-13"></A>用于配置 LDAPv3 系统信息库插件的属性如下：</p>
+<ul><li><p><A HREF="realm.idrepoadd.html#fyfdo">主 LDAP 服务器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdt">LDAP 绑定 DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfds">LDAP 绑定密码</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdu">LDAP 绑定密码（确认）</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdv">组织</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdw">启用 LDAP SSL</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfej">LDAP 连接池的最小尺寸</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfee">LDAP 连接池的最大尺寸</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdx">搜索返回的结果的最大数目</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfen">搜索超时</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdz">遵循候选项</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffh">LDAPv3 系统信息库插件类名称</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeu">属性名称映射</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffb">LDAPv3 插件支持的类型和操作</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffj">LDAP 用户搜索属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeo">LDAP 用户搜索过滤器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffi">用户对象类</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfez">LDAP 用户属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeb">LDAP 组搜索属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfep">LDAP 组搜索过滤器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfed">组容器命名属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfec">组容器值</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffc">LDAP 组对象类</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfff">LDAP 组属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfea">组成员资格的属性名称</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfes">组成员的属性名称</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfev">组成员 URL 的属性名称</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfem">人员容器命名属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffe">人员容器值</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffk">LDAP 代理搜索属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffl">代理容器命名属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffa">代理容器值</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffd">LDAP 代理搜索过滤器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfey">LDAP 代理对象类</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfew">LDAP 代理属性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfef">持久搜索基本 DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffz">重新启动前的持久搜索最长空闲时间</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfgh">出现错误代码后的最大重试次数</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfge">重试之间的延时</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffr">需要重试的异常错误代码</A></p>
+</li>
+</ul>
+<A NAME="fyfdo"></A><h4>主 LDAP 服务器</h4>
+<p>输入要连接的 LDAP 服务器的名称。格式应为 <tt>hostname.domainname:portnumber</tt>。</p>
+<p>如果输入多个 <tt>host:portnumber</tt> 条目，则会尝试连接到列表中的第一个主机。仅当尝试连接当前主机失败时，才会尝试列表中的下一个条目。</p>
+<A NAME="fyfdt"></A><h4>LDAP 绑定 DN</h4>
+<p>指定 Access Manager 将用来通过您当前连接的 LDAP 服务器验证的 DN 名称。拥有用于绑定的 DN 名称的用户应具有在<A HREF="realm.idrepoadd.html#fyffb">LDAPv3 插件支持的类型和操作</A>属性中配置的正确添加/修改/删除权限。</p>
+<A NAME="fyfds"></A><h4>LDAP 绑定密码</h4>
+<p>指定 Access Manager 将用来通过您当前连接的 LDAP 服务器验证的 DN 密码。</p>
+<A NAME="fyfdu"></A><h4>LDAP 绑定密码（确认）</h4>
+<p>确认密码。</p>
+<A NAME="fyfdv"></A><h4>组织</h4>
+<p>该数据存储库将映射到的 DN。它将成为在此数据存储库内执行的所有操作的基本 DN。</p>
+<A NAME="fyfdw"></A><h4>启用 LDAP SSL</h4>
+<p>启用后，Access Manager 将使用 HTTPS 协议连接到主服务器。</p>
+<A NAME="fyfej"></A><h4>LDAP 连接池的最小尺寸</h4>
+<p>指定连接池中连接的初始数量。使用连接池可避免每次都必须创建新的连接。</p>
+<A NAME="fyfee"></A><h4>LDAP 连接池的最大尺寸</h4>
+<p>指定允许的最大连接数。</p>
+<A NAME="fyfdx"></A><h4>搜索返回的结果的最大数目</h4>
+<p>指定搜索操作所返回的最大条目数。如果满足该限制，Directory Server 将返回与搜索请求相匹配的任何条目。</p>
+<A NAME="fyfen"></A><h4>搜索超时</h4>
+<p>指定分配给搜索请求的最长时间（以秒计）。如果满足该限制，Directory Server 将返回与搜索请求相匹配的任何搜索条目。</p>
+<A NAME="fyfdz"></A><h4>遵循候选项</h4>
+<p>如果启用该选项，将指定自动遵循其他 LDAP 服务器的候选项。</p>
+<A NAME="fyffh"></A><h4>LDAPv3 系统信息库插件类名称</h4>
+<p>指定实现 LDAPv3 系统信息库的类文件的位置。</p>
+<A NAME="fyfeu"></A><h4>属性名称映射</h4>
+<p>将框架已知的公共属性映射到本地数据存储库。例如，如果框架使用 <tt>inetUserStatus </tt>确定用户状态，则本机数据存储库实际可能会使用 <tt>userStatus</tt>。属性定义区分大小写。</p>
+<A NAME="fyffb"></A><h4>LDAPv3 插件支持的类型和操作</h4>
+<p>指定允许对或可以在该 LDAP 服务器上执行的操作。默认操作仅为此 LDAPv3 系统信息库插件所支持的操作。LDAPv3 系统信息库插件支持以下操作：</p>
+<ul><li><p>组 -- 读取、创建、编辑、删除</p>
+</li>
+<li><p>领域 -- 读取、创建、编辑、删除、服务</p>
+</li>
+<li><p>用户 -- 读取、创建、编辑、删除、服务</p>
+</li>
+<li><p>代理 -- 读取、创建、编辑、删除</p>
+</li>
+</ul>
+<p>可以根据</p>
+<p>您的 LDAP 服务器设置和任务移除以上权限，但不能添加其他权限。</p>
+<A NAME="fyffj"></A><h4>LDAP 用户搜索属性</h4>
+<p>该字段用于定义搜索用户时使用的属性类型。例如，如果用户的 DN 是 <tt>uid=user1,ou=people,dc=iplanet,dc=com </tt>，则命名属性为 <tt>uid</tt>。</p>
+<A NAME="fyfeo"></A><h4>LDAP 用户搜索过滤器</h4>
+<p>指定用于查找用户条目的搜索过滤器。</p>
+<A NAME="fyffi"></A><h4>用户对象类</h4>
+<p>指定用户的对象类。创建用户之后，其用户对象类列表将被添加到该用户的属性列表中。</p>
+<A NAME="fyfez"></A><h4>LDAP 用户属性</h4>
+<p>定义与用户相关的属性列表。禁止对不在列表之内的用户属性进行任何读写尝试。属性区分大小写。在这里定义对象类和属性模式之前，必须先在 Directory Server 中定义对象类和属性模式。</p>
+<A NAME="fyfeb"></A><h4>LDAP 组搜索属性</h4>
+<p>该字段用于定义搜索组时使用的属性类型。默认值为 <tt>cn</tt>。</p>
+<A NAME="fyfep"></A><h4>LDAP 组搜索过滤器</h4>
+<p>指定用于查找组条目的搜索过滤器。默认值为 <tt>(objectclass=groupOfUniqueNames)</tt>。</p>
+<A NAME="fyfed"></A><h4>组容器命名属性</h4>
+<p>如果组驻留在容器中，则指定组容器的命名属性。否则，该属性保留为空。例如，如果 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的组 DN 位于 <tt>ou=groups</tt> 中，则组容器命名属性为 <tt>ou</tt>。</p>
+<A NAME="fyfec"></A><h4>组容器值</h4>
+<p>指定组容器的值。例如，如果 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的组 DN 位于容器名 <tt>ou=groups</tt> 中，则组容器值应为 <tt>groups</tt>。</p>
+<A NAME="fyffc"></A><h4>LDAP 组对象类</h4>
+<p>指定组的对象类。创建组之后，在组属性列表中添加此组对象类列表。</p>
+<A NAME="fyfff"></A><h4>LDAP 组属性</h4>
+<p>定义与组相关的属性列表。禁止对不在列表之内的组属性进行任何读写尝试。属性区分大小写。在这里定义对象类和属性模式之前，必须先在 Directory Server 中定义对象类和属性模式。</p>
+<A NAME="fyfea"></A><h4>组成员资格的属性名称</h4>
+<p>指定属性名称，该属性的值为包含 DN 的所有组的名称。默认值为 <tt>memberOf</tt>。</p>
+<A NAME="fyfes"></A><h4>组成员的属性名称</h4>
+<p>指定属性名称，该属性的值为该组所包含的某个 DN。默认值为 <tt>uniqueMember</tt>。</p>
+<A NAME="fyfev"></A><h4>组成员 URL 的属性名称</h4>
+<p>指定属性名称，该属性的值为解析为该组所包含成员的某 LDAP URL。默认值为 <tt>memberUrl</tt>。</p>
+<A NAME="fyfem"></A><h4>人员容器命名属性</h4>
+<p>如果用户驻留在人员容器中，则指定该人员容器的命名属性。如果用户没有驻留在人员容器中，则将该字段保留为空。</p>
+<A NAME="fyffe"></A><h4>人员容器值</h4>
+<p>指定人员容器的值。默认值为 <tt>people</tt>。</p>
+<A NAME="fyffk"></A><h4>LDAP 代理搜索属性</h4>
+<p>该字段用于定义搜索代理时使用的属性类型。默认值为 <tt>uid</tt>。</p>
+<A NAME="fyffl"></A><h4>代理容器命名属性</h4>
+<p>如果代理驻留在代理容器中，则指定该代理容器的命名属性。如果代理没有驻留在代理容器中，则将该字段保留为空。</p>
+<A NAME="fyffa"></A><h4>代理容器值</h4>
+<p>指定代理容器的值。默认值为 <tt>agents</tt>。</p>
+<A NAME="fyffd"></A><h4>LDAP 代理搜索过滤器</h4>
+<p>定义用于搜索代理的过滤器。LDAP 代理搜索属性将被置于此字段之前，以构成实际的代理搜索过滤器。</p>
+<p>例如，如果“LDAP 代理搜索属性”为 <tt>uid</tt> 且“LDAP 用户搜索过滤器”为 <tt>(objectClass=sunIdentityServerDevice)</tt>，则实际的用户搜索过滤器将是：<tt>(&amp;(uid=*)(objectClass=sunIdentityServ erDevice))</tt></p>
+<A NAME="fyfey"></A><h4>LDAP 代理对象类</h4>
+<p>定义代理的对象类。创建代理之后，将在代理属性列表中添加此代理对象类列表。</p>
+<A NAME="fyfew"></A><h4>LDAP 代理属性</h4>
+<p>定义与代理相关的属性列表。禁止对不在列表之内的代理属性进行任何读写尝试。属性区分大小写。在这里定义对象类和属性模式之前，必须先在 Directory Server 中定义对象类和属性模式。</p>
+<A NAME="fyfef"></A><h4>持久搜索基本 DN</h4>
+<p>定义用于持久搜索的基本 DN。某些 LDAPv3 服务器仅在根后缀级别上支持持久搜索。</p>
+<A NAME="fyffz"></A><h4>重新启动前的持久搜索最长空闲时间</h4>
+<p>定义重新启动持久搜索前的最长空闲时间。该值必须大于 1。如果小于或等于 1，重新启动搜索时将不会考虑连接的空闲时间。</p>
+<p>如果部署 Access Manager 时包括负载平衡器，则某些负载平衡器会在空闲指定的时间后超时。在这种情况下， 您为重新启动持久搜索前的最长空闲时间设置的值应该小于为负载平衡器指定的空闲时间。</p>
+<A NAME="fyfgh"></A><h4>出现错误代码后的最大重试次数</h4>
+<p>定义持久搜索操作遇到在需要重试的 LDAP 异常错误代码中指定的错误代码时，可以重试的最大次数。</p>
+<A NAME="fyfge"></A><h4>重试之间的延时</h4>
+<p>指定每次重试之前的等待时间。仅适用于持久搜索连接。</p>
+<A NAME="fyffr"></A><h4>需要重试的异常错误代码</h4>
+<p>指定可以重试持久搜索操作的错误代码。该属性仅适用于持久搜索，而非所有 LDAP 操作。</p>
+
+<br />
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Betreffe - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>Betreffe</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a>Ein <b>Betreff</b> definiert den Benutzer bzw. die Benutzer (z. B. eine Gruppe
+bzw. die Benutzer mit einer bestimmten Rolle), auf die sich die Richtlinie
+auswirkt. Allgemein gilt f&#252;r Betreffe, dass eine Richtlinie nur dann zutrifft, wenn
+der Benutzer Mitglied von mindestens einem Betreff der Richtlinie ist. Die Standardbetreffe
+sind:</p><dl><dt>OpenSSO-Identit&#228;ts-Betreff</dt>
+<dd><p>Dieser Betreff impliziert, dass die Identit&#228;ten, die Sie auf der Registerkarte "Bereichsbetreff" erstellen und verwalten, als Mitglied des Betreffs hinzugef&#252;gt werden k&#246;nnen.</p></dd>
+<dt>Authentifizierte Benutzer</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass jeder Benutzer mit einem g&#252;ltigen SSOToken ein Mitglied dieses Betreffs ist.</p><p>Alle authentifizierten Benutzer sind Mitglieder dieses Betreffs, selbst wenn sich der Bereich, bei dem die Authentifizierung erfolgt ist, von der Organisation unterscheidet, in der die Richtlinie definiert ist. Dies ist n&#252;tzlich, wenn der Ressourcen-Eigent&#252;mer den Zugriff auch auf Ressourcen freigeben m&#246;chte, die f&#252;r Benutzer anderer Organisationen verwaltet werden. Wenn Sie den Zugriff auf Ressourcen nur f&#252;r die Mitglieder einer bestimmten Organisation einschr&#228;nken m&#246;chten, m&#252;ssen Sie den Betreff "Organisation" ausw&#228;hlen.</p></dd>
+<dt>Webdienste-Clients</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass ein vom SSOToken identifizierter Web Service Client (WSC) ein Mitglied dieses Betreffs ist, wenn der DN eines im SSOToken enthaltenen Principal einem ausgew&#228;hlten Wert dieses Betreffs entspricht. G&#252;ltige Werte sind die DNs vertrauensw&#252;rdiger Zertifikate im lokalen JKS-Schl&#252;sselspeicher, die den Zertifikaten vertrauensw&#252;rdiger WSCs entsprechen. Dieser Betreff h&#228;ngt vom Liberty Web Services Framework ab und sollte nur von Liberty-Dienstanbietern zur Autorisierung von WSCs verwendet werden.</p><p>Bevor Sie diesen Betreff in einer Richtlinie verwenden, m&#252;ssen Sie den Schl&#252;sselspeicher erstellen. Informationen zur Einrichtung des Schl&#252;sselspeichers finden Sie unter:</p><p><tt></tt><i>OpenSSO-base</i><tt></tt> <tt> /SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>Die folgenden zus&#228;tzlichen Betreffe sind durch Auswahl im Dienst <a href="service.scpolicy.html">Richtlinienkonfiguration</a> des Bereichs
+verf&#252;gbar:</p><dl><dt>OpenSSO-Rollen</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass jedes Mitglied einer OpenSSO-Gruppe Mitglied dieses Betreffs ist. Zur Erstellung von OpenSSO-Rollen wird OpenSSO im Legacy-Modus ausgef&#252;hrt.</p></dd>
+<dt>LDAP-Gruppen</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass jedes Mitglied einer LDAP-Gruppe Mitglied dieses Betreffs ist.</p></dd>
+<dt>LDAP-Rollen</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass jedes Mitglied einer LDAP-Gruppe Mitglied dieses Betreffs ist. Eine LDAP-Rolle ist jede beliebige Rollendefinition, die die Rollenfunktion des Directory Server verwendet. Diese Rollen verf&#252;gen &#252;ber Objektklassen, die von der Rollendefinition von Directory Server zugewiesen wurden. Der Suchfilter f&#252;r die LDAP-Rolle kann im Dienst <a href="service.scpolicy.html">Richtlinienkonfiguration</a> ge&#228;ndert werden, um den Bereich einzugrenzen und die Leistung zu verbessern.</p></dd>
+<dt>LDAP-Benutzer</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass jeder LDAP-Benutzer ein Mitglied dieses Betreffs ist.</p></dd>
+<dt>Organisation</dt>
+<dd><p>Dieser Betrefftyp impliziert, dass jedes Mitglied eines Bereichs Mitglied dieses Betreffs ist.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立 ID-FF 實體提供者 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createidffprovider"></a><h5>建立 ID-FF 實體提供者</h5>
+<p>使用這些步驟根據聯合服務的 ID-FF 協定建立實體提供者。您可以為實體指定身份識別提供者或服務提供者角色 (或兩者都指定)，但是多個角色將會屬於相同的實體提供者。</p><ol>
+<li><b>以管理員身份登入。</b></li>
+<li><b>前往主控台中的 [聯合] 標籤，然後按一下 [實體提供者] 表格中的 [新增]。</b></li>
+<li><b>出現提示時，選取 [ID-FF] 做為實體提供者。</b></li>
+<li><b>選取實體提供者所屬的 [範圍]。</b></li>
+<li><b>在 [實體識別碼] 欄位中鍵入名稱。</b></li>
+<li><b>選擇要指定給實體提供者的實體提供者角色。</b><p>在 [中介別名] 欄位中完成資料輸入後，自動建立和指定實體提供者的實體提供者角色。</p></li>
+<li><b>為一個或多個角色的下列屬性輸入值：</b><dl><dt>中介別名</dt>
+<dd><p>為配置的提供者角色指定 <tt>metaAlias</tt>。<tt>metaAlias</tt> 可用來尋找提供者的實體識別碼及其所在的組織。這個值為字串，等於範圍或組織名稱加上正斜線與提供者名稱。例如 <tt>/suncorp/travelprovider</tt>。</p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> 中使用的名稱不得包含 <tt>/</tt>。</p>
+<hr>
+</dd>
+<dt>簽署憑證別名</dt>
+<dd><p>指定用來尋找金鑰庫中正確的簽署憑證的提供者憑證別名。</p></dd>
+<dt>加密憑證別名</dt>
+<dd><p>指定用來尋找金鑰庫中正確的加密憑證的提供者憑證別名。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [建立]。</b><p>實體提供者、其指定的提供者角色以及位置將會在 [實體提供者] 清單中顯示。</p></li>
+<li><b>若要自訂實體提供者的角色行為，請按一下實體提供者的名稱，然後選擇與要自訂之角色對應的標籤。</b></li></ol>
+<br/>
+
+</body>
+</html>

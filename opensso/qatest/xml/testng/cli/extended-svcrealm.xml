@@ -1,0 +1,211 @@
+<test name="CLI_svc_realm_tests_01">
+    <parameter name="testName" value="svc-realm-test1"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_02">
+    <parameter name="testName" value="svc-realm-test2"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_03">
+    <parameter name="testName" value="svc-realm-test3"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_04">
+    <parameter name="testName" value="svc-realm-test4"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_05">
+    <parameter name="testName" value="svc-realm-test5"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_06">
+    <parameter name="testName" value="svc-realm-test6"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_07">
+    <parameter name="testName" value="svc-realm-test7"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_08">
+    <parameter name="testName" value="svc-realm-test8"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_09">
+    <parameter name="testName" value="svc-realm-test9"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_10">
+    <parameter name="testName" value="svc-realm-test10"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_11">
+    <parameter name="testName" value="svc-realm-test11"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_12">
+    <parameter name="testName" value="svc-realm-test12"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_13">
+    <parameter name="testName" value="svc-realm-test13"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_14">
+    <parameter name="testName" value="svc-realm-test14"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_15">
+    <parameter name="testName" value="svc-realm-test15"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_16">
+    <parameter name="testName" value="svc-realm-test16"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_17">
+    <parameter name="testName" value="svc-realm-test17"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_18">
+    <parameter name="testName" value="svc-realm-test18"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+<test name="CLI_svc_realm_tests_19">
+    <parameter name="testName" value="svc-realm-test19"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.cli.CLISvcRealmTests"/>
+    </classes>
+</test>
+
+

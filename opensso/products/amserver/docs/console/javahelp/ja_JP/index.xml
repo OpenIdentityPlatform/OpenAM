@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE index PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 2.0//EN" "index_1_0.dtd">
+<index version="2.0">
+
+ <indexitem target="ppldapattributemaplist" text="PPLDAP 属性マップリスト"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="RelayState"></indexitem><indexitem target="federation.wsfedsp" text="RelayState"></indexitem>
+ <indexitem target="federation.fssamlservice" text="SAML">
+    <indexitem text="サイト ID">
+        <indexitem target="federation.fssamlsiteidadd" text="設定"></indexitem></indexitem>
+    <indexitem text="信頼パートナー">
+        <indexitem target="federation.fssamlselecttrustedpartnertype" text="設定の第 1 段階"></indexitem>
+        <indexitem target="federation.fssamltrustedpartnersadd" text="設定の第 2 段階"></indexitem></indexitem>
+    <indexitem target="federation.fssamltargeturlsadd" text="ターゲット URL"></indexitem></indexitem>
+ <indexitem target="service.scsoapbinding" text="SOAP バインドサービス">
+    <indexitem target="ggodb" text="Web サービス認証"></indexitem>
+    <indexitem target="ggodb" text="サポートされている認証メカニズム"></indexitem>
+    <indexitem target="mechanismhandlerslist" text="メカニズムハンドラリスト"></indexitem><indexitem target="webservices.wsauthnserviceshandlersadd" text="メカニズムハンドラリスト"></indexitem>
+    <indexitem target="requesthandlerlist" text="要求ハンドラリスト"></indexitem><indexitem target="service.scsoapbindingrequesthandlerlistadd" text="要求ハンドラリスト"></indexitem><indexitem target="service.scsaml2soapbinding" text="要求ハンドラリスト"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="要求ハンドラリスト"></indexitem></indexitem>
+ <indexitem target="ggodb" text="Web サービス認証"></indexitem>
+ <indexitem text="アイデンティティー管理">
+    <indexitem text="ユーザー">
+        <indexitem target="idm.entitymembership" text="サービス、ロール、およびグループへの追加"></indexitem></indexitem></indexitem>
+ <indexitem target="accesscontrol" text="アクセス制御, はじめに"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="アフィリエイトエンティティー"></indexitem>
+ <indexitem target="useimpliedresource" text="暗黙的リソース"></indexitem>
+ <indexitem text="エンティティー">
+    <indexitem target="federation.createsaml2metadata" text="アフィリエイト"></indexitem>
+    <indexitem target="federation.createsaml2metadata" text="プロバイダ"></indexitem></indexitem>
+ <indexitem target="entryhandlerpluginclass" text="エントリハンドラプラグインクラス"></indexitem>
+ <indexitem target="authresponsemessage" text="応答メッセージの認証"></indexitem>
+ <indexitem target="authorizer" text="オーサライザ"></indexitem>
+ <indexitem target="authorizerpluginclass" text="オーサライザプラグインクラス"></indexitem>
+ <indexitem target="extensioncontainerattributes" text="拡張コンテナ属性"></indexitem>
+ <indexitem target="extensionattributesnamespaceprefix" text="拡張属性のネームスペースプレフィックス"></indexitem>
+ <indexitem target="service.mapcreatedevice" text="クライアントディテクション, 新しいクライアントを追加する"></indexitem>
+ <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="クライアントマネージャー"></indexitem>
+ <indexitem text="グローバル属性">
+    <indexitem target="service.scserviceprofile.amsessionservice" text="セッション"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetampasswordresetservice" text="パスワードリセット"></indexitem>
+    <indexitem target="service.scpolicy" text="ポリシー設定"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamuserservice" text="ユーザー"></indexitem></indexitem>
+ <indexitem target="delegation.delegation" text="権限"></indexitem><indexitem target="delegation.delegationproperties" text="権限"></indexitem>
+ <indexitem target="sessionsearch" text="検索"></indexitem>
+ <indexitem target="webservices.wspersonalprofileservice" text="個人プロファイルサービス">
+    <indexitem target="ppldapattributemaplist" text="PPLDAP 属性マップリスト"></indexitem>
+    <indexitem target="authorizer" text="オーサライザ"></indexitem>
+    <indexitem target="extensioncontainerattributes" text="拡張コンテナ属性"></indexitem>
+    <indexitem target="extensionattributesnamespaceprefix" text="拡張属性のネームスペースプレフィックス"></indexitem>
+    <indexitem target="serviceinstanceupdateclass" text="サービスインスタンス更新クラス"></indexitem>
+    <indexitem target="serviceupdateenabled" text="サービスの更新"></indexitem>
+    <indexitem target="supportedcontainers" text="サポートされているコンテナ"></indexitem>
+    <indexitem target="attributemapper" text="属性マッパー"></indexitem>
+    <indexitem target="alternateendpoint" text="代替エンドポイント"></indexitem>
+    <indexitem target="alternatesecuritymechanisms" text="代替セキュリティーメカニズム"></indexitem>
+    <indexitem target="namescheme" text="ネーミング方式"></indexitem>
+    <indexitem target="namespaceprefix" text="ネームスペースプレフィックス"></indexitem>
+    <indexitem target="ppproviderid" text="プロバイダ ID"></indexitem>
+    <indexitem target="requirequery" text="ポリシー評価のクエリーが必要"></indexitem>
+    <indexitem target="requiremodify" text="ポリシー評価の変更が必要"></indexitem>
+    <indexitem target="resourceidmapper" text="リソース ID マッパー"></indexitem></indexitem>
+ <indexitem text="コンソールプロパティー">
+    <indexitem target="service.scserviceprofile.amadminconsoleservice" text="管理"></indexitem>
+    <indexitem target="service.smg11n" text="国際化設定"></indexitem></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="コンテキスト参照属性"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="コンテキスト参照属性"></indexitem><indexitem target="federation.idffidp" text="コンテキスト参照属性"></indexitem><indexitem target="federation.idffsp" text="コンテキスト参照属性"></indexitem>
+ <indexitem target="serviceinstanceupdateclass" text="サービスインスタンス更新クラス"></indexitem>
+ <indexitem target="service.smdiscoverydescriptionadd" text="サービス記述, 設定する"></indexitem>
+ <indexitem target="serviceupdateenabled" text="サービスの更新"></indexitem>
+ <indexitem target="federation.fssamlsiteidadd" text="サイト ID"></indexitem>
+ <indexitem target="supportedlang" text="サポートされている言語ロケール"></indexitem>
+ <indexitem target="supportedcontainers" text="サポートされているコンテナ"></indexitem>
+ <indexitem target="supporteddirectives" text="サポートされているディレクティブ (ディスカバリサービス)"></indexitem>
+ <indexitem target="ggodb" text="サポートされている認証メカニズム (SOAP バインド)"></indexitem>
+ <indexitem target="supportedauthmechanisms" text="サポートされている認証メカニズム (ディスカバリサービス)"></indexitem>
+ <indexitem target="fyfby" text="参照ポリシー"></indexitem>
+ <indexitem text="システムプロパティー">
+    <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="クライアントディテクション"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamnamingservice" text="ネーミング"></indexitem>
+    <indexitem target="service.scplatform" text="プラットフォーム"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamloggingservice" text="ログ"></indexitem></indexitem>
+ <indexitem target="policy.selectcondition" text="条件">
+    <indexitem target="policy.pmdefaultipcondition" text="IP アドレス/DNS 名"></indexitem>
+    <indexitem target="policy.conditionadd" text="LDAP フィルタ"></indexitem>
+    <indexitem target="policy.pmdefaulttimeconditionadd" text="時間"></indexitem>
+    <indexitem target="policy.pmdefaultsessioncondtionadd" text="セッション"></indexitem>
+    <indexitem target="policy.sessionpropertyconditionadd" text="セッションプロパティー"></indexitem>
+    <indexitem target="policy.pmdefaultauthlevelconditionadd" text="認証レベル"></indexitem>
+    <indexitem target="policy.pmdefaultauthschemeconditionadd" text="モジュールインスタンスによる認証"></indexitem>
+    <indexitem target="policy.authtoserviceadd" text="モジュール連鎖による認証"></indexitem>
+    <indexitem target="policy.authtorealmadd" text="レルムへの認証"></indexitem></indexitem>
+ <indexitem target="federation.fssamlselecttrustedpartnertype" text="信頼パートナー"></indexitem>
+ <indexitem target="session.smprofile" text="「セッション」ウィンドウ"></indexitem>
+ <indexitem target="viewsession" text="セッションの表示"></indexitem>
+ <indexitem target="invalidatesession" text="セッションの無効化"></indexitem>
+ <indexitem target="service.subconfigadd" text="セッションプロパティー, サブ設定を追加する"></indexitem>
+ <indexitem target="sessions" text="セッションモジュール"></indexitem>
+ <indexitem target="service.scconfig" text="設定">
+    <indexitem target="servic.scconfigglobal" text="グローバル属性"></indexitem>
+    <indexitem target="service.scconfigconsole" text="コンソールプロパティー"></indexitem>
+    <indexitem target="service.scfonfigsystem" text="システムプロパティー"></indexitem>
+    <indexitem target="service.scconfigauth" text="認証"></indexitem></indexitem>
+ <indexitem text="属性">
+    <indexitem target="federation.samlv2spassertioncontent" text="コンテキスト参照"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="コンテキスト参照"></indexitem><indexitem target="federation.idffidp" text="コンテキスト参照"></indexitem><indexitem target="federation.idffsp" text="コンテキスト参照"></indexitem></indexitem>
+ <indexitem target="attributemapper" text="属性マッパー"></indexitem>
+ <indexitem target="federation.fssamltargeturlsadd" text="ターゲット URL"></indexitem>
+ <indexitem target="policy.selectsubjecttype" text="対象"></indexitem><indexitem target="idm.entities" text="対象">
+    <indexitem target="idm.entitiesgroup" text="グループ"></indexitem>
+    <indexitem target="subjectuser" text="ユーザー"></indexitem></indexitem>
+ <indexitem target="alternateendpoint" text="代替エンドポイント"></indexitem>
+ <indexitem target="alternatesecuritymechanisms" text="代替セキュリティーメカニズム"></indexitem>
+ <indexitem target="policyevaldiscolookup" text="ディスカバリ検索のポリシー評価"></indexitem>
+ <indexitem target="policyevaldiscoupdate" text="ディスカバリ更新のポリシー評価"></indexitem>
+ <indexitem target="service.smdiscoveryservice" text="ディスカバリサービス">
+    <indexitem target="useimpliedresource" text="暗黙的リソース"></indexitem>
+    <indexitem target="entryhandlerpluginclass" text="エントリハンドラプラグインクラス"></indexitem>
+    <indexitem target="authresponsemessage" text="応答メッセージの認証"></indexitem>
+    <indexitem target="authorizerpluginclass" text="オーサライザプラグインクラス"></indexitem>
+    <indexitem target="service.smdiscoverydescriptionadd" text="サービス記述"></indexitem>
+    <indexitem target="supporteddirectives" text="サポートされているディレクティブ"></indexitem>
+    <indexitem target="supportedauthmechanisms" text="サポートされている認証メカニズム"></indexitem>
+    <indexitem target="policyevaldiscolookup" text="ディスカバリ検索のポリシー評価"></indexitem>
+    <indexitem target="policyevaldiscoupdate" text="ディスカバリ更新のポリシー評価"></indexitem>
+    <indexitem target="generatesessioncontext" text="ブートストラップ用のセッションコンテキストステートメント"></indexitem>
+    <indexitem target="encryptnameidentifier" text="ブートストラップ用のセッションコンテキスト内での NameIdentifier の暗号化"></indexitem>
+    <indexitem target="resourceofferingsbootstrapping" text="ブートストラップ用のリソースオファリング"></indexitem><indexitem target="service.smdiscoverybootstraprefoffadd" text="ブートストラップ用のリソースオファリング"></indexitem>
+    <indexitem target="dsproviderid" text="プロバイダ ID"></indexitem>
+    <indexitem target="resourceidmapperpluginclass" text="リソース ID マッパープラグイン用のクラス"></indexitem></indexitem>
+ <indexitem target="dirmang" text="ディレクトリ管理"></indexitem>
+ <indexitem target="realm.idrepo" text="データストア">
+    <indexitem target="realm.idrepoeditfamschema" text="Access Manager スキーマ属性を含んだ Sun Directory Server"></indexitem>
+    <indexitem target="realm.idrepoeditad" text="Active Directory の属性"></indexitem>
+    <indexitem target="realm.idrepoeditldapv3" text="LDPAv3 リポジトリプラグイン属性"></indexitem>
+    <indexitem target="realm.idreposelecttype" text="新しいデータストアを作成する"></indexitem></indexitem>
+ <indexitem target="federation.fsauthdomains" text="トラストサークル">
+    <indexitem target="deleteauthdomain" text="削除"></indexitem>
+    <indexitem target="federation.createcot" text="作成"></indexitem>
+    <indexitem target="federation.fsauthdomainsselectprovider" text="プロバイダの追加"></indexitem>
+    <indexitem target="federation.fsauthdomainsedit" text="変更"></indexitem></indexitem>
+ <indexitem target="webservices.wsauthnservices" text="認証 Web サービス"></indexitem>
+ <indexitem text="認証コンテキスト">
+    <indexitem target="federation.samlv2spassertioncontent" text="属性"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="属性"></indexitem><indexitem target="federation.idffidp" text="属性"></indexitem><indexitem target="federation.idffsp" text="属性"></indexitem></indexitem>
+ <indexitem text="認証属性">
+    <indexitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP 基本"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows デスクトップ SSO"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthservice" text="コア"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthcertservice" text="証明書"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthdatastoreservice" text="データストア"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="匿名"></indexitem>
+    <indexitem target="authentication.authconfig" text="認証設定"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="メンバーシップ"></indexitem>
+    <indexitem target="ggulh" text="連携"></indexitem></indexitem>
+ <indexitem target="namescheme" text="ネーミング方式"></indexitem>
+ <indexitem target="namespaceprefix" text="ネームスペースプレフィックス"></indexitem>
+ <indexitem target="generatesessioncontext" text="ブートストラップ用のセッションコンテキストステートメント"></indexitem>
+ <indexitem target="encryptnameidentifier" text="ブートストラップ用のセッションコンテキスト内での NameIdentifier の暗号化"></indexitem>
+ <indexitem target="resourceofferingsbootstrapping" text="ブートストラップ用のリソースオファリング">
+    <indexitem target="service.smdiscoverybootstraprefoffadd" text="設定する"></indexitem></indexitem>
+ <indexitem target="service.scplatformclientcharsetsadd" text="プラットフォーム, 新しい文字セットを作成する"></indexitem>
+ <indexitem target="ppproviderid" text="プロバイダ ID"></indexitem>
+ <indexitem target="dsproviderid" text="プロバイダ ID (ディスカバリサービス)"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="プロバイダエンティティー"></indexitem>
+ <indexitem target="policy.policy" text="ポリシー">
+    <indexitem target="policy.policyreferraladd" text="新しい参照ポリシーの作成"></indexitem>
+    <indexitem target="responseprovider" text="応答プロバイダ"></indexitem>
+    <indexitem target="policy.responseprovideradd" text="応答プロバイダを追加する"></indexitem>
+    <indexitem target="policy.selectreferraltype" text="参照の追加"></indexitem>
+    <indexitem target="fyfby" text="参照ポリシー"></indexitem>
+    <indexitem target="policy.selectcondition" text="条件"></indexitem>
+    <indexitem target="policy.selectconditiontype" text="条件を追加する"></indexitem>
+    <indexitem target="policy.selectsubjecttype" text="対象"></indexitem>
+    <indexitem target="policy.subjectadd" text="対象を追加する"></indexitem>
+    <indexitem target="normalpolicy" text="標準ポリシー"></indexitem>
+    <indexitem target="policy.selectservicetype" text="ルール"></indexitem>
+    <indexitem target="policy.ruleadd" text="ルールを追加する"></indexitem></indexitem>
+ <indexitem target="requirequery" text="ポリシー評価のクエリーが必要"></indexitem>
+ <indexitem target="requiremodify" text="ポリシー評価の変更が必要"></indexitem>
+ <indexitem target="mechanismhandlerslist" text="メカニズムハンドラリスト">
+    <indexitem target="webservices.wsauthnserviceshandlersadd" text="設定する"></indexitem></indexitem>
+ <indexitem target="idm.entitymembership" text="ユーザー, サービス、ロール、およびグループへの追加"></indexitem>
+ <indexitem target="dm.home" text="ユーザー管理"></indexitem>
+ <indexitem target="requesthandlerlist" text="要求ハンドラリスト"></indexitem><indexitem target="service.scsaml2soapbinding" text="要求ハンドラリスト">
+    <indexitem target="service.scsoapbindingrequesthandlerlistadd" text="設定する"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="設定する"></indexitem></indexitem>
+ <indexitem target="resourceidmapper" text="リソース ID マッパー"></indexitem>
+ <indexitem target="resourceidmapperpluginclass" text="リソース ID マッパープラグイン用のクラス"></indexitem>
+ <indexitem target="policy.selectservicetype" text="ルール"></indexitem>
+ <indexitem target="realm.rmrealm" text="レルム">
+    <indexitem target="authentication.newauthinstance" text="新しい認証モジュールを作成する"></indexitem>
+    <indexitem target="authentication.newauthconfig" text="新しい認証連鎖を作成する"></indexitem>
+    <indexitem target="realm.rmrealmadd" text="新しく作成する"></indexitem>
+    <indexitem target="realm.realmproperties" text="一般プロパティー"></indexitem>
+    <indexitem target="delegation.delegation" text="権限"></indexitem><indexitem target="delegation.delegationproperties" text="権限"></indexitem>
+    <indexitem target="realm.services" text="サービス"></indexitem>
+    <indexitem target="realm.servicesadd" text="サービスを追加する"></indexitem>
+    <indexitem target="idm.entities" text="対象"></indexitem>
+    <indexitem target="realm.idrepo" text="データストア"></indexitem>
+    <indexitem target="authentication.authproperties" text="認証"></indexitem>
+    <indexitem target="policy.policy" text="ポリシー"></indexitem>
+</indexitem>
+</index>

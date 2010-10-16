@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>向策略添加规则 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.ruleadd"></a><h5>向策略添加规则</h5>
+<ol>
+<li><b><a name="indexterm-25"></a>如果已创建了策略，请单击要为其添加规则的策略的名称。如果未创建，请参见<a href="policy.policynormaladd.html">创建新的常规策略</a>。</b></li>
+<li><b>在“规则”菜单中单击“新建”。</b></li>
+<li><b>请为规则选择以下任一默认服务类型。如果策略可用的服务较多时，您看到的列表可能会比较长：</b><dl><dt>搜索服务</dt>
+<dd><p>为搜索服务查询定义授权操作,并通过指定资源的 Web 服务客户机修改调用的协议。</p></dd>
+<dt>Liberty 个人配置文件服务</dt>
+<dd><p>为 Liberty 个人配置文件服务查询定义授权操作,并通过指定资源的 Web 服务客户机修改调用的协议。</p></dd>
+<dt>URL 策略代理</dt>
+<dd><p>定义 URL 策略代理服务的授权操作。它用于定义保护 HTTP 和 HTTPS URL 的策略。这是 OpenSSO 策略最常见的用途。</p></dd>
+</dl>
+</li>
+<li><b>单击“下一步”。</b></li>
+<li><b>请输入规则的名称及其资源名称。</b><p>目前，OpenSSO 策略代理只支持 <tt>http://</tt> 和 <tt>https://</tt> 资源，而不支持使用 IP 地址代替主机名。</p><p>协议、主机、端口和资源名称都支持通配符。例如：</p><pre>http*://*:*/*.html</pre><p>对于“URL 策略代理”服务，如果未输入端口号，则 <tt>http://</tt> 的默认端口号是 80，<tt>https://</tt> 的默认端口号是 443。</p>
+<hr><p><b>注 &#8211; </b>步骤 6 和 7 对引用策略不适用。</p>
+<hr>
+</li>
+<li><b>为规则选择操作。根据服务类型，可选择以下选项：</b>
+<ul><li><p>查找（搜索服务）</p></li>
+<li><p>更新（搜索服务）</p></li>
+<li><p>修改（Liberty 个人配置文件服务）</p></li>
+<li><p>查询（Liberty 个人配置文件服务）</p></li>
+<li><p>GET（URL 策略代理）</p></li>
+<li><p>POST（URL 策略代理）</p></li></ul>
+</li>
+<li><b>选择操作值。</b>
+<ul><li><p>同意交互式操作 &#8212; 为了得到同意而对资源调用 Liberty 交互式操作协议。仅适用于 Liberty 个人配置文件服务类型。</p></li>
+<li><p>交互式操作值 &#8212; 为了获得某个值而对资源调用 Liberty 交互式操作协议。仅适用于 Liberty 个人配置文件服务类型。</p></li>
+<li><p>允许 &#8212; 允许您访问与规则中定义的资源相匹配的资源。</p></li>
+<li><p>拒绝 &#8212; 拒绝您访问与规则中定义的资源相匹配的资源。 </p><p>在策略中，拒绝规则始终比允许规则具有优先权。例如，如果某种给定的资源存在两个策略，一个拒绝访问而另一个允许访问，结果为拒绝访问（假定两个策略的条件都满足）。建议谨慎使用拒绝策略，因为它们会导致策略间的潜在冲突。通常来说，在定义策略的过程中，应只使用允许规则，在没有策略适用于实现拒绝条件时使用默认的拒绝规则。</p><p>当采用了显示拒绝规则时，即使一个或多个策略允许访问，通过多个不同主体（如角色和/或组成员资格）指定给给定用户的策略可能仍然会导致拒绝访问资源。例如，如果应用于“员工”角色的资源的策略为拒绝策略，而应用于“经理”角色的同一资源的策略为允许策略，则被分配了“员工”和“经理”两个角色的用户的策略决策将为拒绝。</p><p>解决此问题的一个方法是使用条件插件来设计策略。在上述情况下，将拒绝策略应用于通过“员工”角色验证的用户并将允许策略应用于通过“经理”角色验证的用户的“角色条件”可以帮助区分两种策略。 另一个方法是使用 <tt>authentication level</tt> 条件，其中“经理”角色在更高验证级别进行验证。</p></li></ul>
+</li>
+<li><b>单击“完成”。</b></li></ol>
+<br/>
+
+</body>
+</html>

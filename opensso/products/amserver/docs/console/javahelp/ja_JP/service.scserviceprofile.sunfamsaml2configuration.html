@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 サービス設定 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>SAMLv2 サービス設定</h4>
+
+
+<a name="ggolz"></a><h5>キャッシュクリーンアップ間隔</h5>
+<p>この属性は、キャッシュのクリーンアップ間隔を秒単位で指定します。</p>
+
+<a name="ggokj"></a><h5>名前 ID 情報の属性名</h5>
+<p>ユーザーのエントリの名前 ID 情報を格納するために使用する属性の名前を指定します。何も指定されていない場合は、デフォルトの属性 (<tt>sun-fm-saml2-nameid-info</tt>) が使用されます。対応するデータストアのバインドユーザーは、この属性に対する読み取り、書き込み、検索、および比較のアクセス権を持っている必要があります。</p>
+
+<a name="ggolv"></a><h5>名前 ID 情報キーの属性名</h5>
+<p>ユーザーのエントリの名前 ID キーを格納するために使用する属性の名前を指定します。指定されていない場合は、デフォルトの属性 (<tt>sun-fm-saml2-nameid-infokey</tt>) が使用されます。対応するデータストアのバインドユーザーは、この属性に対する読み取り、書き込み、検索、および比較のアクセス権を持っている必要があります。また、<tt>等価</tt>タイプのインデックスが追加されていることも確認する必要があります。</p>
+
+<a name="ggojr"></a><h5>IDP ディスカバリサービスの Cookie ドメイン</h5>
+<p>SAMLv2 IDP ディスカバリ Cookie 用の Cookie ドメインを指定します。 </p>
+
+<a name="ggomp"></a><h5>IDP ディスカバリサービスの Cookie タイプ</h5>
+<p>SAMLv2 IDP ディスカバリサービスで使用する Cookie タイプを「持続」または「セッション」として指定します。デフォルトは「セッション」です。</p>
+
+<a name="ggomt"></a><h5>IDP ディスカバリサービスの URL スキーマ</h5>
+<p>SAMLv2 IDP ディスカバリサービスで使用する URL スキーマを指定します。 </p>
+
+<a name="ggoje"></a><h5>XML 暗号 SPI 実装クラス</h5>
+<p>SAMLv2 暗号化プロバイダインタフェースの実装クラスの名前を指定します。このクラスは、SAMLv2 プロファイルで XML 暗号化および復号化を実行するために使用されます。</p>
+
+<a name="ggomb"></a><h5>KeyInfo 要素内に EncryptedKey を含める</h5>
+<p>これは <tt>com.sun.identity.saml2.xmlenc.FMEncProvider</tt> クラスで使用されます。これが有効になっている場合は、XML 暗号化操作の実行時に <tt>EncryptedData</tt> 要素の <tt>KeyInfo</tt> に <tt>EncryptedKey</tt> が含められます。これが有効になっていない場合、<tt>EncryptedKey</tt> は <tt>EncryptedData</tt>
+要素に並列に配置されます。デフォルトは有効です。</p>
+
+<a name="ggoks"></a><h5>XML 署名実装クラス</h5>
+<p>これが有効になっている場合は、アイデンティティープロバイダおよびサービスプロバイダによって使用される署名証明書が、「サイトおよびサーバー」タブの「セキュリティー」で設定された証明書失効リスト (CRL) と照合されます。証明書が検証されず、受け入れられない場合、プロバイダは停止し、XML 署名検証を中断して検証エラーを返します。 </p>
+
+<a name="ggokx"></a><h5>XML 署名証明書検証</h5>
+<p>これが有効になっている場合、SAML アイデンティティープロバイダまたはサービスプロバイダで、署名に使用される証明書を検証します。証明書が検証されて受け入れられた場合、プロバイダは署名を検証します。それ以外の場合、プロバイダは停止し、検証エラーを返します。 </p>
+
+<a name="ggoiv"></a><h5>証明書発行局の証明書検証</h5>
+<p>これが有効になっている場合は、アイデンティティープロバイダとサービスプロバイダによって使用される署名証明書が、信頼できる CA のリストと照合されます。証明書が検証されず、受け入れられない場合、プロバイダは停止し、XML 署名検証を中断して検証エラーを返します。 </p>
+<br/>
+
+</body>
+</html>

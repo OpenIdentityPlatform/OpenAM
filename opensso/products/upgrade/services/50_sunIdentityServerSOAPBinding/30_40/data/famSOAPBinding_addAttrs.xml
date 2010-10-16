@@ -1,0 +1,92 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: famSOAPBinding_addAttrs.xml,v 1.3 2008/06/25 05:53:57 qcheng Exp $
+
+-->
+
+<Requests>
+<AttributeSchema name="EnforceOnlyKnownProvider"
+    type="single"
+    syntax="boolean"
+    i18nKey="a106">
+    <DefaultValues>
+        <Value>true</Value>
+    </DefaultValues>
+</AttributeSchema>
+<AttributeSchema name="CertAliasForSSLClientAuth"
+    type="single"
+    syntax="string"
+    i18nKey="a107">
+</AttributeSchema>
+<AttributeSchema name="StaleTimeLimit"
+    type="single"
+    syntax="number"
+    i18nKey="a108">
+    <DefaultValues>
+        <Value>300000</Value>
+    </DefaultValues>
+</AttributeSchema>
+<AttributeSchema name="MessageIDCacheCleanupInterval"
+    type="single"
+    syntax="number"
+    i18nKey="a109">
+    <DefaultValues>
+        <Value>60000</Value>
+    </DefaultValues>
+</AttributeSchema>
+<AttributeSchema name="SupportedActors"
+     type="single"
+     syntax="string"
+     i18nKey="a110">
+     <DefaultValues>
+          <Value>http://schemas.xmlsoap.org/soap/actor/next</Value>
+     </DefaultValues>
+</AttributeSchema>
+<AttributeSchema name="NamespacePrefixMappingList"
+     type="single"
+     syntax="string"
+     i18nKey="a111">
+     <DefaultValues>
+         <Value>S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/liberty/pp|is=urn:liberty:is:2003-08</Value>
+     </DefaultValues>
+</AttributeSchema>
+<AttributeSchema name="JAXBPackageList"
+    type="single"
+    syntax="string"
+    i18nKey="a112">
+</AttributeSchema>
+<AttributeSchema name="WSFVersion"
+    type="single_choice"
+    syntax="string"
+    i18nKey="a113">
+    <ChoiceValues>
+        <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
+        <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>
+    </ChoiceValues>
+    <DefaultValues>
+        <Value>1.0</Value>
+    </DefaultValues>
+ </AttributeSchema>
+</Requests>

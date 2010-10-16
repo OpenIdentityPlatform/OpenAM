@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建提供者实体或联合提供者实体 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsadd"></a><h4>创建提供者实体或联合提供者实体</h4><a name="indexterm-66"></a><a name="indexterm-67"></a><a name="indexterm-68"></a><a name="indexterm-69"></a><p>建立实体的过程分为两步。首先，创建实体。（此时将定义该实体是<b>提供者实体</b>还是<b>联合提供者实体</b>。）创建实体之后，需以提供者填充该实体。以下过程用于创建新实体。起点是联合界面下的“实体”。</p>
+<hr><p><b>注 &#8211; </b>可以创建实体，但是在以提供者填充它之前，无法将其分配给信任环。</p>
+<hr>
+<ol>
+<li><b>单击“新建”以显示实体属性。</b><p>随即显示“新建实体”页面。</p></li>
+<li><b>键入实体的名称。</b><p>“实体名称”属性定义了实体的统一资源标识符 (uniform resource identifier, URI)。此值在实体名称间必须唯一。</p></li>
+<li><b>键入对实体的说明。</b></li>
+<li><b>选择实体类型。</b>
+<ul><li><p>如果要创建提供者实体，请选择“<b>提供者</b>”。</p></li>
+<li><p>如果要创建联合提供者实体，请选择“<b>联合提供者</b>”，并为必需的“联合提供者名称”属性和“联合提供者拥有者”属性定义相应的值。</p>
+<ul><li><p>“联合提供者名称”定义了联合提供者实体的 URI。此值在联合提供者名称间必须唯一。</p></li>
+<li><p>“联合提供者拥有者”指定某个提供者作为联合提供者的父管理员。此属性的值是一个 URI，它应当与联合提供者拥有者/提供者所属实体的“实体名称”属性中定义的值相匹配。</p></li></ul>
+
+<hr><p><b>注 &#8211; </b>将提供者定义为“联合提供者拥有者”时，并不会自动将其作为成员加入到联合提供者中。如果某个拥有者也是成员，则必须在此处将该 URI 定义为拥有者并在联合提供者实体本身之内将其定义为成员。要向联合提供者添加成员，请参见<a href="federation.fsentitydescriptorsaffiliate.html">向联合提供者实体添加成员</a>。</p>
+<hr>
+</li></ul>
+</li>
+<li><b>单击“确定”。</b><p>“实体”屏幕上将显示新的实体。</p></li></ol>
+<br/>
+
+</body>
+</html>

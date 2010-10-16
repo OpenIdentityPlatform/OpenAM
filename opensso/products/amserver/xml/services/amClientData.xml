@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amClientData.xml,v 1.3 2009/01/13 06:50:17 mahesh_prasad_r Exp $
+  
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+  <Service name="SunAMClientData" version="1.0">
+    <Schema
+      i18nFileName="amClientData"
+      i18nKey=""
+      serviceHierarchy=""
+      revisionNumber="20">
+      <Global>
+
+        <!-- Specifies if the ClientTypesManager can create new Client data -->
+        <AttributeSchema name="enableClientCreation" type="single" syntax="boolean">
+          <DefaultValues>
+            <Value>true</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <!-- For plug-in - to show in the Edit Page (Required + MAP specific) -->
+        <AttributeSchema name="generalPropertyNames" i18nKey="generalPropertyNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>clientType</Value>
+            <Value>parentId</Value>
+            <Value>userAgent</Value>
+            <Value>CcppAccept-Charset</Value>
+            <Value>contentType</Value>
+            <Value>filePath</Value>
+            <Value>cookieSupport</Value>
+            <Value>counterName</Value>
+            <Value>encoderClassName</Value>
+            <Value>genericHTML</Value>
+            <Value>ignoreHostHeader</Value>
+            <Value>lineLength</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="hardwarePlatformNames" i18nKey="hardwarePlatformNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>BluetoothProfile</Value>
+            <Value>BitsPerPixel</Value>
+            <Value>ColorCapable</Value>
+            <Value>CPU</Value>
+            <Value>ImageCapable</Value>
+            <Value>InputCharset</Value>
+            <Value>Keyboard</Value>
+            <Value>Model</Value>
+            <Value>NumberOfSoftKeys</Value>
+            <Value>OutputCharset</Value>
+            <Value>PixelAspectRatio</Value>
+            <Value>PointingResolution</Value>
+            <Value>ScreenSize</Value>
+            <Value>ScreenSizeChar</Value>
+            <Value>SoundOutputCapable</Value>
+            <Value>StandardFontProportional</Value>
+            <Value>TextInputCapable</Value>
+            <Value>Vendor</Value>
+            <Value>VoiceInputCapable</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="softwarePlatformNames" i18nKey="softwarePlatformNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>AcceptDownloadableSoftware</Value>
+            <Value>AudioInputEncoder</Value>
+            <Value>CcppAccept</Value>
+            <Value>CcppAccept-Encoding</Value>
+            <Value>CcppAccept-Language</Value>
+            <Value>DownloadableSoftwareSupport</Value>
+            <Value>JavaEnabled</Value>
+            <Value>JavaPlatform</Value>
+            <Value>JVMVersion</Value>
+            <Value>MexeClassmarks</Value>
+            <Value>MexeSecureDomains</Value>
+            <Value>MexeSpec</Value>
+            <Value>OSName</Value>
+            <Value>OSVendor</Value>
+            <Value>OSVersion</Value>
+            <Value>RecipientAppAgent</Value>
+            <Value>SoftwareNumber</Value>
+            <Value>VideoInputEncoder</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="networkCharacteristicsNames" i18nKey="networkCharacteristicsNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>CurrentBearerService</Value>
+            <Value>SecuritySupport</Value>
+            <Value>SupportedBearers</Value>
+            <Value>SupportedBluetoothVersion</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="browserUANames" i18nKey="browserUANames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>BrowserName</Value>
+            <Value>BrowserVersion</Value>
+            <Value>DownloadableBrowserApps</Value>
+            <Value>FramesCapable</Value>
+            <Value>HtmlVersion</Value>
+            <Value>JavaAppletEnabled</Value>
+            <Value>JavaScriptEnabled</Value>
+            <Value>JavaScriptVersion</Value>
+            <Value>PreferenceForFrames</Value>
+            <Value>TablesCapable</Value>
+            <Value>XhtmlModules</Value>
+            <Value>XhtmlVersion</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="wapCharacteristicsNames" i18nKey="wapCharacteristicsNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>SupportedPictogramSet</Value>
+            <Value>WapDeviceClass</Value>
+            <Value>WapVersion</Value>
+            <Value>WmlDeckSize</Value>
+            <Value>WmlScriptLibraries</Value>
+            <Value>WmlScriptVersion</Value>
+            <Value>WmlVersion</Value>
+            <Value>WtaiLibraries</Value>
+            <Value>WtaVersion</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="pushCharacteristicsNames" i18nKey="pushCharacteristicsNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>Push-Accept</Value>
+            <Value>Push-Accept-Charset</Value>
+            <Value>Push-Accept-Encoding</Value>
+            <Value>Push-Accept-Language</Value>
+            <Value>Push-Accept-AppID</Value>
+            <Value>Push-MsgSize</Value>
+            <Value>Push-MaxPushReq</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="additionalPropertiesNames" i18nKey="additionalPropertiesNames" type="list" syntax="string">
+          <DefaultValues>
+            <Value>additionalProperties</Value>
+          </DefaultValues>
+        </AttributeSchema>
+
+        <!-- END - property names by classification -->
+
+        <AttributeSchema name="configInfo" i18nKey="" type="list" syntax="string">
+          <DefaultValues>
+            <Value>objectclass=sunAMClient</Value>
+            <Value>umsAddTemplateName=Client</Value>
+            <Value>umsSearchTemplateName=BasicClientSearch</Value>
+            <Value>prefixForAttr=sunamclient</Value>
+            <Value>rdn=ou</Value>
+            <Value>clientDN=ou=1.0,ou=SunAMClientData,ou=ClientData</Value>
+            <Value>minimalClientAttrs=rdn,userAgent,parentId</Value>
+          </DefaultValues>
+        </AttributeSchema>
+        <!-- End config info for Schema APIs -->
+
+        <!-- schema to store the client DB -->
+        <SubSchema name="clientDBStore">
+
+          <SubSchema name="clientData">
+
+            <!-- validator for required properties -->
+            <AttributeSchema name="RequiredValueValidator"
+                type="validator"
+                syntax="string">
+                <DefaultValues>
+                    <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                </DefaultValues>
+            </AttributeSchema>
+
+            <AttributeSchema name="clientType" i18nKey="clientType"
+                any="required|display"
+                validator="RequiredValueValidator"
+                type="single"
+                syntax="string">
+                <DefaultValues>
+                    <Value>&#x00A0;</Value>
+                </DefaultValues>
+            </AttributeSchema>
+
+            <AttributeSchema name="parentId" i18nKey="parentId"
+                 any="display" type="single_choice" syntax="string">
+              <ChoiceValues>
+                <ChoiceValue i18nKey="HTML">HTML</ChoiceValue>
+                <ChoiceValue i18nKey="WML">WML</ChoiceValue>
+                <ChoiceValue i18nKey="WML/Nokia">Nokia</ChoiceValue>
+                <ChoiceValue i18nKey="WML/WAP2">WAP2</ChoiceValue>
+                <ChoiceValue i18nKey="XHTML">XHTML</ChoiceValue>
+                <ChoiceValue i18nKey="XHTML/XHtmlEzweb">XHtmlEzweb</ChoiceValue>
+                <ChoiceValue i18nKey="VoiceXML">VoiceXML</ChoiceValue>
+                <ChoiceValue i18nKey="cHTML">cHTML</ChoiceValue>
+                <ChoiceValue i18nKey="iHTML">iHTML</ChoiceValue>
+                <ChoiceValue i18nKey="iHTML/IHtml-1">IHtml-1</ChoiceValue>
+                <ChoiceValue i18nKey="iHTML/IHtml-2">IHtml-2</ChoiceValue>
+                <ChoiceValue i18nKey="iHTML/IHtml-3">IHtml-3</ChoiceValue>
+                <ChoiceValue i18nKey="iHTML/IHtml-4">IHtml-4</ChoiceValue>
+                <ChoiceValue i18nKey="iHTML/L-mode">L-mode</ChoiceValue>
+                <ChoiceValue i18nKey="JHTML">JHTML</ChoiceValue>
+                <ChoiceValue i18nKey="JHTML/JHtml-2">JHtml-2</ChoiceValue>
+                <ChoiceValue i18nKey="JHTML/JHtml-3">JHtml-3</ChoiceValue>
+                <ChoiceValue i18nKey="HDML">HDML</ChoiceValue>
+              </ChoiceValues>
+            </AttributeSchema>
+
+            <AttributeSchema name="userAgent" i18nKey="userAgent"
+                any="required|display"
+                type="single"
+                syntax="string"
+                validator="RequiredValueValidator">
+                <DefaultValues>
+                    <Value>&#x00A0;</Value>
+                </DefaultValues>
+            </AttributeSchema>
+
+            <!-- optional properties -->
+            <AttributeSchema name="contentType" i18nKey="contentType"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="filePath" i18nKey="filePath"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="cookieSupport" i18nKey="cookieSupport"
+                  any="display" type="single_choice" syntax="string">
+              <ChoiceValues>
+                <ChoiceValue i18nKey="cookieDetect">cookieDetect</ChoiceValue>
+                <ChoiceValue i18nKey="cookieSupport">true</ChoiceValue>
+                <ChoiceValue i18nKey="noCookieSupport">false</ChoiceValue>
+              </ChoiceValues>
+            </AttributeSchema>
+            <AttributeSchema name="counterName" i18nKey="counterName"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="encoderClassName" i18nKey="encoderClassName"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="genericHTML" i18nKey="genericHTML"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="ignoreHostHeader" i18nKey="ignoreHostHeader"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="lineLength" i18nKey="lineLength"
+              any="display" type="single" syntax="number"
+            />
+
+            <!-- UAProfile HardwarePlatform properties -->
+
+            <AttributeSchema name="BluetoothProfile" i18nKey="BluetoothProfile"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="BitsPerPixel" i18nKey="BitsPerPixel"
+              any="display" type="single" syntax="number"
+            />
+            <AttributeSchema name="ColorCapable" i18nKey="ColorCapable"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="CPU" i18nKey="CPU"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="ImageCapable" i18nKey="ImageCapable"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="InputCharset" i18nKey="InputCharset"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="Keyboard" i18nKey="Keyboard"
+                any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="Model" i18nKey="Model"
+                any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="NumberOfSoftKeys" i18nKey="NumberOfSoftKeys" 
+              any="display" type="single" syntax="number"
+            />
+            <AttributeSchema name="OutputCharset" i18nKey="OutputCharset"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="PixelAspectRatio" i18nKey="PixelAspectRatio"
+              any="display"  type="single" syntax="string"
+            />
+            <AttributeSchema name="PointingResolution" i18nKey="PointingResolution"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="ScreenSize" i18nKey="ScreenSize"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="ScreenSizeChar" i18nKey="ScreenSizeChar"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="SoundOutputCapable" i18nKey="SoundOutputCapable"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="StandardFontProportional" i18nKey="StandardFontProportional"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="TextInputCapable" i18nKey="TextInputCapable"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="Vendor" i18nKey="Vendor"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="VoiceInputCapable" i18nKey="VoiceInputCapable"
+              any="display" type="single" syntax="boolean"
+            />
+
+            <!-- UAProfile SoftwarePlatform properties -->
+
+            <AttributeSchema name="AcceptDownloadableSoftware" i18nKey="AcceptDownloadableSoftware"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="AudioInputEncoder" i18nKey="AudioInputEncoder"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="CcppAccept" i18nKey="CcppAccept"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="CcppAccept-Charset" i18nKey="CcppAccept-Charset"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="CcppAccept-Encoding" i18nKey="CcppAccept-Encoding"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="CcppAccept-Language" i18nKey="CcppAccept-Language"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="DownloadableSoftwareSupport" i18nKey="DownloadableSoftwareSupport"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="JavaEnabled" i18nKey="JavaEnabled"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="JavaPlatform" i18nKey="JavaPlatform"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="JVMVersion" i18nKey="JVMVersion"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="MexeClassmarks" i18nKey="MexeClassmarks"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="MexeSecureDomains" i18nKey="MexeSecureDomains"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="MexeSpec" i18nKey="MexeSpec"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="OSName" i18nKey="OSName"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="OSVendor" i18nKey="OSVendor"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="OSVersion" i18nKey="OSVersion"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="RecipientAppAgent" i18nKey="RecipientAppAgent"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="SoftwareNumber" i18nKey="SoftwareNumber"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="VideoInputEncoder" i18nKey="VideoInputEncoder"
+              any="display" type="list" syntax="string"
+            />
+
+            <!-- UAProfile Network Characteristic properties -->
+
+            <AttributeSchema name="CurrentBearerService" i18nKey="CurrentBearerService"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="SecuritySupport" i18nKey="SecuritySupport"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="SupportedBearers" i18nKey="SupportedBearers"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="SupportedBluetoothVersion" i18nKey="SupportedBluetoothVersion"
+              any="display" type="single" syntax="string"
+            />
+
+            <!-- UAProfile BrowserUA properties -->
+
+            <AttributeSchema name="BrowserName" i18nKey="BrowserName"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="BrowserVersion" i18nKey="BrowserVersion"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="DownloadableBrowserApps" i18nKey="DownloadableBrowserApps"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="FramesCapable" i18nKey="FramesCapable"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="HtmlVersion" i18nKey="HtmlVersion"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="JavaAppletEnabled" i18nKey="JavaAppletEnabled"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="JavaScriptEnabled" i18nKey="JavaScriptEnabled"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="JavaScriptVersion" i18nKey="JavaScriptVersion"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="PreferenceForFrames" i18nKey="PreferenceForFrames"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="TablesCapable" i18nKey="TablesCapable"
+              any="display" type="single" syntax="boolean"
+            />
+            <AttributeSchema name="XhtmlModules" i18nKey="XhtmlModules"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="XhtmlVersion" i18nKey="XhtmlVersion"
+              any="display" type="single" syntax="string"
+            />
+
+            <!-- UAProfile WapCharacteristics properties -->
+
+            <AttributeSchema name="SupportedPictogramSet" i18nKey="SupportedPictogramSet"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="WapDeviceClass" i18nKey="WapDeviceClass"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="WapVersion" i18nKey="WapVersion"
+              any="display" type="single" syntax="string"
+            />
+            <AttributeSchema name="WmlDeckSize" i18nKey="WmlDeckSize" 
+              any="display" type="single" syntax="number"
+            />
+            <AttributeSchema name="WmlScriptLibraries" i18nKey="WmlScriptLibraries"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="WmlScriptVersion" i18nKey="WmlScriptVersion"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="WmlVersion" i18nKey="WmlVersion"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="WtaiLibraries" i18nKey="WtaiLibraries"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="WtaVersion" i18nKey="WtaVersion"
+              any="display" type="single" syntax="string"
+            />
+
+            <!-- UAProfile PushCharacteristics properties -->
+
+            <AttributeSchema name="Push-Accept" i18nKey="Push-Accept"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="Push-Accept-Charset" i18nKey="Push-Accept-Charset"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="Push-Accept-Encoding" i18nKey="Push-Accept-Encoding"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="Push-Accept-Language" i18nKey="Push-Accept-Language"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="Push-Accept-AppID" i18nKey="Push-Accept-AppID"
+              any="display" type="list" syntax="string"
+            />
+            <AttributeSchema name="Push-MsgSize" i18nKey="Push-MsgSize"
+              any="display" type="single" syntax="number"
+            />
+            <AttributeSchema name="Push-MaxPushReq" i18nKey="Push-MaxPushReq" 
+              any="display" type="single" syntax="number"
+            />
+
+            <!-- additional properties -->
+            <AttributeSchema name="additionalProperties" i18nKey="additionalProperties"
+              any="display" type="list" syntax="string"
+            />
+
+          </SubSchema>
+        </SubSchema> <!-- end database schema -->
+
+        <!-- store the profilemanager.xml -->
+        <AttributeSchema name="profileManagerXML" type="single" syntax="xml" />
+
+      </Global>
+
+    </Schema>
+
+  </Service>
+</ServicesConfiguration>

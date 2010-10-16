@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'un fournisseur d'identit&#233;s WS-FED - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedidp"></a><h4>Personnalisation d'un fournisseur d'identit&#233;s WS-FED</h4>
+<p>Les attributs suivants s'appliquent au r&#244;le Fournisseur d'identit&#233;s WS-FED&#160;:</p>
+
+<a name="ghfke"></a><h5>Format NameID</h5>
+<p>D&#233;finit le format du composant de l'identificateur de nom de la r&#233;ponse
+de connexion unique envoy&#233; par le fournisseur d'identit&#233;s au fournisseur de services.
+La connexion unique WS-Federation prend en charge les formats d'identificateur (par d&#233;faut
+UPN) :</p>
+<ul><li><p>Adresse e-mail</p></li></ul>
+
+<ul><li><p>Nom usuel</p></li>
+<li><p>UPN (User Principal Name) La syntaxe est <tt> utilisateur&#64;domaine</tt> et l'exemple de <tt>domaine</tt>est <tt> exemple.com</tt>.</p></li></ul>
+
+
+<a name="ghfog"></a><h5>Identificateur de nom </h5>
+<p>D&#233;finit l'attribut dans le profil de l'utilisateur qui va &#234;tre employ&#233; comme
+valeur de l'identificateur de nom. La valeur par d&#233;faut est <tt>uid</tt>. </p>
+
+<a name="ghflq"></a><h5>Le nom comprend le domaine</h5>
+<p>Lors de l'utilisation du format UPN d&#233;fini dans l'attribut Identificateur de nom,
+indique si ce dernier dans le profil de l'utilisateur comporte un domaine.
+Dans ce cas, l'attribut Identificateur de nom sera utilis&#233; pour le nom
+UPN d&#233;fini actuellement. Dans le cas contraire, il est combin&#233; &#224; un
+domaine pour former un nom UPN.</p>
+
+<a name="ghfmk"></a><h5>Attribut de domaine</h5>
+<p>Si l'attribut Le nom comprend le domaine n'est pas s&#233;lectionn&#233; lors de
+l'utilisation du format UPN, sp&#233;cifie un attribut du profil de l'utilisateur &#224;
+employer en tant que domaine UPN. </p>
+
+<a name="ghfnw"></a><h5>Domaine UPN</h5>
+<p>Si lors de l'utilisation du format UPN, l'attribut Le nom comprend le
+domaine n'est pas s&#233;lectionn&#233; et que l'attribut Domaine n'est pas sp&#233;cifi&#233; ou
+si cet attribut ne poss&#232;de pas de valeur pour un utilisateur en
+particulier, cet attribut est utilis&#233; concevoir le nom UPN. </p>
+
+<a name="ggwvh"></a><h5>Signature d'alias cert</h5>
+<p>Cet attribut sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le
+certificat de signature d'assertion dans le keystore.</p>
+
+<a name="ggwve"></a><h5>Types de r&#233;clamation</h5>
+<p>Sp&#233;cifie le type de r&#233;clamation afin que le service WS-FED puisse reconna&#238;tre
+le type de jeton &#233;chang&#233; entre les partenaires de la f&#233;d&#233;ration. </p><p>Le type de r&#233;clamation EmailAddress permet d'identifier une entit&#233; principale de s&#233;curit&#233;
+par son adresse &#233;lectronique. </p><p>Le type de r&#233;clamation UPN permet d'identifier une entit&#233; principale de s&#233;curit&#233;
+via un nom principal d'utilisateur. </p><p>Le type de r&#233;clamation CommonName permet d'identifier une entit&#233; principale de s&#233;curit&#233;
+via une valeur CN conforme aux conventions de d&#233;nomination X.500. La valeur
+de cette r&#233;clamation n'est pas n&#233;cessairement unique et ne doit pas &#234;tre
+utilis&#233;e &#224; des fins d'autorisation. </p>
+
+<a name="ggwwj"></a><h5>Mappeur de comptes</h5>
+<p>Cet attribut sp&#233;cifie l'impl&#233;mentation de l'interface <tt>AccountMapper</tt> utilis&#233;e pour mapper un compte
+d'utilisateur distant &#224; un compte d'utilisateur local &#224; des fins de connexion
+unique. La valeur par d&#233;faut est <tt> com.sun.identity.wsfed.plugins.DefaultIDPAccountMapper</tt>. </p>
+
+<a name="ggwuq"></a><h5>Mappeur d'attribut</h5>
+<p>Ceci d&#233;finit la classe utilis&#233;e pour mapper les attributs dans l'assertion aux
+attributs utilisateur d&#233;finis localement par le fournisseur d'identit&#233;s. La classe par d&#233;faut
+est <tt>com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper</tt>.</p>
+
+<a name="ggwul"></a><h5>Mappage d'attributs </h5>
+<p>Sp&#233;cifie les valeurs permettant de d&#233;finir les correspondances utilis&#233;es par le plug-in
+de mappage des attributs par d&#233;faut. Les mappages doivent avoir le format
+suivant&#160;:</p><p><i>Claim_Type</i>=<i>local-attribute</i></p><p>Par exemple, <tt>EmailAddress=mail</tt> ou <tt>Address=postaladdress </tt>. Tapez le mappage dans Nouvelle valeur et
+cliquez sur Ajouter.</p>
+
+<a name="ggwrj"></a><h5>Temps efficace d'assertion</h5>
+<p>Les assertions sont valides pendant un intervalle de temps donn&#233;, pas avant
+ni apr&#232;s.  </p><p><tt>Effective Time</tt> sp&#233;cifie (en secondes) la dur&#233;e de validit&#233; d'une assertion &#224; partir
+de son heure d'&#233;mission. La valeur par d&#233;faut est <tt>600</tt> secondes.</p>
+<br/>
+
+</body>
+</html>

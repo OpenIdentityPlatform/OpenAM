@@ -1,0 +1,210 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-fam,v 1.5 2008/08/19 19:08:32 veiming Exp $
+#
+#
+
+tune_FAMServerConfig() {
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Recommended FAM Server tuning parameters are..."`
+    $ECHO
+    $ECHO `$gettext "File                 : "`
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "1.    com.iplanet.am.sdk.cache.maxSize"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.sdk.cache.maxSize=10000"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.sdk.cache.maxSize=$numSDKCacheEntries"
+    $ECHO
+    $ECHO `$gettext "2.   com.iplanet.am.notification.threadpool.size"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.notification.threadpool.size=10"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.notification.threadpool.size=$numNotificationThreads"
+    $ECHO
+    $ECHO `$gettext "3.   com.iplanet.am.notification.threadpool.threshold"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.notification.threadpool.threshold=100"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.notification.threadpool.threshold=$numNotificationQueue"
+    $ECHO
+    $ECHO `$gettext "4.   com.iplanet.am.session.maxSessions"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.session.maxSessions=5000"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.session.maxSessions=$numSessions"
+    $ECHO
+    $ECHO `$gettext "5.   com.iplanet.am.session.httpSession.enabled"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.session.httpSession.enabled=true"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.session.httpSession.enabled=false"
+    $ECHO
+    $ECHO `$gettext "6.   com.iplanet.am.session.purgedelay"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.session.purgedelay=60"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.session.purgedelay=0"
+    $ECHO
+    $ECHO `$gettext "7.   com.iplanet.am.session.invalidsessionmaxtime"`
+    $ECHO `$gettext "Default Value        :  "` "com.iplanet.am.session.invalidsessionmaxtime=10"
+    $ECHO `$gettext "Recommended Value    :  "` "com.iplanet.am.session.invalidsessionmaxtime=2"
+    $ECHO
+    $ECHO
+
+    ATTR1=com.iplanet.am.sdk.cache.maxSize=$numSDKCacheEntries
+    ATTR2=com.iplanet.am.notification.threadpool.size=$numNotificationThreads
+    ATTR3=com.iplanet.am.notification.threadpool.threshold=$numNotificationQueue
+    ATTR4=com.iplanet.am.session.maxSessions=$numSessions
+    ATTR5=com.iplanet.am.session.httpSession.enabled=false
+    ATTR6=com.iplanet.am.session.purgedelay=0
+    ATTR7=com.iplanet.am.session.invalidsessionmaxtime=2
+ 
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    $ECHO `$gettext "Tuning FAM Server Configurations..."`
+
+    $FAMADM update-server-cfg $FAMADM_COMMON_PARAMS_NO_SERVER $FAMADM_SERVER $FAMSERVER_URL --attributevalues $ATTR1 $ATTR2 $ATTR3 $ATTR4 $ATTR5 $ATTR6 $ATTR7
+     
+    $ECHO `$gettext "Done."`
+    $ECHO
+}
+
+tune_ServerConfig() {
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning serverconfig LDAP connection pool"`
+    $ECHO
+    $ECHO `$gettext "Recomended tuning parameters only. These paramters will not be tuned by the script."`
+    $ECHO `$gettext "You need to modify them manually by using famadm update-svrcfg-xml subcommand to load a serverconfig.xml into"`
+    $ECHO `$gettext "Directory Server.  Please refer to FAM Performance Tuning Guide."`
+    $ECHO
+    $ECHO `$gettext "1.   minConnPool"`
+    $ECHO `$gettext "Recommended Value    : "` "minConnPool=8"
+    $ECHO
+    $ECHO `$gettext "2.   maxConnPool"`
+    $ECHO `$gettext "Recommended Value    : "` "maxConnPool=32"
+    $ECHO
+    $ECHO
+}
+
+tune_LDAPConnPool() {
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning LDAP Connection Pool in Global iPlanetAMAuthService..."`
+    $ECHO
+    $ECHO `$gettext "Service              : iPlanetAMAuthService"`
+    $ECHO `$gettext "SchemaType           : global"`
+    $ECHO
+    $ECHO `$gettext "Recomended tuning parameters only. This paramter will not be tuned by the script."`
+    $ECHO `$gettext "If you want to tune these parameters, please go to FAM console's Authentication Configuration tab,"`
+    $ECHO `$gettext "then click on Core and change LDAP Connection Pool Size. Please refer to FAM "` 
+    $ECHO `$gettext "Performance Tuning Guide."`
+    $ECHO
+    $ECHO `$gettext "1.   iplanet-am-auth-ldap-connection-pool-default-size"`
+    $ECHO `$gettext "Recommended Value    : "` "iplanet-am-auth-ldap-connection-pool-default-size=8:32"
+    $ECHO
+
+}
+
+tune_LDAPSearchCriteriaForDefaultOrg() {
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning LDAP Search Criteria in iPlanetAMAuthLDAPService for Default Org:"`
+    $ECHO
+    $ECHO `$gettext "Service              : iPlanetAMAuthLDAPService for Org"`
+    $ECHO `$gettext "SchemaType           : organization"`
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "Recomended tuning parameters only. This paramter will not be tuned by the script."`
+    $ECHO `$gettext "If you want to tune these parameters, please go to FAM console's appropriate realm's"`
+    $ECHO `$gettext "tab and click on LDAP module instance and change its search scope."`
+    $ECHO
+    $ECHO `$gettext "1.   iplanet-am-auth-ldap-search-scope"`
+    $ECHO `$gettext "Recommended Value    : "` "iplanet-am-auth-ldap-search-scope=OBJECT"
+    $ECHO
+    $ECHO
+
+}
+
+tune_SessionTimeouts() {
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning Session Timeouts in Global iPlanetAMSessionService..."`
+    $ECHO
+    $ECHO `$gettext "Service              : iPlanetAMSessionService"`
+    $ECHO `$gettext "SchemaType           : Dynamic"`
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "Recomended tuning parameters only. This paramter will not be tuned by the script."`
+    $ECHO `$gettext "If you want to tune these parameters, please go to FAM console's Global Configuration tab,"`
+    $ECHO `$gettext "then click on Session and change Maximum Session, Idle and Caching Times."`
+    $ECHO
+    $ECHO `$gettext "1.   iplanet-am-session-max-session-time"`
+    $ECHO `$gettext "Recommended Value    : "` "iplanet-am-session-max-session-time=$AMTUNE_SESSION_MAX_SESSION_TIME_IN_MTS"
+    $ECHO
+    $ECHO `$gettext "2.   iplanet-am-session-max-idle-time"`
+    $ECHO `$gettext "Recommended Value    : "` "iplanet-am-session-max-idle-time=$AMTUNE_SESSION_MAX_IDLE_TIME_IN_MTS"
+    $ECHO
+    $ECHO `$gettext "3.   iplanet-am-session-max-caching-time"`
+    $ECHO `$gettext "Recommended Value    : "` "iplanet-am-session-max-caching-time=$AMTUNE_SESSION_MAX_CACHING_TIME_IN_MTS"
+    $ECHO
+    $ECHO
+
+}
+
+#############################################################################
+# Start of main program
+#############################################################################
+SCRIPT_LOCATION=`/usr/bin/dirname $0`
+AMTUNE_SCRIPT_RECORD_STRING="AMTUNE_FAM_SCRIPT"
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-fam
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+# import the environment
+if [ -f $SCRIPT_LOCATION/amtune-env ]; then
+    if [ ! "$INIT_STATUS" = "INIT_COMPLETE" ]; then
+        . $SCRIPT_LOCATION/amtune-env
+    fi
+fi
+
+ECHO_MSG "`$gettext 'OpenSSO Tuning Script'`"
+
+$ECHO $FAMADM_PASSWORD > $FAMADM_PASSFILE
+
+chmod 400 $FAMADM_PASSFILE
+
+tune_FAMServerConfig     | eval $OUTPUT_TYPE
+tune_ServerConfig       | eval $OUTPUT_TYPE
+tune_LDAPConnPool       | eval $OUTPUT_TYPE
+
+#If default org's people container is specified, then perform this tune
+        if [ "$DEFAULT_ORG_PEOPLE_CONTAINER" != "" ]; then
+                tune_LDAPSearchCriteriaForDefaultOrg    | eval $OUTPUT_TYPE
+        fi
+
+        if [ "$AMTUNE_DONT_TOUCH_SESSION_PARAMETERS" = "false" ]; then
+                tune_SessionTimeouts    | eval $OUTPUT_TYPE
+        fi
+
+$RM $FAMADM_PASSFILE
+
+ECHO_MSG $PARA_SEP

@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>設定属性 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="service.scconfig"></a><h3>設定属性</h3><p><a name="indexterm-164"></a>管理者は、「設定」ページを使用して OpenSSO が提供するサービスの属性値を管理できます。OpenSSO サービスを構成している属性は、次のいずれかのタイプに分類されます。</p><p><b>グローバル</b> &#8211; OpenSSO 設定全体で適用されます。グローバル属性の目的は OpenSSO のカスタマイズなので、ユーザー、ロール、およびレルムに適用することはできません。</p><p><b>レルム</b> &#8211; レルム属性はレルムにのみ割り当てられます。レルム属性には、オブジェクトクラスは関連付けられません。たとえば、認証はサブツリーレベルやユーザーレベルではなくレルムレベルで行われるため、認証サービスに一覧表示された属性は、レルム属性として定義されます。</p><p><b>動的</b> &#8211; OpenSSO で構成されたロールまたはレルムに適用されます。ロールがユーザーに割り当てられるか、ユーザーがレルム内に作成されると、動的属性がそのユーザーの特性になります。</p><p><b>ユーザー</b> &#8211; 各ユーザーに直接適用されます。ユーザー属性はロールとレルムからは継承されないため、通常はユーザーごとに異なります。</p><p>変更できる設定属性は次のとおりです。</p>
+<ul><li><p><a href="service.scconfigauth.html">「認証」</a></p></li>
+<li><p><a href="service.scconfigconsole.html">「コンソールプロパティー」</a></p></li>
+<li><p><a href="servic.scconfigglobal.html">「グローバル属性」</a></p></li>
+<li><p><a href="service.scfonfigsystem.html">「システムプロパティー」</a></p></li>
+<li><p><a href="service.serversite.html">「サーバーおよびサイト」</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

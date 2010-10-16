@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>一般 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>一般</h4>
+<p>一般属性は、サーバーを集中管理するための基本的な設定データを設定します。</p>
+
+<a name="ggjyg"></a><h5>サイト属性</h5>
+<p>サイト属性は次のとおりです。</p>
+
+<a name="ggjxc"></a><h5>親サイト</h5>
+<p>この属性は、ロードバランサのサイト名 (サイト ID) を OpenSSO サーバーにマップします。サイトを追加するには、あらかじめサイトを作成しておく必要があることに注意してください。  </p>
+
+<a name="ggjwl"></a><h5>システム属性</h5>
+<p>システム属性は、サーバーインスタンスの位置情報を一覧表示します。</p>
+
+<a name="ggjyj"></a><h5>ベースインストールディレクトリ</h5>
+<p>製品のデータが存在するベースディレクトリを指定します。 </p>
+
+<a name="ggjxz"></a><h5>デフォルトのロケール</h5>
+<p>ロケールの値は、OpenSSO とともにインストールしたデフォルト言語のサブタイプです。デフォルトは <tt>en_US</tt> です。</p>
+
+<a name="ggjwq"></a><h5>通知 URL</h5>
+<p>通知サービスのエンドポイントの場所。この値はインストール時に設定されます。</p>
+
+<a name="ggjzq"></a><h5>XML 検証</h5>
+<p>デフォルト値は no です。OpenSSO の <tt>XMLUtils</tt> クラスを使用して XML ドキュメントを解析するときに検証が必要かどうかを決定します。このプロパティーは、デバッグレベル属性が warning または message に設定されている場合のみ機能します。指定可能な値は
+yes と no です。XML ドキュメントの検証がオンに設定されるのは、このプロパティーの値が yes で、デバッグレベル属性が warning または message に設定されている場合のみです。</p>
+
+<a name="ggjzy"></a><h5>デバッグ属性</h5>
+<p>デバッグ属性は、基本的なエラーチェック情報を一覧表示します。</p>
+
+<a name="ggjzc"></a><h5>デバッグレベル</h5>
+<p>デバッグレベルを指定します。デフォルト値は error です。指定可能な値は、次のとおりです。</p>
+<ul><li><p>off &#8212; デバッグファイルは作成されません。</p></li>
+<li><p>error &#8212; エラーメッセージだけがログに書き込まれます。</p></li>
+<li><p>warning &#8212; 警告メッセージだけがログに書き込まれます。</p></li>
+<li><p>message &#8212; エラーメッセージ、警告メッセージ、および情報メッセージがログに書き込まれます。</p></li></ul>
+
+
+<a name="ggjze"></a><h5>デバッグディレクトリ</h5>
+<p>デバッグファイルが作成される出力ディレクトリを指定します。値はインストールの間に設定されます。次に例を示します。 <tt></tt><i>OpenSSO-base</i><tt>/</tt><i>debug_URI</i><tt>/debug</tt></p>
+
+<a name="ggjwr"></a><h5>メールサーバー</h5>
+<p>メールサーバー属性は、メールサーバーのホスト名とポートを一覧表示します。</p>
+
+<a name="ggkax"></a><h5>メールサーバーホスト名</h5>
+<p>デフォルト値は <tt>localhost</tt> です。メールサーバーホストを指定します。</p>
+
+<a name="ggkbx"></a><h5>メールサーバーポート番号</h5>
+<p>デフォルト値は 25 です。メールサーバーポートを指定します。</p>
+<br/>
+
+</body>
+</html>

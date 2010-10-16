@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs de l'agent de d&#233;couverte - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.discoveryagentprofile"></a><h4>Attributs de l'agent de d&#233;couverte</h4>
+<p>Le profil de l'agent de d&#233;couverte contient une configuration d'autorit&#233; de confiance
+que le client/profil des services Web utilise afin de communiquer avec le
+service de d&#233;couverte Liberty pour les recherches de services Web et l'enregistrement
+et pour obtenir les r&#233;f&#233;rences de s&#233;curit&#233;.</p>
+
+<a name="gglro"></a><h5>Groupe</h5>
+<p>Le m&#233;canisme de groupe permet de d&#233;finir un ensemble de types d'agents
+similaires. Vous devez d&#233;finir le groupe avant d'inclure l'agent sp&#233;cifique dans un
+ensemble. </p>
+
+<a name="gglpn"></a><h5>Mot de passe</h5>
+<p>D&#233;finit le mot de passe de l'agent de d&#233;couverte.</p>
+
+<a name="ggloy"></a><h5>Confirmation de mot de passe</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="ggtwd"></a><h5>Statut</h5>
+<p>D&#233;finit si l'agent sera actif ou inactif au sein du syst&#232;me. Par
+d&#233;faut, cet attribut est activ&#233;, ce qui signifie que l'agent va participer
+&#224; la s&#233;curisation des demandes de services Web sortantes &#233;mises par les
+clients de services Web et va valider les r&#233;ponses de services Web
+renvoy&#233;es par un fournisseur de services Web.</p>
+
+<a name="ggloo"></a><h5>Emplacement du r&#233;f&#233;rentiel de configuration de l'agent</h5>
+<p>Cet attribut d&#233;finit l'emplacement d'agent du r&#233;f&#233;rentiel de configuration de l'agent de
+d&#233;couverte. </p>
+
+<a name="gglqv"></a><h5>Alias de cl&#233; priv&#233;e</h5>
+<p>Cet attribut d&#233;finit l'alias de cl&#233; de certificat priv&#233;e, utilis&#233; pour signer
+la demande de services Web ou d&#233;chiffrer la r&#233;ponse des services Web.</p>
+
+<a name="gglny"></a><h5>Point d'arriv&#233;e du service de d&#233;couverte</h5>
+<p>Cet attribut d&#233;finit le point d'arriv&#233;e du service de d&#233;couverte o&#249; le
+client de l'autorit&#233; de confiance &#233;tablit des communications en vue des enregistrements
+et des recherches de services.</p>
+
+<a name="gglra"></a><h5>Point d'arriv&#233;e du service Web d'authentification</h5>
+<p>Cet attribut d&#233;finit l'extr&#233;mit&#233; du service d'authentification que le client de services
+Web utilise pour s'authentifier avec le jeton SSOToken de l'utilisateur final afin
+de recevoir l'offre de ressources du service de d&#233;couverte (&#233;galement appel&#233;e offre
+de ressources d'initialisation).</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>An&#243;nimo - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthanonymousservice"></a><h4>An&#243;nimo</h4>
+<p><a name="indexterm-167"></a>Este tipo de m&#243;dulo permite a un usuario iniciar una sesi&#243;n sin
+necesidad de especificar las credenciales. Puede crear un usuario Anonymous (An&#243;nimo) para
+que cualquier usuario pueda iniciar una sesi&#243;n como an&#243;nimo sin necesidad de
+proporcionar una contrase&#241;a. Normalmente, el administrador de OpenSSO personaliza las conexiones an&#243;nimas
+de forma que los usuarios an&#243;nimos tengan acceso limitado al servidor. Los
+atributos de autenticaci&#243;n an&#243;nima son atributos de dominio. Los atributos son:</p>
+<ul><li><p><a href="#fwblp">Usuarios an&#243;nimos v&#225;lidos</a></p></li>
+<li><p><a href="#fwbnz">Nombre de usuario an&#243;nimo predeterminado</a></p></li>
+<li><p><a href="#fwbto">Id. de usuario con distinci&#243;n entre may&#250;sculas y min&#250;sculas</a></p></li>
+<li><p><a href="#fwbli">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwblp"></a><h5>Usuarios an&#243;nimos v&#225;lidos</h5>
+<p>Contiene una lista de los Id. de usuario que tienen permiso para
+iniciar una sesi&#243;n sin proporcionar credenciales. Si un nombre de inicio de
+sesi&#243;n de usuario coincide con un Id. de usuario en esta lista,
+se concede el acceso y se asigna la sesi&#243;n al Id. de
+usuario especificado.</p><p>Si esta lista est&#225; vac&#237;a, al acceder a esta direcci&#243;n URL predeterminada
+de inicio de sesi&#243;n de la instancia del m&#243;dulo, se autenticar&#225; como
+nombre de usuario an&#243;nimo predeterminado:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>Si esta lista no est&#225; vac&#237;a, al acceder a la direcci&#243;n URL
+de inicio de sesi&#243;n de la instancia del m&#243;dulo predeterminada (la misma
+de arriba), se le solicitar&#225; al usuario que introduzca un nombre de
+usuario an&#243;nimo v&#225;lido. Adem&#225;s, el usuario puede iniciar una sesi&#243;n sin ver
+la p&#225;gina de inicio de sesi&#243;n accediendo a la siguiente direcci&#243;n URL:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1=&#60;valid Anonymous username&#62;</tt> </p>
+
+<a name="fwbnz"></a><h5>Nombre de usuario an&#243;nimo predeterminado</h5>
+<p>Define el Id. de usuario que se asigna a una sesi&#243;n si
+la lista de usuarios an&#243;nimos v&#225;lidos est&#225; vac&#237;a y se accede a
+la siguiente direcci&#243;n URL predeterminada de inicio de sesi&#243;n de la instancia
+del m&#243;dulo:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>El valor predeterminado es anonymous (an&#243;nimo). Tambi&#233;n se debe crear un usuario
+an&#243;nimo en el dominio.</p>
+<hr><p><b>Nota &#8211; </b>Si la lista de usuarios an&#243;nimos v&#225;lidos no est&#225; vac&#237;a, puede iniciar
+una sesi&#243;n sin acceder a la p&#225;gina de inicio de sesi&#243;n utilizando
+el usuario definido en Nombre de usuario an&#243;nimo predeterminado. Esto puede realizarse
+accediendo a la siguiente direcci&#243;n URL:</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1= </tt> <tt></tt><i>DefaultAnonymous User Name</i><tt></tt></p>
+<hr>
+
+
+<a name="fwbto"></a><h5>Id. de usuario con distinci&#243;n entre may&#250;sculas y min&#250;sculas</h5>
+<p>Si se habilita, esta opci&#243;n permite diferenciar entre may&#250;sculas y min&#250;sculas para
+los Id. de usuario. De forma predeterminada, este atributo no est&#225; habilitado.</p>
+
+<a name="fwbli"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

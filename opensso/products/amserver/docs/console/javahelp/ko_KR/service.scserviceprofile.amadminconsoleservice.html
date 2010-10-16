@@ -1,0 +1,405 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>관리  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amadminconsoleservice"></a><h4>관리 </h4>
+<p><a name="indexterm-187"></a>관리 서비스를 사용하면 구성된 영역 수준(구성된 영역에 대한 기본 설정 또는 옵션)
+뿐만 아니라 전역 수준에서도 OpenSSO 콘솔을 구성할 수 있습니다. 관리 서비스 속성은
+전역 및 영역 속성입니다. </p>
+<hr><p><b>주 &#8211; </b>이 절에 나와 있는 속성 중 일부는 레거시 모드 설치에만 적용됩니다.</p>
+<hr>
+<p>속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fufly">연합 관리</a></p></li>
+<li><p><a href="#fsvge">사용자 관리</a></p></li>
+<li><p><a href="#fsvgj">사용자 컨테이너</a></p></li>
+<li><p><a href="#fsvgm">조직 구성 단위 컨테이너</a></p></li>
+<li><p><a href="#fsvgq">그룹 컨테이너</a></p></li>
+<li><p><a href="#fsvgh">관리 대상 그룹 유형</a></p></li>
+<li><p><a href="#fsvgr">기본 역할 권한</a></p></li>
+<li><p><a href="#fsvgt">도메인 구성 요소 트리</a></p></li>
+<li><p><a href="#fsvgs">관리 그룹</a></p></li>
+<li><p><a href="#fsvgv">호환 사용자 삭제</a></p></li>
+<li><p><a href="#fsvgu">동적 관리 역할 ACI</a></p></li>
+<li><p><a href="#ftbxa">사용자 프로필 서비스 클래스</a></p></li>
+<li><p><a href="#fsvgw">DC 노드 속성 목록</a></p></li>
+<li><p><a href="#fsvgx">삭제된 객체의 검색 필터</a></p></li>
+<li><p><a href="#fsvgy">기본 사용자 컨테이너</a></p></li>
+<li><p><a href="#fsvhe">기본 그룹 컨테이너</a></p></li>
+<li><p><a href="#fsvhd">기본 에이전트 컨테이너</a></p></li>
+<li><p><a href="#fsvhb">그룹 기본 사용자 컨테이너</a></p></li>
+<li><p><a href="#fsvha">그룹 사용자 컨테이너 목록</a></p></li>
+<li><p><a href="#fsvhc">사용자 프로필 디스플레이 클래스</a></p></li>
+<li><p><a href="#fsvhh">최종 사용자 프로필 디스플레이 클래스</a></p></li>
+<li><p><a href="#fsvhi">사용자 프로필 페이지에 역할 표시</a></p></li>
+<li><p><a href="#fsvhj">사용자 프로필 페이지에 그룹 표시</a></p></li>
+<li><p><a href="#fsvhf">사용자의 그룹 직접 가입</a></p></li>
+<li><p><a href="#fsvhk">사용자 프로필 디스플레이 옵션</a></p></li>
+<li><p><a href="#fsvhl">사용자 작성 기본 역할</a></p></li>
+<li><p><a href="#fsvhm">관리 콘솔 탭</a></p></li>
+<li><p><a href="#fsvho">검색에서 반환되는 최대 결과 수</a></p></li>
+<li><p><a href="#fsvhp">검색 시간 초과</a></p></li>
+<li><p><a href="#fsvhs">JSP 디렉토리 이름</a></p></li>
+<li><p><a href="#fsvhr">온라인 도움말 문서</a></p></li>
+<li><p><a href="#fsvhq">필수 서비스</a></p></li>
+<li><p><a href="#fsvhu">사용자 검색 키</a></p></li>
+<li><p><a href="#fsvht">사용자 검색 반환 속성</a></p></li>
+<li><p><a href="#fsvhv">사용자 작성 알림 목록</a></p></li>
+<li><p><a href="#fsvhw">사용자 삭제 알림 목록</a></p></li>
+<li><p><a href="#fsvhx">사용자 수정 알림 목록</a></p></li>
+<li><p><a href="#fsvia">페이지당 표시되는 최대 항목</a></p></li>
+<li><p><a href="#fsvhz">Event Listener 클래스</a></p></li>
+<li><p><a href="#fsvhy">사전 처리 및 사후 처리 클래스</a></p></li>
+<li><p><a href="#fsvic">외부 속성 불러오기</a></p></li>
+<li><p><a href="#fsvib">잘못된 사용자 아이디 문자</a></p></li>
+<li><p><a href="#fsvie">사용자 아이디 및 비밀번호 검증 플러그인 클래스</a></p></li></ul>
+
+
+<a name="fufly"></a><h5>연합 관리</h5>
+<p>연합 관리를 사용합니다. 이 필드는 기본적으로 선택됩니다. 이 기능을 사용 불가능하게 하려면
+연합 관리 탭을 콘솔에 표시하지 않을 필드의 선택을 취소합니다.</p>
+
+<a name="fsvge"></a><h5>사용자 관리</h5>
+<p>사용자 관리를 사용합니다. 이 필드는 기본적으로 사용 가능합니다. 이 속성은 OpenSSO가 레거시
+모드로 설치된 경우 적용할 수 있습니다. </p>
+
+<a name="fsvgj"></a><h5>사용자 컨테이너</h5>
+<p>이 속성은 기본적으로 선택 취소되며 OpenSSO가 레거시 모드로 설치된 경우에만 적용할 수
+있습니다. 이 속성을 선택하면 [디렉토리 관리] 탭 아래에 사용자 컨테이너가 표시됩니다. DIT에서
+단일 사용자 컨테이너를 사용하고 역할을 사용하여 계정과 서비스를 관리하는 것이 좋습니다. OpenSSO
+콘솔의 기본 동작은 사용자 컨테이너를 숨기는 것입니다. 그러나 DIT에 여러 사용자 컨테이너가
+있는 경우 사용자 컨테이너를 관리 대상 객체로 표시하도록 이 속성을 선택합니다.</p>
+
+<a name="fsvgm"></a><h5>조직 구성 단위 컨테이너</h5>
+<p>이 속성은 기본적으로 선택 취소되며 OpenSSO가 레거시 모드로 설치된 경우 적용할 수
+있습니다. 이 속성을 선택하면 [디렉토리 관리] 탭에 컨테이너가 표시됩니다.</p>
+
+<a name="fsvgq"></a><h5>그룹 컨테이너</h5>
+<p>이 속성은 기본적으로 선택 취소되며 OpenSSO가 레거시 모드로 설치된 경우 적용할 수
+있습니다. 이 속성을 선택하면 [디렉토리 관리] 탭에 그룹 컨테이너가 표시됩니다.</p>
+
+<a name="fsvgh"></a><h5>관리 대상 그룹 유형</h5>
+<p>콘솔을 통해 만들어진 가입 그룹이 정적인지 또는 동적인지 여부를 지정합니다. 콘솔은 정적
+또는 동적이거나 둘 다 해당하지 않는 가입 그룹을 만들고 표시합니다. (필터링된 그룹은
+이 속성에 주어진 값에 상관없이 항상 지원됩니다.) 기본값은 동적입니다.</p>
+<ul><li><p>정적 그룹은 <tt>groupOfNames</tt> 또는 <tt>groupOfUniqueNames</tt> 객체 클래스를 사용하여 각 그룹 구성원을 명시적으로 나열합니다. 그룹 항목은 그룹의 각 구성원에 대해 <i>uniqueMember</i> 속성을 포함합니다. 정적 그룹의 구성원은 수동으로 추가되므로 사용자 항목 자체는 변경되지 않습니다. 정적 그룹은 구성원이 거의 없는 그룹에 적합합니다. </p></li>
+<li><p>동적 그룹은 각 그룹 구성원의 항목에서 <tt>memberOf</tt> 속성을 사용합니다. 동적 그룹의 구성원은 <tt>memberOf</tt> 속성을 포함하는 모든 항목을 검색 및 반환하는 LDAP 필터를 사용하여 생성됩니다. 동적 그룹은 구성원 수가 많은 그룹에 적합합니다. </p></li>
+<li><p>필터링된 그룹은 LDAP 필터를 사용하여 필터의 요구 사항을 충족하는 구성원을 검색하여 반환합니다. 예를 들어, 필터는 특정 uid(<tt>uid=g*</tt>)나 전자 메일 주소(<tt>mail=*@example.com</tt>)를 가진 구성원을 생성할 수 있습니다. </p></li></ul>
+<p>이 예에서 LDAP 필터는 각각 uid가 <tt>g</tt>로 시작하거나 전자 메일 주소가 <tt>example.com</tt>으로
+끝나는 모든 사용자를 반환합니다. 필터링된 그룹은 필터별 구성원을 선택하여 사용자 관리 보기
+내에서만 만들 수 있습니다.</p><p>관리자는 다음 중 하나를 선택할 수 있습니다.</p>
+<ul><li><p>동적 - 가입에 의한 구성원 옵션을 통해 만든 그룹이 동적 그룹이 됩니다.</p></li>
+<li><p>정적 - 가입에 의한 구성원 옵션을 통해 만든 그룹이 정적 그룹이 됩니다.</p></li></ul>
+
+
+<a name="fsvgr"></a><h5>기본 역할 권한</h5>
+<p>새 역할을 만들 때 관리자 권한을 허가하는 데 사용되는 기본 액세스 제어
+명령(ACI) 또는 <b>사용 권한</b>의 목록을 정의합니다. 원하는 권한 수준에 대해 이러한 ACI 중
+하나를 선택합니다. OpenSSO에는 다음의 4가지 기본 역할 권한이 포함되어 있습니다.</p><p>사용 권한 없음 &#8212; 역할에 사용 권한이 설정되지 않습니다.</p><p>조직 관리자 &#8212; 조직 관리자는 구성된 조직의 모든 항목에 대한 읽기 및
+쓰기 권한을 가집니다.</p><p>조직 도움말 데스크 관리자 &#8212; 조직 도움말 데스크 관리자는 구성된 조직의 모든
+항목에 대한 읽기 권한과 <tt>userPassword</tt> 속성에 대한 쓰기 권한을 가집니다.</p><p>조직 정책 관리자 &#8212; 조직 정책 관리자는 영역의 모든 정책에 대한 읽기
+및 쓰기 권한을 가집니다. 조직 정책 관리자는 참조 정책을 만들 수 없습니다.
+</p>
+
+<a name="fsvgt"></a><h5>도메인 구성 요소 트리</h5>
+<p>도메인 구성 요소 트리(DC 트리)는 여러 Sun Java System 구성 요소에서 DNS
+이름과 영역의 항목 간을 매핑하기 위해 사용하는 특정 DIT 구조입니다.</p><p>이 옵션이 사용 가능하면 영역을 만들 때 영역의 DNS 이름을 입력한 경우
+영역에 대한 DN 트리 항목이 만들어집니다. 또한 DNS 이름 필드가 영역 만들기
+페이지에 나타납니다. 이 옵션은 최상위 수준 영역에만 적용할 수 있으며 하위 영역의
+경우에는 표시되지 않습니다.</p><p>영역 트리에서 OpenSSO SDK를 통해 <i>inetdomainstatus</i> 속성의 상태를 변경하면 해당하는 DC 트리
+항목의 상태가 업데이트됩니다. (OpenSSO SDK가 아닌 다른 수단을 통해 수행된 상태 업데이트는
+동기화되지 않습니다.) 예를 들어, DNS 이름 속성 <tt>sun.com</tt>을 사용하여 새 영역 sun을
+만들 경우 DC 트리에 다음 항목이 만들어집니다.</p><p><tt>dc=sun,dc=com,o=internet,root suffix</tt></p><p>기본적으로 이 값은 OpenSSO 루트로 설정됩니다. 다른 접미어를 원할 경우 LDAP 명령을
+사용하여 해당 접미어를 만들어야 합니다. 또한 영역을 만든 관리자에 대한 ACI를 수정하여
+새로운 DC 트리 루트에 대해 무제한적인 액세스 권한을 갖도록 해야 합니다.</p>
+
+<a name="fsvgs"></a><h5>관리 그룹</h5>
+<p>DomainAdministrators 및 DomainHelpDeskAdministrators 그룹을 만들 것인지 여부를 지정합니다. 이 옵션을 선택할 경우
+이러한 그룹이 작성되어 각각 조직 관리자 역할과 조직 도움말 데스크 관리자 역할에
+연결됩니다. 그룹이 작성된 후 이러한 연결된 그룹 중 하나에서 사용자를 추가하거나 제거하면
+해당 그룹에서 사용자가 자동으로 추가 또는 제거됩니다. 그러나 이 동작은 역으로는 작동하지
+않습니다. 즉 이러한 그룹 중 하나에서 사용자를 추가하거나 제거해도 연결된 역할에서 사용자가
+추가 또는 제거되지 않습니다.</p><p>DomainAdministrators 및 DomainHelpDeskAdministrators 그룹은 이 옵션을 사용 가능하게 한 후 작성한 영역에서만
+만들어집니다. </p>
+<hr><p><b>주 &#8211; </b>이 옵션은 루트 영역을 제외한 하위 영역에 적용되지 않습니다. 루트 영역에서는 ServiceAdministrators
+및 ServiceHelpDesk Administrators 그룹이 작성되어 각각 최상위 수준 관리자 및 최상위 수준
+도움말 데스크 관리자 역할에 연결됩니다. 옵션의 동작 방식은 동일하게 적용됩니다.</p>
+<hr>
+
+
+<a name="fsvgv"></a><h5>호환 사용자 삭제</h5>
+<p>사용자의 항목을 디렉토리에서 삭제할 것인지 또는 단순히 삭제된 것으로 표시할 것인지 여부를
+지정합니다. 이 속성은 OpenSSO가 레거시 모드로 설치된 경우에만 적용할 수 있습니다.</p><p>사용자 항목을 삭제하고 이 옵션을 선택(true)하면 해당 사용자 항목은 여전히 디렉토리에 존재하지만
+삭제된 것으로 표시됩니다. 삭제 표시된 사용자 항목은 디렉토리 서버 검색 동안 반환되지
+않습니다. 이 옵션을 선택하지 않으면 사용자 항목이 디렉토리에서 삭제됩니다.</p>
+
+<a name="fsvgu"></a><h5>동적 관리 역할 ACI</h5>
+<p>이 속성은 그룹이나 영역을 OpenSSO를 사용하여 구성할 때 동적으로 만들어지는 관리자 역할에
+대한 액세스 제어 명령을 정의합니다. 이러한 역할은 작성된 항목의 특정 그룹화에 대해
+관리 권한을 허가하는 데 사용됩니다. 기본 ACI는 이 속성 목록 아래에서만 수정할
+수 있습니다.</p>
+<hr><p><b>주 &#8211; </b>영역 수준의 관리자는 그룹 관리자보다 광범위한 액세스 권한을 가집니다. 그러나 기본적으로 사용자가
+그룹 관리자 역할에 추가되면 해당 사용자는 그룹의 모든 사용자에 대해 비밀번호를 변경할
+수 있습니다. 여기에는 해당 그룹의 구성원인 모든 영역 관리자가 포함됩니다.</p>
+<hr>
+<p>컨테이너 도움말 데스크 관리자 역할은 영역의 모든 항목에 대한 읽기 권한과 이 컨테이너 단위에 한하여
+사용자 항목의 <i>userPassword</i> 속성에 대한 쓰기 권한을 가집니다.</p><p>영역 도움말 데스크 관리자는 영역의 모든 항목에 대한 읽기 권한과 <i>userPassword</i> 속성에
+대한 쓰기 권한을 가집니다. 하위 영역을 만들 때 관리 역할이 상위 영역이
+아닌 하위 영역에서 만들어진다는 점에 주의하십시오.</p><p>컨테이너 관리자 역할은 LDAP 조직 구성 단위의 모든 항목에 대한 읽기 및
+쓰기 권한을 가집니다. OpenSSO에서는 LDAP 조직 구성 단위를 흔히 컨테이너라고 부릅니다.</p><p>조직 정책 관리자는 모든 정책에 대한 읽기 및 쓰기 권한을 가지며 해당
+영역 내의 모든 정책을 작성, 할당, 수정 및 삭제할 수 있습니다.</p><p>사용자 컨테이너 관리가 기본이며 새로 만들어진 영역에 있는 모든 사용자 항목은 해당
+영역의 사용자 컨테이너 구성원입니다. 사용자 컨테이너 관리자는 해당 영역의 사용자 컨테이너에 있는
+모든 사용자 항목에 대해 읽기 및 쓰기 권한을 가집니다. 이 역할은 역할
+및 그룹 DN을 포함하는 속성에 대한 읽기 및 쓰기 권한을 갖지 않으므로
+역할 또는 그룹의 속성을 수정하거나 역할 또는 그룹에서 사용자를 제거할 수 없다는
+점에 주의하십시오.</p><p>OpenSSO에서 다른 컨테이너를 구성하여 사용자 항목, 그룹 항목 또는 다른 컨테이너를 포함할
+수 있습니다. 영역이 이미 구성된 후에 만든 컨테이너에 관리자 역할을 할당하면 컨테이너
+관리자 역할 또는 컨테이너 도움말 데스크 관리자 기본값이 사용됩니다.</p><p>그룹 관리자는 특정 그룹의 모든 구성원에 대한 읽기 및 쓰기 권한을 가지며
+새 사용자 작성, 관리하는 그룹에 사용자 할당, 작성한 사용자 삭제 등의 작업을
+수행할 수 있습니다. 그룹이 만들어지면 해당 그룹을 관리하는 데 필요한 권한과 함께
+그룹 관리자 역할이 자동으로 생성됩니다. 이 역할은 그룹 구성원에 자동으로 할당되지 않습니다.
+따라서 그룹 작성자나 그룹 관리자 역할에 대한 액세스 권한을 가진 누군가가 이
+역할을 할당해야 합니다.</p><p>최상위 수준 관리자는 최상위 수준 영역의 모든 항목에 대한 읽기 및 쓰기
+권한을 가집니다. 즉, 이 최상위 수준 관리자 역할은 OpenSSO 응용 프로그램 내의
+모든 구성 기본에 대한 권한을 가집니다.</p><p>조직 관리자는 영역의 모든 항목에 대한 읽기 및 쓰기 권한을 가집니다. 영역이
+만들어지면 해당 영역을 관리하는 데 필요한 권한과 함께 조직 관리자 역할이 자동으로
+생성됩니다.</p>
+
+<a name="ftbxa"></a><h5>사용자 프로필 서비스 클래스</h5>
+<p>사용자 프로필 페이지에서 사용자 정의 디스플레이를 가지는 서비스를 나열합니다. 콘솔에 의해 생성되는
+기본 디스플레이는 일부 서비스에서 충분하지 않을 수 있습니다. 이 속성은 서비스 정보의
+표시 방법과 내용을 완전하게 제어할 수 있게 함으로써 모든 서비스에 맞는 사용자
+정의 디스플레이를 만듭니다. 구문은 다음과 같습니다.</p><p><tt>service name | relative url()</tt></p><p>이 속성에 나열되는 서비스는 사용자 만들기 페이지에 표시되지 않습니다. 사용자 정의 서비스
+디스플레이에 대한 모든 데이터 구성은 사용자 프로필 페이지에서 수행해야 합니다.</p>
+
+<a name="fsvgw"></a><h5>DC 노드 속성 목록</h5>
+<p>객체를 만들 때 DC 트리 항목에 설정되는 속성 집합을 정의합니다. 기본 매개
+변수는 다음과 같습니다.</p><table><tr><td align="left" valign="top" scope="row"><p>maildomainwelcomemessage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailhost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailclientattachmentquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutingsmarthost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailaccessproxyreplay</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredlanguage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>domainuidseparator</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainmsgquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainallowedserviceaccess</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailmessagestore</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>objectclass=maildomain</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutinghosts</p></td>
+</tr>
+</table>
+
+<a name="fsvgx"></a><h5>삭제된 객체의 검색 필터</h5>
+<p>사용자 호환 삭제 모드가 사용 가능할 때 제거할 객체에 대한 검색 필터를
+정의합니다.</p>
+
+<a name="fsvgy"></a><h5>기본 사용자 컨테이너</h5>
+<p>사용자가 만들어지는 기본 사용자 컨테이너를 지정합니다.</p>
+
+<a name="fsvhe"></a><h5>기본 그룹 컨테이너</h5>
+<p>그룹이 만들어지는 기본 그룹 컨테이너를 지정합니다.</p>
+
+<a name="fsvhd"></a><h5>기본 에이전트 컨테이너</h5>
+<p>에이전트가 만들어지는 기본 에이전트 컨테이너를 지정합니다. 기본값은 <tt>Agents</tt>입니다.</p>
+
+<a name="fsvhb"></a><h5>그룹 기본 사용자 컨테이너</h5>
+<p>사용자를 만들 때 사용자가 위치하는 기본 사용자 컨테이너를 지정합니다. 기본값은 없습니다. 유효한
+값은 사용자 컨테이너의 DN입니다. 사용자 컨테이너 폴백 순서는 그룹 사용자 컨테이너 목록
+속성 아래의 주를 참조하십시오.</p>
+
+<a name="fsvha"></a><h5>그룹 사용자 컨테이너 목록</h5>
+<p>새 사용자를 만들 때 그룹 관리자가 선택할 수 있는 사용자 컨테이너 목록을
+지정합니다. 이 목록은 디렉토리 트리에 여러 사용자 컨테이너가 있는 경우 사용할 수
+있습니다. (이 목록이나 그룹 기본 사용자 컨테이너 필드에 사용자 컨테이너가 지정되어 있지
+않을 경우 기본 OpenSSO 사용자 컨테이너인 <tt>ou=people</tt>에서 사용자가 만들어집니다.) 이 필드에는 기본값이
+없습니다.</p><p>이 속성에 대한 구문은 다음과 같습니다.</p><p><tt></tt><i>그룹의 dn</i><tt> | </tt><i>사용자 컨테이너의 dn</i><tt></tt></p><p>사용자가 만들어지면 항목이 배치될 컨테이너에 대해 이 속성이 선택됩니다. 이 속성이 비어
+있는 경우 컨테이너에 대해 그룹 기본 사용자 컨테이너 속성이 선택됩니다. 그룹 기본
+사용자 컨테이너 속성도 비어 있는 경우 <tt>ou=people</tt> 아래에 항목이 만들어집니다.</p><p>이 속성은 OpenSSO가 레거시 모드로 설치된 경우에만 적용할 수 있습니다. 기본값은 없습니다.</p>
+
+<a name="fsvhc"></a><h5>사용자 프로필 디스플레이 클래스</h5>
+<p>OpenSSO 콘솔에서 사용자 프로필 페이지를 표시할 때 사용하는 Java 클래스를 지정합니다.</p>
+
+<a name="fsvhh"></a><h5>최종 사용자 프로필 디스플레이 클래스</h5>
+<p>OpenSSO 콘솔에서 최종 사용자 프로필 페이지를 표시할 때 사용하는 Java 클래스를 지정합니다.</p>
+
+<a name="fsvhi"></a><h5>사용자 프로필 페이지에 역할 표시</h5>
+<p>사용자 프로필 페이지의 일부로 사용자에게 할당된 역할 목록을 표시할지 여부를 지정합니다. 이
+매개 변수가 사용 불가능(기본값)이면 사용자 프로필 페이지는 관리자에 대해서만 사용자 역할을 표시합니다.</p>
+
+<a name="fsvhj"></a><h5>사용자 프로필 페이지에 그룹 표시</h5>
+<p>사용자 프로필 페이지의 일부로 사용자에게 할당된 그룹 목록을 표시할지 여부를 지정합니다. 이
+매개 변수가 사용 불가능(기본값)이면 사용자 프로필 페이지는 관리자에 대해서만 사용자 그룹을 표시합니다.</p>
+
+<a name="fsvhf"></a><h5>사용자의 그룹 직접 가입</h5>
+<p>이 매개 변수는 사용자가 가입이 허용된 그룹에 자신을 추가할 수 있는지 여부를
+지정합니다. 이 매개 변수가 사용 불가능(기본값)이면 사용자 프로필 페이지에서 관리자만 사용자의 그룹
+구성원을 수정할 수 있습니다. 이 매개 변수는 사용자 프로필 페이지에 그룹 표시
+옵션이 선택된 경우에만 적용됩니다.</p>
+
+<a name="fsvhk"></a><h5>사용자 프로필 디스플레이 옵션</h5>
+<p>이 메뉴는 사용자 프로필 페이지에 표시되는 서비스 속성을 지정합니다. 관리자는 다음을 선택할
+수 있습니다. </p><dl><dt>사용자 전용</dt>
+<dd><p>사용자에게 할당된 서비스에 대한 보기 가능한 사용자 스키마 속성을 표시합니다. 속성에 Display 키워드가 포함된 경우 사용자 서비스 속성 값을 사용자가 볼 수 있습니다. 자세한 내용은 OpenSSO Developer's Guide를 참조하십시오.</p></dd>
+<dt>결합형</dt>
+<dd><p>사용자에게 할당된 서비스에 대한 보기 가능한 사용자 및 동적 스키마 속성을 표시합니다.</p></dd>
+</dl>
+
+
+<a name="fsvhl"></a><h5>사용자 작성 기본 역할</h5>
+<p>이 목록은 새로 만든 사용자에게 자동으로 할당되는 역할을 정의합니다. 기본값은 없습니다. 관리자는
+하나 이상의 역할 DN을 입력할 수 있습니다. </p><p>이 필드에는 역할 이름이 아니라 완전한 고유 이름(DN) 주소만 입력해야 합니다. 이
+역할은 OpenSSO 역할만 될 수 있으며 LDAP(Directory Server) 역할은 허용되지 않습니다. </p>
+
+<a name="fsvhm"></a><h5>관리 콘솔 탭</h5>
+<p>이 필드는 콘솔의 맨 위에 표시되는 모듈의 Java 클래스를 나열합니다. 구문은 <tt>i18N key | java class name</tt>입니다.</p><p>i18N key는 콘솔의 현지화된 항목 이름에 사용됩니다.</p>
+
+<a name="fsvho"></a><h5>검색에서 반환되는 최대 결과 수</h5>
+<p>이 필드는 검색에서 반환되는 최대 결과 수를 정의합니다. 기본값은 200입니다. </p><p>시스템 자원이 충분하게 할당되지 않은 경우 이 속성을 1000보다 큰 값으로 설정하지
+마십시오.</p>
+<hr><p><b>주 &#8211; </b>OpenSSO는 최대 4,000개의 검색 항목을 반환하도록 사전 구성되어 있으며이 값은 콘솔을 통하거나
+<tt>ldapmodify</tt>를 사용하여 변경할 수 있습니다. <tt>ldapmodify</tt>를 사용하여 변경하려면 다음 값으로 <tt>newConfig.xml</tt>을 만드십시오(이
+예에서 <tt>nsSizeLimit </tt>: -1은 무제한을 의미함).</p>dn: cn=puser,ou=DSAME Users,ORG_ROOT_SUFFIX changetype: modify replace:nsSizeLimit nsSizeLimit: -1<p>그런 다음 <tt>ldapmodify</tt>를 실행합니다. 예를 들면 다음과 같습니다.</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml<p><tt>LDAPModify</tt>를 통해 이 속성에 수행된 수정 사항은 OpenSSO 콘솔을 통해 수행된 수정
+사항보다 우선하여 적용됩니다. </p>
+<hr>
+
+
+<a name="fsvhp"></a><h5>검색 시간 초과</h5>
+<p>시간이 초과되기 전에 검색이 수행되는 시간(초)을 정의합니다. 이 필드는 너무 오래 수행되는
+검색을 정지하는 데 사용되며 최대 검색 시간에 도달한 후 검색이 종료되고 오류를
+반환합니다. 기본값은 5초입니다.</p>
+<hr><p><b>주 &#8211; </b>디렉토리 서버는 120초의 시간 초과 값을 사용하여 미리 구성됩니다. 이 값은 디렉토리
+서버 콘솔을 통하거나 <tt>ldapmodify</tt>를 사용하여 변경할 수 있습니다. <tt>ldapmodify</tt>를 사용하여 변경하려면 다음
+값으로 <tt>newConfig.xml</tt>을 만드십시오(이 예에서는 시간 초과 값을 120초에서 3600초로 변경).</p>dn: cn=config changetype: modify replace:nsslapd-timelimit nsslapd-timelimit: 3600<p>그런 다음 <tt>ldapmodify</tt>를 실행합니다. 예를 들면 다음과 같습니다.</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml
+<hr>
+
+
+<a name="fsvhs"></a><h5>JSP 디렉토리 이름</h5>
+<p>영역에 대한 JSP 파일이 포함된 디렉토리의 이름을 지정합니다. 이렇게 하면 관리자가 서로
+다른 영역을 서로 다른 모양(사용자 정의)으로 볼 수 있습니다. 이 속성의 기본값은
+<tt>console</tt>입니다. 이 속성은 OpenSSO가 레거시 모드로 설치된 경우에만 적용할 수 있습니다. </p>
+
+<a name="fsvhr"></a><h5>온라인 도움말 문서</h5>
+<p>이 필드는 주 OpenSSO 도움말 페이지에서 만들어지는 온라인 도움말 링크를 나열합니다. 이를
+통해 다른 응용 프로그램에서 자체 온라인 도움말 링크를 OpenSSO 페이지에 추가할 수
+있습니다. 이 속성에 대한 형식은 다음과 같습니다.</p><p><tt>linki18nkey | html page to load | i18n properties file | remote server</tt></p><p>remote server 속성은 온라인 도움말 문서가 위치하는 원격 서버를 지정할 수 있는
+선택 인수입니다. 기본값은 다음과 같습니다.</p><p><tt>DSAME Help|/contents.html|amAdminModlueMsgs</tt></p><p>이 속성은 OpenSSO가 레거시 모드로 설치된 경우에만 적용할 수 있습니다.</p>
+
+<a name="fsvhq"></a><h5>필수 서비스</h5>
+<p>이 필드는 사용자 항목이 만들어질 때 사용자 항목에 동적으로 추가되는 서비스를 나열합니다.
+관리자는 작성 시에 어떤 서비스를 추가할 것인지 선택할 수 있습니다. 이 속성은
+콘솔이 아니라 OpenSSO SDK에서 사용합니다. <tt>amadmin</tt> 명령줄 유틸리티에서 동적으로 만드는 사용자에게 이
+속성에 나열된 서비스가 할당됩니다.</p>
+
+<a name="fsvhu"></a><h5>사용자 검색 키</h5>
+<p>이 속성은 이동 페이지에서 단순 검색을 수행할 때 검색되는 속성 이름을 정의합니다.
+이 속성의 기본값은 <tt>cn</tt>입니다.</p><p>예를 들어, 이동 프레임의 이름 필드에 <tt>j*</tt>를 입력할 경우 이름이 "j" 또는
+"J"로 시작되는 사용자가 표시됩니다.</p>
+
+<a name="fsvht"></a><h5>사용자 검색 반환 속성</h5>
+<p>이 필드는 단순 검색에서 반환된 사용자를 표시하는 데 사용되는 속성 이름을 정의합니다.
+이 속성의 기본값은 uid cn입니다. 이 속성은 사용자 아이디와 사용자의 전체 이름을
+표시합니다.</p><p>처음 나열되는 속성 이름은 반환되는 사용자 집합을 정렬하기 위한 키로도 사용됩니다. 성능
+저하를 방지하려면 사용자 항목에 값이 설정되는 속성을 사용합니다.</p>
+
+<a name="fsvhv"></a><h5>사용자 작성 알림 목록</h5>
+<p>이 필드는 새 사용자를 만들 때 알림이 보내지는 전자 메일 주소의 목록을
+정의합니다. 다음 구문에서와 같이 여러 전자 메일 주소를 지정할 수 있습니다. </p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p>또한 알림 목록에서 <tt>-|locale</tt> 옵션을 사용하여 다른 로켈을 적용합니다.</p><p>로켈 목록은 <a href="supportedlang.html">지원되는 언어 로켈</a>을 참조하십시오. </p><p>보낸 사람의 전자 메일 아이디는 기본적으로 <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt>에 있는 <tt>amProfile.properties</tt>의 등록 정보 497을
+수정하여 변경할 수 있습니다.</p>
+
+<a name="fsvhw"></a><h5>사용자 삭제 알림 목록</h5>
+<p>이 필드는 사용자를 삭제할 때 알림이 보내지는 전자 메일 주소의 목록을 정의합니다.
+다음 구문에서와 같이 여러 전자 메일 주소를 지정할 수 있습니다. </p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p>또한 알림 목록에서 <tt>-|locale</tt> 옵션을 사용하여 다른 로켈을 적용합니다.</p><p>로켈 목록은 <a href="supportedlang.html">지원되는 언어 로켈</a>을 참조하십시오. </p><p>보낸 사람의 전자 메일 아이디는 기본적으로 <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt>에 있는 <tt>amProfile.properties</tt>의 등록 정보 497을
+수정하여 변경할 수 있습니다.</p><p>보낸 사람 아이디의 기본값은 <tt>DSAME</tt>입니다.</p>
+
+<a name="fsvhx"></a><h5>사용자 수정 알림 목록</h5>
+<p>속성 목록 및 속성과 연관된 전자 메일 주소의 목록을 정의합니다. 목록에 정의된
+속성에서 사용자 수정이 발생하면 해당 속성과 연관된 전자 메일 주소로 알림이 보내집니다.
+각 속성에는 여러 주소 집합이 연관되어 있을 수 있습니다. 다음 구문에서와 같이
+여러 전자 메일 주소를 지정할 수 있습니다.</p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt></p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt></p><p>주소 중 하나 대신에 <tt>-self</tt> 키워드를 사용할 수 있습니다. 이 키워드는 프로필이
+수정된 사용자에게 전자 메일을 보냅니다. 예를 들어, 다음을 가정합니다.</p><p><tt>manager someuser@sun.com|self|admin@sun.com</tt></p><p>전자 메일은 manager 속성에 지정된 주소인 <tt>someuser@sun.com</tt>, <tt>admin@sun</tt> 및 사용자를 수정한 사람(self)에게
+보내집니다.</p><p>또한 알림 목록에서 <tt>-|locale</tt> 옵션을 사용하여 다른 로켈을 적용합니다. 예를 들어, 프랑스에
+있는 관리자에게 알림을 보내려는 경우 다음 구문을 사용합니다.</p><p><tt>manager someuser@sun.com|self|admin@sun.com|fr</tt>   로켈 목록은 <a href="supportedlang.html">지원되는 언어 로켈</a>을 참조하십시오. </p><p>속성 이름은 콘솔의 디스플레이 이름이 아니라 디렉토리 서버 스키마에 나타나는 이름과 동일합니다.</p>
+
+<a name="fsvia"></a><h5>페이지당 표시되는 최대 항목</h5>
+<p>이 속성을 사용하면 페이지당 표시할 수 있는 최대 행을 정의할 수 있습니다.
+기본값은 25입니다. 예를 들어, 검색 결과 100개의 행이 반환될 경우 4개의 페이지에
+각각 25개의 행이 표시됩니다.</p>
+
+<a name="fsvhz"></a><h5>Event Listener 클래스</h5>
+<p>이 속성은 OpenSSO 콘솔에서 작성, 수정 및 삭제 이벤트를 받는 수신기 목록을
+포함합니다.</p>
+
+<a name="fsvhy"></a><h5>사전 처리 및 사후 처리 클래스</h5>
+<p>이 필드는 <tt>com.iplanet.am.sdk.</tt><tt>AMCallBack</tt> 클래스를 확장하여 사용자, 영역, 역할 및 그룹에 대한 사전
+처리 및 사후 처리 작업 중에 콜백을 수신하는 플러그인을 통해 구현 클래스의
+목록을 정의합니다. 작업은 다음과 같습니다.</p>
+<ul><li><p>만들기</p></li>
+<li><p>삭제</p></li>
+<li><p>수정</p></li>
+<li><p>역할/그룹에 사용자 추가</p></li>
+<li><p>역할/그룹에서 사용자 삭제</p></li></ul>
+<p>플러그인의 전체 클래스 이름을 입력한 후 OpenSSO 설치 기본에서 웹 컨테이너의 클래스
+경로를 변경하여 플러그인 클래스 위치에 전체 경로를 포함시켜야 합니다.</p>
+
+<a name="fsvic"></a><h5>외부 속성 불러오기</h5>
+<p>이 옵션을 사용하면 플러그인에 대한 콜백에서 외부 속성(모든 외부 응용 프로그램 특정
+속성)을 검색할 수 있습니다. 외부 속성은 OpenSSO SDK에 캐시되지 않기 때문에 이
+속성을 사용하면 영역 수준별 속성 검색이 가능합니다. 기본적으로 이 옵션은 사용 불가능합니다.</p>
+
+<a name="fsvib"></a><h5>잘못된 사용자 아이디 문자</h5>
+<p>이 속성은 사용자 이름에 사용할 수 없는 문자 목록을 정의합니다. 각 문자는
+| 문자로 구분되어야 합니다. 예를 들면 다음과 같습니다.</p><p><tt>*|(|)|&#38;|!</tt></p>
+
+<a name="fsvie"></a><h5>사용자 아이디 및 비밀번호 검증 플러그인 클래스</h5>
+<p>이 클래스는 사용자 아이디 및 비밀번호 검증 플러그인 기법을 제공합니다. 사용자의 사용자
+아이디 및/또는 비밀번호를 검증하는 구현 플러그인 모듈이 이 클래스의 메소드를 대체해야 합니다.
+구현 플러그인 모듈은 OpenSSO 콘솔, <tt>amadmin</tt> 명령줄 인터페이스 또는 SDK를 사용하여 사용자
+아이디 또는 비밀번호 값을 추가하거나 수정할 때마다 호출됩니다.</p><p>이 클래스를 확장하는 플러그인은 영역별로 구성할 수 있습니다. 영역에 대해 플러그인이 구성되지
+않은 경우 전역 수준에서 구성된 플러그인이 사용됩니다.</p><p>플러그인 검증이 실패할 경우 사용자가 제공한 사용자 아이디 또는 비밀번호에 오류가 있다는
+것을 응용 프로그램에 알리기 위해 플러그인 모듈에서 예외가 발생할 수 있습니다.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 XACML PEP のカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pep"></a><h4>SAMLv2 XACML PEP のカスタマイズ</h4>
+<p>XACML PEP には、カスタマイズ用に次の属性が含まれています。</p>
+<ul><li><p><a href="#ggwgy">「サポートされるプロトコルリスト」</a></p></li>
+<li><p><a href="#ggwkt">「署名キーエイリアス」</a></p></li>
+<li><p><a href="#ggwhc">「暗号化キーエイリアス」</a></p></li>
+<li><p><a href="#ggwhq">「基本承認」</a></p></li>
+<li><p><a href="#ggwgq">「承認決定応答が署名されました」</a></p></li>
+<li><p><a href="#ggwjn">「表明が暗号化されました」</a></p></li></ul>
+
+
+<a name="ggwgy"></a><h5>サポートされるプロトコルリスト</h5>
+<p>このプロバイダによってサポートされる XACML PEP リリースを表示します。</p>
+
+<a name="ggwkt"></a><h5>署名キーエイリアス</h5>
+<p>要求および応答の署名に使用されるキーエイリアスを定義します。</p>
+
+<a name="ggwhc"></a><h5>暗号化キーエイリアス</h5>
+<p>XACML の暗号化に対するキーエイリアスを定義します。 </p>
+
+<a name="ggwhq"></a><h5>基本承認</h5>
+<p>基本承認を有効にすると、SOAP エンドポイントを保護できます。SOAP エンドポイントにアクセスするプロバイダは、「<tt>ユーザー名</tt>」と「<tt>パスワード</tt>」の 2 つのプロパティーでユーザーとパスワードを定義する必要があります。</p>
+
+<a name="ggwgq"></a><h5>承認決定応答が署名されました</h5>
+<p>この属性が有効になっている場合は、XACML の承認決定のためにすべての応答が強制的に署名されます。</p>
+
+<a name="ggwjn"></a><h5>表明が暗号化されました</h5>
+<p>この属性が有効になっている場合は、すべての表明が強制的に暗号化されます。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Appartenance - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>Appartenance</h4>
+<p><a name="indexterm-176"></a>Le module d'authentification Appartenance est impl&#233;ment&#233; dans des sites personnalis&#233;s. Lorsque l'authentification
+d'appartenance est activ&#233;e, un utilisateur peut s'auto-enregistrer. Cela signifie que l'utilisateur peut
+cr&#233;er un compte, le personnaliser et y acc&#233;der en tant qu'utilisateur enregistr&#233;
+sans l'aide d'un administrateur. Les attributs sont des attributs de domaine. Ces
+attributs sont les suivants :</p>
+<ul><li><p><a href="#fumys">Longueur minimale du mot de passe</a></p></li>
+<li><p><a href="#fumyr">R&#244;les utilisateur par d&#233;faut</a></p></li>
+<li><p><a href="#fumyt">Statut de l'utilisateur apr&#232;s enregistrement</a></p></li>
+<li><p><a href="#fumzm">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>Longueur minimale du mot de passe</h5>
+<p>Indique le nombre minimal de caract&#232;res requis pour un mot de passe
+d&#233;fini lors de l'auto-enregistrement. La valeur par d&#233;faut est 8.</p><p>Si cette valeur est modifi&#233;e, elle doit &#233;galement &#234;tre modifi&#233;e dans le
+texte d'enregistrement et d'erreur du fichier suivant :</p><p><tt></tt><i>Base AccessManager</i><tt>/locale/amAuthMembership.properties </tt> (entr&#233;e <i>PasswdMinChars</i>)</p>
+
+<a name="fumyr"></a><h5>R&#244;les utilisateur par d&#233;faut</h5>
+<p>Indique les r&#244;les affect&#233;s aux nouveaux utilisateurs dont les profils sont cr&#233;&#233;s
+par le biais de l'auto-enregistrement. Il n'y a pas de valeur par
+d&#233;faut. L'administrateur doit sp&#233;cifier les DN des r&#244;les qui seront affect&#233;s au
+nouvel utilisateur.</p>
+<hr><p><b>Remarque &#8211; </b>Le r&#244;le sp&#233;cifi&#233; doit se trouver sous le domaine dont l'authentification est
+configur&#233;e. Seuls les r&#244;les qui peuvent &#234;tre affect&#233;s &#224; l'utilisateur seront ajout&#233;s
+lors de l'auto-enregistrement. Tous les autres DN seront ignor&#233;s. Ce r&#244;le peut
+&#234;tre soit un r&#244;le OpenSSO soit un r&#244;le LDAP, mais les r&#244;les
+filtr&#233;s ne sont pas accept&#233;s.</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>Statut de l'utilisateur apr&#232;s enregistrement</h5>
+<p>Indique si les services sont imm&#233;diatement disponibles pour un utilisateur qui s'est
+auto-enregistr&#233;. La valeur par d&#233;faut est Actif et les services sont disponibles
+pour le nouvel utilisateur. En s&#233;lectionnant Inactif, l'administrateur choisit de rendre tous
+les services indisponibles pour le nouvel utilisateur.</p>
+
+<a name="fumzm"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

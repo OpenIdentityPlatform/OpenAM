@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>フラットファイルリポジトリの属性 - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>フラットファイルリポジトリの属性</h4>
+<p><a name="indexterm-15"></a>フラットファイルリポジトリの設定に使用される属性は次のとおりです。</p>
+
+<a name="gdokj"></a><h5>ファイルリポジトリプラグインのクラス名</h5>
+<p>フラットファイルの実装を提供する Java クラスファイルを指定します。この属性は変更しないでください。</p>
+
+<a name="gdojs"></a><h5>ファイルリポジトリディレクトリ</h5>
+<p>アイデンティティーとその属性が格納されるベースディレクトリを定義します。</p>
+
+<a name="gdoke"></a><h5>キャッシュ</h5>
+<p>有効にすると (デフォルト)、アイデンティティーとその属性がキャッシュされます。後続の要求では、ファイルシステムにアクセスしません。</p>
+
+<a name="gdokm"></a><h5>キャッシュを更新する時間</h5>
+<p>キャッシュを有効にした場合に、キャッシュ内のエントリがファイルシステム側で変更されたかどうかを調べる時間間隔を分単位で指定します。このチェックメカニズムはタイムスタンプに基づいています。</p>
+
+<a name="gdojw"></a><h5>ファイルユーザーオブジェクトクラス</h5>
+<p>作成時に自動的にユーザーに追加されるオブジェクトクラスを定義します。</p>
+
+<a name="gdojt"></a><h5>パスワード属性</h5>
+<p>認証に使用されるパスワードを含む属性名を指定します。この属性は、「データストア」認証モジュールが有効になっているときに、ユーザーを認証するのに使用されます。</p>
+
+<a name="gdokq"></a><h5>状態属性</h5>
+<p>アイデンティティーの状態を格納する属性名を指定します。状態属性の値は、<tt>active</tt> または <tt>inactive</tt> のいずれかです。これは、アイデンティティーの認証中に使用されます。アイデンティティーが <tt>inactive</tt> の場合、ユーザーは認証されません。</p>
+
+<a name="gdojk"></a><h5>ハッシュ属性</h5>
+<p>値がハッシュされてファイルに保存される属性のリストを指定します。一度ハッシュされると、元の値を取得することはできません。ハッシュ済みの値のみが取得されます。これは、検証に使用するが永久に保存することは適切でない属性が関係する機密性の保証に使用されます。アイデンティティーのパスワード属性は、このタイプの属性の例です。</p>
+
+<a name="gdojb"></a><h5>暗号化された属性</h5>
+<p>値が暗号化されてファイルに保存される属性のリストを指定します。これらの属性は暗号化されて保存されますが、アイデンティティーリポジトリ API を呼び出すと元の値が復号化されて返されます。これにより、ユーザーがファイルシステムに直接アクセスして機密属性を読み取ることを防止できます。</p>
+<br/>
+
+</body>
+</html>

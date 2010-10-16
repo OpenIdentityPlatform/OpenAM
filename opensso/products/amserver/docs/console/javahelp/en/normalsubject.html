@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Subjects - Sun Federated Access Manager 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="normalsubject"></a><h4>Subjects</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a>A <b>subject</b> defines the user or collection of users (for instance, a group
+or those who possess a specific role) that the policy affects. The general
+rule for subjects is that the policy would apply only if the user
+is a member of at least one subject in the policy. The default
+subjects are:</p><dl><dt>Federated Access Manager Identity Subject</dt>
+<dd><p>This subject implies that the identities you create and manage under the Realms Subject tab can be added as a member of the subject.</p></dd>
+<dt>Authenticated Users</dt>
+<dd><p>This subject type implies that any user with a valid SSOToken is a member of this subject.</p><p>All authenticated users would be member of this Subject, even if they have authenticated to a realm that is different from the organization in which the policy is defined. This is useful if the resource owner would like to give access to resources that is managed for users from other organizations. If you want to restrict access to resources being protected to members of a specific organization, please use the Organization subject.</p></dd>
+<dt>Web Services Clients</dt>
+<dd><p>his subject type implies that a web service client (WSC) identified by the SSOToken is a member of this subject, if the DN of any principal contained in the SSOToken matches any selected value of this subject. Valid values are the DNs of trusted certificates in the local JKS keystore, which correspond to the certificates of trusted WSCs. This subject has dependency on the Liberty Web Services Framework and should be used only by Liberty Service Providers to authorize WSCs.</p><p>Make sure that you have created the keystore before you add this Subject to a policy. Information on setting up the keystore can be found in the following location:</p><p><tt></tt><i>FederatedAccessManager-base</i><tt></tt> <tt>/SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>The following additional subjects are available by selecting them in the Policy Configuration Serviceof the
+realm:</p><dl><dt>Federated Access Manager Roles</dt>
+<dd><p>This subject type implies that any member of an Federated Access Manager role is a member of this subject. An Federated Access Manager role is created using Federated Access Manager running in legacy mode and using the 6.3&#8211;based console. These roles have object classes mandated by Federated Access Manager. Federated Access Manager roles can only be accessed through the hosting Federated Access Manager Policy Service.</p></dd>
+<dt>LDAP Groups</dt>
+<dd><p>This subject type implies that any member of an LDAP group is member of this subject.</p></dd>
+<dt>LDAP Roles</dt>
+<dd><p>This subject type implies that any member of an LDAP role is a member of this subject. An LDAP Role is any role definition that uses the Directory Server role capability. These roles have object classes mandated by Directory Server role definition. The LDAP Role Search filter can be modified in the Policy Configuration Service to narrow the scope and improve performance.</p></dd>
+<dt>LDAP Users</dt>
+<dd><p>This subject type implies that any LDAP user is a member of this subject.</p></dd>
+<dt>Organization</dt>
+<dd><p>This subject type implies that any member of a realm is a member of this subject</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

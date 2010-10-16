@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 SOAP 바인딩 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>SAMLv2 SOAP 바인딩</h4>
+<p>SAMLv2 SOAP 바인딩 서비스는 OpenSSO 클라이언트와 OpenSSO 서버 간에 SAMLv2 요청 및
+응답 메시지의 SOAP 기반 교환을 제공합니다. 수신된 요청은 요청 처리기로 위임되어 추가적인
+처리를 진행합니다. Request Handler와 메타 별칭의 키는 SOAP 바인딩 서비스 URL에 있습니다.
+메타 별칭과 RequestHandler의 매핑은 SAMLv2 SOAP 바인딩 서비스에 저장되며, OpenSSO 구성 저장소에서
+읽을 수 있습니다. </p>
+
+<a name="ggokv"></a><h5>요청 처리기 목록</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>RequestHandlerList는 RequestHandler 구현에 대한 메타 별칭 매핑이 포함된 키/값 항목 목록입니다. OpenSSO
+8.0 서버가 PDP(Policy Decision Point) 역할을 하도록 구성하는 경우 이 속성을 설정해야
+합니다. </p><p><i>키</i>는 정책 결정 지점(PDP) 메타 별칭입니다. <i>클래스</i>는 Java 클래스 이름으로, XACML 요청을
+처리할 수 있는 RequestHandler 인터페이스의 구현입니다. </p><p>예를 들어 XACML 정책 결정 지점(PDP)의 메타 별칭이 <tt>/pdp</tt>이고 해당 인터페이스의 구현이
+<tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>인 경우 키는 <tt>/pdp</tt>로 설정되고 클래스는 <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>로 설정되어야 합니다. </p>
+<br/>
+
+</body>
+</html>

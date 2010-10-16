@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Win32)">
+	<META NAME="AUTHOR" CONTENT="Rahul Gopal">
+	<META NAME="CREATED" CONTENT="20090811;11275200">
+	<META NAME="CHANGEDBY" CONTENT="Rahul Gopal">
+	<META NAME="CHANGED" CONTENT="20090811;13492500">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<META NAME="CHANGEDBY" CONTENT="Rahul Gopal">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P><BR><BR>
+</P>
+<P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="Palatino Linotype, serif"><FONT SIZE=5><B>Configuring
+&quot;Password-Expiry&quot; or &quot;Administrator-Driven
+Password-Reset&quot; Behavior</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT FACE="Palatino Linotype, serif">Changes
+/ additions are <SPAN STYLE="background: #ffff00">highlighted</SPAN>
+below.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<TABLE WIDTH=100% BORDER=1 CELLPADDING=4 CELLSPACING=3>
+	<COL WIDTH=256*>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ccccff">
+			<P><FONT FACE="Palatino Linotype, serif"><B>File:
+			</B></FONT><FONT FACE="Courier New, monospace"><B>opensso/config/auth/default/LDAP.xml</B></FONT></P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;PasswordCallback
+			echoPassword=&quot;false&quot; &gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;Prompt&gt;
+			Password: &lt;/Prompt&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/PasswordCallback&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/Callbacks&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><SPAN STYLE="background: #ffff00">&lt;Callbacks
+			length=&quot;4&quot; order=&quot;2&quot; timeout=&quot;120&quot;
+			template=&quot;ChangePassword.jsp&quot; header=&quot;Change
+			Password&amp;lt;BR&amp;gt;&amp;lt;/BR&amp;gt;#REPLACE#&amp;lt;BR&amp;gt;&amp;lt;/BR&amp;gt;&quot;
+			&gt;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;PasswordCallback
+			echoPassword=&quot;false&quot; &gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;Prompt&gt;Old
+			Password &lt;/Prompt&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2>&lt;/PasswordCallback&gt;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0in"><BR>
+			</P>
+			<P STYLE="margin-bottom: 0in"><FONT FACE="Courier New, monospace"><FONT SIZE=2><B>&lt;snip&gt;</B></FONT></FONT></P>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+</BODY>
+</HTML>

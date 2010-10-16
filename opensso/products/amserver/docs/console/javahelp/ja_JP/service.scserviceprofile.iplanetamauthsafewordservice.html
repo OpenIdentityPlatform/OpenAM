@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>このモジュールにより、ユーザーが Secure Computing の SafeWord または SafeWord PremierAccess 認証サーバーを使用して認証できるようになります。SafeWord 認証属性はレルム属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwafv">「サーバー」</a></p></li>
+<li><p><a href="#fwajv">「サーバー検証ファイルのディレクトリ」</a></p></li>
+<li><p><a href="#fwarb">「ログを有効」</a></p></li>
+<li><p><a href="#fwahi">「ログレベル」</a></p></li>
+<li><p><a href="#fwabd">「ログファイル」</a></p></li>
+<li><p><a href="#fwacu">「認証接続タイムアウト」</a></p></li>
+<li><p><a href="#fwanv">「クライアントタイプ」</a></p></li>
+<li><p><a href="#fwafs">「EASSP バージョン」</a></p></li>
+<li><p><a href="#fwaob">「オーセンティケータ最小強度」</a></p></li>
+<li><p><a href="#fwatz">「認証レベル」</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>サーバー</h5>
+<p>SafeWord サーバーまたは SafeWord PremiereAccess サーバーの名前とポートを指定します。ポート 7482 は SafeWord サーバーのデフォルトとして設定されています。SafeWord PremierAccess サーバーのデフォルトポート番号は 5030
+です。</p>
+
+<a name="fwajv"></a><h5>サーバー検証ファイルのディレクトリ</h5>
+<p>SafeWord クライアントライブラリがその検証ファイルを置くディレクトリを指定します。デフォルトは次のとおりです。</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>このフィールドに異なるディレクトリを指定する場合は、SafeWord 認証を試みる前にそのディレクトリが存在する必要があります。</p>
+
+<a name="fwarb"></a><h5>ログを有効</h5>
+<p>SafeWord ログを有効にします。デフォルトでは、SafeWord ログは有効になっています。</p>
+
+<a name="fwahi"></a><h5>ログレベル</h5>
+<p>SafeWord ログレベルを指定します。ドロップダウンメニューでレベルを選択します。「デバッグ」、「エラー」、「情報」、および「なし」を選択できます。</p>
+
+<a name="fwabd"></a><h5>ログファイル</h5>
+<p>SafeWord クライアントログのディレクトリパスとログファイル名を指定します。デフォルトのパスは <tt>/var/opt/SUNWam/auth/safeword/safe.log</tt> です。</p><p>異なるパスまたはファイル名を指定する場合は、SafeWord 認証を試みる前にそれらが存在している必要があります。SafeWord 認証に複数のレルムが設定され別々の SafeWord サーバーが使用されている場合、別々のパスを指定する必要があります。そうしないと、SafeWord 認証が行われる最初のレルムだけが認証されます。同様に、レルムが SafeWord サーバーを変更した場合、新しく設定された SafeWord サーバーの認証が行われる前に、指定されたディレクトリの <tt>swec.dat</tt> ファイルを削除する必要があります。</p>
+
+<a name="fwacu"></a><h5>認証接続タイムアウト</h5>
+<p>SafeWord クライアント (OpenSSO) と SafeWord サーバーとの間のタイムアウト期間を秒単位で定義します。デフォルトは 120 秒です。</p>
+
+<a name="fwanv"></a><h5>クライアントタイプ</h5>
+<p>モバイルクライアント、VPN、固定パスワード、チャレンジ/レスポンスなど、異なるクライアントとの通信に SafeWord サーバーが使用するクライアントタイプを定義します。</p>
+
+<a name="fwafs"></a><h5>EASSP バージョン</h5>
+<p>この属性には、EASSP (Extended Authentication and Single Sign-on Protocol) のバージョンを指定します。このフィールドには、標準 (101)、SSL 暗号化 Premier Access
+(200)、Premier Access (201) のいずれかのプロトコルバージョンを指定できます。</p>
+
+<a name="fwaob"></a><h5>オーセンティケータ最小強度</h5>
+<p>クライアントおよび SafeWord サーバー認証のオーセンティケータ最小強度を定義します。オーセンティケータ値はクライアントタイプごとに異なり、値が高いほどオーセンティケータ強度も強くなります。20 がもっとも高い値です。0 がもっとも低い値です。</p>
+
+<a name="fwatz"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

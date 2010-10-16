@@ -1,0 +1,4 @@
+<project name="legacy">
+    <dirname property="legacy.basedir" file="${ant.file.legacy}"/>
+    <property file="${legacy.basedir}/legacy.properties"/>
+</project>

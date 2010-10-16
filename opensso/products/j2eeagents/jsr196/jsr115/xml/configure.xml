@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<configure>
+	<class-prefix>
+		<package type="system" 
+			name="com.sun.identity.install.tools.configurator"/>
+		<package type="common" 
+			name="com.sun.identity.agents.install.jsr196"/>
+		<package type="custom" 
+			name="com.sun.identity.agents.install.jsr196"/>
+        <package type="agentsdk" 
+        	name="com.sun.identity.agents.install.configurator"/>
+	</class-prefix>
+	<welcome-message>
+		<i18n key="WELCOME_MESSAGE" group="as81Tools"/>
+	</welcome-message>
+	<exit-message>
+		<i18n key="EXIT_MESSAGE" group="as81Tools"/>
+	</exit-message>
+	<instance-finder>	
+		<home-dir-locator>
+			<class name="HomeDirLocator" type="custom"/>
+		</home-dir-locator>
+		<instance-finder-interactions>
+			<interaction lookupkey="CONFIG_DIR">
+				<i18n key="INT_CONFIG_DIR" group="as81Tools"/>
+				<default-value-finder>
+					<class name="ConfigFinder" type="custom"/>
+				</default-value-finder>
+				<validations>
+					<validation name="DIR_EXISTS">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="VALID_AS_CONFIG_DIR">
+						<class name="ConfigDirValidator" type="custom"/>
+					</validation>
+				</validations>
+				<value-normalizer>
+					<class name="PathNormalizer" type="system"/>
+				</value-normalizer>
+			</interaction>
+			<interaction lookupkey="INSTANCE_NAME" optional-display="false">
+				<i18n key="INT_INSTANCE_NAME" group="as81Tools"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="server"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+		</instance-finder-interactions>
+	</instance-finder>	
+	<install>
+		<common-interactions>
+		        <interaction lookupkey="AM_SERVER_URL" persistent="false">
+				<i18n key="INT_AM_SERVER_URL" group="amToolsMessages"/>
+				<validations>			
+				    <validation name="VALID_SERVER_URL">
+						<class name="ValidateURL" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+		</common-interactions>
+		<instance-interactions>
+			<interaction lookupkey="AGENT_URL">
+				<i18n key="INT_AGENT_URL" group="amToolsMessages"/>
+				<validations>	
+				    <validation name="VALID_AGENT_URL">
+						<class name="ValidateURL" type="system"/>
+					</validation>
+				</validations>
+			</interaction>	
+			<interaction lookupkey="AGENT_PROFILE_NAME" persistent="false">
+				<i18n key="INT_AGENT_PROFILE_NAME" group="amToolsMessages"/>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_PASSWORD_FILE" persistent="false">
+				<i18n key="INT_AGENT_PASSWORD_FILE" group="amToolsMessages"/>
+				<validations>
+					<validation name="FILE_VALID">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="FILE_READABLE">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="VALID_PASSWORD">
+						<class name="PasswordValidator" type="system"/>
+						<property name="minLen" value="1"/>
+						<property name="maxLen" value="256"/>
+					</validation>
+					<validation name="VALIDATE_AGENT_PASSWORD">
+						<class name="PasswordValidator" type="system"/>
+						<property name="AGENT_PROFILE_LOOKUP_KEY" value="AGENT_PROFILE_NAME"/>
+					</validation>
+				</validations>                                
+				<value-normalizer>
+					<class name="PathNormalizer" type="system"/>
+				</value-normalizer>
+			</interaction>
+                        
+                        <interaction lookupkey="AGENT_POLICYADM_LOCATION" persistent="false">
+				<i18n key="INT_AGENT_POLICYADM_LOCATION" group="amToolsMessages"/>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+                               	<value-normalizer>
+					<class name="PathNormalizerJSR196" type="custom"/>
+				</value-normalizer>			
+			</interaction>                                                
+		</instance-interactions>
+		<common-tasks>
+            <task name="BACKUP_FILE">
+            	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_LOGIN_CONF_FILE"/>
+            </task>                                             
+            <task name="BACKUP_FILE">
+            	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_SERVER_POLICY_FILE"/>
+            </task>                                 
+            <task name="GRANT_JAVA_PERMS">                  
+                <class name="ConfigureServerPolicyTask" type="custom"/>                                
+            </task>		
+		</common-tasks>
+		<instance-tasks>
+        	<task name="CREATE_LAYOUT">
+            	<class name="CreateLayoutTask" type="system"/>
+           	</task>
+            <task name="ENCRYPT_DATA">
+            	 <class name="EncryptTask" type="agentsdk"/>
+            	 <property name="DATA_FILE_LOOKUP_KEY" 
+            	 			value="AGENT_PASSWORD_FILE"/>
+                 <property name="ENCRYPTION_KEY_LOOKUP_KEY" 
+                 			value="AGENT_ENCRYPT_KEY"/>
+                 <property name="ENCRYPTED_VALUE_KEY_LOOKUP_KEY" 
+                 			value="AGENT_ENCRYPTED_PASSWORD"/>
+            </task>
+                                  
+            <task name="GENERATE_AUDIT_LOGFILE_NAME">
+           		<class name="AuditLogFileNameTask" type="system"/>
+           		<property name="HOSTNAME_LOOKUP_KEY"
+           				  value="AGENT_HOST"/>
+           	    <property name="PORT_LOOKUP_KEY"
+           	    		  value="AGENT_PREF_PORT"/>
+           	    <property name="LOGFILE_NAME_OUTPUT_KEY"
+           	    		  value="AUDIT_LOG_FILENAME"/>
+           	</task>
+            <task name="CONFIGURE_AGENT_PROPS">
+            	<class name="ConfigurePropertiesTask" type="system"/>    
+                <property name="CONFIG_FILENAME_AGENT_BOOTSTRAP_TEMPLATE"
+                                      value="OpenSSOAgentBootstrap.template"/>
+                <property name="CONFIG_FILENAME_AGENT_BOOTSTRAP"
+                                      value="OpenSSOAgentBootstrap.properties"/>
+                <property name="CONFIG_FILENAME_AGENT_CONFIG_TEMPLATE"
+                                      value="OpenSSOAgentConfiguration.template"/>
+                <property name="CONFIG_FILENAME_AGENT_CONFIG"
+                                      value="OpenSSOAgentConfiguration.properties"/>
+            </task>
+            <task name="BACKUP_FILE">
+           	 	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_DOMAIN_XML_FILE"/>
+            </task>                                                         
+            <task name="CONFIGURE_DOMAIN_XML">                  
+ 	            <class name="ConfigureDomainXMLTask" type="custom"/>                                
+            </task>                        
+		</instance-tasks>
+	</install>
+	<custom-install>
+		<common-interactions>
+		        <interaction lookupkey="AM_SERVER_URL" persistent="false">
+				<i18n key="INT_AM_SERVER_URL" group="amToolsMessages"/>
+				<validations>			
+				    <validation name="VALID_SERVER_URL">
+						<class name="ValidateURL" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="DAS_HOST_IS_REMOTE">
+				<i18n key="INT_DAS_HOST_IS_REMOTE" group="as81Tools"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="false"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_CHOICE">
+						<class name="ChoiceValidator" type="system"/>
+						<property name="value1" value="true"/>
+						<property name="value2" value="false"/>
+						<property name="ignorecase" value="true"/>
+					</validation>
+				</validations>
+			</interaction>
+		</common-interactions>
+		<instance-interactions>
+			<interaction lookupkey="AGENT_URL">
+				<i18n key="INT_AGENT_URL" group="amToolsMessages"/>
+				<validations>	
+				    <validation name="VALID_AGENT_URL">
+						<class name="ValidateURL" type="system"/>
+					</validation>
+				</validations>
+			</interaction>	
+		    <interaction lookupkey="AGENT_ENCRYPT_KEY" persistent="false">
+				<i18n key="INT_AGENT_ENCRYPT_KEY" group="amToolsMessages"/>
+				<default-value-finder>
+					<class name="RandomKeyGenerator" type="system"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+					<validation name="VALID_KEY">
+						<class name="StringValidator" type="system"/>
+						<property name="minLen" value="12"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_PROFILE_NAME" persistent="false">
+				<i18n key="INT_AGENT_PROFILE_NAME" group="amToolsMessages"/>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_PASSWORD_FILE" persistent="false">
+				<i18n key="INT_AGENT_PASSWORD_FILE" group="amToolsMessages"/>
+				<validations>
+					<validation name="FILE_VALID">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="FILE_READABLE">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="VALID_PASSWORD">
+						<class name="PasswordValidator" type="system"/>
+						<property name="minLen" value="1"/>
+						<property name="maxLen" value="256"/>
+					</validation>
+					<validation name="VALIDATE_AGENT_PASSWORD">
+						<class name="PasswordValidator" type="system"/>
+						<property name="AGENT_PROFILE_LOOKUP_KEY" value="AGENT_PROFILE_NAME"/>
+					</validation>
+				</validations>
+				<value-normalizer>
+					<class name="PathNormalizer" type="system"/>
+				</value-normalizer>
+			</interaction>
+                        <interaction lookupkey="CREATE_AGENT_PROFILE_NAME" 
+                                     persistent="false">
+                             <skipIf key="CREATE_AGENT_PROFILE_KEY" ignorecase="true">
+                                 <value>false</value>
+                             </skipIf>
+                            <i18n key="INT_CREATE_AGENT_PROFILE_NAME" 
+                                  group="amToolsMessages"/>
+                            <default-value-finder>
+                                <class name="StaticDefaultValueFinder" type="system"/>
+                                <static value="false"/>
+                            </default-value-finder>
+                            <validations>
+                                <validation name="VALID_CHOICE">
+                                    <class name="ChoiceValidator" type="system"/>
+                                    <property name="value1" value="true"/>
+                                    <property name="value2" value="false"/>
+                                    <property name="ignorecase" value="true"/>
+                                </validation>
+                            </validations>
+                        </interaction>
+                        <interaction lookupkey="AGENT_ADMINISTRATOR_NAME" 
+                                     persistent="false">
+                            <skipIf key="CREATE_AGENT_PROFILE_NAME" ignorecase="true">
+                                <value>false</value>
+                            </skipIf>
+                            <i18n key="INT_AGENT_ADMINISTRATOR_NAME" 
+                                  group="amToolsMessages"/>
+                            <validations>
+                                <validation name="VALID_STRING">
+                                    <class name="StringValidator" type="system"/>
+                                </validation>
+                            </validations>
+                        </interaction>
+                        <interaction lookupkey="AGENT_ADMINISTRATOR_PASSWORD_FILE" persistent="false">
+                            <skipIf key="CREATE_AGENT_PROFILE_NAME" ignorecase="true">
+                                <value>false</value>
+                            </skipIf>
+                            <i18n key="INT_AGENT_ADMINISTRATOR_PASSWORD_FILE" group="amToolsMessages"/>
+                            <validations>
+                                <validation name="FILE_VALID">
+                                    <class name="FileSystemValidator" type="system"/>
+                                </validation>
+                                <validation name="FILE_READABLE">
+                                    <class name="FileSystemValidator" type="system"/>
+                                </validation>
+                                <validation name="VALID_PASSWORD">
+                                    <class name="PasswordValidator" type="system"/>
+                                    <property name="minLen" value="1"/>
+                                    <property name="maxLen" value="256"/>
+                                </validation>
+                                <validation name="VALIDATE_AGENT_PASSWORD">
+                                    <class name="PasswordValidator" type="system"/>
+                                    <property name="AGENT_PROFILE_LOOKUP_KEY" value="AGENT_ADMINISTRATOR_NAME"/>
+                                </validation>
+                            </validations>
+                            <value-normalizer>
+                                <class name="PathNormalizer" type="system"/>
+                            </value-normalizer>
+                        </interaction>
+                        <interaction lookupkey="REMOTE_INSTANCE_LOCAL_DAS">
+				<i18n key="INT_REMOTE_INSTANCE_LOCAL_DAS" group="as81Tools"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="false"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_CHOICE">
+						<class name="ChoiceValidator" type="system"/>
+						<property name="value1" value="true"/>
+						<property name="value2" value="false"/>
+						<property name="ignorecase" value="true"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_INSTANCE_NAME">
+		        <skipIf key="REMOTE_INSTANCE_LOCAL_DAS" ignorecase="true">
+                     <value>false</value>
+                </skipIf>
+				<i18n key="INT_AGENT_INSTANCE_NAME" group="as81Tools"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value=""/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="REMOTE_AGENT_INSTALL_DIR">
+		        <skipIf key="REMOTE_INSTANCE_LOCAL_DAS" ignorecase="true">
+                     <value>false</value>
+                </skipIf>
+				<i18n key="INT_REMOTE_AGENT_INSTALL_DIR" group="as81Tools"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="/opt/j2ee_agents/am_as81_agent"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+		        </interaction>
+		</instance-interactions>
+		<common-tasks>
+            <task name="BACKUP_FILE">
+            	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_LOGIN_CONF_FILE"/>
+            </task>                                             
+            <task name="BACKUP_FILE">
+            	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_SERVER_POLICY_FILE"/>
+            </task>                               
+            <task name="GRANT_JAVA_PERMS">                  
+                <class name="ConfigureServerPolicyTask" type="custom"/>                                
+            </task>		
+		</common-tasks>
+		<instance-tasks>
+        	<task name="CREATE_LAYOUT">
+            	<class name="CreateLayoutTask" type="system"/>
+           	</task>
+            <task name="ENCRYPT_DATA">
+            	 <class name="EncryptTask" type="agentsdk"/>
+            	 <property name="DATA_FILE_LOOKUP_KEY" 
+            	 			value="AGENT_PASSWORD_FILE"/>
+                 <property name="ENCRYPTION_KEY_LOOKUP_KEY" 
+                 			value="AGENT_ENCRYPT_KEY"/>
+                 <property name="ENCRYPTED_VALUE_KEY_LOOKUP_KEY" 
+                 			value="AGENT_ENCRYPTED_PASSWORD"/>
+            </task>            
+            <task name="ENCRYPT_DATA">
+                <class name="EncryptTask" type="agentsdk"/>
+                <property name="DATA_FILE_LOOKUP_KEY" value="AGENT_POLICYADM_PWD_FILE"/>
+                <property name="ENCRYPTION_KEY_LOOKUP_KEY" value="AGENT_ENCRYPT_KEY"/>                 
+                <property name="ENCRYPTED_VALUE_KEY_LOOKUP_KEY" value="AGENT_POLICYADM_PWD"/>                
+            </task>          
+            <task name="GENERATE_AUDIT_LOGFILE_NAME">
+           		<class name="AuditLogFileNameTask" type="system"/>
+           		<property name="HOSTNAME_LOOKUP_KEY"
+           				  value="AGENT_HOST"/>
+           	    <property name="PORT_LOOKUP_KEY"
+           	    		  value="AGENT_PREF_PORT"/>
+           	    <property name="LOGFILE_NAME_OUTPUT_KEY"
+           	    		  value="AUDIT_LOG_FILENAME"/>
+           	</task>
+            <task name="CONFIGURE_AGENT_PROPS">
+            	<class name="ConfigurePropertiesTask" type="system"/>    
+                <property name="CONFIG_FILENAME_AGENT_BOOTSTRAP_TEMPLATE"
+                                      value="OpenSSOAgentBootstrap.template"/>
+                <property name="CONFIG_FILENAME_AGENT_BOOTSTRAP"
+                                      value="OpenSSOAgentBootstrap.properties"/>
+                <property name="CONFIG_FILENAME_AGENT_CONFIG_TEMPLATE"
+                                      value="OpenSSOAgentConfiguration.template"/>
+                <property name="CONFIG_FILENAME_AGENT_CONFIG"
+                                      value="OpenSSOAgentConfiguration.properties"/>
+            </task>
+            <task name="CREATE_AGENT_PROFILE">                      
+            	<class name="CreateProfileTask" type="system"/>
+                <property name="AGENT_PROFILE_TYPE" value="J2EEAgent" />
+            </task>      
+            <task name="BACKUP_FILE">
+           	 	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="AS_DOMAIN_XML_FILE"/>
+            </task>                                                         
+            <task name="CONFIGURE_DOMAIN_XML">                  
+ 	            <class name="ConfigureDomainXMLTask" type="custom"/>                                
+            </task>                        
+		</instance-tasks>
+	</custom-install>
+	<uninstall>
+		<common-interactions/>
+		<instance-interactions/>
+		<common-tasks>
+		    	<task name="REMOVE_JAVA_PERMS">
+				<class name="UnconfigureServerPolicyTask" type="custom"/>
+			</task>					
+		</common-tasks>
+		<instance-tasks>
+			<task name="UNCONFIGURE_DOMAIN_XML">
+				<class name="UnconfigureDomainXMLTask" type="custom"/>				
+			</task>
+			<task name="DELETE_LAYOUT">
+				<class name="DeleteLayoutTask" type="system"/>
+			</task>
+		</instance-tasks>
+	</uninstall>	
+        <migrate>
+            <common-interactions/>
+            <instance-interactions>
+                <interaction lookupkey="INSTANCE_NAME">
+                    <skipIf key="REMOTE_INSTANCE_LOCAL_DAS" ignorecase="true">
+                        <value>false</value>
+                    </skipIf>
+                    <i18n key="INT_MIGRATE_INSTANCE_NAME" group="as81Tools"/>
+                    <default-value-finder>
+                        <class name="StaticDefaultValueFinder" type="system"/>
+                        <static value="server"/>
+                    </default-value-finder>
+                    <validations>
+                        <validation name="VALID_STRING">
+                            <class name="StringValidator" type="system"/>
+                        </validation>
+                    </validations>
+                </interaction>
+                <interaction lookupkey="MIGRATE_AGENT_INSTANCE_NAME">
+                    <skipIf key="REMOTE_INSTANCE_LOCAL_DAS" ignorecase="true">
+                        <value>false</value>
+                    </skipIf>
+                    <i18n key="INT_MIGRATE_AGENT_INSTANCE_NAME" group="as81Tools"/>
+                    <default-value-finder>
+                        <class name="StaticDefaultValueFinder" type="system"/>
+                        <static value=""/>
+                    </default-value-finder>
+                    <validations>
+                        <validation name="VALID_STRING">
+                            <class name="StringValidator" type="system"/>
+                        </validation>
+                    </validations>
+                </interaction>
+                <interaction lookupkey="MIGRATE_REMOTE_AGENT_INSTALL_DIR">
+                    <skipIf key="REMOTE_INSTANCE_LOCAL_DAS" ignorecase="true">
+                        <value>false</value>
+                    </skipIf>
+                    <i18n key="INT_MIGRATE_REMOTE_AGENT_INSTALL_DIR" group="as81Tools"/>
+                    <validations>
+                        <validation name="VALID_STRING">
+                            <class name="StringValidator" type="system"/>
+                        </validation>
+                    </validations>
+                </interaction>
+            </instance-interactions>
+            <common-tasks>
+                <task name="BACKUP_FILE">
+                    <class name="BackupFileTask" type="system"/>
+                    <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                              value="AS_LOGIN_CONF_FILE"/>
+                </task>                                             
+                <task name="BACKUP_FILE">
+                    <class name="BackupFileTask" type="system"/>
+                    <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                              value="AS_SERVER_POLICY_FILE"/>
+                </task>                 
+                <task name="REMOVE_JAVA_PERMS">
+                    <class name="MigrateUnconfigureServerPolicyTask" type="custom"/>
+                </task>                
+                <task name="GRANT_JAVA_PERMS">                  
+                    <class name="ConfigureServerPolicyTask" type="custom"/>                                
+                </task>
+            </common-tasks>
+            <instance-tasks>
+                <task name="BACKUP_FILE">
+                    <class name="BackupFileTask" type="system"/>
+                    <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                              value="AS_DOMAIN_XML_FILE"/>
+                </task>   
+                <task name="UNCONFIGURE_DOMAIN_XML">
+                    <class name="MigrateUnconfigureDomainXMLTask" type="custom"/>				
+                </task>
+                
+                <task name="CREATE_LAYOUT">
+                    <class name="CreateLayoutTask" type="system"/>
+                </task>
+                <task name="GENERATE_AUDIT_LOGFILE_NAME">
+                    <class name="AuditLogFileNameTask" type="system"/>
+                    <property name="HOSTNAME_LOOKUP_KEY"
+                              value="AGENT_HOST"/>
+                    <property name="PORT_LOOKUP_KEY"
+                              value="AGENT_PREF_PORT"/>
+                    <property name="LOGFILE_NAME_OUTPUT_KEY"
+                              value="AUDIT_LOG_FILENAME"/>
+                </task>
+                <task name="CONFIGURE_AGENT_PROPS">
+                    <class name="MigrateConfigurePropertiesTask" type="system"/>    
+                    <property name="CONFIG_FILENAME_AGENT_BOOTSTRAP_TEMPLATE"
+                              value="OpenSSOAgentBootstrap.template"/>
+                    <property name="CONFIG_FILENAME_AGENT_BOOTSTRAP"
+                              value="OpenSSOAgentBootstrap.properties"/>
+                    <property name="CONFIG_FILENAME_AGENT_CONFIG_TEMPLATE"
+                              value="OpenSSOAgentConfiguration.template"/>
+                    <property name="CONFIG_FILENAME_AGENT_CONFIG"
+                              value="OpenSSOAgentConfiguration.properties"/>
+                </task>
+                <task name="CONFIGURE_DOMAIN_XML">                  
+                    <class name="ConfigureDomainXMLTask" type="custom"/>                                
+                </task> 
+            </instance-tasks>
+        </migrate>
+</configure>

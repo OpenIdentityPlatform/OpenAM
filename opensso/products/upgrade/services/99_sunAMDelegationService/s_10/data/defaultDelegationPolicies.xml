@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: defaultDelegationPolicies.xml,v 1.2 2008/06/25 05:54:03 qcheng Exp $
+-->
+
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+    "jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+
+<!--  REALM REQUESTS -->
+
+<Requests>
+<RealmRequests>
+    <CreateRealm realm="/sunamhiddenrealmdelegationservicepermissions" />
+</RealmRequests>
+
+<RealmRequests>
+<RealmCreatePolicy realm="/sunamhiddenrealmdelegationservicepermissions">
+<Policy name="RSUFFIX_HAT^^RealmAdmin" referralPolicy="false" active="true" >
+<Rule name="delegation-rule">
+<ServiceName name="sunAMDelegationService" />
+<ResourceName name="sms://*ROOT_SUFFIX/*" />
+<AttributeValuePair>
+<Attribute name="MODIFY" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="DELEGATE" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="READ" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule>
+<Subjects name="Subjects" description="">
+<Subject name="delegation-subject" type="AMIdentitySubject" includeType="inclusive">
+<AttributeValuePair>
+<Attribute name="Values"/>
+<Value>id=Top-level Admin Role,ou=role,ROOT_SUFFIX,amsdkdn=cn=Top-level Admin Role,ROOT_SUFFIX</Value>
+</AttributeValuePair>
+</Subject>
+</Subjects>
+</Policy>
+<Policy name="RSUFFIX_HAT^^PolicyAdmin" referralPolicy="false" active="true" >
+<Rule name="delegation-rule">
+<ServiceName name="sunAMDelegationService" />
+<ResourceName name="sms://*ROOT_SUFFIX/iPlanetAMPolicy*Service/*" />
+<AttributeValuePair>
+<Attribute name="MODIFY" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="DELEGATE" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="READ" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule>
+<Subjects name="Subjects" description="">
+<Subject name="delegation-subject" type="AMIdentitySubject" includeType="inclusive">
+<AttributeValuePair>
+<Attribute name="Values"/>
+<Value>id=Top-level Policy Admin Role,ou=role,ROOT_SUFFIX,amsdkdn=cn=Top-level Policy Admin Role,ROOT_SUFFIX</Value>
+</AttributeValuePair>
+</Subject>
+</Subjects>
+</Policy>
+<Policy name="RSUFFIX_HAT^^RealmReadOnly" referralPolicy="false" active="true" >
+<Rule name="delegation-rule">
+<ServiceName name="sunAMDelegationService" />
+<ResourceName name="sms://*ROOT_SUFFIX/sunAMRealmService/*" />
+<AttributeValuePair>
+<Attribute name="READ" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule>
+<Subjects name="Subjects" description="">
+<Subject name="delegation-subject" type="AMIdentitySubject" includeType="inclusive">
+<AttributeValuePair>
+<Attribute name="Values"/>
+<Value>id=Top-level Policy Admin Role,ou=role,ROOT_SUFFIX,amsdkdn=cn=Top-level Policy Admin Role,ROOT_SUFFIX</Value>
+</AttributeValuePair>
+</Subject>
+</Subjects>
+</Policy>
+<Policy name="RSUFFIX_HAT^^DatastoresReadOnly" referralPolicy="false" active="true" >
+<Rule name="delegation-rule">
+<ServiceName name="sunAMDelegationService" />
+<ResourceName name="sms://*ROOT_SUFFIX/sunIdentityRepositoryService/*" />
+<AttributeValuePair>
+<Attribute name="READ" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule>
+<Subjects name="Subjects" description="">
+<Subject name="delegation-subject" type="AMIdentitySubject" includeType="inclusive">
+<AttributeValuePair>
+<Attribute name="Values"/>
+<Value>id=Top-level Policy Admin Role,ou=role,ROOT_SUFFIX,amsdkdn=cn=Top-level Policy Admin Role,ROOT_SUFFIX</Value>
+</AttributeValuePair>
+</Subject>
+</Subjects>
+</Policy>
+
+<!-- Delegation policy for all authenticated users to use DAI,admin console,IdRepo Service -->
+<Policy name="AllUserReadableServices" referralPolicy="false" active="true" >
+    <Rule name="delegation-rule1">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://ROOT_SUFFIX/sunIdentityRepositoryService/1.0/globalConfig/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Rule name="delegation-rule2">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://ROOT_SUFFIX/DAI/1.0/globalConfig/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Rule name="delegation-rule3">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://ROOT_SUFFIX/iPlanetAMAdminConsoleService/1.0/globalConfig/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="delegation-subject" type="AuthenticatedUsers" includeType="inclusive">
+        </Subject>
+    </Subjects>
+</Policy>
+
+<!-- Delegation policy for users to read their attributes -->
+<Policy name="SelfReadAttributes" referralPolicy="false" active="true" >
+    <Rule name="user-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*ROOT_SUFFIX/sunIdentityRepositoryService/1.0/application/*" />
+        <AttributeValuePair>
+            <Attribute name="READ" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="delegation-subject" type="AuthenticatedUsers" includeType="inclusive">
+        </Subject>
+    </Subjects>
+    <Conditions name="AttrCondition" description="">
+        <Condition name="condition" type="UserSelfCheckCondition">
+            <AttributeValuePair>
+                <Attribute name="attributes"/>
+                <Value>*</Value>
+            </AttributeValuePair>
+        </Condition>
+    </Conditions>
+</Policy>
+
+<!-- Delegation policy for users to write their attributes -->
+<Policy name="SelfWriteAttributes" referralPolicy="false" active="true" >
+    <Rule name="user-read-rule">
+        <ServiceName name="sunAMDelegationService" />
+        <ResourceName name="sms://*ROOT_SUFFIX/sunIdentityRepositoryService/1.0/application/*" />
+        <AttributeValuePair>
+            <Attribute name="MODIFY" />
+            <Value>allow</Value>
+        </AttributeValuePair>
+    </Rule>
+    <Subjects name="Subjects" description="">
+        <Subject name="delegation-subject" type="AuthenticatedUsers" includeType="inclusive">
+        </Subject>
+    </Subjects>
+    <Conditions name="AttrCondition" description="">
+        <Condition name="condition" type="UserSelfCheckCondition">
+            <AttributeValuePair>
+                <Attribute name="attributes"/>
+                <Value>givenname</Value>
+                <Value>sn</Value>
+                <Value>cn</Value>
+                <Value>userpassword</Value>
+                <Value>mail</Value>
+                <Value>telephonenumber</Value>
+                <Value>postaladdress</Value>
+                <Value>preferredlocale</Value>
+                <Value>iplanet-am-user-password-reset-options</Value>
+                <Value>iplanet-am-user-password-reset-question-answer</Value>
+                <Value>iplanet-am-user-password-reset-force-reset</Value>
+                <Value>description</Value>
+                <Value>sunIdentityServerDeviceKeyValue</Value>
+                <Value>sunIdentityServerDeviceStatus</Value>
+            </AttributeValuePair>
+        </Condition>
+    </Conditions>
+</Policy>
+
+</RealmCreatePolicy>
+</RealmRequests>
+
+</Requests>	
+

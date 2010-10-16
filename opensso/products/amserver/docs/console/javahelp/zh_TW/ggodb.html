@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP 連結屬性 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggodb"></a><h4>SOAP 連結屬性</h4>
+
+
+<a name="ggocx"></a><h5>Web 服務認證程式</h5>
+<a name="indexterm-155"></a><a name="indexterm-156"></a><p>此屬性取值為 Web 服務認證程式介面的實作類別。此類別會對請求進行認證，並為 Web 服務使用者產生憑證。</p>
+
+<a name="ggock"></a><h5>支援的認證機制</h5>
+<a name="indexterm-157"></a><a name="indexterm-158"></a><p>此屬性指定 SOAP 接收器支援的認證機制。認證機制提供使用者認證，以及資料完整性和加密。依預設，會選取所有可用的認證機制。如果未選取一個認證機制，且 Web 服務使用者 (WSC) 使用它來傳送請求，將拒絕請求。以下是支援的認證機制的清單：</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+
+<a name="ggocn"></a><h5>僅強制已知的提供者</h5>
+<p>如果啟用，此特性將會強制在 SOAP 訊息中傳送 <tt>ProviderID</tt> 標頭以確保提供者存在於系統中。否則，將會拒絕請求。如果未啟用此屬性，將會略過檢查。</p>
+
+<a name="ggoci"></a><h5>SSL 用戶端認證的憑證別名</h5>
+<p>值會在安裝期間設定。它是在 Liberty SOAP 連結的 SSL 連線中使用的用戶端憑證別名。</p>
+
+<a name="ggocs"></a><h5>舊訊息的時間限制</h5>
+<p>預設值為 300000。判斷訊息是否是舊的，且因此不再值得信任。如果訊息時間戳記早於目前時間戳記達到指定的毫秒數，此訊息會被視為舊的。</p>
+
+<a name="ggofw"></a><h5>訊息 ID 快取清除間隔</h5>
+<p>預設值為 60000。指定快取清除事件開始前的經過毫秒數。每個訊息都隨附自有訊息 ID 儲存在快取中，以避免訊息重複。當訊息的目前時間減去接收時間的差值超出舊訊息的時間限制值時，訊息就會從快取中移除。</p>
+
+<a name="ggohr"></a><h5>支援的 SOAP 行動程式</h5>
+<p>預設值為 <tt>http://schemas.xmlsoap.org/soap/actor/next</tt>。指定支援的 SOAP 行動程式。每個行動程式都必須以管道字元 (|) 分隔。</p>
+
+<a name="ggofh"></a><h5>名稱空間前綴對映</h5>
+<p>預設值為：</p><pre>=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08
+|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/
+liberty/pp|is=urn:liberty:is:2003-08</pre><p>指定將 JAXB 內容樹狀結構封送處理到 DOM 樹時使用的名稱空間前綴對映。語法為 <tt>prefix=namespace|prefix=namespace|... </tt></p>
+
+<a name="ggoho"></a><h5>JAXB 套裝軟體清單</h5>
+<p>指定建構 <tt>JAXBContext </tt> 時所使用的 JAXB 套裝軟體清單。每個套裝軟體都必須以冒號 (:) 分隔。</p>
+
+<a name="ggogm"></a><h5>Liberty 識別 Web 服務版本</h5>
+<p>當 OpenSSO 用做 WSC 時，如果架構無法從輸入訊息或資源提供進行判斷，此特性會決定 Liberty ID-WSF 架構。值可以是 1.0 或 1.1。預設值為 1.1。</p>
+<br/>
+
+</body>
+</html>

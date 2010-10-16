@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Server und Sites - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serversite"></a><h3>Server und Sites</h3>
+<p>Mit dem Konfigurationsattribut "Servers und Sites" ist die zentralisierte Konfigurationsverwaltung der Sites
+und Server f&#252;r die gesamte Bereitstellung m&#246;glich. </p><p>Mehrere (zwei oder mehr) OpenSSO-Instanzen k&#246;nnen auf mindestens zwei verschiedenen Hostservern bereitgestellt
+werden. Sie k&#246;nnten beispielsweise zwei Instanzen auf einem Server und eine dritte
+Instanz auf einem weiteren Server bereitstellen. Oder Sie k&#246;nnten alle Instanzen auf
+verschiedenen Servern bereitstellen. Au&#223;erdem k&#246;nnen Sie die OpenSSO-Instanzen im Sitzungs-Failover-Modus konfigurieren, falls
+dies f&#252;r Ihre Bereitstellung erforderlich ist.</p><p>Ein oder mehrere Lastenausgleichssysteme leiten Clientanforderungen an die verschiedenen OpenSSO-Instanzen weiter. Sie
+konfigurieren die einzelnen Lastenausgleichssysteme gem&#228;&#223; Ihren Bereitstellungsanforderungen (z. B. zur Verwendung des
+Round-Robin-Verfahrens oder des Lastendurchschnitts) zur Verteilung der Last zwischen den OpenSSO-Instanzen. Ein
+Lastenausgleichssystem vereinfacht die Bereitstellung und l&#246;st Probleme wie eine Firewall zwischen Client
+und Back-End-OpenSSO-Servern. Mit der OpenSSO-Bereitstellung kann ein Hardware- oder Software-Lastenausgleichssystem verwendet werden.
+Alle OpenSSO-Instanzen greifen auf denselben Directory Server zu. </p>
+<br/>
+
+</body>
+</html>

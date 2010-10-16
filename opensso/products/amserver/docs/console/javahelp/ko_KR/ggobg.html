@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>새 그룹을 만들려면 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggobg"></a><h5>새 그룹을 만들려면</h5>
+<p>필요한 경우 Federated Access Manager 관리 콘솔에서 이 작업을 수행합니다. 이 작업은
+웹 에이전트 그룹 및 J2EE 에이전트 그룹에 적용됩니다.</p><p>에이전트가 그룹에서 특정 등록 정보를 상속받도록 하려면 그룹을 만듭니다. J2EE 에이전트는 J2EE
+에이전트 그룹에서 등록 정보를 상속받을 수 있으며, 웹 에이전트는 웹 에이전트 그룹에서
+ 등록 정보를 상속받을 수 있습니다.</p><ol>
+<li><b>[구성] 탭의 [에이전트]를 누릅니다.</b></li>
+<li><b>필요한 경우 적절한 에이전트 유형에 해당하는 탭을 선택합니다.</b><ul>
+<li><b>웹 에이전트:</b><p>[웹] 탭은 웹 에이전트용이며, 기본적으로 선택됩니다. 다른 선택은 필요하지 않습니다.</p></li>
+<li><b>J2EE 에이전트:</b><p>[J2EE] 탭은 J2EE 에이전트용입니다. 해당하는 경우 이 탭을 누릅니다.</p></li></ul></li>
+<li><b>그룹 선택에서 [새로 만들기]를 누릅니다.</b><p>[이름] 필드에 새 그룹의 이름을 입력합니다.</p></li>
+<li><b>[서버 URL] 필드에 Federated Access Manager 서버 URL을 입력합니다.</b></li>
+<li><b>[만들기]를 누릅니다.</b><p>콘솔이 에이전트 그룹을 만들고 해당 그룹에 대한 링크가 있는 에이전트(WebAgent 또는 J2EEAgent)
+페이지가 다시 표시됩니다.</p><p>그룹을 추가로 구성하려면 이 링크를 눌러 에이전트 그룹 편집 페이지를 표시합니다.</p><p>그룹을 구성하기 위해 설정할 수 있는 속성은 그룹 수준에서 그룹, 비밀번호 및
+비밀번호 확인 속성을 사용할 수 없는 경우를 제외하고 개별 에이전트와 동일합니다.</p>
+<hr><p><b>주 &#8211; </b>또한 일부 그룹 속성에는 대부분의 경우 변경하지 않아야 하는 변수 값이 이미
+할당되어 있습니다. 다음은 이러한 값의 한 예입니다.</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

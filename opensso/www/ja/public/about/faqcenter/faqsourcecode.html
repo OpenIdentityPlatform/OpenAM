@@ -1,0 +1,201 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="Open Federation"></td></tr>
+	<tr><td><h2>ソースコードに関する FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#related">OpenSSO のソースコードと Sun Java System Access Manager と Sun Java System Federation Manager はどのような関係にありますか?</a></li>
+<li><a href="#comprises">OpenSSO のソースには何が含まれていますか?</a></li>
+<li><a href="#amserver"><code>amserver</code> のソースには何が含まれていますか?</a></li>
+<li><a href="#federation"><code>federation</code> のソースには何が含まれていますか?</a></li>
+<li><a href="#standards"><code>federation</code> のソースコードはどの業界標準に基づいていますか?</a></li>
+<li><a href="#zip"><code>opensso.zip</code> は何ですか?</a></li>
+<li><a href="#ossosamples"><code>amserver</code> のソースで利用可能なサンプルはありますか?</a></li>
+<li><a href="#fedsamples"><code>federation</code> のソースで利用可能なサンプルはありますか?</a></li>
+</ol>
+</font></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="related"></a>
+OpenSSO のソースコードと Sun Java System Access Manager と Sun Java System Federation Manager はどのような関係にありますか?
+</b></b></p>
+
+<p>OpenSSO のソースコードは Sun Java<sup>TM</sup> System Access Manager 7.0 
+(7.1 用に開発されたコンポーネントを含む) と Sun Java System Federation Manager のソースコードを基にしています。
+Sun Microsystems, Inc. はこれらの製品のソースコードを無償のRTU(right-to-use)ライセンスで Java 開発者コミュニティーに提供します:
+ (リリース前に再配布不可能なサードパーティのソースに変更があったため、若干の差異はあります。) 
+Sun Java System Application Server が <a href="https://glassfish.dev.java.net">Glassfish</a>) から作られているように、
+次期リリースの Federated Access Manager 8.0 (Access Manager と Federation Manager を統合したもの) は OpenSSO のソースで作られています。
+Sun が次のリリースに入れるべき機能を OpenSSO に入れる作業を完了したと決定した時点で、ソースコードをブランチし、この "リリースブランチ" 上では機能変更などは行わず安定な状態で公開します。新機能の開発は引きつづき trunk 上で行われ、Sun のリリースブランチで行った修正は、OpenSSO の trunk にコピーされます。</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="comprises"></a>OpenSSO のソースには何が含まれていますか?</b></b></p>
+
+<p>ソースツリー内の <a href="https://opensso.dev.java.net/source/browse/opensso/products/">products</a> を参照すると、OpenSSO 製品のソースに含まれる次のディレクトリが表示されます。:
+
+<UL>
+<LI><code>amserver</code>: セッション管理、ポリシー、認証、コンソール、管理ツール、監査およびその他の連携以外の機能のコードが含まれています。 
+</LI>
+<P></P>
+<LI><code>federation</code>: 連携関連の機能のコードが含まれています。この中には Liberty Alliance project protocols や SAML をベースにしたものも含まれます。. <code>federation</code> の下には 2 つのサブディレクトリがあります:
+<P></P>
+<ol>
+<li><code>library</code> ディレクトリにはアイデンティティー連携のための基本的なフレームワークや関連する Web サービスが含まれています。
+コードは、機能を既存のシステムと統合するために拡張可能でプラグイン可能なインフラを提供します。
+<code>library</code> コードはビルドの際に <code>shared</code> ディレクトリに依存します。</li>
+<p></p>
+<li><code>openfm</code> ディレクトリは <code>library</code> ディレクトリにおけるフレームワーク一式を提供します。 システムを動作させるための簡単なサンプルや任意の J2EE web コンテナに配備可能な単一の war ファイルを提供します。 
+</li>
+</ol>
+</LI>
+<P></P>
+<LI><code>installtools</code>: WAR ファイルを配備するのに必要なインストールおよび設定機能のコードが含まれています。
+</LI>
+<P></P>
+<LI><code>j2eeagents</code>: J2EE コンテナ用に開発されたポリシーエージェントのコードが含まれています。</LI>
+<P></P>
+<LI><code>legacy</code>: 過去のバージョンなどで利用されていたレガシーなコマンドラインインタフェースのコードが含まれています。このコードはいずれなくなります。
+</LI>
+<P></P>
+<LI><code>shared</code>: サードパーティ製のライブラリの JAR ファイルが含まれています。このディレクトリにある JAR ファイルは自動的にコンパイル時の classpath に含まれます。</LI>
+<P></P>
+<LI><code>webagents</code>: web コンテナ用に開発されたポリシーエージェントのコードが含まれています。</LI>
+<P></P>
+<LI><code>wssagents</code>: web サービスセキュリティーエージェントのコードが含まれています。</LI>
+<P></P>
+</UL>
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="amserver"></a> 
+<code>amserver</code> のソースには何が含まれていますか?
+</b></b></p>
+
+<p>ソースツリー内の <a href="https://opensso.dev.java.net/source/browse/opensso/products/amserver/">amserver</a> を参照すると、セッション管理、ポリシー、認証、コンソール、管理ツール、監査、クライアント SDK およびリモート分散認証ユーザーインタフェースのコードを見ることができます。
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="federation"></a> <code>federation</code> 
+のソースには何が含まれていますか?</b></b></p>
+
+<p>ソースツリー内の <a href="https://opensso.dev.java.net/source/browse/opensso/products/federation/">federation</a> を参照すると、次のディレクトリを見ることができます。:
+
+<UL>
+<li>
+<code>library</code> ディレクトリにはアイデンティティー連携のための基本的なフレームワークや関連する Web サービスが含まれています。
+コードは、機能を既存のシステムと統合するために拡張可能でプラグイン可能なインフラを提供します。
+<code>library</code> コードはビルドの際に  <a href="#comprises"><code>shared</code></a> ディレクトリに依存します。
+</li>
+<p></p>
+<li>
+<code>openfm</code> ディレクトリは <code>library</code> ディレクトリにおけるフレームワーク一式を提供します。 システムを動作させるための簡単なサンプルや任意の J2EE web コンテナに配備可能な単一の war ファイルを提供します。
+</li>
+</UL>
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="standards"></a> <code>federation</code> のソースコードはどの業界標準に基づいていますか?</b></b></p>
+
+<ul>
+<li>Liberty Alliance Project Identity Federation Framework (Liberty ID-FF) v.1.1 および v.1.2 (アイデンティティープロバイダおよびサービスプロバイダ拡張プロファイルを含む)</li>
+<P></P>
+<li>Liberty Alliance Project Identity Web Services Framework (Liberty ID-WSF) v.1.0 および v.1.1</li>
+<P></P>
+<li>Organization for the Advancement of Structured Information Standards (OASIS) Security Assertion Markup Language (SAML) v.1.0 および v.1.1</li>
+<P></P>
+<li>OASIS SAML v.2.0 (Operational modes: <code>IdP</code> and <code>SP Complete</code>)</li>
+<P></P>
+<li>WS-Federation Passive Requestor Profile v1.1</li>
+</ul>
+
+<p>以下のものは将来のリリースでサポート予定:</p>
+
+<ul>
+<li>Liberty ID-WSF v.2.0</li>
+<P></P>
+<li>Web Services Interoperability (WS-I) Basic Security Profile (BSP)</li>
+</ul></td></tr>
+
+<tr><td><p><b>Q:<b><a name="zip"></a><code>opensso.zip</code> は何ですか?</b></b></p>
+
+<P><code>opensso.zip</code> は OpenSSO 関連のファイルが一式入ったダウンロード用ファイルです。 zip ファイルを解凍すると以下のファイルがあります。
+
+<UL>
+<LI><code>opensso.war</code> - ソースコード、イメージファイル、ローカリゼーションファイルおよび連携のサンプルファイルを含む配備可能な WAR ファイルです。</LI>
+<P></P>
+<LI>分散された認証 WAR ファイルやコンソール用の WAR ファイルを含む配備可能な WAR ファイルの作成方法が書かれたマニュアル</LI>
+<P></P>
+<LI><code>openssoclientsdk.jar</code> - リモートでの連携ベースのサービスプロバイダをビルドするための <code>federation</code> ライブラリコードを含む Client SDK JAR ファイル
+</LI>
+<P></P>
+<LI><code>opensso-client.zip</code> - Client SDK サンプル</LI>
+<P></P>
+<LI><code>opensso-public-javadocs.jar</code> - パブリックな Java API レファレンスマニュアル</LI>
+<P></P>
+<LI><code>ssoSessionTools.zip</code> - セッションフェイルオーバーツール</LI>
+<P></P>
+<LI><code>ssoAdminTools.zip</code> - コマンドラインインタフェース</LI>
+</ul></p></td></tr>
+
+							
+<tr><td><p><b>Q:<b><a name="ossosamples"></a> <code>amserver</code> のソースで利用可能なサンプルはありますか?</b></b></p>
+
+<p>次の <code>amserver</code> 用サンプルが利用可能です:</p>
+<ol>
+<li>
+OpenSSO コンソールへのログインおよびログアウトを行う認証サンプル。
+</li>
+<p></p>
+<li>
+新しい SSO トークンを作成し、ユーザー属性を表示する SSO コマンドラインのサンプル。
+</li>
+<p></p>
+<li>
+トークン ID と関連する属性を表示する SSOToken サンプル。このサンプルは、トークンプロパティをどのように設定したり値を取得できるかについてのデモも可能です。
+</li>
+<p></p>
+<li>
+<code>AMIdentityRepository</code> クラスの使い方のデモを行うアイデンティティーレポジトリサンプル。
+</li>
+<p></p>
+<li>OpenSSO サーバーのログをとるサンプル。</li>
+</ol>
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="fedsamples"></a> <code>federation</code> のソースで利用可能なサンプルはありますか?</b></b></p>
+
+<p>次の <code>federation</code> 用サンプルが利用可能です:</p>
+<ol>
+<li>
+Open Federation の 2 つのインスタンスの間で 1 つのユーザーを連携する際に関連するインタラクションをデモする Liberty ID-FF サンプル。
+</li>
+<p></p>
+<li>SAMLv2 プロトコルを使って、Open Federation の 2 つのインスタンスの間で 1 つのユーザーを連携する際に関連するインタラクションをデモする SAMLv2 サンプル。
+</li>
+<p></p>
+<li>
+複数の連係プロトコル(ID-FF、SAMLv2、WS-Federation など)がある場合のシングルサインオンとシングルログアウトのユースケースをデモする Multiple-Federation プロトコルサンプル。
+</li>
+<p></p>
+<li>
+Web サービスクライアント(WSC) と Web サービスプロバイダ(WSP) 間のインタラクションをデモする Liberty ID-WSF サンプル。
+このサンプルは、特に、ディスカバリサービスを照会したり更新したり、個人プロファイルサービスを照会したり更新したりする方法についてデモします。
+さらに、このサンプルを用いて、個人プロファイルサービス属性にアクセスするための、ポリシードリブンなインタラクションを設定することができます。
+</li>
+</ol>
+</p></td></tr>
+
+		   									      
+</table>
+
+
+</p>
+
+<!-- content boundary -->
+</div>
+</html>

@@ -1,0 +1,518 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.67 2009/12/07 19:55:58 goodearth Exp $
+
+-->
+
+<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+
+<project name="opensso-war" default="all">
+                
+    <description>Open Web Single Sign-On: WAR</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.warbase.dir"/></not>
+                <not><isset property="amserver.built.war.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <!-- war environment variables -->
+    <property name="war.built.dir" location="${amserver.built.war.dir}"/>
+    <property name="war.xml.dir" location="${amserver.warbase.dir}/xml"/>
+    <property name="war.www.dir" location="${amserver.warbase.dir}/www"/>
+    <property name="war.config.dir" location="${amserver.warbase.dir}/config"/>
+
+    <target name="all" depends="preparebuild">
+        <antcall target="tools" />
+    </target>
+    
+    <target name="tools">
+        <ant antfile="${amserver.base.dir}/build-tools.xml"
+             dir="${amserver.base.dir}" 
+             inheritRefs="true"/>
+    </target>
+    
+    <target name="session-tools">
+        <ant antfile="${amserver.base.dir}/build-session-tools.xml"
+             dir="${amserver.base.dir}" 
+             inheritRefs="true"/>
+    </target>        
+
+    <target name="configurator">
+        <ant antfile="${amserver.base.dir}/build-configurator.xml"
+             dir="${amserver.base.dir}" 
+             inheritRefs="true"/>
+    </target>
+    
+    <target name="war" depends="createwebxml">   
+        <filter token="DATESTAMP" value="${war.time.stamp}"/>        
+        <filter token="VERSION" value="${version.set}" />
+        <copy file="${war.xml.dir}/template/sms/AMConfig.properties"
+            tofile="${amserver.built.res.dir}/AMConfig.properties"
+            filtering="true"/>
+        <copy file="${war.xml.dir}/template/sms/serverdefaults.properties"
+            tofile="${amserver.built.res.dir}/serverdefaults.properties"
+            filtering="true"/>
+        <copy file="${war.xml.dir}/template/sms/legacy.properties"
+            tofile="${amserver.built.res.dir}/legacy.properties" />
+        <war destfile="${amserver.dist.dir}/opensso-amserver.war" webxml="${amserver.dist.dir}/web.xml">
+            <lib dir="${extlib.dir}" includes="${war.lib}" />
+            <lib dir="${lockhart.dir}/lib" />
+            <lib dir="${javahelp.dir}/lib" />
+            <lib dir="${jatolib.dir}">
+                <include name="jato.jar" />
+            </lib>
+            <lib dir="${amserver.dist.dir}" includes="amserver.jar" />
+            <lib dir="${amserver.dist.dir}" includes="console.jar" />
+            <lib dir="${amserver.dist.dir}" includes="opensso-register.jar" />
+            <lib dir="${sharedlib.dist.dir}" includes="opensso-sharedlib.jar" />
+
+            <zipfileset dir="${amserver.www.dir}/authentication/UI">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.www.dir}/authentication/UI/login_images" prefix="login_images" />
+            <zipfileset dir="${amserver.www.dir}/authentication/UI/js" prefix="js" />
+            <zipfileset dir="${amserver.www.dir}/js" prefix="js" />
+            <zipfileset dir="${lockhart.dir}/js" prefix="js">
+                <include name="browserVersion.js" />
+            </zipfileset>
+            <zipfileset dir="${lockhart.dir}" prefix="com_sun_web_ui">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${lockhart.dir}/css" prefix="com_sun_web_ui/css">
+                <exclude name="css_generic.css" />
+                <exclude name="styles.css" />
+            </zipfileset>
+            <zipfileset dir="${lockhart.dir}/dtd" prefix="com_sun_web_ui/dtd" />
+            <zipfileset dir="${lockhart.dir}/html" prefix="com_sun_web_ui/html" />
+            <zipfileset dir="${lockhart.dir}/images" prefix="com_sun_web_ui/images" />
+            <zipfileset dir="${lockhart.dir}/images" prefix="images">
+                <include name="PrimaryProductName.png" />
+                <include name="*.jpg" />
+                <include name="*.gif" />
+                <include name="button/primary*.gif" />
+                <include name="button/index.html" />
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${lockhart.dir}/js" prefix="com_sun_web_ui/js" />
+            <zipfileset dir="${lockhart.dir}/jsp" excludes="help2/*.jsp,version/*.jsp" prefix="com_sun_web_ui/jsp" />
+            <zipfileset dir="${amserver.www.dir}/console/help" prefix="com_sun_web_ui/jsp/help2" />
+            <zipfileset dir="${amserver.www.dir}/console/version" prefix="com_sun_web_ui/jsp/version" />
+            <zipfileset dir="${amserver.www.dir}/authentication/UI" prefix="config/auth/default">
+                <include name="*.jsp" />
+                <include name="*.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.www.dir}/click" prefix="click">
+                 <include name="*.htm" />
+                 <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${war.config.dir}/assets">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${war.config.dir}/config">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}" prefix="config/auth/default">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}" prefix="config/auth/default_en">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/ja_JP" prefix="config/auth/default_ja">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/ko_KR" prefix="config/auth/default_ko">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/zh_CN" prefix="config/auth/default_zh">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/zh_CN" prefix="config/auth/default_zh_CN">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/zh_TW" prefix="config/auth/default_zh_TW">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/de_DE" prefix="config/auth/default_de">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/fr_FR" prefix="config/auth/default_fr">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.authmodule.xml.dir}/es_ES" prefix="config/auth/default_es">
+                <include name="*.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.built.war.dir}/xml/services" prefix="WEB-INF/classes" />
+            <zipfileset dir="${amserver.built.war.dir}/xml" prefix="WEB-INF/template/sms">
+                <include name="serverconfig.xml" />
+            </zipfileset>
+            <zipfileset dir="${war.xml.dir}" prefix="WEB-INF">
+                <include name="jaxrpc-ri-runtime.xml" />
+                <include name="configurator.tld" />
+            </zipfileset>
+            <zipfileset dir="${amserver.built.res.dir}" prefix="WEB-INF/classes">
+                <include name="*.properties" />
+            </zipfileset>
+            <zipfileset dir="${amserver.www.dir}/jsp">
+                <include name="isAlive.jsp" />
+                <include name="Debug.jsp" />
+                <include name="encode.jsp" />
+                <include name="showServerConfig.jsp" />
+            </zipfileset>
+            <zipfileset dir="${war.www.dir}">
+                <exclude name="server" />
+                <exclude name="client" />
+            </zipfileset>
+            <zipfileset dir="${amserver.dtd.xml.dir}" prefix="WEB-INF" />
+            <zipfileset dir="${amserver.classes.dir}/jaxrpc" prefix="WEB-INF/wsdl">
+                <include name="IdentityManagementServices.wsdl" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/xml" prefix="WEB-INF/wsdl">
+                <include name="IdentityServices.wsdl" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/keystore" prefix="WEB-INF/template/keystore">
+                <include name="keystore.jks" />
+            </zipfileset>
+            <zipfileset dir="${war.xml.dir}/template/sms" prefix="WEB-INF/template/sms">
+                <include name="SunAMClientData.xml" />
+                <include name="defaultDelegationPolicies.xml" />
+            </zipfileset>
+            <!-- Include configuration gui into main webapp: -->
+            <zipfileset dir="${amserver.warbase.dir}/config">
+                <include name="**/*" />
+                <!-- useful for standalone testing, but we don't want to 
+                     include these in the master .war file: -->
+                <exclude name="**/web.xml"/>
+                <exclude name="**/build.xml"/>
+                <exclude name="**/index.jsp"/>
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/ldif/sunds" prefix="WEB-INF/template/ldif/sunds">
+                <include name="sunds_config_schema.ldif" />
+                <include name="sunds_config_index.ldif" />
+                <include name="sunds_user_schema.ldif" />
+                <include name="sunds_user_index.ldif" />
+                <include name="sunds_plugin.ldif" />
+                <include name="sunds_userinit.ldif" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/ldif/sunds/amsdk_plugin" prefix="WEB-INF/template/ldif/sunds/amsdk_plugin">
+                <include name="amsdk_init_template.ldif" />
+                <include name="amsdk_sunone_schema2.ldif" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/ldif/ad" prefix="WEB-INF/template/ldif/ad">
+                <include name="ad_config_schema.ldif" />
+                <include name="ad_user_schema.ldif" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/ldif/adam" prefix="WEB-INF/template/ldif/adam">
+                <include name="adam_user_schema.ldif" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/ldif/tivoli" prefix="WEB-INF/template/ldif/tivoli">
+                <include name="tivoli_user_schema.ldif" />
+            </zipfileset>
+            <zipfileset dir="${amserver.warbase.dir}/ldif/opends" prefix="WEB-INF/template/ldif/opends">
+                <include name="opends_config_schema.ldif" />
+                <include name="opends_user_schema.ldif" />
+                <include name="opends_user_index.ldif" />
+                <include name="opends_userinit.ldif" />
+                <include name="opends_embinit.ldif" />
+                <include name="opends_plugin.ldif" />
+                <include name="opends_remove_user_schema.ldif" />
+            </zipfileset>
+            <zipfileset dir="${extlib.dir}/" prefix="WEB-INF/template/opends/">
+                <include name="opends.zip" />
+            </zipfileset>
+            <zipfileset dir="${lockhart.dir}/xml" prefix="WEB-INF">
+                <include name="cc.tld" />
+            </zipfileset>
+            <zipfileset dir="${jatolib.dir}" prefix="WEB-INF">
+                <include name="jato.tld" />
+            </zipfileset>
+            <zipfileset dir="${lockhart.dir}/xml" prefix="WEB-INF/com_sun_web_ui" />
+            <zipfileset dir="${amserver.console.xml.dir}" prefix="WEB-INF/classes">
+                <include name="amAccessControl.xml" />
+                <include name="amConsoleConfig.xml" />
+            </zipfileset>
+            <zipfileset dir="${amserver.www.dir}/console" prefix="console">
+                <exclude name="html" />
+                <exclude name="html/*" />
+            </zipfileset>
+            <zipfileset dir="${amserver.www.dir}/console/html/level1" prefix="console" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/authentication" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/base" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/css" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/delegation" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/idm" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/images" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/js" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/css" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/policy" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/realm" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/service" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/session" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/user" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/html" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/version" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/ajax" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/webservices" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/task" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/agentconfig" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/help" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/federation" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level2" prefix="console/dm" />
+            <zipfileset dir="${amserver.www.dir}/console/html/level3" prefix="console/images/tasks" />
+            <zipfileset dir="${lockhart.dir}/css" prefix="css">
+                <exclude name="css_generic.css" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/en/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/en">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/en" prefix="html/en/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/en/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/en/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/en/help/graphics" />
+            
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/de/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/de">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/de_DE" prefix="html/de/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/de/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/de/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/de/help/graphics" />
+            
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/fr">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/fr/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/fr_FR" prefix="html/fr/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/fr/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/fr/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/fr/help/graphics" />
+            
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/es">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/es/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/es_ES" prefix="html/es/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/es/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/es/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/es/help/graphics" />
+            
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/ja">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/ja/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/ja_JP" prefix="html/ja/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/ja/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/ja/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/ja/help/graphics" />
+            
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/ko/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/ko">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/ko_KR" prefix="html/ko/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/ko/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/ko/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/ko/help/graphics" />
+
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/zh" prefix="html/zh/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/zh/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/zh/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/zh/help/graphics" />
+
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh_CN/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh_CN">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/zh_CN" prefix="html/zh_CN/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/zh_CN/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/zh_CN/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/zh_CN/help/graphics" />
+            
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh_TW/help">
+                <include name="app.hs" />
+                <include name="map.jhm" />
+                <include name="version.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp" prefix="html/zh_TW">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.docs.dir}/console/javahelp/zh_TW" prefix="html/zh_TW/help" />
+            <zipfileset dir="${javahelp.dir}/css" prefix="html/zh_TW/help/css" />
+            <zipfileset dir="${javahelp.dir}/ents" prefix="html/zh_TW/help/ents" />
+            <zipfileset dir="${javahelp.dir}/graphics" prefix="html/zh_TW/help/graphics" />        
+
+            <zipfileset dir="${amserver.passwordreset.dir}/html" prefix="password">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.passwordreset.dir}/html/ui" prefix="password/ui">
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.passwordreset.dir}/jsp" prefix="password/ui">
+                <include name="*.jsp" />
+            </zipfileset>
+            <zipfileset dir="${amserver.passwordreset.dir}/css" prefix="password/css">
+                <include name="*.css" />
+                <include name="index.html" />
+            </zipfileset>
+            <zipfileset dir="${amserver.passwordreset.dir}/images"
+                prefix="password/images">
+                <include name="*.*" />
+            </zipfileset>
+            <zipfileset dir="${amserver.passwordreset.dir}/images/button"
+                prefix="password/images/button">
+                <include name="*.*" />
+            </zipfileset>
+            <zipfileset dir="${amserver.passwordreset.dir}/js" prefix="password/js">
+                <include name="*.js" />
+                <include name="index.html" />
+            </zipfileset>
+        </war>
+
+        <delete file="${amserver.dist.dir}/web.xml"/>
+
+        <antcall target="war-legacy" />
+        <checksum file="${amserver.dist.dir}/opensso-amserver.war" algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="createwebxml">
+        <copy overwrite="true" file="${amserver.warbase.dir}/xml/web.xml" todir="${amserver.dist.dir}" />
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- context param --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;listener&gt;.+?&lt;/listener&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- listener declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;filter&gt;.+?&lt;/filter&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- filter declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;filter-mapping&gt;.+?&lt;/filter-mapping&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- filter mapping --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;session-config&gt;.+?&lt;/session-config&gt;" />
+            <arg value="${amserver.warbase.dir}/xml/console/web.xml" />
+            <arg value="${amserver.dist.dir}/web.xml" />
+            <arg value="&lt;!-- taglib definition --&gt;" />
+        </java>
+
+    </target>
+
+    <target name="war-legacy" if="legacy">
+        <war destfile="${amserver.dist.dir}/opensso-amserver.war" update="true">
+            <zipfileset dir="${legacy.base.dir}/resources/locale" prefix="WEB-INF/classes">
+                <include name="*.properties" />
+            </zipfileset>
+        </war>
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${amserver.built.war.dir}"/>
+        <mkdir dir="${amserver.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${amserver.built.war.dir}"/>
+        <delete file="${amserver.dist.dir}/opensso-amserver.war" />
+        <delete file="${amserver.dist.dir}/opensso-amserver.war.sha" />
+    </target>
+
+</project>

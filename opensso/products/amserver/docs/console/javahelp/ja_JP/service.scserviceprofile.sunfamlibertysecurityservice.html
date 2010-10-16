@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-WSF セキュリティーサービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Liberty ID-WSF セキュリティーサービス</h4>
+
+
+<a name="ggohs"></a><h5>セキュリティー属性プラグインクラス</h5>
+<p>この属性は、<tt>com.sun.identity.liberty.ws.security.SecurityAttributePlugin</tt> インタフェースの実装クラス名を指定します。このクラスは、ディスカバリサービスによって生成される証明情報に含める SAML 属性のリストを返します。</p>
+
+<a name="ggoia"></a><h5>キー情報のタイプ</h5>
+<p>この属性に設定された値は、<tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider</tt> 実装クラスで使用されます。XML 署名内の <tt>KeyInfo</tt> ブロックに含めるデータのタイプを指定します。値が <tt>certificate</tt> の場合は、署名者の X059 証明書が <tt>KeyInfo</tt> 内に含められます。それ以外の場合は、DSA/RSA キーが
+<tt>KeyInfo</tt> 内に含められます。</p>
+
+<a name="ggoin"></a><h5>セキュリティートークンプロバイダクラス</h5>
+<p>この属性は、セキュリティートークンプロバイダの実装クラスを指定します。</p>
+
+<a name="ggohw"></a><h5>デフォルトの WSC 証明書エイリアス</h5>
+<p>この属性は、この Web サービスクライアントに対して Web サービスセキュリティートークンを発行するためのデフォルトの証明書エイリアスを指定します。</p>
+
+<a name="ggohz"></a><h5>信頼できる発行局の署名証明書エイリアス</h5>
+<p>この属性は、応答メッセージの SAML または SAML ベアラー (BEARER) トークンに署名するために使用される、信頼できる発行局の証明書エイリアスを指定します。</p>
+
+<a name="ggohd"></a><h5>信頼できる証明書発行局 (CA) の署名証明書エイリアス</h5>
+<p>この属性は、信頼できる CA の証明書エイリアスを指定します。受信する要求の SAML または SAML ベアラー (BEARER) トークン。メッセージはこのリスト内の信頼 CA によって署名される必要があります。構文は次のとおりです。<tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|..... </tt></p><p>次に例を示します。<tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt> </p><p>値 issuer は、トークンが署名の内部に <tt>KeyInfo</tt> を持たないときに使用されます。トークンの発行者がこのリストに存在している必要があり、署名の検証には対応する証明書エイリアスが使用されます。<tt>KeyInfo</tt> が存在する場合、<tt>KeyInfo</tt> が一致する証明書エイリアスがキーストアに含まれている必要があり、証明書エイリアスがこのリストに存在する必要があります。</p>
+<br/>
+
+</body>
+</html>

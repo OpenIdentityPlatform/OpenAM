@@ -1,0 +1,225 @@
+<div><table cellpadding="0" cellspacing="10" border="0" align="left" valign="top">
+  <col WIDTH=100%>
+
+    <tr><td><img src="../../../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+
+    <tr><td><font size="2"><i>You can post comments and questions regarding the documentation provided below on the <a href="http://wiki.java.net/bin/view/Projects/DocFeedback" target="_blank">Documentation Feedback Wiki Page</a>. The page will open in a new window.</i>
+</font></td></tr>
+
+    <tr><td><h2><code>com.sun.identity.plugin.configuration</code> Package for Service Configurations</h2>
+    
+    <P></P>
+    
+    The <code>com.sun.identity.plugin.configuration</code> package is used to manipulate service configurations. This document contains the following sections:
+    
+    <ul>
+    <li><a href="#interfaces"><code>com.sun.identity.plugin.configuration</code> Interfaces</a></li>
+        <li><a href="#configurations">About Service Configurations</a></li>
+        <li><a href="#manipulate">Manipulating Service Configurations with <code>ConfigurationInstance</code></a></li>
+            <li><a href="#notifications">Event Notification with <code>ConfigurationInstance</code></a></li>
+                <li><a href="#samplecode">Sample Code</a></li>
+    </ul>
+    </td></tr>
+    
+    <tr><td><font size="2">
+    <a name="interfaces"></a><h4><code>com.sun.identity.plugin.configuration</code> Interfaces</h4>
+    Following are the interfaces in the <code>com.sun.identity.plugin.configuration</code> package.
+    <P></P>
+    
+    <table>
+	<tr><td><code>com.sun.identity.plugin.configuration.ConfigurationActionEvent</code></td><td>Represents an event that has happened to the <code>ConfigurationInstance</code></td></tr>
+	<tr><td><code>com.sun.identity.plugin.configuration.ConfigurationException</code></td><td>Thrown when there are errors related to configuration operations</td></tr>
+	<tr><td><code>com.sun.identity.plugin.configuration.ConfigurationInstance</code></td><td>Provides the methods for operations on service configurations</td></tr>
+	<tr><td><code>com.sun.identity.plugin.configuration.ConfigurationManager</code></td><td>Provides a method to retrieve configuration instances</td></tr>
+	<tr><td><code>com.sun.identity.plugin.configuration.ConfigurationListener</code></td><td>Implemented by applications in order to receive configuration data change notifications</td></tr>
+</table>
+
+<a name="configurations"></a><h4>About Service Configurations</h4>
+
+<code>ConfigurationInstance</code> is the interface that provides the methods for operations on service configurations. Service configurations contain attributes; each attribute may have multiple values. Multiple sets of attributes are also supported; each set is accessed by a configuration name. Finally, service configurations are defined within realms; each realm may have more than one set of configurations. Here is an example of a service configuration:
+
+<ul>
+<li>realm 1
+	<ul><li>config 1</li>
+	<ul><li>attribute 1</li><li>attribute 2</li></ul></ul>
+	<ul><li>config 2</li>
+	<ul><li>attribute 1</li><li>attribute 2</li></ul></ul>
+</li>
+<li>realm 2
+	<ul><li>config 3</li>
+	<ul><li>attribute 1</li><li>attribute 2</li></ul></ul>
+	<ul><li>config 4</li>
+	<ul><li>attribute 1</li><li>attribute 2</li></ul></ul>
+</li>	
+</ul>
+
+<a name="manipulate"></a><h4>Manipulating Service Configurations with <code>ConfigurationInstance</code></h4>
+
+<code>ConfigurationInstance</code> contains the following methods for manipulating service configuration attributes. Each method takes as input a realm and a configuration name.
+
+<hr>
+
+<b>NOTE: A null realm is considered the root realm. A null configuration name is considered the default configuration for the realm.</b>
+
+<hr> 
+
+<ul>
+<li>public Map getConfiguration(String realm, String configName)<br>
+        throws ConfigurationException;</li>
+<li>public void setConfiguration(String realm, String configName, Map avPairs)<br>
+        throws ConfigurationException,UnsupportedOperationException;</li>
+<li>public void createConfiguration(String realm, String configName, Map avPairs)<br>
+        throws ConfigurationException, UnsupportedOperationException;</li>
+<li>public void deleteConfiguration(String realm, String configName, Set attributes)<br>
+        throws ConfigurationException, UnsupportedOperationException;</li>
+</ul>
+
+Attributes are represented by a Map where Key is the attribute name and value is a set of values in String.
+
+<P></P>
+
+To get a <code>ConfigurationInstance</code> object, call:
+
+<P></P>
+
+<code>ConfigurationInstance ConfigurationManager.getConfigurationInstance(String componentName)</code>
+
+<P></P>
+
+where <code>componentName</code> is the name of the configuration (for example, SAML1, SAML2 or ID-FF), and <code>ConfigurationManager</code> will read the <code>ConfigurationInstance</code> implementation class from the <code>com.sun.identity.plugin.configuration.class</code> property in <code>FederationConfig.properties</code>.
+
+<a name="notifications"></a><h4>Event Notification with <code>ConfigurationInstance</code></h4>
+
+
+<code>ConfigurationInstance</code> contains the following methods for event notification:
+
+<ul>
+<li>public String addListener(ConfigurationListener listener)
+        throws ConfigurationException, UnsupportedOperationException;</li>
+<li>public void removeListener(String listenerID)
+        throws ConfigurationException, UnsupportedOperationException;</li>
+</ul>
+
+These methods are used to add and remove a ConfigurationListener.
+
+<code>ConfigurationListener</code> has one method:
+
+    <code>public void configChanged(ConfigurationActionEvent e);</code> 
+    
+This method is called when there is a change in the <code>ConfigurationInstance</code>. <code>configChanged</code> is passed a <code>ConfigurationActionEvent</code> as parameter. <code>ConfigurationActionEvent</code> reports the component name, the configuration name, the realm and the type of event action, of which there are three:
+
+<ul>
+<li>ADDED - when a configuration is created</li>
+<li>DELETED - when a configuration is deleted</li>
+<li>MODIFIED - when a configuration is changed</li>
+</ul>
+
+<a name="samplecode"></a><h4>Sample Code</h4>
+    
+<pre>
+package com.sun.identity.plugin.configuration.unitest;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import com.sun.identity.plugin.configuration.ConfigurationActionEvent;
+import com.sun.identity.plugin.configuration.ConfigurationException;
+import com.sun.identity.plugin.configuration.ConfigurationInstance;
+import com.sun.identity.plugin.configuration.ConfigurationManager;
+import com.sun.identity.plugin.configuration.ConfigurationListener;
+
+public class Test implements ConfigurationListener {   
+
+    public static void main(String[] argv) {
+        try {
+            String componentName = "test";
+            String configName = "config1";
+            String realm = "/";
+
+            // get ConfigurationInstance "test"
+            ConfigurationInstance ci =
+                ConfigurationManager.getConfigurationInstance(componentName);
+
+            // add a listener to receive event notification
+            ci.addListener(new Test());
+
+            // create a configuration "config1" under realm "/" with 2
+            // attributes "attr1" and "attr2"
+            Set values = new HashSet();
+            values.add("abcd");
+            values.add("efgh");
+            Map avPairs = new HashMap();
+            avPairs.put("attr1", values);
+            values = new HashSet();
+            values.add("1234");
+            values.add("5678");
+            avPairs.put("attr2", values);
+            ci.createConfiguration(realm, configName, avPairs);
+
+
+            // get configuration we just created.
+            avPairs = ci.getConfiguration(realm, configName);
+            Set attrNames = avPairs.keySet();
+            for(Iterator iter = attrNames.iterator(); iter.hasNext();) {
+                String attrName = (String)iter.next();
+                System.out.println("attribute name : " + attrName);
+                values = (Set)avPairs.get(attrName);
+                for(Iterator iter2 = values.iterator(); iter.hasNext();) {
+                    System.out.println("attribute value : " +
+                        ((String)iter.next()));
+                }
+            }
+
+            // modify attribute "attr1" in configuration
+            values = (Set)avPairs.get("attr1");
+            values.add("ijkl");
+            ci.setConfiguration(realm, configName, avPairs);
+
+            // delete attribute "attr1" in configuration
+            attrNames = new HashSet();
+            attrNames.add("attr1");
+            ci.deleteConfiguration(realm, configName, attrNames);
+
+            // delete configuration
+            ci.deleteConfiguration(realm, configName, null);
+        } catch (ConfigurationException ex) {
+            ex.printStackTrace();
+        }
+    }  
+
+
+    /**
+     * This method will be invoked when a component's 
+     * configuration data has been changed. The parameters componentName,
+     * realm and configName denotes the component name,
+     * organization and configuration instance name that are changed 
+     * respectively.
+     *
+     * @param e Configuration action event, like ADDED, DELETED, MODIFIED etc.
+     */
+    public void configChanged(ConfigurationActionEvent e) {
+        System.out.println("Event component name : " + e.getComponentName());
+        System.out.println("Event configuration name : " +
+            e.getConfigurationName());
+        System.out.println("Event realm : " + e.getRealm());
+        int type = e.getType();
+        if (type == ConfigurationActionEvent.ADDED) {
+            System.out.println("Event type : ADDED");
+        } else if (type == ConfigurationActionEvent.DELETED) {
+            System.out.println("Event type : DELETED");
+        } else if (type == ConfigurationActionEvent.MODIFIED) {
+            System.out.println("Event type : MODIFIED");
+        }
+    }
+}
+</pre>
+</font></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

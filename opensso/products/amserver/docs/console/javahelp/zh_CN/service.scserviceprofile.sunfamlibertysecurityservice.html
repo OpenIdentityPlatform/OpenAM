@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-WSF 安全服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Liberty ID-WSF 安全服务</h4>
+
+
+<a name="ggohs"></a><h5>安全属性插件类</h5>
+<p>此属性指定 <tt>com.sun.identity.liberty.ws.security.SecurityAttributePlugin</tt> 接口的实现类名称。该类返回要包含在由搜索服务所生成的证书中的 SAML 属性列表。</p>
+
+<a name="ggoia"></a><h5>密钥信息类型</h5>
+<p>在此属性中设定的值用于 <tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider</tt> 实现类。它指定要置于 XML 签名中 <tt>KeyInfo</tt> 块内的数据类型。如果值为 <tt>certificate</tt>，则签名者的 X059 证书将包含在 <tt>KeyInfo</tt> 中。否则，相应的
+DSA/RSA 密钥将包含在 <tt>KeyInfo</tt> 中。</p>
+
+<a name="ggoin"></a><h5>安全令牌提供者类</h5>
+<p>此属性指定用于安全令牌提供者的实现类。</p>
+
+<a name="ggohw"></a><h5>默认 WSC 证书别名</h5>
+<p>此属性指定发布该 Web 服务客户机的 Web 服务安全令牌的默认证书别名。</p>
+
+<a name="ggohz"></a><h5>信任的权威签署证书别名</h5>
+<p>此属性指定信任的授权机构的证书别名，用于签署响应消息的 SAML 或 SAML BEARER 令牌。</p>
+
+<a name="ggohd"></a><h5>信任的 CA 签署证书别名</h5>
+<p>此属性指定用于传入请求的可信赖 CA. SAML 或 SAML BEARER 令牌的证书别名。此消息必须由列表中信任的 CA 签署。语法是 <tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|..... </tt></p><p>示例：<tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>。</p><p>当令牌的签名内没有 <tt>KeyInfo</tt> 时，就采用值发布者。令牌的发布者必须在列表中，且将使用相应的证书别名来验证该签名。如果存在 <tt>KeyInfo</tt>，则密钥库必须包含一个与 <tt>KeyInfo</tt> 相匹配的证书别名，并且该证书别名必须在列表中。</p>
+<br/>
+
+</body>
+</html>

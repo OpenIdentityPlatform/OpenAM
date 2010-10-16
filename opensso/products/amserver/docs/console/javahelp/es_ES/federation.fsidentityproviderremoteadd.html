@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para agregar un nuevo proveedor de identidades remoto a una entidad de proveedores - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderremoteadd"></a><h4>Para agregar un nuevo proveedor de identidades remoto a una entidad de proveedores</h4><p>Un <b>proveedor remoto</b> no est&#225; alojado en el mismo servidor que Federated Access
+Manager. La configuraci&#243;n del nuevo proveedor de identidades remoto incluye la adici&#243;n
+de metadatos relacionados con el proveedor de identidades al perfil de la
+entidad de proveedores. El punto de partida es <a href="federation.fsidentityprovider.html">Para agregar un proveedor de identidades a una entidad de proveedores</a>.</p>
+<hr><p><b>Nota &#8211; </b>Los atributos adicionales se pueden configurar, pero no est&#225;n visibles en la
+p&#225;gina de configuraci&#243;n inicial. Consulte <a href="federation.fsidentityproviderremoteprofile.html">Para modificar atributos de un proveedor de identidades remoto en una entidad de proveedores</a>.</p>
+<hr>
+<ol>
+<li><b>Proporcione informaci&#243;n para los atributos comunes.</b><p>Los atributos comunes contienen valores que definen generalmente el propio proveedor de
+identidades.</p><dl><dt>Descripci&#243;n</dt>
+<dd><p>El valor de este atributo es la descripci&#243;n proporcionada al crear la entidad. Puede modificar la descripci&#243;n introducida originalmente y agregar una si no hay ninguna.</p></dd>
+<dt>Enumeraci&#243;n de compatibilidad de protocolos</dt>
+<dd><p>Seleccione la versi&#243;n del Marco de federaci&#243;n de identidades Liberty (ID-FF de Liberty) de Liberty Alliance Project admitida por esta entidad.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> hace referencia a la versi&#243;n 1.2 de ID-FF de Liberty.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> hace referencia a la versi&#243;n 1.1 de ID-FF de Liberty.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>Proporcione informaci&#243;n para los atributos de URL de comunicaci&#243;n.</b><p>Las direcciones URL de comunicaci&#243;n contienen ubicaciones a las que los proveedores
+pueden enviar transmisiones.designadas para este proveedor de identidades.</p><dl><dt>URL de servicio de inicio de sesi&#243;n &#250;nico</dt>
+<dd><p>Escriba una URL a la que los proveedores de servicios pueden enviar solicitudes de inicio de sesi&#243;n &#250;nico y federaci&#243;n.</p></dd>
+</dl>
+</li>
+<li><b>Proporcione informaci&#243;n para los atributos de perfiles de comunicaci&#243;n. </b><p>Un <b>perfil</b> de Liberty Alliance Project define una combinaci&#243;n de contenido del
+mensaje y el mecanismo utilizado para transportarlo. Los siguientes atributos de perfiles
+de comunicaci&#243;n definen los perfiles utilizados por el proveedor de identidades para
+cada funci&#243;n.</p><dl><dt>Inicio de sesi&#243;n &#250;nico/federaci&#243;n</dt>
+<dd><p>Seleccione el perfil que utilizar&#225; este proveedor de identidades al enviar las repuestas a las solicitudes de autenticaci&#243;n o federaci&#243;n.</p>
+<ul><li><p>Env&#237;o de explorador (especifica un protocolo HTTP POST basado en explorador)</p></li>
+<li><p>Artefacto de explorador (especifica un protocolo basado en SOAP sin explorador)</p></li>
+<li><p>LECP, proxy de cliente habilitado para Liberty.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>Seleccione cualquiera de los c&#237;rculos de confianza disponibles para asignarlo al proveedor.</b><p>Un proveedor puede pertenecer a uno o varios c&#237;rculos de confianza. Sin
+embargo, un proveedor sin un c&#237;rculo de confianza especificado no puede participar
+en las comunicaciones basadas en las especificaciones de Liberty Alliance Project. Si
+no se ha creado ning&#250;n c&#237;rculo de confianza, puede definir este atributo
+m&#225;s adelante.</p></li>
+<li><b>Haga clic en Aceptar para agregar el proveedor a la entidad.</b></li>
+<li><b>Seleccione otra opci&#243;n del men&#250; Ver para continuar con la configuraci&#243;n de
+la entidad o haga clic en Guardar para completar la configuraci&#243;n.</b></li></ol>
+<br/>
+
+</body>
+</html>

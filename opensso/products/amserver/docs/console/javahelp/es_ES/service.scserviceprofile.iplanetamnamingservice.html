@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Asignaci&#243;n de nombres - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamnamingservice"></a><h4>Asignaci&#243;n de nombres</h4>
+<p><a name="indexterm-204"></a>El servicio de asignaci&#243;n de nombres se utiliza para obtener y definir
+las direcciones URL, complementos y configuraciones, as&#237; como las notificaciones de solicitudes
+para diversos servicios de OpenSSO como sesi&#243;n, autenticaci&#243;n, registro SAML y federaci&#243;n.</p><p>Este servicio permite que los clientes encuentren la direcci&#243;n URL correcta del
+servicio si la plataforma est&#225; ejecutando m&#225;s de una instancia de OpenSSO.
+Cuando se encuentra una direcci&#243;n URL de asignaci&#243;n de nombres, este servicio
+descodificar&#225; la sesi&#243;n del usuario y sustituir&#225; din&#225;micamente el protocolo, el host
+y el puerto por los par&#225;metros de la sesi&#243;n. De esta forma,
+se garantiza que la direcci&#243;n URL que el servicio devuelve est&#225; destinada
+al host en el que se cre&#243; la sesi&#243;n del usuario. Los
+atributos de asignaci&#243;n de nombres son:</p>
+<ul><li><p><a href="#fwfgc">URL de servicio de perfil</a></p></li>
+<li><p><a href="#fwfgg">URL de servicio de sesi&#243;n</a></p></li>
+<li><p><a href="#fwfgf">URL de servicio de registro</a></p></li>
+<li><p><a href="#fwfgh">URL de servicio de pol&#237;tica</a></p></li>
+<li><p><a href="#fwfge">Direcci&#243;n URL del servicio de autenticaci&#243;n</a></p></li>
+<li><p><a href="#fwfgl">Perfil Web SAML/URL de servicio Artefacto</a></p></li>
+<li><p><a href="#fwfgm">URL de servicio SAML SOAP</a></p></li>
+<li><p><a href="#fwfgk">Perfil Web SAML/URL de servicio POST</a></p></li>
+<li><p><a href="#fwfgi">URL del servicio del administrador de aserci&#243;n SAM</a></p></li>
+<li><p><a href="#fwfgn">URL del servicio del administrador de aserci&#243;n de federaci&#243;n</a></p></li>
+<li><p><a href="#fwfgp">Direcci&#243;n URL del administrador del token de seguridad</a></p></li>
+<li><p><a href="#fwfgo">URL de punto final de JAXRPC</a></p></li></ul>
+
+
+<a name="fwfgc"></a><h5>URL de servicio de perfil</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/profileservice</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del perfil
+en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="fwfgg"></a><h5>URL de servicio de sesi&#243;n</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/sessionservice</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de la
+sesi&#243;n en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="fwfgf"></a><h5>URL de servicio de registro</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/loggingservice</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del registro
+en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="fwfgh"></a><h5>URL de servicio de pol&#237;tica</h5>
+<p>Este campo contiene un valor igual a:</p><p> <tt>%protocol://%host:%port/Server_DEPLOY_URI/policyservice</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de la
+pol&#237;tica en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="fwfge"></a><h5>Direcci&#243;n URL del servicio de autenticaci&#243;n</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/authservice</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de autenticaci&#243;n
+en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="fwfgl"></a><h5>Perfil Web SAML/URL de servicio Artefacto</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLAwareServlet </tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del artefacto/perfil
+Web SAML en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos. </p>
+
+<a name="fwfgm"></a><h5>URL de servicio SAML SOAP</h5>
+<p>Este campo contiene un valor igual a</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLSOAPReceiver </tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de SAML
+SOAP en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="fwfgk"></a><h5>Perfil Web SAML/URL de servicio POST</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLPOSTProfileServlet </tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de POST/perfil
+Web SAML en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos. </p>
+
+<a name="fwfgi"></a><h5>URL del servicio del administrador de aserci&#243;n SAM</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/AssertionManagerServlet/AssertionM anagerIF</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del servicio
+del administrador de aserci&#243;n SAML en funci&#243;n de los par&#225;metros de sesi&#243;n
+espec&#237;ficos. </p>
+
+<a name="fwfgn"></a><h5>URL del servicio del administrador de aserci&#243;n de federaci&#243;n</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/amserver/FSAssertionManagerServlet/FSAssertionMana gerIF</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del servicio
+del administrador de aserci&#243;n de federaci&#243;n en funci&#243;n de los par&#225;metros de
+sesi&#243;n espec&#237;ficos. </p>
+
+<a name="fwfgp"></a><h5>Direcci&#243;n URL del administrador del token de seguridad</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/amserver/SecurityTokenManagerServlet/SecurityToken ManagerIF/</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del administrador
+del token de seguridad en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.
+</p>
+
+<a name="fwfgo"></a><h5>URL de punto final de JAXRPC</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocol://%host:%port/amserver/jaxrpc/</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de punto
+final de JAXRPC en funci&#243;n de los par&#225;metros de sesi&#243;n espec&#237;ficos.</p>
+
+<a name="gguep"></a><h5>URL de punto final de los servicios web de identidad</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocolo://%host:%puerto%uri/serviciosidentidad/</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de punto
+final de Servicios web de identidad en funci&#243;n de los par&#225;metros de
+sesi&#243;n espec&#237;ficos.</p>
+
+<a name="ggudo"></a><h5>URL de punto final de los servicios REST de identidad</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocolo://%host:%puerto%uri/identidad//</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL de punto
+final de Servicios REST de identidad en funci&#243;n de los par&#225;metros de
+sesi&#243;n espec&#237;ficos.</p>
+
+<a name="ggueo"></a><h5>URL de punto final del servicio del token de seguridad</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocolo://%host:%puerto%uri/sts</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del punto
+final del servicio token de seguridad en funci&#243;n de los par&#225;metros de
+sesi&#243;n espec&#237;ficos.</p>
+
+<a name="gguff"></a><h5>URL de punto MEX del servicio del token de seguridad</h5>
+<p>Este campo contiene un valor igual a:</p><p><tt>%protocolo://%host:%puerto%uri/sts/mex</tt></p><p>Esta sintaxis permite la sustituci&#243;n din&#225;mica de la direcci&#243;n URL del punto
+final MEX del servicio token de seguridad en funci&#243;n de los par&#225;metros
+de sesi&#243;n espec&#237;ficos.</p>
+<br/>
+
+</body>
+</html>

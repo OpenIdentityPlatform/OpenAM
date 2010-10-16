@@ -1,0 +1,106 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="SAMLv2SmokeTests">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.ConfigureSAMLv2"/>
+            <class name="com.sun.identity.qatest.samlv2.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2SmokeTest"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2ScenarioTests"/> 
+            <class name="com.sun.identity.qatest.samlv2.UnconfigureSAMLv2"/>
+        </classes>
+    </test>
+    <test name="SAMLv2FeatureTests">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2RelayStateTests"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2AutoFederationTests"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2TransientUserTests"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2AutoFedTransientUserTests"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2AutoFedDynUserCreationTests"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2ForceAuthNTests"/>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2DefaultRelayStateSPTests"/>
+        </classes>
+    </test> 
+    <test name="NameIdMngtSPHttpSPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtSPHttpSPHttpTest"/>
+        <parameter name="tinitor" value="SP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="SP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+        </classes>
+    </test>
+    <test name="NameIdMngtSPHttpIDPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtSPHttpIDPHttpTest"/>
+        <parameter name="tinitor" value="SP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="IDP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+        </classes>
+    </test>
+    <test name="NameIdMngtIDPHttpSPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtIDPHttpSPHttpTest"/>
+        <parameter name="tinitor" value="IDP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="SP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+        </classes>
+    </test>
+    <test name="NameIdMngtIDPHttpIDPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtIDPHttpIDPHttpTest"/>
+        <parameter name="tinitor" value="IDP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="IDP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/> 
+        </classes>
+    </test>
+    <test name="AssertionQueryTest">
+        <parameter name="groupName" value="@mode@"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2AssertionQueryTests"/>
+        </classes>
+    </test>

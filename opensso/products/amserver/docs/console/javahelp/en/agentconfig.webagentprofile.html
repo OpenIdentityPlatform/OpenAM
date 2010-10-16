@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web Policy Agent - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webagentprofile"></a><h4>Web Policy Agent</h4>
+<p>A web agent instance can be configured using this interface. The properties described
+only apply if during agent creation, centralized configuration was chosen. If local configuration
+was selected, the properties related to this agent must be edited in the
+<tt>OpenSSOAgentConfiguration.properites</tt> file in the agent installation directory.</p><p>The types of configuration available are divided into the following categories:</p>
+<ul><li><p><a href="#ggmrx">Global</a></p></li>
+<li><p><a href="#ggmna">Application</a></p></li>
+<li><p><a href="#ggphk">SSO</a></p></li>
+<li><p><a href="#ggwgp">OpenSSO Services</a></p></li>
+<li><p><a href="#ggwhz">Miscellaneous</a></p></li>
+<li><p><a href="#ggmtu">Advanced</a></p></li></ul>
+
+
+<a name="ggmrx"></a><h5>Global</h5>
+<p>These properties apply to all applications protected by an agent.</p>
+
+<a name="ggmvp"></a><h5>Group</h5>
+<p>If applicable, select a group from the drop down list to assign this
+agent to the group. This list consists of previously configured groups.</p>
+
+<a name="ggmtk"></a><h5>Password</h5>
+<p>The password was set when you created the agent profile. However, you can
+change the password at any time in the future.</p>
+
+<a name="ggmvm"></a><h5>Password Confirm</h5>
+<p>The confirmation of the password was performed when you created the agent profile.
+If you change the password, you must confirm the change.</p>
+
+<a name="ggmsp"></a><h5>Status</h5>
+<p>The <tt>Active</tt> option is selected when the agent is created. Choose <tt>Inactive</tt> only
+if you want to remove the protection the agent provides.</p>
+
+<a name="ggmpq"></a><h5>Location of Agent Configuration Repository</h5>
+<p>If desired, change the configuration location to whichever of the two options is
+available: centralized or local. The centralized location allows you to control the configuration
+in a centralized manner, such as from the Console.</p><p>The local option is provided for backward compatibility purposes. If the local configuration
+option is selected, the agent will use its local configuration in the <tt>OpenSSOAgentConfiguration.properites</tt>
+file in the agent installation directory. In addition, the Console will only display
+the following properties: Password, Password (confirmation), and Status.</p>
+
+<a name="ggwku"></a><h5>Agent Configuration Change Notification</h5>
+<p>When enabled, the agent receives notification messages from the OpenSSO server about configuration
+changes.</p>
+
+<a name="ggmri"></a><h5>Enable Notifications</h5>
+<p>When enabled, notifications help maintain the following agent caches: SSO, policy, and configuration.</p>
+
+<a name="ggmpe"></a><h5>Agent Notification URL</h5>
+<p>When the attribute labeled Enable Notifications is enabled, the URL assigned as a
+value for this attribute is used by the agent to register notification listeners.</p>
+
+<a name="ggmqe"></a><h5>Agent Deployment URI Prefix</h5>
+<p>The value of the Universal Resource Identifier (URI). The default value is <tt>/amagent</tt>.</p>
+
+<a name="ggmwj"></a><h5>Configuration Reload Interval</h5>
+<p>The interval in minutes for the agent to fetch the agent configuration from
+OpenSSO. The default value is <tt>60</tt>.</p>
+
+<a name="ggmvs"></a><h5>Configuration Cleanup Interval</h5>
+<p>The interval in minutes for updating old agent configuration entries, as long as
+those entries are not currently referenced by any requests. This is part of
+the hot swapping framework.</p>
+
+<a name="ggmwx"></a><h5>SSO Only Mode</h5>
+<p>When enabled, agent solely enforces authentication (SSO), without enforcing authorization for policies.</p>
+
+<a name="ggmpw"></a><h5>Resources Access Denied URL</h5>
+<p>The URL of the customized access denied page. If no value is provided,
+the agent returns an <tt>HTTP</tt> status of <tt>403 (Forbidden)</tt>.</p>
+
+<a name="ggmoy"></a><h5>Agent Debug Level</h5>
+<p>The type of debug messages logged. This setting determines the level of the
+debug log saved locally on the agent host.</p>
+
+<a name="ggmpt"></a><h5>Agent Local Log File Rotation</h5>
+<p>When enabled, the log file is rotated at the moment the indicated log
+file size is reached, as set by the attribute labeled Agent Local Log
+File Size.</p>
+
+<a name="ggmmw"></a><h5>Agent Local Log File Size</h5>
+<p>The size, in megabytes, at which the log file is rotated to a
+new file.</p>
+
+<a name="ggmno"></a><h5>Agent Remote Log Filename</h5>
+<p>Name of the OpenSSO log file to which each URL access to
+OpenSSO is recorded.</p>
+
+<a name="ggmof"></a><h5>URL Access Remote Logging Type</h5>
+<p>The URL access logging level setting. This setting refers to URL access as
+saved to the OpenSSO log file, whose name is specified by the attribute
+labeled Agent Remote Log Filename.</p>
+
+<a name="ggmnb"></a><h5>FQDN Check</h5>
+<p>When enabled, the FQDN default value and the FQDN map values are checked.</p>
+
+<a name="ggmoc"></a><h5>FQDN Default</h5>
+<p>The fully qualified host name for users to access resources. This host name
+is set during agent installation. Do not modify this setting unless necessary.</p>
+
+<a name="ggmod"></a><h5>FQDN Virtual Host Map</h5>
+<p>A mapping to an actual or valid host name. This mapping is
+from a host name that is not recognized to one that is recognized.
+This mapping is useful in the following situations: when an IP address or an
+incorrect URL is entered by the user, or when a virtual host is
+used for protected resources.</p><p>Enter values for the Map Key and the Corresponding Map Values and click
+Add. </p>
+
+<a name="ggmna"></a><h5>Application</h5>
+<p>These properties tend to be application specific.</p>
+
+<a name="ggmqr"></a><h5>Not Enforced URL List</h5>
+<p>A URL list for which no authentication is performed. For every URL on
+this list, credentials are not requested for authentication.</p>
+
+<a name="ggmon"></a><h5>Invert Check for Not Enforced URL List</h5>
+<p>When enabled, the not enforced list becomes the enforced list. Therefore, all the
+URLs listed as values for the attribute labeled Not Enforced URL List are
+then enforced, while all other URLs are not enforced.</p>
+
+<a name="ggmov"></a><h5>Fetch Attributes for Notenforced URLs</h5>
+<p>When enabled, the agent fetches profile attributes for URLs on the not enforced
+list by performing policy evaluation.</p>
+
+<a name="ggmom"></a><h5>Not Enforced Client IP List</h5>
+<p>The client IP address list. Requests from IP address on this list do
+not undergo authentication or authorization. Therefore, access is granted for every IP address
+listed as a value for this attribute. Credentials are not requested for authentication
+or authorization.</p>
+
+<a name="ggmtz"></a><h5>Client IP Validation</h5>
+<p>When enabled, browser requests are validated to ensure that they come from the
+same IP address against which the SSO token was initially issued.</p>
+
+<a name="ggmuh"></a><h5>Profile Attributes Fetch Mode</h5>
+<p>The modes available to fetch additional user profile attributes to be introduced into
+a request.</p>
+
+<a name="ggmst"></a><h5>Profile Attributes Map</h5>
+<p>A list of mappings from profile attribute names to <tt>HTTP</tt> header names. These
+attribute names are populated under specific names for the currently authenticated user. </p><p>Enter a profile attribute name value for the Map Key and the HTTP
+header name for the Corresponding Map Values. Click Add. </p>
+
+<a name="ggmwy"></a><h5>Response Attributes Fetch Mode</h5>
+<p>The modes available to fetch additional user response attributes to be introduced into
+a request.</p>
+
+<a name="ggmvw"></a><h5>Response Attributes Map</h5>
+<p>A list of mappings from response attribute names to <tt>HTTP</tt> header names. These
+attribute names are populated under specific names for the currently authenticated user. The
+format of values for this property is as follows: <tt>[response_attribute_name]=http_header_name</tt></p>
+
+<a name="ggmvb"></a><h5>Session Attributes Fetch Mode</h5>
+<p>The modes available to fetch additional user session attributes to be introduced into
+a request.</p>
+
+<a name="ggmub"></a><h5>Session Attributes Map</h5>
+<p>A list of mappings from session attribute names to <tt>HTTP</tt> header names. These
+attribute names are populated under specific names for the currently authenticated user. </p><p>Enter a session attribute name value for the Map Key and the HTTP
+header name for the Corresponding Map Values. Click Add. </p>
+
+<a name="ggphk"></a><h5>SSO</h5>
+<p>These properties allow you to configure features of the agent related to single
+sign-on (SSO) and cross domain single sign-on (CDSSO).</p>
+
+<a name="ggmsf"></a><h5>Cookie Name</h5>
+<p>The name of the SSO cookie token used between OpenSSO and the agent.</p>
+<hr><p><b>Caution &#8211; </b>Changing this property in the agent without correspondingly changing OpenSSO disables the SDK.</p>
+<hr>
+
+
+<a name="ggmva"></a><h5>Cookie Security</h5>
+<p>When enabled and when the communications channel with the host is secure, the
+agent marks cookies as secure before sending them.</p>
+
+<a name="ggmwn"></a><h5>Cookies Reset</h5>
+<p>When enabled, the agent resets cookies in the response before redirecting to OpenSSO
+for authentication. By default this property is not enabled.</p>
+
+<a name="ggmwt"></a><h5>Cookies List for Reset</h5>
+<p>A list of cookies to be included in the redirect response to OpenSSO.
+This list is only used when the Cookies Reset property is enabled.</p>
+
+<a name="ggmth"></a><h5>Cookies Domain List</h5>
+<p>When CDSSO is enabled, this list of domains indicates which cookies must be
+set.</p>
+
+<a name="ggmvi"></a><h5>CDSSO</h5>
+<p>When enabled, cross-domain single sign-on is operative. By default, this property is not
+enabled.</p>
+
+<a name="ggmtp"></a><h5>CDSSO Servlet URL List</h5>
+<p>When enabled, this list indicates which URLs of the available CDSSO controllers can
+be used by the agent for CDSSO processing. Once you have entered the
+list of URLs, select a URL and use the buttons to the right
+of the list to order them accordingly.</p>
+
+<a name="ggwgp"></a><h5>OpenSSO Services</h5>
+<p>These properties configure the OpenSSO services that the agent uses, such as policy
+service, session service, authentication service, and service management (SM) service.</p>
+
+<a name="ggmqt"></a><h5>OpenSSO Login URL</h5>
+<p>A list of URLs to OpenSSO authentication. When authentication is required, the agent
+redirects incoming users to the appropriate authentication service as specified by the URL.
+Once you have entered the list of URLs, select a URL and use
+the buttons to the right of the list to order them accordingly.</p>
+
+<a name="ggnej"></a><h5>Agent Connection Timeout:</h5>
+<p>The timeout period in seconds for an agent connection with the OpenSSO authentication
+server. The default value is <tt>2</tt> seconds. The error related to this setting
+is as follows: <tt>unable to find active OpenSSO Auth server.</tt></p>
+
+<a name="ggmnh"></a><h5>Polling Period for Primary Server</h5>
+<p>The interval in minutes that the agent polls the primary server to ensure
+that it is running. The default value is <tt>5</tt>.</p>
+
+<a name="ggmty"></a><h5>Logout URL List</h5>
+<p>The list of logout URLs for applications. Once you have entered the list
+of URLs, select a URL and use the buttons to the right
+of the list to order them accordingly. Once you have entered the list of
+URLs, select a URL and use the buttons to the right of
+the list to order them accordingly.</p>
+
+<a name="ggmsu"></a><h5>Logout Cookies List for Reset</h5>
+<p>The list of cookies to be reset upon log out. The format
+for this list is the same as for the attribute labeled Cookies List
+for Reset.</p>
+
+<a name="ggmnd"></a><h5>Policy Cache Polling Period</h5>
+<p>The polling interval in minutes to refresh the agent's policy cache. The default
+value is <tt>3</tt> minutes.</p>
+
+<a name="ggmqk"></a><h5>SSO Cache Polling Period</h5>
+<p>The polling interval in minutes to refresh the agent's SSO cache. The default
+value is <tt>3</tt> minutes.</p>
+
+<a name="ggmrr"></a><h5>User ID Parameter</h5>
+<p>The value of the user ID is used by the agent to
+set the value of the <tt>REMOTE_USER</tt> server variable. By default, this parameter is set
+to <tt>UserToken</tt>.</p>
+
+<a name="ggmpf"></a><h5>User ID Parameter Type</h5>
+<p>Used in conjunction with the attribute labeled User ID Parameter, this setting determines
+from which attribute type the user ID is fetched. The possible values are
+<tt>session</tt> and <tt>ldap</tt>.</p>
+
+<a name="ggmor"></a><h5>Fetch Policies from Root Resource</h5>
+<p>When enabled, which is the default setting, the agent caches the policy decision
+of the resource and all resources from the root of the resource down.
+To have the agent cache the policy decision for the resource only, which
+can improve response time, ensure the setting is not enabled.</p>
+
+<a name="ggmwv"></a><h5>Retrieve Client Hostname</h5>
+<p>When enabled, the client host name is obtained through DNS reverse lookup for
+use in policy evaluation.</p>
+
+<a name="ggmoa"></a><h5>Policy Clock Skew</h5>
+<p>The number of seconds used to adjust the time difference between the agent
+machine and OpenSSO. Clock skew in seconds equals agent time minus OpenSSO time.</p>
+
+<a name="ggwhz"></a><h5>Miscellaneous</h5>
+<p>These properties do not fit smoothly in other categories.</p>
+
+<a name="ggmrt"></a><h5>Agent Locale</h5>
+<p>A combination of the default settings for the locale country code and language
+code. An underscore, &#8220;_&#8221;, separates the two locale codes.</p>
+
+<a name="ggmuz"></a><h5>Anonymous User Default Value</h5>
+<p>The user ID to be used for unauthenticated users.</p>
+
+<a name="ggmup"></a><h5>Anonymous User</h5>
+<p>When enabled, <tt>REMOTE_USER</tt> processing is performed for anonymous users. This property is associated
+with the attribute labeled Anonymous User Default Value.</p>
+
+<a name="ggmpk"></a><h5>Profile Attributes Cookie Prefix</h5>
+<p>The cookie prefix used in profile attribute headers.</p>
+
+<a name="ggmqv"></a><h5>Profile Attributes Cookie Maxage</h5>
+<p>The maximum age in seconds of profile attribute cookie headers.</p>
+
+<a name="ggmtx"></a><h5>URL Comparison Case Sensitivity Check</h5>
+<p>When enabled, case sensitivity is enforced during both policy evaluation and not-enforced URL
+evaluation.</p>
+
+<a name="ggmta"></a><h5>Encode URL's Special Characters</h5>
+<p>When enabled, URLs with special characters are encoded prior to policy evaluation.</p>
+
+<a name="ggmqs"></a><h5>Ignore Preferred Naming URL in Naming Request</h5>
+<p>When enabled, meaning that &#8220;ignore&#8221; is enabled, the agent does <b>not</b> send the
+preferred naming URL as an attribute in the naming request.</p>
+
+<a name="ggmox"></a><h5>Ignore Server Check</h5>
+<p>When enabled, meaning that &#8220;ignore&#8221; is enabled, the agent does <b>not</b> ensure that
+OpenSSO is running before performing a <tt>302 redirect</tt>.</p>
+
+<a name="ggmse"></a><h5>Ignore Path Info in Request URL</h5>
+<p>When enabled, path information is not stripped from the request URL even if
+a wild character exists in the not enforced list or policy URLs.</p>
+<hr><p><b>Caution &#8211; </b>To prevent a security loop, when this attribute is enabled, ensure that nothing
+follows the wildcard character &#8220;*&#8221; in either the not-enforced list or the policy.</p>
+<hr>
+
+
+<a name="ggmql"></a><h5>Deny Resource Access on Remote Log Failure</h5>
+<p>When enabled and remote logging fails, resource access is denied.</p>
+
+<a name="ggmrk"></a><h5>Native Encoding of Profile Attributes</h5>
+<p>When enabled, the agent encodes the LDAP header values in the default encoding
+of the operating system locale. When not enabled, LDAP header values are encoded
+in UTF-8.</p>
+
+<a name="ggmtu"></a><h5>Advanced</h5>
+<p>These properties are either custom properties or properties that tend to be used
+in more-complex or less-common deployments.</p>
+
+<a name="ggmve"></a><h5>Load Balancer Setup</h5>
+<p>When enabled, a load balancer is used for OpenSSO services.</p>
+
+<a name="ggmxj"></a><h5>Override Request URL Protocol</h5>
+<p>Set this property (as well as the properties labeled as follows: Override Request
+URL Host, Override Request URL Port, Override Notification URL) to <tt>true</tt> if the
+agent is sitting behind an SSL off-loader, load balancer, or proxy.</p>
+
+<a name="ggmwb"></a><h5>Override Request URL Host</h5>
+<p>Set this property (as well as the properties labeled as follows: Override Request
+URL Protocol, Override Request URL Port, Override Notification URL) to <tt>true</tt> if the
+agent is sitting behind an SSL off-loader, load balancer, or proxy.</p>
+
+<a name="ggmvo"></a><h5>Override Request URL Port</h5>
+<p>Set this property (as well as the properties labeled as follows: Override Request
+URL Protocol, Override Request URL Host, Override Notification URL) to <tt>true</tt> if the
+agent is sitting behind an SSL off-loader, load balancer, or proxy.</p>
+
+<a name="ggmxi"></a><h5>Override Notification URL</h5>
+<p>Set this property (as well as the properties labeled as follows: Override Request
+URL Protocol, Override Request URL Host, Override Request URL Port) to <tt>true</tt> if
+the agent is sitting behind an SSL off-loader, load balancer, or proxy.</p>
+
+<a name="ggmun"></a><h5>POST Data Preservation</h5>
+<p>When enabled, <tt>POST</tt> data cache entries are preserved for the time specified by
+the attribute labeled POST Data Entries Cache Period. This attribute is not applicable
+to all agents.</p>
+
+<a name="ggmsv"></a><h5>POST Data Entries Cache Period</h5>
+<p>The number of minutes a POST cache entry exists before being dropped.</p>
+
+<a name="ggmus"></a><h5>Override Proxy Server's Host and Port</h5>
+<p>Container Specific: Sun Java System Proxy Server</p><p>When enabled, the Sun Java System Proxy Server host name and port number
+are overridden.</p>
+
+<a name="ggmwc"></a><h5>Authentication Type</h5>
+<p>Container Specific: Microsoft IIS Server</p>
+
+<a name="ggmvx"></a><h5>Replay Password Key</h5>
+<p>Container Specific: Microsoft IIS Server</p><p>The DES key for decrypting the basic authentication password in the session.</p>
+
+<a name="ggmtj"></a><h5>Filter Priority</h5>
+<p>Container Specific: Microsoft IIS Server</p><p>The options available for the loading priority of the agent filter.</p>
+
+<a name="ggmsz"></a><h5>Filter configured with OWA</h5>
+<p>Container Specific: Microsoft IIS Server</p><p>When enabled and when the Microsoft IIS agent filter is configured for Outlook
+Web Access (OWA), the agent operates properly. Otherwise, this OWA configuration, does not
+operate properly.</p>
+
+<a name="ggmue"></a><h5>Change URL Protocol to https</h5>
+<p>Container Specific: Microsoft IIS Server</p><p>When enabled and when the Microsoft IIS agent filter is configured for Outlook
+Web Access (OWA), pop up messages from using the Internet Explorer 6 browser
+are prevented.</p>
+
+<a name="ggmws"></a><h5>Idle Session Timeout Page URL</h5>
+<p>Container Specific: Microsoft IIS Server</p><p>This property is applicable only when the Microsoft IIS agent filter is configured
+for Outlook Web Access (OWA). The value for this property is the URL
+of the local idle session timeout page.</p>
+
+<a name="ggmsr"></a><h5>Check User in Domino Database</h5>
+<p>Container Specific: IBM Lotus Domino Server</p><p>When enabled, agent checks user existence in the IBM Lotus Domino name database.</p>
+
+<a name="ggmvy"></a><h5>Use LTPA token</h5>
+<p>Container Specific: IBM Lotus Domino Server</p><p>When enabled, agent uses LTPA token. Therefore, enable this property if use of
+the LTPA token is required by the agent.</p>
+
+<a name="ggmto"></a><h5>LTPA Token Cookie Name</h5>
+<p>Container Specific: IBM Lotus Domino Server</p><p>The name of the cookie that contains the LTPA token.</p>
+
+<a name="ggmss"></a><h5>LTPA Token Configuration Name</h5>
+<p>Container Specific: IBM Lotus Domino Server</p><p>The configuration name used by the agent to employ the LTPA token mechanism.</p>
+
+<a name="ggmxf"></a><h5>LTPA Token Organization Name</h5>
+<p>Container Specific: IBM Lotus Domino Server</p><p>The organization name to which the LTPA token belongs.</p>
+
+<a name="ggnjs"></a><h5>Custom Properties</h5>
+<p>A list of custom properties supported by the agent. These are properties created
+by you.</p>
+<br/>
+
+</body>
+</html>

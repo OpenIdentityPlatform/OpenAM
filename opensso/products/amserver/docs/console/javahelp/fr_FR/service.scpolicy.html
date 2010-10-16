@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration de r&#232;gles - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>Configuration de r&#232;gles</h4>
+<p><a name="indexterm-191"></a>L'attribut Configuration des strat&#233;gies permet &#224; l'administrateur de d&#233;finir les propri&#233;t&#233;s g&#233;n&#233;rales
+et du domaine, utilis&#233;es par le service Strat&#233;gie.</p>
+<ul><li><p><a href="#fufnk">Propri&#233;t&#233;s g&#233;n&#233;rales</a></p></li>
+<li><p><a href="#fufmb">Attributs du domaine</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>Propri&#233;t&#233;s g&#233;n&#233;rales</h5>
+<p>Les propri&#233;t&#233;s g&#233;n&#233;rales sont :</p>
+
+<a name="gciwg"></a><h5>Comparateur de ressources</h5>
+<p>Sp&#233;cifie les informations du comparateur de ressources, utilis&#233;es pour comparer les ressources
+mentionn&#233;es dans la d&#233;finition d'une r&#232;gle de strat&#233;gie. La comparaison de ressources
+est utile &#224; la fois pour la cr&#233;ation et pour l'&#233;valuation des
+strat&#233;gies.</p><p>Cliquez sur le bouton Ajouter et d&#233;finissez les attributs suivants :</p><dl><dt>Type de service</dt>
+<dd><p>Sp&#233;cifie le service sur lequel le comparateur doit &#234;tre utilis&#233;.</p></dd>
+<dt>Classe</dt>
+<dd><p>D&#233;finit la classe Java qui impl&#233;mente l'algorithme de comparaison des ressources. </p></dd>
+<dt>S&#233;parateur</dt>
+<dd><p>Sp&#233;cifie le s&#233;parateur &#224; utiliser dans le nom de ressource. </p></dd>
+<dt>Caract&#232;re g&#233;n&#233;rique</dt>
+<dd><p>Sp&#233;cifie le caract&#232;re g&#233;n&#233;rique pouvant &#234;tre d&#233;fini dans les noms de ressource.</p></dd>
+<dt>Caract&#232;re g&#233;n&#233;rique de niveau un</dt>
+<dd><p>Remplace z&#233;ro, un ou plusieurs caract&#232;res.</p></dd>
+<dt>Distinction maj./min.</dt>
+<dd><p>Sp&#233;cifie si la comparaison des deux ressources doit diff&#233;rencier ou non les majuscules et les minuscules. False ne fait pas de distinction maj./min., True tient compte des diff&#233;rences.</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>Continuer l'&#233;valuation de la d&#233;cision de refus</h5>
+<p>Indique si la structure de la strat&#233;gie doit continuer &#224; &#233;valuer les
+strat&#233;gies ult&#233;rieures, m&#234;me en cas de d&#233;cision de REFUS. Si l'option n'est
+pas s&#233;lectionn&#233;e (valeur par d&#233;faut), l'&#233;valuation de strat&#233;gie ignore les strat&#233;gies ult&#233;rieures
+d&#232;s lors qu'une d&#233;cision de REFUS est identifi&#233;e.</p>
+
+<a name="fufng"></a><h5>Avis pouvant &#234;tre g&#233;r&#233;s par OpenSSO</h5>
+<p>D&#233;finit les noms des cl&#233;s de conseil de strat&#233;gie, pour lesquelles Policy
+Enforcement Point (Policy Agent) doit rediriger l'agent utilisateur vers OpenSSO. Si l'agent
+re&#231;oit une d&#233;cision de strat&#233;gie qui n'autorise pas l'acc&#232;s &#224; une ressource
+mais contient un conseil, l'agent v&#233;rifie si cet attribut mentionne cette cl&#233;
+de conseil.</p><p>Dans l'affirmative, l'agent utilisateur est redirig&#233; vers OpenSSO, qui pourra &#233;ventuellement autoriser
+l'acc&#232;s &#224; la ressource.</p>
+
+<a name="gdpdm"></a><h5>Orientations de l'alias de l'organisation</h5>
+<p>Lorsqu'il est d&#233;fini sur Oui, cet attribut vous permet de cr&#233;er des
+strat&#233;gies dans des sous-domaines sans cr&#233;er de strat&#233;gies d'orientation &#224; partir du
+domaine de niveau sup&#233;rieur ou parent. Vous ne pouvez cr&#233;er des strat&#233;gies
+que pour prot&#233;ger des ressources HTTP ou HTTPS dont le nom d'h&#244;te
+pleinement qualifi&#233; correspond &#224; l'alias DNS du domaine. Par d&#233;faut, cet attribut
+est d&#233;fini sur Non. </p>
+
+<a name="fufmb"></a><h5>Attributs du domaine</h5>
+<p>Les propri&#233;t&#233;s LDAP sont :</p>
+
+<a name="fufmg"></a><h5>Serveur LDAP principal</h5>
+<p>Sp&#233;cifie le nom d'h&#244;te et le num&#233;ro de port du serveur LDAP
+principal sp&#233;cifi&#233; lors de l'installation OpenSSO qui sera utilis&#233; pour rechercher les
+objets de strat&#233;gie tels que les utilisateurs LDAP, r&#244;les LDAP, groupes LDAP,
+etc.</p><p>Le format est <i>nomh&#244;te:port</i>. Par exemple : <tt>machine1.exemple.com:389</tt></p><p>Pour la configuration du basculement sur plusieurs h&#244;tes serveur LDAP, cette valeur
+peut &#234;tre une liste de plusieurs h&#244;tes d&#233;limit&#233;s par des espaces. Le
+format est <i>nomh&#244;te1:port1 nomh&#244;te2:port2...</i></p><p>Par exemple : <tt>machine1.exemple1.com:389 machine2.exemple1.com:389 </tt></p><p>Les entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es du nom du serveur local. Ceci
+permet &#224; des serveurs OpenSSO sp&#233;cifiques d'&#234;tre configur&#233;s de mani&#232;re &#224; communiquer
+avec des serveurs Directory Server sp&#233;cifiques.</p><p>Le format est <i>nomserveur|nomh&#244;te:port</i>. Par exemple :</p><p><tt>machine1.exemple1.com|machine1.exemple1.com:389</tt></p><p><tt>machine1.exemple2.com|machine1.exemple2.com:389</tt></p><p>Pour la configuration du basculement :</p><p><tt>Serveur_AM1.exemple1.com|machine1.exemple1.com:389 machine2.exemple.com1:389 </tt></p><p><tt>Serveur_AM2.exemple2.com|machine1.exemple2.com:389 machine2.exemple2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>DN de base du serveur LDAP</h5>
+<p>Sp&#233;cifie le DN de base dans le serveur LDAP &#224; partir duquel
+commencer la recherche. Par d&#233;faut, il s'agit du domaine de niveau sup&#233;rieur
+dans l'installation d'OpenSSO.</p>
+
+<a name="fufmd"></a><h5>DN de base des utilisateurs LDAP</h5>
+<p>Cet attribut sp&#233;cifie le DN de base utilis&#233; par l'objet Utilisateurs LDAP
+dans le serveur LDAP &#224; partir duquel commencer la recherche. Par d&#233;faut,
+il s'agit du domaine de niveau sup&#233;rieur dans l'installation de base OpenSSO.</p>
+
+<a name="fufmz"></a><h5>DN de base des r&#244;les OpenSSO</h5>
+<p>D&#233;finit le DN du domaine ou de l'organisation, utilis&#233; comme base pour
+la recherche des valeurs des r&#244;les OpenSSO. Cet attribut est utilis&#233; par
+l'objet de strat&#233;gie <i>AccessManagerRoles</i>.</p>
+
+<a name="fufme"></a><h5>DN de la liaison LDAP</h5>
+<p>Sp&#233;cifie le DN de liaison dans le serveur LDAP.</p>
+
+<a name="fufmf"></a><h5>Mot de passe pour la liaison LDAP</h5>
+<p>D&#233;finit le mot de passe &#224; utiliser pour &#233;tablir la liaison avec
+le serveur LDAP. Par d&#233;faut, le mot de passe <tt>amldapuser</tt> saisi lors
+de l'installation est utilis&#233; comme utilisateur de liaison.</p>
+
+<a name="fufmn"></a><h5>Filtre de recherche d'organisations LDAP</h5>
+<p>Sp&#233;cifie le filtre de recherche &#224; utiliser pour rechercher les entr&#233;es organisation.
+La valeur par d&#233;faut est <tt>(objectclass=sunMangagedOrganization)</tt>.</p>
+
+<a name="fufmm"></a><h5>&#201;tendue de la recherche d'organisations LDAP</h5>
+<p>D&#233;finit l'&#233;tendue &#224; utiliser pour rechercher les entr&#233;es organisation. L'&#233;tendue peut avoir
+l'une des valeurs suivantes :</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (valeur par d&#233;faut)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>&#201;tendue de la recherche de groupes LDAP</h5>
+<p>D&#233;finit l'&#233;tendue &#224; utiliser pour rechercher les entr&#233;es groupe. L'&#233;tendue peut avoir
+l'une des valeurs suivantes :</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (valeur par d&#233;faut)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>Filtre de recherche de groupes LDAP</h5>
+<p>Sp&#233;cifie le filtre de recherche &#224; utiliser pour rechercher les entr&#233;es groupe.
+La valeur par d&#233;faut est <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fufms"></a><h5>Filtre de recherche d'utilisateurs LDAP</h5>
+<p>Sp&#233;cifie le filtre de recherche &#224; utiliser pour rechercher les entr&#233;es utilisateur.
+La valeur par d&#233;faut est <tt>(objectclass=inetorgperson)</tt>.</p>
+
+<a name="fufmt"></a><h5>&#201;tendue de la recherche d'utilisateurs LDAP</h5>
+<p>D&#233;finit l'&#233;tendue &#224; utiliser pour rechercher les entr&#233;es utilisateur. L'&#233;tendue peut avoir
+l'une des valeurs suivantes :</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (valeur par d&#233;faut)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>Filtre de recherche de r&#244;les LDAP</h5>
+<p>Sp&#233;cifie le filtre de recherche &#224; utiliser pour rechercher les entr&#233;es pour
+les r&#244;les. La valeur par d&#233;faut est <tt>(&#38;;(objectclass=ldapsubentry)(objectclass=nsroledefinitions))</tt> .</p>
+
+<a name="fufmw"></a><h5>&#201;tendue de la recherche de r&#244;les LDAP</h5>
+<p>Cet attribut d&#233;finit l'&#233;tendue &#224; utiliser pour rechercher les entr&#233;es pour les
+r&#244;les. L'&#233;tendue peut avoir l'une des valeurs suivantes :</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (valeur par d&#233;faut)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>&#201;tendue de la recherche de r&#244;les OpenSSO</h5>
+<p>D&#233;finit l'&#233;tendue &#224; utiliser pour rechercher les entr&#233;es pour l'objet R&#244;les OpenSSO.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (valeur par d&#233;faut)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>Attribut de la recherche d'organisation LDAP</h5>
+<p>D&#233;finit le type d'attribut pour lequel mener une recherche sur une organisation.
+La valeur par d&#233;faut est o.</p>
+
+<a name="fufmr"></a><h5>Attribut de recherche de groupes LDAP</h5>
+<p>D&#233;finit le type d'attribut pour lequel mener une recherche sur un groupe.
+La valeur par d&#233;faut est <tt>cn</tt>.</p>
+
+<a name="fufmu"></a><h5>Attribut de recherche d'utilisateurs LDAP</h5>
+<p>D&#233;finit le type d'attribut pour lequel mener une recherche sur un utilisateur.
+La valeur par d&#233;faut est <tt>uid.</tt></p>
+
+<a name="fufmx"></a><h5>Attribut de la recherche de r&#244;les LDAP</h5>
+<p>D&#233;finit le type d'attribut pour lequel mener une recherche sur un r&#244;le.
+La valeur par d&#233;faut est <tt>cn</tt>.</p>
+
+<a name="fufnj"></a><h5>Maximum de r&#233;sultats renvoy&#233;s par la recherche</h5>
+<p>Ce champ d&#233;finit le nombre maximal de r&#233;sultats pouvant &#234;tre renvoy&#233;s par
+une recherche. La valeur par d&#233;faut est 100. If the search limit
+exceeds the amount specified, the entries that have been found to that
+point will be returned.</p>
+
+<a name="fufnl"></a><h5>D&#233;lai de recherche</h5>
+<p>Sp&#233;cifie la dur&#233;e d&#233;finissant le d&#233;lai d'expiration d'une recherche. Si la recherche
+d&#233;passe la dur&#233;e indiqu&#233;e, seules les entr&#233;es trouv&#233;es jusqu'&#224; ce point seront
+renvoy&#233;es.</p>
+
+<a name="fufmi"></a><h5>SSL LDAP</h5>
+<p>Sp&#233;cifie si le serveur LDAP ex&#233;cute ou non SSL. Si l'option est
+s&#233;lectionn&#233;e, SSL est activ&#233; ; si elle est d&#233;s&#233;lectionn&#233;e (valeur par d&#233;faut),
+SSL est d&#233;sactiv&#233;.</p><p>Si le serveur LDAP fonctionne avec SSL activ&#233; (LDAPS), vous devez vous
+assurer qu'OpenSSO est configur&#233; avec les certificats de confiance SSL appropri&#233;s, afin
+qu'OpenSSO puisse se connecter au serveur Directory server par le biais du
+protocole LDAPS.</p>
+
+<a name="fufmk"></a><h5>Taille minimale de pool de connexion LDAP</h5>
+<p>Sp&#233;cifie la taille minimale des pools de connexion devant &#234;tre utilis&#233;s pour
+la connexion au serveur Directory Server, telle que sp&#233;cifi&#233;e par l'attribut du
+serveur LDAP. La valeur par d&#233;faut est 1.</p>
+
+<a name="fufmj"></a><h5>Taille maximale de pool de connexion</h5>
+<p>Sp&#233;cifie la taille maximale des pools de connexion devant &#234;tre utilis&#233;s pour
+la connexion au serveur Directory Server, telle que sp&#233;cifi&#233;e par l'attribut du
+serveur LDAP. La valeur par d&#233;faut est 10.</p>
+
+<a name="fufna"></a><h5>Objets de modalit&#233; s&#233;lectionn&#233;s</h5>
+<p>Permet de s&#233;lectionner un ensemble de types d'objets disponibles &#224; utiliser pour
+la d&#233;finition de strat&#233;gie dans le domaine.</p>
+
+<a name="fufnc"></a><h5>Conditions de modalit&#233; s&#233;lectionn&#233;es</h5>
+<p>Permet de s&#233;lectionner un ensemble de types de conditions disponibles &#224; utiliser
+pour la d&#233;finition de strat&#233;gie dans le domaine.</p>
+
+<a name="fufnd"></a><h5>Orientations de modalit&#233; s&#233;lectionn&#233;es</h5>
+<p>Permet de s&#233;lectionner un ensemble de types d'orientations disponibles &#224; utiliser pour
+la d&#233;finition de strat&#233;gie dans le domaine.</p>
+
+<a name="fufml"></a><h5>Dur&#233;e de vie du r&#233;sultat des objets</h5>
+<p>Cet attribut sp&#233;cifie la dur&#233;e (en minutes) pendant laquelle un r&#233;sultat d'objet
+ plac&#233; en m&#233;moire cache peut &#234;tre utilis&#233; pour &#233;valuer la m&#234;me
+demande de strat&#233;gie bas&#233;e sur le jeton de connexion unique.</p><p>Lorsqu'une strat&#233;gie est &#233;valu&#233;e pour la premi&#232;re fois pour un jeton SSO,
+les instances d'objet de la strat&#233;gie sont &#233;valu&#233;es afin de d&#233;terminer si
+la strat&#233;gie est applicable &#224; un utilisateur donn&#233;. Le r&#233;sultat d'objet, qui
+comporte une cl&#233; ID de de jeton SSO, est plac&#233; en m&#233;moire
+cache dans la strat&#233;gie. Si une autre &#233;valuation est effectu&#233;e pour la
+m&#234;me strat&#233;gie et le m&#234;me ID de jeton SSO au cours de
+la p&#233;riode sp&#233;cifi&#233;e par l'attribut Dur&#233;e de vie du r&#233;sultat des objets,
+la structure de strat&#233;gie r&#233;cup&#232;re le r&#233;sultat d'objet en m&#233;moire cache au
+lieu de proc&#233;der &#224; l'&#233;valuation des instances de l'objet. Ceci permet de
+r&#233;duire de mani&#232;re significative la dur&#233;e d'&#233;valuation de la strat&#233;gie.</p>
+
+<a name="fufnm"></a><h5>Alias utilisateur</h5>
+<p>Cet attribut doit &#234;tre activ&#233; si vous cr&#233;ez une strat&#233;gie pour prot&#233;ger
+une ressource dont le membre objet sur un serveur Directory Server distant
+a comme alias un utilisateur local. Cet attribut doit &#234;tre activ&#233;, par
+exemple si vous cr&#233;ez <tt>uid=rmuser</tt> sur le serveur Directory Server distant, puis
+ajoutez <tt>rmuser</tt> comme alias d'un utilisateur local (tel que <tt>uid=luser</tt>) dans OpenSSO.
+Lorsque vous vous connectez en tant que <tt>rmuser</tt>, une session est cr&#233;&#233;e
+avec l'utilisateur local (<tt>luser</tt>) et l'application de la strat&#233;gie s'effectue correctement.</p>
+
+<a name="fufni"></a><h5>Fournisseurs de r&#233;ponse s&#233;lectionn&#233;s</h5>
+<p>D&#233;finit les plug-ins fournisseurs de r&#233;ponse de strat&#233;gie qui sont activ&#233;s pour
+le domaine. Seuls les plug-ins fournisseurs de r&#233;ponse s&#233;lectionn&#233;s dans cet attribut
+peuvent &#234;tre ajout&#233;s aux strat&#233;gies d&#233;finies dans le domaine.</p>
+
+<a name="fufnn"></a><h5>Attributs de r&#233;ponse dynamiques s&#233;lectionn&#233;s</h5>
+<p>D&#233;finit les attributs de r&#233;ponse dynamiques qui sont activ&#233;s pour le domaine.
+Seul un sous-ensemble de noms s&#233;lectionn&#233;s dans cet attribut peut &#234;tre d&#233;fini
+dans la liste des attributs dynamiques dans <i>IDResponseProvider</i> pour &#234;tre ajout&#233; aux
+strat&#233;gies d&#233;finies dans le domaine.</p>
+<br/>
+
+</body>
+</html>

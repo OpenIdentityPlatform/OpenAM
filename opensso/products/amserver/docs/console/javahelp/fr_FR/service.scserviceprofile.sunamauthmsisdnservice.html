@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN</h4>
+<p><a name="indexterm-177"></a>Le module d'authentification MSDISDN (Mobile Station Integrated Services Digital Network) permet de
+s'authentifier &#224; l'aide d'un num&#233;ro ISDN d'abonn&#233; mobile associ&#233; &#224; un p&#233;riph&#233;rique
+comme un t&#233;l&#233;phone cellulaire. C'est un module non interactif. Ce module r&#233;cup&#232;re
+l'ISDN de l'abonn&#233; et le valide par rapport au serveur Directory Server
+pour trouver un utilisateur correspondant &#224; ce nombre. Les attributs d'authentification MSISDN
+sont des attributs de domaine. Les attributs d'authentification MSISDN sont les suivants
+:</p>
+<ul><li><p><a href="#fumxe">Adresse IP de la passerelle approuv&#233;e</a></p></li>
+<li><p><a href="#fumxg">Argument de num&#233;ro MSISDN</a></p></li>
+<li><p><a href="#fumxf">Serveur et port LDAP</a></p></li>
+<li><p><a href="#fumxi">D&#233;marrage recherche de nom de domaine LDAP</a></p></li>
+<li><p><a href="#fumxk">Attribut &#224; utiliser pour la recherche LDAP</a></p></li>
+<li><p><a href="#fumxl">Utilisateur principal du serveur LDAP</a></p></li>
+<li><p><a href="#fumxn">Mot de passe principal du serveur LDAP</a></p></li>
+<li><p><a href="#fumxm">Mot de passe principal du serveur LDAP (confirmer)</a></p></li>
+<li><p><a href="#fumxo">Activez SSL pour l'acc&#232;s LDAP.</a></p></li>
+<li><p><a href="#fumxp">Attribut LDAP utilis&#233; pour r&#233;cup&#233;rer profil utilisateur</a></p></li>
+<li><p><a href="#fumxr">Renvoyez le DN utilisateur pour authentification.</a></p></li>
+<li><p><a href="#fumxs">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>Adresse IP de la passerelle approuv&#233;e</h5>
+<p>Indique une liste d'adresses IP de clients de confiance pouvant acc&#233;der &#224;
+des modules MSIDSN. Vous pouvez d&#233;finir les adresses IP de tous les
+clients autoris&#233;s &#224; acc&#233;der au module MSISDN en tapant l'adresse (par exemple,
+<tt>123.456.123.111</tt>) dans le champ de saisie, puis en cliquant sur Ajouter. Par
+d&#233;faut, la liste est vide. Si l'attribut est laiss&#233; vide, tous les
+clients sont autoris&#233;s. Si vous sp&#233;cifiez none, aucun client n'est autoris&#233;.</p>
+
+<a name="fumxg"></a><h5>Argument de num&#233;ro MSISDN</h5>
+<p>Indique une liste de noms de param&#232;tres identifiant dans l'en-t&#234;te de demande
+ou de cookie les param&#232;tres dans lesquels rechercher le num&#233;ro MSISDN. Par
+exemple, si vous d&#233;finissez <i>x-Cookie-Param</i>, <i> AM_NUMBER</i> et <i>COOKIE-ID</i>, les services d'authentification MSISDN
+recherchent le num&#233;ro MSISDN dans ces param&#232;tres.</p>
+
+<a name="fumxf"></a><h5>Serveur et port LDAP</h5>
+<p>Indique le nom d'h&#244;te et le num&#233;ro de port du serveur Directory
+Server dans lequel s'effectuera la recherche des utilisateurs poss&#233;dant un num&#233;ro MSISDN.
+Le format est <tt></tt><i>nomh&#244;te:port</i><tt></tt>. Si aucun num&#233;ro de port n'est sp&#233;cifi&#233;, le
+port <tt>389</tt> est utilis&#233; par d&#233;faut.</p><p>Si OpenSSO est d&#233;ploy&#233; avec plusieurs domaines, vous pouvez sp&#233;cifier la liaison
+de communication entre des instances sp&#233;cifiques d'OpenSSO et de Directory Server dans
+le format suivant (les entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es du nom du
+serveur local)&#160;:</p><p><tt>nomserveur_local|serveur:port nomserveur_local2|serveur2:port2 ...</tt></p><p>Par exemple, si vous avez d&#233;ploy&#233; deux instances OpenSSO dans diff&#233;rents emplacements
+(L1-machine1-IS et L2- machine2-IS) qui communiquent avec diff&#233;rentes instances de Directory Server
+(L1-machine1-DS et L2-machine2-DS), la liaison de communication est la suivante&#160;:</p><p><tt>L1-machine1-IS.exemple.com|L1-machine1-DS.exemple.com:389 </tt></p><p><tt>L2-machine2-IS.exemple.com|L2-machine2-DS.exemple.com:389 </tt></p>
+
+<a name="fumxi"></a><h5>D&#233;marrage recherche de nom de domaine LDAP</h5>
+<p>Sp&#233;cifie le DN du n&#339;ud &#224; partir duquel doit commencer la recherche
+du num&#233;ro MSISDN de l'utilisateur. Il n'y a pas de valeur par
+d&#233;faut. Ce champ accepte tout DN valide. Les entr&#233;es multiples doivent &#234;tre
+pr&#233;c&#233;d&#233;es du nom du serveur local. Le format est <tt></tt><i>nomserveur|dn recherche</i><tt></tt>.</p><p>Lorsqu'il existe plusieurs entr&#233;es :</p><p><tt></tt><i>nomserveur1|dn recherche nomserveur2|dn recherche nomserveur3|dn recherche</i><tt>...</tt></p><p>Si plusieurs entr&#233;es ont le m&#234;me ID utilisateur dans l'organisation racine, ce
+param&#232;tre doit &#234;tre d&#233;fini de sorte qu'une seule entr&#233;e &#224; authentifier soit
+recherch&#233;e ou d&#233;tect&#233;e. Par exemple, au cas o&#249; l'ID d'agent et l'ID
+d'utilisateur seraient identiques &#224; la racine de l'organisation, ce param&#232;tre doit &#234;tre
+<tt>ou=Agents</tt> pour que l'organisation racine authentifie selon l'ID d'agent et <tt>ou=People, </tt> pour
+que l'organisation racine authentifie selon l'ID d'utilisateur.</p>
+
+<a name="fumxk"></a><h5>Attribut &#224; utiliser pour la recherche LDAP</h5>
+<p>Indique le nom de l'attribut dans le profil d'utilisateur contenant le num&#233;ro
+MSISDN &#224; rechercher pour un utilisateur particulier. La valeur par d&#233;faut est
+<i>sunIdentityMSISDNNumber</i>. Cette valeur ne doit pas &#234;tre modifi&#233;e, sauf si vous &#234;tes
+certain qu'un autre attribut du profil de l'utilisateur contient le m&#234;me num&#233;ro
+MSISDN.</p>
+
+<a name="fumxl"></a><h5>Utilisateur principal du serveur LDAP</h5>
+<p>Indique le DN de liaison LDAP pour permettre les recherches MSISDN dans
+le serveur Directory Server. Le DN de liaison par d&#233;faut est <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com </tt>
+.</p>
+
+<a name="fumxn"></a><h5>Mot de passe principal du serveur LDAP</h5>
+<p>Indique le mot de passe de liaison LDAP pour le DN de
+liaison d&#233;fini dans l'attribut Utilisateur principal du serveur LDAP.</p>
+
+<a name="fumxm"></a><h5>Mot de passe principal du serveur LDAP (confirmer)</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="fumxo"></a><h5>Activez SSL pour l'acc&#232;s LDAP.</h5>
+<p>Active l'acc&#232;s SSL au serveur Directory Server indiqu&#233; dans l'attribut Serveur et
+port LDAP. Par d&#233;faut, cette case n'est pas coch&#233;e et le protocole
+SSL n'est pas utilis&#233; pour acc&#233;der &#224; Directory Server. Toutefois, si cet
+attribut est activ&#233;, vous pouvez r&#233;aliser la liaison avec un serveur non
+SSL.</p>
+
+<a name="fumxp"></a><h5>Attribut LDAP utilis&#233; pour r&#233;cup&#233;rer profil utilisateur</h5>
+<p>Indique les en-t&#234;tes &#224; utiliser pour rechercher le num&#233;ro MSISDN dans la
+requ&#234;te. Les valeurs prises en charge sont les suivantes :</p><dl><dt>En-t&#234;te de cookie</dt>
+<dd><p>Effectue la recherche dans le cookie.</p></dd>
+<dt>En-t&#234;te de demande</dt>
+<dd><p>Effectue la recherche dans l'en-t&#234;te de demande. </p></dd>
+<dt>Param&#232;tre de demande</dt>
+<dd><p>Effectue la recherche dans le param&#232;tre de demande. Par d&#233;faut, toutes les options sont s&#233;lectionn&#233;es.</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>Renvoyez le DN utilisateur pour authentification.</h5>
+<p>Lorsque l'annuaire OpenSSO est identique &#224; celui configur&#233; pour MSDISN, cette option
+peut &#234;tre activ&#233;e. Dans ce cas, elle permet au module d'authentification de
+renvoyer le DN au lieu de l'ID utilisateur, et aucune recherche n'est
+n&#233;cessaire. Normalement, un module d'authentification renvoie uniquement l'ID utilisateur et le service
+d'authentification recherche l'utilisateur dans l'instance locale d'OpenSSO. Si un annuaire externe est
+utilis&#233;, cette option n'est g&#233;n&#233;ralement pas activ&#233;e.</p>
+
+<a name="fumxs"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

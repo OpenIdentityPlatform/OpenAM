@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>D'ordre g&#233;n&#233;ral - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>D'ordre g&#233;n&#233;ral</h4>
+<p>Les attributs d'ordre g&#233;n&#233;ral d&#233;finissent les donn&#233;es de configuration de base pour
+la gestion centralis&#233;e de votre serveur.</p>
+
+<a name="ggjyg"></a><h5>Attributs de site</h5>
+<p>L'attribut de site est&#160;:</p>
+
+<a name="ggjxc"></a><h5>Site parent</h5>
+<p>Cet attribut mappe le nom de site (ID de site) d'&#233;quilibreur de
+charge sur le serveur OpenSSO. Pour pouvoir ajouter le site, vous devez
+d'abord le cr&#233;er.  </p>
+
+<a name="ggjwl"></a><h5>Attributs syst&#232;me</h5>
+<p>Les attributs syst&#232;me r&#233;pertorient les informations d'emplacement relatives &#224; l'instance de serveur&#160;:</p>
+
+<a name="ggjyj"></a><h5>R&#233;pertoire d'installation de base</h5>
+<p>Sp&#233;cifie le r&#233;pertoire de base contenant les donn&#233;es du produit. </p>
+
+<a name="ggjxz"></a><h5>Param&#232;tre r&#233;gional par d&#233;faut</h5>
+<p>La valeur du param&#232;tre r&#233;gional correspond au sous-type de langue par d&#233;faut
+avec lequel OpenSSO a &#233;t&#233; install&#233;. La valeur par d&#233;faut est <tt>en_us</tt>.</p>
+
+<a name="ggjwq"></a><h5>URL de notification</h5>
+<p>Emplacement du point d'arriv&#233;e de service de notification. Cette valeur est d&#233;finie
+pendant l'installation.</p>
+
+<a name="ggjzq"></a><h5>Validation XML</h5>
+<p>La valeur par d&#233;faut est no. D&#233;termine si la validation est requise
+lors de l'analyse de documents XML avec la classe <tt>XMLUtils</tt> d'OpenSSO. Cette
+propri&#233;t&#233; n'a d'effet que lorsque la valeur de l'attribut Niveau de d&#233;bogage
+est d&#233;finie sur warning ou message. Les valeurs autoris&#233;es sont yes et
+no. La validation de documents XML n'est activ&#233;e que si cette propri&#233;t&#233;
+a pour valeur yes et si l'attribut Niveau de d&#233;bogage a pour
+valeur avertissement ou message.</p>
+
+<a name="ggjzy"></a><h5>Attributs de d&#233;bogage</h5>
+<p>Les attributs de d&#233;bogage r&#233;pertorient les informations de v&#233;rification d'erreur de base&#160;:</p>
+
+<a name="ggjzc"></a><h5>Niveau de d&#233;bogage</h5>
+<p>Sp&#233;cifie le niveau de d&#233;bogage. La valeur par d&#233;faut est error. Les
+valeurs possibles sont les suivantes&#160;:</p>
+<ul><li><p>off &#8212; Aucun fichier de d&#233;bogage n'est cr&#233;&#233;.</p></li>
+<li><p>error &#8212; Seuls les messages d'erreur sont consign&#233;s.</p></li>
+<li><p>warning &#8212; Seuls les messages d'avertissement sont consign&#233;s.</p></li>
+<li><p>message &#8212; Les messages d'erreur, d'avertissement et d'information sont consign&#233;s.</p></li></ul>
+
+
+<a name="ggjze"></a><h5>R&#233;pertoire de d&#233;bogage</h5>
+<p>Sp&#233;cifie le r&#233;pertoire de sortie dans lequel sont cr&#233;&#233;s les fichiers de
+d&#233;bogage. Cette valeur est d&#233;finie pendant l'installation. Exemple&#160;: <tt></tt><i>base OpenSSO </i><tt>/</tt><i>URI_d&#233;bogage</i><tt>/debug</tt>.</p>
+
+<a name="ggjwr"></a><h5>Serveur de courrier &#233;lectronique</h5>
+<p>Les attributs de serveur de courrier &#233;lectronique r&#233;pertorient le nom d'h&#244;te et
+le port du serveur de courrier &#233;lectronique&#160;:</p>
+
+<a name="ggkax"></a><h5>Nom d'h&#244;te du serveur de courrier &#233;lectronique</h5>
+<p>La valeur par d&#233;faut est <tt>localhost</tt>. Sp&#233;cifie l'h&#244;te du serveur de courrier
+&#233;lectronique.</p>
+
+<a name="ggkbx"></a><h5>Num&#233;ro de port du serveur de courrier &#233;lectronique</h5>
+<p>La valeur par d&#233;faut est 25. Sp&#233;cifie le port du serveur de
+courrier &#233;lectronique.</p>
+<br/>
+
+</body>
+</html>

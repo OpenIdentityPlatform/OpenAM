@@ -1,0 +1,17 @@
+libEncryption.properties
+libAuthnSvc.properties
+libBinarySecurityToken.properties
+libConfigurationManager.properties
+libDisco.properties
+libDSTService.properties
+libIDFFMeta.properties
+libIDFF.properties
+libInteraction.properties
+libLibertySecurity.properties
+libPersonalProfile.properties
+libSAML.properties
+libSessionProvider.properties
+libSOAPBinding.properties
+libSAML2.properties
+libSAML2Meta.properties
+libXACML.properties

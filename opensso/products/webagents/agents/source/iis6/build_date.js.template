@@ -1,0 +1,1 @@
+var iis_v6_@OS@@ARCH@_build_date = "@BUILD_DATE@";

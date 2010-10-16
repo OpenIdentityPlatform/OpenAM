@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sesi&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amsessionservice"></a><h4>Sesi&#243;n</h4>
+<p><a name="indexterm-196"></a>El servicio de sesi&#243;n define valores para una sesi&#243;n de usuario autenticado
+como, por ejemplo, el tiempo m&#225;ximo de la sesi&#243;n y el tiempo
+m&#225;ximo de inactividad. Los atributos de sesi&#243;n son globales, din&#225;micos o de
+usuario. Los atributos son:</p>
+<ul><li><p><a href="#fwfeu">Instancia de configuraci&#243;n secundaria</a></p></li>
+<li><p><a href="#fwfew">N&#250;mero m&#225;ximo de resultados de b&#250;squeda</a></p></li>
+<li><p><a href="#fwfex">Tiempo de espera para b&#250;squeda</a></p></li>
+<li><p><a href="#fwfez">Habilitar notificaciones de cambio de propiedades</a></p></li>
+<li><p><a href="#fwfey">Habilitar restricciones de cuotas</a></p></li>
+<li><p><a href="#fwffa">Lectura de tiempo de espera para restricci&#243;n de cuotas</a></p></li>
+<li><p><a href="#fwffb">Exenci&#243;n de administraciones generales de la comprobaci&#243;n de restricciones</a></p></li>
+<li><p><a href="#fwffc">Comportamiento resultante si se agota la cuota de la sesi&#243;n</a></p></li>
+<li><p><a href="#fwffd">Propiedades de notificaci&#243;n</a></p></li>
+<li><p><a href="#fwffe">Tiempo por sesi&#243;n m&#225;ximo</a></p></li>
+<li><p><a href="#fwfff">Tiempo inactivo m&#225;ximo</a></p></li>
+<li><p><a href="#fwffh">Tiempo en cach&#233; m&#225;ximo</a></p></li>
+<li><p><a href="#fwffi">Activar sesiones de usuario</a></p></li></ul>
+
+
+<a name="fwfeu"></a><h5>Instancia de configuraci&#243;n secundaria</h5>
+<p>Proporciona la informaci&#243;n de conexi&#243;n para el repositorio de sesi&#243;n utilizado para
+la funci&#243;n de conmutaci&#243;n por error de sesi&#243;n en OpenSSO. La direcci&#243;n
+URL del equilibrador de carga debe especificarse como identificador de esta configuraci&#243;n
+secundaria. Si la configuraci&#243;n secundaria se define en este caso, la funci&#243;n
+de conmutaci&#243;n por error de la sesi&#243;n se habilitar&#225; autom&#225;ticamente y estar&#225;
+activa despu&#233;s de que se reinicie el servidor. Consulte <a href="service.subconfigadd.html">Para agregar una configuraci&#243;n secundaria</a> para obtener
+m&#225;s informaci&#243;n.</p>
+
+<a name="fwfew"></a><h5>N&#250;mero m&#225;ximo de resultados de b&#250;squeda</h5>
+<p>Este campo especifica el n&#250;mero m&#225;ximo de resultados que muestra una b&#250;squeda
+de sesi&#243;n. El valor predeterminado es 120.</p>
+
+<a name="fwfex"></a><h5>Tiempo de espera para b&#250;squeda</h5>
+<p>Este atributo define el tiempo m&#225;ximo antes de que se finalice una
+b&#250;squeda de sesi&#243;n. El valor predeterminado es 5 segundos.</p>
+
+<a name="fwfez"></a><h5>Habilitar notificaciones de cambio de propiedades</h5>
+<p>Habilita o deshabilita la notificaci&#243;n de cambio de propiedad de la sesi&#243;n.
+En un entorno de inicio de sesi&#243;n &#250;nico, varias aplicaciones pueden compartir
+una sesi&#243;n de OpenSSO. Con esta funci&#243;n est&#225; definida como ON (activada)
+y si una aplicaci&#243;n cambia alguna de las propiedades de la sesi&#243;n
+especificadas en la lista Propiedades de notificaci&#243;n (definida como un atributo de
+servicio de sesi&#243;n independiente), la notificaci&#243;n se enviar&#225; al resto de aplicaciones
+que participan en el mismo entorno de inicio de sesi&#243;n &#250;nico.</p>
+
+<a name="fwfey"></a><h5>Habilitar restricciones de cuotas</h5>
+<p>Habilita o deshabilita las restricciones de cuotas de sesi&#243;n. Al activar las
+restricciones de cuotas de sesi&#243;n, se permite que los administradores limiten el
+n&#250;mero de sesiones activas/concurrentes de un usuario a un n&#250;mero espec&#237;fico en
+funci&#243;n de la configuraci&#243;n de las restricciones en el nivel global, o
+las configuraciones asociadas con las entidades (dominio/rol/usuario) al que pertenece este usuario
+espec&#237;fico.</p><p>La configuraci&#243;n predeterminada para esta opci&#243;n es "Off". Debe reiniciar el servidor
+si ha cambiado la configuraci&#243;n.</p>
+
+<a name="fwffa"></a><h5>Lectura de tiempo de espera para restricci&#243;n de cuotas</h5>
+<p>Define el tiempo (en milisegundos) de una consulta al dep&#243;sito de sesiones
+para el recuento de sesiones del usuario activas antes de que finalice.</p><p>Una vez que se alcanza el tiempo m&#225;ximo de lectura, se mostrar&#225;
+un error. Este atributo s&#243;lo se aplicar&#225; cuando la restricci&#243;n de cuotas
+de sesi&#243;n est&#233; habilitada en la implementaci&#243;n de conmutaci&#243;n por error de
+sesi&#243;n. El valor predeterminado es 6.000 milisegundos. Debe reiniciar el servidor si
+ha cambiado la configuraci&#243;n.</p>
+
+<a name="fwffb"></a><h5>Exenci&#243;n de administraciones generales de la comprobaci&#243;n de restricciones</h5>
+<p>Especifica si los usuarios con el rol de Administrador de nivel superior
+deber&#225;n estar exentos de la comprobaci&#243;n de restricciones de sesi&#243;n. En caso
+AFIRMATIVO, incluso si se ha habilitado la restricci&#243;n de cuotas de sesi&#243;n,
+no se realizar&#225; ninguna comprobaci&#243;n de la misma para estos administradores.</p><p>The default setting for this attribute is NO. Debe reiniciar el servidor
+si ha cambiado la configuraci&#243;n. Este atributo s&#243;lo se aplicar&#225; cuando la
+restricci&#243;n de cuotas de sesi&#243;n est&#233; habilitada.</p>
+<hr><p><b>Nota &#8211; </b>El superusuario definido para OpenSSO en <tt>AMConfig.properties</tt> (<tt>com.sun.identity.authentication.super.user</tt>) siempre est&#225; exento de
+la comprobaci&#243;n de restricci&#243;n de cuotas de sesi&#243;n. </p>
+<hr>
+
+
+<a name="fwffc"></a><h5>Comportamiento resultante si se agota la cuota de la sesi&#243;n</h5>
+<p>Especifica el comportamiento resultante cuando se agota la cuota de sesi&#243;n del
+usuario. Existen dos opciones para este atributo:</p><dl><dt>DESTROY_OLD_SESSION</dt>
+<dd><p>Se destruir&#225; la siguiente sesi&#243;n que caduque.</p></dd>
+<dt>DENY_ACCESS</dt>
+<dd><p>Se denegar&#225; la solicitud de creaci&#243;n de una nueva sesi&#243;n.</p></dd>
+</dl>
+<p>Este atributo s&#243;lo se aplicar&#225; cuando la restricci&#243;n de cuotas de sesi&#243;n
+est&#233; habilitada y la configuraci&#243;n predeterminada sea DESTROY_OLD_SESSION.</p>
+
+<a name="ggyer"></a><h5>Denegar el inicio de sesi&#243;n del usuario cuando el dep&#243;sito de sesiones est&#233; inactivo</h5>
+<p>Si est&#225; configurado en YES, este atributo obligar&#225; el bloqueo del usuario
+al servidor cuando el dep&#243;sito de sesiones est&#233; inactivo. Este atributo s&#243;lo
+se aplicar&#225; cuando est&#233; habilitada la restricci&#243;n de cuota de sesi&#243;n.</p>
+
+<a name="fwffd"></a><h5>Propiedades de notificaci&#243;n</h5>
+<p>Cuando se produce un cambio en una propiedad de sesi&#243;n definida en
+la lista, se enviar&#225; una notificaci&#243;n a las escuchas registradas. El atributo
+se aplicar&#225; cuando la funci&#243;n Session Property Change Notification (Notificaci&#243;n de cambio
+de propiedad de sesi&#243;n) est&#233; habilitada.</p>
+
+<a name="fwffe"></a><h5>Tiempo por sesi&#243;n m&#225;ximo</h5>
+<p>Este atributo acepta un valor en minutos para expresar el tiempo m&#225;ximo
+antes de que caduque la sesi&#243;n y el usuario deba volver a
+autenticarse para acceder. Se aceptar&#225; el valor 1 o superior. El valor
+predeterminado es 120. (To balance the requirements of security and convenience, consider
+setting the Max Session Time interval to a higher value and setting
+the Max Idle Time interval to a relatively low value.) Max Session
+Time limits the validity of the session. No se ampliar&#225; m&#225;s del
+valor configurado.</p>
+
+<a name="fwfff"></a><h5>Tiempo inactivo m&#225;ximo</h5>
+<p>Este atributo acepta un valor (en minutos) igual al tiempo m&#225;ximo sin
+actividad antes de que caduque la sesi&#243;n y el usuario deba volver
+a autenticarse para acceder. Se aceptar&#225; el valor 1 o superior. The
+default value is 30. (To balance the requirements of security and convenience,
+consider setting the Max Session Time interval to a higher value and
+setting the Max Idle Time interval to a relatively low value.)</p>
+
+<a name="fwffh"></a><h5>Tiempo en cach&#233; m&#225;ximo</h5>
+<p>Este atributo acepta un valor (en minutos) igual al intervalo m&#225;ximo antes
+de que el cliente se ponga en contacto con OpenSSO para actualizar
+la informaci&#243;n de la sesi&#243;n almacenada en la cach&#233;. Se aceptar&#225; el
+valor 0 o superior. El valor predeterminado es 3. It is recommended
+that the maximum caching time should always be less than the maximum
+idle time.</p>
+
+<a name="fwffi"></a><h5>Activar sesiones de usuario</h5>
+<p>Especifica el n&#250;mero m&#225;ximo de sesiones concurrentes permitidas para un usuario.</p>
+<br/>
+
+</body>
+</html>
