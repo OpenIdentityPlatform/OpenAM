@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthSafeWordService" version="1.0">
+        <Schema
+	    serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthSafeWordService"
+            i18nFileName="amAuthSafeWord"
+	    revisionNumber="40"
+            i18nKey="iplanet-am-auth-safeword-service-description">
+
+            <Organization>
+	        <AttributeSchema name="iplanet-am-auth-safeword-server-specification"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a101">
+		    <DefaultValues>
+                        <Value>localhost 7482</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+	        <AttributeSchema name="iplanet-am-auth-safeword-srvr-verif-path"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102">
+		    <DefaultValues>
+                        <Value>@BASE_DIR@/@SERVER_URI@/auth/safeword/serverVerification</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-safeword-log-enable"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a103">
+		    <DefaultValues>
+                        <Value>true</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+	        <AttributeSchema name="iplanet-am-auth-safeword-log-level"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a104">
+		    <ChoiceValues>
+                        <ChoiceValue i18nKey="none">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="info">INFO</ChoiceValue>
+                        <ChoiceValue i18nKey="error">ERROR</ChoiceValue>
+                        <ChoiceValue i18nKey="debug">DEBUG</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>DEBUG</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+	        <AttributeSchema name="iplanet-am-auth-safeword-log-path"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a105">
+		    <DefaultValues>
+                        <Value>@BASE_DIR@/@SERVER_URI@/auth/safeword/safe.log</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-safeword-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a106">
+                    <DefaultValues>
+                        <Value>120</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                 <AttributeSchema name="iplanet-am-auth-safeword-client-type"
+                     type="single"
+                     syntax="string"
+                     i18nKey="a107">
+                     <DefaultValues>
+             		<Value></Value>
+                     </DefaultValues>
+         	</AttributeSchema>
+         	<AttributeSchema name="iplanet-am-auth-safeword-eassp-version"
+                     type="single_choice"
+                     syntax="number"
+                     i18nKey="a108">
+                     <ChoiceValues>                          
+                          <ChoiceValue>101</ChoiceValue>
+                          <ChoiceValue>200</ChoiceValue>
+                          <ChoiceValue>201</ChoiceValue>
+                     </ChoiceValues>
+                     <DefaultValues>
+             		<Value>201</Value>
+                     </DefaultValues>
+        	 </AttributeSchema>
+        	 <AttributeSchema name="iplanet-am-auth-safeword-minimum-strength"
+                     type="single"
+                     syntax="number"
+                     i18nKey="a109">
+                     <DefaultValues>
+             		<Value>15</Value>
+                     </DefaultValues>
+        	 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-safeword-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a110">
+		    <DefaultValues>
+                        <Value>0</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+		<SubSchema name="serverconfig" inheritance="multiple">
+    	           <AttributeSchema name="iplanet-am-auth-safeword-server-specification"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a101">
+    		    <DefaultValues>
+                            <Value>localhost 7482</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+    	           <AttributeSchema name="iplanet-am-auth-safeword-srvr-verif-path"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a102">
+    		    <DefaultValues>
+                            <Value>@BASE_DIR@/@SERVER_URI@/auth/safeword/serverVerification</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-safeword-log-enable"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a103">
+    		    <DefaultValues>
+                            <Value>true</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+    	           <AttributeSchema name="iplanet-am-auth-safeword-log-level"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a104">
+    		    <ChoiceValues>
+                            <ChoiceValue i18nKey="none">NONE</ChoiceValue>
+                            <ChoiceValue i18nKey="info">INFO</ChoiceValue>
+                            <ChoiceValue i18nKey="error">ERROR</ChoiceValue>
+                            <ChoiceValue i18nKey="debug">DEBUG</ChoiceValue>
+                        </ChoiceValues>
+    		    <DefaultValues>
+                            <Value>DEBUG</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+    	           <AttributeSchema name="iplanet-am-auth-safeword-log-path"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a105">
+    		    <DefaultValues>
+                            <Value>@BASE_DIR@/@SERVER_URI@/auth/safeword/safe.log</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-safeword-timeout"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a106">
+                        <DefaultValues>
+                            <Value>120</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                     <AttributeSchema name="iplanet-am-auth-safeword-client-type"
+                         type="single"
+                         syntax="string"
+                         i18nKey="a107">
+                         <DefaultValues>
+                 		<Value></Value>
+                         </DefaultValues>
+             	   </AttributeSchema>
+             	   <AttributeSchema name="iplanet-am-auth-safeword-eassp-version"
+                         type="single_choice"
+                         syntax="number"
+                         i18nKey="a108">
+                         <ChoiceValues>                          
+                              <ChoiceValue>101</ChoiceValue>
+                              <ChoiceValue>200</ChoiceValue>
+                              <ChoiceValue>201</ChoiceValue>
+                         </ChoiceValues>
+                         <DefaultValues>
+                 		<Value>201</Value>
+                         </DefaultValues>
+            	    </AttributeSchema>
+            	    <AttributeSchema name="iplanet-am-auth-safeword-minimum-strength"
+                         type="single"
+                         syntax="number"
+                         i18nKey="a109">
+                         <DefaultValues>
+                 		<Value>15</Value>
+                         </DefaultValues>
+            	    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-safeword-auth-level"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a110">
+    		    <DefaultValues>
+                            <Value>0</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+		</SubSchema>
+	    </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

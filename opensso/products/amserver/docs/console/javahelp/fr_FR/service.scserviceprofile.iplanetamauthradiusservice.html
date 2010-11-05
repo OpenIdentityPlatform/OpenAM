@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS</h4>
+<p><a name="indexterm-178"></a>Ce module permet de s'authentifier &#224; l'aide d'un serveur RADIUS (Remote Authentication
+Dial-In User Service) externe. Les attributs d'authentification RADIUS sont des attributs de
+domaine. Ces attributs sont les suivants :</p>
+<ul><li><p><a href="#fwadp">Serveur 1</a></p></li>
+<li><p><a href="#fwaom">Serveur 2</a></p></li>
+<li><p><a href="#fwaka">Secret partag&#233;</a></p></li>
+<li><p><a href="#fwapc">Secret partag&#233; (confirmer)</a></p></li>
+<li><p><a href="#fwapn">Num&#233;ro de port</a></p></li>
+<li><p><a href="#fwaad">D&#233;lai d'attente</a></p></li>
+<li><p><a href="#fwabo">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>Serveur 1</h5>
+<p>Affiche l'adresse IP ou le nom d'h&#244;te complet du serveur RADIUS principal.
+L'adresse IP par d&#233;faut est 127.0.0.1. Ce champ reconna&#238;t toute adresse IP
+ou nom d'h&#244;te valide. Les entr&#233;es multiples doivent &#234;tre pr&#233;c&#233;d&#233;es du nom
+du serveur local selon la syntaxe suivante :</p><p><tt>nomserveur_local|adresse_ip nomserveur_local2|adresse_ip ...</tt></p>
+
+<a name="fwaom"></a><h5>Serveur 2</h5>
+<p>Affiche l'adresse IP ou le nom de domaine complet (FQDN) du serveur
+RADIUS secondaire. C'est un serveur de basculement avec lequel le contact sera
+&#233;tabli si le contact avec le serveur principal a &#233;chou&#233;. L'adresse IP
+par d&#233;faut est 127.0.0.1. Plusieurs entr&#233;es doivent pr&#233;ciser le nom du serveur
+local en pr&#233;fixe, selon la syntaxe suivante :</p><p><tt>nomserveur_local|adresse_ip nomserveur_local2|adresse_ip ...</tt></p>
+
+<a name="fwaka"></a><h5>Secret partag&#233;</h5>
+<p>Contient le secret partag&#233; pour l'authentification RADIUS. Le secret partag&#233; doit poss&#233;der
+les m&#234;mes caract&#233;ristiques qu'un mot de passe bien choisi. Il n'existe pas
+de valeur par d&#233;faut pour ce champ.</p>
+
+<a name="fwapc"></a><h5>Secret partag&#233; (confirmer)</h5>
+<p>Confirmation du secret partag&#233; pour l'authentification RADIUS.</p>
+
+<a name="fwapn"></a><h5>Num&#233;ro de port</h5>
+<p>Indique le port d'&#233;coute utilis&#233; par le serveur RADIUS. La valeur par
+d&#233;faut est 1645.</p>
+
+<a name="fwaad"></a><h5>D&#233;lai d'attente</h5>
+<p>Indique le d&#233;lai d'attente en secondes de la r&#233;ponse du serveur RADIUS
+apr&#232;s lequel un &#233;chec d&#251; &#224; un d&#233;passement de d&#233;lai se produit.
+La valeur par d&#233;faut est 3 secondes. Tout nombre de secondes est
+reconnu.</p>
+
+<a name="fwabo"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

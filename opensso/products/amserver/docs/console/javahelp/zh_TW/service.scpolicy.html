@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>策略配置 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>策略配置</h4>
+<p><a name="indexterm-191"></a>「策略配置」屬性可讓管理員設定策略服務所使用的全域配置及範圍特性。</p>
+<ul><li><p><a href="#fufnk">全域特性</a></p></li>
+<li><p><a href="#fufmb">範圍屬性</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>全域特性</h5>
+<p>全域特性包括：</p>
+
+<a name="gciwg"></a><h5>資源比較程式</h5>
+<p>指定用於比較策略規則定義中所指定之資源的資源比較程式資訊。在建立和評估策略時均會使用資源比較。</p><p>按一下 [新增] 按鈕，並定義下列屬性：</p><dl><dt>服務類型</dt>
+<dd><p>指定應該使用此比較程式的服務。</p></dd>
+<dt>類別</dt>
+<dd><p>定義實作資源比較演算法的 Java 類別。</p></dd>
+<dt>分割元</dt>
+<dd><p>指定在資源名稱中使用的分割元。</p></dd>
+<dt>萬用字元</dt>
+<dd><p>指定可以在資源名稱中定義的萬用字元。</p></dd>
+<dt>一級萬用字元</dt>
+<dd><p>在相同分割元界限符合零個或多個字元。</p></dd>
+<dt>大小寫相符</dt>
+<dd><p>指定在比較兩種資源時，是否應該考量或忽略大小寫。False 忽略大小寫，True 考量大小寫。</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>繼續評估拒絕決定</h5>
+<p>指定策略架構是否應繼續評估後續策略 (即使 DENY 策略決策存在)。如果未選取它 (預設)，則一旦識別了 DENY 決策，策略評估將略過後續策略。</p>
+
+<a name="fufng"></a><h5>可由 OpenSSO 處理的建議</h5>
+<p>定義策略建議鍵的名稱，策略執行點 (策略代理程式) 將會為了這些策略建議鍵，將使用者代理程式重新導向至 OpenSSO。如果代理程式收到不允許存取資源的策略決策，但是的確擁有建議，代理程式將會檢查它是否具有此屬性中列出的建議鍵。</p><p>如果找到這樣的建議，使用者代理程式會重新導向至 OpenSSO，因而有可能允許存取資源。</p>
+
+<a name="gdpdm"></a><h5>組織別名參照</h5>
+<p>此屬性設定為 [是] 時，您可以在子範圍中建立策略，而不必從頂層或父系範圍中建立參照策略。您只能建立用於保護 HTTP 或 HTTPS 資源的策略，而且這些資源的完全合格主機名稱要符合範圍的 DNS 別名。依預設，此屬性定義為「否」。</p>
+
+<a name="fufmb"></a><h5>範圍屬性</h5>
+<p>LDAP 特性如下：</p>
+
+<a name="fufmg"></a><h5>主 LDAP 伺服器</h5>
+<p>指定 OpenSSO 安裝期間指定的主 LDAP 伺服器之主機名稱與連接埠號 (用於搜尋策略主體，例如 LDAP 使用者、LDAP 角色、LDAP 群組等)。</p><p>格式為 <i>hostname:port</i>。例如：<tt>machine1.example.com:389</tt></p><p>對於多重 LDAP 伺服器主機的容錯移轉配置，本值可以為以空格分隔的主機清單。格式為 <i>hostname1:port1 hostname2:port2...</i></p><p>例如：<tt>machine1.example1.com:389 machine2.example1.com:389 </tt></p><p>多重項目必須以本機伺服器名稱為字首。這樣可以將特定的 OpenSSO 配置為與特定的 Directory Server 通訊。</p><p>格式為 <i>servername|hostname:port</i> 例如：</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>對於容錯移轉配置：</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389 </tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>LDAP 基底 DN</h5>
+<p>指定要開始搜尋的 LDAP 伺服器中的基底 DN。依預設，它是 OpenSSO 安裝的頂層範圍。</p>
+
+<a name="fufmd"></a><h5>LDAP 使用者基底 DN</h5>
+<p>此屬性指定 LDAP 伺服器中由 LDAP 使用者主體使用的基底 DN，搜尋將從此基底 DN 開始。依預設，它是 OpenSSO 安裝基底的頂層範圍。</p>
+
+<a name="fufmz"></a><h5>OpenSSO 角色基底 DN</h5>
+<p>定義範圍或組織的 DN，當搜尋 OpenSSO 角色值時，會使用此 DN 做為基底。此屬性是由 <i>AccessManagerRoles</i> 策略主體使用。</p>
+
+<a name="fufme"></a><h5>LDAP 連結 DN</h5>
+<p>指定 LDAP 伺服器中的連結 DN。</p>
+
+<a name="fufmf"></a><h5>LDAP 連結密碼</h5>
+<p>定義用於連結至 LDAP 伺服器的密碼。依預設，在安裝期間輸入的 <tt>amldapuser</tt> 密碼將用作連結使用者。</p>
+
+<a name="fufmn"></a><h5>LDAP 組織搜尋篩選器</h5>
+<p>指定用於尋找組織項目的搜尋篩選器。預設值為 <tt>(objectclass=sunMangagedOrganization)</tt>。</p>
+
+<a name="fufmm"></a><h5>LDAP 組織搜尋範圍</h5>
+<p>定義用於尋找組織項目的範圍。此範圍必須為以下一種：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (預設)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>LDAP 群組搜尋範圍</h5>
+<p>定義用於尋找群組項目的範圍。此範圍必須為以下一種：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (預設)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>LDAP 群組搜尋篩選器</h5>
+<p>指定用於尋找群組項目的搜尋篩選器。預設值為 <tt>(objectclass=groupOfUniqueNames)</tt>。</p>
+
+<a name="fufms"></a><h5>LDAP 使用者搜尋篩選器</h5>
+<p>指定用於尋找使用者項目的搜尋篩選器。預設值為 <tt>(objectclass=inetorgperson)</tt>。</p>
+
+<a name="fufmt"></a><h5>LDAP 使用者搜尋範圍</h5>
+<p>定義用於尋找使用者項目的範圍。此範圍必須為以下一種：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (預設)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>LDAP 角色搜尋篩選器</h5>
+<p>指定用於尋找角色項目的搜尋篩選器。預設值為 <tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions))</tt>。</p>
+
+<a name="fufmw"></a><h5>LDAP 角色搜尋範圍</h5>
+<p>此屬性定義用於尋找角色項目的範圍。此範圍必須為以下一種：</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (預設)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>OpenSSO 角色搜尋範圍</h5>
+<p>定義要用來尋找 OpenSSO 角色主體項目的範圍。</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (預設)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>LDAP 組織搜尋屬性</h5>
+<p>定義對組織進行搜尋的屬性類型。預設值為 o。</p>
+
+<a name="fufmr"></a><h5>LDAP 群組搜尋屬性</h5>
+<p>定義對群組進行搜尋的屬性類型。預設值為 <tt>cn</tt>。</p>
+
+<a name="fufmu"></a><h5>LDAP 使用者搜尋屬性</h5>
+<p>定義對使用者進行搜尋的屬性類型。預設值為 <tt>uid</tt>。</p>
+
+<a name="fufmx"></a><h5>LDAP 角色搜尋屬性</h5>
+<p>此欄位定義對角色進行搜尋的屬性類型。預設值為 <tt>cn</tt>。</p>
+
+<a name="fufnj"></a><h5>從搜尋傳回的最多結果</h5>
+<p>此欄位定義搜尋傳回的最大結果數。預設值為 100。如果搜尋限制超過了指定時間，則會傳回到此指定時間點時已經找到的項目。</p>
+
+<a name="fufnl"></a><h5>搜尋逾時</h5>
+<p>指定在搜尋發生逾時之前的時間量。如果搜尋超過了指定時間，則會傳回到此指定時間點時已經找到的項目。</p>
+
+<a name="fufmi"></a><h5>LDAP SSL</h5>
+<p>指定 LDAP 伺服器是否正在執行 SSL。選取會啟用 SSL，取消選取 (預設) 則會停用 SSL。</p><p>如果 LDAP 伺服器執行時也啟用 SSL (LDAPS)，您必須確保 OpenSSO 已經配置了正確的 SSL 信任憑證，以便讓 OpenSSO 透過 LDAPS
+協定來連接 Directory Server。</p>
+
+<a name="fufmk"></a><h5>LDAP 連接儲存區最小大小</h5>
+<p>指定用於連線至 Directory Server 的連線池最小大小，如 LDAP 伺服器屬性中指定的最小大小。預設值為 1。</p>
+
+<a name="fufmj"></a><h5>連線池最大大小</h5>
+<p>此屬性指定用於連線至 Directory Server 的連線池最大大小，如 LDAP 伺服器屬性中指定的最大大小。預設值為 10。</p>
+
+<a name="fufna"></a><h5>選取的策略主體</h5>
+<p>允許您選取可用於範圍中策略定義的主體類型集。</p>
+
+<a name="fufnc"></a><h5>選取的策略條件</h5>
+<p>允許您選取可用於範圍中策略定義的條件類型集。</p>
+
+<a name="fufnd"></a><h5>選取的策略參照</h5>
+<p>允許您選取可用於範圍中策略定義的參照類型集。</p>
+
+<a name="fufml"></a><h5>持續的主體結果時間</h5>
+<p>此屬性指定快取主體結果 (基於輸單次登入記號) 可用於評估同一策略請求的時間 (以分鐘計算)。</p><p>在最初評估某策略是否與 SSO 記號相符時，會評估策略中的主體實例，以決定此策略是否適用於給定使用者。使用 SSO 記號 ID 加密的主體結果，在策略中進行快取。如果在 [持續的主體結果時間] 屬性指定的時間內，對同一 SSO 記號 ID
+的同一策略進行評估，策略架構會擷取快取的主體結果，而不是評估主體實例。這會大大減少策略評估的時間。</p>
+
+<a name="fufnm"></a><h5>使用者別名</h5>
+<p>如果建立策略以保護在遠端 Directory Server 中主體成員別名為本機使用者的資源，則必須啟用此屬性。例如，如果在遠端 Directory Server 中建立 <tt>uid=rmuser</tt>，然後將 <tt>rmuser</tt> 做為別名增加到 OpenSSO 中的本機使用者
+(如 <tt>uid=luser</tt>)，則必須啟用此屬性。當您以 <tt>rmuser</tt> 登入時，系統會經由本機使用者 (<tt>luser</tt>) 建立階段作業，從而使策略執行成功。</p>
+
+<a name="fufni"></a><h5>選取的回應提供者</h5>
+<p>定義針對範圍啟用的策略回應提供者外掛程式。只有在此屬性中選取的回應提供者外掛程式才能新增到範圍中定義的策略。</p>
+
+<a name="fufnn"></a><h5>選取的動態回應屬性</h5>
+<p>定義針對範圍啟用的動態回應屬性。只有在此屬性中選取之名稱的子集才能定義於 <i>IDResponseProvider</i> 的動態屬性清單中，此清單將新增到範圍中定義的策略。</p>
+<br/>
+
+</body>
+</html>

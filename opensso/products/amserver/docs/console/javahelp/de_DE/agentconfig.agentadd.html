@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie einen neuen Agenten - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>So erstellen Sie einen neuen Agenten</h5>
+<p>Das Erstellen eines neuen Agenten wird auch als Erstellen eines neuen Agentenprofils
+bezeichnet. Sie k&#246;nnen diese Aufgabe an der OpenSSO-Administrationskonsole ausf&#252;hren. Einige der einzelnen
+Schritte gelten nur f&#252;r die Richtlinien-Agenten-Typen "J2EE" und "Web".</p><ol>
+<li><b>Klicken Sie auf die Registerkarte "Zugriffssteuerung".</b></li>
+<li><b>Klicken Sie auf den Namen des Bereichs, zu dem der Agent geh&#246;ren
+soll.</b></li>
+<li><b>Klicken Sie auf die Registerkarte "Agenten".</b></li>
+<li><b>W&#228;hlen Sie die Registerkarte f&#252;r den entsprechenden Agententyp aus.</b><ul>
+<li><b>Web-Agenten</b></li>
+<li><b>J2EE-Agenten</b></li>
+<li><b>Webdienstanbieter-Agenten</b></li>
+<li><b>Webdienst-Client-Agenten</b></li>
+<li><b>STS Client-Agent</b><p>Der Client-Agent f&#252;r den Sicherheitstokendienst stellt zwei Typen zur Auswahl: Discovery-Agent und
+STS-Agent. Weitere Informationen zu den Agententypen finden Sie unter <a href="agentconfig.stsclientedit.html">STS-Client</a>.</p></li>
+<li><b>2.2-Agenten</b><p>Die Registerkarte "2.2-Agenten" bezieht sich auf Agenten im Policy Agent 2.2-Software-Set.</p></li>
+<li><b>Agenten-Authentifizierer</b></li></ul></li>
+<li><b>Klicken Sie im Abschnitt "Agent" auf "Neu".</b></li>
+<li><b>Geben Sie im Feld "Name" den Namen des neuen Agentenprofils ein.</b></li>
+<li><b>Geben Sie das Passwort ein, und best&#228;tigen Sie es.</b>
+<hr><p><b>Achtung &#8211; </b>Dieses Passwort muss mit dem Passwort in der Datei f&#252;r das Agentenprofilpasswort
+&#252;bereinstimmen, die Sie angeben, wenn Sie den Agenten durch Ausf&#252;hrung des Programms
+<tt> agentadmin</tt> installieren.</p>
+<hr>
+<p><b>Die Schritte 8&#8211;10 gelten nur f&#252;r Web- und J2EE-Richtlinienagenten.</b></p></li>
+<li><b>W&#228;hlen Sie die entsprechende Konfiguration: "Lokal" oder "Zentralisiert".</b><p>Bei Auswahl der lokalen Konfiguration k&#246;nnen die zu diesem Agenten geh&#246;renden Eigenschaften
+nicht &#252;ber die Konsole bearbeitet werden. In einem solchen Szenario erh&#228;lt der
+Agent Konfigurationsinformationen aus den lokalen Dateien, <tt>OpenSSOAgentBootstrap.properties</tt> und <tt>OpenSSOAgentConfiguration.properites </tt>, im Verzeichnis der
+Agenteninstallation. Bei einem lokal konfigurierten Agenten &#228;ndern Sie die Eigenschaftswerte durch direkte
+Bearbeitung der Datei <tt>OpenSSOAgentConfiguration.properites </tt>.</p></li>
+<li><b>Geben Sie im Feld "Server-URL" die URL des OpenSSO-Servers ein.</b><p>Beispiel:</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>Geben Sie im Feld "Agenten-URL" die URL der Agentenanwendung, <tt> agentapp</tt>, ein.</b><p>Beispiel:</p><dl><dt>Web-Agenten</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>J2EE-Agenten</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "Erstellen".</b><p>Die Konsole erstellt das Agentenprofil und zeigt die Agentenseite mit einer Verkn&#252;pfung
+zum neuen Agentenprofil an.</p><p>Wenn Sie weitere Konfigurationen am Agentenprofil vornehmen m&#246;chten, klicken Sie auf diese
+Verkn&#252;pfung, um die Seite zur Bearbeitung des Agenten anzuzeigen.</p></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Administration - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amadminconsoleservice"></a><h4>Administration</h4>
+<p><a name="indexterm-187"></a>The Administration service enables you to configure the OpenSSO console at both the
+global level as well as at a configured realm level (Preferences or Options
+specific to a configured realm). The Administration service attributes are global and realm attributes.
+</p>
+<hr><p><b>Note &#8211; </b>Some of the attributes listed in this section apply to Legacy Mode installation
+only.</p>
+<hr>
+<p>The attributes are:</p>
+<ul><li><p><a href="#fufly">Federation Management</a></p></li>
+<li><p><a href="#fsvge">User Management</a></p></li>
+<li><p><a href="#fsvgj">People Containers</a></p></li>
+<li><p><a href="#fsvgm">Organizational Unit Containers</a></p></li>
+<li><p><a href="#fsvgq">Group Containers</a></p></li>
+<li><p><a href="#fsvgh">Managed Group Type</a></p></li>
+<li><p><a href="#fsvgr">Default Role Permissions</a> </p></li>
+<li><p><a href="#fsvgt">Domain Component Tree</a></p></li>
+<li><p><a href="#fsvgs">Administrative Groups</a></p></li>
+<li><p><a href="#fsvgv">Compliance User Deletion</a></p></li>
+<li><p><a href="#fsvgu">Dynamic Administrative Roles ACIs</a></p></li>
+<li><p><a href="#ftbxa">User Profile Service Classes</a></p></li>
+<li><p><a href="#fsvgw">DC Node Attribute List</a></p></li>
+<li><p><a href="#fsvgx">Search Filters for Deleted Objects</a></p></li>
+<li><p><a href="#fsvgy">Default People Container</a></p></li>
+<li><p><a href="#fsvhe">Default Groups Container</a></p></li>
+<li><p><a href="#fsvhd">Default Agents Container</a></p></li>
+<li><p><a href="#fsvhb">Groups Default People Container</a></p></li>
+<li><p><a href="#fsvha">Groups People Container List</a></p></li>
+<li><p><a href="#fsvhc">User Profile Display Class</a></p></li>
+<li><p><a href="#fsvhh">End User Profile Display Class</a></p></li>
+<li><p><a href="#fsvhi">Show Roles on User Profile Page</a></p></li>
+<li><p><a href="#fsvhj">Show Groups on User Profile Page</a></p></li>
+<li><p><a href="#fsvhf">User Self Subscription to Group</a></p></li>
+<li><p><a href="#fsvhk">User Profile Display Options</a></p></li>
+<li><p><a href="#fsvhl">User Creation Default Roles</a></p></li>
+<li><p><a href="#fsvhm">Administrative Console Tabs</a></p></li>
+<li><p><a href="#fsvho">Maximum Results Returned From Search</a></p></li>
+<li><p><a href="#fsvhp">Timeout For Search</a></p></li>
+<li><p><a href="#fsvhs">JSP Directory Name</a></p></li>
+<li><p><a href="#fsvhr">Online Help Documents</a></p></li>
+<li><p><a href="#fsvhq">Required Services</a></p></li>
+<li><p><a href="#fsvhu">User Search Key</a></p></li>
+<li><p><a href="#fsvht">User Search Return Attribute</a></p></li>
+<li><p><a href="#fsvhv">User Creation Notification List</a></p></li>
+<li><p><a href="#fsvhw">User Deletion Notification List</a></p></li>
+<li><p><a href="#fsvhx">User Modification Notification List</a></p></li>
+<li><p><a href="#fsvia">Maximum Entries Displayed per Page</a></p></li>
+<li><p><a href="#fsvhz">Event Listener Classes</a></p></li>
+<li><p><a href="#fsvhy">Pre and Post Processing Classes</a></p></li>
+<li><p><a href="#fsvic">External Attributes Fetch</a></p></li>
+<li><p><a href="#fsvib">Invalid User ID Characters</a></p></li>
+<li><p><a href="#fsvie">UserID and Password Validation Plug-in Class</a></p></li></ul>
+
+
+<a name="fufly"></a><h5>Federation Management</h5>
+<p>Enables Federation Management. It is selected by default. To disable this feature, deselect
+the field The Federation Management tab will not appear in the console.</p>
+
+<a name="fsvge"></a><h5>User Management</h5>
+<p>Enables User Management. This is enabled by default. This attribute is applicable when
+OpenSSO is installed in legacy mode. </p>
+
+<a name="fsvgj"></a><h5>People Containers</h5>
+<p>This attribute is deselected by default and is applicable only when OpenSSO is
+installed in legacy mode. Selecting this attribute will display people containers under the
+Directory Management tab. It is recommended that you use a single people container
+in your DIT and then use roles to manage accounts and services. The
+default behavior of the OpenSSO console is to hide the People Containers. However, if
+you have multiple people containers in your DIT, select this attribute to display
+People Containers as managed objects.</p>
+
+<a name="fsvgm"></a><h5>Organizational Unit Containers</h5>
+<p>This attribute is deselected by default and is applicable when OpenSSO is installed
+in legacy mode. Selecting this attribute will display containers in the Directory Management
+tab.</p>
+
+<a name="fsvgq"></a><h5>Group Containers</h5>
+<p>This attribute is deselected by default and is applicable when OpenSSO is installed
+in legacy mode. Selecting this attribute will display group containers in the Directory
+Management tab.</p>
+
+<a name="fsvgh"></a><h5>Managed Group Type</h5>
+<p>Specifies whether subscription groups created through the console are static or dynamic. The
+console will either create and display subscription groups that are static or dynamic,
+not both. (Filtered groups are always supported regardless of the value given to
+this attribute.) The default value is dynamic.</p>
+<ul><li><p>A static group explicitly lists each group member using the <tt>groupOfNames</tt> or <tt>groupOfUniqueNames</tt> object class. The group entry contains the <i>uniqueMember</i> attribute for each member of the group. Members of static groups are manually added; the user entry itself remains unchanged. Static groups are suitable for groups with few members. </p></li>
+<li><p>A dynamic group uses a <tt>memberOf</tt> attribute in the entry of each group member. Members of dynamic groups are generated through the use of an LDAP filter which searches and returns all entries which contain the <tt>memberOf</tt> attribute. Dynamic groups are suitable for groups that have a very large membership. </p></li>
+<li><p>A filtered group uses an LDAP filter to search and return members that meet the requirement of the filter. For instance, the filter can generate members with a specific uid (<tt>uid=g*</tt>) or email address (<tt>mail=*@example.com</tt>). </p></li></ul>
+<p>In the examples above, the LDAP filter would return all users whose uid
+begins with <tt>g</tt> or whose email address ends with <tt>example.com</tt>, respectively. Filtered groups can
+only be created within the User Management view by choosing Membership by Filter.</p><p>An administrator can select one of the following:</p>
+<ul><li><p>Dynamic - Groups created through the Membership By Subscription option will be dynamic.</p></li>
+<li><p>Static - Groups created through the Membership By Subscription option will be static.</p></li></ul>
+
+
+<a name="fsvgr"></a><h5>Default Role Permissions</h5>
+<p>Defines a list of default access control instructions (ACIs) or <b>permissions</b> that are
+used to grant administrator privileges when creating new roles. Select one of these
+ACIs for the level of privilege you wish. OpenSSO ships with four default
+role permissions:</p><p>No Permissions &#8212; No permissions are to be set on the role.</p><p>Organization Admin &#8212; The Organization Administrator has read and write access to all
+entries in the configured organization.</p><p>Organization Help Desk Admin &#8212; The Organization Help Desk Administrator has read access
+to all entries in the configured organization and write access to the <tt>userPassword</tt>
+attribute.</p><p>Organization Policy Admin &#8212; The Organization Policy Administrator has read and write access
+to all policies in the realm. The Organization Policy Administrator can not create
+a referral policy.  </p>
+
+<a name="fsvgt"></a><h5>Domain Component Tree</h5>
+<p>The Domain Component tree (DC tree) is a specific DIT structure used by
+many Sun Java System components to map between DNS names and realm entries.</p><p>When this option is enabled, the DC tree entry for an realm is
+created, provided that the DNS name of the realm is entered at the
+time the realm is created. The DNS name field will appear in
+the realm Create page. This option is only applicable to top-level realms, and will
+not be displayed for subrealms.</p><p>Any status change made to the <i>inetdomainstatus</i> attribute through the OpenSSO SDK in
+the realm tree will update the corresponding DC tree entry status. (Updates to
+status that are not made through the OpenSSO SDK will not be synchronized.)
+For example, if a new realm, sun, is created with the DNS name
+attribute <tt>sun.com</tt> , the following entry will be created in the DC tree:</p><p><tt>dc=sun,dc=com,o=internet,root suffix</tt></p><p>By default, this is set to the OpenSSO root. If a different suffix
+is desired, this suffix must be created using LDAP commands. The ACIs for
+administrators that create realms required modification so that they have unrestricted access to
+the new DC tree root.</p>
+
+<a name="fsvgs"></a><h5>Administrative Groups</h5>
+<p>Specifies whether to create the DomainAdministrators and DomainHelpDeskAdministrators groups. If enabled, these groups
+are created and associated with the Organization Admin Role and Organization Help Desk
+Admin Role, respectively. Once created, adding or removing a user to one of
+these associated roles automatically adds or removes the user from the corresponding group. This
+behavior, however, does not work in reverse. Adding or removing a user to
+one of these groups will not add or remove the user in the
+user's associated roles.</p><p>The DomainAdministrators and DomainHelpDeskAdministrators groups are only created in realms that are created
+after this option is enabled.  </p>
+<hr><p><b>Note &#8211; </b>This option does not apply to subrealms, with the exception of the root
+realm. At the root realm, the ServiceAdministrators and ServiceHelpDesk Administrators groups are created
+and associated with the Top-level Admin and Top-level Help Desk Admin roles, respectively. The
+same behavior applies.</p>
+<hr>
+
+
+<a name="fsvgv"></a><h5>Compliance User Deletion</h5>
+<p>Specifies whether a user's entry will be deleted, or just marked as deleted,
+from the directory. This attribute is only applicable when OpenSSO is installed in
+legacy mode.</p><p>When a user's entry is deleted and this option is selected (true), the
+user's entry will still exist in the directory, but will be marked as
+deleted. User entries that are marked for deletion are not returned during Directory
+Server searches. If this option is not selected, the user's entry will be
+deleted from the directory.</p>
+
+<a name="fsvgu"></a><h5>Dynamic Administrative Roles ACIs</h5>
+<p>This attribute defines the access control instructions for the administrator roles that are
+created dynamically when a group or realm is configured using OpenSSO. These roles
+are used for granting administrative privileges for the specific grouping of entries created.
+The default ACIs can be modified only under this attribute listing.</p>
+<hr><p><b>Note &#8211; </b>Administrators at the realm level have a wider scope of access than do
+group administrators. But, by default, when a user is added to a group
+administrator role, that user can change the password of anyone in the group.
+This would include any realm administrator who is a member of that group.</p>
+<hr>
+<p>The Container Help Desk Admin role has read access to all entries in a realm and write
+access to the <i>userPassword</i> attribute in user entries only in this container
+unit.</p><p>The Realm Help Desk Admin has read access to all entries in a
+realm and write access to the <i>userPassword</i> attribute.  When a sub&#8212;realm is created,
+remember that the administration roles are created in the sub-realm, not in the
+parent realm.</p><p>The Container Admin role has read and write access to all entries in
+an LDAP organizational unit. In OpenSSO, the LDAP organizational unit is often referred
+to as a container.</p><p>The Organization Policy Administrator has read and write access to all policies, and
+can create, assign, modify, and delete all policies within that realm.</p><p>ThePeople Container Admin is by default, any user entry in an newly created
+realm is a member of that realm's People Container. The People Container Administrator
+has read and write access to all user entries in the realm's People
+Container. Keep in mind that this role DOES NOT have read and write
+access to the attributes that contain role and group DNs therefore, they cannot
+modify the attributes of, or remove a user from, a role or a
+group.</p><p>Other containers can be configured with OpenSSO to hold user entries, group entries
+or even other containers. To apply an Administrator role to a container created
+after the realm has already been configured, the Container Admin Role or Container
+Help Desk Admin defaults would be used.</p><p>The Group Admin has read and write access to all members of a
+specific group, and can create new users, assign users to the groups they
+manage, and delete the users the that they have created. When a group
+is created, the Group Administrator role is automatically generated with the necessary privileges
+to manage the group. The role is not automatically assigned to a group
+member. It must be assigned by the group's creator, or anyone that has
+access to the Group Administrator Role.</p><p>The Top-level Admin has read and write access to all entries in the
+top-level realm. In other words, this Top-level Admin role has privileges for every
+configuration principal within the OpenSSO application.</p><p>The Organization Administrator has read and write access to all entries in a
+realm. When a realm is created, the Organization Admin role is automatically generated
+with the necessary privileges to manage the realm.</p>
+
+<a name="ftbxa"></a><h5>User Profile Service Classes</h5>
+<p>Lists the services that will have a custom display in the User Profile
+page. The default display generated by the console may not be sufficient for
+some services. This attribute creates a custom display for any service, giving full
+control over what and how the service information is displayed. The syntax is
+as follows:</p><p><tt>service name | relative url()</tt></p><p>Services that are listed in this attribute will not display in the User
+Create pages. Any data configuration for a custom service display must be performed
+the User Profile pages.</p>
+
+<a name="fsvgw"></a><h5>DC Node Attribute List</h5>
+<p>Defines the set of attributes that will be set in the DC
+tree entry when an object is created. The default parameters are:</p><table><tr><td align="left" valign="top" scope="row"><p>maildomainwelcomemessage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailhost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailclientattachmentquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutingsmarthost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailaccessproxyreplay</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredlanguage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>domainuidseparator</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainmsgquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainallowedserviceaccess</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailmessagestore</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>objectclass=maildomain</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutinghosts</p></td>
+</tr>
+</table>
+
+<a name="fsvgx"></a><h5>Search Filters for Deleted Objects</h5>
+<p>Defines the search filters for objects to be removed when User Compliance Deletion
+mode is enabled.</p>
+
+<a name="fsvgy"></a><h5>Default People Container</h5>
+<p>Specifies the default people container into which the user is created.</p>
+
+<a name="fsvhe"></a><h5>Default Groups Container</h5>
+<p>Specifies the default groups container into which the group is created.</p>
+
+<a name="fsvhd"></a><h5>Default Agents Container</h5>
+<p>Specifies the default agent container into which the agent is created. The default
+is <tt>Agents</tt>.</p>
+
+<a name="fsvhb"></a><h5>Groups Default People Container</h5>
+<p>Specifies the default People Container where users will be placed when they are
+created. There is no default value. A valid value is the DN of
+a people container. See the note under Groups People Container List attribute for
+the People Container fallback order.</p>
+
+<a name="fsvha"></a><h5>Groups People Container List</h5>
+<p>Specifies a list of People Containers from which a Group Administrator can choose
+when creating a new user. This list can be used if there are
+multiple People Containers in the directory tree. (If no People Containers are specified
+in this list or in the Groups Default People Container field, users are
+created in the default OpenSSO people container, <tt>ou=people</tt>.) There is no default
+value for this field.</p><p>The syntax for this attribute is:</p><p><tt></tt><i>dn of group</i><tt> | </tt><i>dn of people container</i><tt></tt>   </p><p>When a user is created, this attribute is checked for a container in
+which to place the entry. If the attribute is empty, the Groups Default
+People Container attribute is checked for a container. If the latter attribute is
+empty, the entry is created under <tt>ou=people</tt> .</p><p>This attribute is only applicable when OpenSSO is installed in legacy mode. There
+is no default value.</p>
+
+<a name="fsvhc"></a><h5>User Profile Display Class</h5>
+<p>Specifies the Java class used by the OpenSSO console when it displays the
+User Profile pages.</p>
+
+<a name="fsvhh"></a><h5>End User Profile Display Class</h5>
+<p>Specifies the Java class used by the OpenSSO console when it displays the
+End User Profile pages.</p>
+
+<a name="fsvhi"></a><h5>Show Roles on User Profile Page</h5>
+<p>Specifies whether to display a list of roles assigned to a user as
+part of the user's User Profile page. If the parameter is not
+enabled (the default), the User Profile page shows the user's roles only for administrators.</p>
+
+<a name="fsvhj"></a><h5>Show Groups on User Profile Page</h5>
+<p>Specifies whether to display a list of groups assigned to a user as
+part of the user's User Profile page. If this parameter is not enabled
+(the default), the User Profile page shows the user's groups only for administrators.</p>
+
+<a name="fsvhf"></a><h5>User Self Subscription to Group</h5>
+<p>This parameter specifies whether users can add themselves to groups that are open
+to subscription. If the parameter is not enabled (the default), the user profile
+page allows the user's group membership to be modified only by an administrator.
+This parameter applies only when the Show Groups on User Profile Page option
+is selected.</p>
+
+<a name="fsvhk"></a><h5>User Profile Display Options</h5>
+<p>This menu specifies which service attributes will be displayed in the user profile
+page. An administrator can select from the following:</p><dl><dt>UserOnly</dt>
+<dd><p>Display viewable User schema attributes for services assigned to the user. User service attribute values are viewable by the user when the attribute contains the keyword Display. See the OpenSSO Developer's Guide for details.</p></dd>
+<dt>Combined</dt>
+<dd><p>Display viewable User and Dynamic schema attributes for services assigned to the user.</p></dd>
+</dl>
+
+
+<a name="fsvhl"></a><h5>User Creation Default Roles</h5>
+<p>This listing defines roles that will be assigned to newly created users automatically.
+There is no default value. An administrator can input the DN of one
+or more roles.  </p><p>This field only takes a full Distinguished Name address, not a role name.
+The roles can only be OpenSSO roles, not LDAP (Directory Server) roles.</p>
+
+<a name="fsvhm"></a><h5>Administrative Console Tabs</h5>
+<p>This field lists the Java classes of modules that will be displayed at
+the top of the console. The syntax is <tt>i18N key | java class name</tt>.</p><p>The i18N key is used for the localized name of the entry
+in the console.</p>
+
+<a name="fsvho"></a><h5>Maximum Results Returned From Search</h5>
+<p>This field defines the maximum number of results returned from a search. The
+default value is 200.  </p><p>Do not set this attribute to a large value (greater than 1000) unless
+sufficient system resources are allocated.</p>
+<hr><p><b>Note &#8211; </b>OpenSSO is preconfigured to return a maximum size of 4000 search entries. 
+This value can be changed through the console or by using <tt>ldapmodify</tt>. If
+you wish to change it using <tt>ldapmodify,</tt>create a <tt>newConfig.xml</tt>, with the following values (in
+this example, <tt>nsSizeLimit</tt>: -1 means unlimited):</p>dn: cn=puser,ou=DSAME Users,ORG_ROOT_SUFFIX changetype: modify replace:nsSizeLimit nsSizeLimit: -1<p>Then, run <tt>ldapmodify</tt>. For example:</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml<p>Modifications to this attribute done through <tt>LDAPModify</tt> will take precedence to those
+made through the OpenSSO Console. </p>
+<hr>
+
+
+<a name="fsvhp"></a><h5>Timeout For Search</h5>
+<p>Defines the amount of time (in number of seconds) that a search will
+continue before timing out. It is used to stop potentially long searches. After
+the maximum search time is reached, the search terminates and returns an error.
+The default is 5 seconds.</p>
+<hr><p><b>Note &#8211; </b>Directory Server is been preconfigured with a timeout value of 120 seconds. This
+value can be changed through the Directory Server console or by using <tt>ldapmodify.</tt>
+ If you wish to change it using <tt>ldapmodify,</tt>create a <tt>newConfig.xml</tt>, with the
+following values (this example changes the timeout from 120 seconds to 3600 seconds):</p>dn: cn=config changetype: modify replace:nsslapd-timelimit nsslapd-timelimit: 3600<p>Then, run <tt>ldapmodify</tt>. For example:</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml
+<hr>
+
+
+<a name="fsvhs"></a><h5>JSP Directory Name</h5>
+<p>Specifies the name of the directory that contains the JSP files for a
+realm. It allows administrator to have different appearance (customization) for different realm. The
+default value for this attribute is <tt>console</tt>. This attribute is applicable only when OpenSSO
+is installed in legacy mode. </p>
+
+<a name="fsvhr"></a><h5>Online Help Documents</h5>
+<p>This field lists the online help links that will be created on the
+main OpenSSO help page. This allows other applications to add their online help
+links in the OpenSSO page. The format for this attribute is:</p><p><tt>linki18nkey | html page to load | i18n properties file | remote server</tt>  </p><p>The remote server attribute is an optional argument that allows you to specify
+the remote server on which the online help document is located. The default
+value is:</p><p><tt>DSAME Help|/contents.html|amAdminModlueMsgs</tt></p><p>This attribute is only applicable when OpenSSO is installed in legacy mode.</p>
+
+<a name="fsvhq"></a><h5>Required Services</h5>
+<p>This field lists the services that are dynamically added to the users' entries
+when they are created. Administrators can choose which services are added at the
+time of creation. This attribute is not used by the console, but by
+the OpenSSO SDK. Users that are dynamically created by the <tt>amadmin</tt> command line
+utility will be assigned the services listed in this attribute.</p>
+
+<a name="fsvhu"></a><h5>User Search Key</h5>
+<p>This attribute defines the attribute name that is to be searched upon when
+performing a simple search in the Navigation page. The default value for this
+attribute is <tt>cn</tt>.</p><p>For example, if you enter <tt>j*</tt> in the Name field in the Navigation
+frame, users whose names begins with "j" or "J" will be displayed.</p>
+
+<a name="fsvht"></a><h5>User Search Return Attribute</h5>
+<p>This field defines the attribute name used when displaying the users returned from
+a simple search. The default of this attribute is uid cn. This will
+display the user ID and the user's full name.</p><p>The attribute name that is listed first is also used as the key
+for sorting the set of users that will be returned. To avoid
+performance degradation, use an attribute whose value is set in a user's entry.</p>
+
+<a name="fsvhv"></a><h5>User Creation Notification List</h5>
+<p>This field defines a list of email addresses that will be sent notification
+when a new user is created. Multiple email addresses can be specified, as
+in the following syntax:</p><p> <tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt></p><p>The notification list also accepts different locales by using the <tt>-|locale</tt> option.</p><p>See <a href="supportedlang.html">Supported Language Locales</a>for a list of locales.  </p><p>The sender email ID can be changed by modifying property 497 in <tt>amProfile.properties</tt>,
+which is located, by default, at <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt> .</p>
+
+<a name="fsvhw"></a><h5>User Deletion Notification List</h5>
+<p>This field defines a list of email addresses that will be sent notification
+when a user is deleted. Multiple email addresses can be specified, as in
+the following syntax:</p><p> <tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt> </p><p><tt>e-mail|locale|charset</tt></p><p>The notification list also accepts different locales by using the <tt>-|locale</tt> option.</p><p>See for a list of local<a href="supportedlang.html">Supported Language Locales</a>.  </p><p>The sender email ID can be changed by modifying property 497 in <tt>amProfile.properties</tt>,
+which is located, by default, at <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt> .</p><p>The default sender ID is <tt>DSAME</tt>.</p>
+
+<a name="fsvhx"></a><h5>User Modification Notification List</h5>
+<p>Defines a list of attributes and email addresses associated with the attribute. When
+a user modification occurs on an attribute defined in the list, the email
+address associated with the attribute will be sent notification. Each attribute can have
+a different set of addresses associated to it. Multiple email address can be
+specified, as in the following syntax:</p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i>locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail</i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> .....</tt> </p><p><tt>attrName </tt><i>e-mail</i><tt>| </tt><i>locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail</i><tt> |</tt><i>locale</i><tt>|</tt><i>charset</i><tt> .....</tt> </p><p>The <tt>-self</tt> keyword may be used in place of one of the addresses.
+This sends mail to the user whose profile was modified. For example, assume
+the following:</p><p><tt>manager someuser@sun.com|self|admin@sun.com</tt></p><p>Mail will be sent to the address specified in the manager attribute, 
+<tt>someuser@sun.com</tt>, <tt>admin@sun</tt>, the person who modified the user (self).</p><p>The notification list also accepts different locales by using the <tt>-|locale</tt> option. For
+example, to send the notification to an administrator in France:</p><p><tt>manager someuser@sun.com|self|admin@sun.com|fr</tt> See<a href="supportedlang.html">Supported Language Locales</a> for a list of locales.  </p><p>The attribute name is the same as it appears in the Directory Server
+schema, and not as the display name in the console.</p>
+
+<a name="fsvia"></a><h5>Maximum Entries Displayed per Page</h5>
+<p>This attribute allows you to define the maximum rows that can be displayed
+per page. The default is 25. For example, if a user search returns
+100 rows, there will be 4 pages with 25 rows displayed in each
+page.</p>
+
+<a name="fsvhz"></a><h5>Event Listener Classes</h5>
+<p>This attribute contains a list of listeners that receive creation, modification and deletion
+events from the OpenSSO console.</p>
+
+<a name="fsvhy"></a><h5>Pre and Post Processing Classes</h5>
+<p>This field defines a list of implementation classes through plug-ins that extend the
+<tt>com.iplanet.am.sdk.AMCallBack</tt> class to receive callbacks during pre and post processing operations for users, realm,
+roles and groups. The operations are:</p>
+<ul><li><p>create</p></li>
+<li><p>delete</p></li>
+<li><p>modify</p></li>
+<li><p>add users to roles/groups</p></li>
+<li><p>delete users from roles/groups</p></li></ul>
+<p>You must enter the full class name of the plug-in and then
+change the class path of your web container (from the OpenSSO installation base) to
+include the full path to the location of the plug-in class</p>
+
+<a name="fsvic"></a><h5>External Attributes Fetch</h5>
+<p>This option enables callbacks for plug-ins to retrieve external attributes (any external application-specific
+attribute). External attributes are not cached in the OpenSSO SDK, so this attribute
+allows you enable attribute retrieval per realm level. By default, this option is not
+enabled</p>
+
+<a name="fsvib"></a><h5>Invalid User ID Characters</h5>
+<p>This attribute defines a list of characters that are not allowed in a
+user's name. Each character must be separated by the | character. For example:</p><p><tt>*|(|)|&#38;|!</tt></p>
+
+<a name="fsvie"></a><h5>UserID and Password Validation Plug-in Class</h5>
+<p>This class provides a userID and password validation plug-in mechanism. The methods of
+this class need to be overridden by the implementation plug-in modules that validate
+the userID and/or password for the user. The implementation plug-in modules will be
+invoked whenever a userID or password value is being added or modified using
+the OpenSSO console, the <tt>amadmin</tt> command line interface, or using the SDK.</p><p>The plug-ins that extend this class can be configured per realm. If a
+plug-in is not configured for an realm, then the plug-in configured at the
+global level will be used.</p><p>If the validation of the plug-in fails, the plug-in module can throw an
+exception to notify the application to indicate the error in the userID or
+password supplied by the user.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>Ce module permet aux utilisateurs de s'authentifier &#224; l'aide de serveurs d'authentification
+SafeWord ou SafeWord PremierAccess de Secure Computing. Les attributs d'authentification SafeWord sont
+des attributs de domaine. Ces attributs sont les suivants :</p>
+<ul><li><p><a href="#fwafv">Serveur</a></p></li>
+<li><p><a href="#fwajv">R&#233;pertoire de fichiers de v&#233;rification du serveur</a></p></li>
+<li><p><a href="#fwarb">Activation de la journalisation</a></p></li>
+<li><p><a href="#fwahi">niveaux de journalisation.</a></p></li>
+<li><p><a href="#fwabd">Fichier journal</a></p></li>
+<li><p><a href="#fwacu">D&#233;lai d'attente de connexion d'authentification.</a></p></li>
+<li><p><a href="#fwanv">Type de client</a></p></li>
+<li><p><a href="#fwafs">Version EASSP</a></p></li>
+<li><p><a href="#fwaob">Puissance minimale de l'authentificateur</a></p></li>
+<li><p><a href="#fwatz">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>Serveur</h5>
+<p>Indique le nom et le port du serveur SafeWord ou SafeWord PremiereAccess.
+Port 7482 est d&#233;fini comme la valeur par d&#233;faut pour un serveur
+SafeWord. Le num&#233;ro de port par d&#233;faut pour un serveur SafeWord PremierAccess
+est 5030.</p>
+
+<a name="fwajv"></a><h5>R&#233;pertoire de fichiers de v&#233;rification du serveur</h5>
+<p>Indique le r&#233;pertoire dans lequel la biblioth&#232;que cliente SafeWord place ses fichiers
+de v&#233;rification. La valeur par d&#233;faut est la suivante :</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>Si un r&#233;pertoire diff&#233;rent est sp&#233;cifi&#233; dans ce champ, ce r&#233;pertoire doit
+exister avant toute tentative d'authentification SafeWord.</p>
+
+<a name="fwarb"></a><h5>Activation de la journalisation</h5>
+<p>Active la journalisation SafeWord. Par d&#233;faut, la journalisation SafeWord est activ&#233;e.</p>
+
+<a name="fwahi"></a><h5>niveaux de journalisation.</h5>
+<p>Indique le niveau de journalisation SafeWord. S&#233;lectionnez un niveau dans le menu
+d&#233;roulant. Les niveaux sont DEBUG, ERROR, INFO et NONE .</p>
+
+<a name="fwabd"></a><h5>Fichier journal</h5>
+<p>Sp&#233;cifie le chemin du r&#233;pertoire et le nom du fichier journal pour
+la journalisation des clients SafeWord. Le chemin par d&#233;faut est <tt>/var/opt/SUNWam/auth/safeword/safe.log </tt>.</p><p>Si un chemin ou un nom de fichier diff&#233;rent est indiqu&#233;, il
+doit exister avant toute tentative d'authentification SafeWord. Si plusieurs domaines sont configur&#233;s
+pour l'authentification SafeWord et que diff&#233;rents serveurs SafeWord sont utilis&#233;s, des chemins
+diff&#233;rents doivent &#234;tre indiqu&#233;s ou seul fonctionnera le premier domaine dans lequel
+s'effectue l'authentification SafeWord. De m&#234;me, si un domaine modifie les serveurs SafeWord,
+le fichier <tt>swec.dat</tt> situ&#233; dans le r&#233;pertoire sp&#233;cifi&#233; doit &#234;tre supprim&#233; pour
+autoriser les authentifications aupr&#232;s du nouveau serveur SafeWord configur&#233;.</p>
+
+<a name="fwacu"></a><h5>D&#233;lai d'attente de connexion d'authentification.</h5>
+<p>D&#233;finit le d&#233;lai d'attente (en secondes) entre le client SafeWord (OpenSSO) et
+le serveur SafeWord. La valeur par d&#233;faut est 120 secondes.</p>
+
+<a name="fwanv"></a><h5>Type de client</h5>
+<p>D&#233;finit le type de client utilis&#233; par le serveur SafeWord pour communiquer
+avec d'autres clients, tels que Mobile Client, VPN, Fixed Password, Challenge/Response, etc.</p>
+
+<a name="fwafs"></a><h5>Version EASSP</h5>
+<p>Cet attribut indique la version EASSP (Extended Authentication and Single Sign-on Protocol).
+Ce champ accepte les versions de protocole standard (101), d'acc&#232;s principal chiffr&#233;
+SSL (200) ou d'acc&#232;s principal (201).</p>
+
+<a name="fwaob"></a><h5>Puissance minimale de l'authentificateur</h5>
+<p>D&#233;finit la puissance minimale de l'authentificateur pour l'authentification client/serveur SafeWord. Chaque type
+de client poss&#232;de une valeur d'authentificateur diff&#233;rente et plus cette valeur est
+&#233;lev&#233;e, puis la puissance de l'authentificateur est &#233;lev&#233;e. La valeur maximale est
+20. La valeur minimale est 20.</p>
+
+<a name="fwatz"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

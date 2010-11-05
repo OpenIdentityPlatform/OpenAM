@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'un fournisseur d'identit&#233;s ID-FF - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffidp"></a><h4>Personnalisation d'un fournisseur d'identit&#233;s ID-FF</h4>
+<p>Les attributs du fournisseur d'identit&#233;s ID-FF sont organis&#233;s comme suit&#160;:</p>
+<ul><li><p><a href="#ggwkz">Attributs communs</a></p></li>
+<li><p><a href="#ggwne">URL de communication</a></p></li>
+<li><p><a href="#ggwms">Profils de communication</a></p></li>
+<li><p><a href="#ggwnv">Configuration du fournisseur d'identit&#233;s</a></p></li>
+<li><p><a href="#ggwmr">URL de service</a></p></li>
+<li><p><a href="#ggwqu">Plug-ins</a></p></li>
+<li><p><a href="#ggwow">Mappeur d'attribut de fournisseur d'identit&#233;s</a></p></li>
+<li><p><a href="#ggwmp">Initialisation</a></p></li>
+<li><p><a href="#ggwor">F&#233;d&#233;ration automatique </a></p></li>
+<li><p><a href="#ggwnn">Contexte d'authentification</a></p></li>
+<li><p><a href="#ggwmz">Attributs SAML</a></p></li></ul>
+
+
+<a name="ggwkz"></a><h5>Attributs communs</h5>
+
+<ul><li><p><a href="#ggwqt">Type de fournisseur</a></p></li>
+<li><p><a href="#ggwpg">Description</a></p></li>
+<li><p><a href="#ggwqp">&#201;num&#233;ration des protocoles pris en charge</a></p></li>
+<li><p><a href="#ggwra">Cl&#233; de signature</a></p></li>
+<li><p><a href="#ggwob">Cl&#233; de chiffrement</a></p></li>
+<li><p><a href="#ggwmo">Chiffrement de l'identificateur de nom</a></p></li></ul>
+
+
+<a name="ggwqt"></a><h5>Type de fournisseur</h5>
+<p>La valeur statique de cet attribut est le type de fournisseur configur&#233;&#160;:
+h&#233;berg&#233; ou distant.</p>
+
+<a name="ggwpg"></a><h5>Description</h5>
+<p>Cet attribut est une description du fournisseur d'identit&#233;s.</p>
+
+<a name="ggwqp"></a><h5>&#201;num&#233;ration des protocoles pris en charge</h5>
+<p>Choisissez la version de Liberty ID-FF prise en charge par ce fournisseur.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> fait r&#233;f&#233;rence &#224; Liberty Identity Federation Framework Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> fait r&#233;f&#233;rence &#224; Liberty Identity Federation Framework Version 1.1.</p></li></ul>
+
+
+<a name="ggwra"></a><h5>Cl&#233; de signature</h5>
+<p>D&#233;finit l'alias de certificat de s&#233;curit&#233; utilis&#233; pour signer les demandes et
+les r&#233;ponses.</p>
+
+<a name="ggwob"></a><h5>Cl&#233; de chiffrement</h5>
+<p>D&#233;finit l'alias de certificat de s&#233;curit&#233; utilis&#233; pour le codage de la
+cl&#233; de signature et de la cl&#233; de codage. Les certificats sont
+stock&#233;s dans un fichier keystore Java. Chaque certificat est mapp&#233; &#224; un
+alias utilis&#233; pour r&#233;cup&#233;rer le certificat.</p>
+
+<a name="ggwmo"></a><h5>Chiffrement de l'identificateur de nom</h5>
+<p>Cochez la case pour activer le chiffrement de l'identificateur de nom.</p>
+
+<a name="ggwne"></a><h5>URL de communication</h5>
+
+<ul><li><p><a href="#ggwqz">Extr&#233;mit&#233; SOAP</a></p></li>
+<li><p><a href="#ggwls">URL du service de connexion unique (SSO)</a></p></li>
+<li><p><a href="#ggwoh">Service de d&#233;connexion unique </a></p></li>
+<li><p><a href="#ggwln">Retour de d&#233;connexion unique</a></p></li>
+<li><p><a href="#ggwpl">Service d'interruption de la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwna">Retour d'interruption de la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwqn">Service d'enregistrement du nom</a></p></li>
+<li><p><a href="#ggwmy">Retour d'enregistrement du nom</a></p></li></ul>
+
+
+<a name="ggwqz"></a><h5>Extr&#233;mit&#233; SOAP</h5>
+<p>D&#233;finit un URI qui pointe vers le r&#233;cepteur de messages SOAP du
+fournisseur d'identit&#233;s. Cette valeur communique l'emplacement du r&#233;cepteur SOAP lors des communications
+hors navigateur.</p>
+
+<a name="ggwls"></a><h5>URL du service de connexion unique (SSO)</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs de services peuvent envoyer les demandes de
+f&#233;d&#233;ration et de connexion unique.</p>
+
+<a name="ggwoh"></a><h5>Service de d&#233;connexion unique </h5>
+<p>D&#233;finit l'URL auquel les fournisseurs de services peuvent envoyer les demandes de
+d&#233;connexion. La d&#233;connexion unique synchronise la fonctionnalit&#233; de d&#233;connexion pour toutes les
+sessions authentifi&#233;es par le fournisseur d'identit&#233;s.</p>
+
+<a name="ggwln"></a><h5>Retour de d&#233;connexion unique</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs de services peuvent envoyer les r&#233;ponses de
+d&#233;connexion unique. </p>
+
+<a name="ggwpl"></a><h5>Service d'interruption de la f&#233;d&#233;ration</h5>
+<p>D&#233;finit l'URL auquel le fournisseur de services va envoyer les demandes d'interruption
+de la f&#233;d&#233;ration.</p>
+
+<a name="ggwna"></a><h5>Retour d'interruption de la f&#233;d&#233;ration</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs de services peuvent envoyer les r&#233;ponses d'interruption
+de la f&#233;d&#233;ration. </p>
+
+<a name="ggwqn"></a><h5>Service d'enregistrement du nom</h5>
+<p>D&#233;finit l'URL auquel un fournisseur de services va envoyer les demandes pour
+sp&#233;cifier le nouvel identificateur de nom qui sera utilis&#233; lors de la
+communication avec le fournisseur d'identit&#233;s pour une entit&#233; principale. Ce service ne
+peut &#234;tre utilis&#233; qu'une fois une session de f&#233;d&#233;ration &#233;tablie.</p>
+
+<a name="ggwmy"></a><h5>Retour d'enregistrement du nom</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs de services peuvent envoyer les r&#233;ponses d'enregistrement
+de nom.</p>
+
+<a name="ggwms"></a><h5>Profils de communication</h5>
+
+<ul><li><p><a href="#ggwol">Interruption de la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwlm">D&#233;connexion unique</a></p></li>
+<li><p><a href="#ggwng">Enregistrement du nom</a></p></li>
+<li><p><a href="#ggwoo">F&#233;d&#233;ration/connexion unique</a></p></li></ul>
+
+
+<a name="ggwol"></a><h5>Interruption de la f&#233;d&#233;ration</h5>
+<p>S&#233;lectionnez un profil pour notifier aux autres fournisseurs l'interruption de la f&#233;d&#233;ration
+d'une entit&#233; principale&#160;:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwlm"></a><h5>D&#233;connexion unique</h5>
+<p>S&#233;lectionnez un profil pour notifier aux autres fournisseurs la d&#233;connexion d'une entit&#233;
+principale&#160;:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwng"></a><h5>Enregistrement du nom</h5>
+<p>S&#233;lectionnez un profil pour notifier aux autres fournisseurs l'enregistrement du nom d'une
+entit&#233; principale&#160;:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwoo"></a><h5>F&#233;d&#233;ration/connexion unique</h5>
+<p>S&#233;lectionnez un profil pour envoyer les demandes d'authentification&#160;:</p>
+<ul><li><p>Poste navigateur (sp&#233;cifie un protocole POST HTTP bas&#233; sur un navigateur)</p></li>
+<li><p>Art&#233;fact navigateur (sp&#233;cifie un protocole bas&#233; sur SOAP hors navigateur).</p></li>
+<li><p>LECP (sp&#233;cifie un proxy client compatible Liberty)</p>
+<hr><p><b>Remarque &#8211; </b>OpenSSO peut traiter les demandes provenant d'un profil de proxy client Liberty, mais il requiert une op&#233;ration de configuration suppl&#233;mentaire qui n'est pas d&#233;crite dans le pr&#233;sent manuel.</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwnv"></a><h5>Configuration du fournisseur d'identit&#233;s</h5>
+
+<ul><li><p><a href="#ggwpf">Alias du fournisseur</a></p></li>
+<li><p><a href="#ggwoz">Type d'authentification</a></p></li>
+<li><p><a href="#ggwmt">&#201;metteur d'assertion</a></p></li>
+<li><p><a href="#ggwys">R&#233;pond avec</a></p></li>
+<li><p><a href="#ggwmv">&#201;tat du fournisseur</a></p></li></ul>
+
+
+<a name="ggwpf"></a><h5>Alias du fournisseur</h5>
+<p>D&#233;finit le nom d'alias du fournisseur d'identit&#233;s local.</p>
+
+<a name="ggwoz"></a><h5>Type d'authentification</h5>
+<p>S&#233;lectionnez le fournisseur &#224; utiliser pour les demandes d'authentification &#233;mises par un
+fournisseur h&#233;berg&#233; localement&#160;:</p>
+<ul><li><p><b>Distant</b> indique que le fournisseur h&#233;berg&#233; localement doit contacter un fournisseur d'identit&#233;s distant &#224; r&#233;ception d'une demande d'authentification.</p></li>
+<li><p><b>Local</b> sp&#233;cifie que le fournisseur h&#233;berg&#233; localement doit contacter un fournisseur d'identit&#233;s local &#224; r&#233;ception d'une demande d'authentification (en g&#233;n&#233;ral, lui-m&#234;me).</p></li></ul>
+
+
+<a name="ggwmt"></a><h5>&#201;metteur d'assertion</h5>
+<p>D&#233;finit le nom de l'h&#244;te qui &#233;met l'assertion. Cette valeur peut &#234;tre
+le nom d'h&#244;te de l'&#233;quilibreur de charge, si OpenSSO se trouve derri&#232;re.</p>
+
+<a name="ggwys"></a><h5>R&#233;pond avec</h5>
+<p>Sp&#233;cifie le type d'instructions que le fournisseur d'identit&#233;s peut g&#233;n&#233;rer. Par exemple,
+<tt>lib:AuthenticationStatement</tt>.</p>
+
+<a name="ggwmv"></a><h5>&#201;tat du fournisseur</h5>
+<p>D&#233;finit si le fournisseur d'identit&#233;s est actif ou inactif. L'option Actif (par
+d&#233;faut) indique que le fournisseur d'identit&#233;s peut traiter des demandes et g&#233;n&#233;rer
+des r&#233;ponses. </p>
+
+<a name="ggwmr"></a><h5>URL de service</h5>
+
+<ul><li><p><a href="#ggwlo">URL de la page d'accueil</a></p></li>
+<li><p><a href="#ggwnh">URL de redirection en cas d'&#233;chec de la connexion unique</a></p></li>
+<li><p><a href="#ggwnq">F&#233;d&#233;rer l'URL de la page</a></p></li>
+<li><p><a href="#ggwqh">URL d'enregistrement</a></p></li>
+<li><p><a href="#ggwmu">Liste des URL de la page des cercles de confiance</a></p></li>
+<li><p><a href="#ggwqk">URL d'interruption</a></p></li>
+<li><p><a href="#ggwqb">URL d'interruption</a></p></li>
+<li><p><a href="#ggwme">URL de la page d'erreurs</a></p></li>
+<li><p><a href="#ggwon">URL de d&#233;connexion</a></p></li></ul>
+
+
+<a name="ggwlo"></a><h5>URL de la page d'accueil</h5>
+<p>D&#233;finit l'URL de la page d'accueil du fournisseur d'identit&#233;s.</p>
+
+<a name="ggwnh"></a><h5>URL de redirection en cas d'&#233;chec de la connexion unique</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est redirig&#233;e en cas d'&#233;chec
+de la connexion unique.</p>
+
+<a name="ggwnq"></a><h5>F&#233;d&#233;rer l'URL de la page</h5>
+<p>Sp&#233;cifie l'URL qui effectue l'op&#233;ration de f&#233;d&#233;ration. </p>
+
+<a name="ggwqh"></a><h5>URL d'enregistrement</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est redirig&#233;e si l'enregistrement de
+la f&#233;d&#233;ration aboutit.</p>
+
+<a name="ggwmu"></a><h5>Liste des URL de la page des cercles de confiance</h5>
+<p>D&#233;finit l'URL qui r&#233;pertorie tous les cercles de confiance auxquels le fournisseur
+appartient.</p>
+
+<a name="ggwqk"></a><h5>URL d'interruption</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est dirig&#233;e en cas d'interruption
+de la f&#233;d&#233;ration.</p>
+
+<a name="ggwqb"></a><h5>URL d'interruption</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est redirig&#233;e une fois la
+f&#233;d&#233;ration interrompue.</p>
+
+<a name="ggwme"></a><h5>URL de la page d'erreurs</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est dirig&#233;e en cas d'erreur.
+</p>
+
+<a name="ggwon"></a><h5>URL de d&#233;connexion</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est dirig&#233;e apr&#232;s la d&#233;connexion.</p>
+
+<a name="ggwqu"></a><h5>Plug-ins</h5>
+
+<ul><li><p><a href="#ggwmm">Impl&#233;mentation de l'identificateur de nom</a></p></li>
+<li><p><a href="#ggwlq">Plug-in d'instructions comportant des attributs</a></p></li>
+<li><p><a href="#ggwpm">Classe de fournisseurs utilisateurs</a></p></li></ul>
+
+
+<a name="ggwmm"></a><h5>Impl&#233;mentation de l'identificateur de nom</h5>
+<p>Ce champ d&#233;finit la classe utilis&#233;e par un fournisseur d'identit&#233;s pour participer
+&#224; l'enregistrement de nom. L'enregistrement du nom est un profil qui permet
+aux fournisseurs de services d'indiquer l'identificateur de nom d'une entit&#233; principale qu'un
+fournisseur d'identit&#233;s utilisera pour communiquer avec le fournisseur de services. The value
+is <tt>com.sun.identity.federation.services.util.FSNameIdentifierImpl </tt>.</p>
+
+<a name="ggwlq"></a><h5>Plug-in d'instructions comportant des attributs</h5>
+<p>Sp&#233;cifie une classe "plug-able" utilis&#233;e pour ajouter des instructions d'attribut &#224; une
+assertion g&#233;n&#233;r&#233;e pendant le processus de connexion unique Liberty.</p>
+
+<a name="ggwpm"></a><h5>Classe de fournisseurs utilisateurs</h5>
+<p>Sp&#233;cifie une classe "plug-able" utilis&#233;e pour proposer des op&#233;rations telles que la
+recherche d'un utilisateur, l'obtention d'attributs utilisateur, etc. La valeur par d&#233;faut est
+: </p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider </tt> </p>
+
+<a name="ggwow"></a><h5>Mappeur d'attribut de fournisseur d'identit&#233;s</h5>
+
+<ul><li><p><a href="#ggwpa">Classe de mappeur d'attributs</a></p></li>
+<li><p><a href="#ggwmn">Mappage d'attributs de fournisseur d'identit&#233;s</a></p></li></ul>
+
+
+<a name="ggwpa"></a><h5>Classe de mappeur d'attributs</h5>
+<p>Classe utilis&#233;e pour mapper des attributs utilisateur d&#233;finis localement &#224; des attributs
+figurant dans l'assertion SAML. Il n'y a pas de classe par d&#233;faut.</p>
+
+<a name="ggwmn"></a><h5>Mappage d'attributs de fournisseur d'identit&#233;s</h5>
+<p>Sp&#233;cifiez les valeurs pour d&#233;finir les correspondances utilis&#233;es par le plug-in de
+mappage des attributs par d&#233;faut. Les mappages doivent avoir le format suivant&#160;:</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>Par exemple, <tt>Email=emailaddress</tt> ou <tt>Address=postaladdress</tt>. Tapez le mappage dans Nouvelle valeur et
+cliquez sur Ajouter.</p>
+
+<a name="ggwmp"></a><h5>Initialisation</h5>
+<p>L'attribut d'amor&#231;age est&#160;:</p>
+
+<a name="ggwqa"></a><h5>G&#233;n&#233;ration d'une offre de ressources de d&#233;tection pour l'amor&#231;age</h5>
+<p>Cochez cette case si vous souhaitez g&#233;n&#233;rer une Offre de ressources Service
+de d&#233;couverte pendant le processus de connexion unique Liberty &#224; des fins
+de d&#233;marrage.</p>
+
+<a name="ggwor"></a><h5>F&#233;d&#233;ration automatique </h5>
+
+<ul><li><p><a href="#ggwpc">F&#233;d&#233;ration automatique</a></p></li>
+<li><p><a href="#ggwqf">Nom d'attribut commun pour la f&#233;d&#233;ration automatique</a></p></li></ul>
+
+
+<a name="ggwpc"></a><h5>F&#233;d&#233;ration automatique</h5>
+<p>Cochez cette case pour activer la f&#233;d&#233;ration automatique.</p>
+
+<a name="ggwqf"></a><h5>Nom d'attribut commun pour la f&#233;d&#233;ration automatique</h5>
+<p>Lors de la cr&#233;ation d'une instruction d'attribut de f&#233;d&#233;ration automatique, la valeur
+de cet attribut est utilis&#233;e. L'instruction contiendra l'&#233;l&#233;ment attribut et cet attribut
+courant comme valeur. </p>
+
+<a name="ggwnn"></a><h5>Contexte d'authentification</h5>
+<p>Cet attribut d&#233;finit la classe du contexte d'authentification par d&#233;faut (m&#233;thode d'authentification)
+du fournisseur d'identit&#233;s. Cette m&#233;thode sera syst&#233;matiquement appel&#233;e lorsque le fournisseur de
+services envoie une demande d'authentification. Cette valeur pr&#233;cise &#233;galement le contexte d&#8217;authentification
+utilis&#233; par le fournisseur de services lorsqu&#8217;un utilisateur inconnu tente d&#8217;acc&#233;der &#224;
+des ressources prot&#233;g&#233;es.</p><dl><dt>Pris en charge</dt>
+<dd><p>Cochez la case &#224; c&#244;t&#233; de la classe du contexte d'authentification si le fournisseur d'identit&#233;s la prend en charge.</p></dd>
+<a name="indexterm-71"></a><a name="indexterm-72"></a><a name="indexterm-73"></a><dt>R&#233;f&#233;rence du contexte</dt>
+<dd><p>Les classes de contexte d'authentification Liberty sont&#160;:</p>
+<ul><li><p>Contrat mobile</p></li>
+<li><p>ID num&#233;rique mobile</p></li>
+<li><p>Mobile non enregistr&#233;</p></li>
+<li><p>Mot de passe</p></li>
+<li><p>Transport prot&#233;g&#233; par mot de passe</p></li>
+<li><p>Session pr&#233;c&#233;dente</p></li>
+<li><p>Carte &#224; puce</p></li>
+<li><p>Carte &#224; puce PKI</p></li>
+<li><p>Logiciel PKI</p></li>
+<li><p>Jeton temps sync</p></li></ul>
+</dd>
+<dt>Cl&#233;</dt>
+<dd><p>Choisissez le type d'authentification OpenSSO avec lequel le contexte est mapp&#233;.</p></dd>
+<dt>Valeur</dt>
+<dd><p>Tapez l'option d'authentification OpenSSO.</p></dd>
+<dt>Niveau</dt>
+<dd><p>Choisissez un niveau de priorit&#233; dans le cas de contextes multiples.</p></dd>
+</dl>
+
+
+<a name="ggwmz"></a><h5>Attributs SAML</h5>
+
+<ul><li><p><a href="#ggwnd">Intervalle d'assertion</a></p></li>
+<li><p><a href="#ggwqq">Intervalle de nettoyage</a></p></li>
+<li><p><a href="#ggwlp">D&#233;lai d'art&#233;fact</a></p></li>
+<li><p><a href="#ggwoe">Limite d'assertion</a></p></li></ul>
+
+
+<a name="ggwnd"></a><h5>Intervalle d'assertion</h5>
+<p>Tapez l'intervalle de temps (en secondes) pendant lequel une assertion &#233;mise par
+le fournisseur d'identit&#233;s restera valide. </p>
+
+<a name="ggwqq"></a><h5>Intervalle de nettoyage</h5>
+<p>Indiquez le d&#233;lai (en secondes) &#224; l'issue duquel les assertions ayant expir&#233;
+sont supprim&#233;es.</p>
+
+<a name="ggwlp"></a><h5>D&#233;lai d'art&#233;fact</h5>
+<p>Tapez l'intervalle de temps (en secondes) pour sp&#233;cifier le d&#233;lai d'expiration des
+art&#233;facts d'assertion.</p>
+
+<a name="ggwoe"></a><h5>Limite d'assertion</h5>
+<p>Tapez un nombre pour d&#233;finir combien d'assertions peuvent &#234;tre &#233;mises par un
+fournisseur d'identit&#233;s ou combien d'assertions peuvent &#234;tre stock&#233;es.</p>
+<br/>
+
+</body>
+</html>

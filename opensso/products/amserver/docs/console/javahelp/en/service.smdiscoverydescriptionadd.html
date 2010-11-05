@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a Service Description - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverydescriptionadd"></a><h5>To Configure a Service Description</h5>
+<a name="indexterm-148"></a><a name="indexterm-149"></a><p>The Service Description attribute defines a running web service at a distinct protocol
+endpoint. It is defined when you configure <a href="resourceofferingsbootstrapping.html">Resource Offerings for Bootstrapping</a>. Information about service instances
+needs to be communicated in various contexts. For example, the Discovery Service defined is
+an identity service which provides an enumeration of resource offerings (each of which
+includes a service instance description).</p><ol>
+<li><b>Click Add Description to display the new service description attributes or click Edit
+to modify an existing description.</b></li>
+<li><b>Provide values for the attributes based on the following information:</b><dl><dt>Security Mechanism ID</dt>
+<dd><p>This attribute is where authentication methods supported by the Discovery Service are added. These security mechanisms refer to the way a web service consumer authenticates to the web service provider or provides message-level security. By default, all available methods that the service instance supports are selected. If an authentication method is not selected, and a web services consumer sends a request using that method, the request is rejected. See <a href="supportedauthmechanisms.html">Supported Authentication Mechanisms</a>.</p></dd>
+<dt>End Point URL</dt>
+<dd><p>The value of this attribute is the URL of the SOAP-over-HTTP endpoint. The URI scheme must be HTTP or HTTPS as in <tt>https://soap.profile-provider.com/soap</tt>.</p></dd>
+<dt>SOAP Action</dt>
+<dd><p>The value of this optional attribute is the equivalent of the <tt>wsdlsoap:soapAction</tt> attribute of the <tt>wsdlsoap:operation</tt> element in the service's concrete WSDL-based description.</p></dd>
+</dl>
+</li>
+<li><b>Click OK to complete the service configuration.</b></li>
+<li><b>Click Save on the Discovery Service page to complete the service configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

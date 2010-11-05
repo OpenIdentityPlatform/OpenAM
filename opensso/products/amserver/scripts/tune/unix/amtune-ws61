@@ -1,0 +1,339 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-ws61,v 1.5 2008/08/19 19:08:33 veiming Exp $
+#
+#
+
+tuneMagnus() {
+    tune_file="$CONTAINER_INSTANCE_DIR/config/magnus.conf"
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning "` "$tune_file..."
+    $ECHO
+    $ECHO `$gettext "File                 : "` "$tune_file"
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "1.   RqThrottle"`
+    $ECHO `$gettext "Current Value        : "` "RqThrottle=`getMagnusEntry $tune_file 'RqThrottle'`"
+    $ECHO `$gettext "Recommended Value    : "` "RqThrottle=$numRQThrottle"
+    $ECHO
+    $ECHO `$gettext "2.   RqThrottleMin"`
+    $ECHO `$gettext "Current Value        : "` "RqThrottleMin=`getMagnusEntry $tune_file 'RqThrottleMin'`"
+    $ECHO `$gettext "Recommended Value    : "` "RqThrottleMin=$AMTUNE_NUM_WS_RQTHROTTLE_MIN"
+    $ECHO
+    $ECHO `$gettext "3.   ThreadIncrement"`
+    $ECHO `$gettext "Current Value        : "` "ThreadIncrement=`getMagnusEntry $tune_file 'ThreadIncrement'`"
+    $ECHO `$gettext "Recommended Value    : "` "ThreadIncrement=$AMTUNE_NUM_WS_THREAD_INCREMENT"
+    $ECHO
+    $ECHO `$gettext "4.   ConnQueueSize"`
+    $ECHO `$gettext "Current Value        : "` "ConnQueueSize=`getMagnusEntry $tune_file 'ConnQueueSize'`"
+    $ECHO `$gettext "Recommended Value    : "` "ConnQueueSize=$AMTUNE_NUM_TCP_CONN_SIZE"
+    $ECHO
+    $ECHO `$gettext "5.   ListenQ"`
+    $ECHO `$gettext "Current Value        : "` "ListenQ=`getMagnusEntry $tune_file 'ListenQ'`"
+    $ECHO `$gettext "Recommended Value    : "` "ListenQ=$AMTUNE_NUM_TCP_CONN_SIZE"
+    $ECHO
+    if [ "$JVM64bitAvailable" = "true" ]; then
+       $ECHO `$gettext "6.   ListenQ"`
+       $ECHO `$gettext "Current Value        : "` "StackSize=`getMagnusEntry $tune_file 'StackSize'`"
+       $ECHO `$gettext "Recommended Value    : "` "StackSize=$AMTUNE_NATIVE_STACK_SIZE_64_BIT"
+       $ECHO
+    fi
+    $ECHO
+
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    $ECHO `$gettext "Modifying "` "$tune_file..."
+
+    check_file_for_write $tune_file
+    if [ $? = 100 ]; then
+        return
+    fi
+
+    delete_line $tune_file "RqThrottle"
+    delete_line $tune_file "RqThrottleMin"
+    delete_line $tune_file "ThreadIncrement"
+    delete_line $tune_file "ConnQueueSize"
+    delete_line $tune_file "ListenQ"
+    if [ "$JVM64bitAvailable" = "true" ]; then
+       delete_line $tune_file "StackSize"
+    fi
+    delete_line $tune_file "# Start: OpenSSO Tuning"
+    delete_line $tune_file "# End: OpenSSO Tuning"
+
+    add_to_end $tune_file "# Start: OpenSSO Tuning : `date`"
+    add_to_end $tune_file "RqThrottle $numRQThrottle"
+    add_to_end $tune_file "RqThrottleMin $AMTUNE_NUM_WS_RQTHROTTLE_MIN"
+    add_to_end $tune_file "ThreadIncrement $AMTUNE_NUM_WS_THREAD_INCREMENT"
+    add_to_end $tune_file "ConnQueueSize $AMTUNE_NUM_TCP_CONN_SIZE"
+    add_to_end $tune_file "ListenQ $AMTUNE_NUM_TCP_CONN_SIZE"
+    if [ "$JVM64bitAvailable" = "true" ]; then
+       add_to_end $tune_file "StackSize $AMTUNE_NATIVE_STACK_SIZE_64_BIT"
+    fi
+    add_to_end $tune_file "# End: OpenSSO Tuning"
+
+    echo "Done."
+}
+
+tuneServerXML() {
+    tune_file="$CONTAINER_INSTANCE_DIR/config/server.xml"
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning "` "$tune_file..."
+    $ECHO
+    $ECHO `$gettext "File                 : "` "$tune_file"
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+    $ECHO `$gettext "1.   Acceptor Threads"`
+    $ECHO `$gettext "Current Value        : "` "acceptorthreads=`get_token_in_line $tune_file 'acceptorthreads' 'acceptorthreads'`"
+    $ECHO `$gettext "Recommended Value    : "` "acceptorthreads=$acceptorThreads"
+    $ECHO
+    $ECHO `$gettext "2.   nativelibrarypathprefix"`
+    $ECHO `$gettext "Current Value        : "` "nativelibrarypathprefix=`get_token_in_line $tune_file 'nativelibrarypathprefix' 'nativelibrarypathprefix'`"
+    $ECHO `$gettext "Recommended Value    : "` `$gettext "Append "` "/usr/lib/lwp to nativelibrarypathprefix (if Solaris 8)"
+    $ECHO
+    $ECHO `$gettext "3.   Max and Min Heap Size"`
+    $ECHO `$gettext "Current Value        : "` "Min Heap: `getServerXMLJVMOptionEntry $tune_file '-Xms'` Max Heap: `getServerXMLJVMOptionEntry $tune_file '-Xmx'`"
+    if [ "$JVM64bitAvailable" = "true" ] && [ $memToUse -gt $amtuneMaxMemoryToUseInMB ]; then
+       displayJVM64bitMessage "-Xms${maxHeapSize}M" "-Xmx${maxHeapSize}M"
+    else
+       $ECHO `$gettext "Recommended Value    : "` "-Xms${maxHeapSize}M -Xmx${maxHeapSize}M"
+    fi
+    $ECHO
+    $ECHO `$gettext "4.   LogGC Output"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-Xloggc'`
+    $ECHO `$gettext "Recommended Value    : "` "-Xloggc:$CONTAINER_INSTANCE_DIR/logs/gc.log"
+    $ECHO
+    $ECHO `$gettext "5.   JVM in Server mode"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-server'`
+    $ECHO `$gettext "Recommended Value    : "` "-server"
+    $ECHO
+    $ECHO `$gettext "6.   Stack Size"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-Xss'`
+    if [ "$JVM64bitAvailable" = "true" ]; then
+       $ECHO `$gettext "Recommended Value    : "` "-Xss${AMTUNE_PER_THREAD_STACK_SIZE_IN_KB_64_BIT}k"
+    else
+       $ECHO `$gettext "Recommended Value    : "` "-Xss${AMTUNE_PER_THREAD_STACK_SIZE_IN_KB}k"
+    fi
+
+    $ECHO
+    $ECHO `$gettext "7.   New Size"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:NewSize'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:NewSize=${maxNewSize}M"
+    $ECHO
+    $ECHO `$gettext "8.   Max New Size"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:MaxNewSize'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:MaxNewSize=${maxNewSize}M"
+    $ECHO
+    $ECHO `$gettext "9.   Disable Explicit GC"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+DisableExplicitGC'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:+DisableExplicitGC"
+    $ECHO
+    $ECHO `$gettext "10.  Use New Parallel GC"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+UseParNewGC'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:+UseParNewGC"
+    $ECHO
+    $ECHO `$gettext "11.  Print Class Histogram"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+PrintClassHistogram'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:+PrintClassHistogram"
+    $ECHO
+    $ECHO `$gettext "12.  Print GC Time Stamps"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+PrintGCTimeStamps'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:+PrintGCTimeStamps"
+    $ECHO
+    $ECHO `$gettext "13.  OverrideDefaultLibthread (if Solaris 8)"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+OverrideDefaultLibthread'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:+OverrideDefaultLibthread" 
+    $ECHO
+    $ECHO `$gettext "14.  Enable Concurrent Mark Sweep GC"`
+    $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+UseConcMarkSweepGC'`
+    $ECHO `$gettext "Recommended Value    : "` "-XX:+UseConcMarkSweepGC" 
+    $ECHO
+    if [ `checkJDKVersion 1.5` -eq 0 ]; then
+        $ECHO `$gettext "15.  Perm Size"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:PermSize'`
+
+        $ECHO `$gettext "Recommended Value    : "` "-XX:PermSize=${maxPermSize}M (if the calculated value is >= ${AMTUNE_MIN_PERM_SIZE_WS61}M )"
+        $ECHO
+        $ECHO `$gettext "16.  Max Perm Size"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:MaxPermSize'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:MaxPermSize=${maxPermSize}M (if the calculated value is >= ${AMTUNE_MIN_PERM_SIZE_WS61}M )"
+        $ECHO
+        $ECHO `$gettext "17.  CMSPermGenSweepingEnabled"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+CMSPermGenSweepingEnabled'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:+CMSPermGenSweepingEnabled"
+        $ECHO
+        $ECHO `$gettext "18.  CMS Class Unloading"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+CMSClassUnloadingEnabled'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:+CMSClassUnloadingEnabled"
+        $ECHO
+        $ECHO `$gettext "19.  CMS Full GCs before Compact"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:+UseCMSCompactAtFullCollection'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:+UseCMSCompactAtFullCollection"
+        $ECHO
+        $ECHO `$gettext "20.  CMS Full GCs before Compact"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:CMSFullGCsBeforeCompaction'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:CMSFullGCsBeforeCompaction=0"
+        $ECHO
+        $ECHO `$gettext "21.  Soft Reference Cleanup"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:SoftRefLRUPolicyMSPerMB'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:SoftRefLRUPolicyMSPerMB=0"
+        $ECHO
+    fi
+    # Display this JVM Options for Niagara box
+    if [ "$HWPLATFORM" = "Sun-Fire-T" ]; then
+        $ECHO `$gettext "22.  Parallel GC Threads"`
+        $ECHO `$gettext "Current Value        : "` `getServerXMLJVMOptionEntry $tune_file '-XX:ParallelGCThreads'`
+        $ECHO `$gettext "Recommended Value    : "` "-XX:ParallelGCThreads=$gcThreads" 
+        $ECHO
+    fi
+    $ECHO
+ 
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    $ECHO `$gettext "Modifying "` "$tune_file..."
+
+    check_file_for_write $tune_file
+    if [ $? = 100 ]; then
+        return
+    fi
+
+    substitute_token_in_line $tune_file "acceptorthreads" "acceptorthreads" "$acceptorThreads" 0 ":"
+
+    if [ ! "`/bin/uname -r | grep 8 | wc -m`" -eq "0" ] ; then
+        $ECHO  "Solaris 8 " `$gettext "specific changes"`
+        substitute_token_in_line $tune_file "nativelibrarypathprefix" "nativelibrarypathprefix" "/usr/lib/lwp" 2 ":"
+    fi
+
+    delete_line $tune_file "Start: Performance Related JVM Options for OpenSSO"
+    delete_line $tune_file "<JVMOPTIONS>-Xms"
+    delete_line $tune_file "<JVMOPTIONS>-Xmx"
+    delete_line $tune_file "<JVMOPTIONS>-Xloggc"
+    delete_line $tune_file "<JVMOPTIONS>-Xrs"
+    delete_line $tune_file "<JVMOPTIONS>-server"
+    delete_line $tune_file "<JVMOPTIONS>-Xss"
+    delete_line $tune_file "<JVMOPTIONS>-XX:NewSize"
+    delete_line $tune_file "<JVMOPTIONS>-XX:MaxNewSize"
+    delete_line $tune_file "<JVMOPTIONS>-XX:PermSize"
+    delete_line $tune_file "<JVMOPTIONS>-XX:MaxPermSize"
+    delete_line $tune_file "<JVMOPTIONS>-XX:CMSFullGCsBeforeCompaction"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+DisableExplicitGC"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+UseParNewGC"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+UseConcMarkSweepGC"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+CMSPermGenSweepingEnabled"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+CMSClassUnloadingEnabled"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+UseCMSCompactAtFullCollection"
+    delete_line $tune_file "<JVMOPTIONS>-XX:SoftRefLRUPolicyMSPerMB"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+PrintClassHistogram"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+PrintGCDetails"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+PrintGCTimeStamps"
+    delete_line $tune_file "<JVMOPTIONS>-XX:+OverrideDefaultLibthread"
+    delete_line $tune_file "<JVMOPTIONS>-XX:ParallelGCThreads"
+    delete_line $tune_file "End: Performance Related JVM Options for OpenSSO"
+
+    insert_line $tune_file "java.util.logging.manager" "<!-- Start: Performance Related JVM Options for OpenSSO -->"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-Xms${maxHeapSize}M -Xmx${maxHeapSize}M</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-Xloggc:$CONTAINER_INSTANCE_DIR/logs/gc.log</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-server</JVMOPTIONS>"
+    if [ "$JVM64bitAvailable" = "true" ]; then
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-Xss${AMTUNE_PER_THREAD_STACK_SIZE_IN_KB_64_BIT}k</JVMOPTIONS>"
+    else
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-Xss${AMTUNE_PER_THREAD_STACK_SIZE_IN_KB}k</JVMOPTIONS>"
+    fi
+
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:NewSize=${maxNewSize}M</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:MaxNewSize=${maxNewSize}M</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+DisableExplicitGC</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+UseParNewGC</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+UseConcMarkSweepGC</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+PrintClassHistogram</JVMOPTIONS>"
+    insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+PrintGCTimeStamps</JVMOPTIONS>"
+
+    if [ `checkJDKVersion 1.5` -eq 0 ]; then
+       #insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-Xrs</JVMOPTIONS>"
+       if [ $maxPermSize -ge $AMTUNE_MIN_PERM_SIZE_WS61 ]; then
+          insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:PermSize=${maxPermSize}M</JVMOPTIONS>"
+          insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:MaxPermSize=${maxPermSize}M</JVMOPTIONS>"
+       fi
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+CMSPermGenSweepingEnabled</JVMOPTIONS>"
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+CMSClassUnloadingEnabled</JVMOPTIONS>"
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+UseCMSCompactAtFullCollection</JVMOPTIONS>"
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:CMSFullGCsBeforeCompaction=0</JVMOPTIONS>"
+       insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:SoftRefLRUPolicyMSPerMB=0</JVMOPTIONS>"
+       #insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+PrintGCDetails</JVMOPTIONS>"
+    fi
+
+    if [ ! "`/bin/uname -r | grep 8 | wc -m`" -eq "0" ] ; then
+        $ECHO  "Solaris 8 " `$gettext "specific changes"`
+        insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:+OverrideDefaultLibthread</JVMOPTIONS>"
+    fi
+
+    if [ "$HWPLATFORM" = "Sun-Fire-T" ]; then
+        insert_line $tune_file "java.util.logging.manager" "    <JVMOPTIONS>-XX:ParallelGCThreads=$gcThreads</JVMOPTIONS>"
+    fi
+
+    insert_line $tune_file "java.util.logging.manager" "<!-- End: Performance Related JVM Options for OpenSSO -->"
+
+    echo "Done."
+}
+
+#############################################################################
+# Start of main program
+#############################################################################
+SCRIPT_LOCATION=`/usr/bin/dirname $0`
+AMTUNE_SCRIPT_RECORD_STRING="AMTUNE_WS61_SCRIPT"
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-ws61
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+# import the environment
+if [ -f $SCRIPT_LOCATION/amtune-env ]; then
+    if [ ! "$INIT_STATUS" = "INIT_COMPLETE" ]; then
+        . $SCRIPT_LOCATION/amtune-env
+    fi
+fi
+
+ECHO_MSG "`$gettext 'OpenSSO - Web Server Tuning Script'`"
+
+tuneMagnus      | eval $OUTPUT_TYPE 
+tuneServerXML   | eval $OUTPUT_TYPE
+
+if [ "$AMTUNE_MODE" = "CHANGE" ]; then
+   $ECHO
+   $ECHO "##################################################################################"
+   $ECHO `$gettext "Please go to web server console and click on Apply Changes button to load the new"`
+   $ECHO `$gettext "configuration and restart the server."`
+   $ECHO "##################################################################################"
+   $ECHO
+fi
+
+ECHO_MSG $PARA_SEP

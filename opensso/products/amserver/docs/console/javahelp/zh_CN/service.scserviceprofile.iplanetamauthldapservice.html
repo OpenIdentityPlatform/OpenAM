@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAP  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthldapservice"></a><h4>LDAP </h4>
+<p><a name="indexterm-175"></a>该模块将使用 LDAP 绑定（将用户 ID 密码与某特定 LDAP 条目关联起来的 Directory Server 操作）来启用验证。您可为一个领域定义多个 LDAP 验证配置。LDAP
+验证属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwazv">主 LDAP 服务器</a></p></li>
+<li><p><a href="#fwbac">次 LDAP 服务器</a></p></li>
+<li><p><a href="#fwazx">起始用户搜索的 DN</a></p></li>
+<li><p><a href="#fwazz">Root 用户绑定的 DN</a></p></li>
+<li><p><a href="#fwazq">Root 用户绑定密码</a></p></li>
+<li><p><a href="#fwazu">Root 用户绑定密码（确认）</a></p></li>
+<li><p><a href="#fwazs">用于检索用户配置文件的属性</a></p></li>
+<li><p><a href="#fwazy">用于搜索要进行验证的用户的属性</a></p></li>
+<li><p><a href="#fwazw">用户搜索过滤器</a></p></li>
+<li><p><a href="#fwbai">搜索范围</a></p></li>
+<li><p><a href="#fwbal">启用 SSL 以访问 LDAP 服务器</a></p></li>
+<li><p><a href="#fwbak">返回用户 DN 以进行验证</a></p></li>
+<li><p><a href="#fwbaf">LDAP 服务器检查间隔</a></p></li>
+<li><p><a href="#fwbah">用户创建属性列表</a></p></li>
+<li><p><a href="#fwbaj">验证级别</a></p></li></ul>
+
+
+<a name="fwazv"></a><h5>主 LDAP 服务器</h5>
+<p>指定 OpenSSO 安装过程中所指定的主 LDAP 服务器的主机名和端口号。这是进行验证时联系的首选服务器。格式为 <tt></tt><i>hostname:port</i><tt></tt>。如果没有端口号，将采用 <tt>389</tt>。</p><p>如果在多个域部署 OpenSSO，则可按以下格式指定 OpenSSO 与 Directory Server 的特定实例之间的通信链接（如果指定了多个条目，则条目前必须带有本地服务器名称）：</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>例如，如果将两个 OpenSSO 实例部署在不同位置（L1-machine1-IS 和 L2- machine2-IS），它们分别与 Directory Server 的不同实例（L1-machine1-DS 和 L2-machine2-DS）进行通信，则形式如下：</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fwbac"></a><h5>次 LDAP 服务器</h5>
+<p>指定 OpenSSO 平台可用的次 LDAP 服务器的主机名和端口号。如果主 LDAP 服务器对验证请求不响应，则将会搜索次服务器。如果主服务器恢复正常，OpenSSO 将切换回主服务器。格式仍为 <tt></tt><i>hostname:port</i><tt></tt>。如果指定多个条目，条目前面必须带有本地服务器名称。</p>
+<hr><p><b>注意 &#8211; </b>当验证来自 Directory Server 的用户，并且 Directory Server 远离 OpenSSO 时，主 LDAP 服务器和次 LDAP
+服务器的端口都需要具有值，这点很重要。两个字段可以使用一个 Directory Server 位置的值。</p>
+<hr>
+
+
+<a name="fwazx"></a><h5>起始用户搜索的 DN</h5>
+<p>指定节点的 DN，将从该 DN 开始搜索用户。（为了获取较好性能，DN 应当尽可能明确。）默认值是目录树的根。可以接受任何有效的 DN。如果在搜索范围属性中选择 OBJECT，则 DN 应指定配置文件所在级别的上一级。如果指定多个条目，条目前面必须带有本地服务器名称。格式为 <tt></tt><i>servername|search dn</i><tt></tt>。</p><p>对于多个条目：</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>如果根组织下存在多个具有相同用户 ID 的条目，则要进行验证，应设置此参数以便仅能搜索或查找到一个条目。例如，当代理 ID 与用户 ID 均位于根组织下，该参数在根组织使用代理 ID 进行验证时应为 <tt>ou=Agents</tt>，根组织使用用户 ID 进行验证时则应为
+<tt>ou=People</tt>。</p>
+
+<a name="fwazz"></a><h5>Root 用户绑定的 DN</h5>
+<p>指定用户的 DN，该用户将作为管理员被绑定到“主 LDAP 服务器和端口”字段中指定的 Directory Server。验证服务需要进行该 DN 绑定，以便基于用户登录 ID 搜索匹配的用户 DN。默认值为 <tt>amldapuser</tt>。可以接受任何有效的
+DN。</p>
+
+<a name="fwazq"></a><h5>Root 用户绑定密码</h5>
+<p>指定在“Root 用户绑定的 DN”字段中指定的管理员配置文件的密码。该字段没有默认值。只接收管理员的有效 LDAP 密码。</p>
+
+<a name="fwazu"></a><h5>Root 用户绑定密码（确认）</h5>
+<p>确认密码。</p>
+
+<a name="fwazs"></a><h5>用于检索用户配置文件的属性</h5>
+<p>指定用户条目命名惯例的属性。默认情况下，OpenSSO 假定用户条目由 uid 属性标识。如果 Directory Server 使用了其他属性（如 <i>givenname</i>），请在该字段中指定属性名。</p>
+
+<a name="fwazy"></a><h5>用于搜索要进行验证的用户的属性</h5>
+<p>列出为即将验证的用户形成搜索过滤器时所要使用的属性，并允许用户使用用户条目中的多个属性进行验证。例如，如果该字段被设置为 <i>uid</i>、<i>employeenumber</i> 和 <i>mail</i>，则用户可使用这些名称中的任意一个来进行验证。这些属性必须分别进行设置。</p>
+
+<a name="fwazw"></a><h5>用户搜索过滤器</h5>
+<p>指定一个属性，用于搜索“起始用户搜索的 DN”字段下的用户。它与“用户命名”属性共同发挥作用。该字段没有默认值。可以接受任何有效的用户条目属性。</p>
+
+<a name="fwbai"></a><h5>搜索范围</h5>
+<p>指明 Directory Server 中搜索匹配的用户配置文件时所用的级别号。从<a href="#fwazx">起始用户搜索的 DN</a> 属性中指定的节点开始搜索。  默认值为 SUBTREE。可以从列表中选择以下选项之一：</p><dl><dt>OBJECT</dt>
+<dd><p>仅搜索指定的节点。</p></dd>
+<dt>ONELEVEL</dt>
+<dd><p>搜索指定节点一级及其下面一级。</p></dd>
+<dt>SUBTREE</dt>
+<dd><p>搜索指定节点及以下的所有条目。</p></dd>
+</dl>
+
+
+<a name="fwbal"></a><h5>启用 SSL 以访问 LDAP 服务器</h5>
+<p>启用 SSL 来访问“主/次 LDAP 服务器和端口”字段中指定的 Directory Server。默认情况下未选中该复选框，SSL 协议不用于访问 Directory Server。</p><p>如果 LDAP 服务器已启用 SSL (LDAPS)，您必须确保 OpenSSO 已配置正确的 SSL 可信赖证书，以使 AM 可以通过 LDAPS
+协议连接到 Directory Server。</p>
+
+<a name="fwbak"></a><h5>返回用户 DN 以进行验证</h5>
+<p>当 OpenSSO 目录与为 LDAP 配置的目录相同时，可以启用该选项。如果启用，LDAP 验证模块将返回 DN，而不是用户 ID，并且不需要进行搜索。通常情况下，验证模块仅返回用户 ID，且验证服务会在本地 OpenSSO LDAP 中搜索用户。如果使用了外部
+LDAP 目录，则通常不启用该选项。</p>
+
+<a name="fwbaf"></a><h5>LDAP 服务器检查间隔</h5>
+<p>该属性用于 LDAP 服务器鼓掌恢复。它定义了在检验 LDAP 主服务器是否正在运行之前，线程将“休眠”的分钟数。</p>
+
+<a name="fwbah"></a><h5>用户创建属性列表</h5>
+<p>当 LDAP 服务器被配置为外部 LDAP 服务器时，该属性用于 LDAP 验证模块。它包含本地和外部 Directory Server 之间的属性映射。该属性具有以下格式：</p><p><i>attr1|externalattr1</i></p><p><i>attr2|externalattr2</i></p><p>填充该属性后，将从外部 Directory Server 读取外部属性的值，并将这些值应用到内部 Directory Server 属性。仅当<tt>用户配置文件</tt>属性（位于“核心验证”模块中）设置为“动态创建”，且本地 Directory Server 实例不存在该用户时，才在内部属性中设置外部属性的值。新创建的用户将包含内部属性的值（在“用户创建属性列表”中指定），内部属性采用其映射的外部属性的值。</p>
+
+<a name="fwbaj"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

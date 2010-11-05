@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fedlet", "Fedlet\Fedlet.csproj", "{3D7FF238-2339-4046-A5D7-92A5F526DEF2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B3CF4EE8-A959-41E3-96A1-34FA3C326E6F}"
+	ProjectSection(SolutionItems) = preProject
+		CustomDictionary.xml = CustomDictionary.xml
+		Fedlet.vsmdi = Fedlet.vsmdi
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{3009B410-67A7-42A5-A574-C806C3EF90AC}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Fedlet.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D7FF238-2339-4046-A5D7-92A5F526DEF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7FF238-2339-4046-A5D7-92A5F526DEF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D7FF238-2339-4046-A5D7-92A5F526DEF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7FF238-2339-4046-A5D7-92A5F526DEF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3009B410-67A7-42A5-A574-C806C3EF90AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3009B410-67A7-42A5-A574-C806C3EF90AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

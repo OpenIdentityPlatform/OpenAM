@@ -1,0 +1,55 @@
+<samlp:ArtifactResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s25f53063e185d2a757ffc38b7b0bcd2de7a299b93" InResponseTo="Rm23ysRgl5-TWdzkO3k_J" Version="2.0" IssueInstant="2007-07-31T23:00:11Z" Destination="https://sp.symspdemo.com:8643/SP-A"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://bi1-ivs:8080/IVS-idp</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status><samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="s28c4193d44a9b95776ce1a3e160ad7e1596e50b45" InResponseTo="RSPVq4dEeGYbMoBg6xjNN" Version="2.0" IssueInstant="2007-07-31T23:00:11Z" Destination="https://sp.symspdemo.com:8643/SP-A"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://bi1-ivs:8080/IVS-idp</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status><saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0" ID="s213147031ffc9cf518ead5df7f7ba103d4ea38095" IssueInstant="2007-07-31T23:00:11Z">
+<saml:Issuer>http://bi1-ivs:8080/IVS-idp</saml:Issuer>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#s213147031ffc9cf518ead5df7f7ba103d4ea38095">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>IbR2P+wT3Noev8VOQ82SWbj8JCw=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>
+PlR2hqUS16LMLNR86jBtx5xPeIe7gfl4iJvD47ui7tewsiYaJyDHoZWuI+AMQgf5JypAK3A/38Lx
+b8VAUOdK74YJD6weW2PIBU9xCeOdCve7bFGck4rSXCXmRh3n4s/BamRCgEgnRP++5PiEASpM4tre
+n0S3r3CzYqMj8bBuPow=
+</SignatureValue>
+<KeyInfo>
+<X509Data>
+<X509Certificate>
+MIICIDCCAYkCBEapDc4wDQYJKoZIhvcNAQEEBQAwVzELMAkGA1UEBhMCVVMxDDAKBgNVBAoTA1N1
+bjEnMCUGA1UECxMeU1VOIEphdmEgU3lzdGVtIEFjY2VzcyBNYW5hZ2VyMREwDwYDVQQDEwhzdW4t
+dW5peDAeFw0wNzA3MjYyMTEwMzhaFw0wNzEwMjQyMTEwMzhaMFcxCzAJBgNVBAYTAlVTMQwwCgYD
+VQQKEwNTdW4xJzAlBgNVBAsTHlNVTiBKYXZhIFN5c3RlbSBBY2Nlc3MgTWFuYWdlcjERMA8GA1UE
+AxMIc3VuLXVuaXgwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAIcBUC4JsEPQOSYkkUPpsMGK
+osRIHgm47RkmO8LaYC56BIK7ic/NHRUb9Zgs/MPExLNHELYQd8IbvjGGfFuPVLpf96NEAyATppNr
+GZdTCN55gjyYX75L7vEmS0xnkL6sIbt5wlwI9Cz8WHOlL5RiCkux963Gmv3vQWdRorUbUhM3AgMB
+AAEwDQYJKoZIhvcNAQEEBQADgYEADl4ysDBeF6r1SS7qU9/A6VuSJJkAeUAEOQjpVU0WbB7B7LJC
+rSAfSQycugQR0ipihJwu6ovh83aDt4BdlH1uVVe2q7QuIJXM1Th3Fh4veT65HZFw+JHbe/LXecGh
+HdQuhBX4X63PdzK3ogZsGT6FpTIoNkUH0MGPsY0xuZq6RVw=
+</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature><saml:Subject>
+<saml:NameID NameQualifier="http://bi1-ivs:8080/IVS-idp" SPNameQualifier="https://sp.symspdemo.com:8643/sp.xml" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">Bxk/ixdkgUPZm1WITEctMXyOCdN1</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+<saml:SubjectConfirmationData NotOnOrAfter="2007-07-31T23:10:11Z" InResponseTo="RSPVq4dEeGYbMoBg6xjNN" Recipient="https://sp.symspdemo.com:8643/SP-A" ></saml:SubjectConfirmationData></saml:SubjectConfirmation>
+</saml:Subject>
+<saml:Conditions NotBefore="2007-07-31T23:00:11Z" NotOnOrAfter="2007-07-31T23:10:11Z">
+<saml:AudienceRestriction>
+<saml:Audience>https://sp.symspdemo.com:8643/sp.xml</saml:Audience>
+</saml:AudienceRestriction>
+</saml:Conditions>
+<saml:AuthnStatement AuthnInstant="2007-07-31T23:00:11Z" SessionIndex="s2b9995532669d5eb29cc5ec5e087eeb3dab4d1d01"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="name"><saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Benjamin Yeoman</saml:AttributeValue></saml:Attribute><saml:Attribute Name="gender"><saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Male</saml:AttributeValue></saml:Attribute><saml:Attribute Name="placeOfBirth"><saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Palmy</saml:AttributeValue></saml:Attribute><saml:Attribute Name="dob"><saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Tue Jul 19 00:00:00 NZST 1977</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion>
+</samlp:Response></samlp:ArtifactResponse>

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-FF 服务配置 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Liberty ID-FF 服务配置</h4>
+
+
+<a name="ggogr"></a><h5>联合 Cookie 名称</h5>
+<p>此属性指定 ID-FF 服务 Cookie 的名称。该 Cookie 用于记住用户是否已经联合。</p>
+
+<a name="ggohk"></a><h5>IDP 代理查找器 SPI 实现类</h5>
+<p>此属性指定用于查找受代理的首选身份认证提供者的实现类。</p>
+
+<a name="ggogp"></a><h5>请求高速缓存清除时间间隔</h5>
+<p>此属性指定用于 ID-FF 内部请求清除线程的清除时间间隔（以秒为单位）。</p>
+
+<a name="ggoii"></a><h5>请求高速缓存超时设置</h5>
+<p>此属性指定 ID-FF 验证请求的超时值（以秒为单位）。超过超时值的 <tt>AuthnRequest</tt> 对象都将从内存中清除。</p>
+
+<a name="ggofu"></a><h5>IDP 登录 URL</h5>
+<p>此属性指定登录 URL，如果处理验证请求时未找到有效的会话，则会将 IDP 重定向到此登录 URL。如果未指定密钥，则使用默认登录 URL。</p>
+
+<a name="ggoih"></a><h5>XML 登录</h5>
+<p>此属性指定 Liberty 请求和响应的签名验证级别。</p>
+<br/>
+
+</body>
+</html>

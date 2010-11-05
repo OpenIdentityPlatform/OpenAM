@@ -1,0 +1,22 @@
+    <test name="FilteredRolenotification">
+    <parameter name="idtype" value="FILTEREDROLE"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.notification.IDRepoNotificationTests"/> 
+        </classes>
+    </test> 
+    <test name="Rolenotification">
+    <parameter name="idtype" value="ROLE"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.notification.IDRepoNotificationTests"/> 
+        </classes>
+    </test> 

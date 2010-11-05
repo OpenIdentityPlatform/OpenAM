@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新增一個新的遠端服務提供者至提供者實體 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteadd"></a><h4>新增一個新的遠端服務提供者至提供者實體</h4><p><b>遠端提供者</b>不是在與 Federated Access Manager 相同的伺服器上代管。配置 [新增遠端的服務提供者] 屬性將需要新增關於服務提供者之中介資料至實體設定檔。此程序的起點為<a href="federation.fsserviceprovider.html">新增服務提供者至提供者實體</a>。</p>
+<hr><p><b>備註 &#8211; </b>還可以配置其他屬性，但在初始配置頁面中看不見它們。請參閱<a href="federation.fsserviceproviderremoteprofile.html">修改提供者實體內的遠端服務提供者屬性</a>。</p>
+<hr>
+<ol>
+<li><b>提供 [共用屬性] 的資訊。</b><p>[共用屬性] 包含通常定義識別提供者本身的值。</p><dl><dt>描述</dt>
+<dd><p>此屬性值為您建立實體時提供的說明。您可以修改原先輸入的說明，或在說明不存在時新增說明。</p></dd>
+<dt>協定支援列舉</dt>
+<dd><p>選擇此實體支援的「Liberty Alliance Project Liberty 識別聯合架構」 (Liberty ID-FF) 版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 代表 Liberty ID-FF 1.2 版。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 代表 Liberty ID-FF 1.1 版。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>選取任何可用的信任圈以指定給提供者。</b><p>提供者可以屬於一或多個信任圈。然而，沒有指定信任圈的提供者不能參與以 Liberty Alliance Project 規格為基礎的通訊。如果未建立信任圈，您稍後可以定義此屬性。</p></li>
+<li><b>提供 [服務供應程式] 屬性的資訊。</b><p>[服務供應程式] 屬性定義有關服務提供者的一般資訊。</p><dl><dt>指定使用者 URL</dt>
+<dd><p>鍵入端點的 URL，此端點將接收並處理所有已傳送至服務提供者的 SAML 指定。</p></dd>
+<dt>指定使用者服務 URL ID</dt>
+<dd><p>如果 [協定支援列舉] 共用屬性的值是 <tt>urn:liberty:iff:2003-08</tt>，請鍵入必要的 ID。</p></dd>
+<dt>將假定使用者服務 URL 設定為預設值</dt>
+<dd><p>當請求中並未提供識別碼時，選取核取方塊可使用指定使用者服務 URL 做為預設值。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [確定] 以新增提供者至實體。</b></li>
+<li><b>從 [檢視] 功能表選取其他選項以繼續配置實體，或按一下 [儲存] 完成配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

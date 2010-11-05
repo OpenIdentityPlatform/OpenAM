@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED-Identity-Anbieteranpassung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedidp"></a><h4>WS-FED-Identity-Anbieteranpassung</h4>
+<p>Die folgenden Attribute gelten f&#252;r die WS-FED-Identity-Anbieterrolle:</p>
+
+<a name="ghfke"></a><h5>NameID-Format</h5>
+<p>Definiert das Format der Namensbezeichner-Komponente der Single-Sign-On-Antwort, die der Identity-Anbieter an den
+Dienstanbieter sendet. WS-Federation-Single-Sign-On unterst&#252;tzt die folgenden Bezeichnerformat (Standard ist UPN):</p>
+<ul><li><p>E-Mail</p></li></ul>
+
+<ul><li><p>Gemeinsamer Name</p></li>
+<li><p>UPN &#8211; User Principal Name (Name des Benutzer-Principals). Die Syntax lautet <tt> username&#64;domain</tt>. Ein Beispiel f&#252;r <tt>domain</tt> ist <tt>example.com</tt>.</p></li></ul>
+
+
+<a name="ghfog"></a><h5>NameID-Attribut</h5>
+<p>Definiert das Attribut im Benutzerprofil, das als Wert f&#252;r den Namensbezeichner verwendet
+wird. Der Standardwert ist <tt>uid</tt>. </p>
+
+<a name="ghflq"></a><h5>Name enth&#228;lt Dom&#228;ne</h5>
+<p>Bei Verwendung des im Attribut f&#252;r das NameID-Format definierten UPN-Formats gibt dies
+an, ob das NameID-Attribut im Benutzerprofil eine Dom&#228;ne beinhaltet. Ist dies der
+Fall, wird das NameID-Attribut gem&#228;&#223; seiner aktuellen Definition als UPN verwendet. Anderenfalls
+wird es zur Bildung eines UPN mit einer Dom&#228;ne kombiniert.</p>
+
+<a name="ghfmk"></a><h5>Dom&#228;nenattribut</h5>
+<p>Bei Verwendung des UPN-Formats gibt dies ein Attribut im Benutzerprofil zur Verwendung
+als UPN-Dom&#228;ne an, wenn das Attribut "Name enth&#228;lt Dom&#228;ne" nicht ausgew&#228;hlt ist.
+</p>
+
+<a name="ghfnw"></a><h5>UPN-Dom&#228;ne</h5>
+<p>Wenn bei Verwendung des UPN-Formats das Attribut "Name enth&#228;lt Dom&#228;ne" nicht ausgew&#228;hlt
+ist und kein Wert f&#252;r das Dom&#228;nenattribut angegeben ist oder f&#252;r dieses
+Attribut f&#252;r einen bestimmten Benutzer kein Wert vorliegt, wird dieses Attribut zur
+Bildung des UPN verwendet. </p>
+
+<a name="ggwvh"></a><h5>Signieren des Cert-Alias</h5>
+<p>Dieses Attribut gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem
+richtigen Assertion-Signaturzertifikat im Schl&#252;sselspeicher verwendet wird.</p>
+
+<a name="ggwve"></a><h5>Forderungstypen</h5>
+<p>Gibt den Forderungstyp an, sodass der WS-FED-Dienst den Token-Typ erkennen kann, der
+zwischen Verbindungszuordnungen ausgetauscht wird. </p><p>Der Forderungstyp EmailAddress wird verwendet, um einen bestimmten Sicherheits-Principal anhand einer E-Mail-Adresse
+zu identifizieren. </p><p>Der Forderungstyp UPN wird verwendet, um einen bestimmten Sicherheits-Principal &#252;ber den Namen
+des Benutzer-Principals zu identifizieren. </p><p>Der Forderungstyp CommonName wird verwendet, um einen Sicherheits-Principal &#252;ber einen mit X.500-Namenskonventionen
+konsistenten CN-Wert zu identifizieren. Der Wert dieser Forderung ist nicht unbedingt eindeutig
+und sollte nicht zu Autorisierungszwecken verwendet werden. </p>
+
+<a name="ggwwj"></a><h5>Konto-Mapper</h5>
+<p>Dieses Attribut gibt die Implementierung der <tt>AccountMapper</tt>-Schnittstelle an, die f&#252;r die Zuordnung
+eines Remote-Benutzerkontos zu einem lokalen Benutzerkonto zum Zwecke des Single Sign-on verwendet
+wird. Der Standardwert ist <tt>com.sun.identity.wsfed.plugins.DefaultIDPAccountMapper</tt>. </p>
+
+<a name="ggwuq"></a><h5>Attribut-Mapper</h5>
+<p>Dies definiert die Klasse, die verwendet wird, um Attribute in der Assertion
+zu Benutzerattributen hinzuzuf&#252;gen, die lokal vom Identity-Anbieter definiert wurden. Die Standardklasse ist
+<tt>com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper</tt>.</p>
+
+<a name="ggwul"></a><h5>Attributzuordnung</h5>
+<p>Gibt Werte an, um die Zuordnungen zu definieren, die vom standardm&#228;&#223;igen Attribut-Mapper-Plugin
+verwendet werden.  Zuordnungen sollen in folgendem Format konfiguriert werden:</p><p><i>Claim_Type</i>=<i>local-attribute</i></p><p>Beispiel: <tt>EmailAddress=mail</tt> oder <tt>Address=postaladdress </tt>. Geben Sie die Zuordnung als neuen Wert ein
+und klicken Sie auf "Hinzuf&#252;gen".</p>
+
+<a name="ggwrj"></a><h5>Assertion-G&#252;ltigkeit</h5>
+<p>Assertions sind w&#228;hrend eines bestimmten Zeitraums g&#252;ltig, und nicht davor oder danach.
+</p><p><tt>Effektive Zeit</tt> gibt den Zeitraum (in Sekunden) an, w&#228;hrend dessen eine Assertion g&#252;ltig
+ist, und zwar ab der Ausstellungszeit der Assertion. Der Standardwert ist 
+<tt>600</tt> Sekunden.</p>
+<br/>
+
+</body>
+</html>

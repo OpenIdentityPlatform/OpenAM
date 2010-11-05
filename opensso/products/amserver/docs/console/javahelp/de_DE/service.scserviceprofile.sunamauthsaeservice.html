@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAE - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthsaeservice"></a><h4>SAE</h4>
+<p><a name="indexterm-180"></a>Das Authentifizierungsmodul "Secure Attribute Exchange (SAE)" wird verwendet, wenn eine externe Entit&#228;t
+(wie beispielsweise eine bestehende Anwendung) den Benutzer bereits authentifiziert hat und eine
+lokale OpenSSO-Instanz auf sichere Weise &#252;ber die Authentifizierung informieren m&#246;chte, um die
+Erstellung einer OpenSSO-Sitzung f&#252;r den Benutzer einzuleiten. Das SAE-Authentifizierungsmodul wird auch von
+der Funktion "Virtual Federation" verwendet, wenn die bestehende Entit&#228;t die lokale OpenSSO-Instanz
+anweist, Verbindungsprotokolle f&#252;r die &#220;bertragung von Authentifizierungs- und Attributinformationen an eine Partneranwendung
+zu verwenden. Das SAE-Attribut ist ein Bereichsattribut.</p>
+
+<a name="ggukt"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Hinweis: Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut
+<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a> angegebene Wert verwendet.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
+
+-->
+
+<accesscontrols>
+    <!-- REALM -->
+    <viewbean classname="com.sun.identity.console.realm.RMRealmViewBean"
+	view="sunAMRealmService,AgentService" modify="sunAMRealmService,AgentService">
+	<actionhandler name="tblButtonAdd,tblButtonDelete" />
+	<table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.RealmPropertiesViewBean" view="sunAMRealmService,AgentService" modify="sunAMRealmService,AgentService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.IDRepoViewBean" view="sunIdentityRepositoryService" modify="sunIdentityRepositoryService">
+	<actionhandler name="tblButtonAdd,tblButtonDelete" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.IDRepoEditViewBean" view="sunIdentityRepositoryService" modify="sunIdentityRepositoryService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.AuthPropertiesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+	<actionhandler name="button1,button2,createConfigButton,deleteConfigButton,createInstanceButton,deleteInstanceButton" />
+	<table name="authenticationModuleInstanceTable,authenticationConfigurationTable" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.ServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+	<actionhandler name="tblButtonAdd,tblButtonDelete" />
+	<table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.realm.ServicesEditViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.CoreAttributesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.EditAuthTypeViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.authentication.AuthConfigViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+	<actionhandler name="button1,button2,addEntryButton,removeEntryButton" />
+	<table name="authConfigEntryTable" />
+    </viewbean>
+
+    <!-- POLICY -->
+    <viewbean classname="com.sun.identity.console.policy.PolicyViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="tblButtonAddReferral,tblButtonDelete,tblButtonAddNormal" />
+	<table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PolicyNormalEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2,tblRulesButtonAdd,tblRulesButtonDelete,tblSubjectsButtonAdd,tblSubjectsButtonDelete,tblConditionsButtonAdd,tblConditionsButtonDelete,tblResponseProvidersButtonAdd,tblResponseProvidersButtonDelete" />
+	<table name="tblRules,tblSubjects,tblConditions,tblResponseProviders" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PolicyReferralEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2,tblReferralsButtonAdd,tblReferralsButtonDelete,tblRulesButtonAdd,tblRulesButtonDelete" />
+	<table name="tblRules,tblReferrals" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.RuleEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+	<table name="tblActions" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.RuleNoResourceEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+	<table name="tblActions" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.RuleWithPrefixEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultAuthSchemeConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultSessionConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultTimeConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.AuthToRealmEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+      <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.AuthToServiceEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+      <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ResponseProviderEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.IdentitySubjectEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button2,btnFilter,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ConditionNoneEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.IDRepoResponseProviderEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultIPConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.IdentityMembershipConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.PMDefaultAuthLevelConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyConditionViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyConditionAddViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyConditionEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyAddViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SessionPropertyEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="button1,button2,button3" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SubjectEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="btnFilter,button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.ReferralEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="btnFilter,button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.policy.SubjectNoneEditViewBean" view="iPlanetAMPolicyService" modify="iPlanetAMPolicyService">
+	<actionhandler name="btnFilter,button1,button2" />
+    </viewbean>
+
+    <!-- ENTITIES -->
+    <viewbean classname="com.sun.identity.console.agentconfig.AgentsViewBean" view="sunIdentityRepositoryService/1.0/application/agent" modify="sunIdentityRepositoryService/1.0/application/agent">
+	<actionhandler name="tblButtonGroupAdd,tblButtonAdd,tblButtonDelete,tblButtonGroupDelete" />
+	<table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntitiesViewBean" view="*" modify="*">
+	<actionhandler name="tblButtonAdd,tblButtonDelete" />
+	<table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityEditViewBean" view="*" modify="*">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityServicesViewBean" view="*" modify="*">
+	<actionhandler name="tblButtonAdd,tblButtonDelete" />
+	<table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityMembersViewBean" view="*" modify="*">
+	<actionhandler name="btnSearch,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.EntityMembershipViewBean" view="*" modify="*">
+	<actionhandler name="btnSearch,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.idm.ServicesEditViewBean" view="*" modify="*">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- DIRECTORY MANAGER -->
+    <viewbean classname="com.sun.identity.console.dm.OrganizationViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.OrganizationGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.OrganizationServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.GroupViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAddDynamic,tblButtonDelete,tblButtonAddStatic" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.GroupGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button2,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.GroupMembersViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.UserViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.UserGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.UserGroupsViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.UserRolesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.UserServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.RoleViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAddStatic,tblButtonAddDynamic,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.RoleGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button2,button1" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.RoleMembersViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.RoleServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.ContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.ContainerGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.ContainerServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.EditServiceViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.GroupContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.PeopleContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.dm.AgentViewBean" view="sunAMRealmService" modify="sunAMRealmService">
+        <actionhandler name="tblButtonAdd,tblButtonDelete" />
+        <table name="tblSearch" />
+    </viewbean>
+
+    <!-- SERVICE MANAGEMENT -->
+    <viewbean classname="com.sun.identity.console.service.SCServiceProfileViewBean" view="null" modify="null">
+	<actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
+	<table name="tblSubConfig" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCAuthModuleEditViewBean" view="null" modify="null">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCConsoleViewBean" view="iPlanetAMAdminConsoleService" modify="iPlanetAMAdminConsoleService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- PLATFORM SERVICE -->
+    <viewbean classname="com.sun.identity.console.service.SCPlatformViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+	<actionhandler name="button1,button2,Button3,tblSiteListButtonAdd,tblSiteListButtonDelete,tblServerListButtonAdd,tblServerListButtonDelete,tblClientCharSetsButtonAdd,tblClientCharSetsButtonDelete" />
+	<table name="iplanet-am-platform-site-list,iplanet-am-platform-server-list,iplanet-am-platform-client-charsets" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatform30ViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+	<actionhandler name="button1,button2,Button3,tblClientCharSetsButtonAdd,tblClientCharSetsButtonDelete" />
+	<table name="iplanet-am-platform-client-charsets" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatformServerListEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatformClientCharSetsEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPlatformSiteListEditViewBean" view="iPlanetAMPlatformService" modify="iPlanetAMPlatformService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- SUB CONFIG -->
+    <viewbean classname="com.sun.identity.console.service.SubConfigEditViewBean" view="null" modify="null">
+	<actionhandler name="button1,button2,tblSubConfigButtonAdd,tblSubConfigButtonDelete" />
+	<table name="tblSubConfig" />
+    </viewbean>
+
+    <!-- GLOBAL POLICY -->
+    <viewbean classname="com.sun.identity.console.service.SCPolicyViewBean" view="iPlanetAMPolicyConfigService" modify="iPlanetAMPolicyConfigService">
+	<actionhandler name="button1,button2,tblResourceComparatorButtonAdd,tblResourceComparatorButtonDelete" />
+	<table name="tblResourceComparator" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.SCPolicyResourceComparatorEditViewBean" view="iPlanetAMPolicyConfigService" modify="iPlanetAMPolicyConfigService">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+
+    <!-- CLIENT DETECTION -->
+    <viewbean classname="com.sun.identity.console.service.MAPClientManagerViewBean" view="iPlanetAMClientDetection" modify="iPlanetAMClientDetection">
+	<actionhandler name="tblButtonAdd" />
+	<statictext name="tblDataActionDeleteLabel,tblDataActionDefaultLabel,tblDataActionDuplicateLabel" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.MAPDeviceProfileViewBean" view="iPlanetAMClientDetection" modify="iPlanetAMClientDetection">
+	<actionhandler name="button1,button2,btnClassification" />
+    </viewbean>
+
+    <!-- GLOBALIZATION -->
+    <viewbean classname="com.sun.identity.console.service.SMG11NViewBean" view="iPlanetG11NSettings" modify="iPlanetG11NSettings">
+	<actionhandler name="button1,button2,tblCharsetAliasButtonAdd,tblCharsetAliasButtonDelete,tblSupportedCharsetsButtonAdd,tblSupportedCharsetsButtonDelete" />
+	<table name="sun-identity-g11n-settings-locale-charset-mapping,sun-identity-g11n-settings-charset-alias-mapping" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.G11NSupportedCharsetsEditViewBean" view="iPlanetG11NSettings" modify="iPlanetG11NSettings">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+    <viewbean classname="com.sun.identity.console.service.G11NCharsetAliasEditViewBean" view="iPlanetG11NSettings" modify="iPlanetG11NSettings">
+	<actionhandler name="button1,button2" />
+    </viewbean>
+
+    <neednodealwith classname="com.sun.identity.console.authentication.NewAuthConfigViewBean" />
+    <neednodealwith classname="com.sun.identity.console.authentication.NewAuthInstanceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.authentication.ReorderAuthChainsViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AMInvalidURLViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AMInvalidURLViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AMLoginViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AMUncaughtExceptionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AMAdminFrameViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AMPostViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.AuthenticatedViewBean" />
+    <neednodealwith classname="com.sun.identity.console.base.VersionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewOrganizationViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewContainerViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewPeopleContainerViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewStaticGroupViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewUserViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewGroupContainerViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.SelectServicesViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewDynamicGroupViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.NewRoleViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.GroupContainerGeneralViewBean" />
+    <neednodealwith classname="com.sun.identity.console.dm.PeopleContainerGeneralViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.RealmResourceOfferingAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.RealmResourceOfferingEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.RealmResourceOfferingViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.RealmDiscoveryDescriptionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.RealmDiscoveryDescriptionEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.RMRealmAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.IDRepoAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.IDRepoSelectTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.ServicesAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.ServicesNoAttributeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.ServicesCannotAssignServiceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.HomePageViewBean" />
+    <neednodealwith classname="com.sun.identity.console.realm.ServicesSelectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.EntityAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.EndUserViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.UMUserPasswordResetOptions" />
+    <neednodealwith classname="com.sun.identity.console.idm.ServicesAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.ServicesSelectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.EntityMembersFilteredIdentityViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.HomeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PolicyNormalAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PolicyReferralAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SelectServiceTypeViewBean"/>
+    <neednodealwith classname="com.sun.identity.console.policy.RuleAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.RuleNoResourceAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.RuleWithPrefixAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.ReferralAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SelectReferralTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.IDRepoResponseProviderAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.ConditionNoneAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.IdentitySubjectAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.ResponseProviderProxyViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.ReferralProxyViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultTimeConditionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultTimeConditionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.AuthToRealmAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.AuthToServiceAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.AuthToRealmViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.AuthToServiceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultSessionConditionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultSessionConditionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.IdentityMembershipConditionViewBean" /> 
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultIPConditionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultAuthSchemeConditionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultAuthSchemeConditionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.IdentitySubjectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultAuthLevelConditionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultIPConditionAddViewBean" /> 
+    <neednodealwith classname="com.sun.identity.console.policy.IdentityMembershipConditionAddViewBean" /> 
+    <neednodealwith classname="com.sun.identity.console.policy.ResponseProviderAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SelectResponseProviderTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SelectConditionTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDefaultAuthLevelConditionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SubjectNoneAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SubjectProxyViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMLDAPOrgSubjectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMLDAPUserSubjectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMDSAMERoleSubjectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMLDAPGroupSubjectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMLDAPRoleSubjectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.ConditionProxyViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.ConditionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PolicySelectTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SelectSubjectTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SubjectAddViewBean" /> 
+    <neednodealwith classname="com.sun.identity.console.service.SCConfigAuthViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCConfigConsoleViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCConfigSystemViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCConfigGlobalViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCCoreViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCGeneralViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCAuthenticationViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCPolicyResourceComparatorAddViewBean" /> 
+    <neednodealwith classname="com.sun.identity.console.service.SCPlatformServerListAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCPlatformClientCharSetsAddViewBean" /> 
+    <neednodealwith classname="com.sun.identity.console.service.SCPlatformSiteListAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SubSchemaTypeSelectViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SubConfigAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.MAPCreateDeviceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.MAPCreateDeviceTwoViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.MAPDuplicationDeviceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.G11NSupportedCharsetsAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.G11NCharsetAliasAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.session.SMProfileViewBean" />
+    <neednodealwith classname="com.sun.identity.console.delegation.DelegationViewBean" />
+    <neednodealwith classname="com.sun.identity.console.delegation.DelegationPropertiesViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserPasswordResetOptionsViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMChangeUserPasswordViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMAuthenticatedUsersSubjectAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.SelectRealmViewBean" />
+
+    <neednodealwith classname="com.sun.identity.console.federation.CreateCOTViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSAuthDomainsEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FileChooserViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FederationViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.ImportEntityViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.IDFFIDPViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.IDFFSPViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.IDFFAffiliateViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2GeneralViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2SPAssertionContentViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2SPAssertionProcessingViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2SPServicesViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2SPAdvancedViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2IDPAssertionContentViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2IDPAssertionProcessingViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2IDPServicesViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2IDPAdvancedViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2PDPViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.SAMLv2PEPViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLServiceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLSelectTrustedPartnerTypeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLTrustedPartnersAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLTrustedPartnersEditViewBean" />
+
+    <neednodealwith classname="com.sun.identity.console.service.ServerAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerCloneViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerConfigInheritViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SiteAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SiteEditiewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerSiteViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerConfigXMLAddServerViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerConfigXMLViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerEditGeneralViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerEditSDKViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerEditSessionViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerEditSecurityViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerEditAdvancedViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.ServerConfigXMLViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SiteEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentsViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.HomeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.GenericAgentProfileViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentConfigInheritViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentProfileViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentConfigurationServlet" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentGroupMembersViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentTabManager" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.AgentGroupAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceSTSEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceProviderEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceUserCredEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceClientEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceUserCredAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.agentconfig.WebServiceUIElement" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSAML2SOAPBindingViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSAML2SOAPBindingRequestHandlerListAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSAML2SOAPBindingRequestHandlerListDupViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSAML2SOAPBindingRequestHandlerListEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SecurityTokenServiceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserResourceOfferingViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserResourceOfferingAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserResourceOfferingEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserDiscoveryDescriptionAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserDiscoveryDescriptionEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.policy.PMAuthenticatedUsersSubjectEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSAuthNServicesHandlersEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSPPServiceDSAttributeMapListEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSAuthNServicesHandlersAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSAuthNServicesViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSPersonalProfileServiceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSPPServiceSupportedContainerAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.webservices.WSPPServiceSupportedContainerEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SMDiscoveryServiceViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SMDiscoveryBootstrapRefOffEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SMDiscoveryProviderResourceIdMapperEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SMDiscoveryDescriptionEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SMDiscoveryProviderResourceIdMapperAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSOAPBindingViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSOAPBindingRequestHandlerListEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.service.SCSOAPBindingRequestHandlerListDupViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.WebServiceClientEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.WebServiceProviderEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.WebServiceUserCredAddViewBean" />
+    <neednodealwith classname="com.sun.identity.console.idm.WebServiceUserCredEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.HomeViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FileUploaderViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.CreateSAML2MetaDataViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.CompleteCreateHostedIDPViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.ValidateSAML2SetupViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.ConfigureGoogleAppsViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.ConfigureGoogleAppsWarningViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.ConfigureGoogleAppsCompleteViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLSiteIDEditViewBean" />
+    <neednodealwith classname="com.sun.identity.console.task.ConfigureSalesForceAppsCompleteViewBean" />
+    <neednodealwith classname="com.sun.identity.console.federation.FSSAMLSetTrustedPartnerTypeViewBean" />
+
+</accesscontrols>

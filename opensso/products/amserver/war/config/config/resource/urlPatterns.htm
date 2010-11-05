@@ -1,0 +1,10 @@
+{
+    "records":[
+        #foreach($urlPattern in $urlPatterns)
+        {
+            "id":"$urlPattern.id",
+            "urlPattern":"$urlPattern.pattern"
+        },
+        #end
+    ]
+}

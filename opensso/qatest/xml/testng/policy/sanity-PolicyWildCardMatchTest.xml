@@ -1,0 +1,65 @@
+    <test name="PolicyWildcardMatchTest_P4_E0 ">
+	<parameter name="policyIdx" value="4"/>
+	<parameter name="evaluationIdx" value="0"/>
+	<parameter name="setup" value="true"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyWildcardMatchTest_P4_E1">
+	<parameter name="policyIdx" value="4"/>
+	<parameter name="evaluationIdx" value="1"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyWildcardMatchTest_P4_E2">
+	<parameter name="policyIdx" value="4"/>
+	<parameter name="evaluationIdx" value="2"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+  <test name="PolicyWildcardMatchTest_P4_E3">
+	<parameter name="policyIdx" value="4"/>
+	<parameter name="evaluationIdx" value="3"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="true"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+

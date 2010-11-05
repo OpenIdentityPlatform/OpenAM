@@ -1,0 +1,75 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: index.html,v 1.4 2008/06/25 05:44:40 qcheng Exp $
+
+-->
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Please Wait While Redirecting to console</title>
+
+<script language="JavaScript"> <!--
+
+function redirectToConsole() {
+    var params = getQueryParameters();
+    var url = '../../base/AMAdminFrame';
+
+    if (params != '') {
+	url += params + '&amconsoleRedirect=1&' + getDateStamp();
+    } else {
+	url += '?&amconsoleRedirect=1&' + getDateStamp();
+    }
+    top.location.replace(url);
+}
+
+function getDateStamp() {
+    var s='';
+    while (s.length < 80) {
+        t = (48 + Math.round(Math.random() * 74));
+        r = ((t<58) || ((t>64) && (t<91)) || ((t>96) && (t<123))) ?
+	    String.fromCharCode(t) : '';
+        s += r;
+    }
+    return s;
+}
+
+function getQueryParameters() {
+    var loc = '' + location;
+    var idx = loc.indexOf('?');
+    if (idx != -1) {
+	return loc.substring(idx);
+    } else {
+	return '';
+    }
+}
+//-->
+</script>
+</head>
+
+<body bgcolor="#FFFFFF" onLoad="redirectToConsole();">
+</body>
+</html>
+

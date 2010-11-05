@@ -1,0 +1,46 @@
+CE JUSTIFICATIF ET LA OU LES FACTURES ASSOCIÉES CONSTITUENT LA PREUVE DE VOTRE ACHAT DES DROITS DE LICENCE POUR LE LOGICIEL SUN INDIQUÉ CI-DESSOUS ET SOUMIS AUX CONDITIONS DU CONTRAT DE LICENCE DU LOGICIEL (« SLA »).
+
+Date effective : date de facturation plus cinq (5) jours ouvrables.
+
+Détenteur de la licence/Société : selon la ou les factures correspondantes.
+
+Logiciel : OpenSSO Enterprise 8.  
+
+Numéro de référence du logiciel : OPS1F-LCO-9929, OPS2F-LCO-9929, OPS3F-LCO-9929, OPS4F-LCO-9929, OPS5F-LCO-9929, OPS6F-LCO-9929
+
+Durée de la licence : perpétuelle (sauf résiliation en vertu du SLA).
+
+Unité sous licence : l'unité sous licence pour le logiciel est comprise par « utilisateur », lequel est un individu (ni une organisation, ni une entité légale) autorisé à accéder au logiciel et identifié par ses références, celles-ci étant enregistrées par le Logiciel.
+
+Nombre d'unités sous licence : selon la ou les factures correspondantes. 
+
+Utilisation autorisée : l'utilisation du Logiciel est autorisée dans le cadre de vos activités commerciales, de recherche et de formation ou de fournisseur de services, sous réserve d'acceptation des conditions supplémentaires mentionnées ci-dessous :
+
+Conditions supplémentaires :
+
+(1) Sun Vous accorde une licence permettant d'utiliser OpenSSO conformément aux termes de la licence « CDD » (Common Development and Distribution License) Version 1.0. Votre utilisation de OpenSSO est uniquement régie par la CDDL. Par conséquent, ce SLA et ce droit d'usage ainsi que tout autre terme de contrat général accepté au préalable ne s'appliquent pas ici. Vous pouvez consulter la CDDL à l'adresse suivante : http://www.sun.com/cddl/cddl.html. 
+
+(2) Vous pouvez acquérir un plan de support couvrant à la fois le Logiciel et OpenSSO, tels que définis dans la liste des services disponible à l'adresse suivante : http://www.sun.com/service/servicelist/. 
+
+(3) Vous ne pouvez pas héberger de services destinés à des sociétés affiliées, sauf si leurs employés sont inclus dans vos unités sous licence. Une « Société Affiliée » est une entité légale que vous gérez, dont vous partagez le contrôle, ou qui vous gère.
+
+(4) Les entités gouvernementales ne sont pas autorisées à utiliser ce Logiciel dans le cadre d'une fourniture de services.
+
+(5) Vous pouvez utiliser, en tout ou partie, les échantillons de classes Java, fichiers d'en-têtes, bibliothèques de classes, fichiers sources et fichiers de données contenus dans le Logiciel (le « Code de développement »), ceci et exclusivement pour créer et distribuer des programmes permettant d'interagir avec les API, SPI et SDK du Logiciel.  Vous ne pouvez pas modifier le Code de développement.
+
+(6) Vous pouvez modifier, en tout ou partie, les pages du modèle de console d'administration du serveur Java, les pages du modèle d'interface utilisateur d'identification du serveur Java, les pages du modèle de fédération du serveur Java, ainsi que les fichiers XML contenus dans le Logiciel (les « Fichiers d'interface graphique »), ceci exclusivement pour créer des personnalisations permettant d'interagir avec le Logiciel ou d'étendre son champ d'application. 
+
+(7) Sun et ses détenteurs de licence ne pourront être légalement tenus responsables et aucune indemnisation ne Vous sera accordée suite à des réclamations soulevées dans l'exercice de vos droits définis dans les conditions supplémentaires 5 et 6 ci-dessus, y compris, et sans limitation, toute réclamation fondée sur des performances ou fonctionnalités déficientes du Logiciel dans le cadre de l'exercice desdits droits.
+
+En vertu du présent Justificatif, Vous pouvez utiliser la fonctionnalité Gestion des fédérations dans le seul but d'échanger des assertions de sécurité avec des fournisseurs d'identité.
+
+(9) En vertu du présent Justificatif, vous pouvez utiliser Sun Java System Directory Server Enterprise Edition (« DSEE ») et OpenDS Standard Edition (« OpenDS ») pour le stockage de :
+
+(a) mille (1 000) Entrées au maximum, pour stocker exclusivement des noms d'utilisateur, mots de passe et des numéros de groupe accessibles avec des fonctions d'authentification et d'autorisation de l'utilisateur du Logiciel ;
+
+(b) mille (1 000) Entrées au maximum, pour stocker les informations de configuration requises par le Logiciel.  
+
+Le stockage de quelque information que ce soit (y compris et sans s'y limiter, les informations de contact et les préférences utilisateur) nécessite l'acquisition d'un Justificatif approprié pour DSEE ou OpenDS, sauf mention contraire du présent Justificatif, dans le cas où l'accès à DSEE ou à OpenDS se fait depuis d'autres produits du Logiciel sur une base indépendante.
+
+(10) Dans le cadre d'un numéro de terme supplémentaire. « Entrées » désigne un unique nom distinctif et les attributs qui lui sont associés.
+

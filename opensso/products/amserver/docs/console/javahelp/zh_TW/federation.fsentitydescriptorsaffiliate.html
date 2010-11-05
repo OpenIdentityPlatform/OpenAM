@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新增成員至附屬提供者實體 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsaffiliate"></a><h4>新增成員至附屬提供者實體</h4><a name="indexterm-83"></a><a name="indexterm-84"></a><p>建立附屬提供者實體之後，您可以將成員新增至附屬提供者。起點為聯合介面下的實體。</p>
+<hr><p><b>備註 &#8211; </b>您也可以在該畫面中修改已定義的 [共用屬性]。</p>
+<hr>
+<ol>
+<li><b>在配置的附屬提供者實體名稱上按一下以修改其設定檔。</b><p>會顯示實體的設定檔頁面。</p></li>
+<li><b>從 [檢視]功能表選取 [附屬提供者]。</b></li>
+<li><b>選取任一個要指定給附屬提供者的可用實體。</b></li>
+<li><b>修改 [共用屬性] 的值。</b><p>[共用屬性] 包含通常定義識別提供者本身的值。</p><dl><dt>名稱</dt>
+<dd><p>鍵入附屬提供者的新 URI (如果適用的話)。此屬性的目前值是您在建立實體時指定給 [附屬提供者名稱] 屬性的 URI。任何新值在附屬提供者名稱中都必須唯一。</p></dd>
+<dt>所有者</dt>
+<dd><p>鍵入新的 URI，以定義附屬提供者的不同所有者或父系操作員。此屬性的目前值是您在建立實體時指定給 [附屬提供者所有者] 屬性的 URI。此屬性的新值是 URI，此 URI 將符合新所有者/提供者所屬實體之 [實體名稱] 屬性中定義的值。任何新值在附屬提供者名稱中都必須唯一。</p>
+<hr><p><b>備註 &#8211; </b>將提供者定義為 [附屬提供者所有者] 並不會自動將它做為附屬提供者成員併入。如果所有者也是成員，則必須在這裡將 URI 定義為所有者，以及在附屬提供者實體本身內定義為成員。</p>
+<hr>
+</dd>
+<dt>簽署金鑰：金鑰別名</dt>
+<dd><p>憑證儲存在 Java 金鑰庫檔案中。該檔案中的每一個憑證都會對映至用來擷取它的別名。鍵入與用來簽署請求及回應的憑證相關聯的金鑰別名。</p></dd>
+<dt>加密金鑰：金鑰別名</dt>
+<dd><p>憑證儲存在 Java 金鑰庫檔案中。該檔案中的每一個憑證都會對映至用來擷取它的別名。鍵入與提供者的安全憑證相關聯的金鑰別名。</p></dd>
+<dt>加密金鑰：金鑰大小</dt>
+<dd><p>鍵入 Web 服務用戶與其他實體互動時所用金鑰的長度。</p></dd>
+<dt>加密金鑰：加密方法</dt>
+<dd><p>鍵入一個指向加密方法喜好設定的 URI。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [儲存]。</b></li></ol>
+<br/>
+
+</body>
+</html>

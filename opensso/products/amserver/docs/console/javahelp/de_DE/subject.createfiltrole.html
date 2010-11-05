@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie eine gefilterte Rolle - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subject.createfiltrole"></a><h5>So erstellen Sie eine gefilterte Rolle</h5>
+<ol>
+<li><b>Gehen Sie im Navigationsausschnitt zu der Organisation, bei der die Rolle erstellt
+wird.</b></li>
+<li><b>Klicken Sie auf "Neu".</b></li>
+<li><b>Geben Sie einen Namen f&#252;r die gefilterte Rolle ein.</b></li>
+<li><b>Geben Sie die Informationen f&#252;r die Suchkriterien ein.</b><p>Zum Beispiel:</p><pre>(&#38;(uid=user1)(|(inetuserstatus=active)(!(inetuserstatus=*))))</pre><p>Wenn der Filter leer bleibt, wird standardm&#228;&#223;ig die folgende Rolle erstellt:</p><pre>(objectclass = inetorgperson)</pre></li>
+<li><b>Klicken Sie auf "OK", um die Suche basierend auf den Filterkriterien zu
+initiieren. Die durch die Filterkriterien definierten Identit&#228;ten werden automatisch der Rolle zugewiesen.</b></li>
+<li><b>Nachdem Sie die gefilterte Rolle erstellt haben, k&#246;nnen Sie auf deren Namen
+klicken, um die darin enthaltenen Benutzer anzuzeigen. &#220;ber die Registerkarte "Dienste" k&#246;nnen
+Sie der Rolle auch Dienste hinzuf&#252;gen. Weitere Informationen finden Sie unter <a href="idm.entityservices.html">So f&#252;gen Sie einer Identit&#228;t Dienste hinzu</a></b></li></ol>
+<br/>
+
+</body>
+</html>

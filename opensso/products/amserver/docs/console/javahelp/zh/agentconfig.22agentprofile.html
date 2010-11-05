@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>2.2 策略代理 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.22agentprofile"></a><h4>2.2 策略代理</h4>
+<p>OpenSSO 向后兼容策略代理 2.2。策略代理 2.2 必须从其安装所在的部署容器中进行本地配置。因此，通过 OpenSSO 控制台，只能配置非常有限的策略代理 2.2 选项。</p>
+
+<a name="ggmti"></a><h5>密码</h5>
+<p>密码在创建代理配置文件后设置。但是，您以后可以随时更改密码。</p>
+
+<a name="ggmvn"></a><h5>密码确认</h5>
+<p>创建代理配置文件时执行密码确认。如果更改了密码，则必须确认更改。</p>
+
+<a name="ggmsq"></a><h5>状态</h5>
+<p>创建代理时选择“<tt>活动</tt>”选项。仅在要删除代理提供的保护时才选择“<tt>非活动</tt>”。</p>
+
+<a name="ggoub"></a><h5>说明</h5>
+<p>代理的说明，可根据需要添加。</p>
+
+<a name="ggowa"></a><h5>代理关键字值</h5>
+<p>启用 CDSSO 和配置部署以防止 cookie 拦截时所需的设置。</p><p>该属性用作对关键字和值进行配对时的关键字。OpenSSO 使用该属性接收关于用户的证书声明的代理请求。在关键字-值对中，只有一个属性有效。所有其他属性都被忽略。请使用以下格式：</p><pre>agentRootURL=protocol://<i>hostname</i>:<i>port</i>/</pre><p>必须准确输入。例如，代表关键字的字符串 <tt>agentRootURL</tt> 区分大小写。</p>
+<br/>
+
+</body>
+</html>

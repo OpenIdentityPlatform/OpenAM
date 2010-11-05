@@ -1,0 +1,312 @@
+<?php
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ *  
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: opensso.module,v 1.3 2009/07/26 00:46:56 superpat7 Exp $
+ *
+ */
+
+define('OPENSSO_ENABLED',                   variable_get('opensso_enabled', 0));
+define('OPENSSO_COOKIE_NAME',               variable_get('opensso_cookie_name', 'iPlanetDirectoryPro'));
+define('OPENSSO_BASE_URL',                  variable_get('opensso_base_url', 'http://demo.example.com:8080/opensso/'));
+define('OPENSSO_DRUPAL_USERNAME_ATTRIBUTE', variable_get('opensso_drupal_username_attribute', 'uid'));
+
+define('OPENSSO_LOGIN_URL',      OPENSSO_BASE_URL . 'UI/Login');
+define('OPENSSO_LOGOUT_URL',     OPENSSO_BASE_URL . 'UI/Logout');
+define('OPENSSO_IS_TOKEN_VALID', OPENSSO_BASE_URL . 'identity/isTokenValid');
+define('OPENSSO_ATTRIBUTES',     OPENSSO_BASE_URL . 'identity/attributes');
+
+/**
+ * Implements hook_boot().
+ */
+function opensso_boot() {
+  global $user;
+  
+  if (!OPENSSO_ENABLED) {
+      return;
+  }
+
+  // Quick hack to get round the fact that '+' often gets decoded to ' '
+  $ssotoken = str_replace(' ', '+', $_COOKIE[OPENSSO_COOKIE_NAME]);
+  
+  // arg() only available if bootstrap has reached PATH.
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_PATH);
+
+  $arg0 = arg(0);
+  switch ($arg0) {
+    case 'logout':
+      if (!empty($ssotoken)) {
+        // We're still logged in to OpenSSO
+        // Redirect to OpenSSO logout - need to come back here to complete
+        // Drupal logout process
+        _opensso_goto(OPENSSO_LOGOUT_URL . '?goto=' . urlencode(_opensso_full_url()));
+      } 
+      else {
+        // We're logged out from OpenSSO
+        // Allow Drupal's logout processing to take place
+        return;        
+      }
+  }
+  
+  // Design decision - For performance reasons, drupal session takes priority
+  // over OpenSSO session, so we don't do the cookie validity check on every
+  // page access - only if the user is not logged in to Drupal
+
+  // If user is already logged in to Drupal, we're done!
+  if ($user->uid) {
+    return;
+  }
+
+  // Is there an SSO token?
+  if (empty($ssotoken)) {
+    // Redirect to OpenSSO login page then return here
+    _opensso_goto(OPENSSO_LOGIN_URL . '?goto=' . urlencode(_opensso_full_url()));
+  }
+
+  // Is the token valid?  
+  switch (_opensso_is_token_valid($ssotoken)) {
+    case 0:
+      // Session expired
+      _opensso_goto(OPENSSO_LOGIN_URL . '?goto=' . urlencode(_opensso_full_url()));
+    case -1:
+      // Error validating token
+      return;
+  }
+  
+  // OK - if we get here then we have a valid session cookie
+  $name = _opensso_get_name($ssotoken);
+
+  if (empty($name)) {
+    watchdog('opensso', 'Error parsing name from attribute data. Name attribute is %name, response data is %data, ssotoken is %ssotoken', array('%name' => OPENSSO_DRUPAL_USERNAME_ATTRIBUTE, '%data' => $response->data, '%ssotoken' => $ssotoken), WATCHDOG_ERROR);
+    drupal_set_message(t('Error getting user name from OpenSSO. Contact your system administrator.'), 'error');
+    return;
+  }
+
+  // Locate the user in Drupal
+  $account = user_load(array('name' => $name));
+
+  if (empty($account)) {
+    watchdog('opensso', 'Can\'t find %name in Drupal user table', array('%name' => $name), WATCHDOG_ERROR);
+    drupal_set_message(t('Can\'t find you in Drupal\'s user table. Contact your system administrator.'), 'error');
+    return;
+  }
+  
+  // Complete the login process
+  user_external_login($account);
+} // function opensso_boot
+
+/**
+ * Implements hook_admin().
+ */
+function opensso_admin() {
+  $form = array();
+
+  $form['opensso_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable SSO'),
+    '#default_value' => variable_get('opensso_enabled', 0),
+    '#description' => t('Only check this once you\'re sure the following parameters are correct!'),
+    '#required' => TRUE,
+ );
+
+  $form['opensso_cookie_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OpenSSO cookie name'),
+    '#default_value' => variable_get('opensso_cookie_name', 'iPlanetDirectoryPro'),
+    '#size' => 25,
+    '#maxlength' => 64,
+    '#description' => t('This will be <b>iPlanetDirectoryPro</b> unless you\'ve changed it in OpenSSO.'),
+    '#required' => TRUE,
+ );
+
+  $form['opensso_base_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OpenSSO server URL'),
+    '#default_value' => variable_get('opensso_base_url', 'http://demo.example.com:8080/opensso/'),
+    '#size' => 64,
+    '#maxlength' => 128,
+    '#description' => t('For example: <b>http://demo.example.com:8080/opensso/</b>'),
+    '#required' => TRUE,
+ );
+
+  $form['opensso_drupal_username_attribute'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OpenSSO Drupal username attribute'),
+    '#default_value' => variable_get('opensso_drupal_username_attribute', 'uid'),
+    '#size' => 25,
+    '#maxlength' => 64,
+    '#description' => t('The name of the OpenSSO profile attribute to use as the Drupal username. Use the default, <b>uid</b>, if users have the same username in Drupal and OpenSSO.'),
+    '#required' => TRUE,
+ );
+
+  return system_settings_form($form);
+} // function opensso_admin
+
+/**
+ * Implements hook_admin_validate().
+ */
+function opensso_admin_validate($form, &$form_state) {
+  $baseurl = $form_state['values']['opensso_base_url'];
+  if (!valid_url($baseurl, true)) {
+    form_set_error('opensso_base_url', t('OpenSSO Base URL is not a valid URL.'));
+  }
+  if (strpos($baseurl, 'http') !== 0) {
+    form_set_error('opensso_base_url', t('OpenSSO Base URL scheme must be http or https.'));
+  }
+  
+  // Make sure the base URL ends in a slash
+  if (substr($baseurl, -1) != '/') {
+    $form_state['values']['opensso_base_url'] .= '/';
+  }
+} // function opensso_admin_validate
+
+/**
+ * Implements hook_menu().
+ */
+function opensso_menu() {
+
+  $items = array();
+
+  $items['admin/settings/opensso'] = array(
+    'title' => 'OpenSSO module settings',
+    'description' => 'Settings for OpenSSO Module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('opensso_admin'),
+    'access arguments' => array('administer opensso module'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+} // function opensso_menu
+
+/**
+ * Implements hook_help().
+ */
+function opensso_help($path, $arg) {
+  $output = '';  //declare your output variable
+  switch ($path) {
+    case 'admin/help#opensso':
+      $output = '<p>'.  t('OpenSSO Authentication Module') .'</p>';
+      break;
+  }
+  return $output;
+} // function opensso_help
+
+/**
+ * Implements hook_perm().
+ */
+function opensso_perm() {
+  return array('administer opensso module');
+} // function opensso_perm()
+
+/*
+ * Validate token. Returns 1 for valid token, 0 for invalid token, -1 for error
+ */
+function _opensso_is_token_valid($ssotoken) {
+  $headers = array('Cookie' => OPENSSO_COOKIE_NAME . '=' . $ssotoken);
+  
+  // drupal_http_request() only available if bootstrap has reached FULL.
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  
+  $response = drupal_http_request(OPENSSO_IS_TOKEN_VALID, $headers);
+  
+  if ($response->code != 200) {
+    watchdog('opensso', 'Error validating token. URL is %url, response code is %code, error text is %text, ssotoken is %ssotoken', array('%url' => OPENSSO_IS_TOKEN_VALID, '%code' => $response->code, '%text' => $response->error, '%ssotoken' => $ssotoken), WATCHDOG_ERROR);
+    drupal_set_message(t('Error validating OpenSSO token. Contact your system administrator.'), 'error');
+    return -1;
+  }
+
+  // value will be of the form boolean=true
+  if (substr(trim($response->data), 8) == 'true') {
+    return 1;
+  }
+
+  return 0;
+} // function _opensso_is_token_valid
+
+/*
+ * Given an SSO token, return the name
+ */
+function _opensso_get_name($ssotoken) {
+  $url = OPENSSO_ATTRIBUTES . '?subjectid=' . urlencode($ssotoken);
+  $response = drupal_http_request($url);
+
+  if ($response->code != 200) {
+    watchdog('opensso', 'Error getting attributes. URL is %url, response code is %code, error text is %text, ssotoken is %ssotoken', array('%url' => OPENSSO_IS_TOKEN_VALID, '%code' => $response->code, '%text' => $response->error, '%ssotoken' => $ssotoken), WATCHDOG_ERROR);
+    drupal_set_message(t('Error getting attributes from OpenSSO. Contact your system administrator.'), 'error');
+    return;
+  }
+
+  // Need to parse name/value pairs, to get value for Drupal username attribute
+  $lines = explode("\n", $response->data);
+  reset($lines);
+  foreach ($lines as $line) {
+    if ($line == ('userdetails.attribute.name=' . OPENSSO_DRUPAL_USERNAME_ATTRIBUTE)) {
+      // 'current' line holds attribute value
+      // 28 points to character after 'userdetails.attribute.value='
+      $name = substr(current($lines), 28);
+      break;
+    }
+  }
+  
+  return $name;
+} // function _opensso_get_name
+
+/**
+ * Sanitizes the given url then forwards the user to it.
+ *
+ * This function is used because drupal_goto() doesn't allow redirects to
+ * other sites and uses $_REQUEST['destination'] at inappropriate times.
+ */
+function _opensso_goto($uri) {
+  header('Location: '. str_replace(array('\r', '\n'), '', $uri));
+  exit;
+} // function _opensso_goto
+
+/*
+ * Returns the full requested URL so we can redirect the user back here after 
+ * they authenticate at OpenSSO
+ */
+function _opensso_full_url() {
+  $full_url = 'http';
+  
+  if ($_SERVER['HTTPS'] == 'on') { 
+    $full_url .=  's';
+  }
+  
+  $full_url .=  '://';
+  
+  if (($_SERVER['HTTPS'] != 'on' && $_SERVER['SERVER_PORT'] != '80') || ($_SERVER['HTTPS'] == 'on' && $_SERVER['SERVER_PORT'] != '443')) {
+    $full_url .=  $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . $_SERVER['SCRIPT_NAME'];
+  } 
+  else {
+    $full_url .=  $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
+  }
+  
+  if ($_SERVER['QUERY_STRING']>' ') {
+    $full_url .=  '?'.$_SERVER['QUERY_STRING'];
+  }
+  
+  return $full_url;
+} // function _opensso_full_url

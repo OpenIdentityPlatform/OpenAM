@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs du r&#233;f&#233;rentiel fichiers plats - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>Attributs du r&#233;f&#233;rentiel fichiers plats</h4>
+<p><a name="indexterm-15"></a>Les attributs suivants permettent de configurer un r&#233;f&#233;rentiel fichiers plats :</p>
+
+<a name="gdokj"></a><h5>Nom de classe de plug-in du r&#233;f&#233;rentiel de fichiers</h5>
+<p>Cet attribut sp&#233;cifie le fichier de classe Java fournissant l'impl&#233;mentation de fichiers
+plats. Cet attribut ne doit pas &#234;tre modifi&#233;.</p>
+
+<a name="gdojs"></a><h5>R&#233;pertoire r&#233;f&#233;rentiel de fichiers</h5>
+<p>D&#233;finit le r&#233;pertoire de base dans lequel les identit&#233;s et leurs attributs
+sont stock&#233;s.</p>
+
+<a name="gdoke"></a><h5>Cache</h5>
+<p>Si activ&#233; (par d&#233;faut), les identit&#233;s et leurs attributs sont mis en
+cache. Les requ&#234;tes ult&#233;rieures n'acc&#232;dent pas au syst&#232;me de fichiers.</p>
+
+<a name="gdokm"></a><h5>Heure de mise &#224; jour du cache</h5>
+<p>Lorsque la mise en cache est activ&#233;e, cet attribut d&#233;termine l'intervalle (en
+minutes) apr&#232;s lequel les entr&#233;es du cache sont v&#233;rifi&#233;es &#224; la recherche
+de modifications apport&#233;es au syst&#232;me de fichiers. Le m&#233;canisme de v&#233;rification est
+bas&#233; sur des horodatages.</p>
+
+<a name="gdojw"></a><h5>Classes d'objets utilisateur de fichier</h5>
+<p>D&#233;finit les classes d'objets ajout&#233;es automatiquement aux utilisateurs &#224; leur cr&#233;ation.</p>
+
+<a name="gdojt"></a><h5>Attribut du mot de passe</h5>
+<p>Fournit le nom d'attribut contenant le mot de passe utilis&#233; pour l'authentification.
+Cet attribut permet d'authentifier l'utilisateur lorsque le module d'authentification Magasin de donn&#233;es
+est activ&#233;.</p>
+
+<a name="gdokq"></a><h5>Attribut du statut</h5>
+<p>Fournit le nom d'attribut stockant le statut de l'identit&#233;. Les valeurs de
+l'attribut du statut sont <tt>active</tt> et <tt> inactive</tt>. Il est utilis&#233; pendant l'authentification
+de l'identit&#233;. Si une identit&#233; est <tt>inactive</tt>, l'utilisateur n'est pas authentifi&#233;.</p>
+
+<a name="gdojk"></a><h5>Attributs hach&#233;s</h5>
+<p>Fournit une liste d'attributs dont les valeurs sont hach&#233;es et stock&#233;es dans
+les fichiers. Une fois hach&#233;es, les valeurs d'origine ne peuvent pas &#234;tre
+obtenues. Seules les valeurs hach&#233;es sont r&#233;cup&#233;r&#233;es. Il est utilis&#233; pour garantir
+la confidentialit&#233; selon laquelle certains attributs ne doivent pas &#234;tre stock&#233;s de
+mani&#232;re permanente mais dans un objectif de v&#233;rification. Un attribut de mot
+de passe d'identit&#233; est un exemple d'un tel type d'attribut.</p>
+
+<a name="gdojb"></a><h5>Attributs chiffr&#233;s</h5>
+<p>Fournit une liste d'attributs dont les valeurs sont chiffr&#233;es et stock&#233;es dans
+les fichiers. Bien qu'elles soient chiffr&#233;es et stock&#233;es, l'appel d'API du r&#233;f&#233;rentiel
+d'identit&#233; peut renvoyer les valeurs d&#233;chiffr&#233;es d'origine. Ceci emp&#234;che les utilisateurs d'acc&#233;der
+directement au syst&#232;me de fichiers et de consulter des attributs critiques.</p>
+<br/>
+
+</body>
+</html>

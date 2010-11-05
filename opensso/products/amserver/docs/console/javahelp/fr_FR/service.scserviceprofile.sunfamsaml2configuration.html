@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration du service SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>Configuration du service SAMLv2</h4>
+
+
+<a name="ggolz"></a><h5>Intervalle de nettoyage de cache</h5>
+<p>Cet attribut sp&#233;cifie la dur&#233;e (en secondes) s'&#233;coulant entre chaque nettoyage de
+cache.</p>
+
+<a name="ggokj"></a><h5>Nom d'attribut pour les informations d'ID de nom</h5>
+<p>Cet attribut sp&#233;cifie le nom d'attribut utilis&#233; pour stocker les informations d'identificateur
+de nom dans l'entr&#233;e d'un utilisateur. Si aucune donn&#233;e n'est sp&#233;cifi&#233;e, l'attribut
+par d&#233;faut (<tt>sun-fm-saml2-nameid-info</tt>) est utilis&#233;. L'utilisateur de connexion au magasin de donn&#233;es
+correspondant doit poss&#233;der les droits de lecture, d'&#233;criture, de recherche et de
+comparaison sur cet attribut.</p>
+
+<a name="ggolv"></a><h5>Nom d'attribut pour la cl&#233; d'informations d'ID de nom</h5>
+<p>Cet attribut sp&#233;cifie le nom d'attribut utilis&#233; pour stocker la cl&#233; d'identificateur
+de nom dans l'entr&#233;e d'un utilisateur. Si aucune donn&#233;e n'est sp&#233;cifi&#233;e, l'attribut
+par d&#233;faut (<tt>sun-fm-saml2-nameid-infokey</tt>) est utilis&#233;. L'utilisateur de connexion au magasin de donn&#233;es
+correspondant doit poss&#233;der les droits de lecture, d'&#233;criture, de recherche et de
+comparaison sur cet attribut. Vous devez &#233;galement v&#233;rifier que l'index de type
+<tt>equality</tt> est ajout&#233;.</p>
+
+<a name="ggojr"></a><h5>Domaine de cookies du service de d&#233;couverte IDP</h5>
+<p>Sp&#233;cifie le domaine du cookie de d&#233;couverte IDP SAMLv2. </p>
+
+<a name="ggomp"></a><h5>Type de cookie du service de d&#233;couverte IDP</h5>
+<p>Cet attribut sp&#233;cifie le type de cookie utilis&#233; dans le service de
+d&#233;couverte IDP SAMLv2, Persistant ou Session. Le type par d&#233;faut est Session.</p>
+
+<a name="ggomt"></a><h5>Sch&#233;ma URL du service de d&#233;couverte IDP</h5>
+<p>Cet attribut sp&#233;cifie le sch&#233;ma URL utilis&#233; dans le service de d&#233;couverte
+IDP SAMLv2. </p>
+
+<a name="ggoje"></a><h5>Classe d'impl&#233;mentation du SPI de chiffrement XML</h5>
+<p>Cet attribut sp&#233;cifie le nom de classe d'impl&#233;mentation de l'interface du fournisseur
+de chiffrement SAMLv2. La classe est utilis&#233;e pour proc&#233;der au chiffrement et
+au d&#233;chiffrement XML dans les profiles SAMLv2. </p>
+
+<a name="ggomb"></a><h5>Inclure la cl&#233; chiffr&#233;e dans l'&#233;l&#233;ment KeyInfo</h5>
+<p>Cet attribut est utilis&#233; dans la classe <tt>com.sun.identity.saml2.xmlenc.FMEncProvider. </tt> S'il est activ&#233;, il
+inclut <tt>EncryptedKey</tt> dans un <tt>KeyInfo</tt> dans l'&#233;l&#233;ment <tt>EncryptedData</tt> lors de l'op&#233;ration de
+chiffrement XML. S'il n'est pas activ&#233;, <tt> EncryptedKey</tt> fonctionne en parall&#232;le avec l'&#233;l&#233;ment
+<tt>EncryptedData. </tt> Cet attribut est activ&#233; par d&#233;faut.</p>
+
+<a name="ggoks"></a><h5>Classe d'impl&#233;mentation de signature XML</h5>
+<p>Si cet attribut est activ&#233;, le certificat de signature utilis&#233; par le
+fournisseur d'identit&#233;s et le fournisseur de services sera valid&#233; par rapport &#224;
+la liste de r&#233;vocation de certificats (CRL) configur&#233;e dans les param&#232;tres S&#233;curit&#233;
+de l'onglet Serveurs et Sites. Si le certificat n'est pas valid&#233; et
+accept&#233;, le processus s'interrompt et g&#233;n&#232;re une erreur qui bloque la validation
+de la signature XML. </p>
+
+<a name="ggokx"></a><h5>Validation de certificat de signature XML</h5>
+<p>Si cet attribut est activ&#233;, le fournisseur d'identit&#233;s ou de services SAML
+valide le certificat utilis&#233; pour la signature. Si le certificat est valid&#233;
+et accept&#233;, le fournisseur valide la signature. S'il ne l'est pas, il
+s'arr&#234;te et renvoie une erreur de validation. </p>
+
+<a name="ggoiv"></a><h5>Validation de certificat d'AC</h5>
+<p>Si cet attribut est activ&#233;, le certificat de signature utilis&#233; par le
+fournisseur d'identit&#233;s et le fournisseur de services sera valid&#233; par rapport &#224;
+la liste d'AC approuv&#233;es. Si le certificat n'est pas valid&#233; et accept&#233;,
+le processus s'interrompt et g&#233;n&#232;re une erreur qui bloque la validation de
+la signature XML. </p>
+<br/>
+
+</body>
+</html>

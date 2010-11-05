@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SecurID  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsecuridservice"></a><h4>SecurID </h4>
+<p><a name="indexterm-181"></a>此模块允许使用 RSA ACE/Server 软件和 RSA SecurID 验证程序进行验证。SecurID 验证模块无法用于 Linux 或 Solaris x86
+平台，且不能在这两个平台上对其注册、配置或启用。它仅可用于 Solaris 平台。SecurID 验证属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwbpt">ACE/Server 配置路径</a></p></li>
+<li><p><a href="#fwbma">验证级别</a></p></li></ul>
+
+
+<a name="fwbpt"></a><h5>ACE/Server 配置路径</h5>
+<p>指定 SecurID ACE/Server <tt>sdconf.rec</tt> 文件所在的目录，默认情况下，位于 <tt>/opt/ace/data</tt> 下。如果在该字段中指定了其他目录，则尝试进行 SecurID 验证前该目录必须存在。</p>
+
+<a name="fwbma"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

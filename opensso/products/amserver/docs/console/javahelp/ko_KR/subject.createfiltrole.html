@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>필터링된 역할 만들기 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subject.createfiltrole"></a><h5>필터링된 역할 만들기</h5>
+<ol>
+<li><b>[이동] 창에서 역할을 만들 조직으로 이동합니다.</b></li>
+<li><b>[새로 만들기]를 누릅니다.</b></li>
+<li><b>필터링된 역할의 이름을 입력합니다.</b></li>
+<li><b>검색 조건에 대한 정보를 입력합니다.</b><p>예를 들면 다음과 같습니다.</p><pre>(&#38;(uid=user1)(|(inetuserstatus=active)(!(inetuserstatus=*))))</pre><p>필터를 비워두면 기본적으로 다음 역할이 만들어집니다.</p><pre>(objectclass = inetorgperson)</pre></li>
+<li><b>[확인]을 눌러 필터 조건에 기초한 검색을 시작합니다. 필터 조건에 의해 정의된 아이디가
+자동으로 역할에 할당됩니다.</b></li>
+<li><b>필터링된 역할이 생성되면 역할의 이름을 눌러 역할에 속한 사용자를 확인합니다. 또한 [서비스]
+탭을 눌러 역할에 서비스를 추가할 수도 있습니다. <a href="idm.entityservices.html">Identity에 서비스 추가</a>를 참조하십시오.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN  - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN </h4>
+<p><a name="indexterm-177"></a>「行動台整體服務數位網路 (Mobile Station Integrated Services Digital Network, MSISDN)」認證模組可讓您使用與如行動電話之裝置相關聯的行動訂閱者 ISDN 來進行認證。這是非互動式模組。此模組擷取用戶 ISDN 並利用
+Directory Server 進行驗證，以找到符合該號碼的使用者。MSISDN 認證屬性為範圍屬性。MSISDN 認證屬性包括：</p>
+<ul><li><p><a href="#fumxe">可信任的閘道 IP 位址</a></p></li>
+<li><p><a href="#fumxg">MSISDN 號碼引數</a></p></li>
+<li><p><a href="#fumxf">LDAP 伺服器與連接埠</a></p></li>
+<li><p><a href="#fumxi">LDAP 起始搜尋 DN</a></p></li>
+<li><p><a href="#fumxk">用於搜尋 LDAP 的屬性</a></p></li>
+<li><p><a href="#fumxl">LDAP 伺服器主體使用者</a></p></li>
+<li><p><a href="#fumxn">LDAP 伺服器主體密碼</a></p></li>
+<li><p><a href="#fumxm">LDAP 伺服器主體密碼 (確認)</a></p></li>
+<li><p><a href="#fumxo">啟用 SSL 以存取 LDAP</a></p></li>
+<li><p><a href="#fumxp">用於擷取使用者設定檔的 LDAP 屬性</a></p></li>
+<li><p><a href="#fumxr">傳回認證的使用者 DN</a></p></li>
+<li><p><a href="#fumxs">認證級別</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>可信任的閘道 IP 位址</h5>
+<p>指定可以存取 MSIDSN 模組的可信任用戶端之 IP 位址清單。您可以將所有用戶端的 IP 位址設為允許存取 MSISDN 模組，方法為在項目欄位中輸入位址 (如 <tt>123.456.123.111</tt>)，然後按一下 [新增]。依預設，此清單為空白。如果屬性為空，則允許所有用戶端存取。如果指定無，則所有用戶端都不能存取。</p>
+
+<a name="fumxg"></a><h5>MSISDN 號碼引數</h5>
+<p>指定參數名稱清單，這些名稱可識別在請求標頭或 cookie 標頭中，應搜尋的 MSISDN 編號參數。例如，若您定義 <i>x-Cookie-Param</i>、<i>AM_NUMBER</i> 及 <i>COOKIE-ID</i>，則 MSISDN 認證服務將在那些參數中搜尋 MSISDN 編號。</p>
+
+<a name="fumxf"></a><h5>LDAP 伺服器與連接埠</h5>
+<p>指定將為包含 MSISDN 編號之使用者搜尋結果的目錄伺服器之主機名稱與連接埠號。格式為 <tt></tt><i>hostname:port</i><tt></tt>。如果沒有連接埠號，則假定為 <tt>389</tt>。</p><p>如果您使用多重網域部署 OpenSSO，則可按以下格式 (多重項目必須以本機伺服器名稱為字首) 指定 OpenSSO 和 Directory Server 特定實例之間的通訊連結：</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>例如，若您有兩個在不同位置部署的 OpenSSO 實例 (L1-machine1-IS 及 L2- machine2-IS)，且與不同的 Directory Server 實例 (L1-machine1-DS 及
+L2-machine2-DS) 通訊，它將如下所示：</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fumxi"></a><h5>LDAP 起始搜尋 DN</h5>
+<p>指定應該開始搜尋使用者的 MSISDN 號碼的節點 DN。此欄位沒有預設值。此欄位將識別任何有效 DN。多重項目必須以本機伺服器名稱為字首。格式為 <tt></tt><i>servername|search dn</i><tt></tt>。</p><p>對於多個項目：</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>如果在具有同一使用者 ID 的根組織之下有多個項目，則應該將此參數設定為只能搜尋或尋找一個項目進行認證。例如，當代理程式 ID 與使用者 ID 都在根組織下時，若根組織使用代理程式 ID 進行認證，此參數應該為 <tt>ou=Agents</tt>；若根組織採用使用者 ID 進行認證，此參數應該為
+<tt>ou=People</tt>。</p>
+
+<a name="fumxk"></a><h5>用於搜尋 LDAP 的屬性</h5>
+<p>指定在使用者設定檔中的屬性名稱，此使用者設定檔包含了用於搜尋特定使用者的 MSISDN 號碼。預設值為 <i>sunIdentityMSISDNNumber</i>。不應變更此值，除非已確定使用者設定檔的另一個屬性包含相同的 MSISDN 號碼。</p>
+
+<a name="fumxl"></a><h5>LDAP 伺服器主體使用者</h5>
+<p>指定 LDAP 連結 DN，以允許在 Directory Server 中進行 MSISDN 搜尋。預設連結 DN 為 <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com</tt>。</p>
+
+<a name="fumxn"></a><h5>LDAP 伺服器主體密碼</h5>
+<p>指定連結 DN 的 LDAP 連結密碼，如 LDAP 伺服器主體使用者所定義。</p>
+
+<a name="fumxm"></a><h5>LDAP 伺服器主體密碼 (確認)</h5>
+<p>確認密碼。</p>
+
+<a name="fumxo"></a><h5>啟用 SSL 以存取 LDAP</h5>
+<p>啟用以 SSL 存取 LDAP 伺服器和連接埠屬性中指定的 Directory Server。依預設，不啟用 SSL 存取，且不使用 SSL 協定存取 Directory
+Server。但是，如果啟用了此屬性，則可以連結至非 SSL 伺服器。</p>
+
+<a name="fumxp"></a><h5>用於擷取使用者設定檔的 LDAP 屬性</h5>
+<p>指定搜尋 MSISDN 編號請求使用的標頭。支援的值如下所示：</p><dl><dt>Cookie 標頭</dt>
+<dd><p>於 cookie 中執行搜尋。</p></dd>
+<dt>RequestHeader</dt>
+<dd><p>於請求標頭中執行搜尋。</p></dd>
+<dt>RequestParameter</dt>
+<dd><p>於請求參數中執行搜尋。預設為選取所有選項。</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>傳回認證的使用者 DN</h5>
+<p>當 OpenSSO 目錄與為 MSDISN 配置的目錄相同時，則可以啟用此選項。如果啟用了此選項，則允許認證模組傳回 DN，而不是使用者 ID，並且不必進行任何搜尋。通常，認證模組僅傳回使用者 ID，而且認證服務會在本機 OpenSSO 中搜尋使用者。如果使用外部目錄，則通常不啟用此選項。</p>
+
+<a name="fumxs"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

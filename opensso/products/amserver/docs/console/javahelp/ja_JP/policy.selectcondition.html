@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>条件 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>条件</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>条件を使用して、ポリシーに対する制約を定義することができます。たとえば、給与アプリケーションのポリシーを定義する場合、このアクションに条件を定義して、アプリケーションへのアクセスを特定の時間帯だけに制限できます。あるいは、要求の発信元が特定の IP アドレスセットまたは会社のイントラネットである場合のみこのアクションを許可するよう、条件を定義することもできます。</p><p>同じドメイン内の異なる URI に対して異なるポリシーを設定する場合にも、条件を使用できます。たとえば、<tt>http://org.example.com/hr/&#42;jsp</tt> へは午前 9 時から午後 5 時まで <tt>org.example.net</tt> からのみアクセスできるようにするには、IP アドレス条件と時刻条件を組み合わせて使用します。また、ルールのリソースを <tt>http://org.example.com/hr/&#42;.jsp</tt>
+と指定すると、<tt>http://org.example.com/hr</tt> およびそのサブディレクトリの下にある、すべての JSP にポリシーが適用されます。</p>
+<hr><p><b>注 &#8211; </b>「参照」、「ルール」、「リソース」、「対象」、「条件」、「アクション」、および「値」の各用語は、<b>policy.dtd</b> 内の要素 <b>Referral</b>、<b>Rule</b>、<b>ResourceName</b>、<b>Subject</b>、<b>Condition</b>、<b>Attribute</b>、および <tt>Value</tt> にそれぞれ対応します。</p>
+<hr>
+<p><a href="policy.selectconditiontype.html">「条件をポリシーに追加する」</a>を参照してください。</p>
+<br/>
+
+</body>
+</html>

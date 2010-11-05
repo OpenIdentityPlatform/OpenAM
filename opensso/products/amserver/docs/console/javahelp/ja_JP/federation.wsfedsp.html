@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS 連携サービスプロバイダのカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>WS 連携サービスプロバイダのカスタマイズ</h4>
+<p>次の属性は、WS 連携サービスプロバイダロールに適用されます。</p>
+
+<a name="ggwtj"></a><h5>表明が署名されました</h5>
+<p>このサービスプロバイダによって受信されるすべての表明が署名済みである必要があります。</p>
+
+<a name="ggwsg"></a><h5>アカウントマッパー</h5>
+<p>この属性は、シングルサインオンを目的としてリモートユーザーアカウントをローカルユーザーアカウントにマップするために使用される <tt>AccountMapper</tt> インタフェースの実装を指定します。デフォルト値は <tt>com.sun.identity.wsfed.plugins</tt> です。 </p><p> <tt>DefaultADFSPartnerAccountMapper</tt> はデフォルトの実装です。</p>
+
+<a name="ggwrf"></a><h5>属性マッパー</h5>
+<p>これは、表明に含まれる属性をアイデンティティープロバイダがローカルで定義しているユーザー属性にマップするために使用されるクラスを定義します。デフォルトのクラスは <tt>com.sun.identity.wsfederation.plugins.DefaultSPAttributeMapper</tt> です。</p>
+
+<a name="ggwrq"></a><h5>属性マップ</h5>
+<p>デフォルトの属性マッパープラグインによって使用されるマッピングを定義する値を指定します。マッピングは次の形式で設定してください。</p><p><i>SAML 属性</i>=<i>ローカル属性</i></p><p>たとえば、<tt>EmailAddress=mail</tt> や <tt>Address=postaladdress</tt> のようにします。「新しい値」としてマッピングを入力し、「追加」をクリックします。</p>
+
+<a name="ggwvn"></a><h5>表明有効時間</h5>
+<p>表明は、一定の期間だけ有効であり、その前後は無効です。 </p><p>「<tt>有効な時間</tt>」は、表明の発行時間を起点とする表明の有効期間を秒単位で指定します。デフォルト値は <tt>600</tt> 秒です。</p>
+
+<a name="ggwsk"></a><h5>表明スキュー時間</h5>
+<p>表明は、一定の期間だけ有効であり、その前後は無効です。この属性は、<tt>notBefore</tt> 値の猶予期間を秒単位で指定します。デフォルト値は <tt>300</tt> です。<tt>notAfter</tt> 値とは無関係です。</p>
+
+<a name="ggwts"></a><h5>デフォルトの中継状態</h5>
+<p><a name="indexterm-77"></a>WS 連携の処理 (シングルサインオン、シングルログアウト、または連携終了) に成功すると、ページが表示されます。このページは、通常は最初に要求されたリソースであり、最初の要求で <tt>RelayState</tt> 要素を使用して指定されます。<tt>RelayState</tt> が指定されなかった場合は、この <tt>defaultRelayState</tt> プロパティーの値が表示されます。</p>
+<hr><p><b>注意 &#8211; </b><tt>RelayState</tt> または <tt>defaultRelayState</tt> に特殊文字 (<tt>&#38;</tt> など) が含まれている場合は、その値を URL エンコードする必要があります。たとえば、<tt>RelayState</tt> の値が <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt> である場合は、次のように
+URL エンコードする必要があります。</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>その上で、URL に付加します。たとえば、シングルサインオン URL を開始したサービスプロバイダは次のようになります。</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>ホームレルムディスカバリ</h5>
+<p>サービスプロバイダが優先アイデンティティープロバイダを識別できるように、サービスを指定します。サービスの URL は、サービスプロバイダが接続エンドポイントとして指定します。 </p>
+
+<a name="ggwwb"></a><h5>アカウントレルム選択</h5>
+<p>アイデンティティープロバイダの選択メカニズムと設定を指定します。「<tt>Cookie</tt>」または「<tt>HTTP 要求</tt>」ヘッダー属性を使用してアイデンティティープロバイダを特定できます。</p>
+<br/>
+
+</body>
+</html>

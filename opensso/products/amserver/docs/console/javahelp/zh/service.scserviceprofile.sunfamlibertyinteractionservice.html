@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty 交互服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Liberty 交互服务</h4>
+
+
+<a name="ggofj"></a><h5>重定向用户以进行交互的 WSP</h5>
+<p>此属性指明 Web 服务提供者是否重定向用户以获取同意。默认值为“是”。</p>
+
+<a name="ggofq"></a><h5>重定向用户以进行数据交互的 WSP</h5>
+<p>这会启动获取用户同意或收集其他数据的交互。此属性指明 Web 服务提供者是否重定向用户以收集其他数据。默认值为“是”。</p>
+
+<a name="ggogl"></a><h5>WSP 的预期交互持续时间</h5>
+<p>此属性指明 Web 服务提供者预计完成交互并将控制权返回给 Web 服务客户机所需的时间（以秒为单位）。例如，Web 服务提供者收到请求，指明 Web 服务客户机将最多等待 30 秒（在“WSC 的预期交互持续时间”中设置）以进行交互。如果将此属性设置为 40
+秒，则 Web 服务提供者会返回 SOAP 故障 (<tt>timeNotSufficient</tt>)，以表明进行交互的时间不足。</p>
+
+<a name="ggogn"></a><h5>强制 returnToURL 必须为 SSL 的 WSP</h5>
+<p>此属性指明 Web 服务提供者是否将强制 Web 服务客户机指定 HTTPS <tt>returnToURL</tt>。自由联盟计划规范声明此属性的值始终为“是”。“假”值主要是指通过分阶段的方式来简化部署。</p>
+
+<a name="ggoib"></a><h5>强制返回主机必须与请求主机相同的 WSP</h5>
+<p>此属性指明 Web 服务提供者是否在 <tt>returnToHost</tt> 和 <tt> requestHost</tt> 相同时强制使用它们的地址值。自由联盟计划规范声明此属性的值始终为“是”。“假”值主要是指通过分阶段的方式来简化部署。</p>
+
+<a name="ggoha"></a><h5>HTML 样式表位置</h5>
+<p>此属性指定用于以 HTML 方式呈现交互页面的样式表位置。</p>
+
+<a name="ggohi"></a><h5>WML 样式表位置</h5>
+<p>此属性指定用于以 WML 方式呈现交互页面的样式表位置。</p>
+
+<a name="ggogg"></a><h5>WSP 交互 URL</h5>
+<p>此属性指定部署 <tt>WSPRedirectHandler </tt> Servlet 的 URL。此 servlet 处理交互的服务提供者端，以便进行用户重定向。</p>
+
+<a name="ggoft"></a><h5>位于负载平衡器之后的 WSP 交互 URL</h5>
+<p>定义由负载平衡器公开的 WSP 重定向处理器 URL。</p>
+
+<a name="ggogq"></a><h5>位于负载平衡器之后的 WSP 群集（站点）的交互 URL 列表</h5>
+<p>定义群集中可信任服务器的 WSP 重定向处理器 URL。</p>
+
+<a name="ggogx"></a><h5>交互配置类</h5>
+<p>此属性指定提供读取交互配置的访问方法的类。</p>
+
+<a name="ggogj"></a><h5>WSC 用于参与交互的选项</h5>
+<p>此属性指明 WSC 将参与的交互级别（当配置为参与用户重定向时）。可能的值包括 interactIfNeeded、doNotInteract 和 doNotInteractForData。默认值为表示肯定的 interactIfNeeded。</p>
+
+<a name="ggogs"></a><h5>包括 userInteractionHeader 的 WSC</h5>
+<p>此属性指明 Web 服务客户机是否包含 SOAP 标头以表明基于 Liberty 规范的交互的特定首选项。默认值为“是”。</p>
+
+<a name="ggofn"></a><h5>重定向用户以进行交互的 WSC</h5>
+<p>此属性定义 WSC 是否参与用户重定向。默认值为“是”。</p>
+
+<a name="ggoim"></a><h5>WSC 的预期交互持续时间</h5>
+<p>此属性定义 Web 服务客户机能够为 Web 服务提供者完成其交互部分而等待的最长时间（以秒为单位）。如果交互所耗的时间可能会超过设置值，则 Web 服务提供者不会启动该交互。例如，Web 服务提供者接收到该属性被设置为最大 30 秒的请求。如果 Web 服务提供者的“WSP
+的预期交互持续时间”属性设置为 40 秒，则 Web 服务提供者会返回 SOAP 故障 (<tt>timeNotSufficient</tt>)，以表明进行交互的时间不足。</p>
+
+<a name="ggofx"></a><h5>强制重定向 URL 必须为 SSL 的 WSC</h5>
+<p>此属性指定 Web 服务客户机是否会在重定向 URL 中强制使用 HTTPS。自由联盟计划规范声明该属性的值始终为“是”，这表示 Web 服务提供者在 <tt>redirectURL</tt>（由 Web 服务提供者指定）值不为 HTTPS
+URL 时不会重定向用户。“假”值主要是指通过分阶段的方式来简化部署。</p>
+<br/>
+
+</body>
+</html>

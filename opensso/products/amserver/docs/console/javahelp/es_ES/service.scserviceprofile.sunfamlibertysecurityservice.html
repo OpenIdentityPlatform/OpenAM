@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio de seguridad ID-WSF de Liberty - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Servicio de seguridad ID-WSF de Liberty</h4>
+
+
+<a name="ggohs"></a><h5>Clase del complemento del atributo de seguridad</h5>
+<p>Este atributo especifica el nombre de la clase de implementaci&#243;n de la
+interfaz <tt> com.sun.identity.liberty.ws.security.SecurityAttributePlugin. </tt> La clase devuelve una lista con los atributos de SAML
+que se incluir&#225;n en las credenciales generadas por el servicio de detecci&#243;n.</p>
+
+<a name="ggoia"></a><h5>Tipo de informaci&#243;n de clave</h5>
+<p>El valor establecido en este atributo se utiliza en la clase de
+implementaci&#243;n <tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider </tt>. Especifica el tipo de datos que se incluir&#225; en el
+bloque <tt>KeyInfo</tt> dentro de la firma XML. Si el valor es <tt>certificate</tt>,
+el certificado X059 del firmante se incluir&#225; dentro de <tt>KeyInfo</tt>. De lo
+contrario, se incluir&#225; la clave DSA/RSA correspondiente en <tt>KeyInfo</tt>.</p>
+
+<a name="ggoin"></a><h5>Clase del proveedor del testigo de seguridad</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n del proveedor del testigo de
+seguridad.</p>
+
+<a name="ggohw"></a><h5>Alias del certificado WSC predeterminado</h5>
+<p>Este atributo especifica el alias del certificado predeterminado del testigo de seguridad
+del servicio web que ha emitido el certificado para este cliente de
+servicio web.</p>
+
+<a name="ggohz"></a><h5>Alias del certificado de firma de la entidad emisora de confianza</h5>
+<p>Este atributo especifica el alias del certificado de la entidad emisora de
+confianza que se utilizar&#225; para firmar SAML o el testigo BEARER de
+SAML del mensaje de respuesta.</p>
+
+<a name="ggohd"></a><h5>Alias del certificado de firma de la entidad emisora de certificados de confianza</h5>
+<p>Este atributo especifica los alias de certificado de la entidad emisora de
+certificados de confianza. SAML o testigos BEARER de SAML de la solicitud
+entrante. Una entidad emisora de certificados de confianza de esta lista debe
+firmar el mensaje. La sintaxis es <tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|..... </tt></p><p>Ejemplo: <tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>. </p><p>El valor de emisor se utiliza cuando el testigo no presenta ninguna
+propiedad <tt>KeyInfo </tt> dentro de la firma. El emisor del testigo debe encontrarse
+en la lista y el alias de certificado correspondiente se utilizar&#225; para
+verificar la firma. Si <tt>KeyInfo</tt> existe, el almac&#233;n de claves debe contener
+un alias de certificado que coincida con <tt>KeyInfo </tt> y el alias debe
+encontrarse en la lista.</p>
+<br/>
+
+</body>
+</html>

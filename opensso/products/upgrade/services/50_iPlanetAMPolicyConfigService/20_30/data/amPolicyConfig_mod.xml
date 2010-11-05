@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amPolicyConfig_mod.xml,v 1.2 2008/06/25 05:53:44 qcheng Exp $
+    -->
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+    "jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  apply this file by:
+
+  amadmin -u "xxx" -w "yyy" -t amPolicyConfig_mod.xml
+
+-->
+
+<Requests>
+
+    <SchemaRequests serviceName="iPlanetAMPolicyConfigService"
+	SchemaType="Global"
+	i18nKey="">
+
+        <!-- add default value false for continue evaluation on deny -->
+	<AddDefaultValues>
+            <AttributeValuePair>
+                <Attribute name="iplanet-am-policy-config-continue-evaluation-on-deny-decision" />
+                <Value>false</Value>
+            </AttributeValuePair>
+	</AddDefaultValues>
+
+        <!-- add attribute schema for advices handleable by AM -->
+        <AddAttributeSchema fileName="AHAMAttributeSchema.xml" />
+
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="iPlanetAMPolicyConfigService"
+	SchemaType="Organization"
+	i18nKey="">
+
+	<AddChoiceValues>
+
+            <!-- add AMIdentitySubject as a choice value for selected subjects -->
+            <ChoiceValue 
+                    AttributeName="iplanet-am-policy-selected-subjects" 
+                    I18NKey="a145" value="AMIdentitySubject" />
+
+            <!-- add SessionPropertyCondition as a choice value for 
+                    selected conditions -->
+            <ChoiceValue 
+                    AttributeName="iplanet-am-policy-selected-conditions" 
+                    I18NKey="a141a" value="SessionPropertyCondition" />
+	</AddChoiceValues>
+
+
+        <!-- add attribute schema for selected response providers -->
+        <AddAttributeSchema fileName="ResponseProvidersAttributeSchema.xml" />
+
+        <!-- add attribute schema for dynamic response attributes -->
+        <AddAttributeSchema fileName="DynamicAttributesAttributeSchema.xml" />
+
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="iPlanetAMPolicyConfigService"
+	SchemaType="Organization"
+	i18nKey="">
+
+	<AddDefaultValues>
+
+            <!-- add AMIdentitySubject as a default value for 
+                    selected subjects -->
+            <AttributeValuePair>
+                <Attribute name="iplanet-am-policy-selected-subjects"/>
+                <Value>AMIdentitySubject</Value>
+            </AttributeValuePair>
+
+            <!-- add SessionPropertyCondition as a default value for 
+                    selected conditions -->
+            <AttributeValuePair>
+                <Attribute name="iplanet-am-policy-selected-conditions"/>
+                <Value>SessionPropertyCondition</Value>
+            </AttributeValuePair>
+
+	</AddDefaultValues>
+
+    </SchemaRequests>
+
+</Requests>

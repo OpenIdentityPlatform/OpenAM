@@ -1,0 +1,85 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyPMRuleWithPrefixAdd.xml,v 1.2 2008/06/25 05:45:13 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header" >
+    <property required="true">
+	<label name="lblServiceType" defaultValue="policy.rule.attribute.label.serviceType" />
+	<cc name="serviceTypeName" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="tfServiceType" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+	<cc name="tfServiceTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+    <property required="true">
+	<label name="lblName" defaultValue="policy.rule.attribute.label.name" labelFor="tfRuleName" />
+	<cc name="tfRuleName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="50" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblName" defaultValue="policy.rule.attribute.label.managedResource" labelFor="cbManagedResources" />
+	<cc name="cbManagedResources" tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+	    <attribute name="size" value="8" />
+	    <attribute name="onChange" value="setResourceName(this)" />
+	</cc>
+    </property>
+    <property required="true">
+	<label name="lblResourceName" defaultValue="policy.rule.attribute.label.resourceName" labelFor="tfResourceName" />
+	<cc name="tfResourceName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="100" />
+	</cc>
+    </property>
+    </section>
+
+    <section name="actions" defaultValue="policy.rules.section.title.actions">
+	<property span="true" required="true">
+	    <label name="lblAction" defaultValue="policy.rule.attribute.label.actions" />
+	</property>
+	<property span="true">
+	    <cc name="tblActions" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag">
+	    <attribute name="title" value="policy.table.title.actions" />
+	    <attribute name="empty" value="policy.table.rules.actions.empty.message" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="selectionType" value="multiple" />
+	    <attribute name="showAdvancedSortingIcon" value="false" />
+	    <attribute name="showLowerActions" value="false" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="showPaginationIcon" value="false" />
+	    <attribute name="showSelectionIcons" value="false" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+	    <attribute name="showSortingRow" value="false" />
+	    </cc>
+	</property>
+    </section>
+</propertysheet>
+

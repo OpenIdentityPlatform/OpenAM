@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>リソース ID マッパーを設定する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryproviderresourceidmapadd"></a><h5>リソース ID マッパーを設定する</h5>
+<p><tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>ResourceIDMapper</tt> は、ユーザー ID を、それと関連付けられたリソース ID にマップするために使用されるインタフェースです。実装クラスを使用してさまざまな実装プラグインを開発し、属性に追加することができます。新しいリソース ID マッパーをディスカバリサービスに追加する手順を次に示します。Web サービスモジュール内のディスカバリサービス設定画面から作業を始めます。</p><ol>
+<li><b>「新規」をクリックして新規のマッパー属性を表示するか、設定済みマッパーの名前をクリックしてそのマッパーを変更します。</b></li>
+<li><b>次の情報に基づいて、マッパー属性の値を入力します。</b><dl><dt>プロバイダ ID</dt>
+<dd><p>この属性は、ディスカバリサービスを指す URI を値として受け入れます。値は <tt><b>http://</tt><i>host</i><tt>:</tt><i> port</i><tt>/amserver/Liberty/disco</b></tt> の形式で記述します。</p></dd>
+<dt>ID マッパー</dt>
+<dd><p>実装クラスの名前を入力します。</p></dd>
+</dl>
+</li>
+<li><b>「了解」をクリックしてマッパーの設定を完了します。</b></li>
+<li><b>ディスカバリサービスページで「保存」をクリックして、サービスの設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

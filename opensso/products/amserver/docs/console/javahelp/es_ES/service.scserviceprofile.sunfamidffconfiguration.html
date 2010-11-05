@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuraci&#243;n del servicio ID-FF de Liberty - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Configuraci&#243;n del servicio ID-FF de Liberty</h4>
+
+
+<a name="ggogr"></a><h5>Nombre de cookie de federaci&#243;n</h5>
+<p>Este atributo especifica el nombre de la cookie de los servicios ID-FF.
+ La cookie se utiliza para recordar si el usuario ya est&#225;
+federado. </p>
+
+<a name="ggohk"></a><h5>Clase de implementaci&#243;n del SPI del buscador de proxy de IDP</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n de b&#250;squeda del proveedor de
+identidades favorito que se va a utilizar mediante proxy.</p>
+
+<a name="ggogp"></a><h5>Intervalo de vaciado de la cach&#233; de solicitudes</h5>
+<p>Este atributo especifica el intervalo de vaciado (en segundos) del subproceso de
+vaciado de solicitudes internas de ID-FF.</p>
+
+<a name="ggoii"></a><h5>Tiempo de espera de la cach&#233; de solicitudes</h5>
+<p>Este atributo especifica el valor de tiempo de espera (en segundos) de
+la solicitud de autenticaci&#243;n de ID-FF. Cualquier objeto <tt>AuthnRequest</tt> se purgar&#225; de
+la memoria si supera el valor de tiempo de espera.</p>
+
+<a name="ggofu"></a><h5>URL de inicio de sesi&#243;n de IDP</h5>
+<p>Este atributo especifica la URL de inicio de sesi&#243;n a la que
+se redirigir&#225; IDP si no se encuentra una sesi&#243;n v&#225;lida al procesar
+la solicitud de autenticaci&#243;n. Si no se especifica la clave, se utilizar&#225;
+una URL de inicio de sesi&#243;n predeterminada.</p>
+
+<a name="ggoih"></a><h5>Firma XML</h5>
+<p>Este atributo especifica el nivel de verificaci&#243;n de firmas para las solicitudes
+y respuestas de Liberty.</p>
+<br/>
+
+</body>
+</html>

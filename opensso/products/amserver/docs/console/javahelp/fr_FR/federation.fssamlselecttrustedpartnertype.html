@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Partenaires de confiance : s&#233;lection du type et du profil de partenaire - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlselecttrustedpartnertype"></a><h5>Partenaires de confiance : s&#233;lection du type et du profil de partenaire</h5>
+<a name="indexterm-81"></a><a name="indexterm-82"></a><p>Cet attribut d&#233;finit tout partenaire de confiance (distant par rapport au serveur
+sur lequel OpenSSO est install&#233;) qui communiquera avec OpenSSO.</p>
+<hr><p><b>Remarque &#8211; </b>Le site du partenaire de confiance doit avoir une relation de confiance
+pr&#233;alable avec un ou plusieurs des sites configur&#233;s dans l'attribut Identificateurs de
+site.</p>
+<hr>
+<p>La premi&#232;re &#233;tape de configuration d'un partenaire de confiance consiste &#224; d&#233;terminer
+le r&#244;le du partenaire dans la relation de confiance. Un partenaire de
+confiance peut &#234;tre un site source (qui g&#233;n&#232;re une assertion de connexion
+unique) ou un site de destination (qui consomme une assertion de connexion
+unique). Par exemple, si le partenaire est le site source, la configuration
+de cet attribut est fonction de la mani&#232;re dont les assertions seront
+envoy&#233;es. Si le partenaire est le site de destination, la configuration de
+cet attribut est bas&#233;e sur le profil selon lequel il recevra les
+assertions. Voici la premi&#232;re partie de la proc&#233;dure de configuration d'un partenaire
+de confiance. Le point de d&#233;part est l'&#233;cran SAML sous F&#233;d&#233;ration.</p>
+<hr><p><b>Remarque &#8211; </b>Pour modifier ou dupliquer les attributs d'un profil de partenaire de confiance,
+cliquez sur le bouton correspondant dans la colonne Actions &#224; c&#244;t&#233; du
+nom du partenaire de confiance configur&#233;.</p>
+<hr>
+<ol>
+<li><b>S&#233;lectionnez le r&#244;le (Destination ou Source) du site partenaire de confiance en
+cours de configuration en cochant le ou les profils de communication appropri&#233;(s).</b><p>Vous pouvez choisir le <b>profil d'art&#233;fact du navigateur Web</b> ou le <b>profil POST du navigateur Web</b> pour la destination, la
+source ou les deux, ou  <b>Requ&#234;te SOAP</b> pour la destination. Les choix
+effectu&#233;s influent sur les attributs qui devront &#234;tre configur&#233;s dans les &#233;tapes
+qui suivent.</p>
+<hr><p><b>Remarque &#8211; </b>Si vous modifiez un partenaire de confiance existant, cliquez sur Modifier pour
+changer le r&#244;le du site du partenaire.</p>
+<hr>
+</li>
+<li><b>Cliquez sur Suivant.</b></li>
+<li><b>Pour terminer la configuration, consultez <a href="federation.fssamltrustedpartnersadd.html">Partenaires de confiance : configuration des attributs du partenaire de confiance</a>.</b></li></ol>
+<br/>
+
+</body>
+</html>

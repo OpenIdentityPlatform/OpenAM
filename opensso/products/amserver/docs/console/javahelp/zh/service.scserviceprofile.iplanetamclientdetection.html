@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>客户机检测 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>客户机检测</h4>
+<p><a name="indexterm-200"></a>验证过程的第一步是确定发出 HTTP(S) 请求的客户机的类型。此 OpenSSO 功能称为客户机检测。URL 信息用于检索客户机的特征。基于这些特征，将返回相应的验证页面。例如，通过 Netscape 浏览器请求 Web 页面时，OpenSSO 8.0 会显示
+HTML 登录页面。用户通过验证之后， 将在会话令牌中添加客户机类型（Netscape 浏览器）。在“客户机检测”服务中定义的属性是全局属性。</p>
+<ul><li><p><a href="#fxcei">客户机类型</a></p></li>
+<li><p><a href="#fxbxh">默认客户机类型</a></p></li>
+<li><p><a href="#fxccp">客户机检测类</a></p></li>
+<li><p><a href="#fxbvy">客户机检测</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>客户机类型</h5>
+<p>要检测客户机类型，OpenSSO 需要识别其标识特征。这些特征以客户机数据的形式标识所有支持的类型的属性。该属性允许您通过“客户机管理器”界面修改客户机数据。要访问客户机管理器，请单击“编辑”链接。OpenSSO 在交付时包含以下客户机类型：</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>有关这些客户机类型的说明，参见 <a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>。</p>
+
+<a name="gciwk"></a><h5>客户机管理器</h5>
+<p><a name="indexterm-201"></a>“客户机管理器”界面列出了基本客户机、样式以及相关联的属性，并允许您添加和配置设备。“客户机管理器”顶部列出了各种基本客户机类型。这些客户机类型包含可以由属于客户机类型的所有设备继承的默认属性。</p>
+
+<a name="gcivx"></a><h5>客户机类型</h5>
+<p>“客户机管理器”中的式样配置文件在“客户机类型”列表中对所有可用的客户机（包括基本客户机类型本身）进行了分组。对于每个客户机，您可以通过单击设备名称来修改客户机属性。然后这些属性会显示在“客户机编辑器”窗口中。要编辑属性，请从下拉列表中选择以下分类：</p><dl><dt>硬件平台</dt>
+<dd><p>包含设备的硬件属性，例如显示大小、支持的字符集等。</p></dd>
+<dt>软件平台</dt>
+<dd><p>包含设备的应用程序环境、操作系统和已安装软件的属性。</p></dd>
+<dt>网络特性</dt>
+<dd><p>包含描述网络环境（包括支持的载体）的属性。</p></dd>
+<dt>BrowserUA</dt>
+<dd><p>包含设备上运行的浏览器用户代理的相关属性。</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>包含设备所支持的无线应用协议 (WAP) 环境的属性。</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>包含设备所支持的 WAP 环境的属性。</p></dd>
+<dt>其他属性</dt>
+<dd><p>包含设备所支持的无线应用协议 (WAP) 环境的属性。</p></dd>
+</dl>
+
+<hr><p><b>注 &#8211; </b>有关特定属性定义的信息，参见 <b>Open Mobile Alliance Ltd. (OMA) Wireless Application Protocol, Version 20-Oct-2001</b>。</p><p>要访问该文档，可能必须首先在 WAP Forum<sup>TM</sup> 中注册。有关信息，请访问 <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm</a>。</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>默认客户机类型</h5>
+<p>该属性定义“客户机类型”属性中客户机类型列表的默认客户机类型。默认值为 genericHTML。</p>
+
+<a name="fxccp"></a><h5>客户机检测类</h5>
+<p>该属性定义路由所有客户机检测请求的客户机检测类。该属性返回的字符串应该与“客户机类型”属性中列出的某种客户机类型相匹配。默认客户机检测类为 <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>。OpenSSO 还包含 <tt>com.iplanet.services.cdm.</tt><tt>ClientDetectionDefaultImpl</tt>。</p>
+
+<a name="fxbvy"></a><h5>客户机检测</h5>
+<p>启用客户机检测。如果启用了客户机检测（默认），则由客户机检测类属性中指定的类来路由各个请求。默认情况下，客户机检测功能处于启用状态。如果未选择该属性，OpenSSO 会假定该客户机为 genericHTML 类型，并会通过 HTML 浏览器进行访问。</p>
+<br/>
+
+</body>
+</html>

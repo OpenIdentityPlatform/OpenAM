@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para agregar una regla a una pol&#237;tica - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.ruleadd"></a><h5>Para agregar una regla a una pol&#237;tica</h5>
+<ol>
+<li><b><a name="indexterm-25"></a>Si ya ha creado la pol&#237;tica, haga clic en el nombre de
+la pol&#237;tica para la que desea agregar la regla. De lo contrario,
+consulte <a href="policy.policynormaladd.html">Para crear una pol&#237;tica normal nueva</a>.</b></li>
+<li><b>En el men&#250; Rules (Reglas), haga clic en Nuevo.</b></li>
+<li><b>Seleccione uno de los siguientes tipos de servicio predeterminados para la regla.
+Es posible que aparezca una lista m&#225;s amplia si se han habilitado
+m&#225;s servicios para la pol&#237;tica:</b><dl><dt>Discovery Service</dt>
+<dd><p>Define las acciones de autorizaci&#243;n para las invocaciones del protocolo de modificaci&#243;n y consulta de servicio de detecci&#243;n realizadas por los clientes de servicios Web para un recurso especificado.</p></dd>
+<dt>Liberty Personal Profile Service</dt>
+<dd><p>Define las acciones de autorizaci&#243;n para las invocaciones del protocolo de modificaci&#243;n y consulta de servicio de perfil personal Liberty realizadas por los clientes de servicios Web para un recurso especificado.</p></dd>
+<dt>Agente de pol&#237;tica de URL</dt>
+<dd><p>Define las acciones de autorizaci&#243;n para el servicio de agente de directiva de URL. Se utiliza para definir las directivas que protegen las URL HTTP y HTTPS. &#201;ste suele ser el uso m&#225;s habitual de las directivas de OpenSSO.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Siguiente.</b></li>
+<li><b>Agregue un nombre y un nombre de recurso para la regla.</b><p>Actualmente, los agentes de directivas de OpenSSO s&#243;lo admiten recursos <tt>http://</tt> y
+<tt>https://</tt>, y no son compatibles con las direcciones IP especificadas en lugar
+del nombre de host.</p><p>Se admiten los comodines para el nombre de recurso, el protocolo, el
+host y el puerto. Por ejemplo:</p><pre>http*://*:*/*.html</pre><p>Al utilizar el servicio de agente de pol&#237;tica de URL, si no
+se especifica ning&#250;n n&#250;mero de puerto, se utilizar&#225; el n&#250;mero de puerto
+predeterminado 80 para <tt>http://</tt> y 443 para <tt>https://</tt>.</p>
+<hr><p><b>Nota &#8211; </b>los pasos 6 y 7 no son aplicables para las pol&#237;ticas de
+referencia.</p>
+<hr>
+</li>
+<li><b>Seleccione la acci&#243;n para la regla. En funci&#243;n del tipo de servicio,
+puede seleccionar lo siguiente:</b>
+<ul><li><p>LOOKUP (Servicio de detecci&#243;n)</p></li>
+<li><p>UPDATE (Servicio de detecci&#243;n)</p></li>
+<li><p>MODIFY (Servicio de perfil personal Liberty)</p></li>
+<li><p>QUERY (Servicio de perfil personal Liberty)</p></li>
+<li><p>GET (Agente de directiva de URL)</p></li>
+<li><p>POST (Agente de directiva de URL)</p></li></ul>
+</li>
+<li><b>Seleccione los valores de acci&#243;n.</b>
+<ul><li><p>Interactuar para consentir: llama al protocolo de interacci&#243;n de Liberty para obtener el consentimiento en un recurso. Esta opci&#243;n s&#243;lo se utiliza con el tipo de servicio de perfil personal Liberty.</p></li>
+<li><p>Interactuar para valor: llama al protocolo de interacci&#243;n de Liberty para obtener un valor en un recurso. Esta opci&#243;n s&#243;lo se utiliza con el tipo de servicio de perfil personal Liberty.</p></li>
+<li><p>Permitir: permite el acceso al recurso que coincide con el que se ha definido en la regla.</p></li>
+<li><p>Denegar: deniega el acceso al recurso que coincide con el que se ha definido en la regla.</p><p>Las reglas de denegaci&#243;n tienen siempre preferencia sobre las reglas de permiso en una pol&#237;tica. Por ejemplo, si tiene dos pol&#237;ticas para un determinado recurso en las que una deniega el acceso y otra lo concede, el resultado ser&#225; una denegaci&#243;n de acceso (si se cumplen las condiciones de ambas pol&#237;ticas). Se recomienda utilizar las pol&#237;ticas de denegaci&#243;n con extrema cautela, ya que pueden provocar conflictos entre las pol&#237;ticas. Normalmente, el proceso de definici&#243;n de pol&#237;ticas s&#243;lo deber&#237;a utilizar reglas de permiso y emplear la denegaci&#243;n predeterminada cuando no se aplique ninguna pol&#237;tica para lograr la denegaci&#243;n.</p><p>Si se utilizan reglas de denegaci&#243;n expl&#237;citas, las pol&#237;ticas asignadas a un usuario mediante diferentes asuntos (como un rol y/o la pertenencia a un grupo) pueden provocar una denegaci&#243;n de acceso a un recurso, aunque haya una o varias pol&#237;ticas que permitan el acceso. Por ejemplo, si hay una pol&#237;tica de denegaci&#243;n para un recurso aplicable a un rol de empleado y hay otra pol&#237;tica de permiso para el mismo recurso aplicable al rol de administrador, se denegar&#225;n las decisiones de pol&#237;ticas asignadas a ambos roles.</p><p>Para solucionar problemas de este tipo, puede designar pol&#237;ticas utilizando los complementos de condiciones. En el ejemplo anterior, una "condici&#243;n de rol" aplicada a la pol&#237;tica de denegaci&#243;n de los usuarios autenticados en el rol de empleado y a la pol&#237;tica de permiso de los usuarios autenticados en el rol de administrador puede ayudar a distinguir las dos pol&#237;ticas. Tambi&#233;n puede utilizar la condici&#243;n <tt>authentication level</tt> en aquellas ubicaciones en las que el rol de administrador se autentique en un nivel superior.</p></li></ul>
+</li>
+<li><b>Haga clic en Finalizar (Finish).</b></li></ol>
+<br/>
+
+</body>
+</html>

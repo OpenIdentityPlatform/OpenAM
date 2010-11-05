@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service de s&#233;curit&#233; de client de service Web Liberty ID - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Service de s&#233;curit&#233; de client de service Web Liberty ID</h4>
+
+
+<a name="ggohs"></a><h5>Classe de plug-in d'attribut de s&#233;curit&#233;</h5>
+<p>Cet attribut sp&#233;cifie le nom de classe d'impl&#233;mentation de l'interface <tt> com.sun.identity.liberty.ws.security.SecurityAttributePlugin. </tt> La
+classe renvoie une liste d'attributs SAML &#224; inclure dans les r&#233;f&#233;rences g&#233;n&#233;r&#233;es
+par le service de d&#233;couverte.</p>
+
+<a name="ggoia"></a><h5>Type d'infos de cl&#233;</h5>
+<p>La valeur d&#233;finie dans cet attribut est utilis&#233;e dans la classe d'impl&#233;mentation
+<tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider </tt>. Elle sp&#233;cifie le type de donn&#233;es &#224; placer dans le bloc
+<tt>KeyInfo</tt> au sein de la signature XML. Si la valeur est <tt>certificate</tt>,
+le certificat X059 du signataire est inclus dans <tt>KeyInfo</tt>. Dans le cas
+contraire, la cl&#233; DSA/RSA correspondante est incluse dans <tt>KeyInfo</tt>.</p>
+
+<a name="ggoin"></a><h5>Classe de fournisseur de jetons de s&#233;curit&#233;</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation du fournisseur de jetons de s&#233;curit&#233;.</p>
+
+<a name="ggohw"></a><h5>Alias de certificat de client de service Web par d&#233;faut</h5>
+<p>Cet attribut sp&#233;cifie l'alias de certificat par d&#233;faut du jeton de s&#233;curit&#233;
+du service Web &#233;metteur de ce client de service Web.</p>
+
+<a name="ggohz"></a><h5>Alias de certificat de signature d'autorit&#233; de confiance</h5>
+<p>Cet attribut sp&#233;cifie l'alias de certificat de l'autorit&#233; de confiance allant &#234;tre
+utilis&#233; pour signer le jeton SAML ou SAML BEARER du message de
+r&#233;ponse.</p>
+
+<a name="ggohd"></a><h5>Alias de certificat de signature d'AC de confiance</h5>
+<p>Cet attribut sp&#233;cifie les alias de certificat d'AC de confiance Jetons SAML
+ou SAML BEARER d'une demande entrante. Le message doit &#234;tre sign&#233; par
+un AC de confiance dans cette liste. La syntaxe est <tt>alias cert 1[:&#233;metteur 1]|alias cert 2[:&#233;metteur 2]|..... </tt></p><p>Exemple&#160;: <tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>. </p><p>L'&#233;metteur de la valeur est utilis&#233; lorsque le jeton ne comporte aucun
+<tt>KeyInfo</tt> dans la signature. L'&#233;metteur du jeton doit figurer dans cette liste
+et l'alias de certificat correspondant est utilis&#233; pour v&#233;rifier la signature. Si
+<tt>KeyInfo</tt> existe, le keystore doit contenir un alias de certificat correspondant au
+<tt>KeyInfo</tt> et l'alias de certificat doit figurer dans cette liste.</p>
+<br/>
+
+</body>
+</html>

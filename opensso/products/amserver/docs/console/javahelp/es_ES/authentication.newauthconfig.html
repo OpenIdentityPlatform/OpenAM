@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear un nuevo encadenamiento de autenticaci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.newauthconfig"></a><h4>Para crear un nuevo encadenamiento de autenticaci&#243;n</h4><ol>
+<li><b><a name="indexterm-7"></a>Haga clic en el nombre del dominio para el que desea agregar
+un nuevo encadenamiento de autenticaci&#243;n.</b></li>
+<li><b>Seleccione la ficha Autenticaci&#243;n.</b></li>
+<li><b>Haga clic en Nuevo en la lista Authentication Chaining (Cadena de autenticaci&#243;n).</b></li>
+<li><b>Introduzca un nombre para la cadena de autenticaci&#243;n.</b></li>
+<li><b>Haga clic en Aceptar.</b></li>
+<li><b>Haga clic en Agregar para definir la instancia del m&#243;dulo de autenticaci&#243;n
+que desee incluir en la cadena. Para ello, seleccione el nombre de
+la instancia del m&#243;dulo en la lista de instancias. Los nombres mostrados
+en esta lista se crean en el atributo de instancias del m&#243;dulo.
+</b></li>
+<li><b>Seleccione los criterios para la cadena. Estos indicadores establecen criterios de obligaci&#243;n
+para el m&#243;dulo de autenticaci&#243;n para el que est&#225;n definidos. Existe una
+jerarqu&#237;a para el cumplimiento de estos criterios. Required (Obligatorio) es el nivel
+superior y Optional (Opcional) es el inferior:</b><dl><dt>Requisito</dt>
+<dd><p>Es necesaria la instancia del m&#243;dulo para que el proceso se realice con &#233;xito. Si es as&#237;, la autenticaci&#243;n contin&#250;a con los elementos inferiores de la lista de cadenas de autenticaci&#243;n. Si falla, se devuelve el control inmediatamente a la aplicaci&#243;n (la autenticaci&#243;n no contin&#250;a con los elementos inferiores de la lista de cadenas de autenticaci&#243;n).</p></dd>
+<dt>Obligatorio</dt>
+<dd><p>Es necesaria la autenticaci&#243;n de este m&#243;dulo para que el proceso se realice con &#233;xito. Si falla alguno de los m&#243;dulos obligatorios, toda la cadena de autenticaci&#243;n fallar&#225; al final. Sin embargo, independientemente de que falle o no un m&#243;dulo obligatorio, el proceso continuar&#225; con el siguiente m&#243;dulo de la cadena.</p></dd>
+<dt>Suficiente</dt>
+<dd><p>No es necesaria la instancia del m&#243;dulo para que el proceso se realice con &#233;xito. Si se realiza con &#233;xito, se devuelve el control inmediatamente a la aplicaci&#243;n (la autenticaci&#243;n no contin&#250;a con las siguientes instancias de m&#243;dulos de la lista). Si falla, la autenticaci&#243;n contin&#250;a con los elementos inferiores de la lista de cadenas de autenticaci&#243;n.</p></dd>
+<dt>Opcional</dt>
+<dd><p>No es necesaria la instancia del m&#243;dulo para que el proceso se realice con &#233;xito. Independientemente de si falla o no, la autenticaci&#243;n contin&#250;a con los elementos inferiores de la lista de cadenas de autenticaci&#243;n.</p></dd>
+</dl>
+</li>
+<li><b>Introduzca las opciones para la cadena. Esto permite definir opciones adicionales para
+el par de clave y valor del m&#243;dulo. Si hay varias opciones,
+&#233;stas se separan mediante un espacio.</b></li>
+<li><b>Defina los siguientes atributos:</b><dl><dt>URL de inicio de sesi&#243;n correcta</dt>
+<dd><p>Especifica la direcci&#243;n URL a la que se redirigir&#225; el usuario si la autenticaci&#243;n se realiza con &#233;xito.</p></dd>
+<dt>URL de inicio de sesi&#243;n no v&#225;lida</dt>
+<dd><p>Especifica la direcci&#243;n URL a la que se redirigir&#225; el usuario si la autenticaci&#243;n presenta errores.</p></dd>
+<dt>Authentication Post Processing Class</dt>
+<dd><p>Define el nombre de la clase de Java utilizado para personalizar los procesos posteriores a la autenticaci&#243;n para inicios de sesi&#243;n v&#225;lidos o err&#243;neos.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Guardar.</b></li></ol>
+<br/>
+
+</body>
+</html>

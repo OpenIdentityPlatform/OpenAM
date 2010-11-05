@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立新群組 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggobg"></a><h5>建立新群組</h5>
+<p>如有需要，可在 Federated Access Manager 管理主控台中執行這項作業。這項作業適用於 Web 代理程式群組和 J2EE 代理程式群組。</p><p>如果您要讓代理程式繼承群組的特定特性，則請建立群組。J2EE 代理程式可繼承 J2EE 代理程式群組的特性，而 Web 代理程式可繼承 Web 代理程式群組的特性。</p><ol>
+<li><b>按一下 [配置] 標籤下的 [代理程式]。</b></li>
+<li><b>如有必要，請選取適當代理程式類型的標籤。</b><ul>
+<li><b>Web 代理程式：</b><p>[Web] 標籤用於 Web 代理程式，且為預設選項。不需要再進行選取。</p></li>
+<li><b>J2EE 代理程式：</b><p>[J2EE] 標籤用於 J2EE 代理程式。如果適用，請按一下此標籤。</p></li></ul></li>
+<li><b>在 [群組] 區段中，按一下 [新建]。</b><p>在 [名稱] 欄位中，輸入新群組的名稱。</p></li>
+<li><b>在 [伺服器 URL] 欄位中，輸入 Federated Access Manager 伺服器 URL。</b></li>
+<li><b>按一下 [建立]。</b><p>主控台會建立代理程式群組，並且再次顯示代理程式 (WebAgent 或 J2EEAgent) 頁面，其中含有群組的連結。</p><p>若要進行額外的群組配置，請按一下此連結，以顯示 [編輯] 代理程式群組頁面。</p><p>您可設定用來配置群組的屬性與用於個別代理程式的屬性相同，僅有的不同之處是 [群組]、[密碼] 和 [密碼確認] 屬性無法在群組層級使用。</p>
+<hr><p><b>備註 &#8211; </b>同時，務必注意某些群組屬性已指定了變數值，而且在大部分情況下不應該變更。以下為這類值的範例：</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

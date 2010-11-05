@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a ResourceID Mapper - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryproviderresourceidmapperadd"></a><h5>To Configure a ResourceID Mapper</h5>
+<p><tt>com.sun.identity.liberty.ws.interfaces.ResourceIDMapper</tt> is an interface used to map a user identifier to the resource
+identifier associated with it. Different implementations may be developed with the implementing class and
+added to the attribute. Following is the procedure for adding a new resourceID
+mapper to the Discovery Service. The starting point is the Discovery Service configuration
+screen within the Web Services module.</p><ol>
+<li><b>Click New to display the new mapper attributes or click on the name
+of a configured mapper to modify it.</b></li>
+<li><b>Provide values for the mapper attributes based on the following information:</b><dl><dt>Provider ID</dt>
+<dd><p>This attribute takes as a value a URI that points to the Discovery Service. The value is written in the format: <tt><b>http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco</b></tt></p></dd>
+<dt>ID Mapper</dt>
+<dd><p>Enter the name for the implementing class.</p></dd>
+</dl>
+</li>
+<li><b>Click OK to complete the mapper configuration.</b></li>
+<li><b>Click Save on the Discovery Service page to complete the service configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

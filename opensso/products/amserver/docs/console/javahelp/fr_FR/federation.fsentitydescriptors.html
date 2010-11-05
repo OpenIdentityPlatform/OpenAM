@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Entit&#233;s : fournisseur et filiale - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptors"></a><h3>Entit&#233;s : fournisseur et filiale</h3>
+<a name="indexterm-62"></a><a name="indexterm-63"></a><a name="indexterm-64"></a><a name="indexterm-65"></a><p>Une <b>entit&#233;</b> peut &#234;tre configur&#233;e avec des <b>m&#233;tadonn&#233;es</b> (informations de configuration d&#233;finissant
+une architecture de service d'identit&#233; particuli&#232;re) d'un fournisseur d'identit&#233;s, d'un fournisseur de
+services ou des deux. Au contraire, une entit&#233; peut &#234;tre configur&#233;e comme
+une affiliation ou un groupe s&#233;lectionn&#233; de fournisseurs de chaque type. Les
+entit&#233;s fournisseur et d'affiliation (filiale) peuvent &#234;tre toutes les deux configur&#233;es &#224;
+l'aide de la console Federation Access Manager.</p>
+<hr><p><b>Remarque &#8211; </b>Une entit&#233; peut &#234;tre cr&#233;&#233;e mais ne pourra pas &#234;tre assign&#233;e &#224;
+un cercle d'approbation tant qu'elle n'a pas &#233;t&#233; renseign&#233;e avec des fournisseurs.</p>
+<hr>
+<p>Les deux types d'entit&#233; sont d&#233;crits dans le tableau suivant.</p><a name="gbxxa"></a><h6>Tableau&#160;1 Types d'entit&#233;s</h6><table><col width="50%"><col width="50%"><tr><td align="left" valign="top" scope="row"><p><b>Entit&#233; fournisseur</b></p></td>
+<td align="left" valign="top" scope="row"><p>Une <b>entit&#233; fournisseur</b> contient
+les m&#233;tadonn&#233;es de fournisseurs individuels de n'importe quel type. Tous les fournisseurs
+d'identit&#233;s et de services doivent &#234;tre configur&#233;s dans une entit&#233; fournisseur avant
+de pouvoir &#234;tre associ&#233;s &#224; un cercle d'approbation ou choisis pour &#234;tre
+inclus dans une <b>entit&#233; filiale</b>. Avec les attributs fournis dans la Console Access
+Manager, un fournisseur d'identit&#233;s individuel, un fournisseur de services individuel ou les
+deux peuvent &#234;tre d&#233;fini dans une entit&#233; fournisseur. Un profil d'entit&#233; fournisseur
+contient les groupes d'attributs suivants :</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">Attributs g&#233;n&#233;raux</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">Fournisseur d'identit&#233;s</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">Fournisseur de services</a></p></li></ul>
+</td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><b>Entit&#233; filiale</b></p></td>
+<td align="left" valign="top" scope="row"><p>Avec une <b>affiliation</b> configur&#233;e, un utilisateur peut
+f&#233;d&#233;rer un groupe de sites associ&#233;s. Par exemple, quand un fournisseur de
+services &#233;met une demande d'authentification s&#233;curis&#233;e pour un utilisateur de la part
+d'une affiliation, l'utilisateur peut b&#233;n&#233;ficier d'une connexion unique avec tous les membres
+de l'affiliation. Une affiliation est b&#226;tie sans tenir compte des limites d'un
+cercle d'approbation.</p><p>Une <b>entit&#233; filiale</b> contient les m&#233;tadonn&#233;es qui d&#233;finissent le regroupement d'une ou
+plusieurs entit&#233;s fournisseur composant l'affiliation. Elle ne contient que les informations de
+configuration de l'affiliation elle-m&#234;me, et aucune information de configuration sur les fournisseurs.
+Un profil d'entit&#233; filiale contient les groupes d'attributs suivants :</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">Attributs g&#233;n&#233;raux</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">Filiale</a></p></li></ul>
+
+<hr><p><b>Remarque &#8211; </b>Les membres d'une
+affiliation peuvent appeler des services soit individuellement, soit de n'importe quel membre
+de l'affiliation.</p>
+<hr>
+</td>
+</tr>
+</table><p>Toutes les entit&#233;s configur&#233;es des deux types sont r&#233;pertori&#233;es sous Entit&#233;s. Les
+t&#226;ches suivantes sont associ&#233;es aux entit&#233;s :</p>
+<ul><li><p><a href="federation.fsentitydescriptorsadd.html">Cr&#233;ation d'une entit&#233; fournisseur ou d'une entit&#233; filiale</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsprofile.html">Modification des attributs g&#233;n&#233;raux d'une entit&#233; fournisseur ou d'une entit&#233; filiale</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">Ajout d'un fournisseur d'identit&#233;s &#224; une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedadd.html">Ajout d'un nouveau fournisseur d'identit&#233;s h&#233;berg&#233; &#224; une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteadd.html">Ajout d'un nouveau fournisseur d'identit&#233;s distant &#224; une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">Ajout d'un fournisseur de services &#224; une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedadd.html">Ajout d'un nouveau fournisseur de services h&#233;berg&#233; &#224; une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteadd.html">Ajout d'un nouveau fournisseur de services distant &#224; une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedprofile.html">Modification des attributs d'un fournisseur d'identit&#233;s h&#233;berg&#233; dans une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteprofile.html">Modification des attributs d'un fournisseur d'identit&#233;s distant dans une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedprofile.html">Modification des attributs d'un fournisseur de services h&#233;berg&#233; dans une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteprofile.html">Modification des attributs d'un fournisseur de services distant dans une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fscreatecontactperson.html">Ajout d'un contact &#224; un fournisseur dans une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fseditcontactperson.html">Modification du profil d'un contact dans une entit&#233; fournisseur</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">Ajout de membres &#224; une entit&#233; filiale</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

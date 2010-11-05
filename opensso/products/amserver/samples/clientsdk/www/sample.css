@@ -1,0 +1,57 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sample.css,v 1.2 2008/06/25 05:41:09 qcheng Exp $
+
+-->
+
+body,td,p,div,span,a,input,big,small{font-family:arial,helvetica,sans-serif}
+body,td,p,div,span,a,input{font-size:small}
+
+body { 
+    background-color:white;
+    margin:0px 3px 0px 3px;
+}
+
+a {
+    color:#594FBF;
+}
+
+td.bannerContentLeft {     
+    background-color:darkslateblue;
+}
+
+td.bannerContentCenter {     
+    background-color:gold;
+    color:darkslateblue;
+    font-weight:bold;
+    text-align:left;
+}
+
+td.bannerContentRight {      
+    background-color:firebrick;
+    color:gold;
+    text-align:right;
+    font-weight:bold;
+}

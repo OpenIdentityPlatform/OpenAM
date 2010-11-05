@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ユーザー - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamuserservice"></a><h4>ユーザー</h4>
+<p><a name="indexterm-198"></a>デフォルトのユーザー設定は、ユーザーサービスを通して定義されます。この設定には、タイムゾーン、ロケール、および DN 開始表示があります。ユーザーサービス属性は動的属性です。</p>
+<ul><li><p><a href="#fxckn">「ユーザー設定言語」</a></p></li>
+<li><p><a href="#fxcnb">「ユーザー設定タイムゾーン」</a></p></li>
+<li><p><a href="#fxcte">「継承するロケール」</a></p></li>
+<li><p><a href="#fxcpk">「管理者 DN 開始表示」</a></p></li>
+<li><p><a href="#fxciz">「デフォルトユーザー状態」</a></p></li></ul>
+
+
+<a name="fxckn"></a><h5>ユーザー設定言語</h5>
+<p>このフィールドは、OpenSSO コンソールに表示されるテキスト言語に関するユーザーの選択項目を指定します。デフォルト値は en です。この値によってユーザーセッションに地域対応化キーのセットがマップされて、画面のテキストがユーザーに合った言語で表示されます。</p>
+
+<a name="fxcnb"></a><h5>ユーザー設定タイムゾーン</h5>
+<p>このフィールドは、ユーザーが OpenSSO コンソールにアクセスするタイムゾーンを指定します。デフォルト値は存在しません。</p>
+
+<a name="fxcte"></a><h5>継承するロケール</h5>
+<p>このフィールドは、ユーザーのロケールを指定します。デフォルト値は en_US です。ロケールのリストについては、<a href="supportedlang.html">「サポートされている言語ロケール」</a>を参照してください。</p>
+
+<a name="fxcpk"></a><h5>管理者 DN 開始表示</h5>
+<p>このユーザーが OpenSSO 管理者の場合、このフィールドはユーザーがログインするときに OpenSSO コンソールに表示される開始点となるノードを指定します。デフォルト値は存在しません。ユーザーが少なくとも読み取りアクセス権を持っている有効な DN を使用することができます。</p>
+
+<a name="fxciz"></a><h5>デフォルトユーザー状態</h5>
+<p>このオプションは、新しく作成したユーザーのデフォルト状態を示します。ユーザーエントリ状態の方がこの状態よりも優先されます。アクティブなユーザーだけが OpenSSO を使用して認証を受けることができます。デフォルト値は「アクティブ」です。プルダウンメニューから次のどちらかを選択することができます。</p><dl><dt>アクティブ</dt>
+<dd><p>ユーザーは OpenSSO を使用して認証を受けることができます。</p></dd>
+<dt>非アクティブ</dt>
+<dd><p>ユーザーは OpenSSO を使用して認証を受けることはできないが、ユーザープロファイルはそのままディレクトリに格納されます。</p></dd>
+</dl>
+<p>個々のユーザー状態は、ユーザーサービスを登録し、値を選択してロールに適用し、そのロールをユーザープロファイルに追加することによって設定します。</p>
+<br/>
+
+</body>
+</html>

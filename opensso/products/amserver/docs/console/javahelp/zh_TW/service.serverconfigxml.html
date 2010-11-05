@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>目錄配置 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serverconfigxml"></a><h4>目錄配置</h4>
+<p>[目錄配置] 屬性定義內嵌式目錄存放區的基本配置資訊：</p>
+
+<a name="ggkdy"></a><h5>目錄配置</h5>
+<p>[目錄配置] 屬性包括：</p>
+
+<a name="ggkeu"></a><h5>最小連線池</h5>
+<p>指定用於連線至 Directory Server 的連線池最小大小，如 LDAP 伺服器屬性中指定的最小大小。預設值為 1。</p>
+
+<a name="ggkdx"></a><h5>最大連線池</h5>
+<p>此屬性指定用於連線至 Directory Server 的連線池最大大小，如 LDAP 伺服器屬性中指定的最大大小。預設值為 10。</p>
+
+<a name="ggket"></a><h5>連結 DN</h5>
+<p>指定 LDAP 伺服器中的連結 DN。</p>
+
+<a name="ggkdn"></a><h5>連結密碼</h5>
+<p>定義用於連結至 LDAP 伺服器的密碼。依預設，會使用安裝期間輸入的 amldapuser 密碼做為連結使用者。</p>
+
+<a name="ghama"></a><h5>伺服器</h5>
+<p>此屬性會定義當做 OpenSSO 實例的配置資料存放區使用的目錄伺服器。若要增加配置伺服器，按一下 [增加] 按鈕，然後提供下列屬性的值：</p><dl><dt>名稱</dt>
+<dd><p>輸入伺服器的名稱。</p></dd>
+<dt>主機名稱</dt>
+<dd><p>指定 Directory Server 的完全合格的主機名稱。例如：</p><p><tt></tt><i>DirectoryServerHost.domainName</i><tt>.com </tt></p></dd>
+<dt>連接埠號碼</dt>
+<dd><p>指定 Directory Server 的連接埠號碼。</p></dd>
+<dt>連線類型</dt>
+<dd><p>定義 Directory Server 的連線類型。依預設會選取 SIMPLE。您也可以選擇 SSL。</p></dd>
+</dl>
+
+
+<a name="ggkdu"></a><h5>舊有配置</h5>
+<p>下列屬性會針對 OpenSSO 的舊有模式實例定義基本目錄伺服器配置。這些屬性僅會在 [舊有模式] 安裝中出現。</p>
+
+<a name="ggkej"></a><h5>最小連線池</h5>
+<p>指定用於連線至 Directory Server 的連線池最小大小，如 LDAP 伺服器屬性中指定的最小大小。預設值為 1。</p>
+
+<a name="ggkdw"></a><h5>最大連線池</h5>
+<p>此屬性指定用於連線至 Directory Server 的連線池最大大小，如 LDAP 伺服器屬性中指定的最大大小。預設值為 10。</p>
+
+<a name="ggkey"></a><h5>伺服器</h5>
+<p>此屬性會列出負載平衡器協定、主機名稱和連接埠。例如：<tt>http://lb.example.com:80</tt>。</p>
+<br/>
+
+</body>
+</html>

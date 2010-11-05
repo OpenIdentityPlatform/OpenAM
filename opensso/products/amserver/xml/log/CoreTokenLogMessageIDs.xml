@@ -1,0 +1,160 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: CoreTokenLogMessageIDs.xml,v 1.1 2009/11/19 00:10:37 qcheng Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="CORETOKEN">
+    <logmessage name="TOKEN_CREATE_SUCCESS" id="1"
+	loglevel="LL_INFO"
+	description="Creating a token succeeded">
+	<datainfo>
+	    <item>token type</item>
+	    <item>token subject</item>
+	    <item>token attribute names</item>
+	</datainfo>
+	<triggers>
+	    <item>Create token</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="TOKEN_READ_SUCCESS" id="2"
+        loglevel="LL_INFO"
+        description="Retrieving a token succeeded">
+	<datainfo>
+	    <item>token type</item>
+	    <item>token subject</item>
+	</datainfo>
+        <triggers>
+            <item>Read token</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="TOKEN_UPDATE_SUCCESS" id="3"
+        loglevel="LL_INFO"
+        description="Updating a token succeeded">
+        <datainfo>
+	    <item>names of attributes updated</item>
+        </datainfo>
+        <triggers>
+            <item>Update token</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="TOKEN_SEARCH_SUCCESS" id="4"
+	loglevel="LL_INFO"
+	description="Searching tokens succeeded">
+	<datainfo>
+	    <item>query</item>
+	    <item>number of entries returned</item>
+	</datainfo>
+	<triggers>
+	    <item>Search token</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="TOKEN_DELETE_SUCCESS" id="5"
+	loglevel="LL_INFO"
+	description="Removing a token succeeded">
+	<datainfo />
+	<triggers>
+	    <item>Delete token</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="EXPIRED_TOKEN_DELETE_SUCCESS" id="6"
+        loglevel="LL_INFO"
+        description="Removing an expired token succeeded">
+        <datainfo />
+        <triggers>
+            <item>Token expired</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_CREATE_TOKEN" id="7"
+	loglevel="LL_INFO"
+	description="Creating a token failed">
+	<datainfo>
+            <item>error message</item>
+            <item>token type</item>
+            <item>token subject</item>
+	    <item>token attribute names</item>
+	</datainfo>
+	<triggers>
+	    <item>Create token</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_READ_TOKEN" id="8"
+	loglevel="LL_INFO"
+	description="Retrieving a token failed">
+	<datainfo>
+            <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Read token</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_UPDATE_TOKEN" id="9"
+	loglevel="LL_INFO"
+	description="Updating a token failed">
+	<datainfo>
+            <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Update token</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_SEARCH_TOKEN" id="10"
+        loglevel="LL_INFO"
+        description="Searching tokens failed">
+        <datainfo>
+	    <item>query</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Search Token</item>
+        </triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_DELETE_TOKEN" id="11"
+        loglevel="LL_INFO"
+        description="Removing a token failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Delete token</item>
+        </triggers>
+	<actions />
+    </logmessage>
+</logmessages>

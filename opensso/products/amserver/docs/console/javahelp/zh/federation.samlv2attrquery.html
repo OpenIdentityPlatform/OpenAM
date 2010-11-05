@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自定义 SAMLv2 属性查询 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>自定义 SAMLv2 属性查询</h4>
+<p>SAMLv2 属性查询包含以下自定义的属性：</p>
+<ul><li><p><a href="#ggwht">NameID 格式</a></p></li>
+<li><p><a href="#ggwgs">证书别名</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>NameID 格式</h5>
+<p>定义属性查询提供者所支持的名称标识符格式。提供者可通过名称标识符进行涉及到用户的通信。单点登录交互支持以下三种标识符类型：</p>
+<ul><li><p><b>X509SubjectName</b> 定义 X509 加密类型的主体名称。</p></li>
+<li><p><b>持久标识符</b>作为两个属性的值保存到特定的用户数据存储库条目中。</p></li>
+<li><p><b>临时标识符</b>是临时的，不会有任何数据写入用户的持久数据存储库。</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>证书别名</h5>
+<p>此属性为提供者定义证书别名元素。<tt>签署</tt>指定用于在密钥库中查找正确的签署证书的提供者证书别名。<tt>加密</tt>指定用于在密钥库中查找正确的加密证书的提供者证书别名。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>신뢰할 수 있는 파트너: 신뢰할 수 있는 파트너 속성 구성 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamltrustedpartnersadd"></a><h5>신뢰할 수 있는 파트너: 신뢰할 수 있는 파트너 속성 구성</h5>
+<a name="indexterm-83"></a><p>다음은 신뢰할 수 있는 파트너를 구성하는 절차의 두 번째 부분입니다. 시작 위치는
+<a href="federation.fssamlselecttrustedpartnertype.html">신뢰할 수 있는 파트너: 파트너 유형 및 프로필 선택</a>입니다. 첫 번째 부분에서 선택한 역할을 기반으로 다음 절에 나열된 하위 속성이
+정의되어야 합니다.</p>
+<hr><p><b>주 &#8211; </b>연합 아래의 SAML 구성 화면에서 [편집] 또는 [복제]를 눌러 이 페이지로 이동한
+경우 아래의 단계에 따라 신뢰할 수 있는 파트너 프로필을 수정하고 [저장]을 눌러
+값을 변경합니다. SAML 프로필 페이지에서 [저장]을 눌러 수정을 완료합니다. </p>
+<hr>
+<ol>
+<li><b>공통 설정 하위 속성에 대한 값을 입력합니다.</b><dl><dt>이름</dt>
+<dd><p>조직 이름 등의 문자열을 사용할 수 있습니다.</p></dd>
+<dt>소스 아이디</dt>
+<dd><p>파트너 사이트에서 가져온 20바이트 시퀀스(Base64 형식을 사용하여 인코딩됨)입니다. 일반적으로 사이트 식별자 속성을 구성할 때 사이트 아이디 속성에 사용한 값과 같은 값입니다.</p></dd>
+<dt>대상</dt>
+<dd><p>파트너 사이트의 도메인입니다(포트 번호가 있거나 없음). 이 도메인에서 호스트되는 웹 페이지에 연결하려면 리디렉션 URL을 신뢰할 수 있는 파트너 속성에 정의된 값에서 선택합니다.</p>
+<hr><p><b>주 &#8211; </b>같은 도메인에 대해 두 개의 정의된 항목(포트 번호가 있는 항목과 포트 번호가 없는 항목)이 있는 경우 포트 번호가 있는 항목의 우선 순위가 더 높습니다. 예를 들어 두 신뢰할 수 있는 파트너 정의로서<tt>target=sun.com</tt> and <tt>target=sun.com:8080</tt>을 가정합니다. 기본이 <tt>http://machine.sun.com:8080/index.html</tt>을 찾는 경우 두 번째 정의가 선택됩니다.</p>
+<hr>
+</dd>
+<dt>SAML URL</dt>
+<dd><p>웹 브라우저 아티팩트 프로필을 구현하는 서블릿을 가리키는 URL입니다.</p></dd>
+<dt>호스트 목록</dt>
+<dd><p>파트너가 사용하는 IP 주소, DNS 호스트 이름 또는 클라이언트 인증 인증서 별칭의 목록입니다. 이 목록은 이 인증 기관에 요청을 전송할 수 있는 파트너 사이트 내의 모든 호스트에 대해 구성됩니다. 이 목록은 요청자가 아티팩트의 의도된 수신자인지 확인하는 데 도움이 됩니다. 요청자가 이 목록에 정의되어 있으면 상호 작용을 계속 합니다. 요청자의 정보가 호스트 목록에 정의된 호스트와 일치하지 않으면 요청이 거부됩니다.</p></dd>
+<dt>사이트 속성 매퍼</dt>
+<dd><p>클래스는 인증 명제에서 <tt>AttributeStatements</tt> 요소로 정의된 속성 값의 목록을 반환하는 데 사용됩니다. 사이트 속성 매퍼는 <tt>PartnerSiteAttributeMapper</tt> 인터페이스에서 구현해야 합니다.</p><p>클래스가 정의되지 않은 경우 명제에 속성이 포함되지 않습니다.</p></dd>
+<dt>이름 식별자 매퍼</dt>
+<dd><p>명제의 주제가 대상 사이트에서 아이디와 관련되는 방법을 정의하는 클래스입니다. 계정 매퍼는 <tt>com.sun.identity.saml.plugins.</tt><tt>PartnerAccountMapper</tt> 인터페이스에서 구현되어야 합니다. 기본값은 <tt>com.sun.identity.saml.plugins.</tt><tt>DefaultAccountMapper</tt>입니다.</p><p>클래스가 정의되지 않은 경우 명제에 속성이 포함되지 않습니다.</p></dd>
+<dt>버전</dt>
+<dd><p>SAML 요청을 전송하는 데 사용되는 SAML 버전(<tt>1.0</tt> 또는 <tt>1.1</tt>)입니다. 버전 또는 프로토콜을 변경하려면 [로컬 사이트 등록 정보] 버튼을 누르고 필요에 따라 프로토콜 및 명제 속성을 변경합니다. </p></dd>
+<dt>인증서</dt>
+<dd><p>파트너가 명제에 서명했고 서명된 명제의 <tt>KeyInfo</tt> 부분에서 인증서를 찾을 수 없는 경우 명제의 서명을 확인하는 데 사용되는 인증서 별칭을 지정합니다.</p></dd>
+<dt>발급자</dt>
+<dd><p>생성된 명제의 작성자입니다. 기본 구문은 <i>hostname</i><tt>:</tt><i> port</i>입니다.</p></dd>
+</dl>
+</li>
+<li><b>대상 하위 속성의 값을 입력합니다.</b><dl><dt>아티팩트: SAML URL</dt>
+<dd><p>웹 브라우저 아티팩트 프로필을 구현하는 서블릿을 가리키는 URL입니다.</p></dd>
+<dt>게시: 게시 URL</dt>
+<dd><p>웹 브라우저 게시 프로필을 구현하는 서블릿을 가리키는 URL입니다.</p></dd>
+<dt>SOAP 쿼리: 속성 매퍼</dt>
+<dd><p>쿼리에서 단일 사인온(SSO) 정보를 얻는 데 사용하는 클래스입니다. 포함된 인터페이스에서 속성 매퍼를 구현해야 합니다. 클래스가 지정되지 않은 경우 <tt>DefaultAttributeMapper</tt>가 사용됩니다.</p></dd>
+<dt>SOAP 쿼리: 작업 매퍼</dt>
+<dd><p>단일 사인온(SSO) 정보를 가져오고 인증 결정에 파트너 작업을 매핑하는 데 사용되는 클래스입니다. 포함된 인터페이스에서 작업 매퍼를 구현해야 합니다. 클래스가 지정되지 않은 경우 <tt>DefaultActionMapper</tt>가 사용됩니다.</p></dd>
+</dl>
+</li>
+<li><b>소스 하위 속성의 값을 입력합니다.</b><dl><dt>아티팩트: SOAP URL</dt>
+<dd><p>SAML SOAP 수신자에 대한 URL입니다.</p></dd>
+<dt>인증 유형</dt>
+<dd><p>SAML과 함께 사용할 수 있는 인증 유형입니다.</p>
+<ul><li><p>HTTP를 사용하여 SAML SOAP 수신기의 URL에 액세스하는 경우 HTTP 기본 인증 또는 SSL로 SAML SOAP 수신기가 보호되지 않으면 <tt>NOAUTH</tt>를 지정하십시오.</p></li>
+<li><p>HTTP를 사용하여 SAML SOAP 수신기의 URL에 액세스하는 경우 HTTP 기본 인증으로 SAML SOAP 수신기가 보호되면 <tt>BASICAUTH</tt>를 지정하십시오.</p></li>
+<li><p>HTTPS를 사용하여 SAML SOAP 수신기의 URL에 액세스하는 경우 HTTP SSL로 SAML SOAP 수신기가 보호되어 있지 않으면 <tt>SSL</tt>을 지정하십시오.</p></li>
+<li><p>HTTPS를 사용하여 SAML SOAP 수신기의 URL에 액세스하는 경우 <tt>BASIC AUTH WITH SSL</tt>로 SAML SOAP 수신기가 보호되어 있지 않으면 <tt>BASIC AUTH WITH SSL</tt>를 지정하십시오. </p></li></ul>
+
+<hr><p><b>주 &#8211; </b>HTTP 기본 인증을 사용하여 SAML SOAP 수신기 URL을 보호하는 경우에는 OpenSSO 구성이 아니라 웹 컨테이너 구성에서 보호할 수 있습니다. 그러나 OpenSSO 구성에서는 HTTP 기본 인증 사용자 아이디와 비밀번호를 제공해야 합니다. </p>
+<hr>
+<p>이 속성은 선택 사항입니다. 지정되지 않은 경우 기본값은 <tt>NOAUTH</tt>입니다. <tt>BASICAUTH</tt> 또는 <tt>SSLWITHBASICAUTH</tt>가 지정된 경우 신뢰할 수 있는 파트너 속성이 필요하며 <tt>HTTPS</tt>여야 합니다.</p></dd>
+<dt>사용자</dt>
+<dd><p><tt>BASICAUTH</tt>가 인증 유형으로 선택된 경우 이 속성 값은 파트너의 SOAP 수신자를 보호하는 데 사용하는 파트너의 사용자 식별자를 정의합니다.</p></dd>
+<dt>사용자 비밀번호</dt>
+<dd><p><tt>BASICAUTH</tt>가 인증 유형으로 선택된 경우 이 속성 값은 파트너의 SOAP 수신자를 보호하는 데 사용하는 파트너의 사용자 식별자 비밀번호를 정의합니다.</p></dd>
+<dt>사용자 비밀번호(재입력)</dt>
+<dd><p>이전에 정의한 비밀번호를 다시 입력합니다.</p></dd>
+</dl>
+</li>
+<li><b>[마침]을 누릅니다.</b></li>
+<li><b>SAML 프로필 페이지에서 [저장]을 눌러 구성을 완료합니다. </b></li></ol>
+<br/>
+
+</body>
+</html>

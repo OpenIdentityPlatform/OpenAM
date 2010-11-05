@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sts-saml.xhtml,v 1.5 2009/11/13 17:16:57 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+<o:section>
+    <ui:define name="section-title">
+        <ice:outputText
+            value="#{resources['sts-saml.section-title']}"/>
+    </ui:define>
+    <ui:define name="section-details">
+
+        <ice:outputText
+            rendered="#{wizardBean.samlAttributeMappingAvailable}"
+            value="#{resources['sts-saml.section-details.withSaml']}"/>
+
+        <ice:outputText
+            rendered="#{!wizardBean.samlAttributeMappingAvailable}"
+            value="#{resources['sts-saml.section-details.withoutSaml']}"/>
+
+    </ui:define>
+    <ui:define name="section-body">
+
+    <ice:panelGrid 
+        columns="2" 
+        columnClasses="label-column,input-column"
+        rendered="#{wizardBean.samlAttributeMappingAvailable}">
+
+        <ice:outputLabel 
+            for="attributeMapping"
+            style="float: right;"
+            value="#{resources['sts-saml.attributeMapping']}" />
+        <o:samlAttributesTable
+            samlAttributesTable="#{wizardBean.stsProfileBean.samlAttributesTable}" />
+                
+        <ice:outputLabel 
+            effect="#{wizardBean.stsProfileBean.nameIdMapperMessageEffect}"
+            for="nameIdMapper"
+            style="float: right;"
+            value="#{resources['sts-saml.nameIdMapperLabel']}" />
+        <ice:panelGrid columns="1">
+            <ice:inputText
+                id="nameIdMapper"
+                effect="#{wizardBean.stsProfileBean.nameIdMapperInputEffect}"
+                size="70"
+                maxlength="1024"
+                value="#{wizardBean.stsProfileBean.nameIdMapper}" />
+            <o:inlineHelp key="sts-saml.nameIdMapperInlineHelp" />
+        </ice:panelGrid>
+
+        <ice:outputLabel 
+            effect="#{wizardBean.stsProfileBean.attributeNamespaceMessageEffect}"
+            for="attributeNamespace"
+            style="float: right;"
+            value="#{resources['sts-saml.attributeNamespaceLabel']}" />
+        <ice:panelGrid columns="1">
+            <ice:inputText
+                id="attributeNamespace"
+                effect="#{wizardBean.stsProfileBean.attributeNamespaceInputEffect}"
+                size="70"
+                maxlength="1024"
+                value="#{wizardBean.stsProfileBean.attributeNamespace}" />
+            <o:inlineHelp key="sts-saml.attributeNamespaceInlineHelp" />
+        </ice:panelGrid>
+
+        <ice:outputLabel 
+            for="includeMemberships"
+            style="float: right;"
+            value="#{resources['sts-saml.includeMembershipsLabel']}" />
+        <ice:panelGrid columns="1">
+            <ice:selectOneRadio
+                value="#{wizardBean.stsProfileBean.includeMemberships}">
+                <f:selectItem
+                    itemLabel="#{resources['sts-saml.includeMembershipsTrueLabel']}"
+                    itemValue="true" />
+                <f:selectItem
+                    itemLabel="#{resources['sts-saml.includeMembershipsFalseLabel']}"
+                    itemValue="false" />
+            </ice:selectOneRadio>
+            <o:inlineHelp key="sts-saml.includeMembershipsInlineHelp" />
+        </ice:panelGrid>
+        
+      </ice:panelGrid>
+
+  </ui:define>
+</o:section>
+
+</span>

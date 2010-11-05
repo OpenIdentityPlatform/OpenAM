@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty Interaction Service - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Liberty Interaction Service</h4>
+
+
+<a name="ggofj"></a><h5>WSP to Redirect User for Interaction</h5>
+<p>This attribute indicates whether the web service provider will redirect the user for
+consent. The default value is yes.</p>
+
+<a name="ggofq"></a><h5>WSP to Redirect User for Interaction for Data</h5>
+<p>This initiates an interaction to get user consent or to collect additional data.
+This property indicates whether the web service provider will redirect the user to
+collect additional data. The default value is yes.</p>
+
+<a name="ggogl"></a><h5>WSP's Expected Duration for Interaction</h5>
+<p>This attribute indicates the length of time (in seconds) that the web service
+provider expects to take to complete an interaction and return control back to
+the web service client. For example, the web service provider receives a request
+indicating that the web service client will wait a maximum 30 seconds (set
+in WSC's Expected Duration for Interaction) for interaction. If this attribute is set
+to 40 seconds, the web service provider returns a SOAP fault (<tt>timeNotSufficient</tt>), indicating
+that the time is insufficient for interaction.</p>
+
+<a name="ggogn"></a><h5>WSP to Enforce That returnToURL must be SSL</h5>
+<p>This attribute indicates whether the web service provider will enforce a HTTPS <tt>returnToURL</tt>specified
+by the web service client. The Liberty Alliance Project specifications state that the value
+of this property is always yes. The false value is primarily meant for
+ease of deployment in a phased manner.</p>
+
+<a name="ggoib"></a><h5>WSP to Enforce Return to Host be the Same as Request Host</h5>
+<p> This attribute indicates whether the web service provider would enforce the address values
+of <tt>returnToHost</tt> and <tt>requestHost</tt> if they are the same. The Liberty Alliance Project
+specifications state that the value of this property is always yes. The false
+value is primarily meant for ease of deployment in a phased manner.</p>
+
+<a name="ggoha"></a><h5>HTML Style Sheet Location</h5>
+<p>This attribute points to the location of the style sheet that is used
+to render the interaction page in HTML.</p>
+
+<a name="ggohi"></a><h5>WML Style Sheet Location</h5>
+<p>This attribute points to the location of the style sheet that is used
+to render the interaction page in WML.</p>
+
+<a name="ggogg"></a><h5>WSP Interaction URL</h5>
+<p>This attribute specifies the URL where the <tt>WSPRedirectHandler</tt> servlet is deployed. The
+servlet handles the service provider side of interactions for user redirects.</p>
+
+<a name="ggoft"></a><h5>WSP Interaction URL if Behind Load Balancer</h5>
+<p>Defines the WSP redirect handler URL exposed by a Load Balancer.</p>
+
+<a name="ggogq"></a><h5>List of Interaction URLs of the WSP Cluster (site) Behind the Load Balancer</h5>
+<p>Defines the WSP redirect handler URLs of trusted servers in the cluster.</p>
+
+<a name="ggogx"></a><h5>Interaction Configuration Class</h5>
+<p>This attribute specifies the class that provides access methods to read interaction configurations.</p>
+
+<a name="ggogj"></a><h5>Options for WSC to Participate in Interaction</h5>
+<p>This attribute indicates the level of interaction in which the WSC will participate
+if configured to participate in user redirects. The possible values are interactIfNeeded, doNotInteract,
+and doNotInteractForData. The affirmative interactIfNeeded is the default.</p>
+
+<a name="ggogs"></a><h5>WSC to Include userInteractionHeader</h5>
+<p>This attribute indicates whether the web service client will include a SOAP header
+to indicate certain preferences for interaction based on the Liberty specifications. The default
+value is yes.</p>
+
+<a name="ggofn"></a><h5>WSC to redirect user for Interaction</h5>
+<p>This attribute defines whether the WSC will participate in user redirections. The default
+value is yes.</p>
+
+<a name="ggoim"></a><h5>WSC's Expected Duration for Interaction</h5>
+<p>This attribute defines the maximum length of time (in seconds) that the web
+service client is willing to wait for the web service provider to complete
+its portion of the interaction. The web service provider will not initiate an
+interaction if the interaction is likely to take more time than what is
+set. For example, the web service provider receives a request where this property
+is set to a maximum 30 seconds. If the web service provider property
+WSP's Expected Duration for Interaction is set to 40 seconds, the web service
+provider returns a SOAP fault (<tt>timeNotSufficient</tt>), indicating that the time is insufficient for interaction.</p>
+
+<a name="ggofx"></a><h5>WSC to Enforce that Redirection URL Must be SSL</h5>
+<p>This attribute specifies whether the web service client will enforce HTTPS in redirected
+URLs. The Liberty Alliance Project specifications state that the value of this property
+is always yes, which indicates that the web service provider will not redirect
+the user when the value of <tt>redirectURL</tt> (specified by the web service provider) is
+not an HTTPS URL. The false value is primarily meant for easy, phased
+deployment.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,1045 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: ssopre80upgrade,v 1.3 2009/04/14 21:25:08 ww203982 Exp $
+#
+#
+
+#
+# This script does the preparation before upgrade to OpenSSO 8.0 binaries.
+# The script can be run on Java ES 3, Java ES 4  , Java ES 5 and
+# FM 7.0 installations.
+#
+# It does the following:
+#
+# 1. Backs up the essential Access Manager files on the existing system.
+# 2. Removes the Sun Java(tm) System Access Manager 6.3 , 7.0 , 7.1 Packages.
+# 3. Removes the Sun Java(tm) Federation Manager 7.0 Packages
+# 4. Removes the SAMLv2 Plugin package.
+# 5. Updates the /var/sadm/install/productregistry file to reflect the package
+#    removal for JES AM packages.
+#
+
+DEF_UMASK=022
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+OS=`uname`
+if [ $OS = "Linux" ]; then
+    SORT=/bin/sort
+    GREP=/bin/grep
+    LOCALE=/usr/bin/locale
+    CP="/bin/cp -rp"
+    MV=/bin/mv
+    ECHO="/bin/echo -n"
+    NECHO="/bin/echo"
+    SED=/bin/sed
+    MKDIR="/bin/mkdir -p"
+    AWK=/usr/bin/awk
+    gettext=/usr/bin/gettext
+    RM="/bin/rm -r"
+    DATE=/bin/date
+    RPM=/bin/rpm
+    CUT=/usr/bin/cut
+    DOMAINNAME=/bin/domainname
+    PRODUCT_DIR=identity
+    PROD_REGISTRY="/var/opt/sun/install"
+    CONFIG_DIR="/etc/opt/sun/identity/config"
+    classpath=`dirname $0`
+    ldlibrary=`dirname $0`
+    LDAPMODIFY=/opt/sun/private/bin/ldapmodify
+    LDAPDELETE=/opt/sun/private/bin/ldapdelete
+    LDAPLIBS=/opt/sun/share/lib
+else 
+    SORT=/usr/bin/sort
+    GREP=/usr/bin/grep
+    LOCALE=/usr/bin/locale
+    CP="/usr/bin/cp -rp"
+    MV=/usr/bin/mv
+    ECHO=/usr/bin/echo
+    NECHO=/usr/bin/echo
+    SED=/usr/bin/sed
+    MKDIR="/usr/bin/mkdir -p"
+    AWK=/usr/bin/awk
+    gettext=/usr/bin/gettext
+    RM="/bin/rm -r"
+    DATE=/usr/bin/date
+    PKGRM=/usr/sbin/pkgrm
+    CUT=/usr/bin/cut
+    DOMAINNAME=/usr/bin/domainname
+    PRODUCT_DIR=SUNWam
+    PKGINFO=/usr/bin/pkginfo
+    PROD_REGISTRY="/var/sadm/install"
+    CONFIG_DIR=/etc/opt/SUNWam/config
+    classpath=`dirname $0`
+    ldlibrary=`dirname $0`
+    OMIT='\c'
+    LDAPMODIFY=/usr/sfw/bin/ldapmodify
+    LDAPDELETE=/usr/sfw/bin/ldapdelete
+    LDAPLIBS=/usr/share/lib:/usr/lib/mps/secv1
+fi
+### HP-UX is not supported
+### this is redundant for now.
+#####hpux-dev#####
+if [ $OS = "HP-UX" ]; then
+	gettext=/usr/local/bin/gettext
+	PRODUCT_DIR=identity
+	CONFIG_DIR=/etc/opt/sun/identity/config
+	LOGDIR=/var/tmp
+	PROD_REGISTRY=/var/adm/sw
+	SWLIST=/usr/sbin/swlist
+	LDAPMODIFY=/opt/sun/private/bin/ldapmodify
+    LDAPDELETE=/opt/sun/private/bin/ldapdelete
+    LDAPLIBS=/opt/sun/private/lib
+fi	
+
+OPTIONS='-DinstallTime=true'
+export OPTIONS
+
+FM_STAGING_DIR=""
+isFM=false
+AMCONFIG=$CONFIG_DIR/AMConfig.properties
+AMCONFIG_TEMPLATE=$CONFIG_DIR/AMConfig.properties.template
+SERVER_CONFIG=$CONFIG_DIR/serverconfig.xml
+PROD_REGISTRY_FILE=$PROD_REGISTRY/productregistry
+PROD_REGISTRY_BACKUP=$PROD_REGISTRY/productregistry.preupgrade
+PROD_REGISTRY_TEMP=$PROD_REGISTRY/productregistry.pkgrm
+TEXTDOMAIN=setupscripts
+TEXTDOMAINDIR=${classpath}/locale
+NLSPATH=$TEXTDOMAINDIR
+
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+export NLSPATH
+export LANG
+
+
+OPEN='('
+CLOSE=')'
+
+LOGSUFFIX=`$DATE '+%m%d%H%M'`
+LOG=/var/sadm/install/logs/Sun_Java_System_Access_Manager_upgrade_log.$LOGSUFFIX
+FM_LOG=/tmp/Sun_Federation_Manager_upgrade.log.$LOGSUFFIX
+###############################################
+#
+# test for root user
+#
+
+check_root_user() {
+    if test `id | $AWK '{print $1}'` != "uid=0(root)"
+    then
+        eval $ECHO "`$gettext 'You must be root user to run $0.'`"
+        exit 1
+    fi
+}
+
+
+###############################################
+#
+# get hostname info
+#
+
+get_host_info() {
+    HOSTNAME_FULL="`/bin/uname -n`"
+    HOSTNAME=`$ECHO "$HOSTNAME_FULL" | $CUT -d. -f1`
+    fulldomain=`$DOMAINNAME`
+
+    HOSTNAME_FULL="$HOSTNAME.$fulldomain"
+    $NECHO "HOSTNAME_FULL = $HOSTNAME.$fulldomain" >> $LOG
+
+}
+
+
+##############################################################################
+#
+#  get information from $INSTALL_DIR/lib/AMConfig.properties
+#  make sure that get_SUNWamsvc_info is called first, to get INSTALL_DIR
+#
+get_AMConfig_info() {
+    if [ "$isFM" = "true" ]; then
+         CONFIG_DIR=$FM_STAGING_DIR/web-src/WEB-INF/classes
+         SERVER_CONFIG=${FM_STAGING_DIR}/web-src/WEB-INF/config/serverconfig.xml
+    fi
+    export CONFIG_DIR
+
+    DS_HOST=`$GREP "com.iplanet.am.directory.host=" $CONFIG_DIR/AMConfig.properties | $SED -e "s/.*directory.host=//"`
+    export DS_HOST
+    DS_PORT=`$GREP "com.iplanet.am.directory.port=" $CONFIG_DIR/AMConfig.properties | $SED -e "s/.*directory.port=//"`
+    if [ "$isFM" = "true" ]; then
+        DS_PORT=`$AWK '/port/ { print $4 }'  ${FM_STAGING_DIR}/web-src/WEB-INF/config/serverconfig.xml | $SORT -u | $SED -e 's/port=\"//' | $SED -e 's/\"//'`
+    fi
+    export DS_PORT
+    AMADMIN_DN=`$GREP "com.sun.identity.authentication.super.user=" $CONFIG_DIR/AMConfig.properties | $SED -e "s/.*super.user=//"`
+    export AMADMIN_DN
+    $NECHO "get_AMConfig_info: DS_HOST=$DS_HOST, DS_PORT=$DS_PORT" >> $LOG
+    $NECHO "get_AMConfig_info: AMADMIN_DN=$AMADMIN_DN" >> $LOG
+}
+
+
+##############################################################################
+#
+#  get directory server hostname and port number
+#
+get_directory_server_info() {
+    $ECHO ""
+    eval $ECHO "`$gettext 'Directory Server fully-qualified hostname ${OPEN} $DS_HOST ${CLOSE}: ${OMIT}'`"
+    read tmp
+    if [ "$tmp" != "" ]
+    then
+        DS_HOST=$tmp
+    fi
+    
+    eval $ECHO "`$gettext 'Directory Server port ${OPEN} $DS_PORT ${CLOSE}: ${OMIT}'`"
+    read tmp
+    if [ "$tmp" != "" ]
+    then
+        DS_PORT=$tmp
+    fi
+    $NECHO "get_directory_server_info: DS_HOST = $DS_HOST, DS_PORT = $DS_PORT" >> $LOG
+}
+
+
+##############################################################
+#
+#  find base install dir
+#
+get_base_dir() {
+    # check existance of SUNWamsdk.
+    
+    if [ $OS = "Linux" ]; then
+    $RPM -q sun-identity-sdk
+#####hpux-dev#####    	
+    elif [ $OS = "HP-UX" ]; then
+       	$SWLIST -l product sun-identity-sdk >/dev/null 2>&1
+    else
+        $PKGINFO -q SUNWamsdk
+    fi
+
+    if [ "$?" -eq "0" ]; then
+        BASE_DIR="`grep com.iplanet.am.installdir= $AMCONFIG \
+	| $SED -e 's/\/identity//g' | $SED -e 's/com.iplanet.am.installdir=//g'`"
+    else
+        BASE_DIR="`$PKGINFO -r SUNWamsdk`"
+    fi
+    $NECHO get_base_dir: basedir=$BASE_DIR  >> $LOG
+}
+
+
+##############################################################
+#
+#
+#
+get_admin_password() {
+    $ECHO ""
+    while [ "$ADMINPASSWD" = "" ]; do
+        $NECHO "Enter Top-Level Administrator password."
+        eval $ECHO "`$gettext '${OPEN} $AMADMIN_DN ${CLOSE} password: ${OMIT}'`"
+        stty -echo
+        read ADMINPASSWD
+        stty echo
+        ADMINPASSWD=`$ECHO "$ADMINPASSWD" | $SED -e 's/ *$//'`
+        $NECHO
+    done
+}
+
+##############################################################
+#
+#
+#
+get_backup_dir() {
+    $ECHO ""
+    eval $ECHO "`$gettext 'Enter directory to store back up files ${OPEN} $BASE_DIR ${CLOSE}: ${OMIT}'`"
+    read BACKUP_DIR
+    if [ "$BACKUP_DIR" = "" ]
+    then
+        BACKUP_DIR="/tmp/$BASE_DIR"
+    fi
+    if [ ! -d $BACKUP_DIR ]
+    then
+        $MKDIR $BACKUP_DIR 
+    fi
+
+    $NECHO BACKUP_DIR=$BACKUP_DIR >> $LOG
+}
+
+
+##############################################################################
+#
+#  get amadmin_dn
+#
+get_amadmin_dn() {
+    #
+    #  get it from AMConfig.properties
+    #
+
+    eval $ECHO "`$gettext 'Top-Level Administrator DN ${OPEN} $AMADMIN_DN ${CLOSE}: ${OMIT}'`"
+    read tmp
+    if [ "$tmp" != "" ]
+    then
+        AMADMIN_DN="$tmp"
+    fi
+    AMADMIN_DN=`$ECHO ${AMADMIN_DN} | $SED 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+    $NECHO "get_amadmin_dn: AMADMIN_DN = $AMADMIN_DN" >> $LOG
+}
+
+
+##############################################################
+#
+#  find log dir
+#
+
+get_log_dir() {
+ 
+    if [ -f "$AMADMIN" ]
+     then
+
+    ## get_xml_encoding
+
+    if [ "$isFM" = "true" ]; then
+	PLATFORM_XML="$FM_STAGING_DIR/web-src/WEB-INF/config/serverconfig.xml"
+    else 
+        PLATFORM_XML="$CONFIG_DIR/serverconfig.xml"
+    fi
+    XML_ENCODING=`$GREP encoding $PLATFORM_XML  \
+         | $AWK -F= '{print $3}'| $AWK  '{print $1}' | $SED -e s/\"//g`
+    ## create the xml input for amamdmin to retrieve the
+    ## iplanet-am-logging-location value to backup log files
+
+    $NECHO "<?xml version=\"1.0\" encoding=\"$XML_ENCODING\"?>" > /tmp/log.file.xml
+    $NECHO "<!DOCTYPE Requests" >>  /tmp/log.file.xml
+    $NECHO "PUBLIC \"-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN\"" >> /tmp/log.file.xml
+    $NECHO "\"jar://com/iplanet/am/admin/cli/amAdmin.dtd\"">> /tmp/log.file.xml
+    $NECHO ">" >> /tmp/log.file.xml
+
+    $NECHO "<Requests>" >>  /tmp/log.file.xml
+    $NECHO "<SchemaRequests serviceName=\"iPlanetAMLoggingService\" SchemaType=\"global\">" >> /tmp/log.file.xml
+    $NECHO "<GetServiceDefaultValues>" >> /tmp/log.file.xml
+    $NECHO "<Attribute name=\"iplanet-am-logging-location\" />" >> /tmp/log.file.xml
+    $NECHO "</GetServiceDefaultValues>" >> /tmp/log.file.xml
+    $NECHO " </SchemaRequests>" >> /tmp/log.file.xml
+    $NECHO "</Requests>" >>  /tmp/log.file.xml
+
+    if [ "$isFM" = "true" ]; then
+          temp=`$AMADMIN -i $FM_STAGING_DIR --runasdn $AMADMIN_DN -w $ADMINPASSWD -t /tmp/log.file.xml`
+    else 
+         temp=`$AMADMIN -u $AMADMIN_DN -w $ADMINPASSWD -t /tmp/log.file.xml`
+    fi
+         
+    temp=`$ECHO $temp | $SED -e 's/iplanet-am-logging-location=\[//g'`
+    temp=`$ECHO $temp | $SED -e 's/\].*//g'`
+
+#     $RM /tmp/log.file.xml
+     LOGDIR=$temp
+
+     $ECHO "Log directory is :  $LOGDIR" >> $LOG
+   fi
+}
+
+##############################################################################
+#
+#  get package path
+#
+get_pkg_path() {
+    PKGNAME=$1
+    tmp="/"
+    if [ $OS = "Linux" ]; then
+        $RPM -q $PKGNAME >> $LOG
+        if [ "$?" -eq "0" ]; then
+            tmp=`$RPM -q --queryformat "%{PREFIXES}" $PKGNAME`
+	fi
+#####hpux-dev#####	
+    elif [ $OS = "HP-UX" ]; then
+        $SWLIST -l product $PKGNAME >> $LOG
+        if [ "$?" = "0" ]; then
+    	    tmp=`$SWLIST -l product -a location $PKGNAME | grep -v "^#" | awk '{print $2}'`
+    	fi
+    else
+        $PKGINFO -q $PKGNAME >> $LOG
+	if [ "$?" -eq "0" ]; then
+            tmp=`$PKGINFO -r $PKGNAME`
+	fi
+    fi
+    pkgpath=$tmp
+    export pkgpath
+}
+
+##############################################################################
+#
+#  get package paths
+#
+#
+get_security_pkg_paths() {
+#####hpux-dev#####
+    if [ "$OS" = "Linux" ]; then
+	get_pkg_path sun-jss
+    else
+	get_pkg_path SUNWjss
+    fi
+    JSS_BASE_DIR=$pkgpath
+#####hpux-dev#####
+    if [ "$OS" = "Linux" -o $OS = "HP-UX" ]; then
+	get_pkg_path sun-nss
+    else
+	get_pkg_path SUNWtls
+    fi
+    NSS_BASE_DIR=$pkgpath
+#####hpux-dev#####
+    if [ "$OS" = "Linux" -o $OS = "HP-UX" ]; then
+	get_pkg_path sun-nspr
+    else
+	get_pkg_path SUNWpr
+    fi
+    NSPR_BASE_DIR=$pkgpath
+
+    export JSS_BASE_DIR
+    export NSS_BASE_DIR
+    export NSPR_BASE_DIR
+    $NECHO "SUNWjss_BASE_DIR = $JSS_BASE_DIR" >> $LOG 
+    $NECHO "SUNWtls_BASE_DIR = $NSS_BASE_DIR" >> $LOG 
+    $NECHO "SUNWpr_BASE_DIR  = $NSPR_BASE_DIR" >> $LOG 
+}
+
+###### update product registry  misc.
+update_product_registry_misc() {
+    file="$PROD_REGISTRY_TEMP"
+    if [ "$hasProductReg" = "TRUE" ]
+    then
+	matchFound="`$GREP MiscPackages $file`"
+        if [ "$matchFound" != "" ]; then
+	    matchstart="<compid>MiscPackages$"
+	    matchend="<\/compid>"
+	    $SED -e "/$matchstart/,/$matchend/ {
+	        d
+	    }" $file > $file-tmp
+	$MV $file-tmp $file
+	fi
+    fi
+}
+###### update product registry 
+update_product_registry() {
+   pkgname=$1
+   $NECHO "`$gettext 'Removing : '` $pkgname ..."
+   if [ "$hasProductReg" = "TRUE" ]; then
+       matchend="<\/compid>"
+       file=$PROD_REGISTRY/productregistry.pkgrm
+       matchFound="`$GREP $pkgname $file`"
+       if [ "$matchFound" != "" ]; then
+           matchstart="<compid>$pkgname$"
+           $SED -e "/$matchstart/,/$matchend/ {
+	       d
+           }" $file > $file-tmp
+           $MV $file-tmp $file
+       fi
+       if [ "$pkgname" = "SUNWamsvc" ] || [ "$pkgname" = "sun-identity-services" ]
+       then
+	    matchstart="<compid>SunONEIdentityServerManagementandPolicyServices$"
+	    $SED -e "/$matchstart/,/$matchend/ {
+	        d
+	    }" $file > $file-tmp
+	    $MV $file-tmp $file
+	    return 0
+       fi
+       if [ "$pkgname" = "SUNWamcon" ] || [ "$pkgname" = "sun-identity-console" ] || \
+          [ "$pkgname" = "SUNWampwd" ] || [ "$pkgname" = "sun-identity-password" ]
+       then 
+	    matchstart="<compid>ISAdministrationConsole$"
+	    $SED -e "/$matchstart/,/$matchend/ {
+		d
+	    }" $file > $file-tmp
+	    $MV $file-tmp $file
+	    return 0
+	fi
+	if [ "$pkgname" = "SUNWamfcd" ] || [ "$pkgname" = "sun-identity-federation" ]
+	then
+	   
+	    matchstart="<compid>ISCommonDomainDeployment$"
+	    $SED -e "/$matchstart/,/$matchend/ {
+		d
+	    }" $file > $file-tmp
+	    $MV $file-tmp $file
+	    return 0
+	fi
+	if [ "$pkgname" = "SUNWamutl" ] || [ "$pkgname" = "sun-identity-utils" ]
+	then
+	   
+	    matchstart="<compid>ISConfigurator$"
+	    $SED -e "/$matchstart/,/$matchend/ {
+		d
+	    }" $file > $file-tmp
+	    $MV $file-tmp $file
+	    return 0
+	fi
+	if [ "$pkgname" = "SUNWamext" ] || [ "$pkgname" = "sun-identity-external" ]
+	then
+	   
+	    matchstart="<compid>ExternalJARs$"
+	    $SED -e "/$matchstart/,/$matchend/ {
+		d
+	    }" $file > $file-tmp
+	    $MV $file-tmp $file
+	    return 0
+	fi
+        if [ "$pkgname" = "SUNWamdistauth" ] || [ "$pkgname" = "sun-identity-distauth" ]
+        then
+	    matchstart="<compid>${pkgname}$"
+	    $SED -e "/$matchstart/,/$matchend/ {
+	        d
+	    }" $file > $file-tmp
+	    $MV $file-tmp $file
+	    return 0
+        fi
+   fi
+}
+####### remove existing 6.2/6.3 packages
+
+remove_packages_and_update_product_registry() {
+    if [ "$OS" = "Linux" ]; then
+	pkg_list="sun-identity-clientsdk sun-identity-console sun-identity-console-sdk sun-identity-external sun-identity-federation sun-identity-password sun-identity-samples sun-identity-sci sun-identity-sdk sun-identity-services sun-identity-services-config sun-identity-sfodb sun-identity-utils sun-identity-jwsdp sun-identity-distauth sun-identity-sdk-config sun-identity-fm-7.0-1.i686.rpm sun-saml2-1.0-1.i686.rpm"
+	for file in $pkg_list
+	do
+	    $RPM -q $file >> $LOG
+	    if [ "$?" -eq "0" ]; then
+		$RPM -e --nodeps $file
+		update_product_registry $file
+	    fi
+	done
+#####hpux-dev#####
+    elif [ $OS = "HP-UX" ]; then
+pkg_list="sun-identity-clientsdk sun-identity-console sun-identity-console-sdk sun-identity-external sun-identity-federation sun-identity-password sun-identity-samples sun-identity-sci sun-identity-sdk sun-identity-services sun-identity-services-config sun-identity-sfodb sun-identity-utils sun-identity-jwsdp sun-identity-distauth sun-identity-sdk-config"
+for file in $pkg_list
+    	do
+    	    /usr/sbin/swlist -l product $file >> $LOG
+    	    if [ "$?" = "0" ]; then
+   		/usr/sbin/swremove -x enforce_dependencies=false $file
+    		update_product_registry $file
+    	    fi
+	done
+	
+    else
+	pkg_list="SUNWamext SUNWamfcd SUNWamclnt SUNWamcon SUNWamconsdk SUNWampwd SUNWamrsa SUNWamsam SUNWamsci SUNWamsdk SUNWamsvcconfig SUNWamutl SUNWamsfodb SUNWamsvc SUNWamjwsdp SUNWamdistauth SUNWamsdkconfig SUNWamfm SUNWsaml2"
+		
+	for file in $pkg_list
+	do
+	    $PKGINFO -q $file >> $LOG
+	    if [ "$?" -eq "0" ]; then
+		pkgout=`$PKGRM -n -a /tmp/isPkgPremove.admin $file 2>&1` 
+                if [ "$?" -eq "1" ]; then
+                    $ECHO $pkgout
+                fi
+                $ECHO $pkgout >> $LOG
+		update_product_registry $file
+	    fi
+	done
+    fi
+    update_product_registry_misc
+}
+
+backup_files() {
+    if [ "$isFM" = "true" ]; then 
+        backup_fm_files
+    else
+        backup_am_files
+    fi
+}
+
+###############################################################################
+#
+# backup_fm_files - backup fm configuration and staging directory 
+#
+###############################################################################
+backup_fm_files() {
+
+    ## backup logs dir
+    if [ x$LOG_DIR != "x" ] && [ -d $LOGDIR ]; then
+        $NECHO
+        $NECHO "`$gettext 'Backing log directory :'` $LOGDIR"
+	$NECHO "`$gettext 'log backup:'` " >> $LOG 2>&1
+	$NECHO "`$gettext 'log location: $LOGDIR'`" >> $LOG 2>&1
+    
+	$CP $LOGDIR $BACKUP_DIR
+    fi
+
+    if [ "$isFM" = "true" ]; then
+       C_DIR=$FM_AMCONFIG	
+    fi
+        
+    DEBUG_DIR="`$GREP com.iplanet.services.debug.directory= $FM_AMCONFIG \
+		| $SED -e 's/com.iplanet.services.debug.directory=//'`"
+    if [ -d $DEBUG_DIR ]; then
+        $NECHO "`$gettext 'Backing debug directory :'` $DEBUG_DIR"
+	$NECHO "`$gettext 'debug backup : '`" >> $LOG 2>&1
+        $NECHO "`$gettext 'debug location: '` $DEBUG_DIR" >> $LOG 2>&1
+	
+	$CP $DEBUG_DIR $BACKUP_DIR
+    fi
+	
+    ### backup FM staging directory
+
+    FM_DIR="$FM_STAGING_DIR/web-src"
+    if [ -d $FM_DIR ]; then
+        BACKUP_STAGING_DIR=$BACKUP_DIR/$FM_STAGING_DIR
+        $MKDIR $BACKUP_STAGING_DIR
+        $NECHO "`$gettext 'Backing FM staging area :'` $FM_DIR"
+        $NECHO "`$gettext 'FM staging location:'` $FM_STAGING_DIR" >> $LOG 2>&1
+        $NECHO "`$gettext 'FM staging backup :'` $BACKUP_STAGING_DIR" >> $LOG 2>&1
+    
+        $CP $FM_STAGING_DIR $BACKUP_STAGING_DIR
+    fi
+
+    ## backup AM configuration directory
+
+    $NECHO "`$gettext 'Backing up Configuration Directory :'` $CONFIG_DIR"
+    $NECHO
+    BACKUP_CONFIG_DIR=$BACKUP_DIR/$CONFIG_DIR
+    $NECHO "FM backing config dir : $BACKUP_CONFIG_DIR" >> $LOG 2>&1
+
+    $MKDIR $BACKUP_CONFIG_DIR
+    $CP $CONFIG_DIR/* $BACKUP_CONFIG_DIR
+    $CP $FM_AMCONFIG $CONFIG_DIR/.AMConfig.properties.bak
+    $CP $FM_AMCONFIG $FAM_UPGRADE_DIR/upgrade/config/AMConfig.properties.bak
+    $CP $SERVER_CONFIG $FAM_UPGRADE_DIR/upgrade/config/serverconfig.xml.bak
+    $CP $SERVER_CONFIG $FAM_CONFIG_DIR/.serverconfig.xml.bak
+}
+
+###############################################################################
+#
+# backup_am_files - backup am configuration and staging directory 
+#
+###############################################################################
+backup_am_files() {
+
+    ## backup logs dir
+    if [ -d $LOGDIR ]; then
+        $NECHO
+        $NECHO "`$gettext 'Backing log directory :'` $LOGDIR"
+	$NECHO "`$gettext 'log backup:'` " >> $LOG 2>&1
+	$NECHO "`$gettext 'log location: $LOGDIR'`" >> $LOG 2>&1
+    
+	$CP $LOGDIR $BACKUP_DIR
+    fi
+
+    ## backup debug dir
+
+    DEBUG_DIR="`$GREP com.iplanet.services.debug.directory= $AMCONFIG \
+		| $SED -e 's/com.iplanet.services.debug.directory=//'`"
+    if [ -d $DEBUG_DIR ]; then
+        $NECHO "`$gettext 'Backing debug directory :'` $DEBUG_DIR"
+	$NECHO "`$gettext 'debug backup : '`" >> $LOG 2>&1
+        $NECHO "`$gettext 'debug location: '` $DEBUG_DIR" >> $LOG 2>&1
+	
+	$CP $DEBUG_DIR $BACKUP_DIR
+    fi
+	
+    ### backup AM staging directory
+
+    AM_STAGING_DIR="$PROD_BASE_DIR/web-src"
+    if [ -d $AM_STAGING_DIR ]; then
+        BACKUP_STAGING_DIR=$BACKUP_DIR/$PROD_BASE_DIR
+        $MKDIR $BACKUP_STAGING_DIR
+        $NECHO "`$gettext 'Backing AM staging area :'` $AM_STAGING_DIR"
+        $NECHO "`$gettext 'AM staging location:'` $AM_STAGING_DIR" >> $LOG 2>&1
+        $NECHO "`$gettext 'AM staging backup :'` $BACKUP_STAGING_DIR" >> $LOG 2>&1
+    
+        $CP $AM_STAGING_DIR $BACKUP_STAGING_DIR
+    fi
+
+    ## backup AM configuration directory
+
+    $NECHO "`$gettext 'Backing up Configuration Directory :'` $CONFIG_DIR"
+    $NECHO
+    BACKUP_CONFIG_DIR=$BACKUP_DIR/$CONFIG_DIR
+    $NECHO "AM backing config dir : $BACKUP_CONFIG_DIR" >> $LOG 2>&1
+
+    $MKDIR $BACKUP_CONFIG_DIR
+    $CP $CONFIG_DIR/* $BACKUP_CONFIG_DIR
+    $CP $AMCONFIG $CONFIG_DIR/.AMConfig.properties.bak
+    $CP $AMCONFIG $FAM_UPGRADE_DIR/upgrade/config/AMConfig.properties.bak
+    $CP $SERVER_CONFIG $FAM_UPGRADE_DIR/upgrade/config/serverconfig.xml.bak
+    $CP $SERVER_CONFIG $CONFIG_DIR/.serverconfig.xml.bak
+
+    ###  backup ldap lib and commands 
+    $CP $AMCONFIG_TEMPLATE $CONFIG_DIR/.AMConfig.properties.template.bak
+    $CP $PROD_BASE_DIR/ldaplib $BACKUP_DIR
+
+    $CP $PROD_BASE_DIR/bin/ldapmodify $BACKUP_DIR
+
+    $CP $PROD_BASE_DIR/bin/ldapsearch $BACKUP_DIR
+}
+
+get_am_version() {
+
+    VERSION="`$GREP com.iplanet.am.version= $AMCONFIG \
+	      | $SED -e 's/com.iplanet.am.version=//g'`"
+
+    $NECHO "Access Manager Version : $VERSION" >> $LOG 2>&1
+}
+
+
+##############################################################################
+#
+#  get staging dir 
+#
+get_staging_dir() {
+
+    $ECHO ""
+    $NECHO "OpenSSO 8.0 Staging Directory is the directory where the "
+    $NECHO "opensso.war is extracted. 'opensso/deployable_war/opensso.war'"
+    $NECHO "eg., if extracted in /tmp then Staging Directory is /tmp"
+    $ECHO ""
+
+    eval $ECHO "`$gettext 'OpenSSO 8.0 Staging Directory : ${OMIT} '`"
+    tmp=""
+    while [ "$tmp" = "" ]; do
+        read tmp
+        file=`find $tmp/WEB-INF/lib -name amserver.jar -print`  >> $LOG_DIR 2>&1
+        if [ x = x${file} ]; then
+            tmp=""
+            eval $ECHO "`gettext 'Incorrect OpenSSO 8.0 staging directory specified. Re-enter the correct value '` "
+            eval $ECHO "`$gettext 'OpenSSO 8.0 Staging Directory : ${OMIT} '`"
+        fi
+    done
+    if [ "$tmp" != "" ]
+    then
+        STAGING_DIR="$tmp"
+    fi
+    $NECHO "getStagingDir: STAGING_DIR= $STAGING_DIR" >> $LOG
+}
+
+##############################################################################
+#
+#  get upgrade dir 
+#
+get_upgrade_dir() {
+
+    $ECHO ""
+    $NECHO "OpenSSO 8.0 Upgrade Directory is the directory where the "
+    $NECHO "upgrade/scripts/ is (extracted from opensso.war)."
+    $NECHO "eg., if extracted in /tmp then Upgrade Directory is /tmp/opensso"
+    $ECHO ""
+    $NECHO "Upgrade Directory would be the <staging_dir>/opensso."
+    $ECHO ""
+    eval $ECHO "`$gettext 'Enter the OpenSSO 8.0 Upgrade Directory : ${OMIT} '`"
+    tmp=""
+    while [ "$tmp" = "" ]; do
+        read tmp
+        file=`find $tmp/upgrade/scripts -name ssoupgrade -print` >> $LOG_DIR  2>&1
+        if [ x = x${file} ]; then
+            tmp=""
+            eval $ECHO "`gettext 'Incorrect upgrade directory specified. Re-enter the correct value '` "
+            eval $ECHO "`$gettext 'Enter the OpenSSO 8.0 Upgrade Directory : ${OMIT} '`"
+        fi
+    done
+    if [ "$tmp" != "" ]
+    then
+        FAM_UPGRADE_DIR="$tmp"
+    fi
+    $NECHO "getUpgradeDir: FAM_UPGRADE_DIR= $FAM_UPGRADE_DIR" >> $LOG
+}
+
+##############################################################################
+#
+#  get config dir 
+#
+get_config_dir() {
+
+    $ECHO ""
+    $NECHO "Access Manager Configuration Directory is the directory where "
+    $NECHO "the existing configuration files reside."
+    $NECHO "eg., /etc/opt/SUNWam/config/"
+    $ECHO ""
+    eval $ECHO "`$gettext 'Enter Access Manager Configuration Directory: ${OMIT} '`"
+    while [ "$tmp" = "" ]; do
+        read tmp
+        file=`find $tmp -name AMConfig.properties -print`  >> $LOG_DIR 2>&1
+        if [ x = x${file} ]; then
+            tmp=""
+            eval $ECHO "`gettext 'Incorrect config directory specified. Re-enter the correct value'${OMIT}` "
+            eval $ECHO "`$gettext 'Enter Access Manager Configuration Directory: ${OMIT} '`"
+        fi
+    done
+    if [ "$tmp" != "" ]
+    then
+        FAM_CONFIG_DIR="$tmp"
+    fi
+    $NECHO "getAMConfigDir: CONFIG_DIR= $FAM_CONFIG_DIR" >> $LOG
+}
+
+##############################################################################
+#
+# check whether its an AM or FM instance
+#
+#############################################################################
+
+check_instance() {
+ if [ $OS = "Linux" ]; then
+    $RPM -q sun-identity-sdk
+#####hpux-dev#####
+    else
+        $PKGINFO -q SUNWamsdk
+    fi
+
+    if [ "$?" -eq "1" ]; then
+         isFM="true"
+    fi
+    $ECHO ""
+    $NECHO "check_instance isFM is : ${isFM}"
+}
+
+
+##############################################################
+#
+#  find base install dir
+#
+get_fm_base_dir() {
+    # check existance of SUNWamfm.
+    
+    if [ $OS = "Linux" ]; then
+       $RPM -q sun-identity-fm-7.0-1.i686
+#####hpux-dev#####    	
+    else
+        $PKGINFO -q SUNWamfm 
+    fi
+
+    FM_AMCONFIG="${FM_STAGING_DIR}/web-src/WEB-INF/classes/AMConfig.properties";
+    export FM_AMCONFIG
+    if [ "$?" -eq "0" ]; then
+        FM_BASE_DIR="`grep com.iplanet.am.installdir= $FM_AMCONFIG \
+        | $SED -e 's/\/identity//g' | $SED -e 's/com.iplanet.am.installdir=//g'`"
+    else
+        FM_BASE_DIR="`$PKGINFO -r SUNWamsdk`"
+    fi
+    export FM_BASE_DIR
+
+}
+
+get_fm_staging_dir()  {
+ eval $ECHO "`$gettext 'Federation Manager 7.0 staging directory ${OPEN} ${CLOSE}: ${OMIT}'`"
+    while [ "$tmp" = "" ]; do
+        read tmp
+	file=`find $tmp/web-src -name WEB-INF -print` >> $LOG_DIR 2>&1
+	if [ x = x${file} ]; then
+            tmp=""
+	    eval $ECHO "`gettext 'Incorrect staging directory specified. Re-enter the correct value'` "
+            eval $ECHO "`$gettext 'Federation Manager 7.0 staging directory ${OPEN} ${CLOSE}: ${OMIT}'`"
+	fi
+    done
+    if [ "$tmp" != "" ]
+    then
+        FM_STAGING_DIR=$tmp
+    fi
+    export FM_STAGING_DIR
+    $NECHO "get_fm_staging_dir: FM_STAGING_DIR = $FM_STAGING_DIR " >> $LOG
+
+}
+
+####
+#
+# replace character in a string
+#
+#
+replaceCharacter() {
+    NEWSTR=`echo "$1" | awk -F"$2" '{
+        result = ""
+        for (i = 1; i < NF; i=i+1) { result = result $i newch }
+        result =  result $NF
+        print result
+    }' newch=$3`
+}
+
+####
+#
+#
+#
+replaceTag() {
+    replaceCharacter "$2" "/" "\/"
+    $CP $1 $1.tmp
+    $SED -e "s/$3/$NEWSTR/g" $1.tmp > $1
+    $RM $1.tmp
+}
+
+#####
+#
+#
+#
+cleanupFM()
+{
+    if [ $OS = "Linux" ]; then
+        rpm -q --quiet sun-identity-fm
+        if [  $? -eq 0 ]; then
+            rpm -e sun-identity-fm > /dev/null 2>&1
+	fi
+    else 
+        # check if the product is installed first
+        fmbdir=`pkgparam SUNWamfm BASEDIR > /dev/null 2>&1`
+        if [ $? -eq 0 ]; then
+            ADMIN=/tmp/rmpkgadmin
+             $ECHO "action=nocheck" > $ADMIN
+             $ECHO "idepend=nocheck" >> $ADMIN
+             $ECHO "rdepend=nocheck" >> $ADMIN
+             $ECHO "space=nocheck" >> $ADMIN
+             $ECHO "mail=" >> $ADMIN
+             $PKGRM -A -n -a $ADMIN SUNWamfm > /dev/null 2>&1
+        fi
+    fi
+}
+
+cleanupAM() {
+    if [ -s $PROD_REGISTRY_FILE ]
+    then
+        hasProductReg=TRUE
+        $CP $PROD_REGISTRY_FILE $BACKUP_DIR/productregistry.preupgrade
+    else
+        hasProductReg=FALSE
+        $RM -f $PROD_REGISTRY_FILE
+    fi
+
+    # now remove the packages.
+    $NECHO "`$gettext 'Removing Access Manager'` $VERSION ..."
+    $NECHO
+    $NECHO "mail=" > /tmp/isPkgPremove.admin
+    $NECHO "instance=unique" >> /tmp/isPkgPremove.admin
+    $NECHO "partial=nocheck" >> /tmp/isPkgPremove.admin
+    $NECHO "runlevel=nocheck" >> /tmp/isPkgPremove.admin
+    $NECHO "idepend=nocheck" >> /tmp/isPkgPremove.admin
+    $NECHO "rdepend=nocheck" >> /tmp/isPkgPremove.admin
+    $NECHO "space=" >> /tmp/isPkgPremove.admin
+    $NECHO "setuid=" >> /tmp/isPkgPremove.admin
+    $NECHO "conflict=nocheck" >> /tmp/isPkgPremove.admin
+    $NECHO "action=nocheck" >> /tmp/isPkgPremove.admin
+    $NECHO "basedir=default" >> /tmp/isPkgPremove.admin
+
+    if [ "$hasProductReg" = "TRUE" ]
+    then
+        $CP $PROD_REGISTRY_FILE $PROD_REGISTRY_TEMP
+    fi
+
+    remove_packages_and_update_product_registry
+
+    if [ "$hasProductReg" = "TRUE" ]
+    then
+        $CP $PROD_REGISTRY_TEMP $PROD_REGISTRY_FILE
+    fi
+
+    $RM /tmp/isPkgPremove.admin
+}
+#######################################################################
+### Main
+#######################################################################
+
+
+check_root_user
+check_instance
+
+$NECHO "ssopre80upgrade debug log" > $LOG
+
+
+if [ $isFM = "true" ]; then
+    $NECHO "A log of the ssopreupgrade process can be found in $FM_LOG" 
+    get_fm_staging_dir
+    get_fm_base_dir
+    PKGDIR=$FM_BASE_DIR/$PRODUCT_DIR
+    INSTANCE_TYPE="FM"
+else 
+    $NECHO "A log of the ssopreupgrade process can be found in $LOG" 
+    get_am_version
+    get_host_info
+    get_base_dir
+    PKGDIR=$BASE_DIR/$PRODUCT_DIR
+    INSTANCE_TYPE="AM"
+fi
+
+export $INSTANCE_TYPE
+get_AMConfig_info
+
+get_directory_server_info
+
+get_amadmin_dn
+
+get_admin_password
+
+get_backup_dir
+
+get_config_dir
+get_upgrade_dir
+get_staging_dir
+
+if [ $OS = "Linux" ]; then
+    PROD_BASE_DIR=$BASE_DIR/$PRODUCT_DIR
+else
+    PROD_BASE_DIR=$BASE_DIR
+fi
+
+
+if [ "$isFM" = "true" ]; then
+    PROD_BASE_DIR="${FM_BASE_DIR}/fm"
+fi
+AMADMIN=$PROD_BASE_DIR/bin/amadmin
+$ECHO PROD_BASE_DIR=$PROD_BASE_DIR >> $LOG
+$ECHO AMADMIN =$AMADMIN >> $LOG
+
+get_security_pkg_paths
+JSS_PATH="${SUNWjss_BASE_DIR}/usr/lib/mps"
+
+NSS_PATH="${NSS_BASE_DIR}/usr/lib/mps"
+
+NSPR_PATH="${NSPR_BASE_DIR}/usr/lib/mps"
+
+JSS_JAR_PATH="${SUNWjss_BASE_DIR}/usr/share/lib/mps"
+
+if [ "$LD_LIBRARY_PATH" = "" ]
+   then
+       LD_LIBRARY_PATH=$JSS_PATH:$NSS_PATH:$NSPR_PATH:${BASE_DIR}/${PRODNAME}/lib
+   else
+       LD_LIBRARY_PATH=$JSS_PATH:$NSS_PATH:$NSPR_PATH:${BASE_DIR}/${PRODNAME}/lib:$LD_LIBRARY_PATH
+fi
+
+LD_LIBRARY_PATH=${LDAPLIBS}:${LD_LIBRARY_PATH}
+
+export LD_LIBRARY_PATH
+
+$NECHO "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $LOG
+
+get_log_dir
+
+$NECHO "`$gettext 'Backing up files to :'` $BACKUP_DIR"
+$NECHO "`$gettext 'This can take a few minutes.'`"
+
+backup_files
+
+UPGRADE_DIR="$FAM_UPGRADE_DIR/upgrade"
+replaceTag "$UPGRADE_DIR/scripts/ssoupgrade" "$UPGRADE_DIR" "FAM_UPGRADE_DIR"
+replaceTag "$UPGRADE_DIR/scripts/ssoupgrade" "$STAGING_DIR/WEB-INF" "STAGING_DIR"
+replaceTag  "$UPGRADE_DIR/config/ssoUpgradeConfig.properties" "$INSTANCE_TYPE" "SSO_INSTANCE_TYPE"
+
+      
+if [ "$isFM" = "true" ]; then
+    cleanupFM
+else 
+    cleanupAM
+fi
+$NECHO
+$NECHO "`$gettext 'The system is ready for OpenSSO 8.0'`"
+$NECHO "`$gettext 'Please follow the OpenSSO 8.0 Upgrade Guide to continue upgrade'`" 
+$NECHO
+$NECHO

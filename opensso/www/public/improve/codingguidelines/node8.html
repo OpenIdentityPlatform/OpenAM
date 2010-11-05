@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Class/Interface Naming</TITLE>
+<META NAME="description" CONTENT="Class/Interface Naming">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="next" HREF="node9.html">
+<LINK REL="previous" HREF="node7.html">
+<LINK REL="up" HREF="node6.html">
+<LINK REL="next" HREF="node9.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html121"
+  HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html119"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html113"
+  HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html122"
+  HREF="node9.html">Field Naming</A>
+<B> Up:</B> <A NAME="tex2html120"
+  HREF="node6.html">Naming Convention</A>
+<B> Previous:</B> <A NAME="tex2html114"
+  HREF="node7.html">Package Naming</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00032000000000000000">
+Class/Interface Naming</A>
+</H2>
+All type names (classes and interfaces) should use the InfixCaps style. Start with an upper-case letter, and capitalize the first letter of any subsequent word in the name, as well as any letters that are part of an acronym. All other characters in the name are lower-case. Do not use underscores to separate words. Class names should be nouns or noun phrases. Interface names depend on the salient purpose of the interface. If the purpose is primarily to endow an object with a particular capability, then the name should be an adjective (ending in -able or -ible if possible) that describes the capability; e.g., Searchable, Sortable, NetworkAccessible. Otherwise use nouns or noun phrases.
+
+<BR>
+Examples:
+<PRE>
+    // GOOD type names:
+    LayoutManager, AWTException,
+    ArrayIndexOutOfBoundsException
+
+    // BAD type names:
+    ManageLayout // verb phrase
+    awtException // first letter lower-case
+    array_index_out_of_bounds_exception// underscores
+</PRE>
+
+<P>
+Use Design Patterns, [<A
+ HREF="node33.html#Erich">EG94</A>] naming convention to provide better meaning to the Class and Interface. Example:
+<PRE>
+     SSOEventListener
+     MazeFactory
+     BorderDecorator
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

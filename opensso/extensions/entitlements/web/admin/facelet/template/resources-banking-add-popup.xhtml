@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: resources-banking-add-popup.xhtml,v 1.10 2009/08/06 15:25:32 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:popup
+        type="question"
+        width="400"
+        handler="#{bankingResourcesHandler}"
+        modal="true"
+        title="#{resources['resources-banking-add-popup.title']}"
+        visible="#{bankingResourcesBean.addPopupVisible}"
+        closeListenerMethod="addPopupCancelListener">
+
+        <ui:define name="body">
+            <ice:panelGroup
+                styleClass="banking-resources-add-popup">
+                <ice:panelGroup
+                    style="padding-bottom: 20px">
+                    <ice:outputText
+                        escape="false"
+                        value="#{resources['resources-banking-add-popup.info']}"/>
+                </ice:panelGroup>
+                <ice:panelGrid
+                    columns="2">
+                    <ice:outputLabel
+                        for="banking-resource-select"
+                        value="#{resources['resources-banking-add-popup.account']}"/>
+                    <ice:selectInputText
+                        disabled="#{bankingResourcesBean.allAccounts}"
+                        width="300px"
+                        style="position: relative; z-index: 999"
+                        value="#{bankingResourcesBean.addPopupAccountNumber}"
+                        listVar="viewSubject"
+                        listValue="#{bankingResourcesBean.viewSubjectItems}"
+                        valueChangeListener="#{bankingResourcesHandler.addPopupAccountNumberChangedListener}">
+                        <f:facet name="selectInputText">
+                            <ice:panelGrid
+                                styleClass="banking-resources-select-table"
+                                columns="2">
+                                <ice:outputText
+                                    value="#{viewSubject.employeeNumber}"/>
+                                <ice:outputText
+                                    value="#{viewSubject.cn}"/>
+                            </ice:panelGrid>
+                        </f:facet>
+                    </ice:selectInputText>
+                    <ice:panelGroup/>
+                    <ice:panelGroup>
+                        <ice:outputText
+                            style="font-weight: bold; font-size: larger"
+                            rendered="#{bankingResourcesBean.addPopupViewSubject != null}"
+                            value="#{bankingResourcesBean.addPopupViewSubject.cn}"/>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+                <ice:panelGroup
+                    style="padding-top: 20px">
+                    <ice:selectBooleanCheckbox
+                        value="#{bankingResourcesBean.allAccounts}"
+                        valueChangeListener="#{bankingResourcesHandler.allAccountsListener}"/>
+                    <ice:outputLabel
+                        for="all-accounts-select"
+                        value="#{resources['resources-banking-add-popup.allAccounts']}"/>
+                </ice:panelGroup>
+                <ice:panelGrid
+                    styleClass="button-group"
+                    columns="2">
+                    <o:button
+                        type="cancel"
+                        handler="#{bankingResourcesHandler}"
+                        listenerMethod="addPopupCancelListener"/>
+                    <o:button
+                        type="ok"
+                        handler="#{bankingResourcesHandler}"
+                        listenerMethod="addPopupOkListener">
+                        <ui:define name="attributes">
+                            <f:attribute
+                                name="viewEntitlement"
+                                value="#{resourcesBean.viewEntitlement}"/>
+                        </ui:define>
+                    </o:button>
+                </ice:panelGrid>
+            </ice:panelGroup>
+        </ui:define>
+    </o:popup>
+</span>

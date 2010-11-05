@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS 連携アイデンティティープロバイダのカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedidp"></a><h4>WS 連携アイデンティティープロバイダのカスタマイズ</h4>
+<p>次の属性は、WS 連携アイデンティティープロバイダロールに適用されます。</p>
+
+<a name="ghfke"></a><h5>NameID の書式</h5>
+<p>アイデンティティープロバイダからサービスプロバイダに送信されるシングルサインオン応答の名前識別子コンポーネントの書式を定義します。WS 連携シングルサインオンでは、次の識別子の書式をサポートしています (デフォルトは UPN)。</p>
+<ul><li><p>電子メール</p></li></ul>
+
+<ul><li><p>共通名</p></li>
+<li><p>UPN &#8211; ユーザーの主体名。構文は、<tt>username&#64;domain</tt> です。ここで <tt>domain</tt> は、たとえば <tt>example.com</tt> です。</p></li></ul>
+
+
+<a name="ghfog"></a><h5>NameID の属性</h5>
+<p>ユーザーのプロファイルで、名前識別子の値として使用される属性を定義します。デフォルトは <tt>uid</tt> です。 </p>
+
+<a name="ghflq"></a><h5>名前にドメインを含む</h5>
+<p>「NameID の書式」属性で定義された UPN 書式を使用するときに、ユーザーのプロファイルの「NameID の属性」がドメインを含むかどうかを指定します。含む場合、現在定義されているとおりに「NameID の属性」が UPN で使用されます。含まない場合は、ドメインと組み合わせて UPN が構成されます。</p>
+
+<a name="ghfmk"></a><h5>ドメイン属性</h5>
+<p>UPN 書式を使用していて、「名前にドメインを含む」属性が選択されない場合に、ユーザーのプロファイルで UPN のドメインとして使用される属性を指定します。 </p>
+
+<a name="ghfnw"></a><h5>UPN ドメイン</h5>
+<p>UPN 書式を使用していて、「名前にドメインを含む」属性が選択されない場合、かつ「ドメイン属性」の値が指定されていないか特定のユーザーに「ドメイン属性」の値が設定されていない場合、UPN を構成するためにこの属性が使用されます。 </p>
+
+<a name="ggwvh"></a><h5>署名証明書エイリアス</h5>
+<p>この属性は、キーストアで表明の署名証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。</p>
+
+<a name="ggwve"></a><h5>請求のタイプ</h5>
+<p>WS 連携サービスが連携パートナー間で交換されるトークンのタイプを認識できるように、請求のタイプを指定します。 </p><p>EmailAddress 請求タイプは、特定のセキュリティー主体を電子メールアドレスで識別するために使用されます。 </p><p>UPN 請求タイプは、特定のセキュリティー主体をユーザー主体名で識別するために使用されます。 </p><p>CommonName 請求タイプは、特定のセキュリティー主体を X.500 の命名規則と一致する CN 値で識別するために使用されます。この請求の値は、必ずしも一意ではないため、承認には使用しないでください。 </p>
+
+<a name="ggwwj"></a><h5>アカウントマッパー</h5>
+<p>この属性は、シングルサインオンを目的としてリモートユーザーアカウントをローカルユーザーアカウントにマップするために使用される <tt>AccountMapper</tt> インタフェースの実装を指定します。デフォルト値は <tt>com.sun.identity.wsfed.plugins.DefaultIDPAccountMapper</tt> です。 </p>
+
+<a name="ggwuq"></a><h5>属性マッパー</h5>
+<p>これは、表明に含まれる属性をアイデンティティープロバイダがローカルで定義しているユーザー属性にマップするために使用されるクラスを定義します。デフォルトのクラスは <tt>com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper</tt> です。</p>
+
+<a name="ggwul"></a><h5>属性マップ</h5>
+<p>デフォルトの属性マッパープラグインによって使用されるマッピングを定義する値を指定します。マッピングは次の形式で設定してください。</p><p><i>請求のタイプ</i>=<i>ローカル属性</i></p><p>たとえば、<tt>EmailAddress=mail</tt> や <tt>Address=postaladdress</tt> のようにします。「新しい値」としてマッピングを入力し、「追加」をクリックします。</p>
+
+<a name="ggwrj"></a><h5>表明有効時間</h5>
+<p>表明は、一定の期間だけ有効であり、その前後は無効です。 </p><p>「<tt>有効な時間</tt>」は、表明の発行時間を起点とする表明の有効期間を秒単位で指定します。デフォルト値は <tt>600</tt> 秒です。</p>
+<br/>
+
+</body>
+</html>

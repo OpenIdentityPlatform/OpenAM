@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>接続プールを設定する &#8212; 例 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="jdbcexample"></a><h5>接続プールを設定する &#8212; 例</h5>
+<p>次の例は、Web サーバーと MySQL 4.0 の接続プールを設定する方法を示しています。</p><ol>
+<li><b>Web サーバーコンソールで、次の属性を持つ JDBC 接続プールを作成します。</b><dl><dt>poolName</dt>
+<dd><p><tt>samplePool</tt></p></dd>
+<dt>DataSource Classname</dt>
+<dd><p><tt>com.mysql.jdbc.jdbc2.optional.MysqlDatacSource</tt> </p></dd>
+<dt>serverName</dt>
+<dd><p>mySQL サーバーのサーバー名。</p></dd>
+<dt>port</dt>
+<dd><p>mySQL サーバーを実行するポートの番号。</p></dd>
+<dt>user</dt>
+<dd><p>データベースパスワードのユーザー名。</p></dd>
+<dt>password</dt>
+<dd><p> ユーザーのパスワード。</p></dd>
+<dt>databaseName</dt>
+<dd><p>データベースの名前。</p></dd>
+</dl>
+
+<hr><p><b>注 &#8211; </b>次の各手順で使用する <i>DataSource</i> クラスと JDBC ドライバクラスが含まれる jar ファイルは、このアプリケーションのクラスパスに追加するようにしてください。</p>
+<hr>
+</li>
+<li><b>JDBC リソースを設定します。Web サーバーコンソールで、次の属性を持つ JDBC リソースを作成します。</b><dl><dt>JNDI 名</dt>
+<dd><p><i>jdbc/samplePool</i></p></dd>
+<dt>プール名</dt>
+<dd><p><i>samplePool</i></p></dd>
+<dt>データリソースを有効</dt>
+<dd><p><i>on</i></p></dd>
+</dl>
+</li>
+<li><b>次の行をアプリケーションの <tt>sun-web.xml</tt> ファイルに追加します。</b><pre>&#60;resource-ref>
+      &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+      &#60;jndi-name>jdbc/samplePool&#60;/jndi-name>
+&#60;/resource-ref></pre></li>
+<li><b>次の行をアプリケーションの web.xml ファイルに追加します。</b><pre>&#60;resource-ref>
+       &#60;description>mySQL Database&#60;/description>
+       &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+       &#60;res-type>javax.sql.DataSource&#60;/res-type>
+       &#60;res-auth>Container&#60;/res-auth>
+&#60;/resource-ref></pre></li>
+<li><b>設定を完了すると、この属性の値は <i>java:comp/env/jdbc/mySQL</i> のようになります。</b></li></ol>
+<br/>
+
+</body>
+</html>

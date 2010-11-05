@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>세션 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>세션</h4>
+<p>이 세션 속성을 사용하면 추가 사이트 및 서버 인스턴스에 대한 세션 정보를
+구성할 수 있습니다.</p>
+
+<a name="ggkab"></a><h5>세션 제한</h5>
+<p>다음 속성은 서버 세션 제한을 설정합니다.</p>
+
+<a name="ggkat"></a><h5>최대 세션</h5>
+<p>기본값은 5000이며 허용 가능한 최대 동시 세션 수를 지정합니다. 최대 동시 세션
+값이 이 값을 초과하면 로그인에서 최대 세션 오류가 발생합니다.</p>
+
+<a name="ggkac"></a><h5>세션 최대 시간 무효화</h5>
+<p>기본값은 10입니다. 잘못된 세션이 생성되고 사용자가 로그인하지 않은 경우 해당 세션을 세션
+테이블에서 제거할 때까지의 시간(분)을 지정합니다. 이 값은 항상 인증 모듈 등록 정보
+파일의 시간 초과 값보다 커야 합니다.</p>
+
+<a name="ggkaf"></a><h5>세션 제거 지연</h5>
+<p>기본값은 60이며 세션을 제거할 때까지 지연되는 시간(분)을 지정합니다. 세션 시간 초과 후
+해당 세션이 세션 서버에 계속 상주하는 연장 시간입니다. 이 등록 정보는 클라이언트
+응용 프로그램에서 SSO API를 통해 세션이 시간 초과되었는지 여부를 확인하는 데 사용합니다.
+이 연장 시간이 끝나면 세션이 삭제됩니다. 사용자가 로그아웃하거나 OpenSSO 구성 요소에서 해당
+세션을 명시적으로 삭제한 경우에는 연장 시간 동안 세션이 지속되지 않습니다. 이 연장
+시간 동안에는 세션이 INVALID 상태입니다.</p>
+
+<a name="ggkbl"></a><h5>통계</h5>
+<p>다음 속성은 통계 구성을 설정합니다.</p>
+
+<a name="ggkbf"></a><h5>로깅 간격</h5>
+<p>기본값은 60입니다. 통계 로깅 사이의 경과 시간(분)을 지정합니다. CPU 포화를 방지하는 데
+필요한 최소값은 5초입니다. OpenSSO에서는 5초 미만인 값을 5초로 간주합니다.</p>
+
+<a name="ggkbn"></a><h5>상태</h5>
+<p>기본값은 파일입니다. 통계 로그의 위치를 지정합니다. 사용 가능한 값은 다음과 같습니다. </p>
+<ul><li><p>해제 &#8212; 통계를 기록하지 않습니다.</p></li>
+<li><p>파일 &#8212; 통계가 지정된 디렉토리의 파일에 기록됩니다.</p></li>
+<li><p>콘솔 &#8212; 통계가 웹 서버 로그 파일에 기록됩니다.</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>디렉토리</h5>
+<p>이 값은 설치 중에 설정됩니다. 예: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server-URI</i><tt>/stats</tt>. 디버그 파일을 만들 디렉토리를 지정합니다.</p>
+
+<a name="ggkca"></a><h5>호스트 조회 사용</h5>
+<p>기본값은 false입니다. 세션 로깅 중에 호스트 조회를 사용하거나 사용하지 않도록 설정합니다.</p>
+
+<a name="ggkas"></a><h5>알림</h5>
+<p>다음 속성은 알림 구성을 설정합니다.</p>
+
+<a name="ggkbz"></a><h5>알림 풀 크기</h5>
+<p>기본값은 10입니다. 전체 스레드 수를 지정하여 풀 크기를 정의합니다.</p>
+
+<a name="ggkao"></a><h5>알림 스레드 풀 임계값</h5>
+<p>기본값은 100입니다. 최대 작업 대기열 길이를 지정합니다. 알림 작업이 들어오면 처리를 위해
+작업 대기열로 보냅니다. 대기열이 최대 길이에 도달하면 대기열이 비워질 때까지는 이후에 들어오는
+요청이 <tt>ThreadPoolException</tt> 오류와 함께 거부됩니다.</p>
+
+<a name="ggkar"></a><h5>유효성 검사</h5>
+<p>다음 속성은 유효성 검사 구성을 설정합니다.</p>
+
+<a name="ggkcg"></a><h5>대소문자 구분 없이 클라이언트 DN 비교</h5>
+<p>기본값은 true입니다. 에이전트 DN을 비교합니다. 값이 false이면 대소문자를 구분하여 비교합니다. </p>
+<br/>
+
+</body>
+</html>

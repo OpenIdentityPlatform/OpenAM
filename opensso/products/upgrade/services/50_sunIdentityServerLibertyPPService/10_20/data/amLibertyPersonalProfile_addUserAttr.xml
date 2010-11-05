@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amLibertyPersonalProfile_addUserAttr.xml,v 1.2 2008/06/25 05:53:54 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Identity Server 2005Q4 Admin CLI DTD//EN "
+"jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  this file referenced by:
+
+  amadmin -u "xxx" -w "yyy" -t amLibertyPersonalProfile_mod.xml
+
+-->
+
+<Requests>
+    <AttributeSchema name="sunIdentityServerPPAddressCard"
+	type="list" 
+	syntax="string" 
+	uitype="name_value_list"
+	any="display"
+	i18nKey="p138"/>
+    <AttributeSchema name="sunIdentityServerPPMsgContact"
+        type="list" 
+        syntax="string" 
+        uitype="name_value_list"
+        any="display"
+        i18nKey="p139"/>
+    <AttributeSchema name="sunIdentityServerPPFacadeMugShot"
+        type="single" 
+        syntax="url" 
+        any="display"
+        i18nKey="p140"/>
+    <AttributeSchema name="sunIdentityServerPPFacadeWebSite"
+        type="single" 
+        syntax="url" 
+        any="display"
+        i18nKey="p141"/>
+    <AttributeSchema name="sunIdentityServerPPFacadeNamePronounced"
+        type="single" 
+        syntax="url" 
+        any="display"
+        i18nKey="p142"/>
+    <AttributeSchema name="sunIdentityServerPPFacadeGreetSound"
+        type="single" 
+	syntax="url" 
+        any="display"
+        i18nKey="p143"/>
+    <AttributeSchema name="sunIdentityServerPPFacadeGreetMeSound"
+        type="single" 
+        syntax="url" 
+        any="display"
+        i18nKey="p144"/>
+    <AttributeSchema name="sunIdentityServerPPDemographicsDisplayLanguage"
+        type="single" 
+        syntax="url" 
+        any="display"
+        i18nKey="p145"/>
+    <AttributeSchema name="sunIdentityServerPPDemographicsLanguage"
+        type="list" 
+	syntax="string" 
+        any="display"
+        i18nKey="p146"/>
+    <AttributeSchema name="sunIdentityServerPPDemographicsBirthday"
+        type="single" 
+        syntax="string" 
+        any="display"
+        i18nKey="p147"/>
+    <AttributeSchema name="sunIdentityServerPPDemographicsAge"
+        type="single" 
+        syntax="number" 
+        any="display"
+        i18nKey="p148"/>
+    <AttributeSchema name="sunIdentityServerPPDemographicsTimeZone"
+        type="single" 
+        syntax="string" 
+        any="display"
+        i18nKey="p149"/>
+    <AttributeSchema name="sunIdentityServerPPSignKey"
+        type="single" 
+        syntax="string" 
+        i18nKey="p150"/>
+    <AttributeSchema name="sunIdentityServerPPEncryptKey"
+        type="single" 
+        syntax="string" 
+        i18nKey="p151"/>
+    <AttributeSchema name="sunIdentityServerPPEmergencyContact"
+        type="single" 
+        syntax="string" 
+        any="display"
+        i18nKey="p152"/>
+</Requests>

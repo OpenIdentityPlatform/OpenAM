@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>Windows NT 验证模块允许通过 Microsoft Windows NT 服务器进行验证。这些属性是领域属性。它们在“服务配置”下采用的值将成为 Windows NT 验证模板的默认值。为领域注册服务之后，需要创建服务模板。注册后，领域管理员可以更改这些默认值。领域属性不会被领域子树中的条目所继承。</p><p>为了激活 Windows NT 验证模块，必须下载 Samba Client 2.2.2 并将其安装到以下目录：</p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>Samba Client 是文件服务器和打印服务器，它将 Windows 计算机和 UNIX 计算机融合在一起而无需使用单独的 Windows NT/2000 服务器。</p><p>Red Hat Linux 产品随附有 Samba 客户机，它位于 <tt>/usr/bin</tt> 目录下。</p><p>要使用适用于 Linux 的 Windows NT 验证服务进行验证，请将客户端二进制文件复制到 <tt></tt><i>OpenSSO-base</i><tt>/identity/bin</tt>。</p><p>Windows NT 属性包括：</p>
+<ul><li><p><a href="#fumve">验证域</a></p></li>
+<li><p><a href="#fumvp">验证主机</a></p></li>
+<li><p><a href="#fumvq">Samba 配置文件名称</a></p></li>
+<li><p><a href="#fumwi">验证级别</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>验证域</h5>
+<p>定义用户所属的域名。</p>
+
+<a name="fumvp"></a><h5>验证主机</h5>
+<p>定义 Windows NT 验证的主机名。主机名应是 netBIOS 名称，而不是全限定域名 (FQDN)。默认情况下，FQDN 的第一部分是 netBIOS 名称。</p><p>如果使用了 DHCP（动态主机配置协议），则可以在 Windows 2000 计算机上的 HOSTS 文件中加入合适的条目。</p><p>将基于 netBIOS 名称进行名称解析。如果您的子网上没有任何提供 netBIOS 名称解析的服务器，则应该对映射进行硬编码。例如，主机名应为 <tt>example1</tt>，而非 <tt>example1.company1.com</tt>。</p>
+
+<a name="fumvq"></a><h5>Samba 配置文件名称</h5>
+<p>定义 Samba 配置文件名并支持在 <tt>smbclient</tt> 命令中使用 <tt>-s</tt> 选项。该值必须是存储 Samba 配置文件的完整目录路径。例如：<tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

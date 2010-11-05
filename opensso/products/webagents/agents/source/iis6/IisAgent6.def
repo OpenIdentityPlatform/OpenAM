@@ -1,0 +1,8 @@
+LIBRARY	     amiis6
+
+DESCRIPTION 'ISAPI extension Agent for DSAME policy'
+
+EXPORTS
+    GetExtensionVersion
+    HttpExtensionProc
+    TerminateExtension

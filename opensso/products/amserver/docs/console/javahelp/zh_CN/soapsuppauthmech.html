@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>支持的验证机制 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="soapsuppauthmech"></a><h4>支持的验证机制</h4>
+<a name="indexterm-165"></a><a name="indexterm-166"></a><p>此属性用于指定 SOAP 接收方所支持的验证机制。验证机制提供了用户验证、数据完整性和加密。默认情况下，所有可用的验证机制都处于选定状态。如果 Web 服务使用方 (WSC) 使用未选定的验证机制发送请求，则系统将拒绝该请求。以下是支持的验证机制的列表：</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,935 @@
+
+
+    <test name="CLI_crmtieeelede-idp-rootrealm-saml2-1">
+        <parameter name="testName" value="metadata-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ConfigureCLI"/>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-rootrealm-saml2-longoption-2">
+        <parameter name="testName" value="metadata-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-rootrealm-saml2-3">
+        <parameter name="testName" value="metadata-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-rootrealm-saml2-longoption-4">
+        <parameter name="testName" value="metadata-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-rootrealm-saml2-debug-5">
+        <parameter name="testName" value="metadata-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-rootrealm-saml2-longdebug-6">
+        <parameter name="testName" value="metadata-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-rootrealm-saml2-debug-7">
+        <parameter name="testName" value="metadata-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-rootrealm-saml2-longdebug-8">
+        <parameter name="testName" value="metadata-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-rootrealm-saml2-verbose-9">
+        <parameter name="testName" value="metadata-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-rootrealm-saml2-longverbose-10">
+        <parameter name="testName" value="metadata-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-rootrealm-saml2-verbose-11">
+        <parameter name="testName" value="metadata-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-rootrealm-saml2-longverbose-12">
+        <parameter name="testName" value="metadata-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-rootrealm-saml2-13">
+        <parameter name="testName" value="metadata-test13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-rootrealm-saml2-long-14">
+        <parameter name="testName" value="metadata-test14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-rootrealm-saml2-debug-15">
+        <parameter name="testName" value="metadata-test15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-rootrealm-saml2-longdebug-16">
+        <parameter name="testName" value="metadata-test16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-rootrealm-saml2-verbose-17">
+        <parameter name="testName" value="metadata-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-rootrealm-saml2-longverbose-18">
+        <parameter name="testName" value="metadata-test18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_crmtieeelede-idp-subrealm-saml2-205">
+        <parameter name="testName" value="metadata-test205"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-subrealm-saml2-longoption-206">
+        <parameter name="testName" value="metadata-test206"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-subrealm-saml2-207">
+        <parameter name="testName" value="metadata-test207"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-subrealm-saml2-longoption-208">
+        <parameter name="testName" value="metadata-test208"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-subrealm-saml2-debug-209">
+        <parameter name="testName" value="metadata-test209"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-subrealm-saml2-debug-210">
+        <parameter name="testName" value="metadata-test210"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-subrealm-saml2-verbose-211">
+        <parameter name="testName" value="metadata-test211"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-subrealm-saml2-verbose-212">
+        <parameter name="testName" value="metadata-test212"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-subrealm-saml2-213">
+        <parameter name="testName" value="metadata-test213"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-subrealm-saml2-long-214">
+        <parameter name="testName" value="metadata-test214"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-subrealm-saml2-debug-215">
+        <parameter name="testName" value="metadata-test215"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-sp-idp-subrealm-saml2-verbose-216">
+        <parameter name="testName" value="metadata-test216"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_crmtieeelede-idp-sp-rootrealm-saml2-specialcharacter$-331">
+        <parameter name="testName" value="metadata-test331"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-rootrealm-saml2-longoption-specialcharacter$-332">
+        <parameter name="testName" value="metadata-test332"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-subrealm-saml2-specialcharacters-333">
+        <parameter name="testName" value="metadata-test333"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-subrealm-saml2-longoption-specialcharacters-334">
+        <parameter name="testName" value="metadata-test334"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test> 
+    <test name="CLI_crmtieeelede-idp-sp-rootrealm-saml2-noentityid-335">
+        <parameter name="testName" value="metadata-test335"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-rootrealm-saml2-longoption-noentityid-336">
+        <parameter name="testName" value="metadata-test336"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-subrealm-saml2-noentityid-337">
+        <parameter name="testName" value="metadata-test337"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-subrealm-saml2-longoption-noentityid-338">
+        <parameter name="testName" value="metadata-test338"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test> 
+    <test name="CLI_crmtieeelede-idp-sp-rootrealm-saml2-norealm-339">
+        <parameter name="testName" value="metadata-test339"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crmtieeelede-idp-sp-rootrealm-saml2-longoption-norealm-340">
+        <parameter name="testName" value="metadata-test340"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.MetadataTests"/>
+        </classes>
+    </test>
+
+
+<!--*************************************************************************-->
+<!--*********************COTMEMBERSHIP TESTS*********************************-->
+<!--*************************************************************************-->
+
+    <test name="CLI_cmieamlmrmde-idp-rootrealm-saml2-1">
+        <parameter name="testName" value="cotmembershiptests-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-rootrealm-saml2-longoption-2">
+        <parameter name="testName" value="cotmembershiptests-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-rootrealm-saml2-3">
+        <parameter name="testName" value="cotmembershiptests-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-rootrealm-saml2-longoption-4">
+        <parameter name="testName" value="cotmembershiptests-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-rootrealm-saml2-debug-5">
+        <parameter name="testName" value="cotmembershiptests-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-rootrealm-saml2-longdebug-6">
+        <parameter name="testName" value="cotmembershiptests-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-rootrealm-saml2-debug-7">
+        <parameter name="testName" value="cotmembershiptests-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-rootrealm-saml2-longdebug-8">
+        <parameter name="testName" value="cotmembershiptests-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-rootrealm-saml2-verbose-9">
+        <parameter name="testName" value="cotmembershiptests-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-rootrealm-saml2-longverbose-10">
+        <parameter name="testName" value="cotmembershiptests-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-rootrealm-saml2-verbose-11">
+        <parameter name="testName" value="cotmembershiptests-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-rootrealm-saml2-longverbose-12">
+        <parameter name="testName" value="cotmembershiptests-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-rootrealm-saml2-13">
+        <parameter name="testName" value="cotmembershiptests-test13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-rootrealm-saml2-long-14">
+        <parameter name="testName" value="cotmembershiptests-test14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-rootrealm-saml2-debug-15">
+        <parameter name="testName" value="cotmembershiptests-test15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-rootrealm-saml2-longdebug-16">
+        <parameter name="testName" value="cotmembershiptests-test16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-rootrealm-saml2-verbose-17">
+        <parameter name="testName" value="cotmembershiptests-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-rootrealm-saml2-longverbose-18">
+        <parameter name="testName" value="cotmembershiptests-test18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_cmieamlmrmde-idp-subrealm-saml2-205">
+        <parameter name="testName" value="cotmembershiptests-test205"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-subrealm-saml2-longoption-206">
+        <parameter name="testName" value="cotmembershiptests-test206"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-subrealm-saml2-207">
+        <parameter name="testName" value="cotmembershiptests-test207"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-subrealm-saml2-longoption-208">
+        <parameter name="testName" value="cotmembershiptests-test208"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-subrealm-saml2-debug-209">
+        <parameter name="testName" value="cotmembershiptests-test209"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-subrealm-saml2-debug-210">
+        <parameter name="testName" value="cotmembershiptests-test210"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-subrealm-saml2-verbose-211">
+        <parameter name="testName" value="cotmembershiptests-test211"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-subrealm-saml2-verbose-212">
+        <parameter name="testName" value="cotmembershiptests-test212"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-subrealm-saml2-213">
+        <parameter name="testName" value="cotmembershiptests-test213"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-subrealm-saml2-long-214">
+        <parameter name="testName" value="cotmembershiptests-test214"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-subrealm-saml2-debug-215">
+        <parameter name="testName" value="cotmembershiptests-test215"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-sp-idp-subrealm-saml2-verbose-216">
+        <parameter name="testName" value="cotmembershiptests-test216"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-specialcharacter$-331">
+        <parameter name="testName" value="cotmembershiptests-test331"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-longoption-specialcharacter$-332">
+        <parameter name="testName" value="cotmembershiptests-test332"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-subrealm-saml2-specialcharacters-333">
+        <parameter name="testName" value="cotmembershiptests-test333"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-subrealm-saml2-longoption-specialcharacters-334">
+        <parameter name="testName" value="cotmembershiptests-test334"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test> 
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-noentityid-335">
+        <parameter name="testName" value="cotmembershiptests-test335"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-longoption-noentityid-336">
+        <parameter name="testName" value="cotmembershiptests-test336"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-subrealm-saml2-noentityid-337">
+        <parameter name="testName" value="cotmembershiptests-test337"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-subrealm-saml2-longoption-noentityid-338">
+        <parameter name="testName" value="cotmembershiptests-test338"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test> 
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-nocot-339">
+        <parameter name="testName" value="cotmembershiptests-test339"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-longoption-nocot-340">
+        <parameter name="testName" value="cotmembershiptests-test340"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-subrealm-saml2-nocot-341">
+        <parameter name="testName" value="cotmembershiptests-test341"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-subrealm-saml2-longoption-nocot-342">
+        <parameter name="testName" value="cotmembershiptests-test342"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test> 
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-norealm-343">
+        <parameter name="testName" value="cotmembershiptests-test343"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+    <test name="CLI_cmieamlmrmde-idp-sp-rootrealm-saml2-longoption-norealm-344">
+        <parameter name="testName" value="cotmembershiptests-test344"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTMembershipTests"/>
+        </classes>
+    </test>
+
+

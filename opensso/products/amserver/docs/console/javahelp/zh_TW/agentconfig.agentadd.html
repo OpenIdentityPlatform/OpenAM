@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立新代理程式 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>建立新代理程式</h5>
+<p>建立新代理程式也稱為建立新代理程式設定檔。您可以在 OpenSSO 管理主控台中執行這項作業。有些單獨的步驟只適用於 J2EE 和 Web 策略代理程式類型。</p><ol>
+<li><b>按一下 [存取控制] 標籤。</b></li>
+<li><b>按一下代理程式所屬的範圍的名稱。</b></li>
+<li><b>按一下 [代理程式] 標籤。</b></li>
+<li><b>選取適當代理程式類型的標籤。</b><ul>
+<li><b>Web 代理程式</b></li>
+<li><b>J2EE 代理程式</b></li>
+<li><b>Web 服務提供者代理程式</b></li>
+<li><b>Web 服務用戶端代理程式</b></li>
+<li><b>STS 用戶端代理程式</b><p>「安全性記號服務」用戶端代理程式有兩種類型可讓您選擇，即探索代理程式和 STS 代理程式。如需這些代理程式類型的詳細資訊，請參閱<a href="agentconfig.stsclientedit.html">STS 用戶端</a>。</p></li>
+<li><b>2.2 代理程式：</b><p>[2.2 代理程式] 標籤用於「策略代理程式 2.2」軟體集中的代理程式。</p></li>
+<li><b>代理程式認證程式</b></li></ul></li>
+<li><b>在 [代理程式] 區段中，按一下 [新建]。</b></li>
+<li><b>在 [名稱] 欄位中，輸入新代理程式設定檔的名稱。</b></li>
+<li><b>輸入並確認 [密碼]。</b>
+<hr><p><b>注意 &#8211; </b>此密碼必須與您執行 <tt>agentadmin</tt> 程式安裝代理程式時，在指定的代理程式設定檔密碼檔中輸入的密碼相同。</p>
+<hr>
+<p><b>步驟 8 到 10 只適用於 Web 和 J2EE 策略代理程式。</b></p></li>
+<li><b>選取適當的配置：「本機」或「集中」。</b><p>選取本機配置時，無法從主控台編輯與此代理程式相關的特性。在這類情況下，代理程式會從代理程式安裝目錄中的本機檔案 <tt>OpenSSOAgentBootstrap.properties</tt> 和 <tt>OpenSSOAgentConfiguration.properites</tt> 擷取配置資訊。若為本機配置的代理程式，可透過直接編輯 <tt>OpenSSOAgentConfiguration.properites</tt> 檔案來變更特性值。</p></li>
+<li><b>在 [伺服器 URL] 欄位中，輸入 OpenSSO 伺服器 URL。</b><p>例如：</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>在 [代理程式 URL] 欄位中，輸入代理程式應用程式 <tt>agentapp</tt> 的 URL。</b><p>例如：</p><dl><dt>Web 代理程式</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>J2EE 代理程式</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>按一下 [建立]。</b><p>主控台會建立代理程式設定檔，並且再次顯示包含新代理程式設定檔的連結的代理程式頁面。</p><p>若要進行額外的代理程式設定檔配置，請按一下此連結，以顯示 [編輯] 代理程式頁面。</p></li></ol>
+<br/>
+
+</body>
+</html>

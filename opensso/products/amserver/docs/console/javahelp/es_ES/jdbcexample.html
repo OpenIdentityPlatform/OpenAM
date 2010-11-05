@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para configurar un conjunto de conexiones: ejemplo - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="jdbcexample"></a><h5>Para configurar un conjunto de conexiones: ejemplo</h5>
+<p>En el siguiente ejemplo se muestra c&#243;mo configurar un grupo de conexi&#243;n
+para Web Server y MySQL 4.0:</p><ol>
+<li><b>En la consola de Web Server, cree un grupo de conexi&#243;n JDBC
+con los siguientes atributos:</b><dl><dt>Nombre de conjunto</dt>
+<dd><p><tt>samplePool</tt></p></dd>
+<dt>Nombre de clase de origen de datos</dt>
+<dd><p><tt>com.mysql.jdbc.jdbc2.optional.MysqlDatacSource</tt> </p></dd>
+<dt>Nombre de servidor</dt>
+<dd><p>Nombre del servidor mySQL.</p></dd>
+<dt>puerto</dt>
+<dd><p>N&#250;mero de puerto en el que se va a ejecutar el servidor mySQL.</p></dd>
+<dt>usuario</dt>
+<dd><p>Nombre de usuario de la contrase&#241;a de la base de datos:</p></dd>
+<dt>contrase&#241;a</dt>
+<dd><p> La contrase&#241;a del usuario.</p></dd>
+<dt>Nombre de base de datos</dt>
+<dd><p>El nombre de la base de datos.</p></dd>
+</dl>
+
+<hr><p><b>Nota &#8211; </b>El archivo jar que contiene la clase de <i>origen de datos</i> y la clase
+de controlador JDBC que se mencionan en los pasos siguientes debe agregarse
+a la ruta de la clase de aplicaci&#243;n</p>
+<hr>
+</li>
+<li><b>Configure los recursos de JDBC. En la consola de Web Server, cree
+un recurso de JDBC con los siguientes atributos:</b><dl><dt>Nombre JNDI</dt>
+<dd><p><i>jdbc/samplePool</i></p></dd>
+<dt>Nombre de conjunto</dt>
+<dd><p><i>samplePool</i></p></dd>
+<dt>Recurso de datos habilitado</dt>
+<dd><p><i>activado</i></p></dd>
+</dl>
+</li>
+<li><b>Agregue las siguientes l&#237;neas al archivo <tt>sun-web.xml</tt> de la aplicaci&#243;n:</b><pre>&#60;resource-ref>
+      &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+      &#60;jndi-name>jdbc/samplePool&#60;/jndi-name>
+&#60;/resource-ref></pre></li>
+<li><b>Agregue las siguientes l&#237;neas al archivo web.xml de la aplicaci&#243;n:</b><pre>&#60;resource-ref>
+       &#60;description>mySQL Database&#60;/description>
+       &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+       &#60;res-type>javax.sql.DataSource&#60;/res-type>
+       &#60;res-auth>Container&#60;/res-auth>
+&#60;/resource-ref></pre></li>
+<li><b>Una vez que haya completado la configuraci&#243;n, el valor de este atributo
+pasar&#225; a ser <i>java:comp/env/jdbc/mySQL</i>.</b></li></ol>
+<br/>
+
+</body>
+</html>

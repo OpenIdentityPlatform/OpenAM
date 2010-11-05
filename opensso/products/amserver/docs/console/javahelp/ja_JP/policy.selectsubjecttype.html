@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>対象 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>対象</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a>「対象」は、ポリシーが影響を及ぼすユーザーまたはユーザーの集合 (たとえば、特定のロールを所有するグループまたは人) を定義します。<b></b>対象に関する一般的な規則として、ポリシーで少なくとも 1 つの対象のメンバーになっているユーザーにのみ、そのポリシーが適用されます。デフォルトの対象は次のとおりです。</p><dl><dt>OpenSSO アイデンティティー対象</dt>
+<dd><p>この対象タイプでは、「レルム対象」タブで作成し管理しているアイデンティティーをこの対象のメンバーとして追加できます。</p></dd>
+<dt>認証済みユーザー</dt>
+<dd><p>この対象タイプでは、有効な SSOToken を持つ任意のユーザーがこの対象のメンバーとなります。</p><p>すべての認証済みユーザーがこの対象のメンバーとなります。ポリシーが定義されている組織とは異なるレルムで認証されたユーザーも含まれます。これを利用して、リソースの所有者は、管理しているリソースへのアクセス権をほかの組織のユーザーに与えることができます。保護されているリソースへのアクセス権を特定の組織のメンバーに限定する場合は、組織対象を使用してください。</p></dd>
+<dt>Web サービスクライアント</dt>
+<dd><p>この対象タイプでは、SSOToken に含まれている任意の主体の DN とこの対象で選択されたいずれかの値が一致する場合に、SSOToken で識別された Web サービスクライアント (WSC) がこの対象のメンバーとなります。有効な値は、ローカルの JKS キーストアにある信頼できる証明書の DN です。これらは、信頼できる WSC の証明書に対応します。この対象は、Liberty Web Services Framework に依存しているので、WSC を承認するために Liberty サービスプロバイダでのみ使用するようにしてください。</p><p>この対象をポリシーに追加する前に、キーストアが作成済みであることを確認します。キーストアの設定については、次の場所を参照してください。</p><p><tt></tt><i>OpenSSO-base</i><tt></tt> <tt> /SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>レルムの <a href="service.scpolicy.html">「ポリシー設定」</a>サービスで選択することにより、次の付加的な対象を利用できます。</p><dl><dt>OpenSSO ロール</dt>
+<dd><p>この対象タイプでは、OpenSSO ロールの任意のメンバーがこの対象のメンバーとなります。OpenSSO ロールは、旧バージョンモードで実行している OpenSSO を使用して作成されます。</p></dd>
+<dt>LDAP グループ</dt>
+<dd><p>この対象タイプでは、LDAP グループの任意のメンバーがこの対象のメンバーとなります。</p></dd>
+<dt>LDAP ロール</dt>
+<dd><p>この対象タイプでは、LDAP ロールの任意のメンバーがこの対象のメンバーとなります。LDAP ロールとは、Directory Server のロール機能を使用する任意のロール定義です。これらのロールのオブジェクトクラスは、Directory Server のロール定義によって規定されます。LDAP ロール検索フィルタを<a href="service.scpolicy.html">「ポリシー設定」</a>サービスで変更して、検索範囲を絞り込みパフォーマンスを向上させることができます。</p></dd>
+<dt>LDAP ユーザー</dt>
+<dd><p>この対象タイプでは、任意の LDAP ユーザーがこの対象のメンバーとなります。</p></dd>
+<dt>組織</dt>
+<dd><p>この対象タイプでは、レルムの任意のメンバーがこの対象のメンバーとなります。</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

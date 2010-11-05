@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>サポートされているコンテナを設定する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsppservicesupportedcontaineradd"></a><h5>サポートされているコンテナを設定する</h5>
+<p>「コンテナ」は、アイデンティティーデータのホルダーを定義する属性の一種です。<b></b>次に示すのは、新しい属性を Liberty 個人プロファイルサービスに追加する手順です。Web サービスモジュール内の Liberty 個人プロファイルサービス設定画面から作業を始めます。</p><ol>
+<li><b>「新規」をクリックして新規の「サポートされているコンテナ」属性を表示するか、設定済みコンテナの名前をクリックしてそのプロファイルを変更します。</b></li>
+<li><b>次の情報に基づいてコンテナ属性の値を入力します。</b><dl><dt>コンテナ名</dt>
+<dd><p>「クレジットカード」などのコンテナ名を入力します。<b></b></p></dd>
+<dt>プラグイン</dt>
+<dd><p>コンテナ全体を処理するためのクラス名を入力します。このクラス名を使用すると、デフォルトの実装 <tt>com.sun.identity.liberty.ws.idpp.plugin.IDPPContainer</tt> を上書きできます。</p></dd>
+</dl>
+</li>
+<li><b>「了解」をクリックしてコンテナの設定を完了します。</b></li>
+<li><b>Liberty 個人プロファイルサービスページで「保存」をクリックして、サービスの設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

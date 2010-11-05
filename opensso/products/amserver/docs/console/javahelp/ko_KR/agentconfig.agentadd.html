@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>새 에이전트를 만들려면 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>새 에이전트를 만들려면</h5>
+<p>새 에이전트를 만드는 것은 새 에이전트 프로필을 만드는 것입니다. OpenSSO 관리 콘솔에서
+이 작업을 수행할 수 있습니다. 개별 단계 중 일부는 J2EE 및 웹
+정책 에이전트 유형에만 적용됩니다.</p><ol>
+<li><b>[액세스 제어] 탭을 누릅니다.</b></li>
+<li><b>에이전트가 속할 영역 이름을 누릅니다.</b></li>
+<li><b>[에이전트] 탭을 누릅니다.</b></li>
+<li><b>적절한 에이전트 유형에 해당하는 탭을 선택합니다.</b><ul>
+<li><b>웹 에이전트</b></li>
+<li><b>J2EE 에이전트</b></li>
+<li><b>웹 서비스 공급자 에이전트</b></li>
+<li><b>웹 서비스 클라이언트 에이전트</b></li>
+<li><b>STS 클라이언트 에이전트</b><p>STS(Security Token Service) 클라이언트 에이전트 유형은 검색 에이전트와 STS 에이전트 중에서 선택할
+수 있습니다. 해당 에이전트 유형에 대한 자세한 내용은 <a href="agentconfig.stsclientedit.html">STS 클라이언트</a>를 참조하십시오.</p></li>
+<li><b>2.2 에이전트:</b><p>[2.2 에이전트] 탭은 정책 에이전트 2.2 소프트웨어 집합에서 에이전트용으로 사용됩니다.</p></li>
+<li><b>에이전트 인증자</b></li></ul></li>
+<li><b>[에이전트] 섹션에서 [새로 만들기]를 누릅니다.</b></li>
+<li><b>[이름] 필드에 새 에이전트 프로필의 이름을 입력합니다.</b></li>
+<li><b>비밀번호를 입력하고 확인합니다.</b>
+<hr><p><b>주의 &#8211; </b>이 비밀번호는 <tt>agentadmin</tt> 프로그램을 실행하여 에이전트를 설치할 때 지정한 에이전트 프로필 비밀번호
+파일에 입력한 비밀번호와 동일해야 합니다.</p>
+<hr>
+<p><b>8&#8211;10단계는 웹 및 J2EE 정책 에이전트에만 적용됩니다.</b></p></li>
+<li><b>적용 가능한 구성을 로컬 또는 중앙 집중화됨 중에서 선택합니다 .</b><p>로컬 구성을 선택한 경우 이 에이전트 관련 등록 정보를 콘솔에서 편집할 수
+있습니다. 이 시나리오에서 에이전트는 에이전트 설치 디렉토리에 있는 로컬 파일인 <tt>OpenSSOAgentBootstrap.properties</tt> 및
+<tt>OpenSSOAgentConfiguration.properites</tt>에서 구성 정보를 검색합니다. 로컬로 구성된 에이전트의 경우 <tt>OpenSSOAgentConfiguration.properites</tt> 파일을 직접 편집하여
+등록 정보 값을 변경하십시오.</p></li>
+<li><b>[서버 URL] 필드에 OpenSSO 서버 URL을 입력합니다.</b><p>예를 들면 다음과 같습니다.</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>[에이전트 URL] 필드에 에이전트 응용 프로그램(<tt>agentapp</tt>)의 URL을 입력합니다.</b><p>예를 들면 다음과 같습니다.</p><dl><dt>웹 에이전트</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>J2EE 에이전트</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>[만들기]를 누릅니다.</b><p>콘솔에서 에이전트 프로필을 만들고 새로운 에이전트 프로필에 대한 링크와 함께 에이전트 페이지를
+다시 표시합니다.</p><p>에이전트 프로필을 추가로 구성하려면 이 링크를 눌러 에이전트 편집 페이지를 표시합니다.</p></li></ol>
+<br/>
+
+</body>
+</html>

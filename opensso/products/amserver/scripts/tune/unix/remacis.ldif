@@ -1,0 +1,112 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: remacis.ldif,v 1.2 2008/06/25 05:41:18 qcheng Exp $
+#
+#
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter=(entrydn=ORG_ROOT_SUFFIX))(targetattr="*")(version 3.0; acl "S1IS Default Organization delete right denied"; deny (delete) userdn = "ldap:///anyone"; )
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)))(targetattr = "*") (version 3.0; acl "S1IS Top-level Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Help Desk Admin Role,ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter=(!(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)))(targetattr = "userPassword") (version 3.0; acl "S1IS Top-level Help Desk Admin Role access allow"; allow (write) roledn = "ldap:///cn=Top-level Help Desk Admin Role,ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX))))(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Policy Admin Role,ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ou=iPlanetAMAuthService,ou=services,*ROOT_SUFFIX")(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access Auth Service deny"; deny (add,write,delete) roledn = "ldap:///cn=Top-level Policy Admin Role,ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ou=services,*ROOT_SUFFIX")(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (all) roledn = "ldap:///cn=Top-level Policy Admin Role,ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter="(objectclass=ORG_OBJECT_CLASS)")(targetattr = "sunRegisteredServiceName") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,write,search) roledn = "ldap:///cn=Top-level Policy Admin Role,ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (targetattr != "aci || nsLookThroughLimit || nsSizeLimit || nsTimeLimit || nsIdleTimeout || iplanet-am-domain-url-access-allow")(version 3.0; acl "S1IS Allow self entry read search except for nsroledn, aci, resource limit and web agent policy attributes"; allow (read,search)userdn ="ldap:///self";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ou=iPlanetAMAdminConsoleService,*,ROOT_SUFFIX")(targetattr = "*")(version 3.0; acl "S1IS iPlanetAMAdminConsoleService anonymous access"; allow (read, search, compare) userdn = "ldap:///anyone";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///($dn),ROOT_SUFFIX")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Help Desk Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Policy Admin Role,ROOT_SUFFIX))))(targetattr != "nsroledn")(version 3.0; acl "S1IS Organization Admin Role access allow all"; allow (all) roledn = "ldap:///cn=Organization Admin Role,[$dn],ORG_ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///cn=Organization Admin Role,($dn),ORG_ROOT_SUFFIX")(targetattr="*")(version 3.0; acl "S1IS Organization Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///cn=Organization Admin Role,($dn),ORG_ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///($dn),ROOT_SUFFIX")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Help Desk Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Policy Admin Role,ROOT_SUFFIX))))(targetattr != "nsroledn")(version 3.0; acl "S1IS Container Admin Role access allow"; allow (all) roledn = "ldap:///cn=Container Admin Role,[$dn],ORG_ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///cn=Container Admin Role,($dn),ORG_ROOT_SUFFIX")(targetattr="*")(version 3.0; acl "S1IS Container Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///cn=Container Admin Role,($dn),ORG_ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetattr!="nsroledn")(version 3.0; acl "S1IS Group admin's right to the users he creates"; allow (all) userattr = "iplanet-am-modifiable-by#ROLEDN";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Help Desk Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Policy Admin Role,ROOT_SUFFIX)(nsroledn=cn=Organization Admin Role,ORG_ROOT_SUFFIX))))(targetattr = "*") (version 3.0; acl "S1IS Organization Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Organization Help Desk Admin Role,ORG_ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ROOT_SUFFIX")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Help Desk Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Policy Admin Role,ROOT_SUFFIX)(nsroledn=cn=Organization Admin Role,ORG_ROOT_SUFFIX))))(targetattr = "userPassword") (version 3.0; acl "S1IS Organization Help Desk Admin Role access allow"; allow (write) roledn = "ldap:///cn=Organization Help Desk Admin Role,ORG_ROOT_SUFFIX";)
+
+dn: ROOT_SUFFIX
+changetype: modify
+delete: aci
+aci: (target="ldap:///ou=People,ORG_ROOT_SUFFIX")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Help Desk Admin Role,ROOT_SUFFIX)(nsroledn=cn=Top-level Policy Admin Role,ROOT_SUFFIX)(nsroledn=cn=Organization Admin Role,ROOT_SUFFIX)(nsroledn=cn=Container Admin Role,ORG_ROOT_SUFFIX))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn") (version 3.0; acl "S1IS Group and people container admin role"; allow (all) roledn = "ldap:///cn=ou=People_NM_ORG_ROOT_SUFFIX,ORG_ROOT_SUFFIX";)

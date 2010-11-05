@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Globalization Settings - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>Globalization Settings</h4>
+<p><a name="indexterm-188"></a>The Globalization Settings service contains global attributes that enable you to configure OpenSSO
+for different locales and character sets. The attributes are:</p>
+<ul><li><p><a href="#fsvdx">Charsets Supported By Each Locale</a></p></li>
+<li><p><a href="#fsvec">Charset Aliases</a></p></li>
+<li><p><a href="#fsveb">Auto Generated Common Name Format</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>Charsets Supported By Each Locale</h5>
+<p>This attribute lists the character sets supported for each locale, which indicates the
+mapping between locale and character set. The format is as follows:</p><p>To add a New Supported Charset, click Add and define the following parameters:</p><dl><dt>Locale</dt>
+<dd><p>The new locale you wish to add. See<a href="supportedlang.html">Supported Language Locales</a> for more information.</p></dd>
+<dt>Supported Charsets</dt>
+<dd><p>Enter the supported charset for the specified locale. Charsets are delimited by a semicolon. For example, <tt>charset=charset1;charset2;charset3;...;charsetn</tt></p></dd>
+</dl>
+<p>To edit any existing Supported Charset, click the name in the Supported Charset
+table. Click OK when you are finished.</p>
+
+<a name="fsvec"></a><h5>Charset Aliases</h5>
+<p>This attribute lists the codeset names (which map to IANA names) that will
+be used to send the response. These codeset names do not need to
+match Java codeset names. Currently, there is a hash table to map Java
+character sets into IANA charsets and vice versa.</p><p>To add a New Charset Alias, click Add button and define the following
+parameters:</p><dl><dt>MIME name</dt>
+<dd><p>The IANA mapping name. For example, <tt>Shift_JIS</tt></p></dd>
+<dt>Java Name</dt>
+<dd><p>The Java character set to map to the IANA character set. </p></dd>
+</dl>
+<p>To edit any existing Charset Alias, click the name in the table. Click
+OK when you are finished.</p>
+
+<a name="fsveb"></a><h5>Auto Generated Common Name Format</h5>
+<p>This display option allows you to define the way in which a name
+is automatically generated to accommodate name formats for different locales and character sets.
+The default syntax is as follows (please note that including commas and/or spaces
+in the definition will display in the name format):</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>For example, if you wanted to display a new name format for a
+user (User One) with a uid (11111) for the Chinese character set, define:</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>The display is:</p><p><tt>OneUser 11111</tt></p>
+<br/>
+
+</body>
+</html>

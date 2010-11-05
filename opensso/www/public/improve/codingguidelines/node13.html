@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Blank spaces</TITLE>
+<META NAME="description" CONTENT="Blank spaces">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="previous" HREF="node12.html">
+<LINK REL="up" HREF="node11.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html169"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html167"
+  HREF="node11.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html163"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html170"
+  HREF="node14.html">Indentation</A>
+<B> Up:</B> <A NAME="tex2html168"
+  HREF="node11.html">White Space Usage</A>
+<B> Previous:</B> <A NAME="tex2html164"
+  HREF="node12.html">Blank lines</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00042000000000000000">
+Blank spaces</A>
+</H2>
+A single blank space (not tab) should be used:
+
+<OL>
+<LI>Between a keyword and its opening parenthesis. This applies to the following keywords: catch,for, if, switch, synchronized, while. It does not apply to the keywords super and this.
+</LI>
+<LI>After any keyword that takes an argument. Example: return true;
+</LI>
+<LI>Between two adjacent keywords.
+</LI>
+<LI>Between a keyword or closing parenthesis, and an opening brace "{".
+</LI>
+<LI>Before and after binary operators3 except .(dot).
+</LI>
+<LI>After a comma in a list.
+</LI>
+<LI>After the semicolons in a for statement, e.g.: for (expr1; expr2; expr3) {
+</LI>
+</OL>
+Blanks should not be used:
+
+<OL>
+<LI>Between or after a 'dot' operator.
+</LI>
+<LI>Between a unary operator and its operand.
+</LI>
+<LI>Between a cast and the expression being casted.
+</LI>
+<LI>After an opening parenthesis or before a closing parenthesis.
+</LI>
+<LI>After an opening square bracket [ or before a closing square bracket ]. Examples:
+      <PRE>
+      a += c[i + j] + (int)d + foo(bar(i + j), e);
+      a = (a + b) / (c * d);
+      if (((x + y) > (z + w)) || (a != (b + 3))) {
+           return foo.distance(x, y);
+      }
+</PRE>
+</LI>
+</OL>
+
+<P>
+Do not use special characters like form-feeds or backspaces.
+
+<P>
+<BR><HR>
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

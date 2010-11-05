@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>共用聯合配置 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamfederationcommon"></a><h4>共用聯合配置</h4>
+
+
+<a name="ggoir"></a><h5>資料存放區 SPI 實作類別</h5>
+<p>此屬性指定預設資料存放區提供者的實作類別。</p>
+
+<a name="ggogw"></a><h5>配置實例 SPI 實作類別</h5>
+<p>此屬性指定管理配置資料的實作類別。</p>
+
+<a name="ggofp"></a><h5>記錄程式 SPI 實作類別</h5>
+<p>此屬性指定記錄提供者的實作類別。</p>
+
+<a name="ggofy"></a><h5>階段作業提供者 SPI 實作類別</h5>
+<p>這會指定階段作業提供者的實作類別。</p>
+
+<a name="ggogv"></a><h5>允許的內容長度最大值</h5>
+<p>此屬性會指定聯合服務中將使用之 HTTP 請求所允許的內容長度最大值。內容超出指定內容長度最大值的任何請求都會被拒絕。</p>
+
+<a name="ggogu"></a><h5>密碼解碼器 SPI 實作類別</h5>
+<p>此屬性指定<tt> com.sun.identity.saml.xmlsig.PasswordDecoder</tt> 介面的實作類別，該介面用來解碼儲存在 XML 簽署金鑰庫中的密碼，以及 SAML 1.x 下基本驗證的密碼。</p>
+
+<a name="ggohx"></a><h5>簽名提供者 SPI 實作類別</h5>
+<p>此屬性指定 SAML XML 簽名提供者類別。預設的 SPI 為 <tt>com.sun.identity.saml.xmlsig.AMSignatureProvider</tt>。</p>
+
+<a name="ggohm"></a><h5>金鑰提供者 SPI 實作類別</h5>
+<p>此屬性指定 XML 簽名金鑰提供者類別。預設的 SPI 為 <tt>com.sun.identity.saml.xmlsig.JKSKeyProvider</tt>。</p>
+
+<a name="ggofo"></a><h5>請檢查憑證是否存在</h5>
+<p>如果設為 <tt>開啟</tt>，則金鑰庫中必須存在用於 XML 簽名驗證的憑證。如果設為 <tt>關閉</tt>，則不會檢查憑證是否存在。這僅適用於 SMAL1.x。</p>
+
+<a name="ggohn"></a><h5>XML Canonicalization (標準化) 演算法</h5>
+<p>此屬性指定用於產生和驗證 SAML XML 簽名的 XML 標準化演算法。預設值為 <tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>。</p>
+
+<a name="ggohp"></a><h5>XML 簽名演算法</h5>
+<p>此屬性指定用於產生和驗證 SAML XML 簽名的 XML 簽名演算法。未指定或值為空白時，會使用預設值 (<tt>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tt>)。</p>
+
+<a name="ggoie"></a><h5>XML 變換演算法</h5>
+<p>此屬性指定用於產生和驗證 SAML XML 簽名的變換演算法。未指定或值為空白時，會使用預設值 (<tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>)。</p>
+<br/>
+
+</body>
+</html>

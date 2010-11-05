@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP バインド属性 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggodb"></a><h4>SOAP バインド属性</h4>
+
+
+<a name="ggocx"></a><h5>Web サービス認証</h5>
+<a name="indexterm-155"></a><a name="indexterm-156"></a><p>この属性には、Web サービス認証インタフェースの実装クラスを値として指定します。このクラスは要求を認証し、Web サービスコンシューマの証明情報を生成します。</p>
+
+<a name="ggock"></a><h5>サポートされている認証メカニズム</h5>
+<a name="indexterm-157"></a><a name="indexterm-158"></a><p>この属性は、SOAP Receiver がサポートする認証メカニズムを指定します。認証メカニズムにより、データの整合性と暗号化のほかに、ユーザー認証も提供されます。デフォルトでは、利用可能なすべての認証メカニズムが選択されています。Web サービスコンシューマ (WSC) が認証メカニズムを 1 つも選択せずに、その方法で要求を送信しようとすると、その要求は拒否されます。サポートされている認証メカニズムのリストは、次のとおりです。</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+
+<a name="ggocn"></a><h5>既知のプロバイダのみを強制</h5>
+<p>このプロパティーが有効になっている場合は、プロバイダがシステムに存在していることを確認するために、SOAP メッセージで <tt>ProviderID</tt> ヘッダーを送信することが強制されます。プロバイダがシステムに存在していない場合、要求は拒否されます。この属性が有効になっていない場合、チェックはスキップされます。 </p>
+
+<a name="ggoci"></a><h5>SSL クライアント認証用の証明書エイリアス</h5>
+<p>値はインストールの間に設定されます。Liberty SOAP バインディングのための SSL 接続で使用されるクライアント証明書エイリアス。</p>
+
+<a name="ggocs"></a><h5>古いメッセージの制限時間</h5>
+<p>デフォルト値は 300000 です。メッセージが期限切れですでに信頼できないものかどうかを決定します。メッセージのタイムスタンプが、現在のタイムスタンプよりも指定されたミリ秒数だけ古い場合、メッセージは期限切れと見なされます。</p>
+
+<a name="ggofw"></a><h5>メッセージ ID キャッシュのクリーンアップ間隔 </h5>
+<p>デフォルト値は 60000 です。キャッシュクリーンアップイベントが開始するまでの経過時間をミリ秒単位で指定します。個々のメッセージは、メッセージの重複を避けるために個別の messageID を付与されてキャッシュに格納されます。受信時点からのメッセージの経過時間が staleTimeLimit の値を超えると、メッセージはキャッシュから削除されます。</p>
+
+<a name="ggohr"></a><h5>サポートされる SOAP アクター</h5>
+<p>デフォルト値は <tt>http://schemas.xmlsoap.org/soap/actor/next</tt> です。サポートされる SOAP アクターを指定します。個々のアクターはパイプ文字 (|) で区切る必要があります。</p>
+
+<a name="ggofh"></a><h5>ネームスペースプレフィックスマッピング</h5>
+<p>デフォルト値は次のとおりです。</p><pre>=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08
+|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/
+liberty/pp|is=urn:liberty:is:2003-08</pre><p>JAXB コンテンツツリーを DOM ツリーに整列化するときに使用されるネームスペースプレフィックスマッピングを指定します。構文は「<tt>prefix=namespace|prefix=namespace|...</tt>」です。</p>
+
+<a name="ggoho"></a><h5>JAXB パッケージリスト</h5>
+<p><tt>JAXBContext</tt> の構築時に使用される JAXB パッケージリストを指定します。各パッケージはコロン (:) で区切る必要があります。</p>
+
+<a name="ggogm"></a><h5>Liberty アイデンティティー Web サービスのバージョン</h5>
+<p>このプロパティーは、OpenSSO が WSC として動作しているときに、受信メッセージやリソースオファリングから Liberty ID-WSF のフレームワークを判定できない場合に、そのフレームワークを決定します。指定できる値は 1.0 または 1.1 で、デフォルトは 1.1
+です。</p>
+<br/>
+
+</body>
+</html>

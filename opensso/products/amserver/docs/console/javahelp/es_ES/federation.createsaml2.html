@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear un proveedor de entidades SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createsaml2"></a><h5>Para crear un proveedor de entidades SAMLv2</h5>
+<p>Utilice estos pasos para crear un proveedor de entidades basado en el
+complemento SAMLv2 para Servicios de federaci&#243;n. Tiene la posibilidad de asignar una,
+m&#225;s de una o todas las funciones de proveedor a la entidad,
+pero las funciones que defina pertenecer&#225;n al mismo proveedor de entidades.</p><ol>
+<li><b>Inicie la sesi&#243;n como administrador.</b></li>
+<li><b>Dir&#237;jase a la ficha Federaci&#243;n de la consola y, en la tabla
+Proveedor de entidades, haga clic en Nuevo.</b></li>
+<li><b>Cuando se le pregunte, seleccione SAMLv2 como proveedor de entidades.</b></li>
+<li><b>Seleccione el dominio al que pertenecer&#225; el proveedor de entidades.</b></li>
+<li><b>Escriba un nombre en el campo Identificador de identidad. </b></li>
+<li><b>Elija la funci&#243;n de proveedor de entidades que desea asignar al proveedor
+de entidades.</b><p>Al introducir datos en el campo Meta Alias se crear&#225; y asignar&#225;
+autom&#225;ticamente la funci&#243;n de proveedor de entidades al proveedor de entidades, una
+vez finalizado.</p></li>
+<li><b>Introduzca valores para los siguientes atributos de una o m&#225;s funciones:</b><dl><dt>Meta Alias</dt>
+<dd><p>Especifique un <tt>metaAlias</tt> para la funci&#243;n de proveedor que se est&#225; configurando. El <tt>metaAlias</tt> se utiliza para localizar el identificador de entidades del proveedor y la organizaci&#243;n en la que est&#225; situado. El valor es una cadena equivalente al dominio o nombre de la organizaci&#243;n, unido a una barra inclinada y el nombre del proveedor. Por ejemplo, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Precauci&#243;n &#8211; </b>Los nombres utilizados en el <tt>metaAlias</tt> no deben contener ninguna <tt>/</tt>.</p>
+<hr>
+</dd>
+<dt>Alias del certificado firmado</dt>
+<dd><p>Especifica el alias de certificado de proveedor utilizado para encontrar en el almac&#233;n de claves el certificado firmante correcto. </p></dd>
+<dt>Alias del certificado de cifrado</dt>
+<dd><p>Especifica el alias de certificado de proveedor utilizado para encontrar en el almac&#233;n de claves el certificado de cifrado correcto.</p></dd>
+<dt>Miembros de afiliaci&#243;n (s&#243;lo Afiliaci&#243;n alojada)</dt>
+<dd><p>Un proveedor debe ser miembro de un c&#237;rculo de confianza, o no podr&#225; participar en comunicaciones basadas en SAMLv2. El proveedor puede pertenecer a una o m&#225;s afiliaciones. El proveedor seleccionado deber&#225; tener habilitado el atributo Federaci&#243;n de afiliaci&#243;n. Introduzca el meta alias del proveedor el campo Nuevo valor y haga clic en Agregar.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Create (Crear).</b><p>En la lista de Proveedores de entidades aparecer&#225; el proveedor de entidades,
+las funciones de proveedor que tiene asignadas y su ubicaci&#243;n. </p></li>
+<li><b>Para personalizar el comportamiento de las funciones del proveedor de entidades, haga
+clic en el nombre del proveedor de entidades y elija la ficha
+que corresponda a la funci&#243;n que desea personalizar.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Modification des attributs d'un fournisseur de services distant dans une entit&#233; fournisseur - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteprofile"></a><h4>Modification des attributs d'un fournisseur de services distant dans une entit&#233; fournisseur</h4><a name="indexterm-80"></a><p>Apr&#232;s avoir cr&#233;&#233; une entit&#233; et avoir ajout&#233; un fournisseur de services,
+vous pouvez modifier le profil du fournisseur de services. Ceci peut impliquer
+l'ajout de valeurs aux attributs qu'il n'&#233;tait pas possible de configurer lors
+de l'ajout du fournisseur de services ou la modification des donn&#233;es configur&#233;es.
+Le point de d&#233;part est Entit&#233;s sous l'interface F&#233;d&#233;ration.</p><ol>
+<li><b>Cliquez sur le nom d'une entit&#233; fournisseur configur&#233;e pour modifier son profil.</b><p>La page du profil de l'entit&#233; s'affiche.</p></li>
+<li><b>Dans le menu Afficher, s&#233;lectionnez Fournisseur de services.</b></li>
+<li><b>Modifiez les valeurs des attributs communs.</b><p>Ces attributs d&#233;finissent g&#233;n&#233;ralement l'identit&#233; du fournisseur lui-m&#234;me.</p><dl><dt>Type de fournisseur</dt>
+<dd><p>La valeur statique de cet attribut indique s'il s'agit d'un fournisseur h&#233;berg&#233; ou distant.</p></dd>
+<dt>Description</dt>
+<dd><p>La valeur de cet attribut est la description fournie lors de la cr&#233;ation de l'entit&#233;. Vous pouvez modifier la description initiale ou en ajouter une s'il n'y en a pas.</p></dd>
+<dt>&#201;num&#233;ration des protocoles pris en charge</dt>
+<dd><p>Choisissez la version de Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) prise en charge par cette entit&#233;.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> correspond &#224; la version 1.2 de Liberty ID-FF.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> correspond &#224; la version 1.1 de Liberty ID-FF.</p></li></ul>
+</dd>
+<dt>Liaison de mappage de l'identificateur du nom de serveur</dt>
+<dd><p>Le mappage de l'identificateur du nom permet &#224; un fournisseur de services d'obtenir l'identificateur de nom d'une entit&#233; principale qui a &#233;t&#233; f&#233;d&#233;r&#233;e dans l'espace de noms d'un autre fournisseur de services. De cette fa&#231;on, le fournisseur qui &#233;met la demande peut communiquer avec l'autre fournisseur de services au sujet de l'entit&#233; principale sans qu'il y ait entre eux une f&#233;d&#233;ration d'identit&#233; pour l'entit&#233; principale. Tapez un URI qui identifie le protocole de communication utilis&#233; pour obtenir l'identificateur et cliquez sur Ajouter.</p>
+<hr><p><b>Remarque &#8211; </b>Actuellement, dans Access Manager, le mappage de l'identificateur du nom ne prend en charge que SOAP. Si cet attribut est utilis&#233;, il doit avoir la valeur <tt>http://projectliberty.org/profiles/nim-sp-http</tt>.</p>
+<hr>
+</dd>
+<dt>Cl&#233; de signature : Alias cl&#233;</dt>
+<dd><p>Les certificats sont stock&#233;s dans un fichier keystore Java. Chaque certificat du fichier correspond &#224; un alias qui permet de le rechercher. Tapez l'alias cl&#233; associ&#233; au certificat utilis&#233; pour signer les demandes et les r&#233;ponses.</p></dd>
+<dt>Cl&#233; de chiffrement : Alias cl&#233;</dt>
+<dd><p>Les certificats sont stock&#233;s dans un fichier keystore Java. Chaque certificat du fichier correspond &#224; un alias qui permet de le rechercher. Tapez l'alias cl&#233; associ&#233; au certificat de s&#233;curit&#233; du fournisseur.</p></dd>
+<dt>Cl&#233; de chiffrement : Taille de la cl&#233;</dt>
+<dd><p>Tapez la longueur des cl&#233;s utilis&#233;es par le consommateur du service Web lors de l'interaction avec une autre entit&#233;.</p></dd>
+<dt>Cl&#233; de chiffrement : M&#233;thode de chiffrement</dt>
+<dd><p>Choisissez la m&#233;thode de chiffrement. Les choix possibles sont les suivants :</p>
+<ul><li><p>Aucune</p></li>
+<li><p>AES</p></li>
+<li><p>DESede</p></li></ul>
+</dd>
+<dt>Chiffrement de l'identificateur de nom</dt>
+<dd><p>Cochez la case pour activer le chiffrement de l'identificateur de nom.</p></dd>
+</dl>
+</li>
+<li><b>Modifiez les valeurs des attributs des URL de communication.</b><p>Ces attributs contiennent les emplacements auxquels des fournisseurs peuvent envoyer des transmissions
+sp&#233;cialis&#233;es pour ce fournisseur d'identit&#233;s.</p><dl><dt>Point d'extr&#233;mit&#233; SOAP</dt>
+<dd><p>Tapez un URL qui pointe vers le r&#233;cepteur de messages SOAP du fournisseur d'identit&#233;s. Cette valeur communique l'emplacement du r&#233;cepteur SOAP lors des communications hors navigateur.</p></dd>
+<dt>Service de d&#233;connexion unique</dt>
+<dd><p>Tapez l'URL auquel les fournisseurs de services peuvent envoyer les demandes de d&#233;connexion. La d&#233;connexion unique synchronise la fonctionnalit&#233; de d&#233;connexion pour toutes les sessions authentifi&#233;es par ce fournisseur d'identit&#233;s.</p></dd>
+<dt>Retour de d&#233;connexion unique</dt>
+<dd><p>Tapez l'URL vers lequel le fournisseur d'identit&#233;s va rediriger l'entit&#233; principale apr&#232;s la d&#233;connexion.</p></dd>
+<dt>Service d'interruption de la f&#233;d&#233;ration</dt>
+<dd><p>Tapez l'URL auquel le fournisseur de services va envoyer les demandes d'interruption de la f&#233;d&#233;ration.</p></dd>
+<dt>Retour d'interruption de la f&#233;d&#233;ration</dt>
+<dd><p>Tapez l'URL vers lequel le fournisseur d'identit&#233;s va rediriger l'entit&#233; principale apr&#232;s l'interruption de la f&#233;d&#233;ration.</p></dd>
+<dt>Service d'enregistrement du nom</dt>
+<dd><p>Tapez l'URL vers lequel le fournisseur de services va envoyer les demandes pour sp&#233;cifier l'identificateur de nom qui sera utilis&#233; lors de la communication avec ce fournisseur d'identit&#233;s &#224; propos d'une entit&#233; principale particuli&#232;re. Ce service facultatif ne peut &#234;tre impl&#233;ment&#233; qu'une fois une session de f&#233;d&#233;ration &#233;tablie.</p></dd>
+<dt>Retour d'enregistrement du nom</dt>
+<dd><p>Tapez l'URL vers lequel le fournisseur d'identit&#233;s va rediriger l'entit&#233; principale une fois l'enregistrement de nom bas&#233; sur une redirection HTTP achev&#233;.</p></dd>
+</dl>
+</li>
+<li><b>Modifiez les valeurs des attributs des profils de communication.</b><p>Un <b>profil</b> Liberty Alliance Project d&#233;finit la combinaison entre un contenu de
+message et le m&#233;canisme utilis&#233; pour son transport. Les attributs de profils
+de communication suivants d&#233;finissent les profils utilis&#233;s par le fournisseur d'identit&#233;s pour
+chaque fonctionnalit&#233;.</p><dl><dt>Interruption de la f&#233;d&#233;ration</dt>
+<dd><p>S&#233;lectionnez le profil du fournisseur d'identit&#233;s &#224; utiliser pour signaler &#224; d'autres fournisseurs une interruption de la f&#233;d&#233;ration d'une entit&#233; principale.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>D&#233;connexion unique</dt>
+<dd><p>S&#233;lectionnez le profil du fournisseur d'identit&#233;s &#224; utiliser pour signaler &#224; d'autres fournisseurs une d&#233;connexion d'une entit&#233; principale.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>Enregistrement du nom</dt>
+<dd><p>S&#233;lectionnez le profil d'autres fournisseurs &#224; utiliser pour contacter ce fournisseur d'identit&#233;s afin d'enregistrer un nouvel identificateur de nom pour une entit&#233; principale.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>F&#233;d&#233;ration/connexion unique</dt>
+<dd><p>S&#233;lectionnez le profil de ce fournisseur d'identit&#233;s &#224; utiliser pour envoyer des r&#233;ponses &#224; des demandes d'authentification ou de f&#233;d&#233;ration.</p>
+<ul><li><p>Poste navigateur (sp&#233;cifie un protocole POST HTTP bas&#233; sur un navigateur)</p></li>
+<li><p>Art&#233;fact navigateur (sp&#233;cifie un protocole bas&#233; sur SOAP hors navigateur).</p></li>
+<li><p>LECP (sp&#233;cifie un proxy client compatible Liberty)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>S&#233;lectionnez l'un des cercles d'approbation disponibles &#224; attribuer au fournisseur.</b><p>Un fournisseur peut appartenir &#224; un ou plusieurs cercles d'approbation. Cependant, un
+fournisseur sans cercle d'approbation sp&#233;cifi&#233; ne peut pas participer &#224; des communications
+bas&#233;es sur les sp&#233;cifications Liberty Alliance Project. Si aucun cercle d'approbation n'a
+&#233;t&#233; cr&#233;&#233;, vous pouvez d&#233;finir cet attribut plus tard.</p></li>
+<li><b>Modifiez les valeurs des attributs du fournisseur de services.</b><p>Ces attributs d&#233;finissent les informations g&#233;n&#233;rales concernant le fournisseur de services.</p><dl><dt>URL de consommateur d'assertion</dt>
+<dd><p>Tapez un URL dirig&#233; sur le point d'extr&#233;mit&#233; qui va recevoir et traiter toutes les assertions SAML envoy&#233;es au fournisseur de services.</p></dd>
+<dt>ID d'URL du service consommateur d'assertion</dt>
+<dd><p>Si l'attribut commun &#201;num&#233;ration des protocoles pris en charge a la valeur <tt>urn:liberty:iff:2003-08</tt>, tapez l'ID n&#233;cessaire.</p></dd>
+<dt>D&#233;finir l'URL du service consommateur d'assertion comme valeur par d&#233;faut</dt>
+<dd><p>Cochez cette case pour utiliser l'URL du service consommateur d'assertion comme valeur par d&#233;faut si aucun identificateur n'est fourni dans la demande.</p></dd>
+<dt>Signer la demande d'authentification</dt>
+<dd><p>Cochez cette case pour que le fournisseur de services signe syst&#233;matiquement les demandes d'authentification.</p></dd>
+<dt>Enregistrement du nom apr&#232;s la f&#233;d&#233;ration</dt>
+<dd><p>Cochez cette case pour autoriser un fournisseur de services &#224; participer &#224; l'enregistrement du nom une fois une entit&#233; principale f&#233;d&#233;r&#233;e. </p></dd>
+<dt>Strat&#233;gie d'ID de nom</dt>
+<dd><p>S&#233;lectionnez l'option autorisant le demandeur &#224; influer sur la strat&#233;gie d'identificateur de nom du c&#244;t&#233; fournisseur d'identit&#233;s. Les options possibles sont les suivantes :</p><dl><dt>Aucun</dt>
+<dd><p>Le fournisseur d'identit&#233;s renvoie le ou les identificateurs de nom correspondant &#224; la f&#233;d&#233;ration qui existe entre le fournisseur d'identit&#233;s et le fournisseur de services demandeur ou groupe d'affiliation pour l'entit&#233; principale. Si cette f&#233;d&#233;ration n'existe pas, une erreur est retourn&#233;e.</p></dd>
+<dt>Unique</dt>
+<dd><p>Le fournisseur d'identit&#233;s g&#233;n&#232;re alors un identificateur temporaire &#224; usage unique pour l'entit&#233; principale apr&#232;s l'&#233;tablissement de la f&#233;d&#233;ration.</p></dd>
+<dt>F&#233;d&#233;r&#233;</dt>
+<dd><p>Le fournisseur d'identit&#233;s peut d&#233;marrer une nouvelle f&#233;d&#233;ration d'identit&#233;s s'il n'en existe pas encore pour l'entit&#233; principale.</p></dd>
+</dl>
+</dd>
+<dt>F&#233;d&#233;ration d'affiliation</dt>
+<dd><p>Cochez cette case pour activer la f&#233;d&#233;ration d'affiliation.</p></dd>
+</dl>
+</li>
+<li><b>Fournissez les informations des attributs de configuration de l'authentification de proxy.</b><p>Si un fournisseur d'identit&#233;s re&#231;oit une demande d'authentification d'une entit&#233; principale d&#233;j&#224;
+authentifi&#233;e par un autre fournisseur d'identit&#233;s, il peut transmettre (proxy) la demande
+d'authentification, pour le compte du fournisseur de services qui &#233;met la demande,
+au fournisseur d'identit&#233;s authentifiant. C'est la <b>cr&#233;ation de proxys dynamique des fournisseurs d'identit&#233;s</b>. Les attributs de configuration de
+l'authentification de proxy d&#233;finissent les valeurs de la cr&#233;ation de proxys dynamique
+des fournisseurs d'identit&#233;s.</p><dl><dt>Authentification de proxy</dt>
+<dd><p>Cochez cette case pour activer la cr&#233;ation de proxys dynamique des fournisseurs d'identit&#233;s.</p></dd>
+<dt>Liste des fournisseurs d'identit&#233;s proxy</dt>
+<dd><p>Ajoutez une liste de fournisseurs d'identit&#233;s pouvant &#234;tre utilis&#233;s pour la cr&#233;ation de proxys dynamique des fournisseurs d'identit&#233;s. Cet attribut contient un URI qui correspond &#224; la valeur de l'attribut Nom de l'entit&#233; de l'entit&#233; &#224; laquelle le propri&#233;taire/fournisseur appartient.</p></dd>
+<dt>Nombre max. de serveurs proxy</dt>
+<dd><p>Tapez le nombre maximum de fournisseurs d'identit&#233;s proxy auxquels une demande peut &#234;tre envoy&#233;e.</p></dd>
+<dt>Utiliser un cookie d'introduction pour la cr&#233;ation de proxys</dt>
+<dd><p>Cochez cette case pour utiliser des introductions afin de rechercher le fournisseur d'identit&#233;s de cr&#233;ation de proxys.</p></dd>
+</dl>
+</li>
+<li><b>Fournissez les valeurs des attributs des profils de l'organisation.</b><p>Ces attributs donnent des informations de base qui peuvent &#234;tre n&#233;cessaires lors
+d'une interaction avec une entit&#233; principale. Ils sont facultatifs.</p>
+<hr><p><b>Remarque &#8211; </b>Si l'attribut Noms contient une valeur, il faut donner des valeurs aux
+attributs Noms d'affichage et URL.</p>
+<hr>
+<dl><dt>Noms</dt>
+<dd><p>Entrez le nom officiel de l'organisation de l'entit&#233;, puis cliquez sur Ajouter. La valeur est d&#233;finie au format <i>locale</i>| <i> organization-name</i>. Par exemple, <tt>en</tt>| <tt> example.com</tt>.</p></dd>
+<dt>Noms d'affichage</dt>
+<dd><p>Entrez le nom de l'organisation de l'entit&#233; qui s'affichera en premier, puis cliquez sur Ajouter. La valeur est d&#233;finie au format <i>locale</i>|<i>organization-display-name </i> . Par exemple, <tt>fr</tt>|<tt>exemple.com</tt>. </p></dd>
+<dt>URL</dt>
+<dd><p>Entrez l'URL de l'organisation, puis cliquez sur Ajouter. La valeur est d&#233;finie au format <i>locale</i>| <i>organization-URL</i>. Par exemple, <tt>en</tt>|<tt> http://www.example.com</tt> .</p></dd>
+</dl>
+</li>
+<li><b>Pour configurer les contacts pour le fournisseur, cliquez sur Nouveau contact.</b><p>Cet attribut est facultatif. Pour plus d'informations, voir <a href="federation.fscreatecontactperson.html">Ajout d'un contact &#224; un fournisseur dans une entit&#233; fournisseur</a></p></li>
+<li><b>Cliquez sur Enregistrer pour terminer la configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

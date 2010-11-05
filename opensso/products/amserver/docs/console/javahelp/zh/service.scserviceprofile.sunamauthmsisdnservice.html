@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN </h4>
+<p><a name="indexterm-177"></a>移动站集成服务数字网络 (Mobile Station Integrated Services Digital Network, MSISDN) 验证模块将使用与设备（如移动电话）关联的移动用户 ISDN 来启用验证。它是一种非交互式模块。该模块检索用户 ISDN
+并根据 Directory Server 对其进行验证，以查找与编号匹配的用户。 验证属性是领域属性。MSISDN 验证属性包括：</p>
+<ul><li><p><a href="#fumxe">信任的网关 IP 地址</a></p></li>
+<li><p><a href="#fumxg">MSISDN 编号参数</a></p></li>
+<li><p><a href="#fumxf">LDAP 服务器和端口</a></p></li>
+<li><p><a href="#fumxi">LDAP 起始搜索 DN</a></p></li>
+<li><p><a href="#fumxk">用于搜索 LDAP 的属性</a></p></li>
+<li><p><a href="#fumxl">LDAP Server 主体用户</a></p></li>
+<li><p><a href="#fumxn">LDAP Server 主体密码</a></p></li>
+<li><p><a href="#fumxm">LDAP Server 主体密码（确认）</a></p></li>
+<li><p><a href="#fumxo">启用 SSL 进行 LDAP 访问</a></p></li>
+<li><p><a href="#fumxp">用于检索用户配置文件的 LDAP 属性</a></p></li>
+<li><p><a href="#fumxr">验证时返回用户 DN</a></p></li>
+<li><p><a href="#fumxs">验证级别</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>信任的网关 IP 地址</h5>
+<p>指定能存取 MSIDSN 模块的可信任客户机 IP 地址的列表。可将所有客户机的 IP 地址均设置为允许访问 MSISDN 模块，方法是在输入字段中输入地址（例如，<tt>123.456.123.111</tt>），然后单击“添加”。默认情况下，该列表为空。如果此属性为空，则将允许所有的客户机存取。如果指定无，不允许任何客户机存取。</p>
+
+<a name="fumxg"></a><h5>MSISDN 编号参数</h5>
+<p>指定一个参数名的列表，这些参数名用于标识在请求标头或 cookie 标头中对哪些参数搜索 MSISDN 编号的参数。例如，如果定义了 <i>x-Cookie-Param</i>、<i>AM_NUMBER</i> 和 <i>COOKIE-ID</i>，MSISDN 验证服务将会在那些参数中搜索 MSISDN 编号。</p>
+
+<a name="fumxf"></a><h5>LDAP 服务器和端口</h5>
+<p>指定 Directory Server 的主机名和端口号，将在其中搜索拥有 MSISDN 编号的用户。格式为 <tt></tt><i>hostname:port</i><tt></tt>。如果没有端口号，将采用 <tt>389</tt>。</p><p>如果在多个域部署 OpenSSO，则可按以下格式指定 OpenSSO 与 Directory Server 的特定实例之间的通信链接（如果指定了多个条目，则条目前必须带有本地服务器名称）：</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>例如，如果将两个 OpenSSO 实例部署在不同位置（L1-machine1-IS 和 L2- machine2-IS），它们分别与 Directory Server 的不同实例（L1-machine1-DS 和 L2-machine2-DS）进行通信，则形式如下：</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fumxi"></a><h5>LDAP 起始搜索 DN</h5>
+<p>指定节点的 DN，应从该节点开始搜索用户 MSISDN 编号。该字段没有默认值。它接受任何有效的 DN。如果指定多个条目，条目前面必须带有本地服务器名称。格式为 <tt></tt><i>servername|search dn</i><tt></tt>。</p><p>对于多个条目：</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>如果根组织下存在多个具有相同用户 ID 的条目，则要进行验证，应设置此参数以便仅能搜索或查找到一个条目。例如，当代理 ID 与用户 ID 均位于根组织下，该参数在根组织使用代理 ID 进行验证时应为 <tt>ou=Agents</tt>，根组织使用用户 ID 进行验证时则应为
+<tt>ou=People</tt>。</p>
+
+<a name="fumxk"></a><h5>用于搜索 LDAP 的属性</h5>
+<p>指定用户配置文件中属性的名称，此配置文件包含搜索特殊用户所用的 MSISDN 编号。默认值为 <i>sunIdentityMSISDNNumber</i>。不应该更改此默认值，除非能确定用户配置文件中另一个属性包含相同的 MSISDN 编号。</p>
+
+<a name="fumxl"></a><h5>LDAP Server 主体用户</h5>
+<p>指定 LDAP 绑定 DN 以允许在 Directory Server 中搜索 MSISDN。默认的绑定 DN 为 <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com</tt>。</p>
+
+<a name="fumxn"></a><h5>LDAP Server 主体密码</h5>
+<p>指定绑定 DN 的 LDAP 绑定密码，与 LDAP Server 主体中指定的一样。</p>
+
+<a name="fumxm"></a><h5>LDAP Server 主体密码（确认）</h5>
+<p>确认密码。</p>
+
+<a name="fumxo"></a><h5>启用 SSL 进行 LDAP 访问</h5>
+<p>启用 SSL 来访问“LDAP 服务器和端口”属性中指定的 Directory Server。默认情况下，不启用该属性，并且不使用 SSL 协议访问 Directory Server。但是，如果启用该属性，您可以绑定到非 SSL 服务器。</p>
+
+<a name="fumxp"></a><h5>用于检索用户配置文件的 LDAP 属性</h5>
+<p>指定用于搜索 MSISDN 编号请求的标头。支持的值包括：</p><dl><dt>Cookie 标头</dt>
+<dd><p>在 cookie 中进行搜索。</p></dd>
+<dt>请求标头</dt>
+<dd><p>在请求标头中进行搜索。</p></dd>
+<dt>请求参数</dt>
+<dd><p>在请求参数中进行搜索。默认情况下，选择所有选项。</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>验证时返回用户 DN</h5>
+<p>当 OpenSSO 目录与为 MSISDN 配置的目录相同时，可以启用该选项。如果启用，验证模块将返回 DN，而不是用户 ID，并且不需要进行搜索。通常情况下，验证模块仅返回用户 ID，且验证服务会在本地 OpenSSO 中搜索用户。如果使用了外部目录，则通常不启用该选项。</p>
+
+<a name="fumxs"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

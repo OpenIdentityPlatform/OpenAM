@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Cr&#233;ation d'une cha&#238;ne d'authentification - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.newauthconfig"></a><h4>Cr&#233;ation d'une cha&#238;ne d'authentification</h4><ol>
+<li><b><a name="indexterm-7"></a>Cliquez sur le nom du domaine auquel vous souhaitez ajouter une nouvelle
+cha&#238;ne d'authentification.</b></li>
+<li><b>S&#233;lectionnez l'onglet Authentification.</b></li>
+<li><b>Cliquez sur Nouveau dans la liste Encha&#238;nement d'authentification.</b></li>
+<li><b>Entrez le nom de la cha&#238;ne d'authentification.</b></li>
+<li><b>Cliquez sur OK.</b></li>
+<li><b>Cliquez sur Ajouter pour d&#233;finir l'instance du module d'authentification que vous souhaitez
+inclure dans la cha&#238;ne. Pour ce faire, s&#233;lectionnez le nom de l'instance
+de module dans la liste des instances. Les noms d'instance de module
+affich&#233;s dans cette liste sont cr&#233;&#233;s dans l'attribut Instances de module. </b></li>
+<li><b>S&#233;lectionnez les crit&#232;res de la cha&#238;ne. Ces indicateurs d&#233;finissent des crit&#232;res d'application
+destin&#233;s au module d'authentification pour lequel ils sont d&#233;finis. Le processus d'application
+suit une hi&#233;rarchie. Obligatoire est le plus &#233;lev&#233; et Facultatif est le
+plus bas&#160;:</b><dl><dt>Requis</dt>
+<dd><p>L'authentification de l'instance de module doit r&#233;ussir. En cas de r&#233;ussite, l'authentification se poursuit avec la liste Encha&#238;nement d'authentification. En cas d'&#233;chec, le contr&#244;le est imm&#233;diatement rendu &#224; l'application (l'authentification ne se poursuit pas avec la liste Encha&#238;nement d'authentification).</p></dd>
+<dt>Requis</dt>
+<dd><p>L'authentification vis-&#224;-vis de ce module doit r&#233;ussir. Si l'un des modules de la cha&#238;ne &#233;choue, l'ensemble de la cha&#238;ne d'authentification sera en &#233;chec. Toutefois, quel que soit le r&#233;sultat pour un module (r&#233;ussite ou &#233;chec), le contr&#244;le est transf&#233;r&#233; au module suivant de la cha&#238;ne.</p></dd>
+<dt>Suffisant</dt>
+<dd><p>L'authentification de l'instance de module n'est pas obligatoire. En cas de r&#233;ussite, le contr&#244;le est imm&#233;diatement rendu &#224; l'application (l'authentification ne se poursuit pas avec la liste des instances de module). En cas d'&#233;chec, l'authentification se poursuit avec la liste Encha&#238;nement d'authentification.</p></dd>
+<dt>Facultatif</dt>
+<dd><p>L'authentification de l'instance de module n'est pas obligatoire. Quel que soit le r&#233;sultat de l'authentification (r&#233;ussite ou &#233;chec), l'authentification se poursuit avec la liste Encha&#238;nement d'authentification.</p></dd>
+</dl>
+</li>
+<li><b>Entrez les options pour la cha&#238;ne. Ceci permet d'entrer des options suppl&#233;mentaires
+pour le module comme une paire cl&#233;=valeur. S&#233;parez les options par un
+espace.</b></li>
+<li><b>D&#233;finissez les attributs suivants&#160;:</b><dl><dt>URL de connexion r&#233;ussie</dt>
+<dd><p>Sp&#233;cifie l'URL vers lequel l'utilisateur est redirig&#233; en cas d'authentification r&#233;ussie.</p></dd>
+<dt>URL d'&#233;chec de connexion</dt>
+<dd><p>Sp&#233;cifie l'URL vers lequel l'utilisateur est redirig&#233; en cas d'&#233;chec de l'authentification.</p></dd>
+<dt>Classe de post-traitement de l'authentification</dt>
+<dd><p>D&#233;finit le nom de la classe Java utilis&#233;e pour personnaliser le processus de post-authentification apr&#232;s la r&#233;ussite ou l'&#233;chec d'une connexion.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Enregistrer.</b></li></ol>
+<br/>
+
+</body>
+</html>

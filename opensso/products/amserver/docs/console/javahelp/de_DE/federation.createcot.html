@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie einen neuen Circle of Trust - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createcot"></a><h4>So erstellen Sie einen neuen Circle of Trust</h4><a name="indexterm-56"></a><p>Folgen Sie diesem Verfahren, um einen neuen Circle of Trust zu erstellen.
+Der Ausgangspunkt ist "Neuer Circle of Trust" in der Verbindungsschnittstelle.</p><ol>
+<li><b>Klicken Sie auf "Neu", um die Attribute des Circle of Trust anzuzeigen.</b><p>Die Profilseite des neuen Circle of Trust wird angezeigt.</p></li>
+<li><b>Geben Sie einen Namen f&#252;r den Circle of Trust ein</b></li>
+<li><b>Geben Sie im Feld "Beschreibung" eine Beschreibung des Circle of Trust ein.</b></li>
+<li><b>Geben Sie einen Wert f&#252;r den URL des IDFF-Schreibprogramm-Dienstes ein.</b><p>Die URL des IDFF-Schreibprogramm-Dienstes gibt den Pfad des Servlets an, das das
+allgemeine Dom&#228;nencookie erstellt. Verwenden Sie das Format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/idffwriter</tt>.</p></li>
+<li><b>Geben Sie einen Wert f&#252;r den URL des IDFF-Leseprogramm-Dienstes ein.</b><p>Die URL des IDFF-Leseprogramm-Dienstes gibt den Pfad des Servlets an, das das
+allgemeine Dom&#228;nencookie liest. Verwenden Sie das Format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/idffreader</tt>.</p></li>
+<li><b>Geben Sie einen Wert f&#252;r die URL des SAML2-Schreibprogramm-Dienstes ein.</b><p>Dies gibt den Speicherort des SAML2-Schreibprogramm-Dienstes an, der das Cookie in die
+allgemeine Dom&#228;ne schreibt.  Verwenden Sie das Format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/saml2writer</tt>.</p></li>
+<li><b>Geben Sie einen Wert f&#252;r die URL des SAML2-Leseprogramm-Dienstes ein.</b><p>Dies gibt den Speicherort des SAML2-Leseprogramm-Dienstes an, der das Cookie aus der
+allgemeinen Dom&#228;ne liest. Verwenden Sie das Format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/saml2reader</tt>.</p></li>
+<li><b>W&#228;hlen Sie "Aktiv" oder "Inaktiv".</b><p>Der Standardstatus ist "Aktiv". Durch Auswahl von "Inaktiv" deaktivieren Sie die Kommunikation
+innerhalb der Authentifizierungsdom&#228;ne.</p></li>
+<li><b>W&#228;hlen Sie den Bereich, in dem der Circle of Trust erstellt werden
+soll. </b></li>
+<li><b>W&#228;hlen Sie einen oder mehrere Anbieter aus und klicken Sie auf den
+Pfeil zum Hinzuf&#252;gen, um sie zu markieren.</b><p>Die Liste enth&#228;lt die Namen von Entities, die erstellt und mit Anbietern
+aufgef&#252;llt wurden. Weitere Informationen finden Sie unter <a href="federation.fsauthdomainsselectprovider.html">So f&#252;gen Sie Anbieter zu einem Circle of Trust hinzu</a>.</p></li>
+<li><b>Klicken Sie auf "OK", um die Konfiguration abzuschlie&#223;en.</b><p>Der neue Circle of Trust wird in der Circle of Trust-Liste angezeigt.</p></li></ol>
+<br/>
+
+</body>
+</html>
