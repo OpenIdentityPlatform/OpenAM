@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>2.2 Policy Agent - Sun Federated Access Manager 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggnbx"></a><h4>2.2 Policy Agent</h4>
+<p>Federated Access Manager is backward compatible with Policy Agent 2.2. Policy Agent 2.2
+must be configured locally from the deployment container on which it is installed.
+Therefore, from Federated Access Manager Console, a very limited number of Policy Agent
+2.2 options can be configured.</p>
+
+<a name="ggmti"></a><h5>Password</h5>
+<p>The password was set when you created the agent profile. However, you can
+change the password at any time in the future.</p>
+
+<a name="ggmvn"></a><h5>Password Confirm</h5>
+<p>The confirmation of the password was performed when you created the agent profile.
+If you change the password, you must confirm the change.</p>
+
+<a name="ggmsq"></a><h5>Status</h5>
+<p>The <tt>Active</tt> option is selected when the agent is created. Choose <tt>Inactive</tt> only
+if you want to remove the protection the agent provides.</p>
+
+<a name="ggoub"></a><h5>description</h5>
+<p>A description of the agent, which you can add if desired.</p>
+
+<a name="ggowa"></a><h5>Agent Key Value</h5>
+<p>A required setting when enabling CDSSO and when configuring the deployment to prevent
+cookie hijacking.</p><p>This attribute serves as a key in a pairing of a key
+and a value. This attribute is used by Federated Access Manager to receive
+agent requests for credential assertions about users. Only one attribute is valid in this
+key-value pairing. All other attributes are ignored. Use the following format:</p><pre>agentRootURL=protocol://<i>hostname</i>:<i>port</i>/</pre><p>The entry must be precise. For example, the string representing the key, <tt>agentRootURL</tt>,
+is case sensitive.</p>
+<br/>
+
+</body>
+</html>

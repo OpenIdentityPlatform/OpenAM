@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding="UTF-8"?> 
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+
+
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+          "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="CAS" version="1.0" >    
+</ModuleProperties>

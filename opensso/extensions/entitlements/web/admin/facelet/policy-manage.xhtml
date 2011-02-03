@@ -1,0 +1,524 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policy-manage.xhtml,v 1.55 2009/07/27 19:35:26 farble1670 Exp $
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText
+            value="#{resources['policy-manage.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText
+            value="#{resources['policy-manage.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <ui:include
+            src="/admin/facelet/template/policy-manage-view-options-popup.xhtml"/>
+        <ui:include
+            src="/admin/facelet/template/policy-manage-remove-popup.xhtml"/>
+        <ui:include
+            src="/admin/facelet/template/policy-manage-export-popup.xhtml"/>
+        <o:section>
+            <ui:define name="section-title">
+                <ice:dataPaginator
+                    for="policyManageTable"
+                    rowsCountVar="rowsCount"
+                    displayedRowsCountVar="displayedRowsCountVar"
+                    firstRowIndexVar="firstRowIndex"
+                    lastRowIndexVar="lastRowIndex"
+                    pageCountVar="pageCount"
+                    pageIndexVar="pageIndex">
+                    <ice:outputFormat
+                        value="#{resources['policy-manage.tableTitle']}">
+                        <f:param value="#{firstRowIndex}" />
+                        <f:param value="#{lastRowIndex}" />
+                        <f:param value="#{rowsCount}" />
+                    </ice:outputFormat>
+                </ice:dataPaginator>
+            </ui:define>
+            <ui:define name="section-details">
+                <ice:outputText
+                    value="#{resources['policy-manage.sectionDetails']}"/>
+            </ui:define>
+            <ui:define name="section-links">
+                <ice:panelGrid
+                    columns="5">
+                    <ice:commandLink
+                        actionListener="#{policyManageHandler.removeListener}"
+                        styleClass="command-link">
+                        <ice:graphicImage
+                            value="/admin/image/remove.png"/>
+                        <ice:outputText
+                            value="Remove"/>
+                    </ice:commandLink>
+                    <ice:commandLink
+                        actionListener="#{policyManageHandler.exportListener}"
+                        styleClass="command-link">
+                        <ice:graphicImage
+                            value="/admin/image/export.png"/>
+                        <ice:outputText
+                            value="Export"/>
+                    </ice:commandLink>
+                    <o:clink
+                        type="view-options"
+                        handler="#{policyManageHandler}"
+                        listenerMethod="viewOptionsListener"/>
+                    <ice:panelGroup>
+                        <ice:graphicImage
+                            value="/admin/image/search.png"/>
+                        <ice:inputText
+                            styleClass="section-input"
+                            onkeyup="submitNow(this);"
+                            value="#{policyManageBean.searchFilter}"/>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+            </ui:define>
+            <ui:define name="section-body">
+                <ui:include
+                    src="/admin/facelet/template/policy-manage-filters.xhtml"/>
+                <ice:panelGroup
+                    style="padding-top: 10px"
+                    rendered="#{o:size(policyManageBean.privilegeBeans) == 0}">
+                    <ice:outputText
+                        value="No policies."/>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    rendered="#{o:size(policyManageBean.privilegeBeans) > 0}">
+                    <ice:dataTable
+                        id="policyManageTable"
+                        var="privilegeBean"
+                        rows="#{policyManageBean.policyManageTableBean.rows}"
+                        styleClass="policy-manage"
+                        value="#{policyManageBean.privilegeBeans}"
+                        sortColumn="#{policyManageBean.policyManageTableBean.sortKey.column}"
+                        sortAscending="#{policyManageBean.policyManageTableBean.sortKey.ascending}"
+                        resizable="true">
+
+                        <ice:column>
+                            <f:facet name="header">
+                                <ice:commandLink
+                                    actionListener="#{policyManageHandler.selectAllListener}">
+                                    <ice:graphicImage
+                                        value="../image/select-all.png"/>
+                                </ice:commandLink>
+                            </f:facet>
+                            <ice:selectBooleanCheckbox
+                                value="#{privilegeBean.selected}">
+                            </ice:selectBooleanCheckbox>
+                        </ice:column>
+                        <ice:column>
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="name"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.nameColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputLink
+                                    rendered="#{permissionsBean.policyEditAllowed}"
+                                    styleClass="command-link"
+                                    value="policy-edit.xhtml?privilegeName=#{privilegeBean.name}">
+                                    <ice:outputText
+                                        value="#{privilegeBean.name}"/>
+                                </ice:outputLink>
+                                <ice:outputLabel
+                                    rendered="#{!permissionsBean.policyEditAllowed}"
+                                    value="#{privilegeBean.name}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.descriptionColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="description"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.descriptionColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                panelTooltip="descriptionTooltip"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{privilegeBean.description}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="descriptionTooltip"
+                                title="#{privilegeBean.name}: description">
+                                <ui:define name="body">
+                                    <ice:outputText
+                                        value="#{privilegeBean.description}"/>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.applicationColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="application"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.applicationColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{privilegeBean.viewEntitlement.viewApplication.title}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.modifierColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="modifier"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.modifierColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{privilegeBean.modifier}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.authorColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="author"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.authorColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{privilegeBean.author}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.modifiedColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="modified"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.modifiedColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{privilegeBean.modified}">
+                                    <f:convertDateTime
+                                        dateStyle="short"
+                                        timeZone="#{timeZoneBean.timeZone.ID}"
+                                        type="both" />
+                                </ice:outputText>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.birthColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="birth"
+                                        actionListener="#{policyManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['policy-manage.birthColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{privilegeBean.birth}">
+                                    <f:convertDateTime
+                                        dateStyle="short"
+                                        timeZone="#{timeZoneBean.timeZone.ID}"
+                                        type="both" />
+                                </ice:outputText>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.resourcesColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.resourceColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="resourcesTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.viewEntitlement.resourcesToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="resourcesTooltip"
+                                title="#{privilegeBean.name}: resources (#{o:size(privilegeBean.viewEntitlement.resources)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{privilegeBean.viewEntitlement.resourcesToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.exceptionsColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.exceptionColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="exceptionsTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.viewEntitlement.exceptionsToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="exceptionsTooltip"
+                                title="#{privilegeBean.name}: exceptions (#{o:size(privilegeBean.viewEntitlement.exceptions)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{privilegeBean.viewEntitlement.exceptionsToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.subjectColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.subjectColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="subjectTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.viewSubject.toString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="subjectTooltip"
+                                title="#{privilegeBean.name}: subjects (#{privilegeBean.viewSubject.sizeLeafs})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                        value="#{privilegeBean.viewSubject.toFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.actionColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.actionColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="actionTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.viewEntitlement.booleanActionsBean.actionsToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="actionTooltip"
+                                title="#{privilegeBean.name}: actions (#{o:size(privilegeBean.viewEntitlement.booleanActionsBean.actions)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{privilegeBean.viewEntitlement.booleanActionsBean.actionsToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.conditionColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.conditionColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="conditionTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.viewCondition.toString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="conditionTooltip"
+                                title="#{privilegeBean.name}: conditions (#{privilegeBean.viewCondition.sizeLeafs})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{privilegeBean.viewCondition.toFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.staticAttributesColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.staticAttributeColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="staticAttributesTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.staticAttributesBean.toString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="staticAttributesTooltip"
+                                title="#{privilegeBean.name}: resource attributes (#{o:size(privilegeBean.staticAttributesBean.viewAttributes)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{privilegeBean.staticAttributesBean.toFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{policyManageBean.policyManageTableBean.userAttributesColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['policy-manage.userAttributeColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="policy-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="userAttributesTooltip">
+                                <ice:outputText
+                                    value="#{privilegeBean.userAttributesBean.toString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="userAttributesTooltip"
+                                title="#{privilegeBean.name}: user attributes (#{o:size(privilegeBean.userAttributesBean.viewAttributes)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{privilegeBean.userAttributesBean.toFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                    </ice:dataTable>
+                    <center>
+                        <ice:panelGrid
+                            columns="1" >
+                            <ice:dataPaginator
+                                for="policyManageTable"
+                                rowsCountVar="rowsCount"
+                                displayedRowsCountVar="displayedRowsCountVar"
+                                rendered="#{o:size(policyManageBean.privilegeBeans) > policyManageBean.policyManageTableBean.rows}"
+                                fastStep="1"
+                                pageCountVar="pageCount"
+                                pageIndexVar="pageIndex"
+                                paginatorMaxPages="9"
+                                paginator="true">
+                                <f:facet
+                                    name="first">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-first.gif"
+                                        style="border:none;"/>
+                                </f:facet>
+                                <f:facet
+                                    name="last">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-last.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="previous">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-previous.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="next">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-next.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="fastforward">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-ff.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="fastrewind">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-fr.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                            </ice:dataPaginator>
+                        </ice:panelGrid>
+                    </center>
+                </ice:panelGroup>
+            </ui:define>
+        </o:section>
+    </ui:define>
+</ui:composition>

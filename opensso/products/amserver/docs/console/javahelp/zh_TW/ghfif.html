@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>代理程式認證程式 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ghfif"></a><h4>代理程式認證程式</h4>
+<p>代理程式認證程式是通過認證後，就可以取得代理程式設定檔唯讀資料 (已選取以供代理程式認證程式讀取) 的代理程式。代理程式設定檔可以是任何類型 (J2EE、WSP、探索等)，但必須在同一個範圍內。擁有代理程式認證程式憑證 (使用者名稱與密碼) 的使用者可讀取代理程式設定檔資料，但沒有建立、更新或刪除等代理程式管理員權限。</p><p>代理程式認證程式包含以下的屬性：</p>
+
+<a name="ghfjj"></a><h5>密碼</h5>
+<p>密碼在您建立代理程式認證程式設定檔時設定。不過，您以後隨時可以變更密碼。</p>
+
+<a name="ghfiu"></a><h5>密碼確認</h5>
+<p>密碼確認在您建立代理程式認證程式設定檔時執行。如果您變更密碼，則必須確認變更。</p>
+
+<a name="ghfka"></a><h5>狀態</h5>
+<p>建立代理程式認證程式時，選取 <tt>[使用中]</tt> 選項。僅在要移除代理程式提供的保護時，才選擇 <tt>[非使用中]</tt>。</p>
+
+<a name="ghfig"></a><h5>允許讀取的代理程式設定檔</h5>
+<p>此屬性會定義代理程式認證程式可讀取其設定檔資料的 OpenSSO 代理程式的清單。這些代理程式可以是任何類型 (J2EE、WSP、探索等等)，但必須在同一個範圍內。若要將代理程式增加至清單，請選取代理程式名稱並按一下 [增加]。</p>
+<br/>
+
+</body>
+</html>

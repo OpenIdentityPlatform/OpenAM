@@ -1,0 +1,46 @@
+ESTA NOTIFICACIÓN DE DERECHOS Y LAS FACTURAS ASOCIADAS PRUEBAN LA ADQUISICIÓN DE LOS DERECHOS DE LICENCIA DEL SOFTWARE DE SUN INDICADO EN EL PRESENTE DOCUMENTO EN VIRTUD DE LAS CONDICIONES DEL CONTRATO DE LICENCIA DEL SOFTWARE ("SLA").
+
+Fecha en vigor: fecha de facturación más 5 días laborables
+
+Nombre de licenciatario/compañía: según las facturas correspondientes
+
+Software: OpenSSO Enterprise 8.  
+
+Números de referencia: OPS1F-LCO-9929, OPS2F-LCO-9929, OPS3F-LCO-9929, OPS4F-LCO-9929, OPS5F-LCO-9929, OPS6F-LCO-9929
+
+Término de licencia: Perpetuo (sujeto a la terminación según la SLA).
+
+Unidad con licencia: la unidad con licencia para el Software es por usuario, donde "Usuario" significa un individuo (no una empresa o cualquier otra entidad legal) con autorización para acceder al Software, identificado por las credenciales del individuo registradas en el Software.
+
+Recuento de unidades con licencia: según las facturas correspondientes
+
+Uso permitido: puede utilizar el Software para su propio uso como proveedor comercial o de servicios, investigación y formación a condición del cumplimiento de la lista de términos adicionales que se incluye a continuación: 
+
+Términos adicionales: 
+
+(1) Sun le concede una licencia para utilizar OpenSSO, de acuerdo con la Licencia de distribución y desarrollo común Versión 1.0 ("CDDL"). El uso de OpenSSO está regido únicamente por la CDDL, y no se aplicará este SLA, el Derecho ni otros términos principales cualesquiera que se hayan acordado. Puede encontrar el texto de la CDDL en http://www.sun.com/cddl/cddl.html. 
+
+(2) Puede adquirir un plan de asistencia que cubra el Software y OpenSSO como se define en la lista de servicios que se encuentra en http://www.sun.com/service/servicelist/. 
+
+(3) No deberá alojar servicios para una(s) empresa(s) afiliada(s) a menos que los empleados se hayan incluido en su número de unidades bajo licencia. "Empresa afiliada" se refiere a una entidad legal sobre la que usted tenga control de administración, que comparta un control común con usted o bien que ésta tenga control de administración sobre usted.
+
+(4) Las entidades gubernamentales no son válidas para el uso de proveedor de servicios.
+
+(5) Puede utilizar las clases de Java de ejemplo, archivos de cabecera, bibliotecas de clase, archivos de origen y archivos de datos contenidos en el Software (en su totalidad o parcialmente, el "Código de desarrollo") únicamente para crear y distribuir programas para que interactúen con las API, los SPI y SDK del Software.  No podrá modificar el Código de desarrollo.
+
+(6) Puede modificar la plantilla de la consola de administración de Java Server Pages, la plantilla de interfaz de usuario de autenticación de Java Server Pages, la plantilla de federación de Java Server Pages y los archivos XML contenidos en el Software (en su totalidad o parcialmente, los "Archivos de Interfaz gráfica") únicamente para crear personalizaciones diseñadas para interactuar con el Software y aumentar el entorno previsto para el uso del Software. 
+
+(7) Sun y sus otorgantes de licencia estarán exentos de reclamaciones y de ningún derecho a recuperar los daños o recibir indemnizaciones derivados de cualquier reclamación procedente del ejercicio de los derechos proporcionados en los Términos adicionales 5 y 6 anteriores, incluyendo, entre otros, cualquier reclamación basada en un fallo del rendimiento o función del Software que estuviera relacionado con el ejercicio de dichos derechos.
+
+(8) De acuerdo con este Derecho, debe utilizar la funcionalidad de administración de la Federación con el único propósito de intercambiar las confirmaciones de seguridad con proveedores de identidad.
+
+(9) De acuerdo con este Derecho, puede utilizar Sun Java System Directory Server Enterprise Edition ("DSEE") y OpenDS Standard Edition ("OpenDS") para el almacenamiento de:  
+
+(a) un máximo de mil (1.000) entradas, únicamente para almacenar nombres de usuarios, contraseñas y ID de grupos a los que se accede mediante la autenticación y las funciones de autorización del usuario del Software; 
+
+(b) un máximo de mil (1.000) entradas, para almacenar la información de configuración solicitada por el Software.  
+
+Almacenamiento de cualquier información (incluida la información de contacto sin limitación y preferencias del usuario) a excepción de lo que se indique explícitamente en este Derecho o acceso a DSEE o OpenDS desde otros productos de software en una base independiente, requiere la adquisición del Derecho adecuado para DSEE u OpenDS.
+
+(10) Para los objetivos del Término adicional nº 9, "Entradas" significará un nombre distintivo y sus atributos asociados.
+

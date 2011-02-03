@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>修改提供者实体中的远程服务提供者属性 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteprofile"></a><h4>修改提供者实体中的远程服务提供者属性</h4><a name="indexterm-80"></a><p>创建实体并添加服务提供者后，可编辑服务提供者的配置文件。这可能需要为最初添加服务提供者或修改已配置数据时无法进行配置的属性添加值。起点是联合界面下的“实体”。</p><ol>
+<li><b>单击已配置的提供者实体的名称，对其配置文件进行修改。</b><p>随即显示实体的配置文件页面。</p></li>
+<li><b>从“查看”菜单中选择“服务提供者”。</b></li>
+<li><b>修改“公共属性”的值。</b><p>一般而言，“公共属性”所含的值定义了身份认证提供者本身。</p><dl><dt>提供者类型</dt>
+<dd><p>此属性的静态值定义了此提供者是托管提供者还是远程提供者。</p></dd>
+<dt>说明</dt>
+<dd><p>该属性的值是您创建实体时提供的说明。可以修改原来输入的说明，如果不存在，则可添加一条说明。</p></dd>
+<dt>协议支持枚举</dt>
+<dd><p>选择此实体所支持的自由联盟计划自由身份联合框架 (Liberty Identity Federation Framework, Liberty ID-FF) 发行版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 指的是 Liberty ID-FF 版本 1.2。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 指的是 Liberty ID-FF 版本 1.1。</p></li></ul>
+</dd>
+<dt>服务器名称标识符映射绑定</dt>
+<dd><p>通过名称标识符映射，服务提供者可获得已在另一不同服务提供者的名称空间中进行联合的主体的名称标识符。因此，请求的提供者可与其他服务提供者就主体进行通信，而无需在它们之间进行主体的身份联合。键入标识用于获得标识符的通信协议的 URI，然后单击“添加”。</p>
+<hr><p><b>注 &#8211; </b>目前，Access Manager 中的名称标识符映射配置文件仅支持 SOAP。如果使用此属性，则其值必须为 <tt>http://projectliberty.org/profiles/nim-sp-http</tt>。</p>
+<hr>
+</dd>
+<dt>签署密钥：密钥别名</dt>
+<dd><p>证书存储在 Java 密钥库文件中。 文件中的每个证书均被映射到用于获取证书的别名。键入与用于签署请求和响应的证书相关联的密钥别名。</p></dd>
+<dt>加密密钥：密钥别名</dt>
+<dd><p>证书存储在 Java 密钥库文件中。文件中的每个证书均被映射到用于获取证书的别名。键入与提供者的安全证书相关联的密钥别名。</p></dd>
+<dt>加密密钥：密钥大小</dt>
+<dd><p>键入 Web 服务使用方与另一个实体交互时所用密钥的长度。</p></dd>
+<dt>加密密钥：加密方法</dt>
+<dd><p>选择加密方法。选项包括：</p>
+<ul><li><p>无</p></li>
+<li><p>AES</p></li>
+<li><p>DESede</p></li></ul>
+</dd>
+<dt>名称标识符加密</dt>
+<dd><p>选中此复选框可启用名称标识符加密。</p></dd>
+</dl>
+</li>
+<li><b>修改“通信 URL”属性的值。</b><p>“通信 URL”属性包含位置，提供者可将标明发往此身份认证提供者的传输发送到这些位置。</p><dl><dt>SOAP 端点</dt>
+<dd><p>键入身份认证提供者 SOAP 消息接收方的 URL。在非浏览器通信中，此值用于同 SOAP 接收方的位置进行通信。</p></dd>
+<dt>单点注销服务</dt>
+<dd><p>键入一个 URL，服务提供者可将注销请求发送到该 URL。单点注销会在此身份认证提供者验证的所有会话间对注销功能进行同步。</p></dd>
+<dt>单点注销返回</dt>
+<dd><p>键入一个 URL，身份认证提供者会在完成注销后将主体重定向至该 URL。</p></dd>
+<dt>联合终止服务</dt>
+<dd><p>键入一个 URL，服务提供者会将联合终止请求发送到该 URL。</p></dd>
+<dt>联合终止返回</dt>
+<dd><p>键入一个 URL，身份认证提供者会在完成联合终止后将主体重定向至该 URL。</p></dd>
+<dt>名称注册服务</dt>
+<dd><p>键入一个 URL，服务提供者会将请求发送到该 URL，以指定在与此身份认证提供者就特定主体进行通信时使用的名称标识符。只有在建立联合会话之后，才能实现此可选服务。</p></dd>
+<dt>名称注册返回</dt>
+<dd><p>键入一个 URL，身份认证提供者会在完成基于 HTTP 重定向的名称注册之后，将主体重定向至该 URL。</p></dd>
+</dl>
+</li>
+<li><b>修改“通信配置文件”属性的值。</b><p>自由联盟计划<b>配置文件</b>一并定义了消息的内容以及用于传输消息的机制。以下“通信配置文件”属性定义了身份认证提供者对各项功能使用的配置文件。</p><dl><dt>联合终止</dt>
+<dd><p>选择一个配置文件，身份认证提供者将使用该配置文件以便就主体联合终止一事通知其他提供者。</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>单点注销</dt>
+<dd><p>选择一个配置文件，身份认证提供者将使用该配置文件以便就主体注销一事通知其他提供者。</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>获取 HTTP</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>名称注册</dt>
+<dd><p>选择一个配置文件，其他提供者将在联系此身份认证提供者以便为主体注册新的名称标识符时使用该配置文件。</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>单点登录/联合</dt>
+<dd><p>选择此身份认证提供者在向验证请求或联合请求发送响应时使用的配置文件。</p>
+<ul><li><p>浏览器 POST（指定基于浏览器的 HTTP POST 协议）</p></li>
+<li><p>浏览器辅件（指定基于 SOAP 的非浏览器协议）</p></li>
+<li><p>LECP（指定一个启用了 Liberty 的客户机代理）</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>选择任何可用信任环以分配给提供者。</b><p>提供者可以属于一个或多个信任环。但是，没有指定信任环的提供者不能参与基于 自由联盟计划 规范的通信。如果未曾创建信任环，可在以后定义此属性。</p></li>
+<li><b>修改“服务提供者”属性的值。</b><p>“服务提供者”属性定义了关于服务提供者的一般信息。</p><dl><dt>声明使用方 URL</dt>
+<dd><p>键入端点的 URL，该端点将接收和处理所有发送给服务提供者的 SAML 声明。</p></dd>
+<dt>声明使用方服务 URL ID</dt>
+<dd><p>如果“协议支持枚举”公共属性的值为 <tt>urn:liberty:iff:2003-08</tt>，请键入所需的 ID。</p></dd>
+<dt>将声明使用方服务 URL 设置为默认值</dt>
+<dd><p>如果请求中未提供标识符，选中此复选框，以默认值使用“声明使用方服务 URL”。</p></dd>
+<dt>签名验证请求</dt>
+<dd><p>选中该复选框可使服务提供者始终签署验证请求。</p></dd>
+<dt>名称注册指示符</dt>
+<dd><p>选中该复选框可使服务提供者在主体进行联合之后参与名称注册。</p></dd>
+<dt>名称 ID 策略</dt>
+<dd><p>选择该选项将允许请求者对身份认证提供者一方的名称标识符策略施加影响。选项包括：</p><dl><dt>无</dt>
+<dd><p>身份认证提供者将返回名称标识符，它们对应于身份认证提供者与主体的请求服务提供者或联合提供者组之间现有的联合关系。如果不存在这种联合关系，将返回错误。</p></dd>
+<dt>一次性</dt>
+<dd><p>联合之后，身份认证提供者将为主体发布一个临时的、一次性使用的标识符。</p></dd>
+<dt>联合的</dt>
+<dd><p>如果主体尚不存在联合，身份认证提供者可以启动新的身份联合。</p></dd>
+</dl>
+</dd>
+<dt>联合提供者联盟</dt>
+<dd><p>选中此复选框可启用联合提供者联合。</p></dd>
+</dl>
+</li>
+<li><b>提供“代理验证配置”属性信息。</b><p>如果请求某个身份认证提供者验证的主体已向另一身份认证提供者进行了验证，则该身份认证提供者可以代表请求的服务提供者，以代理方式将验证请求转给进行验证的身份认证提供者。这就是<b>动态身份认证提供者代理</b>。“代理验证配置”属性定义了动态身份认证提供者代理值。</p><dl><dt>代理验证</dt>
+<dd><p>选中该复选框可启用动态身份认证提供者代理。</p></dd>
+<dt>代理身份认证提供者列表</dt>
+<dd><p>添加可用于动态身份认证提供者代理的身份认证提供者列表。此属性的值是一个 URI，它应当与拥有者/提供者所属实体的“实体名称”属性中定义的值相匹配。</p></dd>
+<dt>代理的最大数目</dt>
+<dd><p>键入可向其发送请求的代理身份认证提供者的最大数目。</p></dd>
+<dt>对代理使用引入 Cookie</dt>
+<dd><p>如果您要使用引入 Cookie 来查找代理身份认证提供者，请选中此复选框。</p></dd>
+</dl>
+</li>
+<li><b>提供“组织配置文件”属性的值。</b><p>“组织配置文件”属性提供与主体交互时可能需要的基本信息。这些属性都是可选的。</p>
+<hr><p><b>注 &#8211; </b>如果“名称”属性包含值，则需要向“显示名称”属性和 "URL" 属性添加值。</p>
+<hr>
+<dl><dt>名称</dt>
+<dd><p>输入实体组织的合法名称并单击“添加”。按 <i>locale</i>|<i>organization-name</i> 格式定义该值。例如，<tt>en</tt>|<tt>example.com</tt>。</p></dd>
+<dt>显示名称</dt>
+<dd><p>输入适于向主体显示的实体组织名称，然后单击“添加”。按 <i>locale</i>|<i>organization-display-name </i> 格式定义该值。例如，<tt>en</tt>|<tt>example.com</tt>。</p></dd>
+<dt>URL</dt>
+<dd><p>输入组织的 URL 并单击“添加”。按 <i>locale</i>|<i>organization-URL</i> 格式定义该值。例如，<tt>en</tt>|<tt>http://www.example.com</tt>。</p></dd>
+</dl>
+</li>
+<li><b>要为提供者配置“联系人”，请单击“新建联系人”。</b><p>此属性是可选的。有关更多信息，参见<a href="federation.fscreatecontactperson.html">向提供者实体中的提供者添加联系人</a>。</p></li>
+<li><b>单击“保存”完成配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

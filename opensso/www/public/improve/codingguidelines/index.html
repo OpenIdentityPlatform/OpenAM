@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Coding Guidelines for OpenSSO</TITLE>
+<META NAME="description" CONTENT="Coding Guidelines for OpenSSO">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="next" HREF="node1.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html2"
+  HREF="node1.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev_g.png">   
+<BR>
+<B> Next:</B> <A NAME="tex2html3"
+  HREF="node1.html">Introduction</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<P>
+<H1 ALIGN="CENTER">Coding Guidelines for OpenSSO</H1>
+<DIV>
+
+<P ALIGN="CENTER"><STRONG>compiled by Dennis Seah (dennis.seah@sun.com)</STRONG></P>
+<P ALIGN="CENTER"><I>Staff Engineer, Sun Microsystems Inc. </I></P>
+<P ALIGN="CENTER"><STRONG>July 2006</STRONG></P>
+</DIV>
+
+<P>
+
+<H3>Abstract:</H3>
+<DIV>
+This paper describes a set of guidelines for writing source code. The main objectives are to
+improve code readability; ease code maintenance; and reduce defects. We hope that all engineers
+who are developing code for OpenSSO project can follow these guidelines.
+</DIV>
+<P>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"></A>
+
+<UL>
+<LI><A NAME="tex2html4"
+  HREF="node1.html">Introduction</A>
+<LI><A NAME="tex2html5"
+  HREF="node2.html">Source Files</A>
+<UL>
+<LI><A NAME="tex2html6"
+  HREF="node3.html">Size of source file</A>
+<LI><A NAME="tex2html7"
+  HREF="node4.html">Organization of source file</A>
+<LI><A NAME="tex2html8"
+  HREF="node5.html">Import declaration</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html9"
+  HREF="node6.html">Naming Convention</A>
+<UL>
+<LI><A NAME="tex2html10"
+  HREF="node7.html">Package Naming</A>
+<LI><A NAME="tex2html11"
+  HREF="node8.html">Class/Interface Naming</A>
+<LI><A NAME="tex2html12"
+  HREF="node9.html">Field Naming</A>
+<LI><A NAME="tex2html13"
+  HREF="node10.html">Method naming</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html14"
+  HREF="node11.html">White Space Usage</A>
+<UL>
+<LI><A NAME="tex2html15"
+  HREF="node12.html">Blank lines</A>
+<LI><A NAME="tex2html16"
+  HREF="node13.html">Blank spaces</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html17"
+  HREF="node14.html">Indentation</A>
+<LI><A NAME="tex2html18"
+  HREF="node15.html">Continuation lines</A>
+<LI><A NAME="tex2html19"
+  HREF="node16.html">Comments</A>
+<UL>
+<LI><A NAME="tex2html20"
+  HREF="node17.html">Documentation comments</A>
+<LI><A NAME="tex2html21"
+  HREF="node18.html">Block comments</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html22"
+  HREF="node19.html">Classes</A>
+<UL>
+<LI><A NAME="tex2html23"
+  HREF="node20.html">Class body organization</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html24"
+  HREF="node21.html">Statements</A>
+<UL>
+<LI><A NAME="tex2html25"
+  HREF="node22.html">Simple statements</A>
+<UL>
+<LI><A NAME="tex2html26"
+  HREF="node23.html">Assignment and expression statements</A>
+<LI><A NAME="tex2html27"
+  HREF="node24.html">Local variable declarations</A>
+</UL>
+<LI><A NAME="tex2html28"
+  HREF="node25.html">Compound statements</A>
+<UL>
+<LI><A NAME="tex2html29"
+  HREF="node26.html">if statement</A>
+<LI><A NAME="tex2html30"
+  HREF="node27.html">for statement</A>
+<LI><A NAME="tex2html31"
+  HREF="node28.html">while statement</A>
+<LI><A NAME="tex2html32"
+  HREF="node29.html">do-while statement</A>
+<LI><A NAME="tex2html33"
+  HREF="node30.html">switch statement</A>
+<LI><A NAME="tex2html34"
+  HREF="node31.html">try statement</A>
+<LI><A NAME="tex2html35"
+  HREF="node32.html">synchronized statement</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html36"
+  HREF="node33.html">Bibliography</A>
+<LI><A NAME="tex2html37"
+  HREF="node34.html">About this document ...</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

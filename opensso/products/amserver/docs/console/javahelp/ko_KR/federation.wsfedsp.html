@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED 서비스 공급자 사용자 정의  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>WS-FED 서비스 공급자 사용자 정의 </h4>
+<p>다음 속성은 WS-FED 서비스 공급자 역할에 적용됩니다.</p>
+
+<a name="ggwtj"></a><h5>서명된 명제</h5>
+<p>이 서비스 공급자에서 받은 모든 명제에 서명해야 합니다.</p>
+
+<a name="ggwsg"></a><h5>계정 매퍼</h5>
+<p>이 속성은 원격 사용자 계정을 단일 사인온용 로컬 사용자 계정에 매핑하는 데
+사용할 <tt>AccountMapper</tt> 인터페이스의 구현을 지정합니다. 기본값은 <tt>com.sun.identity.wsfed.plugins.</tt></p><p><tt>DefaultADFSPartnerAccountMapper</tt>(기본 구현)입니다.</p>
+
+<a name="ggwrf"></a><h5>속성 매퍼</h5>
+<p>이 속성은 명제의 속성을 Identity 공급자가 로컬로 정의한 사용자 속성에 매핑하는 데
+사용되는 클래스를 정의합니다. 기본 클래스는 <tt>com.sun.identity.wsfederation.plugins.</tt><tt>DefaultSPAttributeMapper</tt>입니다.</p>
+
+<a name="ggwrq"></a><h5>속성 맵</h5>
+<p>이 값은 기본 속성 매퍼 플러그인에서 사용하는 매핑을 정의하는 값을 지정합니다. 매핑은
+다음 형식으로 구성해야 합니다.</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>예를 들어, <tt>EmailAddress=mail</tt> 또는 <tt>Address=postaladdress</tt>입니다. 해당 매핑을 [새 값]으로 입력하고 [추가]를 누르십시오.</p>
+
+<a name="ggwvn"></a><h5>명제 유효 시간</h5>
+<p>명제는 특정 기간 동안 유효하며 그 이전과 이후에는 유효하지 않습니다. </p><p><tt>유효 시간</tt>은 명제 발급 시간부터 계산하여 해당 명제가 유효 상태를 유지하는 시간(초)을 지정합니다.
+기본값은 <tt>600</tt>초입니다.</p>
+
+<a name="ggwsk"></a><h5>명제 오차 시간</h5>
+<p>명제는 특정 기간 동안 유효하며 그 이전과 이후에는 유효하지 않습니다. 이 속성은
+<tt>notBefore</tt> 값의 점진적 간격(초)을 지정합니다. 기본값은 <tt>300</tt>이며<tt>notAfter</tt> 값과는 관련이 없습니다.</p>
+
+<a name="ggwts"></a><h5>기본 중계 상태</h5>
+<p><a name="indexterm-77"></a>성공적인 WS-FED 작업(단일 사인온, 단일 로그아웃 또는 연합 종료) 후에 페이지가 표시되는데,이
+페이지는 일반적으로 원래 요청된 자원이며 <tt>RelayState</tt> 요소를 사용하여 시작 요청에 지정됩니다. <tt>RelayState</tt>를
+지정하지 않으면 이 <tt>defaultRelayState</tt> 등록 정보의 값이 표시됩니다.</p>
+<hr><p><b>주의 &#8211; </b><tt>RelayState</tt> 또는 <tt>defaultRelayState</tt>에 특수 문자(예: <tt>&#38;</tt>)가 있으면 URL 인코딩해야 합니다. 예를 들어
+<tt>RelayState</tt>의 값이 <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt>이면 URL은 다음과 같이 인코딩되어야 하며</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>그런 다음 URL에 추가되어야 합니다. 예를 들어 단일 사인온 URL을 시작한 서비스
+공급자는 다음과 같습니다.</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>홈 영역 검색</h5>
+<p>서비스 공급자가 기본 Identity 공급자를 식별할 수 있도록 서비스를 지정합니다. 또한 서비스
+공급자는 서비스 URL을 연결 엔드포인트로 지정합니다. </p>
+
+<a name="ggwwb"></a><h5>계정 영역 선택</h5>
+<p>Identity 공급자 선택 메커니즘과 구성을 지정합니다. <tt>cookie</tt> 또는 <tt>HTTP Request</tt> 헤더 속성은 Identity
+공급자를 찾는 데 사용할 수 있습니다.</p>
+<br/>
+
+</body>
+</html>

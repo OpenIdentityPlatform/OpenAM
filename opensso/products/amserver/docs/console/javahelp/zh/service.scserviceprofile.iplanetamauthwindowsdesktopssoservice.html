@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows 桌面 SSO - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>Windows 桌面 SSO</h4>
+<p><a name="indexterm-183"></a>该模块是特定于 Windows 操作系统的，也称为 Kerberos 验证。用户通过“简单且受保护的 GSS-API 协商机制 (Simple and Protected GSS-API Negotiation
+Mechanism, SPNEGO)”协议向 OpenSSO 提交 Kerberos 令牌。Windows 桌面 SSO 验证插件模块为客户机（用户）提供桌面单点登录。这意味着已通过密钥分发中心进行验证的用户能够通过 OpenSSO 验证，而不必再次提供登录信息。Windows 桌面
+SSO 属性是全局属性。这些属性包括：</p>
+<ul><li><p><a href="#fwbfr">服务主体</a></p></li>
+<li><p><a href="#fwbfo">Keytab 文件名</a></p></li>
+<li><p><a href="#fwbhy">Kerberos 领域</a></p></li>
+<li><p><a href="#fwbid">Kerberos 服务器名</a></p></li>
+<li><p><a href="#fwbhw">返回主体的域名</a></p></li>
+<li><p><a href="#fwbic">验证级别</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>服务主体</h5>
+<p>指定用于验证的 Kerberos 主体。请使用以下格式：</p><p><tt><b>HTTP/</tt><i>hostname.domainname@dc_domain_name</i><tt></b></tt></p><p><b>hostname</b> 和 <b>domainame</b> 表示 OpenSSO 实例的主机名和域名。<b>dc_domain_name</b> 是 Windows Kerberos 服务器（域控制器）所在的 Kerberos 域。它可能与
+OpenSSO 的域名不同。</p>
+
+<a name="fwbfo"></a><h5>Keytab 文件名</h5>
+<p>此属性指定用来验证的 Kerberos keytab 文件。使用以下格式（尽管该格式不是必需的）：</p><p><tt><b></tt><i>hostname</i><tt>.HTTP.keytab</b></tt></p><p><b>hostname</b> 是 OpenSSO 实例的主机名。</p>
+
+<a name="fwbhy"></a><h5>Kerberos 领域</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）域名。域控制器的域名可能与 OpenSSO 域名不同，这取决于具体的配置。</p>
+
+<a name="fwbid"></a><h5>Kerberos 服务器名</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）主机名。必须输入该域控制器的全限定域名。</p>
+
+<a name="fwbhw"></a><h5>返回主体的域名</h5>
+<p>如果启用，此属性允许 OpenSSO 在验证期间自动将 Kerberos 主体和域控制器的域名同时返回。</p>
+
+<a name="fwbic"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

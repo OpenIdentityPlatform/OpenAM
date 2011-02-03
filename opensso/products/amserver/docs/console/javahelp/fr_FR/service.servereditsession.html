@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Session - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>Session</h4>
+<p>Les attributs de session vous permettent de configurer des informations de session
+pour un site et des instances de serveur suppl&#233;mentaires.</p>
+
+<a name="ggkab"></a><h5>Limites de session</h5>
+<p>Les attributs suivants d&#233;finissent les limites de session de serveur&#160;:</p>
+
+<a name="ggkat"></a><h5>Nombre maximum de sessions</h5>
+<p>La valeur par d&#233;faut est 5000. Sp&#233;cifiez le nombre maximal de sessions
+simultan&#233;es autoris&#233;es. &#192; la connexion, une erreur de nombre de sessions maximal
+est g&#233;n&#233;r&#233;e si la valeur de sessions simultan&#233;es maximale d&#233;passe ce nombre.</p>
+
+<a name="ggkac"></a><h5>Dur&#233;e maximale de session non valide</h5>
+<p>La valeur par d&#233;faut est 10. Sp&#233;cifie le nombre de minutes apr&#232;s
+lequel la session non valide est supprim&#233;e de la table des sessions
+si cette table est cr&#233;&#233;e et si l'utilisateur ne se connecte pas.
+Cette valeur doit toujours &#234;tre sup&#233;rieure &#224; la valeur de temporisation indiqu&#233;e
+dans le fichier de propri&#233;t&#233;s du module d'authentification.</p>
+
+<a name="ggkaf"></a><h5>D&#233;lai de purge de session</h5>
+<p>La valeur par d&#233;faut est 60. Sp&#233;cifie, en minutes, le d&#233;lai de
+retard de l'op&#233;ration de session de purge. Apr&#232;s expiration d'une session, il
+s'agit d'une p&#233;riode de prolongation pendant laquelle la session continue &#224; r&#233;sider
+sur le serveur de session. Cette propri&#233;t&#233; est utilis&#233;e par l'application cliente
+pour v&#233;rifier si la session a expir&#233; via les API SSO. &#192;
+l'issue de cette p&#233;riode de prolongation, la session est arr&#234;t&#233;e. Si l'utilisateur
+se d&#233;connecte ou si la session est explicitement arr&#234;t&#233;e par un composant
+OpenSSO, elle n'est pas maintenue pendant la p&#233;riode de prolongation. Pendant la
+p&#233;riode de prolongation, la session est dans l'&#233;tat NON VALIDE.</p>
+
+<a name="ggkbl"></a><h5>Statistiques</h5>
+<p>Les attributs suivants d&#233;finissent la configuration des statistiques&#160;:</p>
+
+<a name="ggkbf"></a><h5>Intervalle enregistrement</h5>
+<p>La valeur par d&#233;faut est 60. Sp&#233;cifie le d&#233;lai en minutes s&#233;parant
+les journalisations des statistiques. La valeur minimale est de 5&#160;secondes pour &#233;viter
+la saturation de la CPU. OpenSSO consid&#232;re qu'une valeur inf&#233;rieure &#224; 5
+secondes est &#233;gale &#224; 5 secondes.</p>
+
+<a name="ggkbn"></a><h5>&#201;tat</h5>
+<p>La valeur par d&#233;faut est file. Sp&#233;cifie l'emplacement du journal des statistiques.
+Les valeurs possibles sont les suivantes&#160;:  </p>
+<ul><li><p>off &#8212; Aucune statistique n'est consign&#233;e.</p></li>
+<li><p>file &#8212; Les statistiques sont &#233;crites dans un fichier situ&#233; dans le r&#233;pertoire sp&#233;cifi&#233;.</p></li>
+<li><p>console &#8212; Les statistiques sont &#233;crites dans les fichiers journaux du serveur Web.</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>R&#233;pertoire</h5>
+<p>Cette valeur est d&#233;finie pendant l'installation. Exemple&#160;: <tt></tt><i>base OpenSSO</i><tt>/</tt><i>URI-serveur</i><tt>/stats</tt>. Sp&#233;cifie le r&#233;pertoire dans
+lequel les fichiers de d&#233;bogage sont cr&#233;&#233;s.</p>
+
+<a name="ggkca"></a><h5>Activer la recherche d'h&#244;te</h5>
+<p>La valeur par d&#233;faut est false. Active ou d&#233;sactive la recherche d'h&#244;te
+pendant la journalisation de session.</p>
+
+<a name="ggkas"></a><h5>Notification</h5>
+<p>Les attributs suivants d&#233;finissent la configuration de notification&#160;:</p>
+
+<a name="ggkbz"></a><h5>Taille de pool de notification</h5>
+<p>La valeur par d&#233;faut est 10. D&#233;finit la taille du pool en
+sp&#233;cifiant le nombre total de threads.</p>
+
+<a name="ggkao"></a><h5>Seuil de pool de threads de notification</h5>
+<p>La valeur par d&#233;faut est 100. Sp&#233;cifie la longueur maximale des files
+d'attente de t&#226;ches. Lorsqu'une t&#226;che de notification est re&#231;ue, elle est envoy&#233;e
+&#224; la file d'attente des t&#226;ches pour &#234;tre trait&#233;e. Si la file
+d'attente atteint la longueur maximale, les nouvelles demandes entrantes sont rejet&#233;es avec
+un message <tt>ThreadPoolException</tt> jusqu'&#224; ce qu'une t&#226;che disparaisse de la file d'attente.</p>
+
+<a name="ggkar"></a><h5>Validation</h5>
+<p>Les attributs suivants d&#233;finissent la configuration de validation&#160;:</p>
+
+<a name="ggkcg"></a><h5>Comparaison DN client insensible &#224; la casse</h5>
+<p>La valeur par d&#233;faut est true. Compare le DN d'agent. Si la
+valeur est false, la comparaison est sensible &#224; la casse. </p>
+<br/>
+
+</body>
+</html>

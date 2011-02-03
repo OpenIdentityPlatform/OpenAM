@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Condiciones - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectcondition"></a><h4>Condiciones</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>Una condici&#243;n permite definir las restricciones de la pol&#237;tica. Por ejemplo, si
+define una pol&#237;tica para una aplicaci&#243;n de pago de n&#243;minas, puede definir
+una condici&#243;n en esta acci&#243;n que limite el acceso a la aplicaci&#243;n
+durante &#250;nicamente determinadas horas. O tambi&#233;n puede definir una condici&#243;n que permita
+s&#243;lo esta acci&#243;n si la solicitud se origina a partir de un
+determinado conjunto de direcciones IP o de una Intranet corporativa.</p><p>La condici&#243;n puede utilizarse tambi&#233;n para configurar diferentes pol&#237;ticas en distintos URI
+del mismo dominio. Por ejemplo, s&#243;lo se puede acceder a <tt>http://org.example.com/hr/&#42;jsp </tt> mediante
+<tt>org.example.net</tt> desde las 9:00 a las 17:00. Para ello, se debe utilizar
+una condici&#243;n de IP con una condici&#243;n de tiempo. Adem&#225;s, al especificar
+el recurso de regla como <tt>http://org.example.com/hr/&#42;.jsp</tt>, la directiva se aplicar&#225; a todos
+los JSP por debajo de <tt>http://org.example.com/hr </tt>, incluidos aqu&#233;llos que residen en los
+subdirectorios.</p>
+<hr><p><b>Nota &#8211; </b>Los t&#233;rminos referencia, regla, recurso, asunto, condici&#243;n y valor se corresponden con
+los elementos <b>Referencia</b>, <b> Regla</b>, <b>Nombre de recurso</b>, <b>Asunto</b>, <b> Condici&#243;n</b>, <b>Atributo</b> y <b>Valor</b> en <tt>policy.dtd</tt>.</p>
+<hr>
+<p><a href="policy.selectconditiontype.html">Para agregar una condici&#243;n a una pol&#237;tica</a>.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 屬性授權 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>自訂 SAMLv2 屬性授權</h4>
+<p>SAMLv2 屬性授權包含下列用於自訂的屬性：</p>
+<ul><li><p><a href="#ggwhl">簽署與加密</a></p></li>
+<li><p><a href="#ggwgh">屬性服務</a></p></li>
+<li><p><a href="#ggwjy">AssertionID 請求</a></p></li>
+<li><p><a href="#ggwju">屬性設定檔</a></p></li>
+<li><p><a href="#ggwha">憑證別名</a></p></li>
+<li><p><a href="#ggwjj">主體資料存放區</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>簽署與加密</h5>
+<dl><dt>金鑰大小</dt>
+<dd><p>屬性授權實體與其他實體互動時使用的金鑰長度。</p></dd>
+<dt>演算法</dt>
+<dd><p>用來與其他實體互動的加密演算法。</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>屬性服務</h5>
+<p>此屬性定義將接收屬性查詢請求的 URL 端點。<tt>位置</tt>會指定將請求傳送到的提供者的 URL。<tt>對映程式</tt>會定義 SPI，SPI 會尋找屬性對映授權以傳回回應中將包含的屬性的清單。SAMLv2 定義的屬性查詢設定檔包括：</p>
+<ul><li><p>Basic</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>AssertionID 請求</h5>
+<p>定義身份識別提供者的 URL， AssertionID 會從用戶端傳送到這些 URL 以擷取對應的指定。<tt>位置</tt>會指定將請求傳送到的提供者的 URL。<tt>對映程式</tt>會定義 SPI，SPI 會尋找 AssertionID 對映授權以傳回回應中將包含的屬性的清單。連結包括：</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>屬性設定檔</h5>
+<p>定義 SAMLv2 定義的支援屬性設定檔的類型。<tt>基本</tt>是預設類型。</p>
+
+<a name="ggwha"></a><h5>憑證別名</h5>
+<p>定義憑證別名元素。<tt>簽署</tt>會指定用來尋找金鑰庫中正確的簽署憑證的提供者憑證別名。<tt>加密</tt>會指定用來尋找金鑰庫中正確的加密憑證的提供者憑證別名。</p>
+
+<a name="ggwjj"></a><h5>主體資料存放區</h5>
+<p>指定包含 X509 主體 DN 的資料存放區屬性名稱。它可用來尋找屬性值符合 X.509 主體 DN 的使用者。此欄位只能用於 X.509 主體的屬性查詢設定檔。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>搜索服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>搜索服务</h3>
+<a name="indexterm-119"></a><p>访问身份数据的第一步是确定信息所处的位置。（例如，哪个身份服务保留主体的信用卡信息，或者哪个服务器存储主体的日历服务。）通常，网络上有一个或多个服务允许其他条目对身份数据执行操作。由于客户机不能记录这些服务或不知道哪个服务可以信任，因此他们需要搜索服务。<b>搜索服务</b>实质上是搜索资源的 Web 服务接口。<b>搜索资源</b>是资源提供的注册表。<b>资源提供</b>用于定义身份数据与服务实例之间的关联，该服务实例应能提供对该数据的访问。<b>资源标识符</b>是在搜索服务中注册的唯一资源标识符 (unique resource identifier，URI)，它指向特定搜索资源。当客户机发送某种类型数据的请求时，它将包含 OpenSSO 搜索服务用来查找请求的属性的 Web 服务提供者的资源标识符。搜索服务将返回其中包含查找数据所需信息的资源提供。</p>
+<hr><p><b>注 &#8211; </b>为了进行访问，Liberty 个人配置文件服务 的托管提供者需代表各身份主体在 搜索服务 中注册。</p>
+<hr>
+<p>可为您的实现配置以下搜索服务全局属性。</p>
+<ul><li><p><a href="dsproviderid.html">提供者 ID</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">支持的验证机制</a></p></li>
+<li><p><a href="supporteddirectives.html">支持的指令</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">搜索查找的策略评估</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">搜索更新的策略评估</a></p></li>
+<li><p><a href="authorizerpluginclass.html">授权者插件类：</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">条目处理程序插件类：</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">用于资源 ID 映射程序插件的类</a></p></li>
+<li><p><a href="authresponsemessage.html">验证响应消息</a></p></li>
+<li><p><a href="generatesessioncontext.html">用于引导的会话上下文语句</a></p></li>
+<li><p><a href="encryptnameidentifier.html">加密会话上下文中的名称标识符以进行引导</a></p></li>
+<li><p><a href="useimpliedresource.html">隐含资源</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">用于引导的资源提供</a></p></li></ul>
+<p>以下任务与配置搜索服务关联：</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">配置用于引导的资源提供</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">配置服务说明</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

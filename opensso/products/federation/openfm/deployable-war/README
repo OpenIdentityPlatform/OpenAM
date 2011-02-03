@@ -1,0 +1,92 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README,v 1.9 2009/01/05 23:51:29 veiming Exp $
+
+-->
+
+Portions Copyrighted [2011] [ForgeRock AS]
+
+
+OpenSSO - Deployable WAR 
+
+This directory contains the OpenSSO deployable WAR file
+(opensso.war which contains all server components and server samples), 
+and files/directories required to create some specialized WAR files.
+
+The following specialized WAR files are supported:
+  - Console Only WAR (fam-console.list)
+  - Server without console WAR (fam-noconsole.list)
+  - Distributed Authentication WAR (fam-distauth.list)
+  - SAMLv2/ID-FF IDP Discovery/Introduction WAR (fam-idpdiscovery.list)
+
+Contents of this directory:
+  <zip staging area>            (root directory where opensso.zip is extracted)
+   |- opensso                   (parent directory)
+     |- deployable-war          (current directory)
+       |- README                (this README file)
+       |- createwar.sh          (shell script to create WAR files)
+       |- createwar.bat         (bat file to create WAR files)
+       |- opensso.war           (OpenSSO Server WAR with samples)
+       |- fam-idpdiscovery.list (files list for IDP Discovery WAR)
+       |- fam-distauth.list     (files list for Distributed Authentication WAR)
+       |- fam-console.list      (files list for Console Only WAR)
+       |- fam-noconsole.list    (files list for Server without console WAR)
+       |- classes               (contains resources and classes for executing
+       |                         createwar.sh and createwar.bat)
+       |- idpdiscovery          (directory containing additional files for
+       |                         IDP discovery WAR)
+       |- distauth              (directory containing additional files for
+       |                         Distributed Authentication WAR) 
+       |- console               (directory containing additional files for
+       |                         Console Only WAR)
+       |- noconsole             (directory containing additional files for
+                                 Server without console WAR)
+
+
+Steps to create a specialized WAR file:
+
+1. Creates a new directory as staging area for the server WAR, and extracts the 
+   opensso.war in this staging directory:
+   % mkdir <server war staging area>
+   % cd <server war staging area>
+   % jar xvf <zip staging area>/opensso/deployable-war/opensso.war
+
+2. Creates the specialized WAR file using createwar.sh or createwar.bat. 
+   (Please remember that createwar.sh and createwar.bat needs to be executed in
+    its current directory to be able to find the type-specific additional 
+    files)
+   For example, to create Console WAR:
+   % ./createwar.sh -s /tmp/staging -t console -w /tmp/console.war
+
+Now the specialized WAR is ready to be deployed into your web container.
+
+After deploying the WAR, access the WAR deployment URL 
+(e.g. http://moonriver.eng.sun.com/console) from your browser. A configurator 
+JSP page will be displayed for you to enter the configuration information 
+for the special WAR. Enter the fields and submit the data, a configuration file 
+(e.g. AMConfig.properties) will be created under your home directory. It is 
+highly recommended that you change the permission of the configuration file 
+to limit access to the sensitive configuration information. 
+Now you could access the special WAR for its functions. 

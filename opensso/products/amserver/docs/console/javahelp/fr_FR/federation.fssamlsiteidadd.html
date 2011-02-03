@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration d'un identificateur de site - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>Configuration d'un identificateur de site</h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>Cet attribut d&#233;finit tout site h&#233;berg&#233; par le serveur sur lequel OpenSSO
+est install&#233;. Une valeur par d&#233;faut et un ID de site g&#233;n&#233;r&#233;
+automatiquement sont d&#233;finis pour l'h&#244;te lors de l'installation. Il peut y avoir
+plusieurs entr&#233;es. Par exemple, l'&#233;quilibrage de charge ou plusieurs instances d'OpenSSO partageant
+le m&#234;me Directory Server doivent &#234;tre tous d&#233;finis. Le point de d&#233;part
+est l'attribut Identificateurs de site dans l'&#233;cran SAML sous l'interface F&#233;d&#233;ration. Les
+ID de site sont d&#233;finis dans l'&#233;cran de configuration Serveurs et sites.
+Pour plus d'informations, reportez-vous &#224; la rubrique <a href="service.serversite.html">Serveurs et Sites</a>.</p><ol>
+<li><b>Cliquez sur Nouveau pour ajouter un identificateur de site ou cliquez sur
+le nom d'un identificateur de site configur&#233; pour modifier son profil.</b><p>Les attributs de l'identificateur de site s'affichent.</p></li>
+<li><b>Fournissez les valeurs pour les attributs d'identificateur de site en vous basant
+sur les informations suivantes :</b><dl><dt>ID d'instance</dt>
+<dd><p>La valeur de cette propri&#233;t&#233; est <i>protocol</i> <tt> ://</tt><i>host</i><tt>:</tt> <i> port</i>.</p><p>En cas de configuration SAML pour SSL (dans les sites source et de destination), v&#233;rifiez que le protocole d&#233;fini ici est <tt>https//</tt>.</p></dd>
+<dt>ID de site</dt>
+<dd><p>L'ID de site est un identificateur g&#233;n&#233;r&#233; pour chaque site (bien que la valeur puisse &#234;tre identique pour plusieurs serveurs plac&#233;s derri&#232;re un &#233;quilibreur de charge). Vous pouvez utiliser une classe du package <tt>com.sun.identity.saml.common</tt> afin de g&#233;n&#233;rer manuellement cet identificateur si besoin est. Tapez la commande suivante sur la ligne de commandes :</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>Nom de l'&#233;metteur</dt>
+<dd><p>La valeur par d&#233;faut de cette propri&#233;t&#233; est <i>host</i> <tt> :</tt><i>port</i>, mais ce peut &#234;tre un URI quelconque.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur OK pour terminer la configuration de l'identificateur de site.</b></li>
+<li><b>Cliquez sur Enregistrer dans la page Propri&#233;t&#233;s du site local pour finaliser
+la configuration SAML.</b></li></ol>
+<br/>
+
+</body>
+</html>

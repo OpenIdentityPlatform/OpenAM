@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>匿名 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthanonymousservice"></a><h4>匿名</h4>
+<p><a name="indexterm-167"></a>此模組類型允許使用者不需指定憑證即可登入。您可以建立匿名使用者，以便所有人無需提供密碼即可匿名登入。匿名連線通常是由 OpenSSO 管理員自訂，以便匿名使用者只能有限地存取伺服器。匿名認證屬性為範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwblp">有效匿名使用者</a></p></li>
+<li><p><a href="#fwbnz">預設匿名使用者名稱</a></p></li>
+<li><p><a href="#fwbto">大小寫相符的使用者 ID</a></p></li>
+<li><p><a href="#fwbli">認證級別</a></p></li></ul>
+
+
+<a name="fwblp"></a><h5>有效匿名使用者</h5>
+<p>包含無需提供憑證即可登入的使用者 ID 清單。如果使用者的登入名稱與此清單中的使用者 ID 相符，則授與存取權並將階段作業指定給指定的使用者 ID。</p><p>如果此清單為空，則存取以下預設模組實例登入 URL 將被認證為預設匿名使用者名稱：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>如果此清單不為空，則存取預設模組實例登入 URL (與上述相同) 將會提示使用者輸入任何有效匿名使用者名稱。如果此清單不為空，使用者透過存取以下 URL 可以無需看到登入頁面而登入：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1=&#60;valid Anonymous username></tt></p>
+
+<a name="fwbnz"></a><h5>預設匿名使用者名稱</h5>
+<p>如果 [有效匿名使用者清單] 為空且以下預設模組實例登入 URL 被存取，則會定義已被指定階段作業的使用者 ID：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>預設值為 anonymous。同時，必須在範圍中建立匿名使用者。</p>
+<hr><p><b>備註 &#8211; </b>如果 [有效匿名使用者清單] 不為空，您可透過使用 [預設匿名使用者名稱] 中定義的使用者無需存取登入頁面而登入。透過存取以下 URL 可完成此作業：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1= </tt> <tt></tt><i>DefaultAnonymous User Name</i><tt></tt></p>
+<hr>
+
+
+<a name="fwbto"></a><h5>大小寫相符的使用者 ID</h5>
+<p>如果啟用了此選項，則使用者 ID 會區分大小寫。依預設，不啟用此屬性。</p>
+
+<a name="fwbli"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

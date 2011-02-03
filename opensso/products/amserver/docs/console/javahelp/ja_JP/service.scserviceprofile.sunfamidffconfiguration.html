@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-FF サービス設定 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Liberty ID-FF サービス設定</h4>
+
+
+<a name="ggogr"></a><h5>連携 Cookie 名</h5>
+<p>この属性は、ID-FF サービス Cookie の名前を指定します。この Cookie は、ユーザーがすでに連携されているかどうかを確認するために使用されます。 </p>
+
+<a name="ggohk"></a><h5>IDP プロキシ検索 SPI 実装クラス</h5>
+<p>この属性は、プロキシ化する優先アイデンティティープロバイダを見つけるための実装クラスを指定します。</p>
+
+<a name="ggogp"></a><h5>要求キャッシュクリーンアップ間隔</h5>
+<p>この属性は、ID-FF 内部要求クリーンアップスレッドのクリーンアップ間隔を秒単位で指定します。</p>
+
+<a name="ggoii"></a><h5>要求キャッシュタイムアウト</h5>
+<p>この属性は、ID-FF 認証要求のタイムアウト値を秒単位で指定します。このタイムアウト値を超えると、<tt>AuthnRequest</tt> オブジェクトはメモリーから消去されます。</p>
+
+<a name="ggofu"></a><h5>IDP ログイン URl</h5>
+<p>この属性は、認証要求を処理する際に有効なセッションが見つからない場合に IDP がリダイレクトするログイン URL を指定します。キーが指定されていない場合は、デフォルトのログイン URL が使用されます。</p>
+
+<a name="ggoih"></a><h5>XML 署名先</h5>
+<p>この属性は、Liberty 要求および応答の署名検証のレベルを指定します。</p>
+<br/>
+
+</body>
+</html>

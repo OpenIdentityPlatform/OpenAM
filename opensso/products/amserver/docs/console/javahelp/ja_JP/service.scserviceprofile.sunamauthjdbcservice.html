@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>JDBC - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthjdbcservice"></a><h4>JDBC</h4>
+<p><a name="indexterm-174"></a>Java Database Connectivity (JDBC) 認証モジュールにより、OpenSSO が、JDBC 対応ドライバを提供する任意の SQL (Structured Query Language) データベースを通じてユーザーを認証できるようになります。SQL
+データベースへの接続は、JDBC ドライバを通して直接行うか、JNDI 接続プールを通して行います。JDBC 属性はレルム属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwajx">「接続のタイプ」</a></p></li>
+<li><p><a href="#fwafb">「接続プールの JNDI 名」</a></p></li>
+<li><p><a href="#fwaap">「JDBC ドライバ」</a></p></li>
+<li><p><a href="#fwarc">「JDBC URL」</a></p></li>
+<li><p><a href="#fwaum">「データベースに接続するユーザー」</a></p></li>
+<li><p><a href="#fwaeu">「データベースへ接続するためのパスワード」</a></p></li>
+<li><p><a href="#fwavq">「データベースへ接続するためのパスワード (確認)」</a></p></li>
+<li><p><a href="#fwads">「パスワードカラムの文字列」</a></p></li>
+<li><p><a href="#fwapb">「準備されているステートメント」</a></p></li>
+<li><p><a href="#fwapv">「パスワード構文を変換するためのクラス」</a></p></li>
+<li><p><a href="#fwavz">「認証レベル」</a></p></li></ul>
+
+
+<a name="fwajx"></a><h5>接続のタイプ</h5>
+<p>JNDI (Java Naming and Directory Interface) 接続プールまたは JDBC ドライバのいずれかを使用して、SQL データベースへの接続タイプを指定します。オプションは次のとおりです。</p>
+<ul><li><p>JNDI から取得された接続プール</p></li>
+<li><p>非持続 JDBC 接続</p></li></ul>
+<p>JNDI 接続プールは、配下の Web コンテナの設定を利用します。</p>
+
+<a name="fwafb"></a><h5>接続プールの JNDI 名</h5>
+<p>「接続タイプ」で JNDI を選択した場合は、このフィールドに接続プール名を指定します。JDBC 認証では Web コンテナから提供される JNDI 接続が使用されるので、ここで設定した JNDI 接続プールがほかの Web コンテナの接続と一致しなくなることがあります。例については、『OpenSSO
+Administration Guide』を参照してください。</p>
+
+<a name="fwaap"></a><h5>JDBC ドライバ</h5>
+<p><a href="#fwajx">「接続のタイプ」</a>で JDBC を選択した場合は、SQL データベースから提供される JDBC ドライバをこのフィールドに指定します。たとえば、<tt>com.mysql.jdbc.Driver</tt> と指定します。</p>
+
+<a name="fwarc"></a><h5>JDBC URL</h5>
+<p><a href="#fwajx">「接続のタイプ」</a>で JDBC を選択した場合は、データベース URL を指定します。たとえば、mySQL の場合は、<tt>jdbc.mysql://hostname:port/databaseName</tt> と指定します。</p>
+
+<a name="fwaum"></a><h5>データベースに接続するユーザー</h5>
+<p>JDBC 接続を使用してデータベースに接続するユーザーの名前を指定します。</p>
+
+<a name="fwaeu"></a><h5>データベースへ接続するためのパスワード</h5>
+<p>「データベースに接続するユーザー」に指定したユーザーのパスワードを定義します。</p>
+
+<a name="fwavq"></a><h5>データベースへ接続するためのパスワード (確認)</h5>
+<p>パスワードを確認します。</p>
+
+<a name="fwads"></a><h5>パスワードカラムの文字列</h5>
+<p>SQL データベースのパスワードカラム名を指定します。</p>
+
+<a name="fwapb"></a><h5>準備されているステートメント</h5>
+<p>ログインしようとしているユーザーのパスワードを取得するための SQL 文を指定します。次に例を示します。</p><pre> select Password from Employees where USERNAME = ?</pre>
+
+<a name="fwapv"></a><h5>パスワード構文を変換するためのクラス</h5>
+<p>データベースから取得したパスワードをユーザー入力の形式に変換して、パスワードを比較するためのクラス名を指定します。このクラスは、<tt>JDBCPasswordSyntaxTransform</tt> インタフェースを実装している必要があります。</p>
+
+<a name="fwavz"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

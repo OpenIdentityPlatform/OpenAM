@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>此模块允许用户使用 Secure Computing 的 SafeWord 或 SafeWord PremierAccess 验证服务器进行验证。SafeWord 验证属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwafv">服务器</a></p></li>
+<li><p><a href="#fwajv">服务器验证文件目录</a></p></li>
+<li><p><a href="#fwarb">启用日志记录</a></p></li>
+<li><p><a href="#fwahi">日志记录的级别</a></p></li>
+<li><p><a href="#fwabd">日志文件</a></p></li>
+<li><p><a href="#fwacu">验证连接超时</a></p></li>
+<li><p><a href="#fwanv">客户机类型</a></p></li>
+<li><p><a href="#fwafs">EASSP 版本</a></p></li>
+<li><p><a href="#fwaob">最小验证程序强度</a></p></li>
+<li><p><a href="#fwatz">验证级别</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>服务器</h5>
+<p>指定 SafeWord 或 SafeWord PremiereAccess 服务器的名称和端口。端口 7482 为 SafeWord 服务器的默认端口。SafeWord PremierAccess 服务器的默认端口号为
+5030。</p>
+
+<a name="fwajv"></a><h5>服务器验证文件目录</h5>
+<p>指定 SafeWord 客户机库放置其验证文件的目录。默认路径如下所示：</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>如果该字段中指定的是其他目录，进行 SafeWord 验证前该目录必须存在。</p>
+
+<a name="fwarb"></a><h5>启用日志记录</h5>
+<p>启用 SafeWord 日志。默认情况下，日志为启用状态。</p>
+
+<a name="fwahi"></a><h5>日志记录的级别</h5>
+<p>指定 SafeWord 日志记录级别。在下拉式菜单中选择级别。级别包括 DEBUG、ERROR、INFO 和 NONE。</p>
+
+<a name="fwabd"></a><h5>日志文件</h5>
+<p>指定 SafeWord 客户机日志的目录路径和日志文件名。默认路径为 <tt>/var/opt/SUNWam/auth/safeword/safe.log</tt>。</p><p>如果指定的是其他路径或文件名，进行 SafeWord 验证前该路径或文件名必须存在。如果多个领域同时配置了 SafeWord 验证，并且它们使用不同的 SafeWord 服务器，则必须指定不同的路径，否则，SafeWord 验证只在第一个进行验证的领域中生效。与此类似，如果某个领域更改了 SafeWord 服务器，则验证前必须删除指定目录中的 <tt>swec.dat</tt> 文件，以使新配置的
+SafeWord 服务器生效。</p>
+
+<a name="fwacu"></a><h5>验证连接超时</h5>
+<p>定义 SafeWord 客户机 (OpenSSO) 与 SafeWord 服务器之间的超时时间（以秒为单位）。默认值为 120 秒。</p>
+
+<a name="fwanv"></a><h5>客户机类型</h5>
+<p>定义 SafeWord 服务器与不同的客户机进行通信的客户机类型，例如 Mobile Client、 VPN、Fixed Password 和 Challenge/Response 等等。</p>
+
+<a name="fwafs"></a><h5>EASSP 版本</h5>
+<p>该属性指定扩展验证和单点登录协议 (EASSP) 版本。该字段接受标准 (101)、SSL 加密首要访问 (200)，或首要访问 (201) 协议版本。</p>
+
+<a name="fwaob"></a><h5>最小验证程序强度</h5>
+<p>定义客户机/SafeWord 服务器验证的最小验证程序强度。每一种客户机类型都有不同的验证程序值，且值越高，验证程序强度越高。20 为允许的最高值。0 为允许的最低值。</p>
+
+<a name="fwatz"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

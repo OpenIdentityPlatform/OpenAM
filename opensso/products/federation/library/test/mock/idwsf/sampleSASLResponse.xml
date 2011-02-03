@@ -1,0 +1,28 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: sampleSASLResponse.xml,v 1.2 2008/06/25 05:48:20 qcheng Exp $
+                                                                                
+-->
+<sa:SASLResponse xmlns:sa="urn:liberty:sa:2004-04" xmlns:disco="urn:liberty:disco:2003-08"><sa:Status code="sa:OK"/><ResourceOffering xmlns="urn:liberty:disco:2003-08"><ResourceID>http://moonriver.red.iplanet.com:80/amserver/Liberty/disco/aWQ9YW1hZG1pbixvdT11c2VyLGRjPWlwbGFuZXQsZGM9Y29t</ResourceID><ServiceInstance><ServiceType>urn:liberty:disco:2003-08</ServiceType><ProviderID>http://moonriver.red.iplanet.com:80/amserver/Liberty/disco</ProviderID><Description><SecurityMechID>urn:liberty:security:2003-08:null:null</SecurityMechID><Endpoint>http://moonriver.red.iplanet.com:80/amserver/Liberty/disco</Endpoint></Description></ServiceInstance></ResourceOffering></sa:SASLResponse>

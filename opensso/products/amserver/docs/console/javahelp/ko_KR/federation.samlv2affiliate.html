@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 호스트 제휴 사용자 정의 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2affiliate"></a><h4>SAMLv2 호스트 제휴 사용자 정의</h4>
+<p>호스트 제휴에는 서비스 공급자 그룹이 포함되어 있습니다. 제휴는 이미 구성된 공급자 엔티티에서
+구성원 공급자를 선택한 제휴 소유자가 구성하고 관리합니다. 제휴를 사용하면 사용자가 연결된 사이트
+그룹에서 연합할 수 있습니다. 선택한 공급자는 제휴 구성원으로 서비스를 실행하거나 공급자로 개별
+실행할 수 있습니다. 서비스를 제휴 구성원으로 실행한 경우 서비스 공급자는 제휴를 대신하여
+사용자에 대한 인증 요청을 발급할 수 있습니다. 인증이 보호되어 있는 경우에는 사용자가
+모든 제휴 구성원으로 단일 사인온을 수행할 수 있습니다. </p><p>호스트 제휴 공급자에는 제휴를 구성하는 하나 이상의 공급자 엔티티 그룹을 정의하는 메타데이터가
+있습니다. 여기에는 공급자 엔티티에 정의된 모든 공급자에 대한 구성 정보는 포함되어 있지
+않으며 제휴 자체에 대한 구성 정보만 포함됩니다. 동일한 CoT에 여러 서비스 공급자와
+Identity 공급자가 있는 경우 제휴 엔티티를 사용하여 공통 공유 서비스에 대해 서로
+다른 이름 식별자를 생성하지 않도록 하십시오. </p><p>호스트 제휴에는 사용자 정의에 필요한 다음과 같은 속성이 포함되어 있습니다. </p>
+<ul><li><p><a href="#ggwxt">메타 별칭</a></p></li>
+<li><p><a href="#ggwxj">구성원</a></p></li>
+<li><p><a href="#ggwww">인증서 별칭</a></p></li></ul>
+
+
+<a name="ggwxt"></a><h5>메타 별칭</h5>
+<p>구성할 공급자의 <tt>메타 별칭</tt>을 지정합니다. <tt>메타 별칭</tt>은 공급자의 엔티티 식별자 및 해당 공급자가 있는
+조직을 찾는 데 사용됩니다. 이 값은 영역 또는 조직 이름(연합 서비스용 SAML
+v2 플러그인이 OpenSSO에 설치되어 있는지 여부에 따라 달라짐)에 슬래시가 연결되어 있고 공급자
+이름이 조합된 문자열입니다. 예를 들어 <tt>/suncorp/travelprovider</tt>와 같습니다.</p>
+<hr><p><b>주의 &#8211; </b><tt>메타 별칭</tt>에 사용되는 이름에는 <tt>/</tt>를 사용할 수 없습니다.</p>
+<hr>
+
+
+<a name="ggwxj"></a><h5>구성원</h5>
+<p>공급자는 CoT의 구성원이어야 하며, 아니면 리버티 기반 통신에 참가할 수 없습니다. 공급자는
+하나 이상의 제휴에 속할 수 있습니다. [새 값] 필드에 공급자의 엔티티 아이디를
+입력하고 [추가]를 누릅니다.</p>
+
+<a name="ggwww"></a><h5>인증서 별칭</h5>
+<p>이 속성은 공급자의 인증서 별칭 요소를 정의합니다. <tt>서명</tt>은 키 저장소에서 올바른 서명
+인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다. <tt>암호화</tt>는 키 저장소에서 올바른
+암호화 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다.</p>
+<br/>
+
+</body>
+</html>

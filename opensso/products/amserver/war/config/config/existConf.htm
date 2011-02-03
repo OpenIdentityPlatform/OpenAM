@@ -1,0 +1,122 @@
+<script type="text/javascript">
+
+    YAHOO.namespace("sun.identity.config.options.existConf");
+
+    var $ = YAHOO.util.Dom.get;
+
+    function cancel() {
+        document.location = "$context/config/commonTasks.htm";
+    }
+
+    function writingFailed( body ) {
+        alert( "Writing configuration failed! [" + body + "]" );
+    }
+
+    function writingComplete( body ) {
+        //the actual call happens really fast - so, simulate a longer writing process for better user experience
+        //(otherwise looks very chopping - almost instantaneous)
+        setTimeout( "YAHOO.sun.identity.config.options.existConf.writeConf.hide()", 1500);
+        setTimeout( "YAHOO.sun.identity.config.options.existConf.confComplete.show()", 1500);
+    }
+
+    function createConf() {
+
+        var params = "indices=";
+
+        var selected = false;
+
+        for ( var i = 1; i <= $existingConfigs.size(); i++ ) {
+            var option = $('configOption' + i );
+            if ( option.checked ) {
+                if ( !selected ) {
+                    params += i;
+                } else {
+                    params += "," + i;
+                }
+                selected = true;
+            }
+        }
+
+        if ( !selected ) {
+            alert( "Please choose at least one existing configuration.");
+            return;
+        }
+
+        YAHOO.sun.identity.config.options.existConf.writeConf.show();
+        
+        APP.call( "$context$path", "writeConfig", params, writingComplete, writingFailed );
+    }
+
+    function launchConsole() {
+        document.location = "$context/config/commonTasks.htm";
+    }
+
+    function init() {
+        YAHOO.sun.identity.config.options.existConf.writeConf = new YAHOO.widget.Panel("writeConf", { width:"240px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
+        YAHOO.sun.identity.config.options.existConf.writeConf.setHeader("Writing configuration.  Please wait...");
+        YAHOO.sun.identity.config.options.existConf.writeConf.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
+        YAHOO.sun.identity.config.options.existConf.writeConf.render(document.body);
+
+        YAHOO.sun.identity.config.options.existConf.confComplete = new YAHOO.widget.Panel("confComplete", { fixedcenter: true, close: false, visible:false, constraintoviewport:true });
+        YAHOO.sun.identity.config.options.existConf.confComplete.render();
+    }
+
+    YAHOO.util.Event.onDOMReady(init);
+
+</script>
+<style type="text/css">
+    #title {
+        background: #60a2e1;
+        border: 1px solid;
+        border-color: #999999;
+        font-family: Helvetica, sans-serif;
+        font-size: 14px;
+        color: #FFFFFF;
+        font-weight: bold;
+        padding-left: 10px;
+        padding-right: 10px;
+        width: 450px;
+    }
+
+    .border {
+        font-family: Helvetica, sans-serif;
+        font-size: 12px;
+        border: 1px solid #60a2e1;
+        padding: 5px;
+        width: 460px;
+    }
+</style>
+<div align="left" style="width:700px">
+    <h1>$page.getLocalizedString("configuration.existConf.title")</h1>
+
+    <h2>$page.getLocalizedString("configuration.existConf.instructionsLabel")</h2>
+
+    <div id="title">$page.getLocalizedString("configuration.existConf.configurations")</div>
+    <div class="border">
+        #if ( $existingConfigs.empty )
+        <p>$page.getLocalizedString("configuration.existConf.noConf")</p>
+        #else
+            #foreach( $url in $existingConfigs )
+            <p>&nbsp;<input id="configOption${velocityCount}" type="checkbox"/>$url</p>
+            #end
+        #end
+    </div>
+    <br/>
+
+    <div align="right" style="width:460px">
+        <button type="button" value="Cancel" onClick="cancel();">$page.getLocalizedString("configuration.existConf.cancel")</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" value="AcddConf" onClick="createConf();">$page.getLocalizedString("configuration.existConf.add")</button>
+    </div>
+</div>
+<div id="confComplete" style="visibility:hidden">
+    <div class="hd">$page.getLocalizedString("configuration.existConf.completeConf")</div>
+    <div class="bd">
+        <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+            <h1>$page.getLocalizedString("configuration.existConf.completeConf.header")</h1>
+            <p align="center" class="blueSmall">
+                <a class="pointer" href="#" onclick="launchConsole(); return false">$page.getLocalizedString("configuration.existConf.launch")</a>
+            </p>
+        </div>
+    </div>
+</div>

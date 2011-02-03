@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Modification des attributs g&#233;n&#233;raux d'une entit&#233; fournisseur ou d'une entit&#233; filiale - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsprofile"></a><h4>Modification des attributs g&#233;n&#233;raux d'une entit&#233; fournisseur ou d'une entit&#233; filiale</h4><a name="indexterm-70"></a><a name="indexterm-71"></a><a name="indexterm-72"></a><p>Apr&#232;s avoir cr&#233;&#233; une entit&#233;, vous pouvez modifier son profil. En particulier,
+vous pouvez modifier des attributs, ajouter des fournisseurs d'identit&#233;s et de services
+ou configurer des affiliations. Les op&#233;rations de modification des attributs g&#233;n&#233;raux d'un
+profil d'entit&#233; peuvent inclure la modification des attributs communs d&#233;j&#224; d&#233;finis, l'ajout
+d'un contact ou la saisie d'informations facultatives concernant l'organisation. La proc&#233;dure suivante
+permet de modifier les attributs g&#233;n&#233;raux. Le point de d&#233;part est l'&#233;cran
+Entit&#233;s sous F&#233;d&#233;ration.</p><ol>
+<li><b>S&#233;lectionnez le nom d'une entit&#233; configur&#233;e pour modifier son profil. </b><p>Par d&#233;faut, la page des attributs g&#233;n&#233;raux du profil de l'entit&#233; s'affiche.
+Si vous n'acc&#233;dez pas &#224; cette page, vous pouvez s&#233;lectionner G&#233;n&#233;ral dans
+le menu Affichage.</p></li>
+<li><b>Modifiez les valeurs des attributs communs de l'entit&#233;.</b><dl><dt>Nom de l'entit&#233;</dt>
+<dd><p>La valeur statique de cet attribut est le nom fourni lors de la cr&#233;ation de l'entit&#233;.</p></dd>
+<dt>Type</dt>
+<dd><p>La valeur statique de cet attribut est le type de l'entit&#233;, Fournisseur ou Filiale.</p></dd>
+<dt>Description</dt>
+<dd><p>La valeur de cet attribut est la description fournie lors de la cr&#233;ation de l'entit&#233;. Vous pouvez modifier la description initiale ou en ajouter une s'il n'y en a pas.</p></dd>
+</dl>
+</li>
+<li><b>Fournissez les valeurs des attributs de profil du contact de l'entit&#233;. </b><p>Ces attributs donnent des informations sur la personne &#224; contacter pour l'entit&#233;.
+Ils sont facultatifs.</p><dl><dt>Pr&#233;nom</dt>
+<dd><p>Tapez le nom de bapt&#234;me du contact de l'entit&#233;.</p></dd>
+<dt>Nom</dt>
+<dd><p>Tapez le nom de famille du contact de l'entit&#233;.</p></dd>
+<dt>Type</dt>
+<dd><p>Choisissez le type du contact dans le menu d&#233;roulant :</p>
+<ul><li><p>Administrateur</p></li>
+<li><p>Facturation</p></li>
+<li><p>Technique</p></li>
+<li><p>Autre</p></li></ul>
+</dd>
+<dt>Soci&#233;t&#233;</dt>
+<dd><p>Tapez le nom de la soci&#233;t&#233; qui emploie cette personne.</p></dd>
+<dt>ID principal Liberty</dt>
+<dd><p>Tapez un URI (Uniform Resource Identifier) qui pointe sur une instance du profil des informations personnelles du contact.</p></dd>
+<dt>Adresses e-mail</dt>
+<dd><p>Tapez une ou plusieurs adresses e-mail pour le contact, puis cliquez sur Ajouter.</p></dd>
+<dt>Num&#233;ros de t&#233;l&#233;phone</dt>
+<dd><p>Tapez un ou plusieurs num&#233;ros de t&#233;l&#233;phone pour le contact, puis cliquez sur Ajouter.</p></dd>
+</dl>
+</li>
+<li><b>Fournissez les valeurs des attributs des profils de l'organisation.</b><p>Ces attributs donnent des informations de base qui peuvent &#234;tre n&#233;cessaires lors
+d'une interaction avec une entit&#233; principale. Ils sont facultatifs.</p>
+<hr><p><b>Remarque &#8211; </b>Si l'attribut Noms contient une valeur, il faut donner des valeurs aux
+attributs Noms d'affichage et URL.</p>
+<hr>
+<dl><dt>Noms</dt>
+<dd><p>Entrez le nom officiel de l'organisation de l'entit&#233;, puis cliquez sur Ajouter. La valeur est d&#233;finie au format <i>locale</i>| <i> organization-name</i>. Par exemple, <tt>en</tt>| <tt> example.com</tt>.</p></dd>
+<dt>Noms d'affichage</dt>
+<dd><p>Entrez le nom de l'organisation de l'entit&#233; qui s'affichera en premier, puis cliquez sur Ajouter. La valeur est d&#233;finie au format <i>locale</i>|<i>organization-display-name </i> . Par exemple, <tt>fr</tt>|<tt>exemple.com</tt>. </p></dd>
+<dt>URL</dt>
+<dd><p>Entrez l'URL de l'organisation, puis cliquez sur Ajouter. La valeur est d&#233;finie au format <i>locale</i>| <i>organization-URL</i>. Par exemple, <tt>en</tt>|<tt> http://www.example.com</tt> .</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Enregistrer pour terminer la configuration, ou continuez &#224; d&#233;finir des
+valeurs pour le fournisseur d'identit&#233;s, le fournisseur de services ou les attributs
+de filiale.</b><p>Si vous poursuivez la configuration, consultez :</p><ul>
+<li><b><a href="federation.fsidentityprovider.html">Ajout d'un fournisseur d'identit&#233;s &#224; une entit&#233; fournisseur</a> pour d&#233;finir les valeurs des attributs du fournisseur d'identit&#233;s.</b></li>
+<li><b><a href="federation.fsserviceprovider.html">Ajout d'un fournisseur de services &#224; une entit&#233; fournisseur</a> pour d&#233;finir les valeurs des attributs du fournisseur de services.</b></li>
+<li><b><a href="federation.fsentitydescriptorsaffiliate.html">Ajout de membres &#224; une entit&#233; filiale</a> pour renseigner une entit&#233; filiale avec des membres.</b></li></ul></li></ol>
+<br/>
+
+</body>
+</html>

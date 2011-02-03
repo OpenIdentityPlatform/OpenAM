@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para configurar un identificador de sitio - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>Para configurar un identificador de sitio</h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>Este atributo define cualquier sitio alojado por el servidor en el que
+est&#233; instalado OpenSSO. Durante la instalaci&#243;n se define para el host un
+valor predeterminado y un Id. de sitio generado de forma autom&#225;tica. Se
+pueden especificar varias entradas. Por ejemplo, deber&#237;an definirse tanto el equilibrado de
+carga como varias instancias de OpenSSO que compartan la misma instancia de
+Directory Server. El punto de partida es el atributo Identificadores de sitio
+de la pantalla SAML en la interfaz Federaci&#243;n. Los Id. de sitio
+se definen en la pantalla de configuraci&#243;n de Servidores y sitios. Para
+obtener m&#225;s informaci&#243;n, consulte <a href="service.serversite.html">Servidores y sitios</a>.</p><ol>
+<li><b>Haga clic en Nuevo para agregar un identificador de sitio nuevo o
+haga clic en el nombre de un identificador de sitio que ya
+est&#233; configurado para modificar su perfil.</b><p>Se muestran los atributos de identificadores de sitio.</p></li>
+<li><b>Proporcione los valores de los atributos del identificador de sitio seg&#250;n la
+siguiente informaci&#243;n:</b><dl><dt>Id. de instancia</dt>
+<dd><p>El valor de esta propiedad es <i>protocol</i> <tt> ://</tt><i>host</i><tt>:</tt> <i> port</i>.</p><p>Si configura SAML para SSL (tanto en el sitio de origen como de destino), aseg&#250;rese de que el protocolo definido sea <tt>https//</tt>.</p></dd>
+<dt>Id. de sitio</dt>
+<dd><p>El Id. de sitio es un identificador generado para cada sitio (aunque el valor sea el mismo para varios servidores detr&#225;s de un equilibrador de carga). Hay una clase en el paquete <tt>com.sun.identity.saml.common</tt> que se puede utilizar para generar este identificador de forma manual, en caso de ser necesario. Escriba lo siguiente en la l&#237;nea de comandos:</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>Nombre de emisor</dt>
+<dd><p>El valor predeterminado de esta propiedad es <i>host</i><tt> :</tt><i>port</i>, aunque podr&#237;a ser cualquier URI.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Aceptar para completar la configuraci&#243;n del identificador de sitio.</b></li>
+<li><b>Haga clic en Guardar en la p&#225;gina Propiedades del sitio local para
+completar la configuraci&#243;n de SAML.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>익명 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthanonymousservice"></a><h4>익명</h4>
+<p><a name="indexterm-167"></a>이 모듈 유형을 사용하면 사용자는 자격 증명을 지정하지 않고도 로그인할 수 있습니다.
+누구나 비밀번호를 제공하지 않고 익명으로 로그인할 수 있도록 익명 사용자를 만들 수
+있습니다. 일반적으로 OpenSSO 관리자는 서버에 대한 익명 사용자의 액세스를 제한하기 위해 익명
+연결을 사용자 정의합니다. 익명 인증 속성은 영역 속성입니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fwblp">유효한 익명 사용자</a></p></li>
+<li><p><a href="#fwbnz">기본 익명 사용자 이름</a></p></li>
+<li><p><a href="#fwbto">대소문자 구분 사용자 아이디</a></p></li>
+<li><p><a href="#fwbli">인증 수준</a></p></li></ul>
+
+
+<a name="fwblp"></a><h5>유효한 익명 사용자</h5>
+<p>자격 증명을 제공하지 않고 로그인할 수 있는 권한을 가진 사용자 아이디 목록을
+포함합니다. 사용자의 로그인 이름이 이 목록의 사용자 아이디와 일치하면 액세스가 허가되며 지정된
+사용자 아이디에 세션이 할당됩니다.</p><p>이 목록이 비어 있는 경우 다음과 같은 기본 모듈 인스턴스 로그인 URL에
+액세스하면 기본 익명 사용자 이름으로 인증됩니다.</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>이 목록이 비어 있지 않은 경우 기본 모듈 인스턴스 로그인 URL(위와 동일)에
+액세스하면 유효한 익명 사용자 이름을 입력하라는 메시지가 표시됩니다. 이 목록이 비어 있지
+않은 경우 다음 URL에 액세스하여 로그인 페이지를 표시하지 않고 로그인할 수 있습니다.</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1=&#60;valid Anonymous username></tt></p>
+
+<a name="fwbnz"></a><h5>기본 익명 사용자 이름</h5>
+<p>유효한 익명 사용자 목록이 비어 있고 다음과 같은 기본 모듈 인스턴스 로그인
+URL에 액세스하는 경우 세션이 할당되는 사용자 아이디를 정의합니다.</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>기본값은 anonymous입니다. 또한 영역에서 익명 사용자를 만들어야 합니다.</p>
+<hr><p><b>주 &#8211; </b>유효한 익명 사용자 목록이 비어 있지 않은 경우 기본 익명 아이디에 정의된
+사용자를 사용하여 로그인 페이지에 액세스하지 않고 로그인할 수 있습니다. 그렇게 하려면 다음
+URL에 액세스합니다.</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1= </tt> <tt></tt><i>DefaultAnonymous User Name</i><tt></tt></p>
+<hr>
+
+
+<a name="fwbto"></a><h5>대소문자 구분 사용자 아이디</h5>
+<p>이 옵션을 사용하면 사용자 아이디에서 대소문자를 구분할 수 있습니다. 기본적으로 이 속성은
+사용하지 않는 것으로 설정됩니다.</p>
+
+<a name="fwbli"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

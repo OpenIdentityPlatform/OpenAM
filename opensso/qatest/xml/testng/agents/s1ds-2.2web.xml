@@ -1,0 +1,15 @@
+    <test name="Header Attribute Tests for 2.2 Agent">
+            <parameter name="policyIdx" value="0"/>
+            <parameter name="evaluationIdx" value="0"/>
+            <parameter name="resourceIdx" value="21"/>
+            <parameter name="agentType" value="2.2"/>
+            <groups>
+                <run>
+                    <include name="@mode@"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sun.identity.qatest.agents.AgentTests2_2"/>
+            </classes>
+    </test>
+

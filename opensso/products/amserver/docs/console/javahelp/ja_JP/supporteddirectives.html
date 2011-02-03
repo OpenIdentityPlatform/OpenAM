@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>サポートされているディレクティブ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>サポートされているディレクティブ</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>この属性により、リソースに対してポリシー関連のディレクティブを指定できます。サポートされていないディレクティブは、サービスプロバイダが使用しようとしても、その要求は失敗します。次の表に、利用可能なオプションの詳細を示します。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>ディレクティブ</p></th>
+<th align="left" valign="top" scope="column"><p>目的</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>ディスカバリサービスでは、リソースをホストしているサービスインスタンスに対するクライアントの認証を有効にするため、応答に SAML 表明 (<tt>AuthenticationStatement</tt> を含む) が含まれている必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>ディスカバリサービスでは、セッションの状態を示す応答に SAML 表明 (<tt>SessionContextStatement</tt> を含む) が含まれている必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p> ディスカバリサービスでは、クライアントがリソースにアクセス可能かどうかを示す応答に
+SAML 表明 (<tt>ResourceAccessStatement</tt> を含む) が含まれる必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>ディスカバリサービスは、すべてのクライアント宛ての応答に含まれるリソース ID を暗号化する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>ベアラートークン認証と組み合わせて使用するため、ディスカバリサービスは、リソースへのベアラーのアクセス権を与えるトークンを生成する必要があります。</p></td>
+</tr>
+</table>
+<hr><p><b>注意 &#8211; </b><tt>AuthorizeRequestor</tt> ディレクティブと <tt>EncryptResourceID</tt> ディレクティブは組み合わせて使用できません。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

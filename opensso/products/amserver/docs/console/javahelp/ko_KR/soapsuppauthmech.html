@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>지원되는 인증 기법 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="soapsuppauthmech"></a><h4>지원되는 인증 기법</h4>
+<a name="indexterm-165"></a><a name="indexterm-166"></a><p>이 속성은 SOAP 수신자가 지원하는 인증 기법을 지정합니다. 인증 기법은 데이터 무결성
+및 암호화와 함께 사용자 인증을 제공합니다. 기본적으로 사용 가능한 모든 인증 기법이
+선택됩니다. 인증 방법을 선택하지 않은 경우 선택하지 않은 인증 방법을 사용하여 웹
+서비스 사용자(WSC)가 요청을 보내면 해당 요청이 거부됩니다. 다음은 지원되는 인증 기법의 목록입니다.
+</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+<br/>
+
+</body>
+</html>

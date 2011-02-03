@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Richtlinienkonfiguration - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>Richtlinienkonfiguration</h4>
+<p><a name="indexterm-191"></a>Mit den Attributen zur Richtlinienkonfiguration kann der Administrator globale Eigenschaften und Bereichseigenschaften
+festlegen, die vom Richtliniendienst verwendet werden.</p>
+<ul><li><p><a href="#fufnk">Globale Eigenschaften</a></p></li>
+<li><p><a href="#fufmb">Bereichsattribute</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>Globale Eigenschaften</h5>
+<p>Es gibt folgende globale Eigenschaften:</p>
+
+<a name="gciwg"></a><h5>Ressourcen-Vergleichsoperator</h5>
+<p>Gibt die Ressourcen-Vergleichsinformationen an, die f&#252;r den Vergleich der in einer Richtlinienregeldefinition
+angegebenen Ressourcen verwendet werden. Der Ressourcenvergleich wird sowohl f&#252;r die Erstellung als
+auch f&#252;r die Bewertung von Richtlinien verwendet.</p><p>Klicken Sie auf ";Hinzuf&#252;gen" und legen Sie die folgenden Attribute fest:</p><dl><dt>Diensttyp</dt>
+<dd><p>Gibt den Dienst an, f&#252;r den der Vergleichsoperator verwendet werden soll.</p></dd>
+<dt>Klasse</dt>
+<dd><p>Gibt die Java-Klasse an, die den Ressourcen-Vergleichsalgorithmus implementiert. </p></dd>
+<dt>Trennzeichen</dt>
+<dd><p>Gibt das Trennzeichen an, das im Ressourcennamen verwendet werden soll. </p></dd>
+<dt>Platzhalter</dt>
+<dd><p>Gibt das Platzhalterzeichen an, das in Ressourcennamen definiert werden kann.</p></dd>
+<dt>Ein Ebenenplatzhalter</dt>
+<dd><p>Steht f&#252;r 0 oder mehr Zeichen in derselben Trennzeichengrenze.</p></dd>
+<dt>Gro&#223;-/Kleinschreibung</dt>
+<dd><p>Gibt an, ob beim Vergleich zweier Ressourcen die Gro&#223;-/Kleinschreibung beachtet werden muss. Bei ";False" wird die Schreibweise ignoriert, bei "True" wird sie beachtet.</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>Bewertung bei Verweigerungsentscheidung fortsetzen</h5>
+<p>Legt fest, ob das Richtlinien-Framework nachfolgende Richtlinien bewerten soll, wenn bereits eine
+DENY-Richtlinienentscheidung existiert. In der Standardeinstellung (deaktiviert) werden bei der Richtlinienbewertung nachfolgende Richtlinien
+ignoriert, sobald eine DENY-Entscheidung eingeht.</p>
+
+<a name="fufng"></a><h5>Von OpenSSO verarbeitbare Advices</h5>
+<p>Legt die Namen der Richtlinien-Advice-Schl&#252;ssel fest, bei denen die Richtliniendurchsetzungsinstanz (Richtlinienagent) den
+Benutzeragenten zu OpenSSO umleitet. Wenn der Agent eine Richtlinienentscheidung erh&#228;lt, die zwar
+den Zugriff auf eine Ressource ablehnt, die jedoch Advices enth&#228;lt, &#252;berpr&#252;ft der
+Agent, ob dieses Attribut einen entsprechenden Advice-Schl&#252;ssel enth&#228;lt.</p><p>Ist ein solcher Advice-Schl&#252;ssel vorhanden, wird der Benutzeragent zu OpenSSO umgeleitet. Dies
+kann den Zugriff auf die Ressource nun zulassen.</p>
+
+<a name="gdpdm"></a><h5>Organisations-Aliasbez&#252;ge</h5>
+<p>Wenn dieses Attribut auf ";Ja" eingestellt ist, k&#246;nnen Sie Richtlinien in Unterbereichen
+erstellen, ohne Bezugsrichtlinien im oberen bzw. &#252;bergeordneten Bereich erstellen zu m&#252;ssen. Sie
+k&#246;nnen nur Richtlinien zum Schutz von HTTP- bzw. HTTPS-Ressourcen erstellen, deren vollst&#228;ndiger
+Hostname mit dem DNS-Alias des Bereichs &#252;bereinstimmt. Standardm&#228;&#223;ig ist f&#252;r dieses Attribut
+der Wert "Nein" angegeben. </p>
+
+<a name="fufmb"></a><h5>Bereichsattribute</h5>
+<p>Es gibt folgende LDAP-Eigenschaften:</p>
+
+<a name="fufmg"></a><h5>Prim&#228;rer LDAP-Server</h5>
+<p>Gibt den Hostnamen und die Anschlussnummer des w&#228;hrend der OpenSSO-Installation festgelegten prim&#228;ren
+LDAP-Servers an, der f&#252;r die Suche nach Richtlinienobjekten wie LDAP-Benutzer, LDAP-Rollen oder
+LDAP-Gruppen verwendet wird.</p><p>Das Format lautet <i>hostname:port</i>. For example: <tt>machine1.example.com:389</tt></p><p>Bei einer Failover-Konfiguration mit mehreren LDAP-Serverhosts kann dieser Wert auch eine durch
+Leerzeichen getrennte Hostliste sein. Das Format lautet <i> hostname1:port1 hostname2:port2...</i></p><p>For example: <tt>machine1.example1.com:389 machine2.example1.com:389 </tt></p><p>Bei Mehrfacheingaben muss der lokale Servername vorangestellt werden. Nur so k&#246;nnen bestimmte
+OpenSSOs so konfiguriert werden, dass sie mit bestimmten Directory Servern kommunizieren k&#246;nnen.</p><p>Das Format lautet <i>servername|hostname:port</i> Beispiel:</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>F&#252;r die Failover-Konfiguration:</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389 </tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>LDAP-Basis-DN</h5>
+<p>Legt den Basis-DN des LDAP-Servers fest, bei dem die Suche beginnt. Standardm&#228;&#223;ig
+ist dies der oberste Bereich der OpenSSO-Installation.</p>
+
+<a name="fufmd"></a><h5>LDAP-Benutzer-Basis-DN</h5>
+<p>Dieses Attribut legt den vom LDAP-Benutzer-Betreff verwendeten Basis-DN des LDAP-Servers fest, bei
+dem die Suche beginnt. Standardm&#228;&#223;ig ist dies der oberste Bereich der OpenSSO-Installationsbasis.</p>
+
+<a name="fufmz"></a><h5>Basis-DN f&#252;r OpenSSO-Rollen</h5>
+<p>Legt den DN des Bereichs bzw. der Organisation fest, der bei der
+Suche nach den Werten von OpenSSO-Rollen als Basis verwendet wird. Dieses Attribut
+wird vom <i>AccessManagerRoles</i>-Richtlinienbetreff verwendet.</p>
+
+<a name="fufme"></a><h5>LDAP-BIND-DN</h5>
+<p>Dieses Attribut gibt den BIND-DN des LDAP-Servers an.</p>
+
+<a name="fufmf"></a><h5>LDAP-BIND-Passwort</h5>
+<p>Dieses Attribut legt das Passwort fest, dass f&#252;r die Verbindung zum LDAP-Server
+verwendet wird. Standardm&#228;&#223;ig wird das Passwort <tt>amldapuser</tt>, das w&#228;hrend der Installation eingegeben
+wurde, als Bind-Benutzer verwendet.</p>
+
+<a name="fufmn"></a><h5>Suchfilter (LDAP-Organisation)</h5>
+<p>Gibt den Suchfilter an, der bei der Suche nach Organisationseintr&#228;ge verwendet wird.
+Der Standardwert lautet <tt>(objectclass=sunMangagedOrganization)</tt>.</p>
+
+<a name="fufmm"></a><h5>Suchbereich (LDAP-Organisationen)</h5>
+<p>Legt den Bereich fest, der nach Organisationseintr&#228;gen durchsucht wird. Der Bereich muss
+einer der folgenden Werte sein:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (Standardwert)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>Suchbereich (LDAP-Gruppen)</h5>
+<p>Legt den Bereich fest, der nach Gruppeneintr&#228;gen durchsucht wird. Der Bereich muss
+einer der folgenden Werte sein:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (Standardwert)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>Suchfilter (LDAP-Gruppen)</h5>
+<p>Gibt den Suchfilter an, der bei der Suche nach Gruppeneintr&#228;gen verwendet wird.
+Der Standardwert ist <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fufms"></a><h5>Suchfilter (LDAP-Benutzer)</h5>
+<p>Gibt den Suchfilter an, der bei der Suche nach Benutzereintr&#228;gen verwendet wird.
+Der Standardwert lautet <tt>(objectclass=inetorgperson)</tt>.</p>
+
+<a name="fufmt"></a><h5>Suchbereich (LDAP-Benutzer)</h5>
+<p>Legt den Bereich fest, der nach Benutzereintr&#228;gen durchsucht wird. Der Bereich muss
+einer der folgenden Werte sein:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (Standardwert)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>Suchfilter (LDAP-Rollen)</h5>
+<p>Gibt den Suchfilter an, der bei der Suche nach Rolleneintr&#228;gen verwendet wird.
+Der Standard lautet <tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions)) </tt>.</p>
+
+<a name="fufmw"></a><h5>Suchbereich (LDAP-Rollen)</h5>
+<p>Legt den Bereich fest, der nach Rolleneintr&#228;gen durchsucht wird. Der Bereich muss
+einer der folgenden Werte sein:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (Standardwert)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>Suchbereich (OpenSSO-Rollen)</h5>
+<p>Legt den Bereich fest, der nach OpenSSO-Rollenbetreffeintr&#228;gen durchsucht wird.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (Standardwert)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>Suchattribut (LDAP-Organisation)</h5>
+<p>Legt den bei der Suche nach einer Organisation verwendeten Attributtyp fest. Der
+Standardwert ist o.</p>
+
+<a name="fufmr"></a><h5>Suchattribut (LDAP-Gruppen)</h5>
+<p>Legt den bei der Suche nach einer Gruppe verwendeten Attributtyp fest. Der
+Standardwert ist <tt>cn</tt>.</p>
+
+<a name="fufmu"></a><h5>Suchattribut (LDAP-Benutzer)</h5>
+<p>Legt den bei der Suche nach einem Benutzer verwendeten Attributtyp fest. Der
+Standardwert lautet <tt>uid.</tt></p>
+
+<a name="fufmx"></a><h5>Suchattribut (LDAP-Rollen)</h5>
+<p>Legt den bei der Suche nach einer Rolle verwendeten Attributtyp fest. Der
+Standardwert ist <tt>cn</tt>.</p>
+
+<a name="fufnj"></a><h5>Maximale Ergebnisse aus Suchlauf</h5>
+<p>Legt fest, wie viele Suchergebnisse maximal angezeigt werden. The default value is
+100. If the search limit exceeds the amount specified, the entries that
+have been found to that point will be returned.</p>
+
+<a name="fufnl"></a><h5>Timeout f&#252;r Suche</h5>
+<p>Dieses Attribut gibt an, wie lange eine Suche fortgesetzt wird, bevor sie
+wegen Zeit&#252;berschreitung abgebrochen wird. Wenn die Suche l&#228;nger dauert, als der angegebene
+Wert zul&#228;sst, werden nur die Eintr&#228;ge zur&#252;ckgegeben, die bis zu diesem Punkt
+gefunden wurden.</p>
+
+<a name="fufmi"></a><h5>LDA-SSL</h5>
+<p>Gibt an, ob der LDAP-Server SSL unterst&#252;tzt. Durch Aktivierung dieses Attributs wird
+die Unterst&#252;tzung von SSL aktiviert, durch Deaktivierung (Standard) wird die Unterst&#252;tzung von
+SSL deaktiviert.</p><p>Wenn der LDAP-Server mit aktiviertem SSL (LDAPS) ausgef&#252;hrt wird, muss OpenSSO mit
+den entsprechenden vertrauensw&#252;rdigen SSL-Zertifikaten konfiguriert sein, damit OpenSSO &#252;ber das LDAPS-Protokoll eine
+Verbindung zum Directory Server herstellen kann.</p>
+
+<a name="fufmk"></a><h5>LDAP-Verbindung Pool-Mindestgr&#246;&#223;e</h5>
+<p>Gibt die minimale Gr&#246;&#223;e der Verbindungspools an, die f&#252;r die Verbindung zum
+Directory Server verwendet werden, der im LDAP Server-Attribut festgelegt ist. Der Standardwert
+ist 1.</p>
+
+<a name="fufmj"></a><h5>Maximalgr&#246;&#223;e des Verbindungspools</h5>
+<p>Gibt die maximale Gr&#246;&#223;e der Verbindungspools an, die f&#252;r die Verbindung zum
+Directory Server verwendet werden, der im LDAP Server-Attribut festgelegt ist. Der Standardwert
+ist 10.</p>
+
+<a name="fufna"></a><h5>Ausgew&#228;hlte Richtlinienbetreffe</h5>
+<p>Erm&#246;glicht Ihnen die Auswahl eines Satzes von Betrefftypen, die f&#252;r die Richtliniendefinition
+innerhalb des Bereichs zur Verf&#252;gung stehen.</p>
+
+<a name="fufnc"></a><h5>Ausgew&#228;hlte Richtlinienbedingungen</h5>
+<p>Erm&#246;glicht Ihnen die Auswahl eines Satzes von Bedingungstypen, die f&#252;r die Richtliniendefinition
+innerhalb des Bereichs zur Verf&#252;gung stehen.</p>
+
+<a name="fufnd"></a><h5>Ausgew&#228;hlte Richtlinienbez&#252;ge</h5>
+<p>Erm&#246;glicht Ihnen die Auswahl eines Satzes von Bezugstypen, die f&#252;r die Richtliniendefinition
+innerhalb des Bereichs zur Verf&#252;gung stehen.</p>
+
+<a name="fufml"></a><h5>Time to Live f&#252;r Betreffergebnis</h5>
+<p>Dieses Attribut gibt an, wie lange (in Minuten) ein gecachtes Betreffergebnis verwendet
+werden kann, um eine gleichartige Richtlinienanfrage aufgrund des Single Sign-on-Tokens zu beantworten.</p><p>Wenn die Richtlinie zuerst f&#252;r ein SSO-Token bewertet wird, wird anhand der
+Betreffinstanzen der Richtlinie festgestellt, ob die Richtlinie f&#252;r einen bestimmten Benutzer zutrifft.
+Das Betreffergebnis, das in der SSO-Token-ID verschl&#252;sselt ist, wird durch die Richtlinie
+gecacht. Wenn f&#252;r die gleiche SSO-Token-ID dieselbe Richtlinie innerhalb der im Attribut
+";Time to Live f&#252;r Betreffergebnis" angegebenen Zeitspanne bewertet wird, wird statt einer
+erneuten Bewertung der Betreffinstanzen das gecachte Betreffergebnis verwendet. Dadurch wird die f&#252;r
+die Richtlinienbewertung ben&#246;tigte Zeit deutlich verringert.</p>
+
+<a name="fufnm"></a><h5>Benutzer-Alias</h5>
+<p>Dieses Attribut muss aktiviert sein, wenn Sie eine Richtlinie zum Schutz einer
+Ressource erstellen, deren Objekt ein Mitglied eines entfernten Directory Servers enth&#228;lt, das
+Alias f&#252;r einen lokalen Benutzer ist. Dieses Attribut muss aktiviert sein, wenn
+Sie beispielsweise auf dem entfernten Directory Server den Benutzer <tt>uid=rmuser</tt> erstellen und
+dann in OpenSSO <tt>rmuser</tt> als Alias f&#252;r einen lokalen Benutzer hinzuf&#252;gen (beispielsweise
+f&#252;r <tt>uid=luser</tt>). Wenn Sie sich als  <tt>rmuser</tt> anmelden, wird eine Sitzung
+f&#252;r den lokalen Benutzer (<tt>luser</tt>) aufgebaut. Die Richtlinie wurde erfolgreich durchgef&#252;hrt.</p>
+
+<a name="fufni"></a><h5>Ausgew&#228;hlte Response-Anbieter</h5>
+<p>Legt die f&#252;r den Bereich aktivierten Response-Anbieter-Plugins f&#252;r Richtlinien fest. Nur die
+in diesem Attribut ausgew&#228;hlten Response-Anbieter-Plugins k&#246;nnen den im Bereich definierten Richtlinien hinzugef&#252;gt
+werden.</p>
+
+<a name="fufnn"></a><h5>Ausgew&#228;hlte dynamische Antwortattribute</h5>
+<p>Legt die f&#252;r den Bereich aktivierten dynamischen Antwortattribute fest. Nur eine Teilmenge
+der in diesem Attribut ausgew&#228;hlten Namen kann in der dynamischen Attributliste in
+<i>IDResponseProvider</i> festgelegt und den im Bereich definierten Richtlinien hinzugef&#252;gt werden.</p>
+<br/>
+
+</body>
+</html>

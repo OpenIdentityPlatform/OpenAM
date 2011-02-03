@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: lib-arch-metadata.xsd,v 1.4 2008/06/25 05:48:41 qcheng Exp $
+
+-->
+
+
+<xs:schema targetNamespace="urn:liberty:metadata:2003-08" xmlns="urn:liberty:metadata:2003-08" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+  <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+  <xs:import namespace="urn:oasis:names:tc:SAML:1.0:assertion" schemaLocation="cs-sstc-schema-assertion-01.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:include schemaLocation="lib-arch-utility.xsd"/>
+  <xs:annotation>
+    <xs:documentation>XML Schema fom Metadata description and discovery protocols</xs:documentation>
+    <xs:documentation>The source code in this XSD file was excerpted verbatim from:
+
+Liberty Metadata Description and Discovery Specification
+Version 1.0
+12th November 2003
+
+Copyright (c) 2003 Liberty Alliance participants, see
+https://www.projectliberty.org/specs/idff_copyrights.html
+
+</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="entityIDType">
+    <xs:restriction base="xs:anyURI">
+      <xs:maxLength value="1024" id="maxlengthid"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--
+  <xs:attribute name="libertyPrincipalIdentifier" type="entityIDType"/>
+  <xs:attribute name="providerID" type="entityIDType"/>
+  <xs:attribute name="validUntil" type="xs:dateTime"/>
+  <xs:attribute name="cacheDuration" type="xs:duration"/>
+  -->
+  <xs:complexType name="additionalMetadataLocationType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:attribute name="namespace" type="xs:anyURI"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="organizationType">
+    <xs:sequence>
+      <xs:element name="OrganizationName" type="organizationNameType" maxOccurs="unbounded"/>
+      <xs:element name="OrganizationDisplayName" type="organizationDisplayNameType" maxOccurs="unbounded"/>
+      <xs:element name="OrganizationURL" type="localizedURIType" maxOccurs="unbounded"/>
+      <xs:element ref="Extension" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="organizationNameType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute ref="xml:lang"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="organizationDisplayNameType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute ref="xml:lang" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="localizedURIType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anyURI">
+        <xs:attribute ref="xml:lang" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="contactType">
+    <xs:sequence>
+      <xs:element name="Company" type="xs:string" minOccurs="0"/>
+      <xs:element name="GivenName" type="xs:string" minOccurs="0"/>
+      <xs:element name="SurName" type="xs:string" minOccurs="0"/>
+      <xs:element name="EmailAddress" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="TelephoneNumber" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="Extension" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="libertyPrincipalIdentifier" use="optional"/>
+    <xs:attribute name="contactType" type="attr.contactType" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="attr.contactType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="technical"/>
+      <xs:enumeration value="administrative"/>
+      <xs:enumeration value="billing"/>
+      <xs:enumeration value="other"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="keyTypes">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="encryption"/>
+      <xs:enumeration value="signing"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="providerDescriptorType">
+    <xs:sequence>
+      <xs:element ref="KeyDescriptor" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="SoapEndpoint" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="SingleLogoutServiceURL" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="SingleLogoutServiceReturnURL" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="FederationTerminationServiceURL" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="FederationTerminationServiceReturnURL" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="FederationTerminationNotificationProtocolProfile" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="SingleLogoutProtocolProfile" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="RegisterNameIdentifierProtocolProfile" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="RegisterNameIdentifierServiceURL" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="RegisterNameIdentifierServiceReturnURL" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="NameIdentifierMappingProtocolProfile" type="saml:AuthorityBindingType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="NameIdentifierMappingEncryptionProfile" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Organization" type="organizationType" minOccurs="0"/>
+      <xs:element name="ContactPerson" type="contactType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="AdditionalMetaLocation" type="additionalMetadataLocationType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="Extension" minOccurs="0"/>
+      <xs:element ref="ds:Signature" minOccurs="0"/>
+    </xs:sequence>
+    <!--xs:attribute ref="providerID" use="required"/-->
+    <xs:attribute name="protocolSupportEnumeration" type="xs:NMTOKENS" use="required"/>
+    <xs:attribute name="id" type="xs:ID" use="optional"/>
+    <xs:attribute name="validUntil" type="xs:dateTime" use="optional"/>
+    <xs:attribute name="cacheDuration" type="xs:duration" use="optional"/>
+  </xs:complexType>
+  <!--added-->
+  <xs:element name="KeyDescriptor" type="keyDescriptorType"/>
+  <xs:complexType name="keyDescriptorType">
+    <xs:sequence>
+      <xs:element name="EncryptionMethod" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="KeySize" type="xs:integer" minOccurs="0"/>
+      <xs:element ref="ds:KeyInfo" minOccurs="0"/>
+      <xs:element ref="Extension" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="use" type="keyTypes" use="optional"/>
+  </xs:complexType>
+  <!-- -->
+  <xs:element name="EntityDescriptor" type="entityDescriptorType"/>
+  <xs:group name="providerGroup">
+    <xs:sequence>
+      <xs:element ref="IDPDescriptor" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="SPDescriptor" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="entityDescriptorType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:group ref="providerGroup"/>
+        <xs:element name="AffiliationDescriptor" type="affiliationDescriptorType"/>
+      </xs:choice>
+      <xs:element name="ContactPerson" type="contactType" minOccurs="0"/>
+      <xs:element name="Organization" type="organizationType" minOccurs="0"/>
+      <xs:element ref="Extension" minOccurs="0"/>
+      <xs:element ref="ds:Signature" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="providerID" type="entityIDType" use="required"/>
+    <xs:attribute name="id" type="xs:ID" use="optional"/>
+    <xs:attribute name="validUntil"  use="optional"/>
+    <xs:attribute name="cacheDuration" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="SPDescriptorType">
+    <xs:complexContent>
+      <xs:extension base="providerDescriptorType">
+        <xs:sequence>
+          <xs:element name="AssertionConsumerServiceURL" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:simpleContent>
+                <xs:extension base="xs:anyURI">
+                  <xs:attribute name="id" type="xs:ID" use="required"/>
+                  <xs:attribute name="isDefault" type="xs:boolean" default="false"/>
+                </xs:extension>
+              </xs:simpleContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="AuthnRequestsSigned" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="IDPDescriptor" type="IDPDescriptorType"/>
+  <xs:element name="SPDescriptor" type="SPDescriptorType"/>
+  <xs:complexType name="IDPDescriptorType">
+    <xs:complexContent>
+      <xs:extension base="providerDescriptorType">
+        <xs:sequence>
+          <xs:element name="SingleSignOnServiceURL" type="xs:anyURI"/>
+          <xs:element name="SingleSignOnProtocolProfile" type="xs:anyURI" maxOccurs="unbounded"/>
+          <xs:element name="AuthnServiceURL" type="xs:anyURI" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="EntitiesDescriptor" type="entitiesDescriptorType"/>
+  <xs:complexType name="entitiesDescriptorType">
+    <xs:sequence>
+      <xs:element ref="EntityDescriptor" minOccurs="2" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="affiliationDescriptorType">
+    <xs:sequence>
+      <xs:element name="AffiliateMember" type="entityIDType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="Extension" minOccurs="0"/>
+      <xs:element ref="KeyDescriptor" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="ds:Signature" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="affiliationID" type="entityIDType" use="required"/>
+    <xs:attribute name="affiliationOwnerID" type="entityIDType" use="required"/>
+    <xs:attribute name="validUntil" type="xs:dateTime" use="optional"/>
+    <xs:attribute name="cacheDuration" type="xs:duration" use="optional"/>
+    <xs:attribute name="id" type="xs:ID" use="optional"/>
+  </xs:complexType>
+</xs:schema>

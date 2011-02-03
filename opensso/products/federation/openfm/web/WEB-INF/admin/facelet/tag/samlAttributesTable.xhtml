@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: samlAttributesTable.xhtml,v 1.1 2009/10/07 20:00:51 ggennaro Exp $
+
+-->
+
+<ui:composition
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net"
+    xmlns:f="http://java.sun.com/jsf/core">
+
+    <f:subview>
+
+        <ice:dataTable
+            headerClasses="inputFieldColumn, inputFieldColumn, optionsColumn"
+            columnClasses="inputFieldColumn, inputFieldColumn, optionsColumn"
+            styleClass="dynamicTable"
+            var="attributeMapItem"
+            value="#{samlAttributesTable.attributeMapItems}">
+            
+            <ice:column>
+                <f:facet name="header">
+                    <ice:outputText
+                        value="#{resources['samlAttributesTable.assertionAttributeNameLabel']}" />
+                </f:facet>
+                <ice:outputText 
+                    rendered="#{!attributeMapItem.editing &amp;&amp; attributeMapItem.assertionAttributeName == null}"
+                    style="color: #ccc; font-style: italic;"
+                    value="#{resources['samlAttributesTable.localAttributeNotUsed']}" />
+                <ice:outputText 
+                    rendered="#{!attributeMapItem.editing &amp;&amp; attributeMapItem.assertionAttributeName != null}"
+                    value="#{attributeMapItem.assertionAttributeName}" />
+                <ice:inputText
+                    maxsize="50"
+                    size="25"
+                    rendered="#{attributeMapItem.editing}"
+                    value="#{attributeMapItem.newAssertionAttributeName}" />
+                <f:facet name="footer">
+                    <ice:inputText
+                        maxsize="50"
+                        size="25"
+                        rendered="#{samlAttributesTable.showingAddAttribute}"
+                        value="#{samlAttributesTable.newAssertionAttributeName}" />
+                </f:facet>
+            </ice:column>
+
+            <ice:column>
+                <f:facet name="header">
+                    <ice:outputText
+                        value="#{resources['samlAttributesTable.localAttributeNameLabel']}" />
+                </f:facet>
+                <ice:outputText 
+                    rendered="#{!attributeMapItem.editing || !attributeMapItem.custom}"
+                    value="#{attributeMapItem.localAttributeName}" />
+                <ice:inputText
+                    maxsize="50"
+                    size="25"
+                    rendered="#{attributeMapItem.editing &amp;&amp; attributeMapItem.custom}"
+                    value="#{attributeMapItem.newLocalAttributeName}" />
+                <f:facet name="footer">
+                    <ice:inputText
+                        maxsize="50"
+                        size="25"
+                        rendered="#{samlAttributesTable.showingAddAttribute}"
+                        value="#{samlAttributesTable.newLocalAttributeName}" />
+                </f:facet>
+            </ice:column>
+
+            <ice:column>
+                <f:facet name="header">
+                    <ice:outputText
+                        value="#{resources['samlAttributesTable.attributeMappingOptions']}" />
+                </f:facet>
+                <ice:panelGroup
+                    rendered="#{!attributeMapItem.editing}" >
+                    <ice:commandLink
+                        actionListener="#{samlAttributesTableHandler.editListener}">
+                        <f:attribute name="attributeMapItem" value="#{attributeMapItem}" />
+                        <ice:outputText
+                            value="#{resources['samlAttributesTable.editLink']}" />
+                    </ice:commandLink>
+                    <ice:outputText value=" | " />
+                    <ice:commandLink
+                        actionListener="#{samlAttributesTableHandler.removeListener}"
+                        disabled="#{attributeMapItem.assertionAttributeName == null}">
+                        <f:attribute name="samlAttributesTable" value="#{samlAttributesTable}" />
+                        <f:attribute name="attributeMapItem" value="#{attributeMapItem}" />
+                        <ice:outputText
+                            value="#{resources['samlAttributesTable.removeLink']}" />
+                    </ice:commandLink>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    rendered="#{attributeMapItem.editing}" >
+                    <ice:commandLink
+                        actionListener="#{samlAttributesTableHandler.saveListener}">
+                        <f:attribute name="attributeMapItem" value="#{attributeMapItem}" />
+                        <ice:outputText
+                            value="#{resources['samlAttributesTable.saveLink']}" />
+                    </ice:commandLink>
+                    <ice:outputText value=" | " />
+                    <ice:commandLink
+                        actionListener="#{samlAttributesTableHandler.cancelSaveListener}">
+                        <f:attribute name="attributeMapItem" value="#{attributeMapItem}" />
+                        <ice:outputText
+                            value="#{resources['samlAttributesTable.cancelSaveLink']}" />
+                    </ice:commandLink>
+                </ice:panelGroup>
+                <f:facet name="footer">
+                    <ice:panelGroup>
+                        <ice:panelGroup
+                            visible="#{samlAttributesTable.showingAddAttribute}">
+                            <ice:commandLink
+                                actionListener="#{samlAttributesTableHandler.addListener}">
+                                <f:attribute name="samlAttributesTable" value="#{samlAttributesTable}" />
+                                <ice:outputText
+                                    value="#{resources['samlAttributesTable.addLink']}" />
+                            </ice:commandLink> 
+                            <ice:outputText value=" | " />
+                            <ice:commandLink
+                                actionListener="#{samlAttributesTableHandler.cancelAddListener}">
+                                <f:attribute name="samlAttributesTable" value="#{samlAttributesTable}" />
+                                <ice:outputText
+                                    value="#{resources['samlAttributesTable.cancelAddLink']}" />
+                            </ice:commandLink> 
+                        </ice:panelGroup>
+                        <ice:commandLink
+                            actionListener="#{samlAttributesTableHandler.showAddListener}"
+                            visible="#{!samlAttributesTable.showingAddAttribute}">
+                            <f:attribute name="samlAttributesTable" value="#{samlAttributesTable}" />
+                            <ice:outputText
+                                value="#{resources['samlAttributesTable.addNewLink']}" />
+                        </ice:commandLink> 
+                    </ice:panelGroup>
+                </f:facet>
+            </ice:column>
+            
+        </ice:dataTable>
+
+    </f:subview>
+</ui:composition>

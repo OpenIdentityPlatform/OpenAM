@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a Connection Pool &#8212; Example - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="jdbcexample"></a><h5>To Configure a Connection Pool &#8212; Example</h5>
+<p>The following example shows how to set up a connection pool for Web
+Server and MySQL 4.0:</p><ol>
+<li><b>In the Web Server console, create a JDBC connection pool with the following
+attributes:</b><dl><dt>poolName</dt>
+<dd><p><tt>samplePool</tt></p></dd>
+<dt>DataSource Classname</dt>
+<dd><p><tt>com.mysql.jdbc.jdbc2.optional.MysqlDatacSource</tt> </p></dd>
+<dt>serverName</dt>
+<dd><p>Server name of the mySQL server.</p></dd>
+<dt>port</dt>
+<dd><p>Port number on which mySQL server is running.</p></dd>
+<dt>user</dt>
+<dd><p>User name of the database password.</p></dd>
+<dt>password</dt>
+<dd><p> The password of the user.</p></dd>
+<dt>databaseName</dt>
+<dd><p>The name of the database.</p></dd>
+</dl>
+
+<hr><p><b>Note &#8211; </b>The jar file which contain the <i>DataSource</i> class and the JDBC Driver class
+mentioned in the following steps should be added to the application class path</p>
+<hr>
+</li>
+<li><b>Configure the JDBC Resources. In the Web Server console, create a JDBC resource
+with the following attributes:</b><dl><dt>JNDI name</dt>
+<dd><p><i>jdbc/samplePool</i></p></dd>
+<dt>Pool name</dt>
+<dd><p><i>samplePool</i></p></dd>
+<dt>Data Resource Enabled</dt>
+<dd><p><i>on</i></p></dd>
+</dl>
+</li>
+<li><b>Add the following lines to the <tt>sun-web.xml</tt> file of the application:</b><pre>&#60;resource-ref>
+      &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+      &#60;jndi-name>jdbc/samplePool&#60;/jndi-name>
+&#60;/resource-ref></pre></li>
+<li><b>Add the following lines to the web.xml file of the application:</b><pre>&#60;resource-ref>
+       &#60;description>mySQL Database&#60;/description>
+       &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+       &#60;res-type>javax.sql.DataSource&#60;/res-type>
+       &#60;res-auth>Container&#60;/res-auth>
+&#60;/resource-ref></pre></li>
+<li><b>Once you have completed the settings the value for this attribute is becomes
+<i>java:comp/env/jdbc/mySQL</i>.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: Membership.xml,v 1.9 2009/07/16 04:12:01 cbasha Exp $
+
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="Membership" version="1.0" >
+
+    <Callbacks length="3" order="1" timeout="120" header="Module d&apos;auto-enregistrement" template="membership.jsp" >
+        <NameCallback>
+            <Prompt> Nom d&apos;utilisateur : </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> Mot de passe : </Prompt>    
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Connexion </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Nouvel utilisateur </Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+
+    <Callbacks length="4" order="2" timeout="240" header="Expiration du mot de passe, modifiez-le&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
+        <PasswordCallback echoPassword="false" >
+            <Prompt> Mot de passe actuel : </Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> Nouveau mot de passe : </Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> Confirmation du nouveau mot de passe : </Prompt>
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Envoyer </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Annuler </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="0" order="3" timeout="120" template="wrongPassword.jsp" />
+    
+    <Callbacks length="0" order="4" timeout="120" template="noUserProfile.jsp" />
+    
+    <Callbacks length="0" order="5" timeout="120" template="noUserName.jsp" />
+    
+    <Callbacks length="0" order="6" timeout="120" template="noPassword.jsp" />
+    
+    <Callbacks length="0" order="7" timeout="120" template="noConfirmation.jsp" />
+    
+    <Callbacks length="0" order="8" timeout="120" template="passwordMismatch.jsp" />
+    
+    <Callbacks length="0" order="9" timeout="120" template="configuration.jsp" />
+    
+    <Callbacks length="0" order="10" timeout="120" template="userExists.jsp" />
+    
+    <Callbacks length="0" order="11" timeout="120" template="profileException.jsp" />
+    
+    <Callbacks length="0" order="12" timeout="120" template="missingReqField.jsp" />
+    
+    <Callbacks length="0" order="13" timeout="120" template="userPasswordSame.jsp" />
+
+    <Callbacks length="0" order="14" timeout="120" template="invalidPassword.jsp" />
+    
+    <Callbacks length="0" order="15" timeout="120" header="Votre mot de passe a expiré. Veuillez contacter le service d&apos;assistance pour réinitialiser votre mot de passe." error="true"  />
+    
+    <Callbacks length="8" order="16" timeout="300" header="Auto-enregistrement" template="register.jsp" >
+        <NameCallback isRequired="true" attribute="uid" >
+            <Prompt> Nom d&apos;utilisateur : </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
+            <Prompt> Mot de passe : </Prompt>    
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" >
+            <Prompt> Confirmation du mot de passe : </Prompt>    
+        </PasswordCallback>
+        <NameCallback isRequired="true" attribute="givenname" >
+            <Prompt> Prénom : </Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="sn" >
+            <Prompt> Nom : </Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="cn" >
+            <Prompt> Nom complet : </Prompt>
+        </NameCallback>
+        <NameCallback attribute="mail" >
+            <Prompt> Adresse e-mail : </Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Enregistrer </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Annuler </Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="2" order="17" timeout="120" header="Auto-enregistrement" >
+        <ChoiceCallback attribute="uid" >
+            <Prompt>Un utilisateur existe déjà pour&lt;BR&gt;le nom d&apos;utilisateur saisi.&lt;BR&gt;Veuillez sélectionner l&apos;un&lt;BR&gt;des noms suivants&lt;BR&gt;ou créez-en un nouveau :</Prompt>
+            <ChoiceValues>
+              <ChoiceValue>
+                  <Value>Créer mon propre nom</Value>
+              </ChoiceValue>
+            </ChoiceValues>
+        </ChoiceCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Envoyer </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="1" order="18" timeout="120" template="disclaimer.jsp" >
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Accepter </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Refuser </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+</ModuleProperties>

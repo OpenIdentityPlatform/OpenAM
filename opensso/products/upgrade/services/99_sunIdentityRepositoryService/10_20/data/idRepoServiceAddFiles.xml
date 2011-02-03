@@ -1,0 +1,112 @@
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: idRepoServiceAddFiles.xml,v 1.2 2008/06/25 05:54:08 qcheng Exp $
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/iplanet/am/amadmin/cli/amAdmin.dtd">
+
+<Requests>
+    <SubSchema name="files"
+        inheritance="multiple"
+        i18nKey="a3000">
+        <AttributeSchema name="RequiredValueValidator"
+            type="validator"
+            syntax="string">
+            <DefaultValues>
+                <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+            </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunIdRepoClass"
+            type = "single"
+            syntax = "string"
+            any="required"
+            validator="RequiredValueValidator"
+            i18nKey = "a3010">
+            <DefaultValues>
+                <Value>com.sun.identity.idm.plugins.files.FilesRepo</Value>
+            </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesIdRepoDirectory"
+            type="single" syntax="string"
+            validator="RequiredValueValidator" i18nKey="a3020">
+            <DefaultValues>
+                <Value>/var/opt/SUNWam/idm/flatfiles</Value>
+            </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesMonitorForChanges"
+            type="single"
+            syntax="boolean"
+            i18nKey="a3022">
+            <DefaultValues>
+	        <Value>true</Value>
+	    </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesMonitoringTime"
+            type="single"
+            syntax="string"
+            i18nKey="a3024">
+	    <DefaultValues>
+		<Value>1</Value>
+	    </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesObjectClasses"
+            type="list"
+            syntax="string"
+            i18nKey="a3026">
+	    <DefaultValues>
+		<Value>inetorgperson</Value>
+		<Value>inetuser</Value>
+		<Value>organizationalperson</Value>
+		<Value>person</Value>
+		<Value>top</Value>
+	    </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesPasswordAttr"
+            type="single" syntax="string" i18nKey="a3030">
+            <DefaultValues>
+                <Value>userPassword</Value>
+            </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesStatusAttr"
+            type="single" syntax="string" i18nKey="a3040">
+            <DefaultValues>
+                <Value>inetUserStatus</Value>
+            </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesHashAttrs"
+            type="list" syntax="string" i18nKey="a3050">
+            <DefaultValues>
+                <Value>userPassword</Value>
+            </DefaultValues>
+        </AttributeSchema>
+        <AttributeSchema name="sunFilesEncryptAttrs"
+            type="list" syntax="string" i18nKey="a3060">
+        </AttributeSchema>
+     </SubSchema>
+</Requests>

@@ -1,0 +1,272 @@
+
+    <test name="SessionUpgradeSanityTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeSanityTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestSameModule">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="false"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestForceAuthSameModule">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="false"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeSanityTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm1"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeSanityTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm2"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeLevelSanityTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeLevelSanityTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeLevelMismatchTest">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeLevelMismatchTestForceAuth">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeLevelSanityTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm3"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeLevelSanityTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm4"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="ldapdatastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+    </test>
+    <test name="SessionUpgradeMismatchTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm17"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchLevelTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm18"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchLevelTestSubRealm">
+        <parameter name="forceAuth" value="false"/>
+        <parameter name="testRealm" value="upgradeRealm19"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>
+   <test name="SessionUpgradeMismatchTestForceAuthSubRealm">
+        <parameter name="forceAuth" value="true"/>
+        <parameter name="testRealm" value="upgradeRealm20"/>
+        <parameter name="testMode" value="level"/>
+        <parameter name="useDifferentModules" value="true"/>
+        <parameter name="upgradeTestType" value="mismatch"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.SessionUpgrade"/>
+        </classes>
+   </test>

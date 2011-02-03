@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>探索代理程式屬性 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.discoveryagentprofile"></a><h4>探索代理程式屬性</h4>
+<p>[探索代理程式] 設定檔保存了信任授權配置，Web 服務的用戶端/設定檔可以使用它來與「Liberty 探索」服務通訊，以進行 Web 服務查找、註冊及取得安全憑證。</p>
+
+<a name="gglro"></a><h5>群組</h5>
+<p>群組機制可讓您定義一個相似類型的代理程式的集合。您必須先定義群組，才能將特定代理程式加入集合中。</p>
+
+<a name="gglpn"></a><h5>密碼</h5>
+<p>定義「探索代理程式」的密碼。</p>
+
+<a name="ggloy"></a><h5>密碼確認</h5>
+<p>確認密碼。</p>
+
+<a name="ggtwd"></a><h5>狀態</h5>
+<p>定義代理程式在系統中將是使用中或非使用中。依預設，此屬性會設為使用中，表示代理程式將參與保護來自 Web 服務用戶端的外送 Web 服務請求的安全，並參與驗證來自 Web 服務提供者的 Web 服務回應。</p>
+
+<a name="ggloo"></a><h5>代理程式配置儲存庫的位置</h5>
+<p>此屬性為「探索代理程式」定義配置儲存庫的代理程式位置。</p>
+
+<a name="gglqv"></a><h5>私有金鑰別名</h5>
+<p>此屬性會定義私有憑證金鑰別名，該別名會用來簽署 Web 服務請求或解密 Web 服務回應。</p>
+
+<a name="gglny"></a><h5>探索服務端點</h5>
+<p>此屬性定義探索服務端點，信任授權用戶端會在其中建立通訊，以進行服務註冊與查找。</p>
+
+<a name="gglra"></a><h5>認證 Web 服務端點</h5>
+<p>此屬性定義認證服務端點，Web 服務用戶端會使用此端點來進行認證，方法是使用一般使用者的 SSOToken 接收探索服務資源提供 (亦稱為啟動程式資源提供)</p>
+<br/>
+
+</body>
+</html>

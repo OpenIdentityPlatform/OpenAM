@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amProviderConfig_addAttr.xml,v 1.2 2008/06/25 05:53:48 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Identity Server 2005Q4 Admin CLI DTD//EN"
+"jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  this file referenced by:
+
+  amadmin -u "xxx" -w "yyy" -t amProviderConfig_add.xml
+
+-->
+
+<Requests>
+    <AttributeSchema name="sunIdentityServerEncryptionKeyalias"
+	type="single"
+        i18nKey="a314">
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerProviderEnableProxy"
+	type="single"
+	syntax="boolean"
+	i18nKey="a326">
+    	<DefaultValues>
+	    <Value>false</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerProviderProxies"
+	type="list"
+	syntax="string"
+	i18nKey="a327">
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerProviderProxyCount"
+	type="single"
+	syntax="number"
+	i18nKey="a328">
+    </AttributeSchema>
+    <AttributeSchema name="sunIdentityServerNameIDPolicy"
+	type="single_choice"
+	syntax="string"
+	i18nKey="a329">
+	<ChoiceValues>
+	    <ChoiceValue i18nKey="a330">none</ChoiceValue>
+	    <ChoiceValue i18nKey="a331">onetime</ChoiceValue>
+	    <ChoiceValue i18nKey="a332">federated</ChoiceValue>
+	    <ChoiceValue i18nKey="a333">any</ChoiceValue>
+	</ChoiceValues>
+	<DefaultValues>
+	    <Value>federated</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerIntroductionForProxying"
+	type="single"
+	syntax="boolean"
+	i18nKey="a334">
+        <DefaultValues>
+	    <Value>false</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerAffiliationFederation"
+	type="single"
+	syntax="boolean"
+	i18nKey="a335">
+	<DefaultValues>
+	    <Value>false</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sunIdentityServerNameIdMappingEncryptionProfile"
+        type="list"
+        syntax="url"
+        i18nKey="a200">
+    </AttributeSchema>
+    <AttributeSchema name="sunIdentityServerAuthnServiceUrl"
+        type="single"
+        syntax="url"
+        i18nKey="a210">
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerNameIdentifierEncryption"
+        type="single"
+        syntax="boolean"
+        i18nKey="a336">
+	<DefaultValues>
+            <Value>true</Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name ="sunIdentityServerBootstrapping"
+	type="single"
+	syntax="boolean"
+	i18nKey="a337">
+	<DefaultValues>
+             <Value>true</Value>
+	</DefaultValues>
+    </AttributeSchema>
+</Requests>
+

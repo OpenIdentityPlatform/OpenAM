@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 SOAP Binding - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>SAMLv2 SOAP Binding</h4>
+<p>Der Dienst "SAMLv2 SOAP Binding" bietet SOAP-basierten Austausch von SAMLv2-Anforderungs- und -Antwortnachrichten
+zwischen einem OpenSSO-Client und dem OpenSSO-Server. Die empfangenen Anforderungen werden zur weiteren
+Verarbeitung an den Anforderungs-Handler delegiert. Der Schl&#252;ssel zum Anforderungs-Handler und Meta-Alias findet
+sich in der URL des SOAP Binding-Diensts. Eine Zuordnung zwischen Meta-Alias und
+Anforderungs-Handler wird im SAMLv2 SOAP Binding-Dienst gespeichert, der &#252;ber den Konfigurationsspeicher von
+OpenSSO gelesen werden kann. </p>
+
+<a name="ggokv"></a><h5>Anforderungs-Handler-Liste</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>Die Anforderungs-Handler-Liste ist eine Liste aus Eintr&#228;gen mit Schl&#252;ssel/Wert-Paaren, die die Zuordnung
+des Meta-Alias zur Anforderungs-Handler-Implementierung enthalten. Dieses Attribut muss festgelegt werden, wenn ein
+OpenSSO 8.0-Server konfiguriert wird, um als Policy Decision Point (PDP) zu fungieren.
+</p><p>Der <i>Schl&#252;ssel</i> ist der Meta-Alias des Policy Decision Point und die <i>Klasse</i>
+ist der Name der Java-Klasse, bei der es sich um die Implementierung
+der Anforderungs-Handler-Schnitttelle handelt, die  XACML-Anforderungen verarbeiten kann.  </p><p>Beispiel: Wenn der Meta-Alias des XACML Policy Decision Point <tt>/pdp </tt>und die Implementierung
+der Schnitttelle <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt> lautet, sollte der Schl&#252;ssel auf <tt>/pdp</tt> und die Klasse
+auf <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler </tt> gesetzt werden. </p>
+<br/>
+
+</body>
+</html>

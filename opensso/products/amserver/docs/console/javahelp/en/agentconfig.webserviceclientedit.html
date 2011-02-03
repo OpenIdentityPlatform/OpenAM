@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web Service Client Attributes - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceclientedit"></a><h4>Web Service Client Attributes</h4>
+<p>The Web Service Client agent profile describes the configuration that is used for
+securing outbound web service requests from a web service client. The name of
+the web service client must be unique across all agents.</p>
+
+<a name="gglmr"></a><h5>General</h5>
+<p>The following General attributes define basic web service client properties:</p>
+
+<a name="ggoue"></a><h5>Group</h5>
+<p>The Group mechanism allows you to define a collection of similar types of
+agents. The group must be dfined before including the particular agent into a
+collection. </p>
+
+<a name="ggowm"></a><h5>Password</h5>
+<p>Defines the password for the web service client agent.</p>
+
+<a name="ggoti"></a><h5>Password Confirm</h5>
+<p>Confirm the password.</p>
+
+<a name="ggllf"></a><h5>Status</h5>
+<p>Defines whether the web service client agent will be active or inactive in
+the system. By default, this attribute is set to active, meaning that the
+agent will participate in securing outbound web service requests from web service clients
+and will validate web service responses from a web service provider.</p>
+
+<a name="gglje"></a><h5>Universal Identifier</h5>
+<p>Lists the basic LDAP properties, that uniquely define the web service client agent.</p>
+
+<a name="gglnb"></a><h5>Security</h5>
+<p>The following attributes define web service client security attributes:</p>
+
+<a name="ggliy"></a><h5>Security Mechanism</h5>
+<p>Defines the type of security credential that is used to secure the web
+service client request. You can choose one of the following security credential types:</p>
+<ul><li><p>Anonymous &#8212; The anonymous security mechanism contains no security credentials.</p></li>
+<li><p>KerberosToken &#8212; Uses Kerberos security tokens.</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; Uses Liberty-based security tokens.</p></li>
+<li><p>SAML-HolderOfKey &#8212; Uses the SAML 1.1 assertion type Holder-Of-Key.</p></li>
+<li><p>SAML-SenderVouches &#8212; Uses the SAML 1.1 assertion type Sender Vouchest.</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8212; Uses the SAML 2.0 assertion token type Holder-Of-Key.</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8212; Uses the SAML 2.0 assertion token type Sender Vouches.</p></li>
+<li><p>STSSecurity &#8212; Uses the security token generated from the Security Token service for a given web service provider.</p></li>
+<li><p>UserNameToken &#8212; Uses User Name Token with digest password.</p></li>
+<li><p>UserNameToken-Plain &#8212; Uses a user name token with a clear text password for securing web service requests.</p></li>
+<li><p>X509Token &#8212; Uses the X509 certificate.</p></li></ul>
+
+
+<a name="gglmn"></a><h5>STS Configuration</h5>
+<p>This attribute is enabled when the web service client uses Security Token service
+(STS) as the Security Mechanism. This configuration describes a list of STS agent
+profiles that are used to communicate with and secure the web service requests
+to the STS service.</p>
+
+<a name="ggljq"></a><h5>Discovery Configuration</h5>
+<p>This attribute is enabled when the web service client is enabled for Discovery
+Service security. This configuration describes a list of Discovery Agent profiles that are
+used to secure requests made to the Discovery service.</p>
+
+<a name="ggljr"></a><h5>User Authentication Required</h5>
+<p>When enabled, this attribute defines that the services client's protected page requires a
+user to be authenticated in order to gain access.</p>
+
+<a name="gglmd"></a><h5>Preserve Security Headers in Message</h5>
+<p>When enabled, this attribute defines that the SOAP security headers are preserved by
+the web service client for further processing.</p>
+
+<a name="ghbbp"></a><h5>Use Pass Through Security Token</h5>
+<p>When enabled, this attribute indicates that the web service client will pass through
+the received Security token from the Subject. It will not try to create
+the token locally or from STS communication.</p>
+
+<a name="ggllx"></a><h5>Liberty Service Type URN</h5>
+<p>The URN (Universal Resource Name) describes a Liberty service type that the web
+service client will use for service lookups.</p>
+
+<a name="gglji"></a><h5>Credential for User Token</h5>
+<p>The attribute represents the username/password shared secrets that are used by the web
+service client to generate a Username security token.</p>
+
+<a name="ggliu"></a><h5>signing and Encryption</h5>
+<p>The following attributes define signing and encryption configuration for web service security:</p>
+
+<a name="gglna"></a><h5>Is Request signed</h5>
+<p>When enabled, the web services client signs the request using a given token
+type.</p>
+
+<a name="ggllb"></a><h5>Is Request Header Encrypted</h5>
+<p>When enabled, the web services client security header will be encrypted.</p>
+
+<a name="gglnh"></a><h5>Is Request Encrypted</h5>
+<p>When enabled, the web services client request will be encrypted.</p>
+
+<a name="ggljs"></a><h5>Is Response Signature Verified</h5>
+<p>When enabled, the web services response signature is verified.</p>
+
+<a name="gglks"></a><h5>Is Response Decrypted</h5>
+<p>When enabled, the web services response will be decrypted.</p>
+
+<a name="ggllsa"></a><h5>Key Store</h5>
+<p>The following attributes configure the keystore to be used for certificate storage and
+retrieval: </p>
+
+<a name="ggllda"></a><h5>Public Key Alias of Web Service Provider</h5>
+<p>This attribute defines the public certificate key alias that is used to encrypt
+the web service request or verify the signature of the web service response.</p>
+
+<a name="gglmca"></a><h5>Private Key Alias</h5>
+<p>This attribute defines the private certificate key alias that is used to sign
+the web service request or decrypt the web service response.</p>
+
+<a name="ggljfa"></a><h5>Key Storage Usage</h5>
+<p>This configuration defines whether to use the default keystore, or a custom keystore.
+The following values must be defined for a custom key store:</p>
+<ul><li><p>Location of Key Store</p></li>
+<li><p>Password of Key Store</p></li>
+<li><p>Password of Key</p></li></ul>
+
+
+<a name="endpoint"></a><h5>End Points</h5>
+<p>The following attributes define web service endpoints:</p>
+
+<a name="gglmpa"></a><h5>Web Service Proxy End Point</h5>
+<p>This attribute defines a web service end point to which the web service
+client is making a request. This end point is optional unless it is
+configured as a web security proxy.</p>
+
+<a name="ghbdv"></a><h5>Web Service End Point</h5>
+<p>This attribute defines a web service end point to which the web service
+client is making a request.</p>
+
+<a name="ghcei"></a><h5>Kerberos Configuration</h5>
+<p>Kerberos is a security profile supported by the web services security to secure
+web services communications between a web service client and a web service provider.
+In a typical scenario, a user authenticates to the desktop and invokes a
+web service and the web service client. This requires a Kerberos ticket to
+secure the request to web service provider by identifying his principal as Kerberos
+token. Typically, Kerberos-based web services security is used in same the context of Kerberos
+domain (realm) as opposed to across boundaries, for example SAML-based web services security.
+However, Kerberos is one of the strongest authentication mechanisms, especially in the Windows
+Domain Controller environment.</p>
+
+<a name="ghcfu"></a><h5>Kerberos Domain Server</h5>
+<p>This attribute specifies the Kerberos Distribution Center (the domain controller) hostname. You must
+enter the fully qualified domain name (FQDN) of the domain controller.</p>
+
+<a name="ghccy"></a><h5>Kerberos Domain</h5>
+<p>This attribute specifies the Kerberos Distribution Center (KDC) domain name. Depending up on
+your configuration, the domain name of the domain controller may be different than
+the OpenSSO domain name.</p>
+
+<a name="ghcfa"></a><h5>Kerberos Service Principal</h5>
+<p>Specifies the web service principal registered with the KDC. </p><p>Use the following format: </p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt> </p><p><tt>hostname</tt> and <tt>domainame</tt> represent the hostname and domain name of the OpenSSO instance.
+<tt>dc_domain_name</tt>  is the Kerberos domain in which the Windows Kerberos server (domain
+controller) resides. It is possible that the Kerberos server is different from the
+domain name of the OpenSSO instance.</p>
+
+<a name="ghcdq"></a><h5>Kerberos Ticket Cache Directory</h5>
+<p>Specifies the Kerberos TGT (Ticket Granting Ticket) cache directory. When the user authenticates
+to the desktop or initializes using <tt>kinit</tt> (the command used to obtain
+the TGT from KDC), the TGT is stored in the local cache, as
+defined in this attribute.</p>
+<br/>
+
+</body>
+</html>

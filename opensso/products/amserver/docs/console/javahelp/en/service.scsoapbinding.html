@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP Binding Service - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>SOAP Binding Service</h3>
+<a name="indexterm-150"></a><p>SOAP Binding Service is a transport layer for sending and receiving SOAP
+messages. In the SOAP Binding Service process, an identity service calls the client
+side application programming interface to construct a message and send it to the
+SOAP endpoint URL; in effect, a SOAP Receiver servlet. The SOAP Receiver servlet receives
+the message, verifies the signature, and constructs a second message. The SOAP Receiver
+servlet then invokes the correct Request Handler to send this second message to
+the corresponding identity service for a response. The identity service processes the second message,
+generates a response, and sends that response back to the SOAP Receiver servlet.
+The SOAP receiver, in turn, sends the response back to the identity service
+for processing. </p><p>The following SOAP Binding Service global attributes can be configured for your implementation.</p>
+<ul><li><p><a href="requesthandlerlist.html">Request Handler List</a></p></li>
+<li><p><a href="ggodb.html">SOAP Binding Attributes</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">To Configure a Request Handler</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

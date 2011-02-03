@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAML - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthsamlservice"></a><h4>SAML</h4>
+<p><a name="indexterm-186"></a>El m&#243;dulo de autenticaci&#243;n Lenguaje de marcado de aserci&#243;n de seguridad (SAML,
+Security Assertion Markup Language) recibe y valida las aserciones SAML en un
+servidor de destino. El atributo SAML es un atributo de dominio.</p>
+
+<a name="fwbel"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

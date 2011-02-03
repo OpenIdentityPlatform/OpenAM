@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>Windows NT 認證模組允許對 Microsoft Windows NT 伺服器進行認證。這些屬性為範圍屬性。在服務配置下套用於這些屬性的值會成為 Windows NT 認證範本的預設值。範圍註冊服務後，需要建立服務範本。註冊之後，範圍管理員可以變更預設值。範圍屬性不會由範圍子樹狀結構中的項目繼承。</p><p>若要啟動 Windows NT 認證模組，必須下載 Samba Client 2.2.2，並將之安裝至下列目錄：</p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>Samba Client 是一種檔案與列印伺服器，用於不需要單獨的 Windows NT/2000 Server 而將 Windows 和 UNIX 機器結合在一起。</p><p>Red Hat Linux 隨附 Samba 用戶端，位於 <tt>/usr/bin</tt> 目錄下。</p><p>為了能夠使用適用於 Linux 的 Windows NT 認證服務來進行認證，請將用戶端二進位檔案複製到 <tt></tt><i>OpenSSO-base</i><tt>/identity/bin</tt> 下。</p><p>Windows NT 屬性包括：</p>
+<ul><li><p><a href="#fumve">認證網域</a></p></li>
+<li><p><a href="#fumvp">認證主機</a></p></li>
+<li><p><a href="#fumvq">Samba 配置檔案名稱</a></p></li>
+<li><p><a href="#fumwi">認證級別</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>認證網域</h5>
+<p>定義使用者所屬的網域名稱。</p>
+
+<a name="fumvp"></a><h5>認證主機</h5>
+<p>定義 Windows NT 認證主機名稱。主機名稱應為 netBIOS 名稱，與完整網域名稱 (FQDN) 相對。依預設，FQDN 的第一部分為 netBIOS 名稱。</p><p>如果使用 DHCP (動態主機配置協定)，則會在 Windows 2000 機器上將相符的項目放入 HOSTS 檔案。</p><p>將基於 netBIOS 名稱執行名稱解析。如果子網路上沒有任何提供 netBIOS 名稱解析的伺服器，則對映應為硬碼式的。例如，主機名稱應為 <tt>example1</tt>，而不是 <tt>example1.company1.com</tt>。</p>
+
+<a name="fumvq"></a><h5>Samba 配置檔案名稱</h5>
+<p>定義 Samba 配置檔名稱並支援 <tt>smbclient</tt> 指令中的 <tt>--s</tt> 選項。此值必須等於 Samba 配置檔案所在位置的完整目錄路徑。例如：<tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

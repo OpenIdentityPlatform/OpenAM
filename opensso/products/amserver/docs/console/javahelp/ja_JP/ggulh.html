@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>連携 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggulh"></a><h4>連携</h4>
+<p><a name="indexterm-172"></a>連携認証モジュールは、サービスプロバイダがシングルサインオンプロトコルのメッセージを検証したあとでユーザーセッションを作成するために使用します。この認証モジュールは、SAML、SAMLv2、ID-FF、および WS-F 連携の各プロトコルで使用されます。 </p>
+
+<a name="ggujq"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+dn: cn=config
+changetype: modify
+replace:nsslapd-sizelimit
+nsslapd-sizelimit: 4000
+
+

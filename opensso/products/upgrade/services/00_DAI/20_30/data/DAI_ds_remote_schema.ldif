@@ -1,0 +1,7 @@
+dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.793 NAME 'sunAMAuthInvalidAttemptsData' DESC 'XML data for Invalid Login Attempts' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+-
+add: objectClasses
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.118 NAME 'sunAMAuthAccountLockout' DESC 'Invalid Login Attempts Object Class' SUP top AUXILIARY MAY ( sunAMAuthInvalidAttemptsData ) X-ORIGIN 'Sun Java System Identity Management' )

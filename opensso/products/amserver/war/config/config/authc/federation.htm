@@ -1,0 +1,18 @@
+<script language="javascript">
+
+    YAHOO.util.Event.onDOMReady(initFederation);
+
+    function initFederation() {
+        pageURI = "$context$path";
+        afterAddToStoreSuccessFunction = federationAfterAddToStore;
+        validateFormFunction = null;
+        adjustAddStoreButton();        
+    }
+
+    function federationAfterAddToStore() {
+        YAHOO.sun.container.addStore.show();
+        setTimeout("YAHOO.sun.container.addStore.hide()", 1250);
+        setTimeout("document.location = '$context/commonTasks.htm'", 1250);
+    }
+
+</script>

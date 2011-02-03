@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>全局化设置 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>全局化设置</h4>
+<p><a name="indexterm-188"></a>“全局化设置”服务包含全局属性，这些属性可针对不同的语言环境和字符集配置 OpenSSO。这些属性包括：</p>
+<ul><li><p><a href="#fsvdx">各个语言环境支持的字符集</a></p></li>
+<li><p><a href="#fsvec">字符集别名</a></p></li>
+<li><p><a href="#fsveb">自动生成的公共名称格式</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>各个语言环境支持的字符集</h5>
+<p>该属性列出各个语言环境支持的字符集，指明语言环境与字符集之间的映射。格式如下所示：</p><p>要添加新建支持的字符集，请单击“添加”并定义以下参数：</p><dl><dt>语言环境</dt>
+<dd><p>要添加的新语言环境。有关详细信息，参见<a href="supportedlang.html">支持的语言环境</a>。</p></dd>
+<dt>支持的字符集</dt>
+<dd><p>为指定的语言环境输入支持的字符集。字符集用分号分隔。例如，<tt>charset=charset1;charset2;charset3;...;charsetn</tt></p></dd>
+</dl>
+<p>要编辑任何现有的“支持的字符集”，请在“支持的字符集”表格中单击该名称。完成后单击“确定”。</p>
+
+<a name="fsvec"></a><h5>字符集别名</h5>
+<p>该属性列出将用于发送响应的代码集名称（映射到 IANA 名称）。这些代码集名称无需与 Java 代码集名称匹配。当前提供了一个散列表来形成 Java 字符集与 IANA 字符集之间的映射。</p><p>要添加“新建字符集别名”，请单击“添加”按钮并定义以下参数：</p><dl><dt>MIME 名称</dt>
+<dd><p>IANA 映射名称。例如，<tt>Shift_JIS</tt></p></dd>
+<dt>Java 名称</dt>
+<dd><p>要映射到 IANA 字符集的 Java 字符集。</p></dd>
+</dl>
+<p>要编辑任何现有的字符集别名，请在表格中单击该名称。完成后单击“确定”。</p>
+
+<a name="fsveb"></a><h5>自动生成的公共名称格式</h5>
+<p>该显示选项用于定义自动生成名称的方式，从而针对不同语言环境和字符集提供名称格式。默认语法如下（请注意，定义中包含的逗号和/或空格将显示在名称格式中）：</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>例如，如果要使用中文字符集显示带有 uid（为 11111）的用户（用户 One）的新名称格式，定义如下：</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>显示为：</p><p><tt>OneUser 11111</tt></p>
+<br/>
+
+</body>
+</html>

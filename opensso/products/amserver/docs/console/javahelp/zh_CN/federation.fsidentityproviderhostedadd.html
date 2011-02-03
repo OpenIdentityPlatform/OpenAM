@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>向提供者实体添加新的托管身份认证提供者 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderhostedadd"></a><h4>向提供者实体添加新的托管身份认证提供者</h4><p><b>托管提供者</b>的托管服务器与 Access Manager 所在的服务器相同。配置“新建托管身份认证提供者”属性时，需要向实体配置文件添加与身份认证提供者有关的元数据。此过程的起点是<a href="federation.fsidentityprovider.html">向提供者实体添加身份认证提供者</a>。</p>
+<hr><p><b>注 &#8211; </b>在此初始配置页面中，可配置但无法看到其他属性。参见<a href="federation.fsidentityproviderhostedprofile.html">修改提供者实体中的托管身份认证提供者属性</a>。</p>
+<hr>
+<ol>
+<li><b>提供“公共属性”信息。</b><p>一般而言，“公共属性”所含的值定义了身份认证提供者本身。</p><dl><dt>说明</dt>
+<dd><p>该属性的值是您创建实体时提供的说明。可以修改原来输入的说明，如果不存在，则可添加一条说明。</p></dd>
+<dt>协议支持枚举</dt>
+<dd><p>选择此实体所支持的自由联盟计划自由身份联合框架 (Liberty Identity Federation Framework, Liberty ID-FF) 发行版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 指的是 Liberty ID-FF 版本 1.2。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 指的是 Liberty ID-FF 版本 1.1。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>提供“通信 URL”属性信息。</b><p>“通信 URL”属性包含位置，提供者可将标明发往此身份认证提供者的传输发送到这些位置。</p><dl><dt>单点登录服务 URL</dt>
+<dd><p>键入一个 URL，服务提供者可将单点登录请求和联合请求发送到该 URL。</p></dd>
+</dl>
+</li>
+<li><b>提供“通信配置文件”属性信息。</b><p>自由联盟计划<b>配置文件</b>一并定义了消息的内容以及用于传输消息的机制。以下“通信配置文件”属性定义了身份认证提供者对相应功能所使用的配置文件。</p><dl><dt>单点登录/联合</dt>
+<dd><p>选择此身份认证提供者在向验证请求或联合请求发送响应时使用的配置文件。</p>
+<ul><li><p>浏览器 POST（指定基于浏览器的 HTTP POST 协议）</p></li>
+<li><p>浏览器辅件（指定基于 SOAP 的非浏览器协议）</p></li>
+<li><p>LECP（指定一个启用了 Liberty 的客户机代理）</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>选择任何可用信任环以分配给提供者。</b><p>提供者可以属于一个或多个信任环。但是，没有指定信任环的提供者不能参与基于 自由联盟计划 规范的通信。如果未曾创建信任环，可在以后定义此属性。</p></li>
+<li><b>提供 Federated Access Manager 配置属性信息。</b><p>“Access Manager 配置”属性定义有关此 Federated Access Manager 托管实例的信息。</p><dl><dt>提供者 URL</dt>
+<dd><p>键入本地托管提供者的 URL。</p></dd>
+<dt>提供者别名</dt>
+<dd><p>“提供者别名”是一个名称，用于标识实体配置文件内的托管提供者以及定义它是服务提供者配置还是身份认证提供者配置。该值必须唯一且能够用 URL 表示。例如，<tt>sunAlias</tt>。</p></dd>
+<dt>验证类型</dt>
+<dd><p>选择应对本地托管提供者发出的验证请求使用的提供者类型。</p>
+<ul><li><p><b>本地</b>，指定本地托管提供者应在收到验证请求时联系本地身份认证提供者（实质上是其本身）。</p></li>
+<li><p><b>远程</b>，指定本地托管提供者应在收到验证请求时联系远程身份认证提供者。</p></li></ul>
+</dd>
+<dt>默认验证环境</dt>
+<dd><p>选择此身份认证提供者使用的验证环境类（验证方法）（如果未在服务提供者请求中收到该信息）。此值还指定了当未知用户试图访问服务提供者的受保护资源且服务提供者发送验证请求时使用的验证环境类。这些选项包括：</p>
+<ul><li><p>密码</p></li>
+<li><p>移动数字 ID</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>Mobile Contract</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Password-ProtectedTransport</p></li></ul>
+</dd>
+<dt>领域</dt>
+<dd><p>键入一个值，该值指向在其中配置此提供者的领域。例如，<tt>/sp</tt>。</p></dd>
+<dt>特权版本 URI</dt>
+<dd><p>键入一个 URI，指定所使用自由联盟计划规范的版本。默认值为 <tt>http://projectliberty.org/specs/v1</tt>。</p></dd>
+<dt>名称标识符实现</dt>
+<dd><p>此字段用于定义服务提供者参与名称注册时所使用的类。名称注册是一个配置文件，服务提供者以此指定身份认证提供者在与服务提供者通信时使用的主体名称标识符。该值为 <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt>。</p></dd>
+<dt>主页 URL</dt>
+<dd><p>键入本地托管提供者的主页 URL。</p></dd>
+<dt>单点登录失败重定向 URL</dt>
+<dd><p>键入主体在单点登录失败时将被重定向到的 URL。</p></dd>
+</dl>
+</li>
+<li><b>提供“SAML 属性”信息。</b><p>“SAML 属性”就身份认证提供者如何发送 SAML 声明定义了一般的值。</p><dl><dt>声明时间间隔</dt>
+<dd><p>键入身份认证提供者发布的声明保持有效的时间间隔（以秒为单位）。在声明时间间隔到期之前，主体的状态将一直为已验证。</p></dd>
+<dt>清除时间间隔</dt>
+<dd><p>键入身份认证提供者中所存储的声明被清除前的时间间隔（以秒为单位）。</p></dd>
+<dt>辅件超时</dt>
+<dd><p>键入用于指定声明辅件何时超时的时间间隔（以秒为单位）。</p></dd>
+<dt>声明限制</dt>
+<dd><p>键入一个数字，用于定义身份认证提供者可发布的声明数量或可存储的声明数量。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”以向实体添加提供者。</b></li>
+<li><b>从“查看”菜单中选择另一选项，继续配置实体，或单击“保存”以完成配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

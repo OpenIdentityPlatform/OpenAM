@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Cr&#233;ation d'une entit&#233; fournisseur ou d'une entit&#233; filiale - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsadd"></a><h4>Cr&#233;ation d'une entit&#233; fournisseur ou d'une entit&#233; filiale</h4><a name="indexterm-66"></a><a name="indexterm-67"></a><a name="indexterm-68"></a><a name="indexterm-69"></a><p>La cr&#233;ation d'une entit&#233; se d&#233;roule en deux &#233;tapes. D'abord, vous cr&#233;ez
+l'entit&#233;. (Vous indiquez &#224; cette &#233;tape s'il s'agit d'une <b>entit&#233; fournisseur</b> ou d'une
+<b>entit&#233; filiale</b>.) Apr&#232;s avoir cr&#233;&#233; l'entit&#233;, vous la renseignez avec des fournisseurs. La
+proc&#233;dure suivante cr&#233;e une entit&#233;. Le point de d&#233;part est Entit&#233;s sous
+l'interface F&#233;d&#233;ration.</p>
+<hr><p><b>Remarque &#8211; </b>Une entit&#233; peut &#234;tre cr&#233;&#233;e mais ne pourra pas &#234;tre assign&#233;e &#224;
+un cercle d'approbation tant qu'elle n'a pas &#233;t&#233; renseign&#233;e avec des fournisseurs.</p>
+<hr>
+<ol>
+<li><b>Cliquez sur Nouveau pour afficher les attributs de l'entit&#233;.</b><p>La page Nouvelle entit&#233; s'affiche.</p></li>
+<li><b>Tapez le nom de l'entit&#233;.</b><p>L'attribut Nom de l'entit&#233; d&#233;finit l'URI (Uniform Resource Identifier) de l'entit&#233;. Cette
+valeur ne doit correspondre &#224; aucun autre nom d'identit&#233;.</p></li>
+<li><b>Tapez la description de l'entit&#233;.</b></li>
+<li><b>Choisissez le type de l'entit&#233;.</b>
+<ul><li><p>S'il s'agit d'une entit&#233; fournisseur, s&#233;lectionnez <b>Fournisseur</b>.</p></li>
+<li><p>S'il s'agit d'une entit&#233; filiale, s&#233;lectionnez <b>Filiale</b> et donnez les valeurs des attributs obligatoires Nom de la filiale et Propri&#233;taire de la filiale.</p>
+<ul><li><p>Le Nom de la filiale d&#233;finit l'URI de l'entit&#233; filiale. Cette valeur ne doit correspondre &#224; aucun autre nom de filiale.</p></li>
+<li><p>Le Propri&#233;taire de la filiale sp&#233;cifie l'administrateur parent de l'affiliation. Cet attribut contient un URI qui correspond &#224; la valeur de l'attribut Nom de l'entit&#233; de l'entit&#233; &#224; laquelle le propri&#233;taire/fournisseur de la filiale appartient.</p></li></ul>
+
+<hr><p><b>Remarque &#8211; </b>D&#233;finir un fournisseur comme propri&#233;taire de filiale ne l'inclut pas automatiquement comme membre de l'affiliation. Si un propri&#233;taire est &#233;galement membre, l'URI doit &#234;tre d&#233;fini ici en tant que propri&#233;taire et dans l'entit&#233; filiale elle-m&#234;me en tant que membre. Pour ajouter des membres &#224; une affiliation, voir <a href="federation.fsentitydescriptorsaffiliate.html">Ajout de membres &#224; une entit&#233; filiale</a>.</p>
+<hr>
+</li></ul>
+</li>
+<li><b>Cliquez sur OK.</b><p>La nouvelle entit&#233; est visible dans l'&#233;cran Entit&#233;s.</p></li></ol>
+<br/>
+
+</body>
+</html>

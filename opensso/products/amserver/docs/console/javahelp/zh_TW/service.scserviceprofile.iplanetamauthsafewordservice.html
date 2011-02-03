@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>此模組允許使用者使用 Secure Computing 的 SafeWord 或 SafeWord PremierAccess 認證伺服器來進行認證。SafeWord 認證屬性為範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwafv">伺服器</a></p></li>
+<li><p><a href="#fwajv">伺服器驗證檔案目錄</a></p></li>
+<li><p><a href="#fwarb">啟用記錄</a></p></li>
+<li><p><a href="#fwahi">記錄層級</a></p></li>
+<li><p><a href="#fwabd">記錄檔</a></p></li>
+<li><p><a href="#fwacu">認證連線逾時</a></p></li>
+<li><p><a href="#fwanv">用戶端類型</a></p></li>
+<li><p><a href="#fwafs">EASSP 版本</a></p></li>
+<li><p><a href="#fwaob">最小認證程式強度</a></p></li>
+<li><p><a href="#fwatz">認證級別</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>伺服器</h5>
+<p>指定 SafeWord 或 SafeWord PremiereAccess 伺服器名稱與連接埠。連接埠 7482 設定為 SafeWord 伺服器的預設值。SafeWord PremierAccess 伺服器的預設連接埠號為
+5030。</p>
+
+<a name="fwajv"></a><h5>伺服器驗證檔案目錄</h5>
+<p>指定 SafeWord 用戶端程式庫存放其驗證檔案的目錄。預設路徑如下所示：</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>如果在此欄位中指定了不同目錄，則在嘗試 SafeWord 認證之前必須確保此目錄存在。</p>
+
+<a name="fwarb"></a><h5>啟用記錄</h5>
+<p>啟用 SafeWord 記錄。依預設，將啟用 SafeWord 記錄。</p>
+
+<a name="fwahi"></a><h5>記錄層級</h5>
+<p>指定 SafeWord 記錄層級。在下拉式功能表中選取一個層級。層級為 DEBUG、ERROR、INFO 及 NONE。</p>
+
+<a name="fwabd"></a><h5>記錄檔</h5>
+<p>指定 SafeWord 用戶端記錄所用的目錄路徑與記錄檔名稱。預設路徑為 <tt>/var/opt/SUNWam/auth/safeword/safe.log</tt>。</p><p>如果指定了不同路徑或檔案名稱，則在嘗試 SafeWord 認證之前必須確保其存在。如果為 SafeWord 認證配置了多個範圍，並且使用不同的 SafeWord 伺服器，則必須指定不同的路徑，否則只有進行 SafeWord 認證的第一個範圍才能使用。同樣，如果範圍變更了 SafeWord 伺服器，則必須先刪除指定目錄中的 <tt>swec.dat</tt>
+檔案，然後才能對新配置的 SafeWord 伺服器執行認證。</p>
+
+<a name="fwacu"></a><h5>認證連線逾時</h5>
+<p>定義 SafeWord 用戶端 (OpenSSO) 與 SafeWord 伺服器間的逾時期間 (以秒為單位)。預設為 120 秒。</p>
+
+<a name="fwanv"></a><h5>用戶端類型</h5>
+<p>定義 SafeWord 伺服器用於與不同用戶端 (如 Mobile Client、VPN、Fixed Password、Challenge/Response 等等) 通訊的用戶端類型。</p>
+
+<a name="fwafs"></a><h5>EASSP 版本</h5>
+<p>此屬性指定延伸的認證以及單次登入協定 (EASSP) 版本。此欄位接受標準 (101)、SSL 加密的首要存取 (200) 或首要存取 (201) 協定版本。</p>
+
+<a name="fwaob"></a><h5>最小認證程式強度</h5>
+<p>定義用戶端/SafeWord 伺服器認證的最小認證程式強度。每個用戶端類型包含不同認證值，值愈高，認證程式強度愈強。20 是最高值。0 是最低值。</p>
+
+<a name="fwatz"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

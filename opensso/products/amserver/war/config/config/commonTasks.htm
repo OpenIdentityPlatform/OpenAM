@@ -1,0 +1,145 @@
+<script type="text/javascript">
+    /*YAHOO.namespace("sun.container");
+
+     function init() {
+         YAHOO.sun.container.tooltip = new YAHOO.widget.Panel("tooltip", { width:"270px", fixedcenter: false, close: false, visible:false,constraintoviewport:true} );
+         YAHOO.sun.container.tooltip.render();
+     }
+     YAHOO.util.Event.onDOMReady( init );
+
+     function show_toolTip(url,inputObj,nameDiv){
+         /*Calculate the position
+         AjaxUtils.showToolTip(inputObj, nameDiv, url, 0, 0)
+         /*Show the dialog
+         YAHOO.sun.container.tooltip.show();
+     }*/
+    //AjaxUtils.load('mainPanel', '$context/config/wizard.htm');
+</script>
+<script type="text/javascript">
+
+    function Update( type ) {
+
+        switch ( type )
+            {
+            case 1:
+                AjaxUtils.load('container', '$context/config/realm/create.htm');
+                break;
+            case 2:
+                AjaxUtils.load('container', '$context/config/realm/admin.htm');
+                break;
+            case 3:
+                AjaxUtils.load('container', '$context/config/userStore/create.htm');
+                break;
+            case 4:
+                AjaxUtils.load('container', '$context/config/authc/create.htm');
+                break;
+            case 5:
+                document.location = '$context/config/agent/create.htm';
+                break;
+            case 6:
+                AjaxUtils.load('container', '$context/config/resource/protect.htm');
+                break;
+            case 7:
+                AjaxUtils.load('container', '$context/config/existConf.htm');
+                break;
+			case 8:
+				AjaxUtils.load('container', '$context/config/serviceProvider/createServiceProvider.htm');
+                break;
+			case 9:
+				AjaxUtils.load('container', '$context/config/identityProvider/createIdentityProvider.htm');
+                break;
+            case 10:
+                AjaxUtils.load('container', '$context/config/agent/deploy.htm');
+        }
+    }
+</script>
+
+<style type="text/css">
+    .panel {
+        float: left;
+		width:350px;
+    }
+
+    /* Adjust createPanel list item spacing to account for balloon padding: */
+    .panel h1 {
+        font-weight: normal;
+        font-size: 115.1%;
+    }
+
+    .panel ul, ol {
+        margin-left: 0;
+    }
+
+    .panel li {
+        list-style-type: none;
+        color: #60a2e1;
+        padding: 0.1em 0 0 0;
+        font-size: 116%;
+    }
+
+    #modifyPanel {
+        margin-left: 3em;
+    }
+
+    #modifyPanel li {
+        padding: 0.2em 0;
+    }
+</style>
+<div id="container" align="center" onclick="AjaxUtils.ajax_hideTooltip()">
+    <h1 align="left">$page.getLocalizedString("configuration.common_tasks.title")</h1>
+    <div id="createPanel" class="panel" align="left">
+        <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
+        <h1>$page.getLocalizedString("configuration.common_tasks.widgest_wizard_header")</h1>
+        <div class="body">
+            <h2>$page.getLocalizedString("configuration.common_tasks.access_management")</h2>
+            <ul>
+                <li><a onclick="Update(1)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.create_realm")</a> <a id="ttprealm" href="#" onmouseover="AjaxUtils.ajax_showTooltip('$context/config/realm/createTooltip.htm',this);return false;" ><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></a></li>
+                <li><a onclick="Update(2)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.select_admin")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+                <li><a onclick="Update(3)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.configure_user_store")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+                <li><a onclick="Update(4)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.configure_auth_store")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+                <li><a onclick="Update(5)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.configure_deploy_agent")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+                <li><a onclick="Update(6)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.protect_resource")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+                <li><a onclick="Update(7)" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.add_instance")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+            </ul>
+            <h2>$page.getLocalizedString("configuration.common_tasks.federation")</h2>
+            <ul>
+              	<li><a onclick="Update(8);" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.configure_service_provider")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+                <li><a onclick="Update(9);" href="javaScript:void(0);">$page.getLocalizedString("configuration.common_tasks.configure_identity_provider")</a><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></li>
+            </ul>
+        </div>
+        <b class="xbottom"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
+    </div>
+
+    <div id="modifyPanel" class="panel" align="left">
+        <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
+
+        <h1>$page.getLocalizedString("configuration.common_tasks.shortcuts_header")</h1>
+
+        <div class="body">
+            <div id="configSelectBox">
+                <form action="commonTasks.htm">
+                    <label for="configSelect" class="blue">$page.getLocalizedString("configuration.common_tasks.select_configuration")</label>
+                    <select name="configSelect" id="configSelect">
+                        <option value="blah">Foobar 1</option>
+                    </select>
+                </form>
+            </div>
+            <h2>$page.getLocalizedString("configuration.common_tasks.access_management")</h2>
+            <ul>
+                <li><a href="#">Edit something</a></li>
+                <li><a href="#">Edit or modify something else</a></li>
+                <li><a href="#">Edit or modify something else</a></li>
+                <li><a href="#">Edit or modify something else</a></li>
+                <li><a href="#">Edit or modify something else</a></li>
+                <li><a href="#">Edit or modify something else</a></li>
+            </ul>
+            <h2>$page.getLocalizedString("configuration.common_tasks.federation")</h2>
+            <ul>
+                <li><a href="#">Edit or modify something else</a></li>
+                <li><a href="#">Edit or modify something else</a></li>
+            </ul>
+        </div>
+        <b class="xbottom"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
+    </div>
+   <!-- <div id="tooltip" style="visibility:hidden;z-index:100;position:absolute;background:#FFFFFF;left:0;top:1"></div>-->
+</div>

@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>代理验证程序 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ghfif"></a><h4>代理验证程序</h4>
+<p>代理验证程序是通过验证后就可以获取代理配置文件的只读数据（已选取该数据以供代理验证程序读取）的代理。这些代理配置文件可以是任何类型（J2EE、WSP、搜索等），但它们必须存在于同一领域中。拥有代理验证程序证书（用户名和密码）的用户可读取代理配置文件数据，但不具有代理管理员的创建、更新或删除权限。</p><p>代理验证程序包含以下属性：</p>
+
+<a name="ghfjj"></a><h5>密码</h5>
+<p>密码在创建代理验证程序配置文件时设置。但是，您以后可以随时更改密码。</p>
+
+<a name="ghfiu"></a><h5>密码确认</h5>
+<p>创建代理验证程序配置文件时执行密码确认。如果更改了密码，则必须确认更改。</p>
+
+<a name="ghfka"></a><h5>状态</h5>
+<p>创建代理验证程序时选择“<tt>活动</tt>”选项。仅在要删除代理提供的保护时才选择“<tt>非活动</tt>”。</p>
+
+<a name="ghfig"></a><h5>允许读取的代理配置文件</h5>
+<p>该属性定义特定 OpenSSO 代理的列表，代理验证程序会读取这些代理的配置文件数据。这些代理可以是任何类型（J2EE、WSP、搜索等），但它们必须存在于同一领域中。要将代理添加到列表，可选择代理名称并单击“添加”。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Authentication - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>Authentication</h3>
+<p><a name="indexterm-5"></a>The general authentication service must be registered as a service to a realm
+before any user can log in using the other authentication modules types. The
+Core authentication service allows the OpenSSO administrator to define default values for a
+realm's authentication parameters. These values can then be used if no overriding value
+is defined in the specified authentication module. The default values for the Core Authentication
+Service are defined in the <tt>amAuth.xml</tt> file and stored in Directory Server
+after installation.</p><p>The Authentication properties are:</p><dl><dt>Advanced Properties</dt>
+<dd><p>Clicking the Advanced Properties button displays the Core authentication attributes that can be defined for the realm. The global attributes are not applicable to the realm so they are not displayed.</p></dd>
+<dt>Default Authentication Chain</dt>
+<dd><p>Defines the authentication chain to be used for the realm. Once you create a new chain in the Authentication Chaining attribute, it appears in the pull-down list and is available for you to select. See <a href="authentication.newauthconfig.html">To Create a New Authentication Chain</a> for more information.</p></dd>
+<dt>Administrator Authentication Chain</dt>
+<dd><p>Defines the authentication chain for administrators only. This attribute can be used if the authentication chain for administrators needs to be different from the chain for end users. The modules configured in this attribute are inherited when the OpenSSO console is accessed.</p></dd>
+<dt>Default Success URL</dt>
+<dd><p>Specifies the URL that the user will be redirected to upon successful authentication to the realm.</p></dd>
+<dt>Module Instances</dt>
+<dd><p>Enables you to define and configure the OpenSSO default authentication modules for the realm. You can add multiple instances of the same authentication module. See <a href="authentication.newauthinstance.html">To Create a New Authentication Module Instance</a> for more information.</p></dd>
+<dt>Authentication Chaining</dt>
+<dd><p>One or more authentication modules can be configured so a user must pass authentication credentials to all of them. This is referred to as authentication chaining. this attribute enables you to define the authentication chaining options for the realm. The chains you create are displayed in the Default Authentication Chain list. See<a href="authentication.newauthconfig.html">To Create a New Authentication Chain</a> for more information.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

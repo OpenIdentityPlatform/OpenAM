@@ -1,0 +1,1927 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: Amadmin_CLILogMessageIDs.xml,v 1.2 2008/06/25 05:52:41 qcheng Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "Sun Java System Access Manager Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="AMADMIN">
+
+    <!-- id 1 to 10 are reserved for general messages -->
+    <logmessage name="LOGIN_FAIL" id="1"
+	loglevel="LL_INFO"
+	description="Unsuccessful login for user.">
+	<datainfo>
+	    <item>user id</item>
+	</datainfo>
+	<triggers>
+	    <item>Unsuccessful login for user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADMIN_EXCEPTION" id="2"
+	loglevel="LL_INFO"
+	description="ADMINEXCEPTION Received">
+	<datainfo>
+	    <item>element name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Received ADMINEXCEPTION while processing Admin request(s).</item>
+	</triggers>
+	<actions>
+	    <item>Look in amAdmin debug file for more information.</item>
+	</actions>
+    </logmessage>
+    <logmessage name="STATUS_MSG36" id="3"
+	loglevel="LL_INFO"
+	description="Session destroyed">
+	<datainfo>
+	    <item>name of user</item>
+	</datainfo>
+	<triggers>
+	    <item>Session destroyed.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <!-- id 11 to 20 are reserved for schema creation/deletion -->
+
+    <logmessage name="LOAD_SERVICE" id="11"
+	loglevel="LL_INFO"
+	description="Service Schema Loaded">
+	<datainfo>
+	    <item>schema name</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully loaded service schema.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SERVICE" id="12"
+	loglevel="LL_INFO"
+	description="Service deleted">
+	<datainfo>
+	    <item>service name</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully deleted service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_ATTRS" id="13"
+	loglevel="LL_INFO"
+	description="Attributes Added">
+	<datainfo>
+	    <item>attribute name</item>
+	</datainfo>
+	<triggers>
+	    <item>Attributes successfully added.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <!-- id 21 to 30 are reserved for policy -->
+
+    <logmessage name="NO_POLICY_PRIVS" id="21"
+	loglevel="LL_INFO"
+	description="There are no policies for this service">
+	<datainfo>
+	    <item>service name</item>
+	</datainfo>
+	<triggers>
+	    <item>Delete Policy Rule Flag specified, but service has no policies.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="SVC_NOT_FOUND" id="22"
+	loglevel="LL_INFO"
+	description="Policy Schema for Service not found">
+	<datainfo>
+	    <item>service name</item>
+	</datainfo>
+	<triggers>
+	    <item>Delete Policy Rule Flag specified, but could not find the policy schema for the service</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="START_DELETING_POLICIES" id="23"
+	loglevel="LL_INFO"
+	description="Deleting Policies For Service">
+	<datainfo>
+	    <item>service name</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleting Service with Delete Policy Rule Flag specified.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DONE_DELETING_POLICIES" id="24"
+	loglevel="LL_INFO"
+	description="Done Deleting Policies For Service">
+	<datainfo>
+	    <item>service name</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleting Service with Delete Policy Rule Flag specified.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_POLICY" id="25"
+	loglevel="LL_INFO"
+	description="Created Policy in Organization">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Created Policy in Organization DN.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_POLICY" id="26"
+	loglevel="LL_INFO"
+	description="Deleted Policy from Organization">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted Policy from Organization DN.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <!-- id 31 to 40 are reserved for resource bundles -->
+
+    <logmessage name="ADD_RESOURCE_BUNDLE_TO_DIRECTORY_SERVER" id="31"
+	loglevel="LL_INFO"
+	description="Add Resource Bundle of Locale to Directory Server">
+	<datainfo>
+	    <item>resource bundle name</item>
+	    <item>resource locale</item>
+	</datainfo>
+	<triggers>
+	    <item>Resource Bundle of Locale successfully stored in Directory Server.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="ADD_DEFAULT_RESOURCE_BUNDLE_TO_DIRECTORY_SERVER" id="32"
+	loglevel="LL_INFO"
+	description="Add Default Resource Bundle to Directory Server">
+	<datainfo>
+	    <item>resource bundle name</item>
+	</datainfo>
+	<triggers>
+	    <item>Default Resource Bundle successfully stored in Directory Server.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_RESOURCE_BUNDLE_FROM_DIRECTORY_SERVER" id="33"
+	loglevel="LL_INFO"
+	description="Deleted Resource Bundle of Locale from Directory Server">
+	<datainfo>
+	    <item>resource bundle name</item>
+	    <item>resource locale</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully deleted Resource Bundle of Locale from Directory Server.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_DEFAULT_RESOURCE_BUNDLE_FROM_DIRECTORY_SERVER" id="34"
+	loglevel="LL_INFO"
+	description="Deleted Default Resource Bundle of Locale from Directory Server">
+       <datainfo>
+	    <item>resource bundle name</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully deleted default Resource Bundle from Directory Server.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <!-- id 41 to 50 are reserved for schema root node requests -->
+
+    <logmessage name="MODIFY_SERVICE_SCHEMA" id="41"
+	loglevel="LL_INFO"
+	description="Modified Service Schema of service">
+	<datainfo>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully modified Service Schema of service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SERVICE_SUBSCHEMA" id="42"
+	loglevel="LL_INFO"
+	description="Deleted Service Sub Schema of service">
+	<datainfo>
+	    <item>name of sub schema</item>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully deleted service sub schema of service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_SERVICE_SUBSCHEMA" id="43"
+	loglevel="LL_INFO"
+	description="Added Service Sub Schema to service.">
+	<datainfo>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully added service sub schema to service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="ADD_SUB_CONFIGURATION_TO_DEFAULT" id="44"
+	loglevel="LL_INFO"
+	description="Added Sub Configuration to service.">
+	<datainfo>
+	    <item>name of sub configuration</item>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully added sub configuration to service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SUB_CONFIGURATION_TO_DEFAULT" id="45"
+	loglevel="LL_INFO"
+	description="Modified Sub Configuration of service">
+	<datainfo>
+	    <item>name of sub configuration</item>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully modified sub configuration of service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SUB_CONFIGURATION_TO_DEFAULT" id="46"
+	loglevel="LL_INFO"
+	description="Deleted Sub Configuration of service">
+	<datainfo>
+	    <item>name of sub configuration</item>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully deleted sub configuration of service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_ALL_CONFIGURATIONS" id="47"
+	loglevel="LL_INFO"
+	description="Deleted all Service Configurations of service.">
+	<datainfo>
+	    <item>name of service</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully deleted all service configurations of service.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <!-- id 91 to 200 are reserved for organization, group, etc requests -->
+
+    <logmessage name="MODIFY_SUB_CONFIG_IN_ORG" id="91"
+	loglevel="LL_INFO"
+	description="Modify Service SubConfiguration in Organization">
+	<datainfo>
+	    <item>subconfiguration name</item>
+	    <item>service name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Modified Service SubConfiguration in Organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_SUB_CONFIG_IN_ORG" id="92"
+	loglevel="LL_INFO"
+	description="Added Service SubConfiguration in Organization">
+	<datainfo>
+	    <item>subconfiguration name</item>
+	    <item>service name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Added Service SubConfiguration in Organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SUB_CONFIG_IN_ORG" id="93"
+	loglevel="LL_INFO"
+	description="Deleted Service SubConfiguration in Organization">
+	<datainfo>
+	    <item>subconfiguration name</item>
+	    <item>service name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Deleted Service SubConfiguration in Organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+										
+    <logmessage name="CREATE_REMOTE_PROV" id="94"
+	loglevel="LL_INFO"
+	description="Created remote provider in organization">
+	<datainfo>
+	    <item>provider name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully created remote provider in organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_REMOTE_PROV" id="95"
+	loglevel="LL_INFO"
+	description="Modified remote provider in organization">
+	<datainfo>
+	    <item>provider name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully modified remote provider in organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_HOSTED_PROV" id="96"
+	loglevel="LL_INFO"
+	description="Modified hosted provider in organization">
+	<datainfo>
+	    <item>provider name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully modified hosted provider in organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_HOSTED_PROV" id="97"
+	loglevel="LL_INFO"
+	description="Created hosted provider in organization">
+	<datainfo>
+	    <item>provider name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully created hosted provider in organization.</item>
+	</triggers>
+	<actions>
+	    <item>Look under identity repository log for more information.</item>
+	</actions>
+    </logmessage>
+    <logmessage name="DELETE_PROV" id="98"
+	loglevel="LL_INFO"
+	description="Deleted Remote Provider in organization">
+	<datainfo>
+	    <item>provider name</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Deleted Remote Provider in organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_COT" id="99"
+	loglevel="LL_INFO"
+	description="Created Authentication Domain in organization">
+	<datainfo>
+	    <item>name of circle of trust</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Created Authentication Domain in 0rganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_COT" id="100"
+	loglevel="LL_INFO"
+	description="Deleted Authentication Domain in organization.">
+	<datainfo>
+	    <item>name of circle of trust</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Deleted Authentication Domain in 0rganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_COT" id="101"
+	loglevel="LL_INFO"
+	description="Modified Authentication Domain in organization.">
+	<datainfo>
+	    <item>name of circle of trust</item>
+	    <item>organization DN</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully Modified Authentication Domain in 0rganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVTEMPLATE_ATTEMPT" id="102"
+	loglevel="LL_INFO"
+	description="Attempt to modify service template">
+	<datainfo>
+	    <item>DN of service template</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify service template.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVTEMPLATE" id="103"
+	loglevel="LL_INFO"
+	description="Modified service template">
+	<datainfo>
+	    <item>DN of service template</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully modified service template.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_SERVTEMPLATE_ATTEMPT" id="104"
+	loglevel="LL_INFO"
+	description="Attempt to remove service template">
+	<datainfo>
+	    <item>DN of service template</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove service template.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_SERVTEMPLATE" id="105"
+	loglevel="LL_INFO"
+	description="Removed service template">
+	<datainfo>
+	    <item>DN of service template</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully removed service template.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_SERVTEMPLATE_ATTEMPT" id="106"
+	loglevel="LL_INFO"
+	description="Attempt to add service template">
+	<datainfo>
+	    <item>DN of service template</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to add service template.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_SERVTEMPLATE" id="107"
+	loglevel="LL_INFO"
+	description="Added service template">
+	<datainfo>
+	    <item>DN of service template</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully added service template.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_NESTED_GROUPS_ATTEMPT" id="108"
+	loglevel="LL_INFO"
+	description="Attempt to add nested groups to group">
+	<datainfo>
+	    <item>name of group to add</item>
+	    <item>DN of containing group</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to add nested groups to group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_NESTED_GROUPS" id="109"
+	loglevel="LL_INFO"
+	description="Added nested groups to group">
+	<datainfo>
+	    <item>name of group to add</item>
+	    <item>DN of containing group</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully added nested groups to group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_USER_ATTEMPT" id="110"
+	loglevel="LL_INFO"
+	description="Attempt to add user to group or role">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>target group or role</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to add user to group or role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_USER" id="111"
+	loglevel="LL_INFO"
+	description="Added user to group or role">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>target group or role</item>
+	</datainfo>
+	<triggers>
+	    <item>Successfully added user to group or role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_ENTITY_ATTEMPT" id="112"
+	loglevel="LL_INFO"
+	description="Attempt to create entity.">
+	<datainfo>
+	    <item>localized name of entity</item>
+	    <item>DN of entity</item>
+	    <item>container where entity is to be created</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to Create entity.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_ENTITY" id="113"
+	loglevel="LL_INFO"
+	description="Created entity.">
+	<datainfo>
+	    <item>localized name of entity</item>
+	    <item>DN of entity</item>
+	</datainfo>
+	<triggers>
+	    <item>Created entity.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="CREATE_ROLE_ATTEMPT" id="114"
+	loglevel="LL_INFO"
+	description="Attempt to create role">
+	<datainfo>
+	    <item>role DN</item>
+            <item>container where role is to be created</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_ROLE" id="115"
+	loglevel="LL_INFO"
+	description="Created role">
+	<datainfo>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Created role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_GROUP_CONTAINER_ATTEMPT" id="116"
+	loglevel="LL_INFO"
+	description="Attempt to create group container">
+	<datainfo>
+	    <item>name of group container</item>
+	    <item>container where group container is to be created.</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create group container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_GROUP_CONTAINER" id="117"
+	loglevel="LL_INFO"
+	description="Create group container">
+	<datainfo>
+	    <item>name of group container</item>
+	</datainfo>
+	<triggers>
+	    <item>Created group container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_GROUP_ATTEMPT" id="118"
+	loglevel="LL_INFO"
+	description="Attempt to create group.">
+	<datainfo>
+	    <item>name of group</item>
+	    <item>type of group</item>
+	    <item>container where group is to be created.</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_GROUP" id="119"
+	loglevel="LL_INFO"
+	description="Create group.">
+	<datainfo>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Created group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_PC_ATTEMPT" id="120"
+	loglevel="LL_INFO"
+	description="Attempt to create people container.">
+	<datainfo>
+	    <item>DN of people container</item>
+	    <item>container where people container is to be created.</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create people container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_PC" id="121"
+	loglevel="LL_INFO"
+	description="Create people container.">
+	<datainfo>
+	    <item>DN of people container</item>
+	</datainfo>
+	<triggers>
+	    <item>Created people container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="CREATE_SERVTEMPLATE_ATTEMPT" id="122"
+	loglevel="LL_INFO"
+	description="Attempt to create service template in organization or role">
+	<datainfo>
+	    <item>name of service template</item>
+	    <item>name of organization or role</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create service template in organization or role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_SERVTEMPLATE" id="123"
+	loglevel="LL_INFO"
+	description="Create service template in organization or role">
+	<datainfo>
+	    <item>name of service template</item>
+	    <item>name of organization or role</item>
+	</datainfo>
+	<triggers>
+	    <item>Created service template in organization or role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_CONTAINER_ATTEMPT" id="124"
+	loglevel="LL_INFO"
+	description="Attempt to create container">
+	<datainfo>
+	    <item>name of container</item>
+	    <item>container where container is to be created.</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_CONTAINER" id="125"
+	loglevel="LL_INFO"
+	description="Create container">
+	<datainfo>
+	    <item>name of container</item>
+
+	</datainfo>
+	<triggers>
+	    <item>Created container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_USER_ATTEMPT" id="126"
+	loglevel="LL_INFO"
+	description="Attempt to create user.">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>organization, organizational unit or people container where user is to be created in.</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_USER" id="127"
+	loglevel="LL_INFO"
+	description="Create user.">
+	<datainfo>
+	    <item>name of user</item>
+	</datainfo>
+	<triggers>
+	    <item>Created user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_ENTITY_ATTEMPT" id="128"
+	loglevel="LL_INFO"
+	description="Attempt to delete entity.">
+	<datainfo>
+	    <item>DN of entity</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete entity.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_ENTITY" id="129"
+	loglevel="LL_INFO"
+	description="Delete entity.">
+	<datainfo>
+	    <item>localized name of entity</item>
+	    <item>DN of entity</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted entity.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_PC_ATTEMPT" id="130"
+	loglevel="LL_INFO"
+	description="Attempt to delete people container">
+	<datainfo>
+	    <item>DN of people container</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete people container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_PC" id="131"
+	loglevel="LL_INFO"
+	description="Delete people container">
+	<datainfo>
+	    <item>DN of people container</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted people container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_ROLE_ATTEMPT" id="132"
+	loglevel="LL_INFO"
+	description="Attempt to delete role">
+	<datainfo>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_ROLE" id="133"
+	loglevel="LL_INFO"
+	description="Delete role">
+	<datainfo>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SERVTEMPLATE_ATTEMPT" id="134"
+	loglevel="LL_INFO"
+	description="Attempt to delete service template in organization">
+	<datainfo>
+	    <item>name of service template</item>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete service template in organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SERVTEMPLATE" id="135"
+	loglevel="LL_INFO"
+	description="Delete service template in organization">
+	<datainfo>
+	    <item>name of service template</item>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted service template in organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_CONTAINER_ATTEMPT" id="136"
+	loglevel="LL_INFO"
+	description="Attempt to delete container.">
+	<datainfo>
+	    <item>name of container</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_CONTAINER" id="137"
+	loglevel="LL_INFO"
+	description="Delete container.">
+	<datainfo>
+	    <item>name of container</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="MODIFY_ENTITY_ATTEMPT" id="138"
+	loglevel="LL_INFO"
+	description="Attempt to modify entity">
+	<datainfo>
+	    <item>localized name of entity</item>
+	    <item>DN of entity</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify entity.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_ENTITY" id="139"
+	loglevel="LL_INFO"
+	description="Modify entity">
+	<datainfo>
+	    <item>localized name of entity</item>
+	    <item>DN of entity</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified entity.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_PC_ATTEMPT" id="140"
+	loglevel="LL_INFO"
+	description="Attempt to modify people container.">
+	<datainfo>
+	    <item>DN of people container</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify people container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_PC" id="141"
+	loglevel="LL_INFO"
+	description="Modify people container.">
+	<datainfo>
+	    <item>DN of people container</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified people container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SUBCONT_ATTEMPT" id="142"
+	loglevel="LL_INFO"
+	description="Attempt to modify container.">
+	<datainfo>
+	    <item>name of container</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SUBCONT" id="143"
+	loglevel="LL_INFO"
+	description="Modify container.">
+	<datainfo>
+	    <item>name of container</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified container.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REGISTER_SERVICE_ATTEMPT" id="144"
+	loglevel="LL_INFO"
+	description="Attempt to register service under organization.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to register service under organization</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REGISTER_SERVICE" id="145"
+	loglevel="LL_INFO"
+	description="Register service under organization.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Registered service under organization</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="UNREGISTER_SERVICE_ATTEMPT" id="146"
+	loglevel="LL_INFO"
+	description="Attempt to unregister service under organization.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to unregister service under organization</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNREGISTER_SERVICE" id="147"
+	loglevel="LL_INFO"
+	description="Unregister service under organization.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Unregistered service under organization</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_GROUP_ATTEMPT" id="148"
+	loglevel="LL_INFO"
+	description="Attempt to modify group.">
+	<datainfo>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify group</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_GROUP" id="149"
+	loglevel="LL_INFO"
+	description="Modify group.">
+	<datainfo>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified group</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_NESTED_GROUP_FROM_GROUP_ATTEMPT" id="150"
+	loglevel="LL_INFO"
+	description="Attempt to remove nested group from group.">
+	<datainfo>
+	    <item>name of nested group</item>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove nested group from group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_NESTED_GROUP_FROM_GROUP" id="151"
+	loglevel="LL_INFO"
+	description="Remove nested group from group.">
+	<datainfo>
+	    <item>name of nested group</item>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed nested group from group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="DELETE_GROUP_ATTEMPT" id="152"
+	loglevel="LL_INFO"
+	description="Attempt to delete group">
+	<datainfo>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_GROUP" id="153"
+	loglevel="LL_INFO"
+	description="Delete group">
+	<datainfo>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="REMOVE_USER_FROM_ROLE_ATTEMPT" id="154"
+	loglevel="LL_INFO"
+	description="Attempt to remove a user from a Role">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove a user from a Role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_USER_FROM_ROLE" id="155"
+	loglevel="LL_INFO"
+	description="Remove a user from a Role">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed a user from a Role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_USER_FROM_GROUP_ATTEMPT" id="156"
+	loglevel="LL_INFO"
+	description="Attempt to remove a user from a Group">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove a user from a Group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_USER_FROM_GROUP" id="157"
+	loglevel="LL_INFO"
+	description="Remove a user from a Group">
+	<datainfo>
+	    <item>name of user</item>
+	    <item>name of group</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed a user from a Group.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <!-- 201 to 300 are reserved for identity and realm requests -->
+
+    <logmessage name="ADD_MEMBER_IDENTITY_ATTEMPT" id="201"
+	loglevel="LL_INFO"
+	description="Attempt to add an Identity to an Identity in a Realm">
+	<datainfo>
+	    <item>name of identity to add</item>
+	    <item>type of identity to add</item>
+	    <item>name of identity to add to</item>
+	    <item>type of identity to add to</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to add an Identity to an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_MEMBER_IDENTITY" id="202"
+	loglevel="LL_INFO"
+	description="Add an Identity to an Identity in a Realm">
+	<datainfo>
+	    <item>name of identity to add</item>
+	    <item>type of identity to add</item>
+	    <item>name of identity to add to</item>
+	    <item>type of identity to add to</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Added an Identity to an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_IDENTITY_ATTEMPT" id="203"
+	loglevel="LL_INFO"
+	description="Attempt to assign service to an identity in a realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of identity</item>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to assign service to an identity in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_IDENTITY" id="204"
+	loglevel="LL_INFO"
+	description="Assign service to an identity in a realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of identity</item>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Assigned service to an identity in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_IDENTITIES_ATTEMPT" id="205"
+	loglevel="LL_INFO"
+	description="Attempt to create identities of a type in a realm.">
+	<datainfo>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create identities of a type in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_IDENTITIES" id="206"
+	loglevel="LL_INFO"
+	description="Create identities of a type in a realm.">
+	<datainfo>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Created identities of a type in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="CREATE_IDENTITY_ATTEMPT" id="207"
+	loglevel="LL_INFO"
+	description="Attempt to create identity of a type in a realm.">
+	<datainfo>
+	    <item>name of identity</item>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create identity of a type in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_IDENTITY" id="208"
+	loglevel="LL_INFO"
+	description="Create identity of a type in a realm.">
+	<datainfo>
+	    <item>name of identity</item>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Created identity of a type in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_IDENTITY_ATTEMPT" id="209"
+	loglevel="LL_INFO"
+	description="Attempt to delete identity of a type in a realm">
+	<datainfo>
+	    <item>name of identity</item>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete identity of a type in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_IDENTITY" id="210"
+	loglevel="LL_INFO"
+	description="Delete identity of a type in a realm">
+	<datainfo>
+	    <item>name of identity</item>
+	    <item>type of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted identity of a type in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_IDENTITY_ATTEMPT" id="211"
+	loglevel="LL_INFO"
+	description="Attempt to modify a service for an Identity in a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>type of identity</item>
+	    <item>name of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify a service for an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_IDENTITY" id="212"
+	loglevel="LL_INFO"
+	description="Modify a service for an Identity in a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>type of identity</item>
+	    <item>name of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified a service for an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_MEMBER_IDENTITY_ATTEMPT" id="213"
+	loglevel="LL_INFO"
+	description="Attempt to remove an Identity from an Identity in a Realm">
+	<datainfo>
+	    <item>name of identity to remove</item>
+	    <item>type of identity to remove</item>
+	    <item>name of identity to remove from</item>
+	    <item>type of identity to remove from</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove an Identity from an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_MEMBER_IDENTITY" id="214"
+	loglevel="LL_INFO"
+	description="Remove an Identity from an Identity in a Realm">
+	<datainfo>
+	    <item>name of identity to remove</item>
+	    <item>type of identity to remove</item>
+	    <item>name of identity to remove from</item>
+	    <item>type of identity to remove from</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed an Identity from an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SET_ATTRIBUTES_IDENTITY_ATTEMPT" id="215"
+	loglevel="LL_INFO"
+	description="Attempt to set Service Attributes for an Identity in a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>type of identity</item>
+	    <item>name of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to set Service Attributes for an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SET_ATTRIBUTES_IDENTITY" id="216"
+	loglevel="LL_INFO"
+	description="Set Service Attributes for an Identity in a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>type of identity</item>
+	    <item>name of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Set Service Attributes for an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="UNASSIGN_SERVICE_IDENTITY_ATTEMPT" id="217"
+	loglevel="LL_INFO"
+	description="Attempt to unassign a service from an Identity in a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>type of identity</item>
+	    <item>name of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to unassign a service from an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNASSIGN_SERVICE_IDENTITY" id="218"
+	loglevel="LL_INFO"
+	description="Unassign a service from an Identity in a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>type of identity</item>
+	    <item>name of identity</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Unassigned a service from an Identity in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_SUBORG_ATTEMPT" id="219"
+	loglevel="LL_INFO"
+	description="Attempt to create organization">
+	<datainfo>
+	    <item>name of organization</item>
+	    <item>container where sub organization is to be created</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create an organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_SUBORG" id="220"
+	loglevel="LL_INFO"
+	description="Create organization">
+	<datainfo>
+	    <item>name of organization</item>
+	</datainfo>
+	<triggers>
+	    <item>Created an organization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SUBORG_ATTEMPT" id="221"
+	loglevel="LL_INFO"
+	description="Attempt to delete suborganization.">
+	<datainfo>
+	    <item>name of suborganization</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete suborganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_SUBORG" id="222"
+	loglevel="LL_INFO"
+	description="Delete suborganization.">
+	<datainfo>
+	    <item>name of suborganization</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted suborganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_ROLE_ATTEMPT" id="223"
+	loglevel="LL_INFO"
+	description="Attempt to modify role">
+	<datainfo>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_ROLE" id="224"
+	loglevel="LL_INFO"
+	description="Modify role">
+	<datainfo>
+	    <item>name of role</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified role.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="MODIFY_SUBORG_ATTEMPT" id="225"
+	loglevel="LL_INFO"
+	description="Attempt to modify suborganization.">
+	<datainfo>
+	    <item>name of suborganization</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify suborganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SUBORG" id="226"
+	loglevel="LL_INFO"
+	description="Modify suborganization.">
+	<datainfo>
+	    <item>name of suborganization</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified suborganization.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_USER_ATTEMPT" id="227"
+	loglevel="LL_INFO"
+	description="Attempt to delete user.">
+	<datainfo>
+	    <item>name of user</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to delete user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_USER" id="228"
+	loglevel="LL_INFO"
+	description="Delete user.">
+	<datainfo>
+	    <item>name of user</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_USER_ATTEMPT" id="229"
+	loglevel="LL_INFO"
+	description="Attempt to modify user.">
+	<datainfo>
+	    <item>name of user</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_USER" id="230"
+	loglevel="LL_INFO"
+	description="Modify user.">
+	<datainfo>
+	    <item>name of user</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified user.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_ATTRVALS_REALM_ATTEMPT" id="231"
+	loglevel="LL_INFO"
+	description="Attempt to add values to a Service Attribute in a Realm.">
+	<datainfo>
+	    <item>name of attribute</item>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to add values to a Service Attribute in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ADD_ATTRVALS_REALM" id="232"
+	loglevel="LL_INFO"
+	description="Add values to a Service Attribute in a Realm.">
+	<datainfo>
+	    <item>name of attribute</item>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Added values to a Service Attribute in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="ASSIGN_SERVICE_TO_REALM_ATTEMPT" id="233"
+	loglevel="LL_INFO"
+	description="Attempt to assign a Service to a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to assign a Service to a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_TO_REALM" id="234"
+	loglevel="LL_INFO"
+	description="Assign a Service to a Realm">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Assigned a Service to a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_REALM_ATTEMPT" id="235"
+	loglevel="LL_INFO"
+	description="Attempt to create a Realm">
+	<datainfo>
+	    <item>name of realm created</item>
+	    <item>name of parent realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to create a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="CREATE_REALM" id="236"
+	loglevel="LL_INFO"
+	description="Create a Realm">
+	<datainfo>
+	    <item>name of realm created</item>
+	    <item>name of parent realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Created a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_REALM_ATTEMPT" id="237"
+	loglevel="LL_INFO"
+	description="Delete Realm.">
+	<datainfo>
+	    <item>recursive or not</item>
+	    <item>name of realm deleted</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="DELETE_REALM" id="238"
+	loglevel="LL_INFO"
+	description="Delete Realm.">
+	<datainfo>
+	    <item>recursive or not</item>
+	    <item>name of realm deleted</item>
+	</datainfo>
+	<triggers>
+	    <item>Deleted Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_REALM_ATTEMPT" id="239"
+	loglevel="LL_INFO"
+	description="Attempt to modify a service in a Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify a service in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_REALM" id="240"
+	loglevel="LL_INFO"
+	description="Modify a service in a Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified a service in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="REMOVE_ATTRIBUTE_FROM_SERVICE_ATTEMPT" id="241"
+	loglevel="LL_INFO"
+	description="Attempt to remove an attribute from a service in a Realm">
+	<datainfo>
+	    <item>name of attribute</item>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove an attribute from a service in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_ATTRIBUTE_FROM_SERVICE" id="242"
+	loglevel="LL_INFO"
+	description="Remove an attribute from a service in a Realm">
+	<datainfo>
+	    <item>name of attribute</item>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed an attribute from a service in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_ATTRVALS_REALM_ATTEMPT" id="243"
+	loglevel="LL_INFO"
+	description="Attempt to remove values from a service's attribute in a Realm">
+	<datainfo>
+	    <item>name of attribute</item>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to remove values from a service's attribute in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="REMOVE_ATTRVALS_REALM" id="244"
+	loglevel="LL_INFO"
+	description="Remove values from a service's attribute in a Realm">
+	<datainfo>
+	    <item>name of attribute</item>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed values from a service's attribute in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SET_ATTRS_REALM_ATTEMPT" id="245"
+	loglevel="LL_INFO"
+	description="Attempt to set attributes for a service in a Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to set attributes for a service in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SET_ATTRS_REALM" id="246"
+	loglevel="LL_INFO"
+	description="Set attributes for a service in a Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Set attributes for a service in a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNASSIGN_SERVICE_FROM_REALM_ATTEMPT" id="247"
+	loglevel="LL_INFO"
+	description="Attempt to unassign a service from a Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to unassign a service from a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNASSIGN_SERVICE_FROM_REALM" id="248"
+	loglevel="LL_INFO"
+	description="Unassign a service from a Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Unassigned a service from a Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_TO_ORGCONFIG_ATTEMPT" id="249"
+	loglevel="LL_INFO"
+	description="Attempt to assign a Service to an Organization Configuration">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to assign a Service to an Organization Configuration.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_TO_ORGCONFIG" id="250"
+	loglevel="LL_INFO"
+	description="Assign a Service to an Organization Configuration">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Assigned a Service to an Organization Configuration.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_TO_ORGCONFIG_NOTINLIST" id="251"
+	loglevel="LL_INFO"
+	description="Assign a Service to an Organization Configuration Not Done">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Assigned a Service to an Organization Configuration, but the service is not one of the org config's assignable services.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="ASSIGN_SERVICE_TO_REALM_NOTINLIST" id="252"
+	loglevel="LL_INFO"
+	description="Assign a Service to a Realm Not Done">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Assigned a Service to a Realm, but the service is not one of the realm's assignable services.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNASSIGN_SERVICE_FROM_ORGCONFIG_ATTEMPT" id="253"
+	loglevel="LL_INFO"
+	description="Attempt to unassign a service from an Organization Configuration.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to unassign a service from an Organization Configuration.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNASSIGN_SERVICE_FROM_ORGCONFIG" id="254"
+	loglevel="LL_INFO"
+	description="Unassign a service from an Organization Configuration.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Unassigned a service from an Organization Configuration.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNASSIGN_SERVICE_NOTIN_ORGCONFIG_OR_REALM" id="255"
+	loglevel="LL_INFO"
+	description="Unassign a service not in the Organization Configuration or Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Requested to unassign a service not in the Organization Configuration or Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_ORGCONFIG_ATTEMPT" id="256"
+	loglevel="LL_INFO"
+	description="Attempt to modify a service in an Organization Configuration.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify a service in an Organization Configuration.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_ORGCONFIG" id="257"
+	loglevel="LL_INFO"
+	description="Modify a service in an Organization Configuration.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Modified a service in an Organization Configuration.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="MODIFY_SERVICE_NOTIN_ORGCONFIG_OR_REALM" id="258"
+	loglevel="LL_INFO"
+	description="Modify a service not in the Organization Configuration or Realm.">
+	<datainfo>
+	    <item>name of service</item>
+	    <item>name of realm</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempted to modify a service not in the Organization Configuration or Realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+
+    <logmessage name="ATTEMPT_GET_PRIVILEGES" id="259"
+        loglevel="LL_INFO"
+        description="Attempt to get privileges of an Identity.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of identity</item>
+            <item>type of identity</item>
+        </datainfo>
+        <triggers>
+            <item>Attempted to get privileges of an Identity.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="GET_PRIVILEGES" id="260"
+        loglevel="LL_INFO"
+        description="Get privileges of an Identity.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of identity</item>
+            <item>type of identity</item>
+        </datainfo>
+        <triggers>
+            <item>Gotten privileges of an Identity.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="ATTEMPT_ADD_PRIVILEGES" id="261"
+        loglevel="LL_INFO"
+        description="Attempt to add privileges to an Identity.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of identity</item>
+            <item>type of identity</item>
+        </datainfo>
+        <triggers>
+            <item>Attempted to add privileges to an Identity.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="ADD_PRIVILEGES" id="262"
+        loglevel="LL_INFO"
+        description="Added privileges to an Identity.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of identity</item>
+            <item>type of identity</item>
+        </datainfo>
+        <triggers>
+            <item>Added privileges to an Identity.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="ATTEMPT_REMOVE_PRIVILEGES" id="263"
+        loglevel="LL_INFO"
+        description="Attempt to remove privileges from an Identity.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of identity</item>
+            <item>type of identity</item>
+        </datainfo>
+        <triggers>
+            <item>Attempted to remove privileges from an Identity.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="REMOVE_PRIVILEGES" id="264"
+        loglevel="LL_INFO"
+        description="Removed privileges to an Identity.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of identity</item>
+            <item>type of identity</item>
+        </datainfo>
+        <triggers>
+            <item>Removed privileges from an Identity.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+</logmessages>
+

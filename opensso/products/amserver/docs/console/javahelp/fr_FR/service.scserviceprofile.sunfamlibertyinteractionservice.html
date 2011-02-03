@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service d'interaction Liberty - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Service d'interaction Liberty</h4>
+
+
+<a name="ggofj"></a><h5>Le fournisseur de services Web redirige l'utilisateur pour l'interaction</h5>
+<p>Cet attribut indique si le fournisseur de services Web redirige ou non
+l'utilisateur pour obtenir son autorisation. La valeur par d&#233;faut est yes.</p>
+
+<a name="ggofq"></a><h5>Le fournisseur de services Web redirige l'utilisateur pour l'interaction en vue des donn&#233;es</h5>
+<p>Ceci lance une interaction pour obtenir l'autorisation de l'utilisateur ou collecter des
+donn&#233;es suppl&#233;mentaires. Cette propri&#233;t&#233; indique si le fournisseur de services Web redirige
+ou non l'utilisateur pour collecter d'autres donn&#233;es. La valeur par d&#233;faut est
+yes.</p>
+
+<a name="ggogl"></a><h5>Dur&#233;e d'interaction pr&#233;vue par le fournisseur de services Web</h5>
+<p>Cet attribut indique la dur&#233;e (en secondes) pr&#233;vue par le fournisseur de
+services Web pour effectuer une interaction et restituer le contr&#244;le au client
+du service Web. Par exemple, le fournisseur de services Web re&#231;oit une
+demande indiquant que le client du service Web attendra un maximum de
+30&#160;secondes (d&#233;finies dans Dur&#233;e d'interaction pr&#233;vue par le client du service Web)
+pour l'interaction. Si cet attribut est d&#233;fini sur 40&#160;secondes, le fournisseur de
+services Web renvoie une erreur SOAP (<tt>timeNotSufficient </tt>), indiquant que la dur&#233;e est
+insuffisante pour l'interaction.</p>
+
+<a name="ggogn"></a><h5>Le fournisseur de services Web oblige &#224; ce que returnToURL soit SSL</h5>
+<p>Cet attribut indique si le fournisseur de services Web applique ou non
+un param&#232;tre <tt>returnToURL</tt> HTTPS sp&#233;cifi&#233; par le client du service Web. Les
+sp&#233;cifications Liberty Alliance Project stipulent que la valeur de cette propri&#233;t&#233; est
+toujours yes. La valeur false est essentiellement utilis&#233;e pour un d&#233;ploiement par
+phases ais&#233;.</p>
+
+<a name="ggoib"></a><h5>Le fournisseur de services Web oblige &#224; ce que returnToHost soit identique &#224; requestHost</h5>
+<p> Cet attribut indique si le fournisseur de services Web applique ou non
+les valeurs d'adresse de <tt>returnToHost</tt> et <tt> requestHost</tt> si elles sont identiques. Les
+sp&#233;cifications Liberty Alliance Project stipulent que la valeur de cette propri&#233;t&#233; est
+toujours yes. La valeur false est essentiellement utilis&#233;e pour un d&#233;ploiement par
+phases ais&#233;.</p>
+
+<a name="ggoha"></a><h5>Emplacement de feuille de style HTML</h5>
+<p>Cet attribut pointe sur l'emplacement de la feuille de style utilis&#233;e pour
+afficher la page d'interaction au format HTML.</p>
+
+<a name="ggohi"></a><h5>Emplacement de feuille de style WML</h5>
+<p>Cet attribut pointe sur l'emplacement de la feuille de style utilis&#233;e pour
+afficher la page d'interaction au format WML.</p>
+
+<a name="ggogg"></a><h5>URL d'interaction du fournisseur de services Web</h5>
+<p>Cet attribut sp&#233;cifie l'URL o&#249; le servlet <tt>WSPRedirectHandler </tt> est d&#233;ploy&#233;. Le servlet
+traite la partie fournisseur de services des interactions pour la redirection de
+l'utilisateur.</p>
+
+<a name="ggoft"></a><h5>URL d'interaction du fournisseur de services Web si derri&#232;re un &#233;quilibreur de charge</h5>
+<p>D&#233;finit l'URL du gestionnaire de redirection du fournisseur de services Web affich&#233;e
+par un &#233;quilibreur de charge.</p>
+
+<a name="ggogq"></a><h5>Liste des URL d'interaction du cluster (site) du fournisseur de services Web derri&#232;re l'&#233;quilibreur de charge</h5>
+<p>D&#233;finit les URL du gestionnaire de redirection du fournisseur de services Web
+des serveurs de confiance dans le cluster.</p>
+
+<a name="ggogx"></a><h5>Classe de configuration d'interaction</h5>
+<p>Cet attribut sp&#233;cifie la classe qui fournit les m&#233;thodes d'acc&#232;s permettant de
+lire les configurations d'interaction.</p>
+
+<a name="ggogj"></a><h5>Options de participation du client du service Web &#224; l'interaction</h5>
+<p>Cet attribut indique le niveau d'interaction selon lequel le client du service
+Web participe s'il est configur&#233; pour participer &#224; la redirection de l'utilisateur.
+Les valeurs possibles sont interactIfNeeded, doNotInteract et doNotInteractForData. La valeur affirmative interactIfNeeded
+est la valeur par d&#233;faut.</p>
+
+<a name="ggogs"></a><h5>Le client du service Web inclut userInteractionHeader</h5>
+<p>Cet attribut indique si le client du service Web inclut ou non
+un en-t&#234;te SOAP pour sp&#233;cifier certaines pr&#233;f&#233;rences d'interaction en fonction des sp&#233;cifications
+Liberty. La valeur par d&#233;faut est yes.</p>
+
+<a name="ggofn"></a><h5>Le client du service Web redirige l'utilisateur pour l'interaction</h5>
+<p>Cet attribut sp&#233;cifie si le client du service Web participe ou non
+&#224; la redirection de l'utilisateur. La valeur par d&#233;faut est yes.</p>
+
+<a name="ggoim"></a><h5>Dur&#233;e d'interaction pr&#233;vue par le client du service Web</h5>
+<p>Cet attribut d&#233;finit le temps maximal (en secondes) pendant lequel le client
+du service Web attend que le fournisseur de services Web effectue sa
+partie de l'interaction. Le fournisseur de services Web ne lance pas d'interaction
+s'il est probable que l'interaction dure plus de temps que la dur&#233;e
+d&#233;finie. Par exemple, le fournisseur de services Web re&#231;oit une demande dans
+laquelle cette propri&#233;t&#233; est d&#233;finie sur un maximum de 30&#160;secondes. Si la
+propri&#233;t&#233; Dur&#233;e d'interaction pr&#233;vue par le client du service Web du fournisseur
+de services Web est d&#233;finie sur 40&#160;secondes, le fournisseur de services Web
+renvoie une erreur SOAP (<tt>timeNotSufficient</tt>), indiquant que la dur&#233;e est insuffisante pour
+l'interaction.</p>
+
+<a name="ggofx"></a><h5>Le client du service Web oblige &#224; ce que l'URL de redirection soit SSL</h5>
+<p>Cet attribut sp&#233;cifie si le client du service Web applique ou non
+HTTPS dans les URL de redirection. Les sp&#233;cifications Liberty Alliance Project stipulent
+que la valeur de cette propri&#233;t&#233; est toujours yes, ce qui indique
+que le fournisseur de services Web ne redirige pas l'utilisateur lorsque la
+valeur de <tt>redirectURL</tt> (sp&#233;cifi&#233;e par le fournisseur de services Web) n'est pas
+une URL HTTPS. La valeur false est essentiellement utilis&#233;e pour un d&#233;ploiement
+par phases ais&#233;.</p>
+<br/>
+
+</body>
+</html>

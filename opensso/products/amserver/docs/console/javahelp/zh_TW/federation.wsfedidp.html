@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED 身份識別提供者自訂 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedidp"></a><h4>WS-FED 身份識別提供者自訂</h4>
+<p>下列屬性套用於 WS-FED 身份識別提供者角色：</p>
+
+<a name="ghfke"></a><h5>名稱 ID 格式</h5>
+<p>定義從身份識別提供者傳送至服務提供者之單次登入回應的名稱識別碼元件格式。WS-Federation 單次登入支援以下識別碼格式 (預設值是 UPN)：</p>
+<ul><li><p>電子郵件</p></li></ul>
+
+<ul><li><p>一般名稱</p></li>
+<li><p>UPN &#8211; 使用者主體名稱。語法是 <tt>username@domain</tt>，其中 <tt>domain</tt> 的範例是 <tt>example.com</tt>。</p></li></ul>
+
+
+<a name="ghfog"></a><h5>名稱 ID 屬性</h5>
+<p>定義使用者設定檔中會用作名稱 ID 值的屬性。預設值為 <tt>uid</tt>。</p>
+
+<a name="ghflq"></a><h5>名稱包含網域</h5>
+<p>當使用 [名稱 ID 格式] 屬性來定義的 UPN 格式時，此屬性會指定使用者設定檔中的 [名稱 ID 屬性] 是否包含網域。如果包含，就會將 [名稱
+ID 屬性] 用於 UPN，因為它目前已定義。否則，它會與網域結合以組成 UPN。</p>
+
+<a name="ghfmk"></a><h5>網域屬性</h5>
+<p>使用 UPN 格式時，如果並未選取 [名稱包含網域] 屬性，此屬性會將使用者設定檔中的一個指定為 UPN 網域。</p>
+
+<a name="ghfnw"></a><h5>UPN 網域</h5>
+<p>使用 UPN 格式時，如果並未選擇 [名稱包含網域] 屬性，且未指定 [網域屬性] 的值 (或者特定使用者的該屬性並無值)，就會使用這個屬性來建構 UPN。</p>
+
+<a name="ggwvh"></a><h5>簽署憑證別名</h5>
+<p>此屬性指定提供者憑證別名，用來尋找金鑰庫中的指定簽署憑證。</p>
+
+<a name="ggwve"></a><h5>要求類型</h5>
+<p>指定要求類型，以便 WS-FED 服務能辨識聯合合作夥伴之間交換的記號類型。</p><p>EmailAddress 要求類型用來透過電子郵件地址來識別特定安全性主體。</p><p>UPN 要求類型用來透過使用者主體名稱來識別特定安全性主體。</p><p>CommonName 要求類別用來透過與 X.500 命名慣例一致的 CN 值來識別安全性主體。此要求的值不一定要是唯一的，而且不應用於授權之目的。</p>
+
+<a name="ggwwj"></a><h5>帳號對映程式</h5>
+<p>此屬性指定 <tt>AccountMapper</tt> 介面的實作，該介面用來將遠端使用者帳號對映至本機使用者帳號，以便進行單次登入。預設值為 <tt>com.sun.identity.wsfed.plugins.</tt><tt>DefaultIDPAccountMapper</tt>。</p>
+
+<a name="ggwuq"></a><h5>屬性對映程式</h5>
+<p>此屬性定義類別，該類別用來將指定中屬性對映至身份識別提供者在本機上定義的使用者屬性。預設類別為 <tt>com.sun.identity.wsfederation.plugins.</tt><tt>DefaultIDPAttributeMapper</tt>。</p>
+
+<a name="ggwul"></a><h5>屬性對映</h5>
+<p>指定值，以定義預設屬性對映程式外掛程式所使用的對映。對映應以下列格式配置：</p><p><i>Claim_Type</i>=<i>local-attribute</i></p><p>例如 <tt>EmailAddress=mail</tt> 或 <tt>Address=postaladdress</tt>。鍵入對映做為 [新的值]，然後按一下 [增加]。</p>
+
+<a name="ggwrj"></a><h5>指定有效時間</h5>
+<p>指定在一段時間內有效，在這之前或之後都無效。</p><p><tt>有效時間</tt>會指定從指定的發出時間開始計算的指定有效時間，以秒為單位。預設值為 <tt>600</tt> 秒。</p>
+<br/>
+
+</body>
+</html>

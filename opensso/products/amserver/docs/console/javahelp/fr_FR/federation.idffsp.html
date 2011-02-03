@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'un fournisseur de services ID-FF - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffsp"></a><h4>Personnalisation d'un fournisseur de services ID-FF</h4>
+<p>Les attributs du fournisseur de services ID-FF sont organis&#233;s comme suit&#160;:</p>
+<ul><li><p><a href="#ggwvs">Attributs communs</a></p></li>
+<li><p><a href="#ggwvp">URL de communication</a></p></li>
+<li><p><a href="#ggwrw">Profils de communication</a></p></li>
+<li><p><a href="#ggwud">Configuration du fournisseur de services </a></p></li>
+<li><p><a href="#ggwyd">URL de service</a></p></li>
+<li><p><a href="#ggwsf">Plug-ins</a></p></li>
+<li><p><a href="#ggwtb">Mappeur d'attributs de fournisseur de services</a></p></li>
+<li><p><a href="#ggwtp">F&#233;d&#233;ration automatique </a></p></li>
+<li><p><a href="#ggwrv">Contexte d'authentification</a></p></li>
+<li><p><a href="#ggwub">Configuration de l'authentification de proxy</a></p></li></ul>
+
+
+<a name="ggwvs"></a><h5>Attributs communs</h5>
+
+<ul><li><p><a href="#ggwwh">Type de fournisseur</a></p></li>
+<li><p><a href="#ggwrt">Description</a></p></li>
+<li><p><a href="#ggwuu">&#201;num&#233;ration des protocoles pris en charge</a></p></li>
+<li><p><a href="#ggwwn">Cl&#233; de signature</a></p></li>
+<li><p><a href="#ggwuj">Cl&#233; de chiffrement</a></p></li>
+<li><p><a href="#ggwsc">Chiffrement de l'identificateur de nom</a></p></li>
+<li><p><a href="#ggwwa">Requ&#234;te d'authentification de signature</a></p></li></ul>
+
+
+<a name="ggwwh"></a><h5>Type de fournisseur</h5>
+<p>La valeur statique de cet attribut est le type de fournisseur configur&#233;&#160;:
+h&#233;berg&#233; ou distant.</p>
+
+<a name="ggwrt"></a><h5>Description</h5>
+<p>Cet attribut est une description du fournisseur de services.</p>
+
+<a name="ggwuu"></a><h5>&#201;num&#233;ration des protocoles pris en charge</h5>
+<p>Choisissez la version de Liberty ID-FF prise en charge par ce fournisseur.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> fait r&#233;f&#233;rence &#224; Liberty Identity Federation Framework Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> fait r&#233;f&#233;rence &#224; Liberty Identity Federation Framework Version 1.1.</p></li></ul>
+
+
+<a name="ggwwn"></a><h5>Cl&#233; de signature</h5>
+<p>D&#233;finit l'alias de certificat de s&#233;curit&#233; utilis&#233; pour signer les demandes et
+les r&#233;ponses. Les certificats sont stock&#233;s dans un fichier keystore Java. Chaque
+certificat est mapp&#233; &#224; un alias utilis&#233; pour r&#233;cup&#233;rer le certificat.</p>
+
+<a name="ggwuj"></a><h5>Cl&#233; de chiffrement</h5>
+<p>D&#233;finit l'alias de certificat de s&#233;curit&#233; utilis&#233; pour le chiffrement. Les certificats
+sont stock&#233;s dans un fichier keystore Java. Chaque certificat est mapp&#233; &#224;
+un alias utilis&#233; pour r&#233;cup&#233;rer le certificat.</p>
+
+<a name="ggwsc"></a><h5>Chiffrement de l'identificateur de nom</h5>
+<p>Cochez la case pour activer le chiffrement de l'identificateur de nom.</p>
+
+<a name="ggwwa"></a><h5>Requ&#234;te d'authentification de signature</h5>
+<p>Si cet attribut est activ&#233;, le fournisseur de services va signer toutes
+les demandes d'authentification.</p>
+
+<a name="ggwvp"></a><h5>URL de communication</h5>
+
+<ul><li><p><a href="#ggwrz">Extr&#233;mit&#233; SOAP</a></p></li>
+<li><p><a href="#ggwun">Service de d&#233;connexion unique </a></p></li>
+<li><p><a href="#ggwrn">Retour de d&#233;connexion unique</a></p></li>
+<li><p><a href="#ggwvg">Service d'interruption de la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwup">Retour d'interruption de la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwry">Service d'enregistrement du nom</a></p></li>
+<li><p><a href="#ggwvd">Retour d'enregistrement du nom</a></p></li>
+<li><p><a href="#ggwtq">URL de consommateur d'assertion</a></p></li>
+<li><p><a href="#ggwrh">ID de l'URL du service consommateur d'assertion</a></p></li>
+<li><p><a href="#ggwvi">D&#233;finir l'URL du service consommateurs d'assertion comme URL par d&#233;faut</a></p></li></ul>
+
+
+<a name="ggwrz"></a><h5>Extr&#233;mit&#233; SOAP</h5>
+<p>D&#233;finit un URI pointant vers le r&#233;cepteur de messages SOAP du fournisseur
+de services. Cette valeur communique l'emplacement du r&#233;cepteur SOAP lors des communications
+hors navigateur.</p>
+
+<a name="ggwun"></a><h5>Service de d&#233;connexion unique </h5>
+<p>D&#233;finit l'URL auquel les fournisseurs d'identit&#233;s peuvent envoyer les demandes de d&#233;connexion.
+La d&#233;connexion unique synchronise la fonctionnalit&#233; de d&#233;connexion pour toutes les sessions
+authentifi&#233;es par le fournisseur d'identit&#233;s.</p>
+
+<a name="ggwrn"></a><h5>Retour de d&#233;connexion unique</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs d'identit&#233;s peuvent envoyer les r&#233;ponses de d&#233;connexion
+unique.</p>
+
+<a name="ggwvg"></a><h5>Service d'interruption de la f&#233;d&#233;ration</h5>
+<p>D&#233;finit l'URL auquel le fournisseur d'identit&#233;s va envoyer les demandes d'interruption de
+la f&#233;d&#233;ration.</p>
+
+<a name="ggwup"></a><h5>Retour d'interruption de la f&#233;d&#233;ration</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs d'identit&#233;s peuvent envoyer les r&#233;ponses d'interruption de
+la f&#233;d&#233;ration.</p>
+
+<a name="ggwry"></a><h5>Service d'enregistrement du nom</h5>
+<p>D&#233;finit l'URL qui sera utilis&#233; lors de la communication avec le fournisseur
+d'identit&#233;s pour sp&#233;cifier le nouvel identificateur de nom de l'entit&#233; principale. (L'enregistrement
+ne peut avoir lieu qu'apr&#232;s l'ouverture d'une session de f&#233;d&#233;ration.)</p>
+
+<a name="ggwvd"></a><h5>Retour d'enregistrement du nom</h5>
+<p>D&#233;finit l'URL auquel les fournisseurs d'identit&#233;s peuvent envoyer les r&#233;ponses d'enregistrement de
+nom. (L'enregistrement ne peut avoir lieu qu'apr&#232;s l'ouverture d'une session de f&#233;d&#233;ration.)</p>
+
+<a name="ggwtq"></a><h5>URL de consommateur d'assertion</h5>
+<p>D&#233;finit l'URL auquel le fournisseur d'identit&#233;s peut envoyer des assertions SAML. </p>
+
+<a name="ggwrh"></a><h5>ID de l'URL du service consommateur d'assertion</h5>
+<p>Si l'attribut commun &#201;num&#233;ration des protocoles pris en charge a la valeur
+<tt>urn:liberty:iff:2003-08</tt>, tapez l'ID n&#233;cessaire.</p>
+
+<a name="ggwvi"></a><h5>D&#233;finir l'URL du service consommateurs d'assertion comme URL par d&#233;faut</h5>
+<p>Cochez cette case pour utiliser l'URL du service consommateur d'assertion comme valeur
+par d&#233;faut si aucun identificateur n'est fourni dans la demande.</p>
+
+<a name="ggwrw"></a><h5>Profils de communication</h5>
+
+<ul><li><p><a href="#ggwwg">Interruption de la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwuc">D&#233;connexion unique</a></p></li>
+<li><p><a href="#ggwsy">Enregistrement du nom</a></p></li>
+<li><p><a href="#ggwuk">Profil SSO pris en charge</a></p></li></ul>
+
+
+<a name="ggwwg"></a><h5>Interruption de la f&#233;d&#233;ration</h5>
+<p>S&#233;lectionnez un profil pour notifier aux autres fournisseurs l'interruption de la f&#233;d&#233;ration
+d'une entit&#233; principale&#160;:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuc"></a><h5>D&#233;connexion unique</h5>
+<p>S&#233;lectionnez un profil pour notifier aux autres fournisseurs la d&#233;connexion d'une entit&#233;
+principale&#160;:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwsy"></a><h5>Enregistrement du nom</h5>
+<p>S&#233;lectionnez un profil pour notifier aux autres fournisseurs l'enregistrement du nom d'une
+entit&#233; principale&#160;:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuk"></a><h5>Profil SSO pris en charge</h5>
+<p>S&#233;lectionnez un profil pour envoyer les demandes d'authentification&#160;:</p>
+<ul><li><p>Poste navigateur (sp&#233;cifie un protocole POST HTTP bas&#233; sur un navigateur)</p></li>
+<li><p>Art&#233;fact navigateur (sp&#233;cifie un protocole bas&#233; sur SOAP hors navigateur).</p></li>
+<li><p>WML (sp&#233;cifie le protocole Wireless Markup Language)</p></li>
+<li><p>LECP (sp&#233;cifie un proxy client compatible Liberty)</p>
+<hr><p><b>Remarque &#8211; </b>OpenSSO peut traiter les demandes provenant d'un profil de proxy client Liberty, mais il requiert une op&#233;ration de configuration suppl&#233;mentaire qui n'est pas d&#233;crite dans le pr&#233;sent manuel.</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwud"></a><h5>Configuration du fournisseur de services </h5>
+
+<ul><li><p><a href="#ggwtx">Alias du fournisseur</a></p></li>
+<li><p><a href="#ggwuf">Type d'authentification</a></p></li>
+<li><p><a href="#ggwvl">Authentification forc&#233;e du fournisseur d'identit&#233;s</a></p></li>
+<li><p><a href="#ggwrk">Demander que le fournisseur d'identit&#233;s soit passif</a></p></li>
+<li><p><a href="#ggwwi">Enregistrement du nom apr&#232;s la f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwsq">Strat&#233;gie d'ID de nom</a></p></li>
+<li><p><a href="#ggwvr">F&#233;d&#233;ration d'affiliation</a></p></li>
+<li><p><a href="#ggwwp">&#201;tat du fournisseur</a></p></li>
+<li><p><a href="#ggwti">R&#233;pond avec</a></p></li></ul>
+
+
+<a name="ggwtx"></a><h5>Alias du fournisseur</h5>
+<p>D&#233;finit le nom d'alias du fournisseur de services local.</p>
+
+<a name="ggwuf"></a><h5>Type d'authentification</h5>
+<p>S&#233;lectionnez le fournisseur &#224; utiliser pour les demandes d'authentification &#233;mises par un
+fournisseur h&#233;berg&#233; localement&#160;:</p>
+<ul><li><p><b>Distant</b> indique que le fournisseur h&#233;berg&#233; localement doit contacter un fournisseur d'identit&#233;s distant &#224; r&#233;ception d'une demande d'authentification.</p></li>
+<li><p><b>Local</b> sp&#233;cifie que le fournisseur h&#233;berg&#233; localement doit contacter un fournisseur d'identit&#233;s local &#224; r&#233;ception d'une demande d'authentification (en g&#233;n&#233;ral, lui-m&#234;me).</p></li></ul>
+
+
+<a name="ggwvl"></a><h5>Authentification forc&#233;e du fournisseur d'identit&#233;s</h5>
+<p>Cochez cette case pour indiquer que le fournisseur d'identit&#233;s doit se r&#233;authentifier
+(m&#234;me pendant une session en direct) lorsqu'il re&#231;oit une nouvelle demande d'authentification.
+Par d&#233;faut, cet attribut est activ&#233;.</p>
+
+<a name="ggwrk"></a><h5>Demander que le fournisseur d'identit&#233;s soit passif</h5>
+<p>Cochez cette case pour sp&#233;cifier que le fournisseur d'identit&#233;s ne doit pas
+interagir avec l'entit&#233; principale, mais avec l'utilisateur.</p>
+
+<a name="ggwwi"></a><h5>Enregistrement du nom apr&#232;s la f&#233;d&#233;ration</h5>
+<p>Lorsqu'elle est activ&#233;e, cette option permet &#224; un fournisseur de services de
+participer &#224; l'enregistrement du nom apr&#232;s la f&#233;d&#233;ration.</p>
+
+<a name="ggwsq"></a><h5>Strat&#233;gie d'ID de nom</h5>
+<p>&#201;num&#233;ration permettant au demandeur de d&#233;cider de la strat&#233;gie d'identification de nom
+&#224; appliquer au fournisseur d'identit&#233;s. </p>
+
+<a name="ggwvr"></a><h5>F&#233;d&#233;ration d'affiliation</h5>
+<p>Cochez cette case pour activer la f&#233;d&#233;ration d'affiliation.</p>
+
+<a name="ggwwp"></a><h5>&#201;tat du fournisseur</h5>
+<p>D&#233;finit si le fournisseur de services est actif ou inactif. L'option Actif
+(par d&#233;faut) indique que le fournisseur de services peut traiter des demandes
+et g&#233;n&#233;rer des r&#233;ponses. </p>
+
+<a name="ggwti"></a><h5>R&#233;pond avec</h5>
+<p>Sp&#233;cifie le type d'instructions que le fournisseur de services peut g&#233;n&#233;rer. Par
+exemple, <tt>lib:AuthenticationStatement</tt>.</p>
+
+<a name="ggwyd"></a><h5>URL de service</h5>
+
+<ul><li><p><a href="#ggwro">Liste des URL de la page des cercles de confiance</a></p></li>
+<li><p><a href="#ggwri">F&#233;d&#233;rer l'URL de la page</a></p></li>
+<li><p><a href="#ggwtf">URL de la page d'accueil</a></p></li>
+<li><p><a href="#ggwsa">URL de redirection en cas d'&#233;chec de la connexion unique</a></p></li>
+<li><p><a href="#ggwta">URL d'interruption</a></p></li>
+<li><p><a href="#ggwrd">URL de la page d'erreurs</a></p></li>
+<li><p><a href="#ggwth">URL de d&#233;connexion</a></p></li></ul>
+
+
+<a name="ggwro"></a><h5>Liste des URL de la page des cercles de confiance</h5>
+<p>D&#233;finit l'URL qui r&#233;pertorie tous les cercles de confiance auxquels le fournisseur
+appartient.</p>
+
+<a name="ggwri"></a><h5>F&#233;d&#233;rer l'URL de la page</h5>
+<p>Sp&#233;cifie l'URL qui effectue l'op&#233;ration de f&#233;d&#233;ration. </p>
+
+<a name="ggwtf"></a><h5>URL de la page d'accueil</h5>
+<p>D&#233;finit l'URL de la page d'accueil du fournisseur d'identit&#233;s.</p>
+
+<a name="ggwsa"></a><h5>URL de redirection en cas d'&#233;chec de la connexion unique</h5>
+<p>Tapez l'URL vers lequel une entit&#233; principale est redirig&#233;e en cas d'&#233;chec
+de la connexion unique.</p>
+
+<a name="ggwta"></a><h5>URL d'interruption</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est redirig&#233;e une fois la
+f&#233;d&#233;ration interrompue.</p>
+
+<a name="ggwrd"></a><h5>URL de la page d'erreurs</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est dirig&#233;e en cas d'erreur.
+</p>
+
+<a name="ggwth"></a><h5>URL de d&#233;connexion</h5>
+<p>D&#233;finit l'URL vers lequel une entit&#233; principale est dirig&#233;e apr&#232;s la d&#233;connexion.</p>
+
+<a name="ggwsf"></a><h5>Plug-ins</h5>
+
+<ul><li><p><a href="#ggwuh">Adaptateur fournisseur de services</a></p></li>
+<li><p><a href="#ggwtd">Env d'adaptateur SP f&#233;d&#233;ration</a></p></li>
+<li><p><a href="#ggwuv">Classe de fournisseurs utilisateurs</a></p></li>
+<li><p><a href="#ggwsu">Impl&#233;mentation de l'identificateur de nom</a></p></li></ul>
+
+
+<a name="ggwuh"></a><h5>Adaptateur fournisseur de services</h5>
+<p>D&#233;finit la classe d'impl&#233;mentation de l'interface <tt>com.sun.identity.federation.plugins.FSSPAdapter</tt>. La valeur par d&#233;faut est
+: </p><p><tt>com.sun.identity.federation.plugins.FSDefaultSPAdapter</tt> </p>
+
+<a name="ggwtd"></a><h5>Env d'adaptateur SP f&#233;d&#233;ration</h5>
+<p>D&#233;finit la liste des propri&#233;t&#233;s d'environnement &#224; utiliser par la classe d'impl&#233;mentation
+SPI de l'adaptateur du fournisseur de services.</p>
+
+<a name="ggwuv"></a><h5>Classe de fournisseurs utilisateurs</h5>
+<p>Sp&#233;cifie la classe "plug-able" utilis&#233;e pour proposer des op&#233;rations telles que la
+recherche d'un utilisateur, l'obtention d'attributs utilisateur, etc. La valeur par d&#233;faut est
+: </p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider </tt> </p>
+
+<a name="ggwsu"></a><h5>Impl&#233;mentation de l'identificateur de nom</h5>
+<p>Ce champ d&#233;finit la classe utilis&#233;e par un fournisseur de services pour
+participer &#224; l'enregistrement de nom. L'enregistrement du nom est un profil qui
+permet aux fournisseurs de services d'indiquer l'identificateur de nom d'une entit&#233; principale
+qu'un fournisseur d'identit&#233;s utilisera pour communiquer avec le fournisseur de services. The
+value is <tt>com.sun.identity.federation.services.util.FSNameIdentifierImpl </tt>.</p>
+
+<a name="ggwtb"></a><h5>Mappeur d'attributs de fournisseur de services</h5>
+
+<ul><li><p><a href="#ggwvz">Classe de mappeur d'attributs</a></p></li>
+<li><p><a href="#ggwsh">Mappage d'attributs de fournisseur de services</a></p></li></ul>
+
+
+<a name="ggwvz"></a><h5>Classe de mappeur d'attributs</h5>
+<p>Classe utilis&#233;e pour mapper des attributs utilisateur d&#233;finis localement &#224; des attributs
+figurant dans l'assertion SAML. Il n'y a pas de classe par d&#233;faut.
+</p>
+
+<a name="ggwsh"></a><h5>Mappage d'attributs de fournisseur de services</h5>
+<p>Sp&#233;cifiez des valeurs pour d&#233;finir les correspondances utilis&#233;es par le plug-in de
+mappage des attributs par d&#233;faut sp&#233;cifi&#233; plus haut. Les mappages doivent avoir
+le format suivant&#160;:</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>Par exemple, <tt>Email=emailaddress</tt> ou <tt>Address=postaladdress</tt>. Tapez le mappage dans Nouvelle valeur et
+cliquez sur Ajouter.</p>
+
+<a name="ggwtp"></a><h5>F&#233;d&#233;ration automatique </h5>
+
+<ul><li><p><a href="#ggwrl">F&#233;d&#233;ration automatique</a></p></li>
+<li><p><a href="#ggwsd">Nom d'attribut commun pour la f&#233;d&#233;ration automatique</a></p></li></ul>
+
+
+<a name="ggwrl"></a><h5>F&#233;d&#233;ration automatique</h5>
+<p>Cochez cette case pour activer la f&#233;d&#233;ration automatique.</p>
+
+<a name="ggwsd"></a><h5>Nom d'attribut commun pour la f&#233;d&#233;ration automatique</h5>
+<p>D&#233;finit le nom d'attribut LDAP commun de l'utilisateur, par exemple <tt>telephonenumber</tt>. Il
+permet de cr&#233;er une instruction comportant l'attribut de f&#233;d&#233;ration automatique. Lors de
+la cr&#233;ation d'une instruction d'attribut de f&#233;d&#233;ration automatique, la valeur de cet
+attribut est utilis&#233;e. L'instruction contiendra l'&#233;l&#233;ment attribut et cet attribut courant comme
+valeur. </p>
+
+<a name="ggwrv"></a><h5>Contexte d'authentification</h5>
+<p>Cet attribut d&#233;finit la classe du contexte d'authentification par d&#233;faut (m&#233;thode d'authentification)
+du fournisseur de services. Cette m&#233;thode sera syst&#233;matiquement appel&#233;e lorsque le fournisseur
+de services envoie une demande d'authentification. Cette valeur pr&#233;cise &#233;galement le contexte
+d&#8217;authentification utilis&#233; par le fournisseur de services lorsqu&#8217;un utilisateur inconnu tente d&#8217;acc&#233;der
+&#224; des ressources prot&#233;g&#233;es. Les options sont les suivantes :</p><dl><dt>Pris en charge</dt>
+<dd><p>Cochez la case en regard de la classe du contexte d'authentification si le fournisseur de services l'autorise.</p></dd>
+<a name="indexterm-74"></a><a name="indexterm-75"></a><a name="indexterm-76"></a><dt>R&#233;f&#233;rence du contexte</dt>
+<dd><p>Les classes de contexte d'authentification Liberty sont&#160;:</p>
+<ul><li><p>Contrat mobile</p></li>
+<li><p>ID num&#233;rique mobile</p></li>
+<li><p>Mobile non enregistr&#233;</p></li>
+<li><p>Mot de passe</p></li>
+<li><p>Transport prot&#233;g&#233; par mot de passe</p></li>
+<li><p>Session pr&#233;c&#233;dente</p></li>
+<li><p>Carte &#224; puce</p></li>
+<li><p>Carte &#224; puce PKI</p></li>
+<li><p>Logiciel PKI</p></li>
+<li><p>Jeton temps sync</p></li></ul>
+</dd>
+<dt>Niveau</dt>
+<dd><p>Choisissez un niveau de priorit&#233; dans le cas de contextes multiples.</p></dd>
+</dl>
+
+
+<a name="ggwub"></a><h5>Configuration de l'authentification de proxy</h5>
+
+<ul><li><p><a href="#ggwur">Authentification de proxy</a></p></li>
+<li><p><a href="#ggwrs">Liste des fournisseurs d'identit&#233;s proxy</a></p></li>
+<li><p><a href="#ggwsr">Nombre max. de serveurs proxy</a></p></li>
+<li><p><a href="#ggwtu">Utiliser un cookie d'introduction pour la cr&#233;ation de proxys</a></p></li></ul>
+<p>Les attributs de configuration de l'authentification par proxy d&#233;finissent les valeurs de
+la cr&#233;ation de proxy dynamique des fournisseurs.</p>
+
+<a name="ggwur"></a><h5>Authentification de proxy</h5>
+<p>Cochez la case pour activer l'authentification par proxy d'un fournisseur de services.</p>
+
+<a name="ggwrs"></a><h5>Liste des fournisseurs d'identit&#233;s proxy</h5>
+<p>Saisissez l'identificateur d'un ou de plusieurs fournisseurs d'identit&#233;s, &#224; utiliser pour l'authentification
+par proxy dans le champ Nouvelle valeur, puis cliquez sur Ajouter. La
+valeur est un URI d&#233;fini comme l'identificateur du fournisseur.</p>
+
+<a name="ggwsr"></a><h5>Nombre max. de serveurs proxy</h5>
+<p>Indiquez le nombre maximum de fournisseurs d'identit&#233;s pouvant &#234;tre utilis&#233;s pour l'authentification
+par proxy.</p>
+
+<a name="ggwtu"></a><h5>Utiliser un cookie d'introduction pour la cr&#233;ation de proxys</h5>
+<p>Cochez cette case pour utiliser des cookies d'introduction afin d'identifier le fournisseur
+d'identit&#233;s jouant le r&#244;le de proxy.</p>
+<br/>
+
+</body>
+</html>

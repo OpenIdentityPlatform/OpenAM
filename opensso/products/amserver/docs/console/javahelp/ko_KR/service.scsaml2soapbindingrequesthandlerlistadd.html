@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>요청 처리기 구성 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>요청 처리기 구성</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p><tt>RequestHandler</tt> 인터페이스는 SOAP 바인드 서비스를 사용하는 각 SAMLv2 서비스가 서버측에서 구현해야 합니다.
+요청 처리기 목록 속성은 요청 처리기를 구현하는 구현 클래스에 대한 정보를 저장합니다.
+요청 처리기 목록에는 키/값 쌍이 포함된 항목이 표시됩니다.</p><ol>
+<li><b>[새로 만들기]를 눌러 새 요청 처리기 속성을 표시하거나 구성된 키 값을 눌러
+기존 속성을 수정합니다.</b></li>
+<li><b>다음 정보를 기반으로 속성에 대한 값을 제공합니다.</b><dl><dt>키</dt>
+<dd><p><i>키</i>는 정책 결정 지점(PDP) 메타 별칭입니다. </p></dd>
+<dt>클래스</dt>
+<dd><p><i>클래스</i>는 Java 클래스 이름으로, XACML 요청을 처리할 수 있는 RequestHandler 인터페이스의 구현입니다. </p></dd>
+</dl>
+</li>
+<li><b>[확인]을 눌러 요청 처리기 구성을 완료합니다.</b></li>
+<li><b> SAMLv2 SOAP 바인딩 페이지에서 [저장]을 눌러 서비스 구성을 완료합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

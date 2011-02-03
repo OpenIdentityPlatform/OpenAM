@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2-Dienstkonfiguration - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>SAMLv2-Dienstkonfiguration</h4>
+
+
+<a name="ggolz"></a><h5>Intervall f&#252;r Cache-Bereinigung</h5>
+<p>Dieses Attribut gibt die Dauer (in Sekunden) zwischen den einzelnen Cache-Bereinigungen an.</p>
+
+<a name="ggokj"></a><h5>Attributname f&#252;r Namens-ID-Informationen</h5>
+<p>Gibt den Attributnamen an, der zum Speichern der Namensbezeichnerinformationen im Eintrag eines
+Benutzers verwendet wird. Wenn nichts angegeben wurde, wird das Standardattribut (<tt>sun-fm-saml2-nameid-info</tt>) verwendet.
+Der zugeh&#246;rige Bind-Benutzer des Datenspeichers muss &#252;ber Lese-/Schreib-/Durchsuch-/Vergleichsrechte f&#252;r dieses Attribut verf&#252;gen.</p>
+
+<a name="ggolv"></a><h5>Attributname f&#252;r Namens-ID-Informationsschl&#252;ssel</h5>
+<p>Gibt den Attributnamen an, der zum Speichern des Namensbezeichnerschl&#252;ssels im Eintrag eines
+Benutzers verwendet wird. Wenn keine Angaben gemacht werden, wird das Standardattribut (<tt>sun-fm-saml2-nameid-infokey</tt>)
+verwendet. Der zugeh&#246;rige Bind-Benutzer des Datenspeichers muss &#252;ber Lese-/Schreib-/Durchsuch-/Vergleichsrechte f&#252;r dieses Attribut
+verf&#252;gen. Au&#223;erdem m&#252;ssen Sie sicherstellen dass der Index vom Typ <tt>equality</tt> hinzugef&#252;gt
+wird.</p>
+
+<a name="ggojr"></a><h5>Cookie-Dom&#228;ne f&#252;r IDP Discovery Service</h5>
+<p>Gibt die Cookie-Dom&#228;ne f&#252;r das SAMLv2 IDP Discovery-Cookie an. </p>
+
+<a name="ggomp"></a><h5>Cookie-Typ f&#252;r IDP Discovery Service</h5>
+<p>Gibt den im SAMLv2 IDP Discovery Service verwendeten Cookie-Typ an, entweder "Persistent"
+oder "Session" (Sitzung). Standard:  "Session" (Sitzung).</p>
+
+<a name="ggomt"></a><h5>URL-Schema f&#252;r IDP Discovery Service</h5>
+<p>Gibt das im SAMLv2 IDP Discovery Service verwendete URL-Schema an. </p>
+
+<a name="ggoje"></a><h5>SPI-Implementierungsklasse f&#252;r XML-Verschl&#252;sselung</h5>
+<p>Gibt den Namen der Implementierungsklasse f&#252;r die Schnittstelle des SAMLv2-Verschl&#252;sselungsanbieters an. Die
+Klasse dient zur Durchf&#252;hrung von XML-Ver- und Entschl&#252;sselung in SAMLv2-Profilen.</p>
+
+<a name="ggomb"></a><h5>Verschl&#252;sselten Schl&#252;ssel in KeyInfo-Element aufnehmen</h5>
+<p>Wird in der Klasse <tt>com.sun.identity.saml2.xmlenc.FMEncProvider </tt> verwendet. Wenn diese Option aktiviert ist, wird
+<tt>EncryptedKey</tt> bei der Durchf&#252;hrung einer XML-Verschl&#252;sselung in einem <tt>KeyInfo</tt> in das Element
+<tt>EncryptedData</tt> aufgenommen. Wenn diese Option nicht aktiviert ist,  wird <tt> EncryptedKey</tt> parallel
+zum Element <tt>EncryptedData</tt> verwendet. Standard: Aktiviert.</p>
+
+<a name="ggoks"></a><h5>Implementierungsklasse f&#252;r XML-Signatur</h5>
+<p>Wenn diese Option aktiviert ist, wird das vom Identity-Anbieter und vom Dienstanbieter
+verwendete Signaturzertifikat anhand der Liste zur&#252;ckgezogener Zertifikate (Certificate Revocation List; CRL) validiert,
+die in den Sicherheitseinstellungen auf der Registerkarte "Sites und Server" konfiguriert sind.
+Wenn das Zertifikat nicht validiert und akzeptiert wurde, wird es angehalten und
+ein Validierungsfehler wird ausgegeben; es wird keine weitere Validierung der XML-Signatur durchgef&#252;hrt.
+</p>
+
+<a name="ggokx"></a><h5>Zertifikatvalidierung f&#252;r XML-Signatur</h5>
+<p>Wenn dieses Attribut aktiviert ist, validiert der SAML Identity-Anbieter das beim Signieren
+verwendete Zertifikat. Wenn das Zertifikat validiert und akzeptiert wurde, validiert der Anbieter
+die Signatur. Wenn nicht, h&#228;lt er an und gibt einen Validierungsfehler aus.
+</p>
+
+<a name="ggoiv"></a><h5>Validierung des CA-Zertifikats</h5>
+<p>Wenn diese Option aktiviert ist, wird das vom Identity-Anbieter und vom Dienstanbieter
+verwendete Signaturzertifikat anhand der Liste der vertrauensw&#252;rdigen CA validiert. Wenn das Zertifikat
+nicht validiert und akzeptiert wurde, wird es angehalten und ein Validierungsfehler wird
+ausgegeben; es wird keine weitere Validierung der XML-Signatur durchgef&#252;hrt. </p>
+<br/>
+
+</body>
+</html>

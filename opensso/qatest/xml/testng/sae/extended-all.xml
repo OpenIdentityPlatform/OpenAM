@@ -1,0 +1,37 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="SAESmokeTestsWithoutEncryption">
+        <parameter name="secMode" value="symmetric"/>
+        <parameter name="encrypted" value="off"/>
+        <parameter name="idp_enc_type" value=""/>
+        <parameter name="idp_enc_str" value=""/>
+        <parameter name="sp_enc_type" value=""/>
+        <parameter name="sp_enc_str" value=""/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.sae.ConfigureSAE"/>
+            <class name="com.sun.identity.qatest.sae.SAESmokeTests"/>
+            <class name="com.sun.identity.qatest.sae.UnconfigureSAE"/>
+        </classes>
+    </test>
+    <test name="SAESmokeTestsWithEncryption">
+        <parameter name="secMode" value="symmetric"/>
+        <parameter name="encrypted" value="on"/>
+        <parameter name="idp_enc_type" value="DES"/>
+        <parameter name="idp_enc_str" value="56"/>
+        <parameter name="sp_enc_type" value="DES"/>
+        <parameter name="sp_enc_str" value="128"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.sae.ConfigureSAE"/>
+            <class name="com.sun.identity.qatest.sae.SAESmokeTests"/>
+            <class name="com.sun.identity.qatest.sae.UnconfigureSAE"/>
+        </classes>
+    </test>

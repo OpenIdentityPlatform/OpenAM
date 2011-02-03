@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Agent de strat&#233;gie 2.2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.22agentprofile"></a><h4>Agent de strat&#233;gie 2.2</h4>
+<p>OpenSSO est compatible de mani&#232;re ascendante avec Policy Agent 2.2. La suite
+Policy Agent 2.2 doit &#234;tre configur&#233;e localement &#224; partir du conteneur de
+d&#233;ploiement sur lequel elle est install&#233;e. Par cons&#233;quent, &#224; partir de la
+console OpenSSO, un nombre d'options Policy Agent 2.2 tr&#232;s limit&#233; peut &#234;tre
+configur&#233;.</p>
+
+<a name="ggmti"></a><h5>Mot de passe</h5>
+<p>Le mot de passe a &#233;t&#233; d&#233;fini lors de la cr&#233;ation du
+profil d'agent. Cependant, vous pourrez changer de mot de passe &#224; tout
+moment.</p>
+
+<a name="ggmvn"></a><h5>Confirmation de mot de passe</h5>
+<p>Le mot de passe a &#233;t&#233; confirm&#233; lors de la cr&#233;ation du
+profil d'agent. Si vous modifiez le mot de passe, vous devez confirmer
+votre modification.</p>
+
+<a name="ggmsq"></a><h5>Statut</h5>
+<p>L'option <tt>Active</tt> est s&#233;lectionn&#233;e lors de la cr&#233;ation de l'agent. Ne choisissez
+<tt>Inactive</tt> que si vous voulez supprimer la protection assur&#233;e par l'agent.</p>
+
+<a name="ggoub"></a><h5>Description</h5>
+<p>Description de l'agent, que vous pouvez ajoutez si vous le souhaitez.</p>
+
+<a name="ggowa"></a><h5>Valeur de cl&#233; d'agent</h5>
+<p>Param&#232;tre requis lors de l'activation de la connexion unique inter-domaine (CDSSO) et
+lors de la configuration du d&#233;ploiement pour emp&#234;cher l'interception de cookies.</p><p>Cet attribut joue le r&#244;le d'une cl&#233; dans une paire cl&#233;-valeur. Il
+permet &#224; OpenSSO de recevoir les demandes d'assertions d'informations d'authentification sur les
+utilisateurs, &#233;mises par les agents. Seul un attribut est pris en compte
+dans cette paire cl&#233;-valeur. Tous les autres attributs sont ignor&#233;s. Utilisez le
+format suivant :</p><pre>agentRootURL=protocol://<i>hostname</i>:<i>port</i>/</pre><p>La saisie doit &#234;tre exacte. Par exemple, la cha&#238;ne repr&#233;sentant la cl&#233;
+<tt>agentRootURL</tt> fait la distinction entre majuscules et minuscules.</p>
+<br/>
+
+</body>
+</html>

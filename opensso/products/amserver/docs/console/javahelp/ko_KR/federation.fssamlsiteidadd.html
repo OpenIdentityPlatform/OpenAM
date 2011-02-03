@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>사이트 식별자 구성  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>사이트 식별자 구성 </h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>이 속성은 OpenSSO가 설치되어 있는 서버에서 호스트하는 사이트를 정의합니다. 기본값과 자동 생성된
+사이트 아이디가 설치 중에 호스트에 대해 정의됩니다. 여러 엔티티가 가능합니다. 예를 들어,
+로드 균형 조정 또는 같은 디렉토리 서버를 공유하는 OpenSSO의 여러 인스턴스가 모두
+정의되어야 합니다. 시작 위치는 연합 인터페이스 아래에 있는 SAML 화면의 사이트 식별자
+속성입니다. 사이트 아이디는 서버 및 사이트 구성 화면에서 정의됩니다. 자세한 내용은 <a href="service.serversite.html">서버 및 사이트</a>를
+참조하십시오.</p><ol>
+<li><b>[새로 만들기]를 눌러 새 사이트 식별자를 추가하거나 구성된 사이트 식별자의 이름을 눌러
+해당 프로필을 수정합니다.</b><p>사이트 식별자 속성이 표시됩니다.</p></li>
+<li><b>다음 정보를 기반으로 사이트 식별자 속성의 값을 제공합니다.</b><dl><dt>인스턴스 아이디</dt>
+<dd><p>이 등록 정보의 값은 <i>protocol</i><tt> ://</tt><i>host</i><tt>:</tt><i> port</i>입니다.</p><p>SSL의 SAML을 구성하는 경우(소스 및 대상 사이트 모두) 여기에서 정의된 프로토콜은 <tt>https//</tt>입니다. </p></dd>
+<dt>사이트 아이디</dt>
+<dd><p>사이트 아이디는 각 사이트에 대해 생성된 식별자입니다(하지만 값은 로드 밸런서 뒤의 여러 서버에 대해 동일합니다). <tt>com.sun.identity.saml.common</tt> 패키지에 클래스가 있어서 필요한 경우 식별자를 수동으로 생성하는 데 사용할 수 있습니다. 명령줄에 다음을 입력합니다.</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>발급자 이름</dt>
+<dd><p>이 등록 정보의 기본값은 <i>host</i><tt> :</tt><i>port</i>이지만 모든 URI를 사용할 수 있습니다.</p></dd>
+</dl>
+</li>
+<li><b>[확인]을 눌러 사이트 식별자 구성을 완료합니다.</b></li>
+<li><b>로컬 사이트 등록 정보 페이지에서 [저장]을 눌러 SAML 구성을 완료합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio Web de autenticaci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>Servicio Web de autenticaci&#243;n</h3>
+<a name="indexterm-159"></a><p>El Servicio Web de autenticaci&#243;n define c&#243;mo realizar la autenticaci&#243;n mediante SOAP.
+El intercambio de informaci&#243;n de autenticaci&#243;n entre un consumidor de servicios Web
+(WSC) y el proveedor de servicios Web (WSP) se realiza mediante mensajes
+enlazados con SOAP. Los mensajes son una serie de solicitudes de clientes
+y respuestas de servidores espec&#237;ficos para el mecanismo de Capa de seguridad
+y autenticaci&#243;n simple (SASL) (o modo de autenticaci&#243;n). Tras recibir una solicitud
+de autenticaci&#243;n (o cualquier respuesta de WSC), el WSP puede emitir desaf&#237;os
+adicionales o indicar un fallo o &#233;xito de autenticaci&#243;n. El Servicio Web
+de autenticaci&#243;n se utiliza para la autenticaci&#243;n de servicio a servicio (no
+para usuarios). Los siguientes pasos detallan la secuencia entre el WSC y
+el Servicio Web de autenticaci&#243;n (WSP).</p>
+<ol><li><p>El intercambio de autenticaci&#243;n comienza con un WSC que env&#237;a una solicitud de autenticaci&#243;n SASL al Servicio Web de autenticaci&#243;n en nombre de un servicio principal.</p><p>El mensaje de solicitud contiene un identificador para el servicio principal e indica uno o m&#225;s mecanismos SASL que el servicio puede elegir.</p></li>
+<li><p>El Servicio Web de autenticaci&#243;n responde confirmando el m&#233;todo que se utilizar&#225; y, si se puede, iniciando un desaf&#237;o.</p><p> Si el Servicio Web de autenticaci&#243;n no admite ninguno de los m&#233;todos citados, responder&#225; anulando el intercambio. </p></li>
+<li><p>El WSC responde con las credenciales necesarias para el m&#233;todo de autenticaci&#243;n seleccionado.</p></li>
+<li><p>El Servicio Web de autenticaci&#243;n responde aprobando o rechazando la autenticaci&#243;n.</p><p> Si se aprueba, la respuesta incluye las credenciales que el WSC necesita para invocar otros servicios Web (como el Servicio de detecci&#243;n). </p></li></ol>
+<p>Se pueden configurar los siguientes atributos globales del Servicio Web de autenticaci&#243;n
+para la implementaci&#243;n.</p>
+<ul><li><p><a href="mechanismhandlerslist.html">Lista de administradores de mecanismos</a></p></li>
+<li><p>Intervalo de limpieza de desaf&#237;os: especifica el intervalo de limpieza (en segundos) de la clase de implementaci&#243;n del administrador de mecanismos CRAM-MD5 predeterminada <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler </tt>. El subproceso interno iniciar&#225; la limpieza de la asignaci&#243;n de desaf&#237;os en funci&#243;n de este valor.</p></li>
+<li><p>Clases de transformaci&#243;n: especifica el nombre de transformaci&#243;n de la asignaci&#243;n de clases de implementaci&#243;n. Los valores se separan mediante comas con el car&#225;cter "|" como delimitador del nombre de transformaci&#243;n y el nombre de la clase de implementaci&#243;n. Por ejemplo, <tt>name1|class1, name2|class2</tt>.</p></li></ul>
+<p>A continuaci&#243;n, se muestran distintas tareas asociadas a la configuraci&#243;n del Servicio
+Web de autenticaci&#243;n:</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">Para configurar un administrador de mecanismos nuevo</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

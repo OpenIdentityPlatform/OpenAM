@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Mitgliedschaft - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>Mitgliedschaft</h4>
+<p><a name="indexterm-176"></a>Das Authentifizierungsmodul "Mitgliedschaft" wird f&#252;r personalisierte Sites implementiert. Wenn die Mitgliedschaftsauthentifizierung aktiviert
+ist, kann sich ein Benutzer selbst registrieren. Das bedeutet, dass ein Benutzer
+ein Konto ohne die Hilfe eines Administrators erstellen und anpassen kann und
+als registrierter Benutzer darauf zugreifen kann. Bei diesen Attributen handelt es sich
+um Bereichsattribute. Es existieren folgende Attribute:</p>
+<ul><li><p><a href="#fumys">Minimale Passwortl&#228;nge</a></p></li>
+<li><p><a href="#fumyr">Standard-Benutzerrollen</a></p></li>
+<li><p><a href="#fumyt">Benutzerstatus nach Registrierung</a></p></li>
+<li><p><a href="#fumzm">Authentifizierungsebene</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>Minimale Passwortl&#228;nge</h5>
+<p>Gibt die Mindestl&#228;nge (in Zeichen) der bei der Selbstregistrierung eingerichteten Passw&#246;rter an.
+Der Standardwert ist 8.</p><p>Wird dieser Wert ge&#228;ndert, sollte er auch im Registrierungs- und Fehlertext in
+der folgenden Datei ge&#228;ndert werden:</p><p><tt></tt><i>AcessManager-base</i><tt>/locale/amAuthMembership.properties </tt> (<i>PasswdMinChars</i>-Eintrag)</p>
+
+<a name="fumyr"></a><h5>Standard-Benutzerrollen</h5>
+<p>Gibt an, welche Rollen neuen Benutzern zugewiesen werden, deren Profil durch die
+Selbstregistrierung erstellt wurde. Es gibt keinen Standardwert. Der Administrator muss die DNs
+der Rollen angeben, die selbst-registrierten Benutzer zugewiesen werden sollen.</p>
+<hr><p><b>Hinweis &#8211; </b>Die angegebene Rolle muss unter dem Bereich liegen, f&#252;r den die Authentifizierung
+konfiguriert wird. Bei der Selbstregistrierung werden nur Rollen hinzugef&#252;gt, die dem Benutzer
+zugewiesen werden k&#246;nnen. Alle anderen DNs werden ignoriert. Es k&#246;nnen sowohl OpenSSO-
+als auch LDAP-Rollen, jedoch keine gefilterten Rollen hinzugef&#252;gt werden.</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>Benutzerstatus nach Registrierung</h5>
+<p>Gibt an, ob ein Benutzer, der sich selbst registriert, sofort Zugriff auf
+die Dienste erh&#228;lt. Der Standardwert ist ";Aktiv", sodass der neue Benutzer standardm&#228;&#223;ig
+Zugriff auf die Dienste erh&#228;lt. Durch die Auswahl von ";Inaktiv" legt der
+Administrator fest, dass neue Benutzer keinen Zugriff auf Dienste erhalten sollen.</p>
+
+<a name="fumzm"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Hinweis: Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut
+<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a> angegebene Wert verwendet.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

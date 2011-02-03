@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Conditions - Sun Federated Access Manager 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policyconditions"></a><h4>Conditions</h4>
+<p><a name="indexterm-29"></a><a name="indexterm-30"></a>A condition allows you to define constraints on the policy. For example, if you
+are defining policy for a paycheck application, you can define a condition on
+this action limiting access to the application only during specific hours. Or, you
+may wish to define a condition that only grants this action if the
+request originates from a given set of IP addresses or from a company
+intranet.</p><p>The condition might additionally be used to configure different policies on different URIs
+on the same domain. For example, <tt>http://org.example.com/hr/*jsp</tt>  can only be accessed
+by <tt>org.example.net</tt> from 9 a.m. to 5 p.m. This can be achieved by
+using an IP Condition along with a Time Condition. And specifying the rule
+resource as <tt>http://org.example.com/hr/*.jsp</tt> , the policy would apply to all the JSPs
+under <tt>http://org.example.com/hr</tt>  including those in the sub directories.</p>
+<hr><p><b>Note &#8211; </b>The terms referral, rule, resource, subject, condition, action and value correspond to the
+elements <b>Referral</b>,  <b>Rule</b>, <b>ResourceName</b>, <b>Subject</b>,  <b>Condition</b>, <b>Attribute</b> and <b>Value</b> in the
+<tt>policy.dtd</tt>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

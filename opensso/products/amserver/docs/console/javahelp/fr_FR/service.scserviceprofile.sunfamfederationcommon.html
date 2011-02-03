@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration des f&#233;d&#233;rations communes - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamfederationcommon"></a><h4>Configuration des f&#233;d&#233;rations communes</h4>
+
+
+<a name="ggoir"></a><h5>Classe d'impl&#233;mentation SPI de magasin de donn&#233;es</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation du fournisseur de magasins de donn&#233;es
+par d&#233;faut,</p>
+
+<a name="ggogw"></a><h5>Classe d'impl&#233;mentation SPI d'instance de configuration</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation de gestion des donn&#233;es de configuration.</p>
+
+<a name="ggofp"></a><h5>Classe d'impl&#233;mentation SPI de logger</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation du fournisseur de journaux.</p>
+
+<a name="ggofy"></a><h5>Classe d'impl&#233;mentation SPI de fournisseur de sessions</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation du fournisseur de sessions.</p>
+
+<a name="ggogv"></a><h5>Longueur de contenu autoris&#233;e maximale</h5>
+<p>Cet attribut sp&#233;cifie la longueur maximale du contenu d'une demande HTTP qui
+sera utilis&#233;e dans des services de f&#233;d&#233;ration. Les demandes dont le contenu
+exc&#232;de la longueur maximale sp&#233;cifi&#233;e seront rejet&#233;es.</p>
+
+<a name="ggogu"></a><h5>Classe d'impl&#233;mentation SPI de d&#233;codeur de mot de passe</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation de l'interface <tt> com.sun.identity.saml.xmlsig.PasswordDecoder</tt> utilis&#233;e pour d&#233;coder
+le mot de passe stock&#233; du keystore de signature XML et le
+mot de passe de l'authentification de base sous SAML&#160;1.x.</p>
+
+<a name="ggohx"></a><h5>Classe d'impl&#233;mentation SPI de fournisseur de signatures</h5>
+<p>Cet attribut sp&#233;cifie la classe de fournisseur de signatures XML SAML. Le
+SPI par d&#233;faut est <tt>com.sun.identity.saml.xmlsig.AMSignatureProvider</tt>.</p>
+
+<a name="ggohm"></a><h5>Classe d'impl&#233;mentation SPI de fournisseur de cl&#233;s</h5>
+<p>Cet attribut sp&#233;cifie la classe de fournisseur de cl&#233;s de signature XML.
+Le SPI par d&#233;faut est <tt>com.sun.identity.saml.xmlsig.JKSKeyProvider</tt>.</p>
+
+<a name="ggofo"></a><h5>V&#233;rifier la pr&#233;sence de certificats</h5>
+<p>Si cet attribut est d&#233;fini sur <tt>on</tt>, le certificat doit &#234;tre pr&#233;sent&#233;
+dans le keystore en vue de la validation de la signature XML.
+S'il est d&#233;fini sur <tt>off</tt>, la v&#233;rification de pr&#233;sence du certificat est
+ignor&#233;e. Ceci ne concerne que SMAL1.x.</p>
+
+<a name="ggohn"></a><h5>Algorithme de canonisation XML</h5>
+<p>Cet attribut sp&#233;cifie l'algorithme de canonisation XML utilis&#233; pour la g&#233;n&#233;ration et
+la v&#233;rification des signatures XML SAML. La valeur par d&#233;faut est <tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>.</p>
+
+<a name="ggohp"></a><h5>Algorithme de signature XML</h5>
+<p>Cet attribut sp&#233;cifie l'algorithme de signature XML utilis&#233; pour la g&#233;n&#233;ration et
+la v&#233;rification des signatures XML SAML. Lorsqu'il n'est pas sp&#233;cifi&#233; ou que
+sa valeur est vide, la valeur par d&#233;faut (<tt>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tt>) est utilis&#233;e.</p>
+
+<a name="ggoie"></a><h5>Algorithme de transformation XML</h5>
+<p>Cet attribut sp&#233;cifie l'algorithme de transformation utilis&#233; pour la g&#233;n&#233;ration et la
+v&#233;rification des signatures XML SAML. Lorsqu'il n'est pas sp&#233;cifi&#233; ou que sa
+valeur est vide, la valeur par d&#233;faut (<tt>http://www.w3.org/2001/10/xml-exc-c14n# </tt>) est utilis&#233;e.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de proveedores de identidad WS-FED - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedidp"></a><h4>Personalizaci&#243;n de proveedores de identidad WS-FED</h4>
+<p>Los siguientes atributos se aplican a la funci&#243;n Proveedor de identidades WS-FED:</p>
+
+<a name="ghfke"></a><h5>Formato de Id. de nombre</h5>
+<p>Define el formato del componente de identificador de nombre de la respuesta
+de inicio de sesi&#243;n &#250;nico enviada desde el proveedor de identidades al
+proveedor de servicios. El inicio de sesi&#243;n &#250;nico de WS-Federation admite los
+siguientes formatos de identificador (la opci&#243;n predeterminada es UPN):</p>
+<ul><li><p>Correo elec.</p></li></ul>
+
+<ul><li><p>Nombre com&#250;n</p></li>
+<li><p>UPN: nombre principal de usuario. La sintaxis es <tt> nombre de usuario&#64;dominio</tt>, donde un ejemplo de <tt>dominio</tt> es <tt> example.com</tt>.</p></li></ul>
+
+
+<a name="ghfog"></a><h5>Atributo de Id. de nombre</h5>
+<p>Define el atributo del perfil de usuario que se utilizar&#225; como valor
+de Id. de nombre. El valor predeterminado es <tt>uid</tt>. </p>
+
+<a name="ghflq"></a><h5>El nombre incluye el dominio</h5>
+<p>Si se utiliza el formato UPN definido en el atributo de formato
+de Id. de nombre, esta opci&#243;n indica si el atributo de Id.
+de nombre del perfil de usuario incluye un dominio. Si lo incluye,
+el atributo de Id. de nombre se utilizar&#225; para el UPN, tal
+y como se encuentra definido actualmente. De lo contrario, se combinar&#225; con
+un dominio para formar un UPN.</p>
+
+<a name="ghfmk"></a><h5>Atributo de dominio</h5>
+<p>Si se utiliza el formato UPN y no se ha seleccionado el
+atributo "El nombre incluye el dominio", esta opci&#243;n especifica el atributo del
+perfil de usuario que se utilizar&#225; como dominio de UPN. </p>
+
+<a name="ghfnw"></a><h5>Dominio de UPN</h5>
+<p>Al utilizar el formato UPN, si no se ha seleccionado el atributo
+"El nombre incluye el dominio" ni se ha especificado un dominio para
+el valor de atributo o si no hay ning&#250;n valor para ese
+atributo de un usuario espec&#237;fico, este atributo se utilizar&#225; para crear el
+UPN. </p>
+
+<a name="ggwvh"></a><h5>Alias de certificado</h5>
+<p>Este atributo especifica el alias de certificado proveedor que se utiliza para
+buscar el certificado de firma de aserci&#243;n en el almac&#233;n de claves.</p>
+
+<a name="ggwve"></a><h5>Tipos de reclamaci&#243;n</h5>
+<p>Especifica el tipo de reclamaci&#243;n de forma que el servicio WS-FED pueda
+reconocer el tipo de token que se intercambia entre los socios de
+la federaci&#243;n. </p><p>El tipo de reclamaci&#243;n EmailAddress se utiliza para identificar un principal de
+seguridad concreto mediante una direcci&#243;n de correo electr&#243;nico. </p><p>El tipo de reclamaci&#243;n UPN se utiliza para identificar un principal de
+seguridad concreto mediante un Nombre principal de usuario. </p><p>El tipo de reclamaci&#243;n CommonName se utiliza para identificar un principal de
+seguridad mediante un valor CDN coherente con las convenciones de asignaci&#243;n de
+nombres X.500. El valor de esta reclamaci&#243;n no tiene por qu&#233; ser
+necesariamente exclusivo, y no deber&#225; utilizarse con fines de autorizaci&#243;n. </p>
+
+<a name="ggwwj"></a><h5>Asignador de cuenta</h5>
+<p>Este atributo especifica la implementaci&#243;n de la interfaz <tt>AccountMapper </tt> utilizada para asignar
+una cuenta de usuario remota a una cuenta de usuario local con
+fines de inicio de sesi&#243;n &#250;nico. El valor predeterminado es <tt> com.sun.identity.wsfed.plugins.DefaultIDPAccountMapper</tt>. </p>
+
+<a name="ggwuq"></a><h5>Asignador de atributos</h5>
+<p>Define la clase utilizada para asignar atributos de la aserci&#243;n a atributos
+de usuario definidos localmente por el proveedor de identidades. La clase predeterminada
+es <tt>com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper </tt>.</p>
+
+<a name="ggwul"></a><h5>Asignaci&#243;n de atributos</h5>
+<p>Especifica los valores para definir las asignaciones utilizadas por el complemento del
+asignador de atributos predeterminados. Las asignaciones deben configurase con el formato:</p><p><i>Claim_Type</i>=<i>local-attribute</i></p><p>Por ejemplo, <tt>EmailAddress=mail</tt> o <tt>Address=postaladdress </tt>. Escriba la asignaci&#243;n como un Nuevo valor
+y haga clic en Agregar.</p>
+
+<a name="ggwrj"></a><h5>Momento de la aplicaci&#243;n de la aserci&#243;n</h5>
+<p>Las aserciones son v&#225;lidas durante un periodo de tiempo, y no antes
+ni despu&#233;s. </p><p><tt>Tiempo efectivo</tt> especifica (en segundos) la cantidad de tiempo que una aserci&#243;n es
+v&#225;lida contando a partir del tiempo de emisi&#243;n de la aserci&#243;n. El
+valor predeterminado es <tt>600</tt> segundos. </p>
+<br/>
+
+</body>
+</html>

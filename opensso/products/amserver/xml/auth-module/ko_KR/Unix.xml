@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="Unix" version="1.0" >    
+    <Callbacks length="2" order="1" timeout="60" header="이 서버는 Unix 인증을 사용합니다." >
+        <NameCallback>            
+            <Prompt> 사용자 이름: </Prompt>            
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> 비밀번호: </Prompt>            
+        </PasswordCallback>           
+    </Callbacks>
+    <Callbacks length="0" order="2" timeout="120" header=" 비밀번호가 만료되었습니다. 비밀번호를 재설정하려면 서비스 지원 센터에 문의하십시오." error="true"  />
+</ModuleProperties>

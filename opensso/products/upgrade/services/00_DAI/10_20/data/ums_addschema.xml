@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: ums_addschema.xml,v 1.3 2008/06/25 05:53:12 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+    "jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  apply this file by:
+
+  amadmin -u "xxx" -w "yyy" -t ums_addschema.xml
+
+-->
+
+
+<Requests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Global"
+	SubSchema="ManagedObjects">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+            <AddAttributeSchema fileName="BASEDIR/upgrade/services/00_DAI/10_20/data/ums_add1.xml"/>
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Global"
+	SubSchema="/templates/SearchTemplates">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Global"
+	SubSchema="/templates/SearchTemplates/SearchUmsObjects">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Global"
+	SubSchema="/templates/CreationTemplates/CreationUmsObjects">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Organization"
+	SubSchema="/templates/SearchTemplates">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Organization"
+	SubSchema="/templates/SearchTemplates/SearchUmsObjects">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+    </SchemaRequests>
+
+    <SchemaRequests serviceName="DAI"
+	SchemaType="Organization"
+	SubSchema="/templates/CreationTemplates/CreationUmsObjects">
+	    <ModifyInheritanceAttribute inheritance="multiple" />
+    </SchemaRequests>
+
+    <ServiceConfigurationRequests serviceName="DAI">
+	<AddSubConfiguration
+	    subConfigName="/templates/SearchTemplates/BasicAgentSearch"
+	    subConfigId="SearchUmsObjects"
+	    priority="0">
+	    <AttributeValuePair> 
+		<Attribute name="name" />
+		<Value>BasicAgentSearch</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> 
+		<Attribute name="searchfilter" />
+		<Value>(objectclass=sunIdentityServerDevice)</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> 
+		<Attribute name="attrs" />
+                <Value>objectclass</Value>
+	    </AttributeValuePair>
+	</AddSubConfiguration>
+	<ModifySubConfiguration
+	    subConfigName="/User">
+	    <AttributeValuePair> <Attribute name="parentcontainerdn" />
+		<Value>people</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> <Attribute name="parentcontainertype" />
+		<Value>5</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> <Attribute name="servicename" />
+		<Value>iPlanetAMUserService</Value>
+	    </AttributeValuePair>
+        </ModifySubConfiguration>
+
+	<ModifySubConfiguration
+	    subConfigName="/Group">
+		<AttributeValuePair> <Attribute name="parentcontainerdn" />
+                    <Value>groups</Value>
+		</AttributeValuePair>
+		<AttributeValuePair> <Attribute name="parentcontainertype" />
+                    <Value>4</Value>
+		</AttributeValuePair>
+	</ModifySubConfiguration>
+
+	<ModifySubConfiguration 
+	    subConfigName="/DynamicGroup">
+	    <AttributeValuePair> <Attribute name="parentcontainerdn" />
+		<Value>groups</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> <Attribute name="parentcontainertype" />
+		<Value>4</Value>
+	    </AttributeValuePair>
+	</ModifySubConfiguration>
+
+	<ModifySubConfiguration 
+	    subConfigName="/AssignableDynamicGroup">
+	    <AttributeValuePair> <Attribute name="parentcontainerdn" />
+		<Value>groups</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> <Attribute name="parentcontainertype" />
+		<Value>4</Value>
+	    </AttributeValuePair>
+	</ModifySubConfiguration>
+	<ModifySubConfiguration 
+	    subConfigName="Agent">
+	    <AttributeValuePair> <Attribute name="parentcontainerdn" />
+		<Value>agents</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> <Attribute name="parentcontainertype" />
+		<Value>3</Value>
+	    </AttributeValuePair>
+	    <AttributeValuePair> <Attribute name="servicename" />
+		<Value>iPlanetAMAgentService</Value>
+	    </AttributeValuePair>
+	</ModifySubConfiguration>
+	<ModifySubConfiguration 
+	    subConfigName="/templates/SearchTemplates/BasicEntitySearch">
+	    <AttributeValuePair> <Attribute name="searchfilter" />
+		<Value>(|(&amp;(USER_NAMING_ATTR=%U)(objectclass=inetOrgPerson))(&amp;(uid=%U)(objectclass=sunIdentityServerDevice)))</Value>
+	    </AttributeValuePair>
+	</ModifySubConfiguration>
+    </ServiceConfigurationRequests>
+</Requests>

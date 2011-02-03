@@ -1,0 +1,55 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: adminstyle.css,v 1.2 2008/06/25 05:44:25 qcheng Exp $
+ *
+ */
+
+
+/* GENERAL STYLES */
+BODY, TH, TD, P, DIV, SPAN, INPUT, SELECT, TEXTAREA, FORM, B, STRONG, I, U, H1, H2, H3, UL, LI, option { font-family: verdana;}
+
+.default-body { background-color: #FFF; color: #000; }
+
+
+.footerText {  font-family: Helvetica, Arial, Geneva, sans-serif; font-size: 9pt; color: #333333}
+.loginText {  font-family: Helvetica, Arial, Geneva, sans-serif}
+
+
+
+/* ALERTS */
+
+/* Inline Alert Frame and Contents */ 
+.alert-error-frame { background-color: #C00; }
+.alert-error-content { background-color: #FFF; }
+.alert-warning-frame { background-color: #FC0; }
+.alert-warning-content { background-color: #FFF; }
+.alert-info-frame { background-color: #99C; }
+.alert-info-content { background-color: #FFF; }
+
+/* Alert Text */
+.alert-header-text { color: #000; font-weight: bold; margin: 0px 0px 5px 0px; }
+.alert-normal-text { color: #000; }
+.alert-mono-text { color: #000; font-family: monospace; }
+.alert-strong-text { color: #000; font-weight: bold; }

@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>目录配置 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serverconfigxml"></a><h4>目录配置</h4>
+<p>“目录配置”属性定义嵌入式目录存储库的基本配置信息：</p>
+
+<a name="ggkdy"></a><h5>目录配置</h5>
+<p>“目录配置”属性包括：</p>
+
+<a name="ggkeu"></a><h5>最小连接池</h5>
+<p>指定用于连接 Directory Server 的连接池的最小尺寸，它与 LDAP 服务器属性中指定的一致。默认端口为 1。</p>
+
+<a name="ggkdx"></a><h5>最大连接池</h5>
+<p>该属性指定用于连接 Directory Server 的连接池的最大尺寸，它与 LDAP 服务器属性中指定的一致。默认值为 10。</p>
+
+<a name="ggket"></a><h5>绑定 DN</h5>
+<p>指定 LDAP 服务器中的绑定 DN。</p>
+
+<a name="ggkdn"></a><h5>绑定密码</h5>
+<p>定义用于绑定 LDAP 服务器的密码。默认情况下，会将安装过程中输入的 amldapuser 密码用作绑定用户。</p>
+
+<a name="ghama"></a><h5>服务器</h5>
+<p>该属性定义将用作 OpenSSO 实例的配置数据存储库的目录服务器。要添加配置服务器，可单击“添加”按钮，然后为以下属性赋值：</p><dl><dt>名称</dt>
+<dd><p>输入服务器的名称。</p></dd>
+<dt>主机名</dt>
+<dd><p>指定 Directory Server 的全限定主机名。例如：</p><p><tt></tt><i>DirectoryServerHost.domainName</i><tt>.com</tt></p></dd>
+<dt>端口号</dt>
+<dd><p>指定 Directory Server 的端口号。</p></dd>
+<dt>连接类型</dt>
+<dd><p>定义 Directory Server 的连接类型。默认选择 SIMPLE。也可以选择 SSL。</p></dd>
+</dl>
+
+
+<a name="ggkdu"></a><h5>传统配置</h5>
+<p>以下属性定义用于 OpenSSO 传统模式实例的基本目录服务器配置。这些属性仅在以传统模式安装时才显示出来。</p>
+
+<a name="ggkej"></a><h5>最小连接池</h5>
+<p>指定用于连接 Directory Server 的连接池的最小尺寸，它与 LDAP 服务器属性中指定的一致。默认端口为 1。</p>
+
+<a name="ggkdw"></a><h5>最大连接池</h5>
+<p>该属性指定用于连接 Directory Server 的连接池的最大尺寸，它与 LDAP 服务器属性中指定的一致。默认值为 10。</p>
+
+<a name="ggkey"></a><h5>服务器</h5>
+<p>该属性列出负载平衡器协议、主机名和端口。例如：<tt>http://lb.example.com:80</tt>。</p>
+<br/>
+
+</body>
+</html>

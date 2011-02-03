@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新規グループを作成する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentgroupadd"></a><h5>新規グループを作成する</h5>
+<p>エージェントが特定のプロパティーをグループから継承するようにするには、グループを作成します。エージェントは、同じグループタイプからのみプロパティーを継承できます。たとえば、Web エージェントは Web エージェントグループからプロパティーを継承できます。</p><ol>
+<li><b>「アクセス制御」タブをクリックします。</b></li>
+<li><b>グループが属するレルムの名前をクリックします。</b></li>
+<li><b>「エージェント」タブをクリックします。</b></li>
+<li><b>必要に応じて、適切なエージェントタイプのタブを選択します。</b></li>
+<li><b>「グループ」セクションの「新規」をクリックします。</b><p>「名前」フィールドに新しいグループの名前を入力します。</p></li>
+<li><b>Web エージェントと J2EE エージェントの場合のみ、OpenSSO のサーバー URL を入力します。</b><p>たとえば <tt>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</tt> です。</p></li>
+<li><b>「作成」をクリックします。</b><p>コンソールでエージェントグループが作成され、そのグループへのリンクを含んだエージェントページが再度表示されます。</p><p>グループに対して追加の設定を行うには、このリンクをクリックして「エージェントグループの編集」ページを表示します。</p><p>グループの設定に使用できるプロパティーは個別のエージェントのプロパティーと同じですが、相違点として、グループレベルでは「グループ」、「パスワード」、および「パスワードの確認」プロパティーは使用できません。</p>
+<hr><p><b>注 &#8211; </b>また、一部のグループプロパティーにはすでに変数値が割り当てられており、多くの場合これらは変更すべきではありません。そのような値の一例を次に示します。</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

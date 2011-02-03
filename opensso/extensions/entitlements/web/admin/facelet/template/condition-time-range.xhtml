@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: condition-time-range.xhtml,v 1.6 2009/08/09 06:04:22 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+    
+    <ice:panelGroup>
+        <ice:panelGrid
+            columns="5">
+            <ice:outputLabel
+                value="#{resources['condition-time-range.startTimeLabel']}"/>
+            <ice:selectOneMenu
+                style="width: 50px"
+                value="#{viewCondition.startHour}">
+                <f:selectItem
+                    itemValue="0"
+                    itemLabel="12"/>
+                <f:selectItem
+                    itemValue="1"
+                    itemLabel="01"/>
+                <f:selectItem
+                    itemValue="2"
+                    itemLabel="02"/>
+                <f:selectItem
+                    itemValue="3"
+                    itemLabel="03"/>
+                <f:selectItem
+                    itemValue="4"
+                    itemLabel="04"/>
+                <f:selectItem
+                    itemValue="5"
+                    itemLabel="05"/>
+                <f:selectItem
+                    itemValue="6"
+                    itemLabel="06"/>
+                <f:selectItem
+                    itemValue="7"
+                    itemLabel="07"/>
+                <f:selectItem
+                    itemValue="8"
+                    itemLabel="08"/>
+                <f:selectItem
+                    itemValue="9"
+                    itemLabel="09"/>
+                <f:selectItem
+                    itemValue="10"
+                    itemLabel="10"/>
+                <f:selectItem
+                    itemValue="11"
+                    itemLabel="11"/>
+            </ice:selectOneMenu>
+            <ice:outputText value=":"/>
+            <ice:selectOneMenu
+                style="width: 50px"
+                value="#{viewCondition.startMinute}">
+                <f:selectItem
+                    itemValue="0"
+                    itemLabel="00"/>
+                <f:selectItem
+                    itemValue="15"
+                    itemLabel="15"/>
+                <f:selectItem
+                    itemValue="30"
+                    itemLabel="30"/>
+                <f:selectItem
+                    itemValue="45"
+                    itemLabel="45"/>
+            </ice:selectOneMenu>
+            <ice:selectOneMenu
+                style="width: 50px"
+                value="#{viewCondition.startPeriod}">
+                <f:selectItem itemValue="AM" itemLabel="AM"/>
+                <f:selectItem itemValue="PM" itemLabel="PM"/>
+            </ice:selectOneMenu>
+            <ice:outputLabel
+                value="#{resources['condition-time-range.endTimeLabel']}"/>
+            <ice:selectOneMenu
+                style="width: 50px"
+                value="#{viewCondition.endHour}">
+                <f:selectItem
+                    itemValue="0"
+                    itemLabel="12"/>
+                <f:selectItem
+                    itemValue="1"
+                    itemLabel="01"/>
+                <f:selectItem
+                    itemValue="2"
+                    itemLabel="02"/>
+                <f:selectItem
+                    itemValue="3"
+                    itemLabel="03"/>
+                <f:selectItem
+                    itemValue="4"
+                    itemLabel="04"/>
+                <f:selectItem
+                    itemValue="5"
+                    itemLabel="05"/>
+                <f:selectItem
+                    itemValue="6"
+                    itemLabel="06"/>
+                <f:selectItem
+                    itemValue="7"
+                    itemLabel="07"/>
+                <f:selectItem
+                    itemValue="8"
+                    itemLabel="08"/>
+                <f:selectItem
+                    itemValue="9"
+                    itemLabel="09"/>
+                <f:selectItem
+                    itemValue="10"
+                    itemLabel="10"/>
+                <f:selectItem
+                    itemValue="11"
+                    itemLabel="11"/>
+            </ice:selectOneMenu>
+            <ice:outputText value=":"/>
+            <ice:selectOneMenu
+                style="width: 50px"
+                value="#{viewCondition.endMinute}">
+                <f:selectItem
+                    itemValue="0"
+                    itemLabel="00"/>
+                <f:selectItem
+                    itemValue="15"
+                    itemLabel="15"/>
+                <f:selectItem
+                    itemValue="30"
+                    itemLabel="30"/>
+                <f:selectItem
+                    itemValue="45"
+                    itemLabel="45"/>
+            </ice:selectOneMenu>
+            <ice:selectOneMenu
+                style="width: 50px"
+                value="#{viewCondition.endPeriod}">
+                <f:selectItem 
+                    itemValue="AM"
+                    itemLabel="AM"/>
+                <f:selectItem 
+                    itemValue="PM"
+                    itemLabel="PM"/>
+            </ice:selectOneMenu>
+        </ice:panelGrid>
+    </ice:panelGroup>
+</span>

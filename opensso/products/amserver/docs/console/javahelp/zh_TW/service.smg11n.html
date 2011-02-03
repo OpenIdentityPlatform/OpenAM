@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>全域化設定 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>全域化設定</h4>
+<p><a name="indexterm-188"></a>全域化設定服務包含全域屬性，可讓您針對不同語言環境及字元集配置 OpenSSO。這些屬性包括：</p>
+<ul><li><p><a href="#fsvdx">每種語言環境支援的字元集</a></p></li>
+<li><p><a href="#fsvec">字元集別名</a></p></li>
+<li><p><a href="#fsveb">自動產生的共用名稱格式</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>每種語言環境支援的字元集</h5>
+<p>此屬性列出每種語言環境支援的字元集，指示語言環境與字元集之間的對映。格式如下所示：</p><p>若要增加新建支援的字元集，請按一下 [新增]，然後定義下列參數：</p><dl><dt>語言環境</dt>
+<dd><p>您要新增的語言環境。請參閱<a href="supportedlang.html">支援的語言環境</a>，以取得更多資訊。</p></dd>
+<dt>支援的字元集</dt>
+<dd><p>輸入指定的語言環境支援的字元集。字元集是以分號隔開。例如，<tt>charset=charset1;charset2;charset3;...;charsetn </tt></p></dd>
+</dl>
+<p>若要編輯現有的支援字元集，請按一下支援的字元集表格中的名稱。當完成時，請按一下 [確定]。</p>
+
+<a name="fsvec"></a><h5>字元集別名</h5>
+<p>此屬性列出將用於傳送回應的字碼集名稱 (對映至 IANA 名稱)。這些字碼集名稱不需要與 Java 字碼集名稱相符。目前存在一種雜湊表，可以將 Java 字元集對映至 IANA 字元集，反之亦然。</p><p>若要增加新建字元集別名，請按一下 [新增] 按鈕，然後定義下列參數：</p><dl><dt>MIME 名稱</dt>
+<dd><p>IANA 對映名稱。例如，<tt>Shift_JIS</tt></p></dd>
+<dt>Java 名稱</dt>
+<dd><p>要對映至 IANA 字元集的 Java 字元集。</p></dd>
+</dl>
+<p>若要編輯任何現有的字元集別名，請按一下表格中的名稱。當完成時，請按一下 [確定]。</p>
+
+<a name="fsveb"></a><h5>自動產生的共用名稱格式</h5>
+<p>此顯示選項允許您定義自動產生名稱的方式，以容納不同語言環境和字元集的名稱格式。預設語法如下 (請注意，定義中包含的逗號和/或空格將顯示在名稱格式中)：</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>例如，如果您希望以新的名稱格式，即以中文字元集顯示帶有 uid (11111) 的使用者 (User One)，請以如下格式定義：</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>顯示如下：</p><p><tt>OneUser 11111</tt></p>
+<br/>
+
+</body>
+</html>

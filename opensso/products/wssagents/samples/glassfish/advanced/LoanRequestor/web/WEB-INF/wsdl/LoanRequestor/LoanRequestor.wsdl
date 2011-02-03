@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="LoanRequestor" targetNamespace="http://j2ee.netbeans.org/wsdl/LoanRequestor"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://j2ee.netbeans.org/wsdl/LoanRequestor" xmlns:ns="http://xml.netbeans.org/schema/LoanRequestor" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <types>
+        <xsd:schema targetNamespace="http://j2ee.netbeans.org/wsdl/LoanRequestor">
+            <xsd:import namespace="http://xml.netbeans.org/schema/LoanRequestor" schemaLocation="LoanRequestor.xsd"/>
+        </xsd:schema>
+    </types>
+    <message name="LoanRequestorOperationRequest">
+        <part name="requestLoanMessage" element="ns:processApplicationElement"/>
+    </message>
+    <message name="LoanRequestorOperationReply">
+        <part name="responseLoanMessage" element="ns:processApplicationResponseElement"/>
+    </message>
+    <portType name="LoanRequestorPortType">
+        <operation name="LoanRequestorOperation">
+            <input name="input1" message="tns:LoanRequestorOperationRequest"/>
+            <output name="output1" message="tns:LoanRequestorOperationReply"/>
+        </operation>
+    </portType>
+    <binding name="LoanRequestorBinding" type="tns:LoanRequestorPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="LoanRequestorOperation">
+            <soap:operation/>
+            <input name="input1">
+                <soap:body use="literal"/>
+            </input>
+            <output name="output1">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="LoanRequestorService">
+        <port name="LoanRequestorPort" binding="tns:LoanRequestorBinding">
+            <soap:address location="http://localhost:8080/LoanRequestorService/LoanRequestorPort"/>
+        </port>
+    </service>
+    <plnk:partnerLinkType name="LoanRequestor1">
+        <!-- A partner link type is automatically generated when a new port type is added. Partner link types are used by BPEL processes. 
+In a BPEL process, a partner link represents the interaction between the BPEL process and a partner service. Each partner link is associated with a partner link type.
+A partner link type characterizes the conversational relationship between two services. The partner link type can have one or two roles.-->
+        <plnk:role name="LoanRequestorPortTypeRole" portType="tns:LoanRequestorPortType"/>
+    </plnk:partnerLinkType>
+</definitions>
