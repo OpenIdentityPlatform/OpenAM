@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP 連結服務 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbinding"></a><h3>SOAP 連結服務</h3>
+<a name="indexterm-150"></a><p>SOAP 連結服務是傳送和接收 SOAP 訊息的傳輸層。在 SOAP 連結服務程序中，識別服務會呼叫用戶端應用程式設計介面，以建構訊息並將其傳送至 SOAP 端點 URL；實際上是 SOAP 收件者 servlet。SOAP
+接收器 servlet 會接收訊息、驗證簽名，以及建構另一則訊息。然後，SOAP 接收器 servlet 會呼叫正確的請求處理程式，將此第二則訊息傳送至對應的識別服務，以取得回應。識別服務會處理第二則訊息、產生回應，以及將回應傳回到 SOAP 接收器 servlet。SOAP 接收器反過來會將回應傳回到識別服務以進行處理。</p><p>可以針對您的實作配置以下 SOAP 連結服務全域屬性。</p>
+<ul><li><p><a href="requesthandlerlist.html">請求處理程式清單</a></p></li>
+<li><p><a href="ggodb.html">SOAP 連結屬性</a></p></li></ul>
+
+<ul><li><p><a href="service.scsoapbindingrequesthandlerlistadd.html">配置請求處理程式</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

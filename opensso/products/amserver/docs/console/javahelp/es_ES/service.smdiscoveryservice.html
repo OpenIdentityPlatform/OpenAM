@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio de detecci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>Servicio de detecci&#243;n</h3>
+<a name="indexterm-119"></a><p>El paso inicial para acceder a los datos de identidad es determinar
+d&#243;nde se encuentra la informaci&#243;n. (Por ejemplo, el servicio de detecci&#243;n que
+guarda la informaci&#243;n de la tarjeta de cr&#233;dito de la entidad principal
+o el servidor que guarda el servicio de calendario de la entidad
+principal.) Normalmente, hay uno o m&#225;s servicios en una red que permiten
+que otras entidades realicen una acci&#243;n en los datos de identidad. Debido
+a que no se espera que los clientes mantengan un seguimiento de
+estos servicios o que sepan en cu&#225;l pueden confiar, es necesario disponer
+de un servicio de detecci&#243;n. Un <b>servicio de detecci&#243;n</b> es b&#225;sicamente una interfaz de
+servicio Web para los recursos de detecci&#243;n. Un <b>recurso de detecci&#243;n</b> es un registro
+de las ofertas de recursos. Una <b>oferta de recursos</b> define una asociaci&#243;n entre una
+unidad de datos de identidad y la instancia de servicio que proporciona
+el acceso a dichos datos. Un <b>identificador de recursos</b> es un identificador de recursos
+exclusivo (URI, Unique Resource Identifier) registrado con el servicio de detecci&#243;n que
+se&#241;ala a un determinado recurso de detecci&#243;n. Cuando un cliente env&#237;a una
+solicitud para obtener algunos tipos de datos, se incluye el identificador de
+recursos que el Servicio de detecci&#243;n de OpenSSO utiliza para localizar el
+proveedor de los servicios web de los atributos solicitados. El Servicio de
+detecci&#243;n muestra una oferta de recursos que contiene la informaci&#243;n necesaria para
+localizar los datos.</p>
+<hr><p><b>Nota &#8211; </b>Para poder disponer de acceso, el proveedor que aloja el Servicio de
+perfil personal de Liberty debe registrarse en el Servicio de detecci&#243;n en
+nombre de cada principal de identidad.</p>
+<hr>
+<p>Se pueden configurar los siguientes atributos globales del Servicio de detecci&#243;n para
+la implementaci&#243;n.</p>
+<ul><li><p><a href="dsproviderid.html">Id. de proveedor</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">Mecanismos de autenticaci&#243;n admitidos</a></p></li>
+<li><p><a href="supporteddirectives.html">Directivas admitidas</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">Evaluaci&#243;n de directivas para la b&#250;squeda de detecci&#243;n</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">Evaluaci&#243;n de directivas para la actualizaci&#243;n de detecci&#243;n</a></p></li>
+<li><p><a href="authorizerpluginclass.html">Clase de complemento del autorizador:</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">Clase de complemento del administrador de entradas:</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">Clases de complemento del asignador de Id. de recursos</a></p></li>
+<li><p><a href="authresponsemessage.html">Mensaje de respuesta de autenticaci&#243;n</a></p></li>
+<li><p><a href="generatesessioncontext.html">Instrucci&#243;n de contexto de sesi&#243;n de bootstrapping</a></p></li>
+<li><p><a href="encryptnameidentifier.html">Cifrar el identificador de nombre en el contexto de sesi&#243;n para Bootstrapping</a></p></li>
+<li><p><a href="useimpliedresource.html">Recurso impl&#237;cito</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">Ofertas de recursos para bootstrapping</a></p></li></ul>
+<p>A continuaci&#243;n, se muestran distintas tareas asociadas a la configuraci&#243;n del Servicio
+de detecci&#243;n:</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">Para configurar una oferta de recursos para Bootstrapping</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">Para configurar una descripci&#243;n de servicio</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

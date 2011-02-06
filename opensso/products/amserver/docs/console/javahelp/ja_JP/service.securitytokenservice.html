@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>セキュリティートークンサービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>セキュリティートークンサービス</h4>
+<p>このサービスに含まれる属性は、OpenSSO セキュリティートークンサービス (STS) の動的構成を定義します。これらの属性は、次の構成を定義します。</p>
+<ul><li><p>セキュリティートークンの発行および作成</p></li>
+<li><p> STS サービスエンドポイントをセキュリティー保護するための、STS 自体の Web サービスセキュリティー。署名と暗号化属性は、受信する WS-Trust 要求のサービスプロバイダ検証を構成し、送信する WS-Trust 応答をセキュリティー保護します。セキュリティーメカニズム属性は、セキュリティートークンのセキュリティー資格情報を定義します。</p></li>
+<li><p>SAML 表明を使用してセキュリティートークンで SAML 属性マッピングを要求する SAML 構成。この要求は、構成された STS が Web サービスプロバイダとして指定され、リモートの STS によって生成された SAML トークン (表明) を受信するときに行われます。</p></li>
+<li><p> セキュリティートークンがリモートの STS によって生成されたときの、Web サービスプロバイダから受信したこのトークンの検証。</p><p>「レルム」タブの <a href="agentconfig.agents.html">Centralized Agent configuration</a>では、さまざまな OpenSSO Web サービスセキュリティープロバイダの動的構成プロファイルを作成できます。</p></li></ul>
+
+
+<a name="ghatr"></a><h5>発行者</h5>
+<p>セキュリティートークンを発行するセキュリティートークンサービスの名前です。</p>
+
+<a name="ghawa"></a><h5>エンドポイント</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。 </p><p><tt>%protocol://%host:%port%uri/sts</tt> </p><p>この構文により、特定のセッションパラメータに基づくセキュリティートークンサービスエンドポイント URL を動的に置き換えることができます。</p>
+
+<a name="ghatv"></a><h5>暗号化発行キー</h5>
+<p>この属性が有効になっている場合は、セキュリティートークンサービスで発行されたキーを暗号化します。</p>
+
+<a name="ghauc"></a><h5>暗号化発行トークン</h5>
+<p>この属性が有効になっている場合は、セキュリティートークンサービスで発行されたセキュリティートークンを暗号化します。</p>
+
+<a name="ghavx"></a><h5>セキュリティートークンの寿命</h5>
+<p>発行されたトークンの有効期間を定義します。</p>
+
+<a name="ghaud"></a><h5>トークン実装クラス</h5>
+<p>この属性は、セキュリティートークンプロバイダ/発行者の実装クラスを指定します。</p>
+
+<a name="ghaug"></a><h5>証明書エイリアス名</h5>
+<p>セキュリティートークンサービスで発行されたセキュリティートークンを署名するために使用される証明書のエイリアス名を定義します。</p>
+
+<a name="ghauh"></a><h5>STS エンドユーザートークンプラグインクラス</h5>
+<p>エンドユーザートークン変換の実装クラスを定義します。</p>
+
+<a name="ghawk"></a><h5>セキュリティーメカニズム</h5>
+<p>セキュリティートークン自体をセキュリティー保護するために使用されるセキュリティー資格情報、またはクライアントから送信された受信 WS-Trust 要求からセキュリティートークンサービスで受け付けられたセキュリティー資格情報の種類を定義します。次のセキュリティーの種類を選択できます。</p>
+<ul><li><p>Anonymous &#8212; 匿名セキュリティーメカニズムにはセキュリティー証明情報はありません。</p></li>
+<li><p>KerberosToken &#8212; Kerberos トークンを使用します。</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; Liberty ベースのセキュリティートークンを使用します。</p></li>
+<li><p>SAML-HolderOfKey &#8212; SAML 1.1 の表明タイプ Holder-Of-Key を使用します。</p></li>
+<li><p>SAML-SenderVouches &#8212; SAML 1.1 の表明タイプ Sender Vouches を使用します。</p></li>
+<li><p>SAML2-HolderOfKey &#8212; SAML 2.0 の表明トークンタイプ Holder-Of-Key を使用します。</p></li>
+<li><p>SAML2-SenderVouches &#8212; SAML 2.0 の表明トークンタイプ Sender Vouches を使用します。</p></li>
+<li><p>STSSecurity &#8212; セキュリティートークンサービスエージェントがセキュリティートークンサービスからセキュリティートークンを取得することを定義します。</p></li>
+<li><p>UserNameToken &#8212; ユーザー名トークンを使用してセキュリティートークンサービスの要求をセキュリティー保護します。</p></li>
+<li><p>UserNameToken-Plain &#8212; ユーザー名トークンと平文パスワードを使用してセキュリティートークンサービス要求をセキュリティー保護します。</p></li>
+<li><p>X509Token &#8212; X509 証明書を使用してセキュリティートークンをセキュリティー保護します。</p></li></ul>
+
+
+<a name="ghesm"></a><h5>認証連鎖</h5>
+<p>OpenSSO の認証サービスで認証を受けるために使用できる認証連鎖またはサービス名を定義します。認証サービスは、受信した発行者要求のセキュリティートークンから得た証明情報を使用して OpenSSO の認証済みセキュリティートークンを生成します。</p>
+
+<a name="ghaup"></a><h5>ユーザーの資格情報</h5>
+<p>この属性は、受信 WS-Trust 要求の一部としてクライアントから送信された UserName トークンを検証するために、セキュリティートークンサービスで使用されるユーザー名/パスワード共有シークレットを表します。</p>
+
+<a name="ghauq"></a><h5>リクエストの署名の確認が必要</h5>
+<p>セキュリティートークンサービスは受信した WS-Trust 要求の署名を検証する必要があることを指定します。</p>
+
+<a name="ghaui"></a><h5>リクエストヘッダーの復号化が必要</h5>
+<p>セキュリティートークンサービスによって受信されたすべての要求ヘッダーが復号化される必要があることを指定します。</p>
+
+<a name="ghauf"></a><h5>リクエストの復号化が必要</h5>
+<p>セキュリティートークンサービスによって受信されたすべての要求が復号化される必要があることを指定します。</p>
+
+<a name="ghavc"></a><h5>応答には署名が必要</h5>
+<p>セキュリティートークンサービスによって受信されたすべての応答が署名されている必要があることを指定します。</p>
+
+<a name="ghavo"></a><h5>応答の暗号化が必要</h5>
+<p>セキュリティートークンサービスによって送信されたすべての応答が暗号化されている必要があることを指定します。</p>
+
+<a name="ghdtd"></a><h5>署名参照タイプ</h5>
+<p>セキュリティートークンサービスが WS-Trust 応答を署名するときに使用される参照のタイプを定義します。指定できる参照のタイプは、<tt>DircectReference</tt>、<tt>KeyIdentifier</tt>、および <tt>X509</tt> です。</p>
+
+<a name="ghdss"></a><h5>暗号化アルゴリズム</h5>
+<p>WS-Trust 応答を暗号化するためにセキュリティートークンサービスによって使用される暗号化アルゴリズムを定義します。</p>
+
+<a name="ghdru"></a><h5>暗号化強度</h5>
+<p>WS-Trust 応答を暗号化するためにセキュリティートークンサービスによって使用される暗号化強度を設定します。暗号化強度を高める場合は大きい値を選択します。</p>
+
+<a name="ghavt"></a><h5>非公開鍵のエイリアス</h5>
+<p>この属性は、WS-Trust 応答の署名または受信した WS-Trust 要求の復号化に使用される証明書非公開鍵エイリアスを定義します。</p>
+
+<a name="ghave"></a><h5>非公開鍵のタイプ</h5>
+<p>この属性は、WS-Trust 応答の署名または WS-Trust 要求の復号化に使用される証明書非公開鍵のタイプを定義します。指定できるタイプは、<tt>PublicKey</tt>、<tt>SymmetricKey</tt>、または <tt>NoProofKey</tt> です。</p>
+
+<a name="ghaux"></a><h5>Web サービス (WS-Trust) クライアントの公開鍵のエイリアス</h5>
+<p>受信する WS-Trust 要求の署名を検証したり、WS-Trust 応答を暗号化したりするために使用される証明書公開鍵のエイリアスを定義します。</p>
+
+<a name="ghbbv2"></a><h5>Kerberos ドメインサーバー</h5>
+<p>この属性は、Kerberos Distribution Center (ドメインコントローラ) のホスト名を指定します。ドメインコントローラの完全修飾ドメイン名 (FQDN) を入力する必要があります。</p>
+
+<a name="ghbdx2"></a><h5>Kerberos ドメイン</h5>
+<p>この属性は、Kerberos Distribution Center (ドメインコントローラ) のドメイン名を指定します。設定によっては、ドメインコントローラのドメイン名が OpenSSO のドメイン名とは異なる場合があります。</p>
+
+<a name="ghbcq2"></a><h5>Kerberos サービス主体</h5>
+<p>生成されたセキュリティートークンの所有者として Kerberos 主体を指定します。</p><p>次の形式を使用します。 </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> と <tt>domainame</tt> はそれぞれ、OpenSSO インスタンスのホスト名とドメイン名を表します。<tt>dc_domain_name</tt> は、Windows Kerberos サーバー (ドメインコントローラ) が存在する Kerberos ドメインです。Kerberos
+サーバーを OpenSSO インスタンスのドメイン名と別にすることができます。</p>
+
+<a name="ghbae2"></a><h5>Kerberos キータブファイル</h5>
+<p>この属性は、トークンの発行に使用される Kerberos keytab ファイルを指定します。次の形式を使用します。この形式は必須ではありません。</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> は、OpenSSO インスタンスのホスト名です。</p>
+
+<a name="ghbep2"></a><h5>Kerberos 署名を検証する</h5>
+<p>この属性を有効にすると、Kerberos トークンが署名されていることを指定します。</p>
+
+<a name="ghawg"></a><h5>SAML 属性マッピング</h5>
+
+<hr><p><b>注 &#8211; </b>次のすべての SAML 関連属性は、セキュリティートークンサービスの現在のインスタンスが Web サービスプロバイダを持ち、別のセキュリティートークンサービスインスタンスから生成された SAML トークンを受信するような構成で使用されます。</p>
+<hr>
+<p>この設定は、Web サービスプロバイダに対するセキュリティートークンサービスによって SAML 表明を作成するときに属性ステートメントとして生成する必要がある SAML 属性を表します。形式は <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i>Real_attr_name</i><tt></tt> です。</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> は、受信した Web サービス要求の SAML 表明の SAML 属性名です。<tt></tt><i>Real_attr_name</i><tt></tt> は、認証済みの SSOToken またはアイデンティティーリポジトリから取得した属性名です。</p>
+
+<a name="ghawn"></a><h5>NameID マッパー</h5>
+<p>セキュリティートークンサービス用に生成された表明の SAML NameID マッパー。</p>
+
+<a name="ghavl"></a><h5>メンバーシップを含める</h5>
+<p>有効にすると、生成された表明にユーザーメンバーシップが SAML 属性として含まれます. </p>
+
+<a name="ghawo"></a><h5>属性名前空間</h5>
+<p>セキュリティートークンサービス用に生成された表明の SAML 属性名前空間を定義します。</p>
+
+<a name="ghauj"></a><h5>信頼できる発行者</h5>
+<p>OpenSSO にセキュリティートークンを送信する信頼できる発行者のリストを定義します。OpenSSO は、セキュリティートークンがこれらの発行者のいずれかから送信されたことを検証する必要があります。 </p>
+
+<a name="ghavy"></a><h5>信頼できる IP アドレス</h5>
+<p>OpenSSO にセキュリティートークンを送信する IP アドレスのリストを定義します。OpenSSO は、セキュリティートークンがこれらのホストのいずれかから送信されたことを検証する必要があります。 </p>
+<br/>
+
+</body>
+</html>

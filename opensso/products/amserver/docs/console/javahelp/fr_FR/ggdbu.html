@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service de configuration de strat&#233;gie  - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>Service de configuration de strat&#233;gie </h4>
+<p>Le service de configuration de strat&#233;gie sert &#224; configurer des attributs associ&#233;s
+&#224; une strat&#233;gie pour chaque organisation, via la console de Federated Access
+Manager. Vous pouvez &#233;galement d&#233;finir des impl&#233;mentations de nom de ressource et
+des magasins de donn&#233;es Directory Server pour les utiliser avec la structure
+de strat&#233;gie Federated Access Manager. Le Directory Server sp&#233;cifi&#233; dans le service
+de configuration de strat&#233;gie sert &#224; l'&#233;valuation de l'appartenance des utilisateurs LDAP,
+des groupes LDAP, des r&#244;les LDAP et des objets de strat&#233;gie d'organisation.</p>
+
+<a name="ggdbf"></a><h5>Dur&#233;e des r&#233;sultats d'objets</h5>
+<p>Pour am&#233;liorer les performances d'&#233;valuation de strat&#233;gie, des &#233;valuations d'appartenance sont cach&#233;es
+pendant un d&#233;lai d&#233;fini par l'attribut Dur&#233;e des r&#233;sultats d'objets dans le
+service de configuration de strat&#233;gie. Ces d&#233;cisions d'appartenance cach&#233;es sont utilis&#233;es jusqu'&#224;
+l'expiration du d&#233;lai d&#233;fini dans l'attribut Dur&#233;e des r&#233;sultats d'objets. L'&#233;valuation d'appartenance
+est ensuite utilis&#233;e pour refl&#233;ter l'&#233;tat courant des utilisateurs dans le r&#233;pertoire.
+</p>
+
+<a name="ggday"></a><h5>Attributs dynamiques</h5>
+<p>Il s'agit des noms d'attribut dynamique autoris&#233;s qui apparaissent dans une liste
+et permettent de d&#233;finir des attributs dynamiques de fournisseur de r&#233;ponses de
+strat&#233;gie. Les noms d&#233;finis doivent &#234;tre identiques aux noms d'attribut, comme d&#233;fini
+dans le r&#233;f&#233;rentiel de donn&#233;es.</p>
+
+<a name="ggdcj"></a><h5>D&#233;finition d'amldapuser</h5>
+<p><tt>amldapuser</tt> correspond &#224; un utilisateur cr&#233;&#233; lors de l'installation utilis&#233;e par d&#233;faut
+pour le Directory Server sp&#233;cifi&#233; dans le service de configuration de strat&#233;gie.
+Cela peut &#234;tre modifi&#233;, le cas &#233;ch&#233;ant, par l'administrateur ou l'administrateur de
+strat&#233;gie du domaine.</p>
+<br/>
+
+</body>
+</html>

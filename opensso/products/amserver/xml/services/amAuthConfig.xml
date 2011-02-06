@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amAuthConfig.xml,v 1.3 2008/06/25 05:45:41 qcheng Exp $
+
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration> 
+    <Service name="iPlanetAMAuthConfiguration" version="1.0"> 
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetAMAuthConfiguration"
+            i18nFileName="amAuthConfig"
+            i18nKey="iplanet-am-auth-config-service-description"
+            revisionNumber="20"
+            propertiesViewBeanURL="@CONSOLE_URI@/auth/ACServiceInstanceList"> 
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-auth-configuration-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+
+            <Organization> 
+                <SubSchema name="Configurations"> 
+                    <SubSchema name="NamedConfiguration" 
+                        inheritance="multiple"> 
+                        <AttributeSchema 
+                            name="iplanet-am-auth-configuration" 
+                            type="single" 
+                            syntax="string"
+                            propertiesViewBeanURL="@CONSOLE_URI@/auth/ACModuleList" 
+                            uitype="link"
+                            i18nKey="a101" />
+                             <AttributeSchema name="iplanet-am-auth-login-success-url"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a102">
+                            <DefaultValues>
+                                  <Value/>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-login-failure-url"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a103">
+                            <DefaultValues>
+                                <Value/>
+                            </DefaultValues>
+                        </AttributeSchema>
+                         <AttributeSchema name="iplanet-am-auth-post-login-process-class"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a104">
+                        </AttributeSchema>
+
+                    </SubSchema> 
+                </SubSchema> 
+            </Organization> 
+            
+            <Dynamic>
+                <AttributeSchema name="iplanet-am-auth-configuration"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a101">
+                    <ChoiceValues>
+                        <ChoiceValuesClassName
+                    className= "com.sun.identity.authentication.service.ConfiguredAuthServices" />
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>[Empty]</Value>
+                    </DefaultValues>
+                </AttributeSchema>                
+            </Dynamic>
+        </Schema> 
+        <Configuration>
+            <OrganizationConfiguration name="/">
+                <SubConfiguration name="Configurations">
+                    <SubConfiguration name="ldapService"
+                        id="NamedConfiguration">
+                        <AttributeValuePair>
+                            <Attribute name="iplanet-am-auth-configuration"/>
+                            <Value>&lt;AttributeValuePair&gt;&lt;Value&gt;@DEFAULT_AUTH_MODULE@ REQUIRED &lt;&#47;Value&gt;&lt;&#47;AttributeValuePair&gt;</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </OrganizationConfiguration>
+        </Configuration>
+    </Service> 
+</ServicesConfiguration> 

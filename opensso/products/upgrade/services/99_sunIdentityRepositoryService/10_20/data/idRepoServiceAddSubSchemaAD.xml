@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: idRepoServiceAddSubSchemaAD.xml,v 1.3 2008/06/25 05:54:08 qcheng Exp $
+-->
+
+<!-- This file is used by idRepoServiceAddAttrSchemaRequest.xml -->
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd"
+>
+
+<Requests>
+
+		<!-- LDAPv3 plugin for AD -->
+		<SubSchema name= "LDAPv3ForAD"
+		    inheritance = "multiple"
+		    i18nKey = "a2051">
+		    <AttributeSchema name="RequiredValueValidator"
+			type="validator"
+			syntax="string">
+			<DefaultValues>
+			    <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+		    <!-- The two attributes below, if defined, allow the IdRepo SDK to
+			map attribute names and to determine entities supported and
+			operations supported by this plugin. If no mapping is provided,
+			the assumption is that the attribute names are the same (no
+			mapping needed. If the list of entities supported is not provided
+			then the assumption is that no entities are supported -->
+	            <AttributeSchema name="sunIdRepoClass"
+		        type = "single"
+			syntax = "string"
+			any="required"
+			validator="RequiredValueValidator"
+			i18nKey = "a2013">
+			<DefaultValues>
+			    <Value>com.sun.identity.idm.plugins.ldapv3.LDAPv3Repo</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+                   <AttributeSchema name="sunIdRepoAttributeMapping"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a20131">
+			<DefaultValues>
+			    <Value>employeeNumber=distinguishedName</Value>
+			    <Value>iplanet-am-user-alias-list=objectGUID</Value>
+			    <Value>mail=userPrincipalName</Value>
+			    <Value>portalAddress=sAMAccountName</Value>
+			    <Value>telephonenumber=displayName</Value>
+			    <Value>uid=sAMAccountName</Value>
+			</DefaultValues>
+                     </AttributeSchema>
+	    
+		    <AttributeSchema name="sunIdRepoSupportedOperations"
+			type="list"
+			syntax="string"
+			validator="validatatorClass for verifying this list against supported list"
+			i18nKey="a2014">
+			<DefaultValues>
+			    <!-- IdRepos can provide the object types
+			       it can manage and the operations that can
+			       be performed on these objects, as a key-value
+			       pair. Object types could be User, Group, Role,
+			       etc., and the operations are limited to create,
+			       read, edit and modify. The values are case
+			       insenstive. -->
+			       <Value>realm=read,create,edit,delete,service</Value>
+			       <Value>user=read,create,edit,delete,service</Value>
+			       <Value>agent=read,create,edit,delete</Value>
+			       <Value>group=read,create,edit,delete</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-ldapv3AD"
+			type="single"
+			syntax="string"
+			i18nKey="">
+			<DefaultValues>
+			    <Value>ldapv3AD</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+
+		    <!-- From here on the list of plugin specific attributes for determing
+   		       things like organization relating to this realm, authentication source,
+		       user containers, group containers etc etc. -->
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-ldap-server"
+                        type="list"
+                        syntax="string"
+			any="required"
+			validator="RequiredValueValidator"
+                        i18nKey="a2000">
+                        <DefaultValues>
+                            <Value>DIRECTORY_SERVER:DIRECTORY_PORT</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-authid"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2003">
+                        <DefaultValues>
+                            <Value>CN=Administrator,CN=Users,NORMALIZED_ORGBASE</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
+                        type="single"
+                        syntax="password"
+                        i18nKey="a2004">
+                    </AttributeSchema>
+		    
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-organization_name"
+			type = "single"
+			syntax = "string"
+			any="required"
+			validator="RequiredValueValidator"
+			i18nKey = "a2006">
+			<DefaultValues>
+			    <Value>NORMALIZED_ORGBASE</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+		    
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2007">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2008">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2009">
+                        <DefaultValues>
+                            <Value>10</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-max-result"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2010">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-time-limit"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2011">
+                            <DefaultValues>
+                        <Value>10</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-referrals"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2012">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
+			type="single_choice"
+			syntax="string"
+			i18nKey="a2014a">
+			<ChoiceValues>
+			    <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
+			    <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
+			    <ChoiceValue i18nKey="a2042">SCOPE_SUB</ChoiceValue>
+			</ChoiceValues>
+			<DefaultValues>
+			    <Value>SCOPE_BASE</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-attribute"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2015">
+                        <DefaultValues>
+                            <Value>USER_NAMING_ATTR</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-users-search-filter"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2016">
+                        <DefaultValues>
+                            <Value>(objectclass=person)</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
+			type="list"
+			syntax="string"
+			i18nKey="a2017">
+			<DefaultValues>
+			    <Value>organizationalPerson</Value>
+			    <Value>person</Value>
+			    <Value>top</Value>
+			    <Value>user</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-user-attributes"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a20171">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                            <Value>dn</Value>
+                            <Value>displayName</Value>
+                            <Value>distinguishedName</Value>
+                            <Value>employeeNumber</Value>
+                            <Value>mail</Value>
+                            <Value>name</Value>
+                            <Value>objectclass</Value>
+                            <Value>objectGUID</Value>
+                            <Value>sAMAccountName</Value>
+                            <Value>sn</Value>
+			    <Value>userpassword</Value>
+			    <Value>userPrincipalname</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a201711">
+			<DefaultValues>
+			    <Value>cn</Value>
+			    <Value>sn</Value>
+			</DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-isactive"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a20172">
+                        <DefaultValues>
+                            <Value>inetuserstatus</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-active"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20173">
+                       <DefaultValues>
+                           <Value>Active</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
+                       type="single"
+                       syntax="string"
+                       i18nKey="a20174">
+                       <DefaultValues>
+                           <Value>Inactive</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+
+                   <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-attribute"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2018">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-groups-search-filter"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2019">
+                        <DefaultValues>
+                            <Value>(objectclass=group)</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2020">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-value"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2021">
+                        <DefaultValues>
+                            <Value>users</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-group-objectclass"
+			type="list"
+			syntax="string"
+			i18nKey="a2022">
+			<DefaultValues>
+			    <Value>group</Value>
+			    <Value>top</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-group-attributes"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a20221">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                            <Value>dn</Value>
+                            <Value>distinguishedName</Value>
+                            <Value>member</Value>
+                            <Value>name</Value>
+                            <Value>objectCategory</Value>
+                            <Value>objectclass</Value>
+                            <Value>sAMAccountName</Value>
+                            <Value>sAMAccountType</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-memberof"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2023">
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2024">
+                        <DefaultValues>
+                            <Value>member</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-memberurl"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2025">
+                        <DefaultValues>
+                            <Value>memberUrl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-roles-search-attribute"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-roles-search-filter"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsroledefinition))</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-role-search-scope"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
+                            <ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
+                            <ChoiceValue i18nKey="a2042">SCOPE_SUB</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>SCOPE_SUB</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-role-objectclass"
+			type="list"
+			syntax="string"
+			i18nKey="">
+			<DefaultValues>
+			    <Value>ldapsubentry</Value>
+			    <Value>nssimpleroledefinition</Value>
+			    <Value>nsmanagedroledefinition</Value>
+			    <Value>nsroledefinition</Value>
+			    <Value>top</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-filterrole-objectclass"
+			type="list"
+			syntax="string"
+			i18nKey="">
+			<DefaultValues>
+			    <Value>ldapsubentry</Value>
+			    <Value>nscomplexroledefinition</Value>
+			    <Value>nsfilteredroledefinition</Value>
+			    <Value>nsroledefinition</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-filterrole-attributes"
+                        type="list"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>nsRoleFilter</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-nsrole"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>nsrole</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-nsroledn"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>nsRoleDN</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-nsrolefilter"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>nsRoleFilter</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2034">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-value"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2035">
+                        <DefaultValues>
+                            <Value>users</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-agent-search-attribute"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a20351">
+                        <DefaultValues>
+                            <Value>USER_NAMING_ATTR</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-agent-container-name"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2036">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-agent-container-value"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2037">
+                        <DefaultValues>
+                            <Value>users</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-agent-search-filter"
+                        type="single"
+			syntax="string"
+			i18nKey="a20371">
+			<DefaultValues>
+			    <Value>(objectClass=sunIdentityServerDevice)</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-agent-objectclass"
+			type="list"
+			syntax="string"
+			i18nKey="a2038">
+			<DefaultValues>
+			    <Value>sunIdentityServerDevice</Value>
+			    <Value>top</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-agent-attributes"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a20381">
+                        <DefaultValues>
+                            <Value>cn</Value>
+                            <Value>dn</Value>
+                            <Value>objectclass</Value>
+                            <Value>uid</Value>
+                            <Value>userpassword</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-authenticatable-type"
+			type="multiple_choice"
+			syntax="string"
+			i18nKey="a20385">
+			<ChoiceValues>
+			    <ChoiceValue i18nKey="choiceUSER">User</ChoiceValue>
+			    <ChoiceValue i18nKey="choiceAGENT">Agent</ChoiceValue>
+                        </ChoiceValues>
+			<DefaultValues>
+			    <Value>User</Value>
+			    <Value>Agent</Value>
+			</DefaultValues>
+		    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a20386">
+                        <DefaultValues>
+                            <Value>USER_NAMING_ATTR</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-psearchbase"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2043">
+                        <DefaultValues>
+                            <Value>NORMALIZED_ORGBASE</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-idletimeout"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2044">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-numretires"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2045">
+                        <DefaultValues>
+                            <Value>3</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="com.iplanet.am.ldap.connection.delay.between.retries"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2046">
+                        <DefaultValues>
+                            <Value>1000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-errorcodes"
+			type="list"
+			syntax="string"
+			i18nKey="a2047">
+			<DefaultValues>
+			    <Value>80</Value>
+			    <Value>81</Value>
+			    <Value>91</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-cache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2048">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-cache-ttl"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2049">
+                        <DefaultValues>
+                            <Value>600</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-cache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2050">
+                        <DefaultValues>
+                            <Value>10240</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+		    <AttributeSchema name="sun-idrepo-ldapv3-config-service-attributes"
+			type="list"
+			syntax="xml"
+			i18nKey="">
+                    </AttributeSchema>
+
+		</SubSchema>
+
+</Requests>
+

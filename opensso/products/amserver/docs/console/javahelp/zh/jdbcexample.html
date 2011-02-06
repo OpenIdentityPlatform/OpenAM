@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置连接池 &#8212; 示例 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="jdbcexample"></a><h5>配置连接池 &#8212; 示例</h5>
+<p>以下示例显示为 Web 服务器和 MySQL 4.0 设置连接池的方法：</p><ol>
+<li><b>在 Web Server 控制台中，创建一个具有以下属性的 JDBC 连接池：</b><dl><dt>poolName</dt>
+<dd><p><tt>samplePool</tt></p></dd>
+<dt>DataSource Classname</dt>
+<dd><p><tt>com.mysql.jdbc.jdbc2.optional.MysqlDatacSource</tt></p></dd>
+<dt>serverName</dt>
+<dd><p>mySQL 服务器的服务器名称。</p></dd>
+<dt>port</dt>
+<dd><p>正在运行 mySQL 服务器的端口号。</p></dd>
+<dt>user</dt>
+<dd><p>数据库密码的用户名。</p></dd>
+<dt>password</dt>
+<dd><p>用户的密码。</p></dd>
+<dt>databaseName</dt>
+<dd><p>数据库的名称。</p></dd>
+</dl>
+
+<hr><p><b>注 &#8211; </b>应该将包含以下步骤中提及的 <i>DataSource</i> 类和 JDBC 驱动程序类的 jar 文件添加到应用程序类路径</p>
+<hr>
+</li>
+<li><b>配置 JDBC 资源。在 Web Server 控制台中，创建一个具有以下属性的 JDBC 资源：</b><dl><dt>JNDI 名称</dt>
+<dd><p><i>jdbc/samplePool</i></p></dd>
+<dt>池名称</dt>
+<dd><p><i>samplePool</i></p></dd>
+<dt>启用数据资源</dt>
+<dd><p><i>on</i></p></dd>
+</dl>
+</li>
+<li><b>向应用程序的 <tt>sun-web.xml</tt> 文件中添加以下行：</b><pre>&#60;resource-ref>
+      &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+      &#60;jndi-name>jdbc/samplePool&#60;/jndi-name>
+&#60;/resource-ref></pre></li>
+<li><b>在 web.xml 应用程序文件中添加以下行：</b><pre>&#60;resource-ref>
+       &#60;description>mySQL Database&#60;/description>
+       &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+       &#60;res-type>javax.sql.DataSource&#60;/res-type>
+       &#60;res-auth>Container&#60;/res-auth>
+&#60;/resource-ref></pre></li>
+<li><b>完成这些设置后，该属性的值将变为 <i>java:comp/env/jdbc/mySQL</i>。</b></li></ol>
+<br/>
+
+</body>
+</html>

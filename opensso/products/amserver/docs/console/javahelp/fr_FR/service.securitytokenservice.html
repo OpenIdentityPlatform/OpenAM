@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service de jeton de s&#233;curit&#233; - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>Service de jeton de s&#233;curit&#233;</h4>
+<p>Les attributs de ce services d&#233;finissent la configuration dynamique du service STS
+(Security Token Service) d'OpenSSO. Ils d&#233;finissent la configuration suivante&#160;:</p>
+<ul><li><p>Emission et cr&#233;ation de jetons de s&#233;curit&#233;</p></li>
+<li><p> S&#233;curit&#233; des services Web pour le service STS lui-m&#234;me afin de s&#233;curiser les points d'extr&#233;mit&#233; de celui-ci. Les attributs Signature et Codage configurent la validation par le fournisseur du serveur des demandes WS-Trust entrantes et s&#233;curisent les r&#233;ponses WS-Trust sortantes. L'attribut M&#233;canisme de s&#233;curit&#233; d&#233;finit les informations de s&#233;curit&#233; des jetons de s&#233;curit&#233;.</p></li>
+<li><p>Configuration SAML pour demander le mappage des attributs de s&#233;curit&#233; dans le jeton de s&#233;curit&#233; (via une assertion SAML) quand le STS configur&#233; est sp&#233;cifi&#233; comme fournisseur de services Web et re&#231;oit un jeton SAML (assertion) g&#233;n&#233;r&#233; par un service STS distant.</p></li>
+<li><p> Validation du jeton de s&#233;curit&#233; re&#231;u d'un fournisseur de services Web lorsque le jeton a &#233;t&#233; g&#233;n&#233;r&#233; par un service STS distant.</p><p>Vous pouvez cr&#233;er des profils de configuration dynamique pour les fournisseurs de s&#233;curit&#233; des services Web OpenSSO au niveau de la <a href="agentconfig.agents.html">configuration de l'agent centralis&#233;</a> sous l'onglet Domaines.</p></li></ul>
+
+
+<a name="ghatr"></a><h5>&#201;metteur</h5>
+<p>Nom du service Jeton de s&#233;curit&#233; qui &#233;met les jetons de s&#233;curit&#233;.</p>
+
+<a name="ghawa"></a><h5>Point d'arriv&#233;e</h5>
+<p>Ce champ accepte une valeur du type : </p><p><tt>%protocole://%h&#244;te:%port%uri/sts</tt> </p><p>Cette syntaxe permet le remplacement dynamique de l'URL d'extr&#233;mit&#233; du service de
+jeton de s&#233;curit&#233;, en fonction des param&#232;tres de session sp&#233;cifiques.</p>
+
+<a name="ghatv"></a><h5>Cl&#233; cod&#233;e &#233;mise</h5>
+<p>Lorsqu'il est activ&#233;, cet attribut code la cl&#233; &#233;mise par le service
+Jeton de s&#233;curit&#233;.</p>
+
+<a name="ghauc"></a><h5>Jeton cod&#233; &#233;mis</h5>
+<p>Lorsqu'il est activ&#233;, cet attribut code le jeton de s&#233;curit&#233; &#233;mis par
+le service Jeton de s&#233;curit&#233;.</p>
+
+<a name="ghavx"></a><h5>Dur&#233;e de vie du jeton de s&#233;curit&#233;</h5>
+<p>D&#233;finit la dur&#233;e de validit&#233; du jeton &#233;mis.</p>
+
+<a name="ghaud"></a><h5>Classe d'impl&#233;mentation du jeton</h5>
+<p>Cet attribut sp&#233;cifie la classe d'impl&#233;mentation du fournisseur/&#233;metteur de jetons de s&#233;curit&#233;.</p>
+
+<a name="ghaug"></a><h5>Nom d'alias du certificat</h5>
+<p>D&#233;finissez le nom d'alias pour le certificat utilis&#233; pour signer les &#233;missions
+de jeton de s&#233;curit&#233; par le service Jeton de s&#233;curit&#233;.</p>
+
+<a name="ghauh"></a><h5>Classe de plug-ins de jetons utilisateur final STS</h5>
+<p>D&#233;finit la classe d'impl&#233;mentation pour la conversion du jeton de l'utilisateur final.</p>
+
+<a name="ghawk"></a><h5>M&#233;canisme de s&#233;curit&#233;</h5>
+<p>D&#233;finit le type d'informations de s&#233;curit&#233; utilis&#233; pour s&#233;curiser le jeton de
+s&#233;curit&#233; lui-m&#234;me ou les informations de s&#233;curit&#233; accept&#233;es par le service Jeton
+de s&#233;curit&#233; &#224; partir de la demande WS-Trust envoy&#233;e par le client.
+Vous pouvez effectuer un choix parmi les types de s&#233;curit&#233; suivants&#160;:</p>
+<ul><li><p>Anonyme &#8212; Le m&#233;canisme de s&#233;curit&#233; anonyme ne contient aucune r&#233;f&#233;rence de s&#233;curit&#233;.</p></li>
+<li><p>Jeton Kerberos - Utilise des jetons Kerberos.</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; Utilise des jetons de s&#233;curit&#233; Liberty.</p></li>
+<li><p>SAML-HolderOfKey &#8212; Utilise le type d'assertion SAML 1.1 Holder-Of-Key.</p></li>
+<li><p>SAML-SenderVouches &#8212; Utilise le type d'assertion SAML 1.1 SenderVouches.</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8212; Utilise le type de jeton d'assertion SAML 2.0 Holder-Of-Key.</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8212; Utilise le type de jeton d'assertion SAML 2.0 SenderVouches.</p></li>
+<li><p>STSSecurity &#8212; Sp&#233;cifie que l'agent du service de jeton de s&#233;curit&#233; obtient le jeton de s&#233;curit&#233; aupr&#232;s du service de jeton de s&#233;curit&#233;.</p></li>
+<li><p>UserNameToken &#8212; Utilise un jeton de nom d'utilisateur pour s&#233;curiser les demandes du service de jeton de s&#233;curit&#233;.</p></li>
+<li><p>UserNameToken-Plain &#8212; Utilise un jeton de nom d'utilisateur avec un mot de passe en texte clair pour s&#233;curiser les demandes du service de jeton de s&#233;curit&#233;.</p></li>
+<li><p>X509Token &#8212; Utilise le certificat X509 pour s&#233;curiser le jeton de s&#233;curit&#233;.</p></li></ul>
+
+
+<a name="ghesm"></a><h5>Cha&#238;ne d'authentification</h5>
+<p>D&#233;finit la cha&#238;ne d'authentification ou le nom de service pouvant &#234;tre utilis&#233;
+pour s'authentifier aupr&#232;s du service d'authentification d'OpenSSO, en utilisant les r&#233;f&#233;rences provenant
+du jeton de s&#233;curit&#233; d'une demande de services Web entrante pour g&#233;n&#233;rer
+le jeton SSO authentifi&#233; d'OpenSSO.</p>
+
+<a name="ghaup"></a><h5>R&#233;f&#233;rence de l'utilisateur</h5>
+<p>L'attribut repr&#233;sente les secrets du nom d'utilisateur/mot de passe employ&#233;s par le
+service Jeton de s&#233;curit&#233; afin de valider un jeton Nom d'utilisateur envoy&#233;
+par le client dans le cadre de la demande WS-Trust entrante.</p>
+
+<a name="ghauq"></a><h5>La signature de demande est v&#233;rifi&#233;e</h5>
+<p>Sp&#233;cifie que le service Jeton de s&#233;curit&#233; doit v&#233;rifier la signature de
+la demande WS-Trust entrante.</p>
+
+<a name="ghaui"></a><h5>En-t&#234;te de la demande d&#233;chiffr&#233;</h5>
+<p>Sp&#233;cifie que tous les ent&#234;tes de demande re&#231;us par le service STS
+doivent &#234;tre d&#233;cod&#233;s.</p>
+
+<a name="ghauf"></a><h5>La demande est d&#233;chiffr&#233;e</h5>
+<p>Sp&#233;cifie que toutes les demandes re&#231;ues par le service STS doivent &#234;tre
+d&#233;cod&#233;es.</p>
+
+<a name="ghavc"></a><h5>R&#233;ponse sign&#233;e</h5>
+<p>Sp&#233;cifie que toutes les r&#233;ponses re&#231;ues par le service STS doivent &#234;tre
+sign&#233;es.</p>
+
+<a name="ghavo"></a><h5>La r&#233;ponse est chiffr&#233;e</h5>
+<p>Sp&#233;cifie que toutes les r&#233;ponses envoy&#233;es par le service STS doivent &#234;tre
+cod&#233;es.</p>
+
+<a name="ghdtd"></a><h5>Signature du type de r&#233;f&#233;rence</h5>
+<p>D&#233;finit les types de r&#233;f&#233;rence utilis&#233;s quand le service Jeton de s&#233;curit&#233;
+signe la r&#233;ponse WS-Trust. Les types de r&#233;f&#233;rence possibles sont <tt>DirectReference </tt>, <tt>KeyIdentifier</tt>
+et <tt>X509</tt>.</p>
+
+<a name="ghdss"></a><h5>Algorithme de codage</h5>
+<p>D&#233;finit l'algorithme de codage utilis&#233; par le service STS pour chiffrer la
+r&#233;ponse WS-Trust.</p>
+
+<a name="ghdru"></a><h5>Puissance de chiffrement</h5>
+<p>D&#233;finit la puissance de chiffrement utilis&#233;e par le service STS pour coder
+la r&#233;ponse WS-Trust. S&#233;lectionnez une valeur sup&#233;rieure pour une puissance de chiffrement
+sup&#233;rieure.</p>
+
+<a name="ghavt"></a><h5>Alias de cl&#233; priv&#233;e</h5>
+<p>Cet attribut d&#233;finit l'alias de cl&#233; de certificat priv&#233;e, utilis&#233; pour signer
+la r&#233;ponse WS-Trust ou d&#233;chiffrer la demande WS-Trust.</p>
+
+<a name="ghave"></a><h5>Type de cl&#233; priv&#233;e</h5>
+<p>Cet attribut d&#233;finit le type de cl&#233; priv&#233;e du certificat pour signer
+les r&#233;ponses WS-Trust ou d&#233;chiffrer les demandes WS-Trust. Les types possibles sont
+<tt>PublicKey</tt>, <tt>SymmetricKey </tt> ou <tt>NoProofKey</tt>.</p>
+
+<a name="ghaux"></a><h5>Alias de cl&#233; publique du client du service Web (WS-Trust)</h5>
+<p>D&#233;finit l'alias de cl&#233; du certificat public utilis&#233; permettant de v&#233;rifier la
+signature de la demande WS-Trust entrante ou de d&#233;chiffrer la r&#233;ponse WS-Trust.</p>
+
+<a name="ghbbv2"></a><h5>Serveur de domaine Kerberos</h5>
+<p>Cet attribut indique le nom d'h&#244;te de Kerberos Distribution Center (contr&#244;leur de
+domaine). Vous devez entrer le nom de domaine complet (FQDN) du contr&#244;leur
+de domaine.</p>
+
+<a name="ghbdx2"></a><h5>Domaine Kerberos</h5>
+<p>Cet attribut indique le nom de domaine de Kerberos Distribution Center (contr&#244;leur
+de domaine). Selon votre configuration, le nom de domaine du contr&#244;leur de
+domaine peut &#234;tre diff&#233;rent du nom de domaine OpenSSO.</p>
+
+<a name="ghbcq2"></a><h5>Service du Principal Kerberos</h5>
+<p>Indique le principal Kerberos comme &#233;tant le propri&#233;taire du jeton de s&#233;curit&#233;
+g&#233;n&#233;r&#233;.</p><p>Utilisez le format suivant : </p><p><tt>HTTP/nomh&#244;te.nomdomaine&#64;nom_domaine_dc</tt> </p><p><tt>nomh&#244;te</tt> et <tt>nomdomaine</tt> repr&#233;sentent le nom d'h&#244;te et le nom de domaine
+de l'instance OpenSSO. <tt>nom_domaine_dc</tt> est le domaine Kerberos dans lequel le serveur
+Kerberos Windows  (contr&#244;leur de domaine) r&#233;side. Le serveur Kerberos peut &#234;tre
+diff&#233;rent du nom de domaine de l'instance OpenSSO.</p>
+
+<a name="ghbae2"></a><h5>Fichier de classement de cl&#233;s Kerberos</h5>
+<p>Cet attribut sp&#233;cifie le fichier keytab Kerberos utilis&#233; pour l'&#233;mission du jeton.
+Utilisez de pr&#233;f&#233;rence le format suivant :</p><p><tt>nomh&#244;te.HTTP.fichierkeytab</tt> </p><p><tt>nom_h&#244;te</tt> est le nom d'h&#244;te de l'instance OpenSSO.</p>
+
+<a name="ghbep2"></a><h5>V&#233;rifier la signature Kerberos</h5>
+<p>S'il est activ&#233;, cet attribut sp&#233;cifie que le jeton Kerberos est sign&#233;.</p>
+
+<a name="ghawg"></a><h5>Mappage d'attribut SAML</h5>
+
+<hr><p><b>Remarque &#8211; </b>Tous les attributs SAML de la configuration doivent &#234;tre utilis&#233;s&#160;: l'instance actuelle
+du service STS se comporte comme le fournisseur de services Web et
+re&#231;oit un jeton SAML g&#233;n&#233;r&#233; &#224; partir d'une autre instance du service
+STS.</p>
+<hr>
+<p>Cette configuration repr&#233;sente un attribut SAML qui doit &#234;tre g&#233;n&#233;r&#233; en tant
+que d&#233;claration d'attribut lors de la cr&#233;ation de l'assertion SAML par le
+service de jeton de s&#233;curit&#233; pour un fournisseur de services Web. Le
+format est <tt></tt><i>nom_attr_SAML</i><tt></tt>=<tt></tt><i> nom_attr_r&#233;el</i><tt></tt>.</p><p><tt></tt><i>nom_attr_SAML</i><tt></tt> est le nom de l'attribut SAML provenant d'une assertion SAML d'une
+demande de services Web entrante. <tt></tt><i>nom_attr_r&#233;el</i><tt></tt> est le nom d'attribut extrait du
+jeton SSO authentifi&#233; ou du r&#233;f&#233;rentiel d'identit&#233;s.</p>
+
+<a name="ghawn"></a><h5>Mappeur d'identificateur de nom </h5>
+<p>Mappeur d'identificateur de nom SAML pour une assertion g&#233;n&#233;r&#233;e pour le service
+Jeton de s&#233;curit&#233;.</p>
+
+<a name="ghavl"></a><h5>Doit inclure les adh&#233;sions</h5>
+<p>Lorsque cette propri&#233;t&#233; est activ&#233;e, l'assertion g&#233;n&#233;r&#233;e contient les adh&#233;sions des utilisateurs
+sous forme d'attributs SAML. </p>
+
+<a name="ghawo"></a><h5>Espace de noms d'attributs </h5>
+<p>D&#233;finit l'espace de noms des attributs SAML pour une assertion g&#233;n&#233;r&#233;e pour
+le STS.</p>
+
+<a name="ghauj"></a><h5>Emetteurs dignes de confiance</h5>
+<p>D&#233;finit une liste d'&#233;metteurs approuv&#233;s pouvant &#234;tre utilis&#233;s pour l'envoi de jetons
+de s&#233;curit&#233; &#224; OpenSSO. OpenSSO doit v&#233;rifier que le jeton de s&#233;curit&#233;
+&#233;mane bien de l'un de ces &#233;metteurs. </p>
+
+<a name="ghavy"></a><h5>Adresses IP de confiance</h5>
+<p>D&#233;finit une liste d'adresses IP approuv&#233;es pouvant &#234;tre utilis&#233;es pour l'envoi de
+jetons de s&#233;curit&#233; &#224; OpenSSO. OpenSSO doit v&#233;rifier que le jeton de
+s&#233;curit&#233; &#233;mane bien de l'un de ces h&#244;tes. </p>
+<br/>
+
+</body>
+</html>

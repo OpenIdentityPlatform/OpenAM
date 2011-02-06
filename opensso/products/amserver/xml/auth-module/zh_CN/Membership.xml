@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: Membership.xml,v 1.11 2009/07/16 04:12:03 cbasha Exp $
+
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="Membership" version="1.0" >
+
+    <Callbacks length="3" order="1" timeout="120" header="自注册模块" template="membership.jsp" >
+        <NameCallback>
+            <Prompt> 用户名: </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> 密码: </Prompt>    
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> 登录 </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> 新建用户 </Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+
+    <Callbacks length="4" order="2" timeout="240" header="密码到期，请更改&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
+        <PasswordCallback echoPassword="false" >
+            <Prompt> 当前密码: </Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> 新密码: </Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> 确认新密码: </Prompt>
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> 提交 </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> 取消 </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="0" order="3" timeout="120" template="wrongPassword.jsp" />
+    
+    <Callbacks length="0" order="4" timeout="120" template="noUserProfile.jsp" />
+    
+    <Callbacks length="0" order="5" timeout="120" template="noUserName.jsp" />
+    
+    <Callbacks length="0" order="6" timeout="120" template="noPassword.jsp" />
+    
+    <Callbacks length="0" order="7" timeout="120" template="noConfirmation.jsp" />
+    
+    <Callbacks length="0" order="8" timeout="120" template="passwordMismatch.jsp" />
+    
+    <Callbacks length="0" order="9" timeout="120" template="configuration.jsp" />
+    
+    <Callbacks length="0" order="10" timeout="120" template="userExists.jsp" />
+    
+    <Callbacks length="0" order="11" timeout="120" template="profileException.jsp" />
+    
+    <Callbacks length="0" order="12" timeout="120" template="missingReqField.jsp" />
+    
+    <Callbacks length="0" order="13" timeout="120" template="userPasswordSame.jsp" />
+
+    <Callbacks length="0" order="14" timeout="120" template="invalidPassword.jsp" />
+    
+    <Callbacks length="0" order="15" timeout="120" header="您的密码已过期。请联系服务台重置您的密码" error="true"  />
+    
+    <Callbacks length="8" order="16" timeout="300" header="自注册" template="register.jsp" >
+        <NameCallback isRequired="true" attribute="uid" >
+            <Prompt> 用户名: </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
+            <Prompt> 密码: </Prompt>    
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" >
+            <Prompt> 确认密码: </Prompt>    
+        </PasswordCallback>
+        <NameCallback isRequired="true" attribute="givenname" >
+            <Prompt> 名字: </Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="sn" >
+            <Prompt> 姓氏: </Prompt>
+        </NameCallback>
+        <NameCallback isRequired="true" attribute="cn" >
+            <Prompt> 全名: </Prompt>
+        </NameCallback>
+        <NameCallback attribute="mail" >
+            <Prompt> 电子邮件地址: </Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> 注册 </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> 取消 </Value>
+                </OptionValue>
+             </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="2" order="17" timeout="120" header="自注册" >
+        <ChoiceCallback attribute="uid" >
+            <Prompt>您输入的用户名已&lt;BR&gt;有用户使用。&lt;BR&gt;请从以下用户名中&lt;BR&gt;选择一个，&lt;BR&gt;或创建您自己的用户名:</Prompt>
+            <ChoiceValues>
+              <ChoiceValue>
+                  <Value>创建自己的用户名</Value>
+              </ChoiceValue>
+            </ChoiceValues>
+        </ChoiceCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> 提交 </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+    <Callbacks length="1" order="18" timeout="120" template="disclaimer.jsp" >
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> 同意 </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> 不同意 </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    
+</ModuleProperties>

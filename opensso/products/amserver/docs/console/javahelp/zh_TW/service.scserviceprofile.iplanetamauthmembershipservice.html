@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>成員身份 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>成員身份</h4>
+<p><a name="indexterm-176"></a>「成員身份認證」模組是針對個人化網站而實作的。當啟用成員資格認證時，使用者可以自行註冊。這表示使用者無需管理員的協助，即可建立帳號，將它個人化，以及以註冊的使用者身分存取它。這些屬性為範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fumys">最小密碼長度</a></p></li>
+<li><p><a href="#fumyr">預設使用者角色</a></p></li>
+<li><p><a href="#fumyt">註冊後使用者狀態</a></p></li>
+<li><p><a href="#fumzm">認證級別</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>最小密碼長度</h5>
+<p>指定在自行註冊過程中設定密碼時所需的最小字元數。預設值為 8。</p><p>如果變更此值，則也應該在註冊中以及以下檔案的錯誤文字中進行變更：</p><p><tt></tt><i>AcessManager-base</i><tt>/locale/amAuthMembership.properties </tt> (<i>PasswdMinChars</i> 項目)</p>
+
+<a name="fumyr"></a><h5>預設使用者角色</h5>
+<p>指定分配給新使用者的角色，該使用者的設定檔透過自行註冊建立。此欄位沒有預設值。管理員必須指定將分配給新使用者的角色之 DN。</p>
+<hr><p><b>備註 &#8211; </b>指定的角色必須位於欲配置認證之範圍下。自行註冊期間僅增加可以指定給使用者的角色。所有其他 DN 均會被忽略。角色可以是 OpenSSO 角色或 LDAP 角色，但不接受篩選的角色。</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>註冊後使用者狀態</h5>
+<p>指定服務是否立即可以供已自行註冊的使用者使用。預設值為 [使用中]，新使用者可以使用服務。透過選取 [非使用中]，管理員選擇不向新使用者提供服務。</p>
+
+<a name="fumzm"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

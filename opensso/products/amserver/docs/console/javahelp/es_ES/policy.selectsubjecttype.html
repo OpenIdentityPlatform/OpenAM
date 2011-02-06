@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Asuntos - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>Asuntos</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a>Un <b>asunto</b> define el usuario o conjunto de usuarios (por ejemplo, un
+grupo o grupos que poseen un rol espec&#237;fico) al que afecta la
+pol&#237;tica.  La regla general para los asuntos consiste en que la pol&#237;tica
+s&#243;lo se aplicar&#225; si el usuario es miembro de, al menos, un
+asunto en la pol&#237;tica. Los asuntos predeterminados son:</p><dl><dt>Asunto de identidad de OpenSSO</dt>
+<dd><p>Este asunto implica que las identidades creadas y administradas en la ficha Realms Subjects (Asuntos de dominios) pueden agregarse como miembros del asunto.</p></dd>
+<dt>Usuarios autenticados</dt>
+<dd><p>Este tipo de asunto implica que cualquier usuario con un token SSO v&#225;lido es miembro de este asunto.</p><p>Todos los usuarios autenticados ser&#225;n miembros de este asunto, aunque se hayan autenticado en un dominio diferente a la organizaci&#243;n en la que est&#225; definida la directiva. Este tipo resulta &#250;til si el propietario del recurso desea conceder acceso a los recursos administrados para los usuarios desde otras organizaciones. Si desea restringir el acceso a los recursos protegidos a miembros de un determinada organizaci&#243;n, utilice el tipo de asunto de organizaci&#243;n.</p></dd>
+<dt>Clientes de servicios Web</dt>
+<dd><p>Este tipo de asunto implica que un cliente de servicio Web (WSC, siglas en ingl&#233;s) identificado por el token SSO es miembro de este asunto, si el DN de cualquier entidad principal incluido en el token SSO coincide con alguno de los valores seleccionados de este asunto. Entre los valores v&#225;lidos, se encuentran los DN de certificados de confianza del almac&#233;n de claves JKS local que se correspondan con los certificados de los WSC de confianza. Este asunto tiene una dependencia con la Estructura de servicios Web de Liberty y s&#243;lo deber&#237;an utilizarlo los proveedores de servicios Liberty para autorizar los WSC.</p><p>Aseg&#250;rese de que ha creado el almac&#233;n de claves antes de agregar este asunto a una pol&#237;tica. Puede encontrar informaci&#243;n sobre la configuraci&#243;n del almac&#233;n de claves en la siguiente ubicaci&#243;n:</p><p><tt></tt><i>OpenSSO-base</i><tt></tt> <tt> /SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>Los siguientes asuntos adicionales se pueden seleccionar en el servicio de <a href="service.scpolicy.html">Configuraci&#243;n de pol&#237;ticas</a>
+del dominio:</p><dl><dt>Roles de OpenSSO</dt>
+<dd><p>Este tipo de asunto implica que cualquier miembro de un rol de OpenSSO tambi&#233;n lo es de este asunto. Para crear un rol de OpenSSO, se debe ejecutar esta aplicaci&#243;n en el modo tradicional.</p></dd>
+<dt>Grupos de LDAP</dt>
+<dd><p>Este tipo de asunto implica que cualquier miembro de un grupo de LDAP tambi&#233;n lo es de este asunto.</p></dd>
+<dt>Roles de LDAP</dt>
+<dd><p>Este tipo de asunto implica que cualquier miembro de un rol de LDAP tambi&#233;n lo es de este asunto. Un rol de LDAP es cualquier definici&#243;n de rol que utilice la funci&#243;n de asignaci&#243;n de roles de Directory Server. Estos roles tienen clases de objeto controladas por la definici&#243;n de rol de Directory Server. El filtro de b&#250;squeda de roles de LDAP puede modificarse en el <a href="service.scpolicy.html">Configuraci&#243;n de pol&#237;ticas</a> para restringir el &#225;mbito de b&#250;squeda y mejorar el rendimiento.</p></dd>
+<dt>Usuarios de LDAP</dt>
+<dd><p>Este tipo de asunto implica que cualquier usuario de LDAP es miembro de este asunto.</p></dd>
+<dt>Organizaci&#243;n</dt>
+<dd><p>Este tipo de asunto implica que cualquier miembro de un dominio tambi&#233;n lo es de este asunto.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新增一個新的代管識別提供者至提供者實體 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderhostedadd"></a><h4>新增一個新的代管識別提供者至提供者實體</h4><p><b>代管提供者</b>代管在與 Access Manager 相同的伺服器。配置 [新增代管的識別提供者] 屬性將需要新增關於識別提供者之中介資料至實體設定檔。此程序的起點為<a href="federation.fsidentityprovider.html">新增識別提供者至提供者實體</a>。</p>
+<hr><p><b>備註 &#8211; </b>還可以配置其他屬性，但在初始配置頁面中看不見它們。請參閱<a href="federation.fsidentityproviderhostedprofile.html">修改提供者實體內的代管識別提供者屬性</a>。</p>
+<hr>
+<ol>
+<li><b>提供 [共用屬性] 的資訊。</b><p>[共用屬性] 包含通常定義識別提供者本身的值。</p><dl><dt>描述</dt>
+<dd><p>此屬性值為您建立實體時提供的說明。您可以修改原先輸入的說明，或在說明不存在時新增說明。</p></dd>
+<dt>協定支援列舉</dt>
+<dd><p>選擇此實體支援的「Liberty Alliance Project Liberty 識別聯合架構」 (Liberty ID-FF) 版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 代表 Liberty ID-FF 1.2 版。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 代表 Liberty ID-FF 1.1 版。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>提供通訊 URL 屬性的資訊。</b><p>通訊 URL 屬性包含一些位置，提供者可以將針對此識別提供者做記號的傳輸內容傳送至這些位置。</p><dl><dt>單次登入服務 URL</dt>
+<dd><p>鍵入服務提供者可以傳送單次登入及聯合請求的 URL。</p></dd>
+</dl>
+</li>
+<li><b>提供通訊設定檔屬性的資訊。</b><p>Liberty Alliance Project <b>設定檔</b>定義訊息內容與用來傳輸它的機制之組合。下列通訊設定檔屬性定義識別提供者用於對應功能的設定檔。</p><dl><dt>單次登入/聯合</dt>
+<dd><p>選取設定檔，以供此識別提供者傳送回應至認證或聯合請求時使用。</p>
+<ul><li><p>瀏覽器 Post (指定基於瀏覽器的 HTTP POST 協定)</p></li>
+<li><p>瀏覽器工件 (指定一個基於 (非瀏覽器) SOAP 的協定)</p></li>
+<li><p>LECP (指定一個啟用 Liberty 的用戶端代理)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>選取任何可用的信任圈以指定給提供者。</b><p>提供者可以屬於一或多個信任圈。然而，沒有指定信任圈的提供者不能參與以 Liberty Alliance Project 規格為基礎的通訊。如果未建立信任圈，您稍後可以定義此屬性。</p></li>
+<li><b>提供 Federated Access Manager 配置屬性的資訊。</b><p>Access Manager 配置屬性定義此代管 Federated Access Manager 實例的相關資訊。</p><dl><dt>提供程式 URL</dt>
+<dd><p>鍵入本機所代管之提供者的 URL。</p></dd>
+<dt>提供者別名</dt>
+<dd><p>提供者別名是用來識別實體設定檔內的代管提供者的名稱，並定義它是服務提供者還是識別提供者配置。此值必須是唯一的，而且能夠以 URL 代表。例如 <tt>sunAlias</tt>。</p></dd>
+<dt>認證類型</dt>
+<dd><p>選擇用於本極代管的提供者之認證請求的提供者類型。</p>
+<ul><li><p><b>本機</b>指定本機代管的提供者在接收認證請求時應連絡本機識別提供者 (實質上就是本身)。</p></li>
+<li><p><b>遠端</b>指定本機代管的提供者在接收認證請求時將連絡遠端識別提供者。</p></li></ul>
+</dd>
+<dt>預設認證環境</dt>
+<dd><p>選取認證環境類別 (認證的方法)，當收到的資訊不包含於服務提供者請求時，此識別提供者將使用該類別。此值所指定的認證環境類別也會用於下面的情況：當不明使用者嘗試存取服務提供者受保護的資源，以及服務提供者傳送認證請求時。選項如下：</p>
+<ul><li><p>密碼</p></li>
+<li><p>行動數位 ID</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>取消註冊的行動裝置</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>上一個階段作業</p></li>
+<li><p>行動合約</p></li>
+<li><p>時間-同步-記號</p></li>
+<li><p>受密碼保護的傳輸</p></li></ul>
+</dd>
+<dt>範圍</dt>
+<dd><p>鍵入一個指向配置此提供者之範圍的值。例如，<tt>/sp</tt>。</p></dd>
+<dt>Liberty 版本 URI</dt>
+<dd><p>鍵入一個指定要使用的 Liberty Alliance Project 規格版本的 URI。預設值為 <tt>http://projectliberty.org/specs/v1</tt>。</p></dd>
+<dt>名稱識別碼實作</dt>
+<dd><p>此欄位定義服務提供者用來參加名稱註冊的類別。名稱註冊是一種設定檔，服務提供者透過它指定主體的名稱識別碼，識別提供者將使用該名稱識別碼與服務提供者進行通訊。值為 <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt>。</p></dd>
+<dt>首頁 URL</dt>
+<dd><p>鍵入本機所代管之提供者的首頁 URL。</p></dd>
+<dt>單次登入失敗重新導向 URL</dt>
+<dd><p>鍵入當單次登入失敗時主體重新導向到的 URL。</p></dd>
+</dl>
+</li>
+<li><b>提供 SAML 屬性的資訊。</b><p>SAML 屬性定義有關識別提供者將如何傳送 SAML 指定的一般值。</p><dl><dt>指定間隔</dt>
+<dd><p>鍵入由識別提供者所核發之指定將保持有效的時間間隔 (以秒計)。主體將會保持認證，直到指定間隔失效。</p></dd>
+<dt>清除間隔</dt>
+<dd><p>鍵入在識別提供者內儲存的指定在清除之前的時間間隔 (以秒計)。</p></dd>
+<dt>影像瑕疵逾時</dt>
+<dd><p>鍵入可指出指定工件何時將逾時的時間間隔 (以秒計)。</p></dd>
+<dt>指定限制</dt>
+<dd><p>鍵入數字以定義識別提供者可以核發的指定數目，或是可以儲存的指定數目。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [確定] 以新增提供者至實體。</b></li>
+<li><b>從 [檢視] 功能表選取其他選項以繼續配置實體，或按一下 [儲存] 完成配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

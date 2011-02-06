@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>에이전트 만들기 또는 수정 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>에이전트 만들기 또는 수정</h5>
+<ol>
+<li><b>[에이전트] 탭을 누릅니다.</b></li>
+<li><b>[새로 만들기]를 누릅니다.</b></li>
+<li><b>다음과 같은 필드에 값을 입력합니다.</b><p><b>이름</b>. 에이전트의 이름 또는 아이디를 입력합니다. 에이전트는 Federated Access Manager에 로그인할 때
+이 이름을 사용합니다. 멀티바이트 이름은 사용할 수 없습니다.</p><p><b>비밀번호.</b> 에이전트의 비밀번호를 입력합니다. 이 비밀번호는 LDAP 인증 도중에 에이전트가 사용하는 비밀번호와는
+달라야 합니다.</p><p><b>비밀번호 확인</b>. 비밀번호를 확인합니다.</p><p><b>장치 상태</b>. 에이전트의 장치 상태를 입력합니다. 활성으로 설정된 경우 에이전트는 Federated Access Manager에
+대해 인증되어 Federated Access Manager와 통신할 수 있습니다. 비활성으로 설정된 경우 에이전트는
+Federated Access Manager에 대해 인증될 수 없습니다.</p></li>
+<li><b>[확인]을 누릅니다.</b></li>
+<li><b>에이전트를 만든 후에는 다음과 같은 필드를 추가로 편집할 수 있습니다.</b><p><b>설명</b>.  에이전트에 대한 간단한 설명을 입력합니다. 예를 들어, 에이전트 인스턴스 이름이나
+에이전트가 보호하는 응용 프로그램의 이름을 입력할 수 있습니다.</p><p><b>에이전트 키 값</b>.  키/값 쌍을 사용하여 에이전트 등록 정보를 설정합니다. Federated Access Manager는
+이 등록 정보를 사용하여 사용자의 자격 증명에 대한 에이전트 요청을 받습니다. 현재로는
+하나의 등록 정보만 유효하며 다른 모든 등록 정보는 무시됩니다. 다음 형식을 사용합니다.</p><p><tt></tt><i>agentRootURL</i><tt>=http://</tt><i>server_name:port</i><tt>/ </tt></p></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置用于引导的资源提供 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverybootstraprefoffadd"></a><h5>配置用于引导的资源提供</h5>
+<a name="indexterm-146"></a><a name="indexterm-147"></a><p>仅允许将一个资源提供用于引导；默认情况下，此提供包含关于搜索服务的信息。如果已经定义了资源提供，您可以通过单击其名称来修改属性。您还可以选中名称旁边的复选框并删除现有资源提供。要配置新的资源提供，可在随后单击“新建”。</p><ol>
+<li><b>单击“新建”以显示新的映射程序属性，或单击已配置的映射程序名称以对其进行修改。</b></li>
+<li><b>为资源提供输入可选说明。</b></li>
+<li><b>根据以下信息为“服务实例”属性提供值：</b><dl><dt>服务类型</dt>
+<dd><p>此属性采用的值是定义资源提供实现的服务类型的 URI。例如，<tt><b>urn:liberty:disco:2003-08</b></tt>。</p>
+<hr><p><b>注 &#8211; </b>建议此 URI 与服务的抽象 WSDL 描述 <tt>targetNamespace </tt>URI 相同。</p>
+<hr>
+</dd>
+<dt>提供者 ID</dt>
+<dd><p>此属性采用的值是服务实例提供者的 URI。例如，<tt><b>http://daiquiri.sun.com:80/amserver/Liberty/disco</b></tt>。</p></dd>
+<dt>服务说明</dt>
+<dd><p>此属性用于在不同的协议端点定义运行的 Web 服务。有关服务实例的信息需要在各种语境中进行传送。例如，在此规范中定义的搜索服务是身份服务，它用于枚举资源提供（每个资源提供都包含一个服务实例说明）。 参见<a href="service.smdiscoverydescriptionadd.html">配置服务说明</a>。</p></dd>
+</dl>
+</li>
+<li><b>根据以下信息为“资源提供选项”属性提供值：</b><dl><dt>选项</dt>
+<dd><p>如果资源提供没有可用选项，则选中此复选框。这些选项向潜在的请求者提供关于某些数据或操作是否可用于某个特定资源提供的提示。例如，可以提供一个能够声明主页联系信息可用的选项。</p></dd>
+<dt>选项列表</dt>
+<dd><p>此属性包含服务实例的选项列表。选项被定义为 URI。可能的 URI 集通常由服务类型进行标准化。</p></dd>
+</dl>
+</li>
+<li><b>根据下列信息启用指令：</b><dl><dt>说明 ID 引用用于：GenerateBearerToken</dt>
+<dd><p>所有<a href="supporteddirectives.html">支持的指令</a>都可以包含说明性引用。如果一条指令没有启用 ID 引用属性，则该指令会被应用到“资源提供”中提供的所有验证机制中。如果一条指令启用了 ID 引用属性，则此属性必须包含涉及与该指令关联的验证机制的 ID 引用列表。如果存在此属性，则指令必须仅应用于 ID 引用列表中涉及的那些说明。如果某些指令与某些安全机制不兼容，这可能非常有用。</p></dd>
+<dt>说明 ID 引用用于：Authenticate Requestor</dt>
+<dd><p>所有<a href="supporteddirectives.html">支持的指令</a>都可以包含说明性引用。如果一条指令没有启用 ID 引用属性，则该指令会被应用到“资源提供”中提供的所有验证机制中。如果一条指令启用了 ID 引用属性，则此属性必须包含涉及与该指令关联的验证机制的 ID 引用列表。如果存在此属性，则指令必须仅应用于 ID 引用列表中涉及的那些说明。如果某些指令与某些安全机制不兼容，这可能非常有用。</p></dd>
+<dt>说明 ID 引用用于：Encrypt ResourceID</dt>
+<dd><p>所有<a href="supporteddirectives.html">支持的指令</a>都可以包含说明性引用。如果一条指令没有启用 ID 引用属性，则该指令会被应用到“资源提供”中提供的所有验证机制中。如果一条指令启用了 ID 引用属性，则此属性必须包含涉及与该指令关联的验证机制的 ID 引用列表。如果存在此属性，则指令必须仅应用于 ID 引用列表中涉及的那些说明。如果某些指令与某些安全机制不兼容，这可能非常有用。</p></dd>
+<dt>说明 ID 引用用于：AuthenticateSessionContext</dt>
+<dd><p>所有<a href="supporteddirectives.html">支持的指令</a>都可以包含说明性引用。如果一条指令没有启用 ID 引用属性，则该指令会被应用到“资源提供”中提供的所有验证机制中。如果一条指令启用了 ID 引用属性，则此属性必须包含涉及与该指令关联的验证机制的 ID 引用列表。如果存在此属性，则指令必须仅应用于 ID 引用列表中涉及的那些说明。如果某些指令与某些安全机制不兼容，这可能非常有用。</p></dd>
+<dt>说明 ID 引用用于：Authorize Requester</dt>
+<dd><p>所有<a href="supporteddirectives.html">支持的指令</a>都可以包含说明性引用。如果一条指令没有启用 ID 引用属性，则该指令会被应用到“资源提供”中提供的所有验证机制中。如果一条指令启用了 ID 引用属性，则此属性必须包含涉及与该指令关联的验证机制的 ID 引用列表。如果存在此属性，则指令必须仅应用于 ID 引用列表中涉及的那些说明。如果某些指令与某些安全机制不兼容，这可能非常有用。</p></dd>
+</dl>
+</li>
+<li><b>单击“保存”完成配置操作。</b></li>
+<li><b>单击“搜索服务”页面上的“保存”完成服务的配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

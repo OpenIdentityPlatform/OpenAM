@@ -1,0 +1,65 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.1 2009/01/30 11:56:30 kalpanakm Exp $
+
+-->
+
+<project name="agentApp" basedir = "." default="build">
+
+    <property name="appname" value="agentapp"/>
+    <property name="agentapp.jsp.dir" value="${basedir}/jsp"/>
+    <property name="agentapp.etc.dir" value="${basedir}/etc"/>
+    <property name="built.dir" value="${basedir}/built"/>
+    <property name="server.version" value="jsr196"/>   
+    <property name="built.agentapp.dir" value="${built.dir}/${server.version}"/>
+    <property name="built.agentapp.web.dir" value="${built.agentapp.dir}/web"/>  
+    <property name="weblogic.source.etc.dir" value="${basedir}/../etc"/>
+ 
+    <target name="preparebuild">
+        <mkdir dir="${built.dir}"/>
+        <mkdir dir="${built.agentapp.dir}"/>
+        <mkdir dir="${built.agentapp.web.dir}"/>
+        <mkdir dir="${built.agentapp.web.dir}/WEB-INF"/>  
+    </target>
+ 
+    <target name="build" depends="preparebuild">  
+        <copy todir="${built.agentapp.web.dir}/">
+            <fileset dir="${agentapp.jsp.dir}">
+	        <include name="*.jsp"/>
+	      </fileset>
+	  </copy>
+        <copy file="${agentapp.etc.dir}/web.xml" 
+            tofile="${built.agentapp.web.dir}/WEB-INF/web.xml"/>
+        <copy file="${agentapp.etc.dir}/sun-web.xml" 
+            tofile="${built.agentapp.web.dir}/WEB-INF/sun-web.xml"/>
+        <jar basedir="${built.agentapp.web.dir}" 
+            jarfile="${built.agentapp.dir}/${appname}.war"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${built.dir}"/>
+    </target>
+ 
+</project>

@@ -1,0 +1,40 @@
+ <test name="CSDKAuthTestLDAPRole">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestAnonymousRole">
+        <parameter name="testModule" value="anonymous"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestDataStoreRole">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test> 
+

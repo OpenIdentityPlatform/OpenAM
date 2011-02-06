@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SDK - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsdk"></a><h4>SDK</h4>
+<p>Die SDK-Attribute legen Konfigurationsdefinitionen f&#252;r den Back-End-Datenspeicher fest.</p>
+
+<a name="ggkan"></a><h5>Data Store </h5>
+<p>Die Datenspeicherattribute definieren die grundlegende Datenspeicherkonfiguration:</p>
+
+<a name="ggkem"></a><h5>Datenspeicherbenachrichtigung aktivieren</h5>
+<p>Gibt an, ob die Back-End-Datenspeicherbenachrichtigung aktiviert ist. Wenn dieser Wert auf "false"
+(falsch) gesetzt ist, wird die speicherinterne Benachrichtigung aktiviert.</p>
+
+<a name="ggkfc"></a><h5>Verzeichnis-Proxy aktivieren</h5>
+<p>Der Standardwert ist "falsch". Dieses Flag dient dazu, dem Service Management zu
+melden, dass der Verzeichnis-Proxy f&#252;r Lese-, Schreib- und/oder &#196;nderungsvorg&#228;nge beim Verzeichnis-Server verwendet
+werden muss. Dieses Flag legt au&#223;erdem fest, ob ACIs oder Delegationsberechtigungen verwendet
+werden sollen. Dieses Flag muss auf "true" (wahr) gesetzt sein, wenn das
+Access Manager SDK (aus Version 7 oder 7.1) mit  Access Manager-Version
+6.3 kommuniziert. </p><p>Im Koexistenz-/Legacy-Modus beispielsweise sollte dieser Wert "true" (wahr) sein. Im Legacy-DIT wurden
+die Delegationsrichtlinien nicht unterst&#252;tzt. Es wurden nur ACIs unterst&#252;tzt. Um eine ordnungsgem&#228;&#223;e
+Delegationspr&#252;fung zu gew&#228;hrleisten, muss dieses Flag daher bei einer Installation im Legacy-Modus
+auf "true" (wahr) gesetzt sein, damit die ACIs f&#252;r die Zugriffssteuerung verwendet
+werden. Anderenfalls schl&#228;gt die Delegationspr&#252;fung fehl.  </p><p>Im Bereichsmodus sollte dieser Wert auf "false" (falsch) gesetzt sein, sodass nur
+die Delegationsrichtlinien f&#252;r die Zugriffssteuerung verwendet werden. In Version 7.0 und h&#246;her
+unterst&#252;tzt Access Manager oder OpenSSO die datenunabh&#228;ngige Funktion bei der Installation im
+Bereichsmodus. Daher k&#246;nnen neben Directory Server auch andere Server zum Speichern der
+Dienstkonfigurationsdaten verwendet werden. Zus&#228;tzlich meldet dieses Flag der Service Management-Funktion, dass f&#252;r
+die Lese-, Schreib-, und/oder &#196;nderungsvorg&#228;nge am Back-End-Speicher nicht der Verzeichnis-Proxy verwendet werden
+muss. Dies liegt daran, dass einige Datenspeicher, wie beispielsweise Active Directory, keinen
+Proxy unterst&#252;tzen.</p>
+
+<a name="ggkcv"></a><h5>Ereignisdienst</h5>
+<p>Folgende Attribute definieren die Ereignisdienstbenachrichtigung f&#252;r den Datenspeicher:</p>
+
+<a name="ggkez"></a><h5>Anzahl der erneuten Versuche f&#252;r Ereignisdienstverbindungen</h5>
+<p>Der Standardwert ist 3. Gibt die Anzahl der Versuche an, um die
+Ereignisdienst-Verbindungen erfolgreich wieder herzustellen.</p>
+
+<a name="ggkdr"></a><h5>Verz&#246;gerung zwischen LDAP-Verbindungsversuchen</h5>
+<p>Der Standardwert ist 3000.  Gibt die Verz&#246;gerung in Millisekunden zwischen Wiederholungen
+an, um die Ereignisdienst-Verbindungen wieder herzustellen.  </p>
+
+<a name="ggkcq"></a><h5>Fehlercodes f&#252;r LDAP-Verbindungsversuche</h5>
+<p>Die Standardwerte sind  80,81,91. Gibt die Fehlercodes f&#252;r LDAP-Ausnahmen an, bei
+denen erneute Versuche zur  Wiederherstellung der Ereignisdienstverbindungen ausgel&#246;st werden. </p>
+
+<a name="ggncc"></a><h5>Leerlaufzeitlimit</h5>
+<p>Der Standardwert ist 0. Gibt die Anzahl an Minuten an, nach deren
+Ablauf die best&#228;ndigen Suchvorg&#228;nge erneut gestartet werden.  </p><p>Diese Eigenschaft wird verwendet, wenn ein Lastenausgleichssystem oder eine Firewall zwischen den
+Richtlinienagenten und dem Directory Server steht, und die Verbindungen f&#252;r die persistente
+Suche werden abgebrochen, wenn eine Zeit&#252;berschreitung bei der TCP-Leerlaufzeit auftritt. Der Eigenschaftswert
+sollte niedriger sein als der TCP-Zeit&#252;berschreitungswert des Lastenausgleichssystems bzw. der Firewall. Dadurch
+wird sichergestellt, dass die persistenten Suchabfragen neu gestartet werden, bevor die Verbindungen
+abgebrochen werden. Der Wert 0 gibt an, dass die Suchabfragen nicht neu
+gestartet werden. Es werden nur die Verbindungen zur&#252;ckgesetzt, bei denen eine Zeit&#252;berschreitung
+auftrat.</p>
+
+<a name="ggndm"></a><h5>Deaktivierte Ereignisdienstverbindung</h5>
+<p>Gibt an, welche Ereignisverbindung deaktiviert werden kann. G&#252;ltige Werte (Gro&#223;-/Kleinschreibung beachten): </p>
+<ul><li><p>aci &#8211; &#196;nderungen des Attributs "aci", wobei bei der Suche der LDAP-Filter (aci=&#42;) angewendet wird.</p></li>
+<li><p>sm &#8211; &#196;nderungen des OpenSSO-Informationsbaums (oder des Dienstverwaltungsknotens), der Objekte mit der Markerobjektklasse <tt>sunService</tt> oder <tt>sunServiceComponent </tt> enth&#228;lt. Sie k&#246;nnen beispielsweise eine Richtlinie erstellen, um Zugriffsberechtigungen f&#252;r eine gesch&#252;tzte Ressource festzulegen, oder die Regeln, Subjekte, Bedingungen oder Antwortanbieter f&#252;r eine bestehende Richtlinie &#228;ndern.</p></li>
+<li><p>um &#8211; &#196;nderungen des Benutzerverzeichnisses (oder des Benutzerverwaltungsknotens). Sie k&#246;nnen beispielsweise den Namen oder die Adresse eines Benutzers &#228;ndern.</p></li></ul>
+<p>So deaktivieren Sie beispielsweise die persistente Suche f&#252;r &#196;nderungen des OpenSSO-Informationsbaums (oder
+des Dienstverwaltungsknotens)  </p><p><tt>com.sun.am.event.connection.disable.list=sm </tt></p>
+<hr><p><b>Achtung &#8211; </b>Persistente Suchabfragen verursachen Performance-Overhead in Directory Server. In diesem Fall ist das
+Entfernen diese Performance-Overheads in einer Produktionsumgebung dringend erforderlich. Sie k&#246;nnen eine oder
+mehrere persistente Suchabfragen mit dieser Eigenschaft deaktivieren.  </p><p>Bevor Sie jedoch eine persistente Suche deaktivieren, sollten Sie mit den oben
+beschriebenen Einschr&#228;nkungen vertraut sein. Es wird dringend empfohlen, diese Eigenschaft nur im
+absoluten Bedarfsfall zu &#228;ndern. Diese Eigenschaft wurde in erster Linie eingef&#252;hrt, um
+Overhead auf Directory Server bei Einsatz mehrerer J2EE-Agenten zu vermeiden, da persistente
+Suchabfragen von jedem Agenten eingerichtet werden. Da die 2.2 J2EE-Agenten diese persistenten
+Suchabfragen nicht mehr einrichten, m&#252;ssen Sie die Eigenschaft unter Umst&#228;nden nicht verwenden. 
+</p><p>Das Deaktivieren von persistenten Suchabfragen f&#252;r eine dieser Komponenten wird nicht empfohlen,
+da bei deaktivierter persistenter Suche keine Benachrichtigungen vom Directory Server empfangen werden.
+Folglich werden die in Directory Server f&#252;r die betreffende Komponente vorgenommenen &#196;nderungen
+nicht an den Komponenten-Cache gemeldet. Wenn Sie beispielsweise die persistenten Suchabfragen f&#252;r
+&#196;nderungen des Benutzerverzeichnisses (<tt>um</tt>) deaktivieren, erh&#228;lt der OpenSSO-Server keine Benachrichtigungen vom Directory
+Server. Der Agent erh&#228;lt folglich keine Benachrichtigungen von OpenSSO f&#252;r die Aktualisierung
+seines lokalen Benutzer-Caches mit den neuen Werten des Benutzerattributs. Wenn nun eine
+Anwendung die Benutzerattribute vom Agenten abfragt, erh&#228;lt die Anwendung unter Umst&#228;nden den
+alten Wert f&#252;r das Attribut.  </p><p>Verwenden Sie diese Eigenschaft nur in Ausnahmef&#228;llen, in denen die Eigenschaft unbedingt
+erforderlich ist. Wenn beispielsweise keine Dienstkonfigurations&#228;nderungen (keine &#196;nderung von Werten eines Dienstes,
+z. B. des Sitzungs- oder Authentifizierungsdienstes) in der Produktionsumgebung stattfinden, kann die
+persistente Suche f&#252;r die Service Management-Komponente (<tt>sm</tt>) deaktiviert werden. Wenn jedoch eine
+&#196;nderung in einem der Dienste auftritt, ist ein Neustart des Servers erforderlich.
+Dies gilt auch f&#252;r andere persistente Suchabfragen, die von den Werten <tt>aci </tt>
+und <tt>um</tt> angegeben werden. </p>
+<hr>
+
+
+<a name="ggnip"></a><h5>LDAP Connection</h5>
+<p>Die folgenden Attribute legen Verbindungsdaten f&#252;r den Back-End-Datenspeicher fest:</p>
+
+<a name="ggnjl"></a><h5>Anzahl der erneuten Versuche f&#252;r LDAP-Verbindung</h5>
+<p>Standard: 1000. Gibt die Anzahl der Millisekunden zwischen den erneuten Versuchen an.</p>
+
+<a name="ggnhu"></a><h5>Verz&#246;gerung zwischen erneuten LDAP-Verbindungsversuchen</h5>
+<p>Der Standardwert ist 3. Gibt an, wie viele Versuche unternommen werden, die
+LDAP-Verbindung wiederherzustellen.</p>
+
+<a name="ggnjt"></a><h5>Fehlercodes f&#252;r erneute LDAP-Verbindungsversuche</h5>
+<p>Die Standardwerte sind  80,81,91.  Gibt die <tt>LDAPException</tt>-Fehlercodes an, bei denen
+erneute Versuche zur  Wiederherstellung der LDAP-Verbindung ausgel&#246;st werden.</p>
+
+<a name="ggkcx"></a><h5>Caching und Replikation</h5>
+<p>Folgende Attribute definieren die Caching- und Replikationskonfiguration:</p>
+
+<a name="ggkcm"></a><h5> SDK-Cashing: Max. Gr&#246;&#223;e</h5>
+<p>Der Standardwert ist 10000.  Gibt die Gr&#246;&#223;e des SDK-Cache an, wenn
+Caching aktiviert ist.  Geben Sie eine ganze Zahl gr&#246;&#223;er 0 an.
+Anderenfalls wird die Standardgr&#246;&#223;e (10000 Benutzer) verwendet.</p>
+
+<a name="ggkdo"></a><h5>Erneute Versuche f&#252;r SDK-Replikation</h5>
+<p>Der Standardwert ist 0. Gibt die Anzahl der erneuten Versuche an.</p>
+
+<a name="ggker"></a><h5>Verz&#246;gerung zwischen erneuten SDK-Replikationsversuchen</h5>
+<p>Der Standardwert ist 1000.  Gibt die Anzahl an Millisekunden zwischen den
+erneuten Versuchen an.</p>
+<br/>
+
+</body>
+</html>

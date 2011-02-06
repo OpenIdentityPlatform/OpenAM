@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Create a New Agent - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>To Create a New Agent</h5>
+<p>Creating a new agent is also referred to as creating a new
+agent profile. You can perform this task in the OpenSSO Administration Console. Some of
+the individual steps only apply to the J2EE and Web policy agent types.</p><ol>
+<li><b>Click the Access Control tab.</b></li>
+<li><b>Click the name of the realm to which the agent will belong.</b></li>
+<li><b>Click the Agents tab.</b></li>
+<li><b>Select the tab for the appropriate agent type.</b><ul>
+<li><b>Web Agents</b></li>
+<li><b>J2EE Agents</b></li>
+<li><b>Web Service Provider Agents</b></li>
+<li><b>Web Service Client Agents</b></li>
+<li><b>STS Client Agent</b><p>The Security Token Service client agent has two types from which to choose,
+Discovery agent and STS agent. For more information on these agent types, see
+<a href="agentconfig.stsclientedit.html">STS Client</a>.</p></li>
+<li><b>2.2 Agents</b><p>The 2.2 Agents tab is for agents in the Policy Agent 2.2 software
+set.</p></li>
+<li><b>Agent Authenticator</b></li></ul></li>
+<li><b>In the Agent section, click New.</b></li>
+<li><b>In the Name field, enter the name for the new agent profile.</b></li>
+<li><b>Enter and confirm the Password.</b>
+<hr><p><b>Caution &#8211; </b>This password must be the same password that you enter in the agent
+profile password file that you specify when you run the <tt>agentadmin</tt> program
+to install the agent.</p>
+<hr>
+<p><b>Steps 8&#8211;10 Apply to Web and J2EE policy agents only.</b></p></li>
+<li><b>Select the applicable configuration: Local or Centralized .</b><p>When local configuration is selected, the properties related to this agent cannot be
+edited from the Console. In such a scenario, the agent retrieves configuration information
+from the local files, <tt>OpenSSOAgentBootstrap.properties</tt> and <tt>OpenSSOAgentConfiguration.properites</tt>, in the agent installation directory. For an
+agent configured locally, change property values by editing the <tt>OpenSSOAgentConfiguration.properites</tt> file directly.</p></li>
+<li><b>In the Server URL field, enter the OpenSSO server URL.</b><p>For example:</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>In the Agent URL field, enter the URL for the agent application,
+<tt>agentapp</tt> .</b><p>For example:</p><dl><dt>Web Agents</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>J2EE Agents</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>Click Create.</b><p>The Console creates the agent profile and displays the agent page again, with
+a link to the new agent profile.</p><p>To do additional configuration for the agent profile, click this link to display
+the Edit agent page.</p></li></ol>
+<br/>
+
+</body>
+</html>

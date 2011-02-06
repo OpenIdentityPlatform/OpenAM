@@ -1,0 +1,105 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.9 2009/08/19 05:41:17 veiming Exp $
+
+-->
+<!--
+   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+-->
+
+<project name="opensso shared library" default="all">
+    <description>Open Web Single Sign-On Shared library</description>
+    <import file="../products.xml" />
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <condition property="isMacOS">
+        <os family="mac" />
+    </condition>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${extlib.dir}/ant-contrib-1.0b3.jar" />
+        </classpath>
+    </taskdef>
+
+    <if>
+        <isset property="isMacOS" />
+        <then>
+            <property name="tools.path" value="${java.home}/../../../../../Frameworks/JavaVM.framework/Classes" />
+            <property name="tools.filename" value="classes.jar" />
+        </then>
+        <else>
+            <property name="tools.path" value="${java.home}/../lib" />
+            <property name="tools.filename" value="tools.jar" />
+        </else>
+    </if>
+
+    <!-- build class path -->
+    <path id="build.class.path">
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <fileset dir="${extlib.dir}" includes="**/*.jar" />
+        <fileset dir="${tools.path}" includes="${tools.filename}" />
+    </path>
+
+    <target name="all" depends="build">
+        <jar destfile="${sharedlib.dist.dir}/opensso-sharedlib.jar">
+            <manifest>
+                <attribute name="Version" value="${version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <zipfileset dir="${sharedlib.classes.dir}" />
+            <fileset dir="${products.license.dir}" includes="license.txt" />
+        </jar>
+        <checksum file="${sharedlib.dist.dir}//opensso-sharedlib.jar"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="build" depends="preparebuild">
+        <javac destdir="${sharedlib.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${sharedlib.src.dir}"/>
+            <compilerarg value="-Xlint:none " />
+            <classpath refid="build.class.path"/>
+            <exclude name="**/package-info.java"/>
+            <exclude name="**/com/sun/identity/shared/test/**"/>
+        </javac>
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${sharedlib.built.dir}"/>
+        <mkdir dir="${sharedlib.classes.dir}"/>
+        <mkdir dir="${sharedlib.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${sharedlib.built.dir}"/>
+    </target>
+</project>

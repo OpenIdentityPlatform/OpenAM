@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web 服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="webservices"></a><h3>Web 服务</h3><p>Web 服务模块是自由联盟计划<b>身份认证 Web 服务框架</b> (Identity Web Services Framework, ID-WSF) 规范的 OpenSSO 实现。ID-WSF 基于<b>自由身份联合框架</b> (Identity
+Federation Framework, ID-FF) 构建，这是通过提供对联合网络环境中的身份数据进行检索、更新或执行操作的 Web 服务构建规范来实现的。这些规范概述了构建 Web 服务（如日历服务、 钱包服务或警报服务）所需的技术组件。</p>
+<hr><p><b>注 &#8211; </b><b>身份数据</b>包括但不限于用于定义名、姓、家庭地址、办公地址和紧急情况联系人的属性。</p>
+<hr>
+<p>Web 服务是 Internet 中分布式计算的基础。Web 服务使用方 (WSC) 通过发出请求来查找 Web 服务并调用其提供的操作。Web 服务提供者 (web service
+provider, WSP) 是根据请求来实现 Web 服务的应用程序；它可以与 WSC 位于同一台 Java&#8482; 虚拟机上，也可以位于数千英里以外。当 WSC 需要从 WSP
+检索身份属性时，首先必须联系搜索服务以查找特定属性存储的位置。此信息返回之后，WSC 将联系 WSP（例如，个人配置文件服务）以检索所需的属性。</p><p>OpenSSO 控制台中的 Web 服务模块提供用于配置以下各项的接口：</p>
+<ul><li><p><a href="webservices.wspersonalprofileservice.html">Liberty 个人配置文件服务</a></p></li>
+<li><p><a href="service.smdiscoveryservice.html">搜索服务</a></p></li>
+<li><p><a href="service.scsoapbinding.html">SOAP 绑定服务</a></p></li>
+<li><p><a href="webservices.wsauthnservices.html">验证 Web 服务</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

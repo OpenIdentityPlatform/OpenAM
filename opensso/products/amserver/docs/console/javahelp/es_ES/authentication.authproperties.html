@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Autenticaci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>Autenticaci&#243;n</h3>
+<p><a name="indexterm-5"></a>El servicio de autenticaci&#243;n general debe registrarse como servicio en un dominio
+para que un usuario pueda iniciar la sesi&#243;n utilizando los otros tipos
+de m&#243;dulos de autenticaci&#243;n. El servicio de autenticaci&#243;n principal permite al administrador
+de OpenSSO definir valores predeterminados para los par&#225;metros de autenticaci&#243;n de un
+dominio. Estos valores pueden utilizarse si no se ha definido ning&#250;n otro
+valor que los anule en el m&#243;dulo de autenticaci&#243;n especificado. Los valores
+predeterminados del servicio de autenticaci&#243;n principal se definen en el archivo <tt>amAuth.xml </tt>
+y se almacenan en Directory Server despu&#233;s de la instalaci&#243;n.</p><p>Entre las propiedades de autenticaci&#243;n, se incluyen:</p><dl><dt>Propiedades avanzadas</dt>
+<dd><p>Si hace clic en el bot&#243;n Advanced Properties (Propiedades avanzadas), se muestran los atributos de autenticaci&#243;n principal que pueden definirse para el dominio. No se mostrar&#225;n los atributos globales, ya que no se pueden aplicar al dominio.</p></dd>
+<dt>Cadena de autenticaci&#243;n predeterminada</dt>
+<dd><p>Define la cadena de autenticaci&#243;n que se va a utilizar para el dominio. Una vez creada la nueva cadena en el atributo de cadena de autenticaci&#243;n, aparecer&#225; en la lista desplegable y permitir&#225; su selecci&#243;n. Consulte <a href="authentication.newauthconfig.html">Para crear un nuevo encadenamiento de autenticaci&#243;n</a> para obtener m&#225;s informaci&#243;n.</p></dd>
+<dt>Cadena de autenticaci&#243;n del administrador</dt>
+<dd><p>Define la cadena de autenticaci&#243;n s&#243;lo para los administradores. Este atributo se puede utilizar si la cadena de autenticaci&#243;n de los administradores tiene que ser distinta de la cadena de los usuarios finales. Los m&#243;dulos configurados en este atributo se heredan cuando se accede a la consola de OpenSSO.</p></dd>
+<dt>URL de &#233;xito predeterminada</dt>
+<dd><p>Especifica la direcci&#243;n URL a la que se redirigir&#225; el usuario si la autenticaci&#243;n en el dominio se realiza con &#233;xito.</p></dd>
+<dt>Instancias del m&#243;dulo</dt>
+<dd><p>Permite definir y configurar los m&#243;dulos de autenticaci&#243;n predeterminados de OpenSSO para el dominio. Se pueden agregar varias instancias del mismo m&#243;dulo de autenticaci&#243;n. Consulte <a href="authentication.newauthinstance.html">Para crear una nueva instancia de m&#243;dulo de autenticaci&#243;n</a> para obtener m&#225;s informaci&#243;n.</p></dd>
+<dt>Cadena de autenticaci&#243;n</dt>
+<dd><p>Se pueden configurar uno o varios m&#243;dulos de autenticaci&#243;n a los que el usuario debe transferir las credenciales de autenticaci&#243;n. Este proceso se denomina encadenamiento de autenticaci&#243;n. Este atributo permite definir las opciones de encadenamiento de autenticaci&#243;n para el dominio. Las cadenas que cree se mostrar&#225;n en la lista de cadenas de autenticaci&#243;n predeterminadas. Consulte <a href="authentication.newauthconfig.html">Para crear un nuevo encadenamiento de autenticaci&#243;n</a> para obtener m&#225;s informaci&#243;n.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

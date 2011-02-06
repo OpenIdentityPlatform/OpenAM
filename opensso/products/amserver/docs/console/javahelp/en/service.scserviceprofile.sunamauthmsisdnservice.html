@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN</h4>
+<p><a name="indexterm-177"></a>The Mobile Station Integrated Services Digital Network (MSISDN) authentication module enables authentication using a
+mobile subscriber ISDN associated with a device such as a cellular telephone. It
+is a non-interactive module. The module retrieves the subscriber ISDN and validates it
+against the Directory Server to find a user that matches the number. The
+MSISDN Authentication attributes are realm attributes. The MSISDN Authentication attributes are:</p>
+<ul><li><p><a href="#fumxe">Trusted Gateway IP Address</a></p></li>
+<li><p><a href="#fumxg">MSISDN Number Argument</a></p></li>
+<li><p><a href="#fumxf">LDAP Server and Port</a></p></li>
+<li><p><a href="#fumxi">LDAP Start Search DN</a></p></li>
+<li><p><a href="#fumxk">Attribute To Use To Search LDAP</a></p></li>
+<li><p><a href="#fumxl">LDAP Server Principal User</a></p></li>
+<li><p><a href="#fumxn">LDAP Server Principal Password</a></p></li>
+<li><p><a href="#fumxm">LDAP Server Principal Password (confirm)</a></p></li>
+<li><p><a href="#fumxo">Enable SSL for LDAP Access</a></p></li>
+<li><p><a href="#fumxp">LDAP Attribute Used to Retrieve User Profile</a></p></li>
+<li><p><a href="#fumxr">Return User DN on Authentication</a></p></li>
+<li><p><a href="#fumxs">Authentication Level</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>Trusted Gateway IP Address</h5>
+<p>Specifies a list of IP addresses of trusted clients that can access MSIDSN
+modules. You can set the IP addresses of all clients allows to access
+the MSISDN module by entering the address (for example,  <tt>123.456.123.111</tt>) in the
+entry field and clicking Add. By default, the list is empty. If the
+attribute is left empty, then all clients are allowed. If you specify none,
+no clients are allowed.</p>
+
+<a name="fumxg"></a><h5>MSISDN Number Argument</h5>
+<p>Specifies a list of parameter names that identify which parameters to search in
+the request header or cookie header for the MSISDN number. For example, if
+you define <i>x-Cookie-Param</i>,  <i>AM_NUMBER</i>, and <i>COOKIE-ID</i>, the MSISDN authentication services will search those
+parameters for the MSISDN number.</p>
+
+<a name="fumxf"></a><h5>LDAP Server and Port</h5>
+<p>Specifies the host name and port number of the Directory Server in which
+the search will occur for the users with MSISDN numbers. The format is<tt></tt><i>hostname:port</i><tt></tt>. If
+there is no port number, assume <tt>389</tt>.</p><p>If you have OpenSSO deployed with multiple domains, you can specify the communication
+link between specific instances of OpenSSO and Directory Server in the following format
+(multiple entries must be prefixed by the local server name):</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>For example, if you have two OpenSSO instances deployed in different locations (L1-machine1-IS
+and L2- machine2-IS) communicating with different instances of Directory Server (L1-machine1-DS and L2-machine2-DS), it
+would look the following:</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389</tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389</tt></p>
+
+<a name="fumxi"></a><h5>LDAP Start Search DN</h5>
+<p>Specifies the DN of the node where the search for the user's MSISDN
+number should start. There is no default value. The field will recognize any
+valid DN. Multiple entries must be prefixed by the local server name. The
+format is <tt></tt><i>servername|search dn</i><tt></tt>.</p><p>For multiple entries:</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>If multiple entries exist under the root organization with the same user ID,
+then this parameter should be set so that the only one entry can
+be searched for or found in order to be authenticated. For example, in
+the case where the agent ID and user ID is same under root
+org, this parameter should be <tt>ou=Agents</tt> for the root organization to authenticate using
+Agent ID and <tt>ou=People,</tt> for the root organization to authenticate using User
+ID.</p>
+
+<a name="fumxk"></a><h5>Attribute To Use To Search LDAP</h5>
+<p>Specifies the name of the attribute in the user's profile that contains the
+MSISDN number to search for a particular user. The default value is <i>sunIdentityMSISDNNumber</i>.
+This value should not be changed, unless you are certain that another attribute in
+the user's profile contains the same MSISDN number.</p>
+
+<a name="fumxl"></a><h5>LDAP Server Principal User</h5>
+<p>Specifies the LDAP bind DN to allow MSISDN searches in the Directory Server.
+The default bind DN is <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com</tt> .</p>
+
+<a name="fumxn"></a><h5>LDAP Server Principal Password</h5>
+<p>Specifies the LDAP bind password for the bind DN, as defined in LDAP
+Server Principal User.</p>
+
+<a name="fumxm"></a><h5>LDAP Server Principal Password (confirm)</h5>
+<p>Confirm the password.</p>
+
+<a name="fumxo"></a><h5>Enable SSL for LDAP Access</h5>
+<p>Enables SSL access to the Directory Server specified in the LDAP Server and
+Port attribute. By default, this is not enabled and the SSL protocol will
+not be used to access the Directory Server. However, if this attribute is
+enabled, you can bind to a non-SSL server.</p>
+
+<a name="fumxp"></a><h5>LDAP Attribute Used to Retrieve User Profile</h5>
+<p>Specifies the headers to use for searching the request for the MSISDN number.
+The supported values are as follows:</p><dl><dt>Cookie Header</dt>
+<dd><p>Performs the search in the cookie.</p></dd>
+<dt>RequestHeader</dt>
+<dd><p>Performs the search in the request header. </p></dd>
+<dt>RequestParameter</dt>
+<dd><p>Performs the search in the request parameter. By default, all options are selected.</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>Return User DN on Authentication</h5>
+<p>When the OpenSSO directory is the same as the directory configured for MSDISN,
+this option may be enabled. If enabled, this option allows the authentication module
+to return the DN instead of the User ID, and no search is
+necessary. Normally, an authentication module returns only the User ID, and the authentication
+service searches for the user in the local OpenSSO. If an external directory
+is used, this option is typically not enabled.</p>
+
+<a name="fumxs"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear un nuevo grupo - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentgroupadd"></a><h5>Para crear un nuevo grupo</h5>
+<p>Cree un grupo si desea que los agentes hereden propiedades espec&#237;ficas del
+grupo. Los agentes pueden heredar propiedades &#250;nicamente de su tipo de grupo.
+Por ejemplo, los agentes web pueden heredar las propiedades de un grupo
+de agente web.</p><ol>
+<li><b>Haga clic en la ficha Control de acceso.</b></li>
+<li><b>Haga clic en el nombre del dominio al que pertenecer&#225; el grupo.
+</b></li>
+<li><b>Haga clic en la ficha Agents (Agentes).</b></li>
+<li><b>Si es necesario, seleccione la ficha del tipo de agente adecuado.</b></li>
+<li><b>En la secci&#243;n Grupo, haga clic en Nuevo.</b><p>En el campo Nombre, introduzca el nombre del nuevo grupo.</p></li>
+<li><b>S&#243;lo para agentes web y J2EE, introduzca la URL del servidor de
+OpenSSO.</b><p>Por ejemplo, <tt>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO </tt>.</p></li>
+<li><b>Haga clic en Create (Crear).</b><p>La consola crea el grupo de agentes y muestra de nuevo la
+p&#225;gina del agente con un v&#237;nculo al grupo.</p><p>Si desea realizar la configuraci&#243;n adicional del grupo, haga clic en este
+v&#237;nculo para que se muestre la p&#225;gina Editar grupo de agentes.</p><p>Las propiedades que puede establecer para configurar un grupo son iguales a
+las que se utilizan para un agente individual, a excepci&#243;n de las
+propiedades Grupo, Contrase&#241;a y Confirmar contrase&#241;a, que no est&#225;n disponibles a nivel
+de grupo.</p>
+<hr><p><b>Nota &#8211; </b>Adem&#225;s, tenga en cuenta que algunas propiedades de grupos ya tienen valores
+de variables asignados que, en la mayor&#237;a de los casos, no se
+pueden modificar.  A continuaci&#243;n, se muestra un ejemplo de un valor
+de este tipo:</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

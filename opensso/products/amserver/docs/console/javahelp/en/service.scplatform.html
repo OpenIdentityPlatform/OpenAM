@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Platform - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>Platform</h4>
+<p><a name="indexterm-205"></a>The Platform service is where additional servers can be added to the OpenSSO
+configuration as well as other options applied at the top level of the
+OpenSSO application. The Platform service attributes are global attributes. The attributes are:</p>
+<ul><li><p><a href="#fxcgy">Platform Locale</a></p></li>
+<li><p><a href="#fxcpo">Cookie Domains</a></p></li>
+<li><p><a href="#fxcmi">Available Locales</a></p></li>
+<li><p><a href="#fxctg">Client Character Sets</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>Platform Locale</h5>
+<p>The platform locale value is the default language subtype that OpenSSO was installed
+with. The authentication, logging and administration services are administered in the language of
+this value. The default is en_US. See <a href="supportedlang.html">Supported Language Locales</a>for a listing of supported language
+subtypes.</p>
+
+<a name="fxcpo"></a><h5>Cookie Domains</h5>
+<p>The list of domains that will be returned in the cookie header when
+setting a cookie to the user's browser during authentication. If empty, no cookie
+domain will be set. In other words, the OpenSSO session cookie will only
+be forwarded to the OpenSSO itself and to no other servers in the
+domain.</p><p>If SSO is required with other servers in the domain, this attribute must
+be set with the cookie domain. If you had two interfaces in
+different domains on one OpenSSO then you would need to set both cookie
+domains in this attribute. If a load balancer is used, the cookie domain
+must be that of the load balancer's domain, not the servers behind the load
+balancer. The default value for this field is the domain of the installed
+OpenSSO.</p>
+
+<a name="fxcmi"></a><h5>Available Locales</h5>
+<p>This attribute stores all available locales configured for the platform. Consider an application
+that lets the user choose the user's locale. This application would get this
+attribute from the platform profile and present the list of locales to the
+user. The user would choose a locale and the application would set this
+in the user entry  <i>preferredLocale</i>.</p>
+
+<a name="fxctg"></a><h5>Client Character Sets</h5>
+<p>This attribute specifies the character set for different clients at the platform level.
+It contains a list of client types and the corresponding character sets. See<a href="service.scplatformclientcharsetsadd.html">To Create a New Character Set</a>
+for more information.</p>
+<br/>
+
+</body>
+</html>

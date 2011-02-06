@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>验证 Web 服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>验证 Web 服务</h3>
+<a name="indexterm-159"></a><p>验证 Web 服务定义如何使用 SOAP 执行验证。Web 服务使用方 (WSC) 和 Web 服务提供者 (WSP) 之间的验证信息交换通过
+SOAP 联结消息来实现。该消息是一系列客户机请求和服务器响应，这些请求和响应对已定义的简单验证和安全层 (SASL) 机制（或验证模式）是特定的。接收验证请求（或任何来自 WSC 的响应）之后，WSP 会发出其他挑战，或者指示验证失败或成功。验证 Web 服务用于服务到服务（非用户）的验证。以下步骤详述了 WSC 和验证 Web
+服务 (WSP) 之间的先后顺序。</p>
+<ol><li><p>验证交换从代表主体向验证 Web 服务发送 SASL 验证请求的 WSC 开始。</p><p>请求消息包含主体的标识符并指出可以从中选择服务的一个或多个 SASL 机制。</p></li>
+<li><p>验证 Web 服务通过声明要使用的方法（如果适用，则发起质询）进行响应。</p><p>如果验证 Web 服务不支持所引用的任何方法，则通过中止交换来响应。</p></li>
+<li><p>WSC 通过所选验证方法所需的证书进行响应。</p></li>
+<li><p>验证 Web 服务的回复是通过或不通过验证。</p><p>如果验证通过，响应将包含 WSC 调用其他 Web 服务（如搜索服务）所需的凭证。</p></li></ol>
+<p>可为您的实现配置以下验证 Web 服务全局属性。</p>
+<ul><li><p><a href="mechanismhandlerslist.html">机制处理程序列表</a></p></li>
+<li><p>质询清除时间间隔 &#8212; 指定默认 CRAM-MD5 机制处理程序实现类 <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler </tt> 中的清除时间间隔（以秒为单位）。将启动内部线程来清除基于该值的质询映射。</p></li>
+<li><p>变换类 &#8212; 为实现类映射指定变换名称。值用逗号分隔，并使用 "|" 作为变换名称与实现类名称的分隔符。例如，<tt>name1|class1、name2|class2</tt>。</p></li></ul>
+<p>以下任务与配置验证 Web 服务关联：</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">配置新的机制处理程序</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

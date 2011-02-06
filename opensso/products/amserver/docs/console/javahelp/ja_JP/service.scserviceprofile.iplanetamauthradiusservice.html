@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS</h4>
+<p><a name="indexterm-178"></a>このモジュールにより、外部 RADIUS (Remote Authentication Dial-In User Service) サーバーを使用した認証が可能になります。RADIUS 認証属性はレルム属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwadp">「サーバー 1」</a></p></li>
+<li><p><a href="#fwaom">「サーバー 2」</a></p></li>
+<li><p><a href="#fwaka">「共有シークレット」</a></p></li>
+<li><p><a href="#fwapc">「共有シークレット (確認)」</a></p></li>
+<li><p><a href="#fwapn">「ポート番号」</a></p></li>
+<li><p><a href="#fwaad">「タイムアウト」</a></p></li>
+<li><p><a href="#fwabo">「認証レベル」</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>サーバー 1</h5>
+<p>プライマリ RADIUS サーバーの IP アドレスまたは完全修飾ホスト名を表示します。デフォルト IP アドレスは 127.0.0.1 です。フィールドでは任意の有効な IP アドレスまたはホスト名が認識されます。複数のエントリの場合は、次の構文のようにローカルサーバー名をプレフィックスとして付ける必要があります。</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaom"></a><h5>サーバー 2</h5>
+<p>セカンダリ RADIUS サーバーの IP アドレスまたは完全修飾ドメイン名 (FQDN) を表示します。これはフェイルオーバーサーバーで、プライマリサーバーが通信できない場合に通信するサーバーです。デフォルト IP アドレスは 127.0.0.1 です。複数のエントリには、次の構文のようにローカルサーバー名をプレフィックスとして付ける必要があります。</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaka"></a><h5>共有シークレット</h5>
+<p>RADIUS 認証の共有シークレットを保持します。共有シークレットは、注意深く選んだパスワードと同じレベルにする必要があります。このフィールドのデフォルト値はありません。</p>
+
+<a name="fwapc"></a><h5>共有シークレット (確認)</h5>
+<p>RADIUS 認証の共有シークレットを確認します。</p>
+
+<a name="fwapn"></a><h5>ポート番号</h5>
+<p>RADIUS サーバーが待機するポートを指定します。デフォルト値は 1645 です。</p>
+
+<a name="fwaad"></a><h5>タイムアウト</h5>
+<p>RADIUS サーバーがタイムアウトするまで応答を待つ時間間隔を秒単位で指定します。デフォルト値は 3 秒です。どのような秒数のタイムアウトを指定しても認識されます。</p>
+
+<a name="fwabo"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

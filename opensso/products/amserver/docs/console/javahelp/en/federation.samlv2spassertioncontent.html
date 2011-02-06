@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 Service Provider Customization  - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2spassertioncontent"></a><h4>SAMLv2 Service Provider Customization </h4>
+<p>SAMLv2 service providers contain the following attribute groups:</p>
+<ul><li><p><a href="#ggvhb">Assertion Content</a></p></li>
+<li><p><a href="#ggvgt">Assertion Processing</a></p></li>
+<li><p><a href="#ggvfs">Services</a></p></li>
+<li><p><a href="#ggvgp">Advanced</a></p></li></ul>
+
+
+<a name="ggvhb"></a><h5>Assertion Content</h5>
+
+<ul><li><p><a href="#ggvyt">Request/Response Signing</a></p></li>
+<li><p><a href="#ggvyf">Encryption</a></p></li>
+<li><p><a href="#ggvzm">Certificate Aliases</a></p></li>
+<li><p><a href="#ggvxx">Name ID Format</a></p></li>
+<li><p><a href="#ggvzv">Authentication Context</a></p></li>
+<li><p><a href="#ggvyc">Assertion Time Skew</a></p></li>
+<li><p><a href="#ggvyr">Basic Authentication</a></p></li></ul>
+
+
+<a name="ggvyt"></a><h5>Request/Response Signing</h5>
+<p>Select any checkbox to enable signing for the following SAMLv2 service prover requests
+or responses:</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>Authentication Requests Signed</p></td>
+<td align="left" valign="top" scope="row"><p> All authentication requests received by this service provider must
+be signed.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Assertions Signed</p></td>
+<td align="left" valign="top" scope="row"><p>All assertions received by this service provider must be signed.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>POST
+Response Signed</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider must sign the <tt>PostResponse</tt> element.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Artifact Response</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider
+must sign the <tt>ArtifactResponse</tt> element.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Logout Request</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider must sign the <tt>LogoutRequest</tt>
+element.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Logout Response</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider must sign the <tt>LogoutResponse</tt> element.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Manage Name ID Request
+</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider must sign the <tt>ManageNameIDRequst</tt> element.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Manage Name ID Response</p></td>
+<td align="left" valign="top" scope="row"><p>The identity
+provider must sign the <tt>ManageNameIDResponse</tt> element.</p></td>
+</tr>
+</table>
+
+<a name="ggvyf"></a><h5>Encryption</h5>
+<p>Select any checkbox to enable encryption for the following elements:</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>Attribute</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider
+must encrypt all <tt>AttributeStatement</tt> elements.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Assertion</p></td>
+<td align="left" valign="top" scope="row"><p>The identity provider must encrypt all <tt>Assertion</tt> elements.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>NameID</p></td>
+<td align="left" valign="top" scope="row"><p>The
+identity provider must encrypt all <tt>NameID</tt> elements.</p></td>
+</tr>
+</table>
+
+<a name="ggvzm"></a><h5>Certificate Aliases</h5>
+<p>This attribute defines the certificate alias elements for the service provider. <tt>signing</tt> specifies
+the provider certificate alias used to find the correct signing certificate in the keystore.
+<tt>Encryption</tt> specifies the provider certificate alias used to find the correct encryption certificate in
+the keystore.</p>
+
+<a name="ggvxx"></a><h5>Name ID Format</h5>
+<p>Defines the name identifier formats supported by the service provider. Name identifiers are
+a way for providers to communicate with each other regarding a user. Single
+sign-on interactions support the following types of identifiers:</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified </tt></p></li></ul>
+<p>A <b>persistent identifier</b> is saved to a particular user's data store entry as the
+value of two attributes. A <b>transient identifier</b> is temporary and no data will
+be written to the user's persistent data store</p>
+
+<a name="ggvzv"></a><h5>Authentication Context</h5>
+<p>This attribute maps the SAMLv2-defined authentication context classes to authentication methods available from
+the service provider.</p><dl><dt>Mapper</dt>
+<dd><p>Specifies the implementation of the <tt>SPAuthnContextMapper</tt> interface used to create the requested authentication context. The default implementation is <tt>com.sun.identity.saml2.plugins.DefaultSPAuthnContexteMapper</tt>.</p></dd>
+<dt>Supported</dt>
+<dd><p>Select the check box next to the authentication context class if the identity provider supports it.</p></dd>
+<a name="indexterm-64"></a><a name="indexterm-65"></a><a name="indexterm-66"></a><dt>Context Reference</dt>
+<dd><p>The SAMLv2-defined authentication context classes are:</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Telephony</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Unspecified</p></li></ul>
+</dd>
+<dt>Level</dt>
+<dd><p>Takes as a value a positive number that maps to an authentication level defined in the OpenSSO Authentication Framework. The authentication level indicates how much to trust a method of authentication.</p><p>In this framework, each service provider is configured with a default authentication context (preferred method of authentication). However, the provider might like to change the assigned authentication context to one that is based on the defined authentication level. For example, provider B would like to generate a local session with an authentication level of 3 so it requests the identity provider to authenticate the user with an authentication context assigned that level. The value of this query parameter determines the authentication context to be used by the identity provider.</p></dd>
+<dt>Comparison Type</dt>
+<dd><p>Specifies what the resulting authentication context must be when compared to the value of this property. Accepted values include:</p>
+<ul><li><p><b>exact</b> where the authentication context statement in the assertion must be the exact match of, at least, one of the authentication contexts specified.</p></li>
+<li><p><b>minimum</b> where the authentication context statement in the assertion must be, at least, as strong (as deemed by the identity provider) one of the authentication contexts specified.</p></li>
+<li><p><b>maximum</b> where the authentication context statement in the assertion must be no stronger than any of the authentication contexts specified.</p></li>
+<li><p><b>better</b> where the authentication context statement in the assertion must be stronger than any of the authentication contexts specified.</p></li></ul>
+<p>The default value is <b>exact</b>.</p></dd>
+</dl>
+
+
+<a name="ggvyc"></a><h5>Assertion Time Skew</h5>
+<p>Assertions are valid for a period of time and not before or after.
+This attribute specifies a grace period (in seconds) for the <tt>notBefore</tt> value.
+The default value is <tt>300</tt>. It has no relevance to the <tt>notAfter</tt> value.</p>
+
+<a name="ggvyr"></a><h5>Basic Authentication</h5>
+<p>Basic authentication can be enabled to protect SOAP endpoints. Any provider accessing these
+endpoints must have the user and password defined in the following two properties:
+<tt>User Name</tt> and <tt>Password</tt>.</p>
+
+<a name="ggvgt"></a><h5>Assertion Processing</h5>
+
+<ul><li><p><a href="#ggvym">Attribute Mapper</a></p></li>
+<li><p><a href="#ggvyk">Auto Federation</a></p></li>
+<li><p><a href="#ggvyb">Account Mapper</a></p></li>
+<li><p><a href="#ggvyy">Transient User</a></p></li>
+<li><p><a href="#ggvzn">URL</a></p></li>
+<li><p><a href="#ggvze">Default Relay State</a></p></li>
+<li><p><a href="#ggvzo">Adapter</a></p></li></ul>
+
+
+<a name="ggvym"></a><h5>Attribute Mapper</h5>
+<p>Specifies the values to define the mappings used by the default attribute mapper
+plug-in. The default plug-in class is <tt>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper</tt>.</p><p>Mappings should be configured in the format:</p><p><i>SAML-attribute</i>=<i>local-attribute</i></p><p>For example, <tt>EmailAddress=mail</tt> or <tt>Address=postaladdress</tt>. Type the mapping as a New Value
+and click Add.</p>
+
+<a name="ggvyk"></a><h5>Auto Federation</h5>
+<p>If enabled, Auto-federation automatically federates a user's different provider accounts based on a
+common attribute. The Attribute field specifies the attribute used to match a user's
+different provider accounts when auto-federation is enabled.</p>
+
+<a name="ggvyb"></a><h5>Account Mapper</h5>
+<p>Specifies the implementation of the <tt>AccountMapper</tt> interface used to map a remote user
+account to a local user account for purposes of single sign-on. The default
+value is <tt>com.sun.identity.saml2.plugins.DefaultSPAccountMapper</tt>, the default implementation.</p>
+
+<a name="ghclu"></a><h5>Artifact Message Encoding</h5>
+<p>This attribute defines the message encoding format for artifact, either <tt>URI</tt> or <tt>FORM</tt>.
+</p>
+
+<a name="ggvyy"></a><h5>Transient User</h5>
+<p>This attribute specifies the identifier of the user to which all identity provider
+users will be mapped on the service provider side in cases of single
+sign-on using the transient name identifier.</p>
+
+<a name="ggvzn"></a><h5>URL</h5>
+<p>The Local Authentication URL specifies the URL of the local login page.</p><p>The Intermediate URL specifies a URL to which a user can be directed
+after authentication and before the original request's URL. An example might be a
+successful account creation page after the auto-creation of a user account.</p><p>The External Application Logout URL defines the logout URL for an external application.
+Once the server receives logout request from the remote partner, a request will
+be sent to the logout URL using back channel <tt>HTTP POST</tt> with all cookies.
+Optionally, a user session property could be sent as <tt>HTTP header</tt> and <tt>POST</tt> parameter
+if a query parameter <tt>appsessionproperty</tt> (set to the session property name) is
+included in the URL.</p>
+
+<a name="ggvze"></a><h5>Default Relay State</h5>
+<p><a name="indexterm-67"></a>After a successful SAML v2 operation (single sign-on, single logout, or federation termination),
+a page is displayed. This page, generally the originally requested resource, is specified
+in the initiating request using the <tt>RelayState</tt> element. If a <tt>RelayState</tt> is not specified,
+the value of this <tt>defaultRelayState</tt> property is displayed..</p>
+<hr><p><b>Caution &#8211; </b>When <tt>RelayState</tt> or <tt>defaultRelayState</tt> contains special characters (such as <tt>&#38;</tt>), it must be
+URL-encoded. For example, if the value of <tt>RelayState</tt> is <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt>, it must
+be URL-encoded as:</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz</tt></p><p>and then appended to the URL. For example, the service provider initiated single
+sign-on URL would be:</p><p><tt>http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i>deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz</tt></p>
+<hr>
+
+
+<a name="ggvzo"></a><h5>Adapter</h5>
+<p>Defines the implementation class for the <tt>com.sun.identity.federation.plugins.FederationSPAdapter</tt> interface, used to add application-specific
+processing during the federation process.</p>
+
+<a name="ggvfs"></a><h5>Services</h5>
+
+<ul><li><p><a href="#ggwas">Meta Alias</a></p></li>
+<li><p><a href="#ggvzy">Single Logout Service</a></p></li>
+<li><p><a href="#ggwbo">Manage Name ID Service</a></p></li>
+<li><p><a href="#ggwdw">Assertion Artifact Consumer Service</a></p></li></ul>
+
+
+<a name="ggwas"></a><h5>Meta Alias</h5>
+<p>Specifies a <tt>metaAlias</tt> for the provider being configured. The <tt>metaAlias</tt> is used to
+locate the provider's entity identifier and the organization in which it is located. The
+value is a string equal to the realm or organization name (dependent on
+whether the SAML v2 Plug-in for Federation Services is installed in OpenSSO) coupled
+with a forward slash and the provider name. For example, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Caution &#8211; </b>The names used in the <tt>metaAlias</tt> must not contain a <tt>/</tt>.</p>
+<hr>
+
+
+<a name="ggvzy"></a><h5>Single Logout Service</h5>
+<p>The Single Logout Service synchronizes the logout functionality across all sessions authenticated by
+the service provider. </p><p><tt>Location</tt> specifies the URL of the provider to which the request is sent.
+<tt>Response Location</tt> specifies the URL the expected response provider. The binding types are:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwbo"></a><h5>Manage Name ID Service</h5>
+<p>This services defines the URLs that will be used when communicating with the
+service provider to specify a new name identifier for the principal. (Registration can
+occur only after a federation session is established.)</p><p><tt>Location</tt> specifies the URL of the provider to which the request is sent.
+<tt>Response Location</tt> specifies the URL the expected response provider. The binding types are:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdw"></a><h5>Assertion Artifact Consumer Service</h5>
+<p>This service processes the responses that a service provider receives from an identity
+provider. When a service provider wants to authenticate a user, it sends an
+authentication request to an identity provider. </p>
+<ul><li><p>HTTP-Artifact specifies a non-browser SOAP-based protocol.</p></li>
+<li><p>HTTP-Post specifies a browser-based HTTP POST protocol.</p></li>
+<li><p>PAOS defines the URL location for PAOS binding.</p></li></ul>
+<p><tt>Location</tt> specifies the URL of the provider to which the request is sent.
+<tt>Index</tt> specifies the URL in the standard metadata. <tt>Default</tt>is the default URL to be
+used for the binding. </p>
+
+<a name="ggvgp"></a><h5>Advanced</h5>
+
+<ul><li><p><a href="#ggwds">SP URL</a></p></li>
+<li><p><a href="#ggwdj">SP Logout URL</a></p></li>
+<li><p><a href="#ggwbl">App Secret List</a></p></li>
+<li><p><a href="#ggweh">Request IDP List Finder Implementation</a></p></li>
+<li><p><a href="#ggwfa">Request IDP List Get Complete</a></p></li>
+<li><p><a href="#ggwav">Request IDP List</a></p></li>
+<li><p><a href="#ggway">IDP Proxy</a></p></li>
+<li><p><a href="#ggwak">Introduction</a></p></li>
+<li><p><a href="#ggwcp">Proxy Count</a></p></li>
+<li><p><a href="#ggwdz">IDP Proxy List</a></p></li></ul>
+
+
+<a name="ggwds"></a><h5>SP URL</h5>
+<p>Defines URL endpoint on Service Provider that can handle SAE (Secure Attribute Exchange)
+requests. If this URL is empty (not configured), SAE single sign-on will not
+be enabled. Normal SAMLv2 single sign-on responses will be sent to the service
+provider.</p>
+
+<a name="ggwdj"></a><h5>SP Logout URL</h5>
+<p>Defines the URL endpoint on a Service Provider that can handle SAE global
+logout requests.  </p>
+
+<a name="ggwbl"></a><h5>App Secret List</h5>
+<p>This attribute defines the application security configuration. Each application must have one entry.
+Each entry has the following format: </p><p><tt>url=SPAppURL|type=</tt><i>symmetric_orAsymmetric</i><tt>|secret=</tt><i>ampassword encoded shared secret</i><tt></tt></p>
+
+<a name="ggweh"></a><h5>Request IDP List Finder Implementation</h5>
+<p>Defines the implementation class of the IDP list finder SPI. This returns a
+list of preferred identity providers that are trusted by the ECP.</p>
+
+<a name="ggwfa"></a><h5>Request IDP List Get Complete</h5>
+<p>Specifies a URI reference that can be used to retrieve the complete identity
+provider list if the <tt>IDPList</tt>  element is not complete. </p>
+
+<a name="ggwav"></a><h5>Request IDP List</h5>
+<p>Defines a list of identity providers for the ECP to contact. This is
+used by the default implementation of the IDP Finder (for example, <tt>com.sun.identity.saml2.plugins.ECPIDPFinder</tt>) .</p>
+
+<a name="ggway"></a><h5>IDP Proxy</h5>
+<p>Proxy Authentication Configuration attributes define values for dynamic identity provider proxying. Select the
+check box to enable proxy authentication for a service provider.</p>
+
+<a name="ggwak"></a><h5>Introduction</h5>
+<p>Select the check box if you want introductions to be used to find
+the proxying identity provider.</p>
+
+<a name="ggwcp"></a><h5>Proxy Count</h5>
+<p>Enter the maximum number of identity providers that can be used for proxy
+authentication.</p>
+
+<a name="ggwdz"></a><h5>IDP Proxy List</h5>
+<p>Add a list of identity providers that can be used for proxy authentication.
+Type the URI defined as the provider's identifier in New Value and click
+Add.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>トラストサークルプロファイルを変更する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsauthdomainsedit"></a><h4>トラストサークルプロファイルを変更する</h4><a name="indexterm-57"></a><p>次の手順に従って、既存のトラストサークルの設定済み「一般」属性を編集するか、既存のトラストサークルにプロバイダを追加します。連携インタフェースの「トラストサークル」から作業を始めます。</p><ol>
+<li><b>設定済みのトラストサークルの名前をクリックして、そのプロファイルを変更するか、またはプロバイダを追加します。</b><p>「トラストサークルを編集」ページが表示されます。</p></li>
+<li><b>トラストサークルの次の「一般」属性に新規の値を入力するか、または既存の値を編集します。</b><dl><dt>名前</dt>
+<dd><p>この属性の静的な値は、トラストサークルの作成時に指定した名前です。</p></dd>
+<dt>説明</dt>
+<dd><p>この属性の値はトラストサークルの説明です。適切な場合には、すでに入力されている説明を変更することもできます。</p></dd>
+<dt>IDFF ライターサービス URL</dt>
+<dd><p>この属性は、共通ドメインからの Cookie を書き込むサービスの場所を指定します。URL の形式は <tt><b>http://</tt><i>共通ドメインホスト</i><tt>:</tt><i>ポート</i><tt>/common/idffwriter</b></tt> です。</p></dd>
+<dt>IDFF リーダーサービス URL</dt>
+<dd><p>この属性は、共通ドメインからの Cookie を読み込むサービスの場所を指定します。URL の形式は <tt><b>http://</tt><i>共通ドメインホスト</i><tt>:</tt><i>ポート</i><tt>/common/idffreader</b></tt> です。</p></dd>
+<dt>SAML2 ライター URL</dt>
+<dd><p>この属性は、共通ドメインに Cookie を書き込む SAML2 ライターサービスの場所を指定します。URL の形式は <tt><b>http://</tt><i>共通ドメインホスト</i><tt>:</tt><i>ポート</i><tt>/common/saml2writer</b></tt> です。</p></dd>
+<dt>SAML2 リーダー URL</dt>
+<dd><p>この属性は、共通ドメインに Cookie を書き込む SAML2 ライターサービスの場所を指定します。URL の形式は <tt><b>http://</tt><i>共通ドメインホスト</i><tt>:</tt><i>ポート</i><tt>/common/saml2reader</b></tt> です。</p></dd>
+<dt>状態</dt>
+<dd><p>デフォルトの状態は「アクティブ」です。「非アクティブ」を選択すると、トラストサークル内の通信が無効になります。</p></dd>
+</dl>
+</li>
+<li><b>1 つ以上の利用可能なプロバイダを選択し、「追加」矢印をクリックして追加します。</b><p>表示される一覧には、作成されプロバイダが設定されたエンティティーの名前が入ります。詳細は、<a href="federation.fsauthdomainsselectprovider.html">「トラストサークルにプロバイダを追加する」</a>を参照してください。</p></li>
+<li><b>「保存」をクリックして、操作を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

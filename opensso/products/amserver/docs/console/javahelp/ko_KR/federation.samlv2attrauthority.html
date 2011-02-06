@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 속성 권한 사용자 정의 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>SAMLv2 속성 권한 사용자 정의</h4>
+<p>SAMLv2 속성 권한에는 사용자 정의에 사용할 수 있는 다음과 같은 속성이 포함되어
+있습니다.</p>
+<ul><li><p><a href="#ggwhl">서명 및 암호화</a></p></li>
+<li><p><a href="#ggwgh">속성 서비스</a></p></li>
+<li><p><a href="#ggwjy">AssertionID 요청</a></p></li>
+<li><p><a href="#ggwju">속성 프로필</a></p></li>
+<li><p><a href="#ggwha">인증서 별칭</a></p></li>
+<li><p><a href="#ggwjj">주제 데이터 저장소</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>서명 및 암호화</h5>
+<dl><dt>키 크기</dt>
+<dd><p>다음 엔티티와 상호 작용할 때 속성 권한 엔티티에서 사용하는 키의 길이입니다.</p></dd>
+<dt>알고리즘</dt>
+<dd><p>다른 엔티티와 상호 작용하는 데 사용되는 암호화 알고리즘입니다.</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>속성 서비스</h5>
+<p>이 속성은 속성 쿼리 요청을 받을 URL 엔드포인트를 정의합니다. <tt>위치</tt>는 요청을 보낼
+대상 공급자의 URL을 지정합니다. <tt>매퍼</tt>는 응답에 포함할 속성 목록을 반환하는 데 사용할
+속성 매핑 권한을 찾는 SPI를 정의합니다. SAMLv2 정의 속성 쿼리 프로필을 다음과
+같습니다.</p>
+<ul><li><p>기본</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>AssertionID 요청</h5>
+<p>해당 명제를 검색하기 위해 클라이언트에서 Identity 공급자로 AssertionID를 보내는 URL을 정의합니다. <tt>위치</tt>는
+요청을 보낼 대상 공급자의 URL을 지정합니다. <tt>매퍼</tt>는 응답에 포함할 속성 목록을 반환하는
+데 사용할 AssertionID 매핑 권한을 찾는 SPI를 정의합니다. 바인딩은 다음과 같습니다.</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>속성 프로필</h5>
+<p>SAMLv2 정의 지원되는 속성 프로필 유형을 정의합니다. 기본 유형은 <tt>Basic</tt>입니다.</p>
+
+<a name="ggwha"></a><h5>인증서 별칭</h5>
+<p>인증서 별칭 요소를 정의합니다. <tt>서명</tt>은 키 저장소에서 올바른 서명 인증서를 찾는 데
+사용되는 공급자 인증서 별칭을 지정합니다. <tt>암호화</tt>는 키 저장소에서 올바른 암호화 인증서를 찾는
+데 사용되는 공급자 인증서 별칭을 지정합니다.</p>
+
+<a name="ggwjj"></a><h5>주제 데이터 저장소</h5>
+<p>X509 주제 DN이 포함된 데이터 저장소 속성 이름을 지정합니다. 이 이름은 속성
+값이 X. 509 주제 DN과 일치하는 사용자를 찾는 데 사용됩니다. 이 필드는
+X. 509 주제의 속성 쿼리 프로필에서만 사용됩니다. </p>
+<br/>
+
+</body>
+</html>

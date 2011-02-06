@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie eine neue Gruppe - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentgroupadd"></a><h5>So erstellen Sie eine neue Gruppe</h5>
+<p>Erstellen Sie eine Gruppe, wenn die Agenten bestimmte Eigenschaften aus der Gruppe
+&#252;bernehmen sollen. Agenten k&#246;nnen Eigenschaften nur aus ihrem Gruppentyp &#252;bernehmen. So k&#246;nnen
+Web-Agenten beispielsweise Eigenschaften aus einer Web-Agenten-Gruppe &#252;bernehmen.</p><ol>
+<li><b>Klicken Sie auf die Registerkarte "Zugriffssteuerung".</b></li>
+<li><b>Klicken Sie auf den Namen des Bereichs, zu dem die Gruppe geh&#246;rt.</b></li>
+<li><b>Klicken Sie auf die Registerkarte "Agenten".</b></li>
+<li><b>W&#228;hlen Sie gegebenenfalls die Registerkarte f&#252;r den entsprechenden Agententyp aus.</b></li>
+<li><b>Klicken Sie im Abschnitt "Gruppe" auf "Neu".</b><p>Geben Sie im Feld "Name" den Namen der neuen Gruppe ein.</p></li>
+<li><b>Geben Sie bei Web-Agenten und J2EE-Agenten (und nur dort) die URL des
+OpenSSO-Servers ein.</b><p>Beispiel: <tt>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO </tt>.</p></li>
+<li><b>Klicken Sie auf "Erstellen".</b><p>Die Konsole erstellt die Agentengruppe und zeigt die Agentenseite mit einer Verkn&#252;pfung
+zu der Gruppe an.</p><p>Wenn Sie weitere Konfigurationen an der Gruppe vornehmen m&#246;chten, klicken Sie auf
+diese Verkn&#252;pfung, um die Seite zur Bearbeitung der Agentengruppe anzuzeigen.</p><p>Zur Konfiguration k&#246;nnen Sie dieselben Eigenschaften festlegen wie bei einzelnen Agenten, au&#223;er
+dass die Eigenschaften "Gruppe", "Passwort" und "Passwortbest&#228;tigung" auf Gruppenebene nicht verf&#252;gbar sind.</p>
+<hr><p><b>Hinweis &#8211; </b>Denken Sie au&#223;erdem daran, dass einigen Gruppeneigenschaften bereits Variablenwerte zugewiesen wurden, die
+in den meisten F&#228;llen nicht ge&#228;ndert werden sollten.  Im Folgenden finden
+Sie ein Beispiel f&#252;r einen solchen Wert:</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

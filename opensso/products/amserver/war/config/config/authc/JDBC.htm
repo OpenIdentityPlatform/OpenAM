@@ -1,0 +1,75 @@
+<style>	 
+	.input{
+	 width:250px;
+	}
+</style>
+
+<script language="javascript">
+
+    YAHOO.util.Event.onDOMReady(initJDBC);
+
+    function initJDBC() {
+        pageURI = "$context$path";
+        afterAddToStoreSuccessFunction = jdbcAfterAddToStore;
+        validateFormFunction = null;
+        adjustAddStoreButton();
+    }
+
+    function jdbcAfterAddToStore(){
+        YAHOO.sun.container.addStore.show();
+        setTimeout("YAHOO.sun.container.addStore.hide()",1250);
+        setTimeout("document.location = '$context/commonTasks.htm'",1250);
+    }
+
+    function typeconnection(type){
+        if(type == "1"){
+            document.getElementById("type1").style.display="none";
+            document.getElementById("type2").style.display="none";
+            document.getElementById("type3").style.display="";
+        }else{
+            document.getElementById("type1").style.display="";
+            document.getElementById("type2").style.display="";
+            document.getElementById("type3").style.display="none";
+        }
+    }
+
+</script>
+
+<div id="jdbcMainPanel" align="center">
+    <div id="jdbcCreatePanel" class="createpanel">
+        <div class="bodywhite">
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.select_connection_type")</p>
+            <input type="radio" id="connectionType1" name="connectionType" value="Pooled JNDI" onclick="javascript:typeconnection('1');"/><font class="commonTextblack">$page.getLocalizedString("configuration.authentication_store.jdbc.connection_pool_via_jndi")</font><br />
+            <input type="radio" id="connectionType2" name="connectionType" value="Non Pooled JDBC" onclick="javascript:typeconnection('2');" checked="checked"/><font class="commonTextblack">$page.getLocalizedString("configuration.authentication_store.jdbc.non_pooled_jndi_connection")</font><br />
+            <br />
+        </div>
+        <div class="bodywhite" id="type1">
+            <div class="middletitle OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.enter_store_details")</div><div class="OrangeVerySmall" id="allfields">$page.getLocalizedString("configuration.authentication_store.jdbc.all_fields_required")</div><br />
+            <input class="input" type="text" id="storeDetails" name="storeDetails"/><br />
+        </div>
+        <div class="bodywhite" id="type2">
+             <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.enter_jdbc_url")</p>
+            <input class="input" type="text" id="jdbcURL" name="jdbcURL"/><br />
+        </div>
+        <div class="bodywhite" id="type3" style="display:none">
+            <div class="middletitle OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.connection_pool_jndi_name")</div><div class="OrangeVerySmall" id="allfields">$page.getLocalizedString("configuration.authentication_store.jdbc.all_fields_required")</div><br />
+            <input class="input" type="text" id="jndiName" name="jndiName"/><br />
+        </div>
+        <div class="bodywhite">
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.database_login_info")</p>
+            <p>$page.getLocalizedString("configuration.authentication_store.jdbc.username")&nbsp;<input type="text" id="username" name="username"/></p>
+            <p>$page.getLocalizedString("configuration.authentication_store.jdbc.password")&nbsp;<input type="text" id="password" name="password"/></p>
+        </div>
+        <div class="bodywhite" >
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.database_password_field")&nbsp;<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></p>
+            <input class="input" type="text" id="passwordField" name="passwordField"/><br /><br />
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.password_retrieval_statement")&nbsp;<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></p>
+            <input class="input" type="text" id="retrievalStatement" name="retrievalStatement"/><br /><br />
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.jdbc.password_transformation_class")&nbsp;<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></p>
+            <input class="input" type="text" id="transformationClass" name="transformationClass"/><br />
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SecurID - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsecuridservice"></a><h4>SecurID</h4>
+<p><a name="indexterm-181"></a>Este m&#243;dulo permite realizar la autenticaci&#243;n mediante el software RSA ACE/Server y
+los autenticadores RSA SecurID. El m&#243;dulo de autenticaci&#243;n SecurID no est&#225; disponible
+para las plataformas x86 de Solaris o Linux, y no debe registrarse,
+configurarse ni habilitarse en estas dos plataformas. S&#243;lo est&#225; disponible para Solaris.
+Los atributos de autenticaci&#243;n de SecurID son atributos de dominio. Los atributos
+son:</p>
+<ul><li><p><a href="#fwbpt">Ruta de configuraci&#243;n de ACE/Server</a></p></li>
+<li><p><a href="#fwbma">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwbpt"></a><h5>Ruta de configuraci&#243;n de ACE/Server</h5>
+<p>Especifica el directorio en el que se encuentra el archivo <tt>sdconf.rec </tt> de
+SecurID ACE/Server; de forma predeterminada en <tt>/opt/ace/data</tt>. Si especifica un directorio distinto
+en este campo, el directorio debe existir antes de intentar la autenticaci&#243;n
+mediante SecurID.</p>
+
+<a name="fwbma"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

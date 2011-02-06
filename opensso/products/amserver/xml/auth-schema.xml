@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: auth-schema.xml,v 1.3 2008/06/25 05:44:56 qcheng Exp $
+
+-->
+
+
+
+
+
+<!DOCTYPE iPlanetServicesConfiguration 
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "http://policy.red.iplanet.com/sms/sms.dtd">
+
+<iPlanetServicesConfiguration>
+
+    <Service name="authentication">
+
+    <ServiceSchema
+        i18nFileName="amSDK"
+        descI18Nkey="com.iplanet.auth.name">
+
+        <ServiceSubSchema name="applicationName"
+            inheritance="multiple"
+            descI18Nkey="com.iplanet.auth.application">
+
+            <SchemaType type="Organization" />
+
+            <PluginInterface name="auth-modules"
+                interface="javax.security.auth.spi.LoginModule"
+                descI18Nkey="com.iplanet.auth.moduleInterface" />
+
+        </ServiceSubSchema>
+
+    </ServiceSchema>
+
+    <ServiceConfig>
+
+        <PluginSchema name="Ldap"
+            type="auth-modules"
+            class="com.sun.identity.authentication.server.LdapLoginModule"
+            jarURL="auth.jar">
+
+        <AttributeSchema name="flag"
+            type="single_choice"
+            descI18Nkey="com.iplanet.auth.flag">
+            <DefaultValues>
+                <Value>sufficient</Value>
+            </DefaultValues>
+            <ChoiceValues>
+                <Value>required</Value>
+                <Value>optional</Value>
+                <Value>sufficient</Value>
+                <Value>requisite</Value>
+            </ChoiceValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="moduleClass"
+            type="single"
+            descI18Nkey="com.iplanet.auth.moduleClass">
+            <DefaultValues>
+                <Value>
+                    com.sun.identity.authentication.server.LdapLoginModule
+                </Value>
+            </DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-server"
+            type="single"
+            descI18Nkey="com.iplanet.auth.ldap-server">
+            <DefaultValues><Value>localhost</Value></DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-baseDN"
+            type="single"
+            descI18Nkey="com.iplanet.auth.ldap-baseDN">
+            <DefaultValues><Value>o=iplanet</Value></DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="authLdap-bindDN"
+            type="single"
+            descI18Nkey="com.iplanet.auth.ldap-bindDN">
+            <DefaultValues><Value>cn=Directory Manager</Value></DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-bindPasswd"
+            type="single"
+            descI18Nkey="com.iplanet.auth.ldap-bindPasswd">
+            <DefaultValues><Value>core1234</Value></DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-searchFilter"
+            type="single"
+            descI18Nkey="com.iplanet.auth.ldap-searchFilter">
+            <DefaultValues><Value>uid</Value></DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-searchScope"
+            type="single_choice"
+            descI18Nkey="com.iplanet.auth.ldap-searchScope">
+            <DefaultValues><Value>SUBTREE</Value></DefaultValues>
+            <ChoiceValues>
+                <Value>SUBTREE</Value>
+                <Value>ONELEVEL</Value>
+                <Value>OBJECT</Value>
+            </ChoiceValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-sslEnabled"
+            type="single_choice"
+            syntax="boolean"
+            descI18Nkey="com.iplanet.auth.ldap-sslEnabled">
+            <DefaultValues><Value>false</Value></DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-authLevel"
+            type="single"
+            syntax="numeric"
+            descI18Nkey="com.iplanet.auth.ldap-authLevel">
+            <DefaultValues><Value>1</Value></DefaultValues>
+        </AttributeSchema>
+        
+        <AttributeSchema name="authLdap-debugEnabled"
+            type="single_choice"
+            syntax="boolean"
+            descI18Nkey="com.iplanet.auth.ldap-debugEnabled">
+            <DefaultValues><Value>false</Value></DefaultValues>
+        </AttributeSchema>
+        
+        </PluginSchema>
+
+        <!-- Default configuration for all organizations -->
+        <ServiceSubConfig name="default" id="application">
+
+        <PluginConfig name="Ldap" priority="1">
+            <AttributeValuePair> <Attribute name="flag"/>
+                 <Value>required</Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="moduleClass"/>
+                <Value>
+                    com.sun.identity.authentication.server.LdapLoginModule
+                </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-server"/>
+            <Value>
+                shivalik.red.iplanet.com
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-baseDN"/>
+            <Value>
+                o=iplanet.com
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-bindDN"/>
+            <Value>
+                cn=Directory Manager
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-bindPasswd"/>
+            <Value>
+                core1234
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-searchFilter"/>
+            <Value>
+                uid
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-searchScope"/>
+            <Value>
+                SUBTREE
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-sslEnabled"/>
+            <Value>
+                false
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-authLevel"/>
+            <Value>
+                1
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-debugEnabled"/>
+            <Value>
+                true
+            </Value>
+            </AttributeValuePair>
+        </PluginConfig>
+        </ServiceSubConfig>
+
+        <!-- Configuration for coke organization -->
+        <Organization name="iplanet.com">
+        <!-- Default configuration for all applications
+         within iplanet.com organization -->
+        <ServiceSubConfig name="default" id="application">
+            <PluginConfig name="Ldap" priority="1">
+            <AttributeValuePair> <Attribute name="flag"/>
+                <Value>sufficient</Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="moduleClass"/>
+            <Value>
+                com.sun.identity.authentication.server.LdapLoginModule
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-server"/>
+            <Value>
+                talac.red.iplanet.com
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-baseDN"/>
+            <Value>
+                o=iplanet.com
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-bindDN"/>
+            <Value>
+                cn=Directory Manager
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-bindPasswd"/>
+            <Value>
+                secret12
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-searchFilter"/>
+            <Value>
+                uid
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-searchScope"/>
+            <Value>
+                SUBTREE
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-sslEnabled"/>
+            <Value>
+                false
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-authLevel"/>
+            <Value>
+                1
+            </Value>
+            </AttributeValuePair>
+            <AttributeValuePair> <Attribute name="authLdap-debugEnabled"/>
+            <Value>
+                true
+            </Value>
+            </AttributeValuePair>
+            </PluginConfig>
+        </ServiceSubConfig>
+
+        </Organization>
+
+    </ServiceConfig>
+
+    </Service>
+</iPlanetServicesConfiguration>

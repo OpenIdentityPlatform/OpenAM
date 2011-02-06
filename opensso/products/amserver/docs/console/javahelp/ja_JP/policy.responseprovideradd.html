@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>応答プロバイダをポリシーに追加する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.responseprovideradd"></a><h5>応答プロバイダをポリシーに追加する</h5>
+<ol>
+<li><b><a name="indexterm-42"></a>ポリシーを作成済みの場合、応答プロバイダを追加するポリシーの名前をクリックします。まだポリシーを作成していない場合は、<a href="policy.policynormaladd.html">「新しい標準ポリシーを作成する」</a>を参照してください。</b></li>
+<li><b>「応答プロバイダ」リストの「新規」をクリックします。</b></li>
+<li><b>応答プロバイダの名前を入力します。</b></li>
+<li><b>次の値を定義します。</b><dl><dt>StaticAttribute</dt>
+<dd><p>属性値形式の静的属性で、ポリシーに格納されている <tt>IDResponseProvider</tt> のインスタンスで定義されます。</p></dd>
+<dt>DynamicAttribute</dt>
+<dd><p>ここで選択する応答属性は、対応するレルムの<a href="service.scpolicy.html">「ポリシー設定」</a>サービスで事前に定義されている必要があります。定義する属性名は、設定済みのデータストア (ID Repository) 内に存在する名前のサブセットにしてください。属性を定義する方法については、「ポリシー設定」属性定義を参照してください。複数の属性を選択するには、Control キーを押しながら左マウスボタンをクリックします。</p></dd>
+</dl>
+</li>
+<li><b>「完了」をクリックします。</b></li>
+<li><b>ポリシーから応答プロバイダを削除するには、対象を選択し、「削除」をクリックします。応答プロバイダの定義を編集するには、名前をクリックします。</b></li></ol>
+<br/>
+
+</body>
+</html>

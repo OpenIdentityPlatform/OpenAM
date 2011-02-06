@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Federated Access Manager 저장소 속성 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="amrepoattrs"></a><h4>Federated Access Manager 저장소 속성</h4>
+<p><a name="indexterm-13"></a>다음과 같은 속성을 사용하여 Federated Access Manager 저장소 플러그인을 구성할 수 있습니다.</p>
+
+<a name="gdlng"></a><h5>클래스 이름</h5>
+<p>Federated Access Manager 저장소 플러그인을 구현할 클래스 파일의 위치를 지정합니다.</p>
+
+<a name="gdopv"></a><h5>Federated Access Manager의 지원되는 유형 및 작업</h5>
+<p>해당 LDAP 서버상에서 허용되거나 수행할 수 있는 작업을 지정합니다. 해당 LDAPv3 저장소
+플러그인이 지원하는 작업만 기본 작업입니다. LDAPv3 저장소 플러그인이 지원하는 작업은 다음과 같습니다.</p>
+<ul><li><p>에이전트 &#8212; 읽기, 만들기, 편집, 삭제</p></li>
+<li><p>그룹 &#8212; 읽기, 만들기, 편집, 삭제</p></li>
+<li><p>영역 &#8212; 읽기, 만들기, 편집, 삭제, 서비스</p></li>
+<li><p>사용자 &#8212; 읽기, 만들기, 편집, 삭제, 서비스</p></li></ul>
+<p>LDAP 서버 설정에 따라 위 목록에서 권한을 제거할 수 있지만 권한을 더
+추가할 수는 없습니다. </p><p>구성된 LDAPv3 저장소 플러그인이 Sun Java Systems Directory Server의 인스턴스를 가리키면 <tt>role</tt>
+유형에 대한 권한을 추가할 수 있습니다. 그렇지 않으면 다른 데이터 저장소에서 역할을
+지원하지 않을 수 있으므로 권한을 추가할 수 없습니다. 'role' 유형의 권한은 다음과
+같습니다.</p>
+<ul><li><p>역할 &#8212; 읽기, 만들기, 편집, 삭제</p></li></ul>
+<p><tt>user</tt> 유형이 LDAPv3 저장소에 대해 지원되는 경우 해당 사용자에 대해 읽기, 만들기,
+편집 및 삭제 서비스 작업이 가능합니다. 즉, <tt>user</tt> 유형이 지원되는 경우 읽기,
+편집, 만들기 및 삭제 작업을 사용하여 Identity 저장소에서 사용자 항목을 읽고 편집하고
+만들고 삭제할 수 있습니다. <tt>user=service</tt> 작업을 사용하면 Federated Access Manager 서비스가 사용자
+항목의 속성에 액세스할 수 있습니다. 사용자가 속한 영역이나 역할에 서비스가 할당된 경우
+이 사용자는 동적인 서비스 속성에 액세스할 수 있습니다. </p><p>또한 모든 할당된 서비스에 대한 사용자 속성도 관리할 수 있습니다. 사용자에게 <tt>service</tt>가
+작업으로 되어 있는 경우(<tt>user=service</tt>) 지원되는 모든 서비스 관련 작업을 지정합니다. 이러한 작업으로는
+<tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes </tt> 및 <tt>modifyService</tt>가 있습니다.</p>
+
+<a name="gdlnf"></a><h5>조직 DN 값</h5>
+<p>Federated Access Manager가 관리할 Directory Server 내의 조직을 가리키는 DN을 정의합니다. 이
+DN은 데이터 저장소에서 수행되는 모든 작업의 기본 DN이 됩니다.</p>
+
+<a name="gdopu"></a><h5>사용자 컨테이너 이름 지정 속성</h5>
+<p>사용자가 사용자 컨테이너에 있는 경우 사용자 컨테이너의 이름 지정 속성을 지정합니다. 사용자가
+사용자 컨테이너에 없으면 이 필드는 비어 있습니다.</p>
+
+<a name="gdopc"></a><h5>사용자 컨테이너 값</h5>
+<p>사용자 컨테이너의 값을 지정합니다. 기본값은 <tt>people</tt>입니다.</p>
+
+<a name="gdopl"></a><h5>에이전트 컨테이너 이름 지정 속성</h5>
+<p>에이전트가 에이전트 컨테이너에 있는 경우 에이전트 컨테이너의 이름을 지정합니다. 에이전트가 에이전트 컨테이너에
+없으면 이 필드는 비어 있습니다.</p>
+
+<a name="gdopi"></a><h5>에이전트 컨테이너 값</h5>
+<p>에이전트 컨테이너 값을 지정합니다. 기본값은 <tt>agents</tt>입니다.</p>
+
+<a name="gdoow"></a><h5>재귀적 검색</h5>
+<p>이 옵션이 활성화되면 Federated Access Manager 저장소에서 지정된 Identity에 대해 재귀적으로 검색이
+수행됩니다. 예를 들어 다음 데이터 구조에서 재귀적 검색을 수행하면</p>루트 영역1     하위 영역11         사용자5     하위 영역12         사용자56 영역2     사용자1     사용자2     하위 영역21         사용자3         사용자4<p>다음과 같은 결과가 나옵니다.</p>
+<ul><li><p>루트에서 검색을 수행하는 경우 이 수준에 정의된 사용자(<tt>amadmin</tt> 및 <tt>anonymous</tt> 제외)가 없으면 검색에서 사용자 1&#8211;6을 반환합니다.</p></li>
+<li><p><tt>영역1</tt>에서 검색을 수행하는 경우 정의된 사용자가 없으면 검색에서 <tt>사용자5</tt> 및 <tt> 사용자6</tt>을 반환합니다.</p></li>
+<li><p><tt>영역2</tt>(두 사용자가 정의됨)에서 검색을 수행하는 경우 검색에서 사용자1&#8211;4를 반환합니다.</p></li></ul>
+
+
+<a name="gdoox"></a><h5>영역 구성 복사</h5>
+<p>영역 모드 설치에서 이 속성을 사용하면 Federated Access Manager가 저장소에 있는 각
+영역 및 하위 영역과 동등한 조직 및 하위 조직을 만듭니다. 또한 영역/하위
+영역에 등록된 서비스가 새로 만들어진 조직/하위 조직에도 등록됩니다. 그러면 영역 DIT와 조직
+DIT가 모두 데이터 저장소 내에 존재하게 됩니다.</p>
+<br/>
+
+</body>
+</html>

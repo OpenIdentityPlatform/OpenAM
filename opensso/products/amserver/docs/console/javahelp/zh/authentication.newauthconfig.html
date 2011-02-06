@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建新的验证链 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.newauthconfig"></a><h4>创建新的验证链</h4><ol>
+<li><b><a name="indexterm-7"></a>单击要为其添加新验证链的领域的名称。</b></li>
+<li><b>选择“验证”选项卡。</b></li>
+<li><b>在“验证链”列表中单击“新建”。</b></li>
+<li><b>请输入验证链名称。</b></li>
+<li><b>单击“确定”。</b></li>
+<li><b>单击“添加”，定义您要在链里包含的验证模块实例。可以从实例列表中选择模块实例名完成此步骤。此列表中所显示的模块实例名都是在“模块实例”属性中创建的。</b></li>
+<li><b>为验证链选择标准。这些标志建立了其定义的验证模块的执行标准。执行具有层次结构。“必需”位于最高层，“可选”位于最低层：</b><dl><dt>必要</dt>
+<dd><p>要成功验证必须要通过此模块实例。如果验证成功，将继续验证链列表中的下一个模块实例。如果验证失败，则立即返回到应用程序（不继续验证链列表中的下一个模块实例）。</p></dd>
+<dt>必需</dt>
+<dd><p>对此模块的验证必须成功。如果链中的任一必需模块验证失败，则整个验证链将最终失败。然而，无论任一必需模块的验证是成功或失败，都将继续链中的下一个模块。</p></dd>
+<dt>充足</dt>
+<dd><p>不要求模块实例必须成功。如果验证成功，则立即返回到应用程序（不继续模块实例列表中的下一个验证模块）。如果验证失败，将继续验证链列表中的下一个验证模块。</p></dd>
+<dt>可选</dt>
+<dd><p>不要求模块实例必须成功。无论验证成功或失败，都将继续验证链列表中的下一个验证模块。</p></dd>
+</dl>
+</li>
+<li><b>输入验证链的选项。这将以“关键字=值”对的形式为模块启用附加选项。多个选项之间用空格分隔。</b></li>
+<li><b>定义以下属性：</b><dl><dt>成功登录 URL</dt>
+<dd><p>指定用户在验证成功后，重定向的 URL。</p></dd>
+<dt>登录失败 URL</dt>
+<dd><p>指定用户在验证失败后，重定向的 URL。</p></dd>
+<dt>验证后期处理类</dt>
+<dd><p>定义用于在登录成功或失败后自定义后期验证处理的 Java 类的名称。</p></dd>
+</dl>
+</li>
+<li><b>单击“保存”。</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: webex-config-webex.xhtml,v 1.2 2009/12/19 00:27:38 babysunil Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+<o:section>
+
+    <ui:define name="section-title">
+
+        <ice:outputText
+            value="#{resources['webex-create.step4.details']}"/>
+    </ui:define>
+    <ui:define name="section-details">
+        <ice:outputLabel
+            value="#{resources['webex-create.step4.beginning.details']}"/>
+    </ui:define>
+    <ui:define name="section-body">
+
+        <ice:panelGrid>
+            <ice:panelGrid>
+                <ice:outputLabel
+                    value="#{resources['webex-configuration.webexconfig.save.cert']}"/>
+            </ice:panelGrid>
+            <ice:panelGrid columns="2">
+                <ice:inputTextarea
+                   id="cert"
+                   readonly="true"
+                   styleClass="policy-description"
+                   value="#{webExConfigWizardBean.pubKeyContent}"/>
+
+                <ice:outputResource
+                    id="imgRsource"
+                    resource="#{webExConfigWizardBean.fileResource}"
+                    label="#{resources['webex-configuration.webex.click.to.download']}"
+                    fileName="#{resources['webex-opensso.download.name.cert']}" mimeType="application/octet-stream" attachment="true" />
+            </ice:panelGrid>
+        </ice:panelGrid>
+
+        <ice:panelGrid>
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.copypaste']}"/>
+        </ice:panelGrid>
+<ice:panelGrid  padding-left="30px">
+        <ice:panelGrid columns="3">
+            <ice:outputText value="#{resources['webex-configuration.setup.one.section-details']}"/>
+        </ice:panelGrid>
+        <ice:panelGrid>
+            <ice:outputText
+                value="#{resources['webex-configuration.webexconfig.sso-link']}"/>
+        </ice:panelGrid>
+        <ice:panelGrid>
+            <ice:outputText
+                value="#{resources['webex-configuration.webexconfig.load.cert']}"/>
+        </ice:panelGrid>
+
+        <ice:panelGrid>
+            <ice:outputText
+                value="#{resources['webex-configuration.webexconfig.remove.old.cert']}"/>
+        </ice:panelGrid>
+
+        <ice:panelGrid>
+            <ice:outputText
+                value="#{resources['webex-configuration.webexconfig.upload.cert']}"/>
+        </ice:panelGrid>
+
+        <ice:panelGrid>
+            <ice:outputText
+                value="#{resources['webex-configuration.webexconfig.insert.data']}"/>
+        </ice:panelGrid>
+
+
+        <ice:panelGrid columns="2">
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.protocol']}"/>
+            <ice:inputText
+                id="protoname" readonly="true" style="width:350px;"
+                maxlength="256" value="#{resources['webex-configuration.webexconfig.protocolname']}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.samlspissuer']}" />
+            <ice:inputText
+                id="spname" readonly="true" style="width:350px;"
+                maxlength="256" value="#{webExConfigWizardBean.webexSiteUrl}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.samlidpissuer']}" />
+            <ice:inputText
+                id="idpname" readonly="true" style="width:350px;"
+                maxlength="256" value="#{webExConfigWizardBean.selectedIdp}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webex.servicelogin-url']}"/>
+            <ice:inputText
+                id="desturl" readonly="true" style="width:350px;"
+                maxlength="256" value="#{webExConfigWizardBean.singleSignOnUrl}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webex.choose-nameidformat']}"/>
+            <ice:inputText
+                id="nameidfor" readonly="true" style="width:350px;" maxlength="256"
+                value="#{resources['webex-configuration.nameidformat.section-details']}"/>
+
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.authncontext']}" />
+            <ice:inputText
+                id="authncont" readonly="true" style="width:350px;"
+                maxlength="256" value="#{webExConfigWizardBean.authnContext}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.ssoprofile']}" />
+            <ice:inputText
+                id="ssoprofile" readonly="true" style="width:350px;"
+                maxlength="256" value="#{webExConfigWizardBean.idpInit}"/>
+
+            <ice:outputLabel
+                visible="#{!webExConfigWizardBean.spInit}"
+                value="#{resources['webex-configuration.idpinit.targeturl-details']}"/>
+            <ice:inputText
+                visible="#{!webExConfigWizardBean.spInit}" id="rlystate"
+                readonly="true" style="width:350px;" maxlength="256"
+                value="#{resources['webex-configuration.webex.relay.state']}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.slogout']}" />
+            <ice:selectBooleanCheckbox
+                id="slogout" partialSubmit="false"
+                value="#{webExConfigWizardBean.sloandsso}"/>
+
+            <ice:outputLabel
+                visible="#{webExConfigWizardBean.sloandsso}"
+                value="#{resources['webex-configuration.webexconfig.sloginurl']}" />
+            <ice:inputText
+                visible="#{webExConfigWizardBean.sloandsso}" id="loginurl"
+                readonly="true" style="width:350px;" maxlength="256"
+                value="#{webExConfigWizardBean.singleLogoutUrl}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.signauthreq']}" />
+            <ice:selectBooleanCheckbox
+                id="signauthreq" partialSubmit="false"
+                value="#{webExConfigWizardBean.authnReq}"/>
+
+            <ice:outputLabel
+                visible="#{webExConfigWizardBean.authnReq}"
+                value="#{resources['webex-configuration.webex.destination-url']}"/>
+            <ice:inputText
+                id="desturl" visible="#{webExConfigWizardBean.authnReq}" readonly="true"
+                style="width:350px;" maxlength="256" value="#{webExConfigWizardBean.singleSignOnUrl}"/>
+
+            <ice:outputLabel
+                value="#{resources['webex-configuration.webexconfig.autocreate']}" />
+            <ice:selectBooleanCheckbox
+                id="autocreate"
+                partialSubmit="false"
+                value="#{webExConfigWizardBean.autocrup}"/>
+
+            <ice:outputLabel value="#{resources['webex-configuration.webexconfig.autoupdate']}" />
+            <ice:selectBooleanCheckbox
+                id="autoupdate"
+                partialSubmit="false"
+                value="#{webExConfigWizardBean.autocrup}"/>
+            <ice:outputLabel
+                visible="#{webExConfigWizardBean.autocrup}"
+                value="#{resources['webex-configuration.webex.autocrup-details']}"/>
+            <ice:inputText
+                visible="#{webExConfigWizardBean.autocrup}"
+                id="atrdetails" readonly="true" style="width:350px;" maxlength="256"
+                value="#{resources['webex-configuration.webex.attrmap.details']}"/>
+
+        </ice:panelGrid>
+
+        <ice:panelGrid>
+            <ice:outputText value="#{resources['webex-configuration.update.section-details']}"/>
+        </ice:panelGrid>
+        <ice:panelGrid>
+            <ice:outputText value="#{resources['webex-configuration.webex-user-details']}"/>
+        </ice:panelGrid>
+        <ice:panelGrid>
+            <ice:outputText value="#{resources['webex-configuration.opensso-user-details']}"/>
+        </ice:panelGrid>
+        <ice:panelGrid>
+            <ice:outputText value="#{resources['webex-configuration.goto.next.section-details']}"/>
+        </ice:panelGrid>
+
+</ice:panelGrid>
+
+    </ui:define>
+
+</o:section>
+
+</span>

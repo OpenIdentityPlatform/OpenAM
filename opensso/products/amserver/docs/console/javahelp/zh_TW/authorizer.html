@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>授權程式 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authorizer"></a><h4>授權程式</h4>
+<a name="indexterm-89"></a><a name="indexterm-90"></a><p>處理請求之前，Liberty 個人設定檔服務 將驗證發出請求之 WSC 的授權。可以完成兩種等級的授權檢查：</p>
+<ol><li><p>請求的實體已獲授權存取請求的資源配置文件資訊？</p></li>
+<li><p>請求的資源已發佈給請求者？</p></li></ol>
+<p>授權透過 Liberty 個人設定檔服務 的外掛程式  (<tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>Authorizer</tt> 介面的實作) 發生。雖然可以開發新的實作，但是 OpenSSO 提供了預設實作：<tt>com.sun.identity.liberty.ws.idpp.plugin.</tt><tt>IDPPAuthorizer</tt>。此外掛程式定義了四個針對查詢和修改作業的政策動作值：</p>
+<ul><li><p>允許</p></li>
+<li><p>拒絕</p></li>
+<li><p>互動同意</p></li>
+<li><p>互動值</p></li></ul>
+<p>規則的資源值類似於 Liberty 個人設定檔服務 定義的 <tt>x-path</tt> 表示式。</p>/PP/CommonName/AnalyzedName/FN     查詢     互動同意 /PP/CommonName/*                          修改     互動值 /PP/InformalName                            查詢     拒絕<p>可以透過取消選取以下一個或兩個在 Liberty 個人設定檔服務中定義的屬性來取消授權。</p>
+<ul><li><p><a href="requirequery.html">要求查詢策略評估：</a></p></li>
+<li><p><a href="requiremodify.html">要求修改策略評估：</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

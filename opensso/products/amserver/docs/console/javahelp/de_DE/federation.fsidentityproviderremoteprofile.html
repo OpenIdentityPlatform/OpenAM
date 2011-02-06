@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So &#228;ndern Sie einen Remote-Identity-Anbieter in einer Anbieter-Entity - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderremoteprofile"></a><h4>So &#228;ndern Sie einen Remote-Identity-Anbieter in einer Anbieter-Entity</h4><a name="indexterm-78"></a><p>Nach dem Erstellen einer Entity und dem Hinzuf&#252;gen eines Identity-Anbieters k&#246;nnen Sie
+das Profil des Identity-Anbieters bearbeiten. Hierbei ist es m&#246;glicherweise erforderlich, Werte zu
+Attributen hinzuzuf&#252;gen, die bei der anf&#228;nglichen Erstellung des Identity-Anbieters nicht konfiguriert werden
+konnten, oder konfigurierte Daten zu &#228;ndern. Der Ausgangspunkt ist "Entities" in der
+Verbindungsschnittstelle.</p><ol>
+<li><b>Klicken Sie auf den Namen einer konfigurierten Anbieter-Entity, um deren Profil zu
+&#228;ndern.</b><p>Die Profilseite der Entity wird angezeigt.</p></li>
+<li><b>W&#228;hlen Sie im Men&#252; "Ansicht" die Option "Identity-Anbieter" aus.</b></li>
+<li><b>&#196;ndern Sie die Werte f&#252;r die allgemeinen Attribute.</b><p>Allgemeine Attribute enthalten Werte, die den Identity-Anbieter selbst allgemein beschreiben.</p><dl><dt>Anbietertyp</dt>
+<dd><p>Der statische Wert dieses Attributs legt fest, ob es sich um einen Host- oder einen Remote-Anbieter handelt.</p></dd>
+<dt>Beschreibung</dt>
+<dd><p>Der Wert dieses Attributs ist die Beschreibung, die Sie bei der Erstellung der Entity eingegeben haben. Sie k&#246;nnen die urspr&#252;nglich eingegebene Beschreibung &#228;ndern bzw. eine hinzuf&#252;gen, wenn noch keine vorhanden ist.</p></dd>
+<dt>Protokollunterst&#252;tzungsaufz&#228;hlung</dt>
+<dd><p>W&#228;hlen Sie die von dieser Entity unterst&#252;tzte Version von Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) aus.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> bezieht sich auf Liberty ID-FF-Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> bezieht sich auf Liberty ID-FF-Version 1.1.</p></li></ul>
+</dd>
+<dt>Zuordnungs-Binding Servernamen-ID</dt>
+<dd><p>Durch die Namensbezeichnerzuordnung kann ein Dienstanbieter einen Namensbezeichner f&#252;r einen Principal erhalten, der sich im Namespace eines anderen Dienstanbieters zusammengeschlossen hat. So kann der Anbieter, von dem die Anforderung ausgeht, mit dem anderen Dienstanbieter &#252;ber den Principal kommunizieren, ohne dass eine Identity-Verbindung f&#252;r den Principal zwischen ihnen vorliegt. Geben Sie einen URI an, der das zum Ermitteln des Bezeichners verwendete Protokoll angibt, und klicken Sie auf "Hinzuf&#252;gen".</p>
+<hr><p><b>Hinweis &#8211; </b>Derzeit unterst&#252;tzt das Profil f&#252;r die Namensbezeichnerzuordnung in Access Manager nur SOAP. Bei Verwendung dieses Attributs muss dieser Wert wie folgt lauten: <tt>http://projectliberty.org/profiles/nim-sp-http</tt>.</p>
+<hr>
+</dd>
+<dt>Signaturschl&#252;ssel: Schl&#252;sselalias</dt>
+<dd><p>Zertifikate werden in einer Java-Keystore-Datei gespeichert. Jedes Zertifikat in der Datei wird einem Alias zugeordnet, der dazu verwendet wird, das betreffende Zertifikat abzurufen. Geben Sie den Schl&#252;ssel-Alias ein, der dem Zertifikat zugeordnet ist, das zum Signieren von Anforderungen und Antworten verwendet wird.</p></dd>
+<dt>Verschl&#252;sselungsschl&#252;ssel: Schl&#252;sselalias</dt>
+<dd><p>Zertifikate werden in einer Java-Keystore-Datei gespeichert. Jedes Zertifikat in der Datei wird einem Alias zugeordnet, der dazu verwendet wird, das betreffende Zertifikat abzurufen. Geben Sie den Schl&#252;ssel-Alias ein, der dem Sicherheitszertifikat des Anbieters zugeordnet ist.</p></dd>
+<dt>Verschl&#252;sselungsschl&#252;ssel: Schl&#252;sselgr&#246;&#223;e</dt>
+<dd><p>Geben Sie die Schl&#252;ssell&#228;nge ein, die f&#252;r die Interaktion eines Webdienstbenutzers mit einer anderen Entity verwendet wird.</p></dd>
+<dt>Verschl&#252;sselungsschl&#252;ssel: Verschl&#252;sselungsmethode</dt>
+<dd><p>W&#228;hlen Sie eine Verschl&#252;sselungsmethode aus. Zur Auswahl stehen:</p>
+<ul><li><p>Keine</p></li>
+<li><p>AES</p></li>
+<li><p>DESede</p></li></ul>
+</dd>
+<dt>Verschl&#252;sselung des Namensbezeichners</dt>
+<dd><p>Aktivieren Sie dieses Kontrollk&#228;stchen, um die Verschl&#252;sselung des Namensbezeichners zu aktivieren.</p></dd>
+</dl>
+</li>
+<li><b>&#196;ndern Sie die Werte f&#252;r die Kommunikations-URL-Attribute.</b><p>Kommunikations-URL-Attribute enthalten Orte, an die die Anbieter &#220;bertragungen senden k&#246;nnen, die f&#252;r
+den betreffenden Identity-Anbieter vorgesehen sind.</p><dl><dt>SOAP-Endpunkt</dt>
+<dd><p>Geben Sie einen URL f&#252;r den SOAP-Nachrichtenempf&#228;nger des Identity-Anbieters ein. Dieser Wert legt die Adresse des SOAP-Empf&#228;ngers f&#252;r Kommunikationen fest, die nicht &#252;ber einen Browser erfolgen.</p></dd>
+<dt>Single Sign-On-Dienst-URL</dt>
+<dd><p>Geben Sie einen URL ein, an den die Dienstanbieter Single Sign-On- und Verbindungsanforderungen senden k&#246;nnen.</p></dd>
+<dt>Einzelabmeldungsdienst</dt>
+<dd><p>Geben Sie einen URL ein, an den Dienstanbieter Abmeldeanforderungen senden k&#246;nnen. Die Einzelabmeldung synchronisiert die Abmeldefunktion &#252;ber alle von diesem Identity-Anbieter authentifizierten Sitzungen.</p></dd>
+<dt>Umleitungs-URL f&#252;r Einzelabmeldung</dt>
+<dd><p>Geben Sie einen URL ein, an den der Identity-Anbieter den Principal nach einer Abmeldung umleiten kann.</p></dd>
+<dt>Verbindungstrennungsdienst</dt>
+<dd><p>Geben Sie einen URL ein, an den Dienstanbieter Verbindungstrennungsanforderungen senden k&#246;nnen.</p></dd>
+<dt>Umleitungs-URL f&#252;r Verbindungstrennung</dt>
+<dd><p>Geben Sie einen URL ein, an den der Identity-Anbieter den Principal nach einer Verbindungstrennung umleiten kann.</p></dd>
+<dt>Namensregistrierungsdienst</dt>
+<dd><p>Geben Sie einen URL ein, an den Dienstanbieter Anforderungen zur Angabe eines Namensbezeichners senden k&#246;nnen, der f&#252;r die Kommunikation mit dem Identity-Anbieter &#252;ber einen bestimmten Principal verwendet wird. Dieser optionale Dienst kann erst nach der Einrichtung einer Verbindungssitzung implementiert werden.</p></dd>
+<dt>Umleitungs-URL f&#252;r Namensregistrierung</dt>
+<dd><p>Geben Sie einen URL ein, an den der Identity-Anbieter den Principal nach einer HTTP Redirect-basierten Namensregistrierung umleitet.</p></dd>
+</dl>
+</li>
+<li><b>&#196;ndern Sie die Werte f&#252;r die Kommunikationsprofilattribute.</b><p>Ein Liberty Alliance Project-<b>Profil</b> legt die Kombination aus dem Inhalt einer Nachricht
+und dem zu ihrem Transport verwendeten Mechanismus fest. Die folgenden Kommunikationsprofilattribute legen
+die Profile fest, die vom Identity-Anbieter f&#252;r die einzelnen Funktionen verwendet werden.</p><dl><dt>Verbindungstrennung</dt>
+<dd><p>W&#228;hlen Sie ein Profil aus, das der Identity-Anbieter verwenden kann, um andere Anbieter &#252;ber die Verbindungstrennung eines Principals zu unterrichten.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>Einzelabmeldung</dt>
+<dd><p>W&#228;hlen Sie ein Profil aus, das der Identity-Anbieter verwenden kann, um andere Anbieter &#252;ber die Abmeldung eines Principals zu unterrichten.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>Namensregistrierung</dt>
+<dd><p>W&#228;hlen Sie ein Profil aus, das andere Anbieter verwenden k&#246;nnen, wenn sie Kontakt mit dem betreffenden Identity-Anbieter aufnehmen, um einen neuen Namensbezeichner f&#252;r einen Principal zu registrieren.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>Single Sign-On/Verbindung</dt>
+<dd><p>W&#228;hlen Sie das Profil aus, das dieser Identity-Anbieter beim Senden von Antworten zur Authentifizierung oder von Verbindungsanforderungen verwenden soll.</p>
+<ul><li><p>Browser-Ver&#246;ffentlichung (Browser-basiertes HTTP POST-Protokoll)</p></li>
+<li><p>Browser-Produkt (nicht Browser-basiertes SOAP-Protokoll)</p></li>
+<li><p>LECP (Liberty-f&#228;higer Client-Proxy)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>W&#228;hlen Sie einen der verf&#252;gbaren Circles of Trust aus, der dem Anbieter
+zugewiesen werden soll.</b><p>Ein Anbieter kann zu mehreren Circles of Trust geh&#246;ren. Ein Anbieter, f&#252;r
+den kein Circle of Trust angegeben ist, kann jedoch nicht an Kommunikationen
+teilnehmen, die auf den Liberty Alliance Project-Spezifikationen beruhen. Wenn keine Circles of
+Trust erstellt wurden, k&#246;nnen Sie dieses Attribut sp&#228;ter definieren.</p></li>
+<li><b>Geben Sie Informationen zu den Attributen der Proxy-Authentifizierungskonfiguration an.</b><p>Ein Identity-Anbieter, der aufgefordert wird, einen Principal zu authentifizieren, der sich bereits
+bei einem anderen Identity-Anbieter authentifiziert hat, kann die Authentifizierungsanforderung im Namen des
+anfordernden Dienstanbieters an den Identity-Anbieter weitergeben, der die Authentifizierung durchgef&#252;hrt hatte. Dieser
+Vorgang wird als <b>dynamisches Identity-Anbieter-Proxying</b> bezeichnet. Proxy-Authentifizierungskonfigurationsattribute definieren Werte f&#252;r das dynamische Identity-Anbieter-Proxying.</p><dl><dt>Proxy-Authentifizierung aktivieren</dt>
+<dd><p>Aktivieren Sie dieses Kontrollk&#228;stchen, um dynamisches Identity-Anbieter-Proxying zu aktivieren.</p></dd>
+<dt>Liste der Proxy-Identity-Anbieter</dt>
+<dd><p>Eine Liste mit Identity-Anbietern, die f&#252;r dynamisches Identity-Anbieter-Proxying verwendet werden k&#246;nnen. Der Wert dieses Attributs ist ein URI, der mit dem Wert &#252;bereinstimmt, der im Attribut "Entity-Name" der Entity definiert wurde, zu der der Eigent&#252;mer/Anbieter geh&#246;rt.</p></dd>
+<dt>Maximale Anzahl an Proxies</dt>
+<dd><p>Geben Sie die maximale Anzahl an Proxy-Identity-Anbietern an, an die eine Anforderung gesendet werden kann.</p></dd>
+<dt>Einf&#252;hrungs-Cookie f&#252;r Proxyvorgang verwenden</dt>
+<dd><p>Aktivieren Sie dieses Kontrollk&#228;stchen, wenn zum Auffinden des Proxy-Identity-Anbieters Einf&#252;hrungen verwendet werden sollen.</p></dd>
+</dl>
+</li>
+<li><b>Geben Sie die Werte f&#252;r die Organisationsprofilattribute an.</b><p>Die Attribute des Organisationsprofils beinhalten grundlegende Informationen, die bei der Interaktion mit
+einem Principal verlangt werden k&#246;nnen. Diese Attribute sind optional.</p>
+<hr><p><b>Hinweis &#8211; </b>Wenn das Namensattribut einen Wert enth&#228;lt, m&#252;ssen Werte zu den Anzeigenamen- und
+URL-Attributen hinzugef&#252;gt werden.</p>
+<hr>
+<dl><dt>Namen</dt>
+<dd><p>Geben Sie den zul&#228;ssigen Namen f&#252;r die Organisation der Entity ein und klicken Sie dann auf "Hinzuf&#252;gen". Der Wert wird im Format <i>locale</i>| <i> organization-name</i> definiert. Beispiel: <tt>en</tt>|<tt> example.com</tt>.</p></dd>
+<dt>Anzeigename</dt>
+<dd><p>Geben Sie einen Namen f&#252;r die Organisation der Entity ein, der sich f&#252;r die Anzeige f&#252;r einen Principal eignet, und klicken Sie dann auf "Hinzuf&#252;gen". Der Wert wird im Format <i>locale</i>|<i>organization-display-name</i> definiert. Beispiel: <tt>en</tt>|<tt>example.com</tt>. </p></dd>
+<dt>URL</dt>
+<dd><p>Geben Sie den URL der Organisation ein und klicken Sie dann auf "Hinzuf&#252;gen". Der Wert wird im Format <i>locale</i>|<i>organization-URL</i> definiert. Beispiel: <tt>en</tt>|<tt>http://www.example.com</tt>.</p></dd>
+</dl>
+</li>
+<li><b>Zur Konfiguration von Kontaktpersonen f&#252;r den Anbieter klicken Sie auf "Neue Kontaktperson".</b><p>Dieses Attribut ist optional. Weitere Informationen finden Sie unter <a href="federation.fscreatecontactperson.html">So f&#252;gen Sie einem Anbieter in einer Anbieter-Entity eine Kontaktperson hinzu</a>.</p></li>
+<li><b>Klicken Sie auf "Speichern", um die &#196;nderungen abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

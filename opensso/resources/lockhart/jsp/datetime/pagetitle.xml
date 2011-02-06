@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pagetitle SYSTEM "com_sun_web_ui/dtd/pagetitle.dtd">
+
+<pagetitle>
+  <pagebuttons>
+    <cc name="OkButton" tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
+      <!-- See the CCButton class for button types. -->
+      <attribute name="type" value="primary"/>
+    </cc>
+    <cc name="CancelButton" tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
+      <!-- See the CCButton class for button types. -->
+      <attribute name="type" value="secondary"/>
+      <attribute name="onClick" value="window.close(); return false;"/>
+    </cc>
+  </pagebuttons>
+</pagetitle>
+

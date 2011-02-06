@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Allgemein - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>Allgemein</h4>
+<p>Die allgemeinen Attribute konfigurieren grundlegende Konfigurationsdaten f&#252;r die zentralisierte Serververwaltung.</p>
+
+<a name="ggjyg"></a><h5>Site-Attribute</h5>
+<p>Das Site-Attribut lautet:</p>
+
+<a name="ggjxc"></a><h5>&#220;bergeordnete Site</h5>
+<p>Dieses Attribut ordnet den Site-Namen (Site-ID) des Lastenausgleichssystems dem OpenSSO-Server zu. Beachten
+Sie, dass Sie nur Sites hinzuf&#252;gen k&#246;nnen, die bereits erstellt wurden. 
+</p>
+
+<a name="ggjwl"></a><h5>Systemattribute</h5>
+<p>In den Systemattributen sind Standortinformationen f&#252;r die Serverinstanz aufgef&#252;hrt:</p>
+
+<a name="ggjyj"></a><h5>Basisinstallationsverzeichnis</h5>
+<p>Gibt das Basisverzeichnis an, in dem sich die Daten f&#252;r das Produkt
+befinden. </p>
+
+<a name="ggjxz"></a><h5>Standardgebietsschema</h5>
+<p>Der Wert dieses Attributs ist der Standard-Sprachenuntertyp, mit dem OpenSSO installiert wurde.
+Der Standardwert ist <tt>en_us</tt>.</p>
+
+<a name="ggjwq"></a><h5>Benachrichtigungs-URL</h5>
+<p>Die Position des Endpunkts des Benachrichtigungsdiensts Dieser Wert wird w&#228;hrend der Installation
+festgelegt.</p>
+
+<a name="ggjzq"></a><h5>XML-&#220;berpr&#252;fung</h5>
+<p>Der Standarwert ist "no" (Nein). Legt fest, ob bei der Analyse von
+XML-Dokumenten mithilfe der OpenSSO-Klasse <tt>XMLUtils </tt> eine Validierung erforderlich ist. Diese Eigenschaft ist
+nur aktiv, wenn das Attribut "Fehlersuchebene" auf "warning" (Warnung) oder "message" (Nachricht)
+gesetzt ist. Die zul&#228;ssigen Werte sind "yes" (Ja) und "no" (Nein). Die
+Validierung von XML-Dokumenten wird nur aktiviert, wenn der Wert f&#252;r diese Eigenschaft
+"yes" (Ja) lautet und wenn der Wert f&#252;r das Attribut "Fehlersuchebene" auf
+"warning" (Warnung) oder "message" (Nachricht) gesetzt ist.</p>
+
+<a name="ggjzy"></a><h5>Fehlersuchattribute</h5>
+<p>In den Fehlersuchattributen werden grundlegende Informationen zur Fehlerpr&#252;fung aufgef&#252;hrt:</p>
+
+<a name="ggjzc"></a><h5>Fehlersuchebene</h5>
+<p>Gibt die Fehlersuchebene an. Der Standardwert ist "error" (Fehler). M&#246;gliche Werte:</p>
+<ul><li><p>off (Aus) &#8211; Es wird keine Fehlersuchdatei erstellt.</p></li>
+<li><p>error (Fehler) &#8211; Es werden ausschlie&#223;lich Fehlermeldungen protokolliert.</p></li>
+<li><p>warning (Warnung) &#8211; Es werden ausschlie&#223;lich Warnmeldungen protokolliert.</p></li>
+<li><p>message (Nachricht) &#8211; Es werden Fehler-, Warn- und Informationsmeldungen protokolliert.</p></li></ul>
+
+
+<a name="ggjze"></a><h5>Debug-Verzeichnis</h5>
+<p>Gibt das Ausgabeverzeichnis an, in dem die Fehlersuchdateien erstellt werden. Der 
+Wert wird w&#228;hrend der Installation festgelegt. Beispiel: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>debug_URI</i><tt>/debug</tt>.</p>
+
+<a name="ggjwr"></a><h5>Mail-Server</h5>
+<p>In den Mail Server-Attributen sind Hostname und Anschluss f&#252;r den Mail-Server aufgef&#252;hrt:</p>
+
+<a name="ggkax"></a><h5>Host-Name des Mail-Servers</h5>
+<p>Standardwert: <tt>localhost</tt>.  Gibt den Mail-Server-Host an.</p>
+
+<a name="ggkbx"></a><h5>Mail-Server-Anschlussnummer</h5>
+<p>Der Standardwert ist 25.  Gibt den Mail-Server-Anschluss an.</p>
+<br/>
+
+</body>
+</html>

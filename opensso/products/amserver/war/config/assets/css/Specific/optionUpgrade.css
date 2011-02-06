@@ -1,0 +1,27 @@
+/* CSS Document */
+#options div {
+	width: 230px;
+	float: left;
+	padding-right: 20px;
+	height:200px;
+
+}
+
+.borderRight {
+	border-right: 1px solid #999999;
+	margin-right: 20px;
+}
+
+h4 {
+	background: #FF9933;
+	border: 1px solid;
+	border-color: #FF9933;
+	font-size: 14px;
+	color: #FFFFFF;
+	font-weight: bold;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+p{
+	text-align:justify;
+}

@@ -1,0 +1,136 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+	<tr><td><h2>始めるにあたっての FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#browse">どのようにしてソースコードが見れますか？</a></li>
+<li><a href="#checkout">どのようにしてソースコードをチェックアウトできますか？</a></li>
+<li><a href="#download">OpenSSO のダウンロード方法は？?</a></li>
+<li><a href="#information">環境設定や適切なツールの取得方法や実際にソースをビルドする方法に関する情報はどこから得ることができますか？</a></li>
+<li><a href="#built">まずはコードをビルドすることができました。次にどういったことができますか？</a></li>
+<li><a href="#bug">バグをレポートする方法は？</a></li>
+<li><a href="#changes">ソースのファイルをどのようにして変更できますか？</a></li>
+<li><a href="#patch">パッチとは何ですか？どのようにしてサブミットできますか？</a></li>
+</ol>
+</font></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="browse"></a>どのようにしてソースコードが見れますか？</b></b></p>
+
+<p>java.net のアカウントがなくても <a href="https://opensso.dev.java.net/source/browse/opensso/">Source - CVS</a>ページにアクセスすることでソースコードを見ることができます。</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="checkout"></a>どのようにしてソースコードをチェックアウトできますか？</b></b></p>
+
+<p>登録済みの java.net ユーザーアカウントでプロジェクトのソースをチェックアウトするには、<a href="https://opensso.dev.java.net/servlets/ProjectSource">https://opensso.dev.java.net/servlets/ProjectSource</a> を参照してください。 登録済みのユーザーアカウントに対してコミッターの権限が承認されていれば、ソースツリーに対して修正内容をコミットすることができます。
+(OpenSSO のプロジェクトロールについての詳細は、<a href="../../about/governance/index.html">ガバナンス</a>のページを参照してください。)
+</p>
+<p>
+また、<i>guest</i> アカウントで CVS コマンドを用いてソースコードをチェックアウトすることもできます。
+コマンドは、次のようにユーザー名とパスワードに <i>guest</i> を使用します。
+</p>
+<p>
+<code>cvs -d :pserver:guest:guest@cvs.dev.java.net:/cvs checkout opensso<code>
+</p>
+<p>
+<i>注意: guest アカウントでは変更内容を CVS にコミットすることはできません！</i>
+</p>
+
+</td></tr>
+
+<tr><td><p><b>Q:<b><a name="download"></a>OpenSSO のダウンロード方法</b></b></p>
+<p>
+<a href="https://opensso.dev.java.net/public/use/index.html">ダウンロード</a>ページからビルド済みのバイナリをダウンロードできます。.
+</p>
+</td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="information"></a> 
+環境設定や適切なツールの取得方法や実際にソースをビルドする方法に関する情報はどこから得ることができますか？
+</b></b></p>
+
+
+<p><a href="https://opensso.dev.java.net/source/browse/opensso/">Source - CVS</a> のページで <code>products/amserver</code> ディレクトリに移動します。このディレクトリにある README には要件や依存関係に関する情報が書かれています。
+その情報は<a href="faqbuild.html">ビルドの要件と依存関係に関する FAQ</a>のページにもあります。.       
+
+</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="built"></a> 
+まずはコードをビルドすることができました。次にどういったことができますか？
+</b></b></p>
+
+
+<p>OpenSSO プロジェクトに参加するには、<code>java.net</code> に<a href="https://www.dev.java.net/servlets/Login?cookieCheck=on">登録</a>し、<a href="https://opensso.dev.java.net/public/about/governance/index.html">OpenSSO</a>に参加する必要があります。その後、次のようなことができます:
+</P>
+<ul>
+<li><a href="https://opensso.dev.java.net/servlets/ProjectMailingListList">メーリングリスト</a>や<a href="https://opensso.dev.java.net/servlets/ForumMessageList?forumID=1554">コミュニティーフォーラム</a>のディスカッションに参加する。</li>
+<li>既存のバグを検索したり、新規バグをレポートする。</li>
+<li>マニュアルやソースコードを書く。</li>
+<li>プロジェクトがよりよいものになるようにするためにどうすればいいかについてフィードバックする。</li>
+</ul>
+</td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="bug"></a>バグのレポート方法</b></b></p>
+
+
+<p><a href="faqbugs.html">一般的なバグやセキュリティバグのレポート方法</a>のページを参照してください。
+
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="changes"></a>OpenSSO のソースファイルの変更方法</b></b></p>
+
+<p>OpenSSO の貢献者はソースツリーのファイルに新しいコードを適用することで問題を解決できます。OpenSSO のソースのファイルに変更を適用するプロセスは次の通りです:
+<ol>
+<li>最新のソースファイルの複製をチェックアウトする。</li>
+<li>適切なファイルに対して修正を施す。</li>
+<li>何を変更したかがわかるようなコメントをつける。</li>
+<li>Javadoc<sup>TM</sup> タグや他の適切な形式の文章を用いてコメントを修正する。</li>
+<li>ソフトウェアをビルドし修正内容が適切であるかを確認する。</li>
+<li>適切なサニティテストや回帰テストを行い修正によって他の機能などに悪影響がないかを確認する。</li>
+</ol>
+
+<tr><td><p><b>Q:<b><a name="patch"></a>パッチとは何ですか？どのようにしてサブミットできますか？</b></b></p>
+
+<p>
+<i>cvs diff</i> を実行すると同一ファイルの異なるバージョン間の差異が表示されます。この差異が<i>パッチ</i>です。パッチをワークスペースに適用することで修正内容が取り込まれてファイルのバージョンが更新されます。<i>すべてのパッチはソースツリーにサブミットされる前にレビューしてもらう必要があります。</i>
+
+<p>サブミットするパッチに対するレビュープロセス:
+
+<ol>
+<li>パッチファイルの作成方法:
+<ol type="a">
+<li> % cd <i>checkedout_source</i></li>
+<li> % cvs diff -u > <i>patch_report_name</i></li>
+</ol> 
+
+<p><li>パッチに関連する課題（バグ）がまだない場合には、課題トラッカーにて課題を登録する。
+</li>
+<p><i>課題ごとにサブミットするパッチは 1 つのみとする。2 つ以上の課題に対して、それらが密接に関連している場合を除き、 1 つのパッチをサブミットしないでください。
+</i>
+<p><li><a href="mailto:code-review@opensso.dev.java.net">code-review@opensso.dev.java.net</a> に対して課題番号とともにパッチをサブミットする。.</li>
+<p><li>パッチが承認されたら、課題トラッカーにて対応する課題に対してパッチファイルを添付するか、もしくはパッチファイルの内容を Suggested Fix フィールドに直接コピーします。
+</li>
+<p><li>承認されたパッチをソースツリーに反映させるために、<a href="mailto:committers@opensso.dev.java.net">committers@opensso.dev.java.net</a> 宛にパッチを送ります。</li>
+<p><li>パッチが反映されたら、コミッターが課題トラッカー上で該当する課題のステータスを修正済み(fixed)に変更します。</li>
+</ol>
+
+<p>セキュリティ上の重大な問題を見つけた場合は、<a href="faqbugs.html">セキュリティの問題をレポートする際のガイドライン</a>にしたがってください。 
+<p>もしパッチが大きい場合、もしくは製品の機能拡張を行いたい場合は、パッチをサブミットする前にアーキテクチャーレビューガイドラインに従う必要があります。
+詳細情報については、<a href="mailto:code-review@opensso.dev.java.net">code-review@opensso.dev.java.net</a> にメールで問い合わせてください。
+
+</p></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>
+</html>

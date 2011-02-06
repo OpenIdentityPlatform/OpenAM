@@ -1,0 +1,76 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.7 2009/05/13 21:33:51 dillidorai Exp $
+
+-->
+
+<project name="opensso-unittest" default="build">
+    
+    <description>Open Web Single Sign-On</description>
+    <import file="../entitlements.xml" />
+    <import file="unittest.xml" />
+    
+    <!-- overridable properties -->
+    <property name="build.debug" value="on"/>
+    <property name="build.debuglevel" value="lines,vars,source"/>
+
+    <path id="build.class.path">
+        <pathelement location="${entitlements.classes.dir}"/>
+        <fileset dir="${entitlements.extlib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${entitlements.war.lib.local.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${entitlements.build.lib.local.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="build" depends="preparebuild">        
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+               destdir="${unittest.classes.dir}" source="1.5" target="1.5"
+               debug="${build.debug}" debuglevel="${build.debuglevel}"
+               >
+            <src path="${unittest.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+        <jar destfile="${unittest.dist.dir}/unittest.jar">
+            <zipfileset dir="${unittest.built.dir}/classes" />
+            <zipfileset dir="${unittest.res.dir}" />
+            <zipfileset dir="${unittest.data.dir}" />
+        </jar>
+    </target>
+    
+    <target name="preparebuild">
+        <mkdir dir="${unittest.built.dir}"/>
+        <mkdir dir="${unittest.dist.dir}"/>
+        <mkdir dir="${unittest.classes.dir}"/>
+    </target>
+    
+    <target name="clean">
+        <delete dir="${unittest.built.dir}"/>
+    </target>
+</project>

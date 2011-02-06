@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>認証 Web サービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>認証 Web サービス</h3>
+<a name="indexterm-159"></a><p>認証 Web サービスは、SOAP を使用して認証を実行する方法を定義します。Web サービスコンシューマ (WSC) と Web サービスプロバイダ (WSP) との間での認証情報の交換は、SOAP にバインドされたメッセージを使用して実行されます。このメッセージは、定義済みの
+SASL (Simple Authentication and Security Layer) メカニズム (または認証モード) に固有の一連のクライアント要求とサーバー応答です。認証の要求 (または WSC からの応答)
+を受信すると、WSP は追加のチャレンジを発行するか、あるいは認証に成功または失敗したことを示します。認証 Web サービスは、ユーザーが対象ではなく、サービス間での認証のためのサービスです。次の手順では、WSC と認証 Web サービス (WSP) との間での処理の流れを詳しく説明します。</p>
+<ol><li><p>認証交換では、最初に WSC が、主体を代表して認証 Web サービスに SASL 認証要求を送信します。</p><p>要求メッセージには主体の ID が含まれており、サービスが選択できる SASL メカニズムが 1 つ以上示されています。</p></li>
+<li><p>認証 Web サービスは、使用する方法を明確に指定して応答し、必要な場合は、チャレンジを初期化します。</p><p> 認証 Web サービスが提示されたどの方法もサポートしていない場合は、交換を中止することによって応答します。 </p></li>
+<li><p>WSC は、選択された認証方法に必要な証明情報で応答します。</p></li>
+<li><p>認証 Web サービスは、認証を承認または却下することによって応答します。</p><p> 認証が承認された場合、応答には WSC がほかの Web サービス (ディスカバリサービスなど) を起動するために必要な証明情報が含まれます。 </p></li></ol>
+<p>実装環境には、次の認証 Web サービスのグローバル属性を設定できます。</p>
+<ul><li><p><a href="mechanismhandlerslist.html">「メカニズムハンドラリスト」</a></p></li>
+<li><p>チャレンジのクリーンアップ間隔 &#8212; デフォルトの CRAM-MD5 メカニズムハンドラ実装クラス <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler</tt> のクリーンアップ間隔を秒単位で指定します。内部スレッドはこの値に基づいてチャレンジマップのクリーンアップを開始します。</p></li>
+<li><p>変換クラス &#8212; 変換名から実装クラスへのマッピングを指定します。値はコンマで区切り、変換名と実装クラス名は「|」で区切ります。たとえば、<tt>name1|class1, name2|class2</tt> のように指定します。</p></li></ul>
+<p>認証 Web サービスの設定に関連する作業は、次のとおりです。</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">「新規メカニズムハンドラを設定する」</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

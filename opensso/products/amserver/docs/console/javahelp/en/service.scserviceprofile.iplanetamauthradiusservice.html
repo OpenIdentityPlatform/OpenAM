@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS</h4>
+<p><a name="indexterm-178"></a>This module allows for authentication using an external Remote Authentication Dial-In User Service
+(RADIUS) server. The RADIUS Authentication attributes are realm attributes. The attributes are:</p>
+<ul><li><p><a href="#fwadp">Server 1</a></p></li>
+<li><p><a href="#fwaom">Server 2</a></p></li>
+<li><p><a href="#fwaka">Shared Secret</a></p></li>
+<li><p><a href="#fwapc">Shared Secret Confirm</a></p></li>
+<li><p><a href="#fwapn">Port Number</a></p></li>
+<li><p><a href="#fwaad">Timeout</a></p></li>
+<li><p><a href="#fwabo">Authentication Level</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>Server 1</h5>
+<p>Displays the IP address or fully qualified host name of the primary RADIUS
+server. The default IP address is 127.0.0.1. The field will recognize any valid
+IP address or host name. Multiple entries must be prefixed by the local
+server name as in the following syntax:</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaom"></a><h5>Server 2</h5>
+<p>Displays the IP address or fully qualified domain name (FQDN) of the secondary
+RADIUS server. It is a failover server which will be contacted if the
+primary server could not be contacted. The default IP address is 127.0.0.1. Multiple
+entries must be prefixed by the local server name as in the following
+syntax:</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaka"></a><h5>Shared Secret</h5>
+<p>Carries the shared secret for RADIUS authentication. The shared secret should have the
+same qualifications as a well-chosen password. There is no default value for this
+field.</p>
+
+<a name="fwapc"></a><h5>Shared Secret Confirm</h5>
+<p>Confirmation of the shared secret for RADIUS authentication.</p>
+
+<a name="fwapn"></a><h5>Port Number</h5>
+<p>Specifies the port on which the RADIUS server is listening. The default value
+is 1645.</p>
+
+<a name="fwaad"></a><h5>Timeout</h5>
+<p>Specifies the time interval in seconds to wait for the RADIUS server to
+respond before a timeout. The default value is 3 seconds. It will recognize
+any number specifying the timeout in seconds.</p>
+
+<a name="fwabo"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

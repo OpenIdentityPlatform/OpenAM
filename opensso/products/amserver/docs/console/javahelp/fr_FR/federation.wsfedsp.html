@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'un fournisseur de services WS-FED - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>Personnalisation d'un fournisseur de services WS-FED</h4>
+<p>Les attributs suivants s'appliquent au r&#244;le Fournisseur de services WS-FED&#160;:</p>
+
+<a name="ggwtj"></a><h5>Assertion sign&#233;e</h5>
+<p>Toutes les assertions re&#231;ues par ce fournisseur de services doivent &#234;tre sign&#233;es.</p>
+
+<a name="ggwsg"></a><h5>Mappeur de comptes</h5>
+<p>Cet attribut sp&#233;cifie l'impl&#233;mentation de l'interface <tt>AccountMapper</tt> utilis&#233;e pour mapper un compte
+d'utilisateur distant &#224; un compte d'utilisateur local &#224; des fins de connexion
+unique. La valeur par d&#233;faut est <tt>com.sun.identity.wsfed.plugins</tt>. </p><p> L'impl&#233;mentation par d&#233;faut est <tt>DefaultADFSPartnerAccountMapper</tt>.</p>
+
+<a name="ggwrf"></a><h5>Mappeur d'attribut</h5>
+<p>Ceci d&#233;finit la classe utilis&#233;e pour mapper les attributs dans l'assertion aux
+attributs utilisateur d&#233;finis localement par le fournisseur d'identit&#233;s. La classe par d&#233;faut
+est <tt>com.sun.identity.wsfederation.plugins.DefaultSPAttributeMapper</tt>.</p>
+
+<a name="ggwrq"></a><h5>Mappage d'attributs </h5>
+<p>Sp&#233;cifie les valeurs permettant de d&#233;finir les correspondances utilis&#233;es par le plug-in
+de mappage des attributs par d&#233;faut. Les mappages doivent avoir le format
+suivant&#160;:</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>Par exemple, <tt>EmailAddress=mail</tt> ou <tt>Address=postaladdress </tt>. Tapez le mappage dans Nouvelle valeur et
+cliquez sur Ajouter.</p>
+
+<a name="ggwvn"></a><h5>Temps efficace d'assertion</h5>
+<p>Les assertions sont valides pendant un intervalle de temps donn&#233;, pas avant
+ni apr&#232;s.  </p><p><tt>Effective Time</tt> sp&#233;cifie (en secondes) la dur&#233;e de validit&#233; d'une assertion &#224; partir
+de son heure d'&#233;mission. La valeur par d&#233;faut est <tt>600</tt> secondes.</p>
+
+<a name="ggwsk"></a><h5>Temps d'asym&#233;trie d'assertion</h5>
+<p>Les assertions sont valides pendant un intervalle de temps donn&#233;, pas avant
+ni apr&#232;s. Cet attribut sp&#233;cifie une p&#233;riode de gr&#226;ce (en secondes) pour
+la valeur <tt>notBefore</tt>. La valeur par d&#233;faut est <tt>300</tt>. Il n'a aucun
+rapport avec la valeur <tt>notAfter</tt>.</p>
+
+<a name="ggwts"></a><h5>&#201;tat de relais par d&#233;faut</h5>
+<p><a name="indexterm-77"></a>Apr&#232;s une op&#233;ration WS-FED (connexion unique, d&#233;connexion unique ou interruption de la
+f&#233;d&#233;ration) r&#233;ussie, une page s'affiche. Cette page, g&#233;n&#233;ralement la ressource demand&#233;e, est
+sp&#233;cifi&#233;e dans la demande initiale &#224; l'aide de l'&#233;l&#233;ment <tt>RelayState</tt>. Si l'&#233;l&#233;ment
+<tt>RelayState</tt> n'est pas sp&#233;cifi&#233;, la valeur de la propri&#233;t&#233; <tt>defaultRelayState</tt> s'affiche.</p>
+<hr><p><b>Attention &#8211; </b>Lorsque l'&#233;l&#233;ment <tt>RelayState</tt> ou <tt>defaultRelayState</tt> contient des caract&#232;res sp&#233;ciaux (comme <tt>&#38;</tt>), il
+doit &#234;tre encod&#233; dans un URL. Par exemple, si la valeur de
+<tt>RelayState</tt> est <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz </tt>, elle doit &#234;tre encod&#233;e sous la forme</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>puis ajout&#233;e &#224; la fin de l'URL. Par exemple, l'URL de connexion
+unique initi&#233; par le fournisseur de services serait&#160;:</p><p><tt> http://</tt><i>h&#244;te</i><tt>:</tt><i>port</i><tt>/</tt><i> uri-d&#233;ploiement</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>D&#233;couverte du domaine d'accueil</h5>
+<p>Sp&#233;cifie le service afin que le fournisseur de services puisse identifier le
+fournisseur d'identit&#233;s pr&#233;f&#233;r&#233;. L'URL du service est sp&#233;cifi&#233; comme extr&#233;mit&#233; de contact
+par le fournisseur de services. </p>
+
+<a name="ggwwb"></a><h5>S&#233;lection du domaine de compte</h5>
+<p>Sp&#233;cifie le m&#233;canisme de s&#233;lection et la configuration du fournisseur d'identit&#233;s. Le
+<tt>cookie</tt> ou l'attribut d'en-t&#234;te <tt>HTTP Request</tt> permet de localiser le fournisseur d'identit&#233;s.</p>
+<br/>
+
+</body>
+</html>

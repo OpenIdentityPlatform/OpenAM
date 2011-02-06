@@ -1,0 +1,1634 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-env,v 1.6 2008/08/19 19:08:31 veiming Exp $
+#
+#
+
+################################################################################
+# Keys to performance tuning parameter documentation:    
+#           IS      - OpenSSO
+#           AM      - OpenSSO
+#           DS      - Directory Server
+#           WS      - Web Server
+#           AS      - Application Server
+#           amtune  - OpenSSO tuning scripts located in amtune directory
+#           #x      - Number of x (eg. #Sessions - Number of Sessions) 
+#           KB      - Kilo Bytes
+#           MB      - Mega Bytes
+#           GB      - Giga Bytes
+#           MTS     - Minutes
+#           SM      - OpenSSO Service Management Module
+#           NYI     - Not yet incorporated
+#
+# You will need to modify/verify the parameters mentioned below for perftune/* 
+# scripts to work as designed.
+#
+# All parameters prefixed by AMTUNE are used by the amtune scripts
+# 
+# The following entries can be modified to suit your deployment.
+# Once you have edited this file, you may run any of the amtune scripts.
+# Usage:
+#       When running an amtune script, you need to supply no password or one password depending
+#       on which password is needed to run the script.  For example, amtune-ws7 <web server admin password>,
+#       amtune-as8 or amtune-as91 <application server admin password>,
+#       amtune-prepareDSTuner <directory server admin password>.  Please note that amtune-fam
+#       accepts only a password file, not a password string.  One can also supply a password
+#       file, instead of entering a password on a command line as shown below:
+#       amtune-fam, amtune-as91, amtune-as8 and amtune-ws7 <password file>, 
+#       i.e.,the sample password file is amtune-samplepasswordfile in the amtune directory.
+#
+# Note that amtune currently is not interactive.
+#
+# Also, there is a list of "DO NOT MODIFY" parameters towards the end of this file
+# that the amtune scripts rely on. This section is maintained by OpenSSO engineers
+# and modifications to these parameters are unwarranted and will not be supported.
+#
+################################################################################
+############### Start : Performance Related User Inputs #######################
+################################################################################
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_MODE
+# Values        :   REVIEW, CHANGE
+# Default       :   REVIEW
+#
+# Description   :   Based on this setting, the amtune scripts will behave differently
+#
+#                   1. REVIEW - Suggest Tuning mode (default)
+#                       - In this mode, amtune will suggest tuning recommendations but will not 
+#                       make any changes to the deployment
+#
+#                       This mode will honor AMTUNE_DEBUG_FILE_PREFIX parameter.
+#                       List of tuning recommendations along with the current values will be 
+#                       noted in the debug file and console.
+#
+#                   2. CHANGE - Change Mode 
+#                       - In this mode, amtune scripts will perform
+#                       all changes deemed necessary. 
+#                       (Except for Directory Tuning. Read Note below)
+#
+#                       This mode will honor AMTUNE_DEBUG_FILE_PREFIX parameter.
+#                       List of changes along with the original values will be noted 
+#                       in the debug file and console.
+#
+# Note          :   1. On CHANGE mode
+#                   Please use extreme caution while using CHANGE mode.
+#                   In CHANGE mode, amtune might need to restart the Web Container, OpenSSO
+#                   and might recommend a system restart.
+#   
+#                   2. On Directory Server tuning   
+#                   Tuning Directory Server requires extra levels of confirmation.
+#                   Assumption is that OpenSSO will use an existing Directory Server in
+#                   non-exclusive mode (other applications might use Directory Server)
+#                   
+#                   Irrespective of where the Directory Server is installed (local or remote),
+#                   Directory Server will not be tuned automatically. Only a tar file
+#                   containing the Directory Server tuner scripts will be created. You will need
+#                   to untar this in a location such as /tmp on the Directory Server machine
+#                   and execute the amtune-ds script.
+#                   
+#                   3. On selectively tuning different components
+#                   Different components (such as OS, Web Container, OpenSSO, Directory)
+#                   can be selectively based on AMTUNE_TUNE_* parameters. (Described in
+#                   detail next in the next comment block)
+#-------------------------------------------------------------------------------
+AMTUNE_MODE="REVIEW"
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_LOG_LEVEL
+# Values        :   <logging level>
+# Default       :   FILE
+# Description   :   if AMTUNE_LOG_LEVEL is
+#                       NONE : Nothing is displayed and logged in the debug file
+#                       TERM : The output is only displayed on the terminal
+#                       FILE : The output is displayed on both terminal and debug file (Default)
+#
+#-------------------------------------------------------------------------------
+AMTUNE_LOG_LEVEL=FILE
+
+#-------------------------------------------------------------------------------
+# Parameters    :   AMTUNE_TUNE_*
+# Value         :   true or false
+# Default       :   true
+#
+# Description   :   You can choose specific components to be tuned by the tuner scripts
+#                       Components to tune:
+#                       a) AMTUNE_TUNE_OS               - Operating System - Kernel, TCP settings
+#                       b) AMTUNE_TUNE_DS               - Directory Server
+#                       c) AMTUNE_TUNE_WEB_CONTAINER    - Web Container - Application Server or Web Server
+#                       d) AMTUNE_TUNE_IDENTITY         - OpenSSO
+#                   These settings work in conjunction with AMTUNE_MODE parameter setting.
+#                   You could review or change recommended tunings of any set of components.
+#
+# Note          :   Read note 2 on AMTUNE_MODE
+#-------------------------------------------------------------------------------
+AMTUNE_TUNE_OS=true
+AMTUNE_TUNE_DS=true
+AMTUNE_TUNE_WEB_CONTAINER=true
+AMTUNE_TUNE_IDENTITY=true
+
+#-------------------------------------------------------------------------------
+# Installation Environment
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# Parameter     :   OSTYPE
+# Value         :   Return value of uname -s command
+# Default       :   `/bin/uname -s`
+#
+# Description   :   There should be no need to change this value.
+#                   Its here because this variable is referenced to construct
+#                   other parameters
+#-------------------------------------------------------------------------------
+OSTYPE=`/bin/uname -s`
+
+#-------------------------------------------------------------------------------
+# Parameter     :   OSPLATFORM
+# Value         :   Return value of uname -p command
+# Default       :   `/bin/uname -p`
+#
+# Description   :   There should be no need to change this value.
+#                   Its here because this variable is referenced to construct
+#                   other parameters
+#-------------------------------------------------------------------------------
+# hpux-dev : -p option is not available for HP.
+if [ "$OSTYPE" != "HP-UX" ]; then
+OSPLATFORM=`/bin/uname -p`
+fi
+#-------------------------------------------------------------------------------
+# Parameter     :   HWPLATFORM
+# Value         :   Return value of uname -i command
+# Default       :   `/bin/uname -i`
+#
+# Description   :   There should be no need to change this value.
+#                   Its here because this variable is referenced to construct
+#                   other parameters
+#-------------------------------------------------------------------------------
+# Note: This value is used for Sun Solaris only to determine Niagara box.
+# Linux AS 2.1 does not have -i option so it is better not to run on Linux box.
+if [ "$OSTYPE" = "SunOS" ]; then
+  HWPLATFORM=`/bin/uname -i | /bin/cut -c6-15`
+fi
+
+#-------------------------------------------------------------------------------
+# Parameter     :   HOSTNAME
+# Value         :   Host name 
+# Default       :   `/bin/hostname`
+#
+# Description   :   If the hostname for your environment cannot be obtained through hostname comamnd,
+#                   please comment the following line and add a line setting the right hostname. 
+#                   eg. HOSTNAME=xyz
+#-------------------------------------------------------------------------------
+HOSTNAME=`/bin/hostname | /bin/cut -f1 -d"."`
+
+#-------------------------------------------------------------------------------
+# Parameter     :   DOMAINNAME
+# Value         :   Domain Name
+# Default       :   `/bin/domainname`
+#
+# Description   :   If domainname for your environment cannot be obtained through domainname command,
+#                   please comment the following line and add a line setting the right domainname. 
+#                   eg. DOMAINNAME=yyy.com
+#-------------------------------------------------------------------------------
+DOMAINNAME=`/bin/domainname`
+
+if [ "$HOSTNAME" != "" ] && [ "$DOMAINNAME" != "" ]; then
+    HOSTNAME=${HOSTNAME}.${DOMAINNAME}
+fi
+
+#-------------------------------------------------------------------------------
+# Parameter     :   IS_INSTALL_DIR
+#                   IS_CONFIG_DIR
+# Value         :   OpenSSO installation and configuration directory for AM 6.x and 7.x only.
+# Default       :   /opt/SUNWam for Solaris and /opt/sun/identity for Linux
+#                   /etc/opt/SUNWam/config for Solaris and /etc/opt/sun/identity/config for Linux
+#                   where AMConfig.properties and serverconfig.xml are typically installed.
+#
+#                   For war file deployment, two variables @/BASE_DIR@ and @/CONFIG_DIR@ will be
+#                   replaced by the installation script.
+#
+# Description   :   Leave a variable IS_INSTALL_DIR blank to use default location
+#-------------------------------------------------------------------------------
+IS_INSTALL_DIR=
+IS_CONFIG_DIR=
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_BIN_DIR
+# Value         :   Amtune scripts location
+# Default       :   
+#
+# Description   :   Typical value is the default value. There should be no 
+#                   reason to change this value.
+#-------------------------------------------------------------------------------
+AMTUNE_BIN_DIR=`/usr/bin/dirname $0`
+
+#-------------------------------------------------------------------------------
+# Parameter     :   WEB_CONTAINER
+# Values        :   WS61 or WS7 or AS8 or AS91
+#
+# Description   :   Name of the Web Container that OpenSSO is deployed on.
+#                   Accepted values for WEB_CONTAINER
+#                   WebServer6.1=WS61, WebServer7=WS7, AppServer 8.x=AS8 
+#                   AppServer 9.1=AS91
+#                   If you specify any other value, you will receive a
+#                   validation error
+#-------------------------------------------------------------------------------
+WEB_CONTAINER=AS91
+
+#-------------------------------------------------------------------------------
+# Parameter     :   CONTAINER_BASE_DIR
+# Value         :   OpenSSO Web Container's Install Directory
+# Default       :   /var/opt/SUNWwbsvr7                         - for Web Server 7 or later
+#                   /opt/SUNWwbsvr                              - for Web Server 6.1 
+#                   /var/opt/SUNWappserver7/                    - for Application Server 7.x
+#                   /var/opt/SUNWappserver/                     - for Application Server 8.x on Sun Platforms
+#                   /opt/SUNWappserver                          - for Application Server 9.1 on Sun Platforms               
+#                   /var/opt/sun/appserver                      - for Application Server 8.x on Linux and HP-UX
+#
+# Description   :   Typical value is the default value specified for each container.
+#                   If you install the web container in a non-default location, 
+#                   you will need to change this value
+#-------------------------------------------------------------------------------
+if [ "$OSTYPE" = "SunOS" ]; then
+    if [ "$WEB_CONTAINER" = "" ] || [ "$WEB_CONTAINER" = "WS7" ]; then
+        CONTAINER_BASE_DIR=/var/opt/SUNWwbsvr7
+    elif [ "$WEB_CONTAINER" = "WS61" ]; then
+        CONTAINER_BASE_DIR=/opt/SUNWwbsvr
+    elif [ "$WEB_CONTAINER" = "AS8" ]; then
+        CONTAINER_BASE_DIR=/var/opt/SUNWappserver
+    elif [ "$WEB_CONTAINER" = "AS91" ]; then
+        CONTAINER_BASE_DIR=/opt/SUNWappserver
+    else
+        CONTAINER_BASE_DIR=/var/opt/SUNWappserver7
+    fi
+else
+    if [ "$WEB_CONTAINER" = "" ] || [ "$WEB_CONTAINER" = "WS7" ]; then
+        CONTAINER_BASE_DIR=/var/opt/sun/webserver7
+    elif [ "$WEB_CONTAINER" = "WS61" ]; then
+        CONTAINER_BASE_DIR=/opt/sun/webserver
+    elif [ "$WEB_CONTAINER" = "AS8" ]; then
+        CONTAINER_BASE_DIR=/var/opt/sun/appserver
+    elif [ "$WEB_CONTAINER" = "AS91" ]; then
+        CONTAINER_BASE_DIR=/opt/sun/appserver
+    else
+        CONTAINER_BASE_DIR=/var/opt/sun/appserver7
+    fi
+fi
+
+#-------------------------------------------------------------------------------
+# Parameter     :   WEB_CONTAINER_INSTANCE_NAME
+# Values        :   <web container instance name>
+# Default       :   If this parameter is not defined in WEB_CONTAINER_INSTANCE_NAME=  , the default 
+#                   value will be: 
+#                   ${HOSTNAME}                             - for Web Server 6.1 or later
+#                   domains/server1                         - for Application Server 7.x
+#                   domains/domain1                         - for Application Server 8.x or 9.1
+#
+# Description   :   Typically, this value is the hostname where OpenSSO is deployed.
+#                   When you have multiple instances for the web container,
+#                   this value might be different from the hostname.
+#                   Please customize this accordingly
+#                   
+#-------------------------------------------------------------------------------
+WEB_CONTAINER_INSTANCE_NAME=
+
+if [ "$WEB_CONTAINER_INSTANCE_NAME" = "" ]; then
+   if [ "$WEB_CONTAINER" = "" ] || [ `echo $WEB_CONTAINER | cut -c1-2` = "WS" ]; then
+        WEB_CONTAINER_INSTANCE_NAME=${HOSTNAME}
+   elif [ "$WEB_CONTAINER" = "AS8" ] || [ "$WEB_CONTAINER" = "AS91" ]; then
+        WEB_CONTAINER_INSTANCE_NAME=domains/domain1
+   else
+        WEB_CONTAINER_INSTANCE_NAME=domains/server1
+   fi
+fi
+
+#-------------------------------------------------------------------------------
+# Parameter     :   CONTAINER_INSTANCE_DIR
+# Value         :   OpenSSO Web Container instance directory
+# Default       :   $CONTAINER_BASE_DIR/https-${WEB_CONTAINER_INSTANCE_NAME}    - for Web Server 6.1 or later
+#                   $CONTAINER_BASE_DIR/${WEB_CONTAINER_INSTANCE_NAME}          - for Application Server 7.0 or later
+#
+# Description   :   Typical value is the default value. If you install OpenSSO in a
+#                   non-default location, you will need to change this value
+#-------------------------------------------------------------------------------
+if [ "$WEB_CONTAINER" = "" ] || [ `echo $WEB_CONTAINER|cut -c1-2` = "WS" ]; then
+    CONTAINER_INSTANCE_DIR=$CONTAINER_BASE_DIR/https-${WEB_CONTAINER_INSTANCE_NAME}
+else
+    CONTAINER_INSTANCE_DIR=$CONTAINER_BASE_DIR/${WEB_CONTAINER_INSTANCE_NAME}
+fi
+
+#-------------------------------------------------------------------------------
+# Parameters        : WSADMIN_*
+# Parameter Details : The following parameters need to appropriately configured
+#                     when the Web Container being tuned is WS7
+#                     Each of these parameters is required for tuning the WS7 
+#                     web container. In this note, you will find a simplied explanation
+#                     for each of these parameters, their default values, and 
+#                     acceptable values
+#
+# Parameter         : WSADMIN_DIR
+# Value             : WS7 installation location
+# Default Value     : /opt/sun/webserver7 for Linux/HP-UX and /opt/SUNWwbsvr7 for Solaris
+#
+# Parameter         : WSADMIN
+# Value             : WS7 admin utility location
+# Default Value     : WSADMIN_DIR/bin/wadm
+#
+# Parameter         : WSADMIN_USER
+# Value             : WS7 administrator user account
+# Default Value     : admin
+#
+# Parameter         : WSADMIN_PASSFILE
+# Value             : A temporary password file location used by the WSADMIN tool. 
+#                        This file will be created and deleted by the amtune-ws7 script
+# Default Value     : /tmp/passfile
+#
+# Parameter         : WSADMIN_HOST
+# Value             : WS7 admin host name
+# Default Value     : localhost
+#
+# Parameter         : WSADMIN_PORT
+# Value             : WS7 admin port
+#                     - If this port is a secure port, make sure WSADMIN_SECURE value is set to "--secure"
+#                       If this port is not secure, make sure to set WSADMIN_SECURE value to ""
+# Default Value     : 8989
+#
+# Parameter         : WSADMIN_SECURE
+# Value             : Set this value to "--ssl=true" or blank if the WSADMIN_PORT is secure. Otherwise,
+#                        set to "--ssl=false for non-secure WSADMIN_PORT
+# Default Value     : "--ssl=true"
+#
+# Parameter         : WSADMIN_HTTPLISTENER
+# Value             : WS7 HttpListner name
+# Default Value     : http-listener-1
+#
+#-------------------------------------------------------------------------------
+if [ "$OSTYPE" = "Linux" ]; then
+    WSADMIN_DIR=/opt/sun/webserver7
+elif [ "$OSTYPE" = "HP-UX" ]; then
+    # hpux-dev: Added this elif condition
+    WSADMIN_DIR=/opt/sun/webserver7
+else
+    WSADMIN_DIR=/opt/SUNWwbsvr7
+fi
+
+WSADMIN=$WSADMIN_DIR/bin/wadm
+
+WSADMIN_USER=admin
+WSADMIN_PASSFILE=/tmp/passfile
+
+WSADMIN_HOST=$HOSTNAME
+WSADMIN_PORT=8989
+
+WSADMIN_SECURE="--ssl=true"
+   
+WSADMIN_CONFIG=$WEB_CONTAINER_INSTANCE_NAME
+
+WSADMIN_HTTPLISTENER=http-listener-1
+
+#Do not modify WSADMIN_PASSWORD_SYNTAX
+WSADMIN_PASSWORD_SYNTAX="wadm_password="
+
+WSADMIN_COMMON_PARAMS_NO_CONFIG="--user=$WSADMIN_USER --password-file=$WSADMIN_PASSFILE --host=$WSADMIN_HOST --port=$WSADMIN_PORT $WSADMIN_SECURE"
+
+WSADMIN_COMMON_PARAMS="$WSADMIN_COMMON_PARAMS_NO_CONFIG --config=$WSADMIN_CONFIG"
+
+#-------------------------------------------------------------------------------
+# Parameters        : ASADMIN_*
+# Parameter Details : The following parameters need to appropriately configured
+#                     when the Web Container being tuned is AS8 or AS91
+#                     Each of these parameters are required for tuning the AS8 or AS91
+#                     web container. In this note, you will find a simplied explanation
+#                     for each of these parameters, their default values, and 
+#                     acceptable values
+#
+# Parameter         : ASADMIN_DIR
+# Value             : AS8 or AS91 installation location
+# Default Value     : /opt/sun/appserver for Linux/HP-UX and /opt/SUNWappserver/appserver for AS8
+#                     and /opt/SUNWappserver for AS91 on Solaris
+#
+# Parameter         : ASADMIN
+# Value             : AS8 or AS91 admin utility location
+# Default Value     : ASADMIN_DIR/bin/asadmin
+#
+# Parameter         : ASADMIN_USER
+# Value             : AS8 or AS91 administrator user account
+# Default Value     : admin
+#
+# Parameter         : ASADMIN_PASSFILE
+# Value             : A temporary password file location used by the ASADMIN tool. 
+#                        This file will be created and deleted by amtune-as8 or amtune-as91 script
+# Default Value     : /tmp/passfile
+#
+# Parameter         : ASADMIN_HOST
+# Value             : AS8 or AS91 admin host name
+# Default Value     : localhost
+#
+# Parameter         : ASADMIN_PORT
+# Value             : AS8 or AS91 admin port
+#                     - If this port is a secure port, make sure ASADMIN_SECURE value is set to "--secure=true"
+#                       If this port is not secure, make sure to set ASADMIN_SECURE value to "--secure=false"
+# Default Value     : 4849
+#
+# Parameter         : ASADMIN_SECURE
+# Value             : Set this value to "--secure" if the ASADMIN_PORT is secure. Otherwise,
+#                        leave this blank
+# Default Value     : "--secure"
+#
+# Parameter         : ASADMIN_TARGET
+# Value             : Typically, this value is set to 'server'  (with the assumption that
+#                       this AS 8 or AS91 installation is exclusively used for OpenSSO/Portal Server
+# Default Value     : server
+#
+# Parameter         : ASADMIN_HTTPLISTENER
+# Value             : AS HttpListner name
+# Default Value     : http-listener-1
+#
+# Parameter         : ASADMIN_INTERACTIVE
+# Value             : Please do not change this parameter.
+#                       AS Admin will operate in an interactive way. But, this is not a tested option
+#                       as of this release. Might be useful in debugging amtune problems. But, 
+#                       its not advisable to change this value
+# Default Value     : false
+#
+# Parameter         : AMTUNE_WEB_CONTAINER_JAVA_POLICY
+# Value             : Please do not change this parameter.
+#
+#                       AS8 adds a significant overhead for evaluating Java Security Descriptors i
+#                       specified in the server.policy file. In some cases, you might want this turned off
+#                       
+# Default Value     : false 
+#
+#-------------------------------------------------------------------------------
+if [ "$OSTYPE" = "Linux" ]; then
+    ASADMIN_DIR=/opt/sun/appserver
+elif [ "$OSTYPE" = "HP-UX" ]; then
+    # hpux-dev : Added this elif condition
+    ASADMIN_DIR=/opt/sun/appserver
+elif [ "$WEB_CONTAINER" = "AS91" ]; then
+    ASADMIN_DIR=/opt/SUNWappserver
+else
+    ASADMIN_DIR=/opt/SUNWappserver/appserver
+fi
+
+ASADMIN=$ASADMIN_DIR/bin/asadmin
+
+ASADMIN_USER=admin
+ASADMIN_PASSFILE=/tmp/passfile
+
+ASADMIN_HOST=$HOSTNAME
+ASADMIN_PORT=4849
+
+ASADMIN_SECURE="--secure"
+   
+ASADMIN_TARGET=server
+
+ASADMIN_HTTPLISTENER=http-listener-1
+
+#Do not modify ASADMIN_INTERACTIVE
+ASADMIN_INTERACTIVE=false
+
+AMTUNE_WEB_CONTAINER_JAVA_POLICY=false
+
+#Do not modify ASADMIN_PASSWORD_SYNTAX
+ASADMIN_PASSWORD_SYNTAX="AS_ADMIN_PASSWORD="
+
+ASADMIN_COMMON_PARAMS_NO_TARGET="--user $ASADMIN_USER --passwordfile $ASADMIN_PASSFILE --host $ASADMIN_HOST --port $ASADMIN_PORT $ASADMIN_SECURE --interactive=$ASADMIN_INTERACTIVE"
+
+ASADMIN_COMMON_PARAMS="$ASADMIN_COMMON_PARAMS_NO_TARGET --target $ASADMIN_TARGET"
+
+#--------------------------------------------------------------------------------------
+# Parameter     :  FAMADM_LOCATION
+# Value         :  famadm CLI tool location for tuning FAM configurations.
+# Default Value :  <TOOLS_DIR>/<FAM_INSTANCE_NAME>/bin
+# Description   :  <TOOLS_DIR> is the directory which has ssoAdminTools.zip unzipped
+#               :  (ie: current directory), and <FAM_INSTANCE_NAME> is the name of the 
+#               :  Federated OpenSSO that is deployed in the web container.
+#               :  This is a mandatory field to be filled.
+#
+# Parameter     :  FAMADM_USER
+# Value         :  Administrator of FAM 8.x or later.
+# Default Value :  amadmin
+#
+# Parameter     :  FAMADM_PASSFILE 
+# Value         :  A temporary password file location used by FAMADM_USER to use famadm tool.
+# Default Value :  /tmp/passfile
+# Description   :  This file will be created and deleted by amtune-fam script.
+#
+# Parameter     :  FAMSERVER_URL
+# Value         :  URL for OpenSSO Server 8.x or later after it was deployed in a web container.
+#               :  For instance, a typical value is "http://serverhostname.domainname:port/opensso"
+#               :  Or "http://serverhostname.domainname:port/openfm". 
+#               :  This is a mandatory field to be filled.
+#
+#--------------------------------------------------------------------------------------
+FAMADM_LOCATION=/ssoadm/opensso/bin
+FAMSERVER_URL=http://servername.domainname:port/opensso
+FAMADM_USER=amadmin
+FAMADM=$FAMADM_LOCATION/ssoadm
+FAMADM_PASSFILE=/tmp/fampassfile
+FAMADM_COMMON_PARAMS_NO_SERVER="--adminid $FAMADM_USER --password-file $FAMADM_PASSFILE"
+FAMADM_SERVER="--servername"
+
+#-------------------------------------------------------------------------------
+# Parameter     :   IS_INSTANCE_NAME
+# Value         :   OpenSSO Instance Name for AM 6.x and 7.x only.
+# Default       :   <empty>
+#                   
+#
+# Description   :   This value is used in determining the property
+#                   filenames for the OpenSSO install.
+#                   Multiple instances of OpenSSO could be deployed in
+#                   the same machine.
+#                   Assumption is that there will be one set of property files
+#                   per OpenSSO instance and the instance name will be
+#                   appended to the 
+#                   file names. If there is only one instance of OpenSSO in a machine,
+#                   then the instance name will not be appended to the file names
+#   
+#                   e.g. If your OpenSSO is installed on a machine named
+#                   server.sun.com,
+#                   typically, your first instance of the web server will be 
+#                   https-server.sun.com.
+#                   The property files for the first OpenSSO instance will
+#                   not have the instance name appended. (AMConfig.properties)
+#                   In case of multiple instances, you will have different names.
+#                   lets take an example of 3 instances. Instances could be 
+#                   server.sun.com-instance1, server.sun.com-instance2, 
+#                   server.sun.com-instance3. 
+#                   If 3 instances of OpenSSO are deployed, one per
+#                   container instance, then the property files will look
+#                   something like the following:
+#                   AMConfig-instance1.properties
+#                   AMConfig-instance2.properties
+#                   AMConfig-instance3.properties
+#               
+#                   You can specify IS_INSTANCE_NAME=instance1. 
+#                   AMTUNE will resolve the property file names in the following order:
+#                   in the following order (eg. AMConfig.properties) :
+#                   1. AMConfig-<IS_INSTANCE_NAME>
+#                   2. AMConfig-<WEB_CONTAINER_INSTANCE_NAME>
+#                   3. AMConfig.properties
+#                  
+#                   The tool will use the first available property file in the list and use 
+#                   it.
+#                   
+#                   Another important note here is that the tool "amadmin" should
+#                   point to the correct server name as well (java option -Dserver.name=<IS_INSTANCE_NAME>)
+#                   
+# Significance  :   AMTune will automatically try to associate your instance names with 
+#                   OpenSSO Property files using this parameter.
+#                   Currently, only 2 files are based on this Instance Name
+#                       a. AMConfig.properties file
+#                       b. serverconfig.xml
+#-------------------------------------------------------------------------------
+IS_INSTANCE_NAME=
+
+#-------------------------------------------------------------------------------
+# Directory Server manager's password file location
+# 
+#-------------------------------------------------------------------------------
+DSADMIN_PASSFILE=/tmp/dspassfile
+
+#-------------------------------------------------------------------------------
+# Parameter     :   DEFAULT_ORG_PEOPLE_CONTAINER
+# Value         :   Default Organization's People container name
+# Defalt        :   <empty>
+# Description   :   This value is used to tune the LDAP Auth Module's
+#                   search base. This can be a very useful tuning 
+#                   parameter when there are no sub-orgs in the default
+#                   organization
+#                   If this value is set to empty, the tuning will be skipped
+# Note          :   Along with appending the people container to the search base,
+#                   the search scope will be modified to "OBJECT" level. Default
+#                   search scope is "SUBTREE"
+#-------------------------------------------------------------------------------
+DEFAULT_ORG_PEOPLE_CONTAINER=""
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_DEBUG_FILE_PREFIX
+# Values        :   <log file name prefix>
+# Default       :   amtune
+# Note          :   Here, you specify just the prefix name for the file.
+#                   The file will be automatically created in the debug directory for this deployment
+#                   based on the AMConfig.property "com.iplanet.services.debug.directory"
+#
+# Description   :   If this value is set to a non-empty value, then
+#                   all the operations performed by amtune scripts will be logged.
+#                   AMConfig.property's "com.iplanet.services.debug.directory=" setting
+#                   dictates where the file will be created.
+#
+#                   In future, amtune might be intelligent enough to also 
+#                   provide different levels of information based on "com.iplanet.services.debug.level"
+#                   setting.
+#                   
+# Significance  :   If this value is not specified, then no debugging information
+#                   will be recorded. Essentially, all output will go to /dev/null
+#-------------------------------------------------------------------------------
+AMTUNE_DEBUG_FILE_PREFIX=amtune
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_PCT_MEMORY_TO_USE
+# Values        :   0-100
+# Default       :   75
+# Description   :   Percentage value; Dictates how much of available memory
+#                   will be used by OpenSSO
+# Note          :   Currently, OpenSSO can use a maximum of 4GB. This is the 
+#                   per-process address space limit for 32-bit apps.
+#
+#                   OpenSSO currently requires a minimum of 256MB RAM
+#
+#                   When you set AMTUNE_PCT_MEMORY_TO_USE to 100, the maximum 
+#                   space allocated for OpenSSO would be the minimum
+#                   between 4GB and 100% of available RAM
+#
+#                   When you set AMTUNE_PCT_MEMORY_TO_USE to 0, OpenSSO
+#                   will be configured to use 256MB RAM 
+#                   
+# Significance  :   This value is the driving force in tuning OpenSSO.
+#                   The following values are derived from this setting:
+#                   1. JVM memory usage - Heap Sizes, NewSizes, PermSizes
+#                   2. ThreadPool sizes - WS RqThrottle, 
+#                           Authentication LDAP Connection Pool,
+#                           SM LDAP Connection Pool,
+#                           Notification ThreadPools
+#                           
+#                   3. OpenSSO Caches - SDK Caches, Session Caches
+#                           (NYI: Policy Caches)
+#                   4. Max Sizes - Max. #Sessions, Max #CacheEntries
+#                   
+#-------------------------------------------------------------------------------
+AMTUNE_PCT_MEMORY_TO_USE=75
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_PER_THREAD_STACK_SIZE_IN_KB
+#                   AMTUNE_PER_THREAD_STACK_SIZE_IN_KB_64_BIT
+# Value         :   <value in KB>
+# Default       :   128 (KB) for 32-bit and 256 for 64-bit
+#               
+#
+# Description   :   This value is the available stack space per thread in Java(/Web Container).
+#                   Per thread stack size is used to tune various thread related
+#                   parameters in OpenSSO and the Web Container.
+#                   
+#                   128 KB is a reasonable value for this, and should not be 
+#                   changed unless otherwise absolutely necessary
+#-------------------------------------------------------------------------------
+AMTUNE_PER_THREAD_STACK_SIZE_IN_KB=128
+AMTUNE_PER_THREAD_STACK_SIZE_IN_KB_64_BIT=512
+
+#-------------------------------------------------------------------------------
+# Parameters    :   AMTUNE_SESSION_MAX_SESSION_TIME_IN_MTS
+#                   AMTUNE_SESSION_MAX_IDLE_TIME_IN_MTS
+#                   AMTUNE_SESSION_MAX_CACHING_TIME_IN_MTS
+# Values        :   Max Session Time, Max Idle Time, Max Session Caching Time in minutes
+# Default       :   AMTune will not tune these parameters by default. See Note below.
+#                   Max Session Time default    - 60 minutes
+#                   Session Max Idle Time       - 10 minutes
+#                   Session Max Caching Time    - 02 mintues
+#
+# Description   :   The following three values will change the global session timeout 
+#                   values. If Session Service is registered and customized at any other
+#                   level, the tuning will not apply to them
+#
+# Significance  :   Setting this value to very high or very low values (minutes) will affect the
+#                   number of users an OpenSSO deployment can support. Hence, these parameters
+#                   could be optionally tuned using this tool
+#
+# Note          :   You will have to explicitly enable session timeout tuning by setting
+#                   AMTUNE_DONT_TOUCH_SESSION_PARAMETERS=false.
+#                   Dont assume that that the defaults provided are correct. 
+#
+#   USE THIS TUNING OPTION WITH CARE!!!
+#-------------------------------------------------------------------------------
+AMTUNE_DONT_TOUCH_SESSION_PARAMETERS=true
+AMTUNE_SESSION_MAX_SESSION_TIME_IN_MTS=60
+AMTUNE_SESSION_MAX_IDLE_TIME_IN_MTS=10
+AMTUNE_SESSION_MAX_CACHING_TIME_IN_MTS=2
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_MEM_MAX_HEAP_SIZE_RATIO
+#                   AMTUNE_MEM_MIN_HEAP_SIZE_RATIO
+# Value         :   Percentage to calculate for max heap size and min heap size
+# Default       :   7/8 for max heap size
+#                   1/2 for min heap size
+#
+# Description   :   These parameters are used to calculate the max and min heap sizes.
+#                   You should only change these parameters for JVM 64 bits.  For JVM 32 bits
+#                   leave the default values.
+#                   Note: WS uses about 1/8 of the OpenSSO process memory. Hence
+#                   this setting
+#-------------------------------------------------------------------------------
+AMTUNE_MEM_MAX_HEAP_SIZE_RATIO=7/8
+AMTUNE_MEM_MIN_HEAP_SIZE_RATIO=1/2
+
+#-------------------------------------------------------------------------------
+# Parameter     :   AMTUNE_MIN_MEMORY_TO_USE_IN_MB
+#                   AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS
+#                   AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS_AS8
+#                   AMTUNE_MAX_MEMORY_TO_USE_IN_MB_X86
+#                   AMTUNE_MAX_MEMORY_TO_USE_IN_MB_DEFAULT
+# Value         :
+# Default       :
+#
+# Description   :   Minimum and maximum amount of memory in MB that should not be
+#                   exceeded.
+#-------------------------------------------------------------------------------
+AMTUNE_MIN_MEMORY_TO_USE_IN_MB=512
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS=3584
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS_AS8=2341
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_X86=2341
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_DEFAULT=1755
+
+AMTUNE_MAX_MEMORY_TO_USE_IN_MB_HP_UX=1536
+
+################################################################################
+############### End: Performance Related User Inputs ###########################
+################################################################################
+
+################################################################################
+############### Start: amtune Internals ########################################
+############### DO NOT MODIFY BELOW THIS LINE ##################################
+################################################################################
+#===============================================================================
+# amtune Constants
+#===============================================================================
+AMTUNE_MIN_PERM_SIZE_WS7=400
+AMTUNE_MIN_PERM_SIZE_WS61=400
+AMTUNE_MIN_PERM_SIZE_AS8=400
+
+#Sizes are estimates based on actual usage obtained thru JProbe
+AMTUNE_AVG_PER_ENTRY_CACHE_SIZE_IN_KB=8
+AMTUNE_AVG_PER_SESSION_SIZE_IN_KB=4
+
+#Out the memory available for Java part of the OpenSSO process memory, 
+#the following is the breakdown of memory needs
+AMTUNE_MEM_MAX_NEW_SIZE=1/8
+AMTUNE_MEM_MAX_PERM_SIZE=1/12
+AMTUNE_MEM_THREADS_SIZE=1/16
+AMTUNE_MEM_OPERATIONAL=19/48
+AMTUNE_MEM_CACHES_SIZE=1/3
+
+#Out of the memory available for OpenSSO Caches, 
+#the breakdown b/w SDK and Session Cache size is as follows:
+#NOTE   :   Its not clear how much memory Policy, Liberty, SAML Caches use. 
+#           These fall into the OPERATIONAL memory category. 
+#           Once we have an estimate on them, will adjust these values appropriately. 
+#           OPERATIONAL memory is large enough to handle these unknown quantities
+#
+AMTUNE_MEM_SDK_CACHE_SIZE=2/3
+AMTUNE_MEM_SESSION_CACHE_SIZE=1/3
+
+#From internal testing, best performance was found when notification queue size was 30% of the maximum number of sessions (here, numSessions).
+AMTUNE_NOTIFICATION_QUEUE_CALC_FACTOR=0.3
+
+AMTUNE_MAX_NUM_THREADS="$AMTUNE_MEM_THREADS_SIZE*(1024/$AMTUNE_PER_THREAD_STACK_SIZE_IN_KB)"
+AMTUNE_MAX_NUM_THREADS_64_BIT="$AMTUNE_MEM_THREADS_SIZE*(1024/$AMTUNE_PER_THREAD_STACK_SIZE_IN_KB_64_BIT)"
+
+#WS internal threads used. This is not really factored into any calculation.
+#But, nevertheless, its useful to know how much we estimated. Typical value for this
+#is about 50. But, we leave one more fold contingent threads
+AMTUNE_NUM_WS_INTERNAL_THREADS=100
+
+#Established Thread Counts 
+AMTUNE_NUM_JAVA_INTERNAL_THREADS=8
+AMTUNE_NUM_JAVA_APPS_DEPLOYED=6
+AMTUNE_NUM_IS_INTERNAL_THREADS=3
+
+#After all the known threads are taken into account, we still plan for about a 3rd more
+#threads in the system.
+#The tuner program will figure out how much memory can be used up by threads and reserves 
+# 1/3 of them for unplanned threads
+AMTUNE_THREADS_UNPLANNED=1/3
+
+#Known threads breakdown
+AMTUNE_WS_RQTHROTTLE_THREADS=5/12
+AMTUNE_IS_OPERATIONAL_THREADS=5/12
+AMTUNE_IS_AUTH_LDAP_THREADS=1/24
+AMTUNE_IS_SM_LDAP_THREADS=1/24
+
+#Some known WS and OpenSSO Defaults
+AMTUNE_NUM_WS_RQTHROTTLE_MIN=10
+AMTUNE_NUM_WS_THREAD_INCREMENT=10
+AMTUNE_NUM_IS_MIN_AUTH_LDAP_THREADS=10
+AMTUNE_NUM_WS_MIN_THREADS=10
+AMTUNE_STATISTIC_ENABLED=false
+
+#Just plain constants
+AMTUNE_NUM_FILE_DESCRIPTORS=65536
+AMTUNE_NUM_TCP_CONN_SIZE=8192
+AMTUNE_NATIVE_STACK_SIZE_64_BIT=262144
+
+#AMTune Error Status Codes
+AMTUNE_INVALID_CMDLINE_PARAMETER=100
+AMTUNE_INVALID_ENVIRON_SETTING=200
+
+# hpux-dev: Added for HP-UX
+#AMTune Parameters for HP-UX
+AMTUNE_HPUX_VM_BDFLUSH="100 1200 128 512 15 5000 500 1884 2"
+AMTUNE_HPUX_IPV4_LOCAL_PORT_RANGE="1204 65000"
+AMTUNE_HPUX_CORE_RMEM_MAX=262140
+AMTUNE_HPUX_CORE_RMEM_DEFAULT=262140
+AMTUNE_HPUX_IPV4_TCP_RMEM="4096 131072 262140"
+AMTUNE_HPUX_IPV4_TCP_WMEM="4096 131072 262140"
+AMTUNE_HPUX_IPV4_TCP_SACK=0
+AMTUNE_HPUX_IPV4_TCP_TIMESTAMPS=0
+AMTUNE_HPUX_IPV4_TCP_WIN_SCALE=0
+AMTUNE_HPUX_IPV4_TCP_KEEPALIVE_TIME=60000
+AMTUNE_HPUX_IPV4_TCP_KEEPALIVE_INTVL=15000
+AMTUNE_HPUX_IPV4_TCP_FIN_TIMEOUT=30
+AMTUNE_HPUX_STACK_SIZE_LIMITS=256
+
+#AMTune Parameters for Linux
+AMTUNE_LINUX_VM_BDFLUSH="100 1200 128 512 15 5000 500 1884 2"
+AMTUNE_LINUX_IPV4_LOCAL_PORT_RANGE="1204 65000"
+AMTUNE_LINUX_CORE_RMEM_MAX=262140
+AMTUNE_LINUX_CORE_RMEM_DEFAULT=262140
+AMTUNE_LINUX_IPV4_TCP_RMEM="4096 131072 262140"
+AMTUNE_LINUX_IPV4_TCP_WMEM="4096 131072 262140"
+AMTUNE_LINUX_IPV4_TCP_SACK=0
+AMTUNE_LINUX_IPV4_TCP_TIMESTAMPS=0
+AMTUNE_LINUX_IPV4_TCP_WIN_SCALE=0
+AMTUNE_LINUX_IPV4_TCP_KEEPALIVE_TIME=60000
+AMTUNE_LINUX_IPV4_TCP_KEEPALIVE_INTVL=15000
+AMTUNE_LINUX_IPV4_TCP_FIN_TIMEOUT=30
+AMTUNE_LINUX_STACK_SIZE_LIMITS=256
+
+#AMTune scripts records
+#AMTune record fields=script_name|script type|script expected arguments
+AMTUNE_OS_SCRIPT="amtune-os|os|0"
+AMTUNE_AM_SCRIPT="amtune-identity|am|0"
+AMTUNE_FAM_SCRIPT="amtune-fam|fam|1"
+AMTUNE_WS7_SCRIPT="amtune-ws7|ws|1"
+AMTUNE_WS61_SCRIPT="amtune-ws61|ws|0"
+AMTUNE_AS8_SCRIPT="amtune-as8|as|1"
+AMTUNE_AS91_SCRIPT="amtune-as91|as|1"
+AMTUNE_DS_SCRIPT="amtune-prepareDSTuner|ds|1"
+
+if [ "$OSTYPE" = "HP-UX" ]; then
+    gettext=/usr/local/bin/gettext
+else
+    gettext=/bin/gettext
+fi
+
+#############################################################################
+# amtune functions
+#############################################################################
+#-------------------------------------------------------------------------------
+# Function      :   checkArgs
+# Parameters    :   Number of arguments, argument1, argument2, and argument3
+# Output        :   - None -
+# Description   :   Check for required arguments when the script is executed and
+#                   display Usage information
+#-------------------------------------------------------------------------------
+checkArgs() {
+   numOfArgs=$1
+   argString1=$2
+   argString2=$3
+
+   NUM_PARAMS_EXPECTED=$AMTUNE_SCRIPT_ARGS
+
+   $ECHO "Checking the argument for a valid password file..."
+   if [ -f "$argString1"  ]; then
+      password_option="file"
+      FAMADM_PASSWORD=`$GREP "FAMADM_PASSWORD" $argString1 | $CUT -f2 -d"="`
+      WSADMIN_PASSWORD=`$GREP "WS_ADMIN_PASSWORD" $argString1 | $CUT -f2 -d"="`
+      ASADMIN_PASSWORD=`$GREP "AS_ADMIN_PASSWORD" $argString1 | $CUT -f2 -d"="`
+      DIRMGR_PASSWORD=`$GREP "DS_ADMIN_PASSWORD" $argString1 | $CUT -f2 -d"="`
+   else
+      password_option="string"
+      case $AMTUNE_SCRIPT_TYPE in
+        "ws" )
+            WSADMIN_PASSWORD=$argString1
+            display_usage_password="<web server admin password>"
+            ;;
+        "as" )
+            ASADMIN_PASSWORD=$argString1
+            display_usage_password="<application server admin password>"
+            ;;
+        "ds" )
+            DIRMGR_PASSWORD=$argString1
+            display_usage_password="<directory server admin password>"
+            ;;
+        "am" )
+            WSADMIN_PASSWORD=$argString1
+            display_usage_password="[<web server admin password> is needed only if web server is running in 64-bit mode]"
+            ;;
+        "fam" )
+            display_usage_password="requires a password file with ssoadm password as an argument."  
+            ;;
+        "os" )
+            display_usage_password="does not require any password to run."
+            ;; 
+       esac
+   fi
+
+   if [ "$argString1" = "?" ] || [ "$argString1" = "help" ] ||
+      [ "$argString1" = "-help" ] || [ "$argString1" = "--help" ] ||
+      [ $numOfArgs -lt $NUM_PARAMS_EXPECTED ] && [ "$password_option" = "string" ]; then
+          getUsage
+          exit $AMTUNE_INVALID_CMDLINE_PARAMETER
+   fi
+
+   if [ $NUM_PARAMS_EXPECTED -gt 0 ]; then
+      $ECHO "########################################"
+      $ECHO "`$gettext 'Password option is'` $password_option"
+      $ECHO "########################################"
+   fi
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   getUsage()
+# Parameters    :   <none>
+# Output        :   <none>
+# Description   :   Display help information of amtune scripts
+#-------------------------------------------------------------------------------
+getUsage() {
+
+    $ECHO `$gettext "Usage:"`
+    $ECHO `$gettext "Run an amtune script "` "- amtune-<component name>"
+    $ECHO
+    $ECHO `$gettext "Mandatory Parameter for this script is:"`
+    $ECHO
+    if [ $NUM_PARAMS_EXPECTED -gt 0 ]; then
+      $ECHO "$RUN_SCRIPT_NAME <password file>" `$gettext "i.e. the sample password file is "` "amtune-samplepasswordfile in amtune directory"
+      $ECHO
+      $ECHO `$gettext "or"`
+      $ECHO
+    fi
+    $ECHO "$RUN_SCRIPT_NAME $display_usage_password"
+    $ECHO
+    $ECHO `$gettext "To display this help menu, enter"` "$RUN_SCRIPT_NAME" `$gettext " ? or help"`
+    $ECHO
+    $ECHO `$gettext "Please make sure to customize amtune-env to suit your deployment."`
+}
+
+#############################################################################
+# Start of main program
+#############################################################################
+SCRIPT_BASENAME=`/bin/basename $0`
+SCRIPT_LOCATION=`/usr/bin/dirname $0`
+RUN_SCRIPT_NAME=$SCRIPT_BASENAME
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-env
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+#-------------------------------------------------------------------------------
+#Source utility scripts
+#-------------------------------------------------------------------------------
+INSTALL_FILE_NOT_REQUIRED=true
+
+#import amtune utils
+AMTUNE_UTILS_SCRIPT=$AMTUNE_BIN_DIR/amtune-utils
+if [ ! -f $AMTUNE_UTILS_SCRIPT ]; then
+  echo "ERROR: $AMTUNE_UTILS_SCRIPT not found." 
+fi
+. $AMTUNE_UTILS_SCRIPT
+
+#parsing amtune record
+if [ "$OSTYPE" = "Linux" ]; then
+   tempString="$ECHO `$ECHO $\"$\"$AMTUNE_SCRIPT_RECORD_STRING\"\"`"
+else
+   tempString="$ECHO `$ECHO $\"$AMTUNE_SCRIPT_RECORD_STRING\"`"
+fi
+scriptRecord=`eval $tempString`
+
+AMTUNE_SCRIPT_NAME=`$ECHO $scriptRecord | $AWK -F"|" '{ print $1 }'`
+AMTUNE_SCRIPT_TYPE=`$ECHO $scriptRecord | $AWK -F"|" '{ print $2 }'`
+AMTUNE_SCRIPT_ARGS=`$ECHO $scriptRecord | $AWK -F"|" '{ print $3 }'`
+
+checkArgs $# $1 $2 $3
+
+SCRIPT_BASENAME="$SCRIPT_LOCATION/$SCRIPT_BASENAME : `$DATE +'%D %T'`"
+
+debugdir=.
+#-------------------------------------------------------------------------------
+# Determine IS_INSTALL_DIR and IS_CONFIG_DIR
+#-------------------------------------------------------------------------------
+
+if [ "$IS_INSTALL_DIR" = "" ]; then
+   if [ "$OSTYPE" = "Linux" ] || [ "$OSTYPE" = "HP-UX" ]; then
+        BASEDIR=/opt/sun
+        PRODUCT_DIR=identity
+   else
+        BASEDIR=/opt
+        PRODUCT_DIR=SUNWam
+   fi
+   
+   pkg_name="SUNWamsvc"
+   if [ "$OSTYPE" = "HP-UX" ]; then
+       pkg_name="sun-identity-services"
+   fi
+   return_code=`is_pkg_installed $pkg_name`
+
+   # If package found, get basedir from pkginfo. If not found,
+   # assume, the installation is war file deployment.
+   if [ $return_code -eq 0 ]; then
+        BASEDIR_PKG=`getBaseDir $pkg_name`
+        IS_INSTALL_DIR=$BASEDIR_PKG/$PRODUCT_DIR
+        IS_CONFIG_DIR=/etc$BASEDIR_PKG/$PRODUCT_DIR/config
+   else
+        # Use for war file deployment environment
+        IS_INSTALL_DIR=@BASE_DIR@
+        IS_CONFIG_DIR=@CONFIG_DIR@
+   fi
+
+   # If still cannot find, try to use default AM installation directory
+   if [ ! -d $IS_INSTALL_DIR ]; then
+        IS_INSTALL_DIR=$BASEDIR/$PRODUCT_DIR
+        IS_CONFIG_DIR=/etc$BASEDIR/$PRODUCT_DIR/config
+   fi
+fi
+
+#-------------------------------------------------------------------------------
+# Validate Installation Directory
+#-------------------------------------------------------------------------------
+# OpenSSO Constants
+ADMIN_CLIENT=$IS_INSTALL_DIR/bin/amadmin
+# Retrieve AM config file name
+setAMConfigPropertyFile
+
+# Only validate AM directories and configuration if amtune script is identity 
+# or prepareDSTuner or wraper.
+if   [ "$AMTUNE_SCRIPT_TYPE" = "am"  ] || [ "$AMTUNE_SCRIPT_TYPE" = "fam" ] ||
+     [ "$AMTUNE_SCRIPT_TYPE" = "ds"  ]; then
+
+   if [ "$FAMADM_LOCATION" = "" ] || [ ! -d $FAMADM_LOCATION ]; then
+   
+      $ECHO `$gettext "Please enter FAM server's ssoadm location in amtune-env file."`
+      $ECHO `$gettext "It should be set to "` "FAMADM_LOCATION."
+      exit $AMTUNE_INVALID_ENVIRON_SETTING
+     
+   fi
+
+   if [ "$FAMADM" = "" ] || [ ! -f $FAMADM ]; then
+        
+      $ECHO `$gettext "OpenSSO server's ssoadm tool is not found."`
+      $ECHO `$gettext "Please set ssoadm's location to FAMADM_LOCATION in amtune-env."`
+      exit $AMTUNE_INVALID_ENVIRON_SETTING
+   
+   fi
+
+   if [ "$FAMSERVER_URL" = "" ]; then
+       $ECHO $gettext `"FAM server's URL not found."`
+       $ECHO `$gettext "Please set FAM server's URL to FAMSERVER_URL in amtune-env."`
+       exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   if [ "$FAMADM_USER" = "" ]; then
+       $ECHO `$gettext "FAM server's admin user not found."`
+       $ECHO `$gettext "Please set ssoadm user to FAMADM_USER in amtune-env."`
+       exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   if [ "$FAMADM_PASSFILE" = "" ]; then
+       $ECHO "FAMADM_PASSFILE" `$gettext "not configured."`
+       $ECHO `$gettext "Current setting for"` "FAMADM_PASSFILE: $FAMADM_PASSFILE"
+       $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+       exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   $TOUCH $FAMADM_PASSFILE
+ 
+   if [ ! $? -eq 0 ]; then
+       $ECHO "FAMADM_PASSFILE" `$gettext "not configured correctly."` `$gettext "Cannot proceed."`
+       $ECHO `$gettext "Current setting for"` "FAMADM_PASSFILE: $FAMADM_PASSFILE"
+       $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+       exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   $RM $FAMADM_PASSFILE
+
+   FAMServerCheck=`getFAMVersion`
+   $ECHO $FAMServerCheck
+
+ if [ "$FAMServerCheck" = "" ]; then
+
+   if [ "$IS_INSTALL_DIR" = "" ] || [ ! -d $IS_INSTALL_DIR ] || [ ! -d $IS_INSTALL_DIR/bin ]; then
+        $ECHO `$gettext "Please enter AM 6.x's or 7.x's installation directory."`
+        $ECHO `$gettext "For AM 6.x and 7.x, it should be set to "` "IS_INSTALL_DIR."
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   if [ "$ADMIN_CLIENT" = "" ] || [ ! -f $ADMIN_CLIENT ]; then
+        $ECHO `$gettext "AM 6.x's or 7.x's amadmin is not found."`
+        $ECHO `$gettext "For AM 6.x and 7.x, please set amadmin's location to "` "ADMIN_CLIENT in amtune-env."
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   if [ "$IS_CONFIG_DIR" = "" ] || [ ! -d $IS_CONFIG_DIR ]; then
+        $ECHO `$gettext "Please enter "` "AM 6.x's or 7.x's " `$gettext "configuration directory in "` "amtune-env."
+        $ECHO `$gettext "It should be set to "` "IS_CONFIG_DIR."
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+   if [ "$AMCONFIG_PROPERTY_FILE" = "" ] || [ ! -f $AMCONFIG_PROPERTY_FILE ]; then
+        $ECHO "OpenSSO " `$gettext "configuration file not found. "` `$gettext "Cannot proceed."`
+        $ECHO "OpenSSO " `$gettext "configuration file: "` "$AMCONFIG_PROPERTY_FILE"
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+   fi
+
+ fi
+
+fi
+#-------------------------------------------------------------------------------
+#Validate availability of commands used by the script. Not all of them
+#are tested for. But, the few troublesome ones
+#-------------------------------------------------------------------------------
+if [ ! -f $BC ]; then
+    $ECHO `$gettext "Command not found: "` "$BC "
+    exit $AMTUNE_INVALID_ENVIRON_SETTING
+fi
+
+#-------------------------------------------------------------------------------
+#Validate amtune-env Customizable Enviroment.
+#-------------------------------------------------------------------------------
+# Assume Review mode if nothing is specified
+if [ "$AMTUNE_MODE" = "" ]; then
+    AMTUNE_MODE="REVIEW"
+fi
+
+#validate AMTUNE_MODE
+if [ `$ECHO $AMTUNE_MODE | $GREP -i "REVIEW" | $WC -l` -eq 1 ]; then
+    AMTUNE_MODE="REVIEW"
+elif [ `$ECHO $AMTUNE_MODE | $GREP -i "CHANGE" | $WC -l` -eq 1 ]; then
+    AMTUNE_MODE="CHANGE"
+else
+    $ECHO "AMTUNE_MODE " `$gettext "is not valid. "` `$gettext "Cannot proceed"`
+    $ECHO `$gettext "Current AMTUNE_MODE value: "` "$AMTUNE_MODE"
+    $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+    exit $AMTUNE_INVALID_ENVIRON_SETTING
+fi
+
+#validate AMTUNE_TUNE_* parameters
+if [ `$ECHO $AMTUNE_TUNE_OS | $GREP -i "TRUE" | $WC -l` -eq 1 ]; then
+    AMTUNE_TUNE_OS=true
+else
+    AMTUNE_TUNE_OS=false
+fi
+if [ `$ECHO $AMTUNE_TUNE_DS | $GREP -i "TRUE" | $WC -l` -eq 1 ]; then
+    AMTUNE_TUNE_DS=true
+else
+    AMTUNE_TUNE_DS=false
+fi
+if [ `$ECHO $AMTUNE_TUNE_IDENTITY | $GREP -i "TRUE" | $WC -l` -eq 1 ]; then
+    AMTUNE_TUNE_IDENTITY=true
+else
+    AMTUNE_TUNE_IDENTITY=false
+fi
+if [ `$ECHO $AMTUNE_TUNE_WEB_CONTAINER | $GREP -i "TRUE" | $WC -l` -eq 1 ]; then
+    AMTUNE_TUNE_WEB_CONTAINER=true
+else
+    AMTUNE_TUNE_WEB_CONTAINER=false
+fi
+
+#validate hostname
+if [ "$HOSTNAME" = "" ]; then
+    $ECHO `$gettext "Host name not set. "` `$gettext "Cannot proceed."`
+    $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+    exit $AMTUNE_INVALID_ENVIRON_SETTING
+fi
+
+#validate domainname
+if [ "$DOMAINNAME" = "" ]; then
+    $ECHO `$gettext "Domain name not set. "` `$gettext "Cannot proceed."`
+    $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+    exit $AMTUNE_INVALID_ENVIRON_SETTING
+fi
+
+if [ "$WEB_CONTAINER_INSTANCE_NAME" = "" ]; then
+    WEB_CONTAINER_INSTANCE_NAME=${HOSTNAME}
+fi
+
+# Only validate if amtune script is wraper script, web server script, or app server script
+if [ "$AMTUNE_SCRIPT_TYPE" = "ws"  ] || [ "$AMTUNE_SCRIPT_TYPE" = "as"  ]; then
+
+   if [ "$AMTUNE_TUNE_WEB_CONTAINER" = "true" ]; then
+      #Web Container validation
+      if [ "$WEB_CONTAINER" = "" ]; then
+        $ECHO `$gettext "Web container not specified. "` `$gettext "Cannot proceed."`
+        $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+      fi
+
+      # Check to make sure a correct web server or app server amtune script running
+      # web container should match with the end part of script name after the dash "-" (WS7 <=> amtune-ws7)
+      if [ "`$ECHO $RUN_SCRIPT_NAME | $CUT -f2 -d'-' | $TR_COMMAND '[:lower:]' '[:upper:]'`" != "$WEB_CONTAINER" ] &&
+         [ "$AMTUNE_SCRIPT_TYPE" != "all" ]; then
+        $ECHO `$gettext "Wrong Web Container specified or wrong amtune script was executed. "` `$gettext "Cannot proceed."`
+        $ECHO `$gettext "Current Web Container: "` "$WEB_CONTAINER"
+        $ECHO `$gettext "Current amtune script: "` "$RUN_SCRIPT_NAME"
+        $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+      fi
+       
+      webContainerToTune
+      if [ "$WC_CONFIG" = "" ]; then
+        $ECHO `$gettext "Web container specified not valid. Valid Web Containers are "` "WS7, WS61, AS8, AS91." `$gettext "Cannot proceed."`
+        $ECHO `$gettext "Current Web container :"` "$WEB_CONTAINER"
+        $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+      fi
+
+      if [ "$CONTAINER_BASE_DIR" = "" ] || [ ! -d $CONTAINER_BASE_DIR ]; then
+        $ECHO `$gettext "Web Container configuration directory not found. "` `$gettext "Cannot proceed."`
+        $ECHO `$gettext "Current Web Container base directory in "` "CONTAINER_BASE_DIR: $CONTAINER_BASE_DIR"
+        $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+      fi
+
+      if [ "$CONTAINER_INSTANCE_DIR" = "" ] || [ ! -d $CONTAINER_INSTANCE_DIR ]; then
+        $ECHO `$gettext "Web Container instance directory not found. "` `$gettext "Cannot proceed."`
+        $ECHO `$gettext "Current Web Container instance directory in "` "CONTAINER_INSTANCE_DIR: $CONTAINER_INSTANCE_DIR"
+        $ECHO `$gettext "Please check this directory in your Web Container installation.  You may need to customize the parameter"` 
+        $ECHO "WEB_CONTAINER_INSTANCE_NAME" `$gettext "in the following file appropriately: "` "amtune-env"
+        if [ "$WEB_CONTAINER" = "" ] || [ `echo $WEB_CONTAINER|cut -c1-2` = "WS" ]; then
+            $ECHO `$gettext "The format of Web Container instance directory is "` "[CONTAINER_INSTANCE_DIR]=$CONTAINER_BASE_DIR/https-[WEB_CONTAINER_INSTANCE_NAME]"
+        else
+            $ECHO `$gettext "The format of Web Container instance directory is "` "[CONTAINER_INSTANCE_DIR]=$CONTAINER_BASE_DIR/[WEB_CONTAINER_INSTANCE_NAME]"
+        fi
+        exit $AMTUNE_INVALID_ENVIRON_SETTING
+      fi
+
+      if [ "$WEB_CONTAINER" = "WS7" ]; then
+        if [ "$WSADMIN" = "" ] || [ ! -f $WSADMIN ]; then
+            $ECHO "WSADMIN " `$gettext "tool not found. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "WSADMIN: $WSADMIN"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+
+        if [ "$WSADMIN_USER" = "" ]; then
+            $ECHO "WSADMIN_USER" `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "WSADMIN_USER: $WSADMIN_USER"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+       
+        if [ "$WSADMIN_PASSFILE" = "" ]; then 
+            $ECHO "WSADMIN_PASSFILE " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "WSADMIN_PASSFILE: $WSADMIN_PASSFILE"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+
+        $TOUCH $WSADMIN_PASSFILE
+        if [ ! $? -eq 0 ]; then 
+            $ECHO "WSADMIN_PASSFILE " `$gettext "not configured correctly. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "WSADMIN_PASSFILE: $WSADMIN_PASSFILE"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+        $RM $WSADMIN_PASSFILE
+
+        if [ "$WSADMIN_HOST" = "" ]; then 
+            $ECHO "WSADMIN_HOST " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "WSADMIN_HOSTS:$WSADMIN_HOST"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+
+        if [ "$WSADMIN_PORT" = "" ]; then 
+            $ECHO "WSADMIN_PORT " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "WSADMIN_PORT:$WSADMIN_PORT"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+        
+        validateWSConfig "$WSADMIN_CONFIG"
+
+        validateWSHttpListener "$WSADMIN_HTTPLISTENER"
+
+      elif [ "$WEB_CONTAINER" = "AS8" ] || [ "$WEB_CONTAINER" = "AS91" ]; then
+        if [ "$ASADMIN" = "" ] || [ ! -f $ASADMIN ]; then
+            $ECHO "ASADMIN " `$gettext "tool not found. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "ASADMIN:$ASADMIN"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+
+        if [ "$ASADMIN_USER" = "" ]; then
+            $ECHO "ASADMIN_USER " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "ASADMIN_USER:$ASADMIN_USER"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+       
+        if [ "$ASADMIN_PASSFILE" = "" ]; then 
+            $ECHO "ASADMIN_PASSFILE " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "ASADMIN_PASSFILE:$ASADMIN_PASSFILE"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+
+        $TOUCH $ASADMIN_PASSFILE
+        if [ ! $? -eq 0 ]; then 
+            $ECHO "ASADMIN_PASSFILE " `$gettext "not configured correctly. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "ASADMIN_PASSFILE:$ASADMIN_PASSFILE"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+        $RM $ASADMIN_PASSFILE
+
+        if [ "$ASADMIN_HOST" = "" ]; then 
+            $ECHO "ASADMIN_HOST " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "ASADMIN_HOST:$ASADMIN_HOST"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+
+        if [ "$ASADMIN_PORT" = "" ]; then 
+            $ECHO "ASADMIN_PORT " `$gettext "not configured. "` `$gettext "Cannot proceed."`
+            $ECHO `$gettext "Current setting for "` "ASADMIN_PORT:$ASADMIN_PORT"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+        
+        validateASInstance "$ASADMIN_TARGET"
+      
+      fi
+   fi
+fi
+
+# Only validate if amtune script is wraper script or ds script
+if  [ "$AMTUNE_SCRIPT_TYPE" = "ds"  ]; then
+
+  if [ "$DIRMGR_PASSWORD" = "" ]; then
+    $ECHO `$gettext "Directory Server password not found. "` `$gettext "Cannot proceed."`
+    exit $AMTUNE_INVALID_ENVIRON_SETTING
+  fi
+
+  $ECHO $DIRMGR_PASSWORD > $DSADMIN_PASSFILE
+  chmod 400 $DSADMIN_PASSFILE
+
+  if [ -f "DSADMIN_PASSFILE" ]; then
+    $ECHO `$gettext "Directory Server password file not found. "` `$gettext "Cannot proceed."`
+    exit $AMTUNE_INVALID_ENVIRON_SETTING
+  fi
+
+fi
+
+# If OpenSSO installed, use debug log directory to store debug file; otherwise, 
+# save it in the current directory
+if [ -f "$AMCONFIG_PROPERTY_FILE" ]; then
+   debug_dir=`getConfigEntry "com.iplanet.services.debug.directory"`
+else
+   debug_dir=$SCRIPT_LOCATION
+fi
+setLogOutput $debug_dir
+
+#session parameters to be touched? Default is not to touch it
+if [ `$ECHO $AMTUNE_DONT_TOUCH_SESSION_PARAMETERS | $GREP -i "TRUE" | $WC -l` -eq 1 ]; then
+    AMTUNE_DONT_TOUCH_SESSION_PARAMETERS=true
+else
+    AMTUNE_DONT_TOUCH_SESSION_PARAMETERS=false
+fi
+#validate the session values
+if [ "$AMTUNE_DONT_TOUCH_SESSION_PARAMETERS" = "false" ]; then
+    if [ "$AMTUNE_SESSION_MAX_SESSION_TIME_IN_MTS" = "" ]; then
+        AMTUNE_SESSION_MAX_SESSION_TIME_IN_MTS=60
+    fi
+    if [ "$AMTUNE_SESSION_MAX_IDLE_TIME_IN_MTS" = "" ]; then
+        AMTUNE_SESSION_MAX_IDLE_TIME_IN_MTS=10
+    fi
+    if [ "$AMTUNE_SESSION_MAX_CACHING_TIME_IN_MTS" = "" ]; then
+        AMTUNE_SESSION_MAX_CACHING_TIME_IN_MTS=2
+    fi
+fi
+
+if [ `$ECHO $AMTUNE_WEB_CONTAINER_JAVA_POLICY | $GREP -i "TRUE" | $WC -l` -eq 1 ]; then
+    AMTUNE_WEB_CONTAINER_JAVA_POLICY=true
+else
+    AMTUNE_WEB_CONTAINER_JAVA_POLICY=false
+fi
+
+ECHO_MSG $CHAPTER_SEP
+ECHO_MSG "$SCRIPT_BASENAME"
+ECHO_MSG $CHAPTER_SEP
+ECHO_MSG "`$gettext 'Initializing...'`"
+
+ECHO_MSG $LINE_SEP
+
+# check system env
+ECHO_MSG "`$gettext 'Checking System Environment...'`"
+check_env 
+
+# check for root
+ECHO_MSG "`$gettext 'Checking User...'`"
+check_root_user 
+
+# if amtune-prepareDSTuner is running, don't need to display OpenSSO machine info
+if [ "$AMTUNE_SCRIPT_TYPE" != "ds" ]; then
+
+JVM64bitAvailable="false"
+
+checkWebContainer64BitEnabled
+returncode=$?
+if [ "$returncode" = "0" ]; then
+   JVM64bitAvailable="true"
+elif [ "$returncode" = "2" ]; then
+   ECHO_MSG "`$gettext 'The tuning parameter will be calculated based on the Web Server 32-bit mode.'`"
+elif [ "$returncode" = "100" ]; then
+   exit 1
+fi
+
+# Print mode and components to tune
+ECHO_MSG $LINE_SEP
+ECHO_MSG "amtune `$gettext 'information...'`"
+ECHO_MSG $LINE_SEP
+ECHO_MSG "amtune Mode      : $AMTUNE_MODE"
+ECHO_MSG "OS               : $AMTUNE_TUNE_OS"
+ECHO_MSG "OpenSSO   : $AMTUNE_TUNE_IDENTITY"
+ECHO_MSG "Directory        : $AMTUNE_TUNE_DS"
+ECHO_MSG "Web Container    : $AMTUNE_TUNE_WEB_CONTAINER"
+if [ "$WEB_CONTAINER" = "WS7" ] || [ "$WEB_CONTAINER" = "WS61" ]; then
+   if [ "$JVM64bitAvailable" = "true" ]; then
+        ECHO_MSG "WS Mode          : 64-bit"
+   else
+        ECHO_MSG "WS Mode          : 32-bit"
+   fi
+fi
+
+ECHO_MSG $LINE_SEP
+ECHO_MSG "`$gettext 'Detecting System Environment...'`"
+ECHO_MSG $LINE_SEP
+
+numCPUS=`getNumberOfCPUS`
+if [ "$OSTYPE" = "Linux" ]; then
+    ECHO_MSG "`$gettext 'Number of logical CPUs in the system : '`" $numCPUS
+else
+    ECHO_MSG "`$gettext 'Number of CPUs in the system : '`" $numCPUS
+fi
+if [ "$numCPUS" = "" ]; then 
+    $ECHO `$gettext "Unable to obtain available CPUs. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+gcThreads=`$ECHO $numCPUS | $SED -e 's/ //g'`
+
+acceptorThreads=`$ECHO $numCPUS | $SED -e 's/ //g'`
+ECHO_MSG "WS Acceptor Threads :" $acceptorThreads 
+
+memAvail=`getSystemMemory`
+ECHO_MSG "Memory Available (MB) : " $memAvail       
+if [ "$memAvail" = "" ]; then 
+    $ECHO `$gettext "Unable to obtain available memory. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+if [ "$OSTYPE" = "Linux" ] || [ "$OSTYPE" = "SunOS" ]; then
+   if [ "$WEB_CONTAINER" = "WS7" ]; then
+      if [ "$OSTYPE" = "Linux" ]; then
+        amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_X86
+      else
+        amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS
+      fi
+   elif [ "$WEB_CONTAINER" = "AS8" ]; then
+      if [ "$OSPLATFORM" != "sparc" ]; then
+        amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_X86
+      else
+        amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS_AS8
+      fi
+   else 
+      if [ "$OSPLATFORM" != "sparc" ]; then
+        amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_X86
+      else
+        amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_SOLARIS
+      fi
+   fi
+elif [ "$OSTYPE" = "HP-UX" ]; then
+       amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_HP_UX
+else
+   amtuneMaxMemoryToUseInMB=$AMTUNE_MAX_MEMORY_TO_USE_IN_MB_DEFAULT
+fi
+
+memToUse=` $ECHO "
+scale=0
+$memAvail * $AMTUNE_PCT_MEMORY_TO_USE / 100
+" | $BC `
+
+if [ $memToUse -gt $amtuneMaxMemoryToUseInMB ] && [ $JVM64bitAvailable = "false" ]; then
+    memToUse=$amtuneMaxMemoryToUseInMB
+fi
+
+ECHO_MSG "Memory to Use (MB) :" $memToUse
+
+if [ "$memToUse" = "" ]; then 
+    $ECHO `$gettext "Unable to compute memory requirements. "` `$gettext "Cannot proceed."`
+    exit
+fi
+
+
+memEnough=` $ECHO "
+if ($memToUse >= $AMTUNE_MIN_MEMORY_TO_USE_IN_MB) {
+1
+}
+" | $BC`
+
+if [ "$memEnough" = "1" ]; then
+    ECHO_MSG "`$gettext 'There is enough memory.'`"
+else
+    $ECHO `$gettext "There is not enough memory."`
+    exit
+fi
+
+ECHO_MSG $LINE_SEP
+ECHO_MSG "`$gettext 'Calculating Tuning Parameters...'`"
+ECHO_MSG $LINE_SEP
+
+maxHeapSize=` $ECHO "
+scale=0
+$memToUse * $AMTUNE_MEM_MAX_HEAP_SIZE_RATIO
+" | $BC `
+ECHO_MSG "Max heap size (MB) :" $maxHeapSize 
+
+# Since we set JVM Min Heap Size as same as JVM Max Heap Size, we will display output
+# with the same value. Therefore, we commented out this calculation of minHeapSize
+#minHeapSize=`$ECHO "scale=0; $maxHeapSize * $AMTUNE_MEM_MIN_HEAP_SIZE_RATIO" | $BC`
+minHeapSize=$maxHeapSize
+ECHO_MSG "Min Heap size (MB) :" $minHeapSize
+
+maxNewSize=`$ECHO "scale=0; $maxHeapSize * $AMTUNE_MEM_MAX_NEW_SIZE" | $BC`
+ECHO_MSG "Max new size (MB) :" $maxNewSize
+
+# In WS7 and AS8 or later, we removed this JVM Option
+if [ "$WEB_CONTAINER" = "WS61" ]; then
+  maxPermSize=`$ECHO "scale=0; $maxHeapSize * $AMTUNE_MEM_MAX_PERM_SIZE" | $BC`
+  maxPermSize=`roundOf $maxPermSize 1`
+  ECHO_MSG "Max perm size (MB) :" $maxPermSize
+fi
+
+cacheSize=`$ECHO "scale=0; $maxHeapSize * $AMTUNE_MEM_CACHES_SIZE" | $BC`
+ECHO_MSG "Cache Size (MB) :" $cacheSize
+
+sdkCacheSize=`$ECHO "scale=0; $cacheSize * $AMTUNE_MEM_SDK_CACHE_SIZE" | $BC`
+ECHO_MSG "SDK Cache Size (KB) :" $sdkCacheSize
+
+numSDKCacheEntries=`$ECHO "scale=0; $sdkCacheSize * 1024 / $AMTUNE_AVG_PER_ENTRY_CACHE_SIZE_IN_KB" | $BC`
+ECHO_MSG "Number of SDK Cache Entries :" $numSDKCacheEntries 
+
+sessionCacheSize=`$ECHO "scale=0; $cacheSize * $AMTUNE_MEM_SESSION_CACHE_SIZE" | $BC`
+ECHO_MSG "Session Cache Size (KB) :" $sessionCacheSize 
+
+numSessions=`$ECHO "scale=0; $sessionCacheSize * 1024 / $AMTUNE_AVG_PER_SESSION_SIZE_IN_KB" | $BC`
+ECHO_MSG "Number of Session Cache Entries :" $numSessions 
+
+if [ "$JVM64bitAvailable" = "true" ]; then
+   maxThreads=`$ECHO "scale=10; m=$AMTUNE_MAX_NUM_THREADS_64_BIT; scale=0; $maxHeapSize * m" | $BC`
+else
+   maxThreads=`$ECHO "scale=10; m=$AMTUNE_MAX_NUM_THREADS; scale=0; $maxHeapSize * m" | $BC`
+fi
+maxThreads=`removeDecimals $maxThreads`
+ECHO_MSG "Maximum Number of Java Threads :" $maxThreads 
+
+numRQThrottle=`$ECHO "scale=0; $maxThreads * $AMTUNE_WS_RQTHROTTLE_THREADS " | $BC`
+numOfMaxThreadPool=$numRQThrottle
+if [ "$WEB_CONTAINER" = "WS61" ]; then
+  ECHO_MSG "RQThrottle :" $numRQThrottle 
+else 
+  ECHO_MSG "Maximum Number of Thread Pool :" $numOfMaxThreadPool 
+fi
+
+numLdapAuthThreads=`$ECHO "scale=0; $maxThreads * $AMTUNE_IS_AUTH_LDAP_THREADS" | $BC`
+ECHO_MSG "LDAP Auth Threads :" $numLdapAuthThreads
+
+numSMLdapThreads=`$ECHO "scale=0; $maxThreads * $AMTUNE_IS_SM_LDAP_THREADS" | $BC`
+ECHO_MSG "SM LDAP Threads :" $numSMLdapThreads
+
+#Notification thread size should be 3 x # of CPU's if "com.iplanet.am.session.purgedelay" value in FAM is set to "0".
+numNotificationThreads=`$ECHO "scale=0; $numCPUS * 3 " | $BC`
+ECHO_MSG "Notification Threads :" $numNotificationThreads
+
+numNotificationQueue=`$ECHO "scale=0; $AMTUNE_NOTIFICATION_QUEUE_CALC_FACTOR * $numSessions" | $BC`
+numNotificationQueue=`roundOf $numNotificationQueue 1`
+numNotificationQueue=`removeDecimals $numNotificationQueue`
+ECHO_MSG "Notification Queue Size :" $numNotificationQueue 
+
+fi
+
+ECHO_MSG $PARA_SEP 
+
+INIT_STATUS="INIT_COMPLETE"

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>데이터 저장소 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthdatastoreservice"></a><h4>데이터 저장소</h4>
+<p><a name="indexterm-171"></a>데이터 저장소 인증 모듈은 영역의 Identity 저장소를 사용한 로그인이 사용자를 인증하도록 허용합니다.
+데이터 저장소 모듈을 사용하면 같은 데이터 저장소에 대해 인증해야 하는 경우에도 인증
+플러그인 모듈을 작성하고 인증 모듈을 로드 및 구성할 필요가 없습니다. 또한 해당
+영역에서 플랫 파일 인증이 각 저장소에 필요한 경우 사용자 정의 인증 모듈을
+작성할 필요가 없습니다.</p>
+
+<a name="funad"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

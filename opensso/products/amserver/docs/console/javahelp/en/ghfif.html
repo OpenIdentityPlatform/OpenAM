@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Agent Authenticator - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ghfif"></a><h4>Agent Authenticator</h4>
+<p>An agent authenticator is a type of agent that, once it is
+authenticated, can obtain the read-only data of agent profiles that are selected for the
+agent authenticator to read. The agent profiles can be of any type (J2EE,
+WSP, Discovery, and so forth), but must exist in the same realm. Users
+that have the agent authenticator's credentials (username and password) can read the agent
+profile data, but do not have the create, update, or delete permissions of
+the Agent Admin. </p><p>The agent Authenticator contains the following attributes:</p>
+
+<a name="ghfjj"></a><h5>Password</h5>
+<p>The password was set when you created the agent authenticator profile. However, you
+can change the password at any time in the future.</p>
+
+<a name="ghfiu"></a><h5>Password Confirm</h5>
+<p>The confirmation of the password was performed when you created the agent authenticator
+profile. If you change the password, you must confirm the change.</p>
+
+<a name="ghfka"></a><h5>Status</h5>
+<p>The <tt>Active</tt> option is selected when the agent authenticator is created. Choose <tt>Inactive</tt>
+only if you want to remove the protection the agent provides.</p>
+
+<a name="ghfig"></a><h5>Agent Profiles Allowed to Read</h5>
+<p>This attribute defines a list of OpenSSO agents whose profile data is read
+by the agent authenticator. The agents can be of any type (J2EE, WSP,
+Discovery, and so forth), but must exist in the same realm. To add
+an agent to the list, select the agent name and click Add.</p>
+<br/>
+
+</body>
+</html>

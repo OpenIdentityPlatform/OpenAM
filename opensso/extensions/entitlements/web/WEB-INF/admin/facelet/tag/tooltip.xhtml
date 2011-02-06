@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: tooltip.xhtml,v 1.4 2009/06/04 11:49:24 veiming Exp $
+
+-->
+
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:o="http://opensso.dev.java.net"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+    <ice:panelTooltip
+        id="#{tooltipId}"
+        hideOn="mouseout"
+        styleClass="tooltip">
+        <f:facet name="header">
+            <ice:panelGrid
+                columns="2"
+                columnClasses="icon,title">
+            <ice:graphicImage
+                value="../image/info.png" />
+            <ice:outputText
+                value="#{title}"/>
+            </ice:panelGrid>
+        </f:facet>
+        <f:facet name="body">
+            <ice:panelGroup
+                styleClass="body">
+                <ui:insert name="body"/>
+            </ice:panelGroup>
+        </f:facet>
+    </ice:panelTooltip>
+</ui:composition>

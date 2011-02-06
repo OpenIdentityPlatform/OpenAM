@@ -1,0 +1,487 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: SAMLLogMessageIDs.xml,v 1.4 2008/08/19 19:13:02 veiming Exp $
+
+-->
+
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="SAML">
+    <logmessage name="ASSERTION_CREATED" id="1"
+        loglevel="LL_INFO"
+        description="New assertion created">
+        <datainfo>
+            <item>message id</item>
+            <item>Assertion ID or Assertion if log level is LL_FINER</item>
+        </datainfo>
+        <triggers>
+            <item>Browser Artifact Profile</item>
+            <item>Browser POST Profile</item>
+            <item>Create Assertion Artifact</item>
+            <item>Authentication Query</item>
+            <item>Attribute Query</item>
+            <item>Authorization Decision Query</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ASSERTION_ARTIFACT_CREATED" id="2"
+        loglevel="LL_INFO"
+        description="New assertion artifact created">
+        <datainfo>
+            <item>message id</item>
+            <item>Assertion Artifact</item>
+            <item>ID of the Assertion corresponding to the Artifact</item>
+        </datainfo>
+        <triggers>
+            <item>Browser Artifact Profile</item>
+            <item>Creating Assertion Artifact</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ASSERTION_ARTIFACT_REMOVED" id="3"
+        loglevel="LL_FINE"
+        description="Assertion artifact removed from map">
+        <datainfo>
+            <item>message id</item>
+            <item>Assertion Artifact</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+            <item>Assertion artifact expires</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ASSERTION_REMOVED" id="4"
+        loglevel="LL_FINE"
+        description="Assertion removed from map">
+        <datainfo>
+            <item>message id</item>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+            <item>Assertion expires</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ASSERTION_ARTIFACT_VERIFIED" id="5"
+        loglevel="LL_INFO"
+        description="Access right by assertion artifact verified">
+        <datainfo>
+            <item>message id</item>
+            <item>Assertion Artifact</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="AUTH_PROTOCOL_MISMATCH" id="6"
+        loglevel="LL_INFO"
+        description="Authentication type configured and the actual SOAP protocol do not match.">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Query</item>
+        </triggers>
+        <actions>
+             <item>Login to console, go to Federation, then SAML, edit the Trusted Partners Configuration, check the selected Authentication Type field, make sure it matches the protocol specified in SOAP URL field.
+             </item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_AUTH_TYPE" id="7"
+         loglevel="LL_INFO"
+        description="Invalid authentication type">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Query</item>
+        </triggers>
+        <actions>
+             <item>Login to console, go to Federation, then SAML, edit the Trusted Partners Configuration, select one of the values for Authentication Type field, then save. </item>
+        </actions>
+    </logmessage>
+    <logmessage name="SOAP_RECEIVER_URL" id="8"
+        loglevel="LL_FINE"
+        description="Remote SOAP receiver URL">
+        <datainfo>
+            <item>message id</item>
+            <item>SOAP Receiver URL</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Query</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="NO_ASSERTION_IN_RESPONSE" id="9"
+        loglevel="LL_INFO"
+        description="No assertion present in saml response">
+        <datainfo>
+            <item>message id</item>
+            <item>SAML Response</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+            <item>Contact remote partner on what's wrong</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISMATCHED_ASSERTION_AND_ARTIFACT" id="10"
+        loglevel="LL_INFO"
+        description="Number of assertions in SAML response does not equal to number of artifacts in SAML request.">
+        <datainfo>
+            <item>message id</item>
+            <item>SAML Response</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+            <item>Contact remote partner on what's wrong</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ARTIFACT_TO_SEND" id="11"
+        loglevel="LL_INFO"
+        description="Artifact to be sent to remote partner">
+        <datainfo>
+            <item>message id</item>
+            <item>SAML Artifact</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="WRONG_SOAP_URL" id="12"
+        loglevel="LL_INFO"
+        description="Wrong SOAP URL in trusted partner configuration">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+             <item>Login to console, go to Federation, then SAML, edit the Trusted Partners Configuration, enter value for SOAP URL field, then save. </item>
+        </actions>
+    </logmessage>
+    <logmessage name="SAML_ARTIFACT_QUERY" id="13"
+        loglevel="LL_FINE"
+        description="SAML Artifact Query SOAP request">
+        <datainfo>
+            <item>message id</item>
+            <item>SAML Artifact Query message</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+    </logmessage>
+    <logmessage name="NO_REPLY_FROM_SOAP_RECEIVER" id="14"
+        loglevel="LL_INFO"
+        description="No reply from remote SAML SOAP Receiver">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+            <item>Check remote partner on what's wrong</item>
+        </actions>
+    </logmessage>
+    <logmessage name="REPLIED_SOAP_MESSAGE" id="15"
+        loglevel="LL_FINE"
+        description="SAML Artifact Query response">
+        <datainfo>
+            <item>message id</item>
+            <item>SAML Artifact Query response message</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+    </logmessage>
+    <logmessage name="NULL_SAML_RESPONSE" id="16"
+        loglevel="LL_INFO"
+        description="No SAML response inside SOAP response">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+            <item>Check remote partner on what's wrong</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_RESPONSE_SIGNATURE" id="17"
+        loglevel="LL_INFO"
+        description="XML signature for SAML response is not valid">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+            <item>Check remote partner on what's wrong on XML digital signature</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ERROR_RESPONSE_STATUS" id="18"
+        loglevel="LL_INFO"
+        description="Error in getting SAML response status code">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Query</item>
+        </triggers>
+        <actions>
+            <item>Check remote partner on what's wrong on response status code</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_TARGET" id="19"
+        loglevel="LL_INFO"
+        description="TARGET parameter is missing from the request">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Profile</item>
+            <item>SAML POST Profile</item>
+        </triggers>
+        <actions>
+            <item>Add "TARGET=target_url" as query parameter in the request</item>
+        </actions>
+    </logmessage>
+    <logmessage name="REDIRECT_TO_URL" id="20"
+        loglevel="LL_INFO"
+        description="Redirection URL in SAML artifact source site">
+        <datainfo>
+            <item>message id</item>
+            <item>target</item>
+            <item>redirection URL</item>
+            <item>SAML response message in case of POST profile and log level is LL_FINER</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Profile source</item>
+            <item>SAML POST Profile source</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="TARGET_FORBIDDEN" id="21"
+        loglevel="LL_INFO"
+        description="The specified target site is forbidden">
+        <datainfo>
+            <item>message id</item>
+            <item>target URL</item>
+        </datainfo>
+        <triggers>
+            <item>SAML Artifact Profile source</item>
+            <item>SAML POST Profile source</item>
+        </triggers>
+        <actions>
+            <item>TARGET URL specified in the request is not handled by any trusted partner, check your TARGET url, make sure it matches one of the Target URL configured in trusted partner sites</item>
+        </actions>
+    </logmessage>
+    <logmessage name="FAILED_TO_CREATE_SSO_TOKEN" id="22"
+        loglevel="LL_INFO"
+        description="Failed to create single-sign-on token">
+        <datainfo>
+            <item>message id</item>
+         </datainfo>
+         <triggers>
+            <item>SAML Artifact Profile destination</item>
+            <item>SAML POST Profile destination</item>
+         </triggers>
+         <actions>
+            <item>Authentication component failed to create SSO token, please check authentication log and debug for more details</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ACCESS_GRANTED" id="23"
+        loglevel="LL_INFO"
+        description="Single sign on successful, access to target is granted">
+        <datainfo>
+            <item>message id</item>
+            <item>Response message in case of POST profile and log levele is LL_FINER or higher</item>
+         </datainfo>
+         <triggers>
+            <item>SAML Artifact Profile destination</item>
+            <item>SAML POST Profile destination</item>
+         </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="NULL_PARAMETER" id="24"
+        loglevel="LL_INFO"
+        description="Null servlet request or response">
+        <datainfo>
+            <item>message id</item>
+         </datainfo>
+         <triggers>
+            <item>SAML Artifact Profile</item>
+            <item>SAML POST Profile</item>
+         </triggers>
+        <actions>
+            <item>Check web container error log for details</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_RESPONSE" id="25"
+        loglevel="LL_INFO"
+        description="Missing SAML response in POST body">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML POST Profile destination</item>
+        </triggers>
+        <actions>
+            <item>Check with remote SAML partner to see why SAML response object is missing from HTTP POST body</item>
+        </actions>
+    </logmessage>
+    <logmessage name="RESPONSE_MESSAGE_ERROR" id="26"
+        loglevel="LL_INFO"
+        description="Error in response message">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML POST Profile destination</item>
+        </triggers>
+        <actions>
+            <item>Unable to convert encoded POST body attribute to SAML Response object, check with remote SAML partner to see if there is any error in the SAML response create, for example, encoding error, invalid response sub-element etc.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_RESPONSE" id="27"
+        loglevel="LL_INFO"
+        description="Response is not valid">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML POST Profile destination</item>
+        </triggers>
+        <actions>
+            <item>recipient attribute in SAML response does not match this site's POST profile URL</item>
+            <item>Response status code is not success</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SOAP_MESSAGE_FACTORY_ERROR" id="28"
+        loglevel="LL_INFO"
+        description="Failed to get an instance of the message factory">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Receiver init</item>
+        </triggers>
+        <actions>
+            <item>Check your SOAP factory property (javax.xml.soap.MessageFactory) to make sure it is using a valid SOAP factory implementation</item>
+        </actions>
+    </logmessage>
+    <logmessage name="UNTRUSTED_SITE" id="29"
+        loglevel="LL_INFO"
+        description="Received Request from an untrusted site">
+        <datainfo>
+            <item>message id</item>
+            <item>Remote site Hostname or IP Address</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Queries</item>
+        </triggers>
+        <actions>
+            <item>Login to console, go to Federation, then SAML service, edit the Trusted Partners Configuration, check the Host List field, make sure remote host/IP is one the values. In case of SSL with client auth, make sure Host List contains the client certificate alias of the remote site.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REQUEST" id="30"
+        loglevel="LL_INFO"
+        description="Invalid request from remote partner site">
+        <datainfo>
+            <item>message id and request hostname/IP address</item>
+            <item>return response</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Queries</item>
+        </triggers>
+        <actions>
+            <item>Check with administrator of remote partner site</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SOAP_REQUEST_MESSAGE" id="31"
+        loglevel="LL_FINE"
+        description="Request message from partner site">
+        <datainfo>
+            <item>message id and request hostname/IP address</item>
+            <item>request xml</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Queries</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="BUILD_RESPONSE_ERROR" id="32"
+        loglevel="LL_INFO"
+        description="Failed to build response due to internal server error">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Queries</item>
+        </triggers>
+        <actions>
+            <item>Check debug message to see why it is failing, for example, cannot create response status, major/minor version error, etc.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SENDING_RESPONSE" id="33"
+        loglevel="LL_INFO"
+        description="Sending SAML response to partner site">
+        <datainfo>
+            <item>message id</item>
+            <item>SAML response or response id</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Queries</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SOAP_FAULT_ERROR" id="34"
+        loglevel="LL_INFO"
+        description="Failed to build SOAP fault response body">
+        <datainfo>
+                <item>message id</item>
+        </datainfo>
+        <triggers>
+                <item>SAML SOAP Queries</item>
+        </triggers>
+        <actions>
+                <item>Check debug message to see why it is failing, for example, unable to create SOAP fault, etc.</item>
+        </actions>
+    </logmessage>
+</logmessages>

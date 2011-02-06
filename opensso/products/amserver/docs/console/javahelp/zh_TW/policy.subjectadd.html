@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>將主體增加至策略 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.subjectadd"></a><h5>將主體增加至策略</h5>
+<ol>
+<li><b><a name="indexterm-28"></a>若您已建立策略，按一下您要增加主體的策略名稱。如果尚未建立策略，請參閱<a href="policy.policynormaladd.html">建立新的一般策略</a>。</b></li>
+<li><b>於 [主體] 清單下，按一下 [新建]。</b></li>
+<li><b>選取其中一個預設主體類型。如需主體類型的說明，請參閱<a href="policy.selectsubjecttype.html">主體</a>。</b></li>
+<li><b>按 [下一步]。</b></li>
+<li><b>輸入此主體的名稱。</b></li>
+<li><b>選取或取消選取 [排除] 欄位。</b><p>如果未選取此欄位 (預設)，則此策略將套用於屬於此主體成員的身份。如果選取此欄位，則此策略將套用於<b>不屬於</b>此主體成員的身份。</p><p>如果策略中存在多重主體，並且至少一個主體表示策略套用於給定身份，則策略將套用於此身份。</p></li>
+<li><b>執行搜尋，以便顯示要增加至此主體的識別。此步驟不適用於 [已認證的使用者] 主體或 [Web 服務用戶端] 主體。</b><p>預設 (*) 搜尋式樣將顯示所有合格的項目。</p></li>
+<li><b>選取要為此主體增加的個別身份，或按一下 [全部增加] 以立即增加所有身份。按一下 [增加]，以將識別移至選取的清單。此步驟不適用於認證使用者主體。</b></li>
+<li><b>按一下 [完成]。</b></li>
+<li><b>若要從策略中移除某主體，請選取此主體並按一下 [刪除]。按一下主體名稱可以編輯任何主體定義。</b></li></ol>
+<br/>
+
+</body>
+</html>

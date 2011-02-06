@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 服务配置 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>SAMLv2 服务配置</h4>
+
+
+<a name="ggolz"></a><h5>高速缓存清除时间间隔</h5>
+<p>此属性指定每次高速缓存清除之间的持续时间（以秒为单位）。</p>
+
+<a name="ggokj"></a><h5>名称 ID 信息的属性名称</h5>
+<p>指定用于在用户条目上存储名称标识符信息的属性名称。如果未指定，将使用默认属性 (<tt>sun-fm-saml2-nameid-info</tt>)。对应的数据存储库绑定用户必须拥有该属性的读/写/搜索/比较权限。</p>
+
+<a name="ggolv"></a><h5>名称 ID 信息密钥的属性名称</h5>
+<p>指定用于在用户条目上存储名称标识符密钥的属性名称。如果未指定，将使用默认属性 (<tt>sun-fm-saml2-nameid-infokey</tt>)。对应的数据存储库绑定用户必须拥有该属性的读/写/搜索/比较权限。还必须确认添加了 <tt>equality</tt> 类型的索引。</p>
+
+<a name="ggojr"></a><h5>IDP 搜索服务的 Cookie 域</h5>
+<p>指定 SAMLv2 IDP 搜索 Cookie 的 Cookie 域。</p>
+
+<a name="ggomp"></a><h5>IDP 搜索服务的 Cookie 类型</h5>
+<p>指定 SAMLv2 IDP 搜索服务中所用的 Cookie 类型，可为“持久”或“会话”。默认值为“会话”。</p>
+
+<a name="ggomt"></a><h5>IDP 搜索服务的 URL 方案</h5>
+<p>指定 SAMLv2 IDP 搜索服务中所用的 URL 方案。</p>
+
+<a name="ggoje"></a><h5>XML 加密 SPI 实现类</h5>
+<p>指定“SAMLv2 加密提供者”接口的实现类名称。此类用于在 SAMLv2 配置文件中执行 XML 加密和解密。</p>
+
+<a name="ggomb"></a><h5>在 KeyInfo 元素内包含加密密钥</h5>
+<p>它在 <tt>com.sun.identity.saml2.xmlenc.FMEncProvider</tt> 类中使用。如果启用，则将在执行 XML 加密操作时，于 <tt>EncryptedData</tt> 元素中的 <tt>KeyInfo</tt> 内包含 <tt>EncryptedKey</tt>。如果未启用，则 <tt>EncryptedKey</tt> 会与
+<tt>EncryptedData</tt> 元素并行。默认为启用。</p>
+
+<a name="ggoks"></a><h5>XML 签署实现类</h5>
+<p>如果启用，则根据“站点和服务器”选项卡下的“安全”设置中配置的证书撤销列表 (Certificate Revocation List, CRL)，来验证身份认证提供者和服务提供者使用的签署证书。如果不能验证和接受证书，则会停止并返回验证错误，而不再进一步执行 XML 签名验证。</p>
+
+<a name="ggokx"></a><h5>XML 签署证书验证</h5>
+<p>如果启用，则 SAML 身份认证提供者或服务提供者将验证签署中所用的证书。如果证书通过验证并被接受，则提供者将验证签名。如果未启用，则它会停止并返回验证错误。</p>
+
+<a name="ggoiv"></a><h5>CA 证书验证</h5>
+<p>如果启用，则根据可信赖的 CA 列表验证身份认证提供者和服务提供者使用的签署证书。如果不能验证和接受证书，则会停止并返回验证错误，而不再进一步执行 XML 签名验证。</p>
+<br/>
+
+</body>
+</html>

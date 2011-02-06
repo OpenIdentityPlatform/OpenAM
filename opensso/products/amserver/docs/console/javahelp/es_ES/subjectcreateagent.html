@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para crear o modificar un agente - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>Para crear o modificar un agente</h5>
+<ol>
+<li><b>Haga clic en la ficha Agents (Agentes).</b></li>
+<li><b>Haga clic en Nuevo.</b></li>
+<li><b>Introduzca los valores para los siguientes campos:</b><p><b>Name (Nombre).</b>  Introduzca el nombre o la identidad del agente. Se trata
+del nombre que utilizar&#225; el agente para iniciar una sesi&#243;n en Federated
+Access Manager. No se permiten nombres de varios bytes.</p><p><b>Password (Contrase&#241;a).</b>  Introduzca la contrase&#241;a del agente. Esta contrase&#241;a debe ser diferente
+a la utilizada por el agente durante la autenticaci&#243;n de LDAP.</p><p><b>Confirmar contrase&#241;a </b>.  Confirme la contrase&#241;a.</p><p><b>Estado de dispositivo.</b>  Introduzca el estado de dispositivo del agente. Si se define
+en Active (Activo), el agente podr&#225; autenticarse en Federated Access Manager y
+establecer comunicaci&#243;n con esta aplicaci&#243;n. Si, por el contrario, se define en
+Inactive (Inactivo), el agente no podr&#225; autenticarse en Federated Access Manager.</p></li>
+<li><b>Haga clic en Aceptar.</b></li>
+<li><b>Una vez creado el agente, puede editar tambi&#233;n los siguientes campos:</b><p><b>Description (Descripci&#243;n).</b>  Escriba una breve descripci&#243;n del agente. Por ejemplo, puede introducir
+el nombre de instancia del agente o el nombre de la aplicaci&#243;n
+que est&#225; protegiendo.</p><p><b>Valor y clave de agente.</b>  Defina las propiedades con un par de clave/valor. Federated Access
+Manager utiliza esta propiedad para recibir las solicitudes de agente para las
+aserciones de credenciales relacionadas con los usuarios. Actualmente, s&#243;lo hay una propiedad
+v&#225;lida, las restantes se omitir&#225;n. Use el siguiente formato:</p><p><tt></tt><i> agentRootURL</i><tt>=http://</tt><i>server_name:port</i><tt>/ </tt></p></li></ol>
+<br/>
+
+</body>
+</html>

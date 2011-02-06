@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a Site Identifier - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>To Configure a Site Identifier</h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>This attribute defines any site hosted by the server on which OpenSSO is
+installed. A default value and an automatically generated Site ID are defined for
+the host during installation. Multiple entries are possible. For example, load balancing or
+multiple instances of OpenSSO sharing the same Directory Server would all need to
+be defined. The starting point is the Site Identifiers attribute on the SAML
+screen under the Federation interface. Site IDs are defined in the Servers and Sites
+configuration screen. For more information, see <a href="service.serversite.html">Servers and Sites</a>.</p><ol>
+<li><b>Click New to add a new site identifier or click on the name
+of a configured site identifier to modify its profile.</b><p>The Site Identifier attributes are displayed.</p></li>
+<li><b>Provide values for the Site Identifier attributes based on the following information:</b><dl><dt>Instance ID</dt>
+<dd><p>The value of this property is <i>protocol</i> <tt>://</tt><i>host</i><tt>:</tt> <i>port</i>.</p><p>If configuring SAML for SSL (in both the source and destination site), ensure that the protocol defined here is <tt>https//</tt>.</p></dd>
+<dt>Site ID</dt>
+<dd><p>The site ID is an identifier generated for each site (although the value will be the same for multiple servers behind a load balancer). There is a class in the <tt>com.sun.identity.saml.common</tt> package that can be used to generate this identifier manually, if needed. Type the following at the command line:</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>Issuer Name</dt>
+<dd><p>The default value of this property is <i>host</i> <tt>:</tt><i>port</i>, but it could be any URI.</p></dd>
+</dl>
+</li>
+<li><b>Click OK to complete the Site Identifier configuration.</b></li>
+<li><b>Click Save on the Local Site Properties page to complete the SAML configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

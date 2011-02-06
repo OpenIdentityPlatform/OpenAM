@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Webdienste - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="webservices"></a><h3>Webdienste</h3><p>Beim Webdienste-Modul handelt es sich um die OpenSSO-Implementierung der Liberty Alliance Project
+<b>Identity Web Services Framework</b> (ID-WSF)-Spezifikationen. Die ID-WSF baut auf der <b>Liberty Identity Federation Framework (ID-FF)</b> auf und enth&#228;lt Spezifikationen
+zum Erstellen von Webdiensten f&#252;r das Abrufen, Aktualisieren bzw. Ausf&#252;hren von Vorg&#228;ngen
+f&#252;r Identit&#228;tsdaten in einer Netzwerkumgebung. Die Spezifikationen bieten einen &#220;berblick &#252;ber die
+technischen Komponenten, die zum Erstellen von Webdiensten notwendig sind, beispielsweise Kalenderdienste, Wallet-Dienste
+oder Alarmdienste.</p>
+<hr><p><b>Hinweis &#8211; </b><b>Identit&#228;tsdaten</b> enthalten Attribute zum Festlegen des Vor- und Nachnamens, der Anschrift, der
+Gesch&#228;ftsadresse und des Kontakts f&#252;r Notf&#228;lle. Es k&#246;nnen jedoch auch weitere Attribute
+enthalten sein.</p>
+<hr>
+<p>Webdienste bilden die Grundlage f&#252;r verteilte Netzwerke im Internet. Ein Webdienstbenutzer (Web
+Service Consumer, WSC) sucht nach einem Webdienst und ruft die vom Webdienst
+bereitgestellten Prozesse durch das Senden einer Anfrage auf. Bei einem Webdienstanbieter (Web
+Service Provider, WSP) handelt es sich um die Anwendung, die den Webdienst
+basierend auf der Anforderung implementiert; er kann sich auf derselben Java&#8482; Virtual
+Machine wie der WSC befinden oder Tausende Kilomenter entfernt sein. Wenn ein
+WSC Identit&#228;tsattribute von einem WSP abruft, kontaktiert der WSC zun&#228;chst einen Discovery-Dienst,
+um den Speicherort der ben&#246;tigten Attribute zu ermitteln. Sobald diese Informationen zur&#252;ckgegeben
+wurden, kontaktiert der WSC den WSP (beispielsweise ein pers&#246;nlicher Profildienst), um die
+ben&#246;tigten Attribute abzurufen.</p><p>Das Modul "Webdienste" der OpenSSO-Konsole ist eine Schnittstelle zum Konfigurieren folgender Dienste:</p>
+<ul><li><p><a href="webservices.wspersonalprofileservice.html">Pers&#246;nlicher Liberty-Profildienst</a></p></li>
+<li><p><a href="service.smdiscoveryservice.html">Discovery-Dienst</a></p></li>
+<li><p><a href="service.scsoapbinding.html">SOAP Binding-Dienst</a></p></li>
+<li><p><a href="webservices.wsauthnservices.html">Authentifizierungs-Webdienst</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

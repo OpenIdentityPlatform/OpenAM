@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>プロバイダエンティティーまたはアフィリエイトエンティティーを作成する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsadd"></a><h4>プロバイダエンティティーまたはアフィリエイトエンティティーを作成する</h4><a name="indexterm-66"></a><a name="indexterm-67"></a><a name="indexterm-68"></a><a name="indexterm-69"></a><p>エンティティーの確立は 2 段階の処理です。まず、エンティティーを作成します。エンティティーを<b>プロバイダエンティティー</b>にするか<b>アフィリエイトエンティティー</b>にするかを、ここで定義します。エンティティーを作成したら、そのエンティティーにプロバイダを設定します。新しいエンティティーは次の手順で作成します。連携インタフェースの「エンティティー」から作業を始めます。</p>
+<hr><p><b>注 &#8211; </b>エンティティーは、いつでも作成できますが、プロバイダを設定してはじめてトラストサークルに割り当てることができます。</p>
+<hr>
+<ol>
+<li><b>「新規」をクリックして、エンティティー属性を表示します。</b><p>「新規エンティティー」ページが表示されます。</p></li>
+<li><b>エンティティーの名前を入力します。</b><p>「エンティティー名」属性は、エンティティーの URI (Uniform Resource Identifier) を定義します。この値は、エンティティー名の間で一意でなければなりません。</p></li>
+<li><b>エンティティーの説明を入力します。</b></li>
+<li><b>エンティティーの種類を選択します。</b>
+<ul><li><p>プロバイダエンティティーを作成する場合は、「<b>プロバイダ</b>」を選択します。</p></li>
+<li><p>アフィリエイトエンティティーを作成する場合は、「<b>アフィリエイト</b>」を選択し、必須の「アフィリエイト名」および「アフィリエイト所有者」属性の値を定義します。</p>
+<ul><li><p>「アフィリエイト名」はアフィリエイトエンティティーの URI を定義します。この値は、アフィリエイト名の間で一意でなければなりません。</p></li>
+<li><p>「アフィリエイト所有者」は、アフィリエイトの親管理者としてプロバイダを指定します。この属性の値は、アフィリエイト所有者/プロバイダが属するエンティティーの「エンティティー名」属性に定義された値と一致する URI です。</p></li></ul>
+
+<hr><p><b>注 &#8211; </b>プロバイダを「アフィリエイト所有者」として定義しても、そのプロバイダがアフィリエイトのメンバーとして自動的に組み込まれることはありません。所有者がメンバーでもある場合は、URI をここでは所有者として定義し、エンティティー内部ではメンバーとして定義する必要があります。アフィリエイトにメンバーを追加する場合は、<a href="federation.fsentitydescriptorsaffiliate.html">「アフィリエイトエンティティーにメンバーを追加する」</a>を参照してください。</p>
+<hr>
+</li></ul>
+</li>
+<li><b>「了解」をクリックします。</b><p>新しいエンティティーが「エンティティー」画面に表示されます。</p></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SDK - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsdk"></a><h4>SDK</h4>
+<p>SDK 屬性會設定後端資料存放區的配置定義。</p>
+
+<a name="ggkan"></a><h5>資料存放區</h5>
+<p>[資料存放區] 屬性包含基本資料存放區配置：</p>
+
+<a name="ggkem"></a><h5>啟用資料存放區通知</h5>
+<p>指定是否啟用後端資料存放區通知。如果此值設為「false」，則會啟用記憶體內部通知。</p>
+
+<a name="ggkfc"></a><h5>啟用目錄代理伺服器</h5>
+<p>預設值為 false。此旗標的目的在於向服務管理報告，目錄伺服器的讀取、寫入和/或修改作業必須使用目錄代理伺服器。此旗標也會決定是否使用 ACI 或委託權限。Access Manager SDK (7 或 7.1 版) 與 Access
+Manager 6.3 版進行通訊時，此旗標必須設為「true」。</p><p>例如，在共存/舊有模式中，此值應為「true」。舊有 DIT 中不支援委託策略。僅支援 ACI，因此為確保執行適當的委託檢查，在舊有模式安裝中此旗標必須設為「true」，以便使用 ACI 進行存取控制。否則委託檢查將失敗。</p><p>在範圍模式中，此值應設為 false，以便僅使用委託策略進行存取控制。在 7.0 版及更新版本中，Access Manager 或 OpenSSO 支援在範圍模式安裝中使用資料未知功能。因此，除了 Directory Server 之外，其他伺服器都可以用來儲存服務配置資料。此外，此旗標會向服務管理功能報告，對後端儲存執行讀取、寫入和/或修改作業時，不需要使用目錄代理伺服器。這是因為某些資料存放區 (如
+Active Directory) 可能不支援代理伺服器。</p>
+
+<a name="ggkcv"></a><h5>事件服務</h5>
+<p>下列屬性會定義資料存放區的事件服務通知：</p>
+
+<a name="ggkez"></a><h5>事件服務連線的重試次數</h5>
+<p>預設值為 3。指定成功重新建立事件服務連線的嘗試次數。</p>
+
+<a name="ggkdr"></a><h5>LDAP 連線嘗試之間的延遲</h5>
+<p>預設值為 3000。指定重試重新建立事件服務連線之間的延遲 (以毫秒為單位)。</p>
+
+<a name="ggkcq"></a><h5>LDAP 連線嘗試的錯誤碼</h5>
+<p>預設值為 80、81、91。指定觸發重試重新建立事件服務連線的 LDAP 異常錯誤碼。</p>
+
+<a name="ggncc"></a><h5>閒置逾時</h5>
+<p>預設值為 0。指定重新啟動持續搜尋前的時間 (以分鐘為單位)。</p><p>在策略代理程式和目錄伺服器之間有負載平衡器或防火牆時會使用此特性，而在發生 TCP 閒置逾時中斷持續搜尋連線。此特性值應低於負載平衡器或防火牆 TCP 的逾時值。如此可確保持續搜尋會在連線中斷之前重新啟動。若值為 0，表示搜尋將不會重新啟動。只有逾時的連線會被重設。</p>
+
+<a name="ggndm"></a><h5>已停用事件服務連線</h5>
+<p>指定可停用的事件連線。值 (不區分大小寫) 可以是：</p>
+<ul><li><p>aci &#8212; 透過使用 LDAP 篩選器 (aci=*) 進行搜尋，變更為 aci 屬性。</p></li>
+<li><p>sm &#8212; 在 OpenSSO 資訊樹狀結構 (或服務管理節點) 中進行變更，其中包括帶有 <tt>sunService</tt> 或 <tt>sunServiceComponent</tt> 記號物件類別的物件。例如，您可能建立策略來定義受保護資源的存取權限，或是修改現有策略的規則、主旨、條件或回應提供者。</p></li>
+<li><p>um &#8212; 在使用者目錄 (或使用者管理節點) 中進行變更。例如，您可變更使用者的名稱或位址。</p></li></ul>
+<p>例如，若要停用 OpenSSO 資訊樹狀結構 (或服務管理節點) 的變更的持續搜尋：</p><p><tt>com.sun.am.event.connection.disable.list=sm </tt></p>
+<hr><p><b>注意 &#8211; </b>持續搜尋會耗用 Directory Server 的部分效能。 如果您確定消除生產環境中的部份效能耗用是絕對必要的，則可使用此特性停用一或多個持續搜尋。</p><p>不過，在停用持續搜尋之前，您應先了解上面所述的限制。除非絕對必要，否則強烈建議您不要變更此特性。納入此特性的主要目的是，避免在使用多個 2.1 J2EE 代理程式時耗用 Directory Server，因為每個代理程式都會建立這些持續搜尋。由於 2.2 J2EE 代理程式不再建立這些持續搜尋，因此您可能不需要使用此特性。</p><p>不建議停用這些元件的持續搜尋，因為停用了持續搜尋的元件不會收到來自 Directory Server 的通知。因此在 Directory Server 中對該特殊元件所做的變更將不會通知元件快取。例如，如果您在使用者目錄 (<tt>um</tt>) 中停用了對變更的持續搜尋，則 OpenSSO 將不會收到來自 Directory
+Server 的通知。因此，代理程式不會取得來自 OpenSSO 的通知，以便以使用者屬性的新值來更新本機使用者快取。如此一來，如果應用程式向代理程式查詢使用者屬性，就可能會收到該屬性的舊值。</p><p>僅在絕對必要時於特殊環境下使用此特性。例如，如果您知道在生產環境中將不會發生「服務配置」變更 (涉及變更「階段作業服務」和「認證服務」之類的任何服務的值)，就可以停用「服務管理」(<tt>sm</tt>) 元件的持續搜尋。不過，如果任何服務發生變更，則需要重新啟動伺服器。同樣的情況也適用於 <tt>aci</tt> 和 <tt>um</tt> 值指定的其他持續搜尋。</p>
+<hr>
+
+
+<a name="ggnip"></a><h5>LDAP 連線</h5>
+<p>下列屬性會設定後端資料存放區的連線資料：</p>
+
+<a name="ggnjl"></a><h5>LDAP 連線的重試次數</h5>
+<p>預設值為 1000。指定兩次重試之間的間隔 (以毫秒為單位)。</p>
+
+<a name="ggnhu"></a><h5>LDAP 連線重試之間的延遲</h5>
+<p>預設值為 3。指定成功重新建立 LDAP 連線的嘗試次數。</p>
+
+<a name="ggnjt"></a><h5>LDAP 連線重試的錯誤碼</h5>
+<p>預設值為 80、81、91。指定觸發重試重新建立 LDAP 連線的 <tt>LDAPException</tt> 錯誤碼。</p>
+
+<a name="ggkcx"></a><h5>快取與複本</h5>
+<p>下列屬性定義快取和複製配置：</p>
+
+<a name="ggkcm"></a><h5>SDK 快取最大大小</h5>
+<p>預設值為 10000。指定啟用快取時 SDK 快取的大小。請使用大於 0 的整數，否則將使用預設大小 (10000 位使用者)。</p>
+
+<a name="ggkdo"></a><h5>SDK 複本重試次數</h5>
+<p>預設值為 0。指定重試的次數。</p>
+
+<a name="ggker"></a><h5>SDK 複本嘗試之間的延遲</h5>
+<p>預設值為 1000。指定兩次重試之間的間隔 (以毫秒為單位)。</p>
+<br/>
+
+</body>
+</html>

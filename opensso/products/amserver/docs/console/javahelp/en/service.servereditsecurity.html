@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Security - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>Security</h4>
+<p>The Security attributes define encryption, validation and cookie information to control the level
+of security for the server instance.</p>
+
+<a name="ggkbi"></a><h5>Encryption</h5>
+<p>The encryption attributes are:</p>
+
+<a name="ggkcb"></a><h5>Password Encryption Key</h5>
+<p>Specifies the key used to encrypt and decrypt passwords and is stored in
+the Service Management System configuration. Value is set during installation. Example: <tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd</tt></p>
+
+<a name="ggkbg"></a><h5>Authentication Service Shared Secret</h5>
+<p>The shared secret for application authentication module. Value is set during installation. Example:
+<tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl</tt></p>
+
+<a name="ggkbd"></a><h5>Encryption Class</h5>
+<p>Default value is <tt>com.iplanet.services.util.JCEEncryption</tt>. Specifies the encrypting class implementation. Available classes are: <tt>com.iplanet.services.util.JCEEncryption</tt>
+and <tt>com.iplanet.services.util.JSSEncryption</tt>.</p>
+
+<a name="ggkby"></a><h5>Secure Random Factory Class</h5>
+<p>Default value is <tt>com.iplanet.am.util.JSSSecureRandomFactoryImp</tt>l. Specifies the factory class name for <tt>SecureRandomFactory</tt>. Available
+implementation classes are: <tt>com.iplanet.am.util.JSSSecureRandomFactoryImpl</tt> which uses JSS, and <tt>com.iplanet.am.util.SecureRandomFactoryImpl</tt> which uses pure
+Java.   </p>
+
+<a name="ggkbr"></a><h5>Validation</h5>
+<p>The validation attributes are:</p>
+
+<a name="ggkay"></a><h5>Platform Low Level Comm. Max. Content Length</h5>
+<p>Default value is 16384 or 16k. Specifies the maximum content-length for an <tt>HttpRequest</tt>
+that OpenSSO will accept.</p>
+
+<a name="ggkbb"></a><h5>Client IP Address Check</h5>
+<p>Default value is NO. Specifies whether or not the IP address of the
+client is checked in all <tt>SSOToken</tt> creations or validations.</p>
+
+<a name="ggkba"></a><h5>Cookie</h5>
+<p>The cookie attributes are:</p>
+
+<a name="ggkad"></a><h5>Cookie Name</h5>
+<p>Default value is <tt>iPlanetDirectoryPro</tt>. Cookie name used by Authentication Service to set the
+valid session handler ID. The value of this cookie name is used to
+retrieve the valid session information.</p>
+
+<a name="ggkaw"></a><h5>Secure Cookie</h5>
+<p>Allows the OpenSSO cookie to be set in a secure mode in
+which the browser will only return the cookie when a secure protocol such as
+<tt>HTTP(s)</tt> is used.  Default value is false. </p>
+
+<a name="ggkbk"></a><h5>Encode Cookie Value</h5>
+<p>This property allows OpenSSO to <tt>URLencode</tt> the cookie value which converts characters to
+ones that are understandable by HTTP.</p>
+
+<a name="ggkbc"></a><h5>Keystore</h5>
+<p>The following attributes allow you to configure keystore information for additional sites and
+servers that you create:</p>
+
+<a name="ggkbj"></a><h5>Keystore File</h5>
+<p>Value is set during installation. Example: <tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/keystore.jks</tt>.  Specifies the path to the
+SAML XML keystore password file.</p>
+
+<a name="ggkbu"></a><h5>Keystore Password File</h5>
+<p>Value is set during installation. Example: <tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/.storepass</tt>.  Specifies the path to the
+SAML XML key storepass file.</p>
+
+<a name="ggkbs"></a><h5>Private Key Password File</h5>
+<p>Value is set during installation. Example: <tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/.keypass</tt>  Specifies the path to the
+SAML XML key password file.</p>
+
+<a name="ggkaq"></a><h5>Certificate Alias</h5>
+<p>Default value is test.</p>
+
+<a name="ggkbw"></a><h5>Certificate Revocation List Caching</h5>
+<p>These attributes define the local Certificate Revocation List (CRL) caching repository that is
+used for keeping the CRL from certificate authorities. Any service that needs to
+obtain a CRL for certificate validation will receive the CRL based on this
+information. </p>
+
+<a name="ggkch"></a><h5>LDAP Server Host Name</h5>
+<p>Specifies the name of the LDAP server where the certificates are stored. The
+default value is the host name specified when OpenSSO was installed. The host
+name of any LDAP Server where the certificates are stored can be used.
+</p>
+
+<a name="ggkau"></a><h5>LDAP Server Port Number</h5>
+<p>Specifies the port number of the LDAP server where the certificates are stored.
+The default value is the port specified when OpenSSO was installed. The port
+of any LDAP Server where the certificates are stored can be used. </p>
+
+<a name="ggkam"></a><h5>SSL Enabled</h5>
+<p>Specifies whether to use SSL to access the LDAP server. The default is
+that the Certificate Authentication service does not use SSL for LDAP access.</p>
+
+<a name="ggkbv"></a><h5>LDAP Server Bind User Name</h5>
+<p>Specifies the bind DN in the LDAP server. </p>
+
+<a name="ggkaj"></a><h5>LDAP Server Bind Password</h5>
+<p>Defines the password to be used for binding to the LDAP server. By
+default, the amldapuser password that was entered during installation is used as the
+bind user.</p>
+
+<a name="ggkce"></a><h5>LDAP Search Base DN</h5>
+<p>This attribute specifies the base DN used by the LDAP Users subject in
+the LDAP server from which to begin the search. By default, it is
+the top-level realm of the OpenSSO installation base.</p>
+
+<a name="ggkbp"></a><h5>Search Attributes</h5>
+<p>Any DN component of issuer's <tt>subjectDN</tt> can be used to retrieve a CRL
+from a local LDAP server. It is a single value string, like, "cn".
+All Root CAs need to use the same search attribute.</p>
+
+<a name="ggkaa"></a><h5>Online Certificate Status Protocol Check</h5>
+<p>The Online Certificate Status Protocol (OCSP) enables OpenSSO services to determine the (revocation)
+state of a specified certificate. OCSP may be used to satisfy some of
+the operational requirements of providing more timely revocation information than is possible with CRLs
+and may also be used to obtain additional status information. An OCSP client
+issues a status request to an OCSP responder and suspends acceptance of the
+certificate in question until the responder provides a response. </p>
+
+<a name="ggkal"></a><h5>Check Enabled</h5>
+<p>This attribute enables OCSP checking. It is enabled by default.</p>
+
+<a name="ggkav"></a><h5>Responder URL</h5>
+<p>This attribute defines is a URL that identifies the location of the OCSP
+responder. For example, <tt>http://ocsp.example.net:80</tt>.</p><p>By default, the location of the OCSP responder is determined implicitly from the
+certificate being validated. The property is used when the Authority Information Access extension
+(defined in RFC 3280) is absent from the certificate or when it requires
+overriding. </p>
+
+<a name="ggkai"></a><h5>Certificate Nickname</h5>
+<p>The OCSP responder nickname is the CA certificate nick name for that responder,
+for example <tt>Certificate Manager - sun</tt>. If set, the CA certificate must be presented in the
+web server's certificate database. If the OCSP URL is set, the OCSP responder
+nickname must be set also. Otherwise, both will be ignored. If they are
+not set, the OCSP responder URL presented in user's certificate will be used for
+OCSP validation. If the OCSP responder URL is not presented in user's certificate,
+no OCSP validation will be performed. </p>
+
+<a name="ggkag"></a><h5>Federal Information Processing Standards</h5>
+<p>Under the Information Technology Management Reform Act (Public Law 104-106), the Secretary of
+Commerce approves standards and guidelines that are developed by the National Institute of
+Standards and Technology (NIST) for Federal computer systems. These standards and guidelines are issued
+by NIST as Federal Information Processing Standards (FIPS) for use government-wide. NIST develops
+FIPS when there are compelling Federal government requirements such as for security and
+interoperability and there are no acceptable industry standards or solutions. </p>
+
+<a name="ggkap"></a><h5>FIPS Mode</h5>
+<p>This property can be true or false. All the cryptography operations will be
+running FIPS compliant mode only if it is true. </p>
+<br/>
+
+</body>
+</html>

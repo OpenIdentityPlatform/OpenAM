@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Pour cr&#233;er un nouveau groupe - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentgroupadd"></a><h5>Pour cr&#233;er un nouveau groupe</h5>
+<p>Cr&#233;ez un groupe si vous souhaitez que les agents h&#233;ritent de propri&#233;t&#233;s
+sp&#233;cifiques du groupe. Les agents ne peuvent h&#233;riter leurs propri&#233;t&#233;s que de
+leur groupe. Par exemple, les agents Web peuvent h&#233;riter des propri&#233;t&#233;s d'un
+groupe d'agents Web.</p><ol>
+<li><b>Cliquez sur l'onglet Contr&#244;le d'acc&#232;s.</b></li>
+<li><b>Cliquez sur le nom du domaine auquel le groupe appartiendra.</b></li>
+<li><b>Cliquez sur l'onglet Agents.</b></li>
+<li><b>Si n&#233;cessaire, s&#233;lectionnez l'onglet correspondant au type d'agent appropri&#233;.</b></li>
+<li><b>Dans la section Groupe, cliquez sur Nouveau.</b><p>Dans le champ Nom, entrez le nom du nouveau groupe.</p></li>
+<li><b>Pour les agents Web et J2EE uniquement, saisissez l'URL du serveur OpenSSO.</b><p>Par exemple, <tt>http://OpenSSO_EnterpriseHost.exemple.com:8080/OpenSSO </tt>.</p></li>
+<li><b>Cliquez sur Cr&#233;er.</b><p>La console cr&#233;e le groupe d'agents et affiche de nouveau la page
+des agents, avec un lien pointant vers ce groupe.</p><p>Pour effectuer d'autres t&#226;ches de configuration du groupe, cliquez sur ce lien
+afin d'afficher la page Modification de groupe d'agents.</p><p>Les propri&#233;t&#233;s que vous pouvez d&#233;finir pour configurer un groupe sont les
+m&#234;mes que celles d'un agent, si ce n'est que les propri&#233;t&#233;s Groupe,
+Mot de passe et Confirmation de mot de passe ne sont pas
+disponibles au niveau du groupe.</p>
+<hr><p><b>Remarque &#8211; </b>En outre, sachez que certaines propri&#233;t&#233;s de groupe ont d&#233;j&#224; des valeurs
+variables devant, dans la plupart des cas, ne pas &#234;tre chang&#233;es. Voici
+un exemple d'une de ces valeurs&#160;:</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

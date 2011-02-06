@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: fmMultiProtocol.xml,v 1.4 2008/06/25 05:51:14 qcheng Exp $                                                                                
+
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunMultiFederationProtocol" version="1.0">
+        <Schema 
+            serviceHierarchy=""
+            i18nFileName="fmMultiFederationProtocol"
+            revisionNumber="10"
+            i18nKey="sunMultiFederationProtocol"
+            propertiesViewBeanURL="">
+            <Global>
+               <AttributeSchema name="SingleLogoutHandlerList"
+                   type="list"
+                   syntax="string"
+                   i18nKey="a101">
+                   <DefaultValues>
+                       <Value>key=SAML2|class=com.sun.identity.multiprotocol.SAML2SingleLogoutHandler</Value>
+                       <Value>key=IDFF|class=com.sun.identity.multiprotocol.IDFFSingleLogoutHandler</Value>
+                       <Value>key=WSFED|class=com.sun.identity.multiprotocol.WSFederationSingleLogoutHandler</Value>
+                   </DefaultValues>
+               </AttributeSchema>
+            </Global>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

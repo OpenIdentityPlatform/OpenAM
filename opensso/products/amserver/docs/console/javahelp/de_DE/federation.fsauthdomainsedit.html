@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So &#228;ndern Sie das Profil eines Circle of Trust - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsauthdomainsedit"></a><h4>So &#228;ndern Sie das Profil eines Circle of Trust</h4><a name="indexterm-57"></a><p>F&#252;hren Sie die folgenden Schritte aus, um die allgemeinen Attribute eines vorhandenen
+Circle of Trust zu &#228;ndern oder ihm Anbieter hinzuzuf&#252;gen. Der Ausgangspunkt ist
+"Circle of Trust" in der Verbindungsschnittstelle.</p><ol>
+<li><b>Klicken Sie auf den Namen eines konfigurierten Circle of Trust, um sein
+Profil zu &#228;ndern oder um ihm Anbieter hinzuzuf&#252;gen.</b><p>Die Seite "Circle of Trust bearbeiten" wird angezeigt.</p></li>
+<li><b>Geben Sie neue Werte ein oder bearbeiten Sie bestehende Werte f&#252;r die
+allgemeinen Attribute des Circle of Trust:</b><dl><dt>Name</dt>
+<dd><p>Der statische Wert dieses Attributs ist der Name, den Sie bei der Erstellung des Circle of Trust eingegeben haben.</p></dd>
+<dt>Beschreibung</dt>
+<dd><p>Der Wert dieses Attributs ist eine Beschreibung des Circle of Trust. Die bereits eingegebene Beschreibung kann im Bedarfsfall ge&#228;ndert werden.</p></dd>
+<dt>URL des IDFF-Schreibprogramm-Dienstes</dt>
+<dd><p>Dieses Attribut legt den Pfad des Dienstes fest, der das allgemeine Dom&#228;nencookie erstellt. Der URL hat folgendes Format: <tt><b> http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt> /common/idffwriter</b></tt>.</p></dd>
+<dt>URL des IDFF-Leseprogramm-Dienstes</dt>
+<dd><p>Dieses Attribut legt den Pfad des Dienstes fest, der das allgemeine Dom&#228;nencookie liest. Der URL hat folgendes Format: <tt><b> http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt> /common/idffreader</b></tt>.</p></dd>
+<dt>URL des SAML2-Schreibprogramms</dt>
+<dd><p>Dieses Attribut gibt den Pfad des SAML2-Schreibprogramm-Dienstes an, der das Cookie in der allgemeinen Dom&#228;ne schreibt. Der URL hat folgendes Format: <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt> /common/saml2writer</b></tt>.</p></dd>
+<dt>URL des SAML2-Leseprogramms</dt>
+<dd><p>Dieses Attribut gibt den Pfad des SAML2-Schreibprogramm-Dienstes an, der das Cookie in der allgemeinen Dom&#228;ne schreibt. Der URL hat folgendes Format: <tt><b>http://</tt><i>common-domain-host</i><tt>:</tt><i>port</i><tt> /common/saml2reader</b></tt>.</p></dd>
+<dt>Status</dt>
+<dd><p>Der Standardstatus ist "Aktiv". Bei Auswahl von "Inaktiv" wird die Kommunikation innerhalb des Circle of Trust deaktiviert.</p></dd>
+</dl>
+</li>
+<li><b>W&#228;hlen Sie einen oder mehrere Anbieter aus und klicken Sie auf den
+Pfeil zum Hinzuf&#252;gen, um sie zu markieren.</b><p>Die Liste enth&#228;lt die Namen von Entities, die erstellt und mit Anbietern
+aufgef&#252;llt wurden. Weitere Informationen finden Sie unter <a href="federation.fsauthdomainsselectprovider.html">So f&#252;gen Sie Anbieter zu einem Circle of Trust hinzu</a>.</p></li>
+<li><b>Klicken Sie auf "Speichern", um den Vorgang abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

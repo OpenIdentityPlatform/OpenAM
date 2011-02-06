@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty 상호 작용 서비스 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Liberty 상호 작용 서비스</h4>
+
+
+<a name="ggofj"></a><h5>상호 작용을 위해 사용자를 리디렉션할 WSP</h5>
+<p>이 속성은 웹 서비스 공급자가 동의를 위해 사용자를 리디렉션할지 여부를 나타냅니다. 기본값은
+yes입니다.</p>
+
+<a name="ggofq"></a><h5>데이터에 대한 상호 작용을 위해 사용자를 리디렉션할 WSP</h5>
+<p>사용자 동의를 얻거나 추가 데이터를 수집하기 위한 상호 작용을 시작합니다. 이 등록
+정보는 웹 서비스 공급자가 사용자를 리디렉션하여 추가 정보를 수집할지 여부를 나타냅니다. 기본값은
+yes입니다.</p>
+
+<a name="ggogl"></a><h5>WSP의 예상 상호 작용 기간</h5>
+<p>이 속성은 웹 서비스 공급자가 상호 작용을 완료하고 웹 서비스 클라이언트로 제어를
+반환하는 데 걸리는 예상 시간(초)을 나타냅니다. 예를 들어 웹 서비스 클라이언트가 최대
+30초(WSP의 예상 상호 작용 기간에 설정한 시간) 간 상호 작용을 기다릴 것임을
+나타내는 요청을 웹 서비스 공급자가 수신합니다. 이때 이 속성이 40초로 설정되어 있으면
+웹 서비스 공급자는 상호 작용 시간이 충분하지 않음을 나타내는 SOAP 오류(<tt>timeNotSufficient</tt>)를 반환합니다.</p>
+
+<a name="ggogn"></a><h5>returnToURL을 SSL로 강제 지정할 WSP</h5>
+<p>이 속성은 웹 서비스 공급자가 웹 서비스 클라이언트에서 지정한 HTTPS <tt>returnToURL</tt>을 강제
+지정할지 여부를 나타냅니다. Liberty Alliance Project 사양에 따르면 이 등록 정보의 값은
+항상 yes가 되어야 합니다. false 값은 기본적으로 단계별 방식으로 쉽게 배포하기 위해
+지정합니다.</p>
+
+<a name="ggoib"></a><h5>요청 호스트와 동일한 호스트로 반환되도록 강제 지정할 WSP</h5>
+<p>이 속성은 <tt>returnToHost</tt> 및 <tt>requestHost</tt>의 값이 같은 경우 웹 서비스 공급자가 해당
+주소 값을 강제 지정할지 여부를 나타냅니다. Liberty Alliance Project 사양에 따르면 이
+등록 정보의 값은 항상 yes가 되어야 합니다. false 값은 기본적으로 단계별 방식으로
+쉽게 배포하기 위해 지정합니다.</p>
+
+<a name="ggoha"></a><h5>HTML 스타일 시트 위치</h5>
+<p>이 속성은 HTML로 된 상호 작용 페이지를 렌더링하는 데 사용할 스타일 시트의
+위치를 지정합니다.</p>
+
+<a name="ggohi"></a><h5>WML 스타일 시트 위치</h5>
+<p>이 속성은 WML로 된 상호 작용 페이지를 렌더링하는 데 사용할 스타일 시트의
+위치를 지정합니다.</p>
+
+<a name="ggogg"></a><h5>WSP 상호 작용 URL</h5>
+<p>이 속성은 <tt>WSPRedirectHandler</tt> 서블릿이 배포되는 URL을 지정합니다. 이 서블릿은 사용자 리디렉션을 위한
+상호 작용의 서비스 공급자측을 처리합니다.</p>
+
+<a name="ggoft"></a><h5>로드 밸런서 뒤에 있는 경우 WSP 상호 작용 URL</h5>
+<p>로드 밸런서가 제공하는 WSP 리디렉션 처리기 URL을 정의합니다.</p>
+
+<a name="ggogq"></a><h5>로드 밸런서 뒤에 있는 WSP 클러스터(사이트)의 상호 작용 URL 목록</h5>
+<p>클러스터에 있는 신뢰할 수 있는 서버의 WSP 리디렉션 처리기 URL을 정의합니다.</p>
+
+<a name="ggogx"></a><h5>상호 작용 구성 클래스</h5>
+<p>이 속성은 상호 작용 구성을 읽기 위한 액세스 메소드를 제공하는 클래스를 지정합니다.</p>
+
+<a name="ggogj"></a><h5>상호 작용에 참여할 WSC의 옵션</h5>
+<p>이 속성은 사용자 리디렉션에 참여하도록 구성된 경우 WSP가 참여할 상호 작용 수준을
+나타냅니다. 사용 가능한 값은 interactIfNeeded, doNotInteract 및 doNotInteractForData이며, 기본값은 interactIfNeeded입니다.</p>
+
+<a name="ggogs"></a><h5>userInteractionHeader를 포함할 WSC</h5>
+<p>이 속성은 웹 서비스 클라이언트가 리버티 사양을 기준으로 상호 작용하기 위한 특정
+기본 설정을 나타내는 SOAP 헤더를 포함할지 여부를 나타냅니다. 기본값은 yes입니다.</p>
+
+<a name="ggofn"></a><h5>상호 작용을 위해 사용자를 리디렉션할 WSC</h5>
+<p>이 속성은 WSC가 사용자 리디렉션에 참여할지 여부를 정의합니다. 기본값은 yes입니다.</p>
+
+<a name="ggoim"></a><h5>WSC의 예상 상호 작용 기간</h5>
+<p>이 속성은 웹 서비스 공급자가 자신의 상호 작용 부분을 완료할 때까지 웹
+서비스 클라이언트가 기다리는 최대 시간(초)을 정의합니다. 상호 작용이 설정된 시간보다 오래 걸릴
+것으로 예상되는 경우 웹 서비스 공급자는 상호 작용을 시작하지 않습니다. 예를 들어
+이 등록 정보가 최대 30초로 설정되어 있는 요청을 웹 서비스 공급자가 수신합니다.
+이때 웹 서비스 공급자 등록 정보의 [WSP의 예상 상호 작용 기간]이 40초로
+설정되어 있으면 웹 서비스 공급자가 해당 시간이 상호 작용에 충분하지 않음을 나타내는
+SOAP 오류(<tt>timeNotSufficient</tt>)를 반환합니다.</p>
+
+<a name="ggofx"></a><h5>리디렉션 URL을 SSL로 강제 지정할 WSC</h5>
+<p>이 속성은 웹 서비스 클라이언트가 리디렉션된 URL에서 HTTPS를 강제 지정할지 여부를 지정합니다.
+Liberty Alliance Project 사양에 따르면 이 등록 정보 값이 항상 yes가 되어야
+하는데, 이 값은 <tt>redirectURL</tt>(웹 서비스 공급자에서 지정) 값이 HTTPS URL이 아니면 웹
+서비스 공급자가 사용자를 리디렉션하지 않음을 나타냅니다. false 값은 기본적으로 단계적 방식으로 쉽게
+배포하기 위해 지정합니다.</p>
+<br/>
+
+</body>
+</html>

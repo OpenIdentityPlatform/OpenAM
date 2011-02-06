@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Cr&#233;ation ou modification d'un agent - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>Cr&#233;ation ou modification d'un agent</h5>
+<ol>
+<li><b>Cliquez sur l'onglet Agents.</b></li>
+<li><b>Cliquez sur Nouveau.</b></li>
+<li><b>Renseignez les champs suivants :</b><p><b>Name (Nom).</b>  saisissez le nom ou l' identit&#233; de l' agent. Il
+s'agit du nom que l'agent utilisera pour se connecter &#224; Federated Access
+Manager. Les noms sur plusieurs octets ne sont pas accept&#233;s.</p><p><b>Password (Mot de passe).</b>  saisissez le mot de passe de l' agent. Ce mot
+de passe doit &#234;tre diff&#233;rent du mot de passe utilis&#233; par l'agent
+lors de l'authentification LDAP.</p><p><b>Confirmez le mot de passe </b>. Confirmez le mot de passe.</p><p><b>Statut de l'unit&#233;.</b>  saisissez le statut du dispositif de l' agent. S'il est
+d&#233;fini sur Actif, l'agent pourra s'authentifier aupr&#232;s de Federated Access Manager et
+communiquer avec Access Manager. S'il est d&#233;fini sur Inactif, l'agent ne pourra
+pas s'authentifier aupr&#232;s de Federated Access Manager.</p></li>
+<li><b>Cliquez sur OK.</b></li>
+<li><b>Une fois que vous avez cr&#233;&#233; l'agent, vous pouvez &#233;galement modifier les
+champs suivants :</b><p><b>Description (Description).</b>  d&#233;crivez l' agent bri&#232;vement. Par exemple, vous pouvez entrer le
+nom de l'instance d'agent ou le nom de l'application qu'il prot&#232;ge.</p><p><b>Valeur de cl&#233; d'agent.</b>  d&#233;finissez les propri&#233;t&#233;s de l' agent avec une paire cl&#233;/agent.
+Cette propri&#233;t&#233; est utilis&#233;e par Federated Access Manager pour recevoir les demandes
+d'assertions d'informations d'authentification sur les utilisateurs par les agents. Actuellement, seule une
+propri&#233;t&#233; est valide et toutes les autres propri&#233;t&#233;s seront ignor&#233;es. Utilisez le
+format suivant :</p><p><tt></tt><i>URLRacineAgent</i><tt>=http://</tt><i>nom_serveur:port</i><tt>/ </tt></p></li></ol>
+<br/>
+
+</body>
+</html>

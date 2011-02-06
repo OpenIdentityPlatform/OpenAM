@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>平面文件系统信息库属性 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>平面文件系统信息库属性</h4>
+<p><a name="indexterm-15"></a>用于配置平面文件系统信息库的属性如下：</p>
+
+<a name="gdokj"></a><h5>文件系统信息库插件类名称</h5>
+<p>该属性指定为平面文件提供实现的 Java 类文件。不应修改该属性。</p>
+
+<a name="gdojs"></a><h5>文件系统信息库目录</h5>
+<p>定义用于存储身份及其属性的基目录。</p>
+
+<a name="gdoke"></a><h5>高速缓存</h5>
+<p>若为启用（默认），将对身份及其属性进行高速缓存。这样，后续请求就不会访问文件系统。</p>
+
+<a name="gdokm"></a><h5>更新高速缓存的时间</h5>
+<p>启用高速缓存后，该属性将确定检查高速缓存的时间间隔（以分钟为单位），超过该间隔便会对高速缓存中的条目进行检查，以确定是否对文件系统进行过任何更改。检查机制以时间戳为基础。</p>
+
+<a name="gdojw"></a><h5>文件用户对象类</h5>
+<p>定义创建用户时自动为用户添加的对象类。</p>
+
+<a name="gdojt"></a><h5>密码属性</h5>
+<p>提供包含密码（用于验证）的属性名。该属性用于在启用了“数据存储库”验证模块时对用户进行验证。</p>
+
+<a name="gdokq"></a><h5>状态属性</h5>
+<p>提供存储身份状态的属性名。状态属性的值为<tt>活动</tt>或<tt>不活动</tt>。该属性在身份验证期间使用。如果身份为<tt>不活动</tt>，则不验证用户。</p>
+
+<a name="gdojk"></a><h5>散列的属性</h5>
+<p>提供属性列表，这些属性的值将散列并存储于文件中。执行散列后，便无法获取原始值。只能对散列的值进行检索。某些用于验证的属性不应永久存储，使用散列便可确保这些属性的保密性。例如，身份的密码属性就是一种此类型的属性。</p>
+
+<a name="gdojb"></a><h5>加密的属性</h5>
+<p>提供属性列表，这些属性的值将加密并存储于文件中。虽然对其进行了加密和存储，但调用身份库 API 仍可获得加密前的原始值。这可防止用户直接访问文件系统以及读取敏感属性。</p>
+<br/>
+
+</body>
+</html>

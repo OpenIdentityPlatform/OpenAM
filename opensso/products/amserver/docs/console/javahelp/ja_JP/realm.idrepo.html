@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>データストア - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepo"></a><h3>データストア</h3>
+<p><a name="indexterm-10"></a><a name="indexterm-11"></a>データストアは、ユーザー属性とユーザー設定データを格納することができるデータベースです。</p><p>OpenSSO には、LDAPv3 アイデンティティーリポジトリフレームワークに接続するアイデンティティーリポジトリプラグインが用意されています。これにより、既存のユーザーデータベースに変更を加えることなく、OpenSSO のユーザー情報を表示したり取得したりできます。OpenSSO フレームワークは、アイデンティティーリポジトリプラグインからのデータとほかの OpenSSO プラグインからのデータを統合して、各ユーザーの仮想アイデンティティーを形成します。その後 OpenSSO は、複数のアイデンティティーリポジトリの間で、この汎用アイデンティティーを認証プロセスや承認プロセスに使用できます。仮想ユーザーアイデンティティーは、ユーザーのセッションが終了したときに破棄されます。</p><p>OpenSSO では、次のデータストアをサポートします。</p>
+<ul><li><p>Active Directory</p></li>
+<li><p>汎用 LDAPv3</p></li>
+<li><p>OpenSSO スキーマを含んだ Sun Directory Server</p></li></ul>
+<p>新しいデータストアの作成方法とリポジトリプラグインの設定方法については、<a href="realm.idreposelecttype.html">「新しいデータストアを作成する」</a>を参照してください。</p>
+<br/>
+
+</body>
+</html>

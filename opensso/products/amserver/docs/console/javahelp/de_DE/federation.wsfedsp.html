@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED-Dienstanbieter-Anpassung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>WS-FED-Dienstanbieter-Anpassung</h4>
+<p>Die folgenden Attribute gelten f&#252;r die WS-FED-Dienstanbieter-Rolle:</p>
+
+<a name="ggwtj"></a><h5>Assertion signiert</h5>
+<p>Alle Assertions, die von diesem Dienstanbieter empfangen werden, m&#252;ssen signiert werden.</p>
+
+<a name="ggwsg"></a><h5>Konto-Mapper</h5>
+<p>Das Attribut gibt die Implementierung der <tt>AccountMapper</tt>-Schnittstelle an, die f&#252;r die Zuordnung
+eines Remote-Benutzerkontos zu einem lokalen Benutzerkonto zum Zwecke des Single Sign-On verwendet
+wird. Der Standardwert ist <tt>com.sun.identity.wsfed.plugins</tt>. </p><p> <tt>DefaultADFSPartnerAccountMapper</tt> ist die Standardimplementierung.</p>
+
+<a name="ggwrf"></a><h5>Attribut-Mapper</h5>
+<p>Dies definiert die Klasse, die verwendet wird, um Attribute in der Assertion
+zu Benutzerattributen hinzuzuf&#252;gen, die lokal vom Identity-Anbieter definiert wurden. Die Standardklasse ist
+<tt>com.sun.identity.wsfederation.plugins.DefaultSPAttributeMapper</tt>.</p>
+
+<a name="ggwrq"></a><h5>Attributzuordnung</h5>
+<p>Gibt Werte an, um die Zuordnungen zu definieren, die vom standardm&#228;&#223;igen Attribut-Mapper-Plugin
+verwendet werden.  Zuordnungen sollen in folgendem Format konfiguriert werden:</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>Beispiel: <tt>EmailAddress=mail</tt> oder <tt>Address=postaladdress </tt>. Geben Sie die Zuordnung als neuen Wert ein
+und klicken Sie auf "Hinzuf&#252;gen".</p>
+
+<a name="ggwvn"></a><h5>Assertion-G&#252;ltigkeit</h5>
+<p>Assertions sind w&#228;hrend eines bestimmten Zeitraums g&#252;ltig, und nicht davor oder danach.
+</p><p><tt>Effektive Zeit</tt> gibt den Zeitraum (in Sekunden) an, w&#228;hrend dessen eine Assertion g&#252;ltig
+ist, und zwar ab der Ausstellungszeit der Assertion. Der Standardwert ist 
+<tt>600</tt> Sekunden.</p>
+
+<a name="ggwsk"></a><h5>Zeitverschiebung f&#252;r Best&#228;tigungsanweisung </h5>
+<p>Behauptungen sind w&#228;hrend eines bestimmten Zeitraums g&#252;ltig, und nicht davor oder danach.
+Dieses Attribut gibt eine Frist (in Sekunden) f&#252;r den <tt>notBefore</tt>-Wert an. Der
+Standardwert ist <tt>300</tt>.  Er hat keine Bedeutung f&#252;r den <tt>notAfter</tt>-Wert.</p>
+
+<a name="ggwts"></a><h5>Standard-Relay-Status</h5>
+<p><a name="indexterm-77"></a>Nach einem erfolgreichen WS-FED-Vorgang (Single Sign-On, Einzelabmeldung oder Verbindungstrennung) wird eine Seite
+angezeigt. Diese Seite, im Allgemeinen die urspr&#252;nglich angeforderte Ressource, wird in der
+initiierenden Anforderung mithilfe des <tt>RelayState</tt>-Elements angegeben. Wenn kein <tt>RelayState</tt> angegeben ist, wird
+der Wert dieser <tt>defaultRelayState</tt>-Eigenschaft angezeigt.</p>
+<hr><p><b>Achtung &#8211; </b>Wenn <tt>RelayState</tt> oder <tt>defaultRelayState</tt> Sonderzeichen enth&#228;lt (wie <tt>&#38;</tt>), muss das Element URL-verschl&#252;sselt
+sein. Beispiel: Wenn der Wert von <tt>RelayState</tt> <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt> lautet, muss er URL-verschl&#252;sselt
+sein als:</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>Er muss dann an den URL angeh&#228;ngt werden. Beispiel: Der vom Dienstanbieter
+initiierte Single Sign-On-URL w&#228;re:</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>Home-Bereich-Discovery</h5>
+<p>Gibt den Dienst an, sodass der Dienstanbieter den bevorzugten Identity-Anbieter identifizieren kann.
+Der Dienst-URL wird vom Dienstanbieter als Kontakt-Endpunkt angegeben. </p>
+
+<a name="ggwwb"></a><h5>Kontobereichauswahl</h5>
+<p>Gibt den Auswahlmechanismus und die Konfiguration f&#252;r den Identity-Anbieter an. Entweder das
+<tt>Cookie</tt>- oder das <tt>HTTPAnforderungs</tt>-Header-Attribut k&#246;nnen f&#252;r die Suche nach dem Identity-Anbieter verwendet
+werden.</p>
+<br/>
+
+</body>
+</html>

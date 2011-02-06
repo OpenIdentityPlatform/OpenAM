@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Objets - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>Objets</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a>Un <b>objet</b> d&#233;finit l'utilisateur ou le groupe d'utilisateurs (par exemple,  un
+groupe ou ceux qui poss&#232;dent un r&#244;le donn&#233;) affect&#233; par la strat&#233;gie.
+La r&#232;gle g&#233;n&#233;rale pour les objets est que la strat&#233;gie ne s'applique
+que si l'utilisateur est membre d'au moins un objet de la strat&#233;gie.
+Les objets par d&#233;faut sont les suivants :</p><dl><dt>Objet d'identit&#233; OpenSSO</dt>
+<dd><p>Cet objet implique que les identit&#233;s que vous cr&#233;ez et g&#233;rez sous l'onglet Objet de domaine puissent &#234;tre ajout&#233;es comme membres de l'objet.</p></dd>
+<dt>Utilisateurs authentifi&#233;s</dt>
+<dd><p>Ce type d'objet implique que tout utilisateur disposant d'un jeton SSO valide soit membre de cet objet.</p><p>Tous les utilisateurs authentifi&#233;s doivent &#234;tre membres de cet objet, m&#234;me s'ils ont &#233;t&#233; authentifi&#233;s aupr&#232;s d'un domaine diff&#233;rent de celui dans lequel la strat&#233;gie est d&#233;finie. Ceci est utile si le propri&#233;taire de la ressource souhaite donner acc&#232;s aux ressources qu'il g&#232;re &#224; des utilisateurs d'autres organisations. Si vous souhaitez limiter l'acc&#232;s aux ressources prot&#233;g&#233;es strictement aux membres d'une organisation sp&#233;cifique, utilisez dans ce cas l'objet Organisation.</p></dd>
+<dt>Clients de services Web</dt>
+<dd><p>Ce type d'objet implique qu'un client de service Web (WSC) identifi&#233; par le jeton SSO soit membre de cet objet si le DN de toute entit&#233; principale contenue dans le jeton SSO correspond &#224; une valeur s&#233;lectionn&#233;e quelconque de cet objet. Les valeurs valides sont les DN des certificats de confiance dans le fichier keystore JKS local, qui correspondent aux certificats des WSC de confiance. Cet objet pr&#233;sente une d&#233;pendance vis &#224; vis de Liberty Web Services Framework et ne doit &#234;tre utilis&#233; que par les fournisseurs de services Liberty pour autoriser les WSC.</p><p>Assurez-vous d'avoir cr&#233;&#233; le fichier keystore avant d'ajouter cet objet &#224; une strat&#233;gie. Vous pouvez consulter les informations relatives &#224; la configuration d'un fichier keystore &#224; l'emplacement suivant :</p><p><tt></tt><i>base OpenSSO</i><tt></tt> <tt> /SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>Les autres objets suivants sont s&#233;lectionnables dans le service de <a href="service.scpolicy.html">Configuration de r&#232;gles</a>du domaine&#160;:</p><dl><dt>R&#244;les OpenSSO</dt>
+<dd><p>Ce type de sous-objet implique que tout membre d'un r&#244;le OpenSSO soit membre de cet objet. Un r&#244;le OpenSSO est cr&#233;&#233; &#224; l'aide d'OpenSSO en mode h&#233;rit&#233;.</p></dd>
+<dt>Groupes LDAP</dt>
+<dd><p>Ce type de sous-objet implique que tout membre d'un groupe LDAP soit membre de cet objet.</p></dd>
+<dt>R&#244;les LDAP</dt>
+<dd><p>Ce type de sous-objet implique que tout membre d'un r&#244;le LDAP soit membre de cet objet. Un r&#244;le LDAP est une d&#233;finition de r&#244;le quelconque utilisant la fonctionnalit&#233; de r&#244;le de Directory Server. Ces r&#244;les ont des classes d'objet impos&#233;es par la d&#233;finition de r&#244;le Directory Server. Le filtre de recherche de r&#244;le LDAP peut &#234;tre modifi&#233; dans le service de <a href="service.scpolicy.html">Configuration de r&#232;gles</a> afin de restreindre l'&#233;tendue de la recherche et d'am&#233;liorer les performances.</p></dd>
+<dt>Utilisateurs LDAP</dt>
+<dd><p>Ce type de sous-objet implique que tout utilisateur LDAP soit membre de cet objet.</p></dd>
+<dt>Organisation</dt>
+<dd><p>Ce type d'objet implique que tout membre d'un domaine soit membre de cet objet.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

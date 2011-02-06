@@ -1,0 +1,579 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>J2EE Policy Agent - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.j2eeagentprofile"></a><h4>J2EE Policy Agent</h4>
+<p>A J2EE agent instance can be configured using this interface. The properties described
+only apply if during agent creation, centralized configuration was chosen. If local configuration
+was selected, the properties related to this agent must be edited in the
+<tt>OpenSSOAgentConfiguration.properites</tt> file in the agent installation directory.</p><p>The types of configuration available are divided into the following categories:</p>
+<ul><li><p><a href="#ggmvd">Global</a></p></li>
+<li><p><a href="#ggmwz">Application</a></p></li>
+<li><p><a href="#ggmwl">SSO</a></p></li>
+<li><p><a href="#ggmwi">OpenSSO Services</a></p></li>
+<li><p><a href="#ggmug">Miscellaneous</a></p></li>
+<li><p><a href="#ggmud">Advanced</a></p></li></ul>
+
+
+<a name="ggmvd"></a><h5>Global</h5>
+<p>These properties apply to all applications protected by an agent.</p>
+
+<a name="ggwrr"></a><h5>Group</h5>
+<p>If applicable, select a group from the drop down list to assign this
+agent to the group. This list consists of previously configured groups.</p>
+
+<a name="ggmqz"></a><h5>Password</h5>
+<p>The password was set when you created the agent profile. However, you can
+change the password at any time in the future.</p>
+
+<a name="ggmni"></a><h5>Password Confirm</h5>
+<p>The confirmation of the password was performed when you created the agent profile.
+If you change the password, you must confirm the change.</p>
+
+<a name="ggmpc"></a><h5>Status</h5>
+<p>The <tt>Active</tt> option is selected when the agent is created. Choose <tt>Inactive</tt> only
+if you want to remove the protection the agent provides.</p>
+
+<a name="ggmwm"></a><h5>Agent Notification URL</h5>
+<p>The URL used by the agent to register notification listeners.</p>
+
+<a name="ggmwr"></a><h5>Location of Agent Configuration Repository</h5>
+<p>If desired, change the configuration location to whichever of the two options is
+available: centralized or local. The centralized location allows you to control the configuration
+in a centralized manner, such as from the Console.</p><p>The local option is provided for backward compatibility purposes. If the local configuration
+option is selected, the agent will use its local configuration in the <tt>OpenSSOAgentConfiguration.properites</tt>
+file in the agent installation directory. In addition, the Console will only display
+the following properties: Password, Password (confirmation), and Status.</p>
+
+<a name="ggmwk"></a><h5>Configuration Reload Interval</h5>
+<p>The interval in seconds between configuration reloads. Setting this property to <tt>0</tt> disables
+the hot-swap mechanism.</p>
+
+<a name="ggwkv"></a><h5>Agent Configuration Change Notification</h5>
+<p>When enabled, the agent receives notification messages from the OpenSSO server about configuration
+changes.</p>
+
+<a name="ggmvt"></a><h5>Agent Filter Mode</h5>
+<p>The mode of operation for the filter. For this properly, a global value
+can be set to apply to all the applications that don't have their
+own specific filter mode. </p><p>Enter a web application name for the Map Key and a value
+for the Corresponding Map Values. Valid values are ALL, J2EE_POLICY, URL_POLICY, SSO_ONLY, and NONE.
+To set ALL as the global filter mode: leave Map Key field empty,
+and enter ALL in Corresponding Map Value field. </p>
+
+<a name="ggmvu"></a><h5>Resource Access Denied URI:</h5>
+<p>The URL of the customized access denied page. If no value is provided,
+the agent returns an <tt>HTTP</tt> status of <tt>403 (Forbidden)</tt>.</p>
+
+<a name="ggmxg"></a><h5>HTTP Session Binding</h5>
+<p>When enabled, the <tt>HTTP</tt> session is invalidated when login fails. The user has
+no SSO session, or the principal user name does not match the SSO
+user name.</p>
+
+<a name="ggmut"></a><h5>GOTO Parameter Name</h5>
+<p>A string that represents the <tt>goto</tt> parameter name, which is used by the
+agent to redirect the user to the appropriate authentication service. The value of
+this parameter is used by the authentication service to redirect the user to
+the original requested destination.</p>
+
+<a name="ggmuv"></a><h5>Login Attempt Limit</h5>
+<p>The number of failed login attempts allowed during a single browser session until
+the user request is blocked. A value of <tt>0</tt> disables this feature.</p>
+
+<a name="ggmtr"></a><h5>Custom Response Header</h5>
+<p>A list of mappings of custom headers. The headers are set by the
+agent on the client browser. Enter a header name for the Map
+Key and the header value for the Corresponding Map Values.</p>
+
+<a name="ggmtt"></a><h5>Redirect Attempt Limit</h5>
+<p>The number of successive single point redirects allowed during a single browser session
+until the user request is blocked. A value of <tt>0</tt> disables this feature.</p>
+
+<a name="ggmxd"></a><h5>Agent Debug Level</h5>
+<p>The type of debug messages logged. This setting determines the level of the
+debug log saved locally on the agent host.</p>
+
+<a name="ggmsk"></a><h5>User Mapping Mode</h5>
+<p>The mechanism the agent uses to determine the user ID.</p>
+
+<a name="ggmts"></a><h5>User Attribute Name</h5>
+<p>The name of the attribute that contains the user ID. The value for
+this property is not used if the property labeled User Mapping Mode is
+set to <tt>USER_ID</tt>.</p>
+
+<a name="ggmuc"></a><h5>User Principal Flag</h5>
+<p>When enabled, the principal of the authenticated user is used to authenticate the
+user instead of solely the user ID. The value for this property is
+used if the property labeled User Mapping Mode is set to <tt>USER_ID</tt>.</p>
+
+<a name="ggmtm"></a><h5>User Token Name</h5>
+<p>The session property name of the user ID of the authenticated user in
+session. The value for this property is used when the property labeled User
+Mapping Mode is set to <tt>USER_ID</tt> and the property labeled User Principal Flag
+is not enabled.</p>
+
+<a name="ggmzk"></a><h5>Audit Access Types</h5>
+<p>The types of messages the agent logs based on user URL access attempts.</p>
+
+<a name="ggmyk"></a><h5>Audit Log Location</h5>
+<p>The location to which audit messages are logged.</p>
+
+<a name="ggmxz"></a><h5>Remote Log File Name</h5>
+<p>Name of the OpenSSO log file to which each URL access to
+OpenSSO is recorded.</p>
+
+<a name="ggmxy"></a><h5>Rotate Local Audit Log</h5>
+<p>When enabled, audit log files are rotated when they reach the size specified
+by the property labeled Local Audit Log Rotation Size.</p>
+
+<a name="ggmyc"></a><h5>Local Audit Log Rotation Size</h5>
+<p>The size at which the local audit log file is rotated to
+a new file.</p>
+
+<a name="ggndh"></a><h5>FQDN Check</h5>
+<p>When enabled, the FQDN default value and the FQDN map values are checked.</p>
+
+<a name="ggnfn"></a><h5>FQDN Default</h5>
+<p>The fully qualified host name for users to use to access resources.</p>
+
+<a name="ggnft"></a><h5>FQDN Virtual Host Map</h5>
+<p>A mapping to an actual or valid host name. This mapping is
+from a host name that is not recognized to one that is recognized.
+This mapping is useful in the following situations: when an IP address or an
+incorrect URL is entered by the user or when a virtual host is
+used for protected resources.</p><p>Enter values for the Map Key and the Corresponding Map Values and click
+Add. </p>
+
+<a name="ggmwz"></a><h5>Application</h5>
+<p>These properties tend to be application specific.</p>
+
+<a name="ggmxm"></a><h5>Login Form URI</h5>
+<p>The list of absolute URIs corresponding to an application's <tt>web.xml</tt> form-login-page element.</p>
+
+<a name="ggmzf"></a><h5>Login Error URI</h5>
+<p>The list of absolute URIs corresponding to an application's <tt>web.xml</tt> form-error-page element.</p>
+
+<a name="ggmyn"></a><h5>Use Internal Login</h5>
+<p>When enabled, agent uses the customized internal content as specified by the property
+labeled Login Content File Name. When not enabled, the agent uses the default
+internal content.</p>
+
+<a name="ggmxs"></a><h5>Login Content File Name</h5>
+<p>The complete path and name of the custom login content file.</p>
+
+<a name="ggmyw"></a><h5>Application Logout Handler</h5>
+<p>Application-specific mappings, each of which identifies a handler to be used for logout
+processing.</p><p>Enter the logout handler for the Map Key field and the application logout
+handler class name in the Corresponding Map Values field. Click Add. </p>
+
+<a name="ggmzp"></a><h5>Application Logout URI</h5>
+<p>Application-specific mappings, each of which identifies a request URI. The presence of the
+specified request URI indicates a logout event.</p><p>Enter the logout URI for the Map Key field and the application logout
+URI  in the Corresponding Map Values field. Click Add. </p>
+
+<a name="ggmxw"></a><h5>Logout Request Parameter</h5>
+<p>Application-specific mappings, each of which identifies a parameter. The presence of the specified
+parameter in the <tt>HTTP</tt> request indicates a logout event.</p>
+
+<a name="ggmzu"></a><h5>Logout Introspect Enabled</h5>
+<p>When enabled, the agent to searches the <tt>HTTP</tt> request body to locate the
+logout parameter.</p>
+
+<a name="ggmyj"></a><h5>Logout Entry URI</h5>
+<p>Application specific mappings, each of which identifies a URI to be used as
+an entry point after successful logout and, if applicable, after subsequent successful authentication.</p><p>Enter the value for the Map Key field and the logout entry
+URI  in the Corresponding Map Values field. Click Add. </p>
+
+<a name="ggmxn"></a><h5>Not Enforced URIs</h5>
+<p>A URI list for which no authentication is performed. For every URI on
+this list, protection is not enforced by the agent and credentials are not
+requested.</p>
+
+<a name="ggmyy"></a><h5>Invert Not Enforced URIs</h5>
+<p>When enabled, the not enforced URI list becomes the enforced list. Therefore, all
+the URIs listed as values for the property labeled Not Enforced URIs are
+then enforced, while all other URIs are not enforced.</p>
+
+<a name="ggmyv"></a><h5>Not Enforced URIs Cache Enabled</h5>
+<p>When enabled, the evaluation results are cached for not-enforced URIs. Therefore, evaluation results
+are cached for the list of values associated with the property labeled Not
+Enforced URIs.</p>
+
+<a name="ggmzm"></a><h5>Not Enforced URIs Cache Size</h5>
+<p>When the property labeled Not Enforced URIs Cache Enabled is enabled, the value
+specified for this property is used to set the cache size.</p>
+
+<a name="ggmzd"></a><h5>Not Enforced Client IP List</h5>
+<p>Client IP address list, requests from which do not undergo authentication or authorization.
+For every IP address on this list, access is granted, credentials are not
+requested for authentication or authorization.</p>
+
+<a name="ggmzn"></a><h5>Not Enforced IP Invert List</h5>
+<p>When enabled, the not-enforced client IP list becomes the enforced list. Therefore, all
+the IP addresses listed as values for the property labeled Not Enforced Client
+IP List are then enforced, while all other IP addresses are not enforced.</p>
+
+<a name="ggmzh"></a><h5>Not Enforced IP Cache Flag</h5>
+<p>When enabled, the evaluation results are cached for not-enforced IP addresses. Therefore, evaluation
+results are cached for the list of values associated with the property labeled
+Not Enforced Client IP List.</p>
+
+<a name="ggmzs"></a><h5>Not Enforced IP Cache Size</h5>
+<p>When the property labeled Not Enforced IP Cache Flag is enabled, the value
+specified for this property is used to set the cache size.</p>
+
+<a name="ggmzi"></a><h5>Profile Attribute Fetch Mode</h5>
+<p>The modes available to fetch additional user profile attributes to be introduced into
+a request.</p>
+
+<a name="ggmzo"></a><h5>Profile Attribute Mapping</h5>
+<p>A list of mappings from profile attribute names to <tt>HTTP</tt> header names. The
+<tt>HTTP</tt> header names are populated under specific names for the currently authenticated user.
+</p>
+
+<a name="ggmym"></a><h5>Response Attribute Fetch Mode</h5>
+<p>The modes available to fetch additional user response attributes to be introduced into
+a request.</p>
+
+<a name="ggmzg"></a><h5>Response Attribute Mapping</h5>
+<p>A list of mappings from response attribute names to <tt>HTTP</tt> header names. The
+HTTP header names are populated under specific names for the currently authenticated user.
+</p>
+
+<a name="ggmxl"></a><h5>Cookie Separator Character</h5>
+<p>The character to be used to separate multiple values of the same attribute
+when it is being set as a cookie.</p>
+
+<a name="ggmyl"></a><h5>Fetch Attribute Date Format</h5>
+<p>The format of date attribute values to be used when the attribute is
+being set as an <tt>HTTP</tt> header. The format is based on <tt>java.text.SimpleDateFormat</tt>.</p>
+
+<a name="ggmzq"></a><h5>Attribute Cookie Encode</h5>
+<p>When enabled, the value of the attribute is URL encoded before being set
+as a cookie.</p>
+
+<a name="ggmyf"></a><h5>Session Attribute Fetch Mode</h5>
+<p>The modes available to fetch additional user session attributes to be introduced into
+a request.</p>
+
+<a name="ggmyu"></a><h5>Session Attribute Mapping</h5>
+<p>A list of mappings from session attribute names to <tt>HTTP</tt> header names. The
+session attribute names are populated under specific names for the currently authenticated user.
+</p>
+
+<a name="ggmyi"></a><h5>Default Privileged Attribute</h5>
+<p>A list of privileged attributes to authenticated users. These attributes are granted to
+all users who have a valid OpenSSO session.</p>
+
+<a name="ggmxo"></a><h5>Privileged Attribute Type</h5>
+<p>A list of privileged attribute types to be fetched for each user.</p>
+
+<a name="ggmyb"></a><h5>Privileged Attributes To Lower Case</h5>
+<p>A list of mappings from privileged attribute types to values of <tt>true</tt> or
+<tt>false</tt>: <tt>true</tt> to indicate that the attribute type is converted to lowercase or
+<tt>false</tt> if it is not converted.</p>
+
+<a name="ggmyt"></a><h5>Privileged Session Attribute</h5>
+<p>A list of session property names that hold privileged attributes for the authenticated
+user.</p>
+
+<a name="ggmxk"></a><h5>Enable Privileged Attribute Mapping</h5>
+<p>When enabled, mappings are applied from an attribute's original value to an alternate
+value as specified by the property labeled Privileged Attribute Mapping.</p>
+
+<a name="ggmya"></a><h5>Privileged Attribute Mapping</h5>
+<p>A list of mappings from an attribute's original value to an alternate value.
+This property is effective only when the property labeled Enable Privileged Attribute Mapping
+is enabled.</p>
+
+<a name="ggmyg"></a><h5>Custom Authentication Handler</h5>
+<p>A list of mappings from an application to the authentication handler specific to
+that application. Each authentication handler is used by the agent to authenticate the
+user within the container for the specified application.</p>
+
+<a name="ggmyq"></a><h5>Custom Logout Handler</h5>
+<p>A list of mappings from an application to the logout handler specific to
+that application. Each logout handler is used by the agent to log out
+the user within the container for the specified application.</p>
+
+<a name="ggmxv"></a><h5>Custom Verification Handler</h5>
+<p>A list of mappings from an application to the local verification handler specific
+to that application. Local verification handlers are used by the agent to validate
+the user credentials with the local repository.</p>
+
+<a name="ggmwl"></a><h5>SSO</h5>
+<p>These properties allow you to configure features of the agent related to single
+sign-on (SSO) and cross domain single sign-on (CDSSO).</p>
+
+<a name="ggmyo"></a><h5>Cookie Name</h5>
+<p>The name of the SSO token cookie used between the OpenSSO server and
+the agent.</p>
+
+<a name="ggmxu"></a><h5>SSO Cache Enable</h5>
+<p>When enabled, the SSO cache is active for the agent and can be
+used through public APIs exposed by the agent SDK.</p>
+
+<a name="ggmza"></a><h5>Cross Domain SSO</h5>
+<p>When enabled, cross domain single sign-on (CDSSO) is active.</p>
+
+<a name="ggmzt"></a><h5>CDSSO Redirect URI</h5>
+<p>An intermediate URI used by the agent to process CDSSO requests.</p>
+
+<a name="ggmyd"></a><h5>CDSSO Servlet URL</h5>
+<p>A list of URLs of the available CDSSO controllers. These URLs can be
+used by the agent for CDSSO processing.</p>
+
+<a name="ggmzc"></a><h5>CDSSO Clock Skew</h5>
+<p>The number of seconds to be used by the agent to determine
+the validity of the CDSSO <tt>AuthnResponse</tt> assertion.</p>
+
+<a name="ggmyz"></a><h5>CDSSO Trusted ID Provider</h5>
+<p>A list ofOpenSSO Server/ID providers to be trusted by the agent when evaluating
+the CDC Liberty responses. Setting this property is necessary when a load balancer,
+firewall, or both are present between the agent and theOpenSSO instance.</p>
+
+<a name="ggmzj"></a><h5>CDSSO Secure Enable</h5>
+<p>When enabled and when the communications channel with the host is secure, the
+SSO token cookie set by the agent in the different domains in CDSSO
+mode are marked secure.</p>
+
+<a name="ggmze"></a><h5>CDSSO Domain List</h5>
+<p>A list of domains for which cookies have to be set in
+a CDSSO scenario.</p>
+
+<a name="ggmyx"></a><h5>Cookie Reset</h5>
+<p>When enabled, the agent resets cookies in the response before redirecting to authentication.</p>
+
+<a name="ggmys"></a><h5>Cookies Reset Name List</h5>
+<p>A list of cookie names to be reset by the agent if
+the property labeled Cookie Reset is enabled.</p>
+
+<a name="ggmye"></a><h5>Cookies Reset Domain Map</h5>
+<p>A list of mappings from a cookie name specified by the property labeled
+Cookie Reset Name List to the domain of the cookie to be
+used when a reset event occurs (the value).</p>
+
+<a name="ggmzl"></a><h5>Cookies Reset Path Map</h5>
+<p>A list of mappings from a cookie name specified in the property labeled
+Cookie Reset Name List (the key) to the path of the cookie to
+be used when a reset event occurs (the value).</p>
+
+<a name="ggmwi"></a><h5>OpenSSO Services</h5>
+<p>These properties configure the OpenSSO services that the agent uses, such as policy
+service, session service, authentication service, and service management (SM) service.</p>
+
+<a name="ggmxr"></a><h5>OpenSSO Login URL</h5>
+<p>A list of URLs to OpenSSO authentication. When authentication is required, the agent
+redirects incoming users to the appropriate authentication service as specified by the URL.</p>
+
+<a name="ggmzr"></a><h5>Login URL Prioritized</h5>
+<p>When enabled, prioritizes the failover sequence for Login URLs or CDSSO URLs as
+defined by the property labeled OpenSSO Login URL.</p>
+
+<a name="ggmyh"></a><h5>Login URL Probe</h5>
+<p>When enabled, the agent checks the availability of the URLs defined by the
+property labeled OpenSSO Login URL before redirecting to them.</p>
+
+<a name="ggmxq"></a><h5>Login URL Probe Timeout</h5>
+<p>When the property labeled Login URL Probe is enabled, the value specified for
+this property determines the number of milliseconds for the connect timeout.</p>
+
+<a name="ggmxx"></a><h5>OpenSSO Logout URL</h5>
+<p>A list of OpenSSO logout page URLs.</p>
+
+<a name="ggmzv"></a><h5>Logout URL Prioritized</h5>
+<p>When enabled, prioritizes the failover sequence for logout URLs as defined by the
+property labeled OpenSSO Login URL.</p>
+
+<a name="ggmzx"></a><h5>Logout URL Probe</h5>
+<p>When enabled, the agent checks the availability of logout URLs, as defined by
+the property labeled OpenSSO Login URL, before redirecting to them.</p>
+
+<a name="ggmzy"></a><h5>Logout URL Probe Timeout</h5>
+<p>When the property labeled Logout URL Probe is enabled, the value specified for
+this property determines the number of milliseconds for the connect timeout.</p>
+
+<a name="ggmzz"></a><h5>OpenSSO Authentication Service Protocol</h5>
+<p>The protocol to be used by the OpenSSO authentication service.</p>
+
+<a name="ggmzw"></a><h5>OpenSSO Authentication Service Host Name</h5>
+<p>The host name to be used by the OpenSSO authentication service.</p>
+
+<a name="ggnaw"></a><h5>OpenSSO Authentication Service Port</h5>
+<p>The number of the port to be used by the OpenSSO authentication service.</p>
+
+<a name="ggnak"></a><h5>Enable Policy Notifications</h5>
+<p>When enabled, notifications are operative for the remote policy client.</p>
+
+<a name="ggnao"></a><h5>Policy Client Polling Interval</h5>
+<p>The duration in minutes after which the cached entries are refreshed by the
+remote policy client.</p>
+
+<a name="ggnaj"></a><h5>Policy Client Cache Mode</h5>
+<p>The mode of caching to be used by the remote policy client. The
+valid values are as follows: <tt>subtree</tt> or <tt>self</tt>.</p>
+
+<a name="ggnat"></a><h5>Policy Client Boolean Action Values</h5>
+<p>The boolean action values available for policy action names.</p><p>Example:</p><pre><i>serviceName</i>|<i>actionName</i>|<i>trueValue</i>|<i>falseValue</i></pre>
+
+<a name="ggnbg"></a><h5>Policy Client Resource Comparators</h5>
+<p>The resource comparators to be used for different service names.</p>
+
+<a name="ggnan"></a><h5>Policy Client Clock Skew</h5>
+<p>The number of seconds allowed to accommodate the time difference between the OpenSSO
+server machine and the remote policy client machine.</p>
+
+<a name="ggnbd"></a><h5>URL Policy Env GET Parameters</h5>
+<p>A list of <tt>HTTP GET</tt> request parameters whose names and values are to be
+set in the environment map for URL policy evaluation at OpenSSO server.</p><p>The map key is in the format of <tt>GET</tt> <i>parameterName</i> while the
+map value is a set of string values of the parameter.</p>
+
+<a name="ggnax"></a><h5>URL Policy Env POST Parameters</h5>
+<p>A list of <tt>HTTP POST</tt> request parameters whose names and values are to be
+set in the environment map for URL policy evaluation at OpenSSO erver.</p><p>The map key is in the format of <tt>POST</tt> <i>parameterName</i> while the
+map value is a set of string values of the parameter.</p>
+
+<a name="ggnaa"></a><h5>URL Policy Env jsession Parameters</h5>
+<p>A list of <tt>HTTP SESSION</tt> attributes whose names and values are to be set
+in the environment map for URL policy evaluation at OpenSSO server.</p><p>The map key is in the format of <tt>JSESSION</tt> <i>parameterName</i> while the
+map value is a set of string values of the parameter.</p>
+
+<a name="ggnai"></a><h5>User Data Cache Polling Time</h5>
+<p>The cache update time in minutes for user management data. If set to
+<tt>0</tt>, no updates occur.</p>
+
+<a name="ggnaf"></a><h5>Enable Notification of Service Data Caches</h5>
+<p>When enabled, notifications are operative for service management caches.</p>
+
+<a name="ggnam"></a><h5>Service Data Cache Time</h5>
+<p>Cache update time in minutes for service configuration data. If set to <tt>0</tt>,
+no updates occur.</p><p>This property takes effect only if no notification URL is provided as a
+value for the property labeled Agent Notification URL or if notifications are disabled.</p>
+
+<a name="ggnaq"></a><h5>Enable Client Polling</h5>
+<p>When enabled, the session client must use polling for updating session information and
+not depend upon server notifications.</p>
+
+<a name="ggnar"></a><h5>Client Polling Period</h5>
+<p>The time in seconds after which the session client requests an update of
+cached session information from the server.</p>
+
+<a name="ggmug"></a><h5>Miscellaneous</h5>
+<p>These properties do not fit smoothly in other categories.</p>
+
+<a name="ggnal"></a><h5>Locale Language </h5>
+<p>The language code for identifying the locale of operation.</p>
+
+<a name="ggnae"></a><h5>Locale Country</h5>
+<p>The country code for identifying the locale of operation.</p>
+
+<a name="ggnbc"></a><h5>Port Check Enable</h5>
+<p>When enabled, port check functionality is operative.</p>
+
+<a name="ggnav"></a><h5>Port Check File</h5>
+<p>The name or complete path of a file that has the content
+necessary to handle requests requiring port correction.</p>
+
+<a name="ggnac"></a><h5>Port Check Setting</h5>
+<p>A list of mappings from port numbers to protocols. The key is the
+listening port number while the value is the listening protocol to be used
+by the agent to identify requests with invalid port numbers.</p>
+
+<a name="ggnbf"></a><h5>Bypass Principal List</h5>
+<p>A list of principals bypassed by the agent for authentication and search purposes.</p>
+
+<a name="ggojq"></a><h5>Legacy Support Enable</h5>
+<p>When enabled, legacy user agents (browsers) are supported.</p>
+
+<a name="ggnad"></a><h5>Legacy User Agent</h5>
+<p>A list of user agent header values. Each value identifies a legacy browser.</p>
+
+<a name="ggnap"></a><h5>Legacy Redirect URI</h5>
+<p>An intermediate URI used by the agent to redirect legacy user agent requests.</p>
+
+<a name="ggnay"></a><h5>Encryption Provider</h5>
+<p>The encryption provider implementation to be used by the agent.</p>
+
+<a name="ggmud"></a><h5>Advanced</h5>
+<p>These properties are either custom properties or properties that tend to be used
+in more-complex or less-common deployments.</p>
+
+<a name="ggmxt"></a><h5>Client IP Address Header</h5>
+<p>The <tt>HTTP</tt> header name that holds the IP address of the client.</p>
+
+<a name="ggmyp"></a><h5>Client Hostname Header</h5>
+<p>The <tt>HTTP</tt> header name that holds the host name of the client.</p>
+
+<a name="ggnbb"></a><h5>Web Service Enable</h5>
+<p>When enabled, web services are processed.</p>
+
+<a name="ggnab"></a><h5>Web Service End Points</h5>
+<p>A list of web application end points. Each end point represents a web
+service.</p>
+
+<a name="ggnah"></a><h5>Web Service Process GET Enable</h5>
+<p>When enabled, <tt>HTTP GET</tt> requests for web-service endpoints are processed.</p>
+
+<a name="ggnba"></a><h5>Web Service Authenticator</h5>
+<p>An implementation class that can be used to authenticate web-service requests.</p>
+
+<a name="ggnau"></a><h5>Web Service Internal Error Content File</h5>
+<p>The name of the file of which the agent uses the contents
+to generate an internal error fault for clients.</p>
+
+<a name="ggnag"></a><h5>Web Service Authorization Error Content File</h5>
+<p>The name of the file of which the agent uses the contents
+to generate an authorization error fault for clients.</p>
+
+<a name="ggnfp"></a><h5>Alternative Agent Host Name</h5>
+<p>The host name identifying the agent-protected server to the client browsers, if the
+host name used is different than the actual host name.</p>
+
+<a name="ggnew"></a><h5>Alternative Agent Port Name</h5>
+<p>The port number identifying the agent protected server listening port to the client
+browsers, if the port number used is different than the actual listening port.</p>
+
+<a name="ggnga"></a><h5>Alternative Agent Protocol</h5>
+<p>The protocol being used (<tt>HTTP</tt>/<tt>HTTPS</tt>) by the client browsers to communicate with the
+agent protected server, if the protocol used is different than the actual protocol
+used by the server.</p>
+
+<a name="ggngg"></a><h5>Custom Properties</h5>
+<p>Additional properties that allow users to augment the set of properties supported by
+the agent.</p><p>Example:</p><pre>customproperty=custom-value1
+customlist[0]=customlist-value-0
+customlist[1]=customlist-value-1
+custommap[key1]=custommap-value-1
+custommap[key2]=custommap-value-2</pre>
+<br/>
+
+</body>
+</html>

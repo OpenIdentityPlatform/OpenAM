@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 XACML PEP - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pep"></a><h4>自訂 SAMLv2 XACML PEP</h4>
+<p>XACML PEP 包含下列用於自訂的屬性：</p>
+<ul><li><p><a href="#ggwgy">協定支援列舉</a></p></li>
+<li><p><a href="#ggwkt">簽署金鑰別名</a></p></li>
+<li><p><a href="#ggwhc">加密金鑰別名</a></p></li>
+<li><p><a href="#ggwhq">基本授權</a></p></li>
+<li><p><a href="#ggwgq">已簽名授權決定回應</a></p></li>
+<li><p><a href="#ggwjn">指定已加密</a></p></li></ul>
+
+
+<a name="ggwgy"></a><h5>協定支援列舉</h5>
+<p>顯示此提供者支援的 XACML PEP 發行版本。</p>
+
+<a name="ggwkt"></a><h5>簽署金鑰別名</h5>
+<p>定義用來簽署請求和回應的金鑰別名。</p>
+
+<a name="ggwhc"></a><h5>加密金鑰別名</h5>
+<p>定義 XACML 加密的金鑰別名。</p>
+
+<a name="ggwhq"></a><h5>基本授權</h5>
+<p>啟用基本授權可保護 SOAP 端點。任何存取這些端點的提供者都必須擁有下列兩項特性中定義的使用者和密碼：<tt>使用者名稱</tt>和<tt>密碼</tt>。</p>
+
+<a name="ggwgq"></a><h5>已簽名授權決定回應</h5>
+<p>啟用時，此屬性會強制 XACML 授權決定的所有回應都進行簽名。</p>
+
+<a name="ggwjn"></a><h5>指定已加密</h5>
+<p>啟用時，此屬性會強制加密所有指定。</p>
+<br/>
+
+</body>
+</html>

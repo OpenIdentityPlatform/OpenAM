@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Preferencias de globalizaci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>Preferencias de globalizaci&#243;n</h4>
+<p><a name="indexterm-188"></a>El servicio de preferencias de globalizaci&#243;n contiene atributos globales que permiten configurar
+OpenSSO para las diferentes configuraciones regionales y conjuntos de caracteres. Los atributos son:</p>
+<ul><li><p><a href="#fsvdx">Conjunto de caracteres admitido por cada idioma</a></p></li>
+<li><p><a href="#fsvec">Alias de los conjuntos de caracteres</a></p></li>
+<li><p><a href="#fsveb">Formato de nombre com&#250;n generado autom&#225;ticamente</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>Conjunto de caracteres admitido por cada idioma</h5>
+<p>Este atributo muestra los conjuntos de caracteres que admite cada configuraci&#243;n regional,
+lo que indica la asignaci&#243;n entre las configuraciones regionales y el conjunto
+de caracteres. El formato es el siguiente:</p><p>Para agregar un nuevo juego de caracteres compatible, haga clic en Agregar
+y defina los siguientes par&#225;metros:</p><dl><dt>Configuraci&#243;n regional</dt>
+<dd><p>La nueva configuraci&#243;n regional que desee agregar. Consulte <a href="supportedlang.html">Idiomas admitidos</a> para obtener m&#225;s informaci&#243;n.</p></dd>
+<dt>Conjuntos de caracteres admitidos</dt>
+<dd><p>Introduzca el conjunto de caracteres admitido para la configuraci&#243;n regional especificada. Los conjuntos de caracteres est&#225;n delimitados por punto y coma. Por ejemplo, <tt>charset=charset1;charset2;charset3;...;charsetn </tt></p></dd>
+</dl>
+<p>Para editar un conjunto de caracteres compatible existente, haga clic en el
+nombre en la tabla Supported Charsets (Conjuntos de caracteres admitidos). Pulse "Aceptar"
+cuando haya terminado.</p>
+
+<a name="fsvec"></a><h5>Alias de los conjuntos de caracteres</h5>
+<p>Este atributo muestra los nombres del conjunto de c&#243;digos (que se asignan
+a los nombres IANA) que se utilizar&#225; para enviar la respuesta. Estos
+nombres del conjunto de c&#243;digos no tienen que coincidir con los del
+conjunto de c&#243;digos de Java. En la actualidad, existe una tabla Hash
+que permite asignar los conjuntos de caracteres de Java a conjuntos de
+caracteres IANA y viceversa.</p><p>Para agregar un nuevo alias de conjunto de caracteres, haga clic en
+Agregar y defina los siguientes par&#225;metros:</p><dl><dt>Nombre de MIME</dt>
+<dd><p>El nombre de asignaci&#243;n IANA. Por ejemplo, <tt>Shift_JIS</tt></p></dd>
+<dt>Nombre de Java</dt>
+<dd><p>El conjunto de caracteres de Java definido para asignarse al conjunto de caracteres IANA. </p></dd>
+</dl>
+<p>Para editar un  alias de conjunto de caracteres existente, haga clic
+en el nombre en la tabla. Pulse "Aceptar" cuando haya terminado.</p>
+
+<a name="fsveb"></a><h5>Formato de nombre com&#250;n generado autom&#225;ticamente</h5>
+<p>Esta opci&#243;n de visualizaci&#243;n permite definir la forma en la que un
+nombre se genera autom&#225;ticamente para adaptar los formatos de nombres a distintas
+configuraciones regionales y conjuntos de caracteres. La sintaxis predeterminada es la siguiente
+(tenga en cuenta que la inclusi&#243;n de comas o espacios en la
+definici&#243;n se mostrar&#225; en el formato del nombre):</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>Por ejemplo, si deseaba ver un nuevo formato de nombre para un
+usuario (Usuario uno) con un uid (11111) para el conjunto de caracteres
+chino, defina:</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>Se mostrar&#225;:</p><p><tt>Usuario uno 11111</tt></p>
+<br/>
+
+</body>
+</html>

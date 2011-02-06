@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>Windows NT 인증 모듈은 Microsoft Windows NT 서버에 대한 인증을 허용합니다. 이
+속성은 영역 속성입니다. 서비스 구성에서 이러한 속성에 적용되는 값이 Windows NT 인증
+템플리트의 기본값이 됩니다. 영역의 서비스를 등록한 후 서비스 템플리트를 만들어야 합니다. 기본값은
+등록 후 영역의 관리자에 의해 변경될 수 있습니다. 영역의 하위 트리에 있는
+항목은 영역 속성을 상속하지 않습니다.</p><p>Windows NT 인증 모듈을 활성화하려면 Samba Client 2.2.2를 다운로드하여 다음 디렉토리에 설치해야
+합니다. </p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>Samba 클라이언트는 별도의 Windows NT/2000 Server 없이도 Windows 시스템과 UNIX 시스템을 블렌딩할
+수 있는 파일 및 인쇄 서버입니다.</p><p>Red Hat Linux에서는 <tt>/usr/bin</tt> 디렉토리에 Samba 클라이언트가 제공됩니다.</p><p>Linux용 Windows NT 인증 서비스를 사용하여 인증하려면 클라이언트 이진 파일을 <tt></tt><i>OpenSSO-base </i><tt> /identity/bin</tt>에 복사합니다.</p><p>Windows NT 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fumve">인증 도메인</a></p></li>
+<li><p><a href="#fumvp">인증 호스트</a></p></li>
+<li><p><a href="#fumvq">Samba 구성 파일 이름</a></p></li>
+<li><p><a href="#fumwi">인증 수준</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>인증 도메인</h5>
+<p>사용자가 속한 도메인 이름을 정의합니다.</p>
+
+<a name="fumvp"></a><h5>인증 호스트</h5>
+<p>Windows NT 인증 호스트 이름을 정의합니다. 호스트 이름은 정규화된 도메인 이름(FQDN)이 아니라
+netBIOS 이름이어야 합니다. 기본적으로 FQDN의 첫 번째 부분은 netBIOS 이름입니다.</p><p>DHCP(동적 호스트 구성 프로토콜)가 사용될 경우 Windows 2000 시스템에서 HOSTS 파일에 적절한
+항목을 입력합니다. </p><p>netBIOS 이름에 기초하여 이름 확인이 수행됩니다. netBIOS 이름 확인을 제공하는 서브넷에 서버가
+없을 경우 매핑을 하드 코드해야 합니다. 예를 들어, 호스트 이름은 <tt>example1.company1.com</tt>이 아니라
+<tt>example1</tt>이어야 합니다. </p>
+
+<a name="fumvq"></a><h5>Samba 구성 파일 이름</h5>
+<p>Samba 구성 파일 이름을 정의하며 <tt>smbclient</tt> 명령의 <tt>-s</tt> 옵션을 지원합니다. 값은 Samba
+구성 파일이 있는 전체 디렉토리 경로여야 합니다. 예를 들면 다음과 같습니다. <tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

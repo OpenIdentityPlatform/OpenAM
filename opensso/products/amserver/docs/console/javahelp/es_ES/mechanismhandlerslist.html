@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Lista de administradores de mecanismos - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="mechanismhandlerslist"></a><h4>Lista de administradores de mecanismos</h4>
+<a name="indexterm-160"></a><a name="indexterm-161"></a><p>El atributo Lista de administradores de mecanismos almacena informaci&#243;n acerca de los
+mecanismos SASL admitidos por el Servicio Web de autenticaci&#243;n. It displays entries
+that contain key/value pairs separated by a pipe as in: <tt>key=PLAIN|class=com.sun.identity.liberty.ws.authnsvc.mechanism.PlainMechanismHandler </tt>. Los
+par&#225;metros se explican en la siguiente tabla.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Par&#225;metro</p></th>
+<th align="left" valign="top" scope="column"><p>Valor</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>key</tt></p></td>
+<td align="left" valign="top" scope="row"><p>El par&#225;metro <tt>key</tt> requerido define el
+mecanismo SASL admitido por el Servicio Web de autenticaci&#243;n.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>class</tt></p></td>
+<td align="left" valign="top" scope="row"><p>El par&#225;metro <tt>class</tt> requerido
+especifica el nombre de la clase de implementaci&#243;n del mecanismo SASL. La
+capa del Servicio Web de autenticaci&#243;n proporciona una interfaz de administrador que
+debe ser implementada en cada mecanismo SASL para poder procesar el mensaje
+solicitado y devolver una respuesta.</p></td>
+</tr>
+</table><p>Para agregar un administrador de solicitudes nuevo, haga clic en <b>Agregar</b> y
+consulte <a href="webservices.wsauthnserviceshandlersadd.html">Para configurar un administrador de mecanismos nuevo</a>.</p>
+<br/>
+
+</body>
+</html>

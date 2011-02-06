@@ -1,0 +1,4 @@
+<project name="upgrade">
+    <dirname property="upgrade.basedir" file="${ant.file.upgrade}"/>
+    <property file="${upgrade.basedir}/upgrade.properties"/>
+</project>

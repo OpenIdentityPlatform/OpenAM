@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 認證授權 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2authnauthority"></a><h4>自訂 SAMLv2 認證授權</h4>
+<p>SAMLv2 認證授權包含下列用於自訂的屬性：</p>
+<ul><li><p><a href="#ggwfq">簽署與加密</a></p></li>
+<li><p><a href="#ggwim">認證查詢服務</a></p></li>
+<li><p><a href="#ggwmk">AssertionID 請求</a></p></li>
+<li><p><a href="#ggwqw">憑證別名</a></p></li></ul>
+
+
+<a name="ggwfq"></a><h5>簽署與加密</h5>
+<dl><dt>金鑰大小</dt>
+<dd><p>屬性授權實體與其他實體互動時使用的金鑰長度。</p></dd>
+<dt>演算法</dt>
+<dd><p>用來與其他實體互動的加密演算法。</p></dd>
+</dl>
+
+
+<a name="ggwim"></a><h5>認證查詢服務</h5>
+<p>此屬性定義認證查詢傳送到的目標 URL。</p>
+
+<a name="ggwmk"></a><h5>AssertionID 請求</h5>
+<p>定義身份識別提供者的 URL， AssertionID 會從用戶端傳送到這些 URL 以擷取對應的指定。<tt>位置</tt>會指定將請求傳送到的提供者的 URL。AssertionID 請求類型包括：</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwqw"></a><h5>憑證別名</h5>
+<p>此屬性會定義提供者的憑證別名元素。<tt>簽署</tt>會指定用來尋找金鑰庫中正確的簽署憑證的提供者憑證別名。<tt>加密</tt>會指定用來尋找金鑰庫中正確的加密憑證的提供者憑證別名。</p>
+<br/>
+
+</body>
+</html>

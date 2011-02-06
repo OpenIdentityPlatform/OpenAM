@@ -1,0 +1,77 @@
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+	<tr><td><h2>Reporting Bugs and Security Bugs FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#bug">How do I report a bug?</a></li>
+<li><a href="#securitybug">Is reporting a security bug different?</a></li>
+<li><a href="#how">How do I report a security bug?</a></li>
+<li><a href="#uncertainty">How do I know if it is a security bug?</a></li>
+<li><a href="#evaluate">What are the criteria for evaluating a security bug?</a></li>
+<li><a href="#cve">Should we put the bug on the Common Vulnerabilities and Exposures (CVE) list?</a></li>
+<li><a href="#fix">What is the process for fixing a security bug?</a></li>
+</ol>
+</font></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="bug"></a> How do I report a bug?</b></b></p>
+
+<p>The first step is to search <a href="https://opensso.dev.java.net/servlets/ProjectIssues">Issue Tracker</a> to see if the problem has already been reported. Anyone can search the database but, if you don't find a report for your issue, you must register as a user. See the <a href="../governance/index.html">Governance</a> for more information or click <a href="https://www.dev.java.net/servlets/Login?cookieCheck=on">Join</a> on the navigation bar.
+
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="securitybug"></a> Is reporting a security bug different?</b></b></p>
+
+<p>Yes, security bugs are treated as a matter of absolute urgency so handling a security vulnerability is different from handling any other kind of bug. The bug report cannot be submitted through the regular channels as the objective is to analyze and fix the bug in secrecy, announcing the existence of the bug and its fix concurrently. 
+
+
+<tr><td><p><b>Q:<b><a name="how"></a> How do I report a security bug?</b></b></p>
+
+<p>Security bugs are submitted to a private security team alias outside the <code>java.net</code> infrastructure since it is not possible to restrict a <code>java.net</code> mailing list archive to a tight group of subscribers. The security team email address is:</p>
+
+<p><a href="mailto:opensso-sec-bugs-ext@sun.com">opensso-sec-bugs-ext@sun.com</a></p>
+
+<p>Subscription to the security bug alias and its archive will be tightly restricted to a small security team. At the project's inception, the security team will comprise only Module Owners.</p>
+
+<p><i>And remember, only security bugs should be sent to the security team alias.</i></p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="uncertainty"></a> How do I know if it is a security bug?</b></b></p>
+
+<p>You might not know. There is the assumption that people will send other bugs to the alias, either deliberately, to circumvent the regular process, or mistakenly, believing a real security bug has been found. The security team will discuss the submitted bug and its relevance using the private security team alias (<a href="mailto:opensso-sec-bugs-ext@sun.com">opensso-sec-bugs-ext@sun.com</a>). After a consensus has been reached, a member of the security team may reply to the submitter with a pro forma response, directing them to submit the bug to <a href="https://opensso.dev.java.net/servlets/ProjectIssues">Issue Tracker</a> using the non-security bug process.</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="evaluate"></a> What are the criteria for evaluating a security bug?</b></b></p>
+
+<p>The next task after conceding the receipt of a valid security bug is for the security team to evaluate its severity:</p>
+<ol type="a">
+<li>How serious is the vulnerability?
+	<ul><li>Critical: the bug can lead to arbitrary code execution.</li>
+	<li>Severe: the bug can compromise confidentiality, integrity or availability of resources.</li>
+	<li>Moderate: anything else - for example, the bug exposes operational information such as number of active sessions.</li></ul></li>
+<li>How easy is it to exploit the vulnerability? Is a scripted attack possible? Must the attacker successfully authenticate as a regular user before initiating an attack?</li>
+<li>Who reported the issue? A report from a source outside the project is treated with even more urgency than one from an internal engineer.</li>
+</ol></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="cve"></a> Should we put the bug on the Common Vulnerabilities and Exposures (CVE) list?</b></b></p>
+ 
+<p>CVE is a list of standardized names for vulnerabilities and other information security exposures. It aims to standardize the names for all publicly known vulnerabilities and security exposures. CVE names (also called <i>CVE numbers</i>, <i>CVE-IDs</i>, or <i>CVEs</i>) are unique, common identifiers for publicly known information security vulnerabilities. CVE names have <b>entry</b> or <b>candidate</b> status. Entry status indicates that the CVE name has been accepted to the CVE list. Candidate status (also called <i>candidates</i>, <i>candidate numbers</i>, or <i>CANs</i>) indicates that the name is under review for inclusion to the list.</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="fix"></a> What is the process for fixing a security bug?</b></b></p>
+
+<ol><li>Work on the fix must proceed as quietly as possible, with discussion restricted to members of the security team. Code reviews will be performed as usual with the audience restricted to the security team.</li>
+<li>Once a fix has been produced and tested, important users will be pre-notified. These users will be allowed to apply the patch before the bug becomes public knowledge.</li>
+<li>The bug and the fix must be announced and made available simultaneously (or as close to simultaneous as possible).</li>
+</ol>
+</td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

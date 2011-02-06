@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Create a New Circle of Trust - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createcot"></a><h4>To Create a New Circle of Trust</h4><a name="indexterm-56"></a><p>Follow this procedure to create a new circle of trust. The starting point
+is New Circle of Trust under the Federation interface.</p><ol>
+<li><b>Click New to display the circle of trust attributes.</b><p>The New circle of trust profile page is displayed.</p></li>
+<li><b>Type a name for the circle of trust.</b></li>
+<li><b>Type a description of the circle of trust in the Description field.</b></li>
+<li><b>Type a value for the IDFF Writer Service URL.</b><p>The IDFF Writer Service URL specifies the location of the servlet that writes the
+common domain cookie. Use the format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/idffwriter</tt>.</p></li>
+<li><b>Type a value for the IDFF Reader Service URL.</b><p>The IDFF Reader Service URL specifies the location of the servlet that reads the
+common domain cookie. Use the format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/idffreader</tt>.</p></li>
+<li><b>Type a value for the SAML2 Writer Service URL.</b><p>This specifies the location of the SAML2 Writer service that writes the cookie to
+the common domain. Use the format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/saml2writer</tt>.</p></li>
+<li><b>Type a value for the SAML2 Reader Service URL.</b><p>This specifies the location of the SAML2 Reader service that reads the cookie from
+the common domain. Use the format <tt>http://</tt><i>common-domain-host</i><tt> :</tt><i>port</i><tt>/common/saml2reader</tt>.</p></li>
+<li><b>Choose Active or Inactive.</b><p>The default status is Active. Choosing Inactive disables communication within the authentication domain.</p></li>
+<li><b>Select the Realm in which the circle of trust will be created. </b></li>
+<li><b>Choose one or more of the available providers and click the Add arrow
+to select them.</b><p>The list provided contains the names of entities that have been created and
+populated with providers. For more information, see <a href="federation.fsauthdomainsselectprovider.html">To Add Providers to a Circle of Trust</a>.</p></li>
+<li><b>Click OK to complete the configuration.</b><p>The new circle of trust is displayed in the Circle of Trust list.</p></li></ol>
+<br/>
+
+</body>
+</html>

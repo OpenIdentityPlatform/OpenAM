@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-WSF 보안 서비스 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Liberty ID-WSF 보안 서비스</h4>
+
+
+<a name="ggohs"></a><h5>보안 속성 플러그인 클래스</h5>
+<p>이 속성은 <tt>com.sun.identity.liberty.ws.security.SecurityAttributePlugin</tt> 인터페이스의 구현 클래스 이름을 지정합니다. 이 클래스는 검색 서비스에서
+생성한 자격 증명에 포함할 SAML 속성 목록을 반환합니다.</p>
+
+<a name="ggoia"></a><h5>KeyInfo 유형</h5>
+<p>이 속성에서 설정한 값은 <tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider</tt> 구현 클래스에서 사용합니다. XML 서명 내의 <tt>KeyInfo</tt>
+블록에 넣을 데이터 유형을 지정합니다. 값이 <tt>certificate</tt>이면 서명자의 X059 인증서가 <tt>KeyInfo</tt>에 포함됩니다.
+그렇지 않으면 해당 DSA/RSA 키가 <tt>KeyInfo</tt>에 포함됩니다.</p>
+
+<a name="ggoin"></a><h5>보안 토큰 공급자 클래스</h5>
+<p>이 속성은 보안 토큰 공급자의 구현 클래스를 지정합니다.</p>
+
+<a name="ggohw"></a><h5>기본 WSC 인증서 별칭</h5>
+<p>이 속성은 이 웹 서비스 클라이언트에 대한 웹 서비스 보안 토큰을 발급하는
+데 사용할 기본 인증서 별칭을 지정합니다.</p>
+
+<a name="ggohz"></a><h5>신뢰할 수 있는 기관이 서명한 인증서 별칭</h5>
+<p>이 속성은 응답 메시지의 SAML 또는 SAML BEARER 토큰을 서명하는 데 사용할
+신뢰할 수 있는 기관의 인증서 별칭을 지정합니다.</p>
+
+<a name="ggohd"></a><h5>신뢰할 수 있는 CA가 서명한 인증서 별칭</h5>
+<p>이 속성은 신뢰할 수 있는 CA의 인증서 별칭을 지정하며, 들어오는 요청의 SAML
+또는 SAML BEARER 토큰입니다. 메시지는 이 목록에 있는 신뢰할 수 있는 CA가
+서명해야 합니다. 구문은 <tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|.....</tt>입니다.</p><p>예: <tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>. </p><p>값 발급자는 토큰의 서명 내부에 <tt>KeyInfo</tt>가 없는 경우 사용됩니다. 토큰 발급자는 이
+목록에 있어야 하며 해당 인증서 별칭을 사용하여 서명을 검증합니다. <tt>KeyInfo</tt>가 있는 경우
+키 저장소에는 <tt>KeyInfo</tt>와 일치하는 인증서 별칭이 포함되어야 하며 해당 인증서 별칭이 이
+목록에 있어야 합니다.</p>
+<br/>
+
+</body>
+</html>

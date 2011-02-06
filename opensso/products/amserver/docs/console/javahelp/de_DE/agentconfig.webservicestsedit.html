@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attribute des Agenten f&#252;r den Sicherheitstoken-Dienst - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webservicestsedit"></a><h4>Attribute des Agenten f&#252;r den Sicherheitstoken-Dienst</h4>
+<p>Ein Sicherheitstoken-Dienst ist ein Webdienst f&#252;r die Ausgabe und Verwaltung von Sicherheitstokens.
+Dies bedeutet, dass er Sicherheitsaussagen bzw. -behauptungen h&#228;ufig, wenn auch nicht notwendigerweise,
+in verschl&#252;sselten Sets erstellt. Diese Behauptungen beruhen auf dem Erhalt von Belegen,
+die direkt &#252;berpr&#252;ft werden k&#246;nnen, oder von Sicherheitstokens von Autorit&#228;ten, die als
+vertrauensw&#252;rdig eingestuft werden.  Um die Vertrauensw&#252;rdigkeit zu best&#228;tigen, kann ein Dienst
+sein Recht zur Best&#228;tigung einer Menge von Behauptungen beweisen, indem er ein
+Sicherheitstoken oder ein Set von Sicherheitstokens vorweist, die von einem STS ausgestellt
+wurden. Alternativ k&#246;nnte er ein Sicherheitstoken mit seiner eigenen Vertrauensw&#252;rdigkeitsaussage ausgeben (beachten
+Sie, dass dies bei einigen Sicherheitstoken-Formaten einfach nur eine erneute Ausgabe oder
+eine Co-Signatur sein kann). Dies bildet die Grundlage des Trust-Brokering.</p>
+
+<a name="ggpce"></a><h5>Allgemein</h5>
+<p>Folgende allgemeine Attribute definieren die grundlegenden Eigenschaften f&#252;r den Sicherheitstoken-Dienst:</p>
+
+<a name="ggpct"></a><h5>Gruppe</h5>
+<p>Mit dem Gruppenmechanismus k&#246;nnen Sie eine Sammlung &#228;hnlicher Agententypen definieren. Die Gruppe
+muss definiert sein, bevor der betreffende Agent in die Sammlung aufgenommen wird.
+</p>
+
+<a name="ggpec"></a><h5>Password</h5>
+<p>Definiert das Passwort f&#252;r den Agenten des Sicherheitstoken-Diensts.</p>
+
+<a name="ggpex"></a><h5>Passwortbest&#228;tigung</h5>
+<p> Best&#228;tigen Sie das Passwort.</p>
+
+<a name="ggpdu"></a><h5>Status</h5>
+<p>Legt fest, ob der Agent im System aktiv oder inaktiv sein soll.
+Standardm&#228;&#223;ig ist dieses Attribut auf "Aktiv" gesetzt, was bedeutet, dass der Agent
+an der Sicherung ausgehender Webdienstanforderungen von Webdienst-Clients und der Validierung von Webdienstantworten
+von einem Webdienstanbieter beteiligt ist.</p>
+
+<a name="ggpdg"></a><h5>Universalbezeichner</h5>
+<p>Listet die grundlegenden LDAP-Eigenschaften auf, die den Agenten f&#252;r den Sicherheitstoken-Dienst eindeutig
+definieren.</p>
+
+<a name="ggpfe"></a><h5>Sicherheit</h5>
+<p>Folgende Attribute definieren die Sicherheitsattribute f&#252;r den Sicherheitstoken-Dienst:</p>
+
+<a name="ghery"></a><h5>Sicherheitsmechanismus</h5>
+<p>Legt den Sicherheitsnachweistyp fest, der zur Sicherung der STS-Anforderung verwendet wird. Folgende
+Sicherheitsnachweistypen stehen zur Auswahl:</p>
+<ul><li><p>Anonymous (Anonym) &#8211; Der anonyme Sicherheitsmechanismus enth&#228;lt keine Sicherheitsnachweise.</p></li>
+<li><p>KerberosToken &#8211; Es werden Kerberos-Sicherheitstoken verwendet.</p></li>
+<li><p>LibertyDiscoverySecurity &#8211; Verwendet Liberty-basierte Sicherheitstoken.</p></li>
+<li><p>SAML-HolderOfKey &#8211; Verwendet den SAML 1.1-Behauptungstyp "Holder-Of-Key".</p></li>
+<li><p>SAML-SenderVouches &#8211; Verwendet den SAML 1.1-Behauptungstyp "Sender Vouches".</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; Verwendet den SAML 2.0-Behauptungstoken-Typ "Holder-Of-Key".</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; Verwendet den SAML 2.0-Behauptungstoken-Typ " Sender Vouches".</p></li>
+<li><p>STSSecurity &#8211; Verwendet das aus dem Sicherheitstoken-Dienst f&#252;r einen bestimmten Webdienstanbieter generierte Sicherheitstoken.</p></li>
+<li><p>UserNameToken &#8211; Verwendet ein Benutzernamens-Token mit Digest-Passwort.</p></li>
+<li><p>UserNameToken-Plain &#8211; Verwendet ein Benutzernamens-Token mit einem Klartextpasswort zur Sicherung der Webdienst-Anforderungen.</p></li>
+<li><p>X509Token &#8211; Verwendet das X509-Zertifikat.</p></li></ul>
+
+
+<a name="ggpdk"></a><h5>STS-Konfiguration</h5>
+<p>Dieses Attribut ist aktiviert, wenn der Sicherheitstoken-Dienstagent den Sicherheitstoken-Dienst (Security Token Service,
+STS) als Sicherheitsmechanismus verwendet. Diese Konfiguration beschreibt eine Liste von STS-Agentenprofilen, die
+zur Kommunikation mit den und Sicherung der Anforderungen an den STS-Dienst verwendet
+werden.</p>
+
+<a name="ggpfs"></a><h5>Sicherheits-Header in Nachricht beibehalten</h5>
+<p>Wenn dieses Attribut aktiviert ist, legt es fest, dass die SOAP-Sicherheits-Header vom
+Sicherheitstoken-Dienst zur weiteren Verarbeitung beibehalten werden.</p>
+
+<a name="ggpej"></a><h5>Berechtigungsnachweis f&#252;r Benutzertoken</h5>
+<p>Das Attribut stellt die gemeinsamen Grundschl&#252;ssel (Shared Secrets) f&#252;r  Benutzername/Passwort dar,
+die vom Agenten f&#252;r den Sicherheitstoken-Dienst zur Generierung eines Benutzernamen-Sicherheitstokens verwendet wird.</p>
+
+<a name="ggpbt"></a><h5>Signierung und Verschl&#252;sselung</h5>
+<p>Folgende Attribute definieren die Signierungs- und Verschl&#252;sselungskonfiguration f&#252;r den Sicherheitstoken-Dienst:</p>
+
+<a name="ggpdp"></a><h5>Ist Anforderung signiert</h5>
+<p>Wenn dieses Attribut aktiviert ist, signiert der Agent f&#252;r den Sicherheitstoken-Dienst die
+Anforderung mithilfe eines angegebenen Tokentyps.</p>
+
+<a name="ggpcn"></a><h5>Ist Anforderungs-Header verschl&#252;sselt</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird der Sicherheits-Header des Agenten f&#252;r den
+Sicherheitstoken-Dienst verschl&#252;sselt.</p>
+
+<a name="ggpca"></a><h5>Ist Anforderung verschl&#252;sselt</h5>
+<p>Wenn diese Option aktiviert ist, wird die Anforderung des Sicherheitstoken-Diensts verschl&#252;sselt.</p>
+
+<a name="ggpfo"></a><h5>Ist die Antwortsignatur verifiziert</h5>
+<p>Wenn dieses Attribut aktiviert ist, ist die Signatur des Sicherheitstoken-Diensts verifiziert.</p>
+
+<a name="ggpdo"></a><h5>Ist Antwort entschl&#252;sselt</h5>
+<p>Wenn dieses Attribut aktiviert ist, wird die Antwort des Sicherheitstoken-Diensts entschl&#252;sselt.</p>
+
+<a name="ggpeh"></a><h5>Schl&#252;sselspeicher</h5>
+<p>Folgende Attribute konfigurieren den Schl&#252;sselspeicher, der zum Speichern und Abrufen des Zertifikats
+verwendet werden soll: </p>
+
+<a name="ggpcg"></a><h5>Alias des &#246;ffentlichen Schl&#252;ssels des Webdienstanbieters</h5>
+<p>Dieses Attribut definiert den Alias des &#246;ffentlichen Zertifikatschl&#252;ssels, der verwendet wird, um
+die Webdienstanforderung zu verschl&#252;sseln oder die Signatur der Webdienstantwort zu verifizieren.</p>
+
+<a name="ggpfg"></a><h5>Alias des privaten Schl&#252;ssels</h5>
+<p>Dieses Attribut definiert den Alias des privaten Zertifikatschl&#252;ssels, der verwendet wird, um
+die Webdienstanforderung zu signieren oder die Webdienstantwort zu entschl&#252;sseln.</p>
+
+<a name="ggpdc"></a><h5>Schl&#252;sselspeichernutzung</h5>
+<p>Diese Konfiguration definiert, ob der Standardschl&#252;sselspeicher oder ein benutzerdefinierter Schl&#252;sselspeicher verwendet werden
+soll. Folgende Werte m&#252;ssen f&#252;r einen benutzerdefinierten Schl&#252;sselspeicher definiert werden:</p>
+<ul><li><p>Speicherort des Schl&#252;sselspeichers</p></li>
+<li><p>Passwort des Schl&#252;sselspeichers</p></li>
+<li><p>Passwort des Schl&#252;ssels</p></li></ul>
+
+
+<a name="ggpbr"></a><h5>Endpunkte</h5>
+<p>Folgende Attribute definieren Webdienst-Endpunkte:</p>
+
+<a name="ghbab"></a><h5>Endpunkt des Security Token Service</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig: </p><p><tt>%protocol://%host:%port%uri/sts</tt> </p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Sicherheitstoken-Dienst-Endpunkt, basierend
+auf den sitzungsspezifischen Parametern.</p>
+
+<a name="ghbcm"></a><h5>Endpunkt von Security Token Service MEX</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port%uri/sts/mex </tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Sicherheitstoken-Dienst-MEX-Endpunkt, basierend
+auf den sitzungsspezifischen Parametern.</p>
+
+<a name="ghcdb"></a><h5>Kerberos-Konfiguration</h5>
+<p>Kerberos ist ein von der Webdienstsicherheit unterst&#252;tztes Sicherheitsprofil zur Sicherung der Webdienstkommunikation
+zwischen einem Webdienstclient und einem Webdienstanbieter. In einem typischen Szenario authentifiziert sich
+ein Benutzer beim Desktop und ruft einen Webdienst und den Webdienstclient auf.
+Hierbei ist ein Kerberos-Ticket zur Sicherung der Anforderung an den Webdienstanbieter durch
+Identifizierung seines Principals als Kerberos-Token erforderlich. Normalerweise wird die Kerberos-basierte Webdienstsicherheit im
+selben Kontext der Kerberos-Dom&#228;ne (Bereich) und nicht &#252;ber Grenzen hinweg wie beispielsweise
+die SAML-basierte Webdienstsicherheit verwendet. Kerberos ist jedoch einer der leistungsst&#228;rksten Authentifizierungsmechanismen, insbesondere
+in Umgebungen mit Windows-Dom&#228;nencontroller.</p>
+
+<a name="ghcgo"></a><h5>Kerberos-Domain-Server</h5>
+<p>Gibt den Hostnamen des Kerberos-Verteilungscenters (Dom&#228;nencontroller) an. Hier ist der vollst&#228;ndig qualifizierte
+Dom&#228;nenname (FQDN) des Dom&#228;nencontrollers erforderlich.</p>
+
+<a name="ghceh"></a><h5>Kerberos-Domain</h5>
+<p>Dieses Attribut gibt den Dom&#228;nennamen des Kerberos-Verteilungscenters (Kerberos Distribution Center, KDC) an.
+Je nach Konfiguration ist der Dom&#228;nenname des Dom&#228;nencontrollers nicht identisch mit dem
+Dom&#228;nennamen von OpenSSO.</p>
+
+<a name="ghcgw"></a><h5>Kerberos-Dienstprincipal</h5>
+<p>Gibt den beim KDC registrierten Principal des Sicherheitstoken-Diensts an. </p><p>Verwenden Sie die folgende Syntax: </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> und <tt>domainame</tt> stehen f&#252;r den Hostnamen und den Dom&#228;nennamen der OpenSSO-Instanz.
+<tt>dc_domain_name</tt> is the Kerberos domain in which the Windows Kerberos server (domain
+controller) resides. Der Kerberos-Server unterscheidet sich m&#246;glicherweise vom Dom&#228;nennamen der OpenSSO-Instanz.</p>
+
+<a name="ghcea"></a><h5>Cache-Verzeichnis f&#252;r Kerberos-Ticket</h5>
+<p>Gibt das Cache-Verzeichnis des Kerberos TGT (Ticket Granting Ticket) an. Wenn der
+Benutzer sich beim Desktop authentifiziert oder eine Initialisierung mit <tt> kinit</tt> (dem zum
+Abrufen des TGT vom KDC verwendeten Befehl) durchf&#252;hrt, wird das TGT wie
+in diesem Attribut definiert im lokalen Cache gespeichert.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+amAuth.properties
+amAuthContext.properties
+amIdRepo.properties
+amUtilMsgs.properties
+amNaming.properties
+amProfile.properties
+amSDK.properties
+amSecurity.properties
+amSSOProvider.properties
+amSession.properties
+amPolicy.properties

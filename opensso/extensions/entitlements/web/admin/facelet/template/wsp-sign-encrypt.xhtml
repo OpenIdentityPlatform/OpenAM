@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wsp-sign-encrypt.xhtml,v 1.2 2009/07/23 20:46:56 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['wsp-sign-encrypt.section-title']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['wsp-sign-encrypt.section-details']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGrid 
+                columns="2"
+                columnClasses="label-column,input-column">
+                <ice:outputLabel 
+                    style="float: right;"
+                    value="#{resources['wsp-sign-encrypt.affectedElements']}" />
+                <ice:panelGrid columns="4">
+                    <ice:selectBooleanCheckbox 
+                        id="responseSigned"
+                        value="#{wizardBean.responseSigned}"/>
+                    <ice:outputLabel
+                        for="responseSigned"
+                        style="padding-right: 20px;"
+                        value="#{resources['wsp-sign-encrypt.responseSignedLabel']}" />
+                    <ice:selectBooleanCheckbox 
+                        id="requestSignatureVerified"
+                        value="#{wizardBean.requestSignatureVerified}"/>
+                    <ice:outputLabel 
+                        for="requestSignatureVerified"
+                        value="#{resources['wsp-sign-encrypt.requestSignatureVerifiedLabel']}" />
+
+                    <ice:selectBooleanCheckbox
+                        id="responseEncrypted"
+                        style="padding-right: 20px;"
+                        value="#{wizardBean.responseEncrypted}" />
+                    <ice:outputLabel 
+                        for="responseEncrypted"
+                        value="#{resources['wsp-sign-encrypt.responseEncryptedLabel']}" />
+                    <ice:selectBooleanCheckbox 
+                        id="requestHeaderDecrypted"
+                        value="#{wizardBean.requestHeaderDecrypted}" />
+                    <ice:outputLabel
+                        for="requestHeaderDecrypted"
+                        style="padding-right: 20px;"
+                        value="#{resources['wsp-sign-encrypt.requestHeaderDecryptedLabel']}" />
+
+                    <ice:outputText value="" />
+                    <ice:outputText value="" />
+                    <ice:selectBooleanCheckbox 
+                        id="requestDecrypted"
+                        value="#{wizardBean.requestDecrypted}" />
+                    <ice:outputLabel 
+                        for="requestDecrypted"
+                        value="#{resources['wsp-sign-encrypt.requestDecryptedLabel']}" />
+                </ice:panelGrid>
+            </ice:panelGrid>
+
+            <ice:panelGrid columns="2">
+                <ice:outputLabel
+                    for="wspEncryptionAlgorithm"
+                    style="float: right;"
+                    value="#{resources['wsp-sign-encrypt.encryptionAlgorithmLabel']}" />
+                <ice:selectOneMenu id="encryptionAlgorithm" 
+                                   value="#{wizardBean.encryptionAlgorithm}">
+                    <f:selectItems
+                        value="#{wizardBean.encryptionAlgorithmList}"/>
+                </ice:selectOneMenu>
+
+                <ice:outputLabel
+                    for="privateKeyAlias"
+                    style="float: right;"
+                    value="#{resources['wsp-sign-encrypt.privateKeyAliasLabel']}" />
+                <ice:panelGroup>
+                    <ice:outputText
+                        rendered="#{o:size(wizardBean.privateKeyAliasList) == 0 }"
+                        style="font-style: italic;"
+                        value="#{resources['wsp-sign-encrypt.noPrivateKeyAliases']}"/>
+                    <ice:outputText
+                        rendered="#{o:size(wizardBean.privateKeyAliasList) == 1 }"
+                        value="#{wizardBean.privateKeyAlias}"/>
+                    <ice:selectOneMenu
+                        id="privateKeyAlias"
+                        rendered="#{o:size(wizardBean.privateKeyAliasList) > 1 }"
+                        value="#{wizardBean.privateKeyAlias}">
+                        <f:selectItems value="#{wizardBean.privateKeyAliasList}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+                <ice:outputText value="" />
+                <ice:outputText
+                    style="font-style: italic;"
+                    value="#{resources['wsp-sign-encrypt.privateKeyAliasInlineHelp']}" />
+
+                <ice:outputLabel
+                    for="publicKeyAlias"
+                    style="float: right;"
+                    value="#{resources['wsp-sign-encrypt.publicKeyAliasLabel']}" />
+                <ice:panelGroup>
+                    <ice:outputText
+                        rendered="#{o:size(wizardBean.publicKeyAliasList) == 0 }"
+                        style="font-style: italic;"
+                        value="#{resources['wsp-sign-encrypt.noPublicKeyAliases']}"/>
+                    <ice:outputText
+                        rendered="#{o:size(wizardBean.publicKeyAliasList) == 1 }"
+                        value="#{wizardBean.publicKeyAlias}"/>
+                    <ice:selectOneMenu
+                        id="publicKeyAlias"
+                        rendered="#{o:size(wizardBean.publicKeyAliasList) > 1 }"
+                        value="#{wizardBean.publicKeyAlias}">
+                        <f:selectItems value="#{wizardBean.publicKeyAliasList}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+                <ice:outputText value="" />
+                <ice:outputText
+                        style="font-style: italic;"
+                        value="#{resources['wsp-sign-encrypt.publicKeyAliasInlineHelp']}" />
+
+            </ice:panelGrid>
+
+        </ui:define>
+    </o:section>
+
+</span>

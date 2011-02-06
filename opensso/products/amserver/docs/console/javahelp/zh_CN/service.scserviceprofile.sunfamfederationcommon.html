@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>通用联合配置 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamfederationcommon"></a><h4>通用联合配置</h4>
+
+
+<a name="ggoir"></a><h5>数据存储库 SPI 实现类</h5>
+<p>此属性指定用于默认数据存储库提供者的实现类。</p>
+
+<a name="ggogw"></a><h5>配置实例 SPI 实现类</h5>
+<p>此属性指定用于管理配置数据的实现类。</p>
+
+<a name="ggofp"></a><h5>日志程序 SPI 实现类</h5>
+<p>此属性指定用于日志提供者的实现类。</p>
+
+<a name="ggofy"></a><h5>会话提供者 SPI 实现类</h5>
+<p>此属性指定用于会话提供者的实现类。</p>
+
+<a name="ggogv"></a><h5>最大允许内容长度</h5>
+<p>此属性指定在联合服务中使用的 HTTP 请求的最大允许内容长度。任何其内容超过特定的最大内容长度的请求都会被拒绝。</p>
+
+<a name="ggogu"></a><h5>密码解码器 SPI 实现类</h5>
+<p>此属性指定用于<tt>com.sun.identity.saml.xmlsig.PasswordDecoder</tt> 接口的实现类，用于解码存储在 XML 签署密钥库中的密码和 SAML 1.x 下基本验证的密码。</p>
+
+<a name="ggohx"></a><h5>签名提供者 SPI 实现类</h5>
+<p>此属性指定 SAML XML 签名提供者类。默认 SPI 为 <tt>com.sun.identity.saml.xmlsig.AMSignatureProvider</tt>。</p>
+
+<a name="ggohm"></a><h5>密钥提供者 SPI 实现类</h5>
+<p>此属性指定 XML 签名密钥提供者类。默认 SPI 为 <tt>com.sun.identity.saml.xmlsig.JKSKeyProvider</tt>。</p>
+
+<a name="ggofo"></a><h5>检查证书是否存在</h5>
+<p>如果设置为<tt>开</tt>，则密钥库中必须存在用于 XML 签名验证的证书。如果设置为<tt>关</tt>，则不会检查是否存在证书。仅适用于 SMAL1.x。</p>
+
+<a name="ggohn"></a><h5>XML 标准化算法</h5>
+<p>此属性指定用于生成和验证 SAML XML 签名的 XML 标准化算法。默认值为 <tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>。</p>
+
+<a name="ggohp"></a><h5>XML 签名算法</h5>
+<p>此属性指定用于生成和验证 SAML XML 签名的 XML 签名算法。如果未指定值或值为空，则使用默认值 (<tt>http://www.w3.org/2000/09/xmldsig#rsa-sha1</tt>)。</p>
+
+<a name="ggoie"></a><h5>XML 变换算法</h5>
+<p>此属性指定用于生成和验证 SAML XML 签名的变换算法。如果未指定值或值为空，则使用默认值 (<tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>)。</p>
+<br/>
+
+</body>
+</html>

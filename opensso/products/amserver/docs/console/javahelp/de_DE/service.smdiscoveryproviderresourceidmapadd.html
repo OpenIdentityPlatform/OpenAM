@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So konfigurieren Sie einen ResourceID-Mapper - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryproviderresourceidmapadd"></a><h5>So konfigurieren Sie einen ResourceID-Mapper</h5>
+<p><tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>ResourceIDMapper</tt> ist eine Schnittstelle f&#252;r die Zuordnung einer Benutzer-ID zur zugeh&#246;rigen Ressourcen-ID.
+Mithilfe der Implementierungsklasse k&#246;nnen Sie weitere Implementierungen entwickeln und dem Attribut hinzuf&#252;gen.
+Mit dem folgenden Verfahren f&#252;gen Sie dem Discovery-Dienst einen neuen ResourceID-Mapper hinzu.
+Der Discovery-Dienst-Konfigurationsbildschirm im Modul "Webdienste" bildet den Ausgangspunkt.</p><ol>
+<li><b>Klicken Sie auf "Neu", um die neuen Mapper-Attribute anzuzeigen, bzw. auf den
+Namen eines konfigurierten Mappers, um ihn zu &#228;ndern.</b></li>
+<li><b>Legen Sie die Mapper-Attributwerte entsprechend der folgenden Informationen fest:</b><dl><dt>Anbieter-ID</dt>
+<dd><p>Dieses Attribut akzeptiert als Wert eine URI, die auf den Discovery-Dienst verweist. Der Wert hat folgendes Format: <tt><b>http://</tt><i> host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco </b></tt></p></dd>
+<dt>ID-Mapper</dt>
+<dd><p>Geben Sie einen Namen f&#252;r die Implementierungsklasse ein.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "OK", um die Mapper-Konfiguration abzuschlie&#223;en.</b></li>
+<li><b>Klicken Sie auf der  Discovery-Dienst-Seite auf "Speichern", um die Konfiguration des
+Dienstes abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

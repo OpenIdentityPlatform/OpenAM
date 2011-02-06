@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Zertifikat - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthcertservice"></a><h4>Zertifikat</h4>
+<p><a name="indexterm-169"></a>Mit diesem Modul kann sich ein Benutzer &#252;ber ein pers&#246;nliches digitales Zertifikat
+ (PDC) anmelden. Die Modulinstanz kann zur Ermittlung des Zertifikatstatus die Anwendung
+des Online Certificate Status Protocol (OCSP) verlangen. Die Verwendung des OCSP ist
+jedoch optional. Der Zugriff auf eine Ressource wird dem Benutzer auf Basis
+der G&#252;ltigkeit seines Zertifikats gew&#228;hrt oder verweigert. Bei den Attributen f&#252;r die
+Zertifikatauthentifizierung handelt es sich um Bereichsattribute. Es existieren folgende Attribute:</p>
+<ul><li><p><a href="#fwbia">Zertifikat auf LDAP-Server vergleichen</a></p></li>
+<li><p><a href="#fwbiq">Zum Durchsuchen von LDAP nach Zertifikaten verwendetes DN-Attribut des Betreffs</a></p></li>
+<li><p><a href="#fwbim">Zertifikat mit CRL vergleichen</a></p></li>
+<li><p><a href="#fwbik">Zum Durchsuchen von LDAP nach CRLs verwendetes DN-Attribut des Herausgebers</a></p></li>
+<li><p><a href="#fwbin">HTTP-Parameter f&#252;r CRL-Aktualisierung</a></p></li>
+<li><p><a href="#fwbil">OCSP-&#220;berpr&#252;fung</a></p></li>
+<li><p><a href="#fwbij">LDAP-Server, auf dem die Zertifikate gespeichert sind</a></p></li>
+<li><p><a href="#fwbtp">LDAP-DN f&#252;r Start der Suche</a></p></li>
+<li><p><a href="#fwbqp">Principal-Benutzer f&#252;r LDAP-Server</a></p></li>
+<li><p><a href="#fwbst">Principal-Passwort f&#252;r LDAP-Server</a></p></li>
+<li><p><a href="#fwbiu">Principal-Passwort f&#252;r LDAP-Server (Best&#228;tigung)</a></p></li>
+<li><p><a href="#fwblm">SSL f&#252;r LDAP-Zugriff verwenden</a></p></li>
+<li><p><a href="#fwbof">F&#252;r den Zugriff auf das Benutzerprofil verwendetes Zertifikatsfeld</a></p></li>
+<li><p><a href="#fwbna">F&#252;r den Zugriff auf das Benutzerprofil verwendetes weiteres Zertifikatsfeld</a></p></li>
+<li><p><a href="#fwbiw">Vertrauensw&#252;rdige Remote-Hosts</a></p></li>
+<li><p><a href="#fwbkd">SSL-Anschlussnummer</a></p></li>
+<li><p><a href="#fwblx">Authentifizierungsebene</a></p></li></ul>
+
+
+<a name="fwbia"></a><h5>Zertifikat auf LDAP-Server vergleichen</h5>
+<p>Legt fest, ob &#252;berpr&#252;ft werden soll, ob das bei der Anmeldung vorgelegte
+Benutzerzertifikat auf dem LDAP-Server gespeichert ist. Wenn keine &#220;bereinstimmung gefunden wird, wird
+dem Benutzer der Zugriff verweigert. Wenn eine &#220;bereinstimmung gefunden wird und keine
+weitere Validierung erforderlich ist, erh&#228;lt der Benutzer Zugriff. In der Standardeinstellung f&#252;hrt
+der Dienst f&#252;r die Zertifikatauthentifizierung keine Pr&#252;fung des Benutzerzertifikats durch.</p>
+<hr><p><b>Hinweis &#8211; </b>Ein auf dem Directory Server gespeichertes Zertifikat ist nicht in jedem Fall
+g&#252;ltig; unter Umst&#228;nden befindet es sich in der Liste der zur&#252;ckgezogenen Zertifikate.
+Siehe <a href="#fwbim">Zertifikat mit CRL vergleichen</a>. Der Webcontainer kann jedoch die G&#252;ltigkeit des bei der Anmeldung
+eingegebenen Benutzerzertifikats &#252;berpr&#252;fen.</p>
+<hr>
+
+
+<a name="fwbiq"></a><h5>Zum Durchsuchen von LDAP nach Zertifikaten verwendetes DN-Attribut des Betreffs</h5>
+<p>Gibt das Attribut des <i>SubjectDN</i>-Werts von Zertifikaten an, der f&#252;r die Suche
+nach Zertifikaten in LDAP verwendet wird. Dieses Attribut muss einen Benutzereintrag eindeutig
+identifizieren. Der angegebene Wert wird f&#252;r die Suche verwendet. Der Standardwert ist
+<tt>cn</tt>.</p>
+
+<a name="fwbim"></a><h5>Zertifikat mit CRL vergleichen</h5>
+<p>Legt fest, ob das Benutzerzertifikat mit der CRL (Certificate Revocation List, Liste
+zur&#252;ckgezogener Zertifikate) auf dem LDAP-Server verglichen werden soll. Die CRL wird durch
+einen der Attributnamen im <i>SubjectDN</i> des Ausstellers angegeben. Wenn das Zertifikat in
+der CRL gespeichert ist, wird dem Benutzer der Zugriff verweigert; anderenfalls darf
+er fortfahren. Dieses Attribut ist standardm&#228;&#223;ig deaktiviert.</p><p>Zertifikate werden in der Regel zur&#252;ckgezogen, wenn sich der Status des Zertifikateigent&#252;mers
+ge&#228;ndert hat und er somit nicht mehr berechtigt ist, das Zertifikat zu
+verwenden, oder wenn der private Schl&#252;ssel eines Zertifikateigent&#252;mers ung&#252;ltig geworden ist.</p>
+
+<a name="fwbik"></a><h5>Zum Durchsuchen von LDAP nach CRLs verwendetes DN-Attribut des Herausgebers</h5>
+<p>Gibt das Attribut des <i>subjectDN</i>-Werts des Ausstellers des empfangenen Zertifikats an, der
+f&#252;r die Suche nach CRLs in LDAP verwendet wird. Dieses Feld wird
+nur verwendet, wenn das Attribut "r;Zertifikat mit CRL vergleichen" aktiviert ist. Der
+angegebene Wert wird f&#252;r die Suche verwendet. Der Standardwert ist <tt>cn</tt>.</p>
+
+<a name="fwbin"></a><h5>HTTP-Parameter f&#252;r CRL-Aktualisierung</h5>
+<p>Gibt die HTTP-Parameter an, die bei der Aktualisierung einer CRL zum Abrufen
+der CRL von einem Servlet verwendet werden. Die Werte dieser Parameter erhalten
+Sie von Ihrem ZA-Administrator.</p>
+
+<a name="fwbil"></a><h5>OCSP-&#220;berpr&#252;fung</h5>
+<p>Aktiviert die Durchf&#252;hrung der OCSP-&#220;berpr&#252;fung durch einen Verbindungsaufbau zum jeweiligen OCSP-Empf&#228;nger. Der
+OCSP-Empf&#228;nger wird bei der Ausf&#252;hrung wie folgt festgelegt.  Die erw&#228;hnten Attribute
+befinden sich in der Konsole unter "Konfiguration" &#62; "Servers und Sites" &#62;
+"Sicherheit":</p>
+<ul><li><p>Wenn dieser Wert auf "true" (wahr) gesetzt ist und der OCSP-Empf&#228;nger im Attribut <a href="service.servereditsecurity.html#ggkav">Empf&#228;nger-URL</a> festgelegt ist, wird der Wert des Attributs als OCSP-Empf&#228;nger verwendet.</p></li>
+<li><p>Wenn <a href="service.servereditsecurity.html#ggkaa">&#220;berpr&#252;fung des Online Certificate Status Protocol</a> aktiviert ist und wenn der Wert f&#252;r dieses Attribut nicht festgelegt ist, wird der in Ihrem Client-Zertifikat genannte OCSP-Empf&#228;nger als OCSP-Empf&#228;nger verwendet. </p></li>
+<li><p>Wenn <a href="service.servereditsecurity.html#ggkaa">&#220;berpr&#252;fung des Online Certificate Status Protocol</a> nicht aktiviert ist oder wenn <a href="service.servereditsecurity.html#ggkaa">&#220;berpr&#252;fung des Online Certificate Status Protocol</a> aktiviert ist und kein OCSP-Empf&#228;nger gefunden werden kann, wird keine OCSP-Validierung durchgef&#252;hrt.</p></li></ul>
+<p>Stellen Sie vor dem Aktivieren der OCSP-&#220;berpr&#252;fung sicher, dass die Uhrzeit des
+OpenSSO-Computers mit der des OCSP-Empf&#228;ngercomputers so weit wie m&#246;glich &#252;bereinstimmt. Die Uhrzeit
+auf dem OpenSSO-Computer darf keinesfalls nach der Uhrzeit des OCSP-Empf&#228;ngers liegen. Beispiel:</p><p><tt>OCSP responder machine - 12:00:00 pm</tt></p><p><tt>OpenSSO machine - 12:00:30 pm</tt> </p>
+
+<a name="fwbij"></a><h5>LDAP-Server, auf dem die Zertifikate gespeichert sind</h5>
+<p>Gibt den Namen und die Anschlussnummer des LDAP-Servers an, auf dem die
+Zertifikate gespeichert sind. Der Standardwert ist der bei der Installation von OpenSSO
+angegebene Hostname und Anschluss. Hier k&#246;nnen Hostname und Anschluss jedes LDAP-Servers angegeben
+werden, auf dem Zertifikate gespeichert werden. Das Format lautet <tt>hostname:port</tt>.</p>
+
+<a name="fwbtp"></a><h5>LDAP-DN f&#252;r Start der Suche</h5>
+<p>Gibt den DN des Knotens an, bei dem die Suche nach dem
+Benutzerzertifikat beginnen soll. Es gibt keinen Standardwert. Das Feld erkennt jede beliebige
+g&#252;ltige DN.</p><p>Bei Mehrfacheingaben muss der lokale Servername vorangestellt werden. Das Attribut hat folgendes
+Format:</p><p><tt>servername|search dn</tt> </p><p>F&#252;r Mehrfacheingaben:</p><p><tt>servername1|search dn servername2|search dn servername3|search dn...</tt></p><p>Wenn unter der Root-Organisation mehrere Eintr&#228;ge mit derselben Benutzer-ID vorhanden sind, sollte
+dieser Parameter so festgelegt werden, dass nur nach einem einzigen Eintrag zur
+Authentifizierung gesucht bzw. nur ein einziger gefunden werden kann. Wenn beispielsweise die
+Agenten-ID und die Benutzer-ID unter der Root-Organisation identisch sind, sollte dieser Parameter
+<tt>ou=Agents</tt> (f&#252;r die Authentifizierung der Root-Organisation mithilfe der Agenten-ID) und <tt>ou=People, </tt> (f&#252;r
+die Authentifizierung der Root-Organisation mithilfe der Benutzer-ID) lauten.</p>
+
+<a name="fwbqp"></a><h5>Principal-Benutzer f&#252;r LDAP-Server</h5>
+<p>Gibt den DN des Principal-Benutzers des LDAP-Servers an, auf dem die Zertifikate
+gespeichert sind. F&#252;r dieses Feld gibt es keinen Standardwert; jeder g&#252;ltige DN
+ist zul&#228;ssig. Der Principal-Benutzer muss zum Lesen und Durchsuchen der auf dem
+Directory Server gespeicherten Zertifikatdaten berechtigt sein.</p>
+
+<a name="fwbst"></a><h5>Principal-Passwort f&#252;r LDAP-Server</h5>
+<p>Gibt das LDAP-Passwort des im Feld ";Principal-Benutzer f&#252;r LDAP-Server" festgelegten Benutzers an.
+F&#252;r dieses Feld gibt es keinen Standardwert; das g&#252;ltige LDAP-Passwort f&#252;r den
+angegebenen Principal-Benutzer ist zul&#228;ssig. Dieser Wert wird als lesbarer Text im Verzeichnis
+gespeichert.</p>
+
+<a name="fwbiu"></a><h5>Principal-Passwort f&#252;r LDAP-Server (Best&#228;tigung)</h5>
+<p> Best&#228;tigen Sie das Passwort.</p>
+
+<a name="fwblm"></a><h5>SSL f&#252;r LDAP-Zugriff verwenden</h5>
+<p>Legt fest, ob SSL f&#252;r den Zugriff auf den LDAP-Server eingesetzt werden
+soll. In der Standardeinstellung greift der Dienst f&#252;r die Zertifikatauthentifizierung ohne SSL
+auf den LDAP-Server zu.</p>
+
+<a name="fwbof"></a><h5>F&#252;r den Zugriff auf das Benutzerprofil verwendetes Zertifikatsfeld</h5>
+<p>Gibt an, welches Feld im Betreff-DN des Zertifikats f&#252;r die Suche nach
+einem &#252;bereinstimmenden Benutzerprofil verwendet werden soll. Wenn Sie beispielsweise ";E-Mail-Adresse" ausw&#228;hlen, sucht
+der Dienst f&#252;r die Zertifikatauthentifizierung das Benutzerprofil, das mit dem Attribut <i>emailAddr</i>
+im Benutzerzertifikat &#252;bereinstimmt. F&#252;r den Benutzer, der sich daraufhin anmeldet, wird dann
+das ermittelte Profil verwendet. Das Standardfeld ist <i>subject CN</i>. Diese Liste enth&#228;lt folgende
+Komponenten:</p>
+<ul><li><p>E-Mail-Adresse</p></li>
+<li><p>Subject CN</p></li>
+<li><p>Subject DN</p></li>
+<li><p>Subject UID</p></li>
+<li><p>other</p></li></ul>
+
+
+<a name="fwbna"></a><h5>F&#252;r den Zugriff auf das Benutzerprofil verwendetes weiteres Zertifikatsfeld</h5>
+<p>Wenn der Wert des Attributs ";F&#252;r den Zugriff auf das Benutzerprofil verwendetes
+Zertifikatsfeld" auf "Weitere" gesetzt ist, gibt dieses Feld das Attribut an, das
+aus dem <i>subjectDN </i>-Wert des empfangenen Zertifikats ausgew&#228;hlt wird. Der Authentifizierungsdienst sucht dann
+nach dem Benutzerprofil, das dem Wert dieses Attributs entspricht.</p>
+
+<a name="ggumk"></a><h5>Werttyp SubjectAltNameExt f&#252;r Zugriff auf Benutzerprofil</h5>
+<p>Wird ein anderer Werttyp als <tt>none</tt> ausgew&#228;hlt, hat dieses Attribut Vorrang vor
+dem Attribut <tt>F&#252;r den Zugriff auf das Benutzerprofil verwendetes Zertifikatsfeld</tt> oder <tt>F&#252;r den Zugriff auf das Benutzerprofil verwendetes weiteres Zertifikatsfeld</tt>. </p>
+<ul><li><p>RFC822Name</p></li></ul>
+
+<ul><li><p>UPN</p></li></ul>
+
+
+<a name="fwbiw"></a><h5>Vertrauensw&#252;rdige Remote-Hosts</h5>
+<p>Legt eine Liste der vertrauensw&#252;rdigen Hosts fest, denen die Versendung von Zertifikaten
+an OpenSSO anvertraut wird. OpenSSO muss &#252;berpr&#252;fen, ob das Zertifikat von einem
+dieser Hosts stammt. Dieses Attribut wird f&#252;r das Portal Server-Gateway, f&#252;r einen
+Lastenausgleich mit SSL-Beendigung und f&#252;r verteilte Authentifizierung verwendet. </p><dl><dt>Keiner</dt>
+<dd><p>Deaktiviert das Attribut. Dies ist die Standardeinstellung.</p></dd>
+<dt>Alle</dt>
+<dd><p>Akzeptiert die Portal Server Gateway-Zertifikatauthentifizierung von jeder Client-IP-Adresse.</p></dd>
+<dt>IP-ADDR</dt>
+<dd><p>Gibt eine Liste der IP-Adressen an (IP-Adressen der Gateways), von denen Portal Server Gateway-Zertifikatauthentifizierungsanforderungen akzeptiert werden. Das Attribut wird auf Bereichsebene konfiguriert.</p></dd>
+</dl>
+
+
+<a name="fwbkd"></a><h5>SSL-Anschlussnummer</h5>
+<p>Gibt die Anschlussnummer f&#252;r die Secure Socket Layer-Schicht (SSL) an. Zurzeit wird
+das Attribut nur vom Gateway-Servlet verwendet. Bevor Sie eine SSL-Anschlussnummer hinzuf&#252;gen oder
+&#228;ndern, sollten Sie den Abschnitt "Policy-Based Resource Management" (Richtliniengest&#252;tzte Ressourcenverwaltung) im OpenSSO
+Administration Guide lesen.</p>
+
+<a name="gcabp"></a><h5>HTTP-Header-Name f&#252;r Clientzertifikat</h5>
+<p>Dieses Attribut wird nur verwendet, wenn das Attribut ";Vertrauensw&#252;rdige Remote-Hosts" auf "Alle"
+eingestellt ist bzw. f&#252;r dieses Attribut ein spezifischer Hostname definiert wurde. Der
+Administrator muss den HTTP-Header-Namen f&#252;r das Clientzertifikat angeben, das vom Load Balancer
+bzw. von SRA eingef&#252;gt wird. </p>
+
+<a name="fwblx"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a>
+angegebene Wert verwendet.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>管理 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amadminconsoleservice"></a><h4>管理</h4>
+<p><a name="indexterm-187"></a>“管理”服务允许您在全局级别和已配置的领域级别（“首选项”或“选项”特定于已配置的领域）配置 OpenSSO 控制台。管理服务属性包括全局和领域属性。</p>
+<hr><p><b>注 &#8211; </b>本部分列出的某些属性仅适用于传统模式安装。</p>
+<hr>
+<p>这些属性包括：</p>
+<ul><li><p><a href="#fufly">联合管理</a></p></li>
+<li><p><a href="#fsvge">用户管理</a></p></li>
+<li><p><a href="#fsvgj">人员容器</a></p></li>
+<li><p><a href="#fsvgm">组织单位容器</a></p></li>
+<li><p><a href="#fsvgq">组容器</a></p></li>
+<li><p><a href="#fsvgh">管理的组类型</a></p></li>
+<li><p><a href="#fsvgr">默认角色权限</a></p></li>
+<li><p><a href="#fsvgt">域组件树</a></p></li>
+<li><p><a href="#fsvgs">管理组</a></p></li>
+<li><p><a href="#fsvgv">符合用户删除</a></p></li>
+<li><p><a href="#fsvgu">动态管理角色 ACI</a></p></li>
+<li><p><a href="#ftbxa">用户配置文件服务类</a></p></li>
+<li><p><a href="#fsvgw">DC 节点属性列表</a></p></li>
+<li><p><a href="#fsvgx">用于删除的对象的搜索过滤器</a></p></li>
+<li><p><a href="#fsvgy">默认人员容器</a></p></li>
+<li><p><a href="#fsvhe">默认组容器</a></p></li>
+<li><p><a href="#fsvhd">默认代理容器</a></p></li>
+<li><p><a href="#fsvhb">组默认人员容器</a></p></li>
+<li><p><a href="#fsvha">组人员容器列表</a></p></li>
+<li><p><a href="#fsvhc">用户配置文件显示类</a></p></li>
+<li><p><a href="#fsvhh">最终用户配置文件显示类</a></p></li>
+<li><p><a href="#fsvhi">在“用户配置文件”页面中显示角色</a></p></li>
+<li><p><a href="#fsvhj">在“用户配置文件”页面中显示组</a></p></li>
+<li><p><a href="#fsvhf">用户组自订阅</a></p></li>
+<li><p><a href="#fsvhk">用户配置文件显示选项</a></p></li>
+<li><p><a href="#fsvhl">用户创建默认角色</a></p></li>
+<li><p><a href="#fsvhm">“管理控制台”选项卡</a></p></li>
+<li><p><a href="#fsvho">搜索返回的结果的最大数目</a></p></li>
+<li><p><a href="#fsvhp">搜索超时</a></p></li>
+<li><p><a href="#fsvhs">JSP 目录名称</a></p></li>
+<li><p><a href="#fsvhr">联机帮助文档</a></p></li>
+<li><p><a href="#fsvhq">所需的服务</a></p></li>
+<li><p><a href="#fsvhu">用户搜索关键字</a></p></li>
+<li><p><a href="#fsvht">用户搜索返回属性</a></p></li>
+<li><p><a href="#fsvhv">用户创建通知列表</a></p></li>
+<li><p><a href="#fsvhw">用户删除通知列表</a></p></li>
+<li><p><a href="#fsvhx">用户修改通知列表</a></p></li>
+<li><p><a href="#fsvia">每页可以显示的最大条目数</a></p></li>
+<li><p><a href="#fsvhz">事件侦听器类</a></p></li>
+<li><p><a href="#fsvhy">处理前和处理后的类</a></p></li>
+<li><p><a href="#fsvic">外部属性获取</a></p></li>
+<li><p><a href="#fsvib">无效用户 ID 字符</a></p></li>
+<li><p><a href="#fsvie">用户 ID 和密码验证插件类</a></p></li></ul>
+
+
+<a name="fufly"></a><h5>联合管理</h5>
+<p>启用联合管理。默认情况下将选中该字段。要禁用此功能，请取消选择该字段。控制台中将不再显示“联合管理”选项卡。</p>
+
+<a name="fsvge"></a><h5>用户管理</h5>
+<p>启用用户管理。默认情况下将启用该字段。在传统模式下安装 OpenSSO 时，该属性可用。</p>
+
+<a name="fsvgj"></a><h5>人员容器</h5>
+<p>默认情况下不选择该属性，仅当在传统模式下安装 OpenSSO 时，此属性才可用。选择此属性将在“目录管理”选项卡下显示“人员容器”。建议在 DIT 中只使用一个人员容器，并利用角色来管理帐户和服务。OpenSSO 控制台在默认情况下会隐藏人员容器。但是，如果 DIT 中有多个人员容器，选择此属性会将人员容器显示为受管对象。</p>
+
+<a name="fsvgm"></a><h5>组织单位容器</h5>
+<p>默认情况下不选择该属性，当在传统模式下安装 OpenSSO 时，此属性才可用。选择此属性将在“目录管理”选项卡中显示容器。</p>
+
+<a name="fsvgq"></a><h5>组容器</h5>
+<p>默认情况下不选择该属性，当在传统模式下安装 OpenSSO 时，此属性才可用。选择此属性将在“目录管理”选项卡中显示组容器。</p>
+
+<a name="fsvgh"></a><h5>管理的组类型</h5>
+<p>指定通过控制台创建的是静态订阅组还是动态订阅组。控制台将创建并显示静态订阅组和/或动态订阅组。（不管为这个属性指定了何值，始终都支持过滤组。）默认值是“动态”。</p>
+<ul><li><p>通过使用 <tt>groupOfNames</tt> 或 <tt>groupOfUniqueNames</tt> 对象类，静态组将明确列出每个组成员。组条目包含组中每个成员的 <i>uniqueMember</i> 属性。可以手动添加静态组成员；用户条目本身将保持不变。静态组适用于成员较少的组。</p></li>
+<li><p>动态组使用每个组成员条目中的 <tt>memberOf</tt> 属性。通过使用 LDAP 过滤器来搜索并返回所有包含 <tt>memberOf</tt> 属性的条目，生成动态组成员。动态组适用于成员较多的组。</p></li>
+<li><p>过滤组使用 LDAP 过滤器来搜索并返回符合过滤器要求的成员。例如，过滤器可以生成具有特定 uid (<tt>uid=g*</tt>) 或电子邮件地址 (<tt>mail=*@example.com</tt>) 的成员。</p></li></ul>
+<p>上述示例中，LDAP 过滤器将分别返回 uid 以 <tt>g</tt> 开头或电子邮件地址以 <tt>example.com</tt> 结尾的所有用户。只能在“用户管理”视图中通过选择“过滤成员”来创建过滤组。</p><p>管理员可以选择以下选项之一：</p>
+<ul><li><p>动态 - 通过“预定成员资格”选项创建的组将为动态组。</p></li>
+<li><p>静态 - 通过“预定成员资格”选项创建的组将为静态组。</p></li></ul>
+
+
+<a name="fsvgr"></a><h5>默认角色权限</h5>
+<p>定义默认访问控制指令 (access control instructions, ACI) 或<b>权限</b>的列表，这些指令和权限用于在创建新角色时授予管理员权限。从这些 ACI 中为所需的权限级别选择一项。OpenSSO 在出厂时设置了四种默认角色权限：</p><p>禁止 &#8212; 对角色不设置权限。</p><p>组织管理员 &#8212; 组织管理员拥有对已配置组织中所有条目的读写权限。</p><p>组织帮助台管理员 &#8212; 组织帮助台管理员拥有对已配置组织中所有条目的读取权限，以及对 <tt>userPassword</tt> 属性的写入权限。</p><p>组织策略管理员 &#8212; 组织策略管理员拥有对领域中所有策略的读写权限。组织策略管理员不能创建引用策略。</p>
+
+<a name="fsvgt"></a><h5>域组件树</h5>
+<p>域组件树（DC 树）是许多 Sun Java System 组件使用的特定 DIT 结构，用于在 DNS 名称与领域的条目之间建立映射。</p><p>如果在创建领域时输入了领域的 DNS 名称，则启用此选项将创建领域的 DC 树条目。创建领域页面中将显示“DNS 名称”字段。该选项仅适用于顶层领域，对于子领域将不显示该选项。</p><p>在领域树中通过 OpenSSO SDK 对 <i>inetdomainstatus</i> 属性所做的任何状态更改都将会更新相应的 DC 树条目状态。（不是通过 OpenSSO SDK 进行的状态更新将不会同步更新。）例如，如果创建 DNS
+名称属性为 <tt>sun.com</tt> 的新领域 sun，则会在 DC 树中创建以下条目：</p><p><tt>dc=sun,dc=com,o=internet,root suffix</tt></p><p>默认情况下，它将被设置为 OpenSSO 的根。如果需要其他后缀，则需要使用 LDAP 命令创建后缀。需要修改创建领域的管理员的 ACI，以使他们能够无限制地访问新的 DC 树根。</p>
+
+<a name="fsvgs"></a><h5>管理组</h5>
+<p>指定是否创建 DomainAdministrators 和 DomainHelpDeskAdministrators 组。如果启用，将创建这些组，并将其分别与组织管理角色和组织帮助台管理角色关联起来。创建成功后，当在某个关联的角色中添加或删除用户时，对应的组中也将自动添加或删除该用户。但是该操作不能反向进行。当在其中的某个组中添加或移除用户时，不会在该用户的关联角色中添加或移除该用户。</p><p>只有在启用此选项后创建的领域中才能创建 DomainAdministrators 和 DomainHelpDeskAdministrators 组。</p>
+<hr><p><b>注 &#8211; </b>此选项不适用于子领域，但适用于根领域。对于根领域，将创建 ServiceAdministrators 和 ServiceHelpDeskAdministrators 组，并将其分别与“顶层管理”和“顶层帮助台管理员”角色相关联。上面的操作同样适用于该组织。</p>
+<hr>
+
+
+<a name="fsvgv"></a><h5>符合用户删除</h5>
+<p>指定是从目录中删除用户条目还是只将其标记为已删除。只有在传统模式下安装 OpenSSO 时，该属性才可用。</p><p>如果是在选中该选项 (true) 的情况下删除用户条目，该用户条目仍将存在于目录中，只是将被标记为已删除。Directory Server 搜索时不会返回标记为已删除的用户条目。如果未选定该选项，将会从目录中删除用户条目。</p>
+
+<a name="fsvgu"></a><h5>动态管理角色 ACI</h5>
+<p>该属性用于定义管理员角色的访问控制指令，管理员角色在使用 OpenSSO 配置组或领域时动态创建。这些角色用于为创建的特定条目分组授予管理 Liberty。仅在该属性列表中才能修改默认 ACI。</p>
+<hr><p><b>注 &#8211; </b>领域级别的管理员拥有比组管理员更大的访问权限。但是，如果在默认情况下将某用户添加到组管理员角色中，则该用户可以修改组中任何人员的密码，包括同时是该组成员的任何领域管理员。</p>
+<hr>
+<p>容器帮助台管理员角色拥有对领域内所有条目的读取权限，但仅对该容器单元中用户条目的 <i>userPassword</i> 属性拥有写入权限。</p><p>领域帮助台管理员拥有对领域中所有条目的读取权限，以及对 <i>userPassword</i> 属性的写入权限。创建子领域时，请注意应在该子领域中创建管理角色，而不是在父领域中创建管理角色。</p><p>“容器管理员”角色拥有对 LDAP 组织单位中所有条目的读写权限。 在 OpenSSO 中，LDAP 组织单位通常称为容器。</p><p>组织策略管理员具有对所有策略的读写权限，并可创建、指定、修改和删除该领域内的所有策略。</p><p>默认为“人员容器管理员”，新创建领域中的所有用户条目均为该领域的“人员容器”的成员。“人员容器管理员”拥有对领域的“人员容器”中所有用户条目的读写权限。请注意，该角色“并不”具有对包含角色和组 DN 的属性的读写权限，因此他们不能修改角色和组的属性，也不能从角色或组中删除用户。</p><p>可以使用 OpenSSO 配置其他容器，以包含用户条目、组条目甚至其他容器。要将管理员角色应用到配置领域之后创建的容器，请使用默认的“容器管理员角色”或“容器帮助台管理员”。</p><p>组管理对特定组的所有成员具有读写权限，可以创建新用户、将用户指定给自己所管理的组以及删除自己创建的用户。创建组时，将自动生成“组管理员”角色，并赋予管理组所必需的权限，但不会将角色自动指定到组成员。角色必须由组创建者或任何拥有“组管理员角色”访问权限的人员来指定。</p><p>顶层管理员拥有对顶层领域中所有条目的读写权限。换句话说，顶层管理角色具有 OpenSSO 应用程序内所有配置主体所拥有的权限。</p><p>组织管理员拥有对领域中所有条目的读写权限。创建领域时将自动生成组织管理员角色，该角色拥有管理领域所必需的权限。</p>
+
+<a name="ftbxa"></a><h5>用户配置文件服务类</h5>
+<p>列出了“用户配置文件”页面中具有自定义显示的服务。对于某些服务来说，由控制台生成的默认显示不能完全满足需要。该属性为任意服务创建自定义显示，并完全控制显示信息的内容和方式。其语法如下所示：</p><p><tt>service name | relative url()</tt></p><p>“创建用户”页面中将不会显示该属性中列出的服务。必须在“用户配置文件”页面中执行自定义服务显示的所有数据配置。</p>
+
+<a name="fsvgw"></a><h5>DC 节点属性列表</h5>
+<p>定义当创建对象时将在 DC 树条目中设置的属性集。默认参数包括：</p><table><tr><td align="left" valign="top" scope="row"><p>maildomainwelcomemessage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailhost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailclientattachmentquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutingsmarthost</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailaccessproxyreplay</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredlanguage</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>domainuidseparator</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainmsgquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomainallowedserviceaccess</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>preferredmailmessagestore</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>maildomaindiskquota</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>objectclass=maildomain</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>mailroutinghosts</p></td>
+</tr>
+</table>
+
+<a name="fsvgx"></a><h5>用于删除的对象的搜索过滤器</h5>
+<p>定义当启用“用户符合删除”模式时，用于要删除的对象的搜索过滤器。</p>
+
+<a name="fsvgy"></a><h5>默认人员容器</h5>
+<p>指定将在其中创建用户的默认人员容器。</p>
+
+<a name="fsvhe"></a><h5>默认组容器</h5>
+<p>指定将在其中创建组的默认组容器。</p>
+
+<a name="fsvhd"></a><h5>默认代理容器</h5>
+<p>指定将在其中创建代理的默认代理容器。默认值为 <tt>Agents</tt>。</p>
+
+<a name="fsvhb"></a><h5>组默认人员容器</h5>
+<p>指定在创建用户时，用户将被放到默认人员容器中。该字段没有默认值。其有效值是人员容器的 DN。有关“人员容器”的替代顺序，请参见“组人员容器列表”属性下的说明。</p>
+
+<a name="fsvha"></a><h5>组人员容器列表</h5>
+<p>指定人员容器列表，组管理员在创建新用户时会从中选择人员容器。如果目录树中存在多个人员容器，则可以使用该列表。（如果未在该列表或“组默认人员容器”字段中指定“人员容器”，则在默认的 OpenSSO 人员容器 <tt>ou=people</tt> 中创建用户。）该字段不存在默认值。</p><p>该属性的语法为：</p><p><tt></tt><i>dn of group</i><tt> | </tt><i>dn of people container</i><tt></tt></p><p>创建用户时，将查看要在其中放置用户条目的容器的该属性。如果该属性为空，则检查容器的“组默认人员容器”属性。如果后一属性为空，则在 <tt>ou=people</tt> 下创建条目。</p><p>只有在传统模式下安装 OpenSSO 时，该属性才可用。该字段没有默认值。</p>
+
+<a name="fsvhc"></a><h5>用户配置文件显示类</h5>
+<p>指定显示“用户配置文件”页面时，OpenSSO 控制台使用的 Java 类。</p>
+
+<a name="fsvhh"></a><h5>最终用户配置文件显示类</h5>
+<p>指定显示“最终用户配置文件”页面时，OpenSSO 控制台使用的 Java 类。</p>
+
+<a name="fsvhi"></a><h5>在“用户配置文件”页面中显示角色</h5>
+<p>指定是否在用户的“用户配置文件”页面中显示指定给用户的角色列表。如果该参数未启用（默认），则“用户配置文件”页面将只对管理员显示用户的角色。</p>
+
+<a name="fsvhj"></a><h5>在“用户配置文件”页面中显示组</h5>
+<p>指定是否在用户的“用户配置文件”页面中显示指定给用户的组列表。如果该参数未启用（默认），则“用户配置文件”页面将只对管理员显示用户的组。</p>
+
+<a name="fsvhf"></a><h5>用户组自订阅</h5>
+<p>该参数用于指定用户是否能够将自身添加到可以自由订阅的组。如果该参数未启用（默认），则“用户配置文件”页面将只允许管理员修改用户的组成员资格。仅当选定在用户配置文件页面中显示组选项时，此参数才可用。</p>
+
+<a name="fsvhk"></a><h5>用户配置文件显示选项</h5>
+<p>该菜单用于指定“用户配置文件”页面中显示的服务属性。管理员可以选择以下选项之一：</p><dl><dt>只限于用户</dt>
+<dd><p>显示指定给用户的服务的可查看“用户”模式属性。属性包含关键字 "Display" 时，用户可以查看用户服务属性。有关详细信息，参见 OpenSSO Developer's Guide。</p></dd>
+<dt>组合</dt>
+<dd><p>显示指定给用户的服务的可查看“用户”和“动态”模式属性。</p></dd>
+</dl>
+
+
+<a name="fsvhl"></a><h5>用户创建默认角色</h5>
+<p>该列表用于定义将被自动指定给新创建的用户的角色。该字段没有默认值。管理员可以输入一个或多个角色的 DN。</p><p>该字段只接受完整的独特名称地址，不接受角色名称。角色只能为 OpenSSO 角色，而不能为 LDAP (Directory Server) 角色。</p>
+
+<a name="fsvhm"></a><h5>“管理控制台”选项卡</h5>
+<p>此字段列出要显示在控制台顶部的模块的 Java 类。语法为：<tt>i18N key | java class name</tt>。</p><p>i18N key 是控制台中条目的本地化名称。</p>
+
+<a name="fsvho"></a><h5>搜索返回的结果的最大数目</h5>
+<p>该字段定义搜索返回的结果的最大数目。默认值为 200。</p><p>除非已分配了充足的系统资源，否则请勿将该属性设置为较大的值（大于 1000）。</p>
+<hr><p><b>注 &#8211; </b>OpenSSO 被预先配置为最多返回 4000 个搜索条目。可通过控制台或使用 <tt>ldapmodify</tt> 更改该值。如果希望使用 <tt>ldapmodify</tt> 更改该值，则可使用下列值创建 <tt>newConfig.xml</tt>（本实例中，<tt>nsSizeLimit</tt>: -1 表示无限制）：</p>dn: cn=puser,ou=DSAME Users,ORG_ROOT_SUFFIX changetype: modify replace:nsSizeLimit nsSizeLimit: -1<p>然后，运行 <tt>ldapmodify</tt>。例如：</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml<p>通过 <tt>LDAPModify</tt> 对该属性所做的修改比通过 OpenSSO 控制台所做的修改具有更高的优先权。</p>
+<hr>
+
+
+<a name="fsvhp"></a><h5>搜索超时</h5>
+<p>定义在搜索多长时间（以秒为单位）后超时。它可用于终止可能耗时过长的搜索。达到最长搜索时间后，将停止搜索并返回错误消息。默认值是 5 秒。</p>
+<hr><p><b>注 &#8211; </b>Directory Server 的超时值被预先配置为 120 秒。可通过 Directory Server 控制台或使用 <tt>ldapmodify</tt> 更改该值。如果希望使用 <tt>ldapmodify</tt> 更改该值，则可通过下列值创建
+<tt>newConfig.xml</tt>（本实例将把超时值从 120 秒改为 3600 秒）：</p>dn: cn=config changetype: modify replace:nsslapd-timelimit nsslapd-timelimit: 3600<p>然后，运行 <tt>ldapmodify</tt>。例如：</p>setenv LD_LIBRARY_PATH /opt/SUNWam/lib/:/opt/SUNWam/ldaplib/ldapsdk:/usr/lib/mps:/usr/share/lib/mps/secv1:/usr/lib/mps/secv1: $LD_LIBRARY_PATH  ./ldapmodify -D "cn=Directory Manager" -w "iplanet333" -c -a -h hostname.domain -p 389 -f  newConfig.xml
+<hr>
+
+
+<a name="fsvhs"></a><h5>JSP 目录名称</h5>
+<p>指定包含领域的 JSP 文件的目录名。这使管理员可为不同领域设置不同外观（自定义）。该属性的默认值为 <tt>console</tt>。只有在传统模式下安装 OpenSSO 时，该属性才可用。</p>
+
+<a name="fsvhr"></a><h5>联机帮助文档</h5>
+<p>该字段列出将在 OpenSSO 主帮助页上创建的联机帮助链接。这样其他应用程序也可以在 OpenSSO 页面中添加自己的联机帮助链接。该属性的格式为：</p><p><tt>linki18nkey | html page to load | i18n properties file | remote server</tt></p><p>其中远程服务器属性是可选参数，可用于指定联机帮助文档所在的远程服务器。默认值为：</p><p><tt>DSAME Help|/contents.html|amAdminModlueMsgs</tt></p><p>只有在传统模式下安装 OpenSSO 时，该属性才可用。</p>
+
+<a name="fsvhq"></a><h5>所需的服务</h5>
+<p>该字段列出创建用户条目时向其动态添加的服务。管理员可以选择创建时要添加的服务。该属性不适用于控制台，但适用于 OpenSSO SDK。对于通过 <tt>amadmin</tt> 命令行实用程序动态创建的用户，将为其指定该属性中列出的服务。</p>
+
+<a name="fsvhu"></a><h5>用户搜索关键字</h5>
+<p>此属性定义了属性名称，当在“浏览”页面中进行简单搜索时将搜索该属性名称。该属性的默认值为 <tt>cn</tt>。</p><p>例如，如果在导航框的“名称”字段中输入 <tt>j*</tt>，则显示名称以 "j" 或 "J" 开头的用户。</p>
+
+<a name="fsvht"></a><h5>用户搜索返回属性</h5>
+<p>该字段定义当显示简单搜索返回的用户时，使用的属性名，默认值为 uid cn。此时将显示用户 ID 和用户的全名。</p><p>列出的第一个属性名称还将作为对要返回的用户集进行排序时使用的关键字。要防止性能下降，请使用其值在用户条目中进行设置的属性。</p>
+
+<a name="fsvhv"></a><h5>用户创建通知列表</h5>
+<p>该字段用于定义在创建新用户时，要向其发送通知的电子邮件地址列表。可以指定多个电子邮件地址，语法如下：</p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p>通过使用 <tt>-|locale</tt> 选项，通知列表还可接受不同的语言环境。</p><p>有关语言环境的列表，参见<a href="supportedlang.html">支持的语言环境</a>。</p><p>通过修改 <tt>amProfile.properties</tt>（默认情况下位于 <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt> 下）中的属性 497，可以更改发件人的电子邮件 ID。</p>
+
+<a name="fsvhw"></a><h5>用户删除通知列表</h5>
+<p>该字段用于定义在删除用户时，要向其发送通知的电子邮件地址列表。可以指定多个电子邮件地址，语法如下：</p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p><tt>e-mail|locale|charset</tt></p><p>通过使用 <tt>-|locale</tt> 选项，通知列表还可接受不同的语言环境。</p><p>有关语言环境的列表，参见<a href="supportedlang.html">支持的语言环境</a>。</p><p>通过修改 <tt>amProfile.properties</tt>（默认情况下位于 <tt></tt><i>OpenSSO-base</i><tt>/SUNWam/locale</tt> 下）中的属性 497，可以更改发件人的电子邮件 ID。</p><p>默认发件人 ID 为 <tt>DSAME</tt>。</p>
+
+<a name="fsvhx"></a><h5>用户修改通知列表</h5>
+<p>定义属性及其关联的电子邮件地址列表。如果修改了列表中定义的用户属性，将向该属性关联的电子邮件地址发送通知。每个属性都可以有不同的关联地址集。可以指定多个电子邮件地址，语法如下：</p><p><tt>attrName </tt><i>e-mail</i><tt>|</tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt>|</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt></p><p><tt>attrName </tt><i>e-mail</i><tt>|</tt><i> locale</i><tt>|</tt><i>charset</i><tt> </tt><i>e-mail </i><tt>|</tt><i>locale</i><tt>|</tt><i>charset</i><tt> ..... </tt></p><p><tt>-self</tt> 关键字可用于代替其中的一个地址。这时将向其配置文件被修改的用户发送电子邮件。例如，假定如下：</p><p><tt>manager someuser@sun.com|self|admin@sun.com</tt></p><p>邮件将发送到 manager 属性中指定的地址：<tt>someuser@sun.com</tt>、<tt>admin@sun</tt> 以及修改用户的人员 (self)。</p><p>通过使用 <tt>-|locale</tt> 选项，通知列表还可接受不同的语言环境。例如，将通知发送到在法国的管理员：</p><p><tt>manager someuser@sun.com|self|admin@sun.com|fr</tt> 有关语言环境的列表，参见<a href="supportedlang.html">支持的语言环境</a>。</p><p>该属性名称与 Directory Server 方案中显示的名称相同，但与控制台中显示的名称不同。</p>
+
+<a name="fsvia"></a><h5>每页可以显示的最大条目数</h5>
+<p>该属性允许您定义每页可以显示的最大行数。默认值是 25。例如，如果某个用户搜索返回 100 行，将用 4 页来显示该结果，每页上显示 25 行。</p>
+
+<a name="fsvhz"></a><h5>事件侦听器类</h5>
+<p>该属性包含用于接收 OpenSSO 控制台中创建、修改和删除事件的侦听器的列表。</p>
+
+<a name="fsvhy"></a><h5>处理前和处理后的类</h5>
+<p>该字段将通过插件定义实现类列表，它们扩展了 <tt>com.iplanet.am.sdk.</tt><tt>AMCallBack</tt> 类，以在用户、领域、角色和组的处理前和处理后操作期间接收回调。这些操作包括：</p>
+<ul><li><p>创建</p></li>
+<li><p>删除</p></li>
+<li><p>修改</p></li>
+<li><p>将用户添加到角色/组</p></li>
+<li><p>从角色/组中删除用户</p></li></ul>
+<p>必须输入插件的完整类名，然后更改 Web 容器的类路径（从 OpenSSO 安装基），以包含插件类位置的完整路径。</p>
+
+<a name="fsvic"></a><h5>外部属性获取</h5>
+<p>该选项启用插件的回调以检索外部属性（所有专用于外部应用程序的属性）。不会在 OpenSSO SDK 中缓存外部属性，因此可通过此属性在各个领域级别启用属性检索。默认情况下，不启用该选项。</p>
+
+<a name="fsvib"></a><h5>无效用户 ID 字符</h5>
+<p>这个属性定义用户名称中不允许使用的字符清单。各字符间必须用 | 字符分隔开。例如：</p><p><tt>*|(|)|&#38;|!</tt></p>
+
+<a name="fsvie"></a><h5>用户 ID 和密码验证插件类</h5>
+<p>此类提供了一种用户 ID 和密码验证插件机制。需要由为用户验证用户 ID 和/或密码的实现插件模块来覆盖此类的方法。每当使用 OpenSSO 控制台、<tt>amadmin</tt> 命令行界面或 SDK 来添加或修改用户 ID 或密码值时，都会调用该实现插件模块。</p><p>可以为每个领域配置扩展此类的插件。如果未为领域配置插件，将使用在全局级别上配置的插件。</p><p>如果插件的验证失败，则插件模块可能会抛出异常，通知应用程序指示用户所提供的用户 ID 或密码中的错误。</p>
+<br/>
+
+</body>
+</html>

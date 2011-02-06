@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Trusted Partners: Configuring Trusted Partner Attributes - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamltrustedpartnersadd"></a><h5>Trusted Partners: Configuring Trusted Partner Attributes</h5>
+<a name="indexterm-83"></a><p>Following is the second part of the procedure for configuring a trusted partner.
+The starting point is <a href="federation.fssamlselecttrustedpartnertype.html">Trusted Partners: Selecting Partner Type and Profile</a>. Based on the role(s) selected in the first
+part, any of the sub-attributes listed in the following sections may need to
+be defined.</p>
+<hr><p><b>Note &#8211; </b>If you reached this page by clicking Edit or Duplicate on the SAML
+configuration screen under Federation, modify the trusted partner profile based on the steps
+below and click Save to change the values. Click Save on the SAML
+Profile page to complete the modification.</p>
+<hr>
+<ol>
+<li><b>Type in values for the Common Settings sub-attributes.</b><dl><dt>Name</dt>
+<dd><p>Can be any string, such as an organization name.</p></dd>
+<dt>Source ID</dt>
+<dd><p>This is a 20 byte sequence (encoded using the Base64 format) that comes from the partner site. It is generally the same value as that used for the Site ID attribute when configuring the Site Identifiers attribute.</p></dd>
+<dt>Target</dt>
+<dd><p>This is the domain of the partner site (with or without a port number). If you want to contact a web page that is hosted in this domain, the redirect URL is picked up from the values defined in the Trusted Partner attribute.</p>
+<hr><p><b>Note &#8211; </b>If there are two defined entries for the same domain (one containing a port number and one without a port number), the entry with the port number takes precedence. For example, assume the following two trusted partner definitions: <tt>target=sun.com</tt> and  <tt>target=sun.com:8080</tt>. If the principal is seeking <tt>http://machine.sun.com:8080/index.html</tt> , the second definition will be chosen.</p>
+<hr>
+</dd>
+<dt>SAML URL</dt>
+<dd><p> The URL that points to the servlet that implements the Web Browser Artifact Profile.</p></dd>
+<dt>Host List</dt>
+<dd><p>A list of the IP addresses, the DNS host name, or the alias of the client authentication certificate used by the partner. This is configured for all hosts within the partner site that can send requests to this authority. This list helps to ensure that the requestor is indeed the intended receiver of the artifact. If the requester is defined in this list, the interaction will continue. If the requester&#8217;s information does not match any hosts defined in the host list, the request will be rejected.</p></dd>
+<dt>Site Attribute Mapper</dt>
+<dd><p>The class is used to return a list of attribute values defined as <tt>AttributeStatements</tt> elements in an Authentication Assertion. A site attribute mapper needs to be implemented from the  <tt>PartnerSiteAttributeMapper</tt> interface.</p><p>If no class is defined, no attributes will be included in the assertion.</p></dd>
+<dt>Name Identifier Mapper</dt>
+<dd><p>The class that defines how the subject of an assertion is related to an identity at the destination site. An account mapper needs to be implemented from the <tt>com.sun.identity.saml.plugins.PartnerAccountMapper</tt> interface. The default is <tt>com.sun.identity.saml.plugins.DefaultAccountMapper</tt> .</p><p>If no class is defined, no attributes will be included in the assertion.</p></dd>
+<dt>Version</dt>
+<dd><p>The SAML version used (<tt>1.0</tt> or <tt>1.1</tt>) to send SAML requests. To change the version or protocol, click on the Local Site Properties button and change the Protocol and Assertion attributes as necessary. </p></dd>
+<dt>Certificate</dt>
+<dd><p>A certificate alias that is used to verify the signature in an assertion when it is signed by the partner and the certificate cannot be found in the <tt>KeyInfo</tt> portion of the signed assertion.</p></dd>
+<dt>Issuer</dt>
+<dd><p>The creator of a generated assertion. The default syntax is <i>hostname</i><tt>:</tt> <i>port</i>.</p></dd>
+</dl>
+</li>
+<li><b>Type in values for the Destination sub-attributes.</b><dl><dt>Artifact: SAML URL</dt>
+<dd><p>The URL that points to the servlet that implements the Web Browser Artifact Profile.</p></dd>
+<dt>Post: Post URL</dt>
+<dd><p>The URL that points to the servlet that implements the Web Browser POST Profile.</p></dd>
+<dt>SOAP Query: Attribute Mapper</dt>
+<dd><p>The class that is used to obtain single sign-on information from a query. You need to implement an attribute mapper from the included interface. If no class is specified, the <tt>DefaultAttributeMapper</tt> will be used.</p></dd>
+<dt>SOAP Query: Action Mapper</dt>
+<dd><p>The class that is used to get single sign-on information and map partner actions to authorization decisions. You need to implement an action mapper from the included interface. If no class is specified, the <tt>DefaultActionMapper</tt> will be used.</p></dd>
+</dl>
+</li>
+<li><b>Type in values for the Source sub-attributes.</b><dl><dt>Artifact: SOAP URL</dt>
+<dd><p>The URL to the SAML SOAP Receiver.</p></dd>
+<dt>Authentication Type</dt>
+<dd><p>Authentication types that can be used with SAML:</p>
+<ul><li><p>Specify <tt>NOAUTH</tt> if the URL to the SAML SOAP receiver is accessed using HTTP, and the SAML SOAP receiver is not protected by HTTP basic authentication and/or SSL.</p></li>
+<li><p>Specify <tt>BASICAUTH</tt> if the URL to the SAML SOAP receiver is accessed using HTTP, and the SAML SOAP receiver is protected by HTTP basic authentication.</p></li>
+<li><p>Specify <tt>SSL</tt> if the URL to the SAML SOAP receiver is accessed using HTTPS, and the SAML SOAP receiver is not protected by HTTP SSL.</p></li>
+<li><p>Specify <tt>SSLWITHBASICAUTH</tt> if the URL to the SAML SOAP receiver is accessed using HTTPS, and the SAML SOAP receiver is not protected by<tt> BASIC AUTH WITH SSL</tt>.</p></li></ul>
+
+<hr><p><b>Note &#8211; </b>If you are protecting the SAML SOAP receiver URL with HTTP basic authentication, you do so in the web container configuration and not in the OpenSSO configuration. You do, however, supply the HTTP basic authentication user ID and password in the OpenSSO configuration.</p>
+<hr>
+<p>This attribute is optional. If not specified, the default is  <tt>NOAUTH</tt>. If <tt>BASICAUTH</tt> or <tt>SSLWITHBASICAUTH</tt> is specified, the Trusted Partners attribute is required and should be <tt>HTTPS</tt>.</p></dd>
+<dt>User</dt>
+<dd><p>When <tt>BASICAUTH</tt> is chosen as the Authentication Type, the value of this attribute defines the user identifier of the partner being used to protect the partner&#8217;s SOAP receiver.</p></dd>
+<dt>User's Password</dt>
+<dd><p>When <tt>BASICAUTH</tt> is chosen as the Authentication Type, the value of this attribute defines the password for the user identifier of the partner being used to protect the partner&#8217;s SOAP receiver.</p></dd>
+<dt>User's Password (reenter)</dt>
+<dd><p>Reenter the password defined previously.</p></dd>
+</dl>
+</li>
+<li><b>Click Finish.</b></li>
+<li><b>Click Save on the SAML Profile page to complete the configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>
