@@ -1,0 +1,98 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.1 2008/07/01 06:27:49 veiming Exp $
+
+-->
+
+<project name="OpenSSO WSSProxy" default="usage">
+
+    <description>OpenSSO: WSSProxy</description>
+    <import file="wssproxy.xml" />
+
+    <!-- overridable properties -->
+    <property name="build.debug" value="on"/>
+    <property name="build.debuglevel" value="lines,vars,source"/>
+
+    <path id="build.class.path">
+        <fileset dir="${wssproxy.extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="build" depends="prepbuild">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${wssproxy.classes.dir}" source="1.4" target="1.4"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${wssproxy.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+        <java classname="com.sun.identity.wssagents.wssproxy.Setup" fork="false">
+            <classpath>
+                <pathelement path="${wssproxy.classes.dir}"/>
+                <pathelement path="${wssproxy.res.dir}"/>
+                <fileset dir="${wssproxy.extlib.dir}">
+                    <include name="openssoclientsdk.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="${wssproxy.res.dir}/AMClient.properties" />
+            <arg value="${wssproxy.classes.dir}/AMConfig.properties" />
+        </java>
+        <war destfile="${wssproxy.dist.dir}/wssproxy.war"
+            webxml="${wssproxy.xml.dir}/web.xml">
+            <lib dir="${wssproxy.extlib.dir}" includes="*.jar"
+                excludes="j2ee.jar" />
+            <zipfileset dir="${wssproxy.www.dir}" />
+            <classes dir="${wssproxy.classes.dir}">
+                <exclude name="com/sun/identity/wssagents/wssproxy/Setup.class" />
+            </classes>
+        </war>
+    </target>
+
+    <target name="prepbuild">
+        <mkdir dir="${wssproxy.built.dir}" />
+        <mkdir dir="${wssproxy.classes.dir}" />
+        <mkdir dir="${wssproxy.dist.dir}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${wssproxy.built.dir}" />
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" build      : compiles the sources"/>
+        <echo message=" clean      : deletes the generated files"/>
+        <echo message=" usage      : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+</project>
+
+

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amAuthSafeWord_addAttrs.xml,v 1.2 2008/06/25 05:53:31 qcheng Exp $
+-->
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Identity Server 2005Q4 Admin CLI DTD//EN"
+"jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+<!--
+  this file referenced by:
+
+  amadmin -u "xxx" -w "yyy" -t amAuthSafeWord_addAttrs.xml
+
+-->
+
+<Requests>
+    <AttributeSchema name="iplanet-am-auth-safeword-log-enable"
+	type="single"
+	syntax="boolean"
+	i18nKey="a103">
+	<DefaultValues>
+	    <Value>true</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="iplanet-am-auth-safeword-log-level"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a104">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="none">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="info">INFO</ChoiceValue>
+                        <ChoiceValue i18nKey="error">ERROR</ChoiceValue>
+                        <ChoiceValue i18nKey="debug">DEBUG</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>DEBUG</Value>
+                    </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="iplanet-am-auth-safeword-timeout"
+	type="single"
+	syntax="number"
+	i18nKey="a106">
+	<DefaultValues>
+	    <Value>120</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="iplanet-am-auth-safeword-client-type"
+	type="single"
+	syntax="string"
+	i18nKey="a107">
+	<DefaultValues>
+	    <Value></Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="iplanet-am-auth-safeword-eassp-version"
+	type="single_choice"
+	syntax="number"
+	i18nKey="a108">
+	<ChoiceValues>
+	    <ChoiceValue>101</ChoiceValue>
+	    <ChoiceValue>200</ChoiceValue>
+	    <ChoiceValue>201</ChoiceValue>
+	</ChoiceValues>
+	<DefaultValues>
+	    <Value>201</Value>
+	</DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="iplanet-am-auth-safeword-minimum-strength"
+	type="single"
+	syntax="number"
+	i18nKey="a109">
+	<DefaultValues>
+	    <Value>15</Value>
+	</DefaultValues>
+    </AttributeSchema>
+</Requests>

@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>安全令牌服务代理属性 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webservicestsedit"></a><h4>安全令牌服务代理属性</h4>
+<p>安全令牌服务是提供发布和管理安全令牌的 Web 服务。即它常常以加密的设置发出安全性语句或声明，即使这些安全性语句或声明并非必要。这些语句以特定的证据为基础，这些证据能够直接验证从信任授权机构获得的安全令牌。要声明信任，服务可能会通过提供 STS 发布的一个或一组安全令牌来证明其权利，或者它可以发布带有自己信任语句的安全令牌（请注意，对于某些安全令牌格式，这可能只是重新发布或联合签名）。这构成了信任代理的基础。</p>
+
+<a name="ggpce"></a><h5>常规</h5>
+<p>以下“常规”属性定义安全令牌服务的基本属性：</p>
+
+<a name="ggpct"></a><h5>组</h5>
+<p>可通过“组”机制来定义相似代理类型的集合。组必须在将特定代理纳入集合之前进行定义。</p>
+
+<a name="ggpec"></a><h5>密码</h5>
+<p>定义“安全令牌”服务代理的密码。</p>
+
+<a name="ggpex"></a><h5>密码确认</h5>
+<p>确认密码。</p>
+
+<a name="ggpdu"></a><h5>状态</h5>
+<p>定义代理将在系统中处于“活动”状态还是“非活动”状态。默认情况下，该属性会设置为“活动”，即代理会参与保护 Web 服务客户机的出站 Web 服务请求，并验证 Web 服务提供者的 Web 服务响应。</p>
+
+<a name="ggpdg"></a><h5>通用标识符</h5>
+<p>列出用于唯一定义安全令牌服务代理的基本 LDAP 属性。</p>
+
+<a name="ggpfe"></a><h5>安全</h5>
+<p>以下属性定义安全令牌服务的安全属性：</p>
+
+<a name="ghery"></a><h5>安全机制</h5>
+<p>定义用于保护 STS 请求的安全凭证的类型。可选择以下安全凭证类型之一：</p>
+<ul><li><p>匿名 &#8212; 匿名安全机制不包含安全凭证。</p></li>
+<li><p>KerberosToken &#8212; 使用 Kerberos 安全令牌。</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; 使用基于 Liberty 的安全令牌。</p></li>
+<li><p>SAML-HolderOfKey &#8212; 使用 SAML 1.1 声明类型 Holder-Of-Key。</p></li>
+<li><p>SAML-SenderVouches &#8212; 使用 SAML 1.1 声明类型 Sender Vouches。</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; 使用 SAML 2.0 声明令牌类型 Holder-Of-Key。</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; 使用 SAML 2.0 声明令牌类型 Sender Vouches。</p></li>
+<li><p>STSSecurity &#8212; 使用给定的 Web 服务提供者的安全令牌服务生成的安全令牌。</p></li>
+<li><p>UserNameToken &#8212; 使用带有摘要密码的用户名令牌。</p></li>
+<li><p>UserNameToken-Plain &#8212; 使用带有明文密码的用户名令牌来保护 Web 服务请求。</p></li>
+<li><p>X509Token &#8211; 使用 X509 证书。</p></li></ul>
+
+
+<a name="ggpdk"></a><h5>STS 配置</h5>
+<p>当安全令牌服务代理将安全令牌服务 (Security Token service, STS) 用作安全机制时，启用该属性。该配置描述特定 STS 代理配置文件的列表，这些配置文件用于和 STS 服务的请求通信并保护其安全。</p>
+
+<a name="ggpfs"></a><h5>保留消息中的安全标头</h5>
+<p>启用后，该属性定义由安全令牌服务代理保留 SOAP 安全标头，以进行进一步处理。</p>
+
+<a name="ggpej"></a><h5>用户令牌的证书</h5>
+<p>该属性表示安全令牌服务代理用来生成用户名安全令牌的用户名/密码共享密钥。</p>
+
+<a name="ggpbt"></a><h5>签署和加密</h5>
+<p>以下属性定义安全令牌服务的签署和加密配置：</p>
+
+<a name="ggpdp"></a><h5>请求是否已签署</h5>
+<p>启用后，安全令牌服务代理使用给定的令牌类型签署请求。</p>
+
+<a name="ggpcn"></a><h5>请求标头是否已加密</h5>
+<p>启用后，将加密安全令牌服务代理的安全标头。</p>
+
+<a name="ggpca"></a><h5>请求是否已加密</h5>
+<p>启用后，将加密安全令牌服务请求。</p>
+
+<a name="ggpfo"></a><h5>响应签名是否已验证</h5>
+<p>启用后，将验证安全令牌服务响应签名。</p>
+
+<a name="ggpdo"></a><h5>响应是否已解密</h5>
+<p>启用后，将解密安全令牌服务响应。</p>
+
+<a name="ggpeh"></a><h5>密钥库</h5>
+<p>以下属性配置用于证书存储和检索的密钥库：</p>
+
+<a name="ggpcg"></a><h5>Web 服务提供者的公钥别名</h5>
+<p>该属性定义用于加密 Web 服务请求（或者验证 Web 服务响应签名）的公共证书密钥别名。</p>
+
+<a name="ggpfg"></a><h5>私钥别名</h5>
+<p>该属性定义用于签署 Web 服务请求（或者解密 Web 服务响应）的私有证书密钥别名。</p>
+
+<a name="ggpdc"></a><h5>密钥存储库用法</h5>
+<p>该配置定义是使用默认的密钥库，还是使用自定义的密钥库。必须为自定义密钥库定义以下值：</p>
+<ul><li><p>密钥库位置</p></li>
+<li><p>密钥库密码</p></li>
+<li><p>密钥密码</p></li></ul>
+
+
+<a name="ggpbr"></a><h5>端点</h5>
+<p>以下属性定义 Web 服务端点：</p>
+
+<a name="ghbab"></a><h5>安全令牌服务端点</h5>
+<p>该字段采用的值为：</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>该语法允许基于特定会话参数动态替换安全令牌服务端点的 URL。</p>
+
+<a name="ghbcm"></a><h5>安全令牌服务 MEX 端点</h5>
+<p>该字段采用的值为：</p><p><tt>%protocol://%host:%port%uri/sts/mex </tt></p><p>该语法允许基于特定会话参数动态替换安全令牌服务 MEX 端点的 URL。</p>
+
+<a name="ghcdb"></a><h5>Kerberos 配置</h5>
+<p>Kerberos 是 Web 服务安全支持的安全配置文件，用以保护 Web 服务客户机和 Web 服务提供者之间的 Web 服务通信。一般情况下，用户会验证到桌面，并调用 Web 服务和
+Web 服务客户机。这需要 Kerberos 票证将发送给 Web 服务提供者的请求的主体标识为 Kerberos 令牌，以保证该请求的安全。通常，基于 Kerberos 的 Web 服务安全用在与
+Kerberos 域（领域）相同的环境中，这与跨边界的情况（例如基于 SAML 的 Web 服务安全）相反。不过，Kerberos 是功能最强的验证机制之一，特别是在 Windows 域控制器环境中。</p>
+
+<a name="ghcgo"></a><h5>Kerberos 域服务器</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）主机名。必须输入该域控制器的全限定域名。</p>
+
+<a name="ghceh"></a><h5>Kerberos 域</h5>
+<p>此属性指定 Kerberos 分发中心 (Kerberos Distribution Center, KDC) 域名。域控制器的域名可能与 OpenSSO 域名不同，这取决于具体的配置。</p>
+
+<a name="ghcgw"></a><h5>Kerberos 服务主体</h5>
+<p>指定以 KDC 注册的安全令牌服务主体。</p><p>请使用以下格式：</p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt></p><p><tt>hostname</tt> 和 <tt>domainame</tt> 表示 OpenSSO 实例的主机名和域名。<tt>dc_domain_name</tt> 是 Windows Kerberos 服务器（域控制器）所在的 Kerberos 域。Kerberos
+服务器可能与 OpenSSO 实例的域名不同。</p>
+
+<a name="ghcea"></a><h5>Kerberos 票证高速缓存目录</h5>
+<p>指定 Kerberos TGT（Ticket Granting Ticket，票证授予票证）高速缓存目录。本属性定义：当用户验证至桌面或使用 <tt>kinit</tt>（用于从 KDC 获取 TGT 的命令）进行初始化时，TGT 存储在本地高速缓存中。</p>
+<br/>
+
+</body>
+</html>

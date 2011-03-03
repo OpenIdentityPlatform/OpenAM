@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web 策略代理 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggmok"></a><h4>Web 策略代理</h4>
+<p>可通过此界面配置 Web 代理实例。所述的属性仅在创建代理期间选择了集中配置时适用。如果选择本地配置，则只能从代理的文件中编辑与此代理相关的属性。</p><p>可用的配置类型分为以下类别：</p>
+<ul><li><p><a href="#ggmrx">全局</a></p></li>
+<li><p><a href="#ggmna">应用程序</a></p></li>
+<li><p><b>Broken Link (Target ID: GGMUQ)</b></p></li>
+<li><p><a href="#ggmtu">高级</a></p></li></ul>
+
+
+<a name="ggmrx"></a><h5>全局</h5>
+<p>“全局”属性适用于所有 Web 代理。</p>
+
+<a name="ggmvp"></a><h5>组</h5>
+<p>如果适用，则从下拉列表中选择一个组。该列表由先前配置的组构成。</p>
+
+<a name="ggmtk"></a><h5>密码</h5>
+<p>密码在创建代理配置文件后设置。但是，您以后可以随时更改密码。</p>
+
+<a name="ggmvm"></a><h5>密码确认</h5>
+<p>创建代理配置文件时执行密码确认。如果更改了密码，则必须确认更改。</p>
+
+<a name="ggmsp"></a><h5>状态</h5>
+<p>创建代理时选择“活动”选项。仅在要删除代理提供的保护时才选择“非活动”。</p>
+
+<a name="ggmpq"></a><h5>代理配置系统信息库的位置</h5>
+<p>如有必要，可将配置位置更改为以下两种可用选项之一：集中或本地。您可以通过集中位置来以集中方式控制配置，例如通过控制台。本地选项则是出于向后兼容目的而提供的。</p>
+
+<a name="ggmqt"></a><h5>FAM 登录 URL</h5>
+<p>Federated Access Manager 验证的 URL 列表。需要验证时，代理会将外来的用户重定向到由 URL 指定的适当验证服务。</p>
+
+<a name="ggmqe"></a><h5>代理部署 URI 前缀</h5>
+<p>通用资源标识符 (Universal Resource Identifier, URI) 的值。默认值为 <tt>/amagent</tt>。</p>
+
+<a name="ggmrt"></a><h5>代理语言环境</h5>
+<p>语言环境的值。</p>
+
+<a name="ggmpt"></a><h5>代理本地日志文件轮转</h5>
+<p>启用日志轮转。如果启用，则在达到所指定的日志文件大小时轮转日志，由以下属性设置：代理本地日志文件大小。</p>
+
+<a name="ggmmw"></a><h5>代理本地日志文件大小</h5>
+<p>日志文件轮转为新文件的大小（以兆字节为单位）。</p>
+
+<a name="ggmno"></a><h5>代理远程日志文件名</h5>
+<p>用于记录对 Federated Access Manager 的每个 URL 访问的 Federated Access Manager 日志文件名称。</p>
+
+<a name="ggmof"></a><h5>URL 访问远程日志记录类型</h5>
+<p>URL 访问日志记录级别设置。此设置是指保存到 Federated Access Manager 日志文件的 URL 访问，其名称由标为“代理远程日志文件名”的属性指定。</p>
+
+<a name="ggmoy"></a><h5>代理调试级别</h5>
+<p>要记录的调试消息类型。该设置决定在代理主机上本地保存的调试日志级别。</p>
+
+<a name="ggmnb"></a><h5>FQDN 检查</h5>
+<p>启用后，会检查 FQDN 默认值和 FQDN 映射值。</p>
+
+<a name="ggmoc"></a><h5>FQDN 默认值</h5>
+<p>用户为访问资源而使用的全限定主机名。该主机名在代理安装期间设置。除非必要，请勿修改此设置。</p>
+
+<a name="ggmod"></a><h5>FQDN 虚拟主机映射</h5>
+<p>指向实际或有效主机名的映射。此映射表示从未识别的主机名指向已识别的主机名。此映射在以下场合非常有用：当用户输入 IP 地址或错误的 URL 时，或者当虚拟主机用于受保护的资源时。</p>
+
+<a name="ggmox"></a><h5>忽略服务器检查</h5>
+<p>启用表示“忽略”，即代理<b>不会</b>确保在执行 302 重定向之前运行 Federated Access Manager。</p>
+
+<a name="ggmqs"></a><h5>忽略命名请求中的首选命名 URL</h5>
+<p>启用表示“忽略”，即代理“不会”将首选命名 URL 作为命名请求中的属性发送。</p>
+
+<a name="ggmql"></a><h5>远程日志记录失败时拒绝资源访问</h5>
+<p>启用后，当远程日志记录失败时，会拒绝资源访问。</p>
+
+<a name="ggmpw"></a><h5>资源访问拒绝的 URL</h5>
+<p>自定义的访问拒绝的页面的 URL。如果未指定值，代理会返回 HTTP 403 状态（禁止访问）。</p>
+
+<a name="ggmrk"></a><h5>配置文件属性的本机编码</h5>
+<p>启用后，代理会使用操作系统语言环境的默认编码来编码 LDAP 标头值。如果未启用，则使用 UTF-8 来编码 LDAP 标头值。</p>
+
+<a name="ggmqr"></a><h5>非强制执行的 URL 列表</h5>
+<p>未执行验证的 URL 列表。对于该列表中的每个 URL，进行验证时无需证书。</p>
+
+<a name="ggmon"></a><h5>反转检查非强制执行的 URL 列表</h5>
+<p>启用后，非强制执行的列表变为强制执行列表。因此，所有列为标有“非强制执行的 URL 列表”的属性值的 URL 随后变为强制执行，而其他 URL 为非强制执行。</p>
+
+<a name="ggmom"></a><h5>非强制执行的客户机 IP 列表</h5>
+<p>客户机 IP 地址列表，不会对来自该列表的请求进行验证或授权。因此，对列为该属性值的每个 IP 地址授予访问权限。进行验证或授权时无需证书。</p>
+
+<a name="ggmov"></a><h5>非强制执行 URL 的获取属性</h5>
+<p>启用后，代理通过执行策略评估来获取非强制执行列表上 URL 的配置文件属性。</p>
+
+<a name="ggmna"></a><h5>应用程序</h5>
+<p>应用程序属性往往是应用程序特定的。</p>
+
+<a name="ggnej"></a><h5>代理连接超时设置：</h5>
+<p>与 Federated Access Manager 验证服务器连接的代理的超时周期（以秒为单位）。默认值为 2 秒。与该设置相关的错误如下：<tt>unable to find active Access Manager Auth server.</tt></p>
+
+<a name="ggmnd"></a><h5>策略高速缓存轮询周期</h5>
+<p>刷新代理策略高速缓存的轮询时间间隔（以分钟为单位）。默认值为 3 分钟。</p>
+
+<a name="ggmqk"></a><h5>SSO 高速缓存轮询周期</h5>
+<p>刷新代理 SSO 高速缓存的轮询时间间隔（以分钟为单位）。默认值为 3 分钟。</p>
+
+<a name="ggmrr"></a><h5>用户 ID 参数</h5>
+<p>代理使用用户 ID 的值设置 <tt>REMOTE_USER</tt> 服务器变量的值。默认情况下，该参数设置为 <tt>UserToken</tt>。</p>
+
+<a name="ggmpf"></a><h5>用户 ID 参数类型</h5>
+<p>与标为“用户 ID 参数”的属性结合使用，该设置决定从中获取用户 ID 的属性类型。可能值为 <tt>session</tt> 和 <tt>ldap</tt>。</p>
+
+<a name="ggmor"></a><h5>自根资源的获取策略</h5>
+<p>启用（默认设置）后，代理高速缓存资源的策略决策以及来自资源根目录的所有资源。要使代理仅对资源的策略决策进行高速缓存以改善响应时间，请确保未启用该设置。</p>
+
+<a name="ggmoa"></a><h5>策略时钟偏差</h5>
+<p>用于调整代理机器与 Federated Access Manager 之间时间差异的时间（以秒为单位）。以秒为单位的时钟偏差等于代理时间减去 Federated Access Manager 时间。</p>
+
+<a name="ggmpk"></a><h5>配置文件属性 Cookie 前缀</h5>
+<p>配置文件属性标头中所用的 Cookie 前缀。</p>
+
+<a name="ggmqv"></a><h5>配置文件属性 Cookie 最大生存周期</h5>
+<p>配置文件属性 Cookie 标头的最大生存周期（以秒为单位）。</p>
+
+<a name="ggmri"></a><h5>启用通知</h5>
+<p>启用后，通知可帮助维护以下代理高速缓存：sso、策略和配置。</p>
+
+<a name="ggmpe"></a><h5>代理通知 URL</h5>
+<p>在将“启用通知”属性设置为“启用”后，分配为该属性值的 URL 被代理用来注册通知侦听器。</p>
+
+<a name="ggmnh"></a><h5>主服务器的轮询周期</h5>
+<p>代理轮询主服务器以确定其正在运行的时间间隔（以分钟为单位）。默认值为 5。</p>
+
+<a name="ggmtg"></a><h5>代理配置获取轮询周期</h5>
+<p>代理从 Federated Access Manager 获取代理配置的时间间隔（以分钟为单位）。默认值为 60。</p>
+
+<a name="ggmvs"></a><h5>代理配置清除轮询周期</h5>
+<p>在旧代理配置项当前未被任何请求引用的情况下，更新这些条目的时间间隔（以分钟为单位）。这是热交换框架的一部分。</p>
+
+<a name="ggmtz"></a><h5>客户机 IP 验证</h5>
+<p>启用后，会验证浏览器请求以确定它们来自与 SSO 令牌初始发出至的 IP 地址相同的 IP 地址。</p>
+
+<a name="ggmwv"></a><h5>检索客户机主机名</h5>
+<p>启用后，通过 DNS 反向查找来获取客户机的主机名，以在策略评估中使用。</p>
+
+<a name="ggmve"></a><h5>负载平衡器设置</h5>
+<p>启用后，负载平衡器用于 Federated Access Manager 服务。</p>
+
+<a name="ggmxj"></a><h5>覆盖请求 URL 协议</h5>
+<p>如果代理位于 SSL 卸载器、负载平衡器或代理服务器后方，则将该属性（及以下属性：覆盖请求 URL 主机、覆盖请求 URL 端口、覆盖通知 URL）设置为“真”。</p>
+
+<a name="ggmwb"></a><h5>覆盖请求 URL 主机</h5>
+<p>如果代理位于 SSL 卸载器、负载平衡器或代理服务器后方，则将该属性（及以下属性：覆盖请求 URL 协议、覆盖请求 URL 端口、覆盖通知 URL）设置为“真”。</p>
+
+<a name="ggmvo"></a><h5>覆盖请求 URL 端口</h5>
+<p>如果代理位于 SSL 卸载器、负载平衡器或代理服务器后方，则将该属性（及以下属性：覆盖请求 URL 协议、覆盖请求 URL 主机、覆盖通知 URL）设置为“真”。</p>
+
+<a name="ggmxi"></a><h5>覆盖通知 URL</h5>
+<p>如果代理位于 SSL 卸载器、负载平衡器或代理服务器后方，则将该属性（及以下属性：覆盖请求 URL 协议、覆盖请求 URL 主机、覆盖请求 URL 端口）设置为“真”。</p>
+
+<a name="ggmtx"></a><h5>URL 比较区分大小写检查</h5>
+<p>启用后，在策略评估和非强制执行的 URL 评估中强制执行区分大小写。</p>
+
+<a name="ggmta"></a><h5>编码 URL 的特殊字符</h5>
+<p>启用后，在执行策略评估之前对具有特殊字符的 URL 进行编码。</p>
+
+<a name="ggmse"></a><h5>忽略请求 URL 中的路径信息</h5>
+<p>启用后，即使非强制执行的列表或策略 URL 中有通配符，也不会从请求 URL 中提取路径信息。</p>
+<hr><p><b>注意 &#8211; </b>为避免出现安全循环，启用该属性后，请确保在非强制执行的列表或策略的“*”通配符后没有任何内容。</p>
+<hr>
+
+
+<a name="ggmty"></a><h5>注销 URL 列表</h5>
+<p>应用程序的注销 URL 列表。</p>
+
+<a name="ggmsu"></a><h5>重置的注销 Cookie 列表</h5>
+<p>要在注销时重置的 cookie 的列表。其格式与“重置的 cookie 列表”相同。</p>
+
+<a name="ggmun"></a><h5>POST 数据保留</h5>
+<p>启用后，会保留 POST 数据高速缓存条目，保留的时间是由标为“POST 数据项高速缓存周期”的属性指定的。该属性并不适用于所有代理。</p>
+
+<a name="ggmsv"></a><h5>POST 数据项高速缓存周期</h5>
+<p>保留 POST 高速缓存条目的时间长度（以分钟为单位），超过该时间后条目将被删除。</p>
+
+<a name="ggmuh"></a><h5>配置文件属性获取模式</h5>
+<p>可用于获取要引入到请求中的其他用户配置文件属性的模式。</p>
+
+<a name="ggmst"></a><h5>配置文件属性映射</h5>
+<p>从配置文件属性名称到 HTTP 标头名称的映射列表，根据当前已验证用户的特定名称填充。格式：[profile_attribute_name]=http_header_name。</p>
+
+<a name="ggmvb"></a><h5>会话属性获取模式</h5>
+<p>可用于获取要引入到请求中的其他用户会话属性的模式。</p>
+
+<a name="ggmub"></a><h5>会话属性映射</h5>
+<p>从会话属性名称到 HTTP 标头名称的映射列表，根据当前已验证用户的特定名称填充。格式：[session_attribute_name]=http_header_name。</p>
+
+<a name="ggmwy"></a><h5>响应属性获取模式</h5>
+<p>可用于获取要引入到请求中的其他用户响应属性的模式。</p>
+
+<a name="ggmvw"></a><h5>响应属性映射</h5>
+<p>从响应属性名称到 HTTP 标头名称的映射列表，根据当前已验证用户的特定名称填充。格式：[response_attribute_name]=http_header_name。</p>
+
+<a name="ggphk"></a><h5>SSO</h5>
+<p>您可以通过 SSO 属性配置与单点登录 (Single Sign On, SSO) 相关的代理功能。与 SSO 相关的大多数属性按照 SSO 类别分组。但是，可能不会包含提供默认
+SSO 功能的属性。</p>
+
+<a name="ggmwx"></a><h5>仅 SSO</h5>
+<p>启用后，代理只会强制执行验证 (SSO)，而不会强制执行策略授权。</p>
+
+<a name="ggmuz"></a><h5>匿名用户默认值</h5>
+<p>用于未经验证用户的用户 ID。</p>
+
+<a name="ggmup"></a><h5>匿名用户</h5>
+<p>启用后，对匿名用户执行 REMOTE_USER 处理。该属性与标为“匿名用户默认值”的属性相关</p>
+
+<a name="ggmsf"></a><h5>Cookie 名称</h5>
+<p>Federated Access Manager 和代理之间所用的 SSO cookie 令牌的名称。</p>
+<hr><p><b>注意 &#8211; </b>更改代理中的该属性而未相应地更改 Federated Access Manager 会导致禁用 SDK。</p>
+<hr>
+
+
+<a name="ggmva"></a><h5>Cookie 安全性</h5>
+<p>启用后，代理会在通信安全的情况下发送安全 cookie。</p>
+
+<a name="ggmwn"></a><h5>重置 Cookie</h5>
+<p>启用后，会先重置响应中的 Cookie，再重定向到 Federated Access Manager 以进行验证。默认情况下，不启用该属性。</p>
+
+<a name="ggmwt"></a><h5>重置的 Cookie 列表</h5>
+<p>包含在 Federated Access Manager 重定向响应中的 cookie 列表的格式：name[=value][;Domain=value]。该列表仅在“重置 Cookie”属性启用的情况下使用。</p>
+
+<a name="ggmth"></a><h5>Cookie 域列表</h5>
+<p>启用 CDSSO 后，该域列表指明必须设置的 cookie。</p>
+
+<a name="ggmvi"></a><h5>CDSSO</h5>
+<p>启用后，跨域单点登录会生效。默认情况下，不启用该属性。</p>
+
+<a name="ggmtp"></a><h5>CDSSO Servlet URL 列表</h5>
+<p>启用后，该列表指明可用 CDSSO 控制器的哪些 URL 可被代理用于处理 CDSSO。</p>
+
+<a name="ggmtu"></a><h5>高级</h5>
+<p>对于 Web 代理，高级属性（特性）可以是自定义创建的属性或特定于部署容器的属性。</p>
+
+<a name="ggnjs"></a><h5>自定义属性</h5>
+<p>代理支持的自定义属性的列表。这些属性是您的站点创建的。</p>
+
+<a name="ggmus"></a><h5>覆盖代理服务器的主机和端口</h5>
+<p>容器专用：Sun Java System Proxy Server</p><p>启用后，Sun Java System Proxy Server 主机名和端口号会被覆盖。</p>
+
+<a name="ggmwc"></a><h5>验证类型</h5>
+<p>容器专用：Microsoft IIS 服务器</p>
+
+<a name="ggmvx"></a><h5>重放密码密钥</h5>
+<p>容器专用：Microsoft IIS 服务器</p><p>解密会话中基本验证密码的 DES 密钥。</p>
+
+<a name="ggmtj"></a><h5>过滤器优先级</h5>
+<p>特定容器：Microsoft IIS 服务器</p><p>可用于加载代理过滤器优先级的选项。</p>
+
+<a name="ggmsz"></a><h5>使用 OWA 配置的过滤器</h5>
+<p>容器专用：Microsoft IIS 服务器</p><p>启用该属性且为 Outlook Web Access (OWA) 配置 Microsoft IIS 代理过滤器后，可按预期操作代理。</p>
+
+<a name="ggmue"></a><h5>将 URL 协议更改为 https</h5>
+<p>容器专用：Microsoft IIS 服务器</p><p>启用该属性且为 Outlook Web Access (OWA) 配置 Microsoft IIS 代理过滤器后，使用 Internet Explorer 6
+浏览器的用户则无法遇到弹出消息。</p>
+
+<a name="ggmws"></a><h5>闲置会话超时页面 URL</h5>
+<p>容器专用：Microsoft IIS 服务器</p><p>该属性仅在为 Outlook Web Access (OWA) 配置 Microsoft IIS 代理过滤器后适用。该属性的值为本地闲置会话超时页面的 URL。</p>
+
+<a name="ggmsr"></a><h5>在 Domino 数据库中检查用户</h5>
+<p>容器专用：IBM Lotus Domino 服务器</p><p>启用后，代理会检查用户在 IBM Lotus Domino 名称数据库中是否存在。</p>
+
+<a name="ggmvy"></a><h5>使用 LTPA 令牌</h5>
+<p>容器专用：IBM Lotus Domino 服务器</p><p>启用后，代理会使用 LTPA 令牌。因此，如果代理需要使用 LTPA 令牌，则启用该属性。</p>
+
+<a name="ggmto"></a><h5>LTPA 令牌 Cookie 名称</h5>
+<p>容器专用：IBM Lotus Domino 服务器</p><p>包含 LTPA 令牌的 cookie 的名称。</p>
+
+<a name="ggmss"></a><h5>LTPA 令牌配置名称</h5>
+<p>容器专用：IBM Lotus Domino 服务器</p><p>代理为利用 LTPA 令牌机制所使用的配置名称。</p>
+
+<a name="ggmxf"></a><h5>LTPA 令牌配置名称</h5>
+<p>容器专用：IBM Lotus Domino 服务器</p><p>LTPA 令牌所属的组织名称。</p>
+<br/>
+
+</body>
+</html>

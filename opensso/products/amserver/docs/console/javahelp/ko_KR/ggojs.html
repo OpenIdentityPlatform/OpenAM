@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>요청 처리기 구성 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggojs"></a><h5>요청 처리기 구성</h5>
+<a name="indexterm-200"></a><a name="indexterm-201"></a><p><tt>RequestHandler</tt> 인터페이스는 SOAP 바인드 서비스를 사용하는 각 리버티 기반 Identity 서비스가 서버측에서
+구현해야 합니다. 요청 처리기 목록 속성은 요청 처리기를 구현하는 웹 서비스의 구현
+클래스에 대한 정보를 저장합니다. 요청 처리기 목록에서는 다음과 같이 파이프로 구분된 키/값
+쌍이 포함된 항목을 표시합니다(예: <tt>key=disco|class=com.example.identity.liberty.ws.discoDiscoveryService</tt>).</p><ol>
+<li><b>[새로 만들기]를 눌러 새 요청 처리기 속성을 표시하거나 구성된 키 값을 눌러
+기존 속성을 수정합니다.</b></li>
+<li><b>다음 정보를 기반으로 속성에 대한 값을 제공합니다.</b><dl><dt>key</dt>
+<dd><p>이 필수 매개 변수는 SOAP 종점에 대한 URI 경로의 마지막 부분입니다. Access Manager에서 SOAP 종점은 SOAP 수신자 서블릿입니다. SOAP 수신기의 URI는 <tt><b></tt><i>protocol</i><tt>://</tt><i>host </i><tt>:</tt><i>port</i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt>입니다. <tt><b>disco</b></tt>를 key로 정의하면 해당 검색 서비스에 대한 SOAP 종점의 URI 경로는 다음과 같습니다: <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>. 서비스 클라이언트마다 서로 다른 키를 사용하여 SOAP 수신자를 연결합니다.</p></dd>
+<dt>class</dt>
+<dd><p>이 필수 매개 변수는 특정 Identity 서비스에 대한 요청 처리기 구현 클래스의 이름을 지정합니다. 예를 들면 다음과 같습니다. <tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt></p></dd>
+</dl>
+</li>
+<li><b>[확인]을 눌러 요청 처리기 구성을 완료합니다.</b></li>
+<li><b>SOAP 바인드 서비스 페이지에서 [저장]을 눌러 서비스 구성을 완료합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

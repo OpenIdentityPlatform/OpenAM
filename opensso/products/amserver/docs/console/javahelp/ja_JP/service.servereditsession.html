@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>セッション - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>セッション</h4>
+<p>セッション属性を使用すると、追加のサイトインスタンスやサーバーインスタンスのセッション情報を設定できます。</p>
+
+<a name="ggkab"></a><h5>セッションの制限</h5>
+<p>次の属性は、サーバーセッションの制限を設定します。</p>
+
+<a name="ggkat"></a><h5>最大セッション</h5>
+<p>デフォルト値は 5000 です。同時に許可されるセッションの最大数を指定します。最大同時セッションの値がこの数値を超えた場合、ログインは最大セッションエラーを送出します。</p>
+
+<a name="ggkac"></a><h5>セッション最大時間を無効にする</h5>
+<p>デフォルト値は 10 です。セッションが作成されてユーザーがログインしなかった場合に、その無効なセッションがセッションテーブルから消去されるまでの時間を分単位で指定します。この値は、認証モジュールのプロパティーファイル内のタイムアウト値よりも常に大きくすることをお勧めします。</p>
+
+<a name="ggkaf"></a><h5>セッション削除遅延</h5>
+<p>デフォルト値は 60 です。セッション消去操作を遅延する時間を分単位で指定します。これは、セッションのタイムアウト後に、セッションがセッションサーバー内にとどまり続ける延長時間です。このプロパティーは、セッションがタイムアウトしたかどうかをチェックするために、SSO API 経由でクライアントアプリケーションによって使用されます。この延長期間が終了すると、セッションは破棄されます。ユーザーがログアウトする、またはセッションが OpenSSO コンポーネントによって明示的に破棄される場合、セッションが延長して保持されることはありません。この延長期間の間、セッションは INVALID 状態です。</p>
+
+<a name="ggkbl"></a><h5>統計</h5>
+<p>次の属性は、統計設定を設定します。</p>
+
+<a name="ggkbf"></a><h5>ログの出力間隔</h5>
+<p>デフォルト値は 60 です。統計ログの取得間隔 (分単位) を指定します。最小値は 5 秒で、これは CPU の飽和状態を回避するための設定です。5 秒未満の値が指定された場合、OpenSSO はこの値を 5
+秒と認識します。</p>
+
+<a name="ggkbn"></a><h5>状態</h5>
+<p>デフォルト値は file です。統計ログの場所を指定します。指定可能な値は、次のとおりです。  </p>
+<ul><li><p>off &#8212; 統計はログに記録されません。</p></li>
+<li><p>file &#8212; 統計は指定されたディレクトリ下のファイルに書き込まれます。</p></li>
+<li><p>console &#8212; 統計は Web Server のログファイルに書き込まれます。</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>ディレクトリ</h5>
+<p>値はインストールの間に設定されます。次に例を示します。<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server-URI</i><tt>/stats</tt>デバッグファイルが作成されるディレクトリを指定します。</p>
+
+<a name="ggkca"></a><h5>ホスト検索を有効</h5>
+<p>デフォルト値は false (いいえ) です。セッションロギングの間のホスト検索を有効または無効にします。</p>
+
+<a name="ggkas"></a><h5>通知</h5>
+<p>次の属性は、通知設定を設定します。</p>
+
+<a name="ggkbz"></a><h5>通知プールサイズ</h5>
+<p>デフォルト値は 10 です。スレッドの合計数を指定することによって、プールのサイズを定義します。</p>
+
+<a name="ggkao"></a><h5>通知スレッドプールのしきい値</h5>
+<p>デフォルト値は 100 です。タスクキューの最大長を指定します。到着した通知タスクは処理のためにタスクキューに送られます。キューが最大の長さに達すると、キューに空きができるまで以後の着信要求は拒絶され、<tt>ThreadPoolException</tt> が返されます。</p>
+
+<a name="ggkar"></a><h5>検証</h5>
+<p>次の属性は、検証設定を設定します。</p>
+
+<a name="ggkcg"></a><h5>大文字小文字を区別しないクライアント DN 比較</h5>
+<p>デフォルト値は True (はい) です。エージェント DN を比較します。値が false (いいえ) の場合、比較は大文字と小文字を区別します。 </p>
+<br/>
+
+</body>
+</html>

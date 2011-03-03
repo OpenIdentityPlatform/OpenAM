@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.5-hudson-218-. --><xs:schema xmlns:tns="http://loanprocessor.samples.sun.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://loanprocessor.samples.sun.com/">
+
+<xs:element name="processApplication" type="tns:processApplication" />
+
+<xs:element name="processApplicationResponse" type="tns:processApplicationResponse" />
+
+<xs:complexType name="processApplication">
+<xs:sequence>
+<xs:element name="socialSecurityNumber" type="xs:string" minOccurs="0" />
+<xs:element name="applicantName" type="xs:string" minOccurs="0" />
+<xs:element name="applicantAddress" type="xs:string" minOccurs="0" />
+<xs:element name="applicantEmailAddress" type="xs:string" minOccurs="0" />
+<xs:element name="applicantAge" type="xs:int" />
+<xs:element name="applicantGender" type="xs:string" minOccurs="0" />
+<xs:element name="annualSalary" type="xs:double" />
+<xs:element name="amountRequested" type="xs:double" />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="processApplicationResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0" />
+</xs:sequence>
+</xs:complexType>
+</xs:schema>

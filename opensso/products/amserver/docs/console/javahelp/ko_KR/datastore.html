@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=euc-kr">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>데이터 저장소
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="datastore"></A><h2>데이터 저장소</h2>
+<p><A NAME="indexterm-10"></A><A NAME="indexterm-11"></A>데이터 저장소는 사용자 속성 및 사용자 구성 데이터를 저장할 수 있는 데이터베이스입니다. </p>
+<p>Access Manager는  LDAPv3 아이디 저장소 프레임워크에 연결하는 아이디 저장소 플러그인을 제공합니다. 이 새 모델을 사용하면 기존 사용자 데이터베이스를 변경하지 않고도 Access Manager 사용자 정보를 확인하고 불러올 수 있습니다. Access Manager 프레임워크는 아이디 저장소 플러그인에서 얻은 데이터를 다른 Access Manager 플러그인에서 얻은 데이터와 통합하여 각 사용자의 가상 아이디를 구성합니다. Access Manager는 이제 두 개 이상의 아이디 저장소 간의 인증 및 권한 부여 과정에 이러한 범용 아이디를 사용할 수 있습니다. 가상 사용자 아이디는 사용자 세션이 종료되면 소멸됩니다.</p>
+<p>새 데이터 저장소 만들기 및 저장소 플러그인 구성에 대한 내용은 <A HREF="datastore.html#realm.idrepo"> 새 LDAPv3 데이터 저장소 만들기</A>를 참조하십시오.</p>
+<p>영역 모드로 Access Manager를 설치한 경우 Directory Server 데이터를 관리하도록 Access Manger SDK를 구성할 수 있습니다. <A HREF="amsdkrepo.html#amsdkrepo"> 새 Access Manager 저장소 플러그인 만들기</A>를 참조하십시오.</p>
+<A NAME="realm.idrepo"></A><h3><IMG border="0" alt="Procedure" src="graphics/procedure.gif">새 LDAPv3 데이터 저장소 만들기</h3>
+<ol><li><p><b><A NAME="indexterm-12"></A>새 데이터 저장소를 추가할 영역을 선택합니다.</b></p></li>
+<li><p><b>[데이터 저장소] 탭을 누릅니다.</b></p></li>
+<li><p><b>데이터 저장소 목록에서 [새로 만들기]를 누릅니다.</b></p></li>
+<li><p><b>데이터 저장소의 이름을 입력합니다. </b></p></li>
+<li><p><b>LDAPv3 저장소 플러그인을 위한 속성를 정의합니다. 속성에 대한 설명은 <A HREF="realm.idrepoadd.html#realm.idrepoadd"> LDAPv3 저장소 플러그인 속성</A>을 참조하십시오. </b></p></li>
+<li><p><b>[마침]을 누릅니다.</b></p></li>
+</ol>
+<br />
+
+</body>
+</html>

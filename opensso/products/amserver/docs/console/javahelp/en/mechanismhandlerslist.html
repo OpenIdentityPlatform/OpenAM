@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Mechanism Handlers List - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="mechanismhandlerslist"></a><h4>Mechanism Handlers List</h4>
+<a name="indexterm-160"></a><a name="indexterm-161"></a><p>The Mechanism Handler List attribute stores information about the SASL mechanisms supported by
+the Authentication Web Service. It displays entries that contain key/value pairs separated by
+a pipe as in:  <tt>key=PLAIN|class=com.sun.identity.liberty.ws.authnsvc.mechanism.PlainMechanismHandler</tt>. The parameters are explained in the
+following table.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Parameter</p></th>
+<th align="left" valign="top" scope="column"><p>Value</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>key</tt></p></td>
+<td align="left" valign="top" scope="row"><p>The required <tt>key</tt> parameter defines the SASL mechanism supported by the Authentication
+Web Service.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>class</tt></p></td>
+<td align="left" valign="top" scope="row"><p>The required <tt>class</tt> parameter specifies the name of the implementation class for
+the SASL mechanism. The Authentication Web Service layer provides a handler interface that
+needs to be implemented in order for each SASL mechanism to process the
+requested message and return a response.</p></td>
+</tr>
+</table><p>To add a new Request Handler click <b>Add</b>, and see <a href="webservices.wsauthnserviceshandlersadd.html">To Configure a New Mechanism Handler</a>.</p>
+<br/>
+
+</body>
+</html>

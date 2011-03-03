@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>보안 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>보안</h4>
+<p>보안 속성은 서버 인스턴스의 보안 수준을 제어하는 데 필요한 암호화, 유효성 검사
+및 쿠키 정보를 정의합니다.</p>
+
+<a name="ggkbi"></a><h5>암호화</h5>
+<p>암호화 속성은 다음과 같습니다.</p>
+
+<a name="ggkcb"></a><h5>비밀번호 암호화 키</h5>
+<p>비밀번호 암호화 및 암호 해독에 사용되는 키를 지정하며, 이 키는 서비스 관리
+시스템 구성에 저장됩니다. 이 값은 설치 중에 설정됩니다. 예: <tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd </tt></p>
+
+<a name="ggkbg"></a><h5>인증 서비스 공유 비밀</h5>
+<p>응용 프로그램 인증 모듈의 공유 비밀입니다. 이 값은 설치 중에 설정됩니다. 예:
+<tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl </tt></p>
+
+<a name="ggkbd"></a><h5>암호화 클래스</h5>
+<p>기본값은 <tt>com.iplanet.services.util.JCEEncryption</tt>입니다. 암호화 클래스 구현을 지정합니다. 사용 가능한 클래스는<tt>com.iplanet.services.util.JCEEncryption</tt> 및 <tt>com.iplanet.services.util.JSSEncryption</tt>입니다.</p>
+
+<a name="ggkby"></a><h5>보안 임의 팩토리 클래스</h5>
+<p>기본값은 <tt>com.iplanet.am.</tt><tt>util.JSSSecureRandomFactoryImpl</tt>이며,<tt>SecureRandomFactory</tt>의 팩토리 클래스 이름을 지정합니다. 사용 가능한 구현 클래스에는 JSS를 사용하는
+<tt>com.iplanet.am.</tt><tt>util.JSSSecureRandomFactoryImpl</tt> 및 Java를 사용하는 <tt>com.iplanet.am.</tt><tt>util.SecureRandomFactoryImpl</tt>이 있습니다. </p>
+
+<a name="ggkbr"></a><h5>유효성 검사</h5>
+<p>유효성 검사 속성은 다음과 같습니다.</p>
+
+<a name="ggkay"></a><h5>플랫폼 저수준 명령 최대 컨텐트 길이</h5>
+<p>기본값은 16384 또는 16k입니다. OpenSSO가 받을 <tt>HttpRequest</tt>의 최대 컨텐트 길이를 지정합니다.</p>
+
+<a name="ggkbb"></a><h5>클라이언트 IP 주소 확인</h5>
+<p>기본값은 NO입니다. 모든 <tt>SSOToken</tt> 생성 또는 유효성 검사 시 클라이언트의 IP 주소를
+확인할지 여부를 지정합니다.</p>
+
+<a name="ggkba"></a><h5>쿠키</h5>
+<p>쿠키 속성은 다음과 같습니다.</p>
+
+<a name="ggkad"></a><h5>쿠키 이름</h5>
+<p>기본값은 <tt>iPlanetDirectoryPro</tt>입니다. 인증 서비스에서 유효한 세션 처리기 아이디를 설정하기 위해 사용하는 쿠키
+이름입니다. 이 쿠키 이름의 값은 유효한 세션 정보를 검색하는 데 사용됩니다.</p>
+
+<a name="ggkaw"></a><h5>보안 쿠키</h5>
+<p><tt>HTTP(s)</tt>와 같은 보안 프로토콜을 사용하는 경우에만 브라우저가 쿠키를 반환하는 보안 모드로 OpenSSO
+쿠키를 설정할 수 있습니다. 기본값은 false입니다. </p>
+
+<a name="ggkbk"></a><h5>쿠키 값 인코딩</h5>
+<p>이 등록 정보를 사용하면 OpenSSO가 쿠키 값의 문자를 HTTP에서 인식 가능한 값으로
+변환하도록 <tt>URLencode</tt>를 수행할 수 있습니다.</p>
+
+<a name="ggkbc"></a><h5>키 저장소</h5>
+<p>다음 속성을 사용하면 추가적으로 만드는 사이트 및 서버에 대한 키 저장소 정보를
+구성할 수 있습니다.</p>
+
+<a name="ggkbj"></a><h5>키 저장소 파일</h5>
+<p>이 값은 설치 중에 설정됩니다. 예: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/keystore.jks</tt>. SAML XML 키 저장소 비밀번호
+파일의 경로를 지정합니다.</p>
+
+<a name="ggkbu"></a><h5>키 저장소 비밀번호 파일</h5>
+<p>이 값은 설치 중에 설정됩니다. 예: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.storepass</tt>. SAML XML 키 저장소 비밀번호
+파일의 경로를 지정합니다.</p>
+
+<a name="ggkbs"></a><h5>개인 키 비밀번호 파일</h5>
+<p>이 값은 설치 중에 설정됩니다. 예: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server_URI</i><tt>/.keypass</tt> SAML XML 키 비밀번호 파일의
+경로를 지정합니다.</p>
+
+<a name="ggkaq"></a><h5>인증서 별칭</h5>
+<p>기본값은 test입니다.</p>
+
+<a name="ggkbw"></a><h5>인증서 해지 목록 캐싱</h5>
+<p>이 속성은 인증 기관의 CRL을 보관하는 데 사용하는 로컬 인증서 해지 목록(CRL)
+캐싱 저장소를 정의합니다. 인증서 유효성 검사를 위해 CRL을 획득해야 하는 모든 서비스가
+이 정보를 바탕으로 CRL을 수신합니다. </p>
+
+<a name="ggkch"></a><h5>LDAP 서버 호스트 이름</h5>
+<p>인증서가 저장되는 LDAP 서버의 이름을 지정합니다. 기본값은 OpenSSO를 설치할 때 지정한 호스트
+이름입니다. 인증서가 저장되는 모든 LDAP 서버의 호스트 이름을 사용할 수 있습니다. </p>
+
+<a name="ggkau"></a><h5>LDAP 서버 포트 번호</h5>
+<p>인증서가 저장되는 LDAP 서버의 포트 번호를 지정합니다. 기본값은 OpenSSO를 설치할 때 지정한
+포트입니다. 인증서가 저장되는 모든 LDAP 서버의 포트를 사용할 수 있습니다. </p>
+
+<a name="ggkam"></a><h5>SSL 사용 가능</h5>
+<p>LDAP 서버에 액세스하기 위해 SSL을 사용할지 여부를 지정합니다. 기본값은 인증서 인증 서비스가
+LDAP 액세스에 SSL을 사용하지 않는 것입니다.</p>
+
+<a name="ggkbv"></a><h5>LDAP 서버 바인드 사용자 이름</h5>
+<p>LDAP 서버의 바인드 DN을 지정합니다. </p>
+
+<a name="ggkaj"></a><h5>LDAP 서버 바인드 비밀번호</h5>
+<p>LDAP 서버에 바인드하는 데 사용되는 비밀번호를 정의합니다. 기본적으로 설치하는 동안 입력된 amldapuser
+비밀번호가 바인드 사용자로 사용됩니다.</p>
+
+<a name="ggkce"></a><h5>LDAP 검색 기본 DN</h5>
+<p>이 속성은 검색을 시작할 LDAP 서버의 LDAP 사용자 주제에 사용되는 기본 DN을
+지정합니다. 기본값은 OpenSSO 설치 기본의 최상위 수준 영역입니다.</p>
+
+<a name="ggkbp"></a><h5>검색 속성</h5>
+<p>발급자 <tt>subjectDN</tt>의 모든 DN 구성 요소를 사용하여 로컬 LDAP 서버에서 CRL을 검색할
+수 있습니다. 이 속성의 값은 "cn"과 같은 단일 값 문자열이며, 모든 루트
+CA는 같은 검색 속성을 사용해야 합니다.</p>
+
+<a name="ggkaa"></a><h5>온라인 인증서 상태 프로토콜 확인</h5>
+<p>온라인 인증서 상태 프로토콜(OCSP)을 사용하면 OpenSSO 서비스가 지정된 인증서의 (해지) 상태를 확인할
+수 있습니다. OCSP를 사용하면 CRL을 사용하는 것보다 더욱 시기적절한 해지 정보를 제공해야
+하는 일부 운영 요구 사항을 만족할 수 있으며 추가 상태 정보를 얻을
+수도 있습니다. OCSP 클라이언트는 OCSP 응답자에게 상태 요청을 전달하고 해당 응답자가 응답할
+때까지 요청된 인증서의 수락을 일시 중단합니다. </p>
+
+<a name="ggkal"></a><h5>확인 사용 가능</h5>
+<p>이 속성을 사용하면 OCSP 확인 기능을 사용할 수 있으며, 이 속성은 기본적으로
+활성화되어 있습니다.</p>
+
+<a name="ggkav"></a><h5>응답자 URL</h5>
+<p>이 속성은 OCSP 응답자의 위치를 식별하는 URL을 정의합니다. 예를 들어 <tt>http://ocsp.example.net:80</tt>과 같습니다.
+</p><p>기본적으로 OCSP 응답자의 위치는 유효성을 검사 중인 인증서에서 암시적으로 결정됩니다. 이 등록
+정보는 인증서에 Authority Information Access 확장(RFC 3280에 정의됨)이 없거나 재정의해야 하는 경우에
+사용합니다. </p>
+
+<a name="ggkai"></a><h5>인증서 별명</h5>
+<p>OCSP 응답자 별명은 해당 응답자의 CA 인증서 별명으로, 예를 들면 <tt>Certificate Manager - sun</tt> 등과
+같습니다. 이 속성을 설정하는 경우 CA 인증서가 웹 서버의 인증서 데이터베이스에 있어야
+합니다. OCSP URL을 설정하는 경우에는 OCSP 응답자 별명도 설정해야 합니다. 그렇지 않으면
+둘 다 무시됩니다. 이를 설정하지 않으면 사용자 인증서에 있는 OCSP 응답자 URL이
+OCSP 유효성 검사에 사용됩니다. OCSP 응답자 URL이 사용자의 인증서에 없는 경우 OCSP
+유효성 검사를 수행하지 않습니다. </p>
+
+<a name="ggkag"></a><h5>미국 정보처리 표준(FIPS)</h5>
+<p>정보기술 관리 개혁법(Information Technology Management Reform Act, Public Law 104-106)에 따라 미국
+상무부 장관은 NIST(National Institute of Standards and Technology)에서 개발한 정부 컴퓨터 시스템에
+대한 표준과 지침을 승인했습니다. 이 표준과 지침은 전체 정부 기관에서 사용하기 위한
+FIPS(Federal Information Processing Standards)로 NIST에서 시행합니다. NIST에서는 보안 및 상호 운용성 등과
+같은 연방 정부 요구 사항을 준수해야 하지만 수용 가능한 업계 표준이나 솔루션이
+없는 경우 FIPS를 개발합니다. </p>
+
+<a name="ggkap"></a><h5>FIPS 모드</h5>
+<p>이 등록 정보의 값은 true 또는 false입니다. 이 등록 정보가 true인 경우에만
+모든 암호화 작업이 FIPS 호환 모드로 실행됩니다. </p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,384 @@
+    <test name="AddMembersTest4">
+    	<parameter name="testNum" value="4"/>
+    	<parameter name="testName" value="IDMAddMembersTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CreateIdentitiesTest14">
+    	<parameter name="testNum" value="14"/>
+    	<parameter name="testName" value="IDMCreateIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CreateIdentitiesTest15">
+    	<parameter name="testNum" value="15"/>
+    	<parameter name="testName" value="IDMCreateIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CreateIdentitiesTest2">
+    	<parameter name="testNum" value="2"/>
+    	<parameter name="testName" value="IDMCreateIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CreateIdentitiesTest3">
+    	<parameter name="testNum" value="3"/>
+    	<parameter name="testName" value="IDMCreateIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="DeleteIdentitiesTest2">
+    	<parameter name="testNum" value="2"/>
+    	<parameter name="testName" value="IDMDeleteIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="SearchIdentitiesTest11">
+    	<parameter name="testNum" value="11"/>
+    	<parameter name="testName" value="IDMSearchIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="SearchIdentitiesTest14">
+    	<parameter name="testNum" value="14"/>
+    	<parameter name="testName" value="IDMSearchIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="SearchIdentitiesTest2">
+    	<parameter name="testNum" value="2"/>
+    	<parameter name="testName" value="IDMSearchIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="UpdateIdentitiesTest5">
+    	<parameter name="testNum" value="5"/>
+    	<parameter name="testName" value="IDMUpdateIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest0">
+        <parameter name="testNum" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest1">
+        <parameter name="testNum" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest2">
+        <parameter name="testNum" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest3">
+        <parameter name="testNum" value="3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest4">
+        <parameter name="testNum" value="4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest5">
+        <parameter name="testNum" value="5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest6">
+        <parameter name="testNum" value="6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest7">
+        <parameter name="testNum" value="7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest8">
+        <parameter name="testNum" value="8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest9">
+        <parameter name="testNum" value="9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest10">
+        <parameter name="testNum" value="10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest11">
+        <parameter name="testNum" value="11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest12">
+        <parameter name="testNum" value="12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest13">
+        <parameter name="testNum" value="13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest14">
+        <parameter name="testNum" value="14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest15">
+        <parameter name="testNum" value="15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest16">
+        <parameter name="testNum" value="16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest17">
+        <parameter name="testNum" value="17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest18">
+        <parameter name="testNum" value="18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest19">
+        <parameter name="testNum" value="19"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest20">
+        <parameter name="testNum" value="20"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest21">
+        <parameter name="testNum" value="21"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest22">
+        <parameter name="testNum" value="22"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>
+    <test name="IDMDatastorePluginSupportTest23">
+        <parameter name="testNum" value="23"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IDMDatastorePluginSupportTest"/>
+        </classes>
+    </test>

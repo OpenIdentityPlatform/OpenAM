@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty-Interaktionsdienst - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertyinteractionservice"></a><h4>Liberty-Interaktionsdienst</h4>
+
+
+<a name="ggofj"></a><h5>WSP leitet Benutzer f&#252;r Interaktion um</h5>
+<p>Dieses Attribut gibt an, ob der Webdienstanbieter den Benutzer f&#252;r die Zustimmung
+umleitet.  Der Standardwert ist Yes (Ja).</p>
+
+<a name="ggofq"></a><h5>WSP leitet Benutzer f&#252;r Interaktion f&#252;r Daten um</h5>
+<p>Dies initiiert eine Interaktion zum Einholen der Benutzerzustimmung bzw. zum Sammeln zus&#228;tzlicher
+Daten. Diese Eigenschaft gibt an, ob der Webdienstanbieter den Benutzer f&#252;r zum
+Sammeln zus&#228;tzlicher Daten umleitet.  Der Standardwert ist Yes (Ja).</p>
+
+<a name="ggogl"></a><h5>Erwartete WSP-Dauer f&#252;r Interaktion</h5>
+<p>Dieses Attribut gibt die Zeitdauer (in Sekunden) an, die der Webdienstanbieter (WSP)
+voraussichtlich braucht, um eine Interaktion abzuschlie&#223;en und die Steuerung wieder an den
+Webdienst-Client  (WSC) zu &#252;bertragen. Beispiel: Der Webdienstanbieter erh&#228;lt eine Anforderung, die
+besagt, dass der Webdienst-Client maximal 30 Sekunden (in "Erwartete WSC-Dauer f&#252;r Interaktion"
+festgelegt) auf die Interaktion wartet. Wenn dieses Attribut auf 40 Sekunden gesetzt
+ist, gibt der Webdienstanbieter einen SOAP-Fehler (<tt>timeNotSufficient </tt>) aus, der besagt, dass die
+Zeit f&#252;r die Interaktion nicht ausreicht.</p>
+
+<a name="ggogn"></a><h5>WSP erzwingt, dass returnToURL SSL sein muss</h5>
+<p>Dieses Attribut gibt an, ob der Webdienstanbieter (WSP) eine vom Webdienst-Client (WSC)
+angegebene HTTPS <tt>returnToURL</tt> erzwingt. Die Liberty Alliance Project-Spezifikationen besagen, dass der Wert
+dieser Eigenschaft immer Yes (Ja) ist. Der Falsch-Wert ist in erster Linie
+zur Erleichterung der Bereitstellung in Phasen gedacht.</p>
+
+<a name="ggoib"></a><h5>WSP erzwingt, dass der R&#252;ckgabe-Host mit dem Anforderungshost &#252;bereinstimmt</h5>
+<p> Dieses Attribut gibt an, ob der Webdienstanbieter (WSP) die Adresswerte von <tt>returnToHost</tt>
+und <tt> requestHost</tt> erzwingen w&#252;rde, wenn sie &#252;bereinstimmen. Die Liberty Alliance Project-Spezifikationen besagen,
+dass der Wert dieser Eigenschaft immer Yes (Ja) ist. Der Falsch-Wert ist
+in erster Linie zur Erleichterung der Bereitstellung in Phasen gedacht.</p>
+
+<a name="ggoha"></a><h5>Speicherort der HTML-Formatvorlage</h5>
+<p>Dieses Attribut verweist auf den Speicherort der Formatvorlage, die zur Wiedergabe der
+Interaktionsseite im HTML-Format verwendet wird.</p>
+
+<a name="ggohi"></a><h5>Speicherort der WML-Formatvorlage</h5>
+<p>Dieses Attribut verweist auf den Speicherort der Formatvorlage, die zur Wiedergabe der
+Interaktionsseite im WML-Format verwendet wird.</p>
+
+<a name="ggogg"></a><h5>WSP-Interaktions-URL</h5>
+<p>Dieses Attribut gibt die URL an, unter der das <tt>WSPRedirectHandler </tt>-Servlet bereitgestellt wird.
+Das Servlet ist f&#252;r die Dienstanbieterseite von Interaktionen f&#252;r Benutzerumleitungen zust&#228;ndig.</p>
+
+<a name="ggoft"></a><h5>WSP-Interaktions-URL, sofern hinter einem Lastenausgleichssystem</h5>
+<p>Definiert das URL f&#252;r den WSP-Umleitungs-Handler, der durch ein Lastenausgleichssystem bekannt gegeben
+wird.</p>
+
+<a name="ggogq"></a><h5>Liste der Interaktions-URLs des WSP-Clusters (Website) hinter dem Lastenausgleichssystem</h5>
+<p>Definiert die URLs f&#252;r die WSP-Umleitungs-Handler vertrauensw&#252;rdiger Server im Cluster.</p>
+
+<a name="ggogx"></a><h5>Interaktionskonfigurationsklasse</h5>
+<p>Dieses Attribut gibt die Klasse an, die Zugriffsmethoden zum Lesen von Interaktionskonfigurationen
+bietet.</p>
+
+<a name="ggogj"></a><h5>Optionen f&#252;r WSC zur Teilnahme an Interaktion</h5>
+<p>Dieses Attribut gibt die Interaktionsebene an, auf der der WSC teilnimmt, wenn
+er f&#252;r die Teilnahme an Benutzerumleitungen konfiguriert wurde. Folgende Werte sind m&#246;glich:
+interactIfNeeded, doNotInteract und doNotInteractForData. Der best&#228;tigende Wert interactIfNeeded ist der Standardwert.</p>
+
+<a name="ggogs"></a><h5>WSC nimmt userInteractionHeader auf</h5>
+<p>Dieses Attribut gibt an, ob der Webdienst-Client (WSC) einen SOAP-Header aufnehmen soll,
+um bestimmte Voreinstellungen f&#252;r die Interaktion auf der Grundlage der Liberty-Spezifikationen anzuzeigen.
+Der Standardwert ist Yes (Ja).</p>
+
+<a name="ggofn"></a><h5>WSC leitet Benutzer f&#252;r Interaktion um</h5>
+<p>Dieses Attribut legt fest, ob der  WSC an Benutzerumleitungen teilnimmt. Der
+Standardwert ist Yes (Ja).</p>
+
+<a name="ggoim"></a><h5>Erwartete WSC-Dauer f&#252;r Interaktion</h5>
+<p>Dieses Attribut gibt an, wie lange (in Sekunden) der Webdienst-Client  (WSC)
+bereit ist, darauf zu warten, dass der Webdienstanbieter (WSP) seinen Teil der
+Interaktion beendet. Der Webdienstanbieter initiiert keine Interaktion, wenn diese voraussichtlich l&#228;nger dauert
+als hier festgelegt. Beispiel: Der Webdienstanbieter erh&#228;lt eine Anforderung, in der diese
+Eigenschaft auf einen maximalwert von 30 Sekunden festgelegt ist. Wenn die Webdienstanbieter-Eigenschaft
+Erwartete WSP-Dauer f&#252;r Interaktion auf 40 Sekunden festgelegt ist, gibt der Webdienstanbieter
+einen SOAP-Fehler (<tt>timeNotSufficient</tt>) aus, der besagt, dass die Zeit f&#252;r die Interaktion
+nicht ausreicht.</p>
+
+<a name="ggofx"></a><h5>WSC erzwingt, dass Umleitungs-URL SSL sein muss</h5>
+<p>Dieses Attribut gibt an, ob der Webdienst-Client (WSC) HTTPS in umgeleiteten URLs
+erzwingt. Die Liberty Alliance Project-Spezifikationen besagen, dass der Wert dieser Eigenschaft immer
+Yes (Ja) ist, was bedeutet, dass der Webdienstanbieter (WSP) den Benutzer nicht
+umleitet, wenn der Wert von <tt>redirectURL</tt> (vom Webdienstanbieter angegeben) keine HTTPS-URL ist.
+Der Falsch-Wert ist in erster Linie f&#252;r eine einfache Bereitstellung in Phasen
+gedacht.</p>
+<br/>
+
+</body>
+</html>

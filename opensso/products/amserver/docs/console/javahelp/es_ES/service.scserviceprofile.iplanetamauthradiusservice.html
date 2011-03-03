@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS</h4>
+<p><a name="indexterm-178"></a>Este m&#243;dulo permite realizar la autenticaci&#243;n mediante un servidor de Servicio de
+usuario de marcaci&#243;n de entrada de autenticaci&#243;n remota (RADIUS, Remote Authentication Dial-In
+User Service). Los atributos de autenticaci&#243;n RADIUS son atributos de dominio. Los
+atributos son:</p>
+<ul><li><p><a href="#fwadp">Servidor 1</a></p></li>
+<li><p><a href="#fwaom">Servidor 2</a></p></li>
+<li><p><a href="#fwaka">Secreto compartido</a></p></li>
+<li><p><a href="#fwapc">Confirmar secreto compartido</a></p></li>
+<li><p><a href="#fwapn">N&#250;mero de puerto</a></p></li>
+<li><p><a href="#fwaad">Tiempo de espera</a></p></li>
+<li><p><a href="#fwabo">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>Servidor 1</h5>
+<p>Muestra la direcci&#243;n IP o el nombre de host completo del servidor
+RADIUS principal. La direcci&#243;n IP predeterminada es 127.0.0.1. El campo reconocer&#225; cualquier
+direcci&#243;n IP o nombre de host v&#225;lido. Si hay varias entradas, deber&#225;n
+tener el nombre del servidor local como prefijo como en la siguiente
+sintaxis:</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaom"></a><h5>Servidor 2</h5>
+<p>Muestra la direcci&#243;n IP o el nombre de dominio completo (FQDN) del
+servidor RADIUS secundario. Se trata de un servidor de conmutaci&#243;n por error
+con el que se establecer&#225; comunicaci&#243;n si no se ha podido contactar
+con el servidor principal. La direcci&#243;n IP predeterminada es 127.0.0.1. El nombre
+de servidor local debe ir delante de las diferentes entradas con la
+siguiente sintaxis:</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaka"></a><h5>Secreto compartido</h5>
+<p>Incorpora el secreto compartido de la autenticaci&#243;n RADIUS. El secreto compartido deber&#225;
+tener las mismas caracter&#237;sticas que una buena contrase&#241;a. No existe ning&#250;n valor
+predeterminado para este campo.</p>
+
+<a name="fwapc"></a><h5>Confirmar secreto compartido</h5>
+<p>Confirmaci&#243;n del secreto compartido de la autenticaci&#243;n RADIUS.</p>
+
+<a name="fwapn"></a><h5>N&#250;mero de puerto</h5>
+<p>Especifica el puerto en el que el servidor RADIUS recibe la comunicaci&#243;n.
+El valor predeterminado es 1645.</p>
+
+<a name="fwaad"></a><h5>Tiempo de espera</h5>
+<p>Especifica el intervalo de tiempo en segundos que se debe esperar a
+que un servidor RADIUS responda antes de que se agote el tiempo
+de espera. El valor predeterminado es de 3 segundos. Reconocer&#225; cualquier n&#250;mero
+que especifique el tiempo de espera en segundos.</p>
+
+<a name="fwabo"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

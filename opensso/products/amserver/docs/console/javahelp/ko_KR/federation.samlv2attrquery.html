@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 속성 쿼리 사용자 정의 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>SAMLv2 속성 쿼리 사용자 정의</h4>
+<p>SAMLv2 속성 쿼리에는 사용자 정의에 사용할 수 있는 다음과 같은 속성이 포함되어
+있습니다.</p>
+<ul><li><p><a href="#ggwht">NameID 형식</a></p></li>
+<li><p><a href="#ggwgs">인증서 별칭</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>NameID 형식</h5>
+<p>속성 쿼리 공급자에서 지원되는 이름 식별자 형식을 정의합니다. 이름 식별자는 공급자가 한
+사용자와 관련하여 서로 통신하는 방법입니다. 단일 사인온 상호 작용은 세 가지 유형의
+식별자를 지원합니다.</p>
+<ul><li><p><b>X509SubjectName</b>은 X509 암호화 유형의 주제 이름을 정의합니다.</p></li>
+<li><p><b>영구 식별자</b>는 특정 사용자의 데이터 저장소 항목에 두 속성의 값으로 저장되어 있습니다.</p></li>
+<li><p><b>일시적 식별자</b>는 임시로 사용되며 사용자의 영구 데이터 저장소에는 데이터가 기록되지 않습니다.</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>인증서 별칭</h5>
+<p>이 속성은 공급자의 인증서 별칭 요소를 정의합니다. <tt>서명</tt>은 키 저장소에서 올바른 서명
+인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다. <tt>암호화</tt>는 키 저장소에서 올바른
+암호화 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다.</p>
+<br/>
+
+</body>
+</html>

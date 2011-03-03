@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>策略配置服務 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>策略配置服務</h4>
+<p>可使用「策略配置」服務來透過 Fedrated Access Manager 主控台為每個組織配置與策略相關的屬性。您也可定義資源名稱實作與 Directory Server 資料存放區，以用於 Federated Access Manager 策略架構。在「策略配置服務」中指定的
+Directory Server 是用於 LDAP 使用者、LDAP 群組、LDAP 角色與組織策略主體的成員身份評估。</p>
+
+<a name="ggdbf"></a><h5>主體結果存在時間</h5>
+<p>為改善策略評估效能，會依照「策略配置」服務中的「主體結果存在時間」屬性所定義的一段時間來快取成員身份評估。然後就可使用這些快取的成員身份決定，直到「主體結果存在時間」屬性所定義的時間逾期為止。在這之後的成員身份評估可用來反映目錄中的目前使用者狀態。</p>
+
+<a name="ggday"></a><h5>動態屬性</h5>
+<p>這些是允許的動態屬性名稱，它們顯示於清單中，且用於定義政策回應提供者的動態屬性。已定義的名稱必須與資料儲存庫中所定義的屬性名稱相同。</p>
+
+<a name="ggdcj"></a><h5>amldapuser 定義</h5>
+<p><tt>amldapuser</tt> 是在「策略配置」服務中指定的 Directory Server 所使用的預設安裝期間建立的使用者。如有需要，該範圍的管理員或策略管理員可變更它。</p>
+<br/>
+
+</body>
+</html>

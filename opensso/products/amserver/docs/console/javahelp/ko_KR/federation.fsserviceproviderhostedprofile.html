@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>공급자 엔티티의 호스트 서비스 공급자 속성 수정 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderhostedprofile"></a><h4>공급자 엔티티의 호스트 서비스 공급자 속성 수정</h4><a name="indexterm-79"></a><p>엔티티를 작성하고 서비스 공급자를 추가한 후 서비스 공급자의 프로필을 편집할 수 있습니다.
+서비스 공급자를 처음으로 만들거나 구성된 데이터를 수정할 경우 구성할 수 없는 속성에
+값이 추가됩니다. 시작 위치는 연합 인터페이스 아래의 엔티티입니다.</p><ol>
+<li><b>구성된 공급자 엔티티의 이름을 눌러 해당 프로필을 수정합니다.</b></li>
+<li><b>[보기] 메뉴에서 서비스 공급자를 선택합니다.</b></li>
+<li><b>공통 속성에 대한 값을 수정합니다.</b><p>공통 속성에는 일반적으로 Identity 공급자 자체를 정의하는 값이 포함되어 있습니다.</p><dl><dt>공급자 유형</dt>
+<dd><p>이 속성의 정적 값은 해당 공급자가 호스트 공급자인지 또는 원격 공급자인지를 정의합니다.</p></dd>
+<dt>설명</dt>
+<dd><p>이 속성 값은 엔티티를 작성할 때 제공되는 설명입니다. 이미 입력된 설명을 수정하거나 입력된 설명이 없는 경우 추가할 수 있습니다.</p></dd>
+<dt>프로토콜 지원 열거</dt>
+<dd><p>이 엔티티에서 지원하는 Liberty Alliance Project Liberty ID-FF(Liberty Identity Federation Framework) 릴리스를 선택합니다.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt>은 Liberty ID-FF 버전 1.2를 나타냅니다.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt>는 Liberty ID-FF 버전 1.1을 나타냅니다.</p></li></ul>
+</dd>
+<dt>서버 이름 식별자 매핑 바인드</dt>
+<dd><p>이름 식별자 매핑을 사용하면 서비스 공급자가 다른 서비스 공급자의 이름 공간에서 연합한 기본의 이름 식별자를 얻을 수 있습니다. 그 결과, 요청하는 공급자는 기본에 대한 공급자 간의 Identity 연합 없이 다른 서비스 공급자와 기본에 대해 통신할 수 있습니다. 식별자를 얻는 데 사용한 통신 프로토콜을 식별하는 URI를 입력하고 [추가]를 누릅니다.</p>
+<hr><p><b>주 &#8211; </b>현재 Access Manager에서 이름 식별자 매핑 프로필만 SOAP를 지원합니다. 이 속성을 사용하는 경우 값은 <tt>http://projectliberty.org/profiles/nim-sp-http</tt>여야 합니다.</p>
+<hr>
+</dd>
+<dt>서명 키: 키 별칭</dt>
+<dd><p>인증서는 Java 키 저장소 파일에 저장됩니다. 파일에 있는 각 인증서는 인증서를 가져오는 데 사용하는 별칭에 매핑되어 있습니다. 요청 및 응답을 서명하는 데 사용하는 인증서와 연결된 키 별칭을 입력합니다.</p></dd>
+<dt>암호화 키: 키 별칭</dt>
+<dd><p>인증서는 Java 키 저장소 파일에 저장됩니다. 파일에 있는 각 인증서는 인증서를 가져오는 데 사용하는 별칭에 매핑되어 있습니다. 공급자의 보안 인증서와 연결된 키 별칭을 입력합니다.</p></dd>
+<dt>암호화 키: 키 크기</dt>
+<dd><p>다른 엔티티와 상호 작용할 때 웹 서비스 사용자가 사용하는 키 길이를 입력합니다.</p></dd>
+<dt>암호화 키: 암호화 방법</dt>
+<dd><p>암호화 방법을 선택합니다. 선택할 수 있는 방법은 다음과 같습니다.</p>
+<ul><li><p>없음</p></li>
+<li><p>AES</p></li>
+<li><p>DESede</p></li></ul>
+</dd>
+<dt>이름 식별자 암호화</dt>
+<dd><p>이름 식별자의 암호화를 활성화하려면 이 확인란을 선택합니다.</p></dd>
+</dl>
+</li>
+<li><b>통신 URL 속성에 대한 값을 수정합니다.</b><p>통신 URL 속성에는 공급자가 이 Identify 공급자용으로 표시된 전송을 보낼 수 있는
+위치가 포함되어 있습니다.</p><dl><dt>SOAP 종점</dt>
+<dd><p>Identity 공급자의 SOAP 메시지 수신자에 대한 URL을 입력합니다. 이 값은 비 브라우저 통신 시 SOAP 수신자의 위치를 나타냅니다.</p></dd>
+<dt>단일 로그아웃 서비스</dt>
+<dd><p>서비스 공급자가 로그아웃 요청을 보낼 대상 URL을 입력합니다. 단일 로그아웃은 Identity 공급자가 인증한 모든 세션에 대한 로그아웃 기능을 동기화합니다.</p></dd>
+<dt>단일 로그아웃 반환</dt>
+<dd><p>Identity 공급자가 로그아웃을 완료한 후 기본을 리디렉션할 대상 URL을 입력합니다.</p></dd>
+<dt>연합 종료 서비스</dt>
+<dd><p>서비스 공급자가 연합 종료 요청을 보낼 대상 URL을 입력합니다.</p></dd>
+<dt>연합 종료 반환</dt>
+<dd><p>Identity 공급자가 연합 종료를 완료한 후 기본을 리디렉션할 대상 URL을 입력합니다.</p></dd>
+<dt>이름 등록 서비스</dt>
+<dd><p>이 Identity 공급자와 특정 기본에 대해 통신할 때 사용할 이름 식별자를 지정하기 위해 서비스 공급자가 연합 종료 요청을 보낼 대상 URL을 입력합니다. 이 선택 사항 서비스는 연합 세션이 설정된 후에만 구현될 수 있습니다.</p></dd>
+<dt>이름 등록 반환</dt>
+<dd><p>HTTP 리디렉션 기반의 이름 등록이 완료된 후 Identity 공급자가 기본을 리디렉션할 대상 URL을 입력합니다.</p></dd>
+</dl>
+</li>
+<li><b>통신 프로필 속성에 대한 값을 수정합니다.</b><p>Liberty Alliance Project <b>프로필</b>은 메시지 내용과 이를 전송하는 데 사용되는 메커니즘의 조합을
+정의합니다. 다음 통신 프로필 속성은 Identity 공급자가 각 기능에 대해 사용하는 프로필을
+정의합니다.</p><dl><dt>연합 종료</dt>
+<dd><p>여러 공급자에게 기본의 연합 종료에 대해 알리기 위해 사용할 Identity 공급자의 프로필을 선택합니다.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>단일 로그아웃</dt>
+<dd><p>여러 공급자에게 기본의 로그아웃에 대해 알리기 위해 사용할 Identity 공급자의 프로필을 선택합니다.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>이름 등록</dt>
+<dd><p>다른 공급자가 기본에 대한 새 이름 식별자를 등록하기 위해 Identity 공급자에게 연락할 때 사용할 프로필을 선택합니다.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+</dd>
+<dt>단일 사인온(SSO)/연합</dt>
+<dd><p>이 Identity 공급자가 인증 또는 연합 요청에 대한 응답을 전송할 때 사용할 프로필을 선택합니다.</p>
+<ul><li><p>브라우저 게시 - 브라우저 기반 HTTP POST 프로토콜을 지정합니다.</p></li>
+<li><p>브라우저 아티팩트 - 비 브라우저 SOAP 기반 프로토콜을 지정합니다.</p></li>
+<li><p>LECP - 리버티 사용 클라이언트 프록시를 지정합니다.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>사용 가능한 CoT(Circle of Trust) 중에 공급자에 할당할 CoT(Circle of Trust)를 하나
+선택합니다.</b><p>공급자는 하나 이상의 CoT(Circle of Trust)에 속할 수 있습니다. 그러나 지정된 CoT(Circle
+of Trust)가 없는 공급자는 Liberty Alliance Project 사양에 기초한 통신에 참여할 수
+없습니다. CoT(Circle of Trust)를 작성하지 않은 경우 나중에 이 속성을 정의할 수
+있습니다.</p></li>
+<li><b>인증 컨텍스트 속성에서 각 컨텍스트 참조에 대한 [수준] 상자에 양수를 입력합니다.</b><p>이 숫자는 특정 인증 모듈에 대해 정의된 인증 수준에 해당합니다. 사용자는 정의된
+인증 수준과 함께 모듈로 리디렉션됩니다.</p>
+<ul><li><p>모바일 연락처</p></li>
+<li><p>모바일 디지털 아이디</p></li>
+<li><p>등록되지 않은 모바일</p></li>
+<li><p>비밀번호</p></li>
+<li><p>비밀번호로 보호된 전송</p></li>
+<li><p>이전 세션</p></li>
+<li><p>스마트 카드</p></li>
+<li><p>스마트 카드 PKI</p></li>
+<li><p>소프트웨어 PKI</p></li>
+<li><p>시간 동기화 토큰</p></li></ul>
+</li>
+<li><b>사용 가능한 신뢰할 수 있는 공급자를 선택하고 엔티티에 추가합니다.</b><p>이 목록은 공급자로 채워진 구성된 엔티티를 포함합니다.</p></li>
+<li><b>서비스 공급자 속성의 값을 수정합니다.</b><p>서비스 공급자 속성은 서비스 공급자에 대한 일반 정보를 정의합니다.</p><dl><dt>명제 사용자 URL</dt>
+<dd><p>서비스 공급자로 보낸 모든 SAML 명제를 수신 및 처리하는 종점에 대한 URL을 입력합니다.</p></dd>
+<dt>명제 사용자 서비스 URL 아이디</dt>
+<dd><p>프로토콜 지원 열거 공통 속성의 값이 <tt>urn:liberty:iff:2003-08</tt>인 경우 필요한 아이디를 입력합니다.</p></dd>
+<dt>명제 사용자 서비스 URL을 기본값으로 설정</dt>
+<dd><p>식별자가 요청에서 제공되지 않은 경우 명제 사용자 서비스 URL을 기본값으로 사용하려면 이 확인란을 선택합니다.</p></dd>
+<dt>인증 요청 서명</dt>
+<dd><p>서비스 공급자가 항상 인증 요청을 서명하게 하려면 이 확인란을 선택합니다.</p></dd>
+<dt>연합 후 이름 등록</dt>
+<dd><p>기본이 연합된 후에 서비스 공급자가 이름 등록에 참가할 수 있도록 하려면 이 확인란을 선택합니다. </p></dd>
+<dt>이름 아이디 정책</dt>
+<dd><p>Identity 공급자 측에서 이름 식별자 정책에 대한 요청자의 영향을 허용하는 옵션을 선택합니다. 옵션은 다음과 같습니다.</p><dl><dt>없음</dt>
+<dd><p>Identity 공급자는 Identity 공급자와 요청하는 서비스 공급자 또는 기본에 대한 제휴 그룹 사이에 존재하는 연합에 해당하는 이름 식별자를 반환합니다. 이러한 연합이 없는 경우 오류가 반환됩니다.</p></dd>
+<dt>일회성</dt>
+<dd><p>Identity 공급자는 연합 후 기본에 대한 일시적인 일회성 식별자를 발행합니다.</p></dd>
+<dt>연합</dt>
+<dd><p>기본에 대해 연합이 존재하지 않는 경우 Identity 공급자는 새 Identity 연합을 시작할 수 있습니다.</p></dd>
+</dl>
+</dd>
+<dt>제휴 연합</dt>
+<dd><p>제휴 연합을 사용 가능하게 설정하려면 이 확인란을 선택합니다.</p></dd>
+</dl>
+</li>
+<li><b>Federated Access Manager 구성 속성 값을 수정합니다.</b><p>Federated Access Manager 구성 속성은 Access Manager의 이 호스트 인스턴스에 대한 정보를
+정의합니다.</p><dl><dt>서비스 공급자 어댑터</dt>
+<dd><p>연합 프로세스 중에 응용 프로그램 관련 처리를 추가하는 데 사용되는 com.sun.identity.federation.plugins.FederationSPAdapter 에 대한 구현 클래스를 정의합니다.</p></dd>
+<dt>공급자 별칭</dt>
+<dd><p>공급자 별칭은 엔티티 프로필 내에서 호스트 공급자를 식별하는 데 사용하는 이름으로서 서비스 공급자 또는 Identity 공급자 구성인지 여부를 정의합니다. 값은 고유해야 하며 URL로 표시할 수 있어야 합니다(예: <tt>sunAlias</tt>).</p></dd>
+<dt>인증 유형</dt>
+<dd><p>로컬로 호스트된 공급자의 인증 요청에 사용할 공급자의 유형을 선택합니다.</p>
+<ul><li><p><b>로컬</b>은 로컬로 호스트된 공급자가 인증 요청을 받았을 때(본질적으로 자체 요청) 로컬 Identity 공급자에게 연결해야 할 것인지를 지정합니다.</p></li>
+<li><p><b>원격</b>은 로컬로 호스트된 공급자가 인증 요청을 받았을 때 원격 Identity 공급자에게 연결할 것인지를 지정합니다.</p></li></ul>
+</dd>
+<dt>기본 인증 컨텍스트</dt>
+<dd><p>정보를 서비스 공급자 요청의 일부로 수신하지 않은 경우 이 Identity 공급자가 사용할 인증 컨텍스트 클래스(인증 방법)를 선택합니다. 또한 이 값은 알려지지 않은 사용자가 서비스 공급자의 보호된 자원에 액세스하려고 시도하고 서비스 공급자가 인증에 대한 요청을 전송할 때 사용할 인증 컨텍스트 클래스도 지정합니다. 옵션은 다음과 같습니다.</p>
+<ul><li><p>비밀번호</p></li>
+<li><p>모바일 디지털 아이디</p></li>
+<li><p>스마트 카드</p></li>
+<li><p>스마트 카드 PKI</p></li>
+<li><p>등록되지 않은 모바일</p></li>
+<li><p>소프트웨어 PKI</p></li>
+<li><p>이전 세션</p></li>
+<li><p>모바일 연락처</p></li>
+<li><p>시간 동기화 토큰</p></li>
+<li><p>비밀번호로 보호된 전송</p></li></ul>
+</dd>
+<dt>Identity 공급자 강제 인증</dt>
+<dd><p>새 인증 요청을 받았을 때 Identity 공급자가 사용자를 다시 인증해야 하는지(라이브 세션 동안인 경우에도) 여부를 지정하려면 이 확인란을 사용합니다. 이 속성은 기본적으로 사용됩니다.</p></dd>
+<dt>Identity 공급자에게 준수 요청</dt>
+<dd><p>Identity 공급자가 사용자와 상호 작용하지 않아야 하는지 여부를 지정하려면 이 확인란을 선택합니다.</p></dd>
+<dt>영역</dt>
+<dd><p>이 공급자가 구성되는 영역을 가리키는 값을 입력합니다(예: <tt>/sp</tt>).</p></dd>
+<dt>리버티 버전 URI</dt>
+<dd><p>사용 중인 Liberty Alliance Project 사양의 버전을 지정하는 URI를 입력합니다. 기본값은 <tt>http://projectliberty.org/specs/v1</tt>입니다.</p></dd>
+<dt>이름 식별자 구현</dt>
+<dd><p>이 필드는 서비스 공급자가 이름 등록에 참여하는 데 사용하는 클래스를 정의합니다. 이름 등록은 Identity 공급자가 서비스 공급자와 통신할 때 사용하는 사용자의 이름 식별자를 서비스 공급자가 지정하는 데 기준이 되는 프로필입니다. 값은 <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt>입니다.</p></dd>
+<dt>홈 페이지 URL</dt>
+<dd><p>로컬에서 호스트되는 공급자 홈 페이지의 URL을 입력합니다.</p></dd>
+<dt>단일 사인온(SSO) 실패 리디렉션 URL</dt>
+<dd><p>단일 사인온(SSO)이 실패했을 경우 기본이 리디렉션할 대상 URL을 입력합니다.</p></dd>
+<dt>자동 연합</dt>
+<dd><p>자동 연합은 공통 속성에 기초한 사용자의 다른 공급자 계정을 자동으로 연합합니다. 자동 연합을 사용 가능하도록 하려면 이 확인란을 선택합니다.</p></dd>
+<dt>자동 연합 공통 속성 이름</dt>
+<dd><p>이 속성 값은 사용자의 다른 공급자 계정이 자동으로 연합될 공통 속성으로 사용됩니다.</p></dd>
+<dt>속성 매퍼 클래스</dt>
+<dd><p>이 속성 값은 SAML 명제의 속성을 로컬에서 정의된 사용자 속성에 매핑하는 데 사용되는 클래스입니다. 기본 클래스는 <tt>com.sun.identity.</tt><tt>federation.services.FSDefaultAttributeMapper</tt>입니다.</p></dd>
+<dt>서비스 공급자 속성 매핑</dt>
+<dd><p>이 값은 위에서 지정된 속성 매퍼 클래스가 사용하는 매핑을 정의합니다. 이 속성에 대한 매핑은 다음과 같이 구성되어야 합니다.</p><p><tt><b></tt><i>SAML-attribute</i><tt>=</tt><i>local-attribute </i><tt></b></tt></p><p>예를 들어, <tt>EmailAddress=mail</tt> 또는 <tt>Address=postaladdress</tt>입니다.</p></dd>
+</dl>
+</li>
+<li><b>프록시 인증 구성 속성에 대한 정보를 수정합니다.</b><p>다른 Identity 공급자로 이미 인증한 기본에 대한 인증 요청을 받은 Identity 공급자는
+요청하는 서비스 공급자를 대신하여 인증하는 Identity 공급자에 대해 인증 요청의 프록시 작업을
+수행할 수 있습니다. 이는 <b>동적 Identity 공급자 프록시</b>입니다. 프록시 인증 구성 속성은 동적 Identity 공급자
+프록시의 값을 정의합니다.</p><dl><dt>프록시 인증</dt>
+<dd><p>동적 Identity 공급자 프록시를 사용하려면 이 확인란을 선택합니다.</p></dd>
+<dt>프록시 Identity 공급자 목록</dt>
+<dd><p>동적 Identity 공급자 프록시에 사용할 수 있는 Identity 공급자의 목록을 추가합니다. 이 속성 값은 소유자/공급자가 속한 엔티티의 엔티티 이름 속성에서 정의된 값과 일치하는 URI입니다.</p></dd>
+<dt>최대 프록시 수</dt>
+<dd><p>요청을 전송할 수 있는 프록시 Identity 공급자의 최대 수를 입력합니다.</p></dd>
+<dt>프록시용 소개 쿠키 사용</dt>
+<dd><p>프록시 Identity 공급자를 찾는 데 소개를 사용하려면 이 확인란을 선택합니다.</p></dd>
+</dl>
+</li>
+<li><b>조직 프로필 속성의 값을 수정합니다.</b><p>조직 프로필 속성에는 기본과 상호 작용할 때 필요할 수 있는 기본 정보가
+제공됩니다. 이 속성은 선택 사항입니다.</p>
+<hr><p><b>주 &#8211; </b>이름 속성에 값이 포함되어 있는 경우 디스플레이 이름 및 URL 속성에 값을
+추가해야 합니다.</p>
+<hr>
+<dl><dt>이름</dt>
+<dd><p>엔티티 조직에 대한 법적 이름을 입력하고 [추가]를 누릅니다. 이 값은 <i>locale</i>| <i> organization-name</i> 형식으로 정의됩니다. 예를 들어 <tt>en</tt>|<tt> example.com</tt> 형식입니다.</p></dd>
+<dt>디스플레이 이름</dt>
+<dd><p>기본에 표시하기 적절한 엔티티의 조직 이름을 입력하고 [추가]를 누릅니다. 이 값은 <i>locale</i>| <i> organization-display-name</i> 형식으로 정의됩니다. 예를 들어 <tt>en</tt>|<tt>example.com</tt> 형식입니다. </p></dd>
+<dt>URL</dt>
+<dd><p>조직의 URL을 입력하고 [추가]를 누릅니다. 이 값은 <i>locale</i>| <i> organization-URL</i> 형식으로 정의됩니다. 예를 들어 <tt>en</tt>|<tt> http://www.example.com</tt> 형식입니다.</p></dd>
+</dl>
+</li>
+<li><b>공급자의 연락 담당자를 구성하려면 [새 연락 담당자]를 누릅니다.</b><p>이 속성은 선택 사항입니다. 자세한 내용은 <a href="federation.fscreatecontactperson.html">공급자 엔티티의 공급자에 연락 담당자 추가</a>를 참조하십시오.</p></li>
+<li><b>[저장]을 눌러 구성을 완료합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

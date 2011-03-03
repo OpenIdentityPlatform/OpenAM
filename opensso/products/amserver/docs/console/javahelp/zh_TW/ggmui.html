@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>J2EE 策略代理程式 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggmui"></a><h4>J2EE 策略代理程式</h4>
+<p>J2EE 代理程式實例可從此介面配置。可用的配置類型分成下列種類：</p>
+<ul><li><p><a href="#ggmvd">全域</a></p></li>
+<li><p><a href="#ggmwz">應用程式</a></p></li>
+<li><p><a href="#ggmwl">SSO</a></p></li>
+<li><p><a href="#ggmwi">FAM 服務</a></p></li>
+<li><p><a href="#ggmug">其他</a></p></li>
+<li><p><a href="#ggmud">進階</a></p></li></ul>
+
+
+<a name="ggmvd"></a><h5>全域</h5>
+<p>[全域] 屬性套用至所有 J2EE 代理程式，以及代理程式保護的所有應用程式。</p>
+
+<a name="ggmph"></a><h5>群組</h5>
+<p>如果適用，請從下拉式清單選取一個群組。此清單由之前已配置的群組組成。</p>
+
+<a name="ggmqz"></a><h5>密碼</h5>
+<p>密碼是在您建立代理程式設定檔時設定的。不過，您以後隨時可以變更密碼。</p>
+
+<a name="ggmni"></a><h5>密碼確認</h5>
+<p>密碼確認是在您建立代理程式設定檔時執行。如果您變更密碼，則必須確認變更。</p>
+
+<a name="ggmpc"></a><h5>狀態</h5>
+<p>建立代理程式時，選取 [使用中] 選項。只有在您要移除代理程式提供的保護時，才選擇 [非使用中]。</p>
+
+<a name="ggmwm"></a><h5>代理程式通知 URL</h5>
+<p>代理程式用來註冊通知偵聽程式的 URL。</p>
+
+<a name="ggmwr"></a><h5>代理程式配置儲存庫的位置</h5>
+<p>如有需要，請將配置的位置變更為兩個選項之一：集中或本機。集中位置可讓您以集中的方式控制配置，例如透過主控台。提供本機選項是用於向下相容。</p>
+
+<a name="ggmwj"></a><h5>配置重新載入間隔</h5>
+<p>配置重新載入之間的間隔時間，以秒為單位。將此屬性設為 0 會停用熱交換機制。</p>
+
+<a name="ggmsi"></a><h5>啟用集中式通知</h5>
+<p>啟用時，代理程式會從 Federated Access Manager 接收到有關配置變更的通知訊息。</p>
+
+<a name="ggmvt"></a><h5>代理程式篩選器模式</h5>
+<p>篩選器的作業模式。</p>
+
+<a name="ggmvu"></a><h5>拒絕資源存取的 URI：</h5>
+<p>自訂拒絕存取的頁面的 URL。如果未提供任何值，代理程式便會傳回 HTTP 狀態 403 (禁止)。</p>
+
+<a name="ggmxg"></a><h5>HTTP 階段作業連結</h5>
+<p>啟用時，HTTP 階段作業會在登入失敗時失效。使用者沒有 SSO 階段作業，或是主體使用者名稱與 SSO 使用者名稱不相符。</p>
+
+<a name="ggmut"></a><h5>com.sun.identity.agents.config.redirect.param</h5>
+<p>代表 goto 參數名稱的字串，代理程式會使用該字串將使用者重新導向至適當的認證服務。認證服務會使用此參數的值將使用者重新導向至原始請求的目標。</p>
+
+<a name="ggmuv"></a><h5>登入嘗試限制</h5>
+<p>在攔截使用者請求之前，在單一瀏覽器階段作業期間允許的登入嘗試失敗次數。值為 0 則停用此功能。</p>
+
+<a name="ggmtr"></a><h5>自訂回應標頭</h5>
+<p>代理程式在用戶端瀏覽器上設定的自訂標頭對映清單。關鍵字為標頭名稱，值則代表標頭值。</p>
+
+<a name="ggmtt"></a><h5>重新導向嘗試限制</h5>
+<p>在攔截使用者請求之前，在單一瀏覽器階段作業期間允許的連續單點重新導向次數。值為 0 則停用此功能。</p>
+
+<a name="ggmxd"></a><h5>代理程式除錯等級</h5>
+<p>記錄的除錯訊息類型。此設定決定儲存在代理程式主機本機上的除錯記錄等級。</p>
+
+<a name="ggmsk"></a><h5>使用者對映模式</h5>
+<p>代理程式用來判斷使用者 ID 的機制。</p>
+
+<a name="ggmts"></a><h5>使用者屬性名稱</h5>
+<p>包含使用者 ID 的屬性名稱。如果標示為 [使用者對映模式] 的屬性設為 <tt>USER_ID</tt>，則不會使用此屬性的值。</p>
+
+<a name="ggmuc"></a><h5>使用者主體標幟</h5>
+<p>啟用時，使用經認證使用者的主體而不只是使用者 ID 來認證使用者。如果標示為 [使用者對映模式] 的屬性設為 <tt>USER_ID</tt>，則會使用此屬性的值。</p>
+
+<a name="ggmtm"></a><h5>使用者記號名稱</h5>
+<p>階段作業中已認證使用者之使用者 ID 的階段作業特性名稱。如果標示為 [使用者對映模式] 的屬性設為 <tt>USER_ID</tt>，且標示為 [使用者主體標幟] 的屬性未啟用，則會使用此屬性的值。</p>
+
+<a name="ggmzk"></a><h5>稽核存取類型</h5>
+<p>代理程式依據使用者 URL 存取嘗試記錄的訊息類型。</p>
+
+<a name="ggmyk"></a><h5>稽核記錄位置</h5>
+<p>記錄稽核訊息的位置。</p>
+
+<a name="ggmxz"></a><h5>遠端記錄檔名稱</h5>
+<p>Federated Access Manager 記錄檔的名稱，其中會記錄每次對 Federated Access Manager 的 URL 存取。</p>
+
+<a name="ggmxy"></a><h5>自動重建本機稽核記錄</h5>
+<p>啟用時，在到達標示為 [本機稽核記錄自動重建大小] 的屬性所指定的大小後，稽核記錄檔會自動重建。</p>
+
+<a name="ggmyc"></a><h5>本機稽核記錄自動重建大小</h5>
+<p>本機稽核記錄檔自動重建至新檔案的大小。</p>
+
+<a name="ggmxt"></a><h5>用戶端 IP 位址標頭</h5>
+<p>保存用戶端 IP 位址的 HTTP 標頭名稱。</p>
+
+<a name="ggmyp"></a><h5>用戶端主機名稱標頭</h5>
+<p>保存用戶端主機名稱的 HTTP 標頭名稱。</p>
+
+<a name="ggmwz"></a><h5>應用程式</h5>
+<p>[應用程式] 屬性為應用程式專用。</p>
+
+<a name="ggmxm"></a><h5>登入表單 URI</h5>
+<p>對應至應用程式的 <tt>web.xml</tt> form-login-page 元素的絕對 URI 清單。</p>
+
+<a name="ggmzf"></a><h5>登入錯誤 URI</h5>
+<p>對應至應用程式的 <tt>web.xml</tt> form-error-page 元素的絕對 URI 清單。</p>
+
+<a name="ggmyn"></a><h5>使用內部登入</h5>
+<p>啟用時，代理程式會使用標示為 [登入內容檔案名稱] 的屬性所指定的自訂內部內容。未啟用時，代理程式會使用預設的內部內容。</p>
+
+<a name="ggmxs"></a><h5>登入內容檔案名稱</h5>
+<p>自訂登入內容檔案的完整路徑和名稱。</p>
+
+<a name="ggmyw"></a><h5>登出應用程式處理程式</h5>
+<p>應用程式專用的對映，每一個對映會識別一個用於處理登出的處理程式。</p>
+
+<a name="ggmzp"></a><h5>登出應用程式 URI</h5>
+<p>應用程式專用的對映，每一個對映會識別一個請求 URI。若指定的請求 URI 存在，則表示有登出事件。</p>
+
+<a name="ggmxw"></a><h5>登出請求參數</h5>
+<p>應用程式專用的對映，每一個對映會識別一個參數。若 HTTP 請求中存在指定的參數，則表示有登出事件。</p>
+
+<a name="ggmzu"></a><h5>已啟用登出內視</h5>
+<p>啟用時，代理程式會搜尋 HTTP 請求內文以尋找登出參數。</p>
+
+<a name="ggmyj"></a><h5>登出進入 URI</h5>
+<p>應用程式專用的對映，每一個對映會識別成功登出及後續成功認證 (如果可行) 之後，要用作進入點的 URI。</p>
+
+<a name="ggmxn"></a><h5>非強制 URI</h5>
+<p>未對其執行任何認證的 URI 清單。代理程式不會強制保護此清單上的每一個 URI，並且不要求憑證。</p>
+
+<a name="ggmyy"></a><h5>反向非強制 URI</h5>
+<p>啟用時，非強制 URI 清單會變成強制清單。因此，做為標示為 [非強制 URI] 的屬性值而列示的所有 URI 都是強制，而所有其他 URI 則為非強制。</p>
+
+<a name="ggmyv"></a><h5>啟用非強制 URI 快取</h5>
+<p>啟用時，會快取非強制 URI 的評估結果。因此，會針對與標示為 [非強制 URI] 的屬性相關之值的清單快取其評估結果。</p>
+
+<a name="ggmzm"></a><h5>非強制 URI 快取大小</h5>
+<p>啟用標示為 [啟用非強制 URI 快取] 的屬性時，會使用為此屬性指定的值來設定快取大小。</p>
+
+<a name="ggmzd"></a><h5>非強制用戶端 IP 清單</h5>
+<p>用戶端 IP 位址清單，來自該清單的請求不會經過認證或授權。此清單中的每個 IP 位址都會被授予存取權，而且不需要憑證以進行認證或授權。</p>
+
+<a name="ggmzn"></a><h5>非強制 IP 反向清單</h5>
+<p>啟用時，非強制用戶端 IP 清單會變成強制清單。因此，做為標示為 [非強制用戶端 IP 清單] 的屬性值而列示的所有 IP 位址都是強制，而所有其他 IP 位址則為非強制。</p>
+
+<a name="ggmzh"></a><h5>非強制 IP 快取標幟</h5>
+<p>啟用時，會快取非強制 IP 位址的評估結果。因此，會針對與標示為 [非強制用戶端 IP 清單] 的屬性相關之值的清單快取其評估結果。</p>
+
+<a name="ggmzs"></a><h5>非強制 IP 快取大小</h5>
+<p>啟用標示為 [非強制 IP 快取標幟] 的屬性時，會使用為此屬性指定的值來設定快取大小。</p>
+
+<a name="ggmzi"></a><h5>設定檔屬性擷取模式</h5>
+<p>適用於擷取將納入請求中的額外使用者設定檔屬性的模式。</p>
+
+<a name="ggmzo"></a><h5>設定檔屬性對映</h5>
+<p>設定檔屬性名稱與 HTTP 標頭的對映清單，該清單會以目前認證使用者的特定名稱填入。格式：[profile_attribute_name]=http_header_name。</p>
+
+<a name="ggmym"></a><h5>回應屬性擷取模式</h5>
+<p>適用於擷取將納入請求中的額外使用者回應屬性的模式。</p>
+
+<a name="ggmzg"></a><h5>回應屬性對映</h5>
+<p>回應屬性名稱與 HTTP 標頭名稱的對映清單，該清單會以目前認證使用者的特定名稱填入。格式：[response_attribute_name]=http_header_name。</p>
+
+<a name="ggmxl"></a><h5>Cookie 分隔符字元</h5>
+<p>將屬性設為 Cookie 時，用來分隔同一屬性的多個值的字元。</p>
+
+<a name="ggmyl"></a><h5>擷取屬性日期格式</h5>
+<p>將屬性設為 HTTP 標頭時使用的日期屬性值的格式。此格式是以 <tt>java.text.SimpleDateFormat </tt>為基礎。</p>
+
+<a name="ggmzq"></a><h5>屬性 Cookie 編碼</h5>
+<p>啟用時，屬性值會在設為 Cookie 之前進行 URL 編碼。</p>
+
+<a name="ggmyf"></a><h5>階段作業屬性擷取模式</h5>
+<p>適用於擷取將納入請求中的額外使用者階段作業屬性的模式。</p>
+
+<a name="ggmyu"></a><h5>階段作業屬性對映</h5>
+<p>階段作業屬性名稱與 HTTP 標頭名稱的對映清單，該清單會以目前認證使用者的特定名稱填入。格式：[session_attribute_name]=http_header_name。</p>
+
+<a name="ggmyi"></a><h5>預設具有權限的屬性</h5>
+<p>具有權限的屬性的清單，這些屬性將授予所有擁有有效 Federated Access Manager 階段作業的使用者。</p>
+
+<a name="ggmxo"></a><h5>具有權限的屬性類型</h5>
+<p>要為每個使用者擷取的、具有權限的屬性類型的清單。</p>
+
+<a name="ggmyb"></a><h5>將具有權限的屬性轉換成小寫</h5>
+<p>具權限的屬性類型的對應清單，其值為 <tt>true</tt> 或 <tt>false</tt>：<tt>true</tt> 表示屬性類型會轉換成小寫，<tt>false</tt> 則表示不轉換。</p>
+
+<a name="ggmyt"></a><h5>具有權限的階段作業屬性</h5>
+<p>階段作業特性名稱的清單，其中保存認證使用者的具有權限的屬性。</p>
+
+<a name="ggmxk"></a><h5>啟用具有權限的屬性對映</h5>
+<p>啟用時，對映會從屬性的原始值套用至標示為 [具有權限的屬性對映] 的屬性所指定的替代值。</p>
+
+<a name="ggmya"></a><h5>具有權限的屬性對映</h5>
+<p>從屬性原始值至替代值的對映清單。此屬性只有在啟用了標示為 [啟用具有權限的屬性對映] 的屬性時才有效。</p><p>範例：</p><pre>[id=manager,ou=group,dc=opensso,dc=java,dc=net]=am_manager_role
+[id=employee,ou=group,dc=opensso,dc=java,dc=net]=am_employee_role</pre>
+
+<a name="ggmyg"></a><h5>自訂認證處理程式</h5>
+<p>從應用程式至該應用程式專用的認證處理程式的對映清單。代理程式會使用每一個認證處理程式來認證所指定應用程式容器內的使用者。</p><p>範例：</p><pre>[BankApp]=BankAuthHandler</pre>
+
+<a name="ggmyq"></a><h5>自訂登出處理程式</h5>
+<p>從應用程式至該應用程式專用的登出處理程式的對映清單。代理程式會使用每一個登出處理程式來登出所指定應用程式容器內的使用者。</p><p>範例：</p><pre>[BankApp]=BankLogoutHandler</pre>
+
+<a name="ggmxv"></a><h5>自訂驗證處理程式</h5>
+<p>從應用程式至該應用程式專用的本機驗證處理程式的對映清單。代理程式會使用本機驗證處理程式對照本機儲存庫驗證使用者憑證。</p><p>範例：</p><pre>[BankApp]=BankVerificationHandler</pre>
+
+<a name="ggmwl"></a><h5>SSO</h5>
+<p>[SSO] 屬性可讓您配置與單次登入 (single sign-on, SSO) 相關的代理程式功能。大部分與 SSO 相關的屬性都會分到 SSO 種類中。不過，此群組中可能不包括提供預設 SSO 功能的屬性。</p>
+
+<a name="ggmyo"></a><h5>Cookie 名稱</h5>
+<p>Federated Access Manager 伺服器和代理程式之間所使用的 SSO Cookie 記號的名稱。</p>
+
+<a name="ggmxu"></a><h5>啟用 SSO 快取</h5>
+<p>啟用時，SSO 快取為使用中快取，並且可透過由代理程式 SDK 公開的公用 API 使用。</p>
+
+<a name="ggmza"></a><h5>跨網域 SSO</h5>
+<p>啟用時，跨網域單次登入 (Cross Domain Single Sign On, CDSSO) 為使用中。</p>
+
+<a name="ggmzt"></a><h5>CDSSO 重新導向 URI</h5>
+<p>代理程式用來處理 CDSSO 請求的中間 URI。</p>
+
+<a name="ggmyd"></a><h5>CDSSO Servlet URL</h5>
+<p>代理程式可用來處理 CDSSO 的可用 CDSSO 控制器的 URL 清單。</p><p>範例：</p><pre>[0]=http://host:port/opensso/cdcservlet</pre>
+
+<a name="ggmzc"></a><h5>CDSSO 時鐘偏差</h5>
+<p>代理程式用來判斷 CDSSO <tt>AuthnResponse</tt> 指定的有效性的時間，以秒為單位。</p>
+
+<a name="ggmyz"></a><h5>CDSSO 信任的 ID 提供者</h5>
+<p>評估 CDC Liberty 回應時代理程式信任的 Federated Access Manager 伺服器/ID 提供者清單。當代理程式和 Federated Access Manager
+實例之間存在負載平衡器、防火牆或兩者都存在時，就必須設定此屬性。</p><p>範例：</p><pre>[0]=http://host:port/opensso/cdcservlet</pre>
+
+<a name="ggmzj"></a><h5>啟用 CDSSO 安全</h5>
+<p>啟用時，代理程式在不同網域中以 CDSSO 模式設定的 SSO 記號 Cookie 就會標記為安全。只有在與主機的通訊通道是安全的時，才會進行傳輸。</p>
+
+<a name="ggmze"></a><h5>CDSSO 網域清單</h5>
+<p>必須在 CDSSO 分析藍本中設定其 Cookie 的網域清單。</p><p>範例：</p><pre>[0]=.sun.com</pre>
+
+<a name="ggmyx"></a><h5>重設 Cookie</h5>
+<p>啟用時，代理程式會先重設回應中的 Cookie，再重新導向至認證。</p>
+
+<a name="ggmys"></a><h5>Cookie 重設名稱清單</h5>
+<p>啟用了標示為 [重設 Cookie] 的屬性時，代理程式要重設的 Cookie 名稱清單。</p>
+
+<a name="ggmye"></a><h5>Cookie 重設網域對映</h5>
+<p>從關鍵字至值的對映清單，該關鍵字是在標示為 [Cookie 重設名稱清單] 的屬性中指定的 Cookie 名稱，而該值為發生重設事件時要使用的 Cookie 的網域。</p>
+
+<a name="ggmzl"></a><h5>Cookie 重設路徑對映</h5>
+<p>從關鍵字至值的對映清單，該關鍵字是在標示為 [Cookie 重設名稱清單] 的屬性中指定的 Cookie 名稱，而該值為發生重設事件時要使用的 Cookie 的路徑。</p>
+
+<a name="ggmxp"></a><h5>SSO 解碼</h5>
+<p>啟用時，代理程式在使用該記號之前會先對 SSO 記號進行 URL 解碼。</p>
+
+<a name="ggmwi"></a><h5>FAM 服務</h5>
+<p>FAM 服務屬性 (特性) 會啟用代理程式使用的 Federated Access Manager 服務的配置，例如策略服務、階段作業服務、認證服務及服務管理 (SM) 服務。</p>
+
+<a name="ggmxr"></a><h5>FAM 登入 URL</h5>
+<p>Federated Access Manager 認證的 URL 清單。需要認證時，代理程式會將連入的使用者重新導向至 URL 所指定的適當認證服務。</p><p>範例：</p><pre>[0]=http://host:port/opensso/UI/Login</pre>
+
+<a name="ggmzr"></a><h5>設定登入 URL 優先順序</h5>
+<p>啟用時，會依照標示為 [FAM 登入 URL] 的屬性的定義來設定登入 URL 或 CDSSO URL 的容錯移轉順序的優先順序。</p>
+
+<a name="ggmyh"></a><h5>登入 URL 測試</h5>
+<p>啟用時，代理程式會先檢查標示為 [FAM 登入 URL] 的屬性定義的 URL 可用性，然後才進行重新導向。</p>
+
+<a name="ggmxq"></a><h5>登入 URL 測試逾時</h5>
+<p>啟用了標示為 [登入 URL 測試] 的屬性時，為此屬性指定的值會決定連線逾時時間，以毫秒為單位。</p>
+
+<a name="ggmxx"></a><h5>FAM 登出 URL</h5>
+<p>Federated Access Manager 登出頁面 URL 的清單。</p><p>範例：</p><pre>[0]=http://host:port/opensso/UI/Logout</pre>
+
+<a name="ggmzv"></a><h5>設定登出 URL 優先順序</h5>
+<p>啟用時，會依照標示為 [FAM 登出 URL] 的屬性的定義來設定登出 URL 的容錯移轉順序的優先順序。</p>
+
+<a name="ggmzx"></a><h5>登出 URL 測試</h5>
+<p>指定在重新導向至這些 URL 之前，代理程式是否檢查其可用性。</p>
+
+<a name="ggmzy"></a><h5>登出 URL 測試逾時</h5>
+<p>啟用了標示為 [登出 URL 測試] 的屬性時，為此屬性指定的值會決定連線逾時時間，以毫秒為單位。</p>
+
+<a name="ggmzz"></a><h5>FAM 認證服務協定</h5>
+<p>Federated Access Manager 認證服務使用的協定。</p>
+
+<a name="ggmzw"></a><h5>FAM 認證服務主機名稱</h5>
+<p>Federated Access Manager 認證服務使用的主機名稱。</p>
+
+<a name="ggnaw"></a><h5>FAM 認證服務連接埠</h5>
+<p>Federated Access Manager 認證服務使用的連接埠號碼。</p>
+
+<a name="ggnaz"></a><h5>策略遠端記錄檔名稱</h5>
+<p>記錄訊息至 Federated Access Manager 伺服器時使用的記錄檔名稱。</p>
+
+<a name="ggnas"></a><h5>策略記錄等級</h5>
+<p>要記錄的遠端記錄訊息類型。有效的值如下：<tt>ALLOW</tt>、<tt>DENY</tt>、<tt>BOTH</tt> 和 <tt>NONE</tt>。</p>
+
+<a name="ggnak"></a><h5>啟用策略通知</h5>
+<p>啟用時，遠端策略用戶端可使用通知。</p>
+
+<a name="ggnao"></a><h5>策略用戶端輪詢間隔</h5>
+<p>以分鐘為單位的持續時間，經過這段時間後，遠端策略用戶端會重新整理快取項目。</p>
+
+<a name="ggnaj"></a><h5>策略用戶端快取模式</h5>
+<p>遠端策略用戶端使用的快取模式。有效的值如下：<tt>subtree</tt> 或 <tt>self </tt>。</p>
+
+<a name="ggnat"></a><h5>策略用戶端布林動作值</h5>
+<p>可用於策略動作名稱的布林動作值。</p><p>範例：</p><pre><i>serviceName</i>|<i>actionName</i>|<i>trueValue</i>|<i>falseValue</i></pre>
+
+<a name="ggnbg"></a><h5>策略用戶端資源比較程式</h5>
+<p>用於不同服務名稱的資源比較程式。</p>
+
+<a name="ggnan"></a><h5>策略用戶端時鐘偏差</h5>
+<p>Federated Access Manager 伺服器機器與遠端策略用戶端機器之間允許的時差，以秒為單位。</p>
+
+<a name="ggnbd"></a><h5>URL 策略環境 GET 參數</h5>
+<p>HTTP GET 請求參數的清單，這些參數的名稱和值將在 Federated Access Manager 伺服器 URL 策略評估的環境對映中設定。</p><p>對映關鍵字的格式為 GET <i>parameterName</i>，對映值則為參數的一組字串值。</p><p>範例：</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnax"></a><h5>URL 策略環境 POST 參數</h5>
+<p>HTTP HTTP 請求參數的清單，這些參數的名稱和值將在 Federated Access Manager 伺服器 URL 策略評估的環境對映中設定。</p><p>對映關鍵字的格式為 POST <i>parameterName</i>，對映值則為參數的一組字串值。</p><p>範例：</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnaa"></a><h5>URL 策略環境 jsession 參數</h5>
+<p>HTTP SESSION 屬性的清單，這些參數的名稱和值將在 Federated Access Manager 伺服器 URL 策略評估的環境對映中設定。</p><p>對映關鍵字的格式為 JSESSION <i>parameterName</i>，對映值則為參數的一組字串值。</p><p>範例：</p><pre>[0]=name
+[1]=phonenumber</pre>
+
+<a name="ggnai"></a><h5>使用者資料快取輪詢時間</h5>
+<p>使用者管理資料的快取更新時間，以分鐘為單位。如果設為 <tt>0</tt>，則不會進行任何更新。</p>
+
+<a name="ggnaf"></a><h5>啟用服務資料快取通知</h5>
+<p>啟用時，服務管理快取可使用通知。</p>
+
+<a name="ggnam"></a><h5>服務資料快取時間</h5>
+<p>服務配置資料的快取更新時間，以分鐘為單位。如果設為 <tt>0</tt>，則不會進行任何更新。</p><p>此屬性只有在標示為 [代理程式通知 URL] 的屬性未提供任何通知 URL，或是通知已停用時才會生效。</p>
+
+<a name="ggnaq"></a><h5>啟用用戶端輪詢</h5>
+<p>指定階段作業用戶端是否必須使用輪詢更新階段作業資訊，而不依賴伺服器通知。</p>
+
+<a name="ggnar"></a><h5>用戶端輪詢期</h5>
+<p>以秒為單位的時間，經過這段時間之後，階段作業用戶端將請求從伺服器更新快取的階段作業資訊。</p>
+
+<a name="ggmug"></a><h5>其他</h5>
+<p>其他屬性 (特性) 為不完全符合其他種類的屬性。</p>
+
+<a name="ggnal"></a><h5>語言環境 (語言)</h5>
+<p>識別操作語言環境的語言代碼。</p>
+
+<a name="ggnae"></a><h5>語言環境 (國家)</h5>
+<p>識別操作語言環境的國家代碼。</p>
+
+<a name="ggnbc"></a><h5>啟用連接埠檢查</h5>
+<p>啟用時，連接埠檢查功能便會運作。</p>
+
+<a name="ggnav"></a><h5>連接埠檢查檔案</h5>
+<p>包含特定內容的檔案的名稱或完整路徑，這些內容是處理需要更正連接埠的請求時所必需的。</p>
+
+<a name="ggnac"></a><h5>連接埠檢查設定</h5>
+<p>連接埠與協定項目的對映，其中關鍵字為偵聽連接埠號碼，值為代理程式用來識別含有無效連接埠號碼的請求的偵聽協定。</p><p>範例：</p><pre>[80] = http
+[443] = https</pre>
+
+<a name="ggnbf"></a><h5>略過主體清單</h5>
+<p>代理程式根據認證和搜尋目的略過的主體之清單。</p><p>範例：</p><pre>[0]=guest
+[1]=testuser</pre>
+
+<a name="ggojq"></a><h5>啟用舊有支援</h5>
+<p>啟用支援舊有使用者代理程式 (瀏覽器)。</p>
+
+<a name="ggnad"></a><h5>舊有使用者代理程式</h5>
+<p>識別舊有瀏覽器的使用者代理程式標頭值的清單。</p>
+
+<a name="ggnap"></a><h5>舊有重新導向 URI</h5>
+<p>代理程式用來重新導向舊有使用者代理程式請求的中間 URI。</p>
+
+<a name="ggnay"></a><h5>加密提供者</h5>
+<p>指定代理程式使用的加密提供者實作。</p>
+
+<a name="ggmud"></a><h5>進階</h5>
+<p>對於 J2EE 代理程式，進階屬性 (特性) 是指自訂建立的屬性，或是主要用於更複雜或較不常見部署的屬性。</p>
+
+<a name="ggnbb"></a><h5>com.sun.identity.agents.config.webservice.enable </h5>
+<p>啟用時，會處理 Web 服務。</p>
+
+<a name="ggnab"></a><h5>com.sun.identity.agents.config.webservice.endpoint </h5>
+<p>代表 Web 服務的 Web 應用程式端點清單。</p>
+
+<a name="ggnah"></a><h5>com.sun.identity.agents.config.webservice.process.get.enable </h5>
+<p>啟用時，會處理 Web 服務端點的 <tt>HTTP GET</tt> 請求。</p>
+
+<a name="ggnba"></a><h5>com.sun.identity.agents.config.webservice.authenticator </h5>
+<p>可用來認證 Web 服務請求的實作類別。</p>
+
+<a name="ggnau"></a><h5>com.sun.identity.agents.config.webservice.internalerror.content </h5>
+<p>代理程式使用其內容產生用戶端內部錯誤的檔案名稱。</p>
+
+<a name="ggnag"></a><h5>com.sun.identity.agents.config.webservice.autherror.content </h5>
+<p>代理程式使用其內容產生用戶端授權錯誤的檔案名稱。</p>
+
+<a name="ggnfp"></a><h5>替代代理程式主機名稱</h5>
+<p>特定的主機名稱，如果代理程式所保護伺服器的名稱與實際主機名稱不同，則用戶端瀏覽器用此主機名稱識別伺服器。</p>
+
+<a name="ggnew"></a><h5>替代代理程式連接埠號碼</h5>
+<p>特定的連接埠號碼，如果代理程式所保護伺服器的偵聽連接埠與實際偵聽連接埠不同，則用戶端瀏覽器用此連接埠號碼識別偵聽連接埠。</p>
+
+<a name="ggnga"></a><h5>替代代理程式協定</h5>
+<p>特定的協定 (HTTP/HTTPS)，如果用戶端瀏覽器使用的協定與代理程式所保護伺服器實際使用的通訊協定不同，則用戶端瀏覽器使用此協定與伺服器進行通訊。</p>
+
+<a name="ggndh"></a><h5>FQDN 檢查</h5>
+<p>啟用對 FQDN 預設值和 fqdn 對映值的檢查。</p>
+
+<a name="ggnfn"></a><h5>FQDN 預設</h5>
+<p>使用者用來存取資源的完全合格的主機名稱。</p>
+
+<a name="ggnft"></a><h5>FQDN 虛擬主機對映</h5>
+<p>與實際或有效主機名稱的對映。此對映是從無法識別的主機名稱至可識別的主機名稱。此對映在下列情況中十分有用：使用者輸入 IP 位址或不正確的 URL 時，或是針對受保護的資源使用虛擬主機時。</p>
+
+<a name="ggngg"></a><h5>自訂特性</h5>
+<p>可讓使用者增加代理程式所支援特性集合的其他特性。</p><p>範例：</p><pre>customproperty=custom-value1
+customlist[0]=customlist-value-0
+customlist[1]=customlist-value-1
+custommap[key1]=custommap-value-1
+custommap[key2]=custommap-value-2</pre>
+<br/>
+
+</body>
+</html>

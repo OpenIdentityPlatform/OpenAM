@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n del proveedor de servicios WS-FED - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>Personalizaci&#243;n del proveedor de servicios WS-FED</h4>
+<p>Los siguientes atributos se aplican a la funci&#243;n Proveedor de servicios WS-FED:</p>
+
+<a name="ggwtj"></a><h5>Aserci&#243;n firmada</h5>
+<p>Todas las aserciones que reciba este proveedor de servicios deber&#225;n estar firmadas.</p>
+
+<a name="ggwsg"></a><h5>Asignador de cuenta</h5>
+<p>Este atributo especifica la implementaci&#243;n de la interfaz <tt>AccountMapper </tt> utilizada para asignar
+una cuenta de usuario remota a una cuenta de usuario local con
+fines de inicio de sesi&#243;n &#250;nico. El valor predeterminado es <tt> com.sun.identity.wsfed.plugins.</tt> </p><p> <tt>DefaultADFSPartnerAccountMapper</tt> es la implementaci&#243;n predeterminada.</p>
+
+<a name="ggwrf"></a><h5>Asignador de atributos</h5>
+<p>Define la clase utilizada para asignar atributos de la aserci&#243;n a atributos
+de usuario definidos localmente por el proveedor de identidades. La clase predeterminada
+es <tt>com.sun.identity.wsfederation.plugins.DefaultSPAttributeMapper </tt>.</p>
+
+<a name="ggwrq"></a><h5>Asignaci&#243;n de atributos</h5>
+<p>Especifica los valores para definir las asignaciones utilizadas por el complemento del
+asignador de atributos predeterminados. Las asignaciones deben configurase con el formato:</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>Por ejemplo, <tt>EmailAddress=mail</tt> o <tt>Address=postaladdress </tt>. Escriba la asignaci&#243;n como un Nuevo valor
+y haga clic en Agregar.</p>
+
+<a name="ggwvn"></a><h5>Momento de la aplicaci&#243;n de la aserci&#243;n</h5>
+<p>Las aserciones son v&#225;lidas durante un periodo de tiempo, y no antes
+ni despu&#233;s. </p><p><tt>Tiempo efectivo</tt> especifica (en segundos) la cantidad de tiempo que una aserci&#243;n es
+v&#225;lida contando a partir del tiempo de emisi&#243;n de la aserci&#243;n. El
+valor predeterminado es <tt>600</tt> segundos. </p>
+
+<a name="ggwsk"></a><h5>Tiempo de desfase de aserci&#243;n</h5>
+<p>Las aserciones son v&#225;lidas durante un periodo de tiempo, y no antes
+ni despu&#233;s. Este atributo especifica un periodo de gracia (en segundos) para
+el valor <tt> notBefore</tt>. El valor predeterminado es <tt>300</tt>. No tiene relevancia para
+el valor <tt>notAfter</tt>.</p>
+
+<a name="ggwts"></a><h5>Estado de rel&#233; predeterminado</h5>
+<p><a name="indexterm-77"></a>Despu&#233;s de una operaci&#243;n WS-FED con &#233;xito (inicio de sesi&#243;n &#250;nico, cierre
+de sesi&#243;n &#250;nico o finalizaci&#243;n de federaci&#243;n), se mostrar&#225; una p&#225;gina. Esta
+p&#225;gina, normalmente el recurso originalmente solicitado, se especifica en la solicitud que
+inicia utilizando el elemento <tt>RelayState</tt>. Si no se especifica un <tt> RelayState</tt>, se
+mostrar&#225; el valor de esta propiedad <tt>defaultRelayState </tt>.</p>
+<hr><p><b>Precauci&#243;n &#8211; </b>Cuando <tt>RelayState</tt> o <tt>defaultRelayState </tt> contiene caracteres especiales (como por ejemplo <tt>&#38;</tt>), deber&#225;
+codificarse por URL. Por ejemplo, si el valor de <tt>RelayState </tt> es <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz </tt>,
+deber&#225; codificarse por URL de la forma siguiente:</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>para posteriormente anexarlo a la URL. Por ejemplo, la URL de inicio
+de sesi&#243;n &#250;nico iniciada por el proveedor de servicios ser&#237;a:</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>Detecci&#243;n del dominio de inicio</h5>
+<p>Especifica el servicio de forma que el proveedor de servicios pueda identificar
+al proveedor de identidades preferido. La URL de servicio se especifica como
+punto final de contacto mediante el proveedor de servicios. </p>
+
+<a name="ggwwb"></a><h5>Selecci&#243;n del dominio de la cuenta</h5>
+<p>Especifica el mecanismo y la configuraci&#243;n de la selecci&#243;n del proveedor de
+identidades. Para localizar el proveedor de identidades puede utilizarse el atributo de
+encabezado <tt>cookie</tt> o <tt>Solicitud HTTP</tt>.</p>
+<br/>
+
+</body>
+</html>

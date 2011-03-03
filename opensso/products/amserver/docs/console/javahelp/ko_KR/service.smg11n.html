@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>국제화 설정 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>국제화 설정</h4>
+<p><a name="indexterm-188"></a>국제화 설정 서비스에는 여러 로켈 및 문자 집합에 대해 OpenSSO를 구성할 수
+있는 전역 속성이 포함되어 있습니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fsvdx">각 로켈이 지원하는 문자 집합</a></p></li>
+<li><p><a href="#fsvec">문자 집합 별칭</a></p></li>
+<li><p><a href="#fsveb">자동 생성된 공통 이름 형식</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>각 로켈이 지원하는 문자 집합</h5>
+<p>이 속성은 각 로켈에서 지원하는 문자 집합을 나열하며 로켈과 문자 집합 간의
+매핑을 나타냅니다. 형식은 다음과 같습니다.</p><p>지원되는 새 문자 집합을 추가하려면 [추가]를 누르고 다음 매개 변수를 정의합니다.</p><dl><dt>로켈</dt>
+<dd><p>추가하려는 새 로켈입니다. 자세한 내용은 <a href="supportedlang.html">지원되는 언어 로켈</a>을 참조하십시오.</p></dd>
+<dt>지원되는 문자 집합</dt>
+<dd><p>특정 로켈에서 지원되는 문자 집합을 입력합니다. 각 문자 집합을 세미콜론으로 구분합니다. 예를 들면 <tt>charset=charset1;charset2;charset3;...;charsetn</tt>과 같습니다.</p></dd>
+</dl>
+<p>기존의 지원되는 문자 집합을 편집하려면 지원되는 문자 집합 테이블에서 해당 이름을 누릅니다.
+작업을 마치면 [확인]을 누릅니다.</p>
+
+<a name="fsvec"></a><h5>문자 집합 별칭</h5>
+<p>이 속성은 응답을 보내는 데 사용되는 코드 집합 이름(IANA 이름에 매핑됨)을 나열합니다.
+이러한 코드 집합 이름은 Java 코드 집합 이름과 일치할 필요가 없습니다. 현재는
+Java 문자 집합을 IANA 문자 집합으로 또는 그 반대로 매핑하기 위한 해시
+테이블이 있습니다.</p><p>새 문자 집합 별칭을 추가하려면 [추가] 버튼을 누르고 다음 매개 변수를 정의합니다.</p><dl><dt>MIME 이름</dt>
+<dd><p>IANA 매핑 이름입니다. 예를 들면 <tt>Shift_JIS</tt>와 같습니다.</p></dd>
+<dt>Java 이름</dt>
+<dd><p>IANA 문자 집합에 매핑할 Java 문자 집합입니다. </p></dd>
+</dl>
+<p>기존의 문자 집합 별칭을 편집하려면 테이블에서 해당 이름을 누릅니다. 작업을 마치면 [확인]을
+누릅니다.</p>
+
+<a name="fsveb"></a><h5>자동 생성된 공통 이름 형식</h5>
+<p>이 디스플레이 옵션을 사용하면 다른 로켈 및 문자 집합에 대한 이름 형식을
+적용하여 이름을 자동으로 생성하는 방법을 정의할 수 있습니다. 기본 구문은 다음과 같습니다(정의에
+포함된 쉼표 및/또는 공백이 이름 형식에 표시됨).</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>예를 들어, 사용자(User One)의 새 이름 형식을 중국어 문자 집합의 uid (11111)를
+사용하여 표시하려면 다음과 같이 정의합니다.</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>다음과 같이 표시됩니다.</p><p><tt>OneUser 11111</tt></p>
+<br/>
+
+</body>
+</html>

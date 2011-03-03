@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>安全令牌服务 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>安全令牌服务</h4>
+<p>此服务中所包含的属性定义了 OpenSSO 安全令牌服务 (Security Token Service, STS) 的动态配置。这些属性定义以下配置：</p>
+<ul><li><p>发布并创建安全令牌</p></li>
+<li><p>STS 本身的 Web 服务安全，用于保护 STS 服务端点。“签署和加密”属性配置传入的 WS-Trust 请求的服务器提供者验证，并保护传出的 WS-Trust 响应。“安全机制”属性则定义安全令牌的安全凭证。</p></li>
+<li><p>将配置后的 STS 指定为 Web 服务提供者并接收由远程 STS 生成的 SAML 令牌（声明）时，用于（通过 SAML 声明）请求安全令牌中的 SAML 属性映射的 SAML 配置。</p></li>
+<li><p>当由远程 STS 生成令牌时，从 Web 服务提供者接收到的安全令牌验证。</p><p>可以在“领域”选项卡下的“<a href="agentconfig.agents.html">集中代理配置</a>”中，为不同 OpenSSO Web 服务安全提供者创建动态配置文件。</p></li></ul>
+
+
+<a name="ghatr"></a><h5>发布者</h5>
+<p>发布安全令牌的“安全令牌”服务的名称。</p>
+
+<a name="ghawa"></a><h5>端点</h5>
+<p>该字段采用的值为：</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>该语法允许基于特定会话参数动态替换安全令牌服务端点的 URL。</p>
+
+<a name="ghatv"></a><h5>加密发布的密钥</h5>
+<p>如果启用，该属性会加密由“安全令牌”服务发布的密钥。</p>
+
+<a name="ghauc"></a><h5>加密发布的令牌</h5>
+<p>如果启用，该属性会加密由“安全令牌”服务发布的安全令牌。</p>
+
+<a name="ghavx"></a><h5>安全令牌的使用寿命</h5>
+<p>定义发布的令牌的有效时间。</p>
+
+<a name="ghaud"></a><h5>令牌实现类</h5>
+<p>此属性指定用于安全令牌提供者/发布者的实现类。</p>
+
+<a name="ghaug"></a><h5>证书别名</h5>
+<p>定义证书的别名，该证书用于签署由“安全令牌”服务发布的安全令牌。</p>
+
+<a name="ghauh"></a><h5>STS 最终用户令牌插件类</h5>
+<p>定义最终用户令牌转换的实现类。</p>
+
+<a name="ghawk"></a><h5>安全机制</h5>
+<p>定义用于保护安全令牌本身的安全凭证的类型，或者由“安全令牌”服务从客户机发送的传入 WS-Trust 请求中接受的安全凭证。可选择以下安全类型：</p>
+<ul><li><p>匿名 &#8212; 匿名安全机制不包含安全凭证。</p></li>
+<li><p>KerberosToken &#8212; 使用 Kerberos 令牌。</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; 使用基于 Liberty 的安全令牌。</p></li>
+<li><p>SAML-HolderOfKey &#8212; 使用 SAML 1.1 声明类型 Holder-Of-Key。</p></li>
+<li><p>SAML-SenderVouches &#8212; 使用 SAML 1.1 声明类型 Sender Vouches。</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8212; 使用 SAML 2.0 声明令牌类型 Holder-Of-Key。</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8212; 使用 SAML 2.0 声明令牌类型 Sender Vouches。</p></li>
+<li><p>STSSecurity &#8212; 定义安全令牌服务代理从安全令牌服务获取安全令牌。</p></li>
+<li><p>UserNameToken &#8212; 使用用户名令牌来保护安全令牌服务请求。</p></li>
+<li><p>UserNameToken-Plain &#8212; 使用带有明文密码的用户名令牌来保护安全令牌服务请求。</p></li>
+<li><p>X509Token &#8212; 使用 X509 证书来保护安全令牌。</p></li></ul>
+
+
+<a name="ghesm"></a><h5>验证链</h5>
+<p>定义验证链或服务名称，它们可使用传入的发布者请求的安全令牌的证书来验证到 OpenSSO 验证服务，以生成 OpenSSO 验证的安全令牌。</p>
+
+<a name="ghaup"></a><h5>用户证书</h5>
+<p>该属性表示由“安全令牌”服务使用的用户名/密码共享密钥，该密钥用于验证由客户机将其作为传入 WS-Trust 请求的一部分发送的用户名令牌。</p>
+
+<a name="ghauq"></a><h5>检验请求签名</h5>
+<p>指定“安全令牌”服务必须检验传入 WS-Trust 请求的签名。</p>
+
+<a name="ghaui"></a><h5>解密请求标头</h5>
+<p>指定必须解密由“安全令牌”服务接收的所有请求标头。</p>
+
+<a name="ghauf"></a><h5>解密请求</h5>
+<p>指定必须解密由“安全令牌”服务接收的所有请求。</p>
+
+<a name="ghavc"></a><h5>签署响应</h5>
+<p>指定必须签署由“安全令牌”服务接收的所有响应。</p>
+
+<a name="ghavo"></a><h5>加密响应</h5>
+<p>指定必须加密由“安全令牌”服务发送的所有响应。</p>
+
+<a name="ghdtd"></a><h5>签署参考类型</h5>
+<p>定义在“安全令牌”服务签署 WS-Trust 响应时使用的参考类型。参考类型可以为 <tt>DircectReference</tt>、<tt>KeyIdentifier</tt> 和 <tt>X509</tt>。</p>
+
+<a name="ghdss"></a><h5>加密算法</h5>
+<p>定义“安全令牌”服务用来加密 WS-Trust 响应的加密算法。</p>
+
+<a name="ghdru"></a><h5>加密强度</h5>
+<p>设置“安全令牌”服务用来加密 WS-Trust 响应的加密强度。选择的值越大，加密强度越大。</p>
+
+<a name="ghavt"></a><h5>私钥别名</h5>
+<p>该属性定义用于签署 WS-Trust 响应（或者解密传入 WS-Trust 请求）的私有证书密钥别名。</p>
+
+<a name="ghave"></a><h5>私钥类型</h5>
+<p>该属性定义用于签署 WS-Trust 响应（或解密 WS-Trust 请求）的证书私钥类型。类型可以为 <tt>PublicKey</tt>、<tt>SymmetricKey</tt> 或 <tt>NoProofKey</tt>。</p>
+
+<a name="ghaux"></a><h5>Web 服务 (WS-Trust) 客户机的公钥别名</h5>
+<p>定义用于检验传入 WS-Trust 请求的签名（或加密 WS-Trust 响应）的公共证书密钥别名。</p>
+
+<a name="ghbbv2"></a><h5>Kerberos 域服务器</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）主机名。必须输入该域控制器的全限定域名。</p>
+
+<a name="ghbdx2"></a><h5>Kerberos 域</h5>
+<p>此属性指定 Kerberos 分发中心（域控制器）域名。域控制器的域名可能与 OpenSSO 域名不同，这取决于具体的配置。</p>
+
+<a name="ghbcq2"></a><h5>Kerberos 服务主体</h5>
+<p>将 Kerberos 主体指定为生成的安全令牌的所有者。</p><p>请使用以下格式：</p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt></p><p><tt>hostname</tt> 和 <tt>domainame</tt> 表示 OpenSSO 实例的主机名和域名。<tt>dc_domain_name</tt> 是 Windows Kerberos 服务器（域控制器）所在的 Kerberos 域。Kerberos
+服务器可能与 OpenSSO 实例的域名不同。</p>
+
+<a name="ghbae2"></a><h5>Kerberos 密钥表文件</h5>
+<p>此属性指定用来发布令牌的 Kerberos keytab 文件。使用以下格式（尽管该格式不是必需的）：</p><p><tt>hostname.HTTP.keytab</tt></p><p><tt>hostname</tt> 是 OpenSSO 实例的主机名。</p>
+
+<a name="ghbep2"></a><h5>检验 Kerberos 签名</h5>
+<p>如果启用，则此属性指定已签署 Kerberos 令牌。</p>
+
+<a name="ghawg"></a><h5>SAML 属性映射</h5>
+
+<hr><p><b>注 &#8211; </b>以下所有与 SAML 相关的属性都是用于这样的配置中：其中“安全令牌”服务拥有的当前实例与 Web 服务提供者相同，并接收由其他“安全令牌”服务实例生成的“SAML 令牌”。</p>
+<hr>
+<p>该配置代表特定的 SAML 属性，需要在创建 SAML 声明的过程中由 Web 服务提供者的安全令牌服务生成该属性，并将其作为属性语句。格式为 <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>。</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> 是传入的 Web 服务请求中的 SAML 声明的 SAML 属性名称。<tt></tt><i>Real_attr_name</i><tt></tt> 是通过已验证的 SSOToken 或身份库获取的属性名称。</p>
+
+<a name="ghawn"></a><h5>NameID 映射程序</h5>
+<p>为“安全令牌”服务生成的声明的 SAML NameID 映射程序。</p>
+
+<a name="ghavl"></a><h5>应包括成员资格</h5>
+<p>如果启用，生成的声明会包含作为 SAML 属性的用户成员资格。</p>
+
+<a name="ghawo"></a><h5>属性名称空间</h5>
+<p>定义为“安全令牌”服务生成的声明的 SAML 属性名称空间。</p>
+
+<a name="ghauj"></a><h5>可信赖的发布者</h5>
+<p>定义一系列可信赖的发布者，这些发布者可向 OpenSSO 发送安全令牌。OpenSSO 必须检验安全令牌是否由这些发布者中的某一位发送。</p>
+
+<a name="ghavy"></a><h5>可信赖的 IP 地址</h5>
+<p>定义一列可信赖的 IP 地址，这些 IP 地址可向 OpenSSO 发送安全令牌。OpenSSO 必须检验安全令牌是否由这些主机中的某一台发送。</p>
+<br/>
+
+</body>
+</html>

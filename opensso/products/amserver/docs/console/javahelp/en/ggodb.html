@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP Binding Attributes - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggodb"></a><h4>SOAP Binding Attributes</h4>
+
+
+<a name="ggocx"></a><h5>Web Service Authenticator</h5>
+<a name="indexterm-155"></a><a name="indexterm-156"></a><p>This attribute takes as a value the implementation class for the Web Service
+Authenticator interface. This class authenticates a request and generates a credential for a
+web service consumer.</p>
+
+<a name="ggock"></a><h5>Supported Authentication Mechanisms</h5>
+<a name="indexterm-157"></a><a name="indexterm-158"></a><p>This attribute specifies the authentication mechanisms supported by the SOAP Receiver. Authentication mechanisms
+offer user authentication, as well as data integrity and encryption. By default, all
+available authentication mechanisms are selected. If one is not selected, and a web services
+consumer (WSC) sends a request using it, the request is rejected. Following is
+a list of the supported authentication mechanisms:</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+
+<a name="ggocn"></a><h5>Enforce Only Known Providers</h5>
+<p>If enabled, this property will enforce the <tt>ProviderID</tt> header sent in a SOAP
+message to ensure that the provider exists in the system. If it does
+not, the request will be rejected. If this attribute is not enabled, the
+check will be skipped. </p>
+
+<a name="ggoci"></a><h5>Certification Alias For SSL Client Authentication</h5>
+<p>Value is set during installation. Client certificate alias that will be used in
+SSL connection for Liberty SOAP Binding.</p>
+
+<a name="ggocs"></a><h5>Time Limit for Stale Message</h5>
+<p>Default value is 300000. Determines if a message is stale and thus no
+longer trustworthy. If the message timestamp is earlier than the current timestamp by
+the specified number of milliseconds, the message the considered to be stale.</p>
+
+<a name="ggofw"></a><h5>Message ID Cache Cleanup Interval </h5>
+<p>Default value is 60000. Specifies the number of milliseconds to elapse before cache
+cleanup events begin. Each message is stored in a cache with its ownmessageID
+to avoid duplicate messages. When a message's current time less the received time
+exceeds thestaleTimeLimit value, the message is removed from the cache.</p>
+
+<a name="ggohr"></a><h5>Supported SOAP Actors</h5>
+<p>Default value is <tt>http://schemas.xmlsoap.org/soap/actor/next</tt>. Specifies supported SOAP actors. Each actor must be
+separated by a pipe character (|).</p>
+
+<a name="ggofh"></a><h5>Namespace Prefix Mapping</h5>
+<p>Default value is:</p><pre>=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08
+|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/
+liberty/pp|is=urn:liberty:is:2003-08</pre><p>Specifies the namespace prefix mapping used when marshalling a JAXB content tree to
+a DOM tree. The syntax is <tt>prefix=namespace|prefix=namespace|...</tt></p>
+
+<a name="ggoho"></a><h5>JAXB Package List</h5>
+<p>Specifies JAXB package list used when constructing <tt>JAXBContext</tt>. Each package must be
+separated by a colon (:).</p>
+
+<a name="ggogm"></a><h5>Liberty Identity Web Service Version</h5>
+<p>This property determines the Liberty ID-WSF framework when the framework cannot determine from
+the in-bound message or from the resource offering when OpenSSO is acting as
+the WSC. Values can be 1.0 or 1.1. The default is 1.1.</p>
+<br/>
+
+</body>
+</html>

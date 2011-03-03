@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Proveedor de servicios web - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceprovideredit"></a><h4>Proveedor de servicios web</h4>
+<p>El perfil del agente Proveedor de servicios web describe la configuraci&#243;n que
+se utiliza para validar las solicitudes de servicio web de clientes de
+servicio web y proteger respuestas de servicio web procedentes de un proveedor
+de servicios web. El nombre del proveedor de servicios web debe ser
+exclusivo en todos los agentes.</p>
+
+<a name="ggouz"></a><h5>General</h5>
+<p>Los siguientes atributos generales definen las propiedades b&#225;sicas del proveedor de servicios
+web:</p>
+
+<a name="ggovu"></a><h5>Grupo</h5>
+<p>El mecanismo de grupo permite definir un conjunto de tipos de agentes
+similares. Debe definirse el grupo antes de incluir un agente espec&#237;fico en
+un conjunto. </p>
+
+<a name="ggotz"></a><h5>Mot de passe</h5>
+<p>Define la contrase&#241;a del agente de proveedor de servicios web.</p>
+
+<a name="ggotl"></a><h5>Confirmar contrase&#241;a</h5>
+<p> Confirme la contrase&#241;a.</p>
+
+<a name="ggova"></a><h5>Estado</h5>
+<p>Define si el agente de proveedor de servicios web estar&#225; Activo o
+Inactivo en el sistema. Esta opci&#243;n est&#225; establecida de forma predeterminada en
+Activo, lo que indica que el agente participar&#225; a la hora de
+validar solicitudes de servicio web procedentes de clientes de servicios web, y
+protegiendo respuestas de servicio procedentes de un proveedor de servicios web.</p>
+
+<a name="ggowp"></a><h5>Identificador universal</h5>
+<p>Incluye las propiedades de LDAP b&#225;sicas, que definen de forma exclusiva al
+agente del proveedor de servicios web.</p>
+
+<a name="gglej"></a><h5>Seguridad</h5>
+<p>Los siguientes atributos definen los atributos de seguridad del proveedor de servicios
+web: </p>
+
+<a name="gglhw"></a><h5>Mecanismo de seguridad</h5>
+<p>Define el tipo de credenciales de seguridad que se utilizar&#225;n para validar
+la solicitud del servicio web. El tipo de mecanismo de seguridad forma
+parte de la solicitud de servicio web procedente de un cliente de
+servicio web, y es aceptado por un proveedor de servicios web. Elija
+entre los tipos siguientes: </p>
+<ul><li><p>Anonymous: el mecanismo de seguridad an&#243;nimo no contiene ninguna credencial de seguridad.</p></li>
+<li><p>KerberosToken: utiliza los tokens de seguridad de Kerberos.</p></li>
+<li><p>LibertyBearerToken: utiliza el token portador definido por Liberty.</p></li>
+<li><p>LibertySAMLToken: utiliza el token SAML definido por Liberty.</p></li>
+<li><p>LibertyX509Token: utiliza el certificado X509 definido por Liberty.</p></li>
+<li><p>SAML-HolderOfKey: utiliza el portador de clave de tipo aserci&#243;n SAML 1.1.</p></li>
+<li><p>SAML-SenderVouches: utiliza los vales de remitente de tipo aserci&#243;n SAML 1.1.</p></li>
+<li><p>SAML2&#8211;HolderOfKey: utiliza el soporte de clave de tipo token de aserci&#243;n SAML 2.0.</p></li>
+<li><p>SAML2&#8211;SenderVouches: utiliza los vales de remitente tipo token de aserci&#243;n SAML 2.0.</p></li>
+<li><p>UserNameToken: utiliza un token de nombre de usuario.</p></li>
+<li><p>UserNameToken-Plain: utiliza un token de nombre de usuario con contrase&#241;a de texto plano.</p></li>
+<li><p>X509Token: utiliza el certificado X509.</p></li></ul>
+
+
+<a name="gglfy"></a><h5>Cadena de autenticaci&#243;n</h5>
+<p>Define la cadena de autenticaci&#243;n o el nombre de servicio que puede
+utilizarse para autenticarse en el servicio de autenticaci&#243;n de OpenSSO mediante la
+utilizaci&#243;n de credenciales procedentes del token de seguridad de la solicitud de
+un servicio web entrante para generar el SSOToken autenticado de OpenSSO.</p>
+
+<a name="ghbbd"></a><h5>Tipo de conversi&#243;n del token</h5>
+<p>Define el tipo de token que se convertir&#225; cuando un proveedor de
+servicios web solicite una conversi&#243;n de token desde el servicio de token
+de seguridad. El token se convertir&#225; en el SAML o SSOToken (token
+de sesi&#243;n) especificado con la misma identidad, pero con las definiciones de
+atributos espec&#237;ficas del tipo de token. El proveedor de servicios web puede
+utilizar este nuevo token realizando una llamada a otro proveedor de servicios
+web. Los tipos de token que se pueden definir son:</p>
+<ul><li><p>Token SAML 1.1</p></li>
+<li><p>Token SAML2</p></li>
+<li><p>SSOToken</p></li></ul>
+<p>Para poder utilizar este atributo, cualquier token SAML debe seleccionarse en el
+atributo <a href="#gglhw">Mecanismo de seguridad</a> y en cualquier <a href="#gglfy">Cadena de autenticaci&#243;n</a> definida por el proveedor de servicios
+web.</p>
+
+<a name="ggoum"></a><h5>Conservar encabezados de seguridad del mensaje</h5>
+<p>Si se habilita, este atributo permite conservar los encabezados de seguridad SOAP
+por el proveedor de servicios web para su posterior procesamiento.</p>
+
+<a name="gglhq"></a><h5>Tipo de clave privada</h5>
+<p>Define el tipo de clave utilizado por el proveedor de servicios web
+durante el proceso de verificaci&#243;n de firma de solicitud de servicio web.
+El valor predeterminado es <tt>PublicKey</tt>.</p>
+
+<a name="ggovi"></a><h5>URN de tipo de servicio de Liberty</h5>
+<p>El URN (Nombre de recurso universal) describe el tipo de servicio de
+Liberty que utilizar&#225; el proveedor de servicios web para la b&#250;squeda de
+servicios.</p>
+
+<a name="ggovn"></a><h5>Credencial del testigo de usuario</h5>
+<p>Este atributo representa los secretos compartidos de contrase&#241;a/nombre de usuario que utiliza
+el proveedor de servicios web para validar el token de seguridad de
+un nombre de usuario procedente de una solicitud de servicio web entrante.
+Estas credenciales se comparan con las credenciales del token de seguridad del
+nombre de usuario procedentes de una solicitud de servicio web entrante.</p>
+
+<a name="gglfz"></a><h5>Configuraci&#243;n de SAML</h5>
+<p>Los siguientes atributos configuran el Lenguaje de marcado de aserci&#243;n de seguridad
+(SAML) para el proveedor de servicios web:</p>
+
+<a name="gglfx"></a><h5>Asignaci&#243;n de atributos de SAML</h5>
+<p>Esta configuraci&#243;n representa un atributo SAML que necesita generarse como instrucci&#243;n de
+atributo durante la creaci&#243;n de aserci&#243;n SAML por el servicio de token
+de seguridad para un proveedor de servicios web. El formato es <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>.</p><p><tt></tt><i>SAML_attr_name</i><tt></tt> es el nombre de atributo SAML de una aserci&#243;n SAML procedente
+de una solicitud de servicio web entrante. <tt></tt><i>Real_attr_name</i><tt></tt> es el nombre de
+atributo que se recupera del SSOToken autenticado o del dep&#243;sito de identidad.</p>
+
+<a name="gglgf"></a><h5>Complemento del asignador de Id. de nombre de SAML</h5>
+<p>Define la clase de complemento del asignador de Id. de nombre utilizada
+para la asignaci&#243;n de cuentas de SAML.</p>
+
+<a name="gglhk"></a><h5>Nombre de espacio de los atributos de SAML</h5>
+<p>Define el nombre de espacio utilizado para generar los atributos de SAML.</p>
+
+<a name="gglfv"></a><h5>Incluir miembros</h5>
+<p>Si se habilita, este atributo define si se deben incluir los miembros
+del elemento principal como atributos de SAML.</p>
+
+<a name="ggovx"></a><h5>Firma y cifrado</h5>
+<p>Los siguientes atributos definen la configuraci&#243;n de firma y cifrado para la
+protecci&#243;n del proveedor web:</p>
+
+<a name="ggowr"></a><h5>Especifique si se ha firmado la respuesta</h5>
+<p>Cuando est&#225; habilitado, el proveedor de servicios web firma la respuesta utilizando
+su certificado X509.</p>
+
+<a name="ggouo"></a><h5>Se ha cifrado la respuesta</h5>
+<p>Si se habilita, se cifrar&#225; la respuesta del servicio web.</p>
+
+<a name="ggowz"></a><h5>Se ha verificado la firma de la solicitud</h5>
+<p>Si se habilita, se verificar&#225; la firma de la solicitud del servicio
+web.</p>
+
+<a name="ggouw"></a><h5>Especifique si se ha descifrado el encabezado de la solicitud</h5>
+<p>Si se habilita, se descifrar&#225; el encabezado de seguridad de la solicitud
+del cliente de servicio web.</p>
+
+<a name="ggotr"></a><h5>Se ha descifrado la solicitud</h5>
+<p>Si se habilita, se descifrar&#225; la solicitud del cliente de servicio web.</p>
+
+<a name="gglls"></a><h5>Almac&#233;n de claves</h5>
+<p>Los siguientes atributos configuran el almac&#233;n de claves que se utilizar&#225; para
+el almacenamiento y la recuperaci&#243;n de los certificados: </p>
+
+<a name="gglld"></a><h5>Alias de la clave p&#250;blica del cliente de servicios web</h5>
+<p>Este atributo define el alias de clave de certificado p&#250;blico que se
+exige para cifrar la respuesta de servicio web o comprobar la firma
+de la solicitud de servicio web.</p>
+
+<a name="gglmc"></a><h5>Alias de clave privada</h5>
+<p>Este atributo define el alias de clave privada del certificado que se
+ha utilizado para firmar la respuesta del servicio web o descifrar la
+solicitud de servicios web.</p>
+
+<a name="ggljf"></a><h5>Uso del almac&#233;n de claves</h5>
+<p>Esta configuraci&#243;n define si se debe utilizar el almac&#233;n de claves predeterminado
+o uno personalizado. Deben definirse los siguientes valores para un almac&#233;n de
+claves personalizado:</p>
+<ul><li><p>Ubicaci&#243;n del almac&#233;n de claves</p></li>
+<li><p>Contrase&#241;a del almac&#233;n de claves</p></li>
+<li><p>Contrase&#241;a de la clave</p></li></ul>
+
+
+<a name="gglko"></a><h5>Puntos finales</h5>
+<p>Los siguientes atributos definen los puntos finales del servicio web:</p>
+
+<a name="gglmp"></a><h5>Punto final de proxy del servicio web</h5>
+<p>Este atributo define el punto final del servicio web en el que
+el cliente de servicios web realiza una solicitud. El punto final es
+opcional a menos que se configure para que utilice el proxy de
+seguridad web. </p>
+
+<a name="ghbed"></a><h5>Punto final del servicio web</h5>
+<p>Este atributo define el punto final del servicio web en el que
+el cliente de servicios web realiza una solicitud.</p>
+
+<a name="ghbay"></a><h5>Configuraci&#243;n de Kerberos</h5>
+<p>Kerberos es un perfil de seguridad admitido por la seguridad de los
+servicios web para proteger la comunicaci&#243;n entre un cliente y un proveedor
+de servicios web. En un escenario habitual, un usuario se autentica en
+el escritorio y llama a un servicio web y al cliente de
+servicios web. Es necesario disponer de un vale de Kerberos para proteger
+la solicitud enviada al proveedor de servicios web mediante la identificaci&#243;n del
+principal como token de Kerberos. Normalmente, la seguridad de los servicios web
+basados en Kerberos se utiliza en el mismo contexto del dominio de
+Kerberos en lugar de entre l&#237;mites, como, por ejemplo, en la seguridad
+de los servicios web basados en SAML. Sin embargo, Kerberos es uno
+de los mecanismos de autenticaci&#243;n m&#225;s eficaces, sobre todo en el entorno
+del controlador de dominio de Windows.</p>
+
+<a name="ghbbv"></a><h5>Servidor de dominios Kerberos</h5>
+<p>Este atributo especifica el nombre de host del centro de distribuci&#243;n Kerberos
+(controlador de dominio). Debe introducir el nombre de dominio completo (FQDN) del
+controlador de dominio.</p>
+
+<a name="ghbdx"></a><h5>Dominio Kerberos</h5>
+<p>Este atributo especifica el nombre de dominio del centro de distribuci&#243;n Kerberos
+(controlador de dominio). En funci&#243;n de la configuraci&#243;n, el nombre de dominio
+del controlador de dominio puede ser distinto del nombre de dominio de
+OpenSSO.</p>
+
+<a name="ghbcq"></a><h5>Principal del servicio Kerberos</h5>
+<p>Especifica el principal de Kerberos como el propietario del token de seguridad
+generado.</p><p>Use el siguiente formato: </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> y <tt>domainame</tt> representan el nombre de host y el nombre de
+dominio de la instancia de OpenSSO. <tt>dc_domain_name </tt> es el dominio de Kerberos
+en el que reside el servidor Windows Kerberos (controlador de dominio). Es
+posible que el servidor de Kerberos sea diferente al nombre de dominio
+de la instancia de OpenSSO.</p>
+
+<a name="ghbae"></a><h5>Archivo de ficha de claves Kerberos</h5>
+<p>Este atributo especifica el archivo Keytab de Kerberos que se utiliza para
+emitir el token. Puede utilizar el siguiente formato, aunque no es necesario:</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> es el nombre de host de la instancia de OpenSSO.</p>
+
+<a name="ghbep"></a><h5>Verificar firma Kerberos</h5>
+<p>Si se habilita, este atributo indica que se ha firmado el token
+de Kerberos.</p>
+<br/>
+
+</body>
+</html>

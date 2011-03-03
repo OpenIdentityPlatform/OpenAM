@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>Das Authentifizierungsmodul "Windows NT" erm&#246;glicht die Authentifizierung bei einem Microsoft Windows NT-Server.
+Bei diesen Attributen handelt es sich um Bereichsattribute. Die diesen Attributen in
+der Dienstkonfiguration zugewiesenen Werte werden in der Windows NT-Authentifizierungsvorlage als Standardwerte verwendet.
+Die Dienstvorlage muss nach der Registrierung des Dienstes f&#252;r den Bereich erstellt
+werden. Die Standardwerte k&#246;nnen nach der Registrierung vom Bereichsadministrator ge&#228;ndert werden. Die
+Bereichsattribute werden nicht von Eintr&#228;gen in den Unterstrukturen des Bereichs &#252;bernommen.</p><p>Zur Aktivierung des Windows NT-Authentifizierungsmoduls muss Samba Client 2.2.2 heruntergeladen und im
+folgenden Verzeichnis installiert werden:</p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>Der Samba Client ist ein Datei- und Druckserver f&#252;r die Integration von
+Windows- und UNIX-Computern ohne Verwendung eines separaten Windows NT/2000-Servers.</p><p>Red Hat Linux wird bereits mit einem Samba Client ausgeliefert, der sich
+im Verzeichnis <tt>/usr/bin </tt> befindet.</p><p>Zur Authentifizierung mit dem Windows NT-Authentifizierungsdienst f&#252;r Linux m&#252;ssen Sie die Bin&#228;rdatei
+des Clients in das Verzeichnis <tt></tt><i>OpenSSO-base </i><tt> /identity/bin</tt> kopieren.</p><p>Die Windows NT-Attribute sind:</p>
+<ul><li><p><a href="#fumve">Authentifizierungsdom&#228;ne</a></p></li>
+<li><p><a href="#fumvp">Authentifizierungs-Host</a></p></li>
+<li><p><a href="#fumvq">Dateiname f&#252;r Samba-Konfiguration</a></p></li>
+<li><p><a href="#fumwi">Authentifizierungsebene</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>Authentifizierungsdom&#228;ne</h5>
+<p>Legt den Namen der Dom&#228;ne fest, zu der der Benutzer geh&#246;rt.</p>
+
+<a name="fumvp"></a><h5>Authentifizierungs-Host</h5>
+<p>Legt den Hostnamen f&#252;r die Windows NT-Authentifizierung fest. Der Hostname sollte der
+netBIOS-Name sein und nicht der voll qualifizierte Dom&#228;nenname (FQDN). Standardm&#228;&#223;ig ist der
+erste Teil des FQDN der netBIOS-Name.</p><p>Falls DHCP (Dynamic Host Configuration Protocol) verwendet wird, f&#252;gen Sie einen entsprechenden
+Eintrag in die HOSTS-Datei auf dem Windows 2000-Computer ein.</p><p>Die Namensaufl&#246;sung basiert auf dem netBIOS-Namen. Falls Sie in Ihrem Subnet &#252;ber
+keinen Server verf&#252;gen, der die netBIOS-Namensaufl&#246;sung bereitstellt, sollten Hardcode-Zuordnungen durchgef&#252;hrt werden. Der
+Hostname sollte beispielsweise im Format <tt>example1</tt> eingegeben werden (nicht im Format <tt>example1.company1.com</tt>).</p>
+
+<a name="fumvq"></a><h5>Dateiname f&#252;r Samba-Konfiguration</h5>
+<p>Legt den Dateinamen f&#252;r die Samba-Konfiguration fest und unterst&#252;tzt im Befehl <tt>-smbclient</tt>
+die Option<tt>s </tt>. Der Wert muss der vollst&#228;ndige Pfad des Verzeichnisses sein, in
+dem sich die Samba-Konfigurationsdatei befindet. For example: <tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Hinweis: Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut
+<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a> angegebene Wert verwendet.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

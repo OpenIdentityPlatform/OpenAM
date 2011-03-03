@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+  <!DOCTYPE jboss PUBLIC
+      "-//JBoss//DTD JBOSS 4.0//EN"
+      "http://www.jboss.org/j2ee/dtd/jboss_4_0.dtd">
+<jboss>
+   <security-domain>java:/jaas/AMRealm</security-domain>
+  <assembly-descriptor>
+<security-role>
+    <role-name>SemiProtectedEJB_Role</role-name>
+    <principal-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</principal-name>
+    <principal-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</principal-name>
+    <principal-name>manager</principal-name>
+ </security-role>
+  </assembly-descriptor>
+</jboss>

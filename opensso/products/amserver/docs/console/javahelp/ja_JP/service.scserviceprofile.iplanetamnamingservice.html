@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ネーミング - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamnamingservice"></a><h4>ネーミング</h4>
+<p><a name="indexterm-204"></a>ネーミングサービスを使用すると、URL、プラグイン、および設定を取得および設定したり、セッション、認証、ログ、SAML、連携などその他各種の OpenSSO サービスの通知を要求したりできます。</p><p>このサービスを使用すると、クライアントは、プラットフォームで複数の OpenSSO が動作している場合でも正しいサービス URL を見つけることができます。ネーミングサービス URL が見つかると、ネーミングサービスはユーザーのセッションを復号化して、プロトコル、ホスト、およびポートをセッションのパラメータで動的に置き換えます。これにより、サービスに対して返された URL が、ユーザーセッションの作成されたホストの URL であることが保証されます。ネーミング属性は次のとおりです。</p>
+<ul><li><p><a href="#fwfgc">「プロファイルサービス URL」</a></p></li>
+<li><p><a href="#fwfgg">「セッションサービス URL」</a></p></li>
+<li><p><a href="#fwfgf">「ログサービス URL」</a></p></li>
+<li><p><a href="#fwfgh">「ポリシーサービス URL」</a></p></li>
+<li><p><a href="#fwfge">「認証サービス URL」</a></p></li>
+<li><p><a href="#fwfgl">「SAML Web プロファイル/アーティファクトサービス URL」</a></p></li>
+<li><p><a href="#fwfgm">「SAML SOAP サービス URL」</a></p></li>
+<li><p><a href="#fwfgk">「SAML Web プロファイル/POST サービス URL」</a></p></li>
+<li><p><a href="#fwfgi">「SAML 表明マネージャーサービス URL」</a></p></li>
+<li><p><a href="#fwfgn">「連携表明マネージャーサービス URL」</a></p></li>
+<li><p><a href="#fwfgp">「セキュリティートークンマネージャー URL」</a></p></li>
+<li><p><a href="#fwfgo">「JAXRPC エンドポイント URL」</a></p></li></ul>
+
+
+<a name="fwfgc"></a><h5>プロファイルサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/profileservice</tt></p><p>この構文により、特定のセッションパラメータに基づくプロファイル URL を動的に置き換えることができます。</p>
+
+<a name="fwfgg"></a><h5>セッションサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/sessionservice</tt></p><p>この構文により、特定のセッションパラメータに基づくセッション URL を動的に置き換えることができます。</p>
+
+<a name="fwfgf"></a><h5>ログサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/loggingservice</tt></p><p>この構文により、特定のセッションパラメータに基づくログ URL を動的に置き換えることができます。</p>
+
+<a name="fwfgh"></a><h5>ポリシーサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p> <tt>%protocol://%host:%port/Server_DEPLOY_URI/policyservice</tt></p><p>この構文により、特定のセッションパラメータに基づくポリシー URL を動的に置き換えることができます。</p>
+
+<a name="fwfge"></a><h5>認証サービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/authservice</tt></p><p>この構文により、特定のセッションパラメータに基づく認証 URL を動的に置き換えることができます。</p>
+
+<a name="fwfgl"></a><h5>SAML Web プロファイル/アーティファクトサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLAwareServlet </tt></p><p>この構文により、特定のセッションパラメータに基づく SAML Web プロファイル/アーティファクト URL を動的に置き換えることができます。 </p>
+
+<a name="fwfgm"></a><h5>SAML SOAP サービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLSOAPReceiver </tt></p><p>この構文により、特定のセッションパラメータに基づく SAML SOAP URL を動的に置き換えることができます。</p>
+
+<a name="fwfgk"></a><h5>SAML Web プロファイル/POST サービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLPOSTProfileServlet </tt></p><p>この構文により、特定のセッションパラメータに基づく SAML Web プロファイル/POST URL を動的に置き換えることができます。 </p>
+
+<a name="fwfgi"></a><h5>SAML 表明マネージャーサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/AssertionManagerServlet/AssertionM anagerIF</tt></p><p>この構文により、特定のセッションパラメータに基づく SAML 表明マネージャーサービス URL を動的に置き換えることができます。 </p>
+
+<a name="fwfgn"></a><h5>連携表明マネージャーサービス URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/amserver/FSAssertionManagerServlet/FSAssertionManagerIF</tt></p><p>この構文により、特定のセッションパラメータに基づく連携表明マネージャーサービス URL を動的に置き換えることができます。 </p>
+
+<a name="fwfgp"></a><h5>セキュリティートークンマネージャー URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/amserver/SecurityTokenManagerServlet/SecurityToken ManagerIF/</tt></p><p>この構文により、特定のセッションパラメータに基づくセキュリティートークンマネージャー URL を動的に置き換えることができます。 </p>
+
+<a name="fwfgo"></a><h5>JAXRPC エンドポイント URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port/amserver/jaxrpc/</tt></p><p>この構文により、特定のセッションパラメータに基づく JAXRPC エンドポイント URL を動的に置き換えることができます。</p>
+
+<a name="gguep"></a><h5>アイデンティティー Web サービスエンドポイント URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port%uri/identityservices/</tt></p><p>この構文により、特定のセッションパラメータに基づくアイデンティティー Web サービスエンドポイント URL を動的に置き換えることができます。</p>
+
+<a name="ggudo"></a><h5>アイデンティティー REST サービスエンドポイント URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port%uri/identity//</tt></p><p>この構文により、特定のセッションパラメータに基づくアイデンティティー REST サービスエンドポイント URL を動的に置き換えることができます。</p>
+
+<a name="ggueo"></a><h5>セキュリティートークンサービスエンドポイント URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>この構文により、特定のセッションパラメータに基づくセキュリティートークンサービスエンドポイント URL を動的に置き換えることができます。</p>
+
+<a name="gguff"></a><h5>セキュリティートークンサービス MEX エンドポイント URL</h5>
+<p>このフィールドには、次の構文を使用して値を指定します。</p><p><tt>%protocol://%host:%port%uri/sts/mex</tt></p><p>この構文により、特定のセッションパラメータに基づくセキュリティートークンサービス MEX エンドポイント URL を動的に置き換えることができます。</p>
+<br/>
+
+</body>
+</html>

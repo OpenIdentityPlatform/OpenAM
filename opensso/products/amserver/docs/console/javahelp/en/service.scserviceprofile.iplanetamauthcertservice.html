@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Certificate - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthcertservice"></a><h4>Certificate</h4>
+<p><a name="indexterm-169"></a>This module enables a user to log in through a personal digital certificate
+(PDC). The module instance can require the use of the Online Certificate Status
+Protocol (OCSP) to determine the state of a certificate. Use of the OCSP
+is optional. The user is granted or denied access to a resource based
+on whether or not the certificate is valid. The Certificate authentication attributes are realm
+attributes. The attributes are:</p>
+<ul><li><p><a href="#fwbia">Match Certificate in LDAP</a></p></li>
+<li><p><a href="#fwbiq">Subject DN Attribute Used to Search LDAP for Certificates</a></p></li>
+<li><p><a href="#fwbim">Match Certificate to CRL</a></p></li>
+<li><p><a href="#fwbik">Issuer DN Attribute Used to Search LDAP for CRLs</a></p></li>
+<li><p><a href="#fwbin">HTTP Parameters for CRL Update</a></p></li>
+<li><p><a href="#fwbil">OCSP Validation</a></p></li>
+<li><p><a href="#fwbij">LDAP Server Where Certificates are Stored</a></p></li>
+<li><p><a href="#fwbtp">LDAP Start Search DN</a></p></li>
+<li><p><a href="#fwbqp">LDAP Server Principal User</a></p></li>
+<li><p><a href="#fwbst">LDAP Server Principal Password</a></p></li>
+<li><p><a href="#fwbiu">LDAP Server Principal Password (confirm)</a></p></li>
+<li><p><a href="#fwblm">Use SSL for LDAP Access</a></p></li>
+<li><p><a href="#fwbof">Certificate Field Used to Access User Profile</a></p></li>
+<li><p><a href="#fwbna">Other Certificate Field Used to Access User Profile</a></p></li>
+<li><p><a href="#fwbiw">Trusted Remote Hosts</a></p></li>
+<li><p><a href="#fwbkd">SSL Port Number</a></p></li>
+<li><p><a href="#fwblx">Authentication Level</a></p></li></ul>
+
+
+<a name="fwbia"></a><h5>Match Certificate in LDAP</h5>
+<p>Specifies whether to check if the user certificate presented at login is stored
+in the LDAP Server. If no match is found, the user is denied
+access. If a match is found and no other validation is required, the
+user is granted access. The default is that the Certificate Authentication service does
+not check for the user certificate.</p>
+<hr><p><b>Note &#8211; </b>A certificate stored in the Directory Server is not necessarily valid; it may
+be on the certificate revocation list. See <a href="#fwbim">Match Certificate to CRL</a>. However, the web container may
+check the validity of the user certificate presented at login.</p>
+<hr>
+
+
+<a name="fwbiq"></a><h5>Subject DN Attribute Used to Search LDAP for Certificates</h5>
+<p>Specifies the attribute of the certificate's <i>SubjectDN</i> value that will be used to
+search LDAP for certificates. This attribute must uniquely identify a user entry. The
+actual value will be used for the search. The default is <tt>cn</tt>.</p>
+
+<a name="fwbim"></a><h5>Match Certificate to CRL</h5>
+<p>Specifies whether to compare the user certificate against the Certificate Revocation List (CRL)
+in the LDAP Server. The CRL is located by one of the attribute
+names in the issuer's <i>SubjectDN</i>. If the certificate is on the CRL, the
+user is denied access; if not, the user is allowed to proceed. This
+attribute is, by default, not enabled.</p><p>Certificates should be revoked when the owner of the certificate has changed status
+and no longer has the right to use the certificate or when the
+private key of a certificate owner has been compromised.</p>
+
+<a name="fwbik"></a><h5>Issuer DN Attribute Used to Search LDAP for CRLs</h5>
+<p>Specifies the attribute of the received certificate's issuer  <i>subjectDN</i> value that will
+be used to search LDAP for CRLs. This field is used only when
+the Match Certificate to CRL attribute is enabled. The actual value will be
+used for the search. The default is <tt>cn</tt>.</p>
+
+<a name="fwbin"></a><h5>HTTP Parameters for CRL Update</h5>
+<p>Specifies the HTTP parameters for obtaining a CRL from a servlet for a
+CRL update. Contact the administrator of your CA for these parameters.</p>
+
+<a name="fwbil"></a><h5>OCSP Validation</h5>
+<p>Enables OCSP validation to be performed by contacting the corresponding OCSP responder. The
+OCSP responder is decided as follows during runtime. The attributes mentioned are located
+in the console at Configuration > Servers and Sites > Security:</p>
+<ul><li><p>If this value is set to true and the OCSP responder is set in the<a href="service.servereditsecurity.html#ggkav">Responder URL</a> attribute, the value of the attribute will be used as the OCSP responder.</p></li>
+<li><p>If <a href="service.servereditsecurity.html#ggkaa">Online Certificate Status Protocol Check</a> is enabled and if the value of this attribute is not set, the OCSP responder presented in your client certificate is used as the OCSP responder. </p></li>
+<li><p>If <a href="service.servereditsecurity.html#ggkaa">Online Certificate Status Protocol Check</a> is not enabled or if <a href="service.servereditsecurity.html#ggkaa">Online Certificate Status Protocol Check</a> is enabled and if an OCSP responder can not be found, no OCSP validation will be performed.</p></li></ul>
+<p>Before enabling OCSP Validation, make sure that the time of the OpenSSO machine
+and the OCSP responder machine are in sync as close as possible. Also,
+the time on the OpenSSO machine must not be behind the time on
+the OCSP responder. For example:</p><p><tt>OCSP responder machine - 12:00:00 pm</tt></p><p><tt>OpenSSO machine - 12:00:30 pm</tt> </p>
+
+<a name="fwbij"></a><h5>LDAP Server Where Certificates are Stored</h5>
+<p>Specifies the name and port number of the LDAP server where the certificates
+are stored. The default value is the host name and port specified when
+OpenSSO was installed. The host name and port of any LDAP Server where
+the certificates are stored can be used. The format is <tt>hostname:port</tt>.</p>
+
+<a name="fwbtp"></a><h5>LDAP Start Search DN</h5>
+<p>Specifies the DN of the node where the search for the user's certificate
+should start. There is no default value. The field will recognize any valid
+DN.</p><p>Multiple entries must be prefixed by the local server name. The format is
+as follows:</p><p><tt>servername|search dn</tt> </p><p>For multiple entries:</p><p><tt>servername1|search dn servername2|search dn servername3|search dn...</tt></p><p>If multiple entries exist under the root organization with the same user ID,
+then this parameter should be set so that the only one entry can
+be searched for or found in order to be authenticated. For example, in
+the case where the agent ID and user ID is same under root
+org, this parameter should be <tt>ou=Agents</tt> for the root organization to authenticate using
+Agent ID and <tt>ou=People,</tt> for the root organization to authenticate using User
+ID.</p>
+
+<a name="fwbqp"></a><h5>LDAP Server Principal User</h5>
+<p>This field accepts the DN of the principal user for the LDAP server
+where the certificates are stored. There is no default value for this field
+which will recognize any valid DN. The principal user must be authorized to
+read, and search certificate information stored in the Directory Server.</p>
+
+<a name="fwbst"></a><h5>LDAP Server Principal Password</h5>
+<p>This field carries the LDAP password associated with the user specified in the
+LDAP Server Principal User field. There is no default value for this field
+which will recognize the valid LDAP password for the specified principal user.  This
+value is stored as readable text in the directory.</p>
+
+<a name="fwbiu"></a><h5>LDAP Server Principal Password (confirm)</h5>
+<p>Confirm the password.</p>
+
+<a name="fwblm"></a><h5>Use SSL for LDAP Access</h5>
+<p>Specifies whether to use SSL to access the LDAP server. The default is
+that the Certificate Authentication service does not use SSL for LDAP access.</p>
+
+<a name="fwbof"></a><h5>Certificate Field Used to Access User Profile</h5>
+<p>Specifies which field in the certificate's Subject DN should be used to search
+for a matching user profile. For example, if you choose email address, the
+certificate authentication service will search for the user profile that matches the attribute
+<i>emailAddr</i>  in the user certificate. The user logging in then uses the
+matched profile. The default field is <i>subject CN</i>. The list contains:</p>
+<ul><li><p>email address</p></li>
+<li><p>subject CN</p></li>
+<li><p>subject DN</p></li>
+<li><p>subject UID</p></li>
+<li><p>other</p></li></ul>
+
+
+<a name="fwbna"></a><h5>Other Certificate Field Used to Access User Profile</h5>
+<p>If the value of the Certificate Field Used to Access User Profile attribute
+is set to other, then this field specifies the attribute that will be
+selected from the received certificate's <i>subjectDN</i>  value. The authentication service will
+then search the user profile that matches the value of that attribute.</p>
+
+<a name="ggumk"></a><h5>SubjectAltNameExt Value Type to Access User Profile</h5>
+<p>If any value type other than <tt>none</tt> is selected, this attribute has precedence
+over <tt>Certificate Field Used to Access User Profile</tt> or <tt>Other Certificate Field Used to Access User Profile</tt>attribute.</p>
+<ul><li><p>RFC822Name</p></li></ul>
+
+<ul><li><p>UPN</p></li></ul>
+
+
+<a name="fwbiw"></a><h5>Trusted Remote Hosts</h5>
+<p>Defines a list of trusted hosts that can be trusted to send certificates
+to OpenSSO. OpenSSO must verify whether the certificate emanated from one of these
+hosts. This attribute is used for the Portal Server gateway, for a load
+balancer with SSL termination and for Distributed Authentication. </p><dl><dt>none</dt>
+<dd><p>Disables the attribute. This is set by default.</p></dd>
+<dt>all</dt>
+<dd><p>Accepts Portal Server Gateway-style certificate authentication from any client IP address.</p></dd>
+<dt>IP ADDR</dt>
+<dd><p>Lists the IP addresses from which to accept Portal Server Gateway-style certificate authentication requests (the IP Address of the Gateway(s)). The attribute is configurable on an realm basis.</p></dd>
+</dl>
+
+
+<a name="fwbkd"></a><h5>SSL Port Number</h5>
+<p>Specifies the port number for the secure socket layer. Currently, this attribute is
+only used by the Gateway servlet. Before you add or change an SSL
+Port Number, see the "Policy-Based Resource Management" section in the OpenSSO Administration Guide.</p>
+
+<a name="gcabp"></a><h5>HTTP Header Name for Client Certificate</h5>
+<p>This attribute is used only when the Trusted Remote Hosts attribute is set
+to all or has a specific host name defined. The administrator must specify
+the http header name for the client certificate that is inserted by the
+load balancer or SRA. </p>
+
+<a name="fwblx"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

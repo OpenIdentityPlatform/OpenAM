@@ -1,0 +1,9 @@
+        <filter>
+                <filter-name>ECPFilter</filter-name>
+                <filter-class>ECPFilter</filter-class>
+        </filter>
+
+        <filter-mapping>
+                <filter-name>ECPFilter</filter-name>
+                <url-pattern>/ecp/*</url-pattern>
+        </filter-mapping>

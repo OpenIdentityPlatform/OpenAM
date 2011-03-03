@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>S&#233;curit&#233; - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>S&#233;curit&#233;</h4>
+<p>Les attributs de s&#233;curit&#233; d&#233;finissent les informations de chiffrement, de validation et
+de cookie pour contr&#244;ler le niveau de s&#233;curit&#233; de l'instance de serveur.</p>
+
+<a name="ggkbi"></a><h5>Codage</h5>
+<p>Les attributs de codage sont&#160;:</p>
+
+<a name="ggkcb"></a><h5>Cl&#233; de chiffrement du mot de passe</h5>
+<p>Sp&#233;cifie la cl&#233; utilis&#233;e pour chiffrer et d&#233;chiffrer les mots de passe
+et est stock&#233; dans la configuration du syst&#232;me de gestion des services.
+Cette valeur est d&#233;finie pendant l'installation. Exemple&#160;: <tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd </tt></p>
+
+<a name="ggkbg"></a><h5>Secret partag&#233; du service d'authentification</h5>
+<p>Secret partag&#233; du module d'authentification d'application. Cette valeur est d&#233;finie pendant l'installation.
+Exemple&#160;: <tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl </tt></p>
+
+<a name="ggkbd"></a><h5>Classe de chiffrement</h5>
+<p>La valeur par d&#233;faut est <tt>com.iplanet.services.util.JCEEncryption</tt>. Sp&#233;cifie l'impl&#233;mentation de classe de chiffrement.
+Les classes disponibles sont <tt>com.iplanet.services.util.JCEEncryption</tt> et <tt>com.iplanet.services.util.JSSEncryption</tt>.</p>
+
+<a name="ggkby"></a><h5>Classe de fabrique al&#233;atoire s&#233;curis&#233;e</h5>
+<p>La valeur par d&#233;faut est <tt>com.iplanet.am.util.JSSSecureRandomFactoryImpl</tt>. Sp&#233;cifie le nom de la classe
+de fabrique <tt>SecureRandomFactory</tt>. Les classes d'impl&#233;mentation disponibles sont <tt>com.iplanet.am.util.JSSSecureRandomFactoryImpl</tt> qui utilise JSS,
+et <tt>com.iplanet.am.util.SecureRandomFactoryImpl</tt> qui utilise du code purement Java.   </p>
+
+<a name="ggkbr"></a><h5>Validation</h5>
+<p>Les attributs de validation sont&#160;:</p>
+
+<a name="ggkay"></a><h5>Communication de bas niveau sur plate-forme. Max. Longueur du contenu</h5>
+<p>La valeur par d&#233;faut est 16384 ou 16k. Sp&#233;cifie la longueur de
+contenu maximale de requ&#234;te <tt>HttpRequest</tt> accept&#233;e par OpenSSO.</p>
+
+<a name="ggkbb"></a><h5>V&#233;rification de l'adresse IP du client</h5>
+<p>La valeur par d&#233;faut est NO. Sp&#233;cifie si l'adresse IP du client
+est v&#233;rifi&#233;e lors de chaque cr&#233;ation ou validation de jetons <tt>SSOToken</tt>.</p>
+
+<a name="ggkba"></a><h5>Cookie</h5>
+<p>Les attributs de cookie sont&#160;:</p>
+
+<a name="ggkad"></a><h5>Nom du cookie</h5>
+<p>La valeur par d&#233;faut est <tt>iPlanetDirectoryPro</tt>. Nom de cookie utilis&#233; par le
+service d'authentification pour d&#233;finir l'ID de gestionnaire de session valide. La valeur
+de ce nom de cookie est utilis&#233;e pour extraire les informations de
+session valides.</p>
+
+<a name="ggkaw"></a><h5>Cookie s&#233;curis&#233;</h5>
+<p>Permet au cookie OpenSSO d'&#234;tre d&#233;fini dans un mode s&#233;curis&#233; dans lequel
+le navigateur ne renvoie le cookie que si un protocole s&#233;curis&#233; tel
+que <tt>HTTP</tt> est utilis&#233;. La valeur par d&#233;faut est false. </p>
+
+<a name="ggkbk"></a><h5>Coder la valeur de cookie</h5>
+<p>Cette propri&#233;t&#233; permet &#224; OpenSSO de <tt>coder par URL (URLencode)</tt> la valeur de cookie qui
+convertit les caract&#232;res en caract&#232;res compr&#233;hensibles par le protocole HTTP.</p>
+
+<a name="ggkbc"></a><h5>Keystore</h5>
+<p>Les attributs suivants vous permettent de configurer les informations de keystore des
+sites et serveurs suppl&#233;mentaires que vous cr&#233;ez&#160;:</p>
+
+<a name="ggkbj"></a><h5>Fichier keystore</h5>
+<p>Cette valeur est d&#233;finie pendant l'installation. Exemple&#160;: <tt></tt><i>base OpenSSO</i><tt>/</tt><i>URI_serveur</i><tt>/keystore.jks</tt>. Sp&#233;cifie le chemin du
+fichier de mots de passe de keystore XML SAML.</p>
+
+<a name="ggkbu"></a><h5>Fichier de mots de passe de keystore</h5>
+<p>Cette valeur est d&#233;finie pendant l'installation. Exemple&#160;: <tt></tt><i>base OpenSSO</i><tt>/</tt><i>URI_serveur</i><tt>/.storepass</tt>. Sp&#233;cifie le chemin du
+fichier storepass de cl&#233; XML SAML.</p>
+
+<a name="ggkbs"></a><h5>Fichier de mots de passe de cl&#233; priv&#233;e</h5>
+<p>Cette valeur est d&#233;finie pendant l'installation. Exemple&#160;: <tt></tt><i>base OpenSSO</i><tt>/</tt><i>URI_serveur</i><tt>/.keypass</tt> Sp&#233;cifie le chemin d'acc&#232;s
+au fichier de mots de passe de cl&#233; XML SAML.</p>
+
+<a name="ggkaq"></a><h5>Alias du certificat</h5>
+<p>La valeur par d&#233;faut est test.</p>
+
+<a name="ggkbw"></a><h5>Mise en cache de la liste de r&#233;vocation de certificats</h5>
+<p>Ces attributs d&#233;finissent le r&#233;f&#233;rentiel de mise en cache LRC (Liste de
+R&#233;vocation de Certificats) local utilis&#233; pour conserver la LRC des autorit&#233;s de
+certification. Un service devant obtenir une LRC en vue de la validation
+de certificat re&#231;oit la LRC en fonction de ces informations. </p>
+
+<a name="ggkch"></a><h5>Nom d'h&#244;te du serveur LDAP</h5>
+<p>Sp&#233;cifie le nom du serveur LDAP sur lequel les certificats sont stock&#233;s.
+La valeur par d&#233;faut est le nom d'h&#244;te sp&#233;cifi&#233; lors de l'installation
+d'OpenSSO. Vous pouvez utiliser le nom d'h&#244;te de tout serveur LDAP contenant
+les certificats. </p>
+
+<a name="ggkau"></a><h5>Num&#233;ro de port du serveur LDAP</h5>
+<p>Sp&#233;cifie le num&#233;ro de port du serveur LDAP sur lequel les certificats
+sont stock&#233;s. La valeur par d&#233;faut est le port sp&#233;cifi&#233; lors de
+l'installation d'OpenSSO. Vous pouvez utiliser le port de tout serveur LDAP contenant
+les certificats. </p>
+
+<a name="ggkam"></a><h5>Protocole SSL activ&#233;</h5>
+<p>Indique si la fonction SSL doit &#234;tre utilis&#233;e pour acc&#233;der au serveur
+LDAP. La valeur par d&#233;faut est que le service d'authentification de certificat
+n'utilise pas la fonction SSL pour l'acc&#232;s LDAP.</p>
+
+<a name="ggkbv"></a><h5>Nom d'utilisateur de liaison de serveur LDAP</h5>
+<p>Sp&#233;cifie le DN de liaison dans le serveur LDAP. </p>
+
+<a name="ggkaj"></a><h5>Mot de passe de liaison de serveur LDAP</h5>
+<p>D&#233;finit le mot de passe &#224; utiliser pour &#233;tablir la liaison avec
+le serveur LDAP. Par d&#233;faut, le mot de passe amldapuser entr&#233; lors
+de l'installation est utilis&#233; comme utilisateur de liaison.</p>
+
+<a name="ggkce"></a><h5>DN de base de recherche LDAP</h5>
+<p>Cet attribut sp&#233;cifie le DN de base utilis&#233; par l'objet Utilisateurs LDAP
+dans le serveur LDAP &#224; partir duquel commencer la recherche. Par d&#233;faut,
+il s'agit du domaine de niveau sup&#233;rieur dans l'installation de base OpenSSO.</p>
+
+<a name="ggkbp"></a><h5>Attributs de recherche</h5>
+<p>N'importe quel composant DN du <tt>subjectDN</tt> de l'&#233;metteur peut &#234;tre utilis&#233; pour
+extraire une LRC d'un serveur LDAP local. Cha&#238;ne de valeur unique, telle
+que "cn". Tous les AC racine doivent utiliser le m&#234;me attribut de
+recherche.</p>
+
+<a name="ggkaa"></a><h5>V&#233;rification du protocole OCSP</h5>
+<p>Le protocole OCSP (Online Certificate Status Protocol) permet aux services d'OpenSSO de
+d&#233;terminer l'&#233;tat (r&#233;vocation) d'un certificat sp&#233;cifi&#233;. Le protocole OCSP peut &#234;tre utilis&#233;
+pour r&#233;pondre &#224; certains besoins op&#233;rationnels de fournir des informations de r&#233;vocation
+plus rapidement que ne le permettent les LRC. Il peut aussi &#234;tre
+utilis&#233; pour obtenir des informations de statut suppl&#233;mentaires. Un client OCSP &#233;met
+une demande de statut vers un r&#233;pondeur OCSP et suspend l'acceptation du
+certificat en question jusqu'&#224; ce que le r&#233;pondeur fournisse une r&#233;ponse. </p>
+
+<a name="ggkal"></a><h5>V&#233;rification activ&#233;e</h5>
+<p>Cet attribut active la v&#233;rification OCSP. Il est activ&#233; par d&#233;faut.</p>
+
+<a name="ggkav"></a><h5>URL de r&#233;pondeur</h5>
+<p>Cet attribut d&#233;finit une URL qui identifie l'emplacement du r&#233;pondeur OCSP. Par
+exemple, <tt>http://ocsp.exemple.net:80</tt>.</p><p>Par d&#233;faut, l'emplacement du r&#233;pondeur OCSP est d&#233;termin&#233; implicitement &#224; partir du
+certificat en cours de validation. La propri&#233;t&#233; est utilis&#233;e lorsque l'extension Authority
+Information Access (d&#233;finie par RFC 3280) est absente du certificat ou lorsqu'elle
+doit &#234;tre ignor&#233;e. </p>
+
+<a name="ggkai"></a><h5>Surnom du certificat</h5>
+<p>Le surnom du r&#233;pondeur OCSP est le surnom du certificat d'AC de
+ce r&#233;pondeur (par exemple, <tt>Certificate Manager - sun</tt>). Si cet attribut est d&#233;fini, le certificat
+d'AC doit &#234;tre pr&#233;sent&#233; dans la base de donn&#233;es de certificats du
+serveur Web. Si l'URL OCSP est d&#233;finie, le surnom du r&#233;pondeur OCSP
+doit &#233;galement &#234;tre d&#233;fini. Sinon, les deux sont ignor&#233;s. S'ils ne sont
+pas d&#233;finis, l'URL du r&#233;pondeur OCSP pr&#233;sent&#233;e dans le certificat de l'utilisateur
+est utilis&#233;e pour la validation OCSP. Si l'URL du r&#233;pondeur OCSP n'est
+pas pr&#233;sent&#233;e dans le certificat de l'utilisateur, aucune validation OCSP n'a lieu.
+</p>
+
+<a name="ggkag"></a><h5>Standards FIPS</h5>
+<p>Dans le cadre de la loi Information Technology Management Reform Act (Public
+Law 104-106), le ministre du commerce approuve les standards et les directives
+d&#233;velopp&#233;s par le NIST (National Institute of Standards and Technology) pour les
+syst&#232;mes informatiques f&#233;d&#233;raux. Ces standards et ces directives sont &#233;mis par le
+NIST en tant que standards FIPS (Federal Information Processing Standards) &#224; utiliser
+au niveau du gouvernement. Le NIST d&#233;veloppe des standards FIPS en cas
+de besoins imp&#233;rieux du gouvernement f&#233;d&#233;ral (par exemple, en mati&#232;re de s&#233;curit&#233;
+et d'interop&#233;rabilit&#233;) et s'il n'existe aucune solution ou aucun standard industriel acceptable.
+</p>
+
+<a name="ggkap"></a><h5>Mode FIPS</h5>
+<p>Cette propri&#233;t&#233; peut &#234;tre true ou false. Toutes les op&#233;rations de chiffrement
+ex&#233;cutent le mode compatible FIPS uniquement si la valeur est true. </p>
+<br/>
+
+</body>
+</html>

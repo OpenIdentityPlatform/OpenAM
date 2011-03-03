@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 Identity 공급자 사용자 정의  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2idpassertioncontent"></a><h4>SAMLv2 Identity 공급자 사용자 정의 </h4>
+<p>SAMLv2 Identity 공급자에는 다음과 같은 속성 그룹이 포함되어 있습니다.</p>
+<ul><li><p><a href="#ggwdf">명제 컨텐트</a></p></li>
+<li><p><a href="#ggwca">명제 처리</a></p></li>
+<li><p><a href="#ggwyj">로컬 구성</a></p></li>
+<li><p><a href="#ggwaw">서비스</a></p></li>
+<li><p><a href="#ggwli">고급</a></p></li></ul>
+
+
+<a name="ggwdf"></a><h5>명제 컨텐트</h5>
+
+<ul><li><p><a href="#ggwad">요청/응답 서명</a></p></li>
+<li><p><a href="#ggwby">암호화</a></p></li>
+<li><p><a href="#ggwcz">인증서 별칭</a></p></li>
+<li><p><a href="#ggwbz">이름 아이디 형식</a></p></li>
+<li><p><a href="#ggyoq">이름 아이디 값 맵</a></p></li>
+<li><p><a href="#ggwer">인증 컨텍스트</a></p></li>
+<li><p><a href="#ggwec">명제 시간</a></p></li>
+<li><p><a href="#ggwce">기본 인증</a></p></li>
+<li><p><a href="#ggwaj">명제 캐시</a></p></li>
+<li><p><a href="#ggwcd">부트스트랩</a></p></li></ul>
+
+
+<a name="ggwad"></a><h5>요청/응답 서명</h5>
+<p>다음 플래그를 설정하면 서비스 공급자가 특정 메시지에 서명하는 방법을 Identity 공급자에게 알려줄
+수 있습니다.</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>인증 요청</p></td>
+<td align="left" valign="top" scope="row"><p>이 Identity 공급자에서 받은 모든 인증 요청에 서명해야 합니다.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>아티팩트 확인</p></td>
+<td align="left" valign="top" scope="row"><p>서비스
+공급자가 <tt>ArtifactResolve</tt> 요소에 서명해야 합니다. </p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>로그아웃 요청</p></td>
+<td align="left" valign="top" scope="row"><p>서비스 공급자가 <tt>LogoutRequest</tt> 요소에 서명해야 합니다.
+</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>로그아웃 응답</p></td>
+<td align="left" valign="top" scope="row"><p>서비스 공급자가 <tt>LogoutResponse</tt> 요소에 서명해야 합니다. </p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>이름 아이디 요청 관리</p></td>
+<td align="left" valign="top" scope="row"><p>서비스 공급자가
+<tt>ManageNameIDRequst</tt> 요소에 서명해야 합니다. </p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>이름 아이디 응답 관리</p></td>
+<td align="left" valign="top" scope="row"><p>서비스 공급자가 <tt>ManageNameIDResponse</tt> 요소에 서명해야
+합니다. </p></td>
+</tr>
+</table>
+
+<a name="ggwby"></a><h5>암호화</h5>
+<p>다음 요소에서 암호화를 사용할 확인란을 선택합니다. </p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>NameID</p></td>
+<td align="left" valign="top" scope="row"><p>서비스 공급자가 모든 <tt>NameID</tt> 요소를 암호화해야
+합니다. </p></td>
+</tr>
+</table>
+
+<a name="ggwcz"></a><h5>인증서 별칭</h5>
+<p>이 속성은 Identity 공급자의 인증서 별칭 요소를 정의합니다. <tt>서명</tt>은 키 저장소에서 올바른
+서명 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다. <tt>암호화</tt>는 키 저장소에서
+올바른 암호화 인증서를 찾는 데 사용되는 공급자 인증서 별칭을 지정합니다.</p>
+
+<a name="ggwbz"></a><h5>이름 아이디 형식</h5>
+<p>Identity 공급자에서 지원되는 이름 식별자 형식을 정의합니다. 이름 식별자는 공급자가 한 사용자와
+관련하여 서로 통신하는 방법입니다. 단일 사인온 상호 작용은 다음과 같은 유형의 식별자를
+지원합니다.</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified </tt></p></li></ul>
+<p><b>영구 식별자</b>는 특정 사용자의 데이터 저장소 항목에 두 속성의 값으로 저장되어 있습니다. <b>일시적 식별자</b>는
+임시로 사용되며 사용자의 영구 데이터 저장소에는 데이터가 기록되지 않습니다.</p>
+
+<a name="ggyoq"></a><h5>이름 아이디 값 맵</h5>
+<p>이 속성은 NameID 형식 속성과 사용자 프로필 속성 간의 매핑을 지정합니다. 정의된
+이름 아이디 형식을 프로토콜에서 사용하는 경우 해당 프로필 속성 값은 [주제]의 형식에
+대한 NameID 값으로 사용됩니다. 각 항목의 구문은 다음과 같습니다.</p><p><tt></tt><i>NameID Format</i><tt>=</tt><i>User profile attribute</i><tt></tt></p><p>예를 들면 다음과 같습니다.</p><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress=mail </tt></p><p>새 NameID 형식을 추가하려면  NameID 값 맵 속성을 해당 항목으로 업데이트해야
+합니다. 사용 가능한 값은 <tt>영구적</tt>, <tt>일시적</tt> 및 <tt>지정되지 않음</tt>입니다. <tt>영구적</tt> 및 <tt>일시적</tt>의 경우
+NameID 값이 임의로 생성됩니다. 이 속성에서는 <tt>지정되지 않음</tt>이 선택 사항입니다. 이 값을 지정하는
+경우 NameID 값은 사용자 프로필 속성의 값이 됩니다. 이 값을 지정하지 않는
+경우에는 임의로 번호가 생성됩니다. </p>
+
+<a name="ggwer"></a><h5>인증 컨텍스트</h5>
+<p>이 속성은 SAMLv2 정의 인증 컨텍스트 클래스를 Identity 공급자에서 사용 가능한 인증
+메소드에 매핑합니다.</p><dl><dt>매퍼</dt>
+<dd><p>요청된 인증 컨텍스트를 만드는 데 사용되는 <tt>IDPAuthnContextMapper</tt> 인터페이스 구현을 지정합니다. 기본 구현은 <tt>com.sun.identity.saml2.plugins.</tt><tt>DefaultIDPAttributeMapper</tt>입니다.</p></dd>
+<dt>기본 인증 컨텍스트</dt>
+<dd><p>서비스 공급자가 인증 컨텍스트 요청을 보내지 않는 경우 Identity 공급자에서 사용하는 기본 인증 컨텍스트 유형을 지정합니다.</p></dd>
+<dt>지원</dt>
+<dd><p>Identity 공급자가 지원하는 경우 인증 컨텍스트 클래스 옆에 있는 확인란을 선택합니다.</p></dd>
+<a name="indexterm-68"></a><a name="indexterm-69"></a><a name="indexterm-70"></a><dt>컨텍스트 참조</dt>
+<dd><p>SAMLv2 정의 인증 컨텍스트 클래스는 다음과 같습니다.</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>비밀번호</p></li>
+<li><p>Password-protectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>스마트 카드</p></li>
+<li><p>스마트 카드 PKI</p></li>
+<li><p>소프트웨어 PKI</p></li>
+<li><p>텔레포니</p></li>
+<li><p>Nomad 텔레포니</p></li>
+<li><p>Personal 텔레포니</p></li>
+<li><p>Authenticaion 텔레포니</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>시간 동기화 토큰</p></li>
+<li><p>지정되지 않음</p></li></ul>
+</dd>
+<dt>키</dt>
+<dd><p>컨텍스트가 매핑되는 OpenSSO 인증 유형을 선택합니다.</p></dd>
+<dt>값</dt>
+<dd><p>OpenSSO 인증 옵션을 입력합니다.</p></dd>
+<dt>수준</dt>
+<dd><p>OpenSSO Authentication Framework에 정의된 인증 수준에 매핑되는 값이며 양수로 지정합니다. 인증 수준은 인증 메소드를 신뢰하는 정도를 나타냅니다. </p><p>이 프레임워크에서 각 Identity 공급자는 기본 인증 컨텍스트(기본 설정된 인증 방법)로 구성되어 있습니다. 하지만 공급자가 할당되어 있는 인증 컨텍스트를 정의된 인증 수준에 따른 인증 컨텍스트로 변경할 수도 있습니다. 예를 들어 공급자 B가 인증 수준 3으로 로컬 세션을 생성하려면 Identity 공급자가 해당 수준에 할당된 인증 컨텍스트로 사용자를 인증해야 합니다이 쿼리 매개 변수 값은 Identity 공급자가 사용할 인증 컨텍스트를 결정합니다.</p></dd>
+</dl>
+
+
+<a name="ggwec"></a><h5>명제 시간</h5>
+<p>명제는 특정 기간 동안 유효하며 그 이전과 이후에는 유효하지 않습니다. 이 속성은
+<tt>Not Before 시간 오차</tt> 값의 점진적 간격(초)을 지정합니다. 기본값은 <tt>600</tt>이며<tt>notAfter</tt> 값과는 관련이 없습니다.</p><p><tt>유효 시간</tt>은 명제 발급 시간부터 계산하여 해당 명제가 유효 상태를 유지하는 시간(초)을 지정합니다.
+기본값은 <tt>600</tt>초입니다.</p>
+
+<a name="ggwce"></a><h5>기본 인증</h5>
+<p>기본 인증을 사용하면 SOAP 엔드포인트를 보호할 수 있습니다. 이러한 엔드포인트에 액세스하는 공급자는<tt>사용자 이름</tt>
+및 <tt>비밀번호</tt> 등록 정보를 사용하여 사용자와 비밀번호를 정의해야 합니다</p>
+
+<a name="ggwaj"></a><h5>명제 캐시</h5>
+<p>이 속성을 사용하면 Identity 공급자가 나중에 검색할 수 있도록 명제를 캐시할 수
+있습니다.</p>
+
+<a name="ggwcd"></a><h5>부트스트랩</h5>
+<p>Liberty 기반 단일 사인온 프로세스에서 부트스트랩용 검색 서비스 자원 오퍼링을 생성하려는 경우
+이 확인란을 선택합니다.</p>
+
+<a name="ggwca"></a><h5>명제 처리</h5>
+
+<ul><li><p><a href="#ggwdy">속성 매퍼</a></p></li>
+<li><p><a href="#ggwcl">계정 매퍼</a></p></li></ul>
+
+
+<a name="ggwdy"></a><h5>속성 매퍼</h5>
+<p>이 값은 기본 속성 매퍼 플러그인에서 사용하는 매핑을 정의하는 값을 지정합니다. 기본
+플러그인 클래스는 <tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</tt>입니다.</p><p>매핑은 다음 형식으로 구성해야 합니다.</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>예를 들어, <tt>EmailAddress=mail</tt> 또는 <tt>Address=postaladdress</tt>입니다. 해당 매핑을 [새 값]으로 입력하고 [추가]를 누르십시오.</p>
+
+<a name="ggwcl"></a><h5>계정 매퍼</h5>
+<p>원격 사용자 계정을 단일 사인온용 로컬 사용자 계정에 매핑하는 데 사용할 <tt>AccountMapper</tt>
+인터페이스의 구현을 지정합니다. 기본값은 <tt>com.sun.identity.saml2.plugins.</tt><tt>DefaultIDPAccountMapper</tt>(기본 구현)입니다.</p>
+
+<a name="ggwyj"></a><h5>로컬 구성</h5>
+<p>이러한 속성에는 OpenSSO 인스턴스 전용 구성이 포함되어 있습니다. </p>
+
+<a name="ggwwx"></a><h5>인증 URL</h5>
+<p>Identity 공급자가 인증을 위해 리디렉션할 인증 URL을 정의합니다.</p>
+
+<a name="ghcia"></a><h5>외부 응용 프로그램 로그아웃 URL</h5>
+<p>외부 응용 프로그램 로그아웃 URL은 외부 응용 프로그램의 로그아웃 URL을 정의합니다. 서버가
+원격 파트너로부터 로그아웃 요청을 받으면 모든 쿠키를 사용하여 백 채널 <tt>HTTP POST</tt>를 통해
+로그아웃 URL로 요청이 전송됩니다. 쿼리 매개 변수 <tt>appsessionproperty</tt>(세션 등록 정보 이름으로 설정됨)가
+URL에 포함된 경우 선택적으로 사용자 세션 등록 정보를 <tt>HTTP 헤더</tt> 및 <tt>POST</tt> 매개
+변수로 보낼 수 있습니다.</p>
+
+<a name="ggwaw"></a><h5>서비스</h5>
+
+<ul><li><p><a href="#ggwbs">메타 별칭</a></p></li>
+<li><p><a href="#ggwip">아티팩트 확인 서비스</a></p></li>
+<li><p><a href="#ggwcq">단일 로그아웃 서비스</a></p></li>
+<li><p><a href="#ggwdm">이름 아이디 서비스 관리</a></p></li>
+<li><p><a href="#ggwhr">단일 사인온(SSO) 서비스</a></p></li></ul>
+
+
+<a name="ggwbs"></a><h5>메타 별칭</h5>
+<p>구성할 공급자의 <tt>메타 별칭</tt>을 지정합니다. <tt>메타 별칭</tt>은 공급자의 엔티티 식별자 및 해당 공급자가 있는
+조직을 찾는 데 사용됩니다. 이 값은 영역 또는 조직 이름(연합 서비스용 SAML
+v2 플러그인이 OpenSSO에 설치되어 있는지 여부에 따라 달라짐)에 슬래시가 연결되어 있고 공급자
+이름이 조합된 문자열입니다. 예를 들어 <tt>/suncorp/travelprovider</tt>와 같습니다.</p>
+<hr><p><b>주의 &#8211; </b><tt>메타 별칭</tt>에 사용되는 이름에는 <tt>/</tt>를 사용할 수 없습니다.</p>
+<hr>
+
+
+<a name="ggwip"></a><h5>아티팩트 확인 서비스</h5>
+<p>아티팩트 확인 프로필을 지원하는 엔드포인트를 정의합니다. <tt>위치</tt>는 요청을 보낼 대상 공급자의 URL을
+지정합니다. <tt>색인</tt>은 프로토콜 메시지에서 참조할 수 있도록 엔드포인트에 대한 고유한 정수 값을
+지정합니다. </p>
+
+<a name="ggwcq"></a><h5>단일 로그아웃 서비스</h5>
+<p>단일 로그아웃 서비스는 Identity 공급자가 인증한 모든 세션에 대한 로그아웃 기능을 동기화합니다.
+</p><p><tt>위치</tt>는 요청을 보낼 대상 공급자의 URL을 지정합니다. <tt>응답 위치</tt>는 응답을 보낼 대상 공급자의
+URL을 지정합니다. 바인딩 유형은 다음과 같습니다.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdm"></a><h5>이름 아이디 서비스 관리</h5>
+<p>이 서비스는 기본에 대한 새 이름 식별자를 지정하기 위해 서비스 공급자와 통신할
+때 사용할 URL을 정의합니다. 연합 세션이 설정된 후에만 등록을 수행할 수 있습니다.</p><p><tt>위치</tt>는 요청을 보낼 대상 공급자의 URL을 지정합니다. <tt>응답 위치</tt>는 응답을 보낼 대상 공급자의
+URL을 지정합니다. . 바인딩 유형은 다음과 같습니다.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwhr"></a><h5>단일 사인온(SSO) 서비스</h5>
+<p>인증 요청 프로토콜의 프로필을 지원하는 엔드포인트를 정의합니다. 모든 Identity 공급자가 이러한 엔드포인트
+중 하나 이상을 지원해야 합니다. </p><p><tt>위치</tt>는 요청을 보낼 대상 공급자의 URL을 지정합니다. 바인딩 유형은 다음과 같습니다.</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwli"></a><h5>고급</h5>
+
+<ul><li><p><a href="#ggwjs">IDP URL</a></p></li>
+<li><p><a href="#ggwix">응용 프로그램 보안 목록</a></p></li>
+<li><p><a href="#ggwir">IDP 매퍼 세션</a></p></li></ul>
+
+
+<a name="ggwjs"></a><h5>IDP URL</h5>
+<p>SAE(Secure Attribute Exchange) 요청을 처리할 수 있는 Identity 공급자의 URL 엔드포인트를 정의합니다.
+</p>
+
+<a name="ggwix"></a><h5>응용 프로그램 보안 목록</h5>
+<p>응용 프로그램 보안 구성을 정의합니다. 각 응용 프로그램에는 하나의 항목이 있어야 합니다.
+각 항목의 형식은 다음과 같습니다. </p><p><tt>url=IDPAppURL|type=</tt><i>symmetric_orAsymmetric</i><tt>|secret=</tt><i> ampassword encoded shared secret</i><tt></tt> OR <tt>or pubkeyalias=</tt><i>idp app signing cert</i><tt></tt></p>
+
+<a name="ggwir"></a><h5>IDP 매퍼 세션</h5>
+<p>세션 매퍼 SPI의 구현 클래스를 정의합니다. 매퍼는 ECP 프로필을 사용하여 Identity 공급자에
+대한 HTTP 서블릿 요청에서 유효한 세션을 찾습니다. </p>
+<br/>
+
+</body>
+</html>

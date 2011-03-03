@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sesi&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>Sesi&#243;n</h4>
+<p>Los atributos de sesi&#243;n permiten configurar la informaci&#243;n de sesi&#243;n para instancias
+del servidor o sitios adicionales.</p>
+
+<a name="ggkab"></a><h5>L&#237;mites de sesiones</h5>
+<p>Los siguientes atributos establecen los l&#237;mites de sesiones del servidor:</p>
+
+<a name="ggkat"></a><h5>N&#186; m&#225;ximo de sesiones</h5>
+<p>El valor predeterminado es 5000.  Especifica el n&#250;mero m&#225;ximo de sesiones
+simult&#225;neas permitidas.  El inicio de sesi&#243;n env&#237;a un error si el
+valor de n&#250;mero m&#225;ximo de sesiones simult&#225;neas supera esta cifra.</p>
+
+<a name="ggkac"></a><h5>Tiempo m&#225;x. de sesi&#243;n no v&#225;lida</h5>
+<p>El valor predeterminado es 10.   Especifica el n&#250;mero de minutos
+tras los que se eliminar&#225; la sesi&#243;n no v&#225;lida de la tabla
+de sesiones si se ha creado y el usuario no ha iniciado
+una sesi&#243;n.  Este valor debe ser siempre superior al valor de
+tiempo de espera especificado en el archivo de propiedades del m&#243;dulo de
+autenticaci&#243;n.</p>
+
+<a name="ggkaf"></a><h5>Retraso de purga de sesi&#243;n</h5>
+<p>El valor predeterminado es 60.    Esta propiedad especifica el
+n&#250;mero de minutos de retraso de la operaci&#243;n de purga de sesi&#243;n.
+ Se trata de un periodo de tiempo ampliado, una vez agotado
+el tiempo de espera de la sesi&#243;n, durante el que la sesi&#243;n
+permanece en el servidor de sesiones. La aplicaci&#243;n de cliente utiliza esta
+propiedad para comprobar si se ha agotado el tiempo de espera de
+la sesi&#243;n mediante las API de SSO. Al final del periodo de
+tiempo ampliado, se destruir&#225; la sesi&#243;n. La sesi&#243;n no se conserva durante
+el periodo de tiempo ampliado si el usuario cierra la sesi&#243;n o
+un componente de OpenSSO la destruye de forma expl&#237;cita. La sesi&#243;n presenta
+el estado INVALID (NO V&#193;LIDO) durante este periodo ampliado.</p>
+
+<a name="ggkbl"></a><h5>Estad&#237;sticas</h5>
+<p>Los siguientes atributos establecen la configuraci&#243;n estad&#237;stica:</p>
+
+<a name="ggkbf"></a><h5>Intervalo de registro</h5>
+<p>El valor predeterminado es 60.    Especifica el n&#250;mero de
+minutos transcurridos entre cada actividad de registro de estad&#237;sticas. El valor m&#237;nimo
+es de 5 segundos para evitar la saturaci&#243;n de la CPU. OpenSSO
+asume como 5 segundos cualquier valor inferior a &#233;ste.</p>
+
+<a name="ggkbn"></a><h5>Estado</h5>
+<p>El valor predeterminado es "file". Especifica la ubicaci&#243;n del registro de estad&#237;sticas.
+Los valores posibles son:  </p>
+<ul><li><p>off (desactivado): no se registra ninguna estad&#237;stica.</p></li>
+<li><p>file (archivo): las estad&#237;sticas se escriben en el archivo ubicado en el directorio especificado.</p></li>
+<li><p>console (consola): las estad&#237;sticas se escriben en el archivo de registro del servidor web.</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>Directorio</h5>
+<p>Este valor se establece durante la instalaci&#243;n. Ejemplo: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server-URI</i><tt>/stats</tt>. Especifica el directorio
+en el que se crean los archivos de depuraci&#243;n.</p>
+
+<a name="ggkca"></a><h5>Habilitar b&#250;squeda de host</h5>
+<p>El valor predeterminado es false. Habilita o deshabilita la b&#250;squeda de host
+durante el registro de sesi&#243;n.</p>
+
+<a name="ggkas"></a><h5>Notificaci&#243;n</h5>
+<p>Los siguientes atributos establecen la configuraci&#243;n de notificaci&#243;n:</p>
+
+<a name="ggkbz"></a><h5>Tama&#241;o del conjunto de notificaci&#243;n</h5>
+<p>El valor predeterminado es 10.   Define el tama&#241;o del conjunto
+especificando el n&#250;mero total de subprocesos.</p>
+
+<a name="ggkao"></a><h5>Umbral del conjunto de subprocesos de notificaci&#243;n</h5>
+<p>El valor predeterminado es 100.     Especifica la longitud
+m&#225;xima de la cola de tareas. Cada vez que se recibe una
+tarea de notificaci&#243;n, se env&#237;a a la cola de tareas para su
+procesamiento. Si la cola alcanza la longitud m&#225;xima, las solicitudes entrantes adicionales
+se rechazar&#225;n y se generar&#225; una excepci&#243;n <tt>ThreadPoolException</tt> hasta que la cola
+tenga espacio libre.</p>
+
+<a name="ggkar"></a><h5>Validaci&#243;n</h5>
+<p>Los siguientes atributos establecen la configuraci&#243;n de la validaci&#243;n:</p>
+
+<a name="ggkcg"></a><h5>Comparaci&#243;n de DN sin distinci&#243;n entre may&#250;sculas y min&#250;sculas</h5>
+<p>El valor predeterminado es "true" (verdadero). Compara el DN de agente. Si
+se establece en "false" (falso), la comparaci&#243;n distinguir&#225; entre may&#250;sculas y min&#250;sculas.
+</p>
+<br/>
+
+</body>
+</html>

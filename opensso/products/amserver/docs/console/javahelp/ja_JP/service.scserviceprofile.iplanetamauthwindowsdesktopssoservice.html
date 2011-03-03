@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows デスクトップ SSO - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>Windows デスクトップ SSO</h4>
+<p><a name="indexterm-183"></a>このモジュールは Windows に固有であり、Kerberos 認証としても知られます。ユーザーは、SPNEGO (Simple and Protected GSS-API Negotiation Mechanism) プロトコルを介して、OpenSSO に
+Kerberos トークンを提供します。Windows デスクトップ SSO 認証プラグインモジュールにより、クライアント (ユーザー) はデスクトップからのシングルサインオンが可能です。すなわち、鍵配布センターで認証済みのユーザーは、再びログイン情報を提供しなくても OpenSSO によって認証されます。Windows デスクトップ SSO 属性はグローバル属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwbfr">「サービス主体」</a></p></li>
+<li><p><a href="#fwbfo">「Keytab ファイル名」</a></p></li>
+<li><p><a href="#fwbhy">「Kerberos レルム」</a></p></li>
+<li><p><a href="#fwbid">「Kerberos サーバー名」</a></p></li>
+<li><p><a href="#fwbhw">「ドメイン名を含む主体を返す」</a></p></li>
+<li><p><a href="#fwbic">「認証レベル」</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>サービス主体</h5>
+<p>認証に使用される Kerberos 主体を指定します。次の形式を使用します。</p><p><tt><b>HTTP/</tt><i>hostname.domainname&#64;dc_domain_name</i><tt></b></tt></p><p><b>hostname</b> と <b>domainame</b> はそれぞれ、OpenSSO インスタンスのホスト名とドメイン名を表します。<b>dc_domain_name</b> は、Windows Kerberos サーバー (ドメインコントローラ) が存在する Kerberos ドメインです。OpenSSO
+のドメイン名とは異なる場合もあります。</p>
+
+<a name="fwbfo"></a><h5>Keytab ファイル名</h5>
+<p>この属性は、認証に使用される Kerberos keytab ファイルを指定します。次の形式を使用します。この形式は必須ではありません。</p><p><tt><b></tt><i>hostname</i><tt>.HTTP.keytab</b></tt></p><p><b>hostname</b> は、OpenSSO インスタンスのホスト名です。</p>
+
+<a name="fwbhy"></a><h5>Kerberos レルム</h5>
+<p>この属性は、Kerberos Distribution Center (ドメインコントローラ) のドメイン名を指定します。設定によっては、ドメインコントローラのドメイン名が OpenSSO のドメイン名とは異なる場合があります。</p>
+
+<a name="fwbid"></a><h5>Kerberos サーバー名</h5>
+<p>この属性は、Kerberos Distribution Center (ドメインコントローラ) のホスト名を指定します。ドメインコントローラの完全修飾ドメイン名 (FQDN) を入力する必要があります。</p>
+
+<a name="fwbhw"></a><h5>ドメイン名を含む主体を返す</h5>
+<p>この属性を有効にした場合は、OpenSSO は認証中に Kerberos 主体をドメインコントローラのドメイン名で自動的に返すことができます。</p>
+
+<a name="fwbic"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

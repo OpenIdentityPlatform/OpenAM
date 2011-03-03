@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ディスカバリエージェント属性 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.discoveryagentprofile"></a><h4>ディスカバリエージェント属性</h4>
+<p>ディスカバリエージェントプロファイルは信頼できる発行局の設定を保持します。この設定は、Web サービスの検索と登録、およびセキュリティー証明情報の取得のために、Web サービスのクライアント/プロファイルで Liberty ディスカバリサービスとの通信に使用されます。</p>
+
+<a name="gglro"></a><h5>グループ</h5>
+<p>「グループ」メカニズムを使用すると、類似のエージェントタイプのコレクションを定義できます。特定のエージェントをコレクションに追加する前に、グループを定義しておく必要があります。 </p>
+
+<a name="gglpn"></a><h5>パスワード</h5>
+<p>ディスカバリエージェントのパスワードを定義します。</p>
+
+<a name="ggloy"></a><h5>パスワードの確認</h5>
+<p>パスワードを確認します。</p>
+
+<a name="ggtwd"></a><h5>ステータス</h5>
+<p>エージェントがシステム内でアクティブになるかどうかを定義します。この属性は、デフォルトではアクティブになります。つまり、エージェントは Web サービスクライアントからのアウトバウンドの Web サービス要求のセキュリティー保護に参加し、Web サービスプロバイダからの Web サービス応答を検証します。</p>
+
+<a name="ggloo"></a><h5>エージェント設定リポジトリの場所</h5>
+<p>この属性は、ディスカバリエージェントの設定リポジトリの場所を定義します。 </p>
+
+<a name="gglqv"></a><h5>非公開鍵のエイリアス</h5>
+<p>この属性は、Web サービス要求の署名または Web サービス応答の復号化に使用される証明書非公開鍵エイリアスを定義します。</p>
+
+<a name="gglny"></a><h5>ディスカバリサービスエンドポイント</h5>
+<p>この属性は、信頼できる発行局クライアントがサービスの登録と検索のために通信を確立する、ディスカバリサービスエンドポイントを定義します。</p>
+
+<a name="gglra"></a><h5>認証 Web サービスエンドポイント</h5>
+<p>この属性は、Web サービスクライアントがエンドユーザーの SSOToken を使用してディスカバリサービスのリソースオファリング (ブートストラップリソースオファリングとも呼ばれる) を受け取るための認証に使用する、認証サービスエンドポイントを定義します。</p>
+<br/>
+
+</body>
+</html>

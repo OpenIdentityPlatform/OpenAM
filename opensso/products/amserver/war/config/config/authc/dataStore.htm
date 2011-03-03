@@ -1,0 +1,18 @@
+<script language="javascript">
+
+    YAHOO.util.Event.onDOMReady(initDataStore);
+
+    function initDataStore() {
+        pageURI = "$context$path";
+        afterAddToStoreSuccessFunction = dataStoreAfterAddToStore;
+        validateFormFunction = null;
+        adjustAddStoreButton();
+    }
+
+    function dataStoreAfterAddToStore() {
+        YAHOO.sun.container.addStore.show();
+        setTimeout("YAHOO.sun.container.addStore.hide()", 1250);
+        setTimeout("document.location = '$context/commonTasks.htm'", 1250);
+    }
+
+</script>

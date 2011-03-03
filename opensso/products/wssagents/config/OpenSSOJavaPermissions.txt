@@ -1,0 +1,54 @@
+// ADDITIONS FOR OPENSSO
+grant {
+permission java.net.SocketPermission "*", "listen,connect,accept,resolve";
+permission java.util.PropertyPermission "*", "read, write";
+permission java.lang.RuntimePermission "modifyThreadGroup";
+permission java.lang.RuntimePermission "setFactory";
+permission java.lang.RuntimePermission "accessClassInPackage.*";
+permission java.util.logging.LoggingPermission "control";
+permission java.lang.RuntimePermission "shutdownHooks";
+permission javax.security.auth.AuthPermission "getLoginConfiguration";
+permission javax.security.auth.AuthPermission "setLoginConfiguration";
+permission javax.security.auth.AuthPermission "modifyPrincipals";
+permission javax.security.auth.AuthPermission "modifyPrivateCredentials";
+permission javax.security.auth.PrivateCredentialPermission "com.iplanet.sso.providers.dpro.SSOTokenImpl * \"*\"","read";
+permission javax.security.auth.AuthPermission "createLoginContext.*";
+permission java.io.FilePermission "<<ALL FILES>>", "read,write,execute,delete";
+permission java.util.PropertyPermission "java.util.logging.config.class", "write";
+permission java.security.SecurityPermission "removeProvider.SUN";
+permission java.security.SecurityPermission "insertProvider.SUN";
+permission javax.security.auth.AuthPermission "doAs";
+permission java.util.PropertyPermission "java.security.krb5.realm", "write";
+permission java.util.PropertyPermission "java.security.krb5.kdc", "write";
+permission java.util.PropertyPermission "java.security.auth.login.config", "write";
+permission java.util.PropertyPermission "user.language", "write";
+permission javax.security.auth.kerberos.ServicePermission "*", "accept";
+permission javax.net.ssl.SSLPermission "setHostnameVerifier";
+permission java.security.SecurityPermission "putProviderProperty.IAIK";
+permission java.security.SecurityPermission "removeProvider.IAIK";
+permission java.security.SecurityPermission "insertProvider.IAIK";
+permission java.lang.RuntimePermission "setDefaultUncaughtExceptionHandler";
+permission javax.management.MBeanServerPermission "newMBeanServer";
+permission javax.management.MBeanPermission "*", "registerMBean";
+permission java.lang.RuntimePermission "createClassLoader";
+permission java.lang.RuntimePermission "accessDeclaredMembers";
+permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+permission javax.security.auth.AuthPermission "getSubject";
+permission javax.management.MBeanTrustPermission "register";
+permission java.lang.management.ManagementPermission "monitor";
+permission javax.management.MBeanServerPermission "createMBeanServer";
+permission java.util.PropertyPermission "javax.xml.soap.MetaFactory", "write";
+permission java.util.PropertyPermission "javax.xml.soap.MessageFactory", "write";
+permission java.util.PropertyPermission "javax.xml.soap.SOAPConnectionFactory", "write";
+permission java.util.PropertyPermission "javax.xml.soap.SOAPFactory", "write";
+permission java.net.NetPermission "getProxySelector";
+permission java.security.SecurityPermission "getProperty.authconfigprovider.factory";
+permission java.security.SecurityPermission "setProperty.authconfigprovider.factory";
+permission javax.security.auth.AuthPermission "doAsPrivileged";
+permission javax.security.auth.AuthPermission "modifyPublicCredentials";
+permission java.security.SecurityPermission "insertProvider.XMLDSig";
+permission java.security.SecurityPermission "putProviderProperty.WSS_TRANSFORM";
+permission java.security.SecurityPermission "insertProvider.WSS_TRANSFORM";
+};
+// END OF ADDITIONS FOR OPENSSO
+

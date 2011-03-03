@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Configure a Request Handler - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>To Configure a Request Handler</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p>The <tt>RequestHandler</tt> interface must be implemented on the server side by each SAMLv2
+service that uses the SOAP Binding Service. The Request Handler List attribute stores
+information about the implementation classes that implement the Request Handler. The Request Handler
+List displays entries that contain key/value pairs.</p><ol>
+<li><b>Click New to display the New Request Handler attributes or click on a
+configured key value to modify existing attributes.</b></li>
+<li><b>Provide values for the attributes based on the following information:</b><dl><dt>key</dt>
+<dd><p>The <i>Key</i> is the Policy Decision Point meta alias. </p></dd>
+<dt>class</dt>
+<dd><p>The <i>Class</i> is the Java class name, which is the implementation of RequestHandler Interface which can process XACML Requests. </p></dd>
+</dl>
+</li>
+<li><b>Click OK to complete the Request Handler configuration.</b></li>
+<li><b>Click Save on the SAMLv2 SOAP Binding page to complete the service configuration.</b></li></ol>
+<br/>
+
+</body>
+</html>

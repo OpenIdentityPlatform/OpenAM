@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wss-create.xhtml,v 1.2 2009/07/23 20:46:56 ggennaro Exp $
+
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText value="#{resources['wss-create.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText value="#{resources['wss-create.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+
+        <o:wizard
+            steps="4"
+            wizardHandler="#{wssCreateWizardHandler}"
+            wizardBean="#{wssCreateWizardBean}">
+            <ui:define name="wizard-steps">
+                <o:wstep
+                    step="0"
+                    label="#{resources['wss-create.wspPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <ui:include src="template/wsp-endpoint-security.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{wssCreateWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{wssCreateWizardHandler}"/>
+                        </ui:include>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="1"
+                    label="#{resources['wss-create.wspSignEncryptPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <ui:include src="template/wsp-sign-encrypt.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{wssCreateWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{wssCreateWizardHandler}"/>
+                        </ui:include>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="2"
+                    label="#{resources['wss-create.wscPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <ui:include src="template/wsc-servicename-security.xhtml">
+                            <ui:param
+                                name="wizardBean"
+                                value="#{wssCreateWizardBean}"/>
+                            <ui:param
+                                name="wizardHandler"
+                                value="#{wssCreateWizardHandler}"/>
+                        </ui:include>
+
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="3"
+                    label="#{resources['wss-create.summaryPanelLabel']}">
+                    <ui:define name="wizard-step-body">
+
+                        <o:section>
+                            <ui:define name="section-title">
+                                <ice:outputText
+                                    value="#{resources['wss-create.summaryPanelLabel.section-title']}"/>
+                            </ui:define>
+                            <ui:define name="section-details">
+                                <ice:outputText
+                                    value="#{resources['wss-create.summaryPanelLabel.section-details']}"/>
+                            </ui:define>
+                            <ui:define name="section-body">
+
+                                <!-- placeholder until realm persistence is supported
+                                <o:summarypanel summary="#{wssCreateWizardBean.summaryRealm}" />
+                                -->
+
+                                <o:summarypanel summary="#{wssCreateWizardBean.summaryServiceEndPoint}" />
+                                <o:summarypanel summary="#{wssCreateWizardBean.summaryWspSecurity}" />
+                                <o:summarypanel summary="#{wssCreateWizardBean.summarySignEncrypt}" />
+                                <o:summarypanel summary="#{wssCreateWizardBean.summaryEncryptAlgorithm}" />
+                                <o:summarypanel summary="#{wssCreateWizardBean.summaryKeyAliases}" />
+
+                                <ice:panelGroup visible="#{wssCreateWizardBean.configureWsc}">
+                                    <o:summarypanel summary="#{wssCreateWizardBean.summaryServiceName}" />
+                                    <o:summarypanel summary="#{wssCreateWizardBean.summaryWscSecurity}" />
+                                </ice:panelGroup>
+
+                            </ui:define>
+                        </o:section>
+
+                    </ui:define>
+                </o:wstep>
+            </ui:define>
+        </o:wizard>
+
+    </ui:define>
+</ui:composition>

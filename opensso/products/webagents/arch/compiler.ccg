@@ -1,0 +1,222 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: compiler.ccg,v 1.4 2008/06/25 05:54:24 qcheng Exp $
+#
+#
+#
+#
+# Generalized C/C++ interface for Microsoft C/C++
+#
+
+# Portions Copyrighted [2010] [ForgeRock AS]
+
+# CL option prefixes: these are passed through to compiler
+
+#ECHO = 1;  # Uncomment this to display exec line arguments.
+
+Copts = { "-C", "-d", "-D", "-E", "-F", "-G", "-H", "-I", "-J", "-M",
+	  "-O", "-P", "-U", "-u", "-v", "-V", "-w", "-W", "-Y", "-Z" };
+
+coptions = { "-EHsc" };
+ldoptions = { "-nologo" };
+debug = 0;
+map = 0;
+val = 0;
+Libs = {};
+Srcs = {};
+Objs = {};
+LibPathVarName = "Lib";
+LibPath = getenv(LibPathVarName);
+if (! LibPath)
+    # The name of this variable is different in different shells, sigh ...
+    LibPathVarName = "LIB";
+    LibPath = getenv(LibPathVarName);
+    if (! LibPath)
+        LibPathVarName = "lib";
+        LibPath = getenv(LibPathVarName);
+    fi
+fi
+LibCName = "msvcrt.lib msvcprt.lib";
+LinkType = "";
+Subsystem = "console";
+Output = "";
+
+
+for (i in ARGV)
+do
+	flag = substr(i,1,2);
+	if (substr(i,1,2) == "-m")
+		println "cc: -m not supported for 32 bit compiler.";
+	elif (i == "-c")
+		compile_only = 1;
+	elif (substr(i,1,5) == "-def:")
+		ldoptions |= i;
+	elif (i == "-dll")
+		ldoptions |= "-dll";
+		coptions |= "-LD";
+	elif (i == "-g")
+		debug = 1;
+		coptions |= "-Zi";
+		ldoptions |= "-debug";
+		LibCName = "msvcrt.lib msvcprt.lib";
+	elif (i == "-O")
+		coptions |= "-Zi";
+		ldoptions |= "-debug -opt:ref";
+	elif (i == "-S")		# assembler listing
+		coptions |= "/FAs";
+	elif (substr(i,1,11) == "-subsystem:")
+		Subsystem = substr(i,12);
+	elif (substr(i,1,6) == "-libc:")
+		LibCName = substr(i,7);
+		if (substr(LibCName,-4) != ".lib")
+			LibCName |= ".lib";
+		fi
+		LibCName |= " msvcrt.lib";
+	elif (substr(i,-2) == ".c")
+		Srcs |= i;
+		opath = filepath(substr(i,1,length(i)-1));
+		Objs |= opath[length(opath)-1] | "obj";
+	elif (substr(i,-4) == ".asm")
+		Srcs |= i;
+		opath = filepath(substr(i,1,length(i)-3));
+		Objs |= opath[length(opath)-1] | "obj";
+	elif (substr(i,-4) == ".cpp")
+		Srcs |= i;
+		coptions |= "-GR";
+		opath = filepath(substr(i,1,length(i)-3));
+		Objs |= opath[length(opath)-1] | "obj";
+	elif (substr(i,-4) == ".cxx")
+		Srcs |= i;
+		opath = filepath(substr(i,1,length(i)-3));
+		Objs |= opath[length(opath)-1] | "obj";
+	elif (substr(i,-2) == ".o")
+		Objs |= replace(i, "/", "\\") | " ";
+	elif (substr(i,-4) == ".obj")
+		Objs |= replace(i, "/", "\\") | " ";
+	elif (substr(i,-4) == ".res")
+		Objs |= replace(i, "/", "\\") | " ";
+	elif (i == "-o")
+		advance i;
+		Output = i;
+	elif (substr(i,1,2) == "-f") 
+		println "cc: -f not supported for 32 bit compiler.";
+	elif (substr(i,1,3) == "-Fe")		# support -Fe<outputfile>
+		Output = substr(i,4);
+	elif (index(Copts, flag) != 0)
+		coptions |= i;
+	elif (i == "-M")
+		map = 1;
+	elif (substr(i,1,2) == "-L")
+		LibDir = replace(substr(i,3), "/", "\\");
+		LibPath |= ";"|LibDir;
+		if (rindex(LibDir, "\\") != length(LibDir))
+			LibDir |= "\\";
+		fi
+	elif (i == "-l")
+		advance i;
+		alib = i;
+	elif (substr(i,1,2) == "-l")
+		alib = substr(i,3);
+	elif (substr(i,1,5) == "-link")
+		LinkOptions |= " " | i;
+	elif (substr(i,-2) == ".a")
+		Libs |= replace(i, "/", "\\");
+	elif (substr(i,-4) == ".lib")
+		Libs |= replace(i, "/", "\\");
+	elif (substr(i,1,1) == "-")
+		println "cc: Unknown option:", i, "(ignored)";
+	else
+		println "cc: Unknown", i, "(ignored)";
+	fi
+	if (alib)
+		if (substr(alib,-4) != ".lib")
+			alib |= ".lib";
+		fi
+#		if (index(alib, ":") || index(alib, "/") || index(alib, "\\"))
+			Libs |= replace(alib, "/", "\\");
+#		else
+#			Libs |= LibDir | alib;
+#		fi
+		alib = "";
+	fi
+done
+
+if (! Objs)
+	print "cc: No source or object files!\n";
+	exit 1;
+fi
+
+if (debug)
+	coptions |= "-MDd";
+else
+	coptions |= "-MD";
+fi
+
+if (compile_only)
+	if (Output != "")
+		coptions |= "-Fo"|replace(Output, "/", "\\");
+	fi
+else
+	if (Output == "")
+		Output = Objs[0];
+		Output = substr(Output, 1, index(Output,".")) | "exe";
+	fi
+fi
+
+# compile all .c files
+for (i in Srcs)
+do
+	val = execv("cl", "-c", "-nologo", coptions, replace(i, "/", "\\"));
+	if (val)
+		exit val;
+	fi
+done
+
+if (compile_only)
+	exit val;
+fi
+
+#ldoptions |= "-align:0x1000 -subsystem:console -entry:mainCRTStartup";
+ldoptions |= "-subsystem:" | Subsystem;
+ldoptions |= "-nodefaultlib";
+ldoptions |= "-OUT:"|replace(Output, "/", "\\");
+if (map)
+	ldoptions |= " -map";
+fi
+
+if (LibPath)
+	putenv(LibPathVarName | "=" | LibPath);
+	print LibPath;
+fi
+if (LinkType)
+	exit exec("link " | LinkType | " " | ldoptions | " " | Objs);
+else
+	Libs |=  LibCName | " oldnames.lib kernel32.lib";
+	exit exec("link " | ldoptions | " " | Objs | " " | Libs);
+fi

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servidores y sitios - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serversite"></a><h3>Servidores y sitios</h3>
+<p>Estos atributos permiten la administraci&#243;n centralizada de la configuraci&#243;n de los servidores
+y sitios de toda la implementaci&#243;n. </p><p>Varias (dos o m&#225;s) instancias de OpenSSO pueden implementarse en, como m&#237;nimo,
+dos servidores host diferentes. Por ejemplo, puede implementar dos instancias en un
+servidor y una tercera en otro. Tambi&#233;n puede implementar todas las instancias
+en distintos servidores. Puede configurar tambi&#233;n las instancias de OpenSSO en el
+modo de conmutaci&#243;n por error de sesi&#243;n, si es necesario para la
+implementaci&#243;n.</p><p>Uno o varios equilibradores de carga enrutan las solicitudes del cliente a
+diversas instancias de OpenSSO. Puede configurar cada equilibrador de carga en funci&#243;n
+de los requisitos de implementaci&#243;n (por ejemplo, para una carga por turnos
+o un promedio de carga) con el fin de distribuir la carga
+entre las instancias de OpenSSO. Un equilibrador de carga simplifica la implementaci&#243;n
+y soluciona adem&#225;s determinados problemas como, por ejemplo, el servidor de seguridad
+entre el cliente y los servidores "back-end" de OpenSSO. Puede utilizar un
+equilibrador de carga de hardware o software con la implementaci&#243;n de OpenSSO.
+Todas las instancias de OpenSSO acceden a la misma instancia de Directory
+Server. </p>
+<br/>
+
+</body>
+</html>

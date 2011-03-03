@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SDK - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsdk"></a><h4>SDK</h4>
+<p>The SDK attributes set configuration definitions for the back-end data store.</p>
+
+<a name="ggkan"></a><h5>Data Store </h5>
+<p>The Data Store attributes basic datastore configuration:</p>
+
+<a name="ggkem"></a><h5>Enable Datastore Notification</h5>
+<p>Specifies if the back-end datastore notification is enabled. If this value is set
+to 'false', then in-memory notification is enabled.</p>
+
+<a name="ggkfc"></a><h5>Enable Directory Proxy</h5>
+<p>The default is false. The purpose of this flag is to report to
+Service Management that the Directory Proxy must be used for read, write, and/or
+modify operations to the Directory Server. This flag also determines if ACIs or
+delegation privileges are to be used.  This flag must be set to
+"true" when the Access Manager SDK (from version 7 or 7.1) is communicating
+with Access Manager version 6.3. </p><p>For example, in the co-existence/legacy mode this value should be "true". In the
+legacy DIT, the delegation policies were not supported. Only ACIs were supported, so
+o to ensure proper delegation check, this flag must be set to 'true'
+in legacy mode installation to make use of the ACIs for access control.
+Otherwise the delegation check will fail.  </p><p>In realm mode, this value should be set to false so only
+the delegation policies are used for access control. In version 7.0 and later, Access
+Manager or OpenSSO supports data-agnostic feature in realm mode installation. So, in addition
+to Directory Server, other servers may be used to store service configuration data.
+ Additionally, this flag will report to the Service Management feature that the
+Directory Proxy does not need to be used for the read, write, and/or
+modify operations to the back-end storage. This is because some data stores, like Active
+Directory, may not support proxy.</p>
+
+<a name="ggkcv"></a><h5>Event Service</h5>
+<p>The following attributes define event service notification for the data store:</p>
+
+<a name="ggkez"></a><h5>Number of Retries for Event Service Connections</h5>
+<p>Default value is 3. Specifies the number of attempts made to successfully re-establish
+the Event Service connections.</p>
+
+<a name="ggkdr"></a><h5>Delay Between LDAP Connection Tries</h5>
+<p>Default value is 3000. Specifies the delay in milliseconds between retries to re-establish
+the Event Service connections.  </p>
+
+<a name="ggkcq"></a><h5>Error Codes for LDAP Connection Tries</h5>
+<p>Default values are 80,81,91. Specifies the LDAP exception error codes for which retries
+to re-establish Event Service connections will trigger.</p>
+
+<a name="ggncc"></a><h5>Idle Timeout</h5>
+<p>Default value is 0. Specifies the number of minutes after which the persistent
+searches will be restarted.  </p><p>This property is used when a load balancer or firewall is between the
+policy agents and the Directory Server, and the persistent search connections are dropped
+when TCP idle timeout occurs. The property value should be lower than the
+load balancer or firewall TCP timeout. This ensures that the persistent searches are
+restarted before the connections are dropped. A value of 0 indicates that searches
+will not be restarted. Only the connections that are timed out will be reset.</p>
+
+<a name="ggndm"></a><h5>Disabled Event Service Connection</h5>
+<p>Specifies which event connection can be disabled. Values (case insensitive) can be: </p>
+<ul><li><p>aci &#8212; Changes to the aci attribute, with the search using the LDAP filter (aci=*).</p></li>
+<li><p>sm &#8212; Changes in the OpenSSO information tree (or service management node), which includes objects with the <tt>sunService</tt> or <tt>sunServiceComponent</tt> marker object class. For example, you might create a policy to define access privileges for a protected resource, or you might modify the rules, subjects, conditions, or response providers for an existing policy.</p></li>
+<li><p>um &#8212; Changes in the user directory (or user management node). For example, you might change a user's name or address.</p></li></ul>
+<p>For example, to disable persistent searches for changes to the OpenSSO information tree
+(or service management node):  </p><p><tt>com.sun.am.event.connection.disable.list=sm </tt></p>
+<hr><p><b>Caution &#8211; </b>Persistent searches cause some performance overhead on Directory Server. If you determine that
+removing some of this performance overhead is absolutely critical in a production environment,
+you can disable one or more persistent searches using this property.  </p><p>However, before disabling a persistent search, you should understand the limitations described above.
+It is strongly recommended that this property not be changed unless absolutely required.
+This property was introduced primarily to avoid overhead on Directory Server when multiple 2.1
+J2EE agents are used, because each of these agents establishes these persistent searches.
+The 2.2 J2EE agents no longer establish these persistent searches, so you might
+not need to use this property.  </p><p>Disabling persistent searches for any of these components is not recommended, because a
+component with a disabled persistent search does not receive notifications from Directory Server.
+Consequently, changes made in Directory Server for that particular component will not be notified
+to the component cache. For example, if you disable persistent searches for changes
+in the user directory (<tt>um</tt>), OpenSSO will not receive notifications from Directory Server.
+Therefore, an agent would not get notifications from OpenSSO to update its local user
+cache with the new values for the user attribute. Then, if an application
+queries the agent for the user attributes, it might receive the old value
+for that attribute.  </p><p>Use this property only in special circumstances when absolutely required. For example, if you
+know that Service Configuration changes (related to changing values to any of services
+such as Session Service and Authentication Services) will not happen in production environment,
+the persistent search to the Service Management (<tt>sm</tt>) component can be disabled. However, if
+any changes occur for any of the services, a server restart would be
+required. The same condition also applies to other persistent searches, specified by the
+<tt>aci</tt> and <tt>um</tt> values. </p>
+<hr>
+
+
+<a name="ggnip"></a><h5>LDAP Connection</h5>
+<p>The following attributes set connection data for the back end data store:</p>
+
+<a name="ggnjl"></a><h5>Number of Retries for LDAP Connection</h5>
+<p>Default is 1000. Specifies the number milliseconds between retries.</p>
+
+<a name="ggnhu"></a><h5>Delay Between LDAP Connection Retries</h5>
+<p>Default value is 3. Specifies the number of attempts made to successfully re-establish
+the LDAP connection.</p>
+
+<a name="ggnjt"></a><h5>Error Codes for LDAP Connection Retries</h5>
+<p>Default values are 80,81,91. Specifies the <tt>LDAPException</tt> error codes for which retries to
+re-establish the LDAP connection will trigger.</p>
+
+<a name="ggkcx"></a><h5>Caching and Replica</h5>
+<p>The following attributes define caching and replication configuration:</p>
+
+<a name="ggkcm"></a><h5>SDK Cashing Max. Size</h5>
+<p>Default value is 10000. Specifies the size of the SDK cache when caching
+is enabled. Use an integer greater than 0, or the default size (10000
+users) will be used.</p>
+
+<a name="ggkdo"></a><h5>SDK Replica Retries</h5>
+<p>Default value is 0. Specifies the number of times to retry.</p>
+
+<a name="ggker"></a><h5>Delay Between SDK Replica Tries</h5>
+<p>Default value is 1000. Specifies the number of milliseconds between retries.</p>
+<br/>
+
+</body>
+</html>

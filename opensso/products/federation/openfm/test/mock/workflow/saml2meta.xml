@@ -1,0 +1,43 @@
+<EntityDescriptor
+    xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    entityID="abc">
+    <IDPSSODescriptor
+        WantAuthnRequestsSigned="false"
+        protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <ArtifactResolutionService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="http://owen1.red.iplanet.com:8080/opensso/ArtifactResolver/metaAlias/xyz"
+            index="0"
+            isDefault="1"/>
+        <SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="http://owen1.red.iplanet.com:8080/opensso/IDPSloRedirect/metaAlias/xyz"
+            ResponseLocation="http://owen1.red.iplanet.com:8080/opensso/IDPSloRedirect/metaAlias/xyz"/>
+        <SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="http://owen1.red.iplanet.com:8080/opensso/IDPSloSoap/metaAlias/xyz"/>
+        <ManageNameIDService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="http://owen1.red.iplanet.com:8080/opensso/IDPMniRedirect/metaAlias/xyz"
+            ResponseLocation="http://owen1.red.iplanet.com:8080/opensso/IDPMniRedirect/metaAlias/xyz"/>
+        <ManageNameIDService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="http://owen1.red.iplanet.com:8080/opensso/IDPMniSoap/metaAlias/xyz"/>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        </NameIDFormat>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+        </NameIDFormat>
+        <SingleSignOnService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="http://owen1.red.iplanet.com:8080/opensso/SSORedirect/metaAlias/xyz"/>
+        <SingleSignOnService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="http://owen1.red.iplanet.com:8080/opensso/SSORedirect/metaAlias/xyz"/>
+        <SingleSignOnService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="http://owen1.red.iplanet.com:8080/opensso/SSOSoap/metaAlias/xyz"/>
+    </IDPSSODescriptor>
+</EntityDescriptor>
+

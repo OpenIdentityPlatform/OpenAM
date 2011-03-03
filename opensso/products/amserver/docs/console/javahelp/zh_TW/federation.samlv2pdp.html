@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 XACML PDP - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pdp"></a><h4>自訂 SAMLv2 XACML PDP</h4>
+<p>XACML PDP 包含下列用於自訂的屬性：</p>
+<ul><li><p><a href="#ggwgo">協定支援列舉</a></p></li>
+<li><p><a href="#ggwjh">簽署金鑰別名</a></p></li>
+<li><p><a href="#ggwjx">加密金鑰別名</a></p></li>
+<li><p><a href="#ggwhi">基本授權</a></p></li>
+<li><p><a href="#ggwgk">已簽名授權決定查詢</a></p></li>
+<li><p><a href="#ggwhp">授權服務</a></p></li></ul>
+
+
+<a name="ggwgo"></a><h5>協定支援列舉</h5>
+<p>顯示此提供者支援的 XACML PDP 發行版本。</p><p><tt>urn:liberty:iff:2003-08</tt> 是指 Liberty Identity Federation Framework 1.2 版。</p><p><tt>urn:liberty:iff:2002-12</tt> 是指 Liberty Identity Federation Framework 1.1 版。</p>
+
+<a name="ggwjh"></a><h5>簽署金鑰別名</h5>
+<p>定義用來簽署請求和回應的金鑰別名。</p>
+
+<a name="ggwjx"></a><h5>加密金鑰別名</h5>
+<p>定義 XACML 加密的金鑰別名。</p>
+
+<a name="ggwhi"></a><h5>基本授權</h5>
+<p>啟用基本授權可保護 SOAP 端點。任何存取這些端點的提供者都必須擁有下列兩項特性中定義的使用者和密碼：<tt>使用者名稱</tt>和<tt>密碼</tt>。</p>
+
+<a name="ggwgk"></a><h5>已簽名授權決定查詢</h5>
+<p>啟用時，此屬性會強制 XACML 授權決定的所有查詢都進行簽名。</p>
+
+<a name="ggwhp"></a><h5>授權服務</h5>
+<p>此屬性定義授權請求的類型 (連結)，以及接收請求的 URL 端點。依預設，連結類型為 SOAP。</p>
+<br/>
+
+</body>
+</html>

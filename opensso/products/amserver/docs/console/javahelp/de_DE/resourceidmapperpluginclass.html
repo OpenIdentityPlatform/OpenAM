@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Klassen f&#252;r ResourceID-Mapper-Plugin - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="resourceidmapperpluginclass"></a><h4>Klassen f&#252;r ResourceID-Mapper-Plugin</h4>
+<a name="indexterm-134"></a><a name="indexterm-135"></a><p>Der Wert dieses Attributs ist eine Liste von Klassen, mit denen IDs
+f&#252;r ein f&#252;r die Organisation oder Rolle konfiguriertes Ressourcenangebot erstellt werden. <tt>com.sun.identity.liberty.ws.interfaces.ResourceIDMapper </tt>
+is an interface used to map a user identifier to the resource
+identifier associated with it. Der  Discovery-Dienst stellt f&#252;r diese Schnittstelle zwei
+Implementierungen bereit:</p>
+<ul><li><p><tt>com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper </tt> (format: <i>providerID</i> + "/" + <i>the Base64 encoded userIDs</i>)</p></li>
+<li><p><tt>com.sun.identity.liberty.ws.disco.plugins.DefaultHexResourceIDMapper </tt> (format: <i>providerID</i> + "/" + <i>the hex string of userID</i>)</p></li></ul>
+<p>Mithilfe der Implementierungsklasse k&#246;nnen Sie weitere Implementierungen entwickeln und als Wert dieses
+Attributs hinzuf&#252;gen. Klicken Sie dazu auf "Neu" und verwenden Sie das folgende
+Format:</p><p><tt><b>providerid=</tt><i>providerID</i><tt>|</tt><i> class_name_and_path</i><tt></b></tt></p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.91 2009/12/01 02:09:58 veiming Exp $
+
+-->
+<!--
+   "Portions Copyrighted [2010-2011] [ForgeRock AS]"
+-->
+
+<project name="opensso" default="usage">
+    <description>Open Web Single Sign-On</description>
+    <import file="../products.xml" />
+    <import file="amserver.xml" />
+
+    <fail message="*** JDK target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <path id="build.class.path">
+        <pathelement location="${amserver.classes.dir}"/>
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <fileset dir="${lockhart.dir}/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${jatolib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="build.ent.class.path">
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <fileset dir="${extlib.dir}"
+            includes="${entitlement.dependencies}"/>
+    </path>
+
+    <property name="tracker" value="${amserver.basedir}/tracker.properties" />
+    <touch file="${tracker}" />
+    
+    <!-- user specific properties -->
+    <property file="${user.home}/.opensso"/>
+    
+    <!-- amserver + built mib sources -->
+    <path id="amserver.src.dirs">
+	<pathelement location="${amserver.built.dir}/mib" />
+	<pathelement location="${amserver.src.dir}" />
+    </path>
+    <property name="amserver.src.dirs" refid="amserver.src.dirs" />
+
+    <target name="build"
+        depends="preparebuild,sharedlib,init">
+        <antcall target="idsvcs" />
+
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+              destdir="${amserver.classes.dir}"
+              source="${target.jdk.set}" target="${target.jdk.set}"
+              debug="${build.debug}" debuglevel="${build.debuglevel}"
+              srcdir="${amserver.src.dir}"
+              includes="com/sun/identity/entitlement/**"
+              excludes = "com/sun/identity/entitlement/opensso/**,com/sun/identity/entitlement/xacml3/**,com/sun/identity/entitlement/log/**" >
+            <classpath refid="build.ent.class.path"/>
+        </javac>
+
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${amserver.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}"
+            srcdir="${amserver.src.dir}"
+            includes="com/sun/identity/rest/*"
+            excludes="com/sun/identity/rest/CoreTokenResource.java,com/sun/identity/rest/RestService.java">
+            <classpath refid="build.ent.class.path"/>
+        </javac>
+        
+	<antcall target="am-mib" />
+        <property environment="env" />
+        <echo message="compiling xacml3 schema to create java source " />
+        <mkdir dir="${amserver.built.src.dir}" />
+        <mkdir dir="${amserver.built.xsd.dir}" />
+
+        <path id="amserver.basedir.forXSD">
+            <pathelement path="${amserver.basedir}"/>
+        </path>
+        <pathconvert targetos="unix" setonempty="false"
+            property="amserver.basedir.forXSD"
+            refid="amserver.basedir.forXSD" />
+        <filter token="ENTITLEMENT_BASE_DIR"
+            value="${amserver.basedir.forXSD}"/>
+        <copy todir="${amserver.built.xsd.dir}">
+            <fileset dir="${amserver.basedir}/xsd" includes="*.*" />
+        </copy>
+
+	<antcall target="am-xacml" />
+
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${amserver.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}"
+            excludes="${amserver.build.exclude}"
+         >
+            <src path="${amserver.src.dirs}" />
+            <classpath refid="build.class.path"/>
+        </javac>
+
+        <java classname="com.sun.identity.cli.tools.CLIDefinitionGenerator">
+            <classpath refid="build.class.path"/>
+            <arg value="${amserver.res.i18n.dir}"/>
+            <arg value="com.sun.identity.cli.definition.AccessManager"/>
+        </java>
+
+        <antcall target="jaxrpc" />
+        <antcall target="copy-res-files" />
+    </target>
+
+    <target name="sharedlib">
+        <subant buildpath="${sharedlib.dir}/build.xml" target="all"
+            inheritall="true"/>
+    </target>
+
+    <target name="copy-res-files">
+        <filter token="DATESTAMP" value="${war.time.stamp}"/>        
+        <filter token="VERSION" value="${version.set}" />
+        
+        <copy todir="${amserver.built.res.dir}" flatten="true" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}">
+                <include name="**/*.properties"/>
+                <exclude name="Services.properties"/>
+                <exclude name="ums.properties"/>
+                <exclude name="sso.properties"/>
+                <exclude name="SMS.properties"/>
+                <exclude name="authentication_util.properties"/>
+            </fileset>
+        </copy>
+        
+        <copy todir="${amserver.built.res.dir}" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}">
+                <include name="*.properties"/>
+                <exclude name="Services.properties"/>
+                <exclude name="ums.properties"/>
+                <exclude name="sso.properties"/>
+                <exclude name="SMS.properties"/>
+                <exclude name="authentication_util.properties"/>
+            </fileset>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+
+        <copy todir="${amserver.built.res.dir}" filtering="true">
+            <fileset dir="${amserver.config.res.dir}"
+                includes="*.properties" />
+            <fileset dir="${amserver.console.res.dir}"    includes="*.properties" />
+            <fileset dir="${amserver.xml.dir}"            includes="*.xml" />
+            <fileset dir="${amserver.console.xml.dir}"    includes="*.xml" />
+            <fileset dir="${amserver.jaxrpc.xml.dir}"     includes="*.xml" />
+            <fileset dir="${amserver.services.xml.dir}"   includes="*.xml" />
+            <fileset dir="${amserver.authmodule.xml.dir}" includes="*.xml" />
+            <fileset dir="${amserver.dtd.xml.dir}"
+                includes="**/*.dtd" excludes="dtd/sms.dtd"/>
+            <fileset dir="${amserver.productregistry.xml.dir}"
+                includes="*.xml" />
+        </copy>
+
+        <concat destfile="${amserver.built.res.dir}/amSDK.properties">
+            <fileset dir="${amserver.res.i18n.dir}">
+                <include name="Services.properties"/>
+                <include name="DSConfig.properties"/>
+                <include name="ums.properties"/>
+                <include name="sso.properties"/>
+                <include name="SMS.properties"/>
+                <include name="authentication_util.properties"/>
+            </fileset>
+        </concat>
+
+        <java classname="com.sun.identity.tools.nightly.MergeSDKProperties"
+              fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="${amserver.res.i18n.dir}" />
+            <arg value="${amserver.built.res.dir}" />
+        </java>
+        <copy file="${amserver.built.res.dir}/amSDK.properties"
+              tofile="${amserver.built.res.dir}/amSDK_en.properties" /> 
+        <copy file="${amserver.dtd.xml.dir}/smsflatfile.dtd" 
+              todir="${amserver.classes.dir}/com/sun/identity/sm/flatfile"/>
+        <copy file="${amserver.dtd.xml.dir}/policyAdmin.dtd" 
+              todir="${amserver.classes.dir}/com/sun/identity/policy"/>
+        <copy file="${amserver.dtd.xml.dir}/sms.dtd" 
+              todir="${amserver.classes.dir}/com/sun/identity/sm"/>
+        <copy todir="${amserver.classes.dir}/com/sun/identity/log/messageid">
+            <fileset dir="${amserver.log.xml.dir}">
+                <include name="*.xml" />
+                <include name="*.dtd" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="init">
+        <property name="amserver.build.exclude" value="${build.java.exclude}" />
+        <property name="amserver.javadoc.excludes"
+            value="${amserver.javadoc-excludes}" />
+        <property name="war.lib" value="${external.lib},${internal.lib}" />
+    </target>
+
+    <target name="idsvcs" unless="amserver.idsvcs.done">
+        <copy file="${amserver.warbase.dir}/xml/IdentityServices.wsdl"
+              tofile="IdentityServices.wsdl" />
+        <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${java.home}/../lib/tools.jar"/>
+            </classpath>
+            <arg value="-classpath" />
+            <arg value="${amserver.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/webservices-api.jar" />
+            <arg value="-gen:server" />
+            <arg value="-d" />
+            <arg value="${amserver.classes.dir}" />
+            <arg value="${amserver.jaxrpc.xml.dir}/IdentityServicesConfig.xml" />
+        </java>
+        <delete file="IdentityServices.wsdl" />
+        <property name="amserver.idsvcs.done" value="true" />
+        <concat destfile="${tracker}" append="true">amserver.idsvcs.done=true&#10;</concat>
+    </target>
+    
+    <target name="jaxrpc" unless="amserver.jaxrpc.done">
+        <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${java.home}/../lib/tools.jar"/>
+            </classpath>
+            <arg value="-classpath" />
+            <arg value="${amserver.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/webservices-api.jar" />
+            <arg value="-gen:server" />
+            <arg value="-d" />
+            <arg value="${amserver.classes.dir}" />
+            <arg value="${amserver.jaxrpc.xml.dir}/config.xml" />
+        </java>
+        <move file="${amserver.classes.dir}/IdentityManagementServices.wsdl"
+            tofile="${amserver.classes.dir}/jaxrpc/IdentityManagementServices.wsdl" />
+        <property name="amserver.jaxrpc.done" value="true" />
+        <concat destfile="${tracker}" append="true">amserver.jaxrpc.done=true&#10;</concat>
+    </target>
+
+    <target name="javadoc" depends="preparebuild">
+        <javadoc destdir="${amserver.built.apidocs.dir}" windowtitle="OpenAM API"
+            maxmemory="512M" useexternalfile="yes">
+            <classpath refid="build.class.path"/>
+            <fileset dir="${amserver.src.dir}" defaultexcludes="yes"
+                includes="${amserver.javadoc-includes}"
+                excludes="${amserver.javadoc-excludes}" />
+            <tag name="supported.all.api" enabled="false" />
+            <tag name="supported.api" enabled="false" />
+            <link href="http://download.oracle.com/javase/6/docs/api/"/>
+            <link href="http://download.oracle.com/javaee/1.3/api/"/>
+        </javadoc>
+    </target>
+    
+    <target name="publicjavadoc" depends="preparebuild">
+        <javadoc destdir="${amserver.built.publicapidocs.dir}"
+                 windowtitle="Public OpenAM API"
+                 maxmemory="512M" useexternalfile="yes">
+            <classpath refid="build.class.path"/>
+            <fileset dir="${amserver.src.dir}" defaultexcludes="yes"
+                includes="${amserver.public.javadoc-includes}" />
+            <doclet name="com.sun.identity.tools.javadocs.SupportedAPIDoclet"
+                path="${sharedlib.classes.dir}" />
+            <tag name="supported.all.api" description="" />
+            <tag name="supported.api" description="" />
+            <link href="http://download.oracle.com/javase/6/docs/api/"/>
+            <link href="http://download.oracle.com/javaee/1.3/api/"/>
+        </javadoc>
+    </target>
+
+    <target name="jars">
+        <ant antfile="${amserver.basedir}/build-jars.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="preparebuild">
+        <mkdir dir="${amserver.built.dir}"/>
+        <mkdir dir="${amserver.dist.dir}"/>
+        <mkdir dir="${amserver.classes.dir}"/>
+        <mkdir dir="${amserver.built.res.dir}"/>
+        <mkdir dir="${amserver.built.docs.dir}"/>
+        <mkdir dir="${amserver.built.apidocs.dir}"/>
+        <mkdir dir="${amserver.built.publicapidocs.dir}"/>
+        <copy file="${amserver.config.res.dir}/serverAttributeMap.properties"
+              toFile="${amserver.classes.dir}/serverAttributeMap.properties" />
+    </target>
+    
+    <target name="clean" depends="nightly-clean,war-clean,jars-clean,clientsdk-clean,samples-clean,distauth-clean,amtune-clean">
+        <delete dir="${amserver.built.publicapidocs.dir}"/>
+        <delete dir="${amserver.built.apidocs.dir}"/>
+        <delete dir="${amserver.built.docs.dir}"/>
+        <delete dir="${amserver.built.res.dir}"/>
+        <delete dir="${amserver.classes.dir}/jaxrpc"/>
+        <delete dir="${amserver.classes.dir}"/>
+        <delete dir="${amserver.built.dir}"/>
+        <delete file="${tracker}" />
+    </target>
+    
+    <target name="tools" depends="build,jars,prep.xml">
+        <ant antfile="${amserver.warbase.dir}/build.xml" inheritRefs="true"/>
+        <ant antfile="${amserver.warbase.dir}/build.xml" target="session-tools"
+             inheritRefs="true"/>        
+        <ant antfile="${amserver.warbase.dir}/build.xml" target="configurator"
+             inheritRefs="true"/>        
+        <ant antfile="${amserver.base.dir}/build-diagnostic-tools.xml"
+            dir="${amserver.base.dir}"
+            inheritRefs="true"/>
+    </target>
+    
+    <target name="war" depends="build,prep.xml">
+        <ant antfile="${amserver.base.dir}/build-jars.xml" target="amserverjar" inheritRefs="true"/>
+        <ant antfile="${amserver.base.dir}/build-jars.xml" target="openssoregjar" inheritRefs="true"/>
+        <ant antfile="${amserver.warbase.dir}/build.xml" target="war"
+             inheritRefs="true"/>
+    </target>
+    
+    <target name="prep.xml">
+        <copy todir="${amserver.built.war.dir}/xml/services">
+            <fileset dir="${amserver.services.xml.dir}" includes="*.xml" />
+            <fileset dir="${amserver.xml.dir}" includes="AccessManagerCLI.xml" />
+            <fileset dir="${amserver.productregistry.xml.dir}" includes="*.xml" />
+        </copy>
+        <copy todir="${amserver.built.war.dir}/xml">
+            <fileset dir="${amserver.xml.dir}" includes="serverconfig.xml" />
+        </copy>
+    </target>
+    
+    <target name="sample-war" depends="war">
+        <ant antfile="${amserver.samples.dir}/server/build.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="samples" depends="clientsdk,war">
+        <ant antfile="${amserver.samples.dir}/build.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="distauth">
+        <ant antfile="${amserver.distauth.dir}/build.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="nightly"
+        depends="tools,javadoc,publicjavadoc,clientsdk,samples,distauth">
+        <copy file="${sharedlib.dist.dir}/opensso-sharedlib.jar"
+              tofile="${amserver.dist.dir}/opensso-sharedlib.jar" />
+        <copy file="${sharedlib.dist.dir}/opensso-sharedlib.jar.sha"
+              tofile="${amserver.dist.dir}/opensso-sharedlib.jar.sha" />
+        <copy file="${amserver.docs.dir}/nightly.html"
+              tofile="${amserver.dist.dir}/index.html" />
+    </target>
+    
+    <target name="nightly-clean">
+        <delete dir="${amserver.dist.dir}" />
+        <delete file="${tracker}" />
+    </target>
+    
+    <target name="war-clean">
+        <ant antfile="${amserver.warbase.dir}/build.xml" 
+             inheritRefs="true" target="clean"/>
+    </target>
+    
+    <target name="jars-clean">
+        <ant antfile="${amserver.basedir}/build-jars.xml" inheritRefs="true" target="clean"/>
+    </target>
+    
+    <target name="clientsdk" depends="build">
+        <ant antfile="${amserver.clientsdkbase.dir}/build.xml" inheritRefs="true"/>
+    </target>
+    
+    <target name="samples-clean">
+        <ant antfile="${amserver.samples.dir}/build.xml"
+             inheritRefs="true" target="clean"/>
+    </target>
+    
+    <target name="distauth-clean">
+        <ant antfile="${amserver.distauth.dir}/build.xml"
+             inheritRefs="true" target="clean"/>
+    </target>
+    
+    <target name="clientsdk-clean">
+        <ant antfile="${amserver.clientsdkbase.dir}/build.xml"
+             inheritRefs="true" target="clean"/>
+    </target>
+
+    <target name="amtune-clean">
+        <ant antfile="${amtune.base.dir}/build.xml" inheritRefs="true" target="clean"/>
+    </target>
+
+    <target name="am-mib" unless="amserver.mib.done">
+        <mkdir dir="${amserver.built.dir}/mib" />
+        <mkdir dir="${amserver.built.dir}/jdmk" />
+        <unzip src="${extlib.dir}/jdmk51_02-allplatforms.zip"
+            dest="${amserver.built.dir}/jdmk" />
+        <unzip src="${amserver.built.dir}/jdmk/sun-jdmk-sdk-5.1-b34.2.zip"
+            dest="${amserver.built.dir}/jdmk" />
+        <unzip src="${amserver.built.dir}/jdmk/sun-jdmk-runtime-5.1-b34.2.zip"
+            dest="${amserver.built.dir}/jdmk" />
+        <unzip src="${amserver.built.dir}/jdmk/sun-jdmk-runtime-jmx-5.1-b34.2.zip"
+            dest="${amserver.built.dir}/jdmk" />
+        <java classname="com.sun.jdmk.tools.MibGen" fork="true"
+            classpath="${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jmx.jar:${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jdmkrt.jar:${amserver.built.dir}/jdmk/SUNWjdmk/5.1/lib/jdmktk.jar">
+            <arg line="-d &quot;${amserver.built.dir}/mib&quot; -tp com.sun.identity.monitoring &quot;${amserver.base.dir}/resources/mib/SUN-OPENSSO-SERVER.mib&quot;"/>
+        </java>
+	<delete file="${amserver.built.dir}/mib/SUN_OPENSSO_SERVER_MIB.java" />
+        <property name="amserver.mib.done" value="true" />
+	<concat destfile="${tracker}" append="true">amserver.mib.done=true&#10;</concat>
+    </target>
+    
+    <target name="am-xacml" unless="amserver.xacml.done">
+        <java classname="com.sun.tools.internal.xjc.Driver"
+            classpath="${env.JAVA_HOME}/lib/tools.jar"
+            maxmemory="256m" failonerror="true" fork="true">
+            <arg line="-b &quot;${amserver.built.xsd.dir}/xacml-core-v3.xjb&quot; -extension -d &quot;${amserver.built.src.dir}&quot; &quot;${amserver.built.xsd.dir}/xacml-core-v3-schema-cd-1.xsd&quot;"/>
+        </java>
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+              destdir="${amserver.classes.dir}" source="1.5" target="1.5"
+              debug="${build.debug}" debuglevel="${build.debuglevel}" >
+            <src path="${amserver.built.src.dir}/com/sun/identity/entitlement/xacml3/core" />
+        </javac>
+        <property name="amserver.xacml.done" value="true" />
+        <concat destfile="${tracker}" append="true">amserver.xacml.done=true&#10;</concat>
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" build      : compiles the sources"/>
+        <echo message=" publicdoc  : creates javadocs for publicly supported API"/>
+        <echo message=" doc        : creates javadocs"/>
+        <echo message=" clean      : deletes the generated files"/>
+        <echo message=" jars       : create jars"/>
+        <echo message=" jars-clean : deletes generated jars"/>
+        <echo message=" tools      : builds the administration CLI tools.zip"/>
+        <echo message=" war-clean  : deletes generated WAR"/>
+        <echo message=" distauth   : builds the distauth zip"/>
+        <echo message=" distauth-clean : deletes generated distauth zip"/>
+        <echo message=" samples    : builds the client samples"/>
+        <echo message=" samples-clean : deletes generated client samples"/>
+        <echo message=" clientsdk  : builds the clientsdk jar/war"/>
+        <echo message=" clientsdk-clean : deletes generated clientsdk files"/>
+        <echo message=" usage      : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+
+</project>

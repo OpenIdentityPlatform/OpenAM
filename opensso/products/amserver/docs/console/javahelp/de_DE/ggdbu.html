@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Richtlinienkonfigurations-Dienst  - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>Richtlinienkonfigurations-Dienst </h4>
+<p>Der Richtlinienkonfigurations-Dienst wird zum Konfigurieren von richtlinienbezogenen Attributen f&#252;r jede Organisation &#252;ber
+die Federated Access Manager-Konsole verwendet. Sie k&#246;nnen auch Ressourcennamen-Implementierungen und Directory Server-Data
+Stores zur Verwendung mit dem Federated Access Manager-Richtlinien-Framework definieren. Der im Richtlinienkonfigurations-Dienst
+angegebene Directory Server wird zur Mitgliedschaftsevaluierung f&#252;r LDAP-Benutzer, LDAP-Gruppen, LDAP-Rollen und Organisationsrichtlinien-Betreffe
+verwendet.</p>
+
+<a name="ggdbf"></a><h5>Time to Live f&#252;r Betreffergebnis</h5>
+<p>Um die Leistung der Richtlinienevaluierung zu verbessern, werden Mitgliedschaftsevaluierungen f&#252;r den Zeitraum
+zwischengespeichert, der im Attribut "Time to Live f&#252;r Betreffergebnis" im Richtlinienkonfigurations-Dienst festgelegt
+ist. Diese zwischengespeicherten Mitgliedschaftsentscheidungen werden so lange verwendet, bis der im Attribut
+"Time to Live f&#252;r Betreffergebnis" festgelegte Zeitraum abgelaufen ist. Danach wird die
+Mitgliedschaftsevaluierung dazu verwendet, den aktuellen Status von Benutzern im Verzeichnis darzustellen. </p>
+
+<a name="ggday"></a><h5>Dynamische Attribute</h5>
+<p>Dies sind die zul&#228;ssigen Namen von dynamischen Attributen, die in einer Liste
+angezeigt und ausgew&#228;hlt werden, um dynamische Attribute f&#252;r Richtlinien-Response-Anbieter festzulegen. Die festgelegten
+Namen m&#252;ssen den im Daten-Repository festgelegten Attributnamen entsprechen.</p>
+
+<a name="ggdcj"></a><h5>amldapuser-Definition</h5>
+<p><tt>amldapuser</tt> ist ein w&#228;hrend der Installation erstellter Benutzer, der standardm&#228;&#223;ig f&#252;r den
+im Richtlinienkonfigurations-Dienst angegebenen Directory Server verwendet wird. Dies kann, falls erforderlich, vom
+Administrator oder Richtlinienadministrator des Bereichs ge&#228;ndert werden.</p>
+<br/>
+
+</body>
+</html>

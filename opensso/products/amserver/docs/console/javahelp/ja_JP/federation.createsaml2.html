@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 エンティティープロバイダを作成する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createsaml2"></a><h5>SAMLv2 エンティティープロバイダを作成する</h5>
+<p>連携サービス用の SAMLv2 プラグインに基づいてエンティティープロバイダを作成するには、次の手順を使用します。1 つ、複数、またはすべてのプロバイダロールをエンティティーに割り当てることができますが、定義したロールはすべて同じエンティティープロバイダに属します。</p><ol>
+<li><b>管理者としてログインします。</b></li>
+<li><b>コンソールの「連携」タブに移動し、「エンティティープロバイダ」テーブルの「新規」をクリックします。</b></li>
+<li><b>表示された画面で、エンティティープロバイダとして「SAMLv2」を選択します。</b></li>
+<li><b>エンティティープロバイダが属するレルムを選択します。</b></li>
+<li><b>「エンティティー識別子」フィールドに名前を入力します。 </b></li>
+<li><b>エンティティープロバイダに割り当てるエンティティープロバイダロールを選択します。</b><p>「メタエイリアス」フィールドにデータを入力すると、作業終了後に自動的にエンティティープロバイダロールが作成され、エンティティープロバイダに割り当てられます。</p></li>
+<li><b>1 つ以上のロールに関して、次の属性の値を入力します。</b><dl><dt>メタエイリアス</dt>
+<dd><p>設定するプロバイダロールの <tt>metaAlias</tt> を指定します。<tt>metaAlias</tt> は、プロバイダのエンティティー識別子と配置されている組織を特定するために使用されます。値は、レルムまたは組織を表す文字列と、スラッシュ「/」およびプロバイダ名を組み合わせたものです。次に例を示します。<tt>/suncorp/travelprovider</tt></p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> で使用する名前に <tt>/</tt> を含めることはできません。</p>
+<hr>
+</dd>
+<dt>署名証明書エイリアス</dt>
+<dd><p>キーストアで正しい署名証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。 </p></dd>
+<dt>暗号化証明書エイリアス</dt>
+<dd><p>キーストアで正しい暗号化証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。</p></dd>
+<dt>アフィリエイトメンバー (ホストアフィリエイトのみ)</dt>
+<dd><p>プロバイダは、トラストサークルのメンバーである必要があります。メンバーでない場合は、SAMLv2 ベースの通信に参加できません。プロバイダは、1 つ以上のアフィリエイトに属することができます。選択したプロバイダでは、「アフィリエイト連携」属性を有効にする必要があります。「新しい値」フィールドにプロバイダのメタエイリアスを入力し、「追加」をクリックします。</p></dd>
+</dl>
+</li>
+<li><b>「作成」をクリックします。</b><p>エンティティープロバイダ、割り当てられたプロバイダロール、および場所が「エンティティープロバイダ」一覧に表示されます。 </p></li>
+<li><b>エンティティープロバイダのロールの動作をカスタマイズするには、エンティティープロバイダの名前をクリックし、カスタマイズするロールに対応するタブを選択します。</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+
+     <test name="CSDK_Write_log_to_file_1">
+        <parameter name="testName" value="LogToFileTest1"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToFileTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_Write_log_to_file_2">
+        <parameter name="testName" value="LogToFileTest2"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToFileTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_Write_log_to_file_3">
+        <parameter name="testName" value="LogToFileTest3"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToFileTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_Write_log_to_file_4">
+        <parameter name="testName" value="LogToFileTest4"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="true"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToFileTest"/>
+        </classes>
+    </test> 
+    <test name="CSDK_Write_log_to_db_1">
+        <parameter name="testName" value="LogToDBTest1"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToDBTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_Write_log_to_db_2">
+        <parameter name="testName" value="LogToDBTest2"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToDBTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_Write_log_to_db_3">
+        <parameter name="testName" value="LogToDBTest3"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="true"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKLogToDBTest"/>
+        </classes>
+    </test> 
+   
+   

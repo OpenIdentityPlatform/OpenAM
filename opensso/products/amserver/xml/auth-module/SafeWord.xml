@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="SafeWord" version="1.0" >    
+    <Callbacks length="1" order="1" timeout="60" header="This server uses SafeWord Authentication" >
+        <NameCallback>            
+            <Prompt> Your User Name: </Prompt>            
+        </NameCallback>     
+    </Callbacks>
+    <Callbacks length="1" order="2" timeout="60" header="This server uses SafeWord Authentication" >
+        <PasswordCallback echoPassword="false" >
+            <Prompt> Your Password: </Prompt>            
+        </PasswordCallback>           
+    </Callbacks>
+</ModuleProperties>

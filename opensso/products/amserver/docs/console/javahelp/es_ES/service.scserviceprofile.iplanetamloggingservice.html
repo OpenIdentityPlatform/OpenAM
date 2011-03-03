@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Registros - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>Registros</h4>
+<p><a name="indexterm-203"></a>El servicio de registro proporciona mensajes de error y estado relacionados con
+la administraci&#243;n de OpenSSO. Un administrador puede configurar valores como, por ejemplo,
+el tama&#241;o del archivo de registro y la ubicaci&#243;n de dicho archivo.
+OpenSSO puede registrar eventos en archivos de texto sin formato o en
+una base de datos relacional. Los atributos del servicio de registro son
+atributos globales. Los atributos son:</p>
+<ul><li><p><a href="#fxbsv">Tama&#241;o m&#225;ximo de registro</a></p></li>
+<li><p><a href="#fxbsg">N&#250;mero de archivos de historial</a></p></li>
+<li><p><a href="#fxbzh">Ubicaci&#243;n de archivo de registro</a></p></li>
+<li><p><a href="#fxbwg">Tipo de registro</a></p></li>
+<li><p><a href="#fxbrd">Nombre de usuario de base de datos</a></p></li>
+<li><p><a href="#fxcdf">Contrase&#241;a de usuario de base de datos</a></p></li>
+<li><p><a href="#fxcep">Contrase&#241;a de usuario de base de datos (confirmar)</a></p></li>
+<li><p><a href="#fxbvb">Nombre del controlador de base de datos</a></p></li>
+<li><p><a href="#fxbsb">Campos de registro configurables</a></p></li>
+<li><p><a href="#fxccb">Frecuencia de verificaci&#243;n de registro</a></p></li>
+<li><p><a href="#fxbxe">Tiempo de firma de registro</a></p></li>
+<li><p><a href="#fxcbz">Registro seguro</a></p></li>
+<li><p><a href="#fxbxt">N&#250;mero m&#225;ximo de registros</a></p></li>
+<li><p><a href="#fxbwp">N&#250;mero de archivos por archivaci&#243;n</a></p></li>
+<li><p><a href="#fxbyw">Tama&#241;o de b&#250;fer</a></p></li>
+<li><p><a href="#fxbvh">Tama&#241;o de b&#250;fer de memoria de fallo de DB</a></p></li>
+<li><p><a href="#fxcea">Tiempo de almacenamiento en b&#250;fer</a></p></li>
+<li><p><a href="#fxbsn">B&#250;fer de tiempo</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>Tama&#241;o m&#225;ximo de registro</h5>
+<p>Este atributo acepta un valor para el tama&#241;o m&#225;ximo (en bytes) de
+un archivo de registro de OpenSSO. El valor predeterminado es 1000000.</p>
+
+<a name="fxbsg"></a><h5>N&#250;mero de archivos de historial</h5>
+<p>Este atributo tiene un valor equivalente al n&#250;mero de archivos de registro
+de copia de seguridad que se retendr&#225;n para an&#225;lisis hist&#243;ricos. Se puede
+introducir cualquier n&#250;mero entero en funci&#243;n del tama&#241;o de la partici&#243;n y
+el espacio disponible en disco del sistema local. El valor predeterminado es
+3.</p><p>Los archivos s&#243;lo son v&#225;lidos para el tipo de registro FILE. Si
+el tipo de registro se establece en DB, no habr&#225; archivos de
+historial y OpenSSO no establecer&#225; de forma expl&#237;cita el l&#237;mite de tama&#241;o
+de los archivos.</p>
+<hr><p><b>Nota &#8211; </b>Si se introduce el valor 0, se interpretar&#225; que es igual al
+valor 1, es decir, si se especifica 0, se crear&#225; un archivo
+de registro de historial.</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>Ubicaci&#243;n de archivo de registro</h5>
+<p>La funci&#243;n de registro basada en archivos necesita una ubicaci&#243;n en la
+que guardar los archivos de registro. .  La ubicaci&#243;n predeterminada es:</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt> es una etiqueta que representa el directorio de configuraci&#243;n b&#225;sico y
+el URI del servidor de OpenSSO. En el tiempo de ejecuci&#243;n, el
+servicio de registro determina el directorio correcto de la instancia a la
+hora de realizar el proceso de registro. El valor de este atributo
+puede establecerse en una ruta expl&#237;cita, pero la ruta base deber&#225; ser
+su directorio de configuraci&#243;n.</p><p>Si se especifica un directorio diferente al predeterminado, OpenSSO crear&#225; este directorio
+en caso de no existir. Deber&#237;a definir los permisos necesarios para ese
+directorio (por ejemplo, 0700).</p><p>Cuando se configura la ubicaci&#243;n para el registro de base de datos
+(como Oracle o MySQL), parte de la ubicaci&#243;n del registro distingue entre
+may&#250;sculas y min&#250;sculas. Por ejemplo, si el registro se realiza en una
+base de datos Oracle, la ubicaci&#243;n del registro deber&#237;a ser (advierta la
+utilizaci&#243;n de may&#250;sculas y min&#250;sculas):</p><p><tt>jdbc:oracle:thin:&#64;machine.domain:port:DBName</tt></p><p>Para configurar el registro en la base de datos, agregue los archivos
+del controlador JDBC a la ruta de clase JVM del contenedor Web.
+Deber&#225; agregar manualmente los archivos del controlador JDBC a la ruta de
+clase de la secuencia de comandos <tt>amadmin</tt>, de lo contrario, el registro
+de <tt>amadmin</tt> no puede cargar el controlador JDBC.</p><p>Los cambios realizados en los atributos de registro se aplican normalmente despu&#233;s
+de guardarlos. No es necesario reiniciar el servidor. Sin embargo, s&#237; debe
+reiniciarlo si realiza cambios en el registro de seguridad.</p>
+
+<a name="ggyhl"></a><h5>Estado de registro</h5>
+<p>Especifica si el registro est&#225; activado (ACTIVO) o desactivado (INACTIVO). Durante la
+instalaci&#243;n el valor se configura en ACTIVO. </p>
+
+<a name="ggydj"></a><h5>Nombre de host de resoluci&#243;n de las entradas del registro</h5>
+<p>Si se establece en "false" (falso), las b&#250;squedas de host no se
+realizar&#225;n para rellenar el campo Nombre de host de la entrada del
+registro.</p>
+
+<a name="fxbwg"></a><h5>Tipo de registro</h5>
+<p>Permite especificar File (Archivo) para el registro de archivo sin formato, o
+DB para el registro de base de datos.</p><p>Si el nombre de usuario o la contrase&#241;a de base de datos
+no es v&#225;lida, esto afectar&#225; gravemente al procesamiento de OpenSSO. Si OpenSSO
+o la consola presentan inestabilidad, deber&#225; establecer el atributo Estado de registro
+en Inactivo. </p><p>Una vez definida la propiedad, reinicie el servidor. A continuaci&#243;n, puede iniciar
+una sesi&#243;n en la consola y restablecer el atributo de registro. A
+continuaci&#243;n, cambie la propiedad Estado de registro a <i>ACTIVO</i> y reinicie el
+servidor.</p>
+
+<a name="fxbrd"></a><h5>Nombre de usuario de base de datos</h5>
+<p>Este atributo acepta el nombre del usuario que se conectar&#225; a la
+base de datos cuando el atributo de tipo de registro se establece
+en DB.</p>
+
+<a name="fxcdf"></a><h5>Contrase&#241;a de usuario de base de datos</h5>
+<p>Este atributo acepta la contrase&#241;a del usuario de la base de datos
+cuando el tipo de registro se ha definido en DB.</p>
+
+<a name="fxcep"></a><h5>Contrase&#241;a de usuario de base de datos (confirmar)</h5>
+<p>Confirme la contrase&#241;a de la base de datos.</p>
+
+<a name="fxbvb"></a><h5>Nombre del controlador de base de datos</h5>
+<p>Este atributo permite especificar el controlador que se utiliza para la clase
+de implementaci&#243;n del registro.</p>
+
+<a name="fxbsb"></a><h5>Campos de registro configurables</h5>
+<p>Representa la lista de campos que se van a registrar. De forma
+predeterminada, se registran todos los campos: Los campos son:</p>
+<ul><li><p>CONTEXTID</p></li>
+<li><p>DOMAIN</p></li>
+<li><p>HOSTNAME</p></li>
+<li><p>IPADDRESS</p></li>
+<li><p>LOGGED BY</p></li>
+<li><p>LOGLEVEL</p></li>
+<li><p>LOGINID</p></li>
+<li><p>MESSAGEID</p></li>
+<li><p>MODULENAME</p></li></ul>
+<p>Como m&#237;nimo, deben registrarse CONTEXTID, DOMAIN, HOSTNAME, LOGINID y MESSAGEID.</p>
+
+<a name="fxccb"></a><h5>Frecuencia de verificaci&#243;n de registro</h5>
+<p>Este atributo define la frecuencia (en segundos) con la que el servidor
+deber&#237;a verificar los registros para detectar una manipulaci&#243;n no autorizada. El valor
+predeterminado es de 3.600 segundos. Este par&#225;metro s&#243;lo es v&#225;lido para el
+registro seguro.</p>
+
+<a name="fxbxe"></a><h5>Tiempo de firma de registro</h5>
+<p>Este par&#225;metro define la frecuencia (en segundos) con la que se firmar&#225;
+el registro. El valor predeterminado es de 900 segundos. Este par&#225;metro s&#243;lo
+es v&#225;lido para el registro seguro.</p>
+
+<a name="fxcbz"></a><h5>Registro seguro</h5>
+<p>Este atributo habilita o deshabilita el registro seguro. De forma predeterminada, esta
+funci&#243;n est&#225; desactivada. El registro seguro habilita la detecci&#243;n de cambios o
+un uso no autorizado en los registros de seguridad.</p>
+<hr><p><b>Nota &#8211; </b>El registro seguro s&#243;lo se puede utilizar para los archivos sin formato.
+Esta opci&#243;n no funciona para el registro de base de datos (DB).</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>Algoritmo de firma de registro de seguridad</h5>
+<p>Este atributo define RSA y DSA (Algoritmo de firma digital), que tiene
+claves privadas de firma y una clave p&#250;blica de verificaci&#243;n. Puede elegir
+uno de los siguientes valores:</p>
+<ul><li><p>MD2 con RSA</p></li>
+<li><p>MD5 con RSA</p></li>
+<li><p>SHA1 con DSA</p></li>
+<li><p>SHA1 con RSA</p></li></ul>
+<p>MD2, MD5 y RSA no son Hash de una direcci&#243;n. Por ejemplo,
+si selecciona el algoritmo de firma MD2 con RSA, la funci&#243;n de
+registro de seguridad genera un grupo de mensajes con MD2 y cifra
+el valor con la clave privada RSA. Este valor cifrado es la
+firma de las entradas registradas originales y se a&#241;adir&#225; al &#250;ltimo registro
+de la firma m&#225;s reciente. Para su validaci&#243;n, se descifrar&#225; la firma
+con la clave p&#250;blica RSA y se comparar&#225; el valor descifrado con
+el grupo de entradas registradas. La funci&#243;n de registro de seguridad detectar&#225;
+cualquier modificaci&#243;n en cualquier entrada registrada.</p>
+
+<a name="ghaeg"></a><h5>Registro de ubicaci&#243;n del almac&#233;n de certificados</h5>
+<p>Cuando est&#233; habilitado el registro seguro, el servicio de registro busca el
+certificado en la ubicaci&#243;n especificada por este atributo. La ruta de directorio
+real se determina en el tiempo de ejecuci&#243;n. El valor puede definirse
+en una ruta expl&#237;cita, pero OpenSSO deber&#225; poder acceder a la ruta
+b&#225;sica.</p>
+
+<a name="fxbxt"></a><h5>N&#250;mero m&#225;ximo de registros</h5>
+<p>Este atributo define el n&#250;mero m&#225;ximo de registros que mostrar&#225;n las interfaces
+de Java LogReader, independientemente de los registros que coincidan con la consulta
+de lectura. By default, it is set to 500. This attribute can
+be overridden by the caller of the Logging API through the <i> LogQuery</i>
+class.</p>
+
+<a name="fxbwp"></a><h5>N&#250;mero de archivos por archivaci&#243;n</h5>
+<p>Este atributo s&#243;lo es v&#225;lido para el registro seguro. Especifica cu&#225;ndo se
+deben archivar los archivos de registro y el almac&#233;n de claves, y
+cu&#225;ndo se debe regenerar el almac&#233;n de claves seguro para posteriores registros
+de seguridad. El valor predeterminado es de cinco archivos por registrador.</p>
+
+<a name="fxbyw"></a><h5>Tama&#241;o de b&#250;fer</h5>
+<p>Este atributo especifica la cantidad m&#225;xima de registros que se almacenar&#225;n en
+el b&#250;fer antes de que el servicio de registro intente escribirlos en
+el repositorio de registro. El valor predeterminado es de un registro.</p>
+
+<a name="fxbvh"></a><h5>Tama&#241;o de b&#250;fer de memoria de fallo de DB</h5>
+<p>Este atributo define el n&#250;mero m&#225;ximo de registros que se conservar&#225; en
+la memoria si el registro de la base de datos (DB) falla.
+Este atributo s&#243;lo es v&#225;lido cuando se ha especificado el registro de
+DB. Cuando el servicio de registro de OpenSSO pierde la conexi&#243;n con
+la base de datos, guardar&#225; en el b&#250;fer el n&#250;mero de registros
+especificados. Este atributo tiene como valor predeterminado el doble del valor definido
+en el atributo de tama&#241;o de b&#250;fer.</p>
+
+<a name="fxcea"></a><h5>Tiempo de almacenamiento en b&#250;fer</h5>
+<p>Este atributo especifica la cantidad de tiempo que los registros se conservar&#225;n
+en el b&#250;fer antes de que se env&#237;en al servicio de registro.
+Este atributo se aplica si Enable Time Buffering (Activar tiempo de almacenamiento
+en b&#250;fer) est&#225; definido en ON (Activado). El valor predeterminado es 3.600
+segundos.</p>
+
+<a name="fxbsn"></a><h5>B&#250;fer de tiempo</h5>
+<p>Cuando se selecciona como ON (Activado), OpenSSO define un l&#237;mite de tiempo
+para guardar en el b&#250;fer los registros. La cantidad de tiempo se
+define en el atributo de tiempo de almacenamiento en b&#250;fer.</p>
+
+<a name="ghaer"></a><h5>Nivel de registro</h5>
+<p>Utilice este atributo para configurar el grado de detalle que debe contener
+un archivo de registro determinado eligiendo una de las opciones. Los servicios
+de OpenSSO se registran en el nivel INFO. Los servicios SAML y
+de Federaci&#243;n de identidad tambi&#233;n registran a niveles m&#225;s detallados (FINE, FINER,
+FINEST). Adem&#225;s, tiene a su disposici&#243;n el nivel OFF, que puede utilizarse
+para desactivar el registro, y el nivel ALL, que puede utilizarse para
+habilitar el registro de todos los mensajes.</p>
+<br/>
+
+</body>
+</html>

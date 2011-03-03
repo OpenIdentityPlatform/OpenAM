@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So f&#252;gen Sie einer Anbieter-Entity einen neuen Remote-Dienstanbieter hinzu - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteadd"></a><h4>So f&#252;gen Sie einer Anbieter-Entity einen neuen Remote-Dienstanbieter hinzu</h4><p>Ein <b>Remote-Anbieter</b> befindet sich auf einem anderen Server als Access Manager. Die
+Konfiguration der Attribute eines neuen Remote-Dienstanbieters beinhaltet das Hinzuf&#252;gen der Metadaten des
+Dienstanbieters zum Entity-Profil. Der Ausgangspunkt f&#252;r dieses Verfahren ist <a href="federation.fsserviceprovider.html">So f&#252;gen Sie einer Anbieter-Entity einen Dienstanbieter hinzu</a>.</p>
+<hr><p><b>Hinweis &#8211; </b>Zus&#228;tzliche Attribute k&#246;nnen konfiguriert werden, sie werden jedoch auf der Seite f&#252;r
+die anf&#228;ngliche Konfiguration nicht angezeigt. Siehe <a href="federation.fsserviceproviderremoteprofile.html">So &#228;ndern Sie einen Remote-Dienstanbieter in einer Anbieter-Entity</a>.</p>
+<hr>
+<ol>
+<li><b>Geben Sie Informationen f&#252;r die allgemeinen Attribute an.</b><p>Allgemeine Attribute enthalten Werte, die den Identity-Anbieter selbst allgemein beschreiben.</p><dl><dt>Beschreibung</dt>
+<dd><p>Der Wert dieses Attributs ist die Beschreibung, die Sie bei der Erstellung der Entity eingegeben haben. Sie k&#246;nnen die urspr&#252;nglich eingegebene Beschreibung &#228;ndern bzw. eine hinzuf&#252;gen, wenn noch keine vorhanden ist.</p></dd>
+<dt>Protokollunterst&#252;tzungsaufz&#228;hlung</dt>
+<dd><p>W&#228;hlen Sie die von dieser Entity unterst&#252;tzte Version von Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) aus.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> bezieht sich auf Liberty ID-FF-Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> bezieht sich auf Liberty ID-FF-Version 1.1.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>W&#228;hlen Sie einen der verf&#252;gbaren Circles of Trust aus, der dem Anbieter
+zugewiesen werden soll.</b><p>Ein Anbieter kann zu mehreren Circles of Trust geh&#246;ren. Ein Anbieter, f&#252;r
+den kein Circle of Trust angegeben ist, kann jedoch nicht an Kommunikationen
+teilnehmen, die auf den Liberty Alliance Project-Spezifikationen beruhen. Wenn keine Circles of
+Trust erstellt wurden, k&#246;nnen Sie dieses Attribut sp&#228;ter definieren.</p></li>
+<li><b>Geben Sie Informationen f&#252;r die Dienstanbieterattribute an.</b><p>Dienstanbieterattribute legen allgemeine Informationen zum Dienstanbieter fest.</p><dl><dt>Assertion Consumer-URL</dt>
+<dd><p>Geben Sie einen URL zu dem Endpunkt ein, der alle SAML-Assertionen empf&#228;ngt und verarbeitet, die an den Dienstanbieter gesendet werden.</p></dd>
+<dt>URL-ID des Assertion Consumer-Dienstes</dt>
+<dd><p>Wenn der Wert des allgemeinen Attributs der Protokollunterst&#252;tzung <tt>urn:liberty:iff:2003-08</tt> lautet, geben Sie die erforderliche ID ein.</p></dd>
+<dt>URL des Assertion Consumer-Dienstes als Standard festlegen</dt>
+<dd><p>Aktivieren Sie dieses Kontrollk&#228;stchen, wenn Sie den URL des Assertion Consumer-Dienstes als Standardwert verwenden m&#246;chten, falls eine Anforderung keinen Bezeichner enth&#228;lt.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "OK", um den Anbieter zur Entity hinzuzuf&#252;gen.</b></li>
+<li><b>W&#228;hlen Sie eine andere Option aus dem Men&#252; "Ansicht" aus, um weitere
+Einstellungen der Entity zu konfigurieren, oder klicken Sie auf "Speichern", um die
+Konfiguration abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

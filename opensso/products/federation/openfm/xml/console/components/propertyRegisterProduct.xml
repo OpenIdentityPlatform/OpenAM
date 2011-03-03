@@ -1,0 +1,160 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyRegisterProduct.xml,v 1.3 2008/06/25 05:51:05 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="question" defaultValue="configure.provider.section.setup">
+    <property span="true">
+        <cc name="txtDesc" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="page.desc.register.product" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblAcctOption" defaultValue="register.product.account.question" labelFor="radioAcctOption" />
+        <cc name="radioAcctOption" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+            <option label="register.product.option.account" value="acct" />
+            <option label="register.product.option.no.account" value="noacct" />
+            <attribute name="layout" value="vertical" />
+            <attribute name="onChange" value="acctSelect(this);" />
+        </cc>
+    </property>
+    </section>
+
+    <section name="accountinfo" defaultValue="register.product.account.info">
+
+    <property required="true">
+        <label name="lblExistUserName" defaultValue="register.product.label.userName" labelFor="tfExistUserName" />
+        <cc name="tfExistUserName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblExistPswd" defaultValue="register.product.label.pswd" labelFor="tfExistPswd" />
+        <cc name="tfExistPswd" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblExistProxyHost" defaultValue="register.product.label.proxyHost" labelFor="tfExistProxyHost" />
+        <cc name="tfExistProxyHost" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="100" />
+        </cc>
+        <fieldhelp name="helpProxyHost" defaultValue="register.product.help.proxyHost" />
+    </property>
+    <property>
+        <label name="lblExistProxyPort" defaultValue="register.product.label.proxyPort" labelFor="tfExistProxyPort" />
+        <cc name="tfExistProxyPort" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="15" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblDomain" defaultValue="register.product.label.domain" labelFor="tfDomain" />
+        <cc name="tfDomain" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+    </property>
+
+    <property>
+<label name="lblUserName" defaultValue="register.product.label.userName" labelFor="tfUserName" />
+        <cc name="tfUserName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="50" />
+        </cc>
+        <fieldhelp name="helpUserName" defaultValue="register.product.help.userName" />
+    </property>
+    <property required="true">
+        <label name="lblEmailAddr" defaultValue="register.product.label.emailAddr" labelFor="tfEmailAddr" />
+        <cc name="tfEmailAddr" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="75" />
+        </cc>
+        <fieldhelp name="helpUserName" defaultValue="register.product.help.emailAddr" />
+    </property>
+    <property required="true">
+        <label name="lblPswd" defaultValue="register.product.label.pswd" labelFor="tfPswd" />
+        <cc name="tfPswd" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblCfrmPswd" defaultValue="register.product.label.cfrmPswd" labelFor="tfCfrmPswd" />
+        <cc name="tfCfrmPswd" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="50" />
+        </cc>
+        <fieldhelp name="helpCfrmPswd" defaultValue="register.product.help.cfrmPswd" />
+    </property>
+    <property>
+        <label name="lblProxyHost" defaultValue="register.product.label.proxyHost" labelFor="tfProxyHost" />
+        <cc name="tfProxyHost" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="100" />
+        </cc>
+        <fieldhelp name="helpProxyHost" defaultValue="register.product.help.proxyHost" />
+    </property>
+    <property>
+        <label name="lblProxyPort" defaultValue="register.product.label.proxyPort" labelFor="tfProxyPort" />
+        <cc name="tfProxyPort" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="15" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblFirstName" defaultValue="register.product.label.firstName" labelFor="tfFirstName" />
+        <cc name="tfFirstName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="75" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblLastName" defaultValue="register.product.label.lastName" labelFor="tfLastName" />
+        <cc name="tfLastName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="75" />
+        </cc>
+    </property>
+
+    <property required="true">
+        <label name="lblCountry" defaultValue="register.product.label.country" labelFor="tfCountry" />
+        <cc name="tfCountry" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <attribute name="onChange" value="countrySelect(this);" />
+        </cc>
+    </property>
+    </section>
+    <section name="priv" defaultValue="register.product.label.privacy.terms">
+    <property span="true">
+        <cc name="txtPriv" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="register.product.label.privacy" />
+        </cc>
+    </property>
+    </section>
+</propertysheet>

@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 XACML PDP-Anpassung  - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pdp"></a><h4>SAMLv2 XACML PDP-Anpassung </h4>
+<p>XACML PDP enth&#228;lt die folgenden Attribute zur Anpassung:</p>
+<ul><li><p><a href="#ggwgo">Protokollunterst&#252;tzungsaufz&#228;hlung</a></p></li>
+<li><p><a href="#ggwjh">Signaturschl&#252;sselalias</a></p></li>
+<li><p><a href="#ggwjx">Verschl&#252;sselungsschl&#252;ssel-Alias</a></p></li>
+<li><p><a href="#ggwhi">Basisautorisierung</a></p></li>
+<li><p><a href="#ggwgk">Abfrage f&#252;r Autorisierungsentscheidung signiert</a></p></li>
+<li><p><a href="#ggwhp">Autorisierungsdienst</a></p></li></ul>
+
+
+<a name="ggwgo"></a><h5>Protokollunterst&#252;tzungsaufz&#228;hlung</h5>
+<p>Zeigt die XACML PDP-Ver&#246;ffentlichung an, die von diesem Anbieter unterst&#252;tzt wird. </p><p><tt>urn:liberty:iff:2003-08</tt> verweist auf Liberty Identity Federation Framework Version 1.2.</p><p><tt>urn:liberty:iff:2002-12</tt> verweist auf Liberty Identity Federation Framework Version 1.1. </p>
+
+<a name="ggwjh"></a><h5>Signaturschl&#252;sselalias</h5>
+<p>Definiert den Schl&#252;ssel-Alisas, der f&#252;r das Signieren von Anforderungen und Antworten verwendet
+wird.</p>
+
+<a name="ggwjx"></a><h5>Verschl&#252;sselungsschl&#252;ssel-Alias</h5>
+<p>Definiert den Schl&#252;ssel-Alias f&#252;r die XACML-Verschl&#252;sselung. </p>
+
+<a name="ggwhi"></a><h5>Basisautorisierung</h5>
+<p>Die Basisautorisierung kann zum Schutz von SOAP-Endpunkten aktiviert werden. S&#228;mtliche Anbieter, die
+auf diese Endpunkte zugreifen, m&#252;ssen &#252;ber einen definierten Benutzer und ein Passwort
+in den folgenden beiden Eigenschaften verf&#252;gen: <tt>Benutzername</tt> und <tt>Passwort</tt>.</p>
+
+<a name="ggwgk"></a><h5>Abfrage f&#252;r Autorisierungsentscheidung signiert</h5>
+<p>Wenn aktiviert, erzwingt dieses Attribut, dass alle Anforderungen f&#252;r die XACML-Autorisierungsentscheidung signiert
+werden.</p>
+
+<a name="ggwhp"></a><h5>Autorisierungsdienst</h5>
+<p>Dieses Attribut definiert den Typ (Binding) der Autorisierungsanforderung, und den URL-Endpunkt f&#252;r
+den Empfang der Anforderung. Standardm&#228;&#223;ig lautet der Binding-Typ SOAP.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>보안 토큰 서비스 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.securitytokenservice"></a><h4>보안 토큰 서비스</h4>
+<p>이 서비스에 포함된 속성은 OpenSSO 보안 토큰 서비스(STS)의 동적 구성을 정의합니다. 이러한
+속성은 다음과 같은 구성을 정의합니다.</p>
+<ul><li><p>보안 토큰 발급 및 만들기</p></li>
+<li><p>STS 서비스 엔드포인트를 보호하기 위한 STS 자체 웹 서비스 보안. 서명 및 암호화 속성은 들어오는 WS-Trust 요청에 대한 서버 공급자 유효성 검사를 구성하고 나가는 WS-Trust 응답을 보호합니다. 보안 메커니즘 속성은 보안 토큰의 보안 자격 증명을 정의합니다.</p></li>
+<li><p>구성된 STS가 웹 서비스 공급자로 지정되어 있고 원격 STS에서 생성된 SAML 토큰(명제)을 수신하는 경우 SAML 명제를 통해 보안 토큰의 SAML 속성 매핑을 요청하는 SAML 구성</p></li>
+<li><p>원격 STS에서 토큰을 생성한 경우 웹 서비스 공급자로부터 받은 보안 토큰 유효성 검사</p><p>[영역] 탭의 <a href="agentconfig.agents.html">중앙 집중화된 에이전트 구성</a>에서 다른 OpenSSO 웹 서비스 보안 공급자에 대한 동적 구성 프로필을 만들 수 있습니다.</p></li></ul>
+
+
+<a name="ghatr"></a><h5>발급자</h5>
+<p>보안 토큰을 발급한 보안 토큰 서비스의 이름입니다.</p>
+
+<a name="ghawa"></a><h5>엔드포인트</h5>
+<p>이 필드는 다음과 동일한 값을 가집니다. </p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>이 구문은 특정 세션 매개 변수에 기초하여 보안 토큰 서비스 엔드포인트 URL을
+동적으로 대체할 수 있게 합니다.</p>
+
+<a name="ghatv"></a><h5>발급된 키 암호화</h5>
+<p>사용 설정되면 이 속성은 보안 토큰 서비스에서 발급한 키를 암호화합니다.</p>
+
+<a name="ghauc"></a><h5>발급된 토큰 암호화</h5>
+<p>사용 설정되면 이 속성은 보안 토큰 서비스에서 발급한 보안 토큰을 암호화합니다.</p>
+
+<a name="ghavx"></a><h5>보안 토큰의 수명</h5>
+<p>발급된 토큰이 유효한 기간을 정의합니다.</p>
+
+<a name="ghaud"></a><h5>토큰 구현 클래스</h5>
+<p>이 속성은 보안 토큰 공급자/발급자의 구현 클래스를 지정합니다.</p>
+
+<a name="ghaug"></a><h5>인증서 별칭 이름</h5>
+<p>보안 토큰 서비스에서 발급한 보안 토큰에 서명하는 데 사용되는 인증서의 별칭 이름을
+정의합니다.</p>
+
+<a name="ghauh"></a><h5>STS 최종 사용자 토큰 플러그인 클래스</h5>
+<p>최종 사용자 토큰 변환을 위한 구현 클래스를 정의합니다. </p>
+
+<a name="ghawk"></a><h5>보안 메커니즘</h5>
+<p>보안 토큰 자체 또는 클라이언트가 보낸 WS-Trust 요청에서 보안 토큰 서비스가 수락한
+보안 자격 증명을 보호하는 데 사용되는 보안 자격 증명 유형을 정의합니다. 다음
+보안 유형 중에서 선택할 수 있습니다.</p>
+<ul><li><p>익명 &#8212; 익명 보안 메커니즘에 보안 자격 증명이 포함되지 않습니다.</p></li>
+<li><p>KerberosToken &#8212; 커버로스 토큰을 사용합니다.</p></li>
+<li><p>LibertyDiscoverySecurity &#8212; Liberty 기반 보안 토큰을 사용합니다.</p></li>
+<li><p>SAML-HolderOfKey &#8212; SAML 1.1 명제 유형 Holder-Of-Key를 사용합니다.</p></li>
+<li><p>SAML-SenderVouches &#8212; SAML 1.1 명제 유형 Sender Vouches를 사용합니다.</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8212; SAML 2.0 명제 토큰 유형 Holder-Of-Key를 사용합니다.</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8212; SAML 2.0 명제 토큰 유형 Sender Vouches를 사용합니다.</p></li>
+<li><p>STSSecurity &#8212; 보안 토큰 서비스 에이전트가 보안 토큰 서비스에서 보안 토큰을 가져옵니다. </p></li>
+<li><p>UserNameToken &#8212; 사용자 이름 토큰을 사용하여 보안 토큰 서비스 요청을 보호합니다.</p></li>
+<li><p>UserNameToken-Plain &#8212; 일반 텍스트 비밀번호가 있는 사용자 이름 토큰을 사용하여 보안 토큰 서비스 요청을 보호합니다.</p></li>
+<li><p>X509Token &#8212; X509 인증서를 사용하여 보안 토큰을 보호합니다.</p></li></ul>
+
+
+<a name="ghesm"></a><h5>인증 체인</h5>
+<p> OpenSSO의 인증된 보안 토큰을 생성하기 위해 들어오는 발급자 요청의 보안 토큰에
+있는 자격 증명을 사용하여 OpenSSO 인증 서비스를 인증하는 데 사용할 수 있는
+인증 체인 또는 서비스 이름을 정의합니다.</p>
+
+<a name="ghaup"></a><h5>사용자 자격 증명</h5>
+<p>이 속성은 클라이언트가 들어오는 WS-Trust 요청의 일부로 보낸 UserName 토큰의 유효성을 검사하기
+위해 보안 토큰 서비스가 사용하는 사용자 이름/비밀번호 공유 비밀을 나타냅니다.</p>
+
+<a name="ghauq"></a><h5>요청 서명 확인됨</h5>
+<p>보안 토큰 서비스가 들어오는 WS-Trust 요청의 서명을 확인해야 함을 지정합니다.</p>
+
+<a name="ghaui"></a><h5>요청 헤더 해독됨</h5>
+<p>보안 토큰 서비스가 수신한 모든 요청 헤더를 해독해야 함을 지정합니다.</p>
+
+<a name="ghauf"></a><h5>요청 해독됨</h5>
+<p>보안 토큰 서비스가 수신한 모든 요청을 해독해야 함을 지정합니다.</p>
+
+<a name="ghavc"></a><h5>응답 서명됨</h5>
+<p>보안 토큰 서비스가 수신한 모든 응답이 서명되어야 함을 지정합니다.</p>
+
+<a name="ghavo"></a><h5>응답 암호화됨</h5>
+<p>보안 토큰 서비스가 보낸 모든 응답이 암호화되어야 함을 지정합니다.</p>
+
+<a name="ghdtd"></a><h5>서명 참조 유형</h5>
+<p>보안 토큰 서비스가 WS-Trust 응답에 서명하는 데 사용할 참조 유형을 정의합니다. 사용
+가능한 참조 유형은 <tt>DircectReference</tt>, <tt>KeyIdentifier</tt> 및 <tt>X509</tt>입니다. </p>
+
+<a name="ghdss"></a><h5>암호화 알고리즘</h5>
+<p>보안 토큰 서비스가 WS-Trust 응답을 암호화하는 데 사용할 암호화 알고리즘을 정의합니다.</p>
+
+<a name="ghdru"></a><h5>암호화 강도</h5>
+<p>보안 토큰 서비스가 WS-Trust 응답을 암호화하는 데 사용할 암호화 강도를 설정합니다. 암호화
+강도를 높이려면 더 큰 값을 선택합니다.</p>
+
+<a name="ghavt"></a><h5>개인 키 별칭</h5>
+<p>이 속성은 WS-Trust 응답에 서명하거나 들어오는 WS-Trust 요청을 해독하는 데 사용할 개인
+인증서 키 별칭을 정의합니다.</p>
+
+<a name="ghave"></a><h5>개인 키 유형</h5>
+<p>이 속성은 WS-Trust 응답에 서명하거나 WS-Trust 요청을 해독하는 데 사용할 인증서 개인
+키 유형을 정의합니다. 사용 가능한 유형은 <tt>PublicKey</tt>, <tt>SymmetricKey</tt> 또는 <tt>NoProofKey</tt>입니다.</p>
+
+<a name="ghaux"></a><h5>웹 서비스(WS-Trust) 클라이언트의 공개 키 별칭</h5>
+<p>들어오는 WS-Trust 요청의 서명을 확인하거나 WS-Trust 응답을 암호화하는 데 사용할 공개 인증서
+키 별칭을 정의합니다.</p>
+
+<a name="ghbbv2"></a><h5>커버로스 도메인 서버</h5>
+<p>이 속성은 커버로스 배포 센터(도메인 제어기)의 호스트 이름을 지정합니다. 도메인 제어기의 정규화된
+도메인 이름(FQDN)을 입력해야 합니다.</p>
+
+<a name="ghbdx2"></a><h5>커버로스 도메인</h5>
+<p>이 속성은 커버로스 배포 센터(도메인 제어기)의 도메인 이름을 지정합니다. 구성에 따라 도메인
+제어기의 도메인 이름은 OpenSSO 도메인 이름과 다를 수 있습니다.</p>
+
+<a name="ghbcq2"></a><h5>커버로스 서비스 기본</h5>
+<p>생성된 보안 토큰의 소유자로 커버로스 기본을 지정합니다.</p><p>다음 형식을 사용합니다. </p><p><tt>HTTP/hostname.domainname@dc_domain_name</tt></p><p><tt>hostname</tt> 및 <tt>domainame</tt>은 OpenSSO 인스턴스의 호스트 이름과 도메인 이름을 나타냅니다. <tt>dc_domain_name</tt>은 Windows
+커버로스 서버(도메인 제어기)가 상주하는 커버로스 도메인입니다. 커버로스 서버가 OpenSSO 인스턴스의 도메인 이름과
+다를 수 있습니다.</p>
+
+<a name="ghbae2"></a><h5>커버로스 키 탭 파일</h5>
+<p>이 속성은 토큰 발급에 사용되는 커버로스 키 탭 파일을 지정합니다. 다음 형식을
+사용합니다(반드시 따라야 하는 형식은 아님).</p><p><tt>hostname.HTTP.keytab</tt></p><p><tt>hostname</tt>은 OpenSSO 인스턴스의 호스트 이름입니다.</p>
+
+<a name="ghbep2"></a><h5>커버로스 서명 확인</h5>
+<p>이 속성을 사용하면 커버로스 토큰이 서명됨을 지정합니다.</p>
+
+<a name="ghawg"></a><h5>SAML 속성 매핑</h5>
+
+<hr><p><b>주 &#8211; </b>다음의 모든 SAML 관련 속성은 보안 토큰 서비스의 현재 인스턴스에 웹 서비스
+공급자가 있고 다른 보안 토큰 서비스 인스턴스에서 생성된 SAML 토큰을 받는 구성에서
+사용됩니다.</p>
+<hr>
+<p>이 구성은 웹 서비스 공급자의 STS(Security Token Service)에서 SAML 명제 생성 중에
+속성 명령문으로 생성해야 하는 SAML 속성을 나타냅니다. 형식은 <tt></tt><i>SAML_attr_name</i><tt></tt>=<tt></tt><i> Real_attr_name</i><tt></tt>입니다.</p><p><tt></tt><i>SAML_attr_name</i><tt></tt>은 들어오는 웹 서비스 요청의 SAML 명제에 있는 SAML 속성 이름입니다. <tt></tt><i>Real_attr_name</i><tt></tt>은
+인증된 SSOToken 또는 Identity 저장소에서 불러온 속성 이름입니다.</p>
+
+<a name="ghawn"></a><h5>NameID 매퍼</h5>
+<p>보안 토큰 서비스에 대해 생성되는 명제의 SAML NameID 매퍼입니다.</p>
+
+<a name="ghavl"></a><h5>구성원이 포함되어야 함</h5>
+<p>사용 설정되면 생성된 명제에 사용자 구성원이 SAML 속성으로 포함됩니다. </p>
+
+<a name="ghawo"></a><h5>속성 이름 공간</h5>
+<p>보안 토큰 서비스에 대해 생성된 명제의 SAML 속성 이름 공간을 정의합니다.</p>
+
+<a name="ghauj"></a><h5>신뢰할 수 있는 발급자</h5>
+<p>OpenSSO에 보안 토큰을 보내도 되는 신뢰할 수 있는 발급자의 목록을 정의합니다. OpenSSO는
+이러한 발급자 중 하나에서 보안 토큰을 보낸 것인지 여부를 확인해야 합니다. </p>
+
+<a name="ghavy"></a><h5>신뢰할 수 있는 IP 주소</h5>
+<p>OpenSSO에 보안 토큰을 보내도 되는 신뢰할 수 있는 IP 주소의 목록을 정의합니다.
+OpenSSO는 이러한 호스트 중 하나에서 보안 토큰을 보낸 것인지 여부를 확인해야 합니다.
+</p>
+<br/>
+
+</body>
+</html>

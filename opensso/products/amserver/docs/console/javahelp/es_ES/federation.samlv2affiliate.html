@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de afiliaci&#243;n alojada SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2affiliate"></a><h4>Personalizaci&#243;n de afiliaci&#243;n alojada SAMLv2</h4>
+<p>Una afiliaci&#243;n alojada contiene un grupo de proveedores de servicio. La afiliaci&#243;n
+la forma y mantiene un propietario de afiliaci&#243;n que elige los proveedores
+de miembros de entidades proveedoras ya configuradas. La afiliaci&#243;n permite a un
+usuario federar en el grupo de sitios asociados. Los proveedores elegidos podr&#237;an
+invocar servicios como miembro de la afiliaci&#243;n, o individualmente, como proveedor. Si
+los servicios se invocan como miembro de afiliaci&#243;n, un proveedor de servicios
+podr&#237;a emitir una solicitud de autenticaci&#243;n para un usuario en nombre de
+una afiliaci&#243;n. Cuando la autenticaci&#243;n es segura, el usuario puede lograr el
+inicio de sesi&#243;n &#250;nico con todos los miembros de la afiliaci&#243;n. </p><p>Un proveedor de afiliaci&#243;n albergada contiene los metadatos que definen el grupo
+de una o varias de las entidades de proveedores que conforman la
+aplicaci&#243;n.  No contiene la informaci&#243;n de configuraci&#243;n de ning&#250;n proveedor (que
+se define en una entidad de proveedor), s&#243;lo la informaci&#243;n de configuraci&#243;n
+de la afiliaci&#243;n en s&#237; misma. Si hay varios proveedores de servicio
+y proveedores de identidad en el mismo c&#237;rculo de confianza, utilice una
+entidad afiliada para evitar tener que generar diferentes identificadores de nombre para
+servicios compartidos en com&#250;n. </p><p>La Afiliaci&#243;n alojada contiene los siguientes atributos que pueden personalizarse:</p>
+<ul><li><p><a href="#ggwxt">Meta Alias</a></p></li>
+<li><p><a href="#ggwxj">Miembros</a></p></li>
+<li><p><a href="#ggwww">Alias de certificado</a></p></li></ul>
+
+
+<a name="ggwxt"></a><h5>Meta Alias</h5>
+<p>Especifica un <tt>metaAlias</tt> para la funci&#243;n de proveedor que se est&#225; configurando.
+ El <tt>metaAlias</tt> se utiliza para localizar el identificador de entidad del
+proveedor y la organizaci&#243;n en la que est&#225; situado. El valor es
+una cadena igual al nombre del dominio o la organizaci&#243;n (dependiendo de
+si Complemento de servicios de federaci&#243;n de SAML v2 est&#225; instalado en
+OpenSSO) acompa&#241;ado de una barra diagonal y el nombre del proveedor. Por
+ejemplo, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Precauci&#243;n &#8211; </b>Los nombres utilizados en el <tt>metaAlias</tt> no deben contener ninguna <tt>/</tt>.</p>
+<hr>
+
+
+<a name="ggwxj"></a><h5>Miembros</h5>
+<p>Un proveedor debe ser miembro de un c&#237;rculo de confianza, o no
+puede participar en comunicaciones basadas en Liberty.  El proveedor puede pertenecer
+a una o m&#225;s afiliaciones. Introduzca el Id. de entidad del proveedor
+el campo Nuevo valor y haga clic en Agregar.</p>
+
+<a name="ggwww"></a><h5>Alias de certificado</h5>
+<p>Este atributo define los elementos de alias de certificado para el proveedor.
+  La <tt>firma</tt> especifica el alias de certificado de proveedor utilizado
+para encontrar el certificado firmante correcto en el almac&#233;n de claves. 
+El <tt>cifrado</tt> especifica el alias de certificado de proveedor utilizado para encontrar
+en el almac&#233;n de claves el certificado de cifrado correcto.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置请求处理程序 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsoapbindingrequesthandlerlistadd"></a><h5>配置请求处理程序</h5>
+<a name="indexterm-153"></a><a name="indexterm-154"></a><p><tt>RequestHandler</tt> 接口必须由每一个使用 SOAP 绑定服务且基于 Liberty 的身份服务在服务器端实现。请求处理程序列表属性存储有关实现请求处理程序的 Web 服务实现类的信息。请求处理程序列表显示的条目包含用竖线分隔的关键字/值对，格式如下：<tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>。</p><ol>
+<li><b>单击“新建”以显示“新建请求处理程序”属性，或单击已配置的关键字值以修改现有属性。</b></li>
+<li><b>基于以下信息，为属性提供值：</b><dl><dt>关键字</dt>
+<dd><p>该必填参数是 SOAP 端点的 URI 路径的最后一部分。OpenSSO 中的 SOAP 端点是 SOAP 接收方 servlet。SOAP 接收方的 URI 为 <tt><b></tt><i>protocol </i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt>。如果将 <tt><b>disco</b></tt> 定义为关键字，则相应搜索服务的 SOAP 端点 URI 路径应该是：<tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>。在与 SOAP 接收方建立连接时，不同的服务客户机使用不同的关键字。</p></dd>
+<dt>类</dt>
+<dd><p>该必填参数为特定的身份服务指定请求处理程序实现类的名称。例如：<tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>。</p></dd>
+<dt>SOAP 操作</dt>
+<dd><p>该参数用于指定特定于 SOAP 的可选 URI。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”完成“请求处理程序”的配置操作。</b></li>
+<li><b>单击“SOAP 绑定服务”页面上的“保存”完成服务的配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

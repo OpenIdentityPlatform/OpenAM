@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>JDBC - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthjdbcservice"></a><h4>JDBC</h4>
+<p><a name="indexterm-174"></a>Le module d'authentification JDBC (Java Database Connectivity) permet &#224; OpenSSO d'authentifier les
+utilisateurs gr&#226;ce &#224; des bases de donn&#233;es SQL (Structured Query Language) qui
+fournissent des pilotes JDBC. La connexion &#224; la base de donn&#233;es SQL
+peut s'effectuer soit directement par l'interm&#233;diaire d'un pilote JDBC soit par l'interm&#233;diaire
+d'un pool de connexions JNDI. Les attributs JDBC sont des attributs de
+domaine. Ces attributs sont les suivants :</p>
+<ul><li><p><a href="#fwajx">Type de connexion</a></p></li>
+<li><p><a href="#fwafb">Nom JNDI de pool de connexion</a></p></li>
+<li><p><a href="#fwaap">Pilote JBDC</a></p></li>
+<li><p><a href="#fwarc">URL JDBC</a></p></li>
+<li><p><a href="#fwaum">Connecter cet utilisateur &#224; la base de donn&#233;es</a></p></li>
+<li><p><a href="#fwaeu">Mot de passe pour la connexion &#224; la base de donn&#233;es</a></p></li>
+<li><p><a href="#fwavq">Mot de passe pour la connexion &#224; la base de donn&#233;es (confirmer)</a></p></li>
+<li><p><a href="#fwads">Cha&#238;ne de colonne de mot de passe</a></p></li>
+<li><p><a href="#fwapb">Instruction pr&#233;par&#233;e</a></p></li>
+<li><p><a href="#fwapv">Classe permettant de transformer la syntaxe du mot de passe</a></p></li>
+<li><p><a href="#fwavz">Niveau d'authentification</a></p></li></ul>
+
+
+<a name="fwajx"></a><h5>Type de connexion</h5>
+<p>Indique le type de connexion &#224; la base de donn&#233;es SQL, &#224;
+l'aide d'un pool de connexions JNDI (Java Naming and Directory Interface) ou
+d'un pilote JDBC. Les options sont les suivantes :</p>
+<ul><li><p>Pool de connexions r&#233;cup&#233;r&#233; via JDNI</p></li>
+<li><p>Connexion JDBC non persistante</p></li></ul>
+<p>Le pool de connexions JNDI utilise la configuration provenant du conteneur Web
+sous-jacent.</p>
+
+<a name="fwafb"></a><h5>Nom JNDI de pool de connexion</h5>
+<p>Si JNDI est s&#233;lectionn&#233; dans l'attribut Type de connexion, ce champ indique
+le nom du pool de connexions. L'authentification JDBC utilisant le pool de
+connexions JNDI fourni par le conteneur Web, il est possible que la
+configuration du pool de connexions JNDI ne soit pas coh&#233;rente avec les
+autres conteneurs Web. Reportez-vous au manuel OpenSSO Administration Guide pour obtenir des
+exemples.</p>
+
+<a name="fwaap"></a><h5>Pilote JBDC</h5>
+<p>Si JDBC est s&#233;lectionn&#233; dans <a href="#fwajx">Type de connexion</a>, ce champ sp&#233;cifie le pilote JDBC
+fourni par la base de donn&#233;es SQL. Par exemple, <tt>com.mysql.jdbc.Driver</tt>.</p>
+
+<a name="fwarc"></a><h5>URL JDBC</h5>
+<p>Sp&#233;cifie l'URL de la base de donn&#233;es si JDBC est s&#233;lectionn&#233; dans
+<a href="#fwajx">Type de connexion</a>. Par exemple, l'URL de mySQL est <tt>jdbc.mysql://nomh&#244;te:port/nomBasededonn&#233;es</tt>.</p>
+
+<a name="fwaum"></a><h5>Connecter cet utilisateur &#224; la base de donn&#233;es</h5>
+<p>Indique le nom d'utilisateur &#224; partir duquel la connexion &#224; la base
+de donn&#233;es est effectu&#233;e pour la connexion JDBC.</p>
+
+<a name="fwaeu"></a><h5>Mot de passe pour la connexion &#224; la base de donn&#233;es</h5>
+<p>D&#233;finit le mot de passe de l'utilisateur sp&#233;cifi&#233; dans le champ Utilisateur
+pour la connexion &#224; la base de donn&#233;es.</p>
+
+<a name="fwavq"></a><h5>Mot de passe pour la connexion &#224; la base de donn&#233;es (confirmer)</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="fwads"></a><h5>Cha&#238;ne de colonne de mot de passe</h5>
+<p>Indique le nom de la colonne de mot de passe dans la
+base de donn&#233;es SQL.</p>
+
+<a name="fwapb"></a><h5>Instruction pr&#233;par&#233;e</h5>
+<p>Sp&#233;cifie l'instruction SQL qui r&#233;cup&#232;re le mot de passe de l'utilisateur qui
+se connecte. Par exemple :</p><pre> select Password from Employees where USERNAME = ?</pre>
+
+<a name="fwapv"></a><h5>Classe permettant de transformer la syntaxe du mot de passe</h5>
+<p>Indique le nom de la classe qui transforme le mot de passe
+r&#233;cup&#233;r&#233; &#224; partir de la base de donn&#233;es dans le format de
+l'entr&#233;e utilisateur &#224; des fins de comparaison des mots de passe. Cette
+classe doit impl&#233;menter l'interface <tt>JDBCPasswordSyntaxTransform</tt>.</p>
+
+<a name="fwavz"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

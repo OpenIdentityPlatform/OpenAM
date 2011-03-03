@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-session-tools.xml,v 1.7 2010/01/12 21:23:35 veiming Exp $
+
+-->
+
+<project name="createsessiontools.zip" default="createZipFile" basedir=".">
+    <description>OpenSSO: amSessionTools.zip Creation</description>
+    <fail message="*** nightly build may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.warbase.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+    
+    <target name="prepareBuild">
+        <mkdir dir="${amsession.locale.dir}"/>
+        <mkdir dir="${amsession.lib.dir}"/>
+        <mkdir dir="${amsession.ext.dir}"/>
+        <mkdir dir="${amsession.template.dir}"/>
+        <mkdir dir="${amsession.windows.dir}"/>
+        <mkdir dir="${amsession.windows.bin.dir}"/>
+        <mkdir dir="${amsession.windows.config.path}"/>
+        <mkdir dir="${amsession.windows.config.lib.path}"/>
+        <mkdir dir="${amsession.unix.dir}"/>
+        <mkdir dir="${amsession.unix.bin.dir}"/>
+        <mkdir dir="${amsession.unix.config.path}"/>
+        <mkdir dir="${amsession.unix.config.lib.path}"/>                
+        <delete dir="${amsession.classes.dir}"/>
+        <mkdir dir="${amsession.classes.dir}"/>        
+        <mkdir dir="${amsession.classes.dir}"/>
+        <mkdir dir="${amsession.package.dir}"/>
+    </target>
+    
+    
+    <target name="makeJar" depends="prepareBuild">
+        <copy todir="${amsession.package.dir}"
+            overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.classes.dir}/${amsession.package.path}"
+                includes="*"/>
+            <fileset dir="${amserver.res.i18n.dir}"
+                includes="amsessiontoolssetup.properties"/>
+        </copy>
+        <jar destfile="${amsession.lib.dir}/am_session_setup.jar"
+            basedir="${amsession.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="com.sun.identity.tools.bundles.SessionMain"/>
+            </manifest>
+        </jar>
+        <delete dir="${amsession.classes.dir}"/>
+        <mkdir dir="${amsession.classes.dir}"/>
+        <mkdir dir="${amsession.classes.dir}/com/sun/identity/ha/jmqdb"/>
+        <mkdir dir="${amsession.classes.dir}/com/sun/identity/ha/jmqdb/client"/>
+        <copy todir="${amsession.classes.dir}/com/sun/identity/ha/jmqdb"
+            overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.classes.dir}/com/sun/identity/ha/jmqdb"
+                includes="*"/>
+        </copy>
+        <copy todir="${amsession.classes.dir}/com/sun/identity/ha/jmqdb/client"
+            overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.classes.dir}/com/sun/identity/ha/jmqdb/client"
+                includes="*"/>
+        </copy>       
+        <jar destfile="${amsession.lib.dir}/am_sessiondb.jar"
+            basedir="${amsession.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="com.iplanet.dpro.session.jmqdb.client.AMSessionDB"/>
+            </manifest>
+        </jar>       
+    </target>
+
+
+    <target name="copyNeededFiles" depends="makeJar">
+        <copy todir="${amsession.ext.dir}"
+            overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${extlib.dir}" includes="${amsession-bundle-jars}" />
+        </copy>
+        <copy todir="${amsession.locale.dir}"
+            overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.built.res.dir}"
+                includes="amSessionDB*.properties"/>
+        </copy>
+        <copy todir="${amsession.tools.dir}" overwrite="yes" flatten="yes"
+            encoding="UTF-8">
+            <fileset dir="${amsession.tools.scripts.dir}"
+                includes="setup, setup.bat, README.txt"/>
+        </copy>        
+        <copy todir="${amsession.unix.bin.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amsession.unix.scripts.dir}"
+                includes="amsfo, amsfopassword, amsessiondb"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+        <copy todir="${amsession.unix.config.lib.path}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amsession.unix.scripts.dir}"
+                includes="amsfo.conf"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>        
+        <copy todir="${amsession.windows.bin.dir}"
+            overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amsession.windows.scripts.dir}"
+                includes="amsfo.pl, amsfopassword.bat, amsessiondb.bat"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>        
+        <copy todir="${amsession.windows.config.lib.path}"
+            overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amsession.windows.scripts.dir}"
+                includes="amsfo.conf"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+    </target>
+    
+        
+    <target name="replaceTags" depends="copyNeededFiles"
+        description="replace the not uniform tag with standard token">
+        <replace file="${amsession.unix.bin.dir}/amsfo.template"
+            encoding="UTF-8">
+            <replacefilter token="/opt/SUNWam/lib/amsfo.conf"
+                value="@DOMAIN_DIR@/config/lib/amsfo.conf"/>
+            <replacefilter token="/opt/sun/identity/lib/amsfo.conf"
+                value="@DOMAIN_DIR@/config/lib/amsfo.conf"/>
+            <replacefilter token="JMQ_BIN_DIR=/usr/bin"
+                value="JMQ_BIN_DIR=@BASE_DIR@/jmq/imq/bin"/>
+            <replacefilter token="JMQ_BIN_DIR=/opt/sun/mq/bin"
+                value="JMQ_BIN_DIR=@BASE_DIR@/jmq/imq/bin"/>
+        </replace>
+        <replace file="${amsession.unix.bin.dir}/amsfopassword.template"
+            encoding="UTF-8">
+            <replacefilter token="/usr/jdk/entsys-j2se" value="@JDK_PATH@"/>
+            <replacefilter token="AM_HOME=/opt/SUNWam"
+                value="AM_HOME=@BASE_DIR@"/>
+            <replacefilter token="AM_HOME=/opt/sun/identity"
+                value="AM_HOME=@BASE_DIR@"/>
+            <replacefilter token="AMCONFIG" value="ANConfig.properties"/>
+            <replacefilter token="AM_HOME=$INSTALL_HOME/identity"
+                value="AM_HOME=@BASE_DIR@"/>
+            <replacefilter token="AM_HOME_LINUX=/opt/sun/identity"
+                value="AM_HOME_LINUX=@BASE_DIR@"/>
+        </replace>
+        <replace file="${amsession.unix.bin.dir}/amsessiondb.template"
+            encoding="UTF-8">
+            <replacefilter token="/usr/jdk/entsys-j2se" value="@JDK_PATH@"/>
+            <replacefilter token="AM_HOME=/opt/SUNWam"
+                value="AM_HOME=@BASE_DIR@"/>
+            <replacefilter token="AM_HOME=/opt/sun/identity"
+                value="AM_HOME=@BASE_DIR@"/>
+            <replacefilter token="AM_HOME_LINUX=/opt/sun/identity"
+                value="AM_HOME_LINUX=@BASE_DIR@"/>
+            <replacefilter token="IMQ_JAR_PATH=/usr/share/lib"
+                value="IMQ_JAR_PATH=@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="JMS_JAR_PATH=/usr/share/lib"
+                value="JMS_JAR_PATH=@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="BDB_JAR_PATH=/usr/share/bdb"
+                value="BDB_JAR_PATH=@BDB_DIR@/lib"/>
+            <replacefilter token="BDB_SO_PATH=/usr/lib"
+                value="BDB_SO_PATH=@BDB_DIR@/lib"/>
+            <replacefilter token="IMQ_JAR_PATH=/opt/sun/mq/share/lib"
+                value="IMQ_JAR_PATH=@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="JMS_JAR_PATH=/opt/sun/mq/share/lib"
+                value="JMS_JAR_PATH=@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="BDB_JAR_PATH=/usr/share"
+                value="BDB_JAR_PATH=@BDB_DIR@/lib"/>
+            <replacefilter token="BDB_SO_PATH=/opt/sun/private/lib"
+                value="BDB_SO_PATH=@BDB_DIR@/lib"/>
+            <replacefilter token="IMQ_JAR_PATH=/opt/sun/mq/share/lib"
+                value="IMQ_JAR_PATH=@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="JMS_JAR_PATH=/opt/sun/mq/share/lib"
+                value="JMS_JAR_PATH=@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="BDB_JAR_PATH=/opt/sun/share/lib/bdb"
+                value="BDB_JAR_PATH=@BDB_DIR@/lib"/>
+            <replacefilter token="BDB_SO_PATH=/opt/sun/private/lib"
+                value="BDB_SO_PATH=@BDB_DIR@/lib"/>
+            <replacefilter token=":{BDB_SO_PATH}" value=":${BDB_SO_PATH}"/>
+        </replace>        
+        <replace file="${amsession.unix.config.lib.path}/amsfo.conf.template"
+            encoding="UTF-8">
+            <replacefilter token="AM_HOME_DIR=/opt/SUNWam"
+                value="AM_HOME_DIR=@DOMAIN_DIR@"/>
+            <replacefilter token="AM_HOME_LINUX=/opt/sun/identity"
+                value="AM_HOME_LINUX=@DOMAIN_DIR@"/>
+            <replacefilter token="AM_HOME_HPUX=/opt/sun/identity"
+                value="AM_HOME_HPUX=@DOMAIN_DIR@"/>
+        </replace>
+        <replace file="${amsession.windows.bin.dir}/amsfo.pl.template"
+            encoding="UTF-8">
+            <replacefilter token="$prop{'AM_HOME_DIR'}/../share/lib"
+                value="@BASE_DIR@/bdb/bdb/lib"/>
+            <replacefilter token="$prop{'AM_HOME_DIR'}/bin"
+                value="@DOMAIN_DIR@/bin"/>
+            <replacefilter token="$prop{'AM_HOME_DIR'}/ext/je.jar"
+                value="@BASE_DIR@/ext/je.jar"/>                
+            <replacefilter token="$prop{'AM_HOME_DIR'}/locale"
+                value="@BASE_DIR@/locale"/>
+            <replacefilter token="$prop{'AM_HOME_DIR'}/lib/am_sessiondb.jar"
+                value="@BASE_DIR@/lib/am_sessiondb.jar"/>
+        </replace>
+        <replace file="${amsession.windows.bin.dir}/amsfopassword.bat.template"
+            encoding="UTF-8">
+            <replacefilter token="\" value="/"/>
+            <replacefilter token="JDK_PATH" value="@JDK_PATH@"/>
+            <replacefilter token="BASEDIR/PRODUCT_DIR" value="@BASE_DIR@"/>
+        </replace>
+        <replace file="${amsession.windows.bin.dir}/amsessiondb.bat.template"
+            encoding="UTF-8">
+            <replacefilter token="\" value="/"/>
+            <replacefilter token="JDK_PATH" value="@JDK_PATH@"/>
+            <replacefilter token="BASEDIR/PRODUCT_DIR" value="@BASE_DIR@"/>
+            <replacefilter token="%AM_HOME%/../MessageQueue/lib"
+                value="@BASE_DIR@/jmq/imq/lib"/>
+            <replacefilter token="%AM_HOME%/../share/lib"
+                value="@BASE_DIR@/bdb/bdb/lib"/>
+        </replace>                
+        <replace file="${amsession.windows.config.lib.path}/amsfo.conf.template"
+            encoding="UTF-8">
+            <replacefilter token="AM_HOME_DIR=/opt/SUNWam"
+                value="AM_HOME_DIR=@DOMAIN_DIR@"/>
+            <replacefilter token="AM_HOME_LINUX=/opt/sun/identity"
+                value="AM_HOME_LINUX=@DOMAIN_DIR@"/>
+            <replacefilter token="AM_HOME_HPUX=/opt/sun/identity"
+                value="AM_HOME_HPUX=@DOMAIN_DIR@"/>
+            <replacefilter token="&quot;/tmp/amsession/sessiondb&quot;"
+                value="/tmp/amsession/amsessiondb"/>
+            <replacefilter token="&quot;/tmp/amsession/logs&quot;"
+                value="/tmp/amsession/logs"/>
+            <replacefilter token="JMQ_INSTALL_DIR="
+                value="JMQ_INSTALL_DIR=@BASE_DIR@/jmq/imq"/>
+            <replacefilter token="JAVA_HOME=" value="JAVA_HOME=@JDK_PATH@"/>
+            <replacefilter token="PASSWORDFILE=$AM_HOME_DIR/.password"
+                value="PASSWORDFILE=@DOMAIN_DIR@/.password"/>
+        </replace>
+    </target>                
+    
+    
+    <target name="createZipFile" depends="replaceTags">
+        <zip destfile="${amserver.dist.dir}/amSessionTools.zip"
+            whenempty="create">
+            <zipfileset dir="${amsession.tools.dir}" filemode="755">
+                <include name="setup"/>
+                <include name="setup.bat"/>
+            </zipfileset>
+            <zipfileset dir="${amsession.tools.dir}">
+                <include name="README.txt"/>
+            </zipfileset>            
+            <zipfileset dir="${amsession.tools.dir}" filemode="755">
+                <include name="lib/**/*"/>
+                <include name="ext/**/*"/>
+                <include name="locale/**/*"/>
+                <include name="template/**/*"/>
+            </zipfileset>
+        </zip>
+        <checksum file="${amserver.dist.dir}/amSessionTools.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>          
+</project>

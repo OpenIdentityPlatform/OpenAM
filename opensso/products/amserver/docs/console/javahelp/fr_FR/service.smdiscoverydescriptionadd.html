@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration d'une description de service - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverydescriptionadd"></a><h5>Configuration d'une description de service</h5>
+<a name="indexterm-148"></a><a name="indexterm-149"></a><p>L'attribut Description du service d&#233;finit un service Web en cours d'ex&#233;cution au
+niveau d'une extr&#233;mit&#233; de protocole distincte. Il est d&#233;fini lorsque vous configurez
+les <a href="resourceofferingsbootstrapping.html">Offres de ressources pour l'amor&#231;age</a>. Les informations sur les instances de service doivent &#234;tre communiqu&#233;es
+dans diff&#233;rents contextes. Par exemple, le Service de d&#233;couverte d&#233;fini est un
+service d'identit&#233; qui fournit une liste des offres de ressources (dont chacune
+inclut une description d'instance de service).</p><ol>
+<li><b>Cliquez sur Ajouter une description pour afficher les attributs de la nouvelle
+description de service ou cliquez sur Modifier pour modifier une description existante.</b></li>
+<li><b>Fournissez les valeurs pour les attributs en vous basant sur les informations
+suivantes :</b><dl><dt>ID de m&#233;canisme de s&#233;curit&#233;</dt>
+<dd><p>Cet attribut d&#233;finit l'emplacement o&#249; sont ajout&#233;es les m&#233;thodes d'authentification prises en charge par le Service de d&#233;couverte. Ces m&#233;canismes de s&#233;curit&#233; font r&#233;f&#233;rence &#224; la mani&#232;re dont un consommateur de service Web s'authentifie aupr&#232;s du fournisseur de services Web ou fournit la s&#233;curit&#233; au niveau des messages. Par d&#233;faut, toutes les m&#233;thodes disponibles prises en charge par l'instance du service sont s&#233;lectionn&#233;es. Si une m&#233;thode d'authentification n'est pas s&#233;lectionn&#233;e et que le consommateur de service Web envoie une demande &#224; l'aide de cette m&#233;thode, la demande est rejet&#233;e. Reportez-vous &#224; <a href="supportedauthmechanisms.html">M&#233;canismes d'authentification pris en charge</a>.</p></dd>
+<dt>URL de point d'arriv&#233;e</dt>
+<dd><p>La valeur de cet attribut est l'URL de point d'arriv&#233;e SOAP sur HTTP. Le plan URI doit &#234;tre HTTP ou HTTPS comme dans <tt>https://soap.profile-provider.com/soap </tt>.</p></dd>
+<dt>Action SOAP</dt>
+<dd><p>La valeur de cet attribut en option &#233;quivaut &#224; l'attribut <tt>wsdlsoap:soapAction</tt> de l'&#233;l&#233;ment <tt>wsdlsoap:operation </tt> dans la description WSDL du service.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur OK pour terminer la configuration du service.</b></li>
+<li><b>Cliquez sur Enregistrer dans la page du Service de d&#233;couverte pour terminer
+la configuration du service.</b></li></ol>
+<br/>
+
+</body>
+</html>

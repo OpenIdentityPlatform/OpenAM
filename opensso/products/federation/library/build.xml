@@ -1,0 +1,332 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.28 2009/08/19 05:40:41 veiming Exp $
+
+-->
+
+<!--
+   "Portions Copyrighted [2011] [ForgeRock AS]"
+-->
+<project name="Open Federation Library" default="usage">
+                
+    <description>Open Federation</description>
+    <import file="../../products.xml" />
+    <import file="library.xml" />
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <property name="libtracker" value="${library.basedir}/tracker.properties" />
+    <touch file="${libtracker}" />
+
+    <property name="fedlibrary.clientsdkbase.dir"
+        value="${library.basedir}/clientsdk"/>
+
+    <!-- build class path -->
+    <path id="build.class.path">
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <pathelement location="${library.classes.dir}"/>
+        <fileset dir="${extlib.dir}"
+            includes="**/*.jar"
+            excludes="webservices-api.jar,webservices-rt.jar,webservices-tools.jar"/>
+    </path>
+
+    <target name="xsd.liberty" depends="preparebuild" unless="library.xsd.liberty.done">
+        <java classname="com.sun.tools.xjc.Driver" 
+            maxmemory="128m" failonerror="true" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg line="-nv -b &quot;${xsd.liberty.dir}/binding.xjb&quot; -extension -d &quot;${library.src.dir}&quot; ${xsd.liberty.files}"/>
+        </java>
+        <property name="library.xsd.liberty.done" value="true" />
+        <concat destfile="${libtracker}" append="true">library.xsd.liberty.done=true&#10;</concat>
+    </target>
+
+    <target name="xsd.saml2" depends="preparebuild" unless="library.xsd.saml2.done">
+        <java classname="com.sun.tools.xjc.Driver" 
+            maxmemory="128m" failonerror="true" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg line="-nv -b &quot;${xsd.saml2.dir}/binding.xjb&quot; -extension -d &quot;${library.src.dir}&quot; ${xsd.saml2.files}"/> 
+        </java>
+        <replace file="${jaxb.saml2}/metadata/impl/RoleDescriptorTypeImpl.java" token="&quot;&quot;, &quot;type&quot;" value="&quot;http://www.w3.org/2001/XMLSchema-instance&quot;, &quot;type&quot;"/>
+        <replace file="${jaxb.saml2}/metadata/impl/RoleDescriptorTypeImpl.java" token="(&quot;type&quot; == ___local)&amp;&amp;(&quot;&quot; == ___uri)" value="(&quot;type&quot; == ___local)&amp;&amp;(&quot;http://www.w3.org/2001/XMLSchema-instance&quot; == ___uri)"/>
+        <property name="library.xsd.saml2.done" value="true" />
+        <concat destfile="${libtracker}" append="true">library.xsd.saml2.done=true&#10;</concat>
+    </target>
+
+    <target name="xsd.wsfederation" depends="preparebuild" unless="library.xsd.wsfederation.done">
+        <java classname="com.sun.tools.xjc.Driver" 
+            maxmemory="128m" failonerror="true" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg line="-nv -b &quot;${xsd.wsfederation.dir}/binding.xjb&quot; -extension -verbose -d &quot;${library.src.dir}&quot; ${xsd.wsfederation.files}"/> 
+        </java>
+        <property name="library.xsd.wsfederation.done" value="true" />
+        <concat destfile="${libtracker}" append="true">library.xsd.wsfederation.done=true&#10;</concat>
+    </target>
+
+    <target name="jaxb.properties" unless="library.jaxb.done">
+        <copy todir="${library.classes.dir}">
+            <fileset dir="${library.src.dir}">
+                <include name="**/jaxb.properties" />
+                <include name="**/bgm.ser" />
+            </fileset>
+        </copy>
+        <property name="library.jaxb.done" value="true" />
+        <concat destfile="${libtracker}" append="true">library.jaxb.done=true&#10;</concat>
+    </target>
+
+    <target name="compile" depends="preparebuild">
+	<javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${library.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+	    debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${library.src.dir}"/>
+            <classpath refid="build.class.path"/>
+            <compilerarg value="-Xlint:none" />
+	</javac>
+    </target>
+
+    <target name="nightly">
+        <antcall target="clientsdk" />
+        <filter token="DATE" value="${nightly.date}" />
+        <copy file="${library.docs.dir}/nightly.html" tofile="${fedlibrary.dist.dir}/index.html" filtering="true" />
+    </target>
+
+    <target name="build" depends="preparebuild, xsd.liberty, xsd.saml2, xsd.wsfederation">
+         <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${library.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}"
+            srcdir="${library.src.dir}" >
+            <classpath refid="build.class.path"/>
+            <compilerarg value="-Xlint:none" />
+        </javac>
+
+        <antcall target="jaxb.properties" />
+        <antcall target="jaxrpc" />
+
+        <tstamp>
+            <format property="touch.time" pattern="yyyy-MMMM-d hh:mm"/>
+        </tstamp>
+
+        <jar destfile="${fedlibrary.dist.dir}/openfedlib.jar">
+            <manifest>
+                <attribute name="Version" value="${version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <fileset dir="${library.xml.dir}" includes="*.xml" />
+            <zipfileset dir="${library.classes.dir}"
+                excludes="com/sun/identity/saml2/idpdiscovery/*.class" />
+        </jar>
+        <checksum file="${fedlibrary.dist.dir}/openfedlib.jar" 
+            algorithm="SHA" fileext=".sha" />
+
+        <jar destfile="${fedlibrary.dist.dir}/idpdiscovery.jar">
+            <manifest>
+                <attribute name="Version" value="${version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <zipfileset dir="${library.classes.dir}"
+                includes="com/sun/identity/saml2/idpdiscovery/*.class" />
+        </jar>
+        <checksum file="${fedlibrary.dist.dir}/idpdiscovery.jar"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="jaxrpc" unless="library.jaxrpc.done">
+        <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${java.home}/../lib/tools.jar"/>
+            </classpath>
+            <arg value="-classpath" />
+            <arg value="${library.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/saaj-api.jar" />
+            <arg value="-gen:server" />
+            <arg value="-d" />
+            <arg value="${library.classes.dir}" />
+            <arg value="${library.xml.dir}/jaxrpc-assertmgr-config.xml" />
+        </java>
+        <move file="${library.classes.dir}/AssertionManagerService.wsdl" tofile="${library.classes.dir}/jaxrpc/AssertionManagerService.wsdl" />
+
+        <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${java.home}/../lib/tools.jar"/>
+            </classpath>
+            <arg value="-classpath" />
+            <arg value="${library.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/saaj-api.jar" />
+            <arg value="-gen:server" />
+            <arg value="-d" />
+            <arg value="${library.classes.dir}" />
+            <arg value="${library.xml.dir}/jaxrpc-fsassertmgr-config.xml" />
+        </java>
+        <move file="${library.classes.dir}/FSAssertionManagerService.wsdl" tofile="${library.classes.dir}/jaxrpc/FSAssertionManagerService.wsdl" />
+
+        <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${java.home}/../lib/tools.jar"/>
+            </classpath>
+            <arg value="-classpath" />
+            <arg value="${library.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/saaj-api.jar" />
+            <arg value="-gen:server" />
+            <arg value="-d" />
+            <arg value="${library.classes.dir}" />
+            <arg value="${library.xml.dir}/jaxrpc-securitytokenmgr-config.xml" />
+        </java>
+        <move file="${library.classes.dir}/SecurityTokenManagerService.wsdl" tofile="${library.classes.dir}/jaxrpc/SecurityTokenManagerService.wsdl" />
+
+        <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${java.home}/../lib/tools.jar"/>
+            </classpath>
+            <arg value="-classpath" />
+            <arg value="${library.classes.dir}:${extlib.dir}/jaxrpc-api.jar:${extlib.dir}/jaxrpc-impl.jar:${extlib.dir}/saaj-api.jar" />
+            <arg value="-gen:server" />
+            <arg value="-d" />
+            <arg value="${library.classes.dir}" />
+            <arg value="${library.xml.dir}/jaxrpc-libertymanager-config.xml" />
+        </java>
+        <move file="${library.classes.dir}/LibertyManagerService.wsdl" tofile="${library.classes.dir}/jaxrpc/LibertyManagerService.wsdl" />
+        <property name="library.jaxrpc.done" value="true" />
+        <concat destfile="${libtracker}" append="true">library.jaxrpc.done=true&#10;</concat>
+    </target>
+
+    <target name="clientsdk" depends="build">
+        <ant antfile="${fedlibrary.clientsdkbase.dir}/build.xml" inheritRefs="true"/>
+    </target>
+
+    <target name="clientsdk-clean">
+        <ant antfile="${fedlibrary.clientsdkbase.dir}/build.xml"
+            inheritRefs="true" target="clean"/>
+    </target>
+
+    <target name="doc" depends="preparebuild">
+        <javadoc maxmemory="512m" destdir="${library.built.apidocs.dir}" 
+            windowtitle="Open Federation API" failonerror="true">
+            <classpath refid="build.class.path"/>
+            <packageset dir="${library.src.dir}"
+                includes="${fedlib.public.doc},${fedlib.doc}" />
+            <tag name="supported.all.api" description="" />
+            <tag name="supported.api" description="" />
+            <link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+            <link href="http://download.oracle.com/javaee/1.3/api/"/>
+        </javadoc>
+    </target>
+
+    <target name="publicdoc" depends="preparebuild">
+        <javadoc maxmemory="512m" destdir="${library.built.publicapidocs.dir}"
+                 windowtitle="Public Open Federation API" failonerror="true">
+            <classpath refid="build.class.path"/>
+            <packageset dir="${library.src.dir}"
+                includes="${fedlib.public.doc}" />
+            <doclet name="com.sun.identity.tools.javadocs.SupportedAPIDoclet"
+                path="${library.classes.dir}" />
+            <tag name="supported.all.api" description="" />
+            <tag name="supported.api" description="" />
+            <link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+            <link href="http://download.oracle.com/javaee/1.3/api/"/>
+        </javadoc>
+    </target>
+
+    <target name="checklib">
+        <ant antfile="${products.basedir}/build-checkjars.xml" />
+    </target>
+
+    <target name="preparebuild" depends="checklib">
+        <mkdir dir="${library.built.dir}"/>
+        <mkdir dir="${fedlibrary.dist.dir}" />
+        <mkdir dir="${library.classes.dir}"/>
+        <mkdir dir="${library.built.docs.dir}"/>
+        <mkdir dir="${library.built.apidocs.dir}"/>
+        <mkdir dir="${library.built.publicapidocs.dir}"/>
+    </target>
+
+    <target name="clean" depends="clientsdk-clean">
+        <delete dir="${jaxb.liberty.authnsvc}"/>
+        <delete dir="${jaxb.liberty.common}"/>
+        <delete dir="${jaxb.liberty.disco.plugins}"/>
+        <delete dir="${jaxb11.liberty.disco}"/>
+        <delete dir="${jaxb.liberty.disco}"/>
+        <delete dir="${jaxb.liberty.idpp.plugins}"/>
+        <delete dir="${jaxb.liberty.idpp}"/>
+        <delete dir="${jaxb.liberty.interaction}"/>
+        <delete dir="${jaxb.liberty.meta}"/>
+        <delete dir="${jaxb.liberty.meta.entityconfig}"/>
+        <delete dir="${jaxb.liberty.paos}"/>
+        <delete dir="${jaxb.liberty.soapbinding}"/>
+        <delete dir="${jaxb11.liberty.soapbinding}"/>
+        <delete dir="${jaxb.w3c}"/>
+        <delete dir="${jaxb.saml2}"/>
+        <delete dir="${jaxb.wsfederation}"/>
+        <delete dir="${library.built.publicapidocs.dir}"/>
+        <delete dir="${library.built.apidocs.dir}"/>
+        <delete dir="${library.built.docs.dir}"/>
+        <delete dir="${library.classes.dir}/jaxrpc"/>
+        <delete dir="${library.classes.dir}"/>
+        <delete dir="${library.built.dir}"/>
+        <delete file="${libtracker}"/>
+    </target>
+
+    <target name="cvsdiff">
+        <mkdir dir="${library.built.diff.dir}" />
+        <cvs command="-q diff -cw" output="${library.built.diff.dir}/.diffs"/>
+        <java classname="com.sun.identity.tools.diffs.Diffs">
+            <classpath refid="build.class.path"/>
+            <arg value="${library.built.diff.dir}/.diffs"/>
+        </java>
+        <cvs command="-q stat" output="${library.built.diff.dir}/.stat"/>
+        <java classname="com.sun.identity.tools.diffs.Stat">
+            <classpath refid="build.class.path"/>
+            <arg value="${library.built.diff.dir}/.stat"/>
+        </java>
+    </target>
+  
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" nightly    : generates nightly build binaries"/>
+        <echo message=" build      : compiles the sources"/>
+        <echo message=" clientsdk  : creates client SDK jar file"/>
+        <echo message=" publicdoc  : creates javadocs for publicly supported API"/>
+        <echo message=" doc        : creates javadocs"/>
+        <echo message=" clean      : deletes the generated files"/>
+        <echo message=" clientsdk-clean : deletes the generated client SDK jar file"/>
+        <echo message=" extlib-clean   : deletes shared library under extlib"/>
+        <echo message=" usage          : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+
+</project>

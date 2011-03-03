@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Classes for ResourceID Mapper Plug-in - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="resourceidmapperpluginclass"></a><h4>Classes for ResourceID Mapper Plug-in</h4>
+<a name="indexterm-134"></a><a name="indexterm-135"></a><p>The value of this attribute is a list of classes that generate identifiers
+for a resource offering configured for an organization or role. <tt>com.sun.identity.liberty.ws.interfaces.ResourceIDMapper</tt> is an
+interface used to map a user identifier to the resource identifier associated with
+it. The Discovery Service provides two implementations for this interface:</p>
+<ul><li><p><tt>com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper</tt> (format: <i>providerID</i> + "/" + <i>the Base64 encoded userIDs</i>)</p></li>
+<li><p><tt>com.sun.identity.liberty.ws.disco.plugins.DefaultHexResourceIDMapper</tt> (format: <i>providerID</i> + "/" + <i>the hex string of userID</i>)</p></li></ul>
+<p>Different implementations may be developed with the implementing class and added as a
+value of this attribute by clicking New and using the following format:</p><p><tt><b>providerid=</tt><i>providerID</i><tt>|</tt><i>class_name_and_path</i><tt></b></tt></p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personnalisation d'une requ&#234;te d'attributs SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>Personnalisation d'une requ&#234;te d'attributs SAMLv2</h4>
+<p>La requ&#234;te d'attributs SAMLv2 contient les attributs personnalisables suivants&#160;:</p>
+<ul><li><p><a href="#ggwht">Format NameID</a></p></li>
+<li><p><a href="#ggwgs">Alias cert</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>Format NameID</h5>
+<p>D&#233;finit les formats d'identificateur de nom pris en charge par le fournisseur
+de requ&#234;te d'attributs. Les identificateurs de nom permettent aux fournisseurs d'&#233;changer des
+informations sur un utilisateur. Les interactions de connexion unique prennent en charge
+trois types d'identificateurs&#160;:</p>
+<ul><li><p>Un identificateur <b>X509SubjectName</b> d&#233;finit le nom d'objet du type de chiffrement X509.</p></li>
+<li><p>Un <b>identificateur persistant</b> est enregistr&#233; dans une entr&#233;e du magasin de donn&#233;es de l'utilisateur. Il reprend la valeur de deux attributs. </p></li>
+<li><p>Un <b>identificateur transitoire</b> est temporaire et aucune donn&#233;e n'est consign&#233;e dans le magasin de donn&#233;es persistant de l'utilisateur.</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>Alias cert</h5>
+<p>Cet attribut d&#233;finit les &#233;l&#233;ments de l'alias du certificat pour le fournisseur.
+<tt>signing</tt> sp&#233;cifie l'alias du certificat du fournisseur, utilis&#233; pour trouver le certificat
+de signature correct dans le keystore. <tt>Encryption</tt> sp&#233;cifie l'alias du certificat du
+fournisseur, utilis&#233; pour trouver le certificat de chiffrement correct dans le keystore.</p>
+<br/>
+
+</body>
+</html>

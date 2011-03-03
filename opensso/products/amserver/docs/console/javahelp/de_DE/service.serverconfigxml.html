@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Verzeichniskonfiguration - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serverconfigxml"></a><h4>Verzeichniskonfiguration</h4>
+<p>Die Attribute f&#252;r die Verzeichniskonfiguration definieren grundlegende Konfigurationsinformationen f&#252;r den eingebetteten Verzeichnisspeicher:</p>
+
+<a name="ggkdy"></a><h5>Verzeichniskonfiguration</h5>
+<p>Es gibt folgende Attribute f&#252;r die Verzeichniskonfiguration:</p>
+
+<a name="ggkeu"></a><h5>Minimaler Verbindungspool</h5>
+<p>Gibt die minimale Gr&#246;&#223;e der Verbindungspools an, die f&#252;r die Verbindung zum
+Directory Server verwendet werden, der im LDAP Server-Attribut festgelegt ist. Der Standardwert
+ist 1.</p>
+
+<a name="ggkdx"></a><h5>Maximaler Verbindungspool</h5>
+<p>Gibt die maximale Gr&#246;&#223;e der Verbindungspools an, die f&#252;r die Verbindung zum
+Directory Server verwendet werden, der im LDAP Server-Attribut festgelegt ist. Der Standardwert
+ist 10.</p>
+
+<a name="ggket"></a><h5>Verbindungs-DN</h5>
+<p>Dieses Attribut gibt den BIND-DN des LDAP-Servers an.</p>
+
+<a name="ggkdn"></a><h5>Verbindungs-Passwort</h5>
+<p>Dieses Attribut legt das Passwort fest, dass f&#252;r die Verbindung zum LDAP-Server
+verwendet wird. Standardm&#228;&#223;ig wird das Passwort amldapuser, das w&#228;hrend der Installation eingegeben
+wurde, als BIND-Passwort verwendet.</p>
+
+<a name="ghama"></a><h5>Server</h5>
+<p>Dieses Attribut definiert den Verzeichnisserver, der als Konfigurationsdatenspeicher f&#252;r die OpenSSO-Instanz dienen
+soll. Klicken Sie zum Hinzuf&#252;gen eines Konfigurationsservers auf die Schaltfl&#228;che "Hinzuf&#252;gen", und
+geben Sie Werte f&#252;r folgende Attribute an:</p><dl><dt>Name</dt>
+<dd><p>Geben Sie einen Namen f&#252;r den Server ein.</p></dd>
+<dt>Hostname</dt>
+<dd><p>Gibt den voll qualifizierten Hostnamen des Directory Server an. Beispiel:</p><p><tt></tt><i>DirectoryServerHost.domainName</i><tt>.com </tt></p></dd>
+<dt>Port Number</dt>
+<dd><p>Gibt die Anschlussnummer des Directory Server an.</p></dd>
+<dt>Connection Type</dt>
+<dd><p>Legt den Verbindungstyp f&#252;r den Directory Server fest. Standardm&#228;&#223;ig ist "SIMPLE" (EINFACH) ausgew&#228;hlt. Sie k&#246;nnen jedoch auch "SSL" ausw&#228;hlen.</p></dd>
+</dl>
+
+
+<a name="ggkdu"></a><h5>Legacy-Konfiguration</h5>
+<p>Die folgenden Attribute definieren grundlegende Verzeichnisserver-Konfigurationen f&#252;r Instanzen von OpenSSO im Legacy-Mode.
+Diese Attribute werden nur bei Installationen im Legacy-Modus angezeigt.</p>
+
+<a name="ggkej"></a><h5>Minimaler Verbindungspool</h5>
+<p>Gibt die minimale Gr&#246;&#223;e der Verbindungspools an, die f&#252;r die Verbindung zum
+Directory Server verwendet werden, der im LDAP Server-Attribut festgelegt ist. Der Standardwert
+ist 1.</p>
+
+<a name="ggkdw"></a><h5>Maximaler Verbindungspool</h5>
+<p>Gibt die maximale Gr&#246;&#223;e der Verbindungspools an, die f&#252;r die Verbindung zum
+Directory Server verwendet werden, der im LDAP Server-Attribut festgelegt ist. Der Standardwert
+ist 10.</p>
+
+<a name="ggkey"></a><h5>Server</h5>
+<p>Dieses Attribut f&#252;hrt Protokoll, Hostname und Anschluss f&#252;r das Lastenausgleichsprotokoll auf. Beispiel:
+<tt>http://lb.example.com:80</tt>.</p>
+<br/>
+
+</body>
+</html>

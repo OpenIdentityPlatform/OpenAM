@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>会话 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>会话</h4>
+<p>您可以通过会话属性配置其他站点和服务器实例的会话信息。</p>
+
+<a name="ggkab"></a><h5>会话限制</h5>
+<p>以下属性设置服务器会话限制：</p>
+
+<a name="ggkat"></a><h5>最大会话数</h5>
+<p>默认值为 5000。指定允许并发会话的最大数目。如果并发会话的最大数目超过此数目，则登录时就会发送“最大会话数”错误。</p>
+
+<a name="ggkac"></a><h5>使会话无效的最长时间</h5>
+<p>默认值为 10。指定在会话创建后没有用户登录的情况下，要从会话表中删除无效会话所间隔的分钟数。该值应该始终大于“验证”模块属性文件中的超时值。</p>
+
+<a name="ggkaf"></a><h5>会话清除延迟</h5>
+<p>默认值为 60。指定延迟清除会话操作的时间（以分钟为单位）。会话超时后，会话将在这个延长时限内继续驻留在会话服务器中。客户机应用程序使用该属性通过 SSO API 检查会话是否超时。在延长时限即将结束时，会话将被销毁。如果用户注销或 OpenSSO 组件明确销毁会话，则在延长时限内不会维持会话。会话在这一延长时限内处于“无效”状态。</p>
+
+<a name="ggkbl"></a><h5>统计信息</h5>
+<p>以下属性设置统计信息配置：</p>
+
+<a name="ggkbf"></a><h5>记录的时间间隔</h5>
+<p>默认值为 60。指定统计信息记录之间的时间间隔（以分钟为单位）。最小为 5 秒，以避免 CPU 饱和。OpenSSO 将小于 5 秒的值视为 5 秒。</p>
+
+<a name="ggkbn"></a><h5>状态</h5>
+<p>默认值为 file。指定统计信息记录的位置。可能的值为：</p>
+<ul><li><p>关 &#8212; 不记录统计信息。</p></li>
+<li><p>文件 &#8212; 将统计信息写入到指定目录下的文件中。</p></li>
+<li><p>控制台 &#8212; 将统计信息写入到 Web 服务器的日志文件中。</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>目录</h5>
+<p>在安装期间设置该值。示例：<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server-URI</i><tt>/stats</tt>。指定将在其中创建调试文件的目录。</p>
+
+<a name="ggkca"></a><h5>启用主机查找</h5>
+<p>默认值为“假”。在会话记录期间启用或禁用主机查找。</p>
+
+<a name="ggkas"></a><h5>通知</h5>
+<p>以下属性设置通知配置：</p>
+
+<a name="ggkbz"></a><h5>通知池大小</h5>
+<p>默认值为 10。通过指定线程总数来定义池的大小。</p>
+
+<a name="ggkao"></a><h5>通知线程池阈值</h5>
+<p>默认值为 100。指定最大任务队列长度。收到通知任务后，会被发送到任务队列以进行处理。如果队列达到最大长度，继续传入的请求将被拒绝，并会发出 <tt>ThreadPoolException</tt>，直到队列有空缺为止。</p>
+
+<a name="ggkar"></a><h5>验证</h5>
+<p>以下属性设置验证配置：</p>
+
+<a name="ggkcg"></a><h5>不区分大小写的客户机 DN 比较</h5>
+<p>默认值为“真”。比较代理 DN。如果值为假，则比较会区分大小写。</p>
+<br/>
+
+</body>
+</html>

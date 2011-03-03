@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Ajout de membres &#224; une entit&#233; filiale - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsaffiliate"></a><h4>Ajout de membres &#224; une entit&#233; filiale</h4><a name="indexterm-83"></a><a name="indexterm-84"></a><p>Apr&#232;s la cr&#233;ation d'une entit&#233; filiale, vous pouvez ajouter des membres &#224;
+l'affiliation. Le point de d&#233;part est Entit&#233;s sous l'interface F&#233;d&#233;ration. </p>
+<hr><p><b>Remarque &#8211; </b>Vous pouvez &#233;galement modifier les attributs communs dans cet &#233;cran.</p>
+<hr>
+<ol>
+<li><b>Cliquez sur le nom d'une entit&#233; Filiale configur&#233;e pour modifier son profil.</b><p>La page du profil de l'entit&#233; s'affiche.</p></li>
+<li><b>Dans le menu Afficher, s&#233;lectionnez Filiale.</b></li>
+<li><b>S&#233;lectionnez les entit&#233;s disponibles &#224; assigner &#224; l'affiliation.</b></li>
+<li><b>Modifiez les valeurs des attributs communs.</b><p>Ces attributs d&#233;finissent g&#233;n&#233;ralement l'identit&#233; du fournisseur lui-m&#234;me.</p><dl><dt>Nom</dt>
+<dd><p>Si n&#233;cessaire, tapez un nouvel URI pour l'affiliation. Cet attribut a actuellement comme valeur l'URI assign&#233; &#224; l'attribut Nom de la filiale &#224; la cr&#233;ation de l'entit&#233;. Les nouvelles valeurs ne doivent correspondre &#224; aucun autre nom de filiale.</p></dd>
+<dt>Propri&#233;taire</dt>
+<dd><p>Tapez un nouvel URI qui d&#233;finit un propri&#233;taire ou un parent diff&#233;rent pour l'affiliation. Cet attribut a actuellement comme valeur l'URI assign&#233; &#224; l'attribut Propri&#233;taire de la filiale &#224; la cr&#233;ation de l'entit&#233;. La nouvelle valeur de cet attribut est un URI qui correspond &#224; la valeur de l'attribut Nom de l'entit&#233; de l'entit&#233; &#224; laquelle le propri&#233;taire/fournisseur appartient. Les nouvelles valeurs ne doivent correspondre &#224; aucun autre nom de filiale.</p>
+<hr><p><b>Remarque &#8211; </b>D&#233;finir un fournisseur comme propri&#233;taire de filiale ne l'inclut pas automatiquement comme membre de l'affiliation. Si un propri&#233;taire est &#233;galement membre, l'URI doit &#234;tre d&#233;fini ici en tant que propri&#233;taire et dans l'entit&#233; filiale elle-m&#234;me en tant que membre.</p>
+<hr>
+</dd>
+<dt>Cl&#233; de signature : Alias cl&#233;</dt>
+<dd><p>Les certificats sont stock&#233;s dans un fichier keystore Java. Chaque certificat du fichier correspond &#224; un alias qui permet de le rechercher. Tapez l'alias cl&#233; associ&#233; au certificat utilis&#233; pour signer les demandes et les r&#233;ponses.</p></dd>
+<dt>Cl&#233; de chiffrement : Alias cl&#233;</dt>
+<dd><p>Les certificats sont stock&#233;s dans un fichier keystore Java. Chaque certificat du fichier correspond &#224; un alias qui permet de le rechercher. Tapez l'alias cl&#233; associ&#233; au certificat de s&#233;curit&#233; du fournisseur.</p></dd>
+<dt>Cl&#233; de chiffrement : Taille de la cl&#233;</dt>
+<dd><p>Tapez la longueur des cl&#233;s utilis&#233;es par le consommateur du service Web lors de l'interaction avec une autre entit&#233;.</p></dd>
+<dt>Cl&#233; de chiffrement : M&#233;thode de chiffrement</dt>
+<dd><p>Tapez un URI qui pointe sur la pr&#233;f&#233;rence de m&#233;thode de chiffrement.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Enregistrer.</b></li></ol>
+<br/>
+
+</body>
+</html>

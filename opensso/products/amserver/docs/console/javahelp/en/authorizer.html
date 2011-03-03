@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Authorizer - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authorizer"></a><h4>Authorizer</h4>
+<a name="indexterm-89"></a><a name="indexterm-90"></a><p>Before processing a request, the Liberty Personal Profile Service will verify the
+authorization of the WSC making the request. There are two levels of authorization check
+that can be done:</p>
+<ol><li><p>Is the requesting entity authorized to access the requested resource profile information?</p></li>
+<li><p>Is the requested resource published to the requestor?</p></li></ol>
+<p>Authorization occurs via a plug-in to the Liberty Personal Profile Service: an
+implementation of the <tt>com.sun.identity.liberty.ws.interfaces.Authorizer</tt> interface. Although a new implementation can be developed, OpenSSO provides
+the default: <tt>com.sun.identity.liberty.ws.idpp.plugin.IDPPAuthorizer</tt>. This plug-in defines four policy action values for the query and
+modify operations:</p>
+<ul><li><p>Allow</p></li>
+<li><p>Deny</p></li>
+<li><p>Interact For Consent</p></li>
+<li><p>Interact For Value</p></li></ul>
+<p>The resource values for the rules are similar to <tt>x-path</tt> expressions defined by
+the Liberty Personal Profile Service.</p>/PP/CommonName/AnalyzedName/FN     Query     Interact for consent /PP/CommonName/*                          Modify     Interact for value /PP/InformalName                            Query     Deny <p>Authorization can be turned off by deselecting one or both of the following
+attributes also defined in the Liberty Personal Profile Service:</p>
+<ul><li><p><a href="requirequery.html">Require Query PolicyEval:</a></p></li>
+<li><p><a href="requiremodify.html">Require Modify PolicyEval:</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-WSF Security Service - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamlibertysecurityservice"></a><h4>Liberty ID-WSF Security Service</h4>
+
+
+<a name="ggohs"></a><h5>Sicherheitsattribut-Plugin-Klasse</h5>
+<p>Dieses Attribut gibt den Namen der Implementierungsklasse f&#252;r die <tt> com.sun.identity.liberty.ws.security.SecurityAttributePlugin</tt>-Schnittstelle an. Die
+Klasse gibt eine Liste von SAML-Attributen zur&#252;ck, die in die durch den
+ Discovery Service generierten Berechtigungsnachweise aufgenommen werden sollen.</p>
+
+<a name="ggoia"></a><h5>Schl&#252;sselinformationstyp</h5>
+<p>Der in diesem Attribut festgelegte Wert wird in der Implementierungsklasse <tt>com.sun.identity.liberty.ws.security.LibSecurityTokenProvider </tt> verwendet.
+Er gibt den in den Block <tt>KeyInfo</tt> in der XML-Signatur aufzunehmenden Datentyp
+an. Beim Wert <tt>Zertifikat</tt> wird das X059-Zertifikat des Unterzeichners in <tt>KeyInfo</tt> aufgenommen.
+Anderenfalls wird der zugeh&#246;rige DSA/RSA-Schl&#252;ssel in <tt>KeyInfo</tt> aufgenommen.</p>
+
+<a name="ggoin"></a><h5>Klasse des Sicherheitstokenanbieters</h5>
+<p>Dieses Attribut gibt die Implementierungsklasse f&#252;r den  Sicherheitstokenanbieter an.</p>
+
+<a name="ggohw"></a><h5>Standard-WSC-Zertifikatalias</h5>
+<p>Dieses Attribut gibt den Standard-Zertifikatalias f&#252;r das Sicherheitstoken des ausgebenden Webdiensts f&#252;r
+diesen Webdienst-Client (Web Service Client) an.</p>
+
+<a name="ggohz"></a><h5>Signierungs-Zertifikatalias der vertrauensw&#252;rdigen Autorit&#228;t</h5>
+<p>Dieses Attribut gibt das Zertifikatalias f&#252;r die vertrauensw&#252;rdige Autorit&#228;t an, die zur
+Signierung des SAML- bzw. SAML BEARER-Tokens der Antwortnachricht verwendet wird.</p>
+
+<a name="ggohd"></a><h5>Signierungs-Zertifikataliasse der vertrauensw&#252;rdigen CA</h5>
+<p>Dieses Attribut gibt die Zertifikataliasse f&#252;r die vertrauensw&#252;rdige CA an. SAML- bzw.
+SAML BEARER-Tokens einer eingehenden Anforderung. Die Meldung muss von einer vertrauensw&#252;rdigen CA
+in dieser Liste unterzeichnet werden. Die Syntax lautet <tt>cert alias 1[:issuer 1]|cert alias 2[:issuer 2]|..... </tt></p><p>Beispiel: <tt>myalias1:myissuer1|myalias2|myalias3:myissuer3</tt>. </p><p>Der Wertaussteller wird verwendet, wenn das Token in der Signatur keine <tt>KeyInfo </tt>
+enth&#228;lt. Der Aussteller des Tokens muss in dieser Liste enthalten sein, und
+das zugeh&#246;rige Zertifikatalias wird zur Verifizierung der Signatur verwendet. Wenn <tt>KeyInfo</tt> vorhanden
+ist, muss der Schl&#252;sselspeicher ein Zertifikatalias enthalten, das mit der <tt>KeyInfo </tt> &#252;bereinstimmt,
+und das Zertifikatalias muss in der Liste enthalten sein.</p>
+<br/>
+
+</body>
+</html>

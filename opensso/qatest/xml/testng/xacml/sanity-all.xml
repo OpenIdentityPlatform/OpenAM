@@ -1,0 +1,22 @@
+    <test name="XACMLTestsGet">
+    <parameter name="actionmethod" value="GET"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.xacml.XACMLTest"/>
+        </classes>
+    </test>
+    <test name="XACMLTestsPOST">
+    <parameter name="actionmethod" value="POST"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.xacml.XACMLTest"/>
+        </classes>
+    </test>

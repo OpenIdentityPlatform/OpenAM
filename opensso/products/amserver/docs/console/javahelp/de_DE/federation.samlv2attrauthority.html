@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2-Attributautorit&#228;tsanpassung  - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>SAMLv2-Attributautorit&#228;tsanpassung </h4>
+<p>Die SAMLv2-Attributsautorit&#228;t enth&#228;lt die folgenden Attribute f&#252;r die Anpassung:</p>
+<ul><li><p><a href="#ggwhl">Signierung und Verschl&#252;sselung</a></p></li>
+<li><p><a href="#ggwgh">Attributdienst</a></p></li>
+<li><p><a href="#ggwjy">AssertionID-Anforderung</a></p></li>
+<li><p><a href="#ggwju">Attributprofil</a></p></li>
+<li><p><a href="#ggwha">Cert-Alias</a></p></li>
+<li><p><a href="#ggwjj">Betreffdatenspeicher</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>Signierung und Verschl&#252;sselung</h5>
+<dl><dt>Schl&#252;sselgr&#246;&#223;e</dt>
+<dd><p>Die L&#228;nge von Schl&#252;sseln, die von der Attributsautorit&#228;ts-Entity bei der Interaktion mit einer anderen Entity verwendet werden.</p></dd>
+<dt>Algorithmus</dt>
+<dd><p>Der Verschl&#252;sselungsalgorithmus, der f&#252;r die Interaktion mit einer anderen Entity verwendet wird.</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>Attributdienst</h5>
+<p>Dieses Attribut definiert die URL-Endpunkte, die Attributsabfrageanforderungen empfangen. <tt>Speicherort</tt> gibt den URL
+des Anbieters an, an den die Anforderung gesendet wird. <tt>Mapper</tt> definiert die
+SPI, die die Attributszuordnungsautorit&#228;t findet, um eine Liste der Attribute auszugeben, die
+in einer Antwort enthalten sind. Die SAMLv2-definierten Attributabfrageprofile sind:</p>
+<ul><li><p>Grundlagen</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>AssertionID-Anforderung</h5>
+<p>Definiert die URLs, an die AssertionIDs von einem Client an einen Identity-Anbieter
+gesendet werden, um die entsprechende Assertion abzurufen. <tt>Speicherort</tt> gibt den URL des
+Anbieters an, an den die Anforderung gesendet wird. <tt>Mapper</tt> definiert die SPI,
+die die Attributszuordnungsautorit&#228;t findet, um eine Liste der Attribute auszugeben, die in
+einer Antwort enthalten sind. Die Bindings sind:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>Attributprofil</h5>
+<p>Definiert den Typ von SAMLv2-definierten unterst&#252;tztem Attributprofil. <tt>Grundlagen</tt> ist der Standardtyp.</p>
+
+<a name="ggwha"></a><h5>Cert-Alias</h5>
+<p>Definiert die Elemente f&#252;r den Zertifikatsalias. <tt>Signieren</tt>Gibt den Anbieterzertifikatalias an, der f&#252;r
+die Suche nach dem richtigen Signaturzertifikat im Schl&#252;sselspeicher verwendet wird. <tt>Verschl&#252;sselung</tt>Gibt den
+Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Verschl&#252;sselungszertifikat im Schl&#252;sselspeicher
+verwendet wird.</p>
+
+<a name="ggwjj"></a><h5>Betreffdatenspeicher</h5>
+<p>Gibt den Attributnamen des Datenspeichers an, der das X509-Betreffs-DN enth&#228;lt. Es wird
+verwendet, um einen Benutzer zu finden, dessen Attributwert mit dem X. 509-Betreffs-DN
+&#252;bereinstimmt. Dieses Feld wird nur im Attributabfrageprofil f&#252;r den X. 509-Betreff verwendet.
+</p>
+<br/>
+
+</body>
+</html>

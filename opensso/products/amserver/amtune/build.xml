@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   http://forgerock.org/license/CDDLv1.0.html
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at http://forgerock.org/license/CDDLv1.0.html
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+-->
+
+<project name="amtune" default="usage" basedir=".">
+    <description>OpenAM Tune</description>
+    <import file="../../products.xml" />
+
+    <property name="amtune.src.dir" value="${amtune.base.dir}/source" />
+    <property name="amtune.res.dir" value="${amtune.base.dir}/resources" />
+    <property name="amtune.locale.dir" value="${amtune.res.dir}/locale" />
+    <property name="amtune.scripts.dir" value="${amtune.res.dir}/scripts"/>
+    <property name="amtune.built.dir" value="${amtune.base.dir}/built" />
+    <property name="amtune.classes.dir" value="${amtune.built.dir}/classes" />
+    <property name="amtune.dist.dir" value="${amtune.built.dir}/dist" />
+    <property name="amtune.dist.lib.dir" value="${amtune.dist.dir}/lib" />
+    <property name="amtune.dist.template.dir" value="${amtune.dist.dir}/template" />
+    <property name="amtune.dist.res.dir" value="${amtune.dist.dir}/resources" />
+    <property name="amtune.unix.scripts.dir" value="" />
+    <property name="amtune.unix.dir" value="${amtune.dist.template.dir}/unix" />
+    <property name="amtune.unix.bin.dir" value="${amtune.unix.dir}/bin" />
+    <property name="amtune.unix.bin.amtune.dir" value="${amtune.unix.bin.dir}/amtune" />
+    <property name="amtune.windows.dir" value="${amtune.dist.template.dir}/windows" />
+    <property name="amtune.windows.bin.dir" value="${amtune.windows.dir}/bin" />
+    <property name="amtune.windows.bin.amtune.dir" value="${amtune.windows.bin.dir}/amtune" />
+
+    <path id="build.class.path">
+        <pathelement location="${sharedlib.classes.dir}" />
+    </path>     
+
+    <target name="prepareBuild">
+        <mkdir dir="${amtune.built.dir}" />
+        <mkdir dir="${amtune.classes.dir}" />
+        <mkdir dir="${amtune.dist.lib.dir}" />
+        <mkdir dir="${amtune.dist.res.dir}" />
+        <mkdir dir="${amtune.dist.template.dir}" />
+    </target>
+
+    <target name="sharedlib">
+        <subant buildpath="${sharedlib.dir}/build.xml" target="all" inheritall="true" />
+    </target>
+
+    <target name="build" depends="prepareBuild,sharedlib">
+        <javac memoryInitialSize="128m" memoryMaximumSize="256m" fork="true"
+             destdir="${amtune.classes.dir}"
+             source="1.5" target="1.5"
+             debug="${build.debug}" debuglevel="${build.debuglevel}">
+             <src path="${amtune.src.dir}" />
+             <classpath refid="build.class.path" />
+         </javac>
+    </target>
+
+    <target name="jar" depends="build">
+            <jar destfile="${amtune.dist.lib.dir}/amtune.jar"
+                basedir="${amtune.classes.dir}">
+                <manifest>
+                    <attribute name="Main-Class"
+                        value="com.sun.identity.tune.AMTune"/>
+                </manifest>
+            </jar>
+    </target>
+
+    <target name="package" depends="jar">
+        <copy todir="${amtune.unix.bin.amtune.dir}"
+              overwrite="yes" flatten="yes">
+            <fileset dir="${amtune.scripts.dir}"
+                includes="amtune-env.properties, README, amtune-samplepasswordfile, amtune"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+        <copy todir="${amtune.windows.bin.amtune.dir}"
+              overwrite="yes" flatten="yes">
+            <fileset dir="${amtune.scripts.dir}"
+                includes="amtune-env.properties, README, amtune-samplepasswordfile, amtune.bat"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+        <copy todir="${amtune.dist.res.dir}" flatten="yes">
+            <fileset dir="${amtune.locale.dir}" includes="*.properties" />
+            <globmapper from="*.properties" to="*_en.properties" />
+        </copy>
+        <copy todir="${amtune.dist.res.dir}" flatten="yes">
+            <fileset dir="${amtune.locale.dir}" includes="**/*.properties" />
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="${amtune.built.dir}" />
+    </target>
+
+    <target name="usage">
+        <echo message="Following targets are available:" />
+        <echo message="" />
+        <echo message=" build    : compiles the sources" />
+        <echo message=" clean    : deletes the generated files" />
+        <echo message=" jar      : creates amtune.jar" />
+        <echo message=" package  : creates directory structure suitable for admin tools containing the resources" />
+        <echo message="" />
+        <echo message="To run a target, issue the following command:" />
+        <echo message="" />
+        <echo message=" ant &lt;target-name&gt;" />
+    </target>
+</project>

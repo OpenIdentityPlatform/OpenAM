@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置资源 ID 映射程序 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryproviderresourceidmapadd"></a><h5>配置资源 ID 映射程序</h5>
+<p><tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>ResourceIDMapper</tt> 是用于将用户标识符映射到与其相关联的资源标识符的接口。使用实现类可以开发不同的实现方法，并且可以将这些方法添加到属性。以下是向搜索服务添加新资源 ID 映射程序的过程。起点是 Web 服务模块中的搜索服务配置屏幕。</p><ol>
+<li><b>单击“新建”以显示新的映射程序属性，或单击已配置的映射程序名称以对其进行修改。</b></li>
+<li><b>基于以下信息，为“映射程序属性”提供值：</b><dl><dt>提供者 ID</dt>
+<dd><p>此属性采用的值是指向搜索服务的 URI。此值的书写格式如下：<tt><b>http://</tt><i> host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco </b></tt></p></dd>
+<dt>ID 映射程序</dt>
+<dd><p>输入实现类的名称。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”完成映射程序的配置操作。</b></li>
+<li><b>单击“搜索服务”页面上的“保存”完成服务的配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

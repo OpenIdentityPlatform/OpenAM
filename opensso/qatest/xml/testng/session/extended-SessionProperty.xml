@@ -1,0 +1,12 @@
+
+    <test name="SessionProperty">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.session.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.session.SessionProperty"/>
+        </classes>
+    </test>

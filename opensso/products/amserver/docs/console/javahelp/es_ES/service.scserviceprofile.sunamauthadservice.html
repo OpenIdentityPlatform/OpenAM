@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Active Directory - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthadservice"></a><h4>Active Directory</h4>
+<p><a name="indexterm-166"></a>Este tipo de m&#243;dulo funciona del mismo modo que el tipo de
+m&#243;dulo de autenticaci&#243;n LDAP, pero utiliza Microsoft Active Directory en lugar de
+un directorio LDAP. La utilizaci&#243;n de este m&#243;dulo permite que LDAP y
+Active Directory coexistan en el mismo dominio. Los atributos de autenticaci&#243;n de
+Active Directory son atributos de dominio. Los atributos son:</p>
+<ul><li><p><a href="#fwfdx">Servidor principal de Active Directory</a></p></li>
+<li><p><a href="#fwbmo">Servidor secundario de Active Directory</a></p></li>
+<li><p><a href="#fwfeb">DN para iniciar b&#250;squeda de usuario</a></p></li>
+<li><p><a href="#fwbjl">DN para conexi&#243;n de superusuario</a></p></li>
+<li><p><a href="#fwbix">Contrase&#241;a para conexi&#243;n de superusuario</a></p></li>
+<li><p><a href="#fwbnt">Contrase&#241;a para conexi&#243;n de superusuario (root) (confirmar)</a></p></li>
+<li><p><a href="#fwblg">Atributo utilizado para recuperar el perfil de usuario</a></p></li>
+<li><p><a href="#fwbpi">Atributos utilizados para buscar un usuario que se va a autenticar</a></p></li>
+<li><p><a href="#fwbmh">Filtro de b&#250;squeda de usuarios</a></p></li>
+<li><p><a href="#fwbju">&#193;mbito de b&#250;squeda</a></p></li>
+<li><p><a href="#fwbmt">Acceso SSL al servidor de Active Directory</a></p></li>
+<li><p><a href="#fwbpx">Devolver DN de usuario para autenticar</a></p></li>
+<li><p><a href="#fwbjb">Intervalo de verificaci&#243;n de servidor de Active Directory</a></p></li>
+<li><p><a href="#fwbtk">Atributos de creaci&#243;n de usuario</a></p></li>
+<li><p><a href="#fwboz">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwfdx"></a><h5>Servidor principal de Active Directory</h5>
+<p>Indica el nombre de host y el n&#250;mero de puerto del servidor
+principal de Active Directory especificado durante la instalaci&#243;n de OpenSSO. Este servidor
+es el primero al que se recurre para la autenticaci&#243;n de Active
+Directory. El formato es <tt></tt><i>hostname:port</i><tt></tt>. Si no hay ning&#250;n n&#250;mero de puerto,
+utilice <tt>389</tt>.</p><p>Si OpenSSO se ha implementado con varios dominios, puede especificar el v&#237;nculo
+de comunicaci&#243;n entre instancias espec&#237;ficas de OpenSSO y Directory Server con el
+siguiente formato (las distintas entradas deben tener el nombre del servidor local
+como prefijo):</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>Por ejemplo, si ha implementado dos instancias de OpenSSO en ubicaciones distintas
+(L1-machine1-IS y L2- machine2-IS) que se comunican con diferentes instancias de Directory
+Server (L1-machine1-DS y L2-machine2-DS), deber&#237;a mostrar el siguiente aspecto:</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fwbmo"></a><h5>Servidor secundario de Active Directory</h5>
+<p>Especifica el nombre de host y el n&#250;mero de puerto de un
+servidor secundario de Active Directory disponible para la plataforma OpenSSO. Si el
+servidor principal de Active Directory no responde a una solicitud de autenticaci&#243;n,
+se deber&#225; establecer comunicaci&#243;n con este servidor. Si el servidor principal est&#225;
+activo, OpenSSO conmutar&#225; a este servidor. El formato tambi&#233;n es <tt></tt><i>hostname:port</i><tt></tt>. Si
+hay varias entradas, el nombre del servidor local debe ir en primer
+lugar.</p>
+<hr><p><b>Precauci&#243;n &#8211; </b>Al autenticar usuarios de una instancia de Directory Server que se encuentre
+en una ubicaci&#243;n remota, lejos de la instancia de OpenSSO, es importante
+que existan valores para el puerto del servidores LDAP principal y secundario.
+Se puede utilizar el valor de una ubicaci&#243;n de Directory Server para
+ambos campos.</p>
+<hr>
+
+
+<a name="fwfeb"></a><h5>DN para iniciar b&#250;squeda de usuario</h5>
+<p>Especifica el DN del nodo en el que debe comenzar la b&#250;squeda
+de un usuario. (Por motivos de rendimiento, este DN debe ser lo
+m&#225;s espec&#237;fico posible.) El valor predeterminado es la ra&#237;z del &#225;rbol de
+directorios. Se reconocer&#225; cualquier DN v&#225;lido. Si OBJETO est&#225; seleccionado en el
+atributo &#193;mbito de b&#250;squeda, el DN deber&#237;a especificar el nivel inmediato superior
+al nivel donde existe el perfil. Si hay varias entradas, el nombre
+del servidor local debe ir en primer lugar. El formato es <tt></tt><i>servername|search dn</i><tt></tt>.</p><p>Para entradas m&#250;ltiples:</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>Si hay varias entradas bajo la organizaci&#243;n root con el mismo Id.
+de usuario, deber&#237;a definirse este par&#225;metro para que s&#243;lo se pueda buscar
+o encontrar la entrada que se autenticar&#225;. Por ejemplo, si el Id.
+de agente y el Id. de usuario se encuentran en la misma
+organizaci&#243;n root, deber&#237;a utilizarse el par&#225;metro <tt>ou=Agents</tt> para que la organizaci&#243;n root
+realice la autenticaci&#243;n mediante el Id. de agente y <tt>ou=People</tt> para que
+la organizaci&#243;n root realice la autenticaci&#243;n mediante el Id. de usuario.</p>
+
+<a name="fwbjl"></a><h5>DN para conexi&#243;n de superusuario</h5>
+<p>Especifica el DN del usuario que se utilizar&#225; para conectar con el
+servidor de directorios especificado en el campo "Puerto y servidor LDAP principales"
+como administrador. El servicio de autenticaci&#243;n debe establecer un enlace mediante este
+DN para buscar un DN de usuario coincidente en funci&#243;n del Id.
+de inicio de sesi&#243;n del usuario. El valor predeterminado es <tt>amldapuser.</tt> Se
+reconocer&#225; cualquier DN v&#225;lido.</p><p>Aseg&#250;rese de que la contrase&#241;a es correcta antes de cerrar la sesi&#243;n.
+Si es incorrecta, se le bloquear&#225;. Si esto sucede puede iniciar la
+sesi&#243;n con el ND de superusuario. De forma predeterminada, &#233;sta es la
+cuenta <tt>amAdmin</tt> con la que iniciar&#237;a una sesi&#243;n normalmente, aunque se utilizar&#225;
+el DN completo. Por ejemplo:</p><p><tt>uid_amAdmin,ou=People,</tt><i>OpenSSO-base</i><tt></tt></p>
+
+<a name="fwbix"></a><h5>Contrase&#241;a para conexi&#243;n de superusuario</h5>
+<p>Contiene la contrase&#241;a para el perfil de administrador especificado en el campo
+"DN para conexi&#243;n de superusuario (root)". No hay ning&#250;n valor predeterminado. S&#243;lo
+se reconocer&#225; la contrase&#241;a de Active Directory v&#225;lida del administrador.</p>
+
+<a name="fwbnt"></a><h5>Contrase&#241;a para conexi&#243;n de superusuario (root) (confirmar)</h5>
+<p> Confirme la contrase&#241;a.</p>
+
+<a name="fwblg"></a><h5>Atributo utilizado para recuperar el perfil de usuario</h5>
+<p>Especifica el atributo utilizado en el convenio de asignaci&#243;n de nombre de
+las entradas de usuario. De forma predeterminada, OpenSSO asume que las entradas
+de usuario se identifican mediante el atributo uid. Si Directory Server utiliza
+un atributo diferente (como, por ejemplo, <i>givenname</i>), especifique el nombre de atributo
+en el campo.</p>
+
+<a name="fwbpi"></a><h5>Atributos utilizados para buscar un usuario que se va a autenticar</h5>
+<p>Muestra los atributos que se van a utilizar para formar el filtro
+de b&#250;squeda para un usuario que se va a autenticar y permite
+que el usuario se autentique con m&#225;s de un atributo en la
+entrada del usuario. Por ejemplo, si este campo se define como <i>uid</i>,
+<i>n&#250;meroempleado</i> y <i>correo</i>, el usuario se podr&#225; autenticar con cualquiera de esos
+nombres.</p>
+
+<a name="fwbmh"></a><h5>Filtro de b&#250;squeda de usuarios</h5>
+<p>Especifica un atributo que se utilizar&#225; para buscar al usuario en el
+campo "DN para iniciar b&#250;squeda de usuario". Funciona con el atributo de
+nombre de usuario. No hay ning&#250;n valor predeterminado. Se reconocer&#225; cualquier atributo
+de entrada de usuario v&#225;lido.</p>
+
+<a name="fwbju"></a><h5>&#193;mbito de b&#250;squeda</h5>
+<p>Indica el n&#250;mero de niveles en el servidor de directorios en el
+que se buscar&#225; un perfil de usuario coincidente. La b&#250;squeda comienza a
+partir del nodo especificado en DN to Start User Search (DN para
+iniciar la b&#250;squeda de usuario). El valor predeterminado es SUBTREE. Se puede
+seleccionar una de las siguientes opciones en la lista:</p><dl><dt>OBJETO</dt>
+<dd><p>Busca s&#243;lo el nodo especificado.</p></dd>
+<dt>UNNIVEL</dt>
+<dd><p>Busca en el nivel del nodo especificado y en un nivel por debajo de &#233;ste</p></dd>
+<dt>&#193;RBOL</dt>
+<dd><p>Busca en todas las entradas del nodo especificado y de los niveles inferiores a &#233;ste.</p></dd>
+</dl>
+
+
+<a name="fwbmt"></a><h5>Acceso SSL al servidor de Active Directory</h5>
+<p>Permite el acceso mediante SSL al servidor Directory Server especificado en el
+campo Primary and Secondary Server and Port (Puerto y servidor principales y
+secundarios). De forma predeterminada, la casilla no est&#225; seleccionada y el protocolo
+SSL no se utilizar&#225; para acceder a Directory Server.</p><p>Si se est&#225; ejecutando el servidor de Active Directory con SSL habilitado
+(LDAPS), debe asegurarse de que OpenSSO est&#233; configurado con los certificados SSL
+de confianza adecuados para que AM pueda conectarse al servidor de directorios
+con el protocolo LDAPS.</p>
+
+<a name="fwbpx"></a><h5>Devolver DN de usuario para autenticar</h5>
+<p>Esta opci&#243;n puede habilitarse cuando el directorio de OpenSSO es igual al
+directorio configurado para Active Directory. En ese caso, esta opci&#243;n permite que
+la instancia del m&#243;dulo de autenticaci&#243;n de Active Directory devuelva el DN
+en lugar del Id. de usuario, y no es necesario realizar ninguna
+b&#250;squeda. Normalmente, una instancia del m&#243;dulo de autenticaci&#243;n devuelve s&#243;lo el Id.
+de usuario y el servicio de autenticaci&#243;n busca al usuario en la
+instancia local de OpenSSO. Si se utiliza un Active Directory externo, normalmente
+esta opci&#243;n no est&#225; habilitada.</p>
+
+<a name="fwbjb"></a><h5>Intervalo de verificaci&#243;n de servidor de Active Directory</h5>
+<p>Este atributo se utiliza para una conmutaci&#243;n por error del servidor de
+Active Directory. Define el n&#250;mero de minutos que el subproceso permanecer&#225; inactivo
+antes de comprobar que el servidor principal de Active Directory est&#233; ejecut&#225;ndose.</p>
+
+<a name="fwbtk"></a><h5>Atributos de creaci&#243;n de usuario</h5>
+<p>La instancia del m&#243;dulo de autenticaci&#243;n de Active Directory utiliza este atributo
+cuando el servidor de Active Directory se configura como un servidor de
+Active Directory externo. Contiene una asignaci&#243;n de los atributos entre un Directory
+Server local y uno externo. Este atributo tiene el siguiente formato:</p><p><i>attr1|externalattr1</i></p><p><i>attr2|externalattr2</i></p><p>Si se rellena este atributo, los valores de los atributos externos se
+leen desde el Directory Server externo y se definen para los atributos
+internos de Directory Server. Los valores de los atributos externos se establecen
+s&#243;lo en los atributos internos cuando el atributo <tt>Perfil de usuario</tt> (en el tipo
+de m&#243;dulo de autenticaci&#243;n principal) se establece en Creado din&#225;micamente y el
+usuario no existe en la instancia del Directory Server local. El usuario
+reci&#233;n creado contendr&#225; los valores de los atributos internos, como se especifican
+en User Creation Attributes List (Lista de atributos de creaci&#243;n de usuarios),
+con los valores de atributos externos a los que est&#225;n asignados. </p>
+
+<a name="fwboz"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

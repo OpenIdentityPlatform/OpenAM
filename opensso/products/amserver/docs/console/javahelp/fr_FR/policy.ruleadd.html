@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Ajout d'une r&#232;gle &#224; une strat&#233;gie - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.ruleadd"></a><h5>Ajout d'une r&#232;gle &#224; une strat&#233;gie</h5>
+<ol>
+<li><b><a name="indexterm-25"></a>Si vous avez d&#233;j&#224; cr&#233;&#233; la strat&#233;gie, cliquez sur le nom de
+la strat&#233;gie &#224; laquelle vous souhaitez ajouter la r&#232;gle. Sinon, reportez-vous &#224;
+<a href="policy.policynormaladd.html">Cr&#233;ation d'une strat&#233;gie normale</a>.</b></li>
+<li><b>Sous le menu R&#232;gles, cliquez sur Nouveau.</b></li>
+<li><b>S&#233;lectionnez l'un des types de service par d&#233;faut suivants pour la r&#232;gle.
+La liste affich&#233;e peut &#234;tre relativement longue si d'autres services sont activ&#233;s
+dans la strat&#233;gie :</b><dl><dt>Service de d&#233;couverte</dt>
+<dd><p>D&#233;finit les actions d'autorisation pour les appels de protocole de modification et de requ&#234;te du service de d&#233;couverte par les clients de services Web pour une ressource sp&#233;cifi&#233;e.</p></dd>
+<dt>Service de profil personnel Liberty</dt>
+<dd><p>D&#233;finit les actions d'autorisation pour les appels de protocole de modification et de requ&#234;te du service de profil personnel Liberty par les clients de services Web pour une ressource sp&#233;cifi&#233;e.</p></dd>
+<dt>Agent de strat&#233;gie URL</dt>
+<dd><p>D&#233;finit des actions d'autorisation du service Agent de strat&#233;gie URL. Il est utilis&#233; pour d&#233;finir des strat&#233;gies prot&#233;geant les URL HTTP et HTTPS. Il s'agit du cas d'emploi le plus fr&#233;quent de strat&#233;gies OpenSSO.</p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Suivant.</b></li>
+<li><b>Entrez un nom et un nom de ressource pour la r&#232;gle.</b><p>Actuellement, les agents de strat&#233;gie OpenSSO ne prennent en charge que les
+ressources <tt>http://</tt> et <tt>https://</tt> et n'acceptent pas les adresses IP &#224; la
+place du nom d'h&#244;te.</p><p>Les caract&#232;res g&#233;n&#233;riques ne sont pas pris en charge pour le nom
+de protocole, d'h&#244;te, de port et de ressource. Par exemple :</p><pre>http*://*:*/*.html</pre><p>Pour le service Agent de strat&#233;gie URL, si aucun num&#233;ro de port
+n'est sp&#233;cifi&#233;, le num&#233;ro de port par d&#233;faut est 80 pour <tt>http://</tt>
+et 443 pour <tt>https://</tt>.</p>
+<hr><p><b>Remarque &#8211; </b>Les &#233;tapes 6 et 7 ne concernent pas les strat&#233;gies d'orientation.</p>
+<hr>
+</li>
+<li><b>S&#233;lectionnez l'action pour la r&#232;gle. Selon le type de service, vous pouvez
+s&#233;lectionner les options suivantes :</b>
+<ul><li><p>LOOKUP (Service de d&#233;couverte)</p></li>
+<li><p>UPDATE (Service de d&#233;couverte)</p></li>
+<li><p>MODIFY (Service de profil personnel Liberty)</p></li>
+<li><p>QUERY (Service de profil personnel Liberty)</p></li>
+<li><p>GET (Agent de strat&#233;gie URL)</p></li>
+<li><p>POST (Agent de strat&#233;gie URL)</p></li></ul>
+</li>
+<li><b>S&#233;lectionnez les valeurs de l'action.</b>
+<ul><li><p>Interaction pour l'acceptation &#8212; Appelle le protocole d'interaction Liberty pour l'acception d'une ressource. Cette option ne concerne que le type de service Profil personnel Liberty.</p></li>
+<li><p>Interaction pour la valeur &#8212; Appelle le protocole d'interaction Liberty pour une valeur d'une ressource. Cette option ne concerne que le type de service Profil personnel Liberty.</p></li>
+<li><p>Autoriser &#8212; Vous permet d'acc&#233;der &#224; la ressource correspondant &#224; celle d&#233;finie dans la r&#232;gle.</p></li>
+<li><p>Refuser &#8212; Refuse l'acc&#232;s &#224; la ressource correspondant &#224; celle d&#233;finie dans la r&#232;gle.</p><p>Les r&#232;gles de refus ont toujours priorit&#233; sur les r&#232;gles d'autorisation dans une strat&#233;gie. Par exemple, s'il existe deux strat&#233;gies pour une ressource donn&#233;e, l'une refusant l'acc&#232;s et l'autre l'autorisant, le r&#233;sultat sera un refus d'acc&#232;s (sous r&#233;serve que les conditions des deux strat&#233;gies soient remplies). Il est conseill&#233; d'utiliser les strat&#233;gies de refus avec un extr&#234;me prudence dans la mesure o&#249; elles peuvent engendrer des conflits potentiels entre les strat&#233;gies. G&#233;n&#233;ralement, le processus de d&#233;finition de strat&#233;gie ne doit utiliser que des r&#232;gles d'autorisation d'acc&#232;s et doit utiliser le refus par d&#233;faut lorsqu'aucune strat&#233;gie ne s'applique pour appliquer le refus.</p><p>Si des r&#232;gles de refus explicites sont utilis&#233;es, les strat&#233;gies assign&#233;es &#224; un utilisateur donn&#233; par le biais de diff&#233;rents objets (par exemple, l'appartenance &#224; un r&#244;le ou un groupe) peuvent entra&#238;ner le refus d'acc&#232;s &#224; une ressource m&#234;me si une ou plusieurs strat&#233;gies autorisent l'acc&#232;s. Par exemple, s'il existe une strat&#233;gie de refus pour une ressource applicable &#224; un r&#244;le Employ&#233; et une strat&#233;gie d'autorisation pour la m&#234;me ressource applicable au r&#244;le Responsable, les d&#233;cisions strat&#233;giques pour les utilisateurs auxquels sont assign&#233;s &#224; la fois le r&#244;le Employ&#233; et le r&#244;le Responsable seront syst&#233;matiquement un refus.</p><p>L'une des m&#233;thodes permettant de r&#233;soudre ce type de probl&#232;me consiste &#224; d&#233;finir les strat&#233;gies &#224; l'aide de plug-in de condition. Dans le cas ci-dessus, une condition de r&#244;le appliquant la strat&#233;gie de refus aux utilisateurs authentifi&#233;s en tant qu'Employ&#233;s et la strat&#233;gie d'autorisation aux utilisateurs authentifi&#233;s en tant que Responsables permet de diff&#233;rencier les deux strat&#233;gies. Une autre m&#233;thode consiste &#224; d&#233;finir la condition de <tt> authentication level</tt> dans laquelle le r&#244;le Responsable est authentifi&#233; &#224; un niveau sup&#233;rieur.</p></li></ul>
+</li>
+<li><b>Cliquez sur Terminer.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,378 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: referral-manage.xhtml,v 1.7 2009/07/27 19:35:26 farble1670 Exp $
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText
+            value="#{resources['referral-manage.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText
+            value="#{resources['referral-manage.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <ui:include
+            src="/admin/facelet/template/referral-manage-view-options-popup.xhtml"/>
+        <ui:include
+            src="/admin/facelet/template/referral-manage-remove-popup.xhtml"/>
+        <o:section>
+            <ui:define name="section-title">
+                <ice:dataPaginator
+                    for="referralManageTable"
+                    rowsCountVar="rowsCount"
+                    displayedRowsCountVar="displayedRowsCountVar"
+                    firstRowIndexVar="firstRowIndex"
+                    lastRowIndexVar="lastRowIndex"
+                    pageCountVar="pageCount"
+                    pageIndexVar="pageIndex">
+                    <ice:outputFormat
+                        value="#{resources['referral-manage.tableTitle']}">
+                        <f:param value="#{firstRowIndex}" />
+                        <f:param value="#{lastRowIndex}" />
+                        <f:param value="#{rowsCount}" />
+                    </ice:outputFormat>
+                </ice:dataPaginator>
+            </ui:define>
+            <ui:define name="section-details">
+                <ice:outputText
+                    value="#{resources['referral-manage.sectionDetails']}"/>
+            </ui:define>
+            <ui:define name="section-links">
+                <ice:panelGrid
+                    columns="5">
+                    <ice:commandLink
+                        actionListener="#{referralManageHandler.removeListener}"
+                        styleClass="command-link">
+                        <ice:graphicImage
+                            value="/admin/image/remove.png"/>
+                        <ice:outputText
+                            value="Remove"/>
+                    </ice:commandLink>
+                    <o:clink
+                        type="view-options"
+                        handler="#{referralManageHandler}"
+                        listenerMethod="viewOptionsListener"/>
+                    <ice:panelGroup>
+                        <ice:graphicImage
+                            value="/admin/image/search.png"/>
+                        <ice:inputText
+                            styleClass="section-input"
+                            value="#{referralManageBean.searchFilter}"
+                            onkeyup="submitNow(this);"/>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+            </ui:define>
+            <ui:define name="section-body">
+                <ui:include
+                    src="/admin/facelet/template/referral-manage-filters.xhtml"/>
+                <ice:panelGroup
+                    style="padding-top: 10px"
+                    rendered="#{o:size(referralManageBean.referralBeans) == 0}">
+                    <ice:outputText
+                        value="#{resources['referral-manage.noReferrals']}"/>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    rendered="#{o:size(referralManageBean.referralBeans) > 0}">
+                    <ice:dataTable
+                        id="referralManageTable"
+                        var="referralBean"
+                        rows="#{referralManageBean.referralManageTableBean.rows}"
+                        styleClass="referral-manage"
+                        value="#{referralManageBean.referralBeans}"
+                        sortColumn="#{referralManageBean.referralManageTableBean.tableSortKey.column}"
+                        sortAscending="#{referralManageBean.referralManageTableBean.tableSortKey.ascending}"
+                        resizable="true">
+
+                        <ice:column>
+                            <f:facet name="header">
+                                <ice:commandLink
+                                    actionListener="#{referralManageHandler.selectAllListener}">
+                                    <ice:graphicImage
+                                        value="../image/select-all.png"/>
+                                </ice:commandLink>
+                            </f:facet>
+                            <ice:selectBooleanCheckbox
+                                value="#{referralBean.selected}">
+                            </ice:selectBooleanCheckbox>
+                        </ice:column>
+                        <ice:column>
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="name"
+                                        actionListener="#{referralManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['referral-manage.nameColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}">
+                                <ice:outputLink
+                                    rendered="#{permissionsBean.referralEditAllowed}"
+                                    value="referral-edit.xhtml?referralName=#{referralBean.name}"
+                                    styleClass="command-link">
+                                    <f:attribute
+                                        name="referralBean"
+                                        value="#{referralBean}"/>
+                                    <ice:outputText
+                                        value="#{referralBean.name}"/>
+                                </ice:outputLink>
+                                <ice:outputLabel
+                                    rendered="#{!permissionsBean.referralEditAllowed}"
+                                    value="#{referralBean.name}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.descriptionColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="description"
+                                        actionListener="#{referralManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['referral-manage.descriptionColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                panelTooltip="descriptionTooltip"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{referralBean.description}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="descriptionTooltip"
+                                title="#{referralBean.name}: description">
+                                <ui:define name="body">
+                                    <ice:outputText
+                                        value="#{referralBean.description}"/>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.modifierColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="modifier"
+                                        actionListener="#{referralManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['referral-manage.modifierColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{referralBean.modifier}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.authorColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="author"
+                                        actionListener="#{referralManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['referral-manage.authorColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{referralBean.author}"/>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.modifiedColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="modified"
+                                        actionListener="#{referralManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['referral-manage.modifiedColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{referralBean.modified}">
+                                    <f:convertDateTime
+                                        dateStyle="short"
+                                        timeZone="#{timeZoneBean.timeZone.ID}"
+                                        type="both" />
+                                </ice:outputText>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.birthColumnVisible}">
+                            <f:facet name="header">
+                                <center>
+                                    <ice:commandSortHeader
+                                        columnName="birth"
+                                        actionListener="#{referralManageHandler.sortTableListener}">
+                                        <ice:outputText
+                                            value="#{resources['referral-manage.birthColumn']}"/>
+                                    </ice:commandSortHeader>
+                                </center>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}">
+                                <ice:outputText
+                                    value="#{referralBean.birth}">
+                                    <f:convertDateTime
+                                        dateStyle="short"
+                                        timeZone="#{timeZoneBean.timeZone.ID}"
+                                        type="both" />
+                                </ice:outputText>
+                            </ice:panelGroup>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.resourcesColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['referral-manage.resourcesColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="resourcesTooltip">
+                                <ice:outputText
+                                    value="#{referralBean.resourcesToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="resourcesTooltip"
+                                title="#{referralBean.name}: resources (#{o:size(referralBean.resources)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{referralBean.resourcesToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                        <ice:column
+                            rendered="#{referralManageBean.referralManageTableBean.subjectsColumnVisible}">
+                            <f:facet name="header">
+                                <ice:outputText
+                                    value="#{resources['referral-manage.subjectsColumn']}"/>
+                            </f:facet>
+                            <ice:panelGroup
+                                styleClass="referral-manage-cell"
+                                visible="#{true}"
+                                panelTooltip="subjectsTooltip">
+                                <ice:outputText
+                                    value="#{referralBean.subjectsToString}"/>
+                            </ice:panelGroup>
+                            <o:tooltip
+                                tooltipId="subjectsTooltip"
+                                title="#{referralBean.name}: subjects (#{o:size(referralBean.realmBeans)})">
+                                <ui:define name="body">
+                                    <pre>
+                                        <ice:outputText
+                                            value="#{referralBean.subjectsToFormattedString}"/>
+                                    </pre>
+                                </ui:define>
+                            </o:tooltip>
+                        </ice:column>
+                    </ice:dataTable>
+                    <center>
+                        <ice:panelGrid
+                            columns="1" >
+                            <ice:dataPaginator
+                                for="referralManageTable"
+                                rowsCountVar="rowsCount"
+                                displayedRowsCountVar="displayedRowsCountVar"
+                                rendered="#{o:size(referralManageBean.referralBeans) > referralManageBean.referralManageTableBean.rows}"
+                                fastStep="1"
+                                pageCountVar="pageCount"
+                                pageIndexVar="pageIndex"
+                                paginatorMaxPages="9"
+                                paginator="true">
+                                <f:facet
+                                    name="first">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-first.gif"
+                                        style="border:none;"/>
+                                </f:facet>
+                                <f:facet
+                                    name="last">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-last.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="previous">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-previous.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="next">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-next.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="fastforward">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-ff.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                                <f:facet
+                                    name="fastrewind">
+                                    <ice:graphicImage
+                                        url="/xmlhttp/css/rime/css-images/arrow-fr.gif"
+                                        style="border:none;" />
+                                </f:facet>
+                            </ice:dataPaginator>
+                        </ice:panelGrid>
+                    </center>
+                </ice:panelGroup>
+            </ui:define>
+        </o:section>
+    </ui:define>
+</ui:composition>

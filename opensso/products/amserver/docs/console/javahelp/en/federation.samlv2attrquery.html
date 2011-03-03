@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 Attribute Query Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>SAMLv2 Attribute Query Customization</h4>
+<p>SAMLv2 Attribute Query contains the following attributes for customization:</p>
+<ul><li><p><a href="#ggwht">NameID Format</a></p></li>
+<li><p><a href="#ggwgs">Cert Alias</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>NameID Format</h5>
+<p>Defines the name identifier formats supported by the attribute query provider. Name identifiers
+are a way for providers to communicate with each other regarding a user.
+Single sign-on interactions support three types of identifiers:</p>
+<ul><li><p>An <b>X509SubjectName</b> defines the subject name of the X509 encryption type.</p></li>
+<li><p>A <b>persistent identifier</b> is saved to a particular user's data store entry as the value of two attributes.</p></li>
+<li><p>A <b>transient identifier</b> is temporary and no data will be written to the user's persistent data store.</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>Cert Alias</h5>
+<p>This attribute defines the certificate alias elements for the provider. <tt>signing</tt> specifies the
+provider certificate alias used to find the correct signing certificate in the keystore.
+<tt>Encryption</tt> specifies the provider certificate alias used to find the correct encryption certificate
+in the keystore.</p>
+<br/>
+
+</body>
+</html>

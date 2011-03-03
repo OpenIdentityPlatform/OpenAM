@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立新的伺服器實例 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serveradd"></a><h4>建立新的伺服器實例</h4><p>執行 OpenSSO 配置程式來配置伺服器時，會在伺服器清單中自動為每個伺服器建立項目。在正常狀況下，應該不需要這些步驟。</p><ol>
+<li><b>以頂層管理員身份登入 OpenSSO 主控台。</b></li>
+<li><b>按一下 [配置] 標籤，然後按一下 [網站與伺服器]。</b></li>
+<li><b>按一下 [伺服器] 清單中的 [新建]。</b></li>
+<li><b>輸入您要新增的伺服器的 FQDN，然後按一下 [確定]。</b><p>FQDN 的格式應為 <tt>http</tt><i> (s)</i><tt>://</tt><i>host.domain</i><tt>:</tt><i>port </i><tt>/</tt><i>uri</i><tt></tt>。</p></li>
+<li><b>新建立的伺服器實例會出現在清單中。</b></li>
+<li><b>若要編輯伺服器，請按一下伺服器的名稱。您可以自訂伺服器的配置屬性。</b><p>[預設伺服器設定] 是伺服器實例的預設值集合。每一個伺服器實例都至少需要一部份的特性值，而根據您的部署，所有伺服器實例的大部分特性值可以相同。此設定可讓您在一個位置輸入基本特性，而不需要對每個額外的伺服器實例逐一變更這些特性。</p><p>這些預設值可以覆寫。您可以透過按一下位於伺服器實例設定檔頁面頂端的 [繼承性設定] 按鈕完成這項操作。按一下此按鈕之後，主控台會顯示一個頁面，您可以在此頁面中選取和取消選取要繼承或覆寫的值。</p></li></ol>
+<br/>
+
+</body>
+</html>

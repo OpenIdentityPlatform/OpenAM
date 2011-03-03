@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de proveedor de identidades SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2idpassertioncontent"></a><h4>Personalizaci&#243;n de proveedor de identidades SAMLv2</h4>
+<p>Los proveedores de identidad SAMLv2 contienen los siguientes grupos de atributos:</p>
+<ul><li><p><a href="#ggwdf">Contenido de la aserci&#243;n</a></p></li>
+<li><p><a href="#ggwca">Procesamiento de la aserci&#243;n</a></p></li>
+<li><p><a href="#ggwyj">Configuraci&#243;n local</a></p></li>
+<li><p><a href="#ggwaw">Servicios</a></p></li>
+<li><p><a href="#ggwli">Advanced (Avanzado)</a></p></li></ul>
+
+
+<a name="ggwdf"></a><h5>Contenido de la aserci&#243;n</h5>
+
+<ul><li><p><a href="#ggwad">Firma de solicitudes/respuestas</a></p></li>
+<li><p><a href="#ggwby">Cifrado</a></p></li>
+<li><p><a href="#ggwcz">Alias de certificado</a></p></li>
+<li><p><a href="#ggwbz">Formato de Id. de nombre</a></p></li>
+<li><p><a href="#ggyoq">Mapa de valor Id. nombre</a></p></li>
+<li><p><a href="#ggwer">Contexto de autenticaci&#243;n</a></p></li>
+<li><p><a href="#ggwec">Tiempo de aserci&#243;n</a></p></li>
+<li><p><a href="#ggwce">Autenticaci&#243;n b&#225;sica</a></p></li>
+<li><p><a href="#ggwaj">Cach&#233; de aserci&#243;n</a></p></li>
+<li><p><a href="#ggwcd">C&#243;digo de inicio</a></p></li></ul>
+
+
+<a name="ggwad"></a><h5>Firma de solicitudes/respuestas</h5>
+<p>El ajuste de los siguientes indicadores instruyen al proveedor de identidades de
+qu&#233; forma el proveedor de servicios firma determinados mensajes:</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>Solicitud de autenticaci&#243;n</p></td>
+<td align="left" valign="top" scope="row"><p> Todas
+las solicitudes de autenticaci&#243;n que reciba este proveedor de identidades deber&#225;n estar
+firmadas.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Resoluci&#243;n de artefactos</p></td>
+<td align="left" valign="top" scope="row"><p>El proveedor de servicios debe firmar el elemento <tt>ArtifactResolve</tt>.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Solicitud de
+cierre de sesi&#243;n</p></td>
+<td align="left" valign="top" scope="row"><p>El proveedor de servicios debe firmar el elemento <tt>LogoutRequest</tt>.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Respuesta de
+cierre de sesi&#243;n</p></td>
+<td align="left" valign="top" scope="row"><p>El proveedor de servicios debe firmar el elemento <tt>LogoutResponse</tt>.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Administrar solicitud
+de Id. de nombre </p></td>
+<td align="left" valign="top" scope="row"><p>El proveedor de servicios debe firmar el elemento
+<tt>ManageNameIDRequst</tt>.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Administrar respuesta de Id. de nombre</p></td>
+<td align="left" valign="top" scope="row"><p>El proveedor de servicios debe firmar el
+elemento <tt>ManageNameIDResponse</tt>.</p></td>
+</tr>
+</table>
+
+<a name="ggwby"></a><h5>Cifrado</h5>
+<p>Seleccione la casilla de verificaci&#243;n para habilitar el cifrado para los siguientes
+elementos:</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>Id. de nombre</p></td>
+<td align="left" valign="top" scope="row"><p>El proveedor de servicios debe cifrar todos los elementos <tt>NameID</tt>.</p></td>
+</tr>
+</table>
+
+<a name="ggwcz"></a><h5>Alias de certificado</h5>
+<p>Este atributo define los elementos de alias de certificado para el proveedor
+de identidades.  La <tt>firma</tt> especifica el alias de certificado de proveedor
+utilizado para encontrar el certificado firmante correcto en el almac&#233;n de claves.
+ El <tt>cifrado</tt> especifica el alias de certificado de proveedor utilizado para
+encontrar en el almac&#233;n de claves el certificado de cifrado correcto.</p>
+
+<a name="ggwbz"></a><h5>Formato de Id. de nombre</h5>
+<p>Define los formatos de identificador de nombre compatibles con el proveedor de
+identidades.  Los identificadores de nombre son una forma de que los
+proveedores se comuniquen entre s&#237; en relaci&#243;n a un usuario. Las interacciones
+de inicio de sesi&#243;n &#250;nico admiten los siguientes tipos de identificadores: </p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified </tt></p></li></ul>
+<p>Un <b>identificador persistente</b> se guarda en la entrada del almac&#233;n de datos de
+un usuario determinado como el valor de dos atributos. Un <b>identificador transitorio</b> es
+temporal, por lo que no se escribir&#225;n datos en el almac&#233;n de
+datos persistente del usuario</p>
+
+<a name="ggyoq"></a><h5>Mapa de valor Id. nombre</h5>
+<p>Este atributo especifica la asignaci&#243;n entre el atributo Formato Id. nombre y
+un atributo de perfil de usuario. Si el formato Id. nombre se
+utiliza en el protocolo, el valor del atributo de perfil se utilizar&#225;
+como el valor Id. nombre para el formato en el Asunto. La
+sintaxis de cada entrada es:</p><p><tt></tt><i>Formato Id. nombre</i><tt>=</tt><i>Atributo perfil usuario</i><tt></tt></p><p> Por ejemplo:</p><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress=mail </tt></p><p>Para agregar un nuevo formato Id. nombre, el atributo Mapa valor Id.
+nombre deber&#225; actualizarse con una entrada correspondiente. Las excepciones son <tt>persistente </tt>, <tt>transitorio</tt>
+y <tt>no especificado</tt>. Para <tt>persistente</tt> y <tt>transitorio</tt>, el valor Id. nombre se generar&#225;
+al azar. Para este atributo, <tt> no especificado</tt> es opcional. Si se especifica, el
+valor Id. nombre ser&#225; el valor del atributo perfil de usuario. Si
+no est&#225; especificado, se generar&#225; un n&#250;mero aleatorio. </p>
+
+<a name="ggwer"></a><h5>Contexto de autenticaci&#243;n</h5>
+<p>Este atributo asigna las clases de contexto de autenticaci&#243;n definido por SAMLv2
+a m&#233;todos de autenticaci&#243;n disponibles del proveedor de identidades.</p><dl><dt>Asignador</dt>
+<dd><p>Especifica la implementaci&#243;n de la interfaz <tt>IDPAuthnContextMapper </tt> utilizada para crear el contexto de autenticaci&#243;n solicitado. La implementaci&#243;n predeterminada es <tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper </tt>.</p></dd>
+<dt>Contexto de autenticaci&#243;n predeterminado</dt>
+<dd><p>Especifica el tipo de contexto de autenticaci&#243;n predeterminado que utiliza el proveedor de identidades si el proveedor de servicios no env&#237;a una solicitud de contexto de autenticaci&#243;n.</p></dd>
+<dt>Compatible</dt>
+<dd><p>Seleccione la casilla de verificaci&#243;n junto a la clase de contexto de autenticaci&#243;n si el proveedor de identidades es compatible con ella.</p></dd>
+<a name="indexterm-68"></a><a name="indexterm-69"></a><a name="indexterm-70"></a><dt>Referencia a contexto</dt>
+<dd><p>Las clases de contexto de autenticaci&#243;n definidas por SAMLv2 son:</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password (Contrase&#241;a)</p></li>
+<li><p>Password-ProtectedTransport (Transporte protegido con contrase&#241;a)</p></li>
+<li><p>Previous-Session (Sesi&#243;n previa)</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard (Tarjeta inteligente)</p></li>
+<li><p>Smartcard-PKI (Tarjeta inteligente - PKI)</p></li>
+<li><p>Software-PKI (Software - PKI)</p></li>
+<li><p>Telefon&#237;a</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token (Token de sincronizaci&#243;n de tiempo)</p></li>
+<li><p>Sin especificar</p></li></ul>
+</dd>
+<dt>Clave</dt>
+<dd><p>Seleccione el tipo de autenticaci&#243;n de OpenSSO al que se asignar&#225; el contexto.</p></dd>
+<dt>Valor</dt>
+<dd><p>Escriba la opci&#243;n de autenticaci&#243;n de OpenSSO.</p></dd>
+<dt>Nivel</dt>
+<dd><p>Recibe como valor un n&#250;mero positivo que se asigna a un nivel de autenticaci&#243;n definido en el marco de autenticaci&#243;n de OpenSSO. El nivel de autenticaci&#243;n indica hasta qu&#233; punto puede confiarse en un m&#233;todo de autenticaci&#243;n.</p><p>En este marco, cada proveedor de identidades se configura con un contexto de autenticaci&#243;n predeterminado (m&#233;todo de autenticaci&#243;n preferido). Sin embargo, el proveedor podr&#237;a querer modificar el contexto de autenticaci&#243;n asignado a uno basado en el nivel de autenticaci&#243;n definido. Por ejemplo, el proveedor B podr&#237;a querer generar una sesi&#243;n local con un nivel de autenticaci&#243;n de 3, de forma que solicita al proveedor de identidades autenticar al usuario con un contexto de autenticaci&#243;n asignado a dicho nivel. El valor de este par&#225;metro de consulta determina el contexto de autenticaci&#243;n que debe utilizar el proveedor de identidades.</p></dd>
+</dl>
+
+
+<a name="ggwec"></a><h5>Tiempo de aserci&#243;n</h5>
+<p>Las aserciones son v&#225;lidas durante un periodo de tiempo, y no antes
+ni despu&#233;s. Este atributo especifica un periodo de gracia (en segundos) para
+el valor <tt> No antes del tiempo de desplazamiento</tt>. El valor predeterminado es <tt>600</tt>.  No tiene relevancia
+para el valor <tt>notAfter</tt>.</p><p><tt>Tiempo efectivo</tt> especifica (en segundos) la cantidad de tiempo que una aserci&#243;n es
+v&#225;lida contando a partir del tiempo de emisi&#243;n de la aserci&#243;n. El
+valor predeterminado es <tt>600</tt> segundos. </p>
+
+<a name="ggwce"></a><h5>Autenticaci&#243;n b&#225;sica</h5>
+<p>Para proteger los puntos finales SOAP puede habilitarse la autenticaci&#243;n b&#225;sica. Todo
+proveedor que acceda a estos puntos finales deber&#225; tener el usuario y
+la contrase&#241;a definidas en las siguientes dos propiedades: <tt>Nombre de usuario</tt> y <tt> Contrase&#241;a</tt>.</p>
+
+<a name="ggwaj"></a><h5>Cach&#233; de aserci&#243;n</h5>
+<p>Si est&#225; habilitado, permite al proveedor de identidades almacenar en cach&#233; aserciones
+para recuperarlas posteriormente.</p>
+
+<a name="ggwcd"></a><h5>C&#243;digo de inicio</h5>
+<p>Seleccione la casilla de verificaci&#243;n si desea que se genere una Oferta
+de recurso Servicio de detecci&#243;n durante el proceso de inicio de sesi&#243;n
+&#250;nico basado en Liberty con fines de c&#243;digo de inicio.</p>
+
+<a name="ggwca"></a><h5>Procesamiento de la aserci&#243;n</h5>
+
+<ul><li><p><a href="#ggwdy">Asignador de atributos</a></p></li>
+<li><p><a href="#ggwcl">Asignador de cuenta</a></p></li></ul>
+
+
+<a name="ggwdy"></a><h5>Asignador de atributos</h5>
+<p>Especifica los valores para definir las asignaciones utilizadas por el complemento del
+asignador de atributos predeterminados. La clase predeterminada del complemento es <tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper </tt>.</p><p>Las asignaciones deben configurase con el formato:</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>Por ejemplo, <tt>EmailAddress=mail</tt> o <tt>Address=postaladdress </tt>. Escriba la asignaci&#243;n como un Nuevo valor
+y haga clic en Agregar.</p>
+
+<a name="ggwcl"></a><h5>Asignador de cuenta</h5>
+<p>Especifica la implementaci&#243;n de la interfaz <tt>AccountMapper</tt> utilizada para asignar una cuenta
+de usuario remota a una cuenta de usuario local con fines de
+inicio de sesi&#243;n &#250;nico. El valor predeterminado es <tt>com.sun.identity.saml2.plugins.DefaultIDPAccountMapper </tt>, la implementaci&#243;n predeterminada.</p>
+
+<a name="ggwyj"></a><h5>Configuraci&#243;n local</h5>
+<p>Estos atributos contienen la configuraci&#243;n espec&#237;fica de la instancia de OpenSSO. </p>
+
+<a name="ggwwx"></a><h5>URL de autenticaci&#243;n</h5>
+<p>Define la URL de autenticaci&#243;n a la que se redirigir&#225; el proveedor
+de identidades para la autenticaci&#243;n.</p>
+
+<a name="ghcia"></a><h5>URL de cierre de sesi&#243;n de aplicaci&#243;n externa</h5>
+<p>Esta opci&#243;n define la URL de cierre de sesi&#243;n para una aplicaci&#243;n
+externa. Una vez que el servidor recibe la solicitud de cierre de
+sesi&#243;n de un socio remoto, &#233;sta se enviar&#225; a la URL de
+cierre de sesi&#243;n utilizando el canal posterior <tt>HTTP POST</tt> con todas las cookies.
+Tambi&#233;n puede enviarse una propiedad de sesi&#243;n de usuario como par&#225;metro de
+<tt>encabezado HTTP </tt> y <tt> POST</tt> si se incluye el par&#225;metro de consulta <tt>appsessionproperty </tt> (establecido
+en el nombre de propiedad de sesi&#243;n) en la URL.</p>
+
+<a name="ggwaw"></a><h5>Servicios</h5>
+
+<ul><li><p><a href="#ggwbs">Meta Alias</a></p></li>
+<li><p><a href="#ggwip">Servicios de resoluci&#243;n de artefactos</a></p></li>
+<li><p><a href="#ggwcq">Servicio de cierre de sesi&#243;n &#250;nico</a></p></li>
+<li><p><a href="#ggwdm">Gestionar servicio de Id. de nombre</a></p></li>
+<li><p><a href="#ggwhr">Servicio de inicio de sesi&#243;n &#250;nico</a></p></li></ul>
+
+
+<a name="ggwbs"></a><h5>Meta Alias</h5>
+<p>Especifica un <tt>metaAlias</tt> para la funci&#243;n de proveedor que se est&#225; configurando.
+ El <tt>metaAlias</tt> se utiliza para localizar el identificador de entidad del
+proveedor y la organizaci&#243;n en la que est&#225; situado. El valor es
+una cadena igual al nombre del dominio o la organizaci&#243;n (dependiendo de
+si Complemento de servicios de federaci&#243;n de SAML v2 est&#225; instalado en
+OpenSSO) acompa&#241;ado de una barra diagonal y el nombre del proveedor. Por
+ejemplo, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Precauci&#243;n &#8211; </b>Los nombres utilizados en el <tt>metaAlias</tt> no deben contener ninguna <tt>/</tt>.</p>
+<hr>
+
+
+<a name="ggwip"></a><h5>Servicios de resoluci&#243;n de artefactos</h5>
+<p>Define los puntos finales que admiten el perfil Resoluci&#243;n de artefactos. <tt>Ubicaci&#243;n</tt>
+especifica la URL del proveedor al que se env&#237;a la solicitud. <tt>&#205;ndice</tt>
+especifica un valor entero &#250;nico al punto final, para que pueda hacerse
+referencia a &#233;l en un mensaje de protocolo. </p>
+
+<a name="ggwcq"></a><h5>Servicio de cierre de sesi&#243;n &#250;nico</h5>
+<p>El Servicio de cierre de sesi&#243;n &#250;nico sincroniza la funci&#243;n de cierre
+de sesi&#243;n en todas las sesiones autenticadas por el proveedor de identidades.
+</p><p><tt>Ubicaci&#243;n</tt> especifica la URL del proveedor al que se env&#237;a la solicitud.
+<tt>Ubicaci&#243;n de la respuesta</tt> especifica la URL del proveedor al que se env&#237;a la respuesta.
+ Los tipos de enlace son:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdm"></a><h5>Gestionar servicio de Id. de nombre</h5>
+<p>Este servicio define las URL que se utilizar&#225;n al establecer comunicaci&#243;n con
+el proveedor de servicios para especificar un nuevo identificador de nombre para
+el principal. (el registro puede llevarse a cabo s&#243;lo despu&#233;s de establecer
+una sesi&#243;n de federaci&#243;n.)</p><p><tt>Ubicaci&#243;n</tt> especifica la URL del proveedor al que se env&#237;a la solicitud.
+<tt>Ubicaci&#243;n de la respuesta</tt> especifica la URL del proveedor al que se env&#237;a la respuesta.
+  Los tipos de enlace son:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwhr"></a><h5>Servicio de inicio de sesi&#243;n &#250;nico</h5>
+<p>Define los puntos finales que admiten los perfiles del protocolo Solicitud de
+autenticaci&#243;n. Todos los proveedores de identidades deben admitir como m&#237;nimo un punto
+final de este tipo. </p><p><tt>Ubicaci&#243;n</tt> especifica la URL del proveedor al que se env&#237;a la solicitud.
+Los tipos de enlace son:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwli"></a><h5>Advanced (Avanzado)</h5>
+
+<ul><li><p><a href="#ggwjs">URL de IDP</a></p></li>
+<li><p><a href="#ggwix">Lista secreta de aplicaciones</a></p></li>
+<li><p><a href="#ggwir">Sesi&#243;n de asignador IDP</a></p></li></ul>
+
+
+<a name="ggwjs"></a><h5>URL de IDP</h5>
+<p>Define el punto final de URL en un Proveedor de identidades que
+puede gestionar solicitudes SAE (Intercambio de atributo seguro). </p>
+
+<a name="ggwix"></a><h5>Lista secreta de aplicaciones</h5>
+<p>Define la configuraci&#243;n de seguridad de la aplicaci&#243;n. Cada aplicaci&#243;n debe tener
+una entrada.  Cada entrada tiene el siguiente formato: </p><p><tt>url=IDPAppURL|type=</tt><i>symmetric_orAsymmetric</i><tt>|secret=</tt><i> ampassword encoded shared secret</i><tt></tt> OR <tt>o pubkeyalias=</tt><i>idp app signing cert</i><tt></tt></p>
+
+<a name="ggwir"></a><h5>Sesi&#243;n de asignador IDP</h5>
+<p>Define una clase de implementaci&#243;n para el SPI asignador de sesi&#243;n. El
+asignador encuentra una sesi&#243;n v&#225;lida de solicitud de servlet HTTP v&#225;lida en
+el proveedor de identidades con un perfil ECP. </p>
+<br/>
+
+</body>
+</html>

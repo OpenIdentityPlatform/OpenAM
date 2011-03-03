@@ -1,0 +1,258 @@
+#!/bin/sh
+
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amsessionconfig,v 1.4 2008/08/19 19:08:27 veiming Exp $
+#
+#
+
+#All defines are listed here..
+#General utils
+platform="`uname`"
+if [ ${platform} = "Linux" ]
+then
+   ID=/usr/bin/id
+   ECHO=/bin/echo
+   DATE=/bin/date
+   SED=/bin/sed
+   AWK=/bin/awk
+   RM=/bin/rm
+   CP=/bin/cp
+   DIRNAME=/usr/bin/dirname
+   CUT=/bin/cut
+   GETTEXT=/bin/gettext
+else
+   ID=/usr/bin/id
+   ECHO=/usr/bin/echo
+   DATE=/usr/bin/date
+   SED=/usr/bin/sed
+   AWK=/usr/bin/awk
+   RM=/usr/bin/rm
+   DIRNAME=/usr/bin/dirname
+   CUT=/usr/bin/cut
+   CP=/usr/bin/cp
+   GETTEXT=/usr/bin/gettext
+fi
+
+
+#Script Specific defines
+
+. IS_INSTALL_ETCDIR/IS_PRODNAME/config/amProfile.conf
+
+#Logfile location where the output is logged.
+LOGFILE=/var/tmp/amsessionconfig.log
+
+#i18n stuff
+TEXTDOMAIN=amhasetup
+TEXTDOMAINDIR=${IS_INSTALL}/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+
+
+AM_MODIFYCONFIG_SUCCEED=0
+
+AM_CONFIGPROPFILE_NOTFOUND=1
+AM_CONFIGPROPFILE_CANNOTREAD=2
+
+AM_INVALID_VALUE=3
+
+AM_USAGE_ERROR=4
+
+#Set input Variables 
+IHOST=
+IPORT=
+IPROTOCOL=
+IFLAG=
+
+
+# Checks if the user entered ! in response to a question and prompts again
+myread()
+{
+    while true
+    do
+        read NOBANG
+        if [ "x$NOBANG" = "x!" ]; then
+            ${ECHO} "`${GETTEXT} 'Please do not enter the character !'`"
+            ${ECHO} "`${GETTEXT} 'Please enter the input again.'`"
+            continue
+        else
+            eval $1=$NOBANG
+            break
+        fi
+    done
+}
+
+
+#Check if all the IS configuration file is present and readable
+CheckConfigFiles()
+{
+    # Check if the AMConfig.properties file exists and readable
+    if [ ! -f "${AMCONFIGPROPFILE}" ]
+    then
+        ${ECHO} "`${GETTEXT} 'OpenSSO configuration file does not exist. Please make sure it is present.'`"
+	exit ${AM_CONFIGPROPFILE_NOTFOUND}
+    fi
+    if [ ! -r "${AMCONFIGPROPFILE}" ]
+    then
+        ${ECHO} "`${GETTEXT} 'OpenSSO configuration file is not readable. Please rerun with read permissions.'`"
+	exit ${AM_CONFIGPROPFILE_CANNOTREAD}
+    fi
+}
+
+ModifyConfigFile()
+{
+    WriteToLog " "
+    WriteToLog "\t `${GETTEXT} 'Modifying file:'` ${AMCONFIGPROPFILE}"
+    ${CP} $AMCONFIGPROPFILE $AMCONFIGPROPFILE.tmp
+    sed "s/^com.iplanet.am.server.protocol=.*$/com.iplanet.am.server.protocol=${IPROTOCOL}/
+        s/^com.iplanet.am.server.host=.*$/com.iplanet.am.server.host=${IHOST}/
+        s/^com.iplanet.am.server.port=.*$/com.iplanet.am.server.port=${IPORT}/
+        s/^com.iplanet.am.console.protocol=.*$/com.iplanet.am.console.protocol=${IPROTOCOL}/
+        s/^com.iplanet.am.console.host=.*$/com.iplanet.am.console.host=${IHOST}/
+        s/^com.iplanet.am.console.port=.*$/com.iplanet.am.console.port=${IPORT}/
+        s/^com.iplanet.am.profile.host=.*$/com.iplanet.am.profile.host=${IHOST}/
+        s/^com.iplanet.am.profile.port=.*$/com.iplanet.am.profile.port=${IPORT}/
+        s/^com.iplanet.am.naming.url=.*$/com.iplanet.am.naming.url=${IPROTOCOL}:\/\/${IHOST}:${IPORT}\/amserver\/namingservice/
+
+    " $AMCONFIGPROPFILE.tmp > $AMCONFIGPROPFILE
+    if [ $?=0 ]; then
+        ${RM} $AMCONFIGPROPFILE.tmp
+        WriteToLog "\t `${GETTEXT} 'Succeeded...'`"
+    else
+        ${CP} $AMCONFIGPROPFILE.tmp $AMCONFIGPROPFILE
+        WriteToLog "\t `${GETTEXT} 'Failed...'`"
+    fi
+}
+
+
+UpdateConfigResourceFile()
+{
+    if [ "x${IFLAG}" = "x" ] 
+    then 
+        WriteToLog " "
+        response= 
+
+        WriteToLog " "
+        WriteToLog "\t `${GETTEXT} 'Running with the following Settings.'`"
+        WriteToLog "\t -------------------------------------------------"
+        WriteToLog "\t `${GETTEXT} 'Host Protocol: '`  ${IPROTOCOL}"
+        WriteToLog "\t `${GETTEXT} 'Host Port    : '`  ${IPORT}"
+        WriteToLog "\t `${GETTEXT} 'Server Host  : '`  ${IHOST}"
+        WriteToLog "\t -------------------------------------------------"
+        WriteToLog " "
+
+        ${ECHO} "`${GETTEXT} 'Please confirm if following configuration values are correct.'`"
+        ${ECHO} "`${GETTEXT} 'Valid values [yY/nN] :'` \c"
+        myread response
+        case $response in
+            [yY]) break;;
+            *)${ECHO} "`${GETTEXT} 'Aborting update process....'`"
+            exit ${AM_INVALID_VALUE};;
+        esac
+    fi
+    ModifyConfigFile 
+}
+
+#Usage message function
+UsageMessage()
+{
+    ${ECHO} "`${GETTEXT} 'Usage : amsessionconfig [--help] port protocol host'`"
+}
+
+
+CheckInputValues()
+{
+    CheckUser
+    #Check if the user entered the help option
+    if [ "${1}" = "--help" ]
+    then
+        UsageMessage
+        exit ${AM_USAGE_ERROR}
+    fi
+
+    #Check if the port is entered
+    if [ "x$1" = "x" ]
+    then
+       UsageMessage
+       exit ${AM_USAGE_ERROR}
+    else 
+       IPORT=$1
+    fi
+
+    #Check if the protocol is entered
+    if [ "x$2" = "x" ]
+    then
+       UsageMessage
+       exit ${AM_USAGE_ERROR}
+    else 
+       IPROTOCOL=$2
+    fi
+
+    #Check if the host is entered
+    if [ "x$3" = "x" ]
+    then
+       UsageMessage
+       exit ${AM_USAGE_ERROR}
+    else 
+       IHOST=$3
+    fi
+
+    #Check if running standalone
+    if [ "x$4" != "x" ]
+    then
+       if [ "x$4" != "xmInstance" ]
+       then
+          AMCONFIGPROPFILE=${IS_CONFIG}/AMConfig.properties
+       else
+          AMCONFIGFILE=$5
+          AMCONFIGPROPFILE=${IS_CONFIG}/${AMCONFIGFILE}
+       fi
+       IFLAG=$4
+    fi
+}
+
+WriteToLog()
+{
+    Message=$1
+    ${ECHO} $1
+    ${ECHO} $1 >> ${LOGFILE}
+}
+
+#Check if the user running this script is root user. If not bail out
+CheckUser()
+{
+    if [ `${ID} | ${AWK} '{print $1}'` != "uid=0(root)" ]
+    then
+        ${ECHO} "`${GETTEXT} 'This program can only be run by a root user.'`"
+	exit ${AMCLSETUP_INVALID_USER}
+    fi
+}
+
+#---- Script Starts here ----------
+CheckInputValues $1 $2 $3 $4 $5
+CheckConfigFiles
+UpdateConfigResourceFile 
+exit ${AM_MODIFYCONFIG_SUCCEED}

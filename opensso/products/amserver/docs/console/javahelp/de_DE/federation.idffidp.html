@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ID-FF-Identity-Anbieteranpassung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffidp"></a><h4>ID-FF-Identity-Anbieteranpassung</h4>
+<p>Die ID-FF-Identity-Anbieterattribute sind wie folgt gruppiert:</p>
+<ul><li><p><a href="#ggwkz">Allgemeine Attribute</a></p></li>
+<li><p><a href="#ggwne">Kommunikations-URLs</a></p></li>
+<li><p><a href="#ggwms">Kommunikationsprofile</a></p></li>
+<li><p><a href="#ggwnv">Identity-Anbieter-Konfiguration</a></p></li>
+<li><p><a href="#ggwmr">Dienst-URL</a></p></li>
+<li><p><a href="#ggwqu">Plugins</a></p></li>
+<li><p><a href="#ggwow">Identity-Anbieter-Attributzuordnungsfunktion</a></p></li>
+<li><p><a href="#ggwmp">Bootstrapping</a></p></li>
+<li><p><a href="#ggwor">Automatische Verbindung </a></p></li>
+<li><p><a href="#ggwnn">Authentifizierungskontext</a></p></li>
+<li><p><a href="#ggwmz">SAML-Attribute</a></p></li></ul>
+
+
+<a name="ggwkz"></a><h5>Allgemeine Attribute</h5>
+
+<ul><li><p><a href="#ggwqt">Anbietertyp</a></p></li>
+<li><p><a href="#ggwpg">Beschreibung</a></p></li>
+<li><p><a href="#ggwqp">Protokollunterst&#252;tzungsaufz&#228;hlung</a></p></li>
+<li><p><a href="#ggwra">Signaturschl&#252;ssel</a></p></li>
+<li><p><a href="#ggwob">Versch&#252;sselungsschl&#252;ssel</a></p></li>
+<li><p><a href="#ggwmo">Verschl&#252;sselung des Namensbezeichners</a></p></li></ul>
+
+
+<a name="ggwqt"></a><h5>Anbietertyp</h5>
+<p>Der statische Wert dieses Attributs ist der zu konfigurierende Anbietertyp: gehostet oder
+remote</p>
+
+<a name="ggwpg"></a><h5>Beschreibung</h5>
+<p>Beim Wert dieses Attributs handelt es sich um eine Beschreibung des Identity-Anbieters.</p>
+
+<a name="ggwqp"></a><h5>Protokollunterst&#252;tzungsaufz&#228;hlung</h5>
+<p>W&#228;hlen Sie die Liberty ID-FF-Ver&#246;ffentlichung, die von diesem Anbieter unterst&#252;tzt wird.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> verweist auf Liberty Identity Federation Framework Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> verweist auf Liberty Identity Federation Framework Version 1.1.</p></li></ul>
+
+
+<a name="ggwra"></a><h5>Signaturschl&#252;ssel</h5>
+<p>Definiert den Schl&#252;ssel-Alisas, der f&#252;r das Signieren von Anforderungen und Antworten verwendet
+wird.</p>
+
+<a name="ggwob"></a><h5>Versch&#252;sselungsschl&#252;ssel</h5>
+<p>Definiert den Sicherheitszertifikat-Alias, der f&#252;r die Verschl&#252;sselung von Signatur- und Verschl&#252;sselungsschl&#252;ssel verwendet
+wird. Zertifikate werden in einer Java-Schl&#252;ssselspeicherdatei gespeichert. Jedes einzelne Zertifikat wird einem
+Alias zugeordnet, der f&#252;r das Abrufen des Zertifikats verwendet wird.</p>
+
+<a name="ggwmo"></a><h5>Verschl&#252;sselung des Namensbezeichners</h5>
+<p>Aktivieren Sie dieses Kontrollk&#228;stchen, um die Verschl&#252;sselung des Namensbezeichners zu aktivieren.</p>
+
+<a name="ggwne"></a><h5>Kommunikations-URLs</h5>
+
+<ul><li><p><a href="#ggwqz">SOAP-Endpunkt</a></p></li>
+<li><p><a href="#ggwls">Single Sign-On-Dienst-URL</a></p></li>
+<li><p><a href="#ggwoh">Einzelabmeldungsdienst </a></p></li>
+<li><p><a href="#ggwln">Umleitungs-URL f&#252;r Einzelabmeldung</a></p></li>
+<li><p><a href="#ggwpl">Verbindungstrennungsdienst</a></p></li>
+<li><p><a href="#ggwna">Umleitungs-URL f&#252;r Verbindungstrennung</a></p></li>
+<li><p><a href="#ggwqn">Namensregistrierungsdienst</a></p></li>
+<li><p><a href="#ggwmy">Umleitungs-URL f&#252;r Namensregistrierung</a></p></li></ul>
+
+
+<a name="ggwqz"></a><h5>SOAP-Endpunkt</h5>
+<p>Defniert einen URI f&#252;r den SOAP-Nachrichtenempf&#228;nger des Identity-Anbieters.  Dieser Wert legt
+die Adresse des SOAP-Empf&#228;ngers f&#252;r Kommunikationen fest, die nicht &#252;ber einen Browser
+erfolgen.</p>
+
+<a name="ggwls"></a><h5>Single Sign-On-Dienst-URL</h5>
+<p>Definiert einen URL, an den die Dienstanbieter Single Sign-On- und Verbindungsanforderungen senden
+k&#246;nnen.</p>
+
+<a name="ggwoh"></a><h5>Einzelabmeldungsdienst </h5>
+<p>Definiert einen URL, an den Dienstanbieter Abmeldeanforderungen senden k&#246;nnen.  Die Einzelabmeldung
+synchronisiert die Abmeldefunktion &#252;ber alle von diesem Identity-Anbieter authentifizierten Sitzungen.</p>
+
+<a name="ggwln"></a><h5>Umleitungs-URL f&#252;r Einzelabmeldung</h5>
+<p>Definiert einen URL, an die Dienstanbieter Einzelabmeldungsantworten senden k&#246;nnen. </p>
+
+<a name="ggwpl"></a><h5>Verbindungstrennungsdienst</h5>
+<p>Definiert einen URL, an den Dienstanbieter Verbindungstrennungsanforderungen senden k&#246;nnen.</p>
+
+<a name="ggwna"></a><h5>Umleitungs-URL f&#252;r Verbindungstrennung</h5>
+<p>Definiert einen URL, an den Dienstanbieter Verbindungstrennungsantworten senden k&#246;nnen. </p>
+
+<a name="ggwqn"></a><h5>Namensregistrierungsdienst</h5>
+<p>Definiert einen URL, an den Dienstanbieter Anforderungen zur Angabe eines neuen Namensbezeichners
+senden k&#246;nnen, der f&#252;r die Kommunikation mit dem Identity-Anbieter &#252;ber einen bestimmten
+Principal verwendet wird.  Dieser Dienst kann erst nach der Einrichtung einer
+Verbindungssitzung verwendet werden.</p>
+
+<a name="ggwmy"></a><h5>Umleitungs-URL f&#252;r Namensregistrierung</h5>
+<p>Definiert einen URL, an den Dienstanbieter Namensregistrierungsantworten senden k&#246;nnen.</p>
+
+<a name="ggwms"></a><h5>Kommunikationsprofile</h5>
+
+<ul><li><p><a href="#ggwol">Verbindungstrennung</a></p></li>
+<li><p><a href="#ggwlm">Einzelabmeldung</a></p></li>
+<li><p><a href="#ggwng">Namensregistrierung</a></p></li>
+<li><p><a href="#ggwoo">Single Sign-On/Verbindung</a></p></li></ul>
+
+
+<a name="ggwol"></a><h5>Verbindungstrennung</h5>
+<p>W&#228;hlen Sie ein Profil aus, um andere Anbieter &#252;ber die Verbindungstrennung eines
+Principals zu benachrichtigen:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwlm"></a><h5>Einzelabmeldung</h5>
+<p>W&#228;hlen Sie ein Profil aus, um andere Anbieter &#252;ber die Abmeldung eines
+Principals zu benachrichtigen:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwng"></a><h5>Namensregistrierung</h5>
+<p>W&#228;hlen Sie ein Profil aus, um andere Anbieter &#252;ber die Namensregistrierung eines
+Principals zu benachrichtigen:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwoo"></a><h5>Single Sign-On/Verbindung</h5>
+<p>W&#228;hlen Sie ein Profil f&#252;r das Senden von Authentifizierungsanforderungen aus:</p>
+<ul><li><p>Browser-Ver&#246;ffentlichung (Browser-basiertes HTTP POST-Protokoll)</p></li>
+<li><p>Browser-Produkt (nicht Browser-basiertes SOAP-Protokoll)</p></li>
+<li><p>LECP (Liberty-f&#228;higer Client-Proxy)</p>
+<hr><p><b>Hinweis &#8211; </b>OpenSSO kann Anforderungen verarbeiten, die von einem Liberty-aktivierten Client-Proxy-Profil stammen. Es erfordert jedoch eine weitere Konfiguration, die &#252;ber den Umfang dieses Handbuchs hinausgeht.</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwnv"></a><h5>Identity-Anbieter-Konfiguration</h5>
+
+<ul><li><p><a href="#ggwpf">Anbieter-Alias</a></p></li>
+<li><p><a href="#ggwoz">Authentifizierungstyp</a></p></li>
+<li><p><a href="#ggwmt">Assertion-Aussteller</a></p></li>
+<li><p><a href="#ggwys">Antwortet mit</a></p></li>
+<li><p><a href="#ggwmv">Anbieterstatus</a></p></li></ul>
+
+
+<a name="ggwpf"></a><h5>Anbieter-Alias</h5>
+<p>Definiert den Aliasnamen f&#252;r den lokalen Identity-Anbieter.</p>
+
+<a name="ggwoz"></a><h5>Authentifizierungstyp</h5>
+<p>W&#228;hlen Sie den Anbieter aus, der f&#252;r Authentifizierungsanforderungen eines lokal gehosteten Anbieters
+verwendet werden soll.</p>
+<ul><li><p><b>Remote</b> legt fest, dass der lokale Host-Anbieter bei Empfang einer Authentifizierungsanforderung einen Remote-Identity-Anbieter kontaktiert.</p></li>
+<li><p><b>Lokal</b> legt fest, dass der lokale Host-Anbieter bei Empfang einer Authentifizierungsanforderung einen lokalen Identity-Anbieter (im Prinzip sich selbst) kontaktiert.</p></li></ul>
+
+
+<a name="ggwmt"></a><h5>Assertion-Aussteller</h5>
+<p>Definiert den Namen des Hosts, der die Assertion ausstellt.  Bei diesem
+Wert kann es sich um den Hostnamen des Load Balancer handeln, sofern
+OpenSSO hinter einen Load Balancer geschaltet ist.</p>
+
+<a name="ggwys"></a><h5>Antwortet mit</h5>
+<p>Gibt den Typ von Anweisung an, den der Identity-Anbieter erzeugen kann. Zum
+Beispiel: <tt>lib:AuthenticationStatement</tt></p>
+
+<a name="ggwmv"></a><h5>Anbieterstatus</h5>
+<p>Definiert, ob der Identity-Anbieter aktiv oder inaktiv ist. Der Standard, aktiv, bedeutet,
+dass der Identity-Anbieter Anforderungen verarbeiten und Antworten erzeugen kann. </p>
+
+<a name="ggwmr"></a><h5>Dienst-URL</h5>
+
+<ul><li><p><a href="#ggwlo">Homepage-URL</a></p></li>
+<li><p><a href="#ggwnh">Umleitungs-URL bei Fehler bei Single Sign-On</a></p></li>
+<li><p><a href="#ggwnq">URL der verbundenen Seite</a></p></li>
+<li><p><a href="#ggwqh">URL f&#252;r Registrierung fertig</a></p></li>
+<li><p><a href="#ggwmu">URL der Seite mit COTs</a></p></li>
+<li><p><a href="#ggwqk">Trennungs-URL</a></p></li>
+<li><p><a href="#ggwqb">URL f&#252;r Trennung fertig</a></p></li>
+<li><p><a href="#ggwme">Fehlerseiten-URL</a></p></li>
+<li><p><a href="#ggwon">URL f&#252;r Abmeldung fertig</a></p></li></ul>
+
+
+<a name="ggwlo"></a><h5>Homepage-URL</h5>
+<p>Definiert den URL der Homepage des Identity-Anbieters.</p>
+
+<a name="ggwnh"></a><h5>Umleitungs-URL bei Fehler bei Single Sign-On</h5>
+<p>Definiert den URL, zu dem ein Principal umgeleitet wird, wenn das Single
+Sign-On fehlschl&#228;gt.</p>
+
+<a name="ggwnq"></a><h5>URL der verbundenen Seite</h5>
+<p>Gibt den URL an, der den Verbindungsvorgang durchf&#252;hrt. </p>
+
+<a name="ggwqh"></a><h5>URL f&#252;r Registrierung fertig</h5>
+<p>Definiert den URL, zu dem ein Principal nach erfolgreicher Verbindungsregistrierung umgeleitet wird.</p>
+
+<a name="ggwmu"></a><h5>URL der Seite mit COTs</h5>
+<p>Definiert den URL, der alle Circles of Trust auflistet, zu denen der
+Anbieter geh&#246;rt.</p>
+
+<a name="ggwqk"></a><h5>Trennungs-URL</h5>
+<p>Definiert den URL, zu dem ein Principal bei Verbindungstrennung weitergeleitet wird.</p>
+
+<a name="ggwqb"></a><h5>URL f&#252;r Trennung fertig</h5>
+<p>Definiert den URL, zu dem ein Principal nach Abschluss der Verbindungstrennung weitergeleitet
+wird.</p>
+
+<a name="ggwme"></a><h5>Fehlerseiten-URL</h5>
+<p>Definiert den URL, zu dem ein Principal bei einem Fehler weitergeleitet wird.
+</p>
+
+<a name="ggwon"></a><h5>URL f&#252;r Abmeldung fertig</h5>
+<p>Definiert den URL, zu dem ein Principal nach dem Abmelden weitergeleitet wird.</p>
+
+<a name="ggwqu"></a><h5>Plugins</h5>
+
+<ul><li><p><a href="#ggwmm">Implementierung des Namensbezeichners</a></p></li>
+<li><p><a href="#ggwlq">Attributsanweisungs-Plugin</a></p></li>
+<li><p><a href="#ggwpm">Benutzeranbieterklasse</a></p></li></ul>
+
+
+<a name="ggwmm"></a><h5>Implementierung des Namensbezeichners</h5>
+<p>Dieses Feld definiert die Klasse, die ein Identity-Anbieter f&#252;r die Teilnahme an
+der Namensregistrierung verwendet.  Die Namensregistrierung ist ein Profil, anhand dessen die
+Dienstanbieter den Namensbezeichner eines Principals angeben, den ein Identity-Anbieter f&#252;r die Kommunikation
+mit dem Dienstanbieter verwendet.  The value is <tt>com.sun.identity.federation.services.util.FSNameIdentifierImpl </tt>.</p>
+
+<a name="ggwlq"></a><h5>Attributsanweisungs-Plugin</h5>
+<p>Gibt eine plugf&#228;hige Klasse an, die f&#252;r das Hinzuf&#252;gen von Attributanweisungen zu
+einer Assertion verwendet wird, die w&#228;hrend eines Liberty-basierten Single Sign-On-Prozesses erzeugt wird.</p>
+
+<a name="ggwpm"></a><h5>Benutzeranbieterklasse</h5>
+<p>Gibt eine plugf&#228;hige Klassen an, die verwendet wird, um Benutzervorg&#228;nge zur Verf&#252;gung
+zu stellen, wie der Suche nach einem Benutzer, dem Abrufen von Benutzerattributen
+usw. Der Standardwert ist: </p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider </tt> </p>
+
+<a name="ggwow"></a><h5>Identity-Anbieter-Attributzuordnungsfunktion</h5>
+
+<ul><li><p><a href="#ggwpa">Klasse der Attributzuordnungsfunktion</a></p></li>
+<li><p><a href="#ggwmn">Identity-Anbieter-Attributzuordnung</a></p></li></ul>
+
+
+<a name="ggwpa"></a><h5>Klasse der Attributzuordnungsfunktion</h5>
+<p>Die Klasse, die f&#252;r die Zuordnung von lokal definierten Benutzerattributen zu Attributen
+in der SAML-Assertion verwendet wird. Es gibt keine Standardklasse.</p>
+
+<a name="ggwmn"></a><h5>Identity-Anbieter-Attributzuordnung</h5>
+<p>Geben Sie Werte an, um die Zuordnungen zu definieren, die vom standardm&#228;&#223;igen
+Attribut-Mapper-Plugin verwendet werden.  Zuordnungen sollen in folgendem Format konfiguriert werden:</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>Beispiel: <tt>Email=emailaddress</tt> or <tt>Address=postaladdress </tt>.. Geben Sie die Zuordnung als neuen Wert ein
+und klicken Sie auf "Hinzuf&#252;gen".</p>
+
+<a name="ggwmp"></a><h5>Bootstrapping</h5>
+<p>Das Bootstrapping-Attribut lautet:</p>
+
+<a name="ggwqa"></a><h5>Ressourcenangebot f&#252;r Discovery-Bootstrapping generieren</h5>
+<p>W&#228;hlen Sie das Kontrollk&#228;stchen aus, wenn Sie m&#246;chten, dass ein Discovery-Dienst Resource
+Offering w&#228;hrend des Liberty-basierten Single Sign-On-Vorgangs zu Bootstrapping-Zwecken erzeugt wird.</p>
+
+<a name="ggwor"></a><h5>Automatische Verbindung </h5>
+
+<ul><li><p><a href="#ggwpc">Automatische Verbindung</a></p></li>
+<li><p><a href="#ggwqf">Allgemeiner Attributname f&#252;r Auto-Verbindung</a></p></li></ul>
+
+
+<a name="ggwpc"></a><h5>Automatische Verbindung</h5>
+<p>Aktivieren Sie dieses Kontrollk&#228;stchen, wenn Sie die automatische Verbindung aktivieren m&#246;chten.</p>
+
+<a name="ggwqf"></a><h5>Allgemeiner Attributname f&#252;r Auto-Verbindung</h5>
+<p>Wenn Sie eine Attributanweisung f&#252;r die automatische Verbindung erstellen, wird der Wert
+dieses Attributs verwendet. Die Anweisung enth&#228;lt das Attributelement und dieses h&#228;ufig verwendete
+Attribut als Wert. </p>
+
+<a name="ggwnn"></a><h5>Authentifizierungskontext</h5>
+<p>Dieses Attribut definiert die standardm&#228;&#223;ige Authentifizierungskontext-Klasse des Identity-Anbieters (Authentifizierungsmethode). Diese Methode wird
+immer verwendet, wenn der Dienstanbieter eine Authentifizierungsanforderung sendet. Au&#223;erdem wird dieser Authentifizierungskontext
+vom Dienstanbieter verwendet, wenn ein unbekannter Benutzer versucht, auf eine gesch&#252;tzte Ressource
+zuzugreifen.</p><dl><dt>Unterst&#252;tzt</dt>
+<dd><p>W&#228;hlen Sie das Kontrollk&#228;stchen neben der Authentifizierungskontext-Klasse aus, wenn diese vom Identity-Anbieter unterst&#252;tzt wird.</p></dd>
+<a name="indexterm-71"></a><a name="indexterm-72"></a><a name="indexterm-73"></a><dt>Kontextreferenz</dt>
+<dd><p>Die Liberty-definierten Authentifizierungskontext-Klassen sind:</p>
+<ul><li><p>Mobilvertrag</p></li>
+<li><p>Mobile Digital-ID</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Password</p></li>
+<li><p>Passwort-ProtectedTransport</p></li>
+<li><p>Zur&#252;ck-Sitzung</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Time-Sync-Token</p></li></ul>
+</dd>
+<dt>Schl&#252;ssel</dt>
+<dd><p>W&#228;hlen Sie den OpenSSO-Authentifizierungstyp aus, dem der Kontext zugeordnet ist.</p></dd>
+<dt>Wert</dt>
+<dd><p>Geben Sie die OpenSSO-Authentifizierungsoption ein.</p></dd>
+<dt>Ebene</dt>
+<dd><p>W&#228;hlen Sie eine Priorit&#228;tsebene f&#252;r F&#228;lle mit mehreren Kontexten aus.</p></dd>
+</dl>
+
+
+<a name="ggwmz"></a><h5>SAML-Attribute</h5>
+
+<ul><li><p><a href="#ggwnd">Assertions-Intervall</a></p></li>
+<li><p><a href="#ggwqq">Bereinigungsintervall</a></p></li>
+<li><p><a href="#ggwlp">Produktzeit&#252;berschreitung</a></p></li>
+<li><p><a href="#ggwoe">Assertion-Limit</a></p></li></ul>
+
+
+<a name="ggwnd"></a><h5>Assertions-Intervall</h5>
+<p>Geben Sie die G&#252;ltigkeitsdauer (in Sekunden) einer vom Identity-Anbieter ausgestellten Assertion ein.
+</p>
+
+<a name="ggwqq"></a><h5>Bereinigungsintervall</h5>
+<p>Geben Sie das Zeitintervall (in Sekunden) an, bis die Bereinigung f&#252;r abgelaufene
+Assertions durchgef&#252;hrt wird.</p>
+
+<a name="ggwlp"></a><h5>Produktzeit&#252;berschreitung</h5>
+<p>Geben Sie die Zeit (in Sekunden) ein, nach der Assertions-Produkte wegen Zeit&#252;berschreitung
+beendet werden.</p>
+
+<a name="ggwoe"></a><h5>Assertion-Limit</h5>
+<p>Geben Sie die Anzahl der Dienstanbieter an, die ein Identity-Anbieter ausstellen kann
+bzw. die gespeichert werden k&#246;nnen.</p>
+<br/>
+
+</body>
+</html>

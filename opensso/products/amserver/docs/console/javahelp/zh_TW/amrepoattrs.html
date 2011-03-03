@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Federated Access Manager 儲存庫屬性 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="amrepoattrs"></a><h4>Federated Access Manager 儲存庫屬性</h4>
+<p><a name="indexterm-13"></a>下列屬性用於配置 Federated Access Manager 儲存庫外掛程式：</p>
+
+<a name="gdlng"></a><h5>類別名稱</h5>
+<p>指定實作 Federated Access Manager 儲存庫外掛程式的類別檔案位置。</p>
+
+<a name="gdopv"></a><h5>Federated Access Manager 支援的類型及作業</h5>
+<p>指定 LDAP 伺服器允許的或可執行的作業。預設作業是僅限於此 LDAPv3 儲存庫外掛程式支援的作業。以下是「LDAPv3 儲存庫外掛程式」支援的作業：</p>
+<ul><li><p>代理程式 &#8212; 讀取、建立、編輯、刪除</p></li>
+<li><p>群組 &#8212; 讀取、建立、編輯、刪除</p></li>
+<li><p>範圍 &#8212; 讀取、建立、編輯、刪除、服務</p></li>
+<li><p>使用者 &#8212; 讀取、建立、編輯、刪除、服務</p></li></ul>
+<p>可根據您的 LDAP 伺服器設定及作業從上述清單中移除權限，但您不能新增更多權限。</p><p>如果所配置的 LDAPv3 儲存庫外掛程式指向 Sun Java Systems Directory Server 的實例，則可以新增<tt>角色</tt>類型權限。否則，由於其他資料存放區可能不支援角色，從而不能新增此權限。「角色」類型的權限為：</p>
+<ul><li><p>角色 &#8212; 讀取、建立、編輯、刪除</p></li></ul>
+<p>如果將<tt>使用者</tt>做為 LDAPv3 儲存庫支援的類型，則該使用者可以進行讀取、建立、編輯及刪除服務作業。換句話說，如果<tt>使用者</tt>是受支援的類型，則讀取、編輯、建立及刪除作業可讓您讀取、編輯、建立及刪除識別儲存庫中的使用者項目。<tt>user=service</tt> 作業可讓 Federated Access Manager 服務存取使用者項目中的屬性。此外，如果為使用者所屬的範圍或角色指定了動態服務，則使用者也可以存取動態服務屬性。</p><p>使用者還能管理所有指定服務的使用者屬性。如果使用者將<tt> service </tt>做為作業 (<tt>user=service</tt>)，則它會指定所有服務相關的作業均受支援。這些作業包括 <tt>assignService</tt>、<tt>unassignService</tt>、<tt>getAssignedServices</tt>、<tt>getServiceAttributes、removeServiceAttributes</tt> 及 <tt>modifyService</tt>。</p>
+
+<a name="gdlnf"></a><h5>組織 DN 值</h5>
+<p>定義指向 Federated Access Manager 管理的 Directory Server 中組織的 DN。此將做為於資料存放區中執行之所有作業的基底 DN。</p>
+
+<a name="gdopu"></a><h5>使用者容器命名屬性</h5>
+<p>若使用者存在於容器中，請指定使用者容器的命名屬性。若使用者並未位於使用者容器中，此欄位應為空白。</p>
+
+<a name="gdopc"></a><h5>使用者容器值</h5>
+<p>指定使用者容器值。預設值為 <tt>people</tt>。</p>
+
+<a name="gdopl"></a><h5>代理程式容器命名屬性</h5>
+<p>若代理程式位於一個代理程式容器中，則為代理程式容器的命名屬性。若代理程式並未位於代理程式容器中，此欄位應為空白。</p>
+
+<a name="gdopi"></a><h5>代理程式容器值</h5>
+<p>指定代理程式容器值。預設值為 <tt>agents</tt>。</p>
+
+<a name="gdoow"></a><h5>遞迴搜尋</h5>
+<p>若啟用，則在 Federated Access Manager 儲存庫中執行的搜尋會針對指定的識別進行遞迴搜尋。例如，對下列資料結構執行遞迴搜尋：</p>root realm1     subrealm11         user5     subrealm12         user6 realm2     user1     user2     subrealm21         user3         user4<p>會產生下列結果：</p>
+<ul><li><p>如果從 root 執行搜尋，而且該層次上沒有定義任何使用者 (<tt>amadmin</tt> 及 <tt>anonymous</tt> 除外)，則搜尋會傳回使用者 1&#8211;6。</p></li>
+<li><p>如果從 <tt>realm1</tt> 執行搜尋，而且沒有定義任何使用者，則搜尋會傳回 <tt>user5</tt> 及 <tt>user6</tt>。</p></li>
+<li><p>如果從 <tt>realm2</tt> 執行搜尋 (定義了 2 位使用者)，則搜尋會傳回使用者 1&#8211;4。</p></li></ul>
+
+
+<a name="gdoox"></a><h5>複製範圍配置</h5>
+<p>如果在範圍模式安裝中啟用了此屬性，則 Federated Access Manager 會為每個存在於儲存庫中的範圍及子範圍建立等同的組織及子組織。此外，在範圍/子範圍中註冊的服務也會在新建立的組織/子組織中進行註冊。範圍 DIT 及組織 DIT 均存在於資料存放區內。</p>
+<br/>
+
+</body>
+</html>

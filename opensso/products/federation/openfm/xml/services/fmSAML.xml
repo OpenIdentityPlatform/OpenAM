@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: fmSAML.xml,v 1.6 2008/12/15 23:03:29 hengming Exp $
+                                                                                
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMSAMLService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetAMSAMLService"
+            i18nFileName="fmSAMLConfiguration"
+            revisionNumber="30"
+            i18nKey="iplanet-am-saml-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>iplanet-am-saml-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-siteid-issuername-list"
+                    type="list"
+                    syntax="string"
+                    uitype="name_value_list"
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>instanceID=@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@|siteid=SAML_SITEID|issuerName=@SERVER_HOST@:@SERVER_PORT@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-signrequest"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-signresponse"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a104">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-signassertion"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a105">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-artifact-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a106">
+                    <DefaultValues>
+                        <Value>SAMLart</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-target-specifier"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a107">
+                    <DefaultValues>
+                        <Value>TARGET</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-artifact-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a108">
+                    <DefaultValues>
+                        <Value>400</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-notbefore-timeskew"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a109">
+                    <DefaultValues>
+                        <Value>180</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-assertion-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a110">
+                    <DefaultValues>
+                        <Value>420</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-cleanup-interval"
+                    type="single"
+                    syntax="number"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>180</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-assertion-max-number"
+                    type="single"
+                    syntax="number"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-partner-urls"
+                    type="list"
+                    syntax="string"
+                    uitype="name_value_list"
+                    i18nKey="a120">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-post-to-target-urls"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a121">
+                </AttributeSchema>
+                <AttributeSchema name="DefaultAssertionVersion"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a122">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
+                        <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>1.1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="DefaultProtocolVersion"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a123">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
+                        <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>1.1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="RemoveAssertion"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a124">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema> 
+                <AttributeSchema name="AttributeListForAttributeQuery"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a125">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-name-id-format-attr-map"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a126">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-attr-map"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a127">
+                </AttributeSchema>
+            </Global>
+
+            <User>
+                <AttributeSchema name="iplanet-am-saml-user"
+                    type="single"
+                    syntax="string"
+                    any="adminDisplay"
+                    i18nKey="a130">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-saml-password"
+                    type="single"
+                    syntax="encrypted_password"
+                    any="adminDisplay"
+                    i18nKey="a131">
+                </AttributeSchema>
+            </User>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
