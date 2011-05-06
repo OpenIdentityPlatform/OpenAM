@@ -1,0 +1,247 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README,v 1.6 2008/09/25 17:33:19 bina Exp $
+
+-->
+
+OpenSSO 8.0 Upgrade
+=============================================================
+    This document describes the steps to upgrade/migrate to
+OpenSSO 8.0 from the following Sun Java System Access Manager and 
+OpenSSO 8.0 from the following OpenSSO and 
+Sun Java System Federation Manager versions : 
+
+    Sun Java System Access Manager (AM)
+        - JES 3 2005Q1 (AM 6.3)
+        - JES 4 2005Q4 (AM 7.0)
+        - JES 5 (AM 7.1)
+
+    Sun Java System Federation Manager (FM) 7.0
+
+===============================================================
+Following are the supported platforms :
+===============================================================
+  
+1. Solaris Sparc/x86 & Linux : 
+      Upgrade/Migration from Sun Java System Access Manager (AM 6.3/7.0/7.1) &
+      Upgrade/Migration from Access Manager (AM 6.3/7.0/7.1) &
+      Federation Manager 7.0 
+
+2. Windows : 
+      Upgrade/Migration from Sun Java System Access Manager (AM 7.1) &
+      Federation Manager 7.0 
+
+=================================================================
+Upgrade Steps to migrate Sun Java System Access Manager & 
+Federation Manager to OpenSSO 8.0
+=================================================================
+
+i. Pre-Upgrade steps :
+
+   Before attempting upgrade, pre-upgrade steps must be followed,
+   these include :
+        - Update OS version to OpenSSO 8.0 supported version.
+	- Update of the Web Container to OpenSSO 8.0 supported
+          versions
+        - Update of the Directory Server version to the OpenSSO 8.0
+          supported version.
+        - Update of shared components (eg. JDK version ).
+        - Collection of configuration parameters such as passwords,
+          encryption keys , admin user information , directory administrator
+          information, deploy uri of existing AM instance.
+        - Backup of the OpenSSO schema (dump to an ldif) before
+          attempting upgrade.
+        - Backup of customized configuration (eg. customized jsps).
+
+   Pre-upgrade steps are explained in detail in the OpenSSO 8.0
+   Upgrade Guide which can be found at: http://docs.sun.com/doc/820-5019
+
+ii. Download the OpenSSO 8.0 zip file (opensso.zip)
+
+iii. Select a directory and extract the zip file into this directory.
+     Note: This directory should be readable and writable.
+     This will be referred to as upgrade base directory which would be
+     <zip-dir>/opensso.
+
+iv. Create a staging directory 
+       - Extract the opensso.war into the staging directory.
+       - apply customizations (console, auth jsp etc)
+       - Create a war from this staging directory and the name of the
+         war should be same as the deploy uri of the previous AM
+         version . Eg. If the existing instance is deployed with uri
+         /amserver then the new war should be re-wared as amserver.war.
+
+v. Undeploy existing instance war and deploy the OpenSSO 8.0 war
+   using web container's deployment commands or container's administration
+   console.
+    1. Undeploy the existing deployed war.
+    2. Deploy the OpenSSO 8.0 war on same host and port where
+       previous instance was deployed. 
+
+vi. Restart the container.
+
+vii. Configure the war against the existing AM schema.
+     > Following configuration parameters are needed from the
+         existing install for configuration
+        - AM Administrator (amAdmin) password.
+	- Server Settings
+	    * Server Host
+	    * Server Port
+	    * Cookie Domain
+	    * Deploy URI
+        - Directory Server Settings
+	    * Directory Server Host Name
+	    * Directory Server Port
+	    * Encryption Key (this should be the value of
+              the "am.encryption.pwd" property from AMConfig.properties)
+	    * Directory Administrator LoginID (eg. cn=Directory Manager)
+	    * Directory Administrator Password
+        - Root Suffix  (this should be the value of the property 
+              "com.iplanet.am.rootsuffix" from AMConfig.properties).
+        - "amldapuser" password
+
+    > Invoke the OpenSSO 8.0 deployment url to configure OpenSSO 8.0 
+      against existing DIT :
+	<protocol>://<serverhost>:<serverport>/<deploy_uri>
+
+    > On the Configuration Page , select "Create New Configuration".
+          This will take to the screen "Step 1 : General"
+
+    > Step 1: General : Enter the amAdmin password and select "Next"
+          to go to Step 2
+
+    > Step 2: Server Settings : Verify the server host , server port,
+      cookie domain and the deploy uri . These values should be same
+      as that of the AM version which is being migrated.
+
+      Click on "Next" to go to Step 3.
+
+    > Step 3: Configuration Store : Enter the configuration store details
+
+	- Select DataStore Type "External (Sun Java System DS)
+	- Enter the values of the following from the existing AM instance:
+	      o Directory Server Host Name
+	      o Directory Server Port
+              o Encryption Key 
+	      o Root Suffix
+              o LoginID  (Directory Server Admin DN)
+              o Password (Directory Server Admin Password)
+	- Select "Next" to go to Step 4.
+
+    > Step 4: User Store: Enter the User Store details :
+
+	 - Enter the values of the following from the existing AM instance:
+	      o Directory Server Host Name
+	      o Directory Server Port
+	      o Root Suffix
+              o LoginID  (Directory Server Admin DN)
+              o Password (Directory Server Admin Password)
+
+        - Select Store Type "LDAP with OpenSSO Schema"
+	- Select "Next" to go to Step 5
+
+    > Step 5: Site Configuration - No Data needs to be entered on this screen
+	- Select "Next" to go to Step 6.
+
+    > Step 6: Default Agent User
+	- Enter "amldapuser" password
+	- Select "Next" to go to Summary.
+
+    > Step 7: Summary 
+	- Select "Create Configuration"
+
+    > Select "Proceed To Login" on Complete of the Configuration.
+
+    > Login to OpenSSO Admin Console.
+
+    > At this point OpenSSO 8.0 is running against existing DIT
+      (also known as coexistance mode).
+        
+viii.  Prepare the system for upgrade by running the preupgrade tool.
+        - Change to <upgrade_base_dir>/upgrade/scripts.
+        - Run the "ssopre80upgrade" tool . 
+
+	  Solaris Sparc/x86 & Linux : At the command prompt enter :
+	    ./ssopre80upgrade 
+
+	  Windows : At the command prompt enter :
+	    ssopre80upgrade.bat
+
+    - "ssopre80upgrade" will require the following inputs :
+	o FM 7.0 Staging Directory (if the instance is FM)
+	o Directory Server full qualified host name
+	o Directory Server port
+	o Top-level Administrator DN
+	o Top-level Adminisrator Password
+	o Directory to store backup.
+	o OpenSSO 8.0 Configuration Directory
+	o OpenSSO 8.0 Upgrade Base Directory
+	o OpenSSO 8.0 Staging Directory 
+
+ix. Update the <upgrade-base-dir>/upgrade/config/ssoUpgradeConfig.properties
+    to set the following properties 
+        o XML_ENCODING - Enter the value of the XML_ENCODING eg. UTF-8
+        o BASEDIR - Enter the value of the upgrade base directory 
+                     (eg <zip-dir>/opensso)
+        o ORG_NAMING_ATTR - value of org naming attribute (default : "o")
+        o USER_NAMING_ATTR - value of user naming attribute (default : "uid")
+        o DEPLOY_URI - value of OpenSSO Deploy URI
+        o PAM_SERVICE_NAME - The PAM Service Name 
+	    (default : "other" for Solaris sparc/x86 , "password" for Linux)
+        o LDAP_USER_PASS - Value of the "amldapuser" password
+
+x. Upgrade/Migrate the AM Schema to OpenSSO 8.0 schema.
+    - Change to <upgrade_base_dir>/upgrade/scripts.
+        - Run the "ssoupgrade" tool . 
+
+	  Solaris Sparc/x86 & Linux : At the command prompt enter :
+	    ./ssoupgrade 
+	
+	  Windows : At the command prompt enter :
+	    ssoupgrade.bat
+
+    - "ssoupgrade" will require the following inputs 
+                o OpenSSO 8.0 Upgrade Base Directory
+	o OpenSSO 8.0 Configuration Directory
+	o OpenSSO 8.0 Staging Dir 
+	o Directory Server full qualified host name
+	o Directory Server port
+	o Top-level Administrator DN (amAdmin DN)
+	o Top-level Adminisrator Password (amAdmin password)
+        o Enable Realms (if existing instance is running in Legacy Mode 
+          or is an FM instance.).
+	
+xi. Restart the web container . 
+
+xii.Login to OpenSSO 8.0 <protocol>://<host>:<port>/<deployURI>/UI/Login
+
+xiii. Post Installation Step (Optional) :
+	Windows : The uninstall of OpenSSO Packages has to
+        be done manually . Follow the JES 5 Windows document 
+        on uninstallation of OpenSSO :
+            http://docs.sun.com/app/docs/doc/819-5699
+
+	Federation Manager : The FM 7.0 staging directory can be manually
+        removed if desired.

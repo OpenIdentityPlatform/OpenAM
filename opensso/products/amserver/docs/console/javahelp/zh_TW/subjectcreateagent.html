@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立或修改代理程式 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subjectcreateagent"></a><h5>建立或修改代理程式</h5>
+<ol>
+<li><b>按一下 [代理程式] 標籤。</b></li>
+<li><b>按一下 [開啟新檔] 。</b></li>
+<li><b>輸入下列欄位值：</b><p><b>名稱</b>。 輸入代理程式的名稱或識別。這是代理程式將用來登入 Fedrated Access Manager 的名稱。不接受多位元的名稱。</p><p><b>密碼</b>。 輸入代理程式密碼。此密碼必須與 LDAP 認證期間代理程式所使用的密碼不同。</p><p><b>確認密碼</b>。確認密碼。</p><p><b>裝置狀態</b>。 輸入代理程式的裝置狀態。若設為 [使用中]，代理程式將可以認證並與 Fedrated Access Manager 通訊。若設為 [非使用中]，代理程式將無法認證 Fedrated Access Manager。</p></li>
+<li><b>按一下 [確定]。</b></li>
+<li><b>一旦您建立了代理程式，您可以另外編輯下列欄位：</b><p><b>描述</b>。 輸入代理程式的簡要說明。例如，您可以輸入代理程式實例名稱或其保護的應用程式名稱。</p><p><b>代理程式金鑰值</b>。 以一個金鑰/值對設定代理程式特性。Fedrated Access Manager 使用此特性以接收有關使用者之憑證指定的代理程式。目前，僅有一個特性有效，且將忽略所有其他特性。請使用以下格式：</p><p><tt></tt><i> agentRootURL</i><tt>=http://</tt><i>server_name:port</i><tt>/ </tt></p></li></ol>
+<br/>
+
+</body>
+</html>

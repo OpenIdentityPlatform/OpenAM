@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>サイト ID を設定する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>サイト ID を設定する</h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>この属性は、OpenSSO がインストールされたサーバーがホストするサイトを定義します。デフォルト値と自動的に生成されるサイト ID は、インストール時にホストに定義されます。複数のエントリを定義することもできます。たとえば、同じディレクトリサーバーを共用する OpenSSO の複数インスタンスをロードバランスする場合には、すべてのインスタンスを定義する必要があります。連携インタフェースの「SAML」画面の「サイト ID」属性から始めます。サイト ID は、「サーバーおよびサイト」設定画面で定義します。詳細は、<a href="service.serversite.html">「サーバーおよびサイト」</a>を参照してください。</p><ol>
+<li><b>「新規」をクリックして新規サイト ID を追加するか、または設定済みのサイト ID の名前をクリックしてそのプロファイルを変更します。</b><p>「サイト ID」属性が表示されます。</p></li>
+<li><b>次の情報に基づいて、サイト ID 属性に値を設定します。</b><dl><dt>インスタンス ID</dt>
+<dd><p>このプロパティーの値は、<i>プロトコル</i><tt>://</tt><i>ホスト</i><tt>:</tt><i>ポート</i> です。</p><p>SAML を SSL 対応に設定する (ソースサイトと送信先サイトの両方で) 場合は、ここに定義するプロトコルを <tt>https//</tt> にします。</p></dd>
+<dt>サイト ID</dt>
+<dd><p>サイト ID はサイトごとに生成される ID です。この値は 1 つのロードバランサの背後にある複数のサーバーに対して同じになります。必要に応じて手動でこの ID を生成するために使用できるクラスが、<tt>com.sun.identity.saml.common</tt> パッケージ内にあります。コマンド行で次のように入力します。</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>発行者名</dt>
+<dd><p>このプロパティーのデフォルト値は <i>ホスト</i><tt>:</tt><i>ポート</i> ですが、任意の URI にすることもできます。</p></dd>
+</dl>
+</li>
+<li><b>「了解」をクリックして、サイト ID の設定を完了します。</b></li>
+<li><b>「ローカルサイトのプロパティー」ページで「保存」をクリックして、SAML の設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

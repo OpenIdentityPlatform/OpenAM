@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Client-Erkennung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>Client-Erkennung</h4>
+<p><a name="indexterm-200"></a>Ein erster Schritt beim Authentifizierungsprozess besteht in der Ermittlung des Clienttyps, von
+dem die HTTP(S)-Anforderung ausgeht. Diese Funktion von OpenSSO wird als Client-Erkennung bezeichnet.
+Die URL-Informationen dienen zum Abrufen der Client-Merkmale. Auf Grundlage dieser Merkmale werden
+die entsprechenden Authentifizierungsseiten zur&#252;ckgegeben. Wenn beispielsweise ein Netscape-Browser zum Anfordern einer Webseite
+verwendet wird, wird von OpenSSO 8.0 eine HTML-Anmeldeseite angezeigt. Nach der Validierung
+des Benutzers wird der Client-Typ (Netscape-Browser) dem Sitzungs-Token hinzugef&#252;gt. Bei den Attributen
+des Client-Erkennungsdienstes handelt es sich um globale Attribute.</p>
+<ul><li><p><a href="#fxcei">Client-Typen</a></p></li>
+<li><p><a href="#fxbxh">Standard-Client-Typ</a></p></li>
+<li><p><a href="#fxccp">Client-Erkennungsklasse</a></p></li>
+<li><p><a href="#fxbvy">Client-Erkennung</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>Client-Typen</h5>
+<p>Zur Feststellung des Client-Typs muss OpenSSO die Merkmale zur Identifikation des Clients
+erkennen. Diese Merkmale identifizieren die Eigenschaften aller unterst&#252;tzten Typen mithilfe von Client-Daten.
+Mit diesem Attribut k&#246;nnen Sie die Client-Daten &#252;ber die Client-Manager-Schnittstelle &#228;ndern. Zum
+&#214;ffnen des Client-Managers klicken Sie auf ";Bearbeiten". OpenSSO bietet die folgenden Client-Typen:</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>For descriptions of these client types, see the <a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>.</p>
+
+<a name="gciwk"></a><h5>Client-Manager</h5>
+<p><a name="indexterm-201"></a>Diese Schnittstelle listet die Basis-Clients, Stile und zugeh&#246;rigen Eigenschaften auf und erm&#246;glicht
+das Hinzuf&#252;gen und Konfigurieren von Ger&#228;ten. Die Basis-Client-Typen sind ganz oben im
+Client-Manager aufgelistet. Diese Client-Typen enthalten die Standardeigenschaften, die von allen Ger&#228;ten &#252;bernommen
+werden k&#246;nnen, die dem jeweiligen Client-Typ zugeordnet sind.</p>
+
+<a name="gcivx"></a><h5>Client-Typ</h5>
+<p>Der Client-Manager fasst alle verf&#252;gbaren Clients einschlie&#223;lich des Basis-Client-Typs in der Liste
+";Client-Typ" zusammen. Wenn Sie die Eigenschaften eines Clients &#228;ndern m&#246;chten, klicken Sie
+auf dessen Ger&#228;tenamen. Die Eigenschaften werden daraufhin im Client-Editor angezeigt. Zur Bearbeitung
+der Eigenschaften w&#228;hlen Sie die folgenden Klassifizierungen aus der Pulldown-Liste aus:</p><dl><dt>Hardware-Plattform</dt>
+<dd><p>Umfasst Eigenschaften der Ger&#228;tehardware wie Aufl&#246;sung, unterst&#252;tzte Zeichens&#228;tze usw.</p></dd>
+<dt>Software-Plattform</dt>
+<dd><p>Umfasst Eigenschaften der Ger&#228;tesoftware wie Anwendungsumgebung, Betriebssystem und installierte Software. </p></dd>
+<dt>Netzwerkeigenschaften</dt>
+<dd><p>Umfasst Eigenschaften, die die Netzwerkumgebung einschlie&#223;lich der unterst&#252;tzten Tr&#228;ger beschreiben.</p></dd>
+<dt>BrowserUA</dt>
+<dd><p>Umfasst Attribute des auf dem Ger&#228;t laufenden Browser-Benutzeragenten.</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>Umfasst Eigenschaften der vom Ger&#228;t unterst&#252;tzten WAP-Umgebung (Wireless Application Protocol).</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>Umfasst Eigenschaften der vom Ger&#228;t unterst&#252;tzten WAP-Umgebung.</p></dd>
+<dt>Weitere Eigenschaften</dt>
+<dd><p>Umfasst Eigenschaften der vom Ger&#228;t unterst&#252;tzten WAP-Umgebung (Wireless Application Protocol).</p></dd>
+</dl>
+
+<hr><p><b>Hinweis &#8211; </b>Die Definitionen bestimmter Eigenschaften finden Sie im  <b>Open Mobile Alliance Ltd. (OMA) Wireless Application Protocol, Version 20-Oct-2001</b>.</p><p>Um auf dieses Dokument zugreifen zu k&#246;nnen, m&#252;ssen Sie sich m&#246;glicherweise zun&#228;chst
+bei WAP Forum<sup>TM</sup> registrieren. For information, please visit <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm </a>.</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>Standard-Client-Typ</h5>
+<p>Legt den Standard-Client-Typ fest, der aus der Liste des Attributs ";Client-Typen" ausgew&#228;hlt
+wird. Die Standardeinstellung ist ";genericHTML".</p>
+
+<a name="fxccp"></a><h5>Client-Erkennungsklasse</h5>
+<p>Legt die Client-Erkennungsklasse fest, von der alle Client-Erkennungsanforderungen verarbeitet werden. Der von
+diesem Attribut zur&#252;ckgegebene Wert sollte mit einem der im Attribut ";Client-Typen" aufgef&#252;hrten
+Typen &#252;bereinstimmen. Die standardm&#228;&#223;ige Client-Erkennungsklasse lautet <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>. OpenSSO enth&#228;lt au&#223;erdem <tt>com.iplanet.services.cdm.ClientDetectionDefaultImpl </tt>.</p>
+
+<a name="fxbvy"></a><h5>Client-Erkennung</h5>
+<p>Aktiviert die Client-Erkennung. Wenn die Client-Erkennung aktiviert ist, wird jede Anforderung von
+der im Attribut Client-Erkennungsklasse angegebenen Klasse verarbeitet. Standardm&#228;&#223;ig ist die Client-Erkennung aktiviert.
+Wenn dieses Attribut deaktiviert ist, geht OpenSSO von einem Client des Typs
+"genericHTML" aus, auf den &#252;ber einen HTML-Browser zugegriffen wird.</p>
+<br/>
+
+</body>
+</html>

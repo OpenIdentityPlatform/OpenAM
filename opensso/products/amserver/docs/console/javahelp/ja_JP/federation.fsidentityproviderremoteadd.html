@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新しいリモートアイデンティティープロバイダをプロバイダエンティティーに追加する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderremoteadd"></a><h4>新しいリモートアイデンティティープロバイダをプロバイダエンティティーに追加する</h4><p><b>リモートプロバイダ</b>は、Federated Access Manager と同じサーバーにはホストされません。「新規リモートアイデンティティープロバイダ」属性を設定する際に、プロバイダエンティティープロファイルにアイデンティティープロバイダに関するメタデータを追加する必要があります。<a href="federation.fsidentityprovider.html">「アイデンティティープロバイダをプロバイダエンティティーに追加する」</a>ことから始めます。</p>
+<hr><p><b>注 &#8211; </b>このほかにも設定可能な属性がありますが、この初期設定ページには表示されません。<a href="federation.fsidentityproviderremoteprofile.html">「プロバイダエンティティーに含まれるリモートアイデンティティープロバイダ属性を変更する」</a>を参照してください。</p>
+<hr>
+<ol>
+<li><b>「共通属性」に情報を設定します。</b><p>「共通属性」の値は、アイデンティティープロバイダ自体の一般的な定義です。</p><dl><dt>説明</dt>
+<dd><p>この属性の値は、エンティティーの作成時に入力した説明です。始めに入力した説明を変更するか、その説明がない場合は新たに説明を追加することができます。</p></dd>
+<dt>サポートされるプロトコルリスト</dt>
+<dd><p>このエンティティーによってサポートされる Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) リリースを選択します。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> は Liberty ID-FF version 1.2 を表します。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> は Liberty ID-FF version 1.1 を表します。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>「通信 URL」属性に情報を設定します。</b><p>「通信 URL」属性には、プロバイダがこのアイデンティティープロバイダ専用で伝送できる場所が入ります。</p><dl><dt>シングルサインオンサービス URL</dt>
+<dd><p>サービスプロバイダがシングルサインオン要求と連携要求を送信できる URL を入力します。</p></dd>
+</dl>
+</li>
+<li><b>「通信プロファイル」属性に情報を設定します。</b><p>Liberty Alliance Project <b>プロファイル</b>は、メッセージの内容とメッセージの移動に使用するメカニズムとの組み合わせを定義します。次の「通信プロファイル」属性は、アイデンティティープロバイダが各機能に使用するプロファイルを定義します。</p><dl><dt>シングルサインオン/連携</dt>
+<dd><p>このアイデンティティープロバイダが認証要求または連携要求への応答を送信するときに使用するプロファイルを選択します。</p>
+<ul><li><p>ブラウザ POST (ブラウザベースの HTTP POST プロトコルを指定)</p></li>
+<li><p>ブラウザアーティファクト (ブラウザを使用しない SOAP ベースのプロトコルを指定)</p></li>
+<li><p>LECP (Liberty 対応クライアントプロキシを指定)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>利用可能なトラストサークルのいずれかを選択し、プロバイダに割り当てます。</b><p>プロバイダは 1 つまたは複数のトラストサークルに所属することができます。しかし、トラストサークルが指定されていないプロバイダは、Liberty Alliance Project 仕様に基づく通信に参加できません。トラストサークルがまだ作成されていない場合は、あとでこの属性を定義することができます。</p></li>
+<li><b>「了解」をクリックして、プロバイダをエンティティーに追加します。</b></li>
+<li><b>「表示」メニューから別のオプションを選択してエンティティーの設定を続行するか、「保存」をクリックして設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

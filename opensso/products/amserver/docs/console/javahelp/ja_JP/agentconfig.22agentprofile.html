@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>2.2 ポリシーエージェント - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.22agentprofile"></a><h4>2.2 ポリシーエージェント</h4>
+<p>OpenSSO にはポリシーエージェント 2.2 との下位互換性があります。ポリシーエージェント 2.2 の設定は、ポリシーエージェントがインストールされている配備コンテナからローカルで行う必要があります。したがって、OpenSSO コンソールから設定できるポリシーエージェント 2.2 のオプションはごくわずかです。</p>
+
+<a name="ggmti"></a><h5>パスワード</h5>
+<p>パスワードはエージェントプロファイルの作成時に設定済みです。ただし、あとでいつでもパスワードを変更できます。</p>
+
+<a name="ggmvn"></a><h5>パスワードの確認</h5>
+<p>パスワードの確認はエージェントプロファイルの作成時に実行済みです。パスワードを変更する場合は、変更を確認する必要があります。</p>
+
+<a name="ggmsq"></a><h5>ステータス</h5>
+<p>エージェントの作成時には「<tt>アクティブ</tt>」オプションが選択されます。エージェントで提供されている保護を取り除く場合のみ、「<tt>非アクティブ</tt>」を選択してください。</p>
+
+<a name="ggoub"></a><h5>説明</h5>
+<p>エージェントの説明。必要に応じて追加できます。</p>
+
+<a name="ggowa"></a><h5>エージェントキー値</h5>
+<p>CDSSO を有効にする場合、および Cookie ハイジャックを防ぐための設定を配備に対して行う場合に必要な設定。</p><p>この属性は、キーと値の組み合わせにおけるキーの役割を果たします。この属性は、OpenSSO がユーザーに関する証明情報表明の要求をエージェントから受信する際に使用されます。このキーと値の組み合わせでは、1 つの属性だけが有効です。ほかのすべての属性は無視されます。次の形式を使用します。</p><pre>agentRootURL=protocol://<i>hostname</i>:<i>port</i>/</pre><p>入力を正確に行う必要があります。たとえば、キーを表す文字列「<tt>agentRootURL</tt>」は大文字と小文字が区別されます。</p>
+<br/>
+
+</body>
+</html>

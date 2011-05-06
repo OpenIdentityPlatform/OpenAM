@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+ The contents of this file are subject to the terms
+ of the Common Development and Distribution License
+ (the License). You may not use this file except in
+ compliance with the License.
+
+ You can obtain a copy of the License at
+ https://opensso.dev.java.net/public/CDDLv1.0.html or
+ opensso/legal/CDDLv1.0.txt
+ See the License for the specific language governing
+ permission and limitations under the License.
+
+ When distributing Covered Code, include this CDDL
+ Header Notice in each file and include the License file
+ at opensso/legal/CDDLv1.0.txt.
+ If applicable, add the following below the CDDL Header,
+ with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
+
+ $Id: build.xml,v 1.9 2009/07/29 19:38:15 nithyas Exp $
+
+ Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<!--
+ Portions Copyrighted [2010] [Forgerock AS]
+-->
+<project name="OpenSSO QA Test Framework" default="usage" basedir=".">
+
+    <import file="./build.properties"/>
+    <import file="./xml/ant/opensso-properties.xml"/>
+    <import file="./xml/ant/opensso-common.xml"/>
+    <target name="checkAntVersion" description="Ensure that we're running ant 1.7.1 or above">
+      <fail message="Please execute QATEST using ant 1.7.1 or above">
+        <condition>
+          <not>
+            <available classname="org.apache.tools.ant.input.SecureInputHandler"/>
+          </not>
+        </condition>
+      </fail>
+    </target> 
+    <target name="IsClientJarExists" description="Ensure that we have openssoclientsdk.jar in the qatest/lib directory" depends="checkAntVersion">
+      <fail message="openssoclientsdk.jar missing in qatest/lib directory">
+        <condition>
+          <not>
+            <available file="./lib/openssoclientsdk.jar" />
+          </not>
+        </condition> 
+      </fail>
+    </target> 
+    <target name="usage" depends="checkAntVersion">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" run    : Executes all tests depending upon the"/>
+        <echo message="          execution mode and module set in the"/>
+        <echo message="          build.properties file"/>
+        <echo message=" doc    : Generates java docs in the directory javadoc"/>
+        <echo message="        : under &lt;install dir&gt;"/>
+        <echo message=" usage  : Displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" Before executing any target"/>
+        <echo message=" note   : Ensure all properties are set in"/>
+        <echo message="          build.properties"/>
+        <echo message=" note   : Ensure all properties are set in resources/"/>
+        <echo message="          Configurator-&lt;server-name1&gt;.properties,"/>
+        <echo message="          resources/Configurator-&lt;server-name2,"/>
+        <echo message="          for single server mode"/>
+        <echo message=" note   : Ensure all properties are set in resources/"/>
+        <echo message="          Configurator-&lt;server-name1&gt;.properties,"/>
+        <echo message="          resources/Configurator-&lt;server-name2,"/>
+        <echo message="          resources/Configurator-&lt;server-name3 (not mandatory),"/>
+        <echo message="          and resources/Configurator-&lt;server-name4 (not mandatory)"/>
+        <echo message="          &gt;.properties for multi server mode (depending upon chosen module)"/>
+        <echo message=" note   : To sanity test opensso,  (valid tests for stand alone non networked system) opensso,"/>
+        <echo message="          set TEST_MODULE to sanity"/>
+        <echo message="          and EXECUTION_MODE to ldapv3"/>
+        <echo message="          value in build.properties file"/>
+        <echo message=" note   : To test agents, specify TEST_MODULE as"/>
+        <echo message="          2.2WebAgent or 2.2J2EEAgent or 3.0WebAgent or 3.0WebAgent."/>
+        <echo message="          You can run only ONE agent at a time"/>
+        <echo message=" note   : ANT version needed is 1.7.1 and above"/>
+        <echo message=" "/>
+        <echo message=" To run a target for single server mode, issue the"/>
+        <echo message=" following command:"/>
+        <echo message=" "/>
+        <echo message=" ant -lib &lt;location of ant-contrib-1.0b3.jar&gt; -DSERVER_NAME1=&lt;server-name&gt; run"/>
+        <echo message=" "/>
+        <echo message=" To run a target for multi server mode, issue the"/>
+        <echo message=" following command:"/>
+        <echo message=" "/>
+        <echo message=" ant -lib &lt;location of ant-contrib-1.0b3.jar&gt; -DSERVER_NAME1=&lt;server-name1&gt;"/>
+        <echo message=" -DSERVER_NAME2=&lt;server-name2&gt; run"/>
+        <echo message=" "/>
+    </target>
+
+    <target name="run" depends="IsClientJarExists">
+      <condition property="SERVER_DIR" value="${SERVER_NAME1}_${SERVER_NAME2}" else="${SERVER_NAME1}">
+            <and>
+                <isset property="SERVER_NAME1"/>
+                <isset property="SERVER_NAME2"/>
+            </and>
+        </condition>
+        <condition property="multimodule" else="false">
+           <or>
+               <equals arg1="${TEST_MODULE}" arg2="sanity" casesensitive="No"/>
+               <equals arg1="${TEST_MODULE}" arg2="all" casesensitive="No"/>
+           </or>
+       </condition>
+       <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+       <if>
+            <equals arg1="${multimodule}" arg2="true"/>
+            <then>
+                <property name="test.output.file" value="multi_module"/>
+            </then>
+            <elseif>
+                <contains string="${TEST_MODULE}" substring="Agent" casesensitive="No"/>
+		<then>       
+                    <property name="test.output.file" value="agents"/>
+		</then>
+            </elseif>
+            <else>
+                <property name="test.output.file" value="${EXECUTION_MODE}-${TEST_MODULE}"/>
+            </else>
+       </if>
+       <property name="test.env.outfile" value="./${SERVER_DIR}/test_env.txt"/>
+       <property name="moduleName" value="./${TEST_MODULE}"/>
+       <echo message="Creating SERVER_DIR ${SERVER_DIR}"/>
+       <mkdir dir="${SERVER_DIR}"/>
+       <record name="${SERVER_DIR}/${test.output.file}.output" action="start"/>
+       <antcall target="execute-module"/>
+       <record name="${SERVER_DIR}/${test.output.file}.output" action="stop"/>
+  </target>
+</project>            

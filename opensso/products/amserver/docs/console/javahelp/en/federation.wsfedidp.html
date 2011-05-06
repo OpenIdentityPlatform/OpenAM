@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED Identity Provider Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedidp"></a><h4>WS-FED Identity Provider Customization</h4>
+<p>The following attributes apply to the WS-FED Identity Provider role:</p>
+
+<a name="ghfke"></a><h5>NameID Format</h5>
+<p>Defines the format of the name identifier component of the single sign-on response
+sent from the identity provider to the service provider. WS-Federation single sign-on supports
+the following identifier formats (default is UPN): :</p>
+<ul><li><p>Email</p></li></ul>
+
+<ul><li><p>Common Name</p></li>
+<li><p>UPN &#8211; User Principal Name. The syntax is <tt>username@domain</tt>, where an example of <tt>domain</tt>is <tt>example.com</tt>.</p></li></ul>
+
+
+<a name="ghfog"></a><h5>NameID Attribute</h5>
+<p>Defines the attribute in the user's profile that will be used as the
+name ID value. The default is <tt>uid</tt>. </p>
+
+<a name="ghflq"></a><h5>Name Includes Domain</h5>
+<p>When using the UPN format defined in the NameID Format attribute, this specifies
+whether the NameID Attribute in the user's profile includes a domain. If it
+does, then the NameID Attribute will be used for the UPN as it
+is currently defined. Otherwise, it is combined with a domain to form a
+UPN.</p>
+
+<a name="ghfmk"></a><h5>Domain Attribute</h5>
+<p>When using the UPN format, if the Name Includes Domain attribute is not
+selected, this specifies an attribute in the user's profile to be used as
+the UPN domain. </p>
+
+<a name="ghfnw"></a><h5>UPN Domain</h5>
+<p>When using UPN format, if the Name Includes Domain attribute is not selected,
+and if a value for Domain Attribute is not specified, or if there
+is no value for that attribute for a particular user, then this attribute
+is used to constructing the UPN. </p>
+
+<a name="ggwvh"></a><h5>Signing Cert Alias</h5>
+<p>This attribute specifies the provider certificate alias used to find the assertion signing
+certificate in the keystore.</p>
+
+<a name="ggwve"></a><h5>Claim Types</h5>
+<p>Specifies the claim type so the WS-FED service can recognize the type of
+token that is exchanged between federation partners. </p><p>The EmailAddress claim type is used to identify a specific security principal by
+an email address. </p><p>The UPN claim type is used to identify a specific security principal via
+a User Principal Name. </p><p>The CommonName claim type is used to identify a security principal via a
+CN value consistent with X.500 naming conventions. The value of this claim is
+not necessarily unique and should not be used for authorization purposes. </p>
+
+<a name="ggwwj"></a><h5>Account Mapper</h5>
+<p>This attribute specifies the implementation of the <tt>AccountMapper</tt> interface used to map
+a remote user account to a local user account for purposes of single
+sign-on. The default value is <tt>com.sun.identity.wsfed.plugins.DefaultIDPAccountMapper</tt>. </p>
+
+<a name="ggwuq"></a><h5>Attribute Mapper</h5>
+<p>This defines the class used to map attributes in the assertion to user
+attributes defined locally by the identity provider. The default class is <tt>com.sun.identity.wsfederation.plugins.DefaultIDPAttributeMapper</tt>.</p>
+
+<a name="ggwul"></a><h5>Attribute Map</h5>
+<p>Specifies values to define the mappings used by the default attribute mapper plug-in.
+Mappings should be configured in the format:</p><p><i>Claim_Type</i>=<i>local-attribute</i></p><p>For example, <tt>EmailAddress=mail</tt> or <tt>Address=postaladdress</tt>. Type the mapping as a New Value
+and click Add.</p>
+
+<a name="ggwrj"></a><h5>Assertion Effective Time</h5>
+<p>Assertions are valid for a period of time and not before or after.
+</p><p><tt>Effective Time</tt> specifies (in seconds) the amount of time that an assertion is valid
+counting from the assertion's issue time. The default value is <tt>600</tt> seconds.</p>
+<br/>
+
+</body>
+</html>

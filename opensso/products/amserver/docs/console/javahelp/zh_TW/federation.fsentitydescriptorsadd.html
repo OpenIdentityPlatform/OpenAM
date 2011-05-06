@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立提供者實體或附屬提供者實體 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsadd"></a><h4>建立提供者實體或附屬提供者實體</h4><a name="indexterm-66"></a><a name="indexterm-67"></a><a name="indexterm-68"></a><a name="indexterm-69"></a><p>建立實體的程序分為兩個步驟。首先，您要建立該實體。(即您將其定義為<b>提供者實體</b>或是<b>附屬提供者實體</b>時。)建立實體之後，即可將提供者寫入其中。下列程序會建立新的實體。起點為聯合介面下的實體。</p>
+<hr><p><b>備註 &#8211; </b>可以建立實體，但是在該實體中寫入提供者之前，無法將其指定給信任圈。</p>
+<hr>
+<ol>
+<li><b>按一下 [新建] 以顯示實體屬性。</b><p>會顯示 [新建實體] 頁面。</p></li>
+<li><b>鍵入實體的名稱。</b><p>[實體名稱] 屬性會定義實體的統一資源識別碼 (URI)。此值在實體名稱中必須唯一。</p></li>
+<li><b>鍵入實體的說明。</b></li>
+<li><b>選擇實體的類型。</b>
+<ul><li><p>如果要建立提供者實體，請選取 <b>[提供者]</b>。</p></li>
+<li><p>如果要建立附屬提供者實體，請選取 <b>[附屬提供者]</b>，並定義必要的 [附屬提供者名稱] 及 [附屬提供者所有者] 屬性的值。</p>
+<ul><li><p>附屬提供者名稱定義附屬提供者實體的 URI。此值在附屬提供者名稱中必須唯一。</p></li>
+<li><p>附屬提供者所有者指定一個提供者做為附屬提供者的父系管理員。此屬性的值是 URI，此 URI 將符合附屬提供者所有者/提供者所屬實體的 [實體名稱] 屬性中定義的值。</p></li></ul>
+
+<hr><p><b>備註 &#8211; </b>將提供者定義為 [附屬提供者所有者] 並不會自動將它做為附屬提供者成員併入。如果所有者也是成員，則必須在這裡將 URI 定義為所有者，以及在附屬提供者實體本身內定義為成員。若要新增成員至附屬提供者，請參閱<a href="federation.fsentitydescriptorsaffiliate.html">新增成員至附屬提供者實體</a>。</p>
+<hr>
+</li></ul>
+</li>
+<li><b>按一下 [確定]。</b><p>新的實體會顯示在 [實體] 畫面上。</p></li></ol>
+<br/>
+
+</body>
+</html>

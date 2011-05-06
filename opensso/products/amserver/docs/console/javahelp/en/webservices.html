@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Web Services - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="webservices"></a><h3>Web Services</h3><p>The Web Services module is the OpenSSO implementation of the Liberty Alliance
+Project <b>Identity Web Services Framework</b> (ID-WSF) specifications. The ID-WSF builds upon the <b>Liberty Identity Federation Framework</b> (ID-FF) by providing
+specifications to build web services that retrieve, update, or perform an action on,
+identity data in a federated network environment. The specifications outline the technical components necessary
+to build web services, such as a calendar service, a wallet service, or
+an alert service.</p>
+<hr><p><b>Note &#8211; </b><b>Identity data</b> includes, but is not limited to, attributes that define first name, last
+name, home address, business address, and an emergency contact.</p>
+<hr>
+<p>Web services are the basis of distributed computing across the Internet. A web
+service consumer (WSC) locates a web service and invokes the operations it provides
+by making a request. A web service provider (WSP) is the application implementing
+the web service based on the request; it can be on the same
+Java&#8482; virtual machine as the WSC, or it can be thousands of miles
+away. When a WSC needs to retrieve identity attributes from a WSP, it
+must first contact a discovery service to locate where the particular attributes are
+stored. When this information is returned, the WSC then contacts the WSP (for
+example, a personal profile service) to retrieve the necessary attributes.</p><p>The Web Services module in the OpenSSO console provides an interface for configuring
+the following:</p>
+<ul><li><p><a href="webservices.wspersonalprofileservice.html">Liberty Personal Profile Service</a></p></li>
+<li><p><a href="service.smdiscoveryservice.html">Discovery Service</a></p></li>
+<li><p><a href="service.scsoapbinding.html">SOAP Binding Service</a></p></li>
+<li><p><a href="webservices.wsauthnservices.html">Authentication Web Service</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

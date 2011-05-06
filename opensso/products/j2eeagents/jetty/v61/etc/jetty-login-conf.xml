@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure id="Server" class="org.mortbay.jetty.Server">
+    <Set name="UserRealms">
+      <Array type="org.mortbay.jetty.security.UserRealm">
+        <Item>
+          <New class="com.sun.identity.agents.jetty.v61.AMJettyUserRealm">
+           <Set name="Name">Policy Agent Realm</Set>
+          </New>
+        </Item>
+      </Array>
+    </Set>
+</Configure>

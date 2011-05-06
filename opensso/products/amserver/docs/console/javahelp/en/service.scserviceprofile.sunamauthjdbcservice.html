@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>JDBC - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthjdbcservice"></a><h4>JDBC</h4>
+<p><a name="indexterm-174"></a>The Java Database Connectivity (JDBC) authentication module allows OpenSSO to authenticate users through
+any Structured Query Language (SQL) databases that provide JDBC-enabled drivers. The connection to the
+SQL database can be either directly through a JDBC driver or through a
+JNDI connection pool. The JDBC attributes are realm attributes. The attributes are:</p>
+<ul><li><p><a href="#fwajx">Connection Type</a></p></li>
+<li><p><a href="#fwafb">Connection Pool JNDI Name</a></p></li>
+<li><p><a href="#fwaap">JDBC Driver</a></p></li>
+<li><p><a href="#fwarc">JDBC URL</a></p></li>
+<li><p><a href="#fwaum">Connect This User to Database</a></p></li>
+<li><p><a href="#fwaeu">Password for Connecting to Database</a></p></li>
+<li><p><a href="#fwavq">Password for Connecting to Database Confirm</a></p></li>
+<li><p><a href="#fwads">Password Column String</a></p></li>
+<li><p><a href="#fwapb">Prepared Statement</a></p></li>
+<li><p><a href="#fwapv">Class to Transform Password Syntax</a></p></li>
+<li><p><a href="#fwavz">Authentication Level</a></p></li></ul>
+
+
+<a name="fwajx"></a><h5>Connection Type</h5>
+<p>Specifies the connection type to the SQL database, using either a JNDI (Java
+Naming and Directory Interface) connection pool or JDBC driver. The options are:</p>
+<ul><li><p>Connection pool is retrieved via JDNI</p></li>
+<li><p>Non-persistent JDBC connection</p></li></ul>
+<p>The JNDI connection pool utilizes the configuration from the underlying web container.</p>
+
+<a name="fwafb"></a><h5>Connection Pool JNDI Name</h5>
+<p>If JNDI is selected in Connection Type, this field specifies the connection pool
+name. Because JDBC authentication uses the JNDI connection pool provided by the web
+container, the setup of JNDI connection pool may not be consistent among other
+web containers. See the OpenSSO Administration Guide for examples</p>
+
+<a name="fwaap"></a><h5>JDBC Driver</h5>
+<p>If JDBC is selected in <a href="#fwajx">Connection Type</a>, this field specifies the JDBC driver provided
+by the SQL database. For example, <tt>com.mysql.jdbc.Driver</tt>.</p>
+
+<a name="fwarc"></a><h5>JDBC URL</h5>
+<p>Specifies the database URL if JDBC is select in <a href="#fwajx">Connection Type</a>. For example,
+the URL for mySQL is <tt>jdbc.mysql://hostname:port/databaseName</tt>.</p>
+
+<a name="fwaum"></a><h5>Connect This User to Database</h5>
+<p>Specifies the user name from whom the database connection is made for the
+JDBC connection.</p>
+
+<a name="fwaeu"></a><h5>Password for Connecting to Database</h5>
+<p>Defines the password for the user specified in User to Connect to Database.</p>
+
+<a name="fwavq"></a><h5>Password for Connecting to Database Confirm</h5>
+<p>Confirm the password.</p>
+
+<a name="fwads"></a><h5>Password Column String</h5>
+<p>Specifies the password column name in the SQL database.</p>
+
+<a name="fwapb"></a><h5>Prepared Statement</h5>
+<p>Specifies the SQL statement that retrieves the password of the user that is
+logging in. For example:</p><pre> select Password from Employees where USERNAME = ?</pre>
+
+<a name="fwapv"></a><h5>Class to Transform Password Syntax</h5>
+<p>Specifies the class name that transforms the password retrieved from the database, to
+the format of the user input, for password comparison. This class must implement
+the <tt>JDBCPasswordSyntaxTransform</tt> interface.</p>
+
+<a name="fwavz"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

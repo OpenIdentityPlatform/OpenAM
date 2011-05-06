@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置請求處理程式 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>配置請求處理程式</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p>每一個使用 SOAP 連結服務 的 SAMLv2 服務都必須在伺服器端實作 <tt>RequestHandler</tt> 介面。[請求處理程式清單] 屬性會儲存實作請求處理程式之實作類別的相關資訊。請求處理程式清單會顯示包含關鍵字/值對的項目。</p><ol>
+<li><b>按一下 [新建] 以顯示 [新建請求處理程式] 屬性，或按一下已配置的鍵值以修改現有屬性。</b></li>
+<li><b>根據下列資訊提供屬性值：</b><dl><dt>關鍵字</dt>
+<dd><p><i>關鍵字</i> 是策略決定點中介別名。</p></dd>
+<dt>類別</dt>
+<dd><p><i>類別</i> 是 Java 類別名稱，此類別是可以處理 XACML 請求之 RequestHandler 介面的實作。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [確定] 以完成請求處理程式的配置。</b></li>
+<li><b>按一下 [SAMLv2 SOAP 連結] 頁面上的 [儲存] 以完成服務配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

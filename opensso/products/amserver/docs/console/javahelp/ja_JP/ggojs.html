@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>要求ハンドラを設定する - Sun Java System Federated Access Manager 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggojs"></a><h5>要求ハンドラを設定する</h5>
+<a name="indexterm-200"></a><a name="indexterm-201"></a><p><tt>RequestHandler</tt> インタフェースは、SOAP バインドサービス を使用している Liberty ベースの各アイデンティティーサービスによって、サーバー側に実装される必要があります。「要求ハンドラリスト」属性は、要求ハンドラを実装している Web サービスの実装クラスに関する情報を格納します。要求ハンドラリストには、キーと値のペアを含むエントリがパイプ文字で区切られて表示されます。たとえば、<tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService</tt> のように表示されます。</p><ol>
+<li><b>「新規」をクリックして「新規要求ハンドラ」属性を表示するか、設定済みのキー値をクリックして既存の属性を変更します。</b></li>
+<li><b>次の情報に基づいて属性の値を入力します。</b><dl><dt>キー</dt>
+<dd><p>この必須パラメータは、SOAP エンドポイントに対する URI パスの最後の部分です。Access Manager の SOAP エンドポイントは、SOAP Receiver サーブレットです。SOAP Receiver への URI は <tt><b></tt><i>protocol</i><tt>://</tt><i>host </i><tt>:</tt><i>port</i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/</tt><i>key</i><tt></b></tt> です。キーとして <tt><b>disco</b></tt> を定義する場合、対応するディスカバリサービスの SOAP エンドポイントへの URI パスは <tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt>/amserver/Liberty/disco</b></tt> のようになります。SOAP Receiver への接続時には、さまざまなサービスクライアントがそれぞれ別のキーを使用します。</p></dd>
+<dt>クラス</dt>
+<dd><p>この必須パラメータは、特定のアイデンティティーサービスの要求ハンドラ実装クラスの名前を指定します。次に例を示します。<tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt></p></dd>
+</dl>
+</li>
+<li><b>「了解」をクリックして要求ハンドラの設定を完了します。</b></li>
+<li><b>SOAP バインドサービスページで「保存」をクリックして、サービスの設定を完了します。</b></li></ol>
+<br/>
+
+</body>
+</html>

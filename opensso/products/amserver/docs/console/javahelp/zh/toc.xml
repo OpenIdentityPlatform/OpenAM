@@ -1,0 +1,1451 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "toc_1_0.dtd">
+<toc version="2.0">
+
+ <tocitem target="aawelcome" text="SunTM OpenSSO 8.0 联机帮助" expand="false">
+    <tocitem target="intro" text="导言" expand="false"></tocitem></tocitem>
+ <tocitem target="commontasks" text="常见任务" expand="false">
+    <tocitem target="task.home" text="常见任务组件" expand="false"></tocitem></tocitem>
+ <tocitem target="accesscontrol" text="访问控制" expand="false">
+    <tocitem target="realm.rmrealm" text="领域" expand="false">
+        <tocitem target="realm.rmrealmadd" text="创建新的领域" expand="false"></tocitem>
+        <tocitem target="realm.realmproperties" text="常规属性" expand="false"></tocitem></tocitem>
+    <tocitem target="authentication.authproperties" text="验证" expand="false">
+        <tocitem target="authentication.newauthinstance" text="创建新的验证模块实例" expand="false"></tocitem>
+        <tocitem target="authentication.newauthconfig" text="创建新的验证链" expand="false"></tocitem></tocitem>
+    <tocitem target="realm.services" text="服务" expand="false">
+        <tocitem target="realm.servicesadd" text="向领域添加服务" expand="false"></tocitem></tocitem>
+    <tocitem target="realm.idrepo" text="数据存储库" expand="false">
+        <tocitem target="realm.idreposelecttype" text="创建新的数据存储库" expand="false"></tocitem>
+        <tocitem target="idrepoadd" text="OpenSSO 数据存储库类型" expand="false">
+            <tocitem target="idrepoadd" text="Active Directory" expand="false"></tocitem>
+            <tocitem target="idrepoadd" text="普通 LDAPv3" expand="false"></tocitem>
+            <tocitem target="idrepoadd" text="Sun Directory Server OpenSSO 模式" expand="false"></tocitem></tocitem>
+        <tocitem target="realm.idrepoedit" text="配置数据存储库" expand="false"></tocitem>
+        <tocitem target="realm.idrepoeditad" text="Active Directory 属性" expand="false">
+            <tocitem target="realm.idrepoeditad" text="LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 绑定 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 绑定密码" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 绑定密码（确认）" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组织 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP SSL" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 连接池的最小尺寸" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 连接池的最大尺寸" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="搜索返回的结果的最大数目" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="搜索超时" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 遵循引用" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAPv3 系统信息库插件类名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="属性名称映射" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAPv3 插件支持的类型和操作" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAPv3 插件搜索范围" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 用户搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 用户搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 用户对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 用户属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="创建用户属性映射" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="用户状态的属性名" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="用户状态活动值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="用户状态不活动值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组容器命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组容器值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 组属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="组成员资格的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="唯一成员的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="组成员 URL 的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 人员容器命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 人员容器值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="可验证的身份类型" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="验证命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="持久搜索基 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="持久搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="持久搜索范围" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="重新启动前的持久搜索最长空闲时间" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="出现错误代码后的最大重试次数" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="重试之间的延时" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="需要重试的 LDAP 异常错误代码" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="高速缓存" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="高速缓存项的最大生存期" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="高速缓存的最大大小" expand="false"></tocitem></tocitem>
+        <tocitem target="realm.idrepoeditldapv3" text="普通 LDAPv3 属性" expand="false">
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 绑定 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 绑定密码" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 绑定密码（确认）" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组织 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP SSL" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 连接池的最小尺寸" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 连接池的最大尺寸" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="搜索返回的结果的最大数目" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="搜索超时" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 遵循引用" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAPv3 系统信息库插件类名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="属性名称映射" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAPv3 插件支持的类型和操作" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAPv3 插件搜索范围" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 用户搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 用户搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 用户对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 用户属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="创建用户属性映射" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="用户状态的属性名" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="用户状态活动值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="用户状态不活动值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组容器命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组容器值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 组属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="组成员资格的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="唯一成员的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="组成员 URL 的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="默认组成员的用户 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 人员容器命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 人员容器值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="可验证的身份类型" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="持久搜索基 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="持久搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="持久搜索范围" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="重新启动前的持久搜索最长空闲时间" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="出现错误代码后的最大重试次数" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="重试之间的延时" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="需要重试的 LDAP 异常错误代码" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="高速缓存" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="高速缓存项的最大生存期" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="高速缓存的最大大小" expand="false"></tocitem></tocitem>
+        <tocitem target="realm.idrepoeditfamschema" text="使用 OpenSSO 模式的 Sun Directory Server 属性" expand="false">
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 绑定 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 绑定密码" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 绑定密码（确认）" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组织 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP SSL" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 连接池的最小尺寸" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 连接池的最大尺寸" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="搜索返回的结果的最大数目" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="搜索超时" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 遵循引用" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAPv3 系统信息库插件类名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="属性名称映射" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAPv3 插件支持的类型和操作" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAPv3 插件搜索范围" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 用户搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 用户搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 用户对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 用户属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="创建用户属性映射" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="用户状态的属性名" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组容器命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组容器值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 组属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="组成员资格的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="唯一成员的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="组成员 URL 的属性名称" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 角色搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 角色搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 角色对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 角色属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 过滤器角色搜索属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 过滤器角色搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 过滤器角色对象类" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 过滤器角色属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 人员容器命名属性" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 人员容器值" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="可验证的身份类型" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="持久搜索基 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="持久搜索过滤器" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="持久搜索范围" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="重新启动前的持久搜索最长空闲时间" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="出现错误代码后的最大重试次数" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="重试之间的延时" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="需要重试的 LDAP 异常错误代码" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="高速缓存" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="高速缓存项的最大生存期" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="高速缓存的最大大小" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="delegation.delegation" text="权限" expand="false">
+        <tocitem target="delegation.delegationproperties" text="权限属性" expand="false"></tocitem></tocitem>
+    <tocitem target="policy.policy" text="策略" expand="false">
+        <tocitem target="normalpolicy" text="常规策略" expand="false">
+            <tocitem target="policy.policynormaladd" text="创建新的常规策略" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.selectservicetype" text="规则" expand="false">
+            <tocitem target="policy.ruleadd" text="向策略添加规则" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.selectsubjecttype" text="主体" expand="false">
+            <tocitem target="policy.subjectadd" text="向策略添加主体" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.selectcondition" text="条件" expand="false">
+            <tocitem target="policy.selectconditiontype" text="向策略添加条件" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.pmdefaultsessioncondtionadd" text="活动会话时间" expand="false"></tocitem>
+        <tocitem target="policy.authtoserviceadd" text="按模块链进行验证" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultauthlevelconditionadd" text="验证级别（大于或等于）" expand="false"></tocitem>
+        <tocitem target="gdovl" text="验证级别（小于或等于）" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultauthschemeconditionadd" text="按模块实例进行验证" expand="false"></tocitem>
+        <tocitem target="policy.sessionpropertyconditionadd" text="当前会话属性" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultipcondition" text="IP 地址/DNS 名称" expand="false"></tocitem>
+        <tocitem target="policy.membershipconditionadd" text="身份认证成员资格" expand="false"></tocitem>
+        <tocitem target="policy.conditionadd" text="LDAP 过滤条件" expand="false"></tocitem>
+        <tocitem target="policy.authtorealmadd" text="领域验证" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaulttimeconditionadd" text="时间（天、日期、时间和时区）" expand="false"></tocitem>
+        <tocitem target="responseprovider" text="响应提供者" expand="false">
+            <tocitem target="policy.responseprovideradd" text="向策略添加响应提供者" expand="false"></tocitem></tocitem>
+        <tocitem target="fyfby" text="引用策略" expand="false">
+            <tocitem target="policy.policyreferraladd" text="创建新的引用策略" expand="false"></tocitem></tocitem>
+        <tocitem target="referrals" text="引用" expand="false">
+            <tocitem target="policy.selectreferraltype" text="向策略添加引用" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="idm.entities" text="主体" expand="false">
+        <tocitem target="idm.entityadd" text="创建主体" expand="false"></tocitem>
+        <tocitem target="subjectuser" text="用户" expand="false">
+            <tocitem target="idm.entityadduser" text="创建或修改用户" expand="false"></tocitem>
+            <tocitem target="idm.entitymembership" text="将用户添加到组" expand="false"></tocitem>
+            <tocitem target="idm.entityservices" text="将服务添加到用户" expand="false"></tocitem></tocitem>
+        <tocitem target="idm.entitiesgroup" text="组" expand="false">
+            <tocitem target="idm.entityaddgroup" text="创建或修改组" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="agentconfig.agents" text="代理" expand="false">
+        <tocitem target="ggobs" text="创建新的组和代理" expand="false">
+            <tocitem target="agentconfig.agentadd" text="创建新代理" expand="false"></tocitem>
+            <tocitem target="agentconfig.agentgroupadd" text="创建新组" expand="false"></tocitem>
+            <tocitem target="ggouy" text="使代理能够继承组的属性" expand="false"></tocitem></tocitem>
+        <tocitem target="agentconfig.genericagentprofile" text="配置代理" expand="false"></tocitem>
+        <tocitem target="agentconfig.webagentprofile" text="Web 策略代理" expand="false">
+            <tocitem target="agentconfig.webagentprofile" text="全局" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="组" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="密码" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="密码确认" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="状态" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理配置系统信息库的位置" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理配置更改通知" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="启用通知" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理通知 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理部署 URI 前缀" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置重新载入的时间间隔" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置清除时间间隔" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="仅 SSO 模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="资源访问拒绝的 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理调试级别" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理本地日志文件轮转" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理本地日志文件大小" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理远程日志文件名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="URL 访问远程日志记录类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="FQDN 检查" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="FQDN 默认值" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="FQDN 虚拟主机映射" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="应用程序" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="非强制执行的 URL 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="反转检查非强制执行的 URL 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="非强制执行 URL 的获取属性" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="非强制执行的客户机 IP 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="客户机 IP 验证" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置文件属性获取模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置文件属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="响应属性获取模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="响应属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="会话属性获取模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="会话属性映射" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="SSO" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="Cookie 名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="Cookie 安全性" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="重置 Cookie" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="重置的 Cookie 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="Cookie 域列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="CDSSO" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="CDSSO Servlet URL 列表" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="OpenSSO 服务" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="OpenSSO 登录 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="代理连接超时设置：" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="主服务器的轮询周期" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="注销 URL 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="重置的注销 Cookie 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="策略高速缓存轮询周期" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="SSO 高速缓存轮询周期" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="用户 ID 参数" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="用户 ID 参数类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="自根资源的获取策略" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="检索客户机主机名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="策略时钟偏差" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="其他" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="代理语言环境" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="匿名用户默认值" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="匿名用户" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置文件属性 Cookie 前缀" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置文件属性 Cookie 最大生存周期" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="URL 比较区分大小写检查" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="编码 URL 的特殊字符" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="忽略命名请求中的首选命名 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="忽略服务器检查" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="忽略请求 URL 中的路径信息" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="远程日志记录失败时拒绝资源访问" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="配置文件属性的本机编码" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="高级" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="负载平衡器设置" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="覆盖请求 URL 协议" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="覆盖请求 URL 主机" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="覆盖请求 URL 端口" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="覆盖通知 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="POST 数据保留" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="POST 数据项高速缓存周期" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="覆盖代理服务器的主机和端口" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="验证类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="重放密码密钥" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="过滤器优先级" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="使用 OWA 配置的过滤器" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="将 URL 协议更改为 https" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="闲置会话超时页面 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="在 Domino 数据库中检查用户" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="使用 LTPA 令牌" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 令牌 Cookie 名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 令牌配置名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 令牌组织名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="自定义属性" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.j2eeagentprofile" text="J2EE 策略代理" expand="false">
+            <tocitem target="agentconfig.j2eeagentprofile" text="全局" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="组" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="密码" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="密码确认" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="状态" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="代理通知 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="代理配置系统信息库的位置" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="配置重新载入的时间间隔" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="代理配置更改通知" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="代理过滤器模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="拒绝资源访问的 URI：" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="HTTP 会话绑定" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="GOTO 参数名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="登录尝试限制" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="自定义响应标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="重定向尝试限制" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="代理调试级别" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="用户映射模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="用户属性名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="用户主体标志" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="用户令牌名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="审计访问类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="审计日志位置" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="远程日志文件名" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="轮转本地审计日志" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="本地审计日志轮转大小" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="FQDN 检查" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="FQDN 默认值" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="FQDN 虚拟主机映射" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="应用程序" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="登录表单 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="登录错误 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="使用内部登录" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="登录内容文件名" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="应用程序注销处理程序" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="应用程序注销 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="注销请求参数" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用注销内省" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="注销入口 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="非强制执行的 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="反转非强制执行的 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用非强制执行的 URI 高速缓存" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="非强制执行的 URI 高速缓存大小" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="非强制执行的客户机 IP 列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="非强制执行的 IP 反转列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="非强制执行的 IP 高速缓存标志" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="非强制执行的 IP 高速缓存大小" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="配置文件属性获取模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="配置文件属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="响应属性获取模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="响应属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="Cookie 分隔符字符" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="获取属性日期格式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="属性 Cookie 编码" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="会话属性获取模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="会话属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="默认特权属性" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="特权属性类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="特权属性小写转换" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="特权会话属性" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用特权属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="特权属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="自定义验证处理器" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="自定义注销处理器" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="自定义检验处理器" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="SSO" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="Cookie 名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用 SSO 高速缓存" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="跨域 SSO" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 重定向 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO Servlet URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 时钟偏差" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 信任的 ID 提供者" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用 CDSSO 安全" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 域列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="重置 Cookie" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="重置 Cookie 名称列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="重置 Cookie 域映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="重置 Cookie 路径映射" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 服务" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 登录 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="按优先级排序登录 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="登录 URL 探测" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="登录 URL 探测超时设置" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 注销 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="按优先级排序注销 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="注销 URL 探测" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="注销 URL 探测超时设置" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 验证服务协议" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 验证服务主机名" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 验证服务端口" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用策略通知" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="策略客户机轮询时间间隔" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="策略客户机高速缓存模式" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="策略客户机布尔行为值" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="策略客户机资源比较器" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="策略客户机时钟偏差" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="URL 策略环境 GET 参数" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="URL 策略环境 POST 参数" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="URL 策略环境 jsession 参数" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="用户数据高速缓存轮询时间" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用服务数据高速缓存通知" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="服务数据高速缓存时间" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用客户机轮询" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="客户机轮询周期" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="其他" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="语言环境（语言）" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="语言环境（国家/地区）" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用端口检查" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="端口检查文件" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="端口检查设置" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="忽略主体列表" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用传统支持" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="传统用户代理" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="传统重定向 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="加密提供者" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="高级" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="客户机 IP 地址标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="客户机主机名标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用 Web 服务" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="Web 服务端点" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="启用 Web 服务处理 GET" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="Web 服务验证程序" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="Web 服务内部错误内容文件" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="Web 服务授权错误内容文件" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="替换代理主机名" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="替换代理端口名称" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="替换代理协议" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="自定义属性" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.webserviceprovideredit" text="Web 服务提供者" expand="false">
+            <tocitem target="agentconfig.webserviceprovideredit" text="常规" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="组" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="密码" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="密码确认" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="状态" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="通用标识符" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="安全" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="安全机制" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="验证链" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="令牌转换类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="保留消息中的安全标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="私钥类型" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="Liberty 服务类型 URN" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="用户令牌的证书" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="SAML 配置" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="SAML 属性映射" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="SAML NameID 映射器插件" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="SAML 属性名称空间" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="包含成员资格" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="签署和加密" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="签署响应" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="加密响应" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="验证请求签名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="解密请求标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="解密请求" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="密钥库" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="Web 服务客户机的公钥别名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="私钥别名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="密钥存储库用法" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="端点" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="Web 服务代理服务器端点" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="Web 服务端点" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="Kerberos 配置" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="Kerberos 域服务器" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="Kerberos 域" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="Kerberos 服务主体" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="Kerberos 密钥表文件" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="检验 Kerberos 签名" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.webserviceclientedit" text="Web 服务客户机属性" expand="false">
+            <tocitem target="agentconfig.webserviceclientedit" text="常规" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="组" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="密码" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="密码确认" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="状态" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="通用标识符" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="安全" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="安全机制" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="STS 配置" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="搜索配置" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="需要进行用户验证" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="保留消息中的安全标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="使用传递安全令牌" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="Liberty 服务类型 URN" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="用户令牌的证书" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="签署和加密" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="请求是否已签署" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="请求标头是否已加密" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="请求是否已加密" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="响应签名是否已验证" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="响应是否已解密" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="密钥库" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="Web 服务提供者的公钥别名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="私钥别名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="密钥存储库用法" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="端点" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="Web 服务代理服务器端点" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="Web 服务端点" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="Kerberos 配置" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="Kerberos 域服务器" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="Kerberos 域" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="Kerberos 服务主体" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="Kerberos 票证高速缓存目录" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.stsclientedit" text="STS 客户机" expand="false"></tocitem>
+        <tocitem target="agentconfig.discoveryagentprofile" text="搜索代理属性" expand="false">
+            <tocitem target="agentconfig.discoveryagentprofile" text="组" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="密码" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="密码确认" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="状态" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="代理配置系统信息库的位置" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="私钥别名" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="搜索服务端点" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="验证 Web 服务端点" expand="false"></tocitem></tocitem>
+        <tocitem target="agentconfig.webservicestsedit" text="安全令牌服务代理属性" expand="false">
+            <tocitem target="agentconfig.webservicestsedit" text="常规" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="组" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="密码" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="密码确认" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="状态" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="通用标识符" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="安全" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="安全机制" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="STS 配置" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="保留消息中的安全标头" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="用户令牌的证书" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="签署和加密" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="请求是否已签署" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="请求标头是否已加密" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="请求是否已加密" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="响应签名是否已验证" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="响应是否已解密" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="密钥库" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="Web 服务提供者的公钥别名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="私钥别名" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="密钥存储库用法" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="端点" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="安全令牌服务端点" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="安全令牌服务 MEX 端点" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="Kerberos 配置" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="Kerberos 域服务器" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="Kerberos 域" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="Kerberos 服务主体" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="Kerberos 票证高速缓存目录" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.22agentprofile" text="2.2 策略代理" expand="false">
+            <tocitem target="agentconfig.22agentprofile" text="密码" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="密码确认" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="状态" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="说明" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="代理关键字值" expand="false"></tocitem></tocitem>
+        <tocitem target="ghfif" text="代理验证程序" expand="false">
+            <tocitem target="ghfif" text="密码" expand="false"></tocitem>
+            <tocitem target="ghfif" text="密码确认" expand="false"></tocitem>
+            <tocitem target="ghfif" text="状态" expand="false"></tocitem>
+            <tocitem target="ghfif" text="允许读取的代理配置文件" expand="false"></tocitem></tocitem></tocitem></tocitem>
+ <tocitem target="dirmang" text="目录管理" expand="false">
+    <tocitem target="dm.home" text="目录管理" expand="false"></tocitem></tocitem>
+ <tocitem target="federation.federation" text="联合" expand="false">
+    <tocitem target="federation.fsauthdomains" text="信任环" expand="false">
+        <tocitem target="federation.createcot" text="创建新的信任环" expand="false"></tocitem>
+        <tocitem target="federation.fsauthdomainsedit" text="修改信任环配置文件" expand="false"></tocitem>
+        <tocitem target="federation.fsauthdomainsselectprovider" text="添加提供者到信任环" expand="false"></tocitem>
+        <tocitem target="deleteauthdomain" text="删除信任环配置文件" expand="false"></tocitem></tocitem>
+    <tocitem target="federation.createsaml2metadata" text="实体提供者" expand="false">
+        <tocitem target="ggwxp" text="SAMLv2 提供者实体" expand="false">
+            <tocitem target="federation.createsaml2" text="创建 SAMLv2 实体提供者" expand="false"></tocitem></tocitem>
+        <tocitem target="ggwwz" text="ID-FF 提供者实体" expand="false">
+            <tocitem target="federation.createidffprovider" text="创建 ID-FF 实体提供者" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.createwsfedprovider" text="WS-FED 提供者实体" expand="false">
+            <tocitem target="ggwwr" text="创建 WS-FED 实体提供者" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2spassertioncontent" text="自定义 SAMLv2 服务提供者" expand="false">
+            <tocitem target="federation.samlv2spassertioncontent" text="声明内容" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="请求/响应签署" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="加密" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="证书别名" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="名称 ID 格式" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="验证环境" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="声明时间偏差" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="基本验证" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2spassertioncontent" text="声明处理" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="属性映射程序" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="自动联合" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="帐户映射程序" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="工件消息编码" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="临时用户" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="默认中继状态" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="适配器" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2spassertioncontent" text="服务" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="元数据别名" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="单点注销服务" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="管理名称 ID 服务" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="工件声明使用方服务" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2spassertioncontent" text="高级" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="SP URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="SP 注销 URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="应用程序密钥列表" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="请求 IDP 列表查找器实现" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="请求 IDP 列表获取完成" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="请求 IDP 列表" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="IDP 代理" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="导言" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="代理计数" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="IDP 代理列表" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.samlv2idpassertioncontent" text="自定义 SAMLv2 身份认证提供者" expand="false">
+            <tocitem target="federation.samlv2idpassertioncontent" text="声明内容" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="请求/响应签署" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="加密" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="证书别名" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="名称 ID 格式" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="名称 ID 值映射" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="验证环境" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="声明时间" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="基本验证" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="声明高速缓存" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="引导" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="声明处理" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="属性映射程序" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="帐户映射程序" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="本地配置" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="验证 URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="外部应用程序注销 URL" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="服务" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="元数据别名" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="工件解析服务" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="单点注销服务" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="管理名称 ID 服务" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="单点登录服务" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="高级" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="IDP URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="应用程序密钥列表" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="IDP 映射程序会话" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.samlv2pdp" text="自定义 SAMLv2 XACML PDP" expand="false">
+            <tocitem target="federation.samlv2pdp" text="协议支持枚举" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="签名密钥别名" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="加密密钥别名" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="基本授权" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="已签署授权决策查询" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="授权服务" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2pep" text="自定义 SAMLv2 XACML PEP" expand="false">
+            <tocitem target="federation.samlv2pep" text="协议支持枚举" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="签名密钥别名" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="加密密钥别名" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="基本授权" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="已签署授权决策响应" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="已加密声明" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2attrauthority" text="自定义 SAMLv2 属性授权" expand="false">
+            <tocitem target="federation.samlv2attrauthority" text="签署和加密" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="属性服务" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="AssertionID 请求" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="属性配置文件" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="证书别名" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="主体数据存储库" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2attrquery" text="自定义 SAMLv2 属性查询" expand="false">
+            <tocitem target="federation.samlv2attrquery" text="NameID 格式" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrquery" text="证书别名" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2authnauthority" text="自定义 SAMLv2 验证授权" expand="false">
+            <tocitem target="federation.samlv2authnauthority" text="签署和加密" expand="false"></tocitem>
+            <tocitem target="federation.samlv2authnauthority" text="验证查询服务" expand="false"></tocitem>
+            <tocitem target="federation.samlv2authnauthority" text="AssertionID 请求" expand="false"></tocitem>
+            <tocitem target="federation.samlv2authnauthority" text="证书别名" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2affiliate" text="自定义 SAMLv2 托管联合提供者" expand="false">
+            <tocitem target="federation.samlv2affiliate" text="元数据别名" expand="false"></tocitem>
+            <tocitem target="federation.samlv2affiliate" text="成员" expand="false"></tocitem>
+            <tocitem target="federation.samlv2affiliate" text="证书别名" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.idffidp" text="自定义 ID-FF 身份认证提供者" expand="false">
+            <tocitem target="federation.idffidp" text="公共属性" expand="false">
+                <tocitem target="federation.idffidp" text="提供者类型" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="说明" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="协议支持枚举" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="签名密钥" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="加密密钥" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="名称标识符加密" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="通信 URL" expand="false">
+                <tocitem target="federation.idffidp" text="SOAP 端点" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="单点登录服务 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="单点注销服务" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="单点注销返回" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="联合终止服务" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="联合终止返回" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="名称注册服务" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="名称注册返回" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="通信配置文件" expand="false">
+                <tocitem target="federation.idffidp" text="联合终止" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="单点注销" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="名称注册" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="单点登录/联合" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="身份认证提供者配置" expand="false">
+                <tocitem target="federation.idffidp" text="提供者别名" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="验证类型" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="声明发布者" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="响应结果" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="提供者状态" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="服务 URL" expand="false">
+                <tocitem target="federation.idffidp" text="主页 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="单点登录失败重定向 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="联合页面 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="注册完成 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="COT 列表页面 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="终止 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="终止完成 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="错误页面 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="注销完成 URL" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="插件" expand="false">
+                <tocitem target="federation.idffidp" text="名称标识符实现" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="属性语句插件" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="用户提供者类" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="身份认证提供者属性映射程序" expand="false">
+                <tocitem target="federation.idffidp" text="属性映射程序类" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="身份认证提供者属性映射" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="引导" expand="false">
+                <tocitem target="federation.idffidp" text="生成引导搜索的资源提供" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="自动联合" expand="false">
+                <tocitem target="federation.idffidp" text="自动联合" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="自动联合公共属性名称" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="验证环境" expand="false"></tocitem>
+            <tocitem target="federation.idffidp" text="SAML 属性" expand="false">
+                <tocitem target="federation.idffidp" text="声明时间间隔" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="清除时间间隔" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="工件超时" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="声明限制" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.idffsp" text="自定义 ID-FF 服务提供者" expand="false">
+            <tocitem target="federation.idffsp" text="公共属性" expand="false">
+                <tocitem target="federation.idffsp" text="提供者类型" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="说明" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="协议支持枚举" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="签名密钥" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="加密密钥" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="名称标识符加密" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="签名验证请求" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="通信 URL" expand="false">
+                <tocitem target="federation.idffsp" text="SOAP 端点" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="单点注销服务" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="单点注销返回" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="联合终止服务" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="联合终止返回" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="名称注册服务" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="名称注册返回" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="声明使用方 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="声明使用方服务 URL ID" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="将声明使用方服务 URL 设置为默认值" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="通信配置文件" expand="false">
+                <tocitem target="federation.idffsp" text="联合终止" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="单点注销" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="名称注册" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="支持的 SSO 配置文件" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="服务提供者配置" expand="false">
+                <tocitem target="federation.idffsp" text="提供者别名" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="验证类型" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="身份认证提供者强制验证" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="请求身份认证提供者被动" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="联合后的名称注册" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="名称 ID 策略" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="联合提供者联盟" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="提供者状态" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="响应结果" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="服务 URL" expand="false">
+                <tocitem target="federation.idffsp" text="COT 列表页面 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="联合页面 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="主页 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="单点登录失败重定向 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="终止完成 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="错误页面 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="注销完成 URL" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="插件" expand="false">
+                <tocitem target="federation.idffsp" text="服务提供者适配器" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="联合 SP 适配器环境" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="用户提供者类" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="名称标识符实现" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="服务提供者属性映射程序" expand="false">
+                <tocitem target="federation.idffsp" text="属性映射程序类" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="服务提供者属性映射" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="自动联合" expand="false">
+                <tocitem target="federation.idffsp" text="自动联合" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="自动联合公共属性名称" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="验证环境" expand="false"></tocitem>
+            <tocitem target="federation.idffsp" text="代理验证配置" expand="false">
+                <tocitem target="federation.idffsp" text="代理验证" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="代理身份认证提供者列表" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="代理的最大数目" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="对代理使用引入 Cookie" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.wsfedgeneral" text="WS-FED 常规属性" expand="false">
+            <tocitem target="federation.wsfedgeneral" text="SP 显示名称" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="IDP 显示名称" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="领域" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="令牌发布者名称" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="令牌发布者端点" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.wsfedidp" text="自定义 WS-FED 身份认证提供者" expand="false">
+            <tocitem target="federation.wsfedidp" text="NameID 格式" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="NameID 属性" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="名称包含域" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="域属性" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="UPN 域" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="签名证书别名" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="声明类型" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="帐户映射程序" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="属性映射程序" expand="false">
+                <tocitem target="federation.wsfedidp" text="属性映射" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.wsfedidp" text="声明有效时间" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.wsfedsp" text="自定义 WS-FED 服务提供者" expand="false">
+            <tocitem target="federation.wsfedsp" text="已签署声明" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="帐户映射程序" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="属性映射程序" expand="false">
+                <tocitem target="federation.wsfedsp" text="属性映射" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.wsfedsp" text="声明有效时间" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="声明偏差时间" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="默认中继状态" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="主领域搜索" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="帐户领域选择" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="federation.fssamlservice" text="SAML1.x" expand="false">
+        <tocitem target="targetspecifier" text="目标指示符" expand="false"></tocitem>
+        <tocitem target="siteidentifiers" text="站点标识符" expand="false">
+            <tocitem target="federation.fssamlsiteidadd" text="配置站点标识符" expand="false"></tocitem></tocitem>
+        <tocitem target="trustedpartners" text="可信赖的伙伴" expand="false">
+            <tocitem target="federation.fssamlselecttrustedpartnertype" text="可信赖的伙伴：选择伙伴类型和配置文件" expand="false"></tocitem>
+            <tocitem target="federation.fssamltrustedpartnersadd" text="可信赖的伙伴：配置可信赖的伙伴属性" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.fsssamltargeturlsadd" text="目标 URL" expand="false">
+            <tocitem target="federation.fssamltargeturlsadd" text="配置目标 URL" expand="false"></tocitem></tocitem>
+        <tocitem target="assertiontimeout" text="声明超时" expand="false"></tocitem>
+        <tocitem target="assertionskew" text="声明不早于偏差因数" expand="false"></tocitem>
+        <tocitem target="artifacttimeout" text="工件超时" expand="false"></tocitem>
+        <tocitem target="samlartifactname" text="SAML 工件名称" expand="false"></tocitem>
+        <tocitem target="signsamlassertion" text="签署 SAML 声明" expand="false"></tocitem>
+        <tocitem target="signsamlrequest" text="签署 SAML 请求" expand="false"></tocitem>
+        <tocitem target="signsamlresponse" text="签署 SAML 响应" expand="false"></tocitem>
+        <tocitem target="ggyfk" text="属性查询" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="webservices" text="Web 服务" expand="false">
+    <tocitem target="webservices.wspersonalprofileservice" text="Liberty 个人配置文件服务" expand="false">
+        <tocitem target="resourceidmapper" text="资源 ID 映射程序" expand="false"></tocitem>
+        <tocitem target="authorizer" text="授权者" expand="false"></tocitem>
+        <tocitem target="attributemapper" text="属性映射程序" expand="false"></tocitem>
+        <tocitem target="ppproviderid" text="提供者 ID" expand="false"></tocitem>
+        <tocitem target="namescheme" text="名称方案" expand="false"></tocitem>
+        <tocitem target="namespaceprefix" text="名称空间前缀" expand="false"></tocitem>
+        <tocitem target="supportedcontainers" text="支持的容器" expand="false">
+            <tocitem target="webservices.wsppservicesupportedcontaineradd" text="配置支持的容器" expand="false"></tocitem></tocitem>
+        <tocitem target="ppldapattributemaplist" text="PPLDAP 属性映射列表" expand="false">
+            <tocitem target="webservices.wsppservicedsattributemaplistadd" text="配置属性映射" expand="false"></tocitem></tocitem>
+        <tocitem target="requirequery" text="要求查询策略评估：" expand="false"></tocitem>
+        <tocitem target="requiremodify" text="要求修改策略评估：" expand="false"></tocitem>
+        <tocitem target="extensioncontainerattributes" text="扩充容器属性" expand="false"></tocitem>
+        <tocitem target="extensionattributesnamespaceprefix" text="扩充属性名称空间前缀" expand="false"></tocitem>
+        <tocitem target="serviceupdateenabled" text="服务更新" expand="false"></tocitem>
+        <tocitem target="serviceinstanceupdateclass" text="服务实例更新类" expand="false"></tocitem>
+        <tocitem target="alternateendpoint" text="备用端点" expand="false"></tocitem>
+        <tocitem target="alternatesecuritymechanisms" text="备用安全机制" expand="false"></tocitem></tocitem>
+    <tocitem target="service.smdiscoveryservice" text="搜索服务" expand="false">
+        <tocitem target="dsproviderid" text="提供者 ID" expand="false"></tocitem>
+        <tocitem target="supportedauthmechanisms" text="支持的验证机制" expand="false"></tocitem>
+        <tocitem target="supporteddirectives" text="支持的指令" expand="false"></tocitem>
+        <tocitem target="policyevaldiscolookup" text="搜索查找的策略评估" expand="false"></tocitem>
+        <tocitem target="policyevaldiscoupdate" text="搜索更新的策略评估" expand="false"></tocitem>
+        <tocitem target="authorizerpluginclass" text="授权者插件类：" expand="false"></tocitem>
+        <tocitem target="entryhandlerpluginclass" text="条目处理程序插件类：" expand="false"></tocitem>
+        <tocitem target="resourceidmapperpluginclass" text="用于资源 ID 映射程序插件的类" expand="false">
+            <tocitem target="service.smdiscoveryproviderresourceidmapperadd" text="配置资源 ID 映射程序" expand="false"></tocitem></tocitem>
+        <tocitem target="authresponsemessage" text="验证响应消息" expand="false"></tocitem>
+        <tocitem target="generatesessioncontext" text="用于引导的会话上下文语句" expand="false"></tocitem>
+        <tocitem target="encryptnameidentifier" text="加密会话上下文中的名称标识符以进行引导" expand="false"></tocitem>
+        <tocitem target="useimpliedresource" text="隐含资源" expand="false"></tocitem>
+        <tocitem target="resourceofferingsbootstrapping" text="用于引导的资源提供" expand="false">
+            <tocitem target="service.smdiscoverybootstraprefoffadd" text="配置用于引导的资源提供" expand="false"></tocitem>
+            <tocitem target="service.smdiscoverydescriptionadd" text="配置服务说明" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="service.scsoapbinding" text="SOAP 绑定服务" expand="false">
+        <tocitem target="requesthandlerlist" text="请求处理程序列表" expand="false">
+            <tocitem target="service.scsoapbindingrequesthandlerlistadd" text="配置请求处理程序" expand="false"></tocitem></tocitem>
+        <tocitem target="ggodb" text="SOAP 绑定属性" expand="false">
+            <tocitem target="ggodb" text="Web 服务验证程序" expand="false"></tocitem>
+            <tocitem target="ggodb" text="支持的验证机制" expand="false"></tocitem>
+            <tocitem target="ggodb" text="强制仅使用已知的提供者" expand="false"></tocitem>
+            <tocitem target="ggodb" text="SSL 客户机验证的证书别名" expand="false"></tocitem>
+            <tocitem target="ggodb" text="过时消息的时间限制" expand="false"></tocitem>
+            <tocitem target="ggodb" text="消息 ID 高速缓存清除时间间隔" expand="false"></tocitem>
+            <tocitem target="ggodb" text="支持的 SOAP 参与者" expand="false"></tocitem>
+            <tocitem target="ggodb" text="名称空间前缀映射" expand="false"></tocitem>
+            <tocitem target="ggodb" text="JAXB 软件包列表" expand="false"></tocitem>
+            <tocitem target="ggodb" text="Liberty Identity Web Service 版本" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="webservices.wsauthnservices" text="验证 Web 服务" expand="false">
+        <tocitem target="mechanismhandlerslist" text="机制处理程序列表" expand="false">
+            <tocitem target="webservices.wsauthnserviceshandlersadd" text="配置新的机制处理程序" expand="false"></tocitem></tocitem></tocitem></tocitem>
+ <tocitem target="service.scconfig" text="配置属性" expand="false">
+    <tocitem target="service.scconfigauth" text="验证" expand="false">
+        <tocitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="主 Active Directory 服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="次 Active Directory 服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="起始用户搜索的 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="Root 用户绑定的 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="Root 用户绑定密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="Root 用户绑定密码（确认）" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="用于检索用户配置文件的属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="用于搜索要进行验证的用户的属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="用户搜索过滤器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="搜索范围" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="对 Active Directory 服务器的 SSL 访问" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="返回用户 DN 以进行验证" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory 服务器检查间隔" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="用户创建属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="匿名" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="匿名用户有效" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="默认匿名用户名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="区分大小写的用户 ID" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="authentication.authconfig" text="验证配置" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="证书 " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="在 LDAP 中匹配证书" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="用于在 LDAP 中搜索证书的主体 DN 属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="将证书与 CRL 匹配" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="用于在 LDAP 中搜索 CRL 的发送者 DN 属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="用于 CRL 更新的 HTTP 参数" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="OCSP 验证" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="存储证书的 LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP 起始搜索 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP Server 主体用户" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP Server 主体密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP Server 主体密码（确认）" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="使用 SSL 进行 LDAP 访问" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="用于访问用户配置文件的证书字段" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="用于访问用户配置文件的其他证书字段" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="用于访问用户配置文件的 SubjectAltNameExt 值类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="可信赖的远程主机" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="SSL 端口号" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="客户机证书的 HTTP 标头名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthservice" text="核心" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="可插接的验证模块类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="客户机支持的验证模块" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="LDAP 连接池大小" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="LDAP 连接池的默认大小" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="用户配置文件" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="远程验证安全性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="保持 Post 处理对象用于注销处理" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="保持验证模块对象用于注销处理" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="管理员验证配置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="用户配置文件动态创建默认角色" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="持久 Cookie 模式" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="持久 Cookie 最长时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="别名搜索属性名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="默认验证语言环境" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="组织验证配置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="登录失败锁定模式" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="登录失败锁定计数" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="登录失败锁定间隔" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="用于发送锁定通知的电子邮件地址" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="N 次失败后警告用户" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="登录失败锁定时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="锁定时间乘数" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="锁定属性名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="锁定属性值" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="默认成功登录 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="默认失败登录 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="验证后期处理类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="生成用户 ID 模式" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="可插接用户名生成器类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="身份类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="可插接的用户状态事件类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="将无效尝试存储到数据存储库中" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="基于模块的验证" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="用户属性映射到会话属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="默认验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthdatastoreservice" text="数据存储库" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthdatastoreservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="ggulh" text="联合" expand="false">
+            <tocitem target="ggulh" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP Basic" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="连接类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="连接池 JNDI 名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC 驱动程序" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="将此用户连接至数据库" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="连接至数据库的密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="连接至数据库的密码确认" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="密码列字符串" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="预处理语句" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="变换密码语法的类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="验证级别" expand="false"></tocitem>
+            <tocitem target="jdbcexample" text="配置连接池--示例" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="主 LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="次 LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="起始用户搜索的 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="Root 用户绑定的 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="Root 用户绑定密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="Root 用户绑定密码（确认）" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="用于检索用户配置文件的属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="用于搜索要进行验证的用户的属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="用户搜索过滤器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="搜索范围" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="启用 SSL 以访问 LDAP 服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="返回用户 DN 以进行验证" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP 服务器检查间隔" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="用户创建属性列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="成员资格" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="最小密码长度" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="默认用户角色" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="注册后的用户状态" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN " expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="信任的网关 IP 地址" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN 编号参数" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 服务器和端口" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 起始搜索 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="用于搜索 LDAP 的属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP Server 主体用户" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP Server 主体密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP Server 主体密码（确认）" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="启用 SSL 进行 LDAP 访问" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="用于检索用户配置文件的 LDAP 属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="验证时返回用户 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="服务器 1" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="服务器 2" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="共享密钥" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="共享密钥确认" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="端口号" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="超时" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="服务器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="服务器验证文件目录" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="启用日志记录" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="日志记录的级别" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="日志文件" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="验证连接超时" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="客户机类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="EASSP 版本" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="最小验证程序强度" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="ACE/Server 配置路径" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="配置端口" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="验证端口" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="超时" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="线程" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="验证级别" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="服务名称" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows 桌面 SSO" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="服务主体" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Keytab 文件名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Kerberos 领域" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Kerberos 服务器名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="返回主体的域名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="验证域" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="验证主机" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="Samba 配置文件名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="验证级别" expand="false"></tocitem></tocitem>
+        <tocitem target="supportedlang" text="支持的语言环境" expand="false"></tocitem></tocitem>
+    <tocitem target="service.scconfigconsole" text="控制台属性" expand="false">
+        <tocitem target="service.scserviceprofile.amadminconsoleservice" text="管理" expand="false">
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="联合管理" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户管理" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="人员容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="组织单位容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="组容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="管理的组类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="默认角色权限" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="域组件树" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="管理组" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="符合用户删除" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="动态管理角色 ACI" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户配置文件服务类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="DC 节点属性列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用于删除的对象的搜索过滤器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="默认人员容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="默认组容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="默认代理容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="组默认人员容器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="组人员容器列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户配置文件显示类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="最终用户配置文件显示类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="在“用户配置文件”页面中显示角色" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="在“用户配置文件”页面中显示组" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户组自订阅" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户配置文件显示选项" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户创建默认角色" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="“管理控制台”选项卡" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="搜索返回的结果的最大数目" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="搜索超时" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="JSP 目录名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="联机帮助文档" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="所需的服务" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户搜索关键字" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户搜索返回属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户创建通知列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户删除通知列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户修改通知列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="每页可以显示的最大条目数" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="事件侦听器类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="处理前和处理后的类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="外部属性获取" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="无效用户 ID 字符" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="用户 ID 和密码验证插件类" expand="false"></tocitem></tocitem>
+        <tocitem target="service.smg11n" text="全局化设置" expand="false">
+            <tocitem target="service.smg11n" text="各个语言环境支持的字符集" expand="false"></tocitem>
+            <tocitem target="service.smg11n" text="字符集别名" expand="false"></tocitem>
+            <tocitem target="service.smg11n" text="自动生成的公共名称格式" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="servic.scconfigglobal" text="全局属性" expand="false">
+        <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="通用联合配置" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="数据存储库 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="配置实例 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="日志程序 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="会话提供者 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="最大允许内容长度" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="密码解码器 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="签名提供者 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="密钥提供者 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="检查证书是否存在" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="XML 标准化算法" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="XML 签名算法" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="XML 变换算法" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="Liberty ID-FF 服务配置" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="联合 Cookie 名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="IDP 代理查找器 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="请求高速缓存清除时间间隔" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="请求高速缓存超时设置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="IDP 登录 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="XML 登录" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="Liberty ID-WSF 安全服务" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="安全属性插件类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="密钥信息类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="安全令牌提供者类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="默认 WSC 证书别名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="信任的权威签署证书别名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="信任的 CA 签署证书别名" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="Liberty 交互服务" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="重定向用户以进行交互的 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="重定向用户以进行数据交互的 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSP 的预期交互持续时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="强制 returnToURL 必须为 SSL 的 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="强制返回主机必须与请求主机相同的 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="HTML 样式表位置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WML 样式表位置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSP 交互 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="位于负载平衡器之后的 WSP 交互 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="位于负载平衡器之后的 WSP 群集（站点）的交互 URL 列表" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="交互配置类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSC 用于参与交互的选项" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="包括 userInteractionHeader 的 WSC" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="重定向用户以进行交互的 WSC" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSC 的预期交互持续时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="强制重定向 URL 必须为 SSL 的 WSC" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunmultifederationprotocol" text="多联合协议" expand="false">
+            <tocitem target="service.scserviceprofile.sunmultifederationprotocol" text="单点注销处理程序列表" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="用户验证" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="保密问题" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="搜索过滤器" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="基 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="绑定 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="绑定密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置选项" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码更改通知选项" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="个人问题" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="问题的最大数目" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="在下一次登录时强制更改密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置失败锁定" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置失败锁定计数" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置失败锁定间隔" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="用于发送锁定通知的电子邮件地址" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="N 次失败后警告用户" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置失败锁定时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置锁定属性名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置锁定属性值" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scpolicy" text="策略配置" expand="false">
+            <tocitem target="service.scpolicy" text="全局属性" expand="false">
+                <tocitem target="service.scpolicy" text="资源比较器" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="拒绝决定时继续评估" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="可由 OpenSSO 处理的建议" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="组织别名引用" expand="false"></tocitem></tocitem>
+            <tocitem target="service.scpolicy" text="领域属性" expand="false">
+                <tocitem target="service.scpolicy" text="主 LDAP 服务器" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 基 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 用户基 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="OpenSSO 角色基 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 绑定 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 绑定密码" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 组织搜索过滤器" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 组织搜索范围" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 组搜索范围" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 组搜索过滤器" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 用户搜索过滤器" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 用户搜索范围" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 角色搜索过滤器" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 角色搜索范围" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="OpenSSO 角色搜索范围" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 组织搜索属性" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 组搜索属性" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 用户搜索属性" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 角色搜索属性" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="搜索返回的结果的最大数目" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="搜索超时" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP SSL" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 连接池的最小尺寸" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="连接池的最大尺寸" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="选定的策略主体" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="选定的策略条件" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="选定的策略引用组织" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="主体结果的生存时间" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="用户别名" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="选定的响应提供者" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="选定的动态响应属性" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="SAMLv2 服务配置" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="高速缓存清除时间间隔" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="名称 ID 信息的属性名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="名称 ID 信息密钥的属性名称" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="IDP 搜索服务的 Cookie 域" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="IDP 搜索服务的 Cookie 类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="IDP 搜索服务的 URL 方案" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="XML 加密 SPI 实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="在 KeyInfo 元素内包含加密密钥" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="XML 签署实现类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="XML 签署证书验证" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="CA 证书验证" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scsaml2soapbinding" text="SAMLv2 SOAP 绑定" expand="false">
+            <tocitem target="service.scsaml2soapbinding" text="请求处理程序列表" expand="false"></tocitem></tocitem>
+        <tocitem target="service.securitytokenservice" text="安全令牌服务" expand="false">
+            <tocitem target="service.securitytokenservice" text="发布者" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="端点" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="加密发布的密钥" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="加密发布的令牌" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="安全令牌的使用寿命" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="令牌实现类" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="证书别名" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="STS 最终用户令牌插件类" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="安全机制" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="验证链" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="用户证书" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="检验请求签名" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="解密请求标头" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="解密请求" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="签署响应" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="加密响应" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="签署参考类型" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="加密算法" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="加密强度" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="私钥别名" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="私钥类型" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="Web 服务 (WS-Trust) 客户机的公钥别名" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="Kerberos 域服务器" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="Kerberos 域" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="Kerberos 服务主体" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="Kerberos 密钥表文件" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="检验 Kerberos 签名" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="SAML 属性映射" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="NameID 映射程序" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="应包括成员资格" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="属性名称空间" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="可信赖的发布者" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="可信赖的 IP 地址" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.amsessionservice" text="会话" expand="false">
+            <tocitem target="service.scserviceprofile.amsessionservice" text="辅助配置实例" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="搜索结果的最大数目" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="搜索超时" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="启用属性更改通知" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="启用配额限制" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="配额限制读取超时" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="免除顶层管理员的限制检查" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="会话配额用尽时的操作" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="当会话系统信息库关闭时拒绝用户登录" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="通知属性" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="最长会话时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="最长空闲时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="最长缓存时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="活动用户会话" expand="false"></tocitem></tocitem>
+        <tocitem target="service.subconfigadd" text="添加子配置" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamuserservice" text="用户" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="用户首选语言" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="用户首选时区" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="继承的语言环境" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="管理员起始视图" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="默认用户状态" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="service.scfonfigsystem" text="系统属性" expand="false">
+        <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机检测" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机类型" expand="false">
+                <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机管理器" expand="false"></tocitem>
+                <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机类型" expand="false"></tocitem></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="默认客户机类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机检测类" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机检测" expand="false"></tocitem></tocitem>
+        <tocitem target="service.mapcreatedevice" text="添加新的客户机" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="记录 " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="最大日志大小" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="历史文件数目" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志文件位置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志状态" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志记录解析主机名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志类型" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="数据库用户名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="数据库用户密码" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="数据库用户密码（确认）" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="数据库驱动程序名" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="可配置日志字段" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志检验频率" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志签名时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="安全日志" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="安全日志签署算法" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志证书存储库位置" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="最大记录数目" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="每个归档文件中的文件数目" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="缓冲大小" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="DB 失败内存缓冲区大小" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="缓冲时间" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="时间缓冲" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="日志记录的级别" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="命名" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="配置服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="会话服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="记录服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="策略服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="验证服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML 网络配置文件/附件服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML SOAP 服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML 网络配置文件/POST 服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML 声明管理器服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="联合声明管理器服务 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="安全令牌管理器 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="JAXRPC 端点 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="身份认证 Web 服务端点 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="身份认证 REST 服务端点 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="安全令牌服务端点 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="安全令牌服务 MEX 端点 URL" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scplatform" text="平台" expand="false">
+            <tocitem target="service.scplatform" text="平台语言环境" expand="false"></tocitem>
+            <tocitem target="service.scplatform" text="Cookie 域" expand="false"></tocitem>
+            <tocitem target="service.scplatform" text="可用的语言环境" expand="false"></tocitem>
+            <tocitem target="service.scplatform" text="客户机字符集" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scplatformclientcharsetsadd" text="创建新的字符集" expand="false"></tocitem></tocitem>
+    <tocitem target="service.serversite" text="服务器和站点" expand="false">
+        <tocitem target="service.serveradd" text="创建新的服务器实例" expand="false"></tocitem>
+        <tocitem target="service.serverconfiginherit" text="继承设置" expand="false"></tocitem>
+        <tocitem target="service.servereditgeneral" text="常规" expand="false">
+            <tocitem target="service.servereditgeneral" text="站点属性" expand="false">
+                <tocitem target="service.servereditgeneral" text="父站点" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditgeneral" text="系统属性" expand="false">
+                <tocitem target="service.servereditgeneral" text="基安装目录" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="默认语言环境" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="通知 URL" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="XML 验证" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditgeneral" text="调试属性" expand="false">
+                <tocitem target="service.servereditgeneral" text="调试级别" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="调试目录" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditgeneral" text="Mail Server" expand="false">
+                <tocitem target="service.servereditgeneral" text="Mail Server 主机名" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="Mail Server 端口号" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.servereditsecurity" text="安全" expand="false">
+            <tocitem target="service.servereditsecurity" text="加密" expand="false">
+                <tocitem target="service.servereditsecurity" text="密码加密密钥" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="验证服务共享密钥" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="加密类" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="安全随机工厂类" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="验证" expand="false">
+                <tocitem target="service.servereditsecurity" text="平台底层通信的最大内容长度" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="客户机 IP 地址检查" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="Cookie" expand="false">
+                <tocitem target="service.servereditsecurity" text="Cookie 名称" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="安全 Cookie" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="对 Cookie 值编码" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="密钥库" expand="false">
+                <tocitem target="service.servereditsecurity" text="密钥库文件" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="密钥库密码文件" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="私钥密码文件" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="证书别名" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="证书撤销列表高速缓存" expand="false">
+                <tocitem target="service.servereditsecurity" text="LDAP 服务器主机名" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 服务器端口号" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="已启用 SSL" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 服务器绑定用户名" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 服务器绑定密码" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 搜索基 DN" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="搜索属性" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="联机证书状态协议检查" expand="false">
+                <tocitem target="service.servereditsecurity" text="已启用检查" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="响应器 URL" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="证书昵称" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="联合信息处理标准" expand="false">
+                <tocitem target="service.servereditsecurity" text="FIPS 模式" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.servereditsession" text="会话" expand="false">
+            <tocitem target="service.servereditsession" text="会话限制" expand="false">
+                <tocitem target="service.servereditsession" text="最大会话数" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="使会话无效的最长时间" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="会话清除延迟" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsession" text="统计信息" expand="false">
+                <tocitem target="service.servereditsession" text="记录的时间间隔" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="状态" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="目录" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="启用主机查找" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsession" text="通知" expand="false">
+                <tocitem target="service.servereditsession" text="通知池大小" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="通知线程池阈值" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsession" text="验证" expand="false">
+                <tocitem target="service.servereditsession" text="不区分大小写的客户机 DN 比较" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.servereditsdk" text="SDK" expand="false">
+            <tocitem target="service.servereditsdk" text="数据存储库" expand="false">
+                <tocitem target="service.servereditsdk" text="启用数据存储库通知" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="启用 Directory Proxy" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsdk" text="事件服务" expand="false">
+                <tocitem target="service.servereditsdk" text="事件服务连接的重试次数" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 连接重试之间的延迟" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 连接重试的错误代码" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="空闲超时" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="禁用的事件服务连接" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsdk" text="LDAP 连接" expand="false">
+                <tocitem target="service.servereditsdk" text="LDAP 连接的重试次数" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 连接重试之间的延迟" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 连接重试的错误代码" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsdk" text="高速缓存和副本" expand="false">
+                <tocitem target="service.servereditsdk" text="SDK 高速缓存的最大大小" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="SDK 副本重试次数" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="SDK 副本尝试之间的延迟" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.serverconfigxml" text="目录配置" expand="false">
+            <tocitem target="service.serverconfigxml" text="目录配置" expand="false">
+                <tocitem target="service.serverconfigxml" text="最小连接池" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="最大连接池" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="绑定 DN" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="绑定密码" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="服务器" expand="false"></tocitem></tocitem>
+            <tocitem target="service.serverconfigxml" text="传统配置" expand="false">
+                <tocitem target="service.serverconfigxml" text="最小连接池" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="最大连接池" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="服务器" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="ggwyq" text="高级" expand="false"></tocitem>
+        <tocitem target="service.siteadd" text="创建新的站点实例" expand="false"></tocitem>
+        <tocitem target="service.siteedit" text="编辑站点实例" expand="false"></tocitem>
+        <tocitem target="ggvwi" text="服务器和站点控制台属性映射" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="sessions" text="会话" expand="false">
+    <tocitem target="sessionpage" text="会话页面" expand="false">
+        <tocitem target="sessionsearch" text="搜索" expand="false"></tocitem>
+        <tocitem target="viewsession" text="查看会话" expand="false"></tocitem>
+        <tocitem target="session.smprofile" text="会话窗口" expand="false">
+            <tocitem target="session.smprofile" text="用户 ID" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="剩余时间（以分钟为单位）" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="最长会话时间（以分钟为单位）" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="空闲时间（以分钟为单位）" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="最长空闲时间（以分钟为单位）" expand="false"></tocitem></tocitem>
+        <tocitem target="invalidatesession" text="使会话无效" expand="false"></tocitem>
+</tocitem>
+</tocitem>
+</toc>

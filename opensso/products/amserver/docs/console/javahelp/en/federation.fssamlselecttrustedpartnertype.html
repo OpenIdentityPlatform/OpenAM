@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Trusted Partners: Selecting Partner Type and Profile - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlselecttrustedpartnertype"></a><h5>Trusted Partners: Selecting Partner Type and Profile</h5>
+<a name="indexterm-81"></a><a name="indexterm-82"></a><p>This attribute defines any trusted partner (remote to the server on which OpenSSO
+is installed) that will be communicating with OpenSSO.</p>
+<hr><p><b>Note &#8211; </b>The trusted partner site must have a prearranged trust relationship with one or
+more of the sites configured in the Site Identifiers attribute.</p>
+<hr>
+<p>The first step in configuring a trusted partner is to determine the partner's
+role in the trust relationship. A trusted partner can be a source site
+(one that generates a single sign-on assertion) or a destination site (one that
+consumes a single sign-on assertion). For example, if the partner is the source
+site, this attribute is configured based on how it will send assertions. If
+the partner is the destination site, this attribute is configured based on the
+profile in which it will be receiving assertions. Following is the first part of
+the procedure for configuring a trusted partner. The starting point is the SAML
+screen under Federation.</p>
+<hr><p><b>Note &#8211; </b>To edit or duplicate the attributes of a trusted partner profile, click the
+appropriate button in the Actions column next to the configured trusted partner name.</p>
+<hr>
+<ol>
+<li><b>Select the role (Destination or Source) of the partner site you are configuring
+by checking the appropriate profile(s) used to communicate with it.</b><p>You may choose <b>Web Browser Artifact Profile</b> or <b>Web Browser Post Profile</b> for either Destination, Source or both, or
+<b>SOAP Query</b> for Destination only. The choices made dictate which of the attributes in the
+following steps need to be configured.</p>
+<hr><p><b>Note &#8211; </b>Click Edit to change the role of the partner site if you are
+modifying an existing trusted partner.</p>
+<hr>
+</li>
+<li><b>Click Next.</b></li>
+<li><b>To complete the configuration, see <a href="federation.fssamltrustedpartnersadd.html">Trusted Partners: Configuring Trusted Partner Attributes</a>.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>공급자 엔티티에 새 원격 서비스 공급자 추가 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteadd"></a><h4>공급자 엔티티에 새 원격 서비스 공급자 추가</h4><p><b>원격 공급자</b>는 Federated Access Manager와 동일한 서버에서 호스팅되지 않습니다. 새 원격 서비스 공급자의
+속성을 구성하면 서비스 공급자에 대한 메타데이터가 엔티티 프로필에 추가됩니다. 이 작업은 <a href="federation.fsserviceprovider.html">공급자 엔티티에 서비스 공급자 추가</a>로
+시작할 수 있습니다.</p>
+<hr><p><b>주 &#8211; </b>추가 속성을 구성할 수 있지만 초기 구성 페이지에서는 볼 수 없습니다. <a href="federation.fsserviceproviderremoteprofile.html">공급자 엔티티의 원격 서비스 공급자 속성 수정</a>을
+참조하십시오.</p>
+<hr>
+<ol>
+<li><b>공통 속성에 대한 정보를 제공합니다.</b><p>공통 속성에는 일반적으로 Identity 공급자 자체를 정의하는 값이 포함되어 있습니다.</p><dl><dt>설명</dt>
+<dd><p>이 속성 값은 엔티티를 작성할 때 제공되는 설명입니다. 이미 입력된 설명을 수정하거나 입력된 설명이 없는 경우 추가할 수 있습니다.</p></dd>
+<dt>프로토콜 지원 열거</dt>
+<dd><p>이 엔티티에서 지원하는 Liberty Alliance Project Liberty ID-FF(Liberty Identity Federation Framework) 릴리스를 선택합니다.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt>은 Liberty ID-FF 버전 1.2를 나타냅니다.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt>는 Liberty ID-FF 버전 1.1을 나타냅니다.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>사용 가능한 CoT(Circle of Trust) 중에 공급자에 할당할 CoT(Circle of Trust)를 하나
+선택합니다.</b><p>공급자는 하나 이상의 CoT(Circle of Trust)에 속할 수 있습니다. 그러나 지정된 CoT(Circle
+of Trust)가 없는 공급자는 Liberty Alliance Project 사양에 기초한 통신에 참여할 수
+없습니다. CoT(Circle of Trust)를 작성하지 않은 경우 나중에 이 속성을 정의할 수
+있습니다.</p></li>
+<li><b>서비스 공급자 속성에 대한 정보를 제공합니다.</b><p>서비스 공급자 속성은 서비스 공급자에 대한 일반 정보를 정의합니다.</p><dl><dt>명제 사용자 URL</dt>
+<dd><p>서비스 공급자로 보낸 모든 SAML 명제를 수신 및 처리하는 종점에 대한 URL을 입력합니다.</p></dd>
+<dt>명제 사용자 서비스 URL 아이디</dt>
+<dd><p>프로토콜 지원 열거 공통 속성의 값이 <tt>urn:liberty:iff:2003-08</tt>인 경우 필요한 아이디를 입력합니다.</p></dd>
+<dt>명제 사용자 서비스 URL을 기본값으로 설정</dt>
+<dd><p>식별자가 요청에서 제공되지 않은 경우 명제 사용자 서비스 URL을 기본값으로 사용하려면 이 확인란을 선택합니다.</p></dd>
+</dl>
+</li>
+<li><b>[확인]을 눌러 엔티티에 공급자를 추가합니다.</b></li>
+<li><b>[보기] 메뉴에서 다른 옵션을 선택하여 엔티티 구성을 계속하거나 [저장]을 눌러 구성을 완료합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,223 @@
+<script type="text/javascript">
+
+    YAHOO.namespace("sun.identity.config.agent");
+
+    //convenient alias:
+    var $ = YAHOO.util.Dom.get;
+
+    function mostrar( type, element, name ) {
+        $(name).style.display = (type == 1) ? "none" : "";
+        $(name).style.left = element.offsetLeft + "px";
+    }
+
+    function cancel() {
+        document.location = "$context/config/commonTasks.htm";
+    }
+    function confAgent() {
+        AjaxUtils.load('container', '$context/config/agent/created.htm');
+    }
+    function changeselectAgent() {
+        if ( $("selectAgent").options[$("selectAgent").selectedIndex].value == "0" )
+            $("btnAdd").disabled = true;
+        else
+            $("btnAdd").disabled = false;
+    }
+    function partGroup() {
+        $("optionYes").style.display = $("yes").checked ? "" : "none";
+    }
+
+    function show( elId ) {
+        $(elId).style.display = "";
+    }
+
+    function hide( elId ) {
+        $(elId).style.display = "none";
+    }
+
+    function showAddGroupDialog() {
+        $('addGroupDialog').style.display = "";
+    }
+
+    function showAddProfileDialog() {
+        $('addProfileDialog').style.display = "";
+    }
+
+    function handleAddGroupSubmit() {
+        alert("Submitted!");
+        YAHOO.sun.identity.config.agent.addGroupDialog.hide();
+
+    }
+    function handleAddGroupCancel() {
+        YAHOO.sun.identity.config.agent.addGroupDialog.hide();
+    }
+
+    function handleAddProfileSubmit() {
+        alert("Submitted!");
+        YAHOO.sun.identity.config.agent.addProfileDialog.hide();
+    }
+    function handleAddProfileCancel() {
+        YAHOO.sun.identity.config.agent.addProfileDialog.hide();
+    }
+
+    function pageInit() {
+        YAHOO.sun.identity.config.agent.addGroupDialog = new YAHOO.widget.Dialog("addGroupDialog",
+        {
+            width : "300px",
+            fixedcenter : true,
+            visible : false,
+            constraintoviewport : true,
+            buttons : [
+            { text:"Cancel", handler:handleAddGroupCancel },
+            { text:"Submit", handler:handleAddGroupSubmit, isDefault:true } ]
+        });
+
+        // Render the Dialog
+        YAHOO.sun.identity.config.agent.addGroupDialog.render();
+
+        YAHOO.util.Event.addListener("addGroupLink", "click", YAHOO.sun.identity.config.agent.addGroupDialog.show, YAHOO.sun.identity.config.agent.addGroupDialog, true);
+
+        YAHOO.sun.identity.config.agent.addProfileDialog = new YAHOO.widget.Dialog("addProfileDialog",
+        {
+            width : "300px",
+            fixedcenter : true,
+            visible : false,
+            constraintoviewport : true,
+            buttons : [
+            { text:"Cancel", handler:handleAddProfileCancel },
+            { text:"Submit", handler:handleAddProfileSubmit, isDefault:true } ]
+        });
+
+        // Render the Dialog
+        YAHOO.sun.identity.config.agent.addProfileDialog.render();
+
+        YAHOO.util.Event.addListener("addProfileLink", "click", YAHOO.sun.identity.config.agent.addProfileDialog.show, YAHOO.sun.identity.config.agent.addProfileDialog, true);
+
+
+    }
+    YAHOO.util.Event.onDOMReady(pageInit);
+
+</script>
+<style type="text/css">
+    .links {
+        width: 200px;
+        text-align: right;
+    }
+
+    .input {
+        width: 200px;
+    }
+
+    .actions {
+        padding: 10px 0 10px 100px;
+    }
+</style>
+
+<div id="mainPanel" align="center">
+    <div id="createPanel" class="createpanel">
+        <br/>
+
+        <div class="bodywhite">
+            <h2>$page.getLocalizedString("configuration.agent.create.title")</h2>
+            <small>$page.getLocalizedString("configuration.agent.create.comment")</small>
+        </div>
+        <br/>
+
+        <div class="bodywhite">
+            <p>$page.getLocalizedString("configuration.agent.create.agentType")<br/>
+                <select id="selectAgent" style="width:200px" onchange="changeselectAgent();">
+                    <option value="0">$page.getLocalizedString("configuration.agent.create.agentType.default")</option>
+                    <option value="1">$page.getLocalizedString("configuration.agent.create.agentType.webAgents")</option>
+                    <option value="2">$page.getLocalizedString("configuration.agent.create.agentType.sjsws")</option>
+                    <option value="3">$page.getLocalizedString("configuration.agent.create.agentType.sjswps")</option>
+                    <option value="4">$page.getLocalizedString("configuration.agent.create.agentType.apache")</option>
+                    <option value="5">$page.getLocalizedString("configuration.agent.create.agentType.lotus")</option>
+                    <option value="6">$page.getLocalizedString("configuration.agent.create.agentType.iis")</option>
+                    <option value="7">$page.getLocalizedString("configuration.agent.create.agentType.eeAgents")</option>
+                    <option value="8">$page.getLocalizedString("configuration.agent.create.agentType.glassfish")</option>
+                    <option value="9">$page.getLocalizedString("configuration.agent.create.agentType.tomcat")</option>
+                    <option value="10">$page.getLocalizedString("configuration.agent.create.agentType.weblogic")</option>
+                    <option value="11">$page.getLocalizedString("configuration.agent.create.agentType.websphere")</option>
+                    <option value="12">$page.getLocalizedString("configuration.agent.create.agentType.jboss")</option>
+                    <option value="13">$page.getLocalizedString("configuration.agent.create.agentType.oracle")</option>
+                    <option value="14">$page.getLocalizedString("configuration.agent.create.agentType.sap")</option>
+                    <option value="15">$page.getLocalizedString("configuration.agent.create.agentType.wsa")</option>
+                    <option value="16">$page.getLocalizedString("configuration.agent.create.agentType.wsc")</option>
+                    <option value="17">$page.getLocalizedString("configuration.agent.create.agentType.wsp")</option>
+                </select>
+            <p>
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.agent.create.partOfGroup")</p>
+            <input type="radio" id="yes" name="partgroup" onclick="partGroup();"/>$page.getLocalizedString("configuration.agent.create.yesOption")&nbsp;&nbsp;
+            <input type="radio" id="no" name="partgroup" onclick="partGroup();" checked="checked"/>$page.getLocalizedString("configuration.agent.create.noOption")<br><br>
+
+            <div id="optionYes" style="display:none">
+
+                #if ( $groups.empty )
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.agent.create.newgroup.title")</p>
+                #else
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.agent.create.newgroup.addNew")</p>
+                <select style="width:200px">
+                    #foreach ( $group in $groups )
+                    <option value="$group">$group</option>
+                    #end
+                </select>
+                #end
+
+                <div class="actions">#if ( !$groups.empty )<a id="deleteGroupLink">$page.getLocalizedString("configuration.agent.create.newgroup.delete")</a> | #{end}<a id="addGroupLink">$page.getLocalizedString("configuration.agent.create.newgroup.addNew")</a></div>
+
+                <div id="addGroupDialog" style="visibility:hidden">
+                    <div class="hd">$page.getLocalizedString("configuration.agent.create.newgroup.addNew.title")</div>
+                    <div class="bd">
+                        <p id="groupNameStatus" class="OrangeVerySmall" style="display:none">$page.getLocalizedString("configuration.agent.create.newgroup.addNew.validation")</p>
+
+                        <form method="POST" action="create.htm">
+                            <label for="groupName">$page.getLocalizedString("configuration.agent.create.newgroup.addNew.groupName"):</label><input id="groupName" type="text" name="groupName"/>
+                        </form>
+                    </div>
+                </div>
+
+                <br/>
+
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.agent.create.profile.agentProfile"):</p>
+                <select style="width:200px;"></select>
+
+                <div class="actions"><a id="deleteProfileLink">$page.getLocalizedString("configuration.agent.create.newgroup.delete")</a> | <a id="addProfileLink">$page.getLocalizedString("configuration.agent.create.newgroup.addNew")</a></div>
+
+                <div id="addProfileDialog" style="visibility:hidden">
+                    <div class="hd">$page.getLocalizedString("configuration.agent.create.profile.title")</div>
+                    <div class="bd">
+                        <p id="profileNameStatus" class="OrangeVerySmall" style="display:none">$page.getLocalizedString("configuration.agent.create.profile.validation")</p>
+
+                        <form method="POST" action="create.htm">
+                            <label for="profileName">$page.getLocalizedString("configuration.agent.create.profile.profileName"):</label><input id="profileName" type="text" name="profileName"/>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="bodywhite">
+            <div class="middletitle OrangeSmall">$page.getLocalizedString("configuration.agent.create.passwordTitle")</div>
+            <div class="OrangeVerySmall" id="allfields">* $page.getLocalizedString("configuration.agent.create.allFields")</div>
+            <br/>
+            <p>$page.getLocalizedString("configuration.agent.create.passwordLabel"): <input class="input" type="password" id="pass1" name="pass1"></p>
+            <p>$page.getLocalizedString("configuration.agent.create.confirm"): &nbsp;&nbsp; <input class="input" type="password" id="pass2" name="pass2"></p>
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.agent.create.agentServerURL")<br/>
+                <input class="input" type="text" id="url" name="url"></p>
+            <p class="blue links"><a class="pointer">$page.getLocalizedString("configuration.agent.create.checkURL")</a></p>
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.agent.create.agentNotificationURL"):<br/>
+                <input class="input" type="text" id="notificationUrl" name="notificationUrl"></p>
+            <p class="blue links"><a class="pointer">$page.getLocalizedString("configuration.agent.create.checkURL")</a></p>
+        </div>
+        <div class="subbody">
+            <button type="button" value="Cancel" onClick="javascript:cancel();">$page.getLocalizedString("configuration.agent.create.cancel")</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="btnAdd" type="button" value="addStore" onClick="javascript:confAgent();" disabled="disabled">$page.getLocalizedString("configuration.agent.create.configureAgent")</button>
+        </div>
+
+    </div>
+
+</div>

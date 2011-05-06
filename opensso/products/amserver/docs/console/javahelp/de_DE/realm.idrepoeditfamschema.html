@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sun Directory Server mit OpenSSO-Schema-Attributen - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepoeditfamschema"></a><h4>Sun Directory Server mit OpenSSO-Schema-Attributen</h4>
+<p><a name="indexterm-15"></a>Folgende Attribute werden zur Konfiguration von Directory Server mit dem OpenSSO-Schema verwendet:</p>
+
+<a name="gdosl"></a><h5>LDAP-Server</h5>
+<p>Geben Sie den Namen des LDAP-Servers ein, mit dem Sie eine Verbindung
+herstellen.   Das Format ist <tt>hostname.domainname:portnumber</tt>.</p><p>Wenn mehrere <tt>host:portnumber</tt>-Eintr&#228;ge vorhanden sind, wird eine Verbindung mit dem ersten Host
+der Liste hergestellt. Schl&#228;gt die Verbindung fehl, wird der n&#228;chste Hosteintrag verwendet.</p>
+
+<a name="gdors"></a><h5>LDAP-BIND-DN</h5>
+<p>Gibt den DN-Namen an, den OpenSSO zur Authentifizierung bei dem LDAP-Server verwendet,
+mit dem Sie zurzeit verbunden sind. Der Benutzer mit dem DN-Namen der
+Bindung sollte &#252;ber die Berechtigungen zum Hinzuf&#252;gen, &#196;ndern und L&#246;schen verf&#252;gen, die
+im Attribut <a href="realm.idrepoeditad.html#fyffb">LDAPv3 Plugin-unterst&#252;tzte Typen und Vorg&#228;nge</a> festgelegt sind.</p>
+
+<a name="gdorp"></a><h5>LDAP-BIND-Passwort</h5>
+<p>Gibt das DN-Passwort an, das OpenSSO zur Authentifizierung bei dem LDAP-Server verwendet,
+mit dem Sie zurzeit verbunden sind.</p>
+
+<a name="gdorv"></a><h5>LDAP-BIND-Passwort (Best&#228;tigen)</h5>
+<p> Best&#228;tigen Sie das Passwort.</p>
+
+<a name="gdosh"></a><h5>LDAP-Organisations-DN</h5>
+<p>Gibt den DN an, dem dieses Data Store-Repository zugeordnet ist. Dieser DN
+wird als Basis-DN f&#252;r alle in diesem Data Store ausgef&#252;hrten Vorg&#228;nge verwendet.
+</p>
+
+<a name="gdorr"></a><h5>LDA-SSL</h5>
+<p>Wenn aktiviert, stellt OpenSSO &#252;ber das HTTPS-Protokoll eine Verbindung mit dem prim&#228;ren
+Server her.</p>
+
+<a name="gdorl"></a><h5>LDAP-Verbindung Pool-Mindestgr&#246;&#223;e</h5>
+<p>Gibt die anf&#228;ngliche Anzahl an Verbindungen im Verbindungspool an. Wenn Sie einen
+Verbindungspool verwenden, m&#252;ssen Sie nicht jedes Mal eine neue Verbindung herstellen.</p>
+
+<a name="gdosj"></a><h5>Maximalgr&#246;&#223;e des LDAP-Verbindungs-Pools</h5>
+<p>Gibt die maximale Anzahl der zul&#228;ssigen Verbindungen an.</p>
+
+<a name="gdosp"></a><h5>Maximale Ergebnisse aus Suchlauf</h5>
+<p>Gibt die maximale Anzahl der bei einem Suchvorgang zur&#252;ckgegebenen Eintr&#228;ge an. Wenn
+die Grenze erreicht ist, gibt Directory Server alle Eintr&#228;ge zur&#252;ck, die mit
+der Suchanforderung &#252;bereinstimmen.</p>
+
+<a name="gdori"></a><h5>Timeout f&#252;r Suche</h5>
+<p>Gibt die maximal zul&#228;ssige Zeit f&#252;r eine Suchanforderung an. Wenn die Grenze
+erreicht ist, gibt Directory Server alle Eintr&#228;ge zur&#252;ck, die mit der Suchanforderung
+&#252;bereinstimmen.</p>
+
+<a name="gdosg"></a><h5>LDAP richtet sich nach Bezug</h5>
+<p>Wenn aktiviert, werden Bez&#252;ge zu anderen LDAP-Servern automatisch verfolgt.</p>
+
+<a name="gdorh"></a><h5>LDAPv3 Repository Plugin-Klassenname</h5>
+<p>Gibt den Speicherort der Klassendatei an, die das LDAPv3-Repository implementiert.</p>
+
+<a name="gdorx"></a><h5>Name-Mapping-Attribut</h5>
+<p>Aktiviert allgemeine Attribute, von denen dem Framework bekannt ist, dass sie dem
+nativen Data Store zugeordnet sind. Beispiel: F&#252;r das Attribut  <tt>inetUserStatus </tt>, das
+das Framework zur Ermittlung des Benutzerstatus verwendet, verwendet der native Data Store
+m&#246;glicherweise das Attribut <tt>userStatus</tt>. Bei den Attributdefinitionen muss die Gro&#223;-/Kleinschreibung beachtet werden.</p>
+
+<a name="gdose"></a><h5>LDAPv3 Plugin-unterst&#252;tzte Typen und Vorg&#228;nge</h5>
+<p>Gibt die Vorg&#228;nge an, die f&#252;r diesen LDAP-Server zugelassen sind. Die Standardvorg&#228;nge
+sind die einzigen Vorg&#228;nge, die von diesem LDAPv3-Repository-Plugin unterst&#252;tzt werden. Folgende Vorg&#228;nge
+werden vom LDAPv3-Repository-Plugin unterst&#252;tzt:</p>
+<ul><li><p>Gefilterte Rolle: Lesen, Erstellen, Bearbeiten, L&#246;schen</p></li>
+<li><p>Gruppe: Lesen, Erstellen, Bearbeiten, L&#246;schen</p></li>
+<li><p>Bereich: Lesen, Erstellen, Bearbeiten, L&#246;schen, Dienst</p></li>
+<li><p>Benutzer: Lesen, Erstellen, Bearbeiten, L&#246;schen, Dienst</p></li></ul>
+<p>Basierend auf Ihren LDAP-Servereinstellungen und den entsprechenden Aufgaben k&#246;nnen Sie Berechtigungen aus
+der obigen Liste entfernen, jedoch keine weiteren Berechtigungen hinzuf&#252;gen.</p><p>Wenn das konfigurierte LDAPv3-Repository-Plugin auf eine Instanz von Sun Directory Server verweist,
+k&#246;nnen Berechtigungen f&#252;r den Typ <tt>role</tt> hinzugef&#252;gt werden.  Anderenfalls kann diese
+Berechtigung nicht hinzugef&#252;gt werden, da Rollen von anderen Data Stores m&#246;glicherweise nicht
+unterst&#252;tzt werden. Die Berechtigungen f&#252;r den Typ "role" lauten wie folgt:</p>
+<ul><li><p>Rolle: Lesen, Erstellen, Bearbeiten, L&#246;schen </p></li></ul>
+<p>Wenn <tt>user</tt> ein unterst&#252;tzer Typ f&#252;r das LDAPv3-Repository ist, sind die Vorg&#228;nge
+Lesen, Erstellen, Bearbeiten und L&#246;schen f&#252;r diesen Benutzer m&#246;glich. Anders ausgedr&#252;ckt: Wenn
+<tt>user</tt> ein unterst&#252;tzter Typ ist, k&#246;nnen Sie dank der Vorg&#228;nge zum Lesen,
+Bearbeiten, Erstellen und L&#246;schen Benutzereintr&#228;ge im Identit&#228;ts-Repository lesen, bearbeiten, erstellen und l&#246;schen.
+&#220;ber den Vorgang <tt>user=service</tt> k&#246;nnen OpenSSO-Dienste auf Attribute in Benutzereintr&#228;gen zugreifen. Zudem
+darf der Benutzer auf die dynamischen Dienstattribute zugreifen, wenn der Dienst dem
+Bereich bzw. der Rolle zugewiesen ist, der der Benutzer zugeh&#246;rig ist. </p><p>Der Benutzer darf auch die Benutzerattribute s&#228;mtlicher zugewiesener Dienste verwalten. Wenn der
+Vorgang des Benutzers <tt>service</tt> lautet (<tt>user=service</tt>), gibt dies an, dass s&#228;mtliche dienstbezogene
+Vorg&#228;nge unterst&#252;tzt werden. Diese Vorg&#228;nge sind <tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes</tt> und <tt>modifyService.</tt></p>
+
+<a name="gdoqv"></a><h5>LDAPv3-Plugin Suchbereich</h5>
+<p>Definiert den Bereich, der nach LDAPv3-Plugin-Eintr&#228;gen durchsucht wird. Der Bereich muss einer
+der folgenden Werte sein:</p>
+<ul><li><p>SCOPE_BASE &#8211; durchsucht ausschlie&#223;lich den Basis-DN.</p></li>
+<li><p>SCOPE_ONE &#8211; durchsucht ausschlie&#223;lich die Eintr&#228;ge unter dem Basis-DN.</p></li>
+<li><p>SCOPE_SUB (Standard) &#8211; durchsucht den Basis-DN und alle Eintr&#228;ge in seiner Unterstruktur.</p></li></ul>
+
+
+<a name="gguen"></a><h5>Suchattribut (LDAP-Benutzer)</h5>
+<p>&#220;ber dieses Feld wird der Attributtyp f&#252;r die  Suche nach einem
+Benutzer definiert.   Wenn der DN des Benutzers beispielsweise <tt>uid=user1, ou=people, dc=example, dc=com</tt> lautet,
+dann geben Sie in diesem Feld <tt>uid</tt> in an.  </p>
+
+<a name="gdoru"></a><h5>Suchfilter (LDAP-Benutzer)</h5>
+<p>Gibt den Suchfilter an, der bei der Suche nach Benutzereintr&#228;gen verwendet wird.</p>
+
+<a name="gdorb"></a><h5>LDAP-Benutzerobjektklasse</h5>
+<p>Gibt die Objektklassen eines Benutzers an. Bei der Erstellung eines Benutzers wird
+diese Liste mit Benutzerobjektklassen der Attributliste des Benutzers hinzugef&#252;gt.</p>
+
+<a name="gdoro"></a><h5>LDAP-Benutzerattribute</h5>
+<p>Legt die einem Benutzer zugeordnete Attributliste fest. Das Lesen und Schreiben von
+Benutzerattributen, die sich nicht in dieser Liste befinden, ist unzul&#228;ssig. Bei den
+Attributen muss die Gro&#223;-/Kleinschreibung beachtet werden. Die Objektklassen und das Attributschema m&#252;ssen
+in Directory Server definiert sein, bevor Sie sie in diesem Attribut festlegen.</p>
+
+<a name="gdosa"></a><h5>Benutzerattributzuordnung erstellen</h5>
+<p>Gibt an, welche Attribute bei der Erstellung eines Benutzers erforderlich sind. Bei
+diesem Attribut wird folgende Syntax verwendet:</p><p><tt>DestinationAttributeName=SourceAttributeName</tt></p><p>Wenn der Name des Quellattributs fehlt, ist die Benutzer-ID (<tt>uid</tt>) der Standard.
+Beispiel:</p>cn sn=givenName<p>Zur Erstellung eines Benutzerprofils ist sowohl <tt>cn</tt> als auch <tt>sn</tt> erforderlich. F&#252;r
+<tt>cn</tt> wird der Wert des Attributs namens <tt>uid</tt> verwendet und f&#252;r <tt> sn</tt>
+wird der Wert des Attributs namens <tt>givenName</tt> verwendet.</p>
+
+<a name="gdora"></a><h5>Attributname des Benutzerstatus</h5>
+<p>Gibt den Attributnamen zur Angabe des Status des Benutzers an. </p>
+
+<a name="gdorq"></a><h5>Suchattribut (LDAP-Gruppen)</h5>
+<p>&#220;ber dieses Attribut wird die Art des Attributs festgelegt, nach dem eine
+Suche nach einer Gruppe durchgef&#252;hrt wird. Der Standardwert ist <tt>cn</tt>.</p>
+
+<a name="gdoqy"></a><h5>Suchfilter (LDAP-Gruppen)</h5>
+<p>Gibt den Suchfilter an, der bei der Suche nach Gruppeneintr&#228;gen verwendet wird.
+Der Standardwert ist <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="gdoqr"></a><h5>Namensattribut f&#252;r LDAP-Gruppen-Container</h5>
+<p>Gibt das Namensattribut eines Gruppen-Containers an, falls die Gruppe einem Container zugeordnet
+ist. Anderenfalls bleibt dieses Attribut leer. Beispiel: Wenn sich der Gruppen-DN <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt>
+in <tt>ou=groups</tt> befindet, lautet das Namensattribut des Gruppen-Containers <tt>ou</tt>.</p>
+
+<a name="gdorg"></a><h5>LDAP-Gruppen-Containerwert</h5>
+<p>Gibt den Wert des Gruppen-Containers an. Beispiel: Wenn sich der Gruppe-DN <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt>
+im Container <tt>ou=groups</tt> befindet, lautet der Gruppen-Containerwert <tt>groups</tt>.</p>
+
+<a name="gdoqx"></a><h5>LDAP-Gruppenobjektklassen</h5>
+<p>Gibt die Objektklassen f&#252;r Gruppen an. Bei der Erstellung einer Gruppe wird
+diese Liste mit Gruppenobjektklassen der Attributliste der Gruppe hinzugef&#252;gt.</p>
+
+<a name="gdoty"></a><h5>LDAP-Gruppenattribute</h5>
+<p>Legt die einer Gruppe zugeordnete Attributliste fest. Das Lesen und Schreiben von
+Gruppenattributen, die sich nicht in dieser Liste befinden, ist unzul&#228;ssig. Bei den
+Attributen muss die Gro&#223;-/Kleinschreibung beachtet werden. Die Objektklassen und das Attributschema m&#252;ssen
+in Directory Server definiert sein, bevor Sie sie in diesem Attribut festlegen.</p>
+
+<a name="gdotx"></a><h5>Attributname f&#252;r Gruppenmitgliedschaft</h5>
+<p>Gibt den Namen des Attributs an, dessen Wert eine Liste mit den
+Namen aller Gruppen ist, denen der DN zugeordnet ist. Der Standardwert ist
+<tt>memberOf</tt>.</p>
+
+<a name="gdouc"></a><h5>Attributname f&#252;r einzelnes Mitglied</h5>
+<p>Gibt den Namen des Attributs an, dessen Wert ein DN ist, der
+dieser Gruppe zugeordnet ist. Der Standardwert ist <tt>uniqueMember</tt>.</p>
+
+<a name="gdotd"></a><h5>Attributsname des Gruppenmitglieds-URL</h5>
+<p>Gibt den Namen des Attributs an, dessen Wert ein LDAP-URL ist, der
+zu Mitgliedern dieser Gruppe aufgel&#246;st wird. Der Standardwert ist <tt>memberUrl</tt>.</p>
+
+<a name="gdotr"></a><h5>Suchattribut (LDAP-Rollen)</h5>
+<p>Legt den bei der Suche nach einer Rolle verwendeten Attributtyp fest. Der
+Standardwert ist <tt>cn</tt>.</p>
+
+<a name="gdost"></a><h5>LDAP-Rollensuchfilter</h5>
+<p>Definiert den Filter f&#252;r die Suche nach einer Rolle. Diesem Feld wird
+das Suchattribut (LDAP-Rolle) vorangestellt. Es bildet den eigentlichen Rollen-Suchfilter.</p><p>Beispiel: Wenn das Suchattribut (LDAP-Rolle) den Wert <tt>CN</tt> aufweist und  der
+Suchfilter (LDAP-Rolle) <tt>(objectClass=sunIdentityServerDevice) </tt> lautet, ist der tats&#228;chliche Benutzersuchfilter: <tt>(&#38;(cn=&#42;)(objectClass=sunIdentityServ erDevice))</tt></p>
+
+<a name="gdotq"></a><h5>LDAP-Rollenobjektklasse</h5>
+<p>Gibt die Objektklassen f&#252;r Rollen an.  Bei der Erstellung einer Rolle
+wird diese Liste mit Benutzerobjektklassen der Attributliste der Rolle hinzugef&#252;gt</p>
+
+<a name="gdote"></a><h5>LDAP-Rollenattribute</h5>
+<p>Legt die einer Rolle zugeordnete Attributliste fest.  Das Lesen und Schreiben
+von Agentenattributen, die sich nicht in dieser Liste befinden, ist unzul&#228;ssig. Bei
+den Attributen muss die Gro&#223;-/Kleinschreibung beachtet werden. Die Objektklassen und das Attributschema
+m&#252;ssen in Directory Server definiert sein, bevor Sie sie in diesem Attribut
+festlegen.</p>
+
+<a name="ggtnw"></a><h5>LDAP-Filterrollen-Suchattribut</h5>
+<p>Legt den bei der Suche nach einer Filterrolle verwendeten Attributtyp fest. 
+Der Standardwert ist <tt>cn</tt>.</p>
+
+<a name="ggtrt"></a><h5>LDAP-Filterrollen- Suchfilter</h5>
+<p>Definiert den Filter f&#252;r die Suche nach einer gefilterten Rolle. Diesem Feld
+wird das Suchattribut (LDAP-Filterrolle) vorangestellt. Es bildet den eigentlichen Suchfilter f&#252;r gefilterte
+Rollen.</p><p>Beispiel: Wenn das Suchattribut (LDAP-Filterolle) den Wert <tt>CN</tt> aufweist und der Suchfilter
+(LDAP-Filterrolle) <tt>(objectClass=sunIdentityServerDevice) </tt> lautet, ist der tats&#228;chliche Benutzersuchfilter: <tt>(&#38;(cn=&#42;)(objectClass=sunIdentityServ erDevice))</tt></p>
+
+<a name="ggtoc"></a><h5>LDAP-Filterrollenobjektklasse</h5>
+<p>Gibt die Objektklassen f&#252;r gefilterte Rollen an.   Bei der Erstellung
+einer gefilterten Rolle wird diese Liste mit Benutzerobjektklassen der Attributliste der gefilterten
+Rolle hinzugef&#252;gt</p>
+
+<a name="ggtmu"></a><h5>LDAP-Filterrollenattribute</h5>
+<p>Legt die einer gefilterten Rolle zugeordnete Attributliste fest.   Das Lesen
+und Schreiben von Agentenattributen, die sich nicht in dieser Liste befinden, ist
+unzul&#228;ssig. Bei den Attributen muss die Gro&#223;-/Kleinschreibung beachtet werden. Die Objektklassen und
+das Attributschema m&#252;ssen in Directory Server definiert sein, bevor Sie sie in
+diesem Attribut festlegen.</p>
+
+<a name="gdoue"></a><h5>Namensattribut f&#252;r LDAP-Personen-Container</h5>
+<p>Gibt das Namensattribut des Personen-Containers an, falls der Benutzer einem Personen-Container zugeordnet
+ist. Wenn sich der Benutzer nicht in einem Personen-Container befindet, bleibt das
+Feld leer.</p>
+
+<a name="gdotl"></a><h5>LDAP-Personen-Containerwert</h5>
+<p>Gibt den Wert des Personen-Containers an. Der Standardwert ist <tt>people</tt>.</p>
+
+<a name="gdosy"></a><h5>Authentifizierbare Identity-Typen</h5>
+<p>Gibt an, dass dieser Data Store Benutzer- und/oder Agenten-Identity-Typen authentifizieren kann, wenn
+das Authentfizierungsmodul f&#252;r den Bereich auf "Data Store" eingestellt ist.</p>
+
+<a name="gdotf"></a><h5>Permanente Suchbasis-DN</h5>
+<p>Legt den Basis-DN f&#252;r die permanente Suche fest. Einige LDAPv3-Server unterst&#252;tzen die
+permanente Suche nur auf Root-Suffix-Ebene.</p>
+
+<a name="gdotu"></a><h5>Persistenter Suchfilter</h5>
+<p>Definiert den Filter, der spezifische &#196;nderungen an Directory Server-Eintr&#228;gen zur&#252;ckgibt. Der Data
+Store erh&#228;lt lediglich die &#196;nderungen, die dem definierten Filter entsprechen.</p>
+
+<a name="ggueg"></a><h5>Bereich f&#252;r best&#228;ndige Suche</h5>
+<p>Gibt den Bereich an, der f&#252;r die best&#228;ndige Suche verwendet werden soll.
+Der Bereich muss einer der folgenden Werte sein:</p>
+<ul><li><p>SCOPE_BASE &#8211; durchsucht ausschlie&#223;lich den Basis-DN.</p></li>
+<li><p>SCOPE_ONE &#8211; durchsucht ausschlie&#223;lich die Eintr&#228;ge unter dem Basis-DN.</p></li>
+<li><p>SCOPE_SUB (Standard) &#8211; durchsucht den Basis-DN und alle Eintr&#228;ge in seiner Unterstruktur.</p></li></ul>
+
+
+<a name="gdoub"></a><h5>Durchgehende maximale Leerlaufzeit bei Suche bevor ein Neustart durchgef&#252;hrt wird</h5>
+<p>Legt die maximale Leerlaufzeit fest, bevor die permanente Suche neu gestartet wird.
+The value must be great than 1. Values less than or equal
+to 1 will restart the search irrespective of the idle time of
+the connection.</p><p>Ein besonderer Fall sind OpenSSO-Implementierungen mit Lastenausgleich. Manche Lastenausgleichsysteme werden nach einer
+gewissen Leerlaufzeit wegen Zeit&#252;berschreitung beendet. In diesem Fall sollten Sie Durchgehende maximale
+Leerlaufzeit bei Suche bevor ein Neustart durchgef&#252;hrt wird auf einen geringeren Wert
+setzen als den f&#252;r den Lastenausgleich angegebenen Zeit&#252;berschreitungswert.</p>
+
+<a name="gdoua"></a><h5>Maximale Anzahl der Versuche nach einem Fehler</h5>
+<p>Legt die maximale Anzahl der Wiederholungsversuche f&#252;r permanente Suchvorg&#228;nge fest, wenn einer
+der in LDAPException-Fehlercodes beim Wiederholen auf angegebenen Fehler auftritt.</p>
+
+<a name="gdotg"></a><h5>Zeit zwischen zwei Versuchen</h5>
+<p>Gibt die Zeit zwischen den einzelnen Wiederholungsversuchen an. Dieses Attribut gilt nur
+f&#252;r permanente Suchverbindungen.</p>
+
+<a name="gdoti"></a><h5>LDAPException-Fehlercodes beim Wiederholen auf</h5>
+<p>Legt die Fehlercodes fest, bei denen ein permanenter Suchvorgang wiederholt wird. Dieses
+Attribut gilt nur f&#252;r die permanente Suche (nicht f&#252;r die anderen LDAP-Vorg&#228;nge).</p>
+
+<a name="gdosw"></a><h5>Zwischenspeicherung</h5>
+<p>Wenn diese Option aktiviert ist, kann OpenSSO aus dem Data Store abgerufene
+Daten zwischenspeichern.</p>
+
+<a name="gdotn"></a><h5>Maximale Lebensdauer zwischengespeicherter Elemente</h5>
+<p>Gibt an, wie lange Daten maximal im Cache verbleiben, bevor sie entfernt
+werden. Die Werte werden in Sekunden definiert.</p>
+
+<a name="gdouf"></a><h5>Maximale Cache-Gr&#246;&#223;e</h5>
+<p>Gibt die maximale Gr&#246;&#223;e des Cache an. Je h&#246;her der Wert, desto
+mehr Daten k&#246;nnen gespeichert werden (hierf&#252;r ist jedoch auch entsprechend mehr Speicher
+erforderlich). Die Werte werden in Byte definiert.</p>
+<br/>
+
+</body>
+</html>

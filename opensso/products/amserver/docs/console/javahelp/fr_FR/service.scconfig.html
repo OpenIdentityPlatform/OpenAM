@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs de configuration - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="service.scconfig"></a><h3>Attributs de configuration</h3><p><a name="indexterm-164"></a>La page Configuration permet aux administrateurs de g&#233;rer la valeur des attributs
+des services offerts par OpenSSO. Les types d'attributs comprenant un service OpenSSO
+sont les suivants&#160;:</p><p><b>Global</b> &#8211; Les attributs globaux s'appliquent &#224; l'ensemble de la configuration OpenSSO.
+Ils ne peuvent &#234;tre appliqu&#233;s aux utilisateurs, r&#244;les ou domaines, leur but
+&#233;tant de personnaliser OpenSSO.</p><p><b>Domaine</b> &#8211; Les attributs de domaine ne sont attribu&#233;s qu'aux domaines. Aucune
+classe d'objet n'est associ&#233;e aux attributs de domaine. Par exemple, les attributs
+mentionn&#233;s dans les services d'authentification sont d&#233;finis en tant qu'attributs de domaine
+car l'authentification est effectu&#233;e au niveau du domaine plut&#244;t qu'au niveau d'une
+sous-arborescence ou d'un utilisateur.</p><p><b>Dynamique</b> - L'attribut s'applique &#224; un r&#244;le ou un domaine configur&#233; OpenSSO.
+Lorsque le r&#244;le est assign&#233; &#224; un utilisateur ou qu'un utilisateur est
+cr&#233;&#233; dans un domaine, l'attribut dynamique devient alors une caract&#233;ristique de l'utilisateur.</p><p><b>Utilisateur</b> - Appliqu&#233; directement &#224; chaque utilisateur. Ces attributs ne sont pas
+h&#233;rit&#233;s d'un r&#244;le ou d'un domaine et ils sont g&#233;n&#233;ralement diff&#233;rents pour
+chaque utilisateur.</p><p>Les attributs de configuration que vous pouvez modifier sont&#160;:</p>
+<ul><li><p><a href="service.scconfigauth.html">Authentification</a></p></li>
+<li><p><a href="service.scconfigconsole.html">Propri&#233;t&#233;s de la console</a></p></li>
+<li><p><a href="servic.scconfigglobal.html">Propri&#233;t&#233;s g&#233;n&#233;rales</a></p></li>
+<li><p><a href="service.scfonfigsystem.html">Propri&#233;t&#233;s du syst&#232;me</a></p></li>
+<li><p><a href="service.serversite.html">Serveurs et Sites</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

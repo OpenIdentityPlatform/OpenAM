@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: status.xhtml,v 1.6 2009/08/10 19:31:28 farble1670 Exp $
+
+-->
+
+<span xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ice="http://www.icesoft.com/icefaces/component">
+    <ice:panelGrid
+        styleClass="status"
+        columnClasses="status-left,status-links"
+        columns="2">
+        <ice:panelGrid
+            columns="3"
+            columnClasses="status-server,status-version,status-user">
+            <ice:panelGroup>
+                <ice:outputLabel
+                    for="status-server"
+                    value="#{resources['status.server']}"/>
+                <ice:outputText
+                    id="status-server"
+                    value="#{statusBean.serverName}"/>
+            </ice:panelGroup>
+            <ice:panelGroup>
+                <ice:outputLabel
+                    for="status-version"
+                    value="#{resources['status.version']}"/>
+                <ice:outputText
+                    id="status-version"
+                    value="#{statusBean.version}"/>
+            </ice:panelGroup>
+            <ice:panelGroup>
+                <ice:outputLabel
+                    for="status-user"
+                    value="#{resources['status.user']}"/>
+                <ice:outputText
+                    id="status-user"
+                    value="#{statusBean.shortUserName}"/>
+            </ice:panelGroup>
+        </ice:panelGrid>
+        <ice:panelGrid
+            columnClasses="status-standard-console,status-help,status-logout"
+            columns="3">
+            <ice:outputLink
+                value="#{statusBean.standardConsoleLink}">
+                <ice:outputLabel
+                    value="#{resources['status.standardConsole']}"/>
+            </ice:outputLink>
+            <ice:outputLink
+                target="blank"
+                value="#{statusBean.helpLink}">
+                <ice:outputLabel
+                    value="#{resources['status.help']}"/>
+            </ice:outputLink>
+            <ice:outputLink
+                value="#{statusBean.logoutLink}">
+                <ice:outputLabel
+                    value="#{resources['status.logout']}"/>
+            </ice:outputLink>
+        </ice:panelGrid>
+    </ice:panelGrid>
+</span>

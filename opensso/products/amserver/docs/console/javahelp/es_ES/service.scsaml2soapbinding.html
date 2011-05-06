@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Enlace SOAP de SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>Enlace SOAP de SAMLv2</h4>
+<p>El servicio de enlace SOAP de SAMLv2 proporciona intercambio basado en SOAP
+del mensaje de solicitud y respuesta de SAMLv2 entre un cliente y
+el servidor de OpenSSO. Las solicitudes recibidas se delegan al controlador de
+solicitud para su posterior procesamiento. La clave del controlador de solicitudes y
+del metaalias se encuentra en la URL del servicio de enlace SOAP.
+En el servicio de enlace SOAP de SAMLv2 se almacena una asignaci&#243;n
+del metaalias y el controlador de solicitudes, que se puede leer desde
+el almac&#233;n de configuraci&#243;n de OpenSSO. </p>
+
+<a name="ggokv"></a><h5>Lista de administradores de solicitudes</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>La RequestHandlerList es una lista de las entradas de parejas clave/valor que
+contiene la asignaci&#243;n del alias meta a la implementaci&#243;n de RequestHandler. Este
+atributo debe definirse si se va a configurar un servidor de OpenSSO
+8.0 para que funcione como un punto de decisi&#243;n de directivas (PDP,
+Policy Decision Point). </p><p>La <i>Clave</i> es el alias meta del Punto de decisi&#243;n de directiva,
+mientras que la <i>Clase</i> es el nombre de clase Java, que es
+la implementaci&#243;n de la Interfaz RequestHandler que puede procesar solicitudes XACML. 
+</p><p>Por ejemplo, si el alias meta del Punto de decisi&#243;n de directiva
+XACML es <tt>/pdp </tt>y la implementaci&#243;n de la interfaz es <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler </tt>, la clave
+deber&#237;a definirse en <tt>/pdp</tt> y la clase en <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler </tt>. </p>
+<br/>
+
+</body>
+</html>

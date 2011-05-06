@@ -1,0 +1,173 @@
+<EntityConfig xmlns="urn:sun:fm:SAML:2.0:entityconfig" xmlns:fm="urn:sun:fm:SAML:2.0:entityconfig" hosted="1" entityID="FEDLET_ENTITY_ID">
+    <SPSSOConfig metaAlias="/sp">
+        <Attribute name="description">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="signingCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="encryptionCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthOn">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="basicAuthUser">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthPassword">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="autofedEnabled">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="autofedAttribute">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="transientUser">
+            <Value>anonymous</Value>
+        </Attribute>
+        <Attribute name="spAdapter">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="spAdapterEnv">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="fedletAdapter">
+            <Value>com.sun.identity.saml2.plugins.DefaultFedletAdapter</Value>
+        </Attribute>
+        <Attribute name="fedletAdapterEnv">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="spAccountMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultLibrarySPAccountMapper</Value>
+        </Attribute>
+        <Attribute name="spAttributeMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper</Value>
+        </Attribute>
+        <Attribute name="spAuthncontextMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper</Value>
+        </Attribute>
+        <Attribute name="spAuthncontextClassrefMapping">
+            <Value>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport|0|default</Value>
+        </Attribute>
+        <Attribute name="spAuthncontextComparisonType">
+           <Value>exact</Value>
+        </Attribute>
+        <Attribute name="attributeMap">
+           <Value>*=*</Value>
+        </Attribute>
+        <Attribute name="saml2AuthModuleName">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="localAuthURL">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="intermediateUrl">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="defaultRelayState">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="appLogoutUrl">
+           <Value>FEDLET_PROTOCOL://FEDLET_HOST:FEDLET_PORT/FEDLET_DEPLOY_URI/logout</Value>
+       </Attribute>
+       <Attribute name="assertionTimeSkew">
+           <Value>300</Value>
+       </Attribute>
+       <Attribute name="wantAttributeEncrypted">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantAssertionEncrypted">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantNameIDEncrypted">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantPOSTResponseSigned">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantArtifactResponseSigned">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantLogoutRequestSigned">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantLogoutResponseSigned">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantMNIRequestSigned">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="wantMNIResponseSigned">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="cotlist">
+           <Value>fedletcot</Value></Attribute>
+       <Attribute name="saeAppSecretList">
+       </Attribute>
+       <Attribute name="saeSPUrl">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="saeSPLogoutUrl">
+       </Attribute>
+       <Attribute name="ECPRequestIDPListFinderImpl">
+           <Value>com.sun.identity.saml2.plugins.ECPIDPFinder</Value>
+       </Attribute>
+       <Attribute name="ECPRequestIDPList">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="enableIDPProxy">
+           <Value>false</Value>
+       </Attribute>
+       <Attribute name="idpProxyList">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="idpProxyCount">
+           <Value>0</Value>
+       </Attribute>
+       <Attribute name="useIntroductionForIDPProxy">
+           <Value>false</Value>
+       </Attribute>
+    </SPSSOConfig>
+    <AttributeQueryConfig metaAlias="/attrQuery">
+        <Attribute name="signingCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="encryptionCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantNameIDEncrypted">
+           <Value></Value>
+        </Attribute>
+        <Attribute name="cotlist">
+           <Value>fedletcot</Value>
+        </Attribute>
+    </AttributeQueryConfig>
+    <XACMLAuthzDecisionQueryConfig metaAlias="/pep">
+        <Attribute name="signingCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="encryptionCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthOn">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="basicAuthUser">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthPassword">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantXACMLAuthzDecisionResponseSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantAssertionEncrypted">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="cotlist">
+            <Value>fedletcot</Value>
+        </Attribute>
+   </XACMLAuthzDecisionQueryConfig>
+</EntityConfig>

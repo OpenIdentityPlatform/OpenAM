@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>主体 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>主体</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a><b>主体</b>定义了策略所影响的用户或用户集合（例如，组或具有特定角色的用户）。主体的常规规则是：只有当用户至少是策略中的其中一个主体的成员时，才能够应用策略。默认主体包括：</p><dl><dt>OpenSSO 身份主体</dt>
+<dd><p>此主体表明可以将在“领域主体”选项卡下创建和管理的身份作为主体的成员添加。</p></dd>
+<dt>验证的用户</dt>
+<dd><p>此主体类型表明任何具有有效 SSO 令牌的用户都是此主体的成员。</p><p>所有通过验证的用户都是该“主体”的成员，即使他们已在其他领域（而不是定义策略所在的组织）中进行了验证。如果资源拥有者要开放一些资源（为其他组织的用户所管理的资源）的访问权时，这将非常有用。如果您要限制某个特定组织的成员对受保护资源的访问权，请使用“组织”主体。</p></dd>
+<dt>Web 服务客户机</dt>
+<dd><p>此主体类型表明如果 SSO 令牌中包含的主体的 DN 与此主体的任意选定值匹配，则由该 SSO 令牌标识的 Web 服务客户机 (WSC) 是此主体的成员。有效值为本地 JKS 密钥库中的可信赖证书（对应于可信赖 WSC 证书）的 DN。 此主体取决于“Liberty Web 服务框架”，并且只能由“Liberty 服务提供者”用来对 WSC 进行授权。 </p><p>请确保将此“主体”添加到策略之前，您已经创建了密钥库。 您可以从以下位置找到有关于设置密钥库的信息：</p><p><tt></tt><i>OpenSSO-base</i><tt></tt><tt>/SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>通过在领域的<a href="service.scpolicy.html">策略配置</a>服务中选择以下附加主体，便可使用它们：</p><dl><dt>OpenSSO 角色</dt>
+<dd><p>此主体类型表明任何使用 OpenSSO 角色的成员都是此主体的成员。OpenSSO 角色使用在传统模式中运行的 OpenSSO 创建。</p></dd>
+<dt>LDAP 组</dt>
+<dd><p>此主体类型表明 LDAP 组的任何成员都是此主体的成员。</p></dd>
+<dt>LDAP 角色</dt>
+<dd><p>此主体类型表明任何使用 LDAP 角色的成员都是此主体的成员。“LDAP 角色”是使用 Directory Server 角色功能的任意角色定义。这些角色具有通过角色定义授权的对象类。可以在<a href="service.scpolicy.html">策略配置</a>服务中修改“LDAP 角色搜索”过滤器以缩小范围并提高性能。</p></dd>
+<dt>LDAP 用户</dt>
+<dd><p>此主体类型表明任何 LDAP 用户都是此主体的成员。</p></dd>
+<dt>组织</dt>
+<dd><p>此主体类型表明领域的所有成员均为该主体的成员。</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

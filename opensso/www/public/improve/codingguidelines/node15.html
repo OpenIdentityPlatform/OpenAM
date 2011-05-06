@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Continuation lines</TITLE>
+<META NAME="description" CONTENT="Continuation lines">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="paper.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html189"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html187"
+  HREF="paper.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html181"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html190"
+  HREF="node16.html">Comments</A>
+<B> Up:</B> <A NAME="tex2html188"
+  HREF="paper.html">Coding Guidelines for OpenSSO</A>
+<B> Previous:</B> <A NAME="tex2html182"
+  HREF="node14.html">Indentation</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00060000000000000000">
+Continuation lines</A>
+</H1>
+Lines should be limited to 80 columns (but not necessarily 80 bytes, for non-English languages). Lines longer than 80 columns should be broken into one or more continuation lines, as needed. All the continuation lines should be aligned, and indented from the first line of the statement. The amount of the indentation depends on the type of statement.
+
+<P>
+If the statement must be broken in the middle of a parenthesized expression, such as for compound statements, or for the parameter list in a method invocation or declaration, the next line should be indented one level. For such statements, the curly opening brace should appear by itself on a new line.
+
+<P>
+Examples:
+<PRE>
+if (long_logical_test_1 ||
+    long_logical_test_2 ||
+    long_logical_test_3)
+{
+    statements;
+}
+
+function(long_expression1,
+    long_expression2,
+    long_expression3,
+    long_expression4,
+    long_expression5,
+    long_expression6
+);
+</PRE>
+
+<P>
+A continuation line should never start with a binary operator. Never break a line where normally no white space appears, such as between a method name and its opening parenthesis, or between an array name and its opening square bracket. Examples:
+
+<P>
+<PRE>
+// WRONG
+while (long_expression1 || long_expression2
+    || long_expression3)
+{
+
+} 
+
+// RIGHT
+while (long_expression1 || long_expression2 ||
+    long_expression3)
+{
+
+}
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

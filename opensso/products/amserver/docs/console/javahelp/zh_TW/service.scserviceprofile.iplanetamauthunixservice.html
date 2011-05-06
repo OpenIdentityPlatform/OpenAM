@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>UNIX  - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthunixservice"></a><h4>UNIX </h4>
+<p><a name="indexterm-182"></a>此 Solaris 特有模組允許利用使用者的 UNIX 識別及密碼來進行認證。如果修改了任何 UNIX 認證屬性，則必須重新啟動 OpenSSO 與 amunixd 輔助程式。UNIX 認證屬性為全域及範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwbsy">配置連接埠</a></p></li>
+<li><p><a href="#fwbqv">認證連接埠</a></p></li>
+<li><p><a href="#fwbrv">逾時</a></p></li>
+<li><p><a href="#fwbls">執行緒</a></p></li>
+<li><p><a href="#fwbra">認證級別</a></p></li>
+<li><p><a href="#fwbky">PAM 服務名稱</a></p></li></ul>
+
+
+<a name="fwbsy"></a><h5>配置連接埠</h5>
+<p>此屬性指定 UNIX 輔助程式在啟動時將「偵聽」哪一個連接埠，以取得 UNIX 輔助程式認證連接埠、UNIX 輔助程式逾時及 UNIX 輔助程式執行緒屬性中包含的配置資訊。預設值為 58946。</p>
+
+<a name="fwbqv"></a><h5>認證連接埠</h5>
+<p>此屬性指定 UNIX 輔助程式在配置之後將「偵聽」哪一個連接埠的認證請求。預設連接埠為 57946。</p>
+
+<a name="fwbrv"></a><h5>逾時</h5>
+<p>此屬性指定使用者必須完成認證所用的時間 (分鐘)。如果使用者認證超過分配的時間，則認證將自動失敗。預設時間設定為 3 分鐘。</p>
+
+<a name="fwbls"></a><h5>執行緒</h5>
+<p>此屬性指定允許同時進行 UNIX 認證階段作業的最大數目。如果在給定時間達到最大數目，則只有釋放某個階段作業後才允許進行後續認證嘗試。預設值設定為 5。</p>
+
+<a name="fwbra"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示信任認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+
+<a name="fwbky"></a><h5>PAM 服務名稱</h5>
+<p>定義 PAM (可插接式認證模組) 配置或堆疊，其隨附於您的作業系統並為 UNIX 認證所使用。若為 Solaris，名稱通常為<tt>其他</tt>，若為 Linux，則名稱為<tt>密碼</tt>。</p>
+<br/>
+
+</body>
+</html>

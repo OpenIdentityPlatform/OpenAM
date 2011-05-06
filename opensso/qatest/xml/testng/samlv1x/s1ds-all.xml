@@ -1,0 +1,193 @@
+    <parameter name="groupName" value="@mode@"/>        
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-nsrolefilroleYes">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-nsrolefilroleYes"/>        
+        <parameter name="ptestIndex" value="16"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                        
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-nsrolefilroleYes">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-nsrolefilroleYes"/>        
+        <parameter name="ptestIndex" value="17"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-nsrolefilroleYes">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-nsrolefilroleYes"/>        
+        <parameter name="ptestIndex" value="18"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-nsrolefilroleYes">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-nsrolefilroleYes"/>        
+        <parameter name="ptestIndex" value="19"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test>     
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-nsrolerolesYes">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-nsrolerolesYes"/>        
+        <parameter name="ptestIndex" value="20"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                   
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-nsrolerolesYes">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-nsrolerolesYes"/>        
+        <parameter name="ptestIndex" value="21"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-nsrolerolesYes">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-nsrolerolesYes"/>        
+        <parameter name="ptestIndex" value="22"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-nsrolerolesYes">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-nsrolerolesYes"/>        
+        <parameter name="ptestIndex" value="23"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test>   
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-nsrolefilroleNo">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-nsrolefilroleNo"/>        
+        <parameter name="ptestIndex" value="24"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                                   
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                       
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-nsrolefilroleNo">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-nsrolefilroleNo"/>        
+        <parameter name="ptestIndex" value="25"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-nsrolefilroleNo">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-nsrolefilroleNo"/>        
+        <parameter name="ptestIndex" value="26"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-nsrolefilroleNo">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-nsrolefilroleNo"/>        
+        <parameter name="ptestIndex" value="27"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test>  
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-nsrolerolesNo">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-nsrolerolesNo"/>        
+        <parameter name="ptestIndex" value="28"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                                    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-nsrolerolesNo">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-nsrolerolesNo"/>        
+        <parameter name="ptestIndex" value="29"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-nsrolerolesNo">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-nsrolerolesNo"/>        
+        <parameter name="ptestIndex" value="30"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-nsrolerolesNo">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-nsrolerolesNo"/>        
+        <parameter name="ptestIndex" value="31"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test>  

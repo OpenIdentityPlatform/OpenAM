@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>정책 구성 서비스  - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>정책 구성 서비스 </h4>
+<p>정책 구성 서비스는 Federated Access Manager 콘솔을 통해 각 조직에 대한 정책
+관련 속성을 구성하는 데 사용됩니다. 또한 Federated Access Manager 정책 프레임워크에서 사용할
+자원 이름을 정의하고 Directory Server 데이터 저장소를 정의할 수 있습니다. 정책 구성
+서비스에 지정된 Directory Server는 LDAP 사용자, LDAP 그룹, LDAP 역할 및 조직
+정책 주제에 대한 구성원 자격을 평가하는 데 사용됩니다.</p>
+
+<a name="ggdbf"></a><h5>주제 결과 유지 시간</h5>
+<p>정책 평가 성능을 개선하기 위해 정책 구성 서비스의 주제 결과 유지 시간
+속성에서 정의한 시간 동안 구성원 자격 평가가 캐시됩니다. 캐시된 구성원 결정은 주제
+결과 유지 시간 속성에 정의된 시간이 경과할 때까지 사용되며,그 이후의 구성원 자격
+평가는 디렉토리의 현재 사용자 상태를 반영하기 위해 사용됩니다. </p>
+
+<a name="ggday"></a><h5>동적 속성</h5>
+<p>목록에 표시되며 정책 응답 공급자 동적 속성을 정의하기 위해 선택된 허용된 동적
+속성 이름입니다. 정의된 이름은 데이터 저장소에 정의된 속성 이름과 동일해야 합니다.</p>
+
+<a name="ggdcj"></a><h5>amldapuser 정의</h5>
+<p><tt>amldapuser</tt>는 설치 중에 만든 사용자이며, 정책 구성 서비스에 지정된 Directory Server에서 기본적으로
+사용합니다. 이 값은 필요에 따라 영역의 관리자 또는 정책 관리자가 변경할 수
+있습니다.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 SOAP Binding - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>SAMLv2 SOAP Binding</h4>
+<p>The SAMLv2 SOAP Binding service provides SOAP-based exchange of SAMLv2 Request and Response
+message between a OpenSSO Client and the OpenSSO Server. The requests received are
+delegated to the request handler for further processing. The key to the Request
+Handler and the meta alias is in the SOAP Binding service URL. A
+mapping of the meta alias and the RequestHandler is stored in the SAMLv2
+SOAP Binding service which can be read from the  OpenSSO configuration store.
+</p>
+
+<a name="ggokv"></a><h5>Request Handler List</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>The RequestHandlerList is a list of key/value pair entries containing the mapping of
+the meta alias to the  RequestHandler implementation.  This attribute must be
+set if a OpenSSO 8.0 server is being configured to act as Policy
+Decision Point (PDP). </p><p>The <i>Key</i> is the Policy Decision Point meta alias and the <i>Class</i> is
+the Java class name, which is the implementation of  RequestHandler Interface which can
+process XACML Requests.  </p><p>For example, If the meta Alias of the XACML Policy Decision Point is
+<tt>/pdp </tt>and the implementation of the interface is <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>, then the key should be
+set to <tt>/pdp</tt> and the class should be set to <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>. </p>
+<br/>
+
+</body>
+</html>

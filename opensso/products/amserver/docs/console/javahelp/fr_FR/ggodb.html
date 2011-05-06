@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs de liaison SOAP - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggodb"></a><h4>Attributs de liaison SOAP</h4>
+
+
+<a name="ggocx"></a><h5>Authentificateur de service Web</h5>
+<a name="indexterm-155"></a><a name="indexterm-156"></a><p>Cet attribut accepte comme valeur la classe d'impl&#233;mentation de l'interface Authentificateur de
+service Web. Cette classe authentifie une demande et g&#233;n&#232;re des donn&#233;es d'identit&#233;
+pour un consommateur de service Web.</p>
+
+<a name="ggock"></a><h5>M&#233;canismes d'authentification pris en charge</h5>
+<a name="indexterm-157"></a><a name="indexterm-158"></a><p>Cet attribut sp&#233;cifie les m&#233;canismes d'authentification pris en charge par le r&#233;cepteur
+SOAP. Les m&#233;canismes d'authentification permettent l'authentification des utilisateurs et assurent le chiffrement
+et l'int&#233;grit&#233; des donn&#233;es. Par d&#233;faut, tous les m&#233;canismes d'authentification disponibles sont
+s&#233;lectionn&#233;s. Si l'un d'entre eux n'est pas s&#233;lectionn&#233; et qu'un consommateur de
+services Web envoie une demande faisant appel &#224; ce m&#233;canisme, la demande
+est rejet&#233;e. Voici la liste des m&#233;canismes d'authentification pris en charge :</p>
+<ul><li><p><tt>urn:liberty:securit&#233;:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:securit&#233;:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+
+<a name="ggocn"></a><h5>N'appliquer que les fournisseurs connus</h5>
+<p>Si cette propri&#233;t&#233; est activ&#233;e, elle applique l'en-t&#234;te <tt>ProviderID</tt> envoy&#233; dans un
+message SOAP pour v&#233;rifier que le fournisseur existe dans le syst&#232;me. Si
+elle n'est pas activ&#233;e, la demande est rejet&#233;e. Si cet attribut n'est
+pas activ&#233;, la v&#233;rification est ignor&#233;e. </p>
+
+<a name="ggoci"></a><h5>Alias de certification de l'authentification du client SSL</h5>
+<p>Cette valeur est d&#233;finie pendant l'installation. Alias de certificat client allant &#234;tre
+utilis&#233; dans la connexion SSL pour la liaison SOAP Liberty.</p>
+
+<a name="ggocs"></a><h5>Limite horaire du message p&#233;rim&#233;</h5>
+<p>La valeur par d&#233;faut est 300&#160;000. D&#233;termine si un message est p&#233;rim&#233;
+et s'il n'est donc plus fiable. Si l'horodatage du message est ant&#233;rieur
+&#224; l'horodatage par le nombre de millisecondes sp&#233;cifi&#233;, le message est consid&#233;r&#233;
+comme p&#233;rim&#233;.</p>
+
+<a name="ggofw"></a><h5>Intervalle de nettoyage de cache d'ID de message </h5>
+<p>La valeur par d&#233;faut est 60&#160;000. Sp&#233;cifie le nombre de millisecondes devant
+s'&#233;couler avant le d&#233;but du nettoyage de cache. Chaque message est stock&#233;
+dans un cache avec son propre ID pour &#233;viter les messages dupliqu&#233;s.
+Lorsque la dur&#233;e actuelle d'un message moins la dur&#233;e re&#231;ue d&#233;passe la
+valeur thestaleTimeLimit, le message est supprim&#233; du cache.</p>
+
+<a name="ggohr"></a><h5>Acteurs SOAP pris en charge</h5>
+<p>La valeur par d&#233;faut est <tt>http://schemas.xmlsoap.org/soap/actor/next </tt>. Sp&#233;cifie les acteurs SOAP pris en
+charge. Chaque acteur doit &#234;tre s&#233;par&#233; par une barre verticale (|).</p>
+
+<a name="ggofh"></a><h5>Mappage de pr&#233;fixe d'espace de noms</h5>
+<p>La valeur par d&#233;faut est&#160;:</p><pre>=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08
+|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/
+liberty/pp|is=urn:liberty:is:2003-08</pre><p>Sp&#233;cifie le mappage de pr&#233;fixe d'espace de noms lors de la conversion
+d'un arbre de contenu JAXB vers un arbre DOM. La syntaxe est
+<tt>prefix=namespace|prefix=namespace|... </tt></p>
+
+<a name="ggoho"></a><h5>Liste des packages JAXB</h5>
+<p>Sp&#233;cifie la liste de packages JAXB utilis&#233;e lors de la construction de
+<tt>JAXBContext </tt>. Chaque package doit &#234;tre s&#233;par&#233; par deux-points (:).</p>
+
+<a name="ggogm"></a><h5>Version de service Web d'identit&#233; Liberty</h5>
+<p>Cette propri&#233;t&#233; d&#233;termine la structure Liberty ID-WSF lorsque la structure ne peut
+pas d&#233;terminer via le message entrant ou l'offre de ressources le moment
+o&#249; OpenSSO op&#232;re en tant que client du service Web. Les valeurs
+peuvent &#234;tre 1.0 ou 1.1. La valeur par d&#233;faut est 1.1.</p>
+<br/>
+
+</body>
+</html>

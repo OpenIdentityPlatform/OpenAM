@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>계열사 엔티티에 구성원 추가 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptorsaffiliate"></a><h4>계열사 엔티티에 구성원 추가</h4><a name="indexterm-83"></a><a name="indexterm-84"></a><p>계열사 엔티티를 만든 후에 계열사에 구성원을 추가할 수 있습니다. 시작 위치는 연합
+인터페이스 아래의 엔티티입니다. </p>
+<hr><p><b>주 &#8211; </b>이 화면에서 정의된 공통 속성을 수정할 수도 있습니다.</p>
+<hr>
+<ol>
+<li><b>구성된 계열사 엔티티의 이름을 눌러 해당 프로필을 수정합니다.</b><p>엔티티 프로필 페이지가 표시됩니다.</p></li>
+<li><b>[보기] 메뉴에서 [계열사]를 선택합니다.</b></li>
+<li><b>제휴에 할당할 사용 가능한 엔티티를 선택합니다.</b></li>
+<li><b>공통 속성에 대한 값을 수정합니다.</b><p>공통 속성에는 일반적으로 Identity 공급자 자체를 정의하는 값이 포함되어 있습니다.</p><dl><dt>이름</dt>
+<dd><p>가능한 경우 제휴에 대한 새 URI를 입력합니다. 이 속성의 현재 값은 엔티티를 작성할 때 계열사 이름 속성에 할당된 URI입니다. 새 값은 계열사 이름 사이에서 고유해야 합니다.</p></dd>
+<dt>소유자</dt>
+<dd><p>새 URI를 입력하여 제휴에 대한 다른 소유자 또는 상위 운영자를 정의합니다. 이 속성의 현재 값은 엔티티를 작성할 때 계열사 소유자 속성에 할당된 URI입니다. 이 속성의 새 값은 새 소유자/공급자가 속한 엔티티의 엔티티 이름 속성에서 정의된 값과 일치하는 URI입니다. 새 값은 계열사 이름 사이에서 고유해야 합니다.</p>
+<hr><p><b>주 &#8211; </b>공급자를 계열사 소유자로 정의하면 이 공급자는 자동으로 제휴의 구성원으로 포함되지 않습니다. 또한 소유자가 구성원인 경우 URI가 여기서는 소유자로 정의되어야 하고 계열사 엔티티 자체 내에서는 구성원으로 정의되어야 합니다.</p>
+<hr>
+</dd>
+<dt>서명 키: 키 별칭</dt>
+<dd><p>인증서는 Java 키 저장소 파일에 저장됩니다. 파일에 있는 각 인증서는 인증서를 가져오는 데 사용하는 별칭에 매핑되어 있습니다. 요청 및 응답을 서명하는 데 사용하는 인증서와 연결된 키 별칭을 입력합니다.</p></dd>
+<dt>암호화 키: 키 별칭</dt>
+<dd><p>인증서는 Java 키 저장소 파일에 저장됩니다. 파일에 있는 각 인증서는 인증서를 가져오는 데 사용하는 별칭에 매핑되어 있습니다. 공급자의 보안 인증서와 연결된 키 별칭을 입력합니다.</p></dd>
+<dt>암호화 키: 키 크기</dt>
+<dd><p>다른 엔티티와 상호 작용할 때 웹 서비스 사용자가 사용하는 키 길이를 입력합니다.</p></dd>
+<dt>암호화 키: 암호화 방법</dt>
+<dd><p>암호화 방법 기본 설정을 가리키는 URI를 입력합니다.</p></dd>
+</dl>
+</li>
+<li><b>[저장]을 누릅니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

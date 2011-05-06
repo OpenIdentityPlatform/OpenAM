@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>플랫 파일 저장소 속성 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="flatfileattr"></a><h4>플랫 파일 저장소 속성</h4>
+<p><a name="indexterm-15"></a>다음 속성을 사용하여 플랫 파일 저장소를 구성할 수 있습니다.</p>
+
+<a name="gdokj"></a><h5>파일 저장소 플러그인 클래스 이름</h5>
+<p>이 속성은 플랫 파일에 대한 구현을 제공하는 Java 클래스 파일을 지정합니다. 이
+속성을 수정해서는 안 됩니다.</p>
+
+<a name="gdojs"></a><h5>파일 저장소 디렉토리</h5>
+<p>Identity 및 해당 속성을 저장할 기본 디렉토리를 정의합니다.</p>
+
+<a name="gdoke"></a><h5>캐시</h5>
+<p>사용하는 경우(기본값) Identity 및 해당 속성이 캐싱됩니다. 후속 요청은 파일 시스템에 액세스하지
+않습니다.</p>
+
+<a name="gdokm"></a><h5>캐시 업데이트 시간</h5>
+<p>캐싱을 사용하면 이 속성으로 파일 시스템이 변경된 경우 캐시의 해당 항목을 검사하기까지의
+시간 간격(분 단위)를 확인할 수 있습니다. 이 검사 메커니즘은 타임스탬프를 기반으로 합니다.</p>
+
+<a name="gdojw"></a><h5>파일 사용자 객체 클래스</h5>
+<p>사용자를 만들 때 해당 사용자에게 자동으로 추가되는 객체 클래스를 정의합니다.</p>
+
+<a name="gdojt"></a><h5>비밀번호 속성</h5>
+<p>인증에 사용되는 비밀번호를 포함하는 속성 이름을 제공합니다. 이 속성은 데이터 저장소 인증
+모듈을 사용하는 경우 사용자를 인증하는 데 사용됩니다.</p>
+
+<a name="gdokq"></a><h5>상태 속성</h5>
+<p>Identity의 상태를 저장하는 속성 이름을 제공합니다. 상태 속성 값으로는 <tt>active</tt> 또는 <tt>inactive</tt>를
+사용할 수 있습니다. 이 속성은 Identity 인증에 사용되며Identity가 <tt>inactive</tt>인 경우 사용자는 인증에
+사용되지 않습니다.</p>
+
+<a name="gdojk"></a><h5>해시된 속성</h5>
+<p>값이 해시되어 파일에 저장된 속성 목록을 제공합니다. 해시된 후에는 원래 값을 얻을
+수 없으며해시된 값만 검색됩니다. 영구적으로 저장되지는 않지만 검증에 사용되는 특정 속성의 기밀을
+보장하는 데 사용됩니다.  이러한 속성 유형의 예로는 Identity의 비밀번호 속성이 있습니다.</p>
+
+<a name="gdojb"></a><h5>암호화된 속성</h5>
+<p>값이 암호화되어 파일에 저장된 속성 목록을 제공합니다. 암호화되어 저장되어 있지만 Identity 저장소
+API를 호출하면 원래의 암호화되지 않은 값이 반환됩니다. 이 속성은 사용자가 파일 시스템에
+직접 액세스하여 중요한 속성을 읽지 못하도록 합니다.</p>
+<br/>
+
+</body>
+</html>

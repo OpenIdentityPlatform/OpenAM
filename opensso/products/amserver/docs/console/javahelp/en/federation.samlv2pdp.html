@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 XACML PDP Customization  - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pdp"></a><h4>SAMLv2 XACML PDP Customization </h4>
+<p>XACML PDP contains the following attributes for customization:</p>
+<ul><li><p><a href="#ggwgo">Protocol Support Enumeration</a></p></li>
+<li><p><a href="#ggwjh">Signing Key Alias</a></p></li>
+<li><p><a href="#ggwjx">Encryption Key Alias</a></p></li>
+<li><p><a href="#ggwhi">Basic Authorization</a></p></li>
+<li><p><a href="#ggwgk">Authorization Decision Query Signed</a></p></li>
+<li><p><a href="#ggwhp">Authorization Service</a></p></li></ul>
+
+
+<a name="ggwgo"></a><h5>Protocol Support Enumeration</h5>
+<p>Displays the XACML PDP release that is supported by this provider. </p><p><tt>urn:liberty:iff:2003-08</tt> refers to Liberty Identity Federation Framework Version 1.2.</p><p><tt>urn:liberty:iff:2002-12</tt> refers to Liberty Identity Federation Framework Version 1.1. </p>
+
+<a name="ggwjh"></a><h5>Signing Key Alias</h5>
+<p>Defines the key alias that is used to sign requests and responses.</p>
+
+<a name="ggwjx"></a><h5>Encryption Key Alias</h5>
+<p>Defines the key alias to XACML encryption. </p>
+
+<a name="ggwhi"></a><h5>Basic Authorization</h5>
+<p>Basic authorization can be enabled to protect SOAP endpoints. Any provider accessing these
+endpoints must have the user and password defined in the following two properties:
+<tt>User Name</tt> and <tt>Password</tt>.</p>
+
+<a name="ggwgk"></a><h5>Authorization Decision Query Signed</h5>
+<p>When enabled, this attribute enforces that all queries be signed for the XACML
+authorization decision.</p>
+
+<a name="ggwhp"></a><h5>Authorization Service</h5>
+<p>This attribute defines the type (binding) of the authorization request, and the URL
+endpoint for receiving the request. By default, the binding type is SOAP.</p>
+<br/>
+
+</body>
+</html>

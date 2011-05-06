@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sun-web.xml,v 1.3 2008/06/25 05:54:46 qcheng Exp $
+
+-->
+<!DOCTYPE sun-web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Application Server 9.0 Servlet 2.5//EN" "http://www.sun.com/software/appserver/dtds/sun-web-app_2_5-0.dtd">
+<sun-web-app error-url="">
+  <context-root>/StockService</context-root>
+  <class-loader delegate="true"/>
+  <jsp-config>
+    <property name="classdebuginfo" value="true">
+      <description>Enable debug info compilation in the generated servlet class</description>
+    </property>
+    <property name="mappedfile" value="true">
+      <description>Maintain a one-to-one correspondence between static content and the generated servlet class' java code</description>
+    </property>
+  </jsp-config>
+</sun-web-app>

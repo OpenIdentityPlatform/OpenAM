@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Active Directory - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthadservice"></a><h4>Active Directory</h4>
+<p><a name="indexterm-166"></a>このモジュールタイプは、LDAP 認証モジュールタイプと同様に機能しますが、LDAP ディレクトリの代わりに Microsoft Active Directory を使用します。このモジュールタイプを使用すると、LDAP と Active Directory の両方を同じレルムの下に置くことが可能になります。Active Directory
+認証属性はレルム属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fwfdx">「プライマリ Active Directory サーバー」</a></p></li>
+<li><p><a href="#fwbmo">「セカンダリ Active Directory サーバー」</a></p></li>
+<li><p><a href="#fwfeb">「ユーザー検索の開始 DN」</a></p></li>
+<li><p><a href="#fwbjl">「root ユーザーバインド DN」</a></p></li>
+<li><p><a href="#fwbix">「root ユーザーバインドパスワード」</a></p></li>
+<li><p><a href="#fwbnt">「root ユーザーバインドパスワード (確認)」</a></p></li>
+<li><p><a href="#fwblg">「ユーザープロファイルの取得に使用する属性」</a></p></li>
+<li><p><a href="#fwbpi">「認証するユーザーの検索に使用する属性」</a></p></li>
+<li><p><a href="#fwbmh">「ユーザー検索フィルタ」</a></p></li>
+<li><p><a href="#fwbju">「検索範囲」</a></p></li>
+<li><p><a href="#fwbmt">「Active Directory サーバーへの SSL アクセス」</a></p></li>
+<li><p><a href="#fwbpx">「認証するユーザー DN を返す」</a></p></li>
+<li><p><a href="#fwbjb">「Active Directory サーバーのチェック間隔」</a></p></li>
+<li><p><a href="#fwbtk">「ユーザー作成属性」</a></p></li>
+<li><p><a href="#fwboz">「認証レベル」</a></p></li></ul>
+
+
+<a name="fwfdx"></a><h5>プライマリ Active Directory サーバー</h5>
+<p>OpenSSO のインストール時に指定するプライマリ Active Directory サーバーのホスト名およびポート番号を指定します。これは、Active Directory 認証で最初に通信するサーバーです。形式は <tt></tt><i>hostname:port</i><tt></tt> です。ポート番号がないときは、<tt>389</tt> と想定します。</p><p>OpenSSO に複数のドメインが配備されている場合、OpenSSO と Directory Server の特定のインスタンス間の通信リンクを次の形式で指定できます。複数のエントリの場合は、ローカルサーバー名を先頭に付ける必要があります。</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>たとえば、異なる場所に配備された 2 つの OpenSSO インスタンス (L1-machine1-IS および L2- machine2-IS) が、それぞれ別の Directory Server
+インスタンス (L1-machine1-DS および L2-machine2-DS) と通信する場合、次のように指定します。</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fwbmo"></a><h5>セカンダリ Active Directory サーバー</h5>
+<p>OpenSSO プラットフォームが利用できるセカンダリ Active Directory サーバーのホスト名およびポート番号を指定します。プライマリ Active Directory サーバーが認証要求に応答しない場合は、このサーバーと通信します。プライマリサーバーが稼働している場合は、OpenSSO はプライマリサーバーに戻ります。この形式も <tt></tt><i>hostname:port</i><tt></tt> です。複数のエントリの場合は、ローカルサーバー名をプレフィックスとして付ける必要があります。</p>
+<hr><p><b>注意 &#8211; </b>OpenSSO が稼働しているホストとは別のホストにある Directory Server からユーザーを認証する場合は、プライマリとセカンダリ両方の LDAP サーバーポートに値があることが重要です。1 つの Directory Server の場所の値を両方のフィールドに使用できます。</p>
+<hr>
+
+
+<a name="fwfeb"></a><h5>ユーザー検索の開始 DN</h5>
+<p>ユーザーの検索を開始するノードの DN を指定します。性能上の理由から、この DN はできるだけ特定のものにしてください。デフォルト値は、ディレクトリツリーのルートです。有効な DN がすべて認識されます。「検索範囲」属性で「オブジェクト」を選択する場合、プロファイルが存在するレベルよりも 1 つ上のレベルを指す DN を指定します。複数のエントリの場合は、ローカルサーバー名をプレフィックスとして付ける必要があります。形式は <tt></tt><i>servername|search dn</i><tt></tt>
+です。</p><p>複数のエントリの場合は、次のようになります。</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>ルート組織の下に同じユーザー ID で複数のエントリが存在する場合、認証が正しく行われるためには、1 つのエントリだけを検索または発見できるようにこのパラメータを設定する必要があります。たとえば、ルート組織の下でエージェント ID とユーザー ID が同じである場合、ルート組織でエージェント ID を使用して認証するにはこのパラメータを <tt>ou=Agents</tt> に、ユーザー
+ID を使用して認証するにはこのパラメータを <tt>ou=People</tt> にしてください。</p>
+
+<a name="fwbjl"></a><h5>root ユーザーバインド DN</h5>
+<p>「プライマリ LDAP サーバーおよびポート」フィールドで指定した Directory Server に管理者としてバインドするのに使用するユーザーの DN を指定します。ユーザーログイン ID に基づいて、一致するユーザー DN を検索するためには、認証サービスはこの
+DN でバインドする必要があります。デフォルトは <tt>amldapuser</tt> です。任意の有効な DN が認識されます。</p><p>ログアウトする前に、パスワードが正しいことを確認します。正しくない場合はロックアウトされます。ロックアウトされた場合は、スーパーユーザー DN でログインできます。デフォルトでは、これは <tt>amAdmin</tt> アカウントです。通常のログインと同じアカウントですが、完全な DN を使用します。次に例を示します。</p><p><tt>uid_amAdmin,ou=People,</tt><i>OpenSSO-base</i><tt></tt></p>
+
+<a name="fwbix"></a><h5>root ユーザーバインドパスワード</h5>
+<p>「root ユーザーバインド DN」フィールドで指定される管理者プロファイルのパスワードを指定します。デフォルト値は存在しません。管理者の有効な Active Directory パスワードだけが認識されます。</p>
+
+<a name="fwbnt"></a><h5>root ユーザーバインドパスワード (確認)</h5>
+<p>パスワードを確認します。</p>
+
+<a name="fwblg"></a><h5>ユーザープロファイルの取得に使用する属性</h5>
+<p>ユーザーエントリのネーミング規則に使用する属性を指定します。デフォルトでは、OpenSSO はユーザーエントリが uid 属性によって識別されるものと想定します。Directory Server で異なる属性 (<i>givenname</i> など) を使用している場合は、このフィールドにその属性名を指定します。</p>
+
+<a name="fwbpi"></a><h5>認証するユーザーの検索に使用する属性</h5>
+<p>認証を受けるユーザーの検索フィルタを設定するのに使用する属性を一覧表示します。これにより、ユーザーは 1 つ以上の属性によって認証を受けることができます。たとえば、このフィールドが <i>uid</i>、<i>employeenumber</i>、および <i>mail</i> に設定されている場合、ユーザーはこれらの名前のどれを使用しても認証を受けることができます。</p>
+
+<a name="fwbmh"></a><h5>ユーザー検索フィルタ</h5>
+<p>「ユーザー検索の開始 DN」フィールドの下でユーザーの検索に使用する属性を指定します。これはユーザーネーミング属性とともに機能します。デフォルト値は存在しません。有効なユーザーエントリ属性はすべて認識されます。</p>
+
+<a name="fwbju"></a><h5>検索範囲</h5>
+<p>一致するユーザープロファイルを検索する対象となる Directory Server のレベルの数を示します。検索は、「ユーザー検索の開始 DN」で指定されたノードから開始されます。デフォルト値は「サブツリー」です。次のリスト項目から 1 つ選択できます。</p><dl><dt>オブジェクト</dt>
+<dd><p>指定したノードだけを検索します。</p></dd>
+<dt>1 レベル</dt>
+<dd><p>指定したノードのレベルとその 1 つ下のレベルで検索します。</p></dd>
+<dt>サブツリー</dt>
+<dd><p>指定したノードとその下のノードのエントリすべてを検索します。</p></dd>
+</dl>
+
+
+<a name="fwbmt"></a><h5>Active Directory サーバーへの SSL アクセス</h5>
+<p>プライマリとセカンダリのサーバーおよびポートフィールドで指定される Directory Server への SSL アクセスを有効にします。デフォルトでは、このチェックボックスはオフなので、Directory Server へのアクセスに SSL プロトコルは使用されません。</p><p>Active Directory サーバーが SSL 有効 (LDAPS) で実行中の場合、OpenSSO が LDAPS プロトコルで Directory Server
+に接続できるように、適切な SSL 信頼証明書で設定されていることを確認する必要があります。</p>
+
+<a name="fwbpx"></a><h5>認証するユーザー DN を返す</h5>
+<p>OpenSSO ディレクトリが Active Directory 用に設定されたディレクトリと同じ場合、このオプションを有効にすることができます。オプションを有効にすると、このオプションによって Active Directory 認証モジュールインスタンスがユーザー ID ではなく DN を返すことができるため、検索が不要になります。通常、認証モジュールインスタンスはユーザー
+ID だけを返すため、認証サービスはローカルの OpenSSO インスタンスでユーザーを検索します。外部の Active Directory が使用された場合、通常このオプションは有効になりません。</p>
+
+<a name="fwbjb"></a><h5>Active Directory サーバーのチェック間隔</h5>
+<p>この属性は Active Directory サーバーのフェイルバックに使用されます。Active Directory プライマリサーバーが実行されているかを確認するまでの、スレッドがスリープしている時間を分単位で定義します。</p>
+
+<a name="fwbtk"></a><h5>ユーザー作成属性</h5>
+<p>Active Directory サーバーが外部 Active Directory サーバーとして設定されている場合、この属性は Active Directory 認証モジュールインスタンスで使用されます。リストには、ローカルと外部 Directory Server 間の属性のマッピングが含まれます。形式は次のとおりです。</p><p><i>attr1|externalattr1</i></p><p><i>attr2|externalattr2</i></p><p>この属性が生成されると、外部属性値が外部 Directory Server から読み込まれて、内部 Directory Server 属性に設定されます。外部属性値が内部属性に設定されるのは、コア認証モジュールタイプの「ユーザープロファイル」属性で「動的」が選択されていて、ローカル Directory Server インスタンスにユーザーが存在しない場合だけです。<tt></tt>新しく作成されたユーザーには、ユーザー作成属性リストに指定されているような、マッピングする外部属性値をともなう内部属性値が含まれます。 </p>
+
+<a name="fwboz"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

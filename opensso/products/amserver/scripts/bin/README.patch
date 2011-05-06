@@ -1,0 +1,244 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.patch,v 1.2 2009/03/10 23:54:14 veiming Exp $
+
+-->
+
+OpenSSO - Patch
+
+NOTE: Patching of OpenSSO is only supported from an Enterprise build to an
+Express build.  While these tools will allow you to update your customized
+opensso.war file to the latest nightly opensso.war (including your
+customizations), this should only be used in a test/development environment, 
+and should not be used to update a production system!
+
+Although ssopatch does not make any changes to your existing war file, you should
+backup your war file prior to using this tool, to an archive location, so that 
+it can be recovered in case you ever need to revert your system to the previous 
+deployment!
+
+
+Before setting up and running the OpenSSO Tools, the JAVA_HOME environment 
+variable needs to be initialized to a path of a compatible Java Runtime 
+(J2SE 1.5 or higher).
+
+
+OpenSSO Patch Utility
+=====================
+
+ssopatch is a Java application that will be included in each OpenSSO enterprise
+and express built zip file, located in the tools subdirectory.  
+ssopatch Usage
+
+Usage:
+ssopatch
+    --help|-?
+    [--locale|-l]
+
+ssopatch
+    --war-file|-o
+    [--manifest|-m]
+    [--locale|-l]
+
+ssopatch
+    --war-file|-o
+    --war-file-compare|-c
+    [--staging|-s]
+    [--locale|-l]
+    [--override|-r] 
+    [--overwrite|-w] 
+
+Options:
+    --help|-?
+        Print this usage. This is a unary option.
+    --war-file|-o
+        Path to the WAR file. opensso.war file which has been previously
+        deployed.
+    --manifest|-m
+        Path to manifest file to create. Manifest file will be generated from
+        --war-file when this option is provided.
+    --war-file-compare|-c
+        Path to the WAR file to compare against. It will be compared against
+        --war-file when this option is provided.
+    --staging|-s
+        Path to the staging area. Staging area where the files will be written.
+        --war-file-compare is compared against --war-file and the result will be
+        written to this directory.
+    --locale|-l
+       Locale to be used. Default system locale is used if this is not set.
+    --overwrite|-w
+        Option to overwrite existing staging area. This is a unary option.
+        Default is false.
+    --override|-r
+       Option to override revision checking. This is a unary option.
+       Default is false.
+
+
+Default usage:	If only the the first argument is specified, ssopatch will 
+                compare the contents of the specified war file against the
+                manifest file stored inside of that war file, and report on the 
+                differences.
+
+
+ssopatch Use cases
+------------------
+
+The patching utility has four functions:  create a manifest file, compare a war 
+file to its internal manifest, compare two war files, and generate a staging 
+area.
+
+Create a Manifest File
+----------------------
+
+If you acquired an opensso.war prior to Express build 5b, or if you are creating
+a customized war file (console only, distributed authentication, etc.), ssopatch 
+can be used to generate a manifest file which can be included in your war.
+
+% ssopatch --war-file "my.war" --manifest "OpenSSO.manifest"
+
+This will create a new file "OpenSSO.manifest" containing an entry for each file 
+in "my.war" with checksum information.  After creating the manifest, if you want 
+to allow the war file to be patched, you should put the manifest file inside 
+your war at "META-INF/OpenSSO.manifest".
+
+Compare War Against Its Manifest
+--------------------------------
+In order to determine if there were any customizations done to the original war 
+file, ssopatch can be used.  ssopatch will internally generate a new manifest 
+file, then compare that internal manifest against the manifest stored inside the 
+war file at META-INF/OpenSSO.manifest.
+
+% ssopatch --war-file "my.war"
+Comparing manifest of Internal (Express Build 5(200810010552)) against 
+    /my.war (generated-200810021026)
+File not in original war (images/login-origimage.jpg)
+File updated in new war (images/login-backimage.jpg)
+File updated in new war (WEB-INF/classes/amConfigurator.properties)
+Differences: 3
+
+The example shows:
+ - the file images/login-origimage.jpg appears in my.war but was not found in 
+   the manifest.
+ - the file images/login-backimage.jpg has been customized in my.war from the 
+   original manifest.
+ - the file WEB-INF/classes/amConfigurator.properties has been customized in 
+   my.war from the original manifest.
+
+
+Compare Two War Files
+---------------------
+
+ssopatch can be used to find out which files have been updated in a new war.  
+ssopatch will internally generate a manifest file for the original war, generate 
+a manifest for the new war, then compare the internal manifests against the 
+manifest stored inside the war file at META-INF/OpenSSO.manifest.  This enables 
+us to show which files were customized inside the initial war, and which files 
+were patched in the new war.  It will also display any files that may have been 
+added or removed between the two versions.
+
+% ssopatch --war-file "my.war" --war-file-compare "new.war"
+Comparing manifest of my.war (generated-200810021042) against 
+    new.war (generated-200810021042)
+File not in original war (WEB-INF/classes/amClientDetection_en.properties)
+File updated in new war (html/fr/help/policy.conditionadd.html)
+...
+File customized (images/login-backimage.jpg)
+May require manual customization (WEB-INF/classes/amConfigurator.properties)
+...
+Differences: 4190
+Customizations: 2
+
+The example shows:
+ - the file WEB-INF/classes/amClientDetection_en.properties appears in new.war 
+    but was not found in my.war.
+ - the file html/fr/help/policy.conditionadd.html appears in my.war but was 
+    updated in new.war.
+ - the file images/login-backimage.jpg has been customized in my.war from the 
+    original manifest, but was not changed in new.war.
+ - the file WEB-INF/classes/amConfigurator.properties has been customized in 
+    my.war from the original manifest, but was also changed in new.war.
+
+
+Create Staging Area
+-------------------
+
+ssopatch can be used to create a new staging area, merging the original war file 
+with the new war file.  ssopatch will internally generate a manifest file for 
+the original war, generate a manifest for the new war, then compare the internal 
+manifests against the manifest stored inside the war file at 
+META-INF/OpenSSO.manifest.  This enables us to show which files were customized 
+inside the initial war, and which files were patched in the new war.  It will 
+also display any files that may have been added or removed between the two 
+versions.  It will output the appropriate files to a staging area, where the 
+user can finalize the customizations before creating the new patched war.
+
+% ssopatch --war-file="my.war" --war-file-compare "new.war" --staging "/staging"
+Comparing manifest of my.war (generated-200810021042) against 
+    new.war (generated-200810021042)
+File customized. Staging area using original war version 
+    (images/login-backimage.jpg)
+May require manual customization. Staging area using new war version 
+    (WEB-INF/classes/amConfigurator.properties)
+Differences: 4190
+Customizations: 2
+
+The example shows:
+ - the file images/login-backimage.jpg has been customized in my.war from the 
+    original manifest, but was not changed in new.war. Since it had not been 
+    changed between the old war manifest, and new war, we use the user 
+    modifications in the staging area.
+ - the file WEB-INF/classes/amConfigurator.properties has been customized in 
+    my.war from the original manifest, but was also changed in new.war. Since 
+    it was customized, but also changed, we put the latest version in the staging 
+    area, and the user will then have to manually re-enter their customizations.
+
+After the staging area has been updated, the user would then create the war 
+file, and then redeploy the war file on their container.
+
+
+OpenSSOpatch Reporting
+======================
+
+ssopatch will output the results to stdout.  If the user wants to capture the 
+output to a file, they can redirect it.  ssopatch will output following results:
+File not in original war (filename) – file does not exist in orginal war, but is 
+    in the latest version of the war.
+File updated in new war (filename) – file exists in both war files, and has been 
+    updated in the latest version of the war. No customizations have been done 
+    in the original.
+File customized (filename) – file exists in both war files, has been customized 
+    in the original version of the war, but has not been updated in the latest 
+    version of the war.
+May require manual customization (filename) - file exists in both war files, has 
+    been customized in the original version of the war, and has been updated in 
+    the latest version of the war.
+
+OpenSSOpatch Exit Codes
+=======================
+If ssopatch finishes successfully, it will return a 0.  For errors, a non-zero 
+exit code will be returned.
+
+
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>UNIX - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthunixservice"></a><h4>UNIX</h4>
+<p><a name="indexterm-182"></a>This Solaris only module allows for authentication using a user's UNIX identification and
+password. If any of the UNIX authentication attributes are modified, both OpenSSO and
+the amunixd  helper must be restarted. The UNIX authentication attributes are global
+and realm attributes. The attributes are:</p>
+<ul><li><p><a href="#fwbsy">Configuration Port</a></p></li>
+<li><p><a href="#fwbqv">Authentication Port</a></p></li>
+<li><p><a href="#fwbrv">Timeout</a></p></li>
+<li><p><a href="#fwbls">Threads</a></p></li>
+<li><p><a href="#fwbra">Authentication Level</a></p></li>
+<li><p><a href="#fwbky">PAM Service Name</a></p></li></ul>
+
+
+<a name="fwbsy"></a><h5>Configuration Port</h5>
+<p>This attribute specifies the port to which the UNIX Helper `listens' upon startup
+for the configuration information contained in the UNIX Helper Authentication Port, UNIX Helper
+Timeout, and UNIX Helper Threads attributes. The default is 58946.</p>
+
+<a name="fwbqv"></a><h5>Authentication Port</h5>
+<p>This attribute specifies the port to which the UNIX Helper `listens' for authentication
+requests after configuration. The default port is 57946.</p>
+
+<a name="fwbrv"></a><h5>Timeout</h5>
+<p>This attribute specifies the number of minutes that users have to complete authentication.
+If users surpass the allotted time, authentication automatically fails. The default time is
+set to 3 minutes.</p>
+
+<a name="fwbls"></a><h5>Threads</h5>
+<p>This attribute specifies the maximum number of permitted simultaneous UNIX authentication sessions. If
+the maximum is reached at a given moment, subsequent authentication attempts are not
+allowed until a session is freed up. The default is set to 5.</p>
+
+<a name="fwbra"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+
+<a name="fwbky"></a><h5>PAM Service Name</h5>
+<p>Defines the PAM (Pluggable Authentication Module) configuration or stack that is shipped for
+you operating system and is used for UNIX authentication. For Solaris, the name
+is usually <tt>other</tt> and for Linux, the name is <tt>password</tt>.</p>
+<br/>
+
+</body>
+</html>

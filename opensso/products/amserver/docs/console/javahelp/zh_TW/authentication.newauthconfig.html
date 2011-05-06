@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>建立新的認證鏈接 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.newauthconfig"></a><h4>建立新的認證鏈接</h4><ol>
+<li><b><a name="indexterm-7"></a>按一下您要新增認證鏈接的範圍名稱。</b></li>
+<li><b>選取 [認證] 標籤。</b></li>
+<li><b>按一下 [認證鏈接] 清單中的 [新建]。</b></li>
+<li><b>輸入此認證鏈接的名稱。</b></li>
+<li><b>按一下 [確定]。</b></li>
+<li><b>按一下 [增加] 以定義您要包括於鏈接中的認證模組實例。若要這麼做，請由實例清單中選取模組實例名稱。　此清單中顯示的模組實例名稱於模組實例屬性中建立。</b></li>
+<li><b>選取鏈接的條件。這些旗標為定義這些旗標的認證模組建立實施條件。此實施具有階層結構。[必要的] 為最高階層而 [可選的] 為最低階層：</b><dl><dt>必要條件</dt>
+<dd><p>模組實例必須成功。若成功，認證將繼續進行至 [認證鏈接] 清單中的下一個選項。如果失敗，立即返回應用程式 (不會繼續認證鏈接清單中的下一個選項)。</p></dd>
+<dt>必要的</dt>
+<dd><p>此模組的認證過程必須成功。若鏈接中所需的任一模組失敗了，則整個認證鏈接將完全失敗。然而，無論所需模組成功與否，將繼續進行至鏈接中的下一個模組。</p></dd>
+<dt>充足的</dt>
+<dd><p>模組實例不必要成功。若其確實成功，立即返回到應用程式 (認證將不進行至模組實例清單的下一個選項)。若失敗，認證將繼續進行至 [認證鏈接] 清單中的下一個選項。</p></dd>
+<dt>可選的</dt>
+<dd><p>模組實例不必要成功。無論成功或失敗，認證都將繼續進行至 [認證鏈接] 清單中的下一個選項。</p></dd>
+</dl>
+</li>
+<li><b>輸入鏈接的選項。允許此模組使用的其他選項，格式為鍵=值對。多重選項由空格分隔。</b></li>
+<li><b>定義下列屬性：</b><dl><dt>成功登入 URL</dt>
+<dd><p>指定使用者認證成功後將重新導向至的 URL。</p></dd>
+<dt>登入失敗 URL</dt>
+<dd><p>指定使用者認證失敗後將重新導向至的 URL。</p></dd>
+<dt>認證發佈處理類別</dt>
+<dd><p>定義在登入成功或失敗後用來自訂認證後程序的 Java 類別名稱。</p></dd>
+</dl>
+</li>
+<li><b>按一下 [儲存]。</b></li></ol>
+<br/>
+
+</body>
+</html>

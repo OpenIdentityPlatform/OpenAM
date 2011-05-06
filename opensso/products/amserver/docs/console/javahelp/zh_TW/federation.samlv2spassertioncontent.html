@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 服務提供者 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2spassertioncontent"></a><h4>自訂 SAMLv2 服務提供者</h4>
+<p>SAMLv2 服務提供者包含下列屬性群組：</p>
+<ul><li><p><a href="#ggvhb">指定內容</a></p></li>
+<li><p><a href="#ggvgt">指定處理</a></p></li>
+<li><p><a href="#ggvfs">服務</a></p></li>
+<li><p><a href="#ggvgp">進階</a></p></li></ul>
+
+
+<a name="ggvhb"></a><h5>指定內容</h5>
+
+<ul><li><p><a href="#ggvyt">請求/回應簽名</a></p></li>
+<li><p><a href="#ggvyf">加密</a></p></li>
+<li><p><a href="#ggvzm">憑證別名</a></p></li>
+<li><p><a href="#ggvxx">名稱 ID 格式</a></p></li>
+<li><p><a href="#ggvzv">認證環境</a></p></li>
+<li><p><a href="#ggvyc">指定時間偏差</a></p></li>
+<li><p><a href="#ggvyr">基本認證</a></p></li></ul>
+
+
+<a name="ggvyt"></a><h5>請求/回應簽名</h5>
+<p>選取任何核取方塊以啟用對下列 SAMLv2 服務提供者請求或回應的簽署：</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>認證請求已簽名</p></td>
+<td align="left" valign="top" scope="row"><p>此服務提供者收到的所有認證請求都必須簽名。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>指定已簽名</p></td>
+<td align="left" valign="top" scope="row"><p>此服務提供者收到的所有指定都必須簽名。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>POST 回應已簽名</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須簽署 <tt>PostResponse</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Artifact 回應</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須簽署 <tt>ArtifactResponse</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>登出請求</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須簽署 <tt>LogoutRequest</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>登出回應</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須簽署 <tt>LogoutResponse</tt>
+元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>管理名稱 ID 請求</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須簽署 <tt>ManageNameIDRequst</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>管理名稱 ID 回應</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須簽署 <tt>ManageNameIDResponse</tt> 元素。</p></td>
+</tr>
+</table>
+
+<a name="ggvyf"></a><h5>加密</h5>
+<p>選取任何核取方塊以啟用對下列元素的加密：</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>屬性</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須加密所有 <tt>AttributeStatement</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>指定</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須加密所有 <tt>Assertion</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>名稱 ID</p></td>
+<td align="left" valign="top" scope="row"><p>身份識別提供者必須加密所有 <tt>NameID</tt> 元素。</p></td>
+</tr>
+</table>
+
+<a name="ggvzm"></a><h5>憑證別名</h5>
+<p>此屬性會定義服務提供者的憑證別名元素。<tt>簽署</tt>會指定用來尋找金鑰庫中正確的簽署憑證的提供者憑證別名。<tt>加密</tt>會指定用來尋找金鑰庫中正確的加密憑證的提供者憑證別名。</p>
+
+<a name="ggvxx"></a><h5>名稱 ID 格式</h5>
+<p>定義服務提供者支援的名稱識別碼格式。提供者可透過名稱識別碼就使用者進行通訊。單次登入互動支援下列類型的識別碼：</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified </tt></p></li></ul>
+<p><b>永久識別碼</b>會做為兩個屬性的值儲存到特定使用者的資料存放區項目中。<b>暫態識別碼</b>是臨時的，不會有任何資料寫入使用者的永久資料存放區。</p>
+
+<a name="ggvzv"></a><h5>認證環境</h5>
+<p>此屬性會將 SAMLv2 定義的認證環境類別對映至服務提供者提供的認證方法。</p><dl><dt>對映程式</dt>
+<dd><p>指定 <tt>SPAuthnContextMapper</tt> 介面的實作，用來建立請求的認證環境。預設實作為 <tt>com.sun.identity.saml2.plugins.</tt><tt>DefaultSPAuthnContexteMapper</tt>。</p></dd>
+<dt>支援的</dt>
+<dd><p>如果身份識別提供者支援認證環境類別，請選取它旁邊的核取方塊。</p></dd>
+<a name="indexterm-64"></a><a name="indexterm-65"></a><a name="indexterm-66"></a><dt>環境參照</dt>
+<dd><p>SAMLv2 定義的認證環境類別包括：</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Telephony</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Unspecified</p></li></ul>
+</dd>
+<dt>層級</dt>
+<dd><p>對映到 OpenSSO 認證架構中定義的認證層級的正數值。認證層級表示對認證方法的信任程度。</p><p>在此框架中，每個服務提供者都會配置預設的認證環境 (喜好的認證方法)。不過，提供者可能想將指定的認證環境變更為以定義的認證層級為基礎的環境。例如，提供者 B 想產生認證層級為 3 的本機階段作業，因此請求身份識別提供者使用指定為該層級的認證環境來認證使用者。此查詢參數的值決定身份識別提供者使用的認證環境。</p></dd>
+<dt>比較類型</dt>
+<dd><p>指定與此特性值比較時必須的結果認證環境。接受的值包括：</p>
+<ul><li><p><b>精確</b>：指定中的認證環境敘述必須至少與其中一個指定的認證環境完全相符。</p></li>
+<li><p><b>最小值</b>：指定中的認證環境敘述必須至少與其中一個指定的認證環境一樣強 (按照身份識別提供者的認定)。</p></li>
+<li><p><b>最大值</b>：指定中的認證環境敘述必須不得比任何一個指定的認證環境強。</p></li>
+<li><p><b>較好</b>：指定中的認證環境敘述必須比任何一個指定的認證環境強。</p></li></ul>
+<p>預設值為<b>精確</b>。</p></dd>
+</dl>
+
+
+<a name="ggvyc"></a><h5>指定時間偏差</h5>
+<p>指定在一段時間內有效，在這之前或之後都無效。此屬性指定 <tt>notBefore</tt> 值的寬限期 (以秒為單位)。預設值為 <tt>300</tt>。這個值與 <tt>notAfter</tt> 值不相關。</p>
+
+<a name="ggvyr"></a><h5>基本認證</h5>
+<p>啟用基本認證可保護 SOAP 端點。任何存取這些端點的提供者都必須擁有下列兩項特性中定義的使用者和密碼：<tt>使用者名稱</tt>和<tt>密碼</tt>。</p>
+
+<a name="ggvgt"></a><h5>指定處理</h5>
+
+<ul><li><p><a href="#ggvym">屬性對映程式</a></p></li>
+<li><p><a href="#ggvyk">自動聯合</a></p></li>
+<li><p><a href="#ggvyb">帳號對映程式</a></p></li>
+<li><p><a href="#ggvyy">暫態使用者</a></p></li>
+<li><p><a href="#ggvzn">URL</a></p></li>
+<li><p><a href="#ggvze">預設轉送狀態</a></p></li>
+<li><p><a href="#ggvzo">介面</a></p></li></ul>
+
+
+<a name="ggvym"></a><h5>屬性對映程式</h5>
+<p>指定值，以定義預設屬性對映程式外掛程式所使用的對映。預設的外掛程式類別為 <tt>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper</tt>。</p><p>對映應以下列格式配置：</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>例如 <tt>EmailAddress=mail</tt> 或 <tt>Address=postaladdress</tt>。鍵入對映做為 [新的值]，然後按一下 [增加]。</p>
+
+<a name="ggvyk"></a><h5>自動聯合</h5>
+<p>如果啟用，自動聯合會根據共用屬性自動聯合使用者的不同提供者帳號。[屬性] 欄位會指定在自動聯合啟用時，用來比對使用者不同提供者帳號的屬性。</p>
+
+<a name="ggvyb"></a><h5>帳號對映程式</h5>
+<p>指定 <tt>AccountMapper</tt> 介面的實作，用來將遠端使用者帳號對映至本機使用者帳號，以便進行單次登入。預設值為 <tt>com.sun.identity.saml2.plugins.</tt><tt>DefaultSPAccountMapper</tt>，即預設實作。</p>
+
+<a name="ghclu"></a><h5>Artifact 訊息編碼</h5>
+<p>此屬性會定義 artifact 的訊息編碼格式，可以是 <tt>URI</tt> 或 <tt>FORM</tt>。</p>
+
+<a name="ggvyy"></a><h5>暫態使用者</h5>
+<p>此屬性指定使用者的識別碼，在使用暫態名稱識別碼進行單次登入時，服務提供者端上所有身份識別提供者使用者都會對映到該識別碼。</p>
+
+<a name="ggvzn"></a><h5>URL</h5>
+<p>[本機認證 URL] 指定本機登入頁面的 URL。</p><p>[中間 URL] 指定可在認證之後以及原始請求的 URL 之前，可將使用者導向至的 URL。例如，自動建立使用者帳號之後的建立帳號成功頁面。</p><p>[外部應用程式登出 URL] 會定義外部應用程式的登出 URL。一旦伺服器收到來自遠端合作夥伴的登出請求後，就會使用回返通道 <tt>HTTP POST</tt> 傳送請求至含有所有 cookie 的登出 URL。或者，如果 URL 中包含查詢參數 <tt>appsessionproperty </tt>
+(設定為階段作業特性名稱)，也可以將使用者階段作業特性作為 <tt>HTTP 標頭</tt>與 <tt> POST</tt> 參數傳送。</p>
+
+<a name="ggvze"></a><h5>預設轉送狀態</h5>
+<p><a name="indexterm-67"></a>在成功的 SAML v2 作業 (單次登入、單一登出或聯合終止) 之後，會顯示一個頁面。此頁面通常為原始請求的資源，是在初始請求中使用 <tt>RelayState</tt> 元素指定。如果未指定 <tt>RelayState</tt>，則會顯示此 <tt>defaultRelayState</tt> 特性的值。</p>
+<hr><p><b>注意 &#8211; </b>當 <tt>RelayState</tt> 或 <tt>defaultRelayState</tt> 包含特殊字元 (例如 <tt>&#38;</tt>) 時，必須以 URL 編碼。例如，如果 <tt>RelayState </tt> 的值為
+<tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt>，則必須以 URL 編碼為：</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>然後附加至 URL。例如，服務提供者啟動的單次登入 URL 可能為：</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggvzo"></a><h5>介面</h5>
+<p>定義 <tt>com.sun.identity.federation.plugins.FederationSPAdapter</tt>介面的實作類別，用來在聯合處理期間增加應用程式專屬的處理。</p>
+
+<a name="ggvfs"></a><h5>服務</h5>
+
+<ul><li><p><a href="#ggwas">中介別名</a></p></li>
+<li><p><a href="#ggvzy">單一登出服務</a></p></li>
+<li><p><a href="#ggwbo">管理名稱 ID 服務</a></p></li>
+<li><p><a href="#ggwdw">指定 Artifact 用戶服務</a></p></li></ul>
+
+
+<a name="ggwas"></a><h5>中介別名</h5>
+<p>為配置的提供者指定 <tt>metaAlias</tt>。<tt>metaAlias</tt> 可用來尋找提供者的實體識別碼及其所在的組織。值為字串，等於範圍或組織名稱 (視 OpenSSO 中是否安裝 聯合服務的 SAML v2 外掛程式而定) 加上正斜線和提供者名稱。例如<tt> /suncorp/travelprovider</tt>。</p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> 中使用的名稱不得包含 <tt>/</tt>。</p>
+<hr>
+
+
+<a name="ggvzy"></a><h5>單一登出服務</h5>
+<p>單一登出服務會同步處理所有由服務提供者所認證的階段作業之登出功能。</p><p><tt>位置</tt>會指定將請求傳送到的提供者的 URL。<tt>回應位置</tt>會指定預期回應提供者的 URL。連結類型包括：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwbo"></a><h5>管理名稱 ID 服務</h5>
+<p>此服務定義特定 URL，當與服務提供者進行通訊以指定主體的新名稱識別碼時，使用這些 URL。(註冊只能在聯合階段作業建立之後進行。)</p><p><tt>位置</tt>會指定將請求傳送到的提供者的 URL。<tt>回應位置</tt>會指定預期回應提供者的 URL。連結類型包括：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdw"></a><h5>指定 Artifact 用戶服務</h5>
+<p>此服務會處理服務提供者從身份識別提供者接收的回應。當服務提供者需要認證使用者時，就會傳送認證請求給身份識別提供者。</p>
+<ul><li><p>HTTP-Artifact 會指定基於 SOAP 的非瀏覽器協定。</p></li>
+<li><p>HTTP-Post 會指定基於瀏覽器的 HTTP POST 協定。</p></li>
+<li><p>PAOS 會定義 PAOS 連結的 URL 位置。</p></li></ul>
+<p><tt>位置</tt>會指定將請求傳送到的提供者的 URL。<tt>索引</tt>會指定標準中介資料中的 URL。<tt>預設</tt>是用於連結的預設 URL。</p>
+
+<a name="ggvgp"></a><h5>進階</h5>
+
+<ul><li><p><a href="#ggwds">SP URL</a></p></li>
+<li><p><a href="#ggwdj">SP 登出 URL</a></p></li>
+<li><p><a href="#ggwbl">應用程式密碼清單</a></p></li>
+<li><p><a href="#ggweh">請求 IDP 清單尋找器實作</a></p></li>
+<li><p><a href="#ggwfa">請求 IDP 清單取得完成</a></p></li>
+<li><p><a href="#ggwav">請求 IDP 清單</a></p></li>
+<li><p><a href="#ggway">IDP 代理伺服器</a></p></li>
+<li><p><a href="#ggwak">簡介</a></p></li>
+<li><p><a href="#ggwcp">代理伺服器計數</a></p></li>
+<li><p><a href="#ggwdz">IDP 代理伺服器清單</a></p></li></ul>
+
+
+<a name="ggwds"></a><h5>SP URL</h5>
+<p>定義可處理 SAE (Secure Attribute Exchange, 安全屬性交換) 請求的服務提供者的 URL 端點。如果此 URL 是為空 (未配置)，則不會啟用
+SAE 單次登入。一般 SAMLv2 單次登入回應將會傳送到服務提供者。</p>
+
+<a name="ggwdj"></a><h5>SP 登出 URL</h5>
+<p>定義可處理 SAE 全域登出請求的服務提供者的 URL 端點。</p>
+
+<a name="ggwbl"></a><h5>應用程式密碼清單</h5>
+<p>此屬性會定義應用程式安全性配置。每個應用程式都必須有一個項目。每個項目的格式如下：</p><p><tt>url=SPAppURL|type=</tt><i>symmetric_orAsymmetric</i><tt>|secret=</tt><i> ampassword encoded shared secret</i><tt></tt></p>
+
+<a name="ggweh"></a><h5>請求 IDP 清單尋找器實作</h5>
+<p>定義 IDP 清單尋找器 SPI 的實作類別。這會傳回 ECP 所信任的喜好身份識別提供者清單。</p>
+
+<a name="ggwfa"></a><h5>請求 IDP 清單取得完成</h5>
+<p>如果 <tt>IDPList</tt> 元素不完整，指定可用來擷取完整的身份識別提供者清單的 URI 參照。</p>
+
+<a name="ggwav"></a><h5>請求 IDP 清單</h5>
+<p>定義供 ECP 連絡的身份識別提供者清單。此清單為 IDP 尋找器 (例如 <tt>com.sun.identity.saml2.plugins.ECPIDPFinder</tt>) 的預設實作所使用。</p>
+
+<a name="ggway"></a><h5>IDP 代理伺服器</h5>
+<p>代理伺服器認證配置屬性定義動態識別提供者代理作業的值。選取此核取方塊，以啟用服務提供者的代理伺服器認證。</p>
+
+<a name="ggwak"></a><h5>簡介</h5>
+<p>若要使用簡介來尋找代理身份識別提供者，請選取核取方塊。</p>
+
+<a name="ggwcp"></a><h5>代理伺服器計數</h5>
+<p>輸入可用於代理伺服器認證的身份識別提供者的最大數目。</p>
+
+<a name="ggwdz"></a><h5>IDP 代理伺服器清單</h5>
+<p>增加可以用於代理伺服器認證的身份識別提供者清單。在 [新的值] 中鍵入定義為提供者的識別碼的 URI，然後按一下 [增加]。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So erstellen Sie eine neue Gruppe - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggobg"></a><h5>So erstellen Sie eine neue Gruppe</h5>
+<p>F&#252;hren Sie diese Aufgabe, sofern erforderlich, an der Federated Access Manager -Administrationskonsole aus.
+Diese Aufgabe bezieht sich auf Webagentengruppen und J2EE-Agentengruppen.</p><p>Erstellen Sie eine Gruppe, wenn die Agenten bestimmte Eigenschaften aus der Gruppe
+&#252;bernehmen sollen. J2EE-Agenten k&#246;nnen Eigenschaften aus einer J2EE-Agentengruppe &#252;bernehmen, Webagenten aus einer
+Webagentengruppe.</p><ol>
+<li><b>Klicken Sie auf der Registerkarte  f&#252;r die Konfiguration auf "Agenten".</b></li>
+<li><b>W&#228;hlen Sie gegebenenfalls die Registerkarte f&#252;r den entsprechenden Agententyp aus.</b><ul>
+<li><b>Webagenten:</b><p>Die Registerkarte "Web" bezieht sich auf Webagenten und ist standardm&#228;&#223;ig ausgew&#228;hlt. Es
+ist keine weitere Auswahl erforderlich.</p></li>
+<li><b>J2EE-Agenten:</b><p>Die Registerkarte "J2EE" bezieht sich auf  J2EE-Agenten. Klicken Sie bei Bedarf
+auf diese Registerkarte.</p></li></ul></li>
+<li><b>Klicken Sie im Abschnitt "Gruppe" auf "Neu".</b><p>Geben Sie im Feld "Name" den Namen der neuen Gruppe ein.</p></li>
+<li><b>Geben Sie im Feld f&#252;r die Server-URL die Server-URL des Federated Access
+Manager ein.</b></li>
+<li><b>Klicken Sie auf "Erstellen".</b><p>Die Konsole erstellt die Agentengruppe und zeigt die Agentenseite (WebAgent bzw. J2EEAgent)
+mit einer Verkn&#252;pfung zu der Gruppe an.</p><p>Wenn Sie weitere Konfigurationen an der Gruppe vornehmen m&#246;chten, klicken Sie auf
+diese Verkn&#252;pfung, um die Seite zur Bearbeitung der Agentengruppe anzuzeigen.</p><p>Zur Konfiguration k&#246;nnen Sie dieselben Attribute festlegen wie bei einzelnen Agenten, au&#223;er
+dass die Attribute "Gruppe", "Passwort" und "Passwortbest&#228;tigung" auf Gruppenebene nicht verf&#252;gbar sind.</p>
+<hr><p><b>Hinweis &#8211; </b>Denken Sie au&#223;erdem daran, dass einigen Gruppenattributen bereits Variablenwerte zugewiesen wurden, die
+in den meisten F&#228;llen nicht ge&#228;ndert werden sollten. Im Folgenden finden Sie
+ein Beispiel f&#252;r einen solchen Wert:</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

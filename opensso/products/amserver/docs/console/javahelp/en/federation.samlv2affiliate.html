@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 Hosted Affiliation Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2affiliate"></a><h4>SAMLv2 Hosted Affiliation Customization</h4>
+<p>A Hosted Affiliation contains a grouping of service providers. The affiliation is formed
+and maintained by an affiliation owner who chooses the member providers from already
+configured provider entities. The affiliation enables a user to federate amongst the group
+of associated sites. The chosen providers may invoke services either as a member of
+the affiliation, or individually as a provider. If services are invoked as an
+affiliation member, a service provider might issue an authentication request for a user
+on behalf of an affiliation. When authentication is secured, the user can achieve
+single sign-on with all members of the affiliation. </p><p>A hosted affiliation provider holds the metadata that defines the grouping of one
+or more provider entities that comprise the affiliation. It does not contain the
+configuration information for any providers (which is defined in a provider entity), only
+the configuration information for the affiliation itself.  If there are several service
+providers and identity providers in the same circle of trust, use an affiliate entity
+to avoid having to generate different name identifiers for commonly shared services. </p><p>Hosted Affiliation contains the following attributes for customization:</p>
+<ul><li><p><a href="#ggwxt">Meta Alias</a></p></li>
+<li><p><a href="#ggwxj">Members</a></p></li>
+<li><p><a href="#ggwww">Cert Alias</a></p></li></ul>
+
+
+<a name="ggwxt"></a><h5>Meta Alias</h5>
+<p>Specifies a <tt>metaAlias</tt> for the provider being configured. The <tt>metaAlias</tt> is used to
+locate the provider's entity identifier and the organization in which it is located. The
+value is a string equal to the realm or organization name (dependent on
+whether the SAML v2 Plug-in for Federation Services is installed in OpenSSO) coupled
+with a forward slash and the provider name. For example, <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Caution &#8211; </b>The names used in the <tt>metaAlias</tt> must not contain a <tt>/</tt>.</p>
+<hr>
+
+
+<a name="ggwxj"></a><h5>Members</h5>
+<p>A provider must be a member of a circle of trust, or
+it cannot participate in Liberty-based communications. The provider can belong to one or more
+affiliations. Enter the entity ID of the provider in the New Value field
+and click Add.</p>
+
+<a name="ggwww"></a><h5>Cert Alias</h5>
+<p>This attribute defines the certificate alias elements for the provider. <tt>Signing</tt> specifies the
+provider certificate alias used to find the correct signing certificate in the keystore.
+<tt>Encryption</tt> specifies the provider certificate alias used to find the correct encryption certificate
+in the keystore.</p>
+<br/>
+
+</body>
+</html>

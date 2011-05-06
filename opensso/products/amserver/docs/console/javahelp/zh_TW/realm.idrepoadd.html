@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAPv3 儲存庫外掛程式屬性
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="realm.idrepoadd"></A><h3>LDAPv3 儲存庫外掛程式屬性</h3>
+<p><A NAME="indexterm-13"></A>下列屬性用於配置 LDAPv3 儲存庫外掛程式：</p>
+<ul><li><p><A HREF="realm.idrepoadd.html#fyfdo">主 LDAP 伺服器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdt">LDAP 連結 DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfds">LDAP 連結密碼</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdu">LDAP 連結密碼 (確認)</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdv">LDAP 組織 DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdw">啟用 LDAP SSL</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfej">LDAP 連接儲存區最小大小</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfee">LDAP 連接儲存區最大大小</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdx">從搜尋傳回的最多結果</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfen">搜尋逾時</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdz">LDAP 依照參照</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffh">LDAPv3 儲存庫外掛程式類別名稱</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeu">屬性名稱對映</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffb">LDAPv3 外掛程式支援的類型和作業</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffj">LDAP 使用者搜尋屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeo">LDAP 使用者搜尋篩選器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffi">LDAP 使用者物件類別</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfez">LDAP 使用者屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeb">LDAP 群組搜尋屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfep">LDAP 群組搜尋篩選器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfed">LDAP 群組容器命名屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfec">LDAP 群組容器值</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffc">LDAP 群組物件類別</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfff">LDAP 群組屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfea">群組成員身份的屬性名稱</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfes">群組成員的屬性名稱</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfev">群組成員 URL 的屬性名稱</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfem">LDAP 使用者容器命名屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffe">LDAP 使用者容器值</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffk">代理程式搜尋屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffl">LDAP 代理程式容器命名屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffa">LDAP 代理程式容器值</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffd">LDAP 代理程式搜尋篩選器</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfey">LDAP 代理程式物件類別</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfew">LDAP 代理程式屬性</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfef">永久性搜尋基底 DN</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffz">重新啟動前永久性搜尋最長閒置時間</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfgh">出現錯誤碼後的最大重試次數</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfge">重試之間的延遲時間</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffr">需要重試的 LDAPException 錯誤碼</A></p>
+</li>
+</ul>
+<A NAME="fyfdo"></A><h4>主 LDAP 伺服器</h4>
+<p>輸入您要連接的 LDAP 伺服器名稱。格式應為 <tt>hostname.domainname:portnumber</tt>。</p>
+<p>如果輸入了多個 <tt>host:portnumber</tt> 項目，則會嘗試連接清單中的第一個主機。僅當連接至目前主機失敗時，才會嘗試清單中的下一個項目。</p>
+<A NAME="fyfdt"></A><h4>LDAP 連結 DN</h4>
+<p>指定 Access Manager 將用來認證您目前所連接之 LDAP 伺服器的 DN 名稱。具有連結所用之 DN 名稱的使用者應具有您配置於 <A HREF="realm.idrepoadd.html#fyffb">LDAPv3 外掛程式支援的類型和作業</A>屬性中的正確的新增/修改/刪除權限。</p>
+<A NAME="fyfds"></A><h4>LDAP 連結密碼</h4>
+<p>指定 Access Manager 將用來認證您目前所連接之 LDAP 伺服器的 DN 密碼。</p>
+<A NAME="fyfdu"></A><h4>LDAP 連結密碼 (確認)</h4>
+<p>確認密碼。</p>
+<A NAME="fyfdv"></A><h4>LDAP 組織 DN</h4>
+<p>此資料存放區將對映的 DN 。此將為於此資料存放區中執行之所有作業的基底 DN。</p>
+<A NAME="fyfdw"></A><h4>啟用 LDAP SSL</h4>
+<p>當啟用時，Access Manger 將使用 HTTPS 協定連線至主伺服器。</p>
+<A NAME="fyfej"></A><h4>LDAP 連接儲存區最小大小</h4>
+<p>指定連接儲存區中的初始連線數目。使用連線池就不必每次都建立新的連線。</p>
+<A NAME="fyfee"></A><h4>LDAP 連接儲存區最大大小</h4>
+<p>指定允許的最大連線數目。</p>
+<A NAME="fyfdx"></A><h4>從搜尋傳回的最多結果</h4>
+<p>指定搜尋作業傳回項目的最大數目。若已達到上限，Directory Server 會傳回任何符合搜尋請求的項目。</p>
+<A NAME="fyfen"></A><h4>搜尋逾時</h4>
+<p>指定搜尋請求所分配的最大秒數。若已達到上限，Directory Server 會傳回任何符合搜尋請求的搜尋項目。</p>
+<A NAME="fyfdz"></A><h4>LDAP 依照參照</h4>
+<p>若啟用，此選項指定自動跟隨其他 LDAP 伺服器的參照。</p>
+<A NAME="fyffh"></A><h4>LDAPv3 儲存庫外掛程式類別名稱</h4>
+<p>指定實作 Access Manager 儲存庫外掛程式的類別檔案位置。</p>
+<A NAME="fyfeu"></A><h4>屬性名稱對映</h4>
+<p>啟用將對映至本機資料存放區的框架所知的通用屬性。例如，若框架使用 <tt>inetUserStatus</tt> 來決定使用者狀態，則本機資料存放區可能實際使用 <tt>userStatus</tt>。屬性定義區分大小寫。</p>
+<A NAME="fyffb"></A><h4>LDAPv3 外掛程式支援的類型和作業</h4>
+<p>指定　LDAP 伺服器允許的或可執行的作業。預設作業是僅限於此 LDAPv3 儲存庫外掛程式支援的作業。以下是「LDAPv3 儲存庫外掛程式」支援的作業：</p>
+<ul><li><p>群組 &#8212; 讀取、建立、編輯、刪除</p>
+</li>
+<li><p>範圍 &#8212; 讀取、建立、編輯、刪除、服務</p>
+</li>
+<li><p>使用者 &#8212; 讀取、建立、編輯、刪除、服務</p>
+</li>
+<li><p>代理程式 &#8212; 讀取、建立、編輯、刪除</p>
+</li>
+</ul>
+<p>您可以根據 LDAP 伺服器的設定與作業</p>
+<p>從上述作業移除權限，但您不可以新增更多的權限。</p>
+<A NAME="fyffj"></A><h4>LDAP 使用者搜尋屬性</h4>
+<p>此欄位定義對使用者進行搜尋的屬性類型。例如，若使用者的 DN 是 <tt>uid=user1,ou=people,dc=iplanet,dc=com</tt>，則命名屬性是 <tt>uid</tt>。</p>
+<A NAME="fyfeo"></A><h4>LDAP 使用者搜尋篩選器</h4>
+<p>指定用於尋找使用者項目的搜尋篩選器。</p>
+<A NAME="fyffi"></A><h4>LDAP 使用者物件類別</h4>
+<p>指定使用者的物件類別。當建立了一個使用者時，本使用者物件類別清單將新增至使用者的屬性清單。</p>
+<A NAME="fyfez"></A><h4>LDAP 使用者屬性</h4>
+<p>定義與使用者相關聯的屬性清單。任何不在本清單上的讀取/寫入使用者屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+<A NAME="fyfeb"></A><h4>LDAP 群組搜尋屬性</h4>
+<p>此欄位定義對群組進行搜尋的屬性類型。預設值為 <tt>cn</tt>。</p>
+<A NAME="fyfep"></A><h4>LDAP 群組搜尋篩選器</h4>
+<p>指定用於尋找群組項目的搜尋篩選器。預設值為 <tt>(objectclass=groupOfUniqueNames)</tt>。</p>
+<A NAME="fyfed"></A><h4>LDAP 群組容器命名屬性</h4>
+<p>若群組存在於容器中，請指定群組容器的命名屬性。否則，此屬性將為空白。例如，若 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的群組 DN 位於 <tt>ou=groups</tt> 之中，則群組容器命名屬性為 <tt>ou</tt>。</p>
+<A NAME="fyfec"></A><h4>LDAP 群組容器值</h4>
+<p>指定群組容器值。例如，如果 <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> 的群組 DN 位於容器名稱 <tt>ou=groups</tt> 之中，則群組容器值應為 <tt>groups</tt>。</p>
+<A NAME="fyffc"></A><h4>LDAP 群組物件類別</h4>
+<p>指定群組的物件類別。當建立了一個群組者時，本群組物件類別清單將新增至群組的屬性清單。</p>
+<A NAME="fyfff"></A><h4>LDAP 群組屬性</h4>
+<p>定義與群組相關聯的屬性清單。任何不在本清單上的讀取/寫入群組屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+<A NAME="fyfea"></A><h4>群組成員身份的屬性名稱</h4>
+<p>指定屬性名稱，其值為 DN 所屬之所有群組的名稱。預設值為 <tt>memberOf</tt>。</p>
+<A NAME="fyfes"></A><h4>群組成員的屬性名稱</h4>
+<p>指定屬性名稱，其值為屬於此群組的 DN。預設值為 <tt>uniqueMember</tt>。</p>
+<A NAME="fyfev"></A><h4>群組成員 URL 的屬性名稱</h4>
+<p>指定屬性名稱，其值為解析為此群組所屬成員的一個 LDAP URL。預設值為 <tt>memberUrl</tt>。</p>
+<A NAME="fyfem"></A><h4>LDAP 使用者容器命名屬性</h4>
+<p>若使用者存在於容器中，請指定使用者容器的命名屬性。若使用者並未位於使用者容器中，此欄位應為空白。</p>
+<A NAME="fyffe"></A><h4>LDAP 使用者容器值</h4>
+<p>指定使用者容器值。預設值為 <tt>people</tt>。</p>
+<A NAME="fyffk"></A><h4>代理程式搜尋屬性</h4>
+<p>此欄位定義對代理程式進行搜尋的屬性類型。預設值為 <tt>uid</tt>。</p>
+<A NAME="fyffl"></A><h4>LDAP 代理程式容器命名屬性</h4>
+<p>若代理程式位於一個代理程式容器中，則為代理程式容器的命名屬性。若代理程式並未位於代理程式容器中，此欄位應為空白。</p>
+<A NAME="fyffa"></A><h4>LDAP 代理程式容器值</h4>
+<p>指定代理程式容器值。預設值為 <tt>agents</tt>。</p>
+<A NAME="fyffd"></A><h4>LDAP 代理程式搜尋篩選器</h4>
+<p>定義用來搜尋代理程式的篩選器。LDAP 代理程式搜尋屬性置於此欄位之前以形成實際代理程式搜尋篩選器。</p>
+<p>例如，若 [LDAP 代理程式搜尋屬性] 為 <tt>uid</tt>，而 [LDAP 使用者搜尋篩選器] 為 <tt>(objectClass=sunIdentityServerDevice)</tt>，則實際使用者搜尋篩選器將為：<tt>(&#38;(uid=*)(objectClass=sunIdentityServerDevice))</tt></p>
+<A NAME="fyfey"></A><h4>LDAP 代理程式物件類別</h4>
+<p>定義代理程式的物件類別。當建立了一個代理程式時，本使用者物件類別清單將新增至代理程式的屬性清單</p>
+<A NAME="fyfew"></A><h4>LDAP 代理程式屬性</h4>
+<p>定義與代理程式相關聯的屬性清單。任何不在本清單上的讀取/寫入代理程式屬性嘗試皆不被允許。這些屬性區分大小寫。於此處定義物件類別與屬性模式之前，必須在 Directory Server 中定義物件類型與屬性模式。</p>
+<A NAME="fyfef"></A><h4>永久性搜尋基底 DN</h4>
+<p>定義用於永久性搜尋的基 DN。某些 LDAPv3 伺服器僅在根字尾層次上支援永久性搜尋。</p>
+<A NAME="fyffz"></A><h4>重新啟動前永久性搜尋最長閒置時間</h4>
+<p>重新啟動永久性搜尋前，請定義最大閒置時間。此值必須大於 1。若值小於或等於 1，則無論連線的閒置時間為何，皆將重新啟動搜尋。</p>
+<p>若 Access Manager 與載入平衡器同時部署，則某些載入平衡器將在閒置一段特定時間后逾時。於此條件中，您應該將	 重新啟動前永久性搜尋最長閒置時間設定為一個小於載入平衡器之特定時間的值。</p>
+<A NAME="fyfgh"></A><h4>出現錯誤碼後的最大重試次數</h4>
+<p>若遇到 需要重試的 LDAPException 錯誤碼中指定的錯誤碼，請定義永久性搜尋作業的最大重試次數。</p>
+<A NAME="fyfge"></A><h4>重試之間的延遲時間</h4>
+<p>指定每次重試前的等待時間。僅適用於永久性搜尋連線。</p>
+<A NAME="fyffr"></A><h4>需要重試的 LDAPException 錯誤碼</h4>
+<p>指定錯誤碼以初始永久性搜尋作業重試。此屬性僅適用於永久性搜尋，並不適用於所有 LDAP 作業。</p>
+
+<br />
+
+</body>
+</html>

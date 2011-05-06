@@ -1,0 +1,75 @@
+<div><table cellpadding="0" cellspacing="10" border="0" align="left" valign="top">
+  <col WIDTH=100%>
+
+    <tr><td><img src="../../../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+
+    <tr><td><font size="2"><i>You can post comments and questions regarding the documentation provided below on the <a href="http://wiki.java.net/bin/view/Projects/DocFeedback" target="_blank">Documentation Feedback Wiki Page</a>. The page will open in a new window.</i>
+</font></td></tr>
+
+    <tr><td><h2>Authentication Chaining</h2></td></tr>
+    
+    <tr><td><font size="2"><p>One or more authentication modules instances can be configured so a user must
+pass authentication credentials to all of them. This is referred to as <b>authentication chaining</b>.
+When an authentication chain is configured, a user interacts with each of the authentication
+module instances in the chain, from the top down, in order to pass
+the authentication process. A criteria flag is assigned to each instance in the
+chain that defines how to continue processing the ordered group of modules if,
+for example, authentication to one of the modules fails. Once authentication to all
+modules in the chain has been successfully achieved, the Authentication Service validates that all
+user identifiers used map to the same user. (These identifiers must be configured
+in the User Alias List attribute in the user's profile.) If this validation
+is successful, a session token is issued for the user and the policy
+evaluation process begins. Authentication chains can be assigned to a realm, a user,
+a role, or a service.</p>
+<hr><p><b>Note - </b>Authentication chaining is achieved using the Java Authentication and Authorization Service (JAAS) framework
+integrated into the Authentication Service.</p>
+<hr>
+<a name="gespn"></a><h4>To Create an Authentication Chain</h4><ol>
+<li><b>Click the name of the realm to which you will add the new
+authentication chain.</b></li>
+<li><b>Select the Authentication tab.</b></li>
+<li><b>Click New under Authentication Chaining.</b></li>
+<li><b>Enter a name for the authentication chain and click OK.</b><p>The authentication chain's Properties page will be displayed.</p></li>
+<li><b>Click Add to define one or more authentication module instances for the chain.</b></li>
+<li><b>Chose one or more of the displayed module instances for the chain.</b><p>The instances displayed are picked up from the realm's configured Module Instances.</p></li>
+<li><b>Select the criteria for the particular instance in the authentication chain.</b><p>These flags establish enforcement criteria for the specified authentication module. There is a
+hierarchy for this enforcement; Required being the highest and Optional the lowest.</p><dl><dt>Required</dt>
+<dd>
+<p>Authentication to this module is required to succeed. If any of the required modules in the chain fail, authentication will ultimately fail. However, whether a required module succeeds or not, the authentication process will continue with the next module in the chain.</p></dd>
+<dt>Requisite</dt>
+<dd>
+<p>Authentication to this module is required to succeed. If it succeeds, the authentication process continues with the next module in the chain. If it fails, control immediately returns back to the requesting application.</p></dd>
+<dt>Sufficient</dt>
+<dd>
+<p>The module instance is not required to succeed. If it does succeed, control immediately returns back to the requesting application. If it fails, the authentication process continues with the next module in the chain.</p></dd>
+<dt>Optional</dt>
+<dd>
+<p>The module instance is not required to succeed. Whether it succeeds or fails, the authentication process continues with the next module in the chain.</p></dd>
+</dl>
+<p>Overall authentication succeeds only if all Required and Requisite modules succeed. If a
+Sufficient module is configured and succeeds, then only Required and Requisite modules prior
+to the Sufficient module need to have succeeded for overall authentication to succeed.
+If no Required or Requisite modules are configured for an application, then at least
+one Sufficient or Optional module must succeed.</p></li>
+<li><b>Enter options for the chain.</b><p>This allows you to define additional options for the module as <tt><b>key=</tt><i>value</i><tt></b></tt> pairs
+as in <tt><b>debug="true"</b></tt>. Multiple options are separated by a space. There is no
+limit to the number of options.</p></li>
+<li><b>Define the remaining attributes.</b><dl><dt>Successful Login URL</dt>
+<dd>
+<p>This attribute specifies the URL that the user will be redirected to upon a successful authentication. The format is <tt><b></tt><i>clientType</i><tt>/</tt><i>URL</i><tt></b></tt>.</p></dd>
+<dt>Failed Login URL</dt>
+<dd>
+<p>Specifies the URL that the user will be redirected to upon a failed authentication</p></dd>
+<dt>Authentication Post Processing Class</dt>
+<dd>
+<p>Defines the name of the Java class used to customize the post authentication process after a login success or failure</p></dd>
+</dl>
+</li>
+<li><b>Click Save.</b></li></ol></font></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

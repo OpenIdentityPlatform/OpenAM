@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Atributos de configuraci&#243;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="service.scconfig"></a><h3>Atributos de configuraci&#243;n</h3><p><a name="indexterm-164"></a>La p&#225;gina Configuraci&#243;n permite a los administradores gestionar los valores de atributo
+de los servicios que ofrece OpenSSO. Los atributos que componen un servicio
+de OpenSSO se clasifican en los tipos siguientes:</p><p><b>Global</b>: se aplica en toda la configuraci&#243;n de OpenSSO. No se pueden
+aplicar a usuarios, roles ni dominios, ya que el prop&#243;sito de los
+atributos globales es personalizar OpenSSO.</p><p><b>Dominio</b>: los atributos de dominio s&#243;lo se asignan a dominios. No se
+asocia ninguna clase de objeto con los atributos de dominio. Por ejemplo,
+los atributos que se muestran en los servicios de autenticaci&#243;n se definen
+como atributos de dominio porque la autenticaci&#243;n se lleva a cabo en
+el nivel de dominio y no en el nivel de &#225;rbol o
+usuario.</p><p><b>Din&#225;mico</b>: se aplica a un rol o dominio configurado de OpenSSO. Cuando
+se asigna un rol a un usuario o se crea un usuario
+en un dominio, el atributo din&#225;mico se convierte en una caracter&#237;stica del
+usuario.</p><p><b>Usuario</b>: se aplica directamente a cada usuario. No se heredan de roles
+o dominios y, normalmente, son diferentes para cada usuario.</p><p>Los atributos de configuraci&#243;n que puede modificar son los siguientes:</p>
+<ul><li><p><a href="service.scconfigauth.html">Autenticaci&#243;n</a></p></li>
+<li><p><a href="service.scconfigconsole.html">Propiedades de la consola</a></p></li>
+<li><p><a href="servic.scconfigglobal.html">Propiedades globales</a></p></li>
+<li><p><a href="service.scfonfigsystem.html">Propiedades del sistema</a></p></li>
+<li><p><a href="service.serversite.html">Servidores y sitios</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

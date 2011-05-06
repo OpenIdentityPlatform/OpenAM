@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Logging - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>Logging</h4>
+<p><a name="indexterm-203"></a>The Logging service provides status and error messages related to OpenSSO administration. An
+administrator can configures values such as log file size and log file location.
+OpenSSO can record events in flat text files or in a relational database.
+The Logging service attributes are global attributes. The attributes are:</p>
+<ul><li><p><a href="#fxbsv">Maximum Log Size</a></p></li>
+<li><p><a href="#fxbsg">Number of History Files</a></p></li>
+<li><p><a href="#fxbzh">Log File Location</a></p></li>
+<li><p><a href="#fxbwg">Logging Type</a></p></li>
+<li><p><a href="#fxbrd">Database User Name</a></p></li>
+<li><p><a href="#fxcdf">Database User Password</a></p></li>
+<li><p><a href="#fxcep">Database User Password (confirm)</a></p></li>
+<li><p><a href="#fxbvb">Database Driver Name</a></p></li>
+<li><p><a href="#fxbsb">Configurable Log Fields</a></p></li>
+<li><p><a href="#fxccb">Log Verification Frequency</a></p></li>
+<li><p><a href="#fxbxe">Log Signature Time</a></p></li>
+<li><p><a href="#fxcbz">Secure Logging</a></p></li>
+<li><p><a href="#fxbxt">Maximum Number of Records</a></p></li>
+<li><p><a href="#fxbwp">Number of Files per Archive</a></p></li>
+<li><p><a href="#fxbyw">Buffer Size</a></p></li>
+<li><p><a href="#fxbvh">DB Failure Memory Buffer Size</a></p></li>
+<li><p><a href="#fxcea">Buffer Time</a></p></li>
+<li><p><a href="#fxbsn">Time Buffering</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>Maximum Log Size</h5>
+<p>This attribute accepts a value for the maximum size (in bytes) of a
+OpenSSO log file. The default value is 1000000.</p>
+
+<a name="fxbsg"></a><h5>Number of History Files</h5>
+<p>This attribute has a value equal to the number of backup log files
+that will be retained for historical analysis. Any integer can be entered depending
+on the partition size and available disk space of the local system. The
+default value is 3.</p><p>The files only apply to the FILE logging type. When the logging type
+is set to DB, there are no history files and limit explicitly set
+by OpenSSO to the size of the files.</p>
+<hr><p><b>Note &#8211; </b>Entering a value of 0 is interpreted to be the same as a
+value of 1, meaning that if you specify 0, a history log
+file will be created.</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>Log File Location</h5>
+<p>The file-based logging function needs a location where log files can be stored.
+. The default location is:</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt> is a tag representing the base configuration directory and the OpenSSO's server's
+URI. At runtime, the logging service determines the instance's proper  directory for logging.
+This attribute's value can be set to  an explicit path , but
+the base path  should be its configuration directory.</p><p>If a non-default directory is specified, OpenSSO will create the directory if it
+does not exist. You should then set the appropriate permissions for that directory
+(for example, 0700).</p><p>When configuring the log location for DB (database) logging (such as, Oracle or
+MySQL), part of the log location is case sensitive. For example, if you
+are logging to an Oracle database, the log location should be (note case
+sensitivity):</p><p><tt>jdbc:oracle:thin:@machine.domain:port:DBName</tt></p><p>To configure logging to DB, add the JDBC driver files to the web
+container's JVM classpath. You need to manually add JDBC driver files to the
+classpath of the <tt>amadmin</tt> script, otherwise  <tt>amadmin</tt> logging can not load the
+JDBC driver.</p><p>Changes to logging attributes usually take effect after you save them. This does
+not require you to restart the server. If you are changing to secure
+logging, however, you should restart the server.</p>
+
+<a name="ggyhl"></a><h5>Log Status</h5>
+<p>Specifies whether logging is turned on (ACTIVE) or off (INACTIVE). Value is set
+to ACTIVE during installation. </p>
+
+<a name="ggydj"></a><h5>Log Record Resolve Host Name</h5>
+<p>If set to false, host lookups will not be performed to populate the
+LogRecord's HostName field.</p>
+
+<a name="fxbwg"></a><h5>Logging Type</h5>
+<p>Enables you to specify either File, for flat file logging, or DB for
+database logging.</p><p>If the Database User Name or Database User Password is invalid, it will
+seriously affect OpenSSO processing. If OpenSSO or the console becomes unstable, you set
+the Log Status attribute to Inactive. </p><p>After you have set the property, restart the server. You can then log
+in to the console and reset the logging attribute. Then, change the Log
+Status property to <i>ACTIVE</i>  and restart the server.</p>
+
+<a name="fxbrd"></a><h5>Database User Name</h5>
+<p>This attribute accepts the name of the user that will connect to the
+database when the Logging Type attribute is set to DB.</p>
+
+<a name="fxcdf"></a><h5>Database User Password</h5>
+<p>This attribute accepts the database user password when the Logging Type attribute is
+set to DB.</p>
+
+<a name="fxcep"></a><h5>Database User Password (confirm)</h5>
+<p>Confirm the database password.</p>
+
+<a name="fxbvb"></a><h5>Database Driver Name</h5>
+<p>This attribute enables you to specify the driver used for the logging implementation
+class.</p>
+
+<a name="fxbsb"></a><h5>Configurable Log Fields</h5>
+<p>Represents the list of fields that are to be logged. By default, all
+of the fields are logged. The fields are:</p>
+<ul><li><p>CONTEXTID</p></li>
+<li><p>DOMAIN</p></li>
+<li><p>HOSTNAME</p></li>
+<li><p>IPADDRESS</p></li>
+<li><p>LOGGED BY</p></li>
+<li><p>LOGLEVEL</p></li>
+<li><p>LOGINID</p></li>
+<li><p>MESSAGEID</p></li>
+<li><p>MODULENAME</p></li></ul>
+<p>At minimum you should log CONTEXTID, DOMAIN, HOSTNAME, LOGINID and MESSAGEID.</p>
+
+<a name="fxccb"></a><h5>Log Verification Frequency</h5>
+<p>This attribute sets the frequency (in seconds) that the server should verify the
+logs to detect tampering. The default time is 3600 seconds. This parameter applies
+to secure logging only.</p>
+
+<a name="fxbxe"></a><h5>Log Signature Time</h5>
+<p>This parameter sets the frequency (in seconds) that the log will be signed.
+The default time is 900 seconds. This parameter applies to secure logging only.</p>
+
+<a name="fxcbz"></a><h5>Secure Logging</h5>
+<p>This attribute enables or disables secure logging. By default, secure logging is off.
+Secure Logging enables detection of unauthorized changes or tampering of security logs.</p>
+<hr><p><b>Note &#8211; </b>Secure logging can only be used for flat files. This option does not
+work for Database (DB) logging.</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>Secure Logging Signing Algorithm</h5>
+<p>This attribute defines RSA and DSA (Digital Signature Algorithm), which have private keys
+for signing and a public key for verification. You can select from the
+following:</p>
+<ul><li><p>MD2 w/RSA</p></li>
+<li><p>MD5 w/RSA</p></li>
+<li><p>SHA1 w/DSA</p></li>
+<li><p>SHA1 w/RSA</p></li></ul>
+<p>MD2, MD5 and RSA are one-way hashes.  For example, if you
+select the signing algorithm MD2 w/RSA, the secure logging feature generates a group of
+messages with MD2 and encrypts the value with the RSA private key. This
+encrypted value is the signature of the original logged records and will be
+appended to the last record of the most recent signature. For validation, it
+well decrypt the signature with the RSA public key and compare the decrypted
+value to the group of logged records. The secure logging feature will then
+will detect any modifications to any logged record.</p>
+
+<a name="ghaeg"></a><h5>Logging Certificate Store Location</h5>
+<p>When secure logging is enabled, the logging service looks for its certificate at
+the location specified by this attribute.  The actual directory path is determined
+at  runtime.  The value can be set to an explicit path,
+but the base  path should be accessible by the OpenSSO instance.</p>
+
+<a name="fxbxt"></a><h5>Maximum Number of Records</h5>
+<p>This attribute sets the maximum number of records that the Java LogReader
+interfaces return, regardless of how many records match the read query. By default,
+it is set to 500. This attribute can be overridden by the caller
+of the Logging API through the  <i>LogQuery</i> class.</p>
+
+<a name="fxbwp"></a><h5>Number of Files per Archive</h5>
+<p>This attribute is only applicable to secure logging. It specifies when the log
+files and keystore need to be archived, and the secure keystore regenerated, for
+subsequent secure logging. The default is five files per logger.</p>
+
+<a name="fxbyw"></a><h5>Buffer Size</h5>
+<p>This attribute specifies the maximum number of log records to be buffered in
+memory before the logging service attempts to write them to the logging repository.
+The default is one record.</p>
+
+<a name="fxbvh"></a><h5>DB Failure Memory Buffer Size</h5>
+<p>This attribute defines the maximum number of log records held in memory if
+database (DB) logging fails. This attribute is only applicable when DB logging is
+specified. When the OpenSSO logging service loses connection to the DB, it will
+buffer up to the number of records specified. This attribute defaults to two
+times of the value defined in the Buffer Size attribute.</p>
+
+<a name="fxcea"></a><h5>Buffer Time</h5>
+<p>This attribute defines the amount of time that the log records will buffered
+in memory before they are sent to the logging service to be logged.
+This attribute applies if Enable Time Buffering is ON. The default is 3600
+seconds.</p>
+
+<a name="fxbsn"></a><h5>Time Buffering</h5>
+<p>When selected as ON, OpenSSO will set a time limit for log
+records to be buffered in memory. The amount of time is set in
+the Buffer Time attribute.</p>
+
+<a name="ghaer"></a><h5>Logging Level</h5>
+<p>Use this attribute to configure the degree of detail to be contained in
+a specific log file by selecting one of the choices. OpenSSO services log
+at the INFO level. SAML and Identity Federation services also log at more
+detailed levels (FINE, FINER, FINEST).  In addition there is a level OFF
+that can be used to turn off logging, and a level ALL that
+can be used to enable logging of all messages.</p>
+<br/>
+
+</body>
+</html>

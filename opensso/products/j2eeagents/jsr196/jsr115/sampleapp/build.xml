@@ -1,0 +1,134 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.2 2009/07/09 17:04:22 veiming Exp $
+
+-->
+
+<project name="AgentSample" default="rebuild">
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <target name="init">
+
+        <!-- Replace APPSERV_LIB_DIR with the directory where j2ee.jar is located -->
+        <property name="appserv.lib.dir" value="d:\\Nov28\\lib"/>
+        <property name="docroot.dir" value="docroot"/>
+        <property name="src.dir" value="src"/>
+        <property name="servlet.src.dir" value="${src.dir}/servlet"/>
+        <property name="ejb.src.dir" value="${src.dir}/ejb"/>
+        <property name="lib.dir" value="lib"/>
+        <property name="built.dir" value="built"/>
+        <property name="built.web.dir" value="${built.dir}/web"/>
+        <property name="built.ejb.dir" value="${built.dir}/ejb"/>
+        <property name="built.ear.dir" value="${built.dir}/ear"/>
+        <property name="dist.dir" value="dist"/>
+        <property name="etc.dir" value="etc"/>
+    </target>
+
+    <target name="rebuild" depends="clean,build"/>
+ 
+    <target name="clean" depends="init">
+        <delete dir="${built.dir}"/>
+    </target>
+
+    <target name="build" depends="buildejb, buildweb">
+        <mkdir dir="${built.ear.dir}"/>
+        <mkdir dir="${built.ear.dir}/META-INF"/>
+        <copy todir="${built.ear.dir}/META-INF">
+            <fileset dir="${etc.dir}">
+                <include name="application.xml"/>
+                <include name="sun-application.xml"/>
+            </fileset>
+        </copy>
+        <jar basedir="${built.ejb.dir}"
+             jarfile="${built.ear.dir}/agentejb.jar"/>
+        <jar basedir="${built.web.dir}"
+             jarfile="${built.ear.dir}/agentservlets.war"/>
+        <jar basedir="${built.ear.dir}"
+             jarfile="${dist.dir}/agentsample.ear"/>
+    </target>
+
+    <target name="buildejb" depends="preparebuildejb">
+        <javac srcdir="${ejb.src.dir}"
+               destdir="${built.ejb.dir}"
+               source="${target.jdk.set}" target="${target.jdk.set}"
+               includes="com/sun/identity/agents/**/*.java"
+               classpath="${ejb.classpath}"/>
+        <copy todir="${built.ejb.dir}/META-INF">
+            <fileset dir="${etc.dir}">
+                <include name="ejb-jar.xml"/>
+                <include name="sun-ejb-jar.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="preparebuildejb" depends="preparebuild">
+        <mkdir dir="${built.ejb.dir}"/>
+        <mkdir dir="${built.ejb.dir}/META-INF"/>
+        <path id="ejb.class.path">
+            <pathelement location="${appserv.lib.dir}/j2ee.jar"/>
+            <pathelement location="${built.ejb.dir}"/>
+        </path>
+        <property name="ejb.classpath" refid="ejb.class.path"/> 
+    </target>
+
+    <target name="buildweb" depends="preparebuildweb">
+        <javac srcdir="${servlet.src.dir}"
+               destdir="${built.web.dir}/WEB-INF/classes"
+               source="${target.jdk.set}" target="${target.jdk.set}"
+               includes="com/sun/identity/agents/**/*.java"
+               classpath="${web.classpath}"/>
+        <copy todir="${built.web.dir}">
+            <fileset dir="${docroot.dir}"/>
+        </copy>
+        <copy todir="${built.web.dir}/WEB-INF">
+            <fileset dir="${etc.dir}">
+                <include name="web.xml"/>
+                <include name="sun-web.xml"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="preparebuildweb" depends="buildejb,preparebuild">
+        <mkdir dir="${built.web.dir}"/>
+        <mkdir dir="${built.web.dir}/WEB-INF"/>
+        <mkdir dir="${built.web.dir}/WEB-INF/classes"/>
+        <path id="web.class.path">
+            <pathelement location="${appserv.lib.dir}/j2ee.jar"/>
+            <pathelement location="${built.web.dir}/WEB-INF/classes"/>
+            <pathelement location="${built.ejb.dir}"/>
+        </path>
+        <property name="web.classpath" refid="web.class.path"/> 
+    </target>
+
+    <target name="preparebuild" depends="init">
+        <mkdir dir="${built.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+</project>

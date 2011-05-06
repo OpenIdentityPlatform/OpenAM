@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ 
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: opensso.taglib.xml,v 1.28 2009/07/24 23:05:57 farble1670 Exp $
+
+-->
+<!DOCTYPE facelet-taglib PUBLIC "-//Sun Microsystems, Inc.//DTD Facelet Taglib 1.0//EN" "http://java.sun.com/dtd/facelet-taglib_1_0.dtd"> 
+<facelet-taglib>
+    <namespace>http://opensso.dev.java.net</namespace>
+    <tag>
+        <tag-name>nbsp</tag-name>
+        <source>tag/nbsp.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>clink</tag-name>
+        <source>tag/clink.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>button</tag-name>
+        <source>tag/button.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>wbuttons</tag-name>
+        <source>tag/wbuttons.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>wizard</tag-name>
+        <source>tag/wizard.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>wstep</tag-name>
+        <source>tag/wstep.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>multipanel</tag-name>
+        <source>tag/multipanel.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>box</tag-name>
+        <source>tag/box.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>conditionpanel</tag-name>
+        <source>tag/conditionpanel.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>subjectpanel</tag-name>
+        <source>tag/subjectpanel.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>popup</tag-name>
+        <source>tag/popup.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>tooltip</tag-name>
+        <source>tag/tooltip.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>iframe</tag-name>
+        <source>tag/iframe.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>messages</tag-name>
+        <source>tag/messages.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>feed</tag-name>
+        <source>tag/feed.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>summarypanel</tag-name>
+        <source>tag/summarypanel.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>policyfilterholder</tag-name>
+        <source>tag/policyfilterholder.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>section</tag-name>
+        <source>tag/section.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>multiselect</tag-name>
+        <source>tag/multiselect.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>referralresourcepanel</tag-name>
+        <source>tag/referralresourcepanel.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>landing</tag-name>
+        <source>tag/landing.xhtml</source>
+    </tag>
+    <tag>
+        <tag-name>litem</tag-name>
+        <source>tag/litem.xhtml</source>
+    </tag>
+    <function>
+        <function-name>indexOf</function-name>
+        <function-class>com.sun.identity.admin.Functions</function-class>
+        <function-signature>java.lang.String indexOf(java.util.List, java.lang.Object)</function-signature>
+    </function>
+    <function>
+        <function-name>contains</function-name>
+        <function-class>com.sun.identity.admin.Functions</function-class>
+        <function-signature>boolean contains(java.util.Collection, java.lang.Object)</function-signature>
+    </function>
+    <function>
+        <function-name>truncate</function-name>
+        <function-class>com.sun.identity.admin.Functions</function-class>
+        <function-signature>java.lang.String truncate(java.lang.String, int)</function-signature>
+    </function>
+    <function>
+        <function-name>size</function-name>
+        <function-class>com.sun.identity.admin.Functions</function-class>
+        <function-signature>int size(java.util.Collection)</function-signature>
+    </function>
+    <function>
+        <function-name>scrape</function-name>
+        <function-class>com.sun.identity.admin.Functions</function-class>
+        <function-signature>java.lang.String scrape(java.lang.String)</function-signature>
+    </function>
+    <function>
+        <function-name>concat</function-name>
+        <function-class>com.sun.identity.admin.Functions</function-class>
+        <function-signature>java.lang.String concat(java.lang.String, java.lang.String)</function-signature>
+    </function>
+</facelet-taglib>

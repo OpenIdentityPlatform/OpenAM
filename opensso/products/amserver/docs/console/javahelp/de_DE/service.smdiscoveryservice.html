@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Discovery-Dienst - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>Discovery-Dienst</h3>
+<a name="indexterm-119"></a><p>Um auf Identity-Daten zugreifen zu k&#246;nnen, muss zun&#228;chst der Speicherort der Informationen
+ermittelt werden. (In welchem Identity-Dienst sind beispielsweise die Kreditkarteninformationen des Principals enthalten
+oder auf welchen Server ist der Kalenderdienst des Principals gespeichert.) In einem
+Netzwerk stehen in der Regel ein oder mehrere Dienste zur Verf&#252;gung, mit
+denen andere Entities Vorg&#228;nge bez&#252;glich Identity-Daten durchf&#252;hren k&#246;nnen. Da Clients nicht daf&#252;r
+ausgelegt sind, diese Dienste nachzuverfolgen bzw. nicht &#252;ber die Informationen verf&#252;gen, welche
+Dienste vertrauensw&#252;rdig sind, wird ein Discovery-Dienst ben&#246;tigt. Bei einem <b>Discovery-Dienst</b> handelt es
+sich im Wesentlichen um eine Webdienstschnittstelle f&#252;r Discovery-Ressourcen. Eine <b>Discovery-Ressource</b> ist eine
+Registrierung von Ressourcenangeboten. Ein <b>Ressourcenangebot</b> definiert die Zuordnung zwischen bestimmten Identity-Daten und
+der Dienstinstanz, &#252;ber die der Zugriff auf diese Daten bereitgestellt wird. Eine
+<b>Ressourcen-ID</b> ist ein eindeutiger Ressourcenbezeichner (Unique Resource Identifier, URI), der in dem
+Discovery-Dienst registriert ist, der auf eine bestimmte Discovery-Ressource verweist. Wenn ein Client
+eine Anforderung f&#252;r einen Datentyp sendet, sucht der OpenSSO Discovery-Dienst anhand des
+darin enthaltenen Ressourcenbezeichners nach dem Webdienstanbieter f&#252;r die angeforderten Attribute. Der Discovery-Dienst
+gibt ein Ressourcenangebot mit Informationen zum Speicherort der Daten zur&#252;ck.</p>
+<hr><p><b>Hinweis &#8211; </b>Um den Zugriff zu erm&#246;glichen, muss der Anbieter der Pers&#246;nlicher Liberty-Profildienst, der
+als Host agiert, im Namen der einzelnen Identit&#228;ts-Principals bei Discovery-Dienst registriert sein.</p>
+<hr>
+<p>Folgende allgemeine  Discovery-Dienst -Attribute k&#246;nnen f&#252;r eine Implementierung konfiguriert werden.</p>
+<ul><li><p><a href="dsproviderid.html">Anbieter-ID</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">Unterst&#252;tzte Authentifizierungsmechanismen</a></p></li>
+<li><p><a href="supporteddirectives.html">Unterst&#252;tzte Richtlinien</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">Richtlinienbewertung f&#252;r Discovery-Suche</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">Richtlinienbewertung f&#252;r Discovery-Aktualisierung</a></p></li>
+<li><p><a href="authorizerpluginclass.html">Plugin-Klasse f&#252;r berechtigte Person:</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">Plugin-Klasse f&#252;r Eintrags-Handler:</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">Klassen f&#252;r ResourceID-Mapper-Plugin</a></p></li>
+<li><p><a href="authresponsemessage.html">Antwort-authentifizieren-Nachricht</a></p></li>
+<li><p><a href="generatesessioncontext.html">Sitzungskontext-Anweisung f&#252;r Bootstrapping </a></p></li>
+<li><p><a href="encryptnameidentifier.html">NameIdentifier in Sitzungskontext f&#252;r Bootstrapping verschl&#252;sseln</a></p></li>
+<li><p><a href="useimpliedresource.html">Implizierte Ressource</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">Ressourcenangebote f&#252;r Bootstrapping</a></p></li></ul>
+<p>In Verbindung mit der Konfiguration von Discovery-Dienst m&#252;ssen die folgenden Aufgaben ausgef&#252;hrt
+werden:</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">So konfigurieren Sie ein Ressourcenangebot f&#252;r Bootstrapping</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">So konfigurieren Sie eine Dienstbeschreibung</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

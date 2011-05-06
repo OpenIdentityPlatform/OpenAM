@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<!DOCTYPE MBeanType SYSTEM "commo.dtd">
+
+<MBeanType
+ Name          = "FAMWSSWLAuthenticator"
+ DisplayName   = "FAMWSSWLAuthenticator"
+ Package       = "com.sun.identity.wssagents.weblogic"
+ Extends       = "weblogic.management.security.authentication.Authenticator"
+ PersistPolicy = "OnUpdate"
+>
+<MBeanAttribute
+  Name          = "ProviderClassName"
+  Type          = "java.lang.String"
+  Writeable     = "false"
+  Default       = "&quot;com.sun.identity.wssagents.weblogic.FAMWSSWLAuthProvider&quot;"
+/>
+
+<MBeanAttribute
+  Name          = "Description"
+  Type          = "java.lang.String"
+  Writeable     = "false"
+  Default       = "&quot;OpenSSO WSS Authentication Provider&quot;"
+/>
+
+<MBeanAttribute
+  Name          = "Version"
+  Type          = "java.lang.String"
+  Writeable     = "false"
+  Default       = "&quot;1.0&quot;"
+/>
+
+</MBeanType>
+ 
+
+

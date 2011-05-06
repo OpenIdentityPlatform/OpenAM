@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>The Windows NT Authentication module allows for authentication against a Microsoft Windows NT
+server. The attributes are realm attributes. The values applied to them under Service
+Configuration become the default values for the Windows NT Authentication template. The service template
+needs to be created after registering the service for the realm. The default
+values can be changed after registration by the realm's administrator. realm attributes are
+not inherited by entries in the subtrees of the realm.</p><p>In order to activate the Widows NT Authentication module, Samba Client 2.2.2 must
+be downloaded and installed to the following directory:</p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>The Samba Client is a file and print server for blending Windows and
+UNIX machines without requiring a separate Windows NT/2000 Server.</p><p>Red Hat Linux ships with a Samba client, located in the<tt>/usr/bin</tt> 
+directory.</p><p>In order to authenticate using the Windows NT Authentication service for Linux, copy
+the client binary to<tt></tt><i>OpenSSO-base</i><tt> /identity/bin</tt>.</p><p>The Windows NT attributes are:</p>
+<ul><li><p><a href="#fumve">Authentication Domain</a></p></li>
+<li><p><a href="#fumvp">Authentication Host</a></p></li>
+<li><p><a href="#fumvq">Samba Configuration File Name</a></p></li>
+<li><p><a href="#fumwi">Authentication Level</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>Authentication Domain</h5>
+<p>Defines the Domain name to which the user belongs.</p>
+
+<a name="fumvp"></a><h5>Authentication Host</h5>
+<p>Defines the Windows NT authentication hostname. The hostname should be the netBIOS name,
+as opposed to the fully qualified domain name (FQDN). By default, the first
+part of the FQDN is the netBIOS name.</p><p>If the DHCP (Dynamic Host Configuration Protocol) is used, you would put a
+suitable entry in the HOSTS file on the Windows 2000 machine.</p><p>Name resolution will be performed based on the netBIOS name. If you do
+not have any server on your subnet supplying netBIOS name resolution, the mappings
+should be hardcoded. For example, the hostname should be <tt>example1</tt> not <tt>example1.company1.com</tt>.</p>
+
+<a name="fumvq"></a><h5>Samba Configuration File Name</h5>
+<p>Defines the Samba configuration filename and supports the <tt>-s</tt>  option in
+the <tt>smbclient</tt> command. The value must be the full directory path where the
+Samba configuration file is located. For example: <tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>Authentication Level</h5>
+<p>The authentication level is set separately for each method of authentication. The value
+indicates how much to trust an authentication mechanism. Once a user has authenticated,
+this value is stored in the SSO token for the session. When the
+SSO token is presented to an application the user wants to access, the
+application uses the stored value to determine whether the level is sufficient to
+grant the user access. If the authentication level stored in an SSO token does
+not meet the minimum value required, the application can prompt the user to
+authenticate again through a service with a higher authentication level. The default value
+is 0.</p>
+<hr><p><b>Note &#8211; </b>If no authentication level is specified, the SSO token stores the value specified
+in the Core Authentication attribute <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Default Authentication Level</a>.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

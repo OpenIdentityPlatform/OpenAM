@@ -1,0 +1,33 @@
+    <test name="Session Property Change Notification">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.session.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.session.PropertyChangeNotification"/>
+        </classes>
+    </test>
+    <test name="SessionProperty">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.session.SessionProperty"/>
+        </classes>
+    </test>
+    <test name="SessionServerTimeConstraintsTest">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.SessionServerTimeConstraintsTest"/>
+        </classes>
+    </test>
+

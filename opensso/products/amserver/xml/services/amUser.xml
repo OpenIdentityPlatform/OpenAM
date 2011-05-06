@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding="UTF-8"?> 
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amUser.xml,v 1.5 2009/01/13 06:50:17 mahesh_prasad_r Exp $
+  
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMUserService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetAMUserService"
+            i18nFileName="amUser"
+            i18nKey="iplanet-am-user-service-description"
+	    revisionNumber="50">
+	    <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+		    i18nKey="">
+		    <DefaultValues>
+                        <Value>iplanet-am-user-service</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+	    </Global>
+
+            <Dynamic>
+	        <AttributeSchema name="preferredlanguage"
+                    type="single"
+                    syntax="string"
+                    any="display"
+                    i18nKey="">
+		</AttributeSchema>
+	        <AttributeSchema name="preferredtimezone"
+                    type="single"
+                    syntax="string"
+                    any="display"
+                    i18nKey="d102">
+		</AttributeSchema>
+	        <AttributeSchema name="preferredlocale"
+                    type="single_choice"
+                    syntax="string"
+		    any="display"
+                    i18nKey="">
+		    <ChoiceValues>
+			<ChoiceValuesClassName
+			    className="com.sun.identity.common.admin.PossibleLocales" />
+		    </ChoiceValues>
+		</AttributeSchema>
+	        <AttributeSchema name="iplanet-am-user-admin-start-dn"
+                    type="single"
+                    syntax="dn"
+                    any="display"
+                    i18nKey="d104">
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-login-status"
+                    type="single_choice"
+                    syntax="string"
+                    any="display"
+                    i18nKey="d105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="u200">Active</ChoiceValue>
+                        <ChoiceValue i18nKey="u201">Inactive</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>Active</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Dynamic>
+
+            <User>
+                <AttributeSchema name="uid"
+                    type="single"
+                    syntax="string"
+                    any="required|filter"
+		    validator="RequiredValueValidator"
+                    i18nKey="u101">
+		    <DefaultValues>
+			<Value>&#x00A0;</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="givenname"
+                    type="single"
+                    syntax="string"
+                    any="optional|filter|display"
+                    i18nKey="u102">
+		</AttributeSchema>
+	        <AttributeSchema name="sn"
+                    type="single"
+                    syntax="string"
+                    any="required|filter|display"
+		    validator="RequiredValueValidator"
+                    i18nKey="u103">
+		    <DefaultValues>
+			<Value>&#x00A0;</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+	        <AttributeSchema name="cn"
+                    type="single"
+                    any="required|filter|display"
+		    validator="RequiredValueValidator"
+                    syntax="string"
+                    i18nKey="u104">
+		    <DefaultValues>
+			<Value>&#x00A0;</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="userpassword"
+                    type="single"
+                    syntax="password"
+                    any="required"
+		    validator="RequiredValueValidator"
+                    i18nKey="u105">
+		    <DefaultValues>
+			<Value>&#x00A0;</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ChangePassword"
+                    type="single"
+                    syntax="string"
+                    any="display" 
+                    uitype="link"
+                    propertiesViewBeanURL="../user/UMChangeUserPassword"
+                    i18nKey="u1051">
+                </AttributeSchema>  
+	        <AttributeSchema name="mail"
+                    type="single"
+                    syntax="email"
+		    any="display"
+                    i18nKey="u106">
+		</AttributeSchema>
+	        <AttributeSchema name="employeenumber"
+                    type="single"
+                    syntax="number"
+		    any="adminDisplay"
+                    i18nKey="u107">
+		</AttributeSchema>
+                <AttributeSchema name="telephonenumber"
+                    type="single"
+                    syntax="string"
+                    any="display"
+                    i18nKey="u108">
+		</AttributeSchema>
+	        <AttributeSchema name="manager"
+                    type="single"
+                    syntax="string"
+                    i18nKey="u109">
+		</AttributeSchema>
+                <AttributeSchema name="postaladdress"
+                    type="single"
+                    syntax="string"
+                    any="display"
+                    i18nKey="u110">
+		</AttributeSchema>
+                <AttributeSchema name="inetuserstatus"
+                    type="single_choice"
+                    syntax="string"
+                    any="required|filter|adminDisplay"
+		    validator="RequiredValueValidator"
+		    i18nKey="u111">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="u200">Active</ChoiceValue>
+                        <ChoiceValue i18nKey="u201">Inactive</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>Active</Value>
+		    </DefaultValues>
+	        </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-account-life"
+                    type="single"
+                    syntax="date"
+                    any="adminDisplay"
+                    i18nKey="u112">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-auth-config"
+                    type="single_choice"
+                    syntax="string"
+                    any="adminDisplay"
+                    i18nKey="u113">
+	     	    <ChoiceValues>
+			<ChoiceValuesClassName
+                            className= "com.sun.identity.authentication.service.ConfiguredAuthServices" />
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>[Empty]</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-alias-list"
+                    type="list"
+                    syntax="string"
+                    any="adminDisplay"
+                    i18nKey="u114">
+                    <DefaultValues>
+                        <Value/>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="preferredlocale"
+                    type="single_choice"
+                    syntax="string"
+                    any="display"
+                    i18nKey="">
+		    <ChoiceValues>
+			<ChoiceValuesClassName
+			    className="com.sun.identity.common.admin.PossibleLocales" />
+		    </ChoiceValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-success-url"
+                    type="list"
+                    syntax="string"
+                    any="adminDisplay"
+                    i18nKey="u116">
+                </AttributeSchema>
+		<AttributeSchema name="iplanet-am-user-failure-url"
+                    type="list"
+                    syntax="string"
+                    any="adminDisplay"
+                    i18nKey="u117">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-password-reset-options"
+                    type="single"
+                    syntax="xml"
+                    propertiesViewBeanURL="../user/UMUserPasswordResetOptions"
+                    uitype="link"
+                    any="display"
+                    i18nKey="u120">
+                    <DefaultValues>
+                        <Value/>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-password-reset-question-answer"
+                    type="list"
+                    syntax="string"
+                    any="display"
+                    i18nKey="">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-password-reset-force-reset"
+                    type="single"
+                    syntax="boolean"
+                    any="display"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+		<AttributeSchema name="sunIdentityMSISDNNumber"
+		    type="list"
+		    syntax="string"
+		    any="adminDisplay"
+		    i18nKey="u122">
+		</AttributeSchema>
+                <AttributeSchema name="RequiredValueValidator"
+                    type="validator"
+                    syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </User>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+

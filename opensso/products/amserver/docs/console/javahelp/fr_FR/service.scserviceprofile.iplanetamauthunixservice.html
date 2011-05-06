@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>UNIX - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthunixservice"></a><h4>UNIX</h4>
+<p><a name="indexterm-182"></a>Ce module Solaris permet &#224; un utilisateur de s'authentifier &#224; l'aide d'un
+ID et d'un mode de passe UNIX. Si l'un des attributs d'authentification
+UNIX est modifi&#233;, OpenSSO et l'assistant amunixd doivent &#234;tre red&#233;marr&#233;s. Les attributs
+d'authentification UNIX comprennent des attributs globaux et de domaine. Ces attributs sont
+les suivants :</p>
+<ul><li><p><a href="#fwbsy">Port de configuration</a></p></li>
+<li><p><a href="#fwbqv">Port d'authentification</a></p></li>
+<li><p><a href="#fwbrv">D&#233;lai d'attente</a></p></li>
+<li><p><a href="#fwbls">Threads</a></p></li>
+<li><p><a href="#fwbra">Niveau d'authentification</a></p></li>
+<li><p><a href="#fwbky">Nom du service PAM</a></p></li></ul>
+
+
+<a name="fwbsy"></a><h5>Port de configuration</h5>
+<p>Cet attribut sp&#233;cifie le port utilis&#233; comme port d'&#233;coute par l'assistant d'UNIX
+d&#232;s le d&#233;marrage pour d&#233;tecter les informations de configuration contenues dans les
+attributs Port d'authentification de l'assistant d'UNIX, D&#233;lai d'attente de l'assistant d'UNIX et
+Threads de l'assistant d'UNIX. La valeur par d&#233;faut est 58946.</p>
+
+<a name="fwbqv"></a><h5>Port d'authentification</h5>
+<p>Cet attribut indique le port d'&#233;coute utilis&#233; par l'assistant d'UNIX pour d&#233;tecter
+les demandes d'authentification apr&#232;s la configuration. Le port par d&#233;faut est 57946.</p>
+
+<a name="fwbrv"></a><h5>D&#233;lai d'attente</h5>
+<p>Cet attribut indique le d&#233;lai (en minutes) dont disposent les utilisateurs pour
+effectuer leur authentification. Si les utilisateurs d&#233;passent le d&#233;lai imparti, l'authentification &#233;choue
+automatiquement. Le d&#233;lai par d&#233;faut est d&#233;fini &#224; 3 minutes.</p>
+
+<a name="fwbls"></a><h5>Threads</h5>
+<p>Cet attribut sp&#233;cifie le nombre maximal de sessions d'authentification UNIX simultan&#233;es autoris&#233;es.
+Une fois que la limite maximale est atteinte, les tentatives d'authentification suivantes
+ne sont pas autoris&#233;es tant qu'une session n'est pas lib&#233;r&#233;e. La valeur
+par d&#233;faut est 5.</p>
+
+<a name="fwbra"></a><h5>Niveau d'authentification</h5>
+<p>Le niveau d'authentification est d&#233;fini s&#233;par&#233;ment pour chaque m&#233;thode d'authentification. La valeur
+indique le niveau de confiance associ&#233; &#224; un m&#233;canisme d'authentification. Une fois
+qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le jeton SSO
+pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224; une application
+&#224; laquelle l'utilisateur souhaite acc&#233;der, l'application utilise la valeur stock&#233;e pour d&#233;terminer
+si le niveau est suffisant pour accorder l'acc&#232;s &#224; l'utilisateur. Si le
+niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond pas &#224; la
+valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier &#224; nouveau par
+l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;. La valeur par
+d&#233;faut est 0.</p>
+<hr><p><b>Remarque &#8211; </b>Si aucun niveau d'authentification n'est pr&#233;cis&#233;, le jeton SSO stocke la valeur
+sp&#233;cifi&#233;e dans l'attribut d'authentification Noyau <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Niveau d'authentification par d&#233;faut</a>.</p>
+<hr>
+
+
+<a name="fwbky"></a><h5>Nom du service PAM</h5>
+<p>D&#233;finit la configuration ou pile PAM (Pluggable Authentication Module) fournie pour votre
+syst&#232;me d'exploitation et utilis&#233;e pour l'authentification UNIX. Pour Solaris, son nom est
+g&#233;n&#233;ralement <tt>other</tt> et pour Linux, <tt>password</tt>.</p>
+<br/>
+
+</body>
+</html>

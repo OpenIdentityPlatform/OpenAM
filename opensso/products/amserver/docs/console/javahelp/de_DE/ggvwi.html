@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Konsolenattributzuordnungen f&#252;r Server und Sites - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggvwi"></a><h4>Konsolenattributzuordnungen f&#252;r Server und Sites</h4>
+<p>In der folgenden Tabelle werden die Server- und Site-Eigenschaften aufgelistet, die in
+fr&#252;heren Versionen in der Datei <tt>AMConfig.properties</tt> enthalten waren, die nun jedoch als
+Attribute &#252;ber die OpenSSO-Konsole verwaltet werden. Die Eigenschaften werden in alphabetischer Reihenfolge
+aufgelistet: Mit der Suchfunktion Ihres Browsers k&#246;nnen Sie nach einer bestimmten Eigenschaft
+suchen.</p><dl><dt>Eigenschaftsname</dt>
+<dd><p>Der Name der Eigenschaft in der Datei <tt>AMConfig.properties </tt>.</p></dd>
+<dt>Attributname in Konsole</dt>
+<dd><p>Der Name des Attributs in der OpenSSO-Konsole</p></dd>
+<dt>Position in Konsole</dt>
+<dd><p>Gibt die Position in der Konsole an, an der sich das Attribut befindet.</p></dd>
+</dl>
+<a name="ggvxo"></a><h6>Tabelle&#160;1 Attributzuordnung f&#252;r Server und Sites</h6><table><col width="33%"><col width="33%"><col width="33%"><tr><th align="left" valign="top" scope="column"><p>Eigenschaftsname</p></th>
+<th align="left" valign="top" scope="column"><p>Attributname in Konsole</p></th>
+<th align="left" valign="top" scope="column"><p>Position in Konsole</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>am.encryption.pwd</p></td>
+<td align="left" valign="top" scope="row"><p>Passwort-Verschl&#252;sselungsschl&#252;ssel</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.  clientIPCheckEnabled</p></td>
+<td align="left" valign="top" scope="row"><p>&#220;berpr&#252;fung der Client-IP-Adresse</p></td>
+<td align="left" valign="top" scope="row"><p>Server und
+Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.cookie.encode</p></td>
+<td align="left" valign="top" scope="row"><p>Kodierter Cookie-Wert</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.cookie.name</p></td>
+<td align="left" valign="top" scope="row"><p>Cookie-Name</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.cookie.secure</p></td>
+<td align="left" valign="top" scope="row"><p>Sicheres
+Cookie</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.event.connection  .delay.between.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Verz&#246;gerung zwischen Wiederholungen von Ereignisdienst-Verbindungen</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62;
+SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.event.connection  .ldap.error.codes.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Fehlercodes f&#252;r Wiederholungen von Ereignisdienst-Verbindungen</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.event  .connection.num.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Anzahl der erneuten Versuche
+f&#252;r Ereignisdienst-Benachrichtigungen </p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.ldap  .connection.delay.between.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Anzahl der erneuten Versuche f&#252;r LDAP-Verbindung
+</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.ldap.connection  .ldap.error.codes.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Fehlercodes f&#252;r erneute LDAP-Verbindungsversuche</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.ldap  .connection.num.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Verz&#246;gerung
+zwischen erneuten LDAP-Verbindungsversuchen</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.locale</p></td>
+<td align="left" valign="top" scope="row"><p>Standardgebietsschema</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.notification  .threadpool.size</p></td>
+<td align="left" valign="top" scope="row"><p>Gr&#246;&#223;e des
+Benachrichtigungspools</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.notification  .threadpool.threshold</p></td>
+<td align="left" valign="top" scope="row"><p>Schwellenwert f&#252;r Benachrichtigungs-Thread-Pool</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.replica.delay  .between.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Verz&#246;gerung zwischen
+erneuten SDK-Replikationsversuchen</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.replica.num.retries</p></td>
+<td align="left" valign="top" scope="row"><p>Erneute Versuche f&#252;r SDK-Replikation</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62;
+SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.rootsuffix</p></td>
+<td align="left" valign="top" scope="row"></td>
+<td align="left" valign="top" scope="row"></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.entry  .default.expire.time</p></td>
+<td align="left" valign="top" scope="row"><p>Standardeintrag-Ablaufzeit</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.entry  .expire.enabled</p></td>
+<td align="left" valign="top" scope="row"><p>Cache-Eintrag-Ablauf aktiviert</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.entry  .user.expire.time</p></td>
+<td align="left" valign="top" scope="row"><p>Benutzereintrag-Ablaufzeit</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites
+&#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.maxSize</p></td>
+<td align="left" valign="top" scope="row"><p>SDK-Zwischenspeicherung-Max. Gr&#246;&#223;e</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.service.secret</p></td>
+<td align="left" valign="top" scope="row"><p> Shared Secret f&#252;r Authentifizierungsdienst</p></td>
+<td align="left" valign="top" scope="row"><p>Server und
+Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.session  .invalidsessionmaxtime</p></td>
+<td align="left" valign="top" scope="row"><p>Maximale Zeit f&#252;r Au&#223;erkraftsetzen der Sitzung</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.session.maxSessions</p></td>
+<td align="left" valign="top" scope="row"><p>Maximale
+Sitzungen</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.session.purgedelay</p></td>
+<td align="left" valign="top" scope="row"><p>Verz&#246;gerung f&#252;r Sitzungsbereinigung</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.smtphost</p></td>
+<td align="left" valign="top" scope="row"><p>Host-Name des
+Mail-Servers</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.smtpport</p></td>
+<td align="left" valign="top" scope="row"><p>Mail-Server-Anschlussnummer</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.stats.interval</p></td>
+<td align="left" valign="top" scope="row"><p>Protokollintervall</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62;
+Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.security.encryptor</p></td>
+<td align="left" valign="top" scope="row"><p>Verschl&#252;sselungsklasse</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.comm.server  .pllrequest.maxContentLength</p></td>
+<td align="left" valign="top" scope="row"><p>Plattform-Low-Level. Comm. Max. Inhaltsl&#228;nge</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.configpath</p></td>
+<td align="left" valign="top" scope="row"><p>Basisinstallationsverzeichnis</p></td>
+<td align="left" valign="top" scope="row"><p>Server
+und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.debug  .directory</p></td>
+<td align="left" valign="top" scope="row"><p>Debug-Verzeichnis</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.debug.level</p></td>
+<td align="left" valign="top" scope="row"><p>Fehlersuchebene</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.stats.directory</p></td>
+<td align="left" valign="top" scope="row"><p>-Verzeichnis
+</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Allgemein</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.stats.state</p></td>
+<td align="left" valign="top" scope="row"><p>Status</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.am.event.connection  .disable.list</p></td>
+<td align="left" valign="top" scope="row"><p>Deaktivierte Ereignisdienstverbindung </p></td>
+<td align="left" valign="top" scope="row"><p>Server und
+Sites &#62; SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.am.session  .caseInsensitiveDN</p></td>
+<td align="left" valign="top" scope="row"><p>Client-DN-Vergleich ohne Ber&#252;cksichtigung der Gro&#223;- und Kleinschreibung</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62;
+Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.am.session  .enableHostLookUp</p></td>
+<td align="left" valign="top" scope="row"><p>Nachschlagen des Hosts aktivieren</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sitzung</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig  .certalias</p></td>
+<td align="left" valign="top" scope="row"><p>Zertifikat-Alias</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig  .keypass</p></td>
+<td align="left" valign="top" scope="row"><p>Passwortdatei
+f&#252;r privaten Schl&#252;ssel</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig  .keystore</p></td>
+<td align="left" valign="top" scope="row"><p>Schl&#252;sselspeicher-Datei</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig  .storepass</p></td>
+<td align="left" valign="top" scope="row"><p>Schl&#252;sselspeicher-Passwortdatei</p></td>
+<td align="left" valign="top" scope="row"><p>Server und
+Sites &#62; Sicherheit</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.sm.ldap  .enableProxy</p></td>
+<td align="left" valign="top" scope="row"><p>Verzeichnis-Proxy aktivieren</p></td>
+<td align="left" valign="top" scope="row"><p>Server und Sites &#62; SDK</p></td>
+</tr>
+</table>
+<br/>
+
+</body>
+</html>

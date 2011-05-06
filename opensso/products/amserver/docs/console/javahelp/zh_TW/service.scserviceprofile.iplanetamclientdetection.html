@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>用戶端偵測 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>用戶端偵測</h4>
+<p><a name="indexterm-200"></a>認證程序的起始步驟就是識別發出 HTTP(S) 請求的用戶端類型。此 OpenSSO 功能也稱為用戶端偵測。URL 資訊用於擷取用戶端的特徵。根據這些特性，會傳回適當的認證頁面。例如，使用 Netscape 瀏覽器請求網頁時，OpenSSO 8.0 會顯示 HTML 登入頁面。一旦使用者通過驗證，用戶端類型
+(Netscape 瀏覽器) 會新增至階段作業記號。用戶端偵測服務中定義的屬性為全域屬性。</p>
+<ul><li><p><a href="#fxcei">用戶端類型</a></p></li>
+<li><p><a href="#fxbxh">預設用戶端類型</a></p></li>
+<li><p><a href="#fxccp">用戶端偵測類別</a></p></li>
+<li><p><a href="#fxbvy">用戶端偵測</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>用戶端類型</h5>
+<p>為了偵測用戶端類型，OpenSSO 需要識別它們的識別特徵。這些特徵可識別用戶端資料格式的所有支援類型的內容。此屬性可讓您透過 [用戶端管理員] 介面修改用戶端資料。若要存取 [用戶端管理員]，請按一下 [編輯] 連結。OpenSSO 預設包含以下用戶端類型：</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>如需這些用戶端類型的說明，請參閱<a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>。</p>
+
+<a name="gciwk"></a><h5>用戶端管理程式</h5>
+<p><a name="indexterm-201"></a>[用戶端管理程式] 為列出基本用戶端、樣式和關聯內容的介面，它可讓您新增和配置裝置。基本用戶端類型在 [用戶端管理員] 頂部列出。這些用戶端類型包含屬於此用戶端類型的所有裝置可繼承的預設特性。</p>
+
+<a name="gcivx"></a><h5>用戶端類型</h5>
+<p>樣式設定檔：[用戶端管理員] 會將用戶端類型清單中的所有可用用戶端 (包括基本用戶端類型本身) 分組。對於每一個用戶端，您可以按一下裝置名稱來修改用戶端特性。這些特性則顯示在 [用戶端編輯程式] 視窗中。若要編輯這些特性，請從下拉式清單中選取以下類別：</p><dl><dt>硬體平台</dt>
+<dd><p>包含裝置的硬體屬性，如顯示大小、支援的字元集等。</p></dd>
+<dt>軟體平台</dt>
+<dd><p>包含裝置的應用程式環境的屬性、作業系統的屬性以及安裝軟體的屬性。</p></dd>
+<dt>網路特性</dt>
+<dd><p>包含描述網路環境 (包括支援的載送程式) 的特性。</p></dd>
+<dt>瀏覽器 UA</dt>
+<dd><p>包含與在此裝置上執行的瀏覽器使用者代理程式相關的屬性。</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>包含此裝置支援的無線應用程式協定 (WAP) 環境的特性。</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>包含此裝置支援的 WAP 環境的特性。</p></dd>
+<dt>其他特性</dt>
+<dd><p>包含此裝置支援的無線應用程式協定 (WAP) 環境的特性。</p></dd>
+</dl>
+
+<hr><p><b>備註 &#8211; </b>如需特定特性的定義，請參閱 <b>Open Mobile Alliance Ltd. (OMA) 無線應用程式協定，版本 20-Oct-2001</b>。</p><p>為了存取此文件，您必須先註冊 WAP Forum<sup>TM</sup>。如需詳細資訊，請造訪 <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm</a>。</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>預設用戶端類型</h5>
+<p>此屬性定義從 [用戶端類型] 屬性的用戶端類型清單中導出的預設用戶端類型。預設值為 genericHTML。</p>
+
+<a name="fxccp"></a><h5>用戶端偵測類別</h5>
+<p>此屬性定義路由所有用戶端偵測請求的用戶端偵測類別。此屬性傳回的字串應該與 [用戶端類型] 屬性中列出的某種用戶端類型相符。預設用戶端偵測類別為 <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>。OpenSSO 也包含 <tt>com.iplanet.services.cdm.</tt><tt>ClientDetectionDefaultImpl</tt>。</p>
+
+<a name="fxbvy"></a><h5>用戶端偵測</h5>
+<p>啟用用戶端偵測。如果啟用了用戶端偵測 (預設值)，則會透過用戶端偵測類別屬性中指定的類別路由每個請求。依預設，會啟用用戶端偵測功能。如果未選取此屬性，則 OpenSSO 假定用戶端是 genericHTML，並可透過 HTML 瀏覽器存取。</p>
+<br/>
+
+</body>
+</html>

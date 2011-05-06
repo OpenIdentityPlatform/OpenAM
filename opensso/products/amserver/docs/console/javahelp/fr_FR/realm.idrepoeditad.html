@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Attributs Active Directory - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepoeditad"></a><h4>Attributs Active Directory</h4>
+<p><a name="indexterm-13"></a>Lorsque vous configurez Microsoft Active Directory pour qu'il communique avec OpenSSO, vous
+devez mapper les propri&#233;t&#233;s pr&#233;d&#233;finies aux propri&#233;t&#233;s d&#233;finies dans votre instance d'Active
+Directory. Cette op&#233;ration est appel&#233;e mappage d'attributs. Les attributs ci-dessous doivent &#234;tre
+d&#233;finis lorsque vous ajoutez Active Directory en tant que magasin de donn&#233;es
+&#224; un domaine.</p>
+
+<a name="fyfdo"></a><h5>Serveur LDAP</h5>
+<p>Entrez le nom du serveur LDAP auquel vous serez connect&#233;. Le format
+doit &#234;tre <tt>nomh&#244;te.nomdomaine:num&#233;roport</tt>.</p><p>Si plusieurs entr&#233;es <tt>h&#244;te:num&#233;roport</tt> sont saisies, une tentative de connexion au premier
+h&#244;te de la liste est effectu&#233;e. L'entr&#233;e suivante dans la liste est
+essay&#233;e uniquement en cas d'&#233;chec de la connexion &#224; l'h&#244;te actuel.</p>
+
+<a name="fyfdt"></a><h5>DN de la liaison LDAP</h5>
+<p>Sp&#233;cifie le nom DN qu'utilisera OpenSSO pour effectuer l'authentification aupr&#232;s du serveur
+LDAP auquel vous &#234;tes actuellement connect&#233;. L'utilisateur poss&#233;dant le nom DN utilis&#233;
+pour la liaison doit poss&#233;der des privil&#232;ges d'ajout/de modification/de suppression appropri&#233;s que
+vous avez configur&#233;s dans l'attribut <a href="#fyffb">Types et op&#233;rations pris en charge pour le plug-in LDAPv3</a>.</p>
+
+<a name="fyfds"></a><h5>Mot de passe pour la liaison LDAP</h5>
+<p>Sp&#233;cifie le mot de passe DN qu'utilisera OpenSSO pour effectuer l'authentification aupr&#232;s
+du serveur LDAP auquel vous &#234;tes actuellement connect&#233;.</p>
+
+<a name="fyfdu"></a><h5>Mot de passe pour la liaison LDAP (confirmer)</h5>
+<p>Confirmez le mot de passe.</p>
+
+<a name="fyfdv"></a><h5>DN de l'organisation LDAP</h5>
+<p>DN sur lequel le r&#233;f&#233;rentiel du magasin de donn&#233;es sera mapp&#233;. Ceci
+constituera le DN de base de toutes les op&#233;rations effectu&#233;es dans le
+magasin de donn&#233;es. </p>
+
+<a name="fyfdw"></a><h5>SSL LDAP</h5>
+<p>Lorsque cet attribut est activ&#233;, OpenSSO se connecte au serveur principal &#224;
+l'aide du protocole HTTPS.</p>
+
+<a name="fyfej"></a><h5>Taille minimale de pool de connexion LDAP</h5>
+<p>D&#233;finit le nombre initial de connexions dans le pool de connexions. L'utilisation
+d'un pool de connexions permet de ne pas avoir &#224; cr&#233;er une
+connexion chaque fois.</p>
+
+<a name="fyfee"></a><h5>Taille maximale de pool de connexion LDAP</h5>
+<p>Indique le nombre maximal de connexions autoris&#233;.</p>
+
+<a name="fyfdx"></a><h5>Maximum de r&#233;sultats renvoy&#233;s par la recherche</h5>
+<p>Sp&#233;cifie le nombre maximal d'entr&#233;es retourn&#233;es &#224; la suite d'une op&#233;ration de
+recherche. Si cette limite est atteinte, Directory Server retourne toutes les entr&#233;es
+correspondant &#224; la recherche.</p>
+
+<a name="fyfen"></a><h5>D&#233;lai de recherche</h5>
+<p>Sp&#233;cifie le nombre maximal de secondes allou&#233; &#224; une recherche. Si cette
+limite est atteinte, Directory Server retourne toutes les entr&#233;es correspondant &#224; la
+recherche.</p>
+
+<a name="fyfdz"></a><h5>Orientation suivie par LDAP</h5>
+<p>Si elle est activ&#233;e, cette option sp&#233;cifie que les r&#233;f&#233;rences aux autres
+serveurs LDAP sont suivies automatiquement.</p>
+
+<a name="fyffh"></a><h5>Nom de la classe pour le plug-in du r&#233;f&#233;rentiel LDAPv3</h5>
+<p>D&#233;finit l'emplacement du fichier de classe qui impl&#233;mente le r&#233;f&#233;rentiel LDAPv3.</p>
+
+<a name="fyfeu"></a><h5>Mappage de noms d'attribut</h5>
+<p>Active le mappage des attributs communs connus de la structure avec le
+magasin de donn&#233;es natif. Par exemple, si la structure utilise <tt>inetUserStatus</tt> pour
+d&#233;terminer le statut de l'utilisateur, il est possible que le magasin de
+donn&#233;es natif utilise <tt>userStatus</tt>. La distinction majuscules/minuscules s'applique pour les d&#233;finitions d'attribut.
+Les valeurs par d&#233;faut sont les suivantes&#160;:</p>
+<ul><li><p><tt>employeeNumber=distinguishedName</tt></p></li>
+<li><p><tt>iplanet-am-user-alias-list=objectGUID</tt></p></li>
+<li><p><tt>mail=userPrincipalName</tt></p></li>
+<li><p><tt>portalAddress=sAMAccountName</tt></p></li>
+<li><p><tt>telephonenumber=displayName</tt></p></li>
+<li><p><tt>uid=sAMAccountName</tt> </p></li></ul>
+
+
+<a name="fyffb"></a><h5>Types et op&#233;rations pris en charge pour le plug-in LDAPv3</h5>
+<p>Sp&#233;cifie les op&#233;rations autoris&#233;es sur ce serveur LDAP. Les op&#233;rations par d&#233;faut
+sont les seules op&#233;rations prises en charge par ce plug-in du r&#233;f&#233;rentiel
+LDAPv3. Les op&#233;rations prises en charge par le plug-in du r&#233;f&#233;rentiel LDAPv3
+sont les suivantes :</p>
+<ul><li><p>agent : lecture, cr&#233;ation, modification, suppression</p></li>
+<li><p>groupe : lecture, cr&#233;ation, modification, suppression</p></li>
+<li><p>domaine&#8212; lecture, cr&#233;ation, modification, suppression, service</p></li>
+<li><p>utilisateur : lecture, cr&#233;ation, modification, suppression, service</p></li></ul>
+<p>Vous pouvez supprimer des autorisations de la liste ci-dessus en fonction des
+param&#232;tres du serveur LDAP et des t&#226;ches mais vous ne pouvez pas
+en ajouter d'autres.</p><p>Si le plug-in du r&#233;f&#233;rentiel LDAPv3 pointe vers une instance de Sun
+Directory Server, des autorisations de type <tt>role</tt> peuvent &#234;tre ajout&#233;es. Sinon, cette
+autorisation peut ne pas &#234;tre ajout&#233;e car d'autres magasins de donn&#233;es peuvent
+ne pas prendre en charge les r&#244;les. L'autorisation du type r&#244;le est
+:</p>
+<ul><li><p>r&#244;le : lecture, cr&#233;ation, modification, suppression </p></li></ul>
+<p>Si <tt>user</tt> est pr&#233;sent en tant que type pris en charge pour
+le r&#233;f&#233;rentiel LDAPv3, les op&#233;rations de lecture, de cr&#233;ation, de modification et
+de suppression de service sont possibles pour cet utilisateur. En d'autres termes,
+si <tt>user</tt> est un type pris en charge, les op&#233;rations de lecture,
+de modification, de cr&#233;ation et de suppression vous permettent de lire, modifier,
+cr&#233;er et supprimer des entr&#233;es utilisateur dans le r&#233;f&#233;rentiel d'identit&#233;. L'op&#233;ration <tt>user=service</tt>
+permet aux services OpenSSO d'acc&#233;der aux attributs d'entr&#233;es utilisateur. L'utilisateur peut &#233;galement
+acc&#233;der aux attributs de service dynamiques si le service est affect&#233; au
+domaine ou au r&#244;le auquel l'utilisateur appartient. </p><p>L'utilisateur peut &#233;galement g&#233;rer les attributs utilisateur d'un quelconque service affect&#233;. Si
+l'utilisateur dispose de <tt>service</tt> en tant qu'op&#233;ration (<tt>user=service</tt>), ceci indique que toutes
+les op&#233;rations li&#233;es au service sont prises en charge. Ces op&#233;rations sont
+<tt>assignService,</tt> <tt>unassignService,</tt> <tt> getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes</tt> et <tt>modifyService.</tt></p>
+
+<a name="gdlmc"></a><h5>&#201;tendue de la recherche de plug-in LDAPv3</h5>
+<p>D&#233;finit l'&#233;tendue &#224; utiliser pour rechercher les entr&#233;es de plug-in LDAPv3. L'&#233;tendue
+peut avoir l'une des valeurs suivantes :</p>
+<ul><li><p>SCOPE_BASE &#8211; N'effectue la recherche que dans le DN de base.</p></li>
+<li><p>SCOPE_ONE &#8211; N'effectue la recherche que dans les entr&#233;es sous le DN de base.</p></li>
+<li><p>SCOPE_SUB (par d&#233;faut) &#8211; Effectue la recherche dans le DN de base et dans toutes les entr&#233;es de sa sous-arborescence.</p></li></ul>
+
+
+<a name="fyffj"></a><h5>Attribut de recherche d'utilisateurs LDAP</h5>
+<p>Ce champ d&#233;finit le type d'attribut &#224; utiliser pour rechercher un utilisateur.
+Par exemple, si le DN de l'utilisateur est <tt>uid=user1, ou=people, dc=example, dc=com</tt>, vous devez saisir
+<tt>uid</tt> dans ce champ.  </p>
+
+<a name="fyfeo"></a><h5>Filtre de recherche d'utilisateurs LDAP</h5>
+<p>Sp&#233;cifie le filtre de recherche &#224; utiliser pour rechercher les entr&#233;es utilisateur.</p>
+
+<a name="fyffi"></a><h5>Classe d'objet utilisateur LDAP</h5>
+<p>Sp&#233;cifie les classes d'objet d'un utilisateur. Lorsqu'un utilisateur est cr&#233;&#233;, la liste
+des classes d'objet de cet utilisateur est ajout&#233;e &#224; la liste des
+attributs de l'utilisateur.</p>
+
+<a name="fyfez"></a><h5>Attributs utilisateur LDAP</h5>
+<p>D&#233;finit la liste des attributs associ&#233;s &#224; un utilisateur. Toute tentative de
+lecture/d'&#233;criture des attributs utilisateur autres que ceux figurant sur cette liste est
+interdite. La distinction majuscules/minuscules s'applique pour les attributs. Vous pouvez d&#233;finir ici
+les classes d'objet et le sch&#233;ma d'attribut uniquement s'ils sont d&#233;j&#224; d&#233;finis
+dans Directory Server.</p>
+
+<a name="gdlms"></a><h5>Cr&#233;er un mappage d'attributs utilisateur</h5>
+<p>Sp&#233;cifie les attributs requis lors de la cr&#233;ation d'un utilisateur. Cet attribut
+utilise la syntaxe suivante :</p><p><tt>DestinationAttributeName=SourceAttributeName</tt></p><p>Si le nom de l'attribut source est manquant, la valeur par d&#233;faut
+est le DN utilisateur (<tt>uid</tt>). Par exemple :</p>cn sn=givenName<p><tt>cn</tt> et <tt>sn</tt> sont requis pour cr&#233;er un profil utilisateur. <tt>cn</tt> prend
+la valeur de l'attribut nomm&#233; <tt>uid</tt> et <tt> sn</tt> prend la valeur de
+l'attribut nomm&#233; <tt>givenName.</tt></p>
+
+<a name="gdlmi"></a><h5>Nom de l'attribut de l'&#233;tat de l'utilisateur</h5>
+<p>Sp&#233;cifie le nom d'attribut &#224; indiquer si l'utilisateur est actif ou inactif.</p>
+
+<a name="gdopm"></a><h5>Valeur active du statut de l'utilisateur</h5>
+<p>Cette valeur d'attribut est associ&#233;e &#224; l'utilisateur lors de la cr&#233;ation de
+ce dernier. Pour un utilisateur actif, la valeur Active Directory est 544.
+Pour un utilisateur inactif, la valeur Active Directory est 546.</p>
+
+<a name="gdoqh"></a><h5>Valeur inactive du statut de l'utilisateur</h5>
+<p>Dans Active Directory, ce champ n'est pas utilis&#233;.</p>
+
+<a name="fyfeb"></a><h5>Attribut de recherche de groupes LDAP</h5>
+<p>Ce champ d&#233;finit le type d'attribut qui permet de rechercher un groupe.
+La valeur par d&#233;faut est <tt>cn</tt>.</p>
+
+<a name="fyfep"></a><h5>Filtre de recherche de groupes LDAP</h5>
+<p>Sp&#233;cifie le filtre de recherche &#224; utiliser pour rechercher les entr&#233;es groupe.
+La valeur par d&#233;faut est <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fyfed"></a><h5>Attribut d'affectation de nom du conteneur de groupes LDAP</h5>
+<p>D&#233;finit l'attribut de nommage d'un conteneur de groupes, si des groupes r&#233;sident
+dans un conteneur. Dans le cas contraire, cet attribut n'est pas d&#233;fini.
+Par exemple, si un DN de groupe <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> r&#233;side dans <tt>ou=groups</tt>, l'attribut
+de nommage de conteneur de groupes est <tt>ou</tt>.</p>
+
+<a name="fyfec"></a><h5>Valeur du conteneur de groupes LDAP</h5>
+<p>Indique la valeur du conteneur de groupes. Par exemple, si le DN
+de groupe  <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> r&#233;side dans un conteneur nomm&#233; <tt>ou=groups</tt>, la valeur
+du conteneur de groupes est <tt>groups</tt>.</p>
+
+<a name="fyffc"></a><h5>Classes d'objets de groupes LDAP</h5>
+<p>Sp&#233;cifie les classes d'objet des groupes. Lorsqu'un groupe est cr&#233;&#233;, cette liste
+des classes d'objet de groupe est ajout&#233;e &#224; la liste des attributs
+du groupe.</p>
+
+<a name="fyfff"></a><h5>Attributs des groupes LDAP</h5>
+<p>D&#233;finit la liste des attributs associ&#233;s &#224; un groupe. Toute tentative de
+lecture/d'&#233;criture des attributs de groupe autres que ceux figurant sur cette liste
+est interdite. La distinction majuscules/minuscules s'applique pour les attributs. Vous pouvez d&#233;finir
+ici les classes d'objet et le sch&#233;ma d'attribut uniquement s'ils sont d&#233;j&#224;
+d&#233;finis dans Directory Server.</p>
+
+<a name="fyfea"></a><h5>Nom d'attribut pour l'appartenance &#224; un groupe</h5>
+<p>Indique le nom des attributs dont les valeurs sont les noms de
+tous les groupes auxquels appartient le DN. La valeur par d&#233;faut est
+<tt>memberOf</tt>.</p>
+
+<a name="fyfes"></a><h5>Nom d'attribut pour un membre unique</h5>
+<p>Sp&#233;cifie le nom de l'attribut dont les valeurs sont un DN appartenant
+&#224; ce groupe. La valeur par d&#233;faut est <tt>uniqueMember</tt>.</p>
+
+<a name="fyfev"></a><h5>Nom d'attribut pour un URL membre d'un groupe</h5>
+<p>Indique le nom de l'attribut dont la valeur est un URL LDAP
+qui aboutit aux membres appartenant &#224; ce groupe. La valeur par d&#233;faut
+est <tt>memberUrl</tt>.</p>
+
+<a name="fyfem"></a><h5>Attribut d'affectation de nom du conteneur de personnes LDAP</h5>
+<p>Indique l'attribut de nommage du conteneur de personnes si un utilisateur r&#233;side
+dans un conteneur de personnes. Ce champ est laiss&#233; vide si l'utilisateur
+ne r&#233;side pas dans un conteneur de personnes.</p>
+
+<a name="fyffe"></a><h5>Valeur du conteneur de personnes LDAP</h5>
+<p>Indique la valeur du conteneur de personnes. La valeur par d&#233;faut est
+<tt>people</tt>.</p>
+
+<a name="gdlns"></a><h5>Types d'identit&#233;s pouvant &#234;tre authentifi&#233;s</h5>
+<p>Indique que ce magasin de donn&#233;es peut authentifier les types d'identit&#233;s utilisateur
+et/ou agent lorsque le mode du module d'authentification du domaine est d&#233;fini
+sur Magasin de donn&#233;es.</p>
+
+<a name="ggtnu"></a><h5>Attribut de nommage d'authentification</h5>
+<p>Cette valeur n'est actuellement pas utilis&#233;e.</p>
+
+<a name="fyfef"></a><h5>DN de base de la recherche persistante</h5>
+<p>D&#233;finit le DN de base &#224; utiliser pour une recherche persistante. Certains
+serveurs LDAPv3 prennent en charge la recherche persistante uniquement au niveau du
+suffixe racine.</p>
+
+<a name="gdlmx"></a><h5>Filtre de recherche persistant</h5>
+<p>D&#233;finit le filtre qui renverra les changements sp&#233;cifiques aux entr&#233;es du serveur
+d'annuaire. Le magasin de donn&#233;es ne recevra que les changements correspondants au
+filtre d&#233;fini.</p>
+
+<a name="ggudj"></a><h5>&#201;tendue de recherche persistante</h5>
+<p>D&#233;finit l'&#233;tendue &#224; utiliser dans une recherche persistante. L'&#233;tendue peut avoir l'une
+des valeurs suivantes :</p>
+<ul><li><p>SCOPE_BASE &#8211; N'effectue la recherche que dans le DN de base.</p></li>
+<li><p>SCOPE_ONE &#8211; N'effectue la recherche que dans les entr&#233;es sous le DN de base.</p></li>
+<li><p>SCOPE_SUB (par d&#233;faut) &#8211; Effectue la recherche dans le DN de base et dans toutes les entr&#233;es de sa sous-arborescence.</p></li></ul>
+
+
+<a name="fyffz"></a><h5>D&#233;lai d'inactivit&#233; maximal de la recherche persistante avant red&#233;marrage</h5>
+<p>D&#233;finit le d&#233;lai d'inactivit&#233; maximal avant de red&#233;marrer la recherche persistante. The
+value must be great than 1. Values less than or equal to
+1 will restart the search irrespective of the idle time of the
+connection.</p><p>Si OpenSSO est d&#233;ploy&#233; avec un &#233;quilibreur de charge, certains &#233;quilibreurs de
+charge seront interrompus apr&#232;s un certain d&#233;lai d'inactivit&#233;. Dans ce cas, vous
+devez d&#233;finir le d&#233;lai d'inactivit&#233; maximal de la recherche persistante avant red&#233;marrage
+sur une valeur inf&#233;rieure au temps sp&#233;cifi&#233; pour l'&#233;quilibreur de charge.</p>
+
+<a name="fyfgh"></a><h5>Nombre maximal de nouvelles tentatives apr&#232;s r&#233;ception d'un code d'erreur</h5>
+<p>D&#233;finit le nombre maximal de tentatives de l'op&#233;ration de recherche persistante si
+celle-ci rencontre les codes d'erreur sp&#233;cifi&#233;s dans les Codes d'erreur LDAPException suite
+auxquels une nouvelle tentative doit avoir lieu.</p>
+
+<a name="fyfge"></a><h5>Le d&#233;lai entre les nouvelles tentatives</h5>
+<p>Indique le d&#233;lai &#224; observer avant chaque tentative. Cet attribut s'applique uniquement
+&#224; la connexion de recherche persistante.</p>
+
+<a name="fyffr"></a><h5>Codes d'erreur LDAPException suite auxquels une nouvelle tentative doit avoir lieu</h5>
+<p>Indique les codes d'erreur apr&#232;s lesquels une nouvelle tentative de recherche persistante
+doit &#234;tre effectu&#233;e. Cet attribut s'applique uniquement &#224; la recherche persistante, et
+non &#224; toutes les op&#233;rations LDAP.</p>
+
+<a name="gdlnn"></a><h5>Mise en m&#233;moire cache</h5>
+<p>Si activ&#233;, cet attribut permet &#224; OpenSSO de mettre en cache des
+donn&#233;es r&#233;cup&#233;r&#233;es du magasin de donn&#233;es.</p>
+
+<a name="gdlnm"></a><h5>&#194;ge maximum d'&#233;l&#233;ments mis en cache</h5>
+<p>Sp&#233;cifie la dur&#233;e maximale de stockage dans le cache avant suppression. Les
+valeurs sont exprim&#233;es en secondes.</p>
+
+<a name="gdlnd"></a><h5>Taille maximum du cache</h5>
+<p>Sp&#233;cifie la taille maximale du cache. Plus la valeur est importante et
+plus la quantit&#233; de donn&#233;es stock&#233;es est importante. Cela n&#233;cessite cependant une
+m&#233;moire sup&#233;rieure. Les valeurs sont exprim&#233;es en octets.</p>
+<br/>
+
+</body>
+</html>

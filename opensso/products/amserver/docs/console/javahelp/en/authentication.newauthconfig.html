@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Create a New Authentication Chain - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.newauthconfig"></a><h4>To Create a New Authentication Chain</h4><ol>
+<li><b><a name="indexterm-7"></a>Click the name of the realm for which you wish to add a
+new authentication chain.</b></li>
+<li><b>Select the Authentication tab.</b></li>
+<li><b>Click New in the Authentication Chaining list.</b></li>
+<li><b>Enter a name for the authentication chain.</b></li>
+<li><b>Click OK.</b></li>
+<li><b>Click Add to define the authentication module instance that you wish to include
+in the chain. To do so, select the module instance name from the
+Instance list. The module instance names displayed in this list are created in
+the Module Instances attribute. </b></li>
+<li><b>Select the criteria for the chain. These flags establish an enforcement criteria for
+the authentication module for which they are defined. There is hierarchy for enforcement.
+Required is the highest and Optional is the lowest:</b><dl><dt>Requisite</dt>
+<dd><p>The module instance is required to succeed. If it succeeds, authentication continues down the Authentication Chaining list. If it fails, control immediately returns to the application (authentication does not proceed down the Authentication Chaining list).</p></dd>
+<dt>Required</dt>
+<dd><p>Authentication to this module is required to succeed. If any of the required modules in the chain fails, the whole authentication chain will ultimately fail. However, whether a required module succeeds or fails, the control will continue down to the next module in the chain.</p></dd>
+<dt>Sufficient</dt>
+<dd><p>The module instance is not required to succeed. If it does succeed, control immediately returns to the application (authentication does not proceed down the module instance list). If it fails, authentication continues down the Authentication Chaining list.</p></dd>
+<dt>Optional</dt>
+<dd><p>The module instance is not required to succeed. If it succeeds or fails, authentication still continues to proceed down the Authentication Chaining list.</p></dd>
+</dl>
+</li>
+<li><b>Enter options for the chain. This enables additional options for the module as
+a key=value pair. Multiple options are separated by a space.</b></li>
+<li><b>Define the following attributes:</b><dl><dt>Successful Login URL</dt>
+<dd><p>Specifies the URL that the user will be redirected to upon successful authentication.</p></dd>
+<dt>Failed Login URL</dt>
+<dd><p>Specifies the URL that the user will be redirected to upon unsuccessful authentication.</p></dd>
+<dt>Authentication Post Processing Class</dt>
+<dd><p>Defines the name of the Java class used to customize the post authentication process after a login success or failure.</p></dd>
+</dl>
+</li>
+<li><b>Click Save.</b></li></ol>
+<br/>
+
+</body>
+</html>

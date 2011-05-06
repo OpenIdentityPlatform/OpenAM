@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>OpenSSO 数据存储库类型 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="idrepoadd"></a><h4>OpenSSO 数据存储库类型</h4>
+<p>在“OpenSSO 数据存储库选择”屏幕中，可创建以下数据存储库类型：</p>
+
+<a name="gdlmv"></a><h5>Active Directory</h5>
+<p>该数据存储类型使用 LDAP 版本 3 规范将身份数据写入到 Microsoft Active Directory 的实例中。</p><p>有关属性定义的信息，参见<a href="realm.idrepoeditad.html">Active Directory 属性</a>。</p>
+
+<a name="gdlmr"></a><h5>普通 LDAPv3</h5>
+<p>该数据存储库类型允许将身份数据写入任意与 LDAPv3 兼容的数据库。如果所使用的 LDAPv3 数据库不支持持久性搜索，则无法使用高速缓存功能。</p><p>有关属性定义的信息，参见<a href="realm.idrepoeditldapv3.html">普通 LDAPv3 属性</a>。</p>
+
+<a name="gdlnw"></a><h5>Sun Directory Server OpenSSO 模式</h5>
+<p>该数据存储库类型驻留在 Sun Java System Directory Server 实例中，并拥有 OpenSSO 信息树。</p><p>有关属性定义的信息，参见<a href="realm.idrepoeditfamschema.html">使用 OpenSSO 模式的 Sun Directory Server 属性</a>。</p>
+<br/>
+
+</body>
+</html>

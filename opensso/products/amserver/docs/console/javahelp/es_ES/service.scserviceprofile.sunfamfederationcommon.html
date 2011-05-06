@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuraci&#243;n de la federaci&#243;n com&#250;n - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamfederationcommon"></a><h4>Configuraci&#243;n de la federaci&#243;n com&#250;n</h4>
+
+
+<a name="ggoir"></a><h5>Clase de implementaci&#243;n del SPI de almac&#233;n de datos</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n del proveedor del almac&#233;n de
+datos predeterminado,</p>
+
+<a name="ggogw"></a><h5>Clase de implementaci&#243;n del SPI de la instancia de configuraci&#243;n</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n para la administraci&#243;n de los
+datos de configuraci&#243;n.</p>
+
+<a name="ggofp"></a><h5>Clase de implementaci&#243;n del SPI del registro</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n del proveedor de registros.</p>
+
+<a name="ggofy"></a><h5>Clase de implementaci&#243;n del SPI del proveedor de sesi&#243;n</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n del proveedor de sesi&#243;n.</p>
+
+<a name="ggogv"></a><h5>Longitud m&#225;xima permitida del contenido</h5>
+<p>Este atributo especifica la longitud m&#225;xima permitida de contenido para una Solicitud
+HTTP que se utilizar&#225; en servicios de federaci&#243;n. Se rechazar&#225; cualquier solicitud
+cuyo contenido supere la longitud m&#225;xima de contenido permitida.</p>
+
+<a name="ggogu"></a><h5>Clase de implementaci&#243;n del SPI del decodificador de contrase&#241;as</h5>
+<p>Este atributo especifica la clase de implementaci&#243;n de la interfaz <tt> com.sun.identity.saml.xmlsig.PasswordDecoder</tt> que
+se utiliza para decodificar la contrase&#241;a guardada del almac&#233;n de claves de
+firmas XML y la contrase&#241;a de autenticaci&#243;n b&#225;sica en SAML 1.x.</p>
+
+<a name="ggohx"></a><h5>Clase de implementaci&#243;n del SPI del proveedor de firmas</h5>
+<p>Este atributo especifica la clase del proveedor de firmas XML de SAML.
+El SPI predeterminado es <tt>com.sun.identity.saml.xmlsig.AMSignatureProvider </tt>.</p>
+
+<a name="ggohm"></a><h5>Clase de implementaci&#243;n del SPI del proveedor de claves</h5>
+<p>Este atributo especifica la clase del proveedor de claves de firmas XML.
+El SPI predeterminado es <tt>com.sun.identity.saml.xmlsig.JKSKeyProvider</tt>.</p>
+
+<a name="ggofo"></a><h5>Comprobar la presencia de los certificados</h5>
+<p>Si se establece en <tt>en</tt>, el certificado debe estar presente en el
+almac&#233;n de claves para la validaci&#243;n de firmas XML.  Si, por
+el contrario, se establece en <tt>off</tt>, se omitir&#225; la comprobaci&#243;n de presencia
+del certificado. Esto s&#243;lo se aplica a SMAL1.x.</p>
+
+<a name="ggohn"></a><h5>Algoritmo de canonicalizaci&#243;n XML</h5>
+<p>Este atributo especifica el algoritmo de canonicalizaci&#243;n XML utilizado para la creaci&#243;n
+y verificaci&#243;n de firmas XML de SAML. El valor predeterminado es <tt>http://www.w3.org/2001/10/xml-exc-c14n#</tt>.</p>
+
+<a name="ggohp"></a><h5>Algoritmo de firma XML</h5>
+<p>Este atributo especifica el algoritmo de firma XML utilizado para la creaci&#243;n
+y verificaci&#243;n de firmas XML de SAML. Si no se especifica o
+el valor est&#225; vac&#237;o, se utilizar&#225; el valor predeterminado (<tt>http://www.w3.org/2000/09/xmldsig#rsa-sha1 </tt>).</p>
+
+<a name="ggoie"></a><h5>Algoritmo de transformaci&#243;n XML</h5>
+<p>Este atributo especifica el algoritmo de transformaci&#243;n XML utilizado para la creaci&#243;n
+y verificaci&#243;n de firmas XML de SAML. Si no se especifica o
+el valor est&#225; vac&#237;o, se utilizar&#225; el valor predeterminado (<tt>http://www.w3.org/2001/10/xml-exc-c14n# </tt>).</p>
+<br/>
+
+</body>
+</html>

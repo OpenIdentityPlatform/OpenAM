@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuration Attributes - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="service.scconfig"></a><h3>Configuration Attributes</h3><p><a name="indexterm-164"></a>The Configuration page allows administrators to manage attribute values of the services that OpenSSO
+offers. The attributes that comprise an OpenSSO service are classified as one of
+the following types:</p><p><b>Global</b> &#8211; Applied across the OpenSSO configuration. They cannot be applied to users,
+roles or realms as the goal of global attributes is to customize OpenSSO.</p><p><b>Realm</b> &#8211; Realm attributes are only assigned to realms. No object classes are
+associated with realm attributes. For instance, attributes listed in the authentication services are defined
+as realm attributes because authentication is done at the realm level rather than
+at a subtree or user level.</p><p><b>Dynamic</b> &#8211; Applies to an OpenSSO configured role or realm. When the role
+is assigned to a user or a user is created in an realm,
+the dynamic attribute then becomes a characteristic of the user.</p><p><b>User</b> &#8211; Applies directly to each user. They are not inherited from a
+role or an realm and, typically, are different for each user.</p><p>The Configuration attributes you can modify are:</p>
+<ul><li><p><a href="service.scconfigauth.html">Authentication</a></p></li>
+<li><p><a href="service.scconfigconsole.html">Console Properties</a></p></li>
+<li><p><a href="servic.scconfigglobal.html">Global Properties</a></p></li>
+<li><p><a href="service.scfonfigsystem.html">System Properties</a></p></li>
+<li><p><a href="service.serversite.html">Servers and Sites</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

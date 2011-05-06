@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<!--
+    Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+    $Id: amPolicy_mod.xml,v 1.1 2008/08/13 21:40:49 dillidorai Exp $
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMPolicyService" version="1.0">
+        <PluginSchema className="com.sun.identity.samples.policy.SampleSubject"  
+                      i18nFileName="amPolicy"  
+                      i18nKey="iplanet-subject-SampleSubject-name"  
+                      interfaceName="Subject"  
+                      name="SampleSubject" >
+        </PluginSchema>
+
+        <PluginSchema className="com.sun.identity.samples.policy.SampleCondition" 
+                      i18nFileName="amPolicy"  
+                      i18nKey="iplanet-samplecondition-condition-name"  
+                      interfaceName="Condition"  
+                      name="SampleCondition" >
+        </PluginSchema>
+ 
+        <PluginSchema className="com.sun.identity.samples.policy.SampleReferral"  
+                      i18nFileName="amPolicy"  
+                      i18nKey="iplanet-sample-referral"  
+                      interfaceName="Referral"  
+                      name="SampleReferral" >
+        </PluginSchema>
+        <PluginSchema className="com.sun.identity.samples.policy.SampleResponseProvider"  
+                      i18nFileName="amPolicy"  
+                      i18nKey="iplanet-sample-responseprovider"  
+                      interfaceName="ResponseProvider"  
+                      name="SampleResponseProvider" >
+        </PluginSchema>
+    </Service>
+</ServicesConfiguration>
+

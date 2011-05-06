@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Agente de directivas 2.2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.22agentprofile"></a><h4>Agente de directivas 2.2</h4>
+<p>OpenSSO proporciona compatibilidad con versiones anteriores de Policy Agent 2.2. Esta aplicaci&#243;n
+debe configurarse de forma local desde el contenedor de implementaci&#243;n en el
+que se ha instalado. Por lo tanto, s&#243;lo se puede configurar un
+n&#250;mero muy limitado de opciones de Policy Agent 2.2 desde la consola
+de OpenSSO.</p>
+
+<a name="ggmti"></a><h5>Mot de passe</h5>
+<p>La contrase&#241;a que se ha definido al crear el perfil de agente.
+No obstante, puede cambiar esta contrase&#241;a en cualquier momento.</p>
+
+<a name="ggmvn"></a><h5>Confirmar contrase&#241;a</h5>
+<p>La confirmaci&#243;n de la contrase&#241;a se ha realizado al crear el perfil
+de agente. Si cambia la contrase&#241;a, debe confirmar el cambio.</p>
+
+<a name="ggmsq"></a><h5>Estado</h5>
+<p>La opci&#243;n <tt>Activo</tt> se selecciona al crear el agente. Seleccione <tt>Inactivo</tt> s&#243;lo
+si desea suprimir la protecci&#243;n que proporciona el agente.</p>
+
+<a name="ggoub"></a><h5>Descripci&#243;n</h5>
+<p>Una descripci&#243;n del agente, que puede agregar si lo desea.</p>
+
+<a name="ggowa"></a><h5>Valor de clave de agente</h5>
+<p>Ajuste necesario al habilitar CDSSO y durante la configuraci&#243;n de la implementaci&#243;n
+para evitar secuestros de cookies.</p><p>Este atributo sirve como clave a la hora de emparejar una clave
+y un valor. OpenSSO utiliza este atributo para recibir las solicitudes del
+agente para las aserciones de credenciales acerca de los usuarios. En esta
+pareja clave-valor s&#243;lo uno de los atributos es v&#225;lido. El resto de
+atributos se ignora. Use el siguiente formato:</p><pre>agentRootURL=protocol://<i>hostname</i>:<i>port</i>/</pre><p>La entrada debe ser precisa. Por ejemplo, el ajuste que representa la
+clave, <tt>agentRootURL</tt>, distingue entre may&#250;sculas y min&#250;sculas.</p>
+<br/>
+
+</body>
+</html>

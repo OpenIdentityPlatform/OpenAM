@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>JDBC - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthjdbcservice"></a><h4>JDBC</h4>
+<p><a name="indexterm-174"></a>Java Database Connectivity (JDBC) 验证模块允许 OpenSSO 通过任何提供启用 JDBC 驱动程序的结构化查询语言 (Structured Query Language,
+SQL) 数据库来验证用户。可以直接通过 JDBC 驱动程序或 JNDI 连接池连接 SQL 数据库。JDBC 属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwajx">连接类型</a></p></li>
+<li><p><a href="#fwafb">连接池 JNDI 名称</a></p></li>
+<li><p><a href="#fwaap">JDBC 驱动程序</a></p></li>
+<li><p><a href="#fwarc">JDBC URL</a></p></li>
+<li><p><a href="#fwaum">将此用户连接至数据库</a></p></li>
+<li><p><a href="#fwaeu">连接至数据库的密码</a></p></li>
+<li><p><a href="#fwavq">连接至数据库的密码确认</a></p></li>
+<li><p><a href="#fwads">密码列字符串</a></p></li>
+<li><p><a href="#fwapb">预处理语句</a></p></li>
+<li><p><a href="#fwapv">变换密码语法的类</a></p></li>
+<li><p><a href="#fwavz">验证级别</a></p></li></ul>
+
+
+<a name="fwajx"></a><h5>连接类型</h5>
+<p>指定连接至 SQL 数据库的连接类型，可以是 JNDI（Java 命名和目录接口）连接池或 JDBC 驱动程序。这些选项包括：</p>
+<ul><li><p>已通过 JNDI 检索连接池</p></li>
+<li><p>非持久 JDBC 连接</p></li></ul>
+<p>JNDI 连接池利用了底层 Web 容器的配置。</p>
+
+<a name="fwafb"></a><h5>连接池 JNDI 名称</h5>
+<p>如果在“连接类型”中选择了 JNDI，此字段将指定连接池名称。由于 JDBC 验证使用 Web 容器提供的 JNDI 连接池，因此，JNDI 连接池的设置在其他 Web 容器中可能会不一致。有关示例，参见 OpenSSO
+Administration Guide。</p>
+
+<a name="fwaap"></a><h5>JDBC 驱动程序</h5>
+<p>如果在<a href="#fwajx">连接类型</a>中选择了 JDBC，此字段将指定 SQL 数据库所提供的 JDBC 驱动程序。例如，<tt>com.mysql.jdbc.Driver</tt>。</p>
+
+<a name="fwarc"></a><h5>JDBC URL</h5>
+<p>如果在<a href="#fwajx">连接类型</a>中选择了 JDBC，此字段将指定数据库 URL。例如，mySQL 的 URL 为 <tt>jdbc.mysql://hostname:port/databaseName</tt>。</p>
+
+<a name="fwaum"></a><h5>将此用户连接至数据库</h5>
+<p>指定用户名称，JDBC 连接以它建立数据库连接。</p>
+
+<a name="fwaeu"></a><h5>连接至数据库的密码</h5>
+<p>为在“连接至数据库的用户”中指定的用户定义密码。</p>
+
+<a name="fwavq"></a><h5>连接至数据库的密码确认</h5>
+<p>确认密码。</p>
+
+<a name="fwads"></a><h5>密码列字符串</h5>
+<p>指定 SQL 数据库中的密码列名。</p>
+
+<a name="fwapb"></a><h5>预处理语句</h5>
+<p>指定用于检索用户登录密码的 SQL 语句。例如：</p><pre> select Password from Employees where USERNAME = ?</pre>
+
+<a name="fwapv"></a><h5>变换密码语法的类</h5>
+<p>指定用于比较的密码，将数据库检索到的密码变换为用户输入格式的类名。此类必须实现 <tt>JDBCPasswordSyntaxTransform</tt> 接口。</p>
+
+<a name="fwavz"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

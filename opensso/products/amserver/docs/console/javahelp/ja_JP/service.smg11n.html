@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>国際化設定 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smg11n"></a><h4>国際化設定</h4>
+<p><a name="indexterm-188"></a>国際化設定サービスには、さまざまなロケールや文字セット用に OpenSSO を設定するためのグローバル属性が含まれます。属性は次のとおりです。</p>
+<ul><li><p><a href="#fsvdx">「各ロケールでサポートされる文字セット」</a></p></li>
+<li><p><a href="#fsvec">「文字セットのエイリアス」</a></p></li>
+<li><p><a href="#fsveb">「自動生成される共通名の形式」</a></p></li></ul>
+
+
+<a name="fsvdx"></a><h5>各ロケールでサポートされる文字セット</h5>
+<p>この属性は各ロケールでサポートされる文字セットを一覧表示します。これにより、ロケールと文字セット間のマッピングが示されます。形式は次のとおりです。</p><p>「新たにサポートする文字セット」を追加するには、「追加」をクリックして次のパラメータを定義します。</p><dl><dt>ロケール</dt>
+<dd><p>追加する新しいロケール。詳細については、<a href="supportedlang.html">「サポートされている言語ロケール」</a>を参照してください。</p></dd>
+<dt>サポートされる文字セット</dt>
+<dd><p>指定したロケールでサポートされる文字セットを入力します。文字セットはセミコロンで区切ります。たとえば、<tt>charset=charset1;charset2;charset3;...;charsetn</tt> のようにします。</p></dd>
+</dl>
+<p>既存のサポートされる文字セットを編集するには、「サポートされる文字セット」の表でその名前をクリックします。作業が終了したら、「了解」をクリックします。</p>
+
+<a name="fsvec"></a><h5>文字セットのエイリアス</h5>
+<p>この属性では、応答を送信するのに使用されるコードセット名 (IANA 名にマッピングされる) が一覧表示されます。これらのコードセット名は Java のコードセット名と一致する必要はありません。現在、Java の文字セットと IANA の文字セットを相互にマッピングするためのハッシュ表が存在しています。</p><p>「新規文字セットのエイリアス」を追加するには、「追加」をクリックして次のパラメータを定義します。</p><dl><dt>MIME 名</dt>
+<dd><p>IANA マッピング名。たとえば、<tt>Shift_JIS</tt> のように指定します。</p></dd>
+<dt>Java 名</dt>
+<dd><p>IANA の文字セットにマッピングする Java 文字セット。 </p></dd>
+</dl>
+<p>既存の「文字セットのエイリアス」を編集するには、表でその名前をクリックします。作業が終了したら、「了解」をクリックします。</p>
+
+<a name="fsveb"></a><h5>自動生成される共通名の形式</h5>
+<p>この表示オプションで、異なるロケールおよび文字セットに適応した名前を自動的に生成する方法を定義できます。デフォルトの構文は次のとおりです。実際に名前を表示する際に、定義内に含めたコンマやスペースもそのまま表示されることに注意してください。</p><p><tt>en_us = {givenname} {initials} {sn}</tt></p><p>たとえば、uid (11111) とユーザー (User One) の新しい名前形式を中国語の文字セットで表示する場合、次のように定義します。</p><p><tt>zh = {sn}{givenname}({uid})</tt></p><p>結果は次のように表示されます。</p><p><tt>OneUser (11111)</tt></p>
+<br/>
+
+</body>
+</html>

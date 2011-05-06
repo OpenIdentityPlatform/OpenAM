@@ -1,0 +1,143 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: default.css,v 1.2 2008/06/25 05:44:23 qcheng Exp $
+ *
+ */
+
+body, th, td, p, div, span, b, strong, i, u, blockquote, ul, li, ol, a {
+    font-family: sans-serif;
+    font-size: small
+}
+
+a:link, a:visited {
+    color: #000000;
+    text-decoration: underline;
+}
+
+pre {
+    font-size: medium;
+}
+
+body {
+    background-color:white;
+}
+
+#maintitle {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: large
+}
+
+table#tblMain {
+    border-spacing: 0;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+table#tblTest {
+    border-spacing: 0;
+    border: 1px solid black;
+}
+
+th#tblTest {
+    padding: 5;
+    font-weight: bold;
+    background-color: #9999CC;
+    color: #000000;
+    border-right: 1px solid #FFFFFF;
+}
+
+th#tblTestTitle {
+    padding: 5;
+    font-weight: bold;
+    background-color: #CCCCCC;
+    color: #000000;
+    white-space: nowrap;
+    border-right: 1px solid #FFFFFF;
+}
+
+td.number {
+    text-align: right;
+}
+
+td#tblTestPassed {
+    padding: 5;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    background-color: lightgreen;
+    vertical-align: top;
+}
+
+td#tblTestSkipped {
+    padding: 5;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    background-color: #C3C3C3;
+    vertical-align: top;
+}
+
+td#tblTestFailed {
+    padding: 5;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    background-color: #DB7093;
+    vertical-align: top;
+}
+
+th#tblMain {
+    padding: 5;
+    font-weight: bold;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    background-color: #9999CC;
+    color: black;
+}
+
+td#tblMainFailedSuite {
+    padding: 5;
+    background-color: #DB7093;
+    border-bottom: 1px solid #FFFFFF;
+}
+td#tblMainPassedSuite {
+    padding: 5;
+    background-color: lightgreen;
+    border-bottom: 1px solid #FFFFFF;
+}
+
+td#tblMainPassed {
+    padding: 5;
+    text-align: right;
+    background-color: lightgreen;
+    border-bottom: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
+}
+td#tblMainFailed {
+    padding: 5;
+    text-align: right;
+    background-color: #DB7093;
+    border-bottom: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
+}

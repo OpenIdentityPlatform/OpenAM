@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>メンバーシップ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>メンバーシップ</h4>
+<p><a name="indexterm-176"></a>メンバーシップ認証モジュールは、パーソナライズされるサイト用に実装されています。メンバーシップ認証が有効になっている場合、ユーザーは自己登録できます。つまり、ユーザーは管理者の助けを借りずに、アカウントを作成して、個別設定し、登録済みユーザーとしてアクセスすることができます。この属性はレルム属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fumys">「パスワードの最少文字数」</a></p></li>
+<li><p><a href="#fumyr">「デフォルトユーザーロール」</a></p></li>
+<li><p><a href="#fumyt">「登録後のユーザー状態」</a></p></li>
+<li><p><a href="#fumzm">「認証レベル」</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>パスワードの最少文字数</h5>
+<p>自己登録時に設定するパスワードに必要な最少文字数を指定します。デフォルト値は 8 です。</p><p>この値を変更すると、次のファイルの登録およびエラーテキストでも値が変更されます。</p><p><tt></tt><i>AcessManager-base</i><tt>/locale/amAuthMembership.properties </tt> (<i>PasswdMinChars</i> エントリ)</p>
+
+<a name="fumyr"></a><h5>デフォルトユーザーロール</h5>
+<p>自己登録で作成されたプロファイルを持つ新しいユーザーに割り当てるロールを指定します。デフォルト値は存在しません。管理者は、新しいユーザーに割り当てられるロールの DN を指定する必要があります。</p>
+<hr><p><b>注 &#8211; </b>指定するロールは、認証を構成するレルムの下にあることが必要です。自己登録時に、ユーザーに割り当てることのできるロールだけを追加することができます。その他のすべての DN は無視されます。このロールは、OpenSSO ロールまたは LDAP ロールにすることができますが、フィルタロールは指定できません。</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>登録後のユーザー状態</h5>
+<p>自己登録したユーザーにサービスをすぐに利用できるようにするかどうかを指定します。デフォルト値は「アクティブ」なので、新しいユーザーはサービスを利用できます。管理者が「非アクティブ」を選択すると、新しいユーザーはサービスを利用できません。</p>
+
+<a name="fumzm"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

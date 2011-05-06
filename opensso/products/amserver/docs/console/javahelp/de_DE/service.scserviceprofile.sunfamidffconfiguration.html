@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liberty ID-FF Service-Konfiguration - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamidffconfiguration"></a><h4>Liberty ID-FF Service-Konfiguration</h4>
+
+
+<a name="ggogr"></a><h5>Name des Verbindungscookies</h5>
+<p>Dieses Attribut gibt den Namen des Cookies f&#252;r die ID-FF-Dienste an. 
+Dieses Cookie wird verwendet, um zu speichern, ob der Benutzer bereits verbunden
+ist. </p>
+
+<a name="ggohk"></a><h5>SPI-Implementierungsklasse f&#252;r IDP-Proxy-Suchfunktion</h5>
+<p>Dieses Attribut gibt die Implementierungsklasse zum Suchen eines bevorzugten Identity-Anbieters f&#252;r die
+Proxy-Funktion an.</p>
+
+<a name="ggogp"></a><h5>Intervall f&#252;r Anforderungs-Cache-Bereinigung</h5>
+<p>Dieses Attribut gibt das Bereinigungsintervall (in Sekunden) f&#252;r den internen ID-FF-Anforderungsbereinigungsthread an.</p>
+
+<a name="ggoii"></a><h5>Zeit&#252;berschreitung f&#252;r Anforderungs-Cache</h5>
+<p>Dieses Attribut gibt den Zeit&#252;berschreitungswert (in Sekunden) f&#252;r die ID-FF-Authentifizierungsanforderung an. Alle
+<tt>AuthnRequest</tt>-Objekte werden aus dem Speicher gel&#246;scht, wenn sie den Zeit&#252;berschreitungswert &#252;berschreiten.</p>
+
+<a name="ggofu"></a><h5>IDP-Anmelde-URl</h5>
+<p>Dieses Attribut gibt die Anmelde-URL ein, an die IDP umgeleitet wird, wenn
+w&#228;hrend der Verarbeitung der Authentifizierungsanforderung keine g&#252;ltige Sitzung gefunden wird. Wenn der
+Schl&#252;ssel nicht angegeben ist, wird eine Standard-Anmelde-URL verwendet.</p>
+
+<a name="ggoih"></a><h5>XML-Signatur ein</h5>
+<p>Dieses Attribut gibt die Ebene der Signaturverifizierung f&#252;r Liberty-Anforderungen und -Antworten an.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SafeWord - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthsafewordservice"></a><h4>SafeWord</h4>
+<p><a name="indexterm-179"></a>Mit diesem Modul k&#246;nnen die Benutzer eine Authentifizierung mithilfe der Authentifizierungsserver SafeWord
+bzw. SafeWord PremierAccess von Secure Computing durchf&#252;hren. Bei den Attributen f&#252;r die
+SafeWord-Authentifizierung handelt es sich um Bereichsattribute. Es existieren folgende Attribute:</p>
+<ul><li><p><a href="#fwafv">Server</a></p></li>
+<li><p><a href="#fwajv">Dateiverzeichnis f&#252;r Server-Verifizierung</a></p></li>
+<li><p><a href="#fwarb">Protokollierung aktivieren</a></p></li>
+<li><p><a href="#fwahi">Protokollebene</a></p></li>
+<li><p><a href="#fwabd">Protokolldatei</a></p></li>
+<li><p><a href="#fwacu">Zeit&#252;berschreitung bei Authentifizierungsverbindung</a></p></li>
+<li><p><a href="#fwanv">Client-Typ</a></p></li>
+<li><p><a href="#fwafs">EASSP-Version</a></p></li>
+<li><p><a href="#fwaob">Mindestst&#228;rke f&#252;r Authentifizierung</a></p></li>
+<li><p><a href="#fwatz">Authentifizierungsebene</a></p></li></ul>
+
+
+<a name="fwafv"></a><h5>Server</h5>
+<p>Gibt den Namen und den Anschluss des SafeWord- oder SafeWord PremiereAccess-Servers an.
+Anschluss 7482 ist als Standard f&#252;r einen SafeWord-Server festgelegt. Anschluss 5030 ist
+der Standardanschluss eines SafeWord PremierAccess-Servers.</p>
+
+<a name="fwajv"></a><h5>Dateiverzeichnis f&#252;r Server-Verifizierung</h5>
+<p>Gibt das Verzeichnis an, in dem die SafeWord-Client-Bibliothek die Verifizierungsdateien ablegt. Der
+Standardwert lautet:</p><p><tt>/var/opt/SUNWam/auth/safeword/serverVerification</tt></p><p>Wenn Sie ein anderes Verzeichnis angeben, m&#252;ssen Sie sicherstellen, dass das Verzeichnis
+bereits eingerichtet ist, bevor Sie versuchen, eine SafeWord-Authentifizierung durchzuf&#252;hren.</p>
+
+<a name="fwarb"></a><h5>Protokollierung aktivieren</h5>
+<p>Aktiviert die SafeWord-Protokollierung. Die Protokollierung ist standardm&#228;&#223;ig aktiviert.</p>
+
+<a name="fwahi"></a><h5>Protokollebene</h5>
+<p>Gibt die SafeWord-Protokollebene an. W&#228;hlen Sie eine der folgenden Ebenen im Dropdown-Men&#252;
+aus: Die Ebenen sind  DEBUG, ERROR, INFO und NONE .</p>
+
+<a name="fwabd"></a><h5>Protokolldatei</h5>
+<p>Gibt das Verzeichnis und den Dateinamen des SafeWord-Client-Protokolls an. Der Standardpfad lautet
+<tt>/var/opt/SUNWam/auth/safeword/safe.log</tt>.</p><p>Wenn Sie einen anderen Verzeichnispfad oder Dateinamen angeben, m&#252;ssen Sie sicherstellen, dass
+Verzeichnis und Datei bereits eingerichtet sind, bevor Sie versuchen, eine SafeWord-Authentifizierung durchzuf&#252;hren.
+Sollten mehrere Bereiche f&#252;r die SafeWord-Authentifizierung konfiguriert sein und verschiedene SafeWord-Server verwendet
+werden, m&#252;ssen verschiedene Pfade angegeben werden. Anderenfalls funktioniert nur der erste Bereich,
+bei dem die SafeWord-Authentifizierung durchgef&#252;hrt wird. Sollte ein Bereich den SafeWord-Server wechseln,
+muss die Datei  <tt>swec.dat</tt> im angegebenen Verzeichnis gel&#246;scht werden, bevor Authentifizierungen
+beim neu erstellten SafeWord-Server durchgef&#252;hrt werden k&#246;nnen.</p>
+
+<a name="fwacu"></a><h5>Zeit&#252;berschreitung bei Authentifizierungsverbindung</h5>
+<p>Legt das Zeit&#252;berschreitungslimit (in Sekunden) f&#252;r Authentifizierungsverbindungen zwischen dem SafeWord-Client (OpenSSO) und
+dem SafeWord-Server fest. Der Standardwert ist 120 Sekunden.</p>
+
+<a name="fwanv"></a><h5>Client-Typ</h5>
+<p>Legt den Client-Typ fest, den der SafeWord-Server f&#252;r die Kommunikation mit verschiedenen
+Clients verwendet. Zum Beispiel ";Mobile Client", "VPN", "Fixed Password" oder "Challenge/Response".</p>
+
+<a name="fwafs"></a><h5>EASSP-Version</h5>
+<p>Gibt die Version des Extended Authentication and Single Sign-on Protocol (EASSP) an.
+F&#252;r dieses Feld sind die Standard (101)-, SSL-Encrypted Premier Access (200)- bzw.
+Premier Access (201)-Protokollversionen zul&#228;ssig.</p>
+
+<a name="fwaob"></a><h5>Mindestst&#228;rke f&#252;r Authentifizierung</h5>
+<p>Legt die Mindestst&#228;rke der Authentifizierung f&#252;r die Client-/SafeWord-Serverauthentifizierung fest. Jedem Client-Typ ist
+ein anderer Authentifizierungswert zugewiesen. Je h&#246;her der Wert, desto h&#246;her ist die
+Authentifizierungsst&#228;rke. 20 ist der H&#246;chstwert und 0 der Mindestwert.</p>
+
+<a name="fwatz"></a><h5>Authentifizierungsebene</h5>
+<p>Die Authentifizierungsebene wird f&#252;r jede Authentifizierungsmethode einzeln festgelegt. Mit diesem Wert wird
+angegeben, wie stark einem Authentifizierungsmechanismus vertraut wird. Sobald ein Benutzer authentifiziert wurde,
+wird der Wert im SSO-Token der aktuellen Sitzung gespeichert. Wird der SSO-Token
+einer Anwendung, auf die der Benutzer zugreifen m&#246;chte, vorgelegt, bestimmt die Anwendung
+anhand des gespeicherten Werts, ob die Ebene ausreicht, um den Benutzer Zugriff
+zu gew&#228;hren. Wenn die im SSO-Token gespeicherte Authentifizierungsebene nicht den erforderlichen Mindestwert
+aufweist, wird der Benutzer aufgefordert, sich erneut &#252;ber einen Dienst mit einer
+h&#246;heren Authentifizierungsebene zu authentifizieren. Der Standardwert ist 0.</p>
+<hr><p><b>Hinweis &#8211; </b>Hinweis: Wenn keine Authentifizierungsebene angegeben wird, wird im SSO-Token der im Kern-Authentifizierungsattribut
+<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Standard-Authentifizierungsebene</a> angegebene Wert verwendet.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

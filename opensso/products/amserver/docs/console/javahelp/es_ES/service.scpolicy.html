@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Configuraci&#243;n de pol&#237;ticas - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scpolicy"></a><h4>Configuraci&#243;n de pol&#237;ticas</h4>
+<p><a name="indexterm-191"></a>Los atributos de configuraci&#243;n de pol&#237;ticas permiten al administrador definir las propiedades
+de dominio y globales de configuraci&#243;n utilizadas por el servicio de pol&#237;tica.</p>
+<ul><li><p><a href="#fufnk">Propiedades globales</a></p></li>
+<li><p><a href="#fufmb">Atributos de dominio</a></p></li></ul>
+
+
+<a name="fufnk"></a><h5>Propiedades globales</h5>
+<p>Las propiedades globales son:</p>
+
+<a name="gciwg"></a><h5>Comparador de recursos</h5>
+<p>Especifica la informaci&#243;n del comparador de recursos, que se utiliza para comparar
+los recursos especificados en una definici&#243;n de regla de pol&#237;tica. La comparaci&#243;n
+de recursos se utiliza tanto para la creaci&#243;n como para la evaluaci&#243;n
+de pol&#237;ticas.</p><p>Haga clic en el bot&#243;n Agregar comparador y defina los siguientes atributos:</p><dl><dt>Tipo de servicio</dt>
+<dd><p>Especifica el servicio en el que se debe utilizar el comparador.</p></dd>
+<dt>Clase</dt>
+<dd><p>Define la clase de Java que implementa el algoritmo de comparaci&#243;n de recursos. </p></dd>
+<dt>Delimitador</dt>
+<dd><p>Especifica el delimitador que se va a utilizar en el nombre del recurso. </p></dd>
+<dt>Comod&#237;n</dt>
+<dd><p>Especifica el comod&#237;n que puede definirse en los nombres de recursos.</p></dd>
+<dt>Comod&#237;n de un nivel</dt>
+<dd><p>Hace coincidir cero o m&#225;s caracteres en el mismo l&#237;mite del delimitador.</p></dd>
+<dt>Distinci&#243;n entre may&#250;sculas y min&#250;sculas</dt>
+<dd><p>Especifica si la comparaci&#243;n de los dos recursos debe distinguir o no entre may&#250;sculas y min&#250;sculas. El valor False (Falso) ignora esta distinci&#243;n y True (Verdadero) la tiene en cuenta.</p></dd>
+</dl>
+
+
+<a name="fufnh"></a><h5>&#191;Continuar evaluaci&#243;n tras decisi&#243;n de denegaci&#243;n?</h5>
+<p>Especifica si la estructura de pol&#237;tica debe continuar evaluando o no las
+pol&#237;ticas posteriores, incluso si existe una decisi&#243;n de pol&#237;tica de denegaci&#243;n (DENY).
+Si no se selecciona esta opci&#243;n (predeterminado), la evaluaci&#243;n de pol&#237;ticas omitir&#225;
+las pol&#237;ticas siguientes una vez reconocida la decisi&#243;n de denegaci&#243;n (DENY).</p>
+
+<a name="fufng"></a><h5>Avisos que puede administrar OpenSSO</h5>
+<p>Define los nombres de claves de avisos de directivas para los que
+el punto de aplicaci&#243;n de directivas (Agente de directivas) redirigir&#225; el agente
+de usuario a OpenSSO. Si el agente recibe una decisi&#243;n de pol&#237;tica
+que no permite el acceso a un recurso, pero posee avisos, el
+agente comprobar&#225; si dispone de una clave de aviso en este atributo.</p><p>En caso de que se encuentre dicho aviso, el agente de usuario
+se redirigir&#225; a OpenSSO, permitiendo potencialmente el acceso al recurso.</p>
+
+<a name="gdpdm"></a><h5>Referencias de alias de la organizaci&#243;n</h5>
+<p>Si se establece en S&#237; (Yes), este atributo permite crear directivas en
+subdominios sin necesidad de crear directivas de referencias en el nivel superior
+o el dominio principal. S&#243;lo se pueden crear directivas para proteger los
+recursos HTTP o HTTPS cuyo nombre de host completo coincida con el
+alias de DNS del dominio. De forma predeterminada, este atributo se define
+como No. </p>
+
+<a name="fufmb"></a><h5>Atributos de dominio</h5>
+<p>Las propiedades de LDAP son las siguientes:</p>
+
+<a name="fufmg"></a><h5>Servidor LDAP principal</h5>
+<p>Establece el nombre de host y el n&#250;mero de puerto del servidor
+LDAP principal especificado durante la instalaci&#243;n de OpenSSO que se utilizar&#225;n para
+buscar asuntos de directivas, como usuarios de LDAP, roles de LDAP, grupos
+de LDAP, etc.</p><p>El formato es <i>hostname:port</i>. For example: <tt>machine1.example.com:389</tt></p><p>Para la configuraci&#243;n de conmutaci&#243;n por error en varios hosts del servidor
+LDAP, este valor puede ser una lista de hosts delimitados por espacios.
+El formato es <i>hostname1:port1 hostname2:port2...</i></p><p>For example: <tt>machine1.example1.com:389 machine2.example1.com:389 </tt></p><p>Si hay varias entradas, el nombre del servidor local debe ir en
+primer lugar. Esto permite configurar instancias de OpenSSO espec&#237;ficas para que se
+conecten a determinados servidores de Directory Server.</p><p>El formato es <i>servername|hostname:port</i>. Por ejemplo:</p><p><tt>machine1.example1.com|machine1.example1.com:389</tt></p><p><tt>machine1.example2.com|machine1.example2.com:389</tt></p><p>Para la configuraci&#243;n de conmutaci&#243;n por error:</p><p><tt>AM_Server1.example1.com|machine1.example1.com:389 machine2.example.com1:389 </tt></p><p><tt>AM_Server2.example2.com|machine1.example2.com:389 machine2.example2.com:389 </tt></p>
+
+<a name="fufmc"></a><h5>DN de base de LDAP</h5>
+<p>Especifica el DN base del servidor LDAP desde el que comenzar&#225; la
+b&#250;squeda. De forma predeterminada, es el dominio de nivel superior de la
+de instalaci&#243;n de OpenSSO.</p>
+
+<a name="fufmd"></a><h5>DN de base de usuarios de LDAP</h5>
+<p>Este atributo especifica el DN base utilizado por el asunto de usuarios
+de LDAP del servidor LDAP para comenzar la b&#250;squeda. De forma predeterminada,
+es el dominio de nivel superior de la de base de instalaci&#243;n
+de OpenSSO.</p>
+
+<a name="fufmz"></a><h5>DN de base de los roles de OpenSSO</h5>
+<p>Define el DN del dominio u organizaci&#243;n que se va utilizar como
+base mientras se buscan los valores de los roles de OpenSSO. Este
+atributo lo utiliza el asunto de pol&#237;tica de <i>AccessManagerRoles</i>.</p>
+
+<a name="fufme"></a><h5>DN de conexi&#243;n de LDAP</h5>
+<p>Especifica el DN de conexi&#243;n del servidor LDAP.</p>
+
+<a name="fufmf"></a><h5>Contrase&#241;a de conexi&#243;n de LDAP</h5>
+<p>Define la contrase&#241;a que se va a utilizar para la conexi&#243;n con
+el servidor LDAP. La contrase&#241;a <tt>amldapuser</tt> que se introdujo durante la instalaci&#243;n
+se utiliza de forma predeterminada como usuario de conexi&#243;n.</p>
+
+<a name="fufmn"></a><h5>Filtro de b&#250;squeda de organizaciones de LDAP</h5>
+<p>Especifica el filtro de b&#250;squeda que se va a utilizar para encontrar
+las entradas de organizaci&#243;n. El valor predeterminado es <tt>(objectclass=sunMangagedOrganization)</tt>.</p>
+
+<a name="fufmm"></a><h5>&#193;mbito de b&#250;squeda de organizaciones de LDAP</h5>
+<p>Define el &#225;mbito que se va a utilizar para encontrar las entradas
+de organizaci&#243;n. El &#225;mbito debe ser uno de los siguientes:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (predeterminado)</p></li></ul>
+
+
+<a name="fufmq"></a><h5>&#193;mbito de b&#250;squeda de grupos de LDAP</h5>
+<p>Define el &#225;mbito que se va a utilizar para encontrar las entradas
+de grupo. El &#225;mbito debe ser uno de los siguientes:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (predeterminado)</p></li></ul>
+
+
+<a name="fufmp"></a><h5>Filtro de b&#250;squeda de grupos de LDAP</h5>
+<p>Especifica el filtro de b&#250;squeda que se va a utilizar para encontrar
+las entradas de grupo. El valor predeterminado es <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fufms"></a><h5>Filtro de b&#250;squeda de usuarios de LDAP</h5>
+<p>Especifica el filtro de b&#250;squeda que se va a utilizar para encontrar
+las entradas de usuario. El valor predeterminado es <tt>(objectclass=inetorgperson)</tt>.</p>
+
+<a name="fufmt"></a><h5>&#193;mbito de b&#250;squeda de usuarios de LDAP</h5>
+<p>Define el &#225;mbito que se va a utilizar para encontrar las entradas
+de usuario. El &#225;mbito debe ser uno de los siguientes:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (predeterminado)</p></li></ul>
+
+
+<a name="fufmv"></a><h5>Filtro de b&#250;squeda de roles de LDAP</h5>
+<p>Especifica el filtro de b&#250;squeda que se va a utilizar para encontrar
+las entradas de los roles. El valor predeterminado es <tt>(&#38;(objectclass=ldapsubentry)(objectclass=nsroledefinitions)) </tt> .</p>
+
+<a name="fufmw"></a><h5>&#193;mbito de b&#250;squeda de roles de LDAP</h5>
+<p>Este atributo define el &#225;mbito que se va a utilizar para encontrar
+las entradas de los roles. El &#225;mbito debe ser uno de los
+siguientes:</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (predeterminado)</p></li></ul>
+
+
+<a name="fufmy"></a><h5>&#193;mbito de b&#250;squeda de los roles de OpenSSO</h5>
+<p>Define el &#225;mbito que se va a utilizar para buscar entradas del
+asunto de los roles de OpenSSO.</p>
+<ul><li><p>SCOPE_BASE</p></li>
+<li><p>SCOPE_ONE</p></li>
+<li><p>SCOPE_SUB (predeterminado)</p></li></ul>
+
+
+<a name="fufmo"></a><h5>Atributo de b&#250;squeda de organizaci&#243;n de LDAP</h5>
+<p>Define el tipo de atributo mediante el que se realiza la b&#250;squeda
+en una organizaci&#243;n. El valor predeterminado es o.</p>
+
+<a name="fufmr"></a><h5>Atributo de b&#250;squeda de grupos de LDAP</h5>
+<p>Define el tipo de atributo mediante el que se realiza la b&#250;squeda
+en un grupo. El valor predeterminado es <tt>cn</tt>.</p>
+
+<a name="fufmu"></a><h5>Atributo de b&#250;squeda de usuarios de LDAP</h5>
+<p>Define el tipo de atributo mediante el que se realiza la b&#250;squeda
+en un usuario. El valor predeterminado es <tt>uid.</tt></p>
+
+<a name="fufmx"></a><h5>Atributo de b&#250;squeda de roles de LDAP</h5>
+<p>Este campo define el tipo de atributo mediante el que se realiza
+la b&#250;squeda en un rol. El valor predeterminado es <tt>cn</tt>.</p>
+
+<a name="fufnj"></a><h5>N&#250;mero m&#225;ximo de resultados de b&#250;squeda</h5>
+<p>Este campo define el n&#250;mero m&#225;ximo de resultados que muestra la b&#250;squeda.
+The default value is 100. If the search limit exceeds the amount
+specified, the entries that have been found to that point will be
+returned.</p>
+
+<a name="fufnl"></a><h5>Tiempo de espera de b&#250;squeda</h5>
+<p>Especifica el intervalo de tiempo antes de que se produzca el tiempo
+de espera en la b&#250;squeda. Si la b&#250;squeda supera el tiempo especificado,
+s&#243;lo se mostrar&#225;n las entradas obtenidas hasta ese momento</p>
+
+<a name="fufmi"></a><h5>SSL de LDAP</h5>
+<p>Especifica si el servidor LDAP ejecuta o no SSL. Si se selecciona
+esta opci&#243;n, se habilitar&#225; SSL. Si no se selecciona (predeterminado), se deshabilitar&#225;
+SSL.</p><p>Si se est&#225; ejecutando el servidor LDAP con SSL habilitado (LDAPS), debe
+asegurarse de que OpenSSO est&#233; configurado con los certificados SSL de confianza
+adecuados para que OpenSSO pueda conectarse al servidor de directorios con el
+protocolo LDAPS.</p>
+
+<a name="fufmk"></a><h5>Tama&#241;o m&#237;nimo de grupo de conexi&#243;n LDAP</h5>
+<p>Especifica el tama&#241;o m&#237;nimo de los grupos  de conexiones que se
+van a utilizar para conectarse a Directory Server, como se especifica en
+el atributo del servidor LDAP. El valor predeterminado es 1.</p>
+
+<a name="fufmj"></a><h5>Tama&#241;o m&#225;ximo de conjunto de conexiones</h5>
+<p>Este atributo especifica el tama&#241;o m&#225;ximo de los grupos de conexiones que
+se van a utilizar para conectarse a Directory Server, como se especifica
+en el atributo del servidor LDAP. El valor predeterminado es 10.</p>
+
+<a name="fufna"></a><h5>Asuntos de pol&#237;tica seleccionados</h5>
+<p>Permite seleccionar un conjunto de tipos de asuntos que se pueden utilizar
+para las definiciones de directivas en el dominio.</p>
+
+<a name="fufnc"></a><h5>Condiciones de pol&#237;tica seleccionadas</h5>
+<p>Permite seleccionar un conjunto de tipos de condiciones que se pueden utilizar
+para las definiciones de directivas en el dominio.</p>
+
+<a name="fufnd"></a><h5>Referencias de pol&#237;tica seleccionadas</h5>
+<p>Permite seleccionar un conjunto de tipos de referencias que se pueden utilizar
+para las definiciones de directivas en el dominio.</p>
+
+<a name="fufml"></a><h5>Tiempo de vida de resultado de asuntos</h5>
+<p>Este atributo especifica el tiempo (en minutos) que se puede utilizar un
+resultado de asunto almacenado en cach&#233; para evaluar la misma solicitud de
+pol&#237;tica en funci&#243;n del token de inicio de sesi&#243;n &#250;nico.</p><p>Cuando se eval&#250;a una pol&#237;tica por primera vez para un token SSO,
+las instancias de asunto de la pol&#237;tica se eval&#250;an para determinar si
+la pol&#237;tica se puede aplicar a un determinado usuario. El resultado del
+asunto, que est&#225; codificado por el Id. del token SSO, se almacena
+en la memoria cach&#233; de la pol&#237;tica. Si se lleva a cabo
+otra evaluaci&#243;n para la misma pol&#237;tica del mismo Id- de token SSO
+en el tiempo especificado en el atributo de tiempo de vida de
+resultado de asuntos, la estructura de pol&#237;tica recuperar&#225; el resultado de los
+asuntos almacenados en cach&#233; en lugar de evaluar las instancias del asunto.
+Esto reduce en gran medida el tiempo de evaluaci&#243;n de pol&#237;ticas.</p>
+
+<a name="fufnm"></a><h5>Alias de usuario</h5>
+<p>Este atributo debe estar habilitado si se crea una pol&#237;tica para proteger
+un recurso cuyo miembro de asunto en un Directory Server remoto asigna
+un alias a un usuario local. Este atributo debe estar habilitado, por
+ejemplo, si se crea <tt>uid=rmuser</tt> en la instancia de Directory Server remoto
+y, a continuaci&#243;n, se agrega <tt>rmuser</tt> como alias para el usuario local
+(por ejemplo, <tt>uid=luser</tt>) en OpenSSO. Al iniciar una sesi&#243;n como <tt>rmuser</tt>, se
+crea una sesi&#243;n con el usuario local (<tt>luser</tt>) y la pol&#237;tica se
+aplica correctamente.</p>
+
+<a name="fufni"></a><h5>Proveedores de respuesta seleccionados</h5>
+<p>Define los complementos de proveedor de respuesta de pol&#237;tica que se van
+a habilitar para el dominio. S&#243;lo los complementos de proveedor de respuesta
+seleccionados en este atributo pueden agregarse a las pol&#237;ticas definidas en el
+dominio.</p>
+
+<a name="fufnn"></a><h5>Atributos de respuesta din&#225;micos seleccionados</h5>
+<p>Define los atributos de respuesta din&#225;micos que se van a habilitar para
+este dominio. S&#243;lo un subconjunto de nombres seleccionados en este atributo puede
+definirse en la lista de atributos din&#225;micos de <i>IDResponseProvider</i> para agregarlos a
+las pol&#237;ticas definidas en el dominio.</p>
+<br/>
+
+</body>
+</html>

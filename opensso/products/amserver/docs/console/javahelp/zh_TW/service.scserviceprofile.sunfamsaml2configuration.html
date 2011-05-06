@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 服務配置 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>SAMLv2 服務配置</h4>
+
+
+<a name="ggolz"></a><h5>快取清除間隔</h5>
+<p>此屬性指定兩次快取清除之間的持續時間 (以秒為單位)。</p>
+
+<a name="ggokj"></a><h5>名稱 ID 資訊的屬性名稱</h5>
+<p>指定用來在使用者項目上儲存名稱識別碼資訊的屬性名稱。如果未指定，則會使用預設屬性 (<tt>sun-fm-saml2-nameid-info</tt>)。對映的資料存放區連結使用者必須擁有此屬性的讀取/寫入/搜尋/比較權限。</p>
+
+<a name="ggolv"></a><h5>名稱 ID 資訊機碼的屬性名稱</h5>
+<p>指定用來在使用者項目上儲存名稱識別碼機碼的屬性名稱。如果未指定，則會使用預設屬性 (<tt>sun-fm-saml2-nameid-infokey</tt>)。對映的資料存放區連結使用者必須擁有此屬性的讀取/寫入/搜尋/比較權限。您還必須確認已增加 <tt>equality</tt> 類型索引。</p>
+
+<a name="ggojr"></a><h5>IDP 探索服務的 Cookie 網域</h5>
+<p>指定 SAMLv2 IDP 探索 Cookie 的 Cookie 網域。</p>
+
+<a name="ggomp"></a><h5>IDP 探索服務的 Cookie 類型</h5>
+<p>指定 SAMLv2 IDP 探索服務中使用的 Cookie 類型，可以是「永久性」或「階段作業」。預設值為「階段作業」。</p>
+
+<a name="ggomt"></a><h5>IDP 探索服務的 URL 模式</h5>
+<p>指定 SAMLv2 IDP 探索服務中使用的 URL 模式。</p>
+
+<a name="ggoje"></a><h5>XML Encryption SPI 實作類別</h5>
+<p>指定「SAMLv2 加密提供者」介面的實作類別名稱。此類別用來在 SAMLv2 設定檔中執行 XML 加密和解密。</p>
+
+<a name="ggomb"></a><h5>在 KeyInfo 元素中包含加密金鑰</h5>
+<p>此金鑰用於 <tt>com.sun.identity.saml2.xmlenc.FMEncProvider</tt> 類別。如果啟用，則在執行 XML 加密操作時，它會在 <tt>EncryptedData</tt> 元素中的 <tt>KeyInfo</tt> 內包含 <tt>EncryptedKey</tt>。如果未啟用，則 <tt>EncryptedKey</tt> 會與
+<tt>EncryptedData</tt> 元素並行。預設為啟用。</p>
+
+<a name="ggoks"></a><h5>XML 簽署實作類別</h5>
+<p>如果啟用，根據 [網站與伺服器] 標籤下的 [安全性] 設定中配置的憑證撤銷清單 (CRL)，來驗證身份識別提供者與服務提供者所使用的簽署憑證。如果未驗證並接受憑證，它將會停止，並傳回驗證錯誤，而不會執行進一步的 XML 簽名驗證。</p>
+
+<a name="ggokx"></a><h5>XML 簽署憑證驗證</h5>
+<p>如果啟用，SAML 身份識別提供者或服務提供者將驗證在簽署中使用的憑證。如果憑證已驗證並已被接受，則提供者將驗證簽名。否則將停止並傳回驗證錯誤。</p>
+
+<a name="ggoiv"></a><h5>CA 憑證驗證</h5>
+<p>如果啟用，身份識別提供者與服務提供者所使用的簽署憑證將會根據信任的 CA 清單進行驗證。如果未驗證並接受憑證，它將會停止，並傳回驗證錯誤，而不會執行進一步的 XML 簽名驗證。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置属性 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+<a name="service.scconfig"></a><h3>配置属性</h3><p><a name="indexterm-164"></a>管理员可通过“配置”页面来管理 OpenSSO 提供的服务的属性值。组成 OpenSSO 服务的属性可划分为以下类型之一：</p><p><b>全局</b> &#8211; 适用于整个 OpenSSO 配置。由于全局属性旨在自定义 OpenSSO，因此它们不能适用于用户、角色或领域。</p><p><b>领域</b> &#8211; 领域属性仅指定给领域。没有与领域属性相关的对象类。例如，由于验证是在领域级别而不是在子树或用户级别完成的，因此验证服务中列出的属性被定义为领域属性。</p><p><b>动态</b> &#8211; 适用于 OpenSSO 的已配置角色或领域。当指定角色给用户，或在领域中创建用户时，动态属性将变为用户的一个特征。</p><p><b>用户</b> &#8211; 直接适用于每位用户。他们不是从角色或领域那里继承而来，通常对于每个用户都不同。</p><p>您可以修改的配置属性包括：</p>
+<ul><li><p><a href="service.scconfigauth.html">验证</a></p></li>
+<li><p><a href="service.scconfigconsole.html">控制台属性</a></p></li>
+<li><p><a href="servic.scconfigglobal.html">全局属性</a></p></li>
+<li><p><a href="service.scfonfigsystem.html">系统属性</a></p></li>
+<li><p><a href="service.serversite.html">服务器和站点</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

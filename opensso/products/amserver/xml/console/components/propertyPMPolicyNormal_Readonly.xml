@@ -1,0 +1,123 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyPMPolicyNormal_Readonly.xml,v 1.2 2008/06/25 05:45:13 qcheng Exp $
+
+-->
+
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="general" defaultValue="policy.section.title.general" >
+    <property>
+	<label name="lblName" defaultValue="policy.attribute.label.name" labelFor="tfName" />
+	<cc name="tfName" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblDescription" defaultValue="policy.attribute.label.description" labelFor="tfDescription" />
+	<cc name="tfDescription" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblIsActive" defaultValue="policy.attribute.label.isActive" labelFor="cbIsActive" />
+	<cc name="cbIsActive" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    </section>
+
+    <section name="rules" defaultValue="policy.section.title.rules">
+	<property span="true">
+	    <cc name="tblRules" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag">
+	    <attribute name="title" value="policy.table.title.rules" />
+	    <attribute name="empty" value="policy.table.rules.empty.message" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="selectionType" value="multiple" />
+	    <attribute name="selectionJavascript" value="toggleButtonState('tblRules', 'rulesCount', 'tblRulesButtonDelete', this)" />
+	    <attribute name="showAdvancedSortingIcon" value="false" />
+	    <attribute name="showLowerActions" value="false" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="showPaginationIcon" value="false" />
+	    <attribute name="showSelectionIcons" value="true" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+	    <attribute name="showSortingRow" value="true" />
+	    </cc>
+	</property>
+    </section>
+
+    <section name="subjects" defaultValue="policy.section.title.subjects">
+	<property span="true">
+	    <cc name="tblSubjects" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag">
+	    <attribute name="title" value="policy.table.title.subjects" />
+	    <attribute name="empty" value="policy.table.subjects.empty.message" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="selectionType" value="multiple" />
+	    <attribute name="selectionJavascript" value="toggleButtonState('tblSubjects', 'subjectsCount', 'tblSubjectsButtonDelete', this)" />
+	    <attribute name="showAdvancedSortingIcon" value="false" />
+	    <attribute name="showLowerActions" value="false" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="showPaginationIcon" value="false" />
+	    <attribute name="showSelectionIcons" value="true" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+	    <attribute name="showSortingRow" value="true" />
+	    </cc>
+	</property>
+    </section>
+
+    <section name="conditions" defaultValue="policy.section.title.conditions">
+	<property span="true">
+	    <cc name="tblConditions" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag">
+	    <attribute name="title" value="policy.table.title.conditions" />
+	    <attribute name="empty" value="policy.table.conditions.empty.message" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="selectionType" value="multiple" />
+	    <attribute name="selectionJavascript" value="toggleButtonState('tblConditions', 'conditionsCount', 'tblConditionsButtonDelete', this)" />
+	    <attribute name="showAdvancedSortingIcon" value="false" />
+	    <attribute name="showLowerActions" value="false" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="showPaginationIcon" value="false" />
+	    <attribute name="showSelectionIcons" value="true" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+	    <attribute name="showSortingRow" value="true" />
+	    </cc>
+	</property>
+    </section>
+
+    <section name="responseproviders" defaultValue="policy.section.title.responseproviders">
+	<property span="true">
+	    <cc name="tblResponseProviders" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag">
+	    <attribute name="title" value="policy.table.title.responseproviders" />
+	    <attribute name="empty" value="policy.table.responseproviders.empty.message" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="selectionType" value="multiple" />
+	    <attribute name="selectionJavascript" value="toggleButtonState('tblResponseProviders', 'responseProvidersCount', 'tblResponseProvidersButtonDelete', this)" />
+	    <attribute name="showAdvancedSortingIcon" value="false" />
+	    <attribute name="showLowerActions" value="false" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="showPaginationIcon" value="false" />
+	    <attribute name="showSelectionIcons" value="true" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+	    <attribute name="showSortingRow" value="true" />
+	    </cc>
+	</property>
+    </section>
+</propertysheet>

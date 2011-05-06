@@ -1,0 +1,410 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-as91,v 1.4 2008/08/19 19:08:31 veiming Exp $
+#
+#
+
+deleteJVMOptionUsingASAdmin() {
+    jvmOptionString=$1
+
+    if [ "$jvmOptionString" = "<No value set>" ] || 
+                [ "$jvmOptionString" = "" ] || 
+                [ "$jvmOptionString" = "<Empty value>" ]; then
+        return
+    fi
+        $ECHO
+        $ECHO `$gettext "Deleting JVM Option : "` "$jvmOptionString"
+
+        #$ECHO $ASADMIN delete-jvm-options $ASADMIN_COMMON_PARAMS :"$jvmOptionString"
+
+        error_message=`$ASADMIN delete-jvm-options $ASADMIN_COMMON_PARAMS :"$jvmOptionString"`
+
+        $ECHO $error_message
+}
+
+insertJVMOptionUsingASAdmin() {
+    jvmOptionString=$1
+
+    if [ "$jvmOptionString" != "" ]; then
+        $ECHO
+        $ECHO `$gettext "Inserting JVM Option : "` "$jvmOptionString"
+
+        #$ECHO $ASADMIN create-jvm-options $ASADMIN_COMMON_PARAMS :"$jvmOptionString"
+        $ASADMIN create-jvm-options $ASADMIN_COMMON_PARAMS :"$jvmOptionString"
+    fi
+
+}
+
+createJvmOptionString() 
+{
+     jvmOptionMainString=$1
+     jvmOptionString=$2
+
+     # Check for the case of -D<option>=<No value set>
+     sub_jvmOptionString=`$ECHO $jvmOptionString | $CUT -f2 -d '='`
+     if [ "$sub_jvmOptionString" = "<No value set>" ] || 
+                [ "$jvmOptionString" = "" ] || 
+                [ "$sub_jvmOptionString" = "<Empty value>" ]; then
+        $ECHO $jvmOptionMainString
+     else
+        jvmOptionString=`$ECHO $jvmOptionString | $AWK ' BEGIN { FS = ":" ; ORS="" } {print ":"} { for (i = 1; i < NF; i++) { print $i; print "\\\:" } {print $i} }'`
+        $ECHO "$jvmOptionMainString$jvmOptionString" 
+     fi
+}
+
+tuneDomainXML() {
+    tune_file="$CONTAINER_INSTANCE_DIR/config/domain.xml"
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Tuning Application Server Instance..."`
+    $ECHO
+    $ECHO `$gettext "File                 : "` "$tune_file (using asadmin command line tool)"
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+
+   acceptor_threads_string="server.http-service.http-listener.$ASADMIN_HTTPLISTENER.acceptor-threads"
+   count_threads_string="server.http-service.connection-pool.max-pending-count"
+   queue_size_string="server.http-service.connection-pool.queue-size-in-bytes"
+
+    # Construct a parameter string to perform an asadmin get for acceptor-thread, queue-size, 
+    # and count-thread parameters
+    asadmin_get_params=$acceptor_threads_string
+    asadmin_get_params="$asadmin_get_params $count_threads_string"
+    asadmin_get_params="$asadmin_get_params $queue_size_string"
+
+    asadmin_get_gen_string=`$ASADMIN get $ASADMIN_COMMON_PARAMS_NO_TARGET $asadmin_get_params | $SED 's/ //g'`
+
+    asadmin_acceptor_threads=`get_token_in_line "$asadmin_get_gen_string" "$acceptor_threads_string" "$acceptor_threads_string" "nvp" "stream"` 
+
+    $ECHO `$gettext "1.   Acceptor Threads"`
+    $ECHO `$gettext "Current Value        : "` "acceptor-threads=$asadmin_acceptor_threads"
+    $ECHO `$gettext "Recommended Value    : "` "acceptor-threads=$acceptorThreads"
+    $ECHO
+
+    asadmin_count_threads=`get_token_in_line "$asadmin_get_gen_string" "$count_threads_string" "$count_threads_string" "nvp" "stream"`
+
+    $ECHO `$gettext "2.   Max Pending Count Threads "`
+    $ECHO `$gettext "Current Value        : "` "max-pending-count=$asadmin_count_threads"
+    $ECHO `$gettext "Recommended Value    : "` "max-pending-count=$AMTUNE_NUM_TCP_CONN_SIZE"
+    $ECHO
+
+    asadmin_queue_size=`get_token_in_line "$asadmin_get_gen_string" "$queue_size_string" "$queue_size_string" "nvp" "stream"`
+
+    $ECHO `$gettext "3.   Queue Size"`
+    $ECHO `$gettext "Current Value        : "` "queue-size=$asadmin_queue_size"
+    $ECHO `$gettext "Recommended Value    : "` "queue-size=$AMTUNE_NUM_TCP_CONN_SIZE"
+    $ECHO
+
+    asadmin_native_library_path_prefix=`get_token_in_line $tune_file 'native-library-path-prefix' 'native-library-path-prefix'` 
+
+    $ECHO `$gettext "4.   native-library-path-prefix (if Solaris 8)"`
+    $ECHO `$gettext "Current Value        : "` "native-library-path-prefix=$asadmin_native_library_path_prefix"
+    $ECHO `$gettext "Recommended Value    : "` "native-library-path-prefix=/usr/lib/lwp"
+    $ECHO
+
+    option_string=`$ASADMIN get $ASADMIN_COMMON_PARAMS_NO_TARGET "$ASADMIN_TARGET.java-config.jvm-options"`
+
+    asadmin_min_heap=`getASJVMOption '-Xms' 'flag' ','`
+    asadmin_max_heap=`getASJVMOption '-Xmx' 'flag' ','`
+
+    asadmin_new_min_heap="-Xms${maxHeapSize}M"
+    asadmin_new_max_heap="-Xmx${maxHeapSize}M"
+
+    $ECHO `$gettext "5.   Max and Min Heap Size"`
+    $ECHO `$gettext "Current Value        : "` "Min Heap: $asadmin_min_heap Max Heap: $asadmin_max_heap"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_min_heap $asadmin_new_max_heap"
+    $ECHO
+
+    asadmin_loggc=`getASJVMOption '-Xloggc' 'flag' ','` 
+    asadmin_new_loggc="-Xloggc:$CONTAINER_INSTANCE_DIR/logs/gc.log"
+
+    $ECHO `$gettext "6.   LogGC Output"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_loggc"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_loggc"
+    $ECHO
+
+    asadmin_serveroption=`getASJVMOption '-server' 'flag' ','`
+    asadmin_new_serveroption="-server"
+
+    $ECHO `$gettext "7.   JVM in Server mode"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_serveroption"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_serveroption"
+    $ECHO
+
+    asadmin_stacksize=`getASJVMOption '-Xss' 'flag' ','`
+    asadmin_new_stacksize="-Xss${AMTUNE_PER_THREAD_STACK_SIZE_IN_KB}k"
+
+    $ECHO `$gettext "8.   Stack Size"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_stacksize"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_stacksize"
+    $ECHO
+
+    asadmin_newsize=`getASJVMOption '-XX:NewSize' 'flag' ','`
+    asadmin_new_newsize="-XX:NewSize=${maxNewSize}M"
+
+    $ECHO `$gettext "9.   New Size"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_newsize"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_newsize"
+    $ECHO
+
+    asadmin_maxnewsize=`getASJVMOption '-XX:MaxNewSize' 'flag' ','`
+    asadmin_new_maxnewsize="-XX:MaxNewSize=${maxNewSize}M"
+
+    $ECHO `$gettext "10.  Max New Size"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_maxnewsize"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_maxnewsize"
+    $ECHO
+
+    asadmin_disableExplicitGC=`getASJVMOption '-XX:+DisableExplicitGC' 'flag' ','`
+    asadmin_new_disableExplicitGC="-XX:+DisableExplicitGC"
+
+    $ECHO `$gettext "11. Disable Explicit GC"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_disableExplicitGC"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_disableExplicitGC"
+    $ECHO
+
+    asadmin_parallelGC=`getASJVMOption '-XX:+UseParNewGC' 'flag' ','`
+    asadmin_new_parallelGC="-XX:+UseParNewGC"
+
+    $ECHO `$gettext "12.  Use New Parallel GC"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_parallelGC"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_parallelGC"
+    $ECHO
+
+    asadmin_printclasshisto=`getASJVMOption '-XX:+PrintClassHistogram' 'flag' ','`
+    asadmin_new_printclasshisto="-XX:+PrintClassHistogram"
+
+    $ECHO `$gettext "13.  Print Class Histogram"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_printclasshisto"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_printclasshisto"
+    $ECHO
+
+    asadmin_printGCTimeStamps=`getASJVMOption '-XX:+PrintGCTimeStamps' 'flag' ','`
+    asadmin_new_printGCTimeStamps="-XX:+PrintGCTimeStamps"
+
+    $ECHO `$gettext "14.  Print GC Time Stamps"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_printGCTimeStamps"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_printGCTimeStamps"
+    $ECHO
+
+    asadmin_overrideDefaultLibthread=`getASJVMOption '-XX:+OverrideDefaultLibthread' 'flag' ','`
+    asadmin_new_overrideDefaultLibthread="-XX:+OverrideDefaultLibthread"
+
+    $ECHO `$gettext "15.  OverrideDefaultLibthread (if Solaris 8)"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_overrideDefaultLibthread"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_overrideDefaultLibthread"
+    $ECHO
+
+    asadmin_useconcmarksweepgc=`getASJVMOption '-XX:+UseConcMarkSweepGC' 'flag' ','`
+    asadmin_new_useconcmarksweepgc="-XX:+UseConcMarkSweepGC"
+
+    $ECHO `$gettext "16.  Enable Conc Mark Sweep GC"`
+    $ECHO `$gettext "Current Value        : "` "$asadmin_useconcmarksweepgc"
+    $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_useconcmarksweepgc"
+    $ECHO
+
+    if [ "$AMTUNE_WEB_CONTAINER_JAVA_POLICY" = "true" ]; then
+        asadmin_serverpolicy=`getASJVMOption '-Djava.security.policy' 'nvp' ',' '='`
+        asadmin_new_serverpolicy="\${com.sun.aas.instanceRoot}/config/server.policy.NOTUSED"
+
+        $ECHO `$gettext "17.  Disable Server Security Policy Checks"`
+        $ECHO `$gettext "Current Value        : "` "-Djava.security.policy=$asadmin_serverpolicy"
+        $ECHO `$gettext "Recommended Value    : "` "-Djava.security.policy=$asadmin_new_serverpolicy"
+        $ECHO
+    fi
+
+    # Display this JVM Options for Niagara box
+    if [ "$HWPLATFORM" = "Sun-Fire-T" ]; then
+        asadmin_parallel_gc_threads=`getASJVMOption '-XX:ParallelGCThreads' 'flag' ','`
+        asadmin_new_parallel_gc_threads="-XX:ParallelGCThreads=$gcThreads"
+
+        $ECHO `$gettext "18.  Parallel GC Threads"`
+        $ECHO `$gettext "Current Value        : "` "$asadmin_parallel_gc_threads"
+        $ECHO `$gettext "Recommended Value    : "` "$asadmin_new_parallel_gc_thread"
+        $ECHO
+    fi
+
+    $ECHO
+ 
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    backupConfigFile "$tune_file"
+
+    #---------------------------------------------------------------------------------------
+    # Construct a parameter string to perform an asadmin set for acceptor-thread, queue-size, 
+    # and count-thread parameters
+    #---------------------------------------------------------------------------------------
+    asadmin_set_params="$acceptor_threads_string=$acceptorThreads"
+    asadmin_set_params="$asadmin_set_params $count_threads_string=$AMTUNE_NUM_TCP_CONN_SIZE"
+    asadmin_set_params="$asadmin_set_params $queue_size_string=$AMTUNE_NUM_TCP_CONN_SIZE"
+
+    $ASADMIN set $ASADMIN_COMMON_PARAMS_NO_TARGET $asadmin_set_params 
+
+    #---------------------------------------------------------------------------------------
+    # Delete current JVM Options
+    #---------------------------------------------------------------------------------------
+    curJVMOptionString=""
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_min_heap"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_max_heap"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_loggc"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_serveroption"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_stacksize"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_newsize"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_maxnewsize"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_disableExplicitGC"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_parallelGC"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_useconcmarksweepgc"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_printclasshisto"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_printGCTimeStamps"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_overrideDefaultLibthread"`
+    curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "$asadmin_parallel_gc_threads"`
+
+    if [ "$AMTUNE_WEB_CONTAINER_JAVA_POLICY" = "true" ]; then
+        curJVMOptionString=`createJvmOptionString "$curJVMOptionString" "-Djava.security.policy=$asadmin_serverpolicy"`
+    fi
+
+    if [ "$curJVMOptionString" != "" ]; then
+       deleteJVMOptionUsingASAdmin "$curJVMOptionString"
+    fi
+
+    #---------------------------------------------------------------------------------------
+    # Insert new JVM Options
+    #---------------------------------------------------------------------------------------
+    newJVMOptionString=""
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_min_heap"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_max_heap"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_loggc"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_serveroption"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_stacksize"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_newsize"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_maxnewsize"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_disableExplicitGC"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_parallelGC"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_useconcmarksweepgc"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_printclasshisto"`
+    newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_printGCTimeStamps"`
+
+    if [ ! "`/bin/uname -r | grep 8 | wc -m`" -eq "0" ] ; then
+        $ECHO  "Solaris 8 " `$gettext "specific changes"`
+        newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_overrideDefaultLibthread"`
+    fi
+
+    if [ "$HWPLATFORM" = "Sun-Fire-T" ]; then
+        newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "$asadmin_new_parallel_gc_threads"`
+    fi
+
+    if [ "$AMTUNE_WEB_CONTAINER_JAVA_POLICY" = "true" ]; then
+        newJVMOptionString=`createJvmOptionString "$newJVMOptionString" "-Djava.security.policy=$asadmin_new_serverpolicy"`
+    fi
+
+
+    insertJVMOptionUsingASAdmin "$newJVMOptionString"
+
+}
+
+tuneSecurityLimits() {
+    #Stack Size
+
+    tune_file="/etc/security/limits.conf"
+
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Stack Size Tuning for AS 9.1..."`
+    $ECHO
+    $ECHO `$gettext "File                 : $tune_file"`
+    $ECHO `$gettext "Parameter tuning     :"`
+    $ECHO
+
+    curStackSizeString=`$GREP -v "^#" $tune_file | $GREP -i "stack" | $GREP -i "hard"`
+    if [ "$curStackSizeString" != "" ]; then
+       curStackSizeDomain=`$ECHO "$curStackSizeString" | $AWK -F" " '{ print $1 }'`
+       newStackSizeString="$curStackSizeDomain               hard    stack          $AMTUNE_LINUX_STACK_SIZE_LIMITS"
+    else
+       newStackSizeString="*               hard    stack          $AMTUNE_LINUX_STACK_SIZE_LIMITS"
+    fi
+
+    $ECHO `$gettext "1.   Stack Size"`
+    $ECHO `$gettext "Current Value        :   "` "$curStackSizeString"
+    $ECHO `$gettext "Recommended Value    :   "` "$newStackSizeString"
+    $ECHO
+
+    if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+        return
+    fi
+
+    delete_line $tune_file "Start: AS9.1 OpenSSO Tuning"
+    if [ "$curStackSizeString" != "" ]; then
+       delete_line $tune_file "$curStackSizeString"
+    fi
+    delete_line $tune_file "End: AS9.1 OpenSSO Tuning"
+
+    add_to_end $tune_file "# Start: AS9.1 OpenSSO Tuning : `date`"
+    add_to_end $tune_file "$newStackSizeString"
+    add_to_end $tune_file "# End: AS9.1 OpenSSO Tuning : `date`"
+
+}
+
+#############################################################################
+# Start of main program
+#############################################################################
+SCRIPT_LOCATION=`/usr/bin/dirname $0`
+AMTUNE_SCRIPT_RECORD_STRING="AMTUNE_AS91_SCRIPT"
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-as91
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+# import the environment
+if [ -f $SCRIPT_LOCATION/amtune-env ]; then
+    if [ ! "$INIT_STATUS" = "INIT_COMPLETE" ]; then
+        . $SCRIPT_LOCATION/amtune-env
+    fi
+fi
+
+ECHO_MSG "`$gettext 'OpenSSO - Application Server Tuning Script'`"
+
+$ECHO "$ASADMIN_PASSWORD_SYNTAX$ASADMIN_PASSWORD" > $ASADMIN_PASSFILE
+
+tuneDomainXML | eval $OUTPUT_TYPE
+
+if [ `getASVersionUsingASAdmin | $GREP "9.1" | $WC -l` -eq 1 ] &&
+   [ "$OSTYPE" = "Linux" ]; then
+   tuneSecurityLimits | eval $OUTPUT_TYPE                                  
+fi
+
+if [ "$AMTUNE_MODE" = "CHANGE" ]; then
+   $ECHO
+   $ECHO "############################################################################"
+   $ECHO `$gettext "Please restart the application server to have new configurations take effect"`
+   $ECHO "############################################################################"
+   $ECHO
+fi
+
+$RM $ASADMIN_PASSFILE                                   
+
+ECHO_MSG $PARA_SEP                                               

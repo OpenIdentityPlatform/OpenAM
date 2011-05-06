@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Authentification - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>Authentification</h3>
+<p><a name="indexterm-5"></a>Le service d'authentification g&#233;n&#233;ral doit &#234;tre enregistr&#233; en tant que service dans
+un domaine pour qu'un utilisateur puisse se connecter &#224; l'aide d'autres types
+de modules d'authentification. Le service d'authentification principal permet &#224; l'administrateur d'OpenSSO de
+d&#233;finir des valeurs par d&#233;faut pour les param&#232;tres d'authentification d'un domaine. Ces
+valeurs peuvent alors &#234;tre utilis&#233;es lorsque aucune valeur de remplacement n'est d&#233;finie
+dans le module d'authentification sp&#233;cifi&#233;. Les valeurs par d&#233;faut du service d'authentification
+principal sont d&#233;finies dans le fichier <tt>amAuth.xml</tt> et stock&#233;es dans Directory Server
+&#224; l'issue de l'installation.</p><p>Les propri&#233;t&#233;s d'authentification sont les suivantes&#160;:</p><dl><dt>Propri&#233;t&#233;s avanc&#233;es</dt>
+<dd><p>Cliquez sur le bouton Propri&#233;t&#233;s avanc&#233;es pour afficher les attributs d'authentification principale pouvant &#234;tre d&#233;finis pour le domaine. Les attributs globaux ne sont pas applicables au domaine et ne sont donc pas affich&#233;s.</p></dd>
+<dt>Cha&#238;ne d'authentification par d&#233;faut</dt>
+<dd><p>D&#233;finit la cha&#238;ne d'authentification &#224; utiliser pour le domaine. D&#232;s qu'une cha&#238;ne est cr&#233;&#233;e dans l'attribut Encha&#238;nement d'authentification, elle appara&#238;t dans la liste d&#233;roulante et peut &#234;tre s&#233;lectionn&#233;e. Pour plus d'informations, reportez-vous &#224; <a href="authentication.newauthconfig.html">Cr&#233;ation d'une cha&#238;ne d'authentification</a>.</p></dd>
+<dt>Cha&#238;ne d'authentification de l'administrateur</dt>
+<dd><p>D&#233;finit la cha&#238;ne d'authentification pour les administrateurs uniquement. Cet attribut peut &#234;tre utilis&#233; si la cha&#238;ne d'authentification des administrateurs doit &#234;tre diff&#233;rente de celle des utilisateurs finaux. Les modules configur&#233;s dans cet attribut sont h&#233;rit&#233;s lors de l'acc&#232;s &#224; la console OpenSSO.</p></dd>
+<dt>URL de r&#233;ussite par d&#233;faut</dt>
+<dd><p>Sp&#233;cifie l'URL vers lequel l'utilisateur est redirig&#233; en cas d'authentification r&#233;ussie aupr&#232;s du domaine.</p></dd>
+<dt>Instances de module</dt>
+<dd><p>Permet de d&#233;finir et de configurer les modules d'authentification par d&#233;faut d'OpenSSO pour le domaine. Vous pouvez ajouter plusieurs instances du m&#234;me module d'authentification. Pour plus d'informations, reportez-vous &#224; <a href="authentication.newauthinstance.html">Cr&#233;ation d'une instance de module d'authentification</a>.</p></dd>
+<dt>Encha&#238;nement d'authentification</dt>
+<dd><p>Il est possible de configurer un ou plusieurs modules d'authentification, afin d'obliger un utilisateur &#224; fournir des donn&#233;es d'identification pour chaque module. On parle alors d'encha&#238;nement d'authentification. Cet attribut vous permet de d&#233;finir les options d'encha&#238;nement d'authentification du domaine. Les cha&#238;nes que vous cr&#233;ez sont affich&#233;es dans la liste Cha&#238;ne d'authentification par d&#233;faut. Pour plus d'informations, reportez-vous &#224; <a href="authentication.newauthconfig.html">Cr&#233;ation d'une cha&#238;ne d'authentification</a>.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

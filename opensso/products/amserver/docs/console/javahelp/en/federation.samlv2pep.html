@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 XACML PEP Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2pep"></a><h4>SAMLv2 XACML PEP Customization</h4>
+<p>XACML PEP contains the following attributes for customization:</p>
+<ul><li><p><a href="#ggwgy">Protocol Support Enumeration</a></p></li>
+<li><p><a href="#ggwkt">Signing Key Alias</a></p></li>
+<li><p><a href="#ggwhc">Encryption Key Alias</a></p></li>
+<li><p><a href="#ggwhq">Basic Authorization</a></p></li>
+<li><p><a href="#ggwgq">Authorization Decision Response Signed</a></p></li>
+<li><p><a href="#ggwjn">Assertion Encrypted</a></p></li></ul>
+
+
+<a name="ggwgy"></a><h5>Protocol Support Enumeration</h5>
+<p>Displays the XACML PEP release that is supported by this provider.</p>
+
+<a name="ggwkt"></a><h5>Signing Key Alias</h5>
+<p>Defines the key alias that is used to sign requests and responses.</p>
+
+<a name="ggwhc"></a><h5>Encryption Key Alias</h5>
+<p>Defines the key alias to XACML encryption. </p>
+
+<a name="ggwhq"></a><h5>Basic Authorization</h5>
+<p>Basic authorization can be enabled to protect SOAP endpoints. Any provider accessing these
+endpoints must have the user and password defined in the following two properties:
+<tt>User Name</tt> and <tt>Password</tt>.</p>
+
+<a name="ggwgq"></a><h5>Authorization Decision Response Signed</h5>
+<p>When enabled, this attribute enforces that all responses be signed for the XACML
+authorization decision.</p>
+
+<a name="ggwjn"></a><h5>Assertion Encrypted</h5>
+<p>When enabled, this attribute enforces that all assertions are to be encrypted.</p>
+<br/>
+
+</body>
+</html>

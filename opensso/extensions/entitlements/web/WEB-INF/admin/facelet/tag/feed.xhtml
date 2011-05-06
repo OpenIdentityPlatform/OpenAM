@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: feed.xhtml,v 1.4 2009/06/04 11:49:24 veiming Exp $
+
+-->
+
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ice:panelGroup
+        styleClass="feed-title">
+        <ice:outputLink
+            value="#{feedBean.feed.link}">
+            <ice:outputText value="#{feedBean.feed.title}"/>
+        </ice:outputLink>
+    </ice:panelGroup>
+    <ice:panelGroup
+        styleClass="feed-description">
+        <ice:outputText value="#{feedBean.feed.description}"/>
+    </ice:panelGroup>
+    <ice:panelSeries
+        rendered="#{feedBean.feed != null}"
+        var="entry"
+        value="#{feedBean.feed.entries}">
+
+        <div class="entry-outer">
+            <o:box>
+                <ui:define name="body">
+                    <div class="entry-inner">
+                        <ice:panelGroup
+                            styleClass="entry-title">
+                            <ice:outputLink
+                                value="#{entry.link}">
+                                <ice:outputText value="#{entry.title}"/>
+                            </ice:outputLink>
+                        </ice:panelGroup>
+                        <ice:panelGroup
+                            styleClass="entry-pubdate">
+                            <ice:outputText value="#{entry.publishedDate}"/>
+                        </ice:panelGroup>
+                        <ice:panelGroup
+                            styleClass="entry-content">
+                            <ice:outputText
+                                escape="false"
+                                value="#{entry.description.value}"/>
+                            <ice:panelSeries
+                                var="content"
+                                value="#{entry.contents}">
+                                <ice:outputText
+                                    rendered="#{o:size(entry.contents) > 0}"
+                                    escape="false"
+                                    value="#{content.value}"/>
+                            </ice:panelSeries>
+                        </ice:panelGroup>
+                    </div>
+                </ui:define>
+            </o:box>
+        </div>
+    </ice:panelSeries>
+    <ice:panelGroup
+        rendered="#{feedBean.exception != null}">
+        <ice:outputText
+            value="Error occured retrieving feed: "/>
+        <ice:outputText
+            style="font-weight: bold"
+            value="#{feedBean.exception}"/>
+    </ice:panelGroup>
+</ui:composition>

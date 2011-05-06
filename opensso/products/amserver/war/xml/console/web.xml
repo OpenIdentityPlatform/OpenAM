@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <display-name>OpenSSO Administration Console</display-name>
+    <distributable/>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.base.*:moduleURL</param-name>
+        <param-value>../base</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.authentication.*:moduleURL</param-name>
+        <param-value>../authentication</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.service.*:moduleURL</param-name>
+        <param-value>../service</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.session.*:moduleURL</param-name>
+        <param-value>../session</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.realm.*:moduleURL</param-name>
+        <param-value>../realm</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.dm.*:moduleURL</param-name>
+        <param-value>../dm</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.policy.*:moduleURL</param-name>
+        <param-value>../policy</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.idm.*:moduleURL</param-name>
+        <param-value>../idm</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.user.*:moduleURL</param-name>
+        <param-value>../user</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.delegation.*:moduleURL</param-name>
+        <param-value>../delegation</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.agentconfig.*:moduleURL</param-name>
+        <param-value>../agentconfig</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.console.task.*:moduleURL</param-name>
+        <param-value>../task</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:enforceStrictSessionTimeout</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.authentication.UI.*:moduleURL</param-name>
+        <param-value>../UI</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:com.sun.identity.password.ui.*:moduleURL</param-name>
+        <param-value>../ui</param-value>
+    </context-param>
+    <context-param>
+        <param-name>jato:enforceStrictSessionTimeout1</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.xhtml</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.concurrentDOMViews</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.debugDOMUpdate</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.validateXml</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.verifyObjects</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.uploadMaxFileSize</param-name>
+        <param-value>4048576</param-value>
+    </context-param>
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.synchronousUpdate</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.heartbeatInterval</param-name>
+        <param-value>60000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.heartbeatTimeout</param-name>
+        <param-value>60000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.connectionTimeout</param-name>
+        <param-value>60000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.blockingConnectionTimeout</param-name>
+        <param-value>60000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.icesoft.faces.heartbeatRetries</param-name>
+        <param-value>3</param-value>
+    </context-param>
+    <context-param>
+        <param-name>facelets.LIBRARIES</param-name>
+        <param-value>
+            /WEB-INF/admin/facelet/opensso.taglib.xml
+        </param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.jboss.jbossfaces.WAR_BUNDLES_JSF_IMPL</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+
+    <!-- context param -->
+
+    <!-- filter definition -->
+
+    <filter>
+        <filter-name>AdminAuthFilter</filter-name>
+        <filter-class>com.sun.identity.admin.AuthFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>AdminPermissionFilter</filter-name>
+        <filter-class>com.sun.identity.admin.PermissionFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AdminAuthFilter</filter-name>
+        <url-pattern>/admin/facelet/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminPermissionFilter</filter-name>
+        <url-pattern>/admin/facelet/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminAuthFilter</filter-name>
+        <url-pattern>/admin/pxml/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminAuthFilter</filter-name>
+        <url-pattern>/admin/test/*</url-pattern>
+    </filter-mapping>
+
+    <!-- filter mapping -->
+
+    <listener>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
+
+    <!-- listener declaration -->
+
+
+    <!-- Add one servlet entry like this per module -->
+    <servlet>
+        <servlet-name>UMServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.user.UMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AuthServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.authentication.AuthServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AMBaseServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.base.AMBaseServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SCServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.service.SCServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SMServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.session.SMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DMServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.dm.DMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RMServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.realm.RMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PMServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.policy.PMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>IDMServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.idm.IDMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DelegationServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.delegation.DelegationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AgentConfigurationServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.agentconfig.AgentConfigurationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TaskServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.task.TaskServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Help2Servlet</servlet-name>
+        <servlet-class>com.sun.identity.console.help.Help2Servlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VersionServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.version.VersionServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>click-servlet</servlet-name>
+        <servlet-class>net.sf.click.ClickServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>PrivilegeXmlServlet</servlet-name>
+        <servlet-class>com.sun.identity.admin.PrivilegeXmlServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminTestServlet</servlet-name>
+        <servlet-class>com.sun.identity.admin.TestServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>Persistent Faces Servlet</servlet-name>
+        <servlet-class>com.icesoft.faces.webapp.xmlhttp.PersistentFacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>Blocking Servlet</servlet-name>
+        <servlet-class>com.icesoft.faces.webapp.xmlhttp.BlockingServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>uploadServlet</servlet-name>
+        <servlet-class>com.icesoft.faces.component.inputfile.FileUploadServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- servlet declaration -->
+
+    <!-- Add one servlet mapping entry like this per module -->
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/authentication/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AMBaseServlet</servlet-name>
+        <url-pattern>/base/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SCServlet</servlet-name>
+        <url-pattern>/service/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SMServlet</servlet-name>
+        <url-pattern>/session/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DMServlet</servlet-name>
+        <url-pattern>/dm/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RMServlet</servlet-name>
+        <url-pattern>/realm/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PMServlet</servlet-name>
+        <url-pattern>/policy/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IDMServlet</servlet-name>
+        <url-pattern>/idm/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UMServlet</servlet-name>
+        <url-pattern>/user/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DelegationServlet</servlet-name>
+        <url-pattern>/delegation/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TaskServlet</servlet-name>
+        <url-pattern>/task/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AgentConfigurationServlet</servlet-name>
+        <url-pattern>/agentconfig/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- lockhart 2.x servlet mappings -->
+    <servlet-mapping>
+        <servlet-name>Help2Servlet</servlet-name>
+        <url-pattern>/cchelp2/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VersionServlet</servlet-name>
+        <url-pattern>/ccversion/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Config GUI: -->
+    <servlet-mapping>
+        <servlet-name>click-servlet</servlet-name>
+        <url-pattern>*.htm</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>PrivilegeXmlServlet</servlet-name>
+        <url-pattern>/admin/pxml/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminTestServlet</servlet-name>
+        <url-pattern>/admin/test/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Persistent Faces Servlet</servlet-name>
+        <url-pattern>/xmlhttp/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Persistent Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Blocking Servlet</servlet-name>
+        <url-pattern>/block/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>uploadServlet</servlet-name>
+        <url-pattern>/uploadHtml</url-pattern>
+    </servlet-mapping>
+
+    <!-- servlet mapping -->
+
+    <!-- This tag is for the welcome files such as index.html -->
+<welcome-file-list>
+    <welcome-file>
+            index.html
+    </welcome-file>
+</welcome-file-list>
+
+    <!-- The taglib is only specified once -->
+<taglib>
+    <taglib-uri>/WEB-INF/jato.tld</taglib-uri>
+    <taglib-location>/WEB-INF/jato.tld</taglib-location>
+</taglib>
+<taglib>
+    <taglib-uri>/WEB-INF/cc.tld</taglib-uri>
+    <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
+</taglib>
+
+    <!-- workarounds for lockart 2.x --> 
+<taglib>
+    <taglib-uri>/WEB-INF/tld/com_iplanet_jato/jato.tld</taglib-uri>
+    <taglib-location>/WEB-INF/jato.tld</taglib-location>
+</taglib>
+<taglib>
+    <taglib-uri>/WEB-INF/tld/com_sun_web_ui/cc.tld</taglib-uri>
+    <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
+</taglib>
+    <!-- taglib definition -->
+    <!-- Comment it out due to issue 4891 in WAS/JBOSS/Geronimo
+    <resource-ref>
+        <description>mysql db idrepo</description>
+        <res-ref-name>jdbc/openssousersdb</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+    </resource-ref>
+    -->
+</web-app>

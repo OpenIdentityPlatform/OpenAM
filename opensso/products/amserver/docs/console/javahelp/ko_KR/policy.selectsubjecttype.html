@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>주제 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.selectsubjecttype"></a><h4>주제</h4>
+<p><a name="indexterm-26"></a><a name="indexterm-27"></a><b>주제</b>는 정책의 영향을 받는 사용자 또는 사용자 모음(예: 특정 역할을 가진 그룹
+또는 사용자)을 정의합니다. 사용자가 적어도 정책의 한 주제의 구성원일 경우에만 정책이 적용되는
+것이 일반적인 규칙입니다. 기본 주제는 다음과 같습니다.</p><dl><dt>OpenSSO Identity 주제</dt>
+<dd><p>이 주제는 사용자가 영역 주제 탭에서 만들고 관리하는 Identity를 해당 주제의 구성원으로 추가할 수 있다는 것을 나타냅니다.</p></dd>
+<dt>인증된 사용자</dt>
+<dd><p> 이 주제 유형은 유효한 SSO 토큰을 가진 사용자가 이 주제의 구성원이라는 것을 나타냅니다.</p><p>인증된 사용자는 정책이 정의된 조직과 다른 영역에 인증한 경우에도 모두 이 주제의 구성원이 됩니다. 이는 자원 소유자가 관리되는 자원에 대한 액세스 권한을 다른 조직의 사용자에게 제공하는 경우에 유용합니다. 보호되는 자원에 대한 액세스 권한을 특정 조직의 구성원에게만 제한하려면 조직 주제를 사용하십시오.</p></dd>
+<dt>웹 서비스 클라이언트</dt>
+<dd><p> 이 주제 유형은 SSO 토큰에 포함된 기본의 DN이 이 주제의 선택된 임의 값과 일치할 경우 SSO 토큰으로 식별된 웹 서비스 클라이언트(WSC)가 이 주제의 구성원이라는 것을 나타냅니다. 유효한 값은 로컬 JKS 키 저장소에 있는 신뢰할 수 있는 인증서(신뢰할 수 있는 WSC의 인증서에 해당)의 DN입니다. 이 주제는 리버티 웹 서비스 프레임워크에 대해 종속성을 가지며 리버티 서비스 공급자가 WSC를 인증하기 위해서만 사용해야 합니다.</p><p>이 주제를 정책에 추가하기 전에 키 저장소를 만들어야 합니다. 키 저장소 설정에 대한 내용은 다음 사이트를 참조하십시오.</p><p><tt></tt><i>OpenSSO-base</i><tt></tt> <tt> /SUNWam/samples/saml/xmlsig/keytool.html</tt></p></dd>
+</dl>
+<p>해당 영역의 <a href="service.scpolicy.html">정책 구성</a>에서 주제를 선택하면 다음과 같은 추가 주제를 사용할 수 있습니다.</p><dl><dt>OpenSSO 역할</dt>
+<dd><p>이 주제 유형은 OpenSSO 역할을 하는 구성원이 이 주제의 구성원이라는 것을 나타냅니다. OpenSSO 역할은 레거시 모드에서 실행되는 OpenSSO를 사용하여 만듭니다.</p></dd>
+<dt>LDAP 그룹</dt>
+<dd><p>이 주제 유형은 LDAP 그룹의 구성원이 이 주제의 구성원이라는 것을 나타냅니다.</p></dd>
+<dt>LDAP 역할</dt>
+<dd><p>이 주제 유형은 LDAP 역할의 구성원이 이 주제의 구성원이라는 것을 나타냅니다. LDAP 역할은 디렉토리 서버 역할 기능을 사용하는 임의의 역할 정의입니다. 이러한 역할은 디렉토리 서버 역할 정의에 의해 위임되는 객체 클래스를 가집니다. <a href="service.scpolicy.html">정책 구성</a> 서비스에서 LDAP 역할 검색 필터를 수정하여 범위를 좁히고 성능을 향상시킬 수 있습니다.</p></dd>
+<dt>LDAP 사용자</dt>
+<dd><p> 이 주제 유형은 LDAP 사용자가 이 주제의 구성원이라는 것을 나타냅니다.</p></dd>
+<dt>조직</dt>
+<dd><p>이 주제 유형은 영역이 이 주제의 구성원이라는 것을 나타냅니다.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

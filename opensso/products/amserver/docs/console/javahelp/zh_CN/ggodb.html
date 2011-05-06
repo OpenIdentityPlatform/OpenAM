@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SOAP 绑定属性 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggodb"></a><h4>SOAP 绑定属性</h4>
+
+
+<a name="ggocx"></a><h5>Web 服务验证程序</h5>
+<a name="indexterm-155"></a><a name="indexterm-156"></a><p>此属性采用的值是 Web 服务验证程序接口的实现类。此类用于为 Web 服务使用方验证请求和生成证书。</p>
+
+<a name="ggock"></a><h5>支持的验证机制</h5>
+<a name="indexterm-157"></a><a name="indexterm-158"></a><p>此属性用于指定 SOAP 接收方所支持的验证机制。验证机制提供了用户验证、数据完整性和加密。默认情况下，所有可用的验证机制都处于选定状态。如果 Web 服务使用方 (WSC) 使用未选定的验证机制发送请求，则系统将拒绝该请求。以下是支持的验证机制的列表：</p>
+<ul><li><p><tt>urn:liberty:security:2003-08:null:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:null:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:null:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:TLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:TLS:Bearer</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:null</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:X509</tt></p></li>
+<li><p><tt>urn:liberty:security:2003-08:ClientTLS:SAML</tt></p></li>
+<li><p><tt>urn:liberty:security:2004-04:ClientTLS:Bearer</tt></p></li></ul>
+
+
+<a name="ggocn"></a><h5>强制仅使用已知的提供者</h5>
+<p>如果启用该属性，它将强制在 SOAP 消息中发送 <tt>ProviderID</tt> 标头以确定该提供者存在于系统中。如果提供者不存在，请求将被拒绝。如果未启用该属性，将跳过上述检查。</p>
+
+<a name="ggoci"></a><h5>SSL 客户机验证的证书别名</h5>
+<p>在安装期间设置该值。将在 Liberty SOAP 绑定的 SSL 连接中使用的客户机证书别名。</p>
+
+<a name="ggocs"></a><h5>过时消息的时间限制</h5>
+<p>默认值是 300000。确定消息是否过时并从此不再值得信任。如果消息时间戳早于当前时间戳达到指定的时间（以毫秒为单位），则认为该消息过时。</p>
+
+<a name="ggofw"></a><h5>消息 ID 高速缓存清除时间间隔</h5>
+<p>默认值是 60000。指定开始高速缓存清除事件之前所经过的时间（以毫秒为单位）。每条消息均使用自有消息 ID 进行存储以避免消息重复。当消息的当前时间减去接收时间超过了过时限制值时，将从高速缓存中移除该消息。</p>
+
+<a name="ggohr"></a><h5>支持的 SOAP 参与者</h5>
+<p>默认值是 <tt>http://schemas.xmlsoap.org/soap/actor/next </tt>。指定支持的 SOAP 参与者。每个参与者必须用管道字符 (|) 分隔。</p>
+
+<a name="ggofh"></a><h5>名称空间前缀映射</h5>
+<p>默认值是：</p><pre>=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08
+|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/
+liberty/pp|is=urn:liberty:is:2003-08</pre><p>指定将 JAXB 内容树编组到 DOM 树时所用的名称空间前缀映射。语法是 <tt>prefix=namespace|prefix=namespace|... </tt></p>
+
+<a name="ggoho"></a><h5>JAXB 软件包列表</h5>
+<p>指定构建 <tt>JAXBContext </tt> 时所用的 JAXB 软件包列表。 每个软件包必须用冒号 (:) 分隔。</p>
+
+<a name="ggogm"></a><h5>Liberty Identity Web Service 版本</h5>
+<p>当 OpenSSO 充当 WSC 时，如果框架无法通过入站消息或资源提供进行判断，则此属性会确定 Liberty ID-WSF 框架。值可以是 1.0 或 1.1。默认值是 1.1。</p>
+<br/>
+
+</body>
+</html>

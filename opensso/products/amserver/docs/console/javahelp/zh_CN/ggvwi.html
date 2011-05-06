@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>服务器和站点控制台属性映射 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggvwi"></a><h4>服务器和站点控制台属性映射</h4>
+<p>下表列出了以前版本的 <tt>AMConfig.properties</tt> 中包含的“服务器和站点”属性，不过现在这些属性由 OpenSSO 控制台管理。属性按字母顺序排列。可使用浏览器的“搜索”或“查找”功能搜索特定属性。</p><dl><dt>属性名</dt>
+<dd><p>位于 <tt>AMConfig.properties</tt> 文件中的属性名。</p></dd>
+<dt>控制台中的属性名</dt>
+<dd><p>显示在 OpenSSO 控制台中的属性名。</p></dd>
+<dt>控制台中的位置</dt>
+<dd><p>列出属性在控制台中的位置。</p></dd>
+</dl>
+<a name="ggvxo"></a><h6>表&#160;1 服务器和站点属性映射</h6><table><col width="33%"><col width="33%"><col width="33%"><tr><th align="left" valign="top" scope="column"><p>属性名</p></th>
+<th align="left" valign="top" scope="column"><p>控制台中的属性名</p></th>
+<th align="left" valign="top" scope="column"><p>控制台中的位置</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>am.encryption.pwd</p></td>
+<td align="left" valign="top" scope="row"><p>密码加密密钥</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.clientIPCheckEnabled</p></td>
+<td align="left" valign="top" scope="row"><p>客户机 IP 地址检查</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.cookie.encode</p></td>
+<td align="left" valign="top" scope="row"><p>对 Cookie 值编码</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.cookie.name</p></td>
+<td align="left" valign="top" scope="row"><p>Cookie 名称</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点
+> 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.cookie.secure</p></td>
+<td align="left" valign="top" scope="row"><p>安全 Cookie</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.event.connection.delay.between.retries</p></td>
+<td align="left" valign="top" scope="row"><p>事件服务连接重试之间的延迟</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.event.connection.ldap.error.codes.retries</p></td>
+<td align="left" valign="top" scope="row"><p>事件服务连接重试的错误代码</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.event.connection.num.retries</p></td>
+<td align="left" valign="top" scope="row"><p>事件服务通知的重试次数</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.ldap.connection.delay.between.retries</p></td>
+<td align="left" valign="top" scope="row"><p>LDAP 连接的重试次数</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点
+> SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.ldap.connection.ldap.error.codes.retries</p></td>
+<td align="left" valign="top" scope="row"><p>LDAP 连接重试的错误代码</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.ldap.connection.num.retries</p></td>
+<td align="left" valign="top" scope="row"><p>LDAP 连接重试之间的延迟</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.locale</p></td>
+<td align="left" valign="top" scope="row"><p>默认语言环境</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.notification.threadpool.size</p></td>
+<td align="left" valign="top" scope="row"><p>通知池大小</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.notification.threadpool.threshold</p></td>
+<td align="left" valign="top" scope="row"><p>通知线程池阈值</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点
+> 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.replica.delay.between.retries</p></td>
+<td align="left" valign="top" scope="row"><p>SDK 副本重试之间的延迟</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.replica.num.retries</p></td>
+<td align="left" valign="top" scope="row"><p>SDK 副本重试次数</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.rootsuffix</p></td>
+<td align="left" valign="top" scope="row"></td>
+<td align="left" valign="top" scope="row"></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.entry.default.expire.time</p></td>
+<td align="left" valign="top" scope="row"><p>默认条目过期时间</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.entry.expire.enabled</p></td>
+<td align="left" valign="top" scope="row"><p>启用高速缓存条目过期</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.entry.user.expire.time</p></td>
+<td align="left" valign="top" scope="row"><p>用户条目过期时间</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点
+> SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.sdk.cache.maxSize</p></td>
+<td align="left" valign="top" scope="row"><p>SDK 高速缓存的最大大小</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.service.secret</p></td>
+<td align="left" valign="top" scope="row"><p>验证服务共享密钥</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.session.invalidsessionmaxtime</p></td>
+<td align="left" valign="top" scope="row"><p>使会话无效的最长时间</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.session.maxSessions</p></td>
+<td align="left" valign="top" scope="row"><p>最大会话数</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.session.purgedelay</p></td>
+<td align="left" valign="top" scope="row"><p>会话清除延迟</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 >
+会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.smtphost</p></td>
+<td align="left" valign="top" scope="row"><p>Mail Server 主机名</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.smtpport</p></td>
+<td align="left" valign="top" scope="row"><p>Mail Server 端口号</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.am.stats.interval</p></td>
+<td align="left" valign="top" scope="row"><p>记录的时间间隔</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.security.encryptor</p></td>
+<td align="left" valign="top" scope="row"><p>加密类</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 >
+安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.comm.server.pllrequest.maxContentLength</p></td>
+<td align="left" valign="top" scope="row"><p>平台底层通信最大内容长度</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.configpath</p></td>
+<td align="left" valign="top" scope="row"><p>基安装目录</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.debug.directory</p></td>
+<td align="left" valign="top" scope="row"><p>调试目录</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.debug.level</p></td>
+<td align="left" valign="top" scope="row"><p>调试级别</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.stats.directory</p></td>
+<td align="left" valign="top" scope="row"><p>目录</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 常规</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.iplanet.services.stats.state</p></td>
+<td align="left" valign="top" scope="row"><p>状态</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 >
+会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.am.event.connection.disable.list</p></td>
+<td align="left" valign="top" scope="row"><p>禁用的事件服务连接</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.am.session.caseInsensitiveDN</p></td>
+<td align="left" valign="top" scope="row"><p>不区分大小写的客户机 DN 比较</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.am.session.enableHostLookUp</p></td>
+<td align="left" valign="top" scope="row"><p>启用主机查找</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 会话</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig.certalias</p></td>
+<td align="left" valign="top" scope="row"><p>证书别名</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig.keypass</p></td>
+<td align="left" valign="top" scope="row"><p>私钥密码文件</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 >
+安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig.keystore</p></td>
+<td align="left" valign="top" scope="row"><p>密钥库文件</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.saml.xmlsig.storepass</p></td>
+<td align="left" valign="top" scope="row"><p>密钥库密码文件</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > 安全</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>com.sun.identity.sm.ldap.enableProxy</p></td>
+<td align="left" valign="top" scope="row"><p>启用 Directory Proxy</p></td>
+<td align="left" valign="top" scope="row"><p>服务器和站点 > SDK</p></td>
+</tr>
+</table>
+<br/>
+
+</body>
+</html>

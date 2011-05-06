@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>RADIUS  - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthradiusservice"></a><h4>RADIUS </h4>
+<p><a name="indexterm-178"></a>이 모듈은 외부 RADIUS(Remote Authentication Dial-In User Service) 서버를 사용한 인증을 허용합니다.
+RADIUS 인증 속성은 영역 속성입니다. 속성은 다음과 같습니다.</p>
+<ul><li><p><a href="#fwadp">서버 1</a></p></li>
+<li><p><a href="#fwaom">서버 2</a></p></li>
+<li><p><a href="#fwaka">공유 비밀</a></p></li>
+<li><p><a href="#fwapc">공유 비밀 확인</a></p></li>
+<li><p><a href="#fwapn">포트 번호</a></p></li>
+<li><p><a href="#fwaad">시간 초과</a></p></li>
+<li><p><a href="#fwabo">인증 수준</a></p></li></ul>
+
+
+<a name="fwadp"></a><h5>서버 1</h5>
+<p>주 RADIUS 서버의 IP 주소나 정규화된 호스트 이름을 표시합니다. 기본 IP 주소는
+127.0.0.1입니다. 필드는 모든 유효한 IP 주소 또는 호스트 이름을 인식합니다. 여러 항목이
+있는 경우 다음 구문과 같이 로컬 서버 이름을 사용하여 접두어를 지정해야 합니다.</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaom"></a><h5>서버 2</h5>
+<p>보조 RADIUS 서버의 IP 주소나 정규화된 도메인 이름(FQDN)을 표시합니다. 이 서버는 주
+서버에 연결할 수 없는 경우 연결되는 페일오버 서버입니다. 기본 IP 주소는 127.0.0.1입니다.
+여러 항목이 있을 경우 다음 구문과 같이 로컬 서버 이름이 앞에 와야
+합니다.</p><p><tt>local_servername|ip_address local_servername2|ip_address ...</tt></p>
+
+<a name="fwaka"></a><h5>공유 비밀</h5>
+<p>RADIUS 인증을 위한 공유 비밀을 포함합니다. 공유 비밀은 적절히 선택된 비밀번호와 동일한
+자격을 가져야 합니다. 이 필드에는 기본값이 없습니다.</p>
+
+<a name="fwapc"></a><h5>공유 비밀 확인</h5>
+<p>RADIUS 인증을 위한 공유 비밀을 확인합니다.</p>
+
+<a name="fwapn"></a><h5>포트 번호</h5>
+<p>RADIUS 서버가 수신하는 포트를 지정합니다. 기본값은 1645입니다.</p>
+
+<a name="fwaad"></a><h5>시간 초과</h5>
+<p>시간 초과 전까지 RADIUS 서버의 응답을 대기하는 시간 간격(초)을 지정합니다. 기본값은 3초입니다.
+이 필드는 시간 초과를 지정하는 모든 숫자를 초 단위로 인식합니다.</p>
+
+<a name="fwabo"></a><h5>인증 수준</h5>
+<p>인증 수준은 각 인증 방법에 대해 별도로 설정됩니다. 이 값은 인증 기법을
+어느 정도 신뢰할 수 있는지를 나타냅니다. 사용자가 인증되고 나면 해당 세션의 SSO
+토큰에 이 값이 저장됩니다. 사용자가 액세스하려는 응용 프로그램에 이 SSO 토큰이 제공되면
+응용 프로그램은 저장된 값을 사용하여 해당 수준이 사용자에게 액세스를 허가할 만큼 충분한지
+여부를 확인합니다. SSO 토큰에 저장된 인증 수준이 필요한 최소값을 충족하지 않을 경우
+응용 프로그램은 더 높은 인증 수준을 가진 서비스를 통해 다시 인증을 받으라는
+메시지를 사용자에게 표시할 수 있습니다. 기본값은 0입니다.</p>
+<hr><p><b>주 &#8211; </b>지정된 인증 수준이 없을 경우 SSO 토큰에는 핵심 인증 속성인 <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">기본 인증 수준</a>에 지정된
+값이 저장됩니다.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>安全 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsecurity"></a><h4>安全</h4>
+<p>“安全”属性定义用于控制服务器实例安全级别的加密、验证和 Cookie 信息。</p>
+
+<a name="ggkbi"></a><h5>加密</h5>
+<p>加密属性包括：</p>
+
+<a name="ggkcb"></a><h5>密码加密密钥</h5>
+<p>指定用于加密和解密密码，并且存储在“服务管理系统”配置中的密钥。在安装期间设置该值。示例：<tt>dSB9LkwPCSoXfIKHVMhIt3bKgibtsggd</tt></p>
+
+<a name="ggkbg"></a><h5>验证服务共享密钥</h5>
+<p>应用程序验证模块的共享密钥。在安装期间设置该值。示例：<tt>AQICPX9e1cxSxB2RSy1WG1+O4msWpt/6djZl</tt></p>
+
+<a name="ggkbd"></a><h5>加密类</h5>
+<p>默认值为 <tt>com.iplanet.services.util.JCEEncryption</tt>。指定加密类实现。可用的类包括：<tt>com.iplanet.services.util.JCEEncryption</tt> 和 <tt>com.iplanet.services.util.JSSEncryption</tt>。</p>
+
+<a name="ggkby"></a><h5>安全随机工厂类</h5>
+<p>默认值为 <tt>com.iplanet.am.</tt><tt>util.JSSSecureRandomFactoryImpl</tt>。指定 <tt>SecureRandomFactory</tt> 的工厂类名称。可用的实现类包括：使用 JSS 的 <tt>com.iplanet.am.</tt><tt>util.JSSSecureRandomFactoryImpl</tt> 和使用纯 Java 的 <tt>com.iplanet.am.</tt><tt>util.SecureRandomFactoryImpl</tt>。</p>
+
+<a name="ggkbr"></a><h5>验证</h5>
+<p>验证属性包括：</p>
+
+<a name="ggkay"></a><h5>平台底层通信的最大内容长度</h5>
+<p>默认值为 16384 或 16k。指定 OpenSSO 可接受的 <tt>HttpRequest</tt> 的最大内容长度。</p>
+
+<a name="ggkbb"></a><h5>客户机 IP 地址检查</h5>
+<p>默认值为“否”。指定在创建或验证所有 <tt>SSOToken</tt> 时是否检查客户机的 IP 地址。</p>
+
+<a name="ggkba"></a><h5>Cookie</h5>
+<p>Cookie 属性包括：</p>
+
+<a name="ggkad"></a><h5>Cookie 名称</h5>
+<p>默认值为 <tt>iPlanetDirectoryPro</tt>。用于设置有效会话处理程序 ID 的“验证服务”所用的 Cookie 名称。该 Cookie 名称的值用于检索有效会话信息。</p>
+
+<a name="ggkaw"></a><h5>安全 Cookie</h5>
+<p>允许在安全模式下设置 OpenSSO Cookie，在该模式下，浏览器仅在使用 <tt>HTTP(s)</tt> 等安全协议时才会返回 Cookie。默认值为“假”。</p>
+
+<a name="ggkbk"></a><h5>对 Cookie 值编码</h5>
+<p>OpenSSO 可通过此属性对 Cookie 值进行 <tt>URLencode</tt>，此操作会将字符转换为 HTTP 可识别的字符。</p>
+
+<a name="ggkbc"></a><h5>密钥库</h5>
+<p>您可以通过以下属性来配置所创建的其他站点和服务器的密钥库信息：</p>
+
+<a name="ggkbj"></a><h5>密钥库文件</h5>
+<p>在安装期间设置该值。示例：<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/keystore.jks</tt>。指定 SAML XML 密钥库密码文件的路径。</p>
+
+<a name="ggkbu"></a><h5>密钥库密码文件</h5>
+<p>在安装期间设置该值。示例：<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/.storepass</tt>。指定 SAML XML 密钥存储密码文件的路径。</p>
+
+<a name="ggkbs"></a><h5>私钥密码文件</h5>
+<p>在安装期间设置该值。示例：<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>server_URI</i><tt>/.keypass</tt>。指定 SAML XML 密钥密码文件的路径。</p>
+
+<a name="ggkaq"></a><h5>证书别名</h5>
+<p>默认值为 test。</p>
+
+<a name="ggkbw"></a><h5>证书撤销列表高速缓存</h5>
+<p>这些属性定义本地证书撤销列表 (Certificate Revocation List, CRL) 高速缓存系统信息库，以用于保存来自证书授权机构的 CRL。任何需要获取 CRL 以进行证书验证的服务都将收到基于该信息的 CRL。</p>
+
+<a name="ggkch"></a><h5>LDAP 服务器主机名</h5>
+<p>指定存储证书的 LDAP 服务器的名称。默认值为安装 OpenSSO 时指定的主机名。可以使用存储证书的任意 LDAP 服务器的主机名。</p>
+
+<a name="ggkau"></a><h5>LDAP 服务器端口号</h5>
+<p>指定存储证书的 LDAP 服务器的端口号。默认值为安装 OpenSSO 时指定的端口。可以使用存储证书的任意 LDAP 服务器的端口。</p>
+
+<a name="ggkam"></a><h5>已启用 SSL</h5>
+<p>指定是否使用 SSL 来访问 LDAP 服务器。在默认情况下，证书验证服务不使用 SSL 进行 LDAP 访问。</p>
+
+<a name="ggkbv"></a><h5>LDAP 服务器绑定用户名</h5>
+<p>指定 LDAP 服务器中的绑定 DN。</p>
+
+<a name="ggkaj"></a><h5>LDAP 服务器绑定密码</h5>
+<p>定义用于绑定 LDAP 服务器的密码。默认情况下，会将安装过程中输入的 amldapuser 密码用作绑定用户。</p>
+
+<a name="ggkce"></a><h5>LDAP 搜索基 DN</h5>
+<p>该属性指定由 LDAP 服务器中的 LDAP 用户主体使用的基 DN，搜索将从此 DN 开始进行。默认情况下，它是 OpenSSO 安装基的顶层领域。</p>
+
+<a name="ggkbp"></a><h5>搜索属性</h5>
+<p>颁发者的 <tt>subjectDN</tt> 的任何 DN 组件均可用于从本地 LDAP 服务器检索 CRL。这是单值字符串，如 "cn"。所有“根 CA”必须使用相同的搜索属性。</p>
+
+<a name="ggkaa"></a><h5>联机证书状态协议检查</h5>
+<p>联机证书状态协议 (Online Certificate Status Protocol, OCSP) 使 OpenSSO 服务能够确定指定证书的（撤销）状态。OCSP 可用于满足一些操作要求，以提供比使用 CRL 时更及时的撤销信息，并且还可用于获取其他状态信息。OCSP
+客户机会向 OCSP 响应器发出状态请求，并暂停接受正在处理的证书，直到响应器提供响应为止。</p>
+
+<a name="ggkal"></a><h5>已启用检查</h5>
+<p>此属性启用 OCSP 检查。它在默认情况下为启用。</p>
+
+<a name="ggkav"></a><h5>响应器 URL</h5>
+<p>此属性定义用于标识 OCSP 响应器位置的 URL。例如，<tt>http://ocsp.example.net:80</tt>。</p><p>默认情况下，OCSP 响应器的位置由正在经过验证的证书隐式确定。此属性在证书没有“授权机构信息访问”扩展（在 RFC 3280 中定义）或需要重写时使用。</p>
+
+<a name="ggkai"></a><h5>证书昵称</h5>
+<p>OCSP 响应器昵称是该响应器 CA 证书的昵称，例如 <tt>Certificate Manager - sun</tt>。如果设定了该属性，则 CA 证书必须存在于 Web 服务器的证书数据库中。如果设定了 OCSP URL，则还必须设置 OCSP
+响应器的昵称。否则，两者都将被忽略。如果两者均未被设置，则用户证书中存在的 OCSP 响应器 URL 将用于进行 OCSP 验证。如果 OCSP 响应器 URL 不在用户证书中，则不会执行 OCSP
+验证。</p>
+
+<a name="ggkag"></a><h5>联合信息处理标准</h5>
+<p>根据信息技术管理改革法案（公法 104-106），商务部长批准了由国家标准与技术研究院 (National Institute of Standards and Technology, NIST) 为联邦计算机系统开发的标准和准则。这些由 NIST 发布的标准和原则是政府使用的联邦信息处理标准
+(Federal Information Processing Standards, FIPS)。NIST 在联邦政府对安全和互操作性具有强制要求，且没有可用的行业标准或解决方案的情况下开发了 FIPS。</p>
+
+<a name="ggkap"></a><h5>FIPS 模式</h5>
+<p>此属性可以为“真”或“假”。所有加密操作将仅在属性为“真”时运行 FIPS 兼容模式。</p>
+<br/>
+
+</body>
+</html>

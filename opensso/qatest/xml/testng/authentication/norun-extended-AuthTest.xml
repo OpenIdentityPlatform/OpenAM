@@ -1,0 +1,261 @@
+
+    <test name="AuthTestNTUser">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestNTModule">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestNTService">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestNTAuthLevel">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestNTRealm">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestJDBCUser">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestJDBCModule">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestJDBCService">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestJDBCAuthLevel">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestJDBCRealm">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestRadiusUser">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestRadiusModule">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestRadiusService">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestRadiusAuthLevel">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestRadiusRealm">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <!--test name="AuthTestUnixUser">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="user"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestUnixModule">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="module"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestUnixService">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="service"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestUnixAuthLevel">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="authlevel"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test>
+    <test name="AuthTestUnixRealm">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="realm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthTest"/>
+        </classes>
+    </test-->

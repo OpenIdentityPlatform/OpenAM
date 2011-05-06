@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>認證 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>認證</h3>
+<p><a name="indexterm-5"></a>一般認證服務必須先註冊為某個範圍的服務，使用者才能使用其他認證模組類型登入。核心認證服務可讓 OpenSSO 管理員定義範圍認證參數的預設值。若未於特定認證模組中定義置換值，稍後則可以使用這些值。核心認證服務的預設值定義於 <tt>amAuth.xml</tt> 檔案中，並於安裝後儲存於 Directory Server 內。</p><p>認證特性包括：</p><dl><dt>進階特性</dt>
+<dd><p>按一下 [進階特性] 按鈕顯示可為範圍定義的核心認證屬性。全域屬性不適用於範圍，因此將不顯示。</p></dd>
+<dt>預設認證鏈接</dt>
+<dd><p>定義範圍所使用的認證鏈接。於 [認證鏈接] 屬性中建立新鏈接後，其將顯示於下拉式清單中並可供選取。請參閱<a href="authentication.newauthconfig.html">建立新的認證鏈接</a>，以取得更多資訊。</p></dd>
+<dt>管理員認證鏈接</dt>
+<dd><p>定義僅適用於管理員的認證鏈接。如果管理員的認證鏈接需要與一般使用者的認證鏈接有所不同，則可以使用此屬性。此屬性中配置的模組將在存取 OpenSSO 主控台時被繼承。</p></dd>
+<dt>預設成功的 URL</dt>
+<dd><p>指定使用者在成功經過範圍認證後將重新導向至的 URL。</p></dd>
+<dt>模組實例</dt>
+<dd><p>您可定義與配置範圍的 OpenSSO 預設認證模組。您可增加相同認證模組的多重實例。請參閱<a href="authentication.newauthinstance.html">建立新的認證模組實例</a>，以取得更多資訊。</p></dd>
+<dt>認證鏈接</dt>
+<dd><p>可以配置一個以上的認證模組，因此使用者必需傳送認證憑證給這些模組。這稱為認證鏈接。這個屬性可讓您定義範圍的認證鏈接選項。您建立的鏈接會顯示於 [預設認證鏈接] 清單中。請參閱<a href="authentication.newauthconfig.html">建立新的認證鏈接</a>，以取得更多資訊。</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

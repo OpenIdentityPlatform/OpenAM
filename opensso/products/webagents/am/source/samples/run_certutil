@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# "$Id: run_certutil,v 1.1 2006/05/03 22:42:53 madan_ranganath Exp $"
+#
+# PROPRIETARY/CONFIDENTIAL.  Use of this product is subject to license terms.
+# Copyright 2006 Sun Microsystems, Inc.  All rights reserved.
+#
+
+LD_LIBRARY_PATH=.:../lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+
+./certutil "$@"

@@ -1,0 +1,2749 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris Sparc)">
+	<META NAME="CREATED" CONTENT="20080130;7101600">
+	<META NAME="CHANGEDBY" CONTENT="Michael Teger">
+	<META NAME="CHANGED" CONTENT="20080130;7103800">
+</HEAD>
+<BODY LANG="ja-JP" DIR="LTR">
+<CENTER>
+	<TABLE WIDTH=1332 BORDER=1 CELLPADDING=2 CELLSPACING=3 FRAME=VOID RULES=GROUPS STYLE="page-break-before: always">
+		<COLGROUP>
+			<COL WIDTH=50>
+			<COL WIDTH=40>
+			<COL WIDTH=40>
+			<COL WIDTH=4>
+			<COL WIDTH=16>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=17>
+			<COL WIDTH=0>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=14>
+			<COL WIDTH=0>
+			<COL WIDTH=0>
+			<COL WIDTH=90>
+			<COL WIDTH=29>
+			<COL WIDTH=68>
+			<COL WIDTH=147>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=1>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=30>
+			<COL WIDTH=19>
+			<COL WIDTH=0>
+			<COL WIDTH=132>
+			<COL WIDTH=0>
+			<COL WIDTH=3>
+			<COL WIDTH=29>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=1>
+			<COL WIDTH=102>
+			<COL WIDTH=0>
+			<COL WIDTH=0>
+			<COL WIDTH=337>
+		</COLGROUP>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<P><IMG SRC="../../../images/logo.gif" NAME="graphics1" ALT="Open Federation" ALIGN=BOTTOM WIDTH=179 HEIGHT=68 BORDER=0></P>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<H2>How Do I... FAQ</H2>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<OL>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#IDFFsample">Liberty ID-FF のサンプルはどのように設定して実行したらよいですか?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#IDWSFsample">
+Liberty ID-WSF のサンプルはどのように設定して実行したらよいですか?
+</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#turnonsaml1">
+SAML v1.x を使って署名をつけるにはどうすればよいですか?</A> 
+</FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#turnonIDFFsigning">
+Liberty ID-FF を使って署名をつけるにはどうすればよいですか?
+</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#keystore">
+どのようにしてキーストアを設定したらよいですか?
+</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><A HREF="#setupsaml1"><FONT SIZE=2>
+SAML v1.x と </FONT><CODE><FONT SIZE=2>ssoadm</FONT></CODE><FONT SIZE=2> コマンドを使ってどのようにシングルサインオンを設定したらよいですか?</FONT></A><FONT SIZE=2> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><A HREF="#setupFFSSO"><FONT SIZE=2>
+Liberty ID-FF と </FONT><CODE><FONT SIZE=2>ssoadm</FONT></CODE><FONT SIZE=2> コマンドを使ってどのようにシングルサインオンを設定したらよいですか?</FONT></A><FONT SIZE=2> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><A HREF="#setupsaml2"><FONT SIZE=2>
+SAML v2 と </FONT><CODE><FONT SIZE=2>ssoadm</FONT></CODE><FONT SIZE=2> コマンドを使ってどのようにシングルサインオンを設定したらよいですか?</FONT></A><FONT SIZE=2> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#turnonsaml2">SAML v2 を使って署名をつけて暗号化するにはどう設定したらよいですか?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#setupauth">
+認証 Web サービスを用いた認証を設定するにはどうしたらよいですか?</A>
+						</FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#discotokens">
+X509、Bearer および SAML トークンを発行するのにディスカバリサービスをどのように設定したらよいですか?
+</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#pa3profile">
+ssoadm コマンドを使ってポリシー Agents 3.0 のプロファイルを設定するにはどうしたらよいですか?
+</A>
+						</FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#configdsfailover">フェイルオーバーを行うには OpenSSO 設定データストアをどのように設定したらよいですか?
+						</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#websphereAIX">AIX 上で Websphere 6.1 にどのようにして OpenSSO を配備したらよいですか?</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#authws1">
+アイデンティティー Web サービスを用いて OpenSSO 上でどのように認証を設定したらよいですか?
+</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#authws2">
+アイデンティティー Web サービスを用いて OpenSSO 上でどのように認可を設定したらよいですか?
+</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#idpproxy">
+SAMLv2 IDP プロキシをどのように設定したらよいですか?
+</A> </FONT>
+						</P>
+                                                <LI><P><FONT SIZE=2><A HREF="#confwithout">
+<code>configurator.jsp</code> を用いずに OpenSSO を設定するにはどのようにしたらよいですか?
+</A></FONT>
+                                                </P>
+
+                                                <LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="sessionupgradeSAML2.html">
+リソースが J2EE ポリシーエージェントで保護されている場合に SAMLv2 セッションをアップグレードするにはどうしたらよいですか? (未翻訳)
+</a>
+                                                </P> 
+					</OL>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<P><A NAME="IDFFsample"></A><B>
+Q: Liberty ID-FF のサンプルはどのように設定して実行したらよいですか?
+</B></P>
+					<P>Liberty ID-FF サンプルは ID-FF プロトコルを用いて 2 つの OpenSSO インスタンス間で単一ユーザーを連携する際に行われるインタラクションについてデモします。
+ID-FF サンプルを配備するパートと実行するパートの 2 つあります。
+以下の両方のセクションで説明されている手順を完了させてください。
+					</P>
+					<UL>
+						<LI><P><A HREF="#setupIDFFsample">Liberty ID-FF サンプルの設定手順</A> 
+						</P>
+						<LI><P><A HREF="#runIDFFsample">
+Liberty ID-FF サンプルの実行手順
+</A> 
+						</P>
+					</UL>
+					<P><A NAME="setupIDFFsample"></A><B>
+Liberty ID-FF サンプルの設定手順
+</B> 
+					</P>
+					<P>Liberty ID-FF サンプルを設定するには 2 つの OpenSSO インスタンスが必要です。
+					各インスタンスごとに
+					<CODE>opensso.war</CODE> を配備し、設定します。
+					</P>
+					<UL>
+						<LI><P><I>machine-IDP</I> はアイデンティティープロバイダとして設定します。
+						</P>
+						<LI><P><I>machine-SP</I> はサービスプロバイダとして設定します。
+						</P>
+					</UL>
+					<HR>
+					<H3><FONT FACE="Times New Roman, serif">始める前に</FONT></H3>
+					<UL>
+            <LI><P><FONT FACE="Times New Roman, serif">
+片方のインスタンスの cookie 名をデフォルトのものから変更する。
+たとえば、<I>machine-IDP</I> のコンソールにアクセスし、cookie 名を
+デフォルトの値とは違うものに変更する。(デフォルト値は &quot;iPlanetDirectoryPro&quot; です。)
+変更後、Web コンテナを再起動する。
+</FONT>
+            </P>
+
+						<LI><P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+<I>machine-IDP</I> と
+          <I>machine-SP</I> を同じホスト上で、2 つの異なる Web コンテナに
+配備して実行させる場合には、WAR ファイルをそれぞれのインスタンスに配備する際には異なる URI 上に配備する。
+</FONT>
+						</P>
+					</UL>
+					<HR>
+					<P>Liberty ID-FF サンプルを配備する手順は次のとおりです。<br>
+					実行する手順については、<A HREF="#runIDFFsample">Liberty ID-FF サンプルの実行手順</A> にて説明します。
+					</P>
+					<OL>
+						<LI><P><CODE>opensso.war</CODE> をダウンロードするかワークスペースでビルドします。 
+						</P>
+						<LI><P><I>machine-IDP</I> にて <CODE>opensso.war</CODE> を配備します。</P>
+						<P>このインスタンスはアイデンティティープロバイダとして設定されます。
+						</P>
+						<LI><P><I>machine-IDP</I> にて設定ページにアクセスします: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE>
+												</P>
+						<P>
+適切な値を入力してインスタンスを設定します。
+						</P>
+						<LI><P><I>machine-SP</I> にて <CODE>opensso.war</CODE> を配備します。</P>
+						<P>このインスタンスはサービスプロバイダとして設定されます。
+						</P>
+						<LI><P><I>machine-SP</I> にて設定ページにアクセスします: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE>
+												</P>
+						<P>
+適切な値を入力してインスタンスを設定します。
+						</P>
+						<LI><P> <I>machine-IDP</I> 上でサンプルの <CODE>configure.jsp</CODE> にアクセスします。 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE><CODE>/samples/idff/idp/configure.jsp</CODE>
+												</P>
+						<P>リモートのサービスプロバイダに関する各フィールドに値を入力し、終わったら Configure をクリックします。
+						</P>
+					</OL>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Protocol</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-SP</I> で使われているプロトコル(例えば <CODE>http</CODE>
+					または <CODE>https</CODE>)</P>
+				</TD>
+				<TD ROWSPAN=4 COLSPAN=12 WIDTH=712 VALIGN=TOP></TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Host</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-SP</I> のホスト名</P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Port</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-SP</I> のポート番号</P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Deployment URI</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-SP</I> で OpenSSO を配備した URI(例 <CODE>/opensso-sp</CODE>)</P>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<OL START=6>
+						<P>上記の設定にしたがって、<I>machine-IDP</I> は
+						ホストアイデンティティープロバイダとして以下の URI で設定され: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE>
+												</P>
+						<P>また
+						</P>
+						<P><I>machine-SP</I> はリモートサービスプロバイダとして以下の URI で設定されます:
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE>
+												</P>
+						<P>さらに、<CODE>sampleidffcot</CODE> という名前でトラストサークルが作成され、上の 2 つのプロバイダがメンバーとして割り当てられます。
+												</P>
+						<LI><P> <I>machine-SP</I> 上でサンプルの <CODE>configure.jsp</CODE> にアクセスします。 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/samples/idff/sp/configure.jsp</CODE>
+												</P>
+						<P>リモートのアイデンティティープロバイダに関する各フィールドに値を入力し、終わったら Configure をクリックします。
+						</P>
+					</OL>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Protocol</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-IDP</I> で使われているプロトコル(例えば <CODE>http</CODE>
+					または <CODE>https</CODE>)</P>
+				</TD>
+				<TD ROWSPAN=4 COLSPAN=12 WIDTH=712 VALIGN=TOP></TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Host</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-IDP</I> のホスト名</P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Port</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-IDP</I> のポート番号</P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Deployment URI</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P><I>machine-IDP</I> で OpenSSO を配備した URI(例 <CODE>/opensso-idp</CODE>)</P>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<OL START=7>
+						<P>上記の設定にしたがって、 <I>machine-SP</I> はホストサービスプロバイダとして設定以下の URI で設定され、: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE>
+												</P>
+						<P>また
+						</P>
+						<P><I>machine-IDP</I> はリモートアイデンティティープロバイダとして以下の URI で設定されます: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE>
+												</P>
+						<P>さらに、 <CODE>sampleidffcot</CODE> という名前でトラストサークルが作成され、上の 2 つのプロバイダがメンバーとして割り当てられます。
+												</P>
+						<LI><P><I>machine-IDP</I> 上で OpenSSO のログインページにアクセスします: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+												</P>
+						<LI><P>Top level administrator (デフォルトでは <CODE>amadmin</CODE>)でログインし、<CODE>idpuser</CODE> という名前でユーザーを作成し、ログアウトします。
+						</P>
+						<LI><P><I>machine-SP</I> 上で OpenSSO のログインページにアクセスします: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+												</P>
+						<LI><P>Top level administrator (デフォルトでは <CODE>amadmin</CODE>)でログインし、<CODE>spuser</CODE> という名前でユーザーを作成し、ログアウトします。
+						</P>
+						<LI>引き続き、<P><A HREF="#runIDFFsample">
+Liberty ID-FF サンプルの実行手順
+</A> で記述されている手順を行います。
+						</P>
+					</OL>
+					<P><A NAME="runIDFFsample"></A><B>
+Liberty ID-FF のサンプルはどのように実行したらよいですか? 
+</B></P>
+					<P><A HREF="#setupIDFFsample">
+Liberty ID-FF サンプルの設定手順
+</A>で記述されている手順は完了しているものとします。<br>
+					以下の手順では、さきほど作成したユーザーをどのようにして連携させるかについて説明します。
+					</P>
+					<OL>
+						<LI><P><I>machine-SP</I> 上で OpenSSO のログインページにアクセスし、 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+												</P>
+						<P><CODE>spuser</CODE> でログインします。 
+						</P>
+						<LI><P>
+						<I>machine-SP</I> 上でサンプルのサービスプロバイダのホームページにアクセスします。 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/samples/idff/sp/index.jsp</CODE>
+												</P>
+						<LI><P>Federate リンクをクリックします。
+						</P>
+						<LI><P>表示されているリストから <I>machine-IDP</I> を選択し、
+						Submit をクリックします。 
+						</P>
+						<P><I>machine-IDP</I> の OpenSSO のログインページにリダイレクトされます。
+												</P>
+						<LI><P><CODE>idpuser</CODE> で <I>machine-IDP</I> にログインします。
+						</P>
+						<P><I>machine-SP</I> にリダイレクトされます。
+						</P>
+						<LI><P>Continue をクリックします。. 
+						</P>
+						<P>サービスプロバイダホームページにリダイレクトされます。
+						これにより、<CODE>spuser</CODE> と <CODE>idpuser</CODE> の間での連携が確立されたことが確認できます。 
+						</P>
+						<HR>
+						<H3><FONT FACE="Times New Roman, serif">オプションの設定</FONT></H3>
+						<P><FONT FACE="Times New Roman, serif">この時点で, 
+						<I>machine-IDP</I> との通信用に名前識別子を作成するために
+						<I>machine-SP</I> を設定することができます。
+				    </FONT></P>
+						<OL>
+							<LI><P><FONT FACE="Times New Roman, serif">サービスプロバイダのホームページで Register Name Identifier をクリックします。
+</FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">IDP リストから <I>machine-IDP</I> を選択します。</FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">Submit をクリックします。</FONT></P>
+							<P><FONT FACE="Times New Roman, serif">ページが表示されます。</FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">表示されたページで Continue をクリックすると、サービスプロバイダのホームページに戻ります。
+							</FONT>
+							</P>
+							<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+サービスプロバイダのホームページに戻ったことで、名前識別子が作成されたことが確認できます。
+							</FONT>
+							</P>
+						</OL>
+						<HR>
+						<P>サービスプロバイダのホームページで Logout をクリックします。</P>
+						<P>ユーザーのログアウトに成功したことを示すメッセージが表示されます。
+						</P>
+						<LI><P>サービスプロバイダのホームページで Continue をクリックします。
+</P>
+						<P>これによりシングルサインオンのプロセスが開始され、
+						<I>machine-IDP</I> のログインページにリダイレクトされます。 
+						</P>
+						<LI><P><I>machine-IDP</I> に <CODE>idpuser</CODE> でログインします。</P>
+						<P>シングルサインオンに成功すると、ユーザートークンが
+						<I>machine-SP</I> 上に作成され、サービスプロバイダのホームページに戻ります。
+						</P>
+						<LI><P>サービスプロバイダのホームページで Terminate Federation をクリックします。
+						</P>
+						<P>これにより、連携を終了させるプロセスが開始されます。
+						</P>
+						<LI><P>表示されているリストから <I>machine-IDP</I> を選択し、
+						Submit をクリックします。</P>
+						<P>連携が終了したことを示すメッセージが表示されます。
+						</P>
+						<LI><P>Continue をクリックします。</P>
+						<P>サービスプロバイダのホームページに戻ります。これで、
+						<CODE>idpuser</CODE> と <CODE>spuser</CODE> の間の連携が終了したことが確認できます。<br>ここでもう一度 Federate をクリックして連携を開始することもできます。
+						</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="IDWSFsample"></A><B>Q: Liberty ID-WSF のサンプルはどのように設定して実行したらよいですか?
+</B></P>
+						<P>Liberty ID-WSF のサンプルは Web サービスクライアント (WSC) と Web サービスプロバイダ (WSP) の間のインタラクションについてデモします。 とくに、
+ディスカバリサービスをどのように照会し更新するか、個人プロファイルサービスをどのように照会し更新するかについてデモします。
+さらに、このサンプルを用いて個人プロファイルサービス属性にアクセスするためにポリシー主導のインタラクションを設定することができます。
+						</P>
+						<P>手順は、Liberty ID-WSF サンプルを配備するパートと実行するパートの 2 つあります。次の両方のセクションで記述されている手順を完了させてください。
+						</P>
+						<UL>
+							<LI><P><A HREF="#setupIDWSFsample">
+Liberty ID-WSF サンプルの設定手順
+</A> 
+							</P>
+							<LI><P><A HREF="#runIDWSFsample">
+Liberty ID-WSF サンプルの実行手順
+</A> 
+							</P>
+						</UL>
+						<P><A NAME="setupIDWSFsample"></A><B>
+Liberty ID-WSF サンプルの設定手順
+</B></P>
+						<P>Liberty ID-WSF のサンプルを設定するには、2 つの OpenSSO インスタンスと 1 つの OpenSSO クライアントインスタンスにアクセスする必要があります。
+						</P>
+						<UL>
+							<LI><P><I>machine-A</I>: アイデンティティープロバイダ、ディスカバリサービスおよび個人プロファイルサービスとして設定します。
+							</P>
+							<LI><P><I>machine-B</I>: サービスプロバイダとして設定します。
+							</P>
+							<LI><P><I>machine-C</I>: Web サービスクライアントとして設定します。
+							</P>
+						</UL>
+						<P STYLE="margin-bottom: 0in">以下では、
+						<CODE>opensso.war</CODE> を <I>machine-A</I> と <I>machine-B</I> に配備し、
+						<CODE>fam-client-jdk15.war</CODE> あるいは <CODE>fam-client-jdk14.war</CODE> を <I>machine-C</I> に配備します。
+ <CODE>fam-client-jdk1x.war</CODE> には Web サービスクライアントのサンプルが含まれています。
+						</P>
+						<HR>
+          <H3><FONT FACE="Times New Roman, serif">始める前に</FONT></H3>
+          <UL>
+            <LI><P><FONT FACE="Times New Roman, serif">
+片方のインスタンスの cookie 名をデフォルトのものから変更する。
+たとえば、<I>machine-A</I> のコンソールにアクセスし、cookie 名を
+デフォルトの値とは違うものに変更する。(デフォルト値は &quot;iPlanetDirectoryPro&quot; です。)
+変更後、Web コンテナを再起動する。
+</FONT>
+            </P>
+
+            <LI><P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+<I>machine-A</I> と
+          <I>machine-B</I> を同じホスト上で、2 つの異なる Web コンテナに
+配備して実行させる場合には、WAR ファイルをそれぞれのインスタンスに配備する際には異なる URI 上に配備する。
+</FONT>
+            </P>
+          </UL>
+						<HR>
+						<P>Liberty ID-WSF サンプルを配備する手順は次のとおりです。<br>
+						実行する手順については、<A HREF="#runIDWSFsample">
+Liberty ID-WSF サンプルの実行手順
+</A> にて説明します。</P>
+						<OL>
+							<LI><P><CODE>opensso.war</CODE> を <I>machine-A</I> に配備し、
+							アイデンティティープロバイダとして動かすために Liberty ID-FF サンプルを設定します。
+							</P>
+							<P>詳細については <A HREF="#setupIDFFsample">
+Liberty ID-FF サンプルの設定手順
+</A> を参照してください。 
+							</P>
+							<LI><P><CODE>opensso.war</CODE> を <I>machine-B</I> に配備し、
+							サービスプロバイダとして動かすために Liberty ID-FF サンプルを設定します。
+							</P>
+							<P>詳細については <A HREF="#setupIDFFsample">
+Liberty ID-FF サンプルの設定手順
+</A> を参照してください。 
+							</P>
+							<LI><P><I>machine-A</I> と <I>machine-B</I> のそれぞれにユーザーアカウントを作成します。. 
+							</P>
+							<LI><P>2 つのアカウントを連携しシングルサインオンの設定を完了させます。
+							</P>
+							<P>詳細については <A HREF="#runIDFFsample">
+Liberty ID-FF サンプルの実行手順
+							</A> を参照してください。
+							</P>
+							<LI><P><CODE>fam-client-jdk15.war</CODE> あるいは
+							<CODE>fam-client-jdk14.war</CODE> を <I>machine-C</I> に配備します。</P>
+							<P STYLE="margin-bottom: 0in">
+							<I>machine-C</I> でサンプルを配備した URI にアクセスします。
+							<BR><CODE><I>machine-C_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-C_host</I></CODE><CODE>:</CODE><CODE><I>machine-C_port</I></CODE><CODE>/</CODE><CODE><I>machine-C_deploy_uri</I></CODE><CODE>/Configurator.jsp<BR><BR>
+Machine-B のプロトコル、ホスト名、ポート番号、配備 URI、デバッグディレクトリ、ユーザー名(UrlAccessAgent)とパスワード(OpenSSO 設定時に指定したもの) を入力し、保存します。
+<br>
+保存が完了すると、$HOME/OpenSSOClient/ ディレクトリに *****AMConfig.properties というファイルが作られます。 <br>
+cookie 名をデフォルト以外に設定している場合は、com.iplanet.am.cookie.name の値を修正し、念のため <I>machine-C</I> の web コンテナを再起動します。
+							</CODE>
+							</P>
+							<LI><P>次に、<I>machine-C</I> で 次の URL にアクセスします。
+							<BR></CODE><CODE><I>machine-C_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-C_host</I></CODE><CODE>:</CODE><CODE><I>machine-C_port</I></CODE><CODE>/</CODE><CODE><I>machine-C_deploy_uri</I></CODE><CODE>/wsc/configure.jsp
+							</CODE>
+							</P>
+							<LI><P><CODE>
+							</CODE><CODE><I>machine-A</I> に関して次の値を入力します。</CODE>
+							</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 WIDTH=50 VALIGN=TOP></TD>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Protocol</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P><I>machine-A</I> の Web コンテナで使用しているプロトコル
+						(例 <CODE>http</CODE> または <CODE>https</CODE>)</P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=5 WIDTH=457 VALIGN=TOP></TD>
+				</TR>
+			</TBODY>
+			<TBODY>
+				<TR>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Host</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P><I>machine-A</I> のホスト名</P>
+					</TD>
+				</TR>
+			</TBODY>
+			<TBODY>
+				<TR>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Port</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P><I>machine-A</I> のポート番号 (
+						例 <CODE>8080</CODE>)</P>
+					</TD>
+				</TR>
+			</TBODY>
+			<TBODY>
+				<TR>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Deployment URI</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P><I>machine-A</I> で OpenSSO を配備した URI
+						(例 <CODE>/opensso-idp</CODE>)</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="runIDWSFsample"></A><B>
+Liberty ID-WSF サンプルの実行手順
+</B></P>
+						<P>
+<A HREF="#setupIDWSFsample">
+Liberty ID-WSF サンプルの設定手順 
+</A>が完了している状態で、次の URL にアクセスすると、<br>
+表示されたページにて "Add PP Resource Offering" や "Send Discovery Lookup" などを試すことができます。
+						</P>
+						<P><CODE><I>machine-C_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-C_hostname</I></CODE><CODE>:</CODE><CODE><I>port</I></CODE><CODE>/</CODE><CODE><I>deployment_uri</I></CODE><CODE>/wsc/index.jsp</CODE>
+												</P>
+操作例: (事前に ResourceOffering が設定されてない場合)
+<OL>
+<LI>テキストフィールドに IDP User DN を指定します。(例 id=idpuser,ou=user,dc=opensso,dc=java,dc=net)
+<LI>"Add PP Resource Offering" をクリックします。
+<LI>"Discovery Service Modification" ページが表示されますので、そのまま "Send Discovery Update Request" をクリックします。
+<LI>結果が表示されます。
+<LI>"Return to index.jsp" をクリックします。
+<LI>"Send Discovery Lookup" をクリックします。
+<LI>"Discovery Service Query Sample"ページが表示されますので、そのまま "Send Discovery Lookup Request" をクリックします。
+<LI>結果が表示され、先ほど追加した ResourceOffering が表示されているはずです。
+<li> "Remove This PP Resource Offering from Discovery Service" をクリックします。
+<LI>"Discovery Service Modification" ページが表示されますので、そのまま "Send Discovery Update Request" をクリックします。
+<LI>結果が表示されます。"Return to index.jsp" をクリックします。
+<LI>再度、"Send Discovery Lookup" をクリックします。
+<LI>"Discovery Service Query Sample"ページが表示されますので、そのまま "Send Discovery Lookup Request" をクリックします。
+<LI>今度は該当する ResourceOffering がないため、 "No ResourceOffering found." と表示されるはずです。
+</OL>
+						<P>以下の手順は必須の設定ではありませんので、必要に応じて行ってください。: 
+						</P>
+						<UL>
+							<LI><P><A HREF="#PPinteractions">個人プロファイルサービスを照会したり更新したりする際にユーザーインタラクションを有効にする方法
+</A> 
+							</P>
+							<LI><P><A HREF="#nameIDencrypt">
+ディスカバリブートストラップのセッションコンテキストで名前識別子の暗号化を有効にする方法
+</A>
+														</P>
+						</UL>
+						<P><A NAME="PPinteractions"></A><B>1</B>. <B>
+個人プロファイルサービスを照会したり更新したりする際にユーザーインタラクションを有効にする方法
+</B> 
+						</P>
+						<OL TYPE=a>
+							<LI><P>次のコマンドを実行して、個人プロファイルサービスに対するすべての照会および更新アクションに対してポリシー評価を有効にします。 </P>
+							<UL>
+								<LI><P STYLE="margin-bottom: 0in"><CODE>ssoadm set-attr-defs
+								-s sunIdentityServerLibertyPPService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a &quot;sunIdentityServerPPisQueryPolicyEvalRequired=true&quot;</CODE>
+																</P>
+								<LI><P><CODE>ssoadm set-attr-defs -s
+								sunIdentityServerLibertyPPService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a
+								&quot;sunIdentityServerPPisModifyPolicyEvalRequired=true&quot;</CODE>
+																</P>
+							</UL>
+							<LI><P>以下の手順で個人プロファイルサービス用のポリシーを作成します。
+</P>
+							<UL>
+								<LI><P><I>machine-A</I> の OpenSSO のログインページにアクセスします: 
+								</P>
+								<P><CODE><I>machine-A_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-A_host</I></CODE><CODE>:</CODE><CODE><I>machine-A_port</I></CODE><CODE>/</CODE><CODE><I>machine-A_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+																</P>
+								<P>Top-Level 管理者 (デフォルトでは <CODE>amadmin</CODE>) でログインします。
+								</P>
+								<LI><P>最上位のレルムをクリックします。
+								</P>
+								<LI><P>「ポリシー」タブをクリックします。
+								</P>
+								<LI><P>「新規ポリシー」をクリックします。
+								</P>
+								<LI><P>ポリシー名を入力します。
+								</P>
+								<LI><P>「ルール」のところで「新規」をクリックします。
+								</P>
+								<LI><P>「Liberty 個人プロファイルサービス (リソース名あり)」を選択し、「次へ」をクリックします。
+								</P>
+								<LI><P>名前フィールドにルール名を入力します。
+								</P>
+								<LI><P>リソース名フィールドに <CODE>*</CODE> (アスタリスク) を入力します。
+								</P>
+								<LI><P>アクションのところで MODIFY と QUERY のチェックボックスを選択します。
+								</P>
+								<LI><P>それぞれ値のドロップダウンメニューから <CODE>interactForConsent</CODE> を選択し、「終了」をクリックします。
+								</P>
+								<LI><P>対象のところで「新規」をクリックします。
+								</P>
+								<LI><P>「認証済みユーザー」を選択し、「次へ」をクリックします。
+								</P>
+								<LI><P>名前を入力し、「終了」をクリックします。
+								</P>
+								<LI><P>「了解」をクリックしてポリシーを保存します。
+								</P>
+							</UL>
+							<P>これで認証済みのユーザーだけが個人プロファイルサービスへのアクセスを許可され、個人プロファイルの照会や更新を試みると、<br>
+「User Interaction Required」というページが表示されて、そこで照会や更新を許可するかどうかを選択できます。
+							</P>
+						</OL>
+						<P><A NAME="nameIDencrypt"></A><B>2</B>. <B>
+ディスカバリブートストラップのセッションコンテキストで名前識別子の暗号化を有効にする方法
+</B> 
+						</P>
+						<OL TYPE=a>
+							<LI><P><I>machine-A</I> で以下の手順を実行します。
+</P>
+							<OL TYPE=1>
+								<LI><P>amadmin で OpenSSO にログインし、「Web サービス」タブをクリックし、「ディスカバリサービス」タブに移動します。</P>
+								<LI><P>「プロバイダ ID」の値を
+								<I>machine-A_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-A_host</I></CODE><CODE>:</CODE><CODE><I>machine-A_port</I></CODE><CODE>/</CODE><CODE><I>machine-A_deploy_uri</I></CODE> と設定します。
+																</P>
+								<LI><P>
+「ブートストラップ用のセッションコンテキスト内での名前識別子の暗号化」の隣の有効チェックボックスをチェックし、「保存」をクリックします。
+								</P>
+								<LI><P>「ブートストラップのリソースオファリング」で「urn:liberty:disco:2003-08」をクリックします。
+								</P>
+								<LI><P>「サービス記述」の「urn:liberty:security:2003-08:null:null」の横の「編集」をクリックします。
+								</P>
+								<LI><P>「urn:liberty:security:2003-08:null:SAML」を選択可能リストから選んで「追加」をクリックします。「urn:liberty:security:2003-08:null:null」を選択リストから選んで、「削除」をクリックします。
+								</P>
+					      <LI><P>「保存」をクリックします。</P>
+								<P>「サービスインスタンス」の下にある「プロバイダ ID」の値を
+%SERVER_PROTO%://%SERVER_HOST%:%SERVER_PORT%%SERVER_URI% に変更します。
+																</P>
+								<LI><P>「AuthorizeRequester」のチェックボックスをチェックし、「urn:liberty:security:2003-08:null:SAML」を選択して、「保存」をクリックします。
+								</P>
+	              <LI><P>ディスカバリサービスのページでもう一度「保存」をクリックします。</P>
+								<LI><P>「設定」タブに移動し、「グローバル」タブをクリックします。
+								</P>
+								<LI><P>「Liberty ID-WSF セキュリティーサービス」をクリックします。</P>
+								<LI><P>「デフォルトの WSC 証明書エイリアス」、「信頼できる発行局の署名証明書エイリアス」、「信頼できる証明書発行局の署名証明書エイリアス」の値フィールドに「test」と入力し、保存します。
+								</P>
+								<LI><P>次のコマンドを実行してアイデンティティプロバイダのメタデータを削除します。
+								</P>
+								<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>machine-A_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P> 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=7 WIDTH=126 VALIGN=TOP>
+						<P><I>machine-A_entityid</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>プロバイダのエンティティ ID のフォーマットは
+						<I>machine-A_protocol</I>://<I>machine-A_host</I>:<I>machine-A_port</I>/<I>machine-A_deploy_uri</I> です。
+						<BR>例) <CODE>http://happy1.red.sun.com:8080/opensso-idp</CODE></P>
+					</TD>
+					<TD ROWSPAN=2 COLSPAN=2 WIDTH=339 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=7 WIDTH=126 VALIGN=TOP>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P><CODE>idff</CODE> か <CODE>saml2</CODE> のいずれかを指定できます。
+						ここでは <CODE>idff</CODE> を指定します。</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=1 START=14>
+								<LI><P>次のコマンドを実行してサービスプロバイダのメタデータを削除します。
+								</P>
+								<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>machine-B_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P> 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=6 WIDTH=124 VALIGN=TOP>
+						<P><I>machine-B_entityid</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>プロバイダのエンティティ ID のフォーマットは
+            <I>machine-B_protocol</I>://<I>machine-B_host</I>:<I>machine-B_port</I>/<I>machine-B_deploy_uri</I> です。
+            <BR>例) <CODE>http://happy2.red.sun.com:8080/opensso-sp</CODE></P>
+					</TD>
+					<TD ROWSPAN=2 COLSPAN=3 WIDTH=341 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=6 WIDTH=124>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P><CODE>idff</CODE> か <CODE>saml2</CODE> のいずれかを指定できます。
+						ここでは <CODE>idff</CODE> を指定します。</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=1 START=15>
+								<LI><P>次のコマンドを実行してアイデンティティプロバイダのメタデータファイルを作成します。
+								</P>
+								<P><CODE>ssoadm create-metadata-templ -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -y
+								</CODE><CODE><I>machine-A_entityid</I></CODE><CODE> -m
+								</CODE><CODE>/tmp/idpm</CODE><CODE> -x
+								</CODE><CODE>/tmp/idpx</CODE><CODE> -i
+								</CODE><CODE>/idp</CODE><CODE> -b
+								</CODE><CODE>test</CODE><CODE> -g
+								</CODE><CODE>test</CODE><CODE> -c
+								</CODE><CODE>idff</CODE> 
+								</P>
+								<LI><P>/tmp/idpx ファイルを編集し、<CODE>enableNameIDEncryption</CODE>
+								属性の値を <CODE>true</CODE> にします。
+																</P>
+								<LI><P>次のコマンドを実行します。
+								</P>
+								<P><CODE>ssoadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE>/tmp/idpm</CODE><CODE> -x
+								</CODE><CODE>/tmp/idpx</CODE><CODE> -t
+								</CODE><CODE>sampleidffcot</CODE><CODE> -c </CODE><CODE>idff</CODE>
+																</P>
+				        <LI>ここまでの手順が完了したら、先に C の節に書かれているサービスプロバイダに対する設定を行ってください。
+								<LI><P>
+								<I>machine-B</I> で作成された <CODE>/tmp/spm</CODE> と <CODE>/tmp/spx</CODE> を <I>machine-A</I> の /tmp ディレクトリにコピーし、 <CODE>/tmp/spx</CODE> を編集して、hosted の値を 0 にします。
+								</P>
+								<LI><P>次のコマンドを実行して <I>machine-B</I> からコピーしたメタデータファイルをインポートします。
+								</P>
+								<P><CODE>ssoadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE>/tmp/spm</CODE><CODE> -x
+								</CODE><CODE>/tmp/spx</CODE><CODE> -t
+								</CODE><CODE>sampleidffcot</CODE><CODE> -c </CODE><CODE>idff</CODE>
+																</P>
+			      </OL></OL>
+            <OL TYPE=a START=2>
+              <LI><P> <I>machine-B</I> で以下の手順を実行します。
+              </P>
+							<OL TYPE=1>
+								<LI><P>次のコマンドを実行してアイデンティティプロバイダのエンティティを削除します。
+								</P>
+								<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>machine-A_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE>idff</CODE> 
+								</P>
+								<LI><P>次のコマンドを実行してサービスプロバイダのエンティティを削除します。
+								</P>
+								<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>machine-B_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE>idff</CODE> 
+								</P>
+								<LI><P>次のコマンドを実行してサービスプロバイダのメタデータファイルを作成します。
+								</P>
+								<P><CODE>ssoadm create-metadata-templ -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -y
+								</CODE><CODE><I>machine-B_entityid</I></CODE><CODE> -m
+								</CODE><CODE>/tmp/spm</CODE><CODE> -x
+								</CODE><CODE>/tmp/spx</CODE><CODE> -s
+								</CODE><CODE>/sp</CODE><CODE> -a </CODE><CODE>test</CODE><CODE>
+								-r </CODE><CODE>test</CODE><CODE> -c
+								</CODE><CODE>idff</CODE> 
+<!--
+								</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=7 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+						<P><I>machine-B_entityid</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>The provider's entity ID in the format:
+						<I>machine-B_protocol</I>://<I>machine-B_host</I>:<I>machine-B_port</I>/<I>machine-B_deploy_uri</I>
+						<BR>For example, <CODE>http://sad.red.sun.com:80/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=7 COLSPAN=3 WIDTH=341 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Path to, and name of, the extended metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>spMetaAlias</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Specify a metaAlias for the service provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>spSCertAlias</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Specify a signing certificate alias for the identity
+						provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>speCertAlias</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Specify an encryption certificate alias for the identity
+						provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=4>
+-->
+								<LI><P>次のコマンドを実行して作成したメタデータファイルをインポートします。</P>
+								<P><CODE>ssoadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE>/tmp/spm</CODE><CODE> -x
+								</CODE><CODE>/tmp/spx</CODE><CODE> -t
+								</CODE><CODE>sampleidffcot</CODE><CODE> -c </CODE><CODE>idff</CODE>
+																</P>
+<!--
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=7 WIDTH=503 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Path to, and name of, the extended metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>cot_name</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Name of the circle to which the metadata is being imported;
+						in this case, <CODE>sampleidffcot</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=5>
+-->
+								<LI><P><CODE>machine-A</CODE> で作成された <CODE>/tmp/idpm</CODE> と <CODE>/tmp/idpx</CODE> を <CODE>machine-B</CODE> の /tmp ディレクトリにコピーし、<CODE>/tmp/idpx</CODE> の hosted の値を 0 にします。
+								</P>
+								<LI><P>次のコマンドを実行して、アイデンティティプロバイダのエンティティをトラストサークルにインポートします。
+								</P>
+								<P><CODE>ssoadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE>/tmp/idpm</CODE><CODE> -x
+								</CODE><CODE>/tmp/idpx</CODE><CODE> -t
+								</CODE><CODE>sampleidffcot</CODE><CODE> -c </CODE><CODE>idff</CODE>
+																</P>
+<!--
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=3 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+					<TD ROWSPAN=3 COLSPAN=7 WIDTH=503 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>cot_name</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Name of the circle to which the metadata is being imported;
+						in this case, <CODE>sampleidffcot</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+-->
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a START=3>
+							<LI><P>両方のマシンで Web コンテナを再起動します。これで、ディスカバリブートストラップのセッションコンテキストで名前識別子の暗号化が有効になりました。
+							</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="turnonsaml1"></A><B>Q: SAML v1.x を使って署名をつけるにはどうすればよいですか?
+						</B></P>
+						<P>SAML POST プロファイルを使うと自動的に署名がつけられます。<Br>
+						以下の手順では、SAML v1.x SAML アーティファクトプロファイルを用いて署名をつける方法を説明します。
+						</P>
+						<OL>
+							<LI><P>すべての SAML 応答に署名をつけるには、以下のコマンドを実行します。
+							</P>
+							<P><CODE>ssoadm set-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							--attributevalues iplanet-am-saml-signresponse=true -d</CODE> 
+							</P>
+							<LI><P>すべての SAML 要求に署名をつけるには、以下のコマンドを実行します。
+							</P>
+							<P><CODE>ssoadm set-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							--attributevalues iplanet-am-saml-signrequest=true -d</CODE> 
+							</P>
+							<LI><P>すべての SAML 表明に署名をつけるには、以下のコマンドを実行します。
+							</P>
+							<P><CODE>ssoadm set-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							--attributevalues iplanet-am-saml-signassertion=true -d</CODE>
+														</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="turnonIDFFsigning"></A><B>Q: Liberty ID-FF を使って署名をつけるにはどうすればよいですか?
+						</B></P>
+						<P>以下の 2 点がどちらも満たされていれば、 Liberty ID-FF による署名は有効となっています。<br>
+						もし、満たされていなければ
+			      以下の手順に従って必要な変更を行い、web コンテナを再起動してください。
+						</P>
+						<UL>
+							<LI><P>キーストアがホストプロバイダで設定されている。<br>
+			 手順については <A HREF="#keystore">キーストアの設定方法</A> を参照してください。
+							</P>
+							<LI><P>ホストプロバイダの標準メタデータ XML ファイルで、<CODE>signingCertAlias</CODE> 属性と <CODE>KeyDescriptor</CODE> 属性が適切に設定されている。
+							</P>
+							<P>確認方法: 
+							</P>
+							<OL>
+								<LI><P>プロバイダ上で以下のコマンドを実行してください。
+								</P>
+								<P><CODE>ssoadm export-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -c
+								</CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P> 
+								</P>
+							</OL>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+						<P><I>hosted_entityid</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>プロバイダエンティティの ID を次のフォーマットで指定:
+						<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+						<BR>例 <CODE>http://happy1.red.sun.com:8080/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=9 WIDTH=645 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>標準メタデータがエクスポートされるファイル</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>拡張メタデータファイルがエクスポートされるファイル</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P><CODE>idff</CODE> または <CODE>saml2</CODE>。ここでは
+						<CODE>idff</CODE> を指定します。</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<UL>
+							<OL START=2>
+								<P>
+								<I>extended_metadata</I> で <CODE>signingCertAlias</CODE> の値が設定されていて、
+								<I>standard_metadata</I> で <CODE>KeyDescriptor</CODE> の値が設定されていれば以降の作業を行う必要はありません。そうでない場合は、次の手順に進みます。
+								</P>
+								<LI><P>ホストプロバイダでメタデータを再生成します。
+								</P>
+								<UL>
+									<LI><P>ホストアイデンティティプロバイダで次のコマンドを実行します。
+									</P>
+									<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>extended_metadata</I></CODE><CODE> -i
+									</CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+									</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -c
+									</CODE><CODE><I>metadata_spec</I></CODE> 
+									</P>
+									<LI><P>ホストサービスプロバイダで次のコマンドを実行します。
+									</P>
+									<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>extended_metadata</I></CODE><CODE> -s
+									</CODE><CODE><I>spMetaAlias</I></CODE><CODE> -a </CODE><CODE><I>spSCertAlias</I></CODE><CODE>
+									-c </CODE><CODE><I>metadata_spec</I></CODE> 
+									</P>
+									<P>必要に応じて拡張メタデータ属性も変更してください。
+									(例えば <CODE>providerHomePageURL</CODE>) 
+									</P>
+								</UL>
+								<LI><P>ホストプロバイダで、次のコマンドを実行してメタデータを削除します。
+								</P>
+								<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<LI><P>ホストプロバイダで、さきほど再生成および変更したメタデータ XML ファイルをインポートします。
+								</P>
+								<P><CODE>ssoadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+								</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+							</OL>
+							<LI><P>amadmin で OpenSSO にログインし、「設定」 -&gt; 「Liberty ID-FF サービス」に移動し、 XML 署名のラジオボタンで「真」が選択されているか確認する。選択されていなければこの場で選択し、保存する。
+							</P>
+							<LI><P>リモートプロバイダの標準メタデータ XML ファイルで <CODE>KeyDescriptor</CODE> 属性が適切に設定されている。
+</P>
+							<P>確認方法: 
+							</P>
+							<OL>
+								<LI><P>ホストプロバイダ上で以下のコマンドを実行し、
+								リモートプロバイダの標準メタデータをエクスポートします。
+</P>
+								<P><CODE>ssoadm export-entity -y </CODE><CODE><I>remote_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-m </CODE><CODE><I>remote_standard_metadata</I></CODE><CODE>
+								-x </CODE><CODE><I>remote_extended_metadata</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<LI><P><CODE><I>remote_standard_metadata</I></CODE> ファイルを開いて、<CODE>KeyDescriptor</CODE> 属性に適切な値が入っているかを確認します。
+</P>
+								<P>もし、値が入っていなければ、以下の手順を行います。
+								</P>
+								<UL>
+									<LI><P>ホストプロバイダが動いているマシン上で、以下のコマンドを実行し、リモートプロバイダのメタデータを削除します。
+									</P>
+									<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>remote_entity_id</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<LI><P>標準メタデータファイルで、<CODE>KeyDescriptor</CODE> の値を設定した上で、以下のコマンドを実行してそれをホストプロバイダマシンにインポートします。
+									</P>
+									<P><CODE>ssoadm import-entity -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+									</CODE><CODE><I>new_remote_standard_metadata</I></CODE><CODE> -x 
+									</CODE><CODE><I>remote_extended_metadata</I></CODE><CODE>
+									-t </CODE><CODE><I>circle-of-trust_name</I></CODE><CODE> -c
+									</CODE><CODE><I>metadata_spec</I></CODE> 
+									</P>
+									<P>
+									</P>
+								</UL>
+							</OL>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=2 COLSPAN=3 WIDTH=144 VALIGN=TOP></TD>
+					<TD COLSPAN=9 WIDTH=214>
+						<P><I>new_remote_standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=492>
+						<P> <CODE>KeyDescriptor</CODE> の値を追加した標準メタデータファイル</P>
+					</TD>
+					<TD ROWSPAN=2 COLSPAN=4 WIDTH=450 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=9 WIDTH=214>
+						<P><I>remote_extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=492>
+						<P>手順 1 でエクスポートしたときに生成された拡張メタデータファイル
+</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<UL>
+							<OL>
+<!--
+								<UL>
+									<H3><FONT FACE="Times New Roman, serif">注意</FONT></H3>
+								</UL>
+-->
+								<P><B>オプショナル:</B> ホストサービスプロバイダ上で認証リクエストの署名を有効にするには、以下の手順に従ってホストサービスプロバイダの標準メタデータの確認（必要に応じて変更）を行ってください。
+								</P>
+								<LI><P>次のコマンドを実行してホストサービスプロバイダから標準メタデータと拡張メタデータをエクスポートします。
+								</P>
+								<P><CODE>ssoadm export-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+								-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<LI><P>
+								<I>hosted_standard_metadata</I> で <CODE>AuthnRequestsSigned</CODE> の値が <CODE>true</CODE> になっていることを確認する。 true であればここで完了です。
+								</P>
+								<P>true になっていなければ、値を true に変更して、以下の手順に進みます。
+								</P>
+								<LI><P>次のコマンドを実行して、ホストプロバイダのメタデータを削除します。
+								</P>
+								<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<LI><P>次のコマンドを実行して、変更したメタデータをインポートします。
+								</P>
+								<P><CODE>ssoadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE> -c
+								</CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+							</OL>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="keystore"></A><B>Q: どのようにしてキーストアを設定したらよいですか?</B></P>
+						<P>
+						Java Development Kit (JDK) に付属されている <CODE>keytool</CODE> 
+				    コマンドを用いてキーストアを設定する方法について以下に示します。
+			      </P>
+						<OL>
+							<LI><P>次のコマンドを実行します: 
+							</P>
+							<P><CODE><I>JDK Home</I></CODE><CODE>/bin/keytool -genkey
+							-keyalg rsa -alias test -dname &quot;cn=sun-unix,ou=SUN Java
+							System Access Manager,o=Sun, c=US&quot; -keypass 11111111
+							-keystore keystore.jks -storepass 11111111</CODE> <BR>
+					    コマンドにより生成された
+							<CODE>keystore.jks</CODE> ファイルを
+							<I>&lt;configuration_dir&gt;/&lt;deploy_uri&gt;</I>
+		          ディレクトリにコピーします。 
+							ここで、 <I>&lt;configuration_dir&gt;</I> は OpenSSO を設定したときに指定した設定ディレクトリで
+							<I>&lt;deploy_uri&gt;</I> は OpenSSO WAR ファイルを配備した URI です。
+							</P>
+							<LI><P>キーストアのパスワードを暗号化するために、OpenSSO インスタンスの <CODE>encode.jsp</CODE> にアクセスします。
+							</P>
+							<P><CODE><I>server_protocol</I></CODE><CODE>://</CODE><CODE><I>server_host</I></CODE><CODE>:</CODE><CODE><I>server_port</I></CODE><CODE>/</CODE><CODE><I>server_deploy_uri</I></CODE><CODE>/encode.jsp</CODE>
+														</P>
+							<P>
+							<CODE>encode.jsp</CODE> にアクセスするには事前に
+<CODE>opensso.war</CODE> が配備されている必要があります。また、amadmin などのユーザーで penSSO にログインする必要があります。
+							</P>
+							<LI><P>テキストパスワードを入力し、「符号化」をクリックします。
+</P>
+							<P>例えば、 <CODE>11111111</CODE> が
+							<CODE>AQICQS+KlLm9oNd2l98bnkd7TraHI/cv8B1p</CODE> になります。 
+							</P>
+							<LI><P> <I>&lt;configuration_dir&gt;/&lt;deploy_uri&gt;</I> ディレクトリに
+<CODE>.storepass</CODE> という名前で新しいファイルを作成し、キーストア用に符号化されたパスワードをコピー＆ペーストします。
+							</P>
+							<P>上の例の場合、<CODE>AQICQS+KlLm9oNd2l98bnkd7TraHI/cv8B1p</CODE> を
+							<CODE>.storepass</CODE> に貼り付けます。
+							</P>
+							<LI><P> <I>&lt;configuration_dir&gt;/&lt;deploy_uri&gt;</I> ディレクトリに
+							<CODE>.keypass</CODE> という名前で新しいファイルを作成し、個人鍵(private key)用に符号化されたパスワードをコピー＆ペーストします。
+							<P>上の例の場合、<CODE>AQICQS+KlLm9oNd2l98bnkd7TraHI/cv8B1p</CODE> を
+							<CODE>.keypass</CODE> に貼り付けます。
+							</P>
+							<LI><P>Web コンテナを再起動します。
+							</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="setupsaml1"></A><B>Q: SAML 1.x と </B><CODE><B>ssoadm</B></CODE><B> コマンドを使ってどのようにシングルサインオンを設定したらよいですか?
+						</B></P>
+						<P>SAML 1.x を用いてシングルサインオンを実現するには、
+<br>SAML プロデューサの OpenSSO インスタンスと SAML コンシューマの OpenSSO インスタンスの両方で以下の手順を実行します。<br>
+ここでは例として、プロデューサインスタンスを配備したホストを hostA.example.com、コンシューマインスタンスを配備したホストを hostB.example.com とし、<br>それぞれ OpenSSO をポート 58080 に配備したものとします。<br>
+また、テスト用に両方の OpenSSO 上で amuser1 というアカウントを作成済みであるとします。
+						</P>
+<hr>
+          <H3><FONT FACE="Times New Roman, serif">始める前に</FONT></H3>
+<ul>
+<li>
+<a href="https://opensso.dev.java.net/issues/show_bug.cgi?id=4307">課題 4307</a>で報告されているように、この機能は、OpenSSO Enterprise 8.0 リリース時点で動作しません。<br>
+2009年1月23日以降にリリースされた安定版ビルド、もしくは最新のナイトリービルドを使用してください。
+<li>
+2 つのホストが同じドメイン上にある場合は、双方の cookie 名が異なるように、片方の cookie 名を変更する必要があります。<br>
+cookie 名を変更するには、OpenSSO コンソールにログインして、「設定」→「サーバーおよびサイト」へアクセスし、<br>
+「デフォルトのサーバー設定値」をクリックして、「セキュリティ」タブにある「Cookie 名」の値を変更して、Application Server を再起動してください。
+</ul>
+<hr>
+						<OL>
+							<LI><P>コンシューマインスタンスに対して次のコマンドを実行し、サイト ID を取得します。
+							</P>
+							<P><CODE>ssoadm get-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							-a iplanet-am-saml-siteid-issuername-list</CODE> 
+							</P>
+							<P>例えばこのコマンドの出力が次のとおりだとします。
+</P>
+							<P><CODE>iplanet-am-saml-siteid-issuername-list=instanceID=http://hostB.example.com:58080|siteid=VhqieajnHbbNX1usZkmnQLTxNeQ=|issuerName=hostB.example.com:58080</CODE>
+														</P>
+							<P><CODE>siteid</CODE> プロパティの値がサイト ID です。
+							この場合、<CODE>VhqieajnHbbNX1usZkmnQLTxNeQ=</CODE> です。
+							</P>
+							<LI><P>次の手順により、プロデューサインスタンスの SAML サービスに信頼パートナーエントリを設定します。
+							</P>
+							<OL TYPE=a>
+								<LI><P>次のコマンドを実行して、既存の信頼パートナーを表示させます。
+								</P>
+								<P><CODE>ssoadm get-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-a iplanet-am-saml-partner-urls</CODE> 
+								</P>
+								<P>出力は、たとえば次のようになります。(既存のパートナーが存在しない場合)
+								</P>
+								<P><CODE>iplanet-am-saml-partner-urls=</CODE> 
+								</P>
+								<LI><P>パートナーの情報を
+								<CODE>partner.txt</CODE> というファイルに記述します。
+								</P>
+								<P>ファイルには次の属性と対応する値を含めます。
+								</P>
+								<UL>
+									<LI><P STYLE="margin-bottom: 0in">partnername=<I>partnername</I> (ここには任意の値を指定できます。ここで指定した名前が、OpenSSO コンソール上で「信頼パートナー」テーブルの名前の欄に表示されます。)
+									<LI><P STYLE="margin-bottom: 0in">target=<I>partner_domain</I> (パートナーとなるコンシューマホストのドメイン名)
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">sourceid=<I>remote_siteid_from_previous_step</I> (手順 1 で取得したサイト ID を指定する)
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">samlurl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLAwareServlet</CODE>
+																		</P>
+<!--
+									<LI><P STYLE="margin-bottom: 0in">soapurl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLSOAPReceiver</CODE>
+																		</P>
+-->
+									<LI><P STYLE="margin-bottom: 0in">posturl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLPOSTProfileServlet</CODE>
+																		</P>
+<!--
+									<LI><P STYLE="margin-bottom: 0in">issuer=<I>partner_hostname</I>:<I>partner_port</I>
+																		</P>
+-->
+									<LI><P>hostlist=<I>partner_hostname</I> (パートナーのホスト名)
+									</P>
+								</UL>
+								<P>例: 
+								</P>
+								<PRE>iplanet-am-saml-partner-urls=partnername=samltest|target=example.com|sourceid=VhqieajnHbbNX1usZkmnQLTxNeQ=|samlurl=http://hostB.example.com:58080/opensso/SAMLAwareServlet|posturl=http://hostB.example.com:58080/opensso/SAMLPOSTProfileServlet|hostlist=hostB.example.com</PRE><P>
+								他の属性も必要に応じて設定します。
+								</P>
+								<UL>
+									<LI><P STYLE="margin-bottom: 0in">Version 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">Certalias 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">AuthType 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">authuser 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">authpassword 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">AttributeMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">PartnerAccountMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">SiteAttributeMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">ActionMapper 
+									</P>
+									<LI><P>nameidentifiermapper 
+									</P>
+								</UL>
+								<P>前の手順で作成したファイルをインポートします。
+								</P>
+								<P><CODE>ssoadm add-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								--datafile ./partner.txt</CODE> 
+								</P>
+								<LI><P>ファイルがインポートされたことを確認するには、次のコマンドを実行します。
+								</P>
+								<P><CODE>ssoadm get-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-a iplanet-am-saml-partner-urls</CODE> 
+								</P>
+								<P>例えば、出力は次のようになります。
+								</P>
+								<PRE>iplanet-am-saml-partner-urls=partnername=samltest|target=example.com|sourceid=VhqieajnHbbNX1usZkmnQLTxNeQ=|samlurl=http://hostB.example.com:58080/opensso/SAMLAwareServlet|posturl=http://hostB.example.com:58080/opensso/SAMLPOSTProfileServlet|hostlist=hostB.example.com</PRE>
+							</OL>
+							<LI>次に、手順 1 をプロデューサインスタンスに対して実行し、サイト ID を取得します。
+<LI><P>次の手順により、コンシューマインスタンスの SAML サービスに信頼パートナーエントリを設定します。
+							</P>
+							<OL TYPE=a>
+								<LI><P>次のコマンドを実行して、既存の信頼パートナーを表示させます。
+								</P>
+								<P><CODE>ssoadm get-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-a iplanet-am-saml-partner-urls</CODE> 
+								</P>
+								<P>出力は、たとえば次のようになります。(既存のパートナーが存在しない場合)
+								</P>
+								<P><CODE>iplanet-am-saml-partner-urls=</CODE> 
+								</P>
+								<LI><P>パートナーの情報を
+								<CODE>partner.txt</CODE> というファイルに記述します。
+								</P>
+								<P>ファイルには次の属性と対応する値を含めます。
+								</P>
+								<UL>
+									<LI><P STYLE="margin-bottom: 0in">partnername=<I>partnername</I> (ここには任意の値を指定できます。ここで指定した名前が、OpenSSO コンソール上で「信頼パートナー」テーブルの名前の欄に表示されます。)
+									<LI><P STYLE="margin-bottom: 0in">target=<I>partner_domain</I> (パートナーとなるプロデューサホストのドメイン名)
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">sourceid=<I>remote_siteid_from_previous_step</I> (手順 1 で取得したサイト ID を指定する)
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">soapurl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLSOAPReceiver</CODE>
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">issuer=<I>partner_hostname:port</I>:<I>partner_port</I> (パートナーのホスト名:OpenSSOを配備したポート番号 を指定します。)
+																		</P>
+								</UL>
+								<P>例: 
+								</P>
+								<PRE>iplanet-am-saml-partner-urls=partnername=samltest|sourceid=SaiueoHbbNX1usZkmnQLTxNeQ=|soapurl=http://hostA.example.com:58080/opensso/SAMLSOAPReceiver|issuer=host.exampleA.com:58080</PRE><P>
+								他の属性も必要に応じて設定します。
+								</P>
+								<UL>
+									<LI><P STYLE="margin-bottom: 0in">Version 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">Certalias 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">AuthType 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">authuser 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">authpassword 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">AttributeMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">PartnerAccountMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">SiteAttributeMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">ActionMapper 
+									</P>
+									<LI><P>nameidentifiermapper 
+									</P>
+								</UL>
+								<P>前の手順で作成したファイルをインポートします。
+								</P>
+								<P><CODE>ssoadm add-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								--datafile ./partner.txt</CODE> 
+								</P>
+								<LI><P>ファイルがインポートされたことを確認するには、次のコマンドを実行します。
+								</P>
+								<P><CODE>ssoadm get-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-a iplanet-am-saml-partner-urls</CODE> 
+								</P>
+								<P>例えば、出力は次のようになります。
+								</P>
+								<PRE>iplanet-am-saml-partner-urls=partnername=samltest|sourceid=SaiueoHbbNX1usZkmnQLTxNeQ=|soapurl=http://hostA.example.com:58080/opensso/SAMLSOAPReceiver|issuer=host.exampleA.com:58080</PRE>
+							</OL>
+							<LI><P>SAML アーティファクトプロファイルまたは、SAML ポストプロファイルにアクセスするには、SAML プロデューサの OpenSSO にログインし、(ここでは、amuser1 でログインします。)
+							</P>
+							<OL TYPE=a>
+								<LI><P>SAML アーティファクトプロファイルにアクセスするには、以下の URL にアクセスします。
+								</P>
+								<P><CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>hostname</I></CODE><CODE>:</CODE><CODE><I>port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLAwareServlet?TARGET=</CODE><CODE><I>target_protocol</I></CODE><CODE>://</CODE><CODE><I>target_hostname</I></CODE><CODE>:</CODE><CODE><I>target_port</I></CODE><CODE>/</CODE><CODE><I>target_uri</I></CODE><CODE>/UI/Login</CODE>
+																</P>
+								<P>認証なしで SAML コンシューマにリダイレクトされます。
+								</P>
+								<LI><P>SAML ポストプロファイルにアクセスするには、以下の URL にアクセスします。
+								</P>
+								<P><CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>hostname</I></CODE><CODE>:</CODE><CODE><I>port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLPOSTProfileServlet?TARGET=</CODE><CODE><I>target_protocol</I></CODE><CODE>://</CODE><CODE><I>target_hostname</I></CODE><CODE>:</CODE><CODE><I>target_port</I></CODE><CODE>/</CODE><CODE><I>target_uri</I></CODE><CODE>/UI/Login</CODE>
+																</P>
+								<P STYLE="margin-bottom: 0in">
+認証なしで SAML コンシューマにリダイレクトされます。
+								</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">注意</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+SAML ポストプロファイルにアクセスする前に、キーストアを設定する必要があります。
+								手順については、<A HREF="#keystore">キーストアの設定方法</A>を参照してください。
+								</FONT>
+								</P>
+								<HR>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="setupFFSSO"></A><B>Q: Liberty ID-FF と </B><CODE><B>ssoadm</B><CODE><B> コマンドを使ってどのようにシングルサインオンを設定したらよいですか?
+								</B></P>
+								<P>Liberty ID-FF と ssoadm コマンドを用いてシングルサインオンを設定するには、<br>以下の手順をアイデンティティプロバイダ用の OpenSSO インスタンスとサービスプロバイダ用の OpenSSO インスタンスの両方で実行します。
+								</P>
+								<OL>
+									<LI><P>次のコマンドを実行してトラストサークルを作成します。
+									</P>
+									<P><CODE>ssoadm create-cot -t </CODE><CODE><I>cot_name</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-e </CODE><CODE><I>realm</I></CODE>
+<!--
+<CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+-->
+																		</P>
+									<P>
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=2 WIDTH=50 VALIGN=TOP></TD>
+							<TD COLSPAN=3 WIDTH=98>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=278>
+								<P>作成するサークル名</P>
+							</TD>
+							<TD ROWSPAN=3 COLSPAN=14 WIDTH=874 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=3 WIDTH=98>
+								<P><I>realm</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=278>
+								<P>サークルを作成するレルム</P>
+							</TD>
+						</TR>
+<!--
+						<TR>
+							<TD COLSPAN=3 WIDTH=98>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=278>
+								<P><CODE>idff</CODE> または <CODE>saml2</CODE>; ここでは
+								<CODE>idff</CODE> です。</P>
+							</TD>
+						</TR>
+-->
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL START=2>
+									<LI><P>ホストアイデンティティプロバイダとホストサービスプロバイダに対して、以下のいずれかの手順により標準メタデータファイルと拡張メタデータファイルを生成します。
+									</P>
+									<UL>
+										<LI><P>キーストアを設定しているかどうかによって、以下のどちらかのコマンドを実行してホストアイデンティティプロバイダ用のメタデータを生成します。
+										</P>
+										<OL TYPE=a>
+											<LI><P>キーストアをすでに設定している場合
+											: 
+											</P>
+											<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-i </CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+											</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+											<P>
+											</P>
+										</OL>
+									</UL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=6 COLSPAN=3 WIDTH=144 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=178 VALIGN=TOP>
+								<P><I>idp_entity_id</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>プロバイダのエンティティ ID を次の形式で指定します。
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>例、<CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=6 COLSPAN=8 WIDTH=506 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>生成する標準メタデータ XML ファイルのパスとファイル名を指定します。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>生成する拡張メタデータ XML ファイルのパスとファイル名を指定します。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>idpMetaAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>ここで指定したものが、ホストアイデンティティプロバイダ用のメタエイリアスとして作成されます。
+								</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>idpSCertAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>ホストアイデンティティプロバイダ用にキーストアを設定した際に指定した署名証明書エイリアス
+								</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+                <P><CODE>idff</CODE> または <CODE>saml2</CODE>; ここでは
+                <CODE>idff</CODE> です。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<UL>
+										<OL TYPE=a start=2>
+											<LI><P>キーストアを設定していない場合
+											</P>
+											<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-i </CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+										</OL>
+										<LI><P>キーストアを設定しているかどうかによって、以下のどちらかのコマンドを実行してホストサービスプロバイダ用のメタデータを生成します。
+										</P>
+										<OL TYPE=a>
+											<LI><P>キーストアをすでに設定している場合
+											: 
+											</P>
+											<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-s </CODE><CODE><I>spMetaAlias</I></CODE><CODE> -b
+											</CODE><CODE><I>spSCertAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+											<P>
+											</P>
+										</OL>
+									</UL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=6 COLSPAN=3 WIDTH=144 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=178 VALIGN=TOP>
+								<P><I>sp_entity_id</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>プロバイダのエンティティ ID を次の形式で指定します。
+								<I>protocol</I>://<I>mhost</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>例、 <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=6 COLSPAN=8 WIDTH=506 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>生成する標準メタデータ XML ファイルのパスとファイル名を指定します。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>生成する拡張メタデータ XML ファイルのパスとファイル名を指定します。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>spMetaAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>ここで指定したものが、ホストサービスプロバイダ用のメタエイリアスとして作成されます。
+								</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>spSCertAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>ホストサービスプロバイダ用にキーストアを設定した際に指定した署名証明書エイリアス
+								</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+                <P><CODE>idff</CODE> または <CODE>saml2</CODE>; ここでは
+                <CODE>idff</CODE> です。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL start=3>
+									<UL>
+										<OL TYPE=a start=2>
+											<LI><P>キーストアを設定していない場合
+											</P>
+											<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-s </CODE><CODE><I>spMetaAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+										</OL>
+									</UL>
+									<LI><P>リモートプロバイダで生成された標準メタデータと拡張メタデータをホストプロバイダ側にコピーします。
+									</P>
+									<P>ホストプロバイダがアイデンティティプロバイダであれば、リモートプロバイダはサービスプロバイダです。<br>
+									逆に、ホストプロバイダがサービスプロバイダであれば、リモートプロバイダはアイデンティティプロバイダです。
+									</P>
+<!--
+									<HR>
+									<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+									<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">If
+									the remote provider is hosted on Sun Java System Federation
+									Manager, you can run the command documented previously on
+									the remote machine and copy the generated standard metadata
+									file to the hosted machine. </FONT>
+									</P>
+									<HR>
+-->
+									<P>次のコマンドを実行してホストプロバイダのメタデータをインポートします。
+									</P>
+									<P><CODE>ssoadm import-entity -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+									</CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE> -t
+									</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<P><I>cot_name</I> の値には手順 1 で作成したトラストサークル名を指定します。
+									</P>
+									<LI><P>次のコマンドを実行してリモートプロバイダのメタデータをインポートします。
+									</P>
+									<P><CODE>ssoadm import-entity -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+									</CODE><CODE><I>remote_standard_metadata</I></CODE><CODE> -t
+									</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<P><I>cot_name</I> の値には手順 1 で作成したトラストサークル名を指定します。
+									</P>
+									<LI><P>Web コンテナを再起動します。
+	                </P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="setupsaml2"></A><B>Q: SAML v2 と <code>ssoadm</code> コマンドを使ってどのようにシングルサインオンを設定したらよいですか?
+								</B></P>
+								<P>SAML v2 を用いてシングルサインオンを実現するには、アイデンティティプロバイダ用の OpenSSO インスタンスとサービスプロバイダ用の OpenSSO インスタンス上で以下の手順を行います。
+								</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">始める前に</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">サービスプロバイダ用のインスタンスとアイデンティティプロバイダ用のインスタンスを決めておきます。<br>
+ここでは、例として、http://sp.example.net:8080/opensso-sp をサービスプロバイダ、 http://idp.example.com:8080/opensso-idp をアイデンティティプロバイダとします。
+								</FONT>
+								</P>
+								<HR>
+								<OL>
+									<LI><P>サービスプロバイダのメタデータファイルを作成します。</P>
+									<OL TYPE=a>
+										<LI><P>サービスプロバイダインスタンス上で以下のコマンドを実行して、サービスプロバイダメタデータファイルを作成します。
+</P>
+										<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE>http://sp.example.net:8080/opensso-sp</CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -s
+										</CODE><CODE><I>sp_meta_alias</I></CODE> 
+										</P>
+										<LI><P>必要に応じて <I>sp_extended_metadata</I> ファイル内の属性のデフォルト値を変更してください。
+										</P>
+									</OL>
+									<LI><P>アイデンティティプロバイダのメタデータファイルを作成します。
+									</P>
+									<OL TYPE=a>
+										<LI><P>アイデンティティプロバイダインスタンス上で以下のコマンドを実行して、アイデンティティプロバイダメタデータファイルを作成します。
+</P>
+										<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE>
+http://idp.example.com:8080/opensso-idp</CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-i </CODE><CODE><I>idp_meta_alias</I></CODE> 
+										</P>
+										<LI><P>必要に応じて
+										<I>idp_extended_metadata</I> ファイル内の属性のデフォルト値を変更してください。
+										</P>
+									</OL>
+									<LI><P>メタデータファイルをサービスプロバイダインスタンスにインポートします。
+									</P>
+									<OL TYPE=a>
+										<LI><P>次のコマンドを実行して、サービスプロバイダインスタンス上にトラストサークルを作成します。
+										</P>
+										<P><CODE>ssoadm create-cot -t </CODE><CODE><I>cot_name</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>次のコマンドを実行して、先ほど作成したトラストサークルにサービスプロバイダメタデータファイルをインポートします。
+</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P><i>idp_standard_metadata</i> をアイデンティティプロバイダインスタンスからサービスプロバイダインスタンスにコピーします。
+										</P>
+										<LI><P>次のコマンドを実行して、サービスプロバイダインスタンスにアイデンティティプロバイダメタデータファイルをインポートします。
+</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>インポートが成功したことを確認するには、次のコマンドを実行します。
+										</P>
+										<P><CODE>ssoadm list-cot-members -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<P>指定したトラストサークルに含まれるメンバーがすべて表示されます。<br>この場合は、http://idp.example.com:8080/opensso-idp と http://sp.example.net:8080/opensso-sp が表示されます。<br>
+										また、次のコマンドを実行してメタデータファイルをエクスポートすることで確認することもできます。
+										</P>
+										<P><CODE>ssoadm export-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE>http://sp.example.net:8080/opensso-sp
+</CODE><CODE> -m
+										</CODE><CODE><I>provider_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>provider_extended_metadata</I></CODE> 
+										</P>
+										<LI><P>Web コンテナを再起動します。
+										</P>
+									</OL>
+									<LI><P>メタデータファイルをアイデンティティプロバイダインスタンスにインポートします。
+									</P>
+									<OL TYPE=a>
+										<LI><P>次のコマンドを実行して、アイデンティティプロバイダインスタンス上にトラストサークルを作成します。
+										</P>
+										<P><CODE>ssoadm create-cot -t </CODE><CODE><I>cot_name</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>次のコマンドを実行して、先ほど作成したトラストサークルにアイデンティティプロバイダメタデータファイルをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P><i>sp_standard_metadata</i> ファイルをサービスプロバイダインスタンスからアイデンティティプロバイダインスタンスにコピーします。
+										</P>
+										<LI><P>次のコマンドを実行して、アイデンティティプロバイダインスタンスにサービスプロバイダメタデータファイルをインポートします。
+</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>インポートが成功したことを確認するには、次のコマンドを実行します。
+										</P>
+										<P><CODE>ssoadm list-cot-members -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<P>指定したトラストサークルに含まれるメンバーがすべて表示されます。<br>
+この場合は、http://idp.example.com:8080/opensso-idp と http://sp.example.net:8080/opensso-sp が表示されます。<br>
+また、次のコマンドを実行してメタデータファイルをエクスポートすることで確認することもできます。
+										</P>
+										<P><CODE>ssoadm export-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE>http://idp.example.com:8080/opensso-idp</CODE><CODE> -m
+										</CODE><CODE><I>provider_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>provider_extended_metadata</I></CODE> 
+										</P>
+										<LI><P>Web コンテナを再起動します。
+										</P>
+									</OL>
+									<LI><P>シングルサインオンを確認するには次の URL にアクセスします。
+									: 
+									</P>
+									<OL TYPE=a>
+										<LI><P>サービスプロバイダインスタンスからシングルサインオンを開始するには次の URL にアクセスします。
+										: 
+										</P>
+										<P><CODE>
+http://sp.example.net:8080/opensso-sp/spssoinit?metaAlias=<i>spMetaAlias</i>&amp;idpEntityID=http://idp.example.com:8080/opensso-idp
+</CODE>
+																				</P>
+										<LI><P>アイデンティティプロバイダインスタンスからシングルサインオンを開始するには次の URL にアクセスします。
+										</P>
+										<P><CODE>
+http://idp.example.net:8080/opensso-idp/idpssoinit?metaAlias=<i>idpMetaAlias</i>&amp;spEntityID=http://sp.example.com:8080/opensso-sp
+</CODE>
+																				</P>
+									</OL>
+									<P>まず最初に、連携を確立するためにサービスプロバイダとアイデンティティプロバイダに有効なユーザーでログインする必要があります。<br>
+例えば、a の場合、
+<ol>
+<li>上記の URL にアクセスすると、 http://idp.example.net:8080/opensso-idp のログインページが表示されるので、<Br>例えば、あらかじめ作っておいたユーザー idpuser でログインします。
+<li> 次に、http://sp.example.net:8080/opensso-sp のログインページが表示されるので、<br>同じくあらかじめ作っておいたユーザー spuser でログインします。
+<li>これで、idpuser と spuser の連携が確立され、これ以降はシングルサインオンでのログインが可能となります。
+<li>試しに、いったんブラウザを再起動し、<CODE>
+http://sp.example.net:8080/opensso-sp/samples/saml2/useCaseDemo/home.jsp</CODE>
+にアクセスしてみます。
+<li>"Login" のリンクをクリックすると、http://idp.example.net:8080/opensso-idp のログインページが表示されるので、idpuser でログインします。
+<li>サービスプロバイダのページが表示されて、spuser でログインに成功したことを示すメッセージが表示されるはずです。<Br>この結果からシングルサインオンに成功したことがわかります。
+</ul>
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="turnonsaml2"></A><B>Q: 
+SAML v2 を使って署名をつけて暗号化するにはどう設定したらよいですか?
+								</B></P>
+								<P STYLE="margin-bottom: 0in">以下の手順では、SAML v2 を使って署名をつけて暗号化を有効にする方法について説明します。
+								</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">始める前に</FONT></H3>
+								<P><FONT FACE="Times New Roman, serif">
+								</FONT><CODE><FONT FACE="Times New Roman, serif">keytool</FONT></CODE><FONT FACE="Times New Roman, serif"> コマンドを用いて、サービスプロバイダとアイデンティティプロバイダ上でキーストアを設定します。<br>
+								詳細については、<A HREF="#keystore">
+								キーストアの設定方法</A>を参照してください。</FONT></P>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+								キーストアを設定したら、再度、
+								</FONT><CODE><FONT FACE="Times New Roman, serif">keytool</FONT></CODE><FONT FACE="Times New Roman, serif"> コマンドを用いて適切な署名と暗号化の証明書をキーストアにインポートします。</FONT>
+								</P>
+								<HR>
+								<OL>
+									<LI><P>サービスプロバイダ上で次のコマンドを実行して、
+									サービスプロバイダのメタデータを再生成します。<br>
+(署名と暗号化鍵の情報を含めます。)
+									</P>
+									<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -s
+									</CODE><CODE><I>sp_metaAlias</I></CODE><CODE> -a
+									</CODE><CODE><I>sp_certalias</I></CODE><CODE> -r
+									</CODE><CODE><I>sp_enc_alias</I></CODE> 
+									</P>
+                  <LI><P>アイデンティティプロバイダ上で次のコマンドを実行して、
+                  アイデンティティプロバイダのメタデータを再生成します。<br>
+(署名と暗号化鍵の情報を含めます。)
+									</P>
+									<P><CODE>ssoadm create-metadata-templ -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>idp_extended_metadata</I></CODE><CODE> -i
+									</CODE><CODE><I>idp_metaAlias</I></CODE><CODE> -b
+									</CODE><CODE><I>idp_certalias</I></CODE><CODE> -g
+									</CODE><CODE><I>idp_enc_alias</I></CODE> 
+									</P>
+									<LI><P>それぞれ生成されたファイルを編集して、署名と暗号化を有効にするために以下の属性の値を true にします。
+									</P>
+									<UL>
+										<LI><P><CODE><I>idp_standard_metadata</I></CODE>
+										</P>
+										<UL>
+											<LI><P><CODE>WantAuthnRequestsSigned</CODE> 
+											</P>
+										</UL>
+										<LI><P><CODE><I>sp_standard_metadata</I></CODE>
+										</P>
+										<UL>
+											<LI><P><CODE>AuthnRequestsSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantAssertionsSigned</CODE> 
+											</P>
+										</UL>
+										<LI><P><CODE><I>idp_extended_metadata</I></CODE>
+										</P>
+										<UL>
+											<LI><P><CODE>wantNameIDEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantArtifactResolveSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantLogoutRequestSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantLogoutResponseSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantMNIRequestSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantMNIResponseSigned</CODE></P>
+										</UL>
+										<LI><P><CODE><I>sp_extended_metadata</I></CODE>
+										</P>
+										<UL>
+											<LI><P><CODE>wantAttributeEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantAssertionEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantNameIDEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantArtifactResponseSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantLogoutRequestSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantLogoutResponseSigned</CODE> 
+											</P>
+											<LI><P><CODE>wantMNIRequestSigned</CODE> 
+											</P>
+											<LI><P STYLE="margin-bottom: 0in"><CODE>wantMNIResponseSigned</CODE>
+																						</P>
+										</UL>
+									</UL>
+									<HR>
+									<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+									<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+									SAML POST プロファイルを使用するには、署名を有効にする必要があります。
+									SAML Artifact プロファイルを使用すると署名は自動的に有効になります。</FONT>
+									</P>
+									<HR>
+									<LI><P>以下の手順を実行してサービスプロバイダから既存のメタデータ(が存在する場合)を削除し、新たに生成したメタデータをインポートします。
+									</P>
+									<UL>
+										<LI><P>以下のコマンドを実行して既存のサービスプロバイダメタデータを削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>以下のコマンドを実行して既存のアイデンティティプロバイダメタデータを削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>以下のコマンドを実行して、先ほど作成し編集したサービスプロバイダメタデータをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>アイデンティティプロバイダから、先ほど作成し編集した新しいメタデータファイル( <CODE><I>idp_standard_metadata</I></CODE> と ><CODE><I>idp_extended_metadata</I></CODE>)をサービスプロバイダにコピーします。
+										</P>
+										<LI><P>コピーしてきた <CODE><I>idp_extended_metadata</I></CODE> を編集し、<CODE>hosted=&quot;1&quot;</CODE> を
+										<CODE>hosted=&quot;0&quot;</CODE> に変更します。
+										</P>
+										<LI><P>以下のコマンドを実行して変更を加えたアイデンティティプロバイダのメタデータをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+									</UL>
+									<LI><P>以下の手順を実行してアイデンティティプロバイダから既存のメタデータ(が存在する場合)を削除し、新たに生成したメタデータをインポートします。
+									</P>
+									<UL>
+										<LI><P>以下のコマンドを実行して既存のアイデンティティプロバイダメタデータを削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>以下のコマンドを実行して既存のサービスプロバイダメタデータを削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>以下のコマンドを実行して、先ほど作成し編集したアイデンティティプロバイダメタデータをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>サービスプロバイダから、先ほど作成し編集した新しいメタデータファイル(<CODE><I>sp_standard_metadata</I></CODE> と <CODE><I>sp_extended_metadata</I></CODE>) をアイデンティティプロバイダにコピーします。
+										</P>
+										<LI><P>コピーしてきた <CODE><I>sp_extended_metadata</I></CODE> を編集し、<CODE>hosted=&quot;1&quot;</CODE> を
+										<CODE>hosted=&quot;0&quot;</CODE> に変更します。
+										</P>
+										<LI><P>以下のコマンドを実行して変更を加えたサービスプロバイダのメタデータをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+									</UL>
+									<LI><P>両プロバイダの Web コンテナを再起動します。
+									</P>
+									<LI><P>シングルサインオンを確認するには次の URL にアクセスします。 :
+									</P>
+									<UL>
+										<LI><P>サービスプロバイダインスタンスからシングルサインオンを開始するには次の URL にアクセスします。 
+										</P>
+										<P><CODE><I>sp_protocol</I></CODE><CODE>://</CODE><CODE><I>sp_host</I></CODE><CODE>:</CODE><CODE><I>sp_port</I></CODE><CODE>/</CODE><CODE><I>sp_deploy_URI</I></CODE><CODE>/spssoinit?metaAlias=</CODE><CODE><I>spMetaAlias</I></CODE><CODE>&amp;idpEntityID=</CODE><CODE><I>idp_entityID</I></CODE>
+																				</P>
+										<LI><P>アイデンティティプロバイダインスタンスからシングルサインオンを開始するには次の URL にアクセスします。
+										</P>
+										<P><CODE><I>idp_protocol</I></CODE><CODE>://</CODE><CODE><I>idp_host</I></CODE><CODE>:</CODE><CODE><I>idp_port</I></CODE><CODE>/</CODE><CODE><I>idp_deploy_URI</I></CODE><CODE>/idpssoinit?metaAlias=</CODE><CODE><I>idpMetaAlias</I></CODE><CODE>&amp;spEntityID=</CODE><CODE><I>sp_entityID</I></CODE>
+																				</P>
+									</UL>
+									<P>最初に、連携を確立するためにサービスプロバイダとアイデンティティプロバイダにログインする必要があります。その後は、ホストプロバイダでログインすると、認証手続きなしでリモートプロバイダにログインすることができます。
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="setupauth"></A><B>Q: 認証 Web サービスを用いた認証を設定するにはどうしたらよいですか?
+								</B></P>
+								<P>以下の手順では、認証 Web サービスを用いた認証を設定する方法を説明します。
+								</P>
+								<OL>
+									<LI><P>次のコマンドを実行して、認証 Web サービス属性の現在の値を取得します。
+									</P>
+									<P><CODE>ssoadm get-attr-defs -s
+									sunIdentityServerAuthnService -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+									Global -a MechanismHandlerList</CODE> 
+									</P>
+									<LI><P>コマンドの出力結果から、
+									<CODE>MechanismHandlerList=</CODE> で始まる行をすべてコピーし、ファイルに保存します。
+									</P>
+									<P>ここでは、このファイル名を <CODE>datafile</CODE> とします。
+																		</P>
+									<LI><P><CODE>datafile</CODE> を編集して、既存のハンドラクラスを変更したり、新しいものを追加します。
+									</P>
+									<P><CODE>MechanismHandlerList</CODE> 属性の値は
+									<CODE>key=</CODE><CODE><I>mechanism_name</I></CODE><CODE>|class=</CODE><CODE><I>handler_class_for_mechanism_specified_in_key</I></CODE> という形式で設定します。
+									</P>
+									<LI><P>次のコマンドを実行して
+									<CODE>MechanismHandlerList</CODE> 属性の値を変更します。
+									</P>
+									<P><CODE>ssoadm set-attr-defs -s
+									sunIdentityServerAuthnService -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+									Global -D datafile</CODE> 
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="discotokens"></A><B>Q: 
+X509、Bearer および SAML トークンを発行するのにディスカバリサービスをどのように設定したらよいですか?
+</B></P>
+								<P>以下の手順では、X509、Bearer および SAML トークンを発行するために、ディスカバリサービスを設定する方法について説明します。
+</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">始める前に</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">
+								<A HREF="#IDFFsample">
+Liberty ID-FF サンプルの設定および実行手順
+</A> に従って、アイデンティティプロバイダとサービスプロバイダのインスタンスを設定し、<Br>
+<A HREF="#keystore"> キーストアの設定方法 </A>に従って、各インスタンスにキーストアを設定してください。
+</FONT> 
+								</P>
+								<HR>
+								<OL>
+									<LI><P><A NAME="idpm"></A>アイデンティティプロバイダのマシン上での手順: 
+									</P>
+									<OL TYPE=a>
+										<LI><P>次のコマンドを実行して、ディスカバリサービス属性の現在の値を取得します。
+										</P>
+										<P><CODE>ssoadm get-attr-defs -s
+										sunIdentityServerDiscoveryService -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t Global -a sunIdentityServerBootstrappingDiscoEntry</CODE>
+																				</P>
+										<LI><P>コマンドの出力結果から、
+										<CODE>sunIdentityServerBootstrappingDiscoEntry=</CODE> で始まる行をすべてコピーし、ファイルに保存します。
+										</P>
+										<P>ここでは、このファイル名を <CODE>datafile</CODE> とします。
+																				</P>
+										<LI><P><CODE>datafile</CODE> を編集し、各トークンについて設定します。
+										</P>
+										<UL>
+											<LI><P>SAML トークンについては、次のように変更します。
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>を 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:SAML&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>に変更します。さらに、
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;/DiscoEntry&gt;</CODE>
+																						</P>
+											<P>を
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;AuthorizeRequester
+											xmlns=&quot;urn:liberty:disco:2003-08&quot;/&gt;&lt;/DiscoEntry&gt;</CODE>
+												に変更します。										</P>
+											<LI><P>X509 トークンについては、次のように変更します。
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>を 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:X509&lt;/SecurityMechID&gt;</CODE>
+													に変更します。									</P>
+											<LI><P>Bearer トークンについては、次のように変更します。
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P> を
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2004-04:null:Bearer&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>に変更します。さらに、
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;/DiscoEntry&gt;</CODE>
+																						</P>
+											<P>を
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;AuthenticateRequester
+											xmlns=&quot;urn:liberty:disco:2003-08&quot;/&gt;&lt;GenerateBearerToken
+											xmlns=&quot;urn:liberty:disco:2004-04&quot;/&gt;&lt;/DiscoEntry&gt;</CODE>
+											に変更します。											</P>
+										</UL>
+										<LI><P>属性の値を変更するために、<CODE>datafile</CODE> を入力ファイルとして用いて、次のコマンドを実行します。
+
+										</P>
+										<P><CODE>ssoadm set-attr-defs -s
+										sunIdentityServerDiscoveryService -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t Global -D datafile</CODE> 
+										</P>
+										<LI><P STYLE="margin-bottom: 0in">最上位管理者(amAdmin)でコンソールにログインして、「設定」 -&gt; 「グローバル」  -&gt; 「Liberty ID-WSF セキュリティサービス」に移動し、 
+<br>
+										次のプロパティーの値を編集します。(test と設定します。)
+										</P>
+										<UL>
+											<LI><P>「信頼できる発行局の署名証明書エイリアス」
+											: <CODE>test</CODE> 
+											</P>
+											<LI><P>「デフォルトの WSC 証明書エイリアス」
+: <CODE>test</CODE>
+																						</P>
+											<LI><P>「信頼できる証明書発行局の署名証明書エイリアス」
+											: <CODE>test</CODE> 
+											</P>
+										</UL>
+										<P><CODE>test</CODE> はサンプルの値です。
+										</P>
+										<LI><P>次のコマンドを実行して、既存のアイデンティティプロバイダ(があれば)を削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<P>
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=4 WIDTH=98 VALIGN=TOP>
+								<P><I>idp_entityid</I></P>
+							</TD>
+							<TD COLSPAN=10 WIDTH=430>
+								<P>プロバイダのエンティティ ID を次の形式で指定します。
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>例 <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=2 COLSPAN=11 WIDTH=675 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=4 WIDTH=98>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=10 WIDTH=430>
+								<P><CODE>idff</CODE> または <CODE>saml2</CODE> を指定します。
+この場合は、<CODE>idff</CODE> です。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=7>
+										<LI><P>次のコマンドを実行してリモートのサービスプロバイダのエンティティを削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>remote_sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<P>
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=6 WIDTH=124 VALIGN=TOP>
+								<P><I>remote_sp_entityid</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=430>
+								<P>プロバイダのエンティティ ID を次の形式で指定します。
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>例、 <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=2 COLSPAN=10 WIDTH=649 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=6 WIDTH=124>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=430>
+								<P><CODE>idff</CODE> または <CODE>saml2</CODE> を指定します。
+この場合は、<CODE>idff</CODE> です。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=8>
+										<LI><P>次のコマンドを実行して、アイデンティティプロバイダ用の標準メタデータファイルと拡張メタデータファイルを作成します。
+										</P>
+										<P><CODE>ssoadm create-metadata-templ -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE><I>idp_entityid</I></CODE><CODE> -m
+										</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -i
+										</CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+										</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -c
+										</CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<P>
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=6 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+								<P><I>idp_entityid</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>プロバイダのエンティティ ID を次の形式で指定します。
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>例、 <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=7 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>
+生成する標準メタデータ XML ファイルのパスとファイル名を指定します。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>
+生成する拡張メタデータ XML ファイルのパスとファイル名を指定します。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>idpMetaAlias</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>ここで指定したものが、ホストアイデンティティプロバイダ用のメタエイリアスとして作成されます。
+								</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>idpSCertAlias</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>ホストアイデンティティプロバイダ用にキーストアを設定した際に指定した署名証明書エイリアス
+								</P>
+							</TD>
+						</TR>
+<!--
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The name of the circle into which the files are being
+								imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+							</TD>
+						</TR>
+-->
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+                <P><CODE>idff</CODE> または <CODE>saml2</CODE> を指定します。
+この場合は、<CODE>idff</CODE> です。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=9>
+										<LI><P>次のコマンドを実行して、すでに設定済みのトラストサークルに新しいメタデータファイルをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<P>
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+<!--
+						<TR>
+							<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+							<TD ROWSPAN=4 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the extended metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The name of the circle into which the files are being
+								imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+-->
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=10>
+										<LI><P>サービスプロバイダから標準メタデータファイル
+										(後で説明する<A HREF="#spm">サービスプロバイダ上での手順</a>により生成されたファイル)
+										をアイデンティティプロバイダのマシンの
+<CODE>/tmp</CODE> ディレクトリにコピーします。
+										</P>
+										<LI><P>次のコマンドを実行してリモートのサービスプロバイダのメタデータファイルをトラストサークルにインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<P>
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+<!--
+						<TR>
+							<TD ROWSPAN=3 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+							<TD ROWSPAN=3 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The name of the circle into which the files are being
+								imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+-->
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a start=12>
+										<LI><P>Web コンテナを再起動します。
+										</P>
+									</OL>
+									<LI><P><A NAME="spm"></A>サービスプロバイダのマシン上での手順
+									</P>
+									<OL TYPE=a>
+										<LI><P>次のコマンドを実行して既存のサービスプロバイダのエンティティがあれば削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<LI><P>次のコマンドを実行して、リモートのアイデンティティプロバイダのエンティティを削除します。
+										</P>
+										<P><CODE>ssoadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<LI><P>次のコマンドを実行して、サービスプロバイダ用の標準メタデータファイルと拡張メタデータファイルを作成します。
+										</P>
+										<P><CODE>famadm create-metadata-templ -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE><I>sp_entityid</I></CODE><CODE> -m
+										</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -s
+										</CODE><CODE><I>spMetaAlias</I></CODE><CODE> -a
+										</CODE><CODE><I>spSCertAlias</I></CODE><CODE> -c
+										</CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<LI><P>次のコマンドを実行して、すでに設定済みのトラストサークルに新しいメタデータファイルをインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<LI><P>アイデンティティプロバイダから標準メタデータファイル
+										(<A HREF="#idpm">アイデンティティプロバイダ上での手順</A>により生成されたファイル)
+をサービスプロバイダのマシンの <CODE>/tmp</CODE> ディレクトリにコピーします。
+										</P>
+										<LI><P>次のコマンドを実行してリモートのアイデンティティプロバイダのメタデータファイルをトラストサークルにインポートします。
+										</P>
+										<P><CODE>ssoadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<LI><P>
+最上位管理者(amAdmin)でコンソールにログインして、「設定」 -&gt; 「グローバル」  -&gt; 「Liberty ID-WSF セキュリティサービス」に移動し、
+<br>
+「デフォルトの WSC 証明書エイリアス」に適切な証明書エイリアスを設定します。
+<br>
+この証明書エイリアスは、Web サービスクライアント用に X509 トークンが生成される際に使用されます。
+										</P>
+										<LI><P>Web コンテナを再起動します。
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="pa3profile"></A><B>Q: <code>ssoadm</code> コマンドを使ってポリシー Agents 3.0 のプロファイルを設定するにはどのようにしたらよいですか?
+								</B></P>
+								<P>手順例が<A HREF="http://blogs.sun.com/hanaki/entry/ssoadm_%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88_3_0_%E3%81%AE%E3%83%97%E3%83%AD%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92"
+">こちらのブログ</A>(日本語)に記載されてますので参考にしてください。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="configdsfailover"></A><B>Q: 
+フェイルオーバーを行うには OpenSSO 設定データストアをどのように設定したらよいですか?
+								</B></P>
+								<P>DocTeger 氏のブログエントリ <A HREF="http://blogs.sun.com/docteger/entry/opensso_bootstrap_file_now_with">The
+								OpenSSO Bootstrap File Deconstructed</A>(英語) を参考にしてください。
+</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="websphereAIX"></A><B>Q: AIX 上で Websphere 6.1 にどのようにして OpenSSO を配備したらよいですか?
+</B></P>
+								<P>DocTeger 氏のブログエントリ <A HREF="http://blogs.sun.com/docteger/entry/deploying_opensso_on_websphere_6">Deploying OpenSSO on WebSphere 6.1 AIX</A>(英語) を参考にしてください。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="authws1"></A><B>Q: 
+アイデンティティー Web サービスを用いて OpenSSO 上でどのように認証を設定したらよいですか?
+</B></P>
+								<P>ソフトウェアアーキテクトである Aravindan Ranganathan 氏の記事 <A HREF="http://developers.sun.com/identity/reference/techart/id-svcs.html">Securing Applications with Identity Services, Part 1: Authentication</A>(英語) を参考にしてください。</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="authws2"></A><B>Q: 
+アイデンティティー Web サービスを用いて OpenSSO 上でどのように認可を設定したらよいですか?
+</B></P>
+								<P>
+ソフトウェアアーキテクトである Aravindan Ranganathan 氏の記事
+<A HREF="http://developers.sun.com/identity/reference/techart/id-svcs2.html">Securing Applications with Identity Services, Part 2: Authorization</A>(英語) を参考にしてください。
+</P>
+							</TD>
+						</TR>
+<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="idpproxy"></A><B>Q: 
+SAMLv2 IDP プロキシをどのように設定したらよいですか?
+</B></P>
+								<P>DocTeger 氏のブログエントリ <A HREF="http://blogs.sun.com/docteger/entry/setting_up_an_idp_proxy">Setting Up a SAMLv2 IDP Proxy</A>(英語)を参考にしてください。</P></TD>
+						</TR>
+<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="confwithout"></A><B>Q: 
+<code>configurator.jsp</code> を用いずに OpenSSO を設定するにはどのようにしたらよいですか?
+</B> </P>
+								<P>DocTeger 氏のブログエントリ <A HREF="http://blogs.sun.com/docteger/entry/configuring_opensso_without_configurator_jsp">Configuring OpenSSO without <code>configurator.jsp</A> (英語) を参考にしてください。<br>
+Linux や Windows 環境で行う場合は、このブログエントリのコメント欄の最初に書かれている説明書きに留意してください。
+</P></TD></TR>
+					</TBODY>
+				</TABLE>
+			</CENTER>
+			<P><!-- content boundary --><BR><BR>
+			</P>
+			</BODY>
+			</HTML>

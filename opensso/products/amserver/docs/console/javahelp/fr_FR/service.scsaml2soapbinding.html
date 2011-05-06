@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Liaison SOAP SAMLv2 - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>Liaison SOAP SAMLv2</h4>
+<p>Le service de liaison SOAP SAMLv2 assure l'&#233;change SOAP des demandes et
+r&#233;ponses SAMLv2 entre un client OpenSSO Client et le serveur OpenSSO. Les
+demandes re&#231;ues sont transmises aux gestionnaires de demandes pour traitement. La cl&#233;
+de RequestHandler et du m&#233;ta-alias se trouve dans l'URL du service de
+liaison SOAP. Le mappage du m&#233;ta-alias et de l'interface de RequestHandler est
+stock&#233; dans le service de liaison SOAP SAMLv2 qui est lisible &#224;
+partir du magasin de configurations OpenSSO. </p>
+
+<a name="ggokv"></a><h5>Liste de gestionnaires de demandes</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>RequestHandlerList est une liste de paires cl&#233;/valeur contenant le mappage du m&#233;ta-alias
+&#224; l'impl&#233;mentation de RequestHandler. Cet attribut doit &#234;tre d&#233;fini si un serveur
+OpenSSO&#160;8.0 est configur&#233; pour se comporter comme un point de d&#233;cision de
+strat&#233;gie (PDP). </p><p>Le param&#232;tre <i>Key</i> est le m&#233;ta-alias du point de d&#233;cision de strat&#233;gie
+et le param&#232;tre <i>Class</i> correspond au nom de la classe Java qui
+impl&#233;mente l'interface RequestHandler capable de traiter les demandes XACML.  </p><p>Par exemple, si le m&#233;ta-alias du point de d&#233;cision de strat&#233;gie XACML
+est <tt>/pdp</tt> et que l'impl&#233;mentation de l'interface est <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler </tt>, la cl&#233; doit
+&#234;tre <tt>/pdp</tt> et la classe, <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>. </p>
+<br/>
+
+</body>
+</html>

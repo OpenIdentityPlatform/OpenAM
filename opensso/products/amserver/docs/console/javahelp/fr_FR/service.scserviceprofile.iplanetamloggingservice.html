@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Journalisation - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>Journalisation</h4>
+<p><a name="indexterm-203"></a>Le service Journalisation fournit des messages d'&#233;tat et d'erreur concernant l'administration d'OpenSSO.
+Un administrateur peut configurer des valeurs telles que la taille et l'emplacement
+du fichier journal. OpenSSO peut consigner les &#233;v&#233;nements dans un fichier texte
+ordinaire ou dans une base de donn&#233;es relationnelles. Les attributs du service
+Journalisation sont des attributs globaux. Ces attributs sont les suivants :</p>
+<ul><li><p><a href="#fxbsv">Taille maximale du journal</a></p></li>
+<li><p><a href="#fxbsg">Nombre de fichiers d'historique</a></p></li>
+<li><p><a href="#fxbzh">Emplacement du fichier journal</a></p></li>
+<li><p><a href="#fxbwg">Type de connexion</a></p></li>
+<li><p><a href="#fxbrd">Nom d'utilisateur de la base de donn&#233;es</a></p></li>
+<li><p><a href="#fxcdf">Mot de passe de la base de donn&#233;es</a></p></li>
+<li><p><a href="#fxcep">Mot de passe de la base de donn&#233;es (confirmer)</a></p></li>
+<li><p><a href="#fxbvb">Nom du pilote de la base de donn&#233;es</a></p></li>
+<li><p><a href="#fxbsb">Champs de journal configurables</a></p></li>
+<li><p><a href="#fxccb">Fr&#233;quence de v&#233;rification du journal</a></p></li>
+<li><p><a href="#fxbxe">Dur&#233;e de signature du journal</a></p></li>
+<li><p><a href="#fxcbz">Connexion s&#233;curis&#233;e</a></p></li>
+<li><p><a href="#fxbxt">Nombre max. d'enregistrements</a></p></li>
+<li><p><a href="#fxbwp">Nombre de fichiers par archive</a></p></li>
+<li><p><a href="#fxbyw">Taille du tampon</a></p></li>
+<li><p><a href="#fxbvh">Taille de la m&#233;moire tampon pour &#233;chec de base de donn&#233;es</a></p></li>
+<li><p><a href="#fxcea">Dur&#233;e de la m&#233;moire tampon</a></p></li>
+<li><p><a href="#fxbsn">Dur&#233;e de la mise en m&#233;moire tampon</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>Taille maximale du journal</h5>
+<p>Cet attribut d&#233;finit la taille maximale (en octets) d'un fichier journal OpenSSO.
+La valeur par d&#233;faut est 1000000.</p>
+
+<a name="fxbsg"></a><h5>Nombre de fichiers d'historique</h5>
+<p>Cet attribut d&#233;finit le nombre de fichiers journaux de sauvegarde qui seront
+conserv&#233;s pour l'analyse historique. Cet attribut accepte tout entier bas&#233; sur la
+taille de partition et l'espace disque disponible sur le syst&#232;me local. La
+valeur par d&#233;faut est 3.</p><p>Les fichiers s'appliquent uniquement au type de journalisation FILE. Lorsque le type
+de journalisation est d&#233;fini sur DB, aucun fichier d'historique n'est cr&#233;&#233; et
+aucune limite de taille de fichier n'est d&#233;finie par OpenSSO.</p>
+<hr><p><b>Remarque &#8211; </b>La valeur 0 est interpr&#233;t&#233;e de la m&#234;me mani&#232;re que la valeur
+1, ce qui signifie que si vous sp&#233;cifiez 0, un journal d'historique
+est cr&#233;&#233;.</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>Emplacement du fichier journal</h5>
+<p>La fonction de journalisation par fichier n&#233;cessite la d&#233;finition de l'emplacement de
+stockage des fichiers journaux. L'emplacement par d&#233;faut est :</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt> est une balise repr&#233;sentant le r&#233;pertoire de configuration de base et
+l'URI du serveur d'OpenSSO. Lors de l'ex&#233;cution, le service de journalisation d&#233;termine
+le r&#233;pertoire utilis&#233; par l'instance pour la journalisation. Cet attribut peut avoir
+pour valeur un chemin explicite, mais le chemin de base doit d&#233;signer
+son r&#233;pertoire de configuration.</p><p>Si un r&#233;pertoire autre que le r&#233;pertoire par d&#233;faut est sp&#233;cifi&#233;, OpenSSO
+cr&#233;era ce r&#233;pertoire si celui-ci n'existe pas. Vous devez alors d&#233;finir les
+permissions appropri&#233;es pour ce r&#233;pertoire (par exemple, 0700).</p><p>Lorsque vous configurez l'emplacement pour la journalisation dans une base de donn&#233;es
+(par exemple, Oracle ou MySQL), notez que pour une partie de l'emplacement,
+la distinction majuscules/minuscules s'applique. Par exemple, si vous effectuez la journalisation dans
+une base de donn&#233;es Oracle, l'emplacement de la journalisation doit &#234;tre le
+suivant (notez la distinction majuscules/minuscules) :</p><p><tt>jdbc:oracle:thin:&#64;machine.domaine:port:nomBD</tt></p><p>Pour configurer la journalisation dans la base de donn&#233;es, ajoutez les fichiers
+de pilote JDBC au chemin d'acc&#232;s de la classe JVM du conteneur
+Web. Vous devez ajouter manuellement les fichiers de pilote JDBC au chemin
+d'acc&#232;s de la classe du script <tt>amadmin</tt>. Sinon, la journalisation <tt>amadmin</tt> ne
+peut pas charger le pilote JDBC.</p><p>Les modifications apport&#233;es aux attributs de journalisation prennent effet une fois que
+vous les avez enregistr&#233;es. Il n'est pas n&#233;cessaire de red&#233;marrer le serveur.
+Si vous activez la journalisation s&#233;curis&#233;e, toutefois, vous devez red&#233;marrer le serveur.</p>
+
+<a name="ggyhl"></a><h5>Statut du journal</h5>
+<p>Sp&#233;cifie si la journalisation est activ&#233;e ou non. La valeur configur&#233;e lors
+de l'installation est ACTIVE. </p>
+
+<a name="ggydj"></a><h5>Enregistrement de journal - r&#233;solution du nom d'h&#244;te</h5>
+<p>Les recherches d'h&#244;te pour le champ HostName de LogRecord ne seront pas
+ex&#233;cut&#233;es, si cette variable est d&#233;finie sur Faux</p>
+
+<a name="fxbwg"></a><h5>Type de connexion</h5>
+<p>Vous permet d'indiquer soit Fichier pour la journalisation dans un fichier texte
+ordinaire, soit DB pour la journalisation dans une base de donn&#233;es.</p><p>Si le nom d'utilisateur ou le mot de passe de la base
+de donn&#233;es est incorrect, ceci emp&#234;che l'ex&#233;cution correcte d'OpenSSO. Si OpenSSO ou
+la console devient instable, choisissez la valeur Inactif pour l'attribut Statut du
+journal. </p><p>Une fois que vous d&#233;fini cette propri&#233;t&#233;, red&#233;marrez le serveur. Vous pouvez
+alors vous connecter &#224; la console et red&#233;finir l'attribut de journalisation. Ensuite,
+attribuez-lui la valeur <i>ACTIVE</i> et red&#233;marrez le serveur.</p>
+
+<a name="fxbrd"></a><h5>Nom d'utilisateur de la base de donn&#233;es</h5>
+<p>Cet attribut accepte le nom de l'utilisateur qui se connectera &#224; la
+base de donn&#233;es lorsque l'attribut Type de connexion est d&#233;fini sur DB.</p>
+
+<a name="fxcdf"></a><h5>Mot de passe de la base de donn&#233;es</h5>
+<p>Cet attribut accepte le mot de passe de la base de donn&#233;es
+lorsque l'attribut Type de connexion est d&#233;fini sur DB.</p>
+
+<a name="fxcep"></a><h5>Mot de passe de la base de donn&#233;es (confirmer)</h5>
+<p>Confirmez le mot de passe de la base de donn&#233;es.</p>
+
+<a name="fxbvb"></a><h5>Nom du pilote de la base de donn&#233;es</h5>
+<p>Cet attribut vous permet de sp&#233;cifier le pilote utilis&#233; pour la classe
+d'impl&#233;mentation de la journalisation.</p>
+
+<a name="fxbsb"></a><h5>Champs de journal configurables</h5>
+<p>Repr&#233;sente la liste des champs &#224; consigner. Par d&#233;faut, tous les champs
+sont consign&#233;s : Ces champs sont les suivants :</p>
+<ul><li><p>ID DE CONTEXTE</p></li>
+<li><p>DOMAINE</p></li>
+<li><p>NOM D'H&#212;TE</p></li>
+<li><p>ADRESSE IP</p></li>
+<li><p>CONSIGN&#201; PAR</p></li>
+<li><p>NIVEAU DE JOURNAL</p></li>
+<li><p>ID DE CONNEXION</p></li>
+<li><p>ID DE MESSAGE</p></li>
+<li><p>NOM DU MODULE</p></li></ul>
+<p>Au minimum, vous devez consigner les champs ID DE CONTEXTE, DOMAINE, NOM
+D'H&#212;TE, ID DE CONNEXION, ID DE MESSAGE.</p>
+
+<a name="fxccb"></a><h5>Fr&#233;quence de v&#233;rification du journal</h5>
+<p>Cet attribut indique la fr&#233;quence (en secondes) &#224; laquelle le serveur doit
+v&#233;rifier les journaux afin de d&#233;tecter les &#233;ventuelles modifications non autoris&#233;es. La
+valeur par d&#233;faut est 3600 secondes. Ce param&#232;tre s'applique uniquement &#224; la
+journalisation s&#233;curis&#233;e.</p>
+
+<a name="fxbxe"></a><h5>Dur&#233;e de signature du journal</h5>
+<p>Ce param&#232;tre d&#233;finit la fr&#233;quence (en secondes) avec laquelle le journal sera
+sign&#233;. La valeur par d&#233;faut est 900 secondes. Ce param&#232;tre s'applique uniquement
+&#224; la journalisation s&#233;curis&#233;e.</p>
+
+<a name="fxcbz"></a><h5>Connexion s&#233;curis&#233;e</h5>
+<p>Cet attribut active ou d&#233;sactive la journalisation s&#233;curis&#233;e. Par d&#233;faut, elle est
+d&#233;sactiv&#233;e. La journalisation s&#233;curis&#233;e active la d&#233;tection des modifications non autoris&#233;es des
+journaux de s&#233;curit&#233;.</p>
+<hr><p><b>Remarque &#8211; </b>La journalisation s&#233;curis&#233;e n'est utilisable que pour les fichiers plats. Cette option
+ne fonctionne pas pour la journalisation DB.</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>Algorithme de signature de journalisation s&#233;curis&#233;e</h5>
+<p>Cet attribut d&#233;finit RSA et DSA (Digital Signature Algorithm), qui disposent de
+cl&#233;s priv&#233;es pour la signature et d'une cl&#233; publique pour la v&#233;rification.
+Les options propos&#233;es sont les suivantes&#160;:</p>
+<ul><li><p>MD2 avec RSA</p></li>
+<li><p>MD5 avec RSA</p></li>
+<li><p>SHA1 avec DSA</p></li>
+<li><p>SHA1 avec RSA</p></li></ul>
+<p>MD2, MD5 et RSA sont des hachages unidirectionnels. Si, par exemple, vous
+s&#233;lectionnez l'algorithme de signature MD2 avec RSA, la fonction de journalisation s&#233;curis&#233;e
+cr&#233;e un groupe de messages avec MD2 et chiffre la valeur &#224;
+l'aide de la cl&#233; priv&#233;e RSA. Cette valeur chiffr&#233;e constitue la signature
+des enregistrements journalis&#233;s. Elle est ensuite ajout&#233;e au dernier enregistrement de la
+signature la plus r&#233;cente. Pour la validation, la signature est d&#233;chiffr&#233;e avec
+la cl&#233; publique RSA, puis la valeur d&#233;chiffr&#233;e est compar&#233;e au groupe
+d'enregistrements journalis&#233;s. La fonction de journalisation s&#233;curis&#233;e d&#233;tectera ensuite toute modification apport&#233;e
+&#224; n'importe quel enregistrement journalis&#233;.</p>
+
+<a name="ghaeg"></a><h5>Emplacement du magasin de certificats de journalisation</h5>
+<p>Lorsque la journalisation s&#233;curis&#233;e est activ&#233;e, le service de journalisation recherche son
+certificat &#224; l'emplacement sp&#233;cifi&#233; par cet attribut. Le chemin de ce r&#233;pertoire
+est d&#233;termin&#233; lors de l'ex&#233;cution. Il peut s'agir d'un chemin explicite, mais
+le chemin de base doit &#234;tre accessible &#224; l'instance OpenSSO.</p>
+
+<a name="fxbxt"></a><h5>Nombre max. d'enregistrements</h5>
+<p>Cet attribut d&#233;finit le nombre maximum d'enregistrements renvoy&#233;s par les interfaces Java
+LogReader, quel que soit le nombre d'enregistrements correspondant &#224; la demande de
+lecture. Par d&#233;faut, il est r&#233;gl&#233; sur 500. Cet attribut peut &#234;tre
+remplac&#233; par l'appelant de l'API de journalisation via la classe <i>LogQuery</i>.</p>
+
+<a name="fxbwp"></a><h5>Nombre de fichiers par archive</h5>
+<p>Cet attribut s'applique uniquement &#224; la journalisation s&#233;curis&#233;e. Il indique le moment
+auquel les fichiers journaux doivent &#234;tre archiv&#233;s et le keystore s&#233;curis&#233; g&#233;n&#233;r&#233;
+de nouveau pour les journalisations s&#233;curis&#233;es suivantes. La valeur par d&#233;faut est
+cinq fichiers par logger.</p>
+
+<a name="fxbyw"></a><h5>Taille du tampon</h5>
+<p>Cet attribut d&#233;finit le nombre maximal d'enregistrements de journal &#224; placer en
+m&#233;moire tampon avant que le service de journalisation tente de les &#233;crire
+dans le r&#233;f&#233;rentiel de journalisation. La valeur par d&#233;faut est un enregistrement.</p>
+
+<a name="fxbvh"></a><h5>Taille de la m&#233;moire tampon pour &#233;chec de base de donn&#233;es</h5>
+<p>Cet attribut d&#233;finit le nombre maximal d'enregistrements de journal conserv&#233;s en m&#233;moire
+en cas d'&#233;chec de la journalisation en base de donn&#233;es. Cet attribut
+s'applique uniquement lorsque la journalisation en base de donn&#233;es est sp&#233;cifi&#233;e. Lorsque
+le service de journalisation d'OpenSSO perd la connexion &#224; la base de
+donn&#233;es, il place en m&#233;moire tampon le nombre d'enregistrements sp&#233;cifi&#233;s. La valeur
+par d&#233;faut de cet attribut correspond au double de la valeur d&#233;finie
+dans l'attribut Taille du tampon.</p>
+
+<a name="fxcea"></a><h5>Dur&#233;e de la m&#233;moire tampon</h5>
+<p>Cet attribut d&#233;finit la dur&#233;e maximale de mise en m&#233;moire tampon des
+enregistrements de journal avant leur envoi au service de journalisation. Cet attribut
+s'applique si l'attribut Activer la mise en m&#233;moire tampon temporelle est s&#233;lectionn&#233;.
+La valeur par d&#233;faut est 3600 secondes.</p>
+
+<a name="fxbsn"></a><h5>Dur&#233;e de la mise en m&#233;moire tampon</h5>
+<p>Lorsque cet attribut est s&#233;lectionn&#233;, OpenSSO d&#233;finit un d&#233;lai maximal de conservation
+dans la m&#233;moire tampon des enregistrements de journal. Cette p&#233;riode est d&#233;finie
+dans l'attribut Dur&#233;e de la m&#233;moire tampon.</p>
+
+<a name="ghaer"></a><h5>Niveau de journalisation.</h5>
+<p>Utilisez cet attribut pour configurer le niveau de d&#233;tail d'un fichier journal
+en s&#233;lectionnant l'une des options suivantes&#160;: Les services OpenSSO se connectent au
+niveau INFO. Les services SAML et F&#233;d&#233;ration d'identit&#233;s proposent &#233;galement des niveaux
+de journalisation plus d&#233;taill&#233;s (FIN, PLUS FIN, LE PLUS FIN). De plus,
+le niveau AUCUN permet de d&#233;sactiver la journalisation et le niveau TOUT
+active la journalisation de tous les messages.</p>
+<br/>
+
+</body>
+</html>

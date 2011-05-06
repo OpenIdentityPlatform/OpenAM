@@ -1,0 +1,174 @@
+<link href="$context/assets/css/Specific/identityService.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+YAHOO.namespace("sun.container");
+
+function init() {
+    AjaxUtils.load( 'createNew', '$context/config/dlg/popupCreatingProvider.htm');
+    YAHOO.sun.container.createNew = new YAHOO.widget.Panel("createNew", { width:"320px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true } );
+    YAHOO.sun.container.createNew.render();
+
+}
+YAHOO.util.Event.onDOMReady( init );
+
+function confProvider() {
+    YAHOO.sun.container.createNew.show();
+	setTimeout("YAHOO.sun.container.createNew.hide()",1250);
+	setTimeout("document.getElementById('ServiceProvider').style.display='none'",1250);
+	setTimeout("document.getElementById('created').style.display=''",1250);
+}
+
+function Cancel(){
+	document.location = "$context/commonTasks.htm";
+}
+
+function remoteService(){
+	if (document.getElementById("sam1").checked)
+		document.getElementById("optionYes").style.display="";
+	else
+		document.getElementById("optionYes").style.display="none";
+}
+function appearOption(element,name,div){
+	if (document.getElementById(name+"1").checked)
+		document.getElementById(div).style.display="";
+	else
+		document.getElementById(div).style.display="none";
+}
+function FederateChange(){
+	if (document.getElementById("federationSelect").options[document.getElementById("federationSelect").selectedIndex].value=="select"){
+		document.getElementById("btnConfigure").disabled=true;
+		document.getElementById("sam2.0").style.display="none";
+	}
+	else{
+		document.getElementById("btnConfigure").disabled=false;
+		if (document.getElementById("federationSelect").options[document.getElementById("federationSelect").selectedIndex].value=="SAML 2.0")
+			document.getElementById("sam2.0").style.display="";
+		else
+			document.getElementById("sam2.0").style.display="none";
+	}
+}
+function next(){
+	if (document.getElementById("sam1").checked)
+		setTimeout(" AjaxUtils.load('container', '$context/config/dlg/popupConfigureRemoteIdentity.htm');",1250);
+	else
+		setTimeout(" AjaxUtils.load('container', '$context/config/serviceProvider/configureSystem.htm');",1250);
+}
+/*Add New*/
+function mostrar(type,element,name){
+	document.getElementById(name).style.display = (type==1) ? "none" : "";
+	document.getElementById(name).style.left=element.offsetLeft+"px";
+}
+function cancelPopUp(name){
+	document.getElementById(name).style.display = "none";
+	document.getElementById("newCircle").style.display = "none";
+}
+function SavePopUp(){
+	document.getElementById("newCircle").style.display = "";
+	document.getElementById("contentTabs1").style.display = "none";
+}
+</script>
+<div id="ServiceProvider">
+	<div id="mainPanel" align="center">
+		<div id="createPanel" class="createpanel">
+			<br />
+			<div class="bodywhite">
+				<h2>Configure this system as a service provider</h2>
+				<small>Lorem ipsum dolor sit amet consectateur nonummy lorenzino. Interdum volgus videt, est ubi peccat ita miratur laudatque poetas, ut nihil anteferat, nihil illis.</small>
+			</div>
+			<div class="bodywhite">
+				<p class="OrangeSmall">Select a Federation Protocol<br />
+				<select name="federationSelect" id="federationSelect" onchange="FederateChange();">
+					<option value="select">Select ...</option>
+					<option value="SAML 1.0">SAML 1.0</option>
+					<option value="SAML 1.1">SAML 1.1</option>
+					<option value="SAML 2.0">SAML 2.0</option>
+					<option value="ID-FF">ID-FF</option>
+					<option value="WSFederation">WSFederation</option>
+				</select></p>
+				<div id="sam2.0" style="display:none">
+					<p class="OrangeSmall">Do you have a SAML 2.0 metadata file for this hosted service?</p>
+					<input type="radio" name="sam" id="sam1" onclick="remoteService();" checked="checked"/>Yes&nbsp;&nbsp;<input type="radio" name="sam" id="sam2" onclick="remoteService();"/>No
+					<div id="optionYes">
+						<p class="OrangeSmall">Is the metadata available in a file or at a URL?</p>
+						<p><input type="radio" name="url" id="url1"/>&nbsp;File&nbsp;&nbsp;<input type="text"/>&nbsp;<button id="btnbrowser" type="button">Browse</button></p>
+						<p><input type="radio" name="url" id="url2"/>&nbsp;URL&nbsp;<input type="text"/></p>
+					</div>
+					<p class="OrangeSmall">Select or create a circle of trust</p>
+					<select name="circleTrust" id="circleTrust" size="3">
+						<option>cot1 in sun > us</option>
+						<option>cot1 in sun > uk</option>
+						<option>cot1 in sun > asia</option>
+					</select>
+					<!--<div class="links blue"><a class="pointer">Delete</a>&nbsp;|&nbsp;<a class="pointer">Create New</a></div>-->
+					<div id="options1" class="yui-navset links">
+						<div id="contentTabs1" class="yui-content" style="z-index:20;display:none;position:absolute;top:-168px;">
+							<div id="tabOption1">
+							</div>
+							<div id="tabOption2" style="width:220px">
+								<p align="left"><b>Name the circle of trust:</b><br />
+								<input id="newNameGroup" name="newNameGroup" style="width:200px"/></p>
+								<p align="left"><b>Select the circle of trust's realm:</b><br />
+								<select id="Circletrust" size="3" style="width:200px"></select></p>
+								<p align="right" style="color:#000066"><a class="pointer" onclick="cancelPopUp('contentTabs1');">Cancel</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="pointer" onclick="SavePopUp();">Save</a></p>
+							</div>
+						</div>
+						<ul class="yui-nav" style="text-align:right">
+							<li><a href="#tab1" onclick="mostrar(1,this,'contentTabs1')"><em>Delete</em></a></li>
+							<li><a href="#tab2" onclick="mostrar(2,this,'contentTabs1')"><em>Add New</em></a></li>
+						</ul>
+					</div>
+				</div>
+				<div id="newCircle" style="display:none">
+					<p class="OrangeSmall">Display name (optional)<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+					<input type="text" id="name"/></p>
+					<p class="OrangeSmall">Enter the metaalias<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+					<input type="text" id="metaalias"/></p>
+					<p class="OrangeSmall">Select type of binding</p>
+					<input type="checkbox" />&nbsp;Post&nbsp;&nbsp;&nbsp;
+					<input type="checkbox" />&nbsp;Artifact&nbsp;<br />
+					<p class="OrangeSmall">Require signature for incoming assertions?</p>
+					<input type="radio" name="signatureIn" id="signatureIn1" checked="checked" onclick="appearOption(this,'signatureIn','divsignature1')"/>&nbsp;Yes&nbsp;&nbsp;&nbsp;
+					<input type="radio" name="signatureIn" id="signatureIn2" onclick="appearOption(this,'signatureIn','divsignature1')"/>&nbsp;No&nbsp;<br />
+					<div id="divsignature1">
+						<p class="OrangeSmall">Assertion signing certificate<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+						<textarea id="assertion"></textarea></p><br />
+					</div>
+					<p class="OrangeSmall">Require signature for outgoing assertions?<br />
+										   This default is set to match your Service Provider metadata</p>
+					<input type="radio" name="signatureOut" id="signatureOut1" checked="checked" onclick="appearOption(this,'signatureOut','divsignature2')"/>&nbsp;Yes&nbsp;&nbsp;&nbsp;
+					<input type="radio" name="signatureOut" id="signatureOut2" onclick="appearOption(this,'signatureOut','divsignature2')"/>&nbsp;No&nbsp;<br />
+					<div id="divsignature2">
+						<p class="OrangeSmall">Please select a signing key alias<br />
+						<select id="KeyAlias"></select></p>
+					</div>
+				</div>
+			</div>
+			<div class="subbody">
+					<button id="btnCancel" type="button" onclick="Cancel();">Cancel</button>
+					<button id="btnConfigure" type="button" onclick="confProvider();" disabled="disabled">CONFIGURE PROVIDER</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="createNew"></div>
+
+<div id="created" style="display:none">
+	<div id="mainPanel" align="center">
+		<div id="createPanel" class="createpanel">
+			<br />
+			<div class="bodywhite" align="left">
+				<h2>Your configurations have been created</h2>
+				<p class="OrangeSmall">Service URLs:<p>
+				<p>Pellentesque libero diam, ultrices sed, cursus non, vulputate ac, tortor. Cras eros. Aenean eget felis. Aenean varius, nisi a consequat rutrum, justo sapien sagittis turpis, facilisis facilisis sem justo non tellus. Donec iaculis dolor a tortor. Nulla metus. Donec id dui.</p>
+				<p class="OrangeSmall">Download Standard</p>
+				<p>Aenean eget felis. Aenean varius, nisi a consequat rutrum, justo sapien sagittis turpis, facilisis facilisis sem justo non tellus. Donec iaculis dolor a tortor.<a class="blue pointer">Download</a></p>
+				<p class="OrangeSmall">Download extended metadata</p>
+				<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus tristique volutpat dolor. Etiam ac elit. Integer vitae lorem vel ante tincidunt rhoncus. Duis dolor. Vivamus pharetra tristique dui.<a class="blue pointer">Download</a></p>
+			</div>
+			<br />
+			<div class="subbody">
+				<button id="btnCancel" type="button" value="close" onclick="next();">NEXT</button>
+			</div>
+		</div>
+	</div>
+</div>

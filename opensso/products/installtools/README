@@ -1,0 +1,195 @@
+------------------------------------------------------------------------------
+README file for Open Web Single Sign-On Install Tools
+------------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.4 2008/06/25 05:51:15 qcheng Exp $
+
+------------------------------------------------------------------------------
+%% Contents:
+    %% 1. Build requirements
+    %% 2. Building the workspace
+        %% 2.1 all
+        %% 2.2 build target
+        %% 2.3 clean target
+        %% 2.4 usage target
+    %% 3. Creating an Installer/Configurator using Install Tools 
+        %% 3.1 What does Install Tools package provide?
+        %% 3.2 High Level Details
+    %% 4. Layout for Install/Configurator distribution 
+%% 1. Build requirements
+
+The OpenSSO workspace uses Apache Ant as the build tool. The build scripts
+in this workspace use features not present in releases of Ant prior to 1.6.
+Thus, in order to build this workspace you must have Ant version 1.6.5 or above
+installed and available in your system path.
+
+The sources in this workspace should be compiled using JDK 5.0 with the source
+and target levels set to "1.5". In order to allow this, you must ensure that
+JDK 5.0 is present in your system path and the JAVA_HOME environment variable
+is setup correctly pointing to its location.
+
+
+%% 2. Building the workspace
+
+The workspace build system offers several build targets. You can view the
+available targets by issuing the "ant usage" command from the root of the
+workspace. The default target that is executed is the all target which
+compiles the sources and creates the jar files. Currently the main
+targets available in the workspace are:
+   
+     - all           : compiles the sources and creates the jar files
+     - build         : compiles the sources
+     - clean         : deletes the generated class files, jar files and 
+                       directories
+     - usage         : displays this usage message
+
+%% 2.1 all target
+
+The all target compiles the sources if needed using the build target and then
+generates jar files in built/dist directory. 
+
+%% 2.2 build target
+
+The build target compiles the common sources and generates all the class files
+in built/classes directory.
+
+%% 2.3 clean target
+
+The clean target removes all the build output directories. It deletes the 
+built/classes, built/dist directories and their contents. 
+
+
+%% 2.4 usage target
+
+Displays a list of available targets along with a brief description of
+each available target for quick reference.
+
+%% 3. Creating an Installer/Configurator using Install Tools
+
+This section describes some high level details of this package and how it can
+be used to create an Installer/Configurator.
+
+%% 3.1 What does Install Tools package provide?
+
+This install tools package provides the infrastructure by means of API's,
+resources (property files) and XML files to create a full fledge command
+line installer / configurator. The install tools package provides an Admin Tool
+to which different handlers can be plugged in. Each of these handlers can be
+invoked from the Admin Tool by their respective commands line options. 
+
+Some of the key features include:
+  
+  * Simple console-based interface
+  * Greater customization through pluggable components
+  * Platform independent installer - 100% written in java
+  * Support for silent install without user interaction
+  * Support for configuring multiple instances of the product.   
+    
+%% 3.2 High Level Details
+
+The Admin Tool provides default handlers for Install, Un-install, Version & 
+Un-installAll, list-instances & Instance-info. The Admin Tool 
+com.sun.identity.install.tools.admin.AdminTool which is an implementation of the
+interface com.sun.identity.install.tools.launch.IAdminTool can be launched using
+the admin tool scripts admintool & admintool.bat. These scripts can be found in 
+the <workspace-root>/scripts directory. These scripts use a java launcher 
+program to load all the libraries, resources etc which are necessary to run the 
+admin tool. The AdminTool can be extended or a custom admin tool can also be 
+plugged in, by configuring it in FAMInstallerConfig.properties. This file can be 
+found in <workspace-root>/config directory.
+
+An abstract resolver class com.sun.identity.install.tools.admin.BaseToolsResolver 
+has the default handlers configured and provides hook to add additional handlers
+for product specific installers/configurators.
+
+The Install/Un-install Handlers provide means to install/configure & uninstall 
+several instance(s) of a product. The Install & Un-install handlers depend on 
+a configuration file configure.xml. This file can be customized to suite the 
+needs any product installer/configurator. The configure.xml specifies 
+interaction and task elements. The interactions are actions that interact with 
+the user and obtain user input/data for install. Interactions include 
+validator's which validate the data provided by the user. After interactions
+are executed, the tasks specified in the configure.xml are executed in the 
+listed order to configure / install the product. This configure.xml provides
+means to hook in either system (provide by install tools package) or custom 
+implementations for interactions, validators, tasks etc. A sample configure.xml
+which has been customized for Sun Java System Application S 8.2 Policy Agent
+has been included in the directory <workspace-root>/config.
+
+The resources needed for Internationalization of install tools package can be
+found in <workspace-root>/resources directory. The values in 
+amToolsMessages.properties can be customized to the needs of product specific 
+installer/configurator. New i18N keys and values can also be added. 
+
+%% 4. Layout for Install/Configurator distribution.
+
+The product specific installer/configurator distribution built using Install 
+Tools needs to have the following directory layout.
+
+<product-dir>
+     |
+     |- bin
+     |   |-- admintool      ( The admintool scripts to launch the AdminTool )
+     |   |-- admintool.bat  ( These can be renamed to be specific to a product )
+     |
+     |- config
+     |   |-- configure.xml  
+     |   |-- FAMInstallerConfig.properties
+     |   |-- <Any other configuration files needed for the product>
+     |
+     |- data 
+     |  ( Directory where all the installer/configuration state/data is stored. 
+     |    The files created in this directory should not be modified )
+     |
+     |- jce
+     |  ( JCE jar files and libraries needed if any of those features are 
+     |    being used by the product specific installer when JDK version
+     |    lower than 1.4 is being used. Otherwise it can be empty )
+     |   
+     |- jsse
+     |  ( JSSE jar files and libraries needed if any of those features are 
+     |    being used by the product specific installer when JDK version
+     |    lower than 1.4 is being used. Otherwise it can be empty )
+     |
+     |- lib
+     |   |-- opensso-installtools.jar  
+     |   |-- opensso-installtools-launcher.jar
+     |   |-- <product-install>.jar (containing product specific 
+     |   |                          implementation classes for interactions,
+     |   |                          tasks, validators etc & .version file with
+     |   |                          product version information)      
+     |   |-- (include all the other jars that are needed for the product)
+     |
+     |- license.txt
+     |
+     |- logs 
+     |   |-- ( place holder for install debug and audit log files )
+     |
+     |- locale
+         |-- amToolsMessages.properties (customized i18N properties)
+         |-- ( all other localization resources needed for the product) 
+     
+A zip/tar file of the above distribution can be created to serve as binary 
+distribution that can be shipped. 

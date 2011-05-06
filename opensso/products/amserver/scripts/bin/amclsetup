@@ -1,0 +1,693 @@
+#!/bin/sh
+
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amclsetup,v 1.4 2008/08/19 19:08:26 veiming Exp $
+#
+#
+
+#All defines are listed here..
+#General utils
+platform="`uname`"
+if [ ${platform} = "Linux" ]
+then
+   ID=/usr/bin/id
+   ECHO=/bin/echo
+   DATE=/bin/date
+   SED=/bin/sed
+   AWK=/bin/awk
+   RM=/bin/rm
+   DIRNAME=/usr/bin/dirname
+   CUT=/bin/cut
+   GETTEXT=/bin/gettext
+else
+   ID=/usr/bin/id
+   ECHO=/usr/bin/echo
+   DATE=/usr/bin/date
+   SED=/usr/bin/sed
+   AWK=/usr/bin/awk
+   RM=/usr/bin/rm
+   DIRNAME=/usr/bin/dirname
+   CUT=/usr/bin/cut
+   GETTEXT=/usr/bin/gettext
+fi
+
+
+#Script Specific defines
+
+. IS_INSTALL_ETCDIR/IS_PRODNAME/config/amenv.conf
+JAVA_HOME=${IS_JAVA}
+export JAVA_HOME
+
+#i18n stuff
+TEXTDOMAIN=clsetup
+TEXTDOMAINDIR=${IS_INSTALL}/lib/messages
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+# Error Codes
+AMCLSETUP_SUCCESS=0
+AMCLSETUP_USAGE_ERROR=1
+
+
+AMCLSETUP_RESOURCEFILE_NOTFOUND=2
+AMCLSETUP_CANNOTREAD_RESOURCEFILE=3
+
+AMCLSETUP_PASSWORDFILE_NOTFOUND=4
+AMCLSETUP_CANNOTREAD_PASSWORDFILE=5
+
+AMCLSETUP_AWKFILE_NOTFOUND=6
+AMCLSETUP_CANNOTREAD_AWKFILE=7
+
+AMCLSETUP_INVALID_USER=8
+AMCLSETUP_AMADMIN_NOTFOUND=9
+AMCLSETUP_HADBM_NOTFOUND=10
+
+AMCLSETUP_SESSIONSTORE_FAILED=11
+AMCLSETUP_HADBDB_FAILED=12
+AMCLSETUP_USER_EXIT=13
+
+#Logfile location where the output is logged.
+LOGFILE=/var/tmp/amclsetup.log
+
+#Configuration file that holds session related information 
+SESSIONCONFIGXML=${IS_CONFIG}/xml/amModifySessCfg.xml
+
+#Configuration file that holds information about cluster objects.
+#Can be overridden by passing --resourcefile to this script.'
+RESOURCEFILE=${IS_CONFIG}/amclresource.conf
+
+
+#Password file that holds admin server password.
+#Can be overridden by passing --passwordfile to this script.'
+PASSWORDFILE=${IS_CONFIG}/amclpassword.conf
+
+# awk script used by this script to parse the various information files.
+AWKFILE=${IS_INSTALL}/bin/util.awk
+
+# Notations for amadmin and hadbm commands.
+HADBM=${IS_HADB}/bin/hadbm
+AMADMIN=${IS_INSTALL}/bin/amadmin
+AMADMIN_ID=amadmin
+
+# Flags to check what arguments were passed to the script 
+CREATE_DATABASE="false"
+CREATE_SESSIONSTORE="false"
+CLEAR_SESSIONSTORE="false"
+
+
+#Show welcome text and get confirmation from the user before proceding.
+ShowWelcome()
+{
+    ${ECHO} "`${GETTEXT} 'Welcome to JES OpenSSO Session Failover Setup'`"
+    ${ECHO} "`${GETTEXT} 'Session Failover Configuration Setup Program.'`"
+    ${ECHO} "===================================================================="
+    ${ECHO} "`${GETTEXT} 'Please read the following prior to starting the configuration process. '`"
+    ${ECHO} " "
+    ${ECHO} "`${GETTEXT} 'a). Make sure your machine is configured properly to run RSH/SSH commands.'`"
+    ${ECHO} " "
+    ${ECHO} "`${GETTEXT} 'b). No inetd configuration will be done by this script.'`"
+    ${ECHO} " "
+    ${ECHO} "`${GETTEXT} 'c). Shared Memory settings required for HADB Commands will not be set'`"
+    ${ECHO} "`${GETTEXT} 'by this script.It is assumed that they have been preset to desired values.'`"
+    ${ECHO} " "
+    ${ECHO} "`${GETTEXT} 'd). LoadBalancer configuration will not be handled by this script.'`"
+    ${ECHO} " "
+    ${ECHO} "`${GETTEXT} 'e). Make sure the Directory Server is up and running on this host.'`"
+    ${ECHO} "===================================================================="
+    ${ECHO} " "
+    ${ECHO} "`${GETTEXT} 'Do you want to start configuring for Session Failover? [Yes/No]'` "
+    read prompt
+
+    reponse=`${ECHO} "$prompt" | tr "[a-z]" "[A-Z]"`
+    if [ "$reponse" = "`${GETTEXT} 'YES'`" ] 
+    then
+	return
+    fi
+    ${ECHO}
+    ${ECHO} "`${GETTEXT} 'Exiting ...'`"
+    ${ECHO}
+    ${ECHO} " " >> ${LOGFILE}
+    ${ECHO} "#######################################################################" >> ${LOGFILE}
+    ${ECHO} "`${GETTEXT} 'Session Failover Setup Script. Execution end time'` `${DATE} +%D` `${DATE} +%H:%M:%S`" >> ${LOGFILE}
+    ${ECHO} "#######################################################################" >> ${LOGFILE}
+    exit ${AMCLSETUP_USER_EXIT}
+}
+
+#Usage message function 
+UsageMessage()
+{
+	${ECHO} "`${GETTEXT} 'Usage : amclsetup [--help] [--createdatabase|--createsessionstore|clearsessionstore] [--passwordfile <Password File>]'`"
+} 
+
+#Check if the usage of the script is correct
+CheckUsage()
+{
+   if [ "${1}" = "--help" ]
+    then
+        UsageMessage
+	exit ${AMCLSETUP_USAGE_ERROR}
+    fi
+
+    # Check if correct number of arguments are passed, otherwise display
+    # usage and bail out
+
+    if [ $# -eq 1 -o $# -eq 2 -o $# -eq 3 -o $# -eq 4 -o $# -eq 5 ]
+    then
+        PWDFILE=
+	ctr=0
+	ArgCount=$#
+	for i in $*
+	do
+            if [ "${i}" = "--createdatabase" ]
+            then
+                CREATE_DATABASE="true"
+		ctr=`expr $ctr + 1`
+            else
+            if [ "${i}" = "--createsessionstore" ]
+            then
+                CREATE_SESSIONSTORE="true"
+		ctr=`expr $ctr + 1`
+            else
+            if [ "${i}" = "--clearsessionstore" ]
+            then
+                CLEAR_SESSIONSTORE="true"
+		ctr=`expr $ctr + 1`
+            else
+            if [ "${i}" = "--passwordfile" -a "$CREATE_SESSIONSTORE" = "true" -o "$CLEAR_SESSIONSTORE" = "true" ]
+            then
+		if [ "x${2}" != "x" ]
+		then
+                   PWDFILE="$2"
+                   ctr=`expr $ctr + 2`
+                   shift
+                   continue
+		fi
+            fi
+            fi
+            fi
+            fi
+            shift
+	done
+	if [ $ctr != $ArgCount ];
+	then
+            UsageMessage
+            exit ${AMCLSETUP_USAGE_ERROR}
+	fi
+ fi
+}
+
+
+#Check if all the HADB related configuration files are present and readable 
+CheckHADBConfigFiles()
+{
+    # Check if the Common AWK file exists and readable
+    if [ ! -f "${AWKFILE}" ]
+    then
+        ${ECHO} "`${GETTEXT} 'Common utitlity AWK file does not exist. Please rerun with a valid filename.'`"
+        exit ${AMCLSETUP_AWKFILE_NOTFOUND}
+    fi
+    if [ ! -r "${AWKFILE}" ]
+    then
+        ${ECHO} "`${GETTEXT} 'Common utility AWK file is not readable. Please rerun with a valid filename.'`"
+	exit ${AMCLSETUP_CANNOTREAD_AWKFILE}
+    fi
+
+    # Check if the file exists and readable
+    if [ ! -r "${RESOURCEFILE}" ]
+    then
+        ${ECHO} "`${GETTEXT} 'Resource file is not readable. Please modify the permissions on file: ${RESOURCEFILE}  '`" 
+        exit ${AMCLSETUP_CANNOTREAD_RESOURCEFILE}
+    fi
+    # If --passwordfile argument is passed then this will be set to non 
+    # empty value if so then check if the file exists and readable
+    if [ ! -z "${PWDFILE}" ]
+    then
+       PASSWORDFILE=${PWDFILE}
+       if [ ! -f "${PASSWORDFILE}"  ]
+       then
+          ${ECHO} "`${GETTEXT} 'Password file does not exist. Please rerun with a valid filename.'`" 
+          exit ${AMCLSETUP_PASSWORDFILE_NOTFOUND}
+       fi
+       if [ ! -r "${PASSWORDFILE}" ]
+       then
+          ${ECHO} "`${GETTEXT} 'Password file is not readable. Please rerun with a valid filename.'`" 
+          exit ${AMCLSETUP_CANNOTREAD_PASSWORDFILE}
+       fi
+    fi
+}
+
+#Check if the user running this script is root user. If not bail out
+CheckUser()
+{
+    if [ `${ID} | ${AWK} '{print $1}'` != "uid=0(root)" ]
+    then
+	${ECHO} "`${GETTEXT} 'This program can only be run by a root user.'`"
+	exit ${AMCLSETUP_INVALID_USER}
+    fi
+}
+
+# If the password file is provided or default file is used then
+# read the password else prompt the user for the password
+GetAdminPassword()
+{
+    while true
+    do
+        echo "$1 (nothing will be echoed): \c"
+        stty -echo
+        myread PASSWORD1
+        stty echo
+        echo
+        echo "Verify: \c"
+        stty -echo
+        myread PASSWORD2
+        stty echo
+        echo
+        if [ "${PASSWORD1}" != "${PASSWORD2}" ]; then
+           echo "Passwords are different!. Please retry"
+        else
+           break
+        fi
+    done
+    PSWD=${PASSWORD1}
+}
+
+# Checks if the user entered ! in response to a question and prompts again
+myread()
+{
+    while true
+    do
+        read NOBANG
+        if [ "x${NOBANG}" = "x!" ]; then
+            echo "Please do not enter the character !"
+            echo "Please enter the input again"
+            continue
+        else
+            eval $1=${NOBANG}
+            break
+        fi
+    done
+}
+
+
+#This function checks if amadmin is available in the directory where
+#the OpenSSO is installed. If not this will bail out..
+CheckAmadmin()
+{
+    if [ ! -f ${AMADMIN} ]
+    then
+	writeToLog "`${GETTEXT} 'Could not locate asadmin command on this machine. Exiting...'`"
+	exit ${AMCLSETUP_AMADMIN_NOT_FOUND}
+    else
+	WriteToLog "\t `${GETTEXT} 'Using'` ${AMADMIN}"
+    fi
+}
+
+
+#This function checks if hadbm is available in the specified directory.
+#This script is a one time configuration script that should be
+#run on a machine where application server and hadb are pre installed
+#If this script cannot find hadbm then it will bail out
+CheckHadbm()
+{
+    if [ ! -f ${HADBM} ]
+    then
+	WriteToLog "`${GETTEXT} 'Could not locate hadbm command on this machine. Exiting...'`"
+	exit ${AMCLSETUP_HADBM_NOT_FOUND}
+    else
+	WriteToLog "\t `${GETTEXT} 'Using'` ${HADBM}"
+    fi
+}
+
+#This function clear session store created in the HADB Database.
+ClearSessionstore()
+{
+    if [ "${CLEAR_SESSIONSTORE}" != "false"  ]
+    then
+       DBNAME="hadb"
+       ${HADBM} status ${DBNAME} 1>>${LOGFILE} 2>>${LOGFILE}
+       if [ $? != 0 ]
+       then
+          WriteToLog " "
+          WriteToLog " "
+          WriteToLog "\t `${GETTEXT} 'Database does not exist!!.'`"
+          EndScript ${AMCLSETUP_SESSIONSTORE_FAILED}
+       fi
+
+       #Find out URL, start the database before getting..
+       SESSIONSTOREURL=`${HADBM} get jdbcURL --quiet ${DBNAME} | ${CUT} -f2 -d ' '`
+       if [ -f ${PASSWORDFILE} ]; then
+           PSWD=`${AWK} -F=  '/AM_ADMIN_PASSWORD/ {print $2}' ${PASSWORDFILE}`
+       fi
+       if [ "x${PSWD}" = "x" ]
+       then
+          GetAdminPassword "Please enter the LDAP Admin password:"
+       fi
+       CMD="${AMADMIN} -u ${AMADMIN_ID} --password ${PSWD} --clearsessionstore --dbms hadb `${AWK} -f ${AWKFILE} SECTIONNAME="[SESSION_STORE]" ${RESOURCEFILE} | ${SED} "s/REPLACEURL/${SESSIONSTOREURL}/g"`"
+       WriteToLog " "
+       WriteToLog " "
+       WriteToLog "\t `${GETTEXT} 'CLEARING DATABASE TABLES REQUIRED FOR SESSION FAILOVER SETUP...'`"
+       WriteToLog " "
+       #WriteToLog "\t $CMD \n\n"
+       $CMD 1>>${LOGFILE} 2>>${LOGFILE}
+       if [ $? = 0 ]
+       then
+	  WriteToLog	"\t `${GETTEXT} 'Session Store tables cleared successfully.'`"
+       else
+          WriteToLog	"\t `${GETTEXT} 'Clearing Session Store table Failed.'`"
+          EndScript ${AMCLSETUP_SESSIONSTORE_FAILED}
+       fi
+    fi
+}
+
+#This function creates session store in the newly created HADB Database.
+CreateSessionstore()
+{
+    if [ "${CREATE_SESSIONSTORE}" != "false" -o "${CREATE_DATABASE}" = "false" -a "${CREATE_SESSIONSTORE}" = "false" -a  "${CLEAR_SESSIONSTORE}" = "false" ]
+    then
+       DBNAME="hadb"
+       ${HADBM} status ${DBNAME} 1>>${LOGFILE} 2>>${LOGFILE}
+
+       if [ $? != 0 ]
+       then
+          WriteToLog " "
+          WriteToLog " "
+          WriteToLog "\t `${GETTEXT} 'Database does not exist!!.'`"
+          EndScript ${AMCLSETUP_SESSIONSTORE_FAILED}
+       fi
+       if [ -f ${PASSWORDFILE} ]; then
+           PSWD=`${AWK} -F=  '/AM_ADMIN_PASSWORD/ {print $2}' ${PASSWORDFILE}`
+       fi
+       if [ "x${PSWD}" = "x" ]
+       then
+          GetAdminPassword "Please enter the LDAP Admin password:"
+       fi
+       #Find out URL, start the database before getting..
+       SESSIONSTOREURL=`${HADBM} get jdbcURL --quiet ${DBNAME} | ${CUT} -f2 -d ' '`
+       CMD="${AMADMIN} -u ${AMADMIN_ID} --password ${PSWD} --createsessionstore --dbms hadb `${AWK} -f ${AWKFILE} SECTIONNAME="[SESSION_STORE]" ${RESOURCEFILE} | ${SED} "s/REPLACEURL/${SESSIONSTOREURL}/g"`"
+       WriteToLog " "
+       WriteToLog " "
+       WriteToLog "\t `${GETTEXT} 'CREATING DATABASE TABLES REQUIRED FOR SESSION FAILOVER SETUP...'`"
+       WriteToLog " "
+       #WriteToLog "\t $CMD \n\n"
+
+       $CMD 1>>${LOGFILE} 2>>${LOGFILE}
+
+       if [ $? = 0 ]
+       then
+	  WriteToLog	"\t `${GETTEXT} 'Session Store created successfully.'`"
+       else
+          WriteToLog	"\t `${GETTEXT} 'Session Store Creation Failed.'`"
+          EndScript ${AMCLSETUP_SESSIONSTORE_FAILED}
+       fi
+    fi
+}
+
+#This function creates a HADB Database with two nodes on local machine.
+#The parameter values are read from ${RESOURCEFILE}.
+#This function also starts the recently created Database and 
+#gives out the JDBC URL info.
+CreateHadbdb()
+{
+    if [ "${CREATE_DATABASE}" != "false" -o "${CREATE_DATABASE}" = "false" -a "${CREATE_SESSIONSTORE}" = "false" -a  "${CLEAR_SESSIONSTORE}" = "false" ]
+    then 
+       CMD="${HADBM} create --installpath=${IS_HADB} --configpath=${IS_HADB_CONFIG} `${AWK} -f ${AWKFILE} SECTIONNAME="[HADBINFO]" ${RESOURCEFILE}`"
+       DBNAME=`echo ${CMD} | ${AWK} '{print $NF}'`
+       WriteToLog " "
+       WriteToLog " "
+       WriteToLog "\t `${GETTEXT} 'CHECKING IF DATABASE EXISTS...'` "
+       WriteToLog " "
+       WriteToLog "\t ${HADBM} status ${DBNAME} \n\n"
+       ${HADBM} status ${DBNAME} 1>>${LOGFILE} 2>>${LOGFILE}
+
+       if [ $? = 0 ]
+       then
+          WriteToLog "\t `${GETTEXT} 'Database already exists!!. Skipping creation part'`"
+       else
+          WriteToLog " "
+          WriteToLog " "
+          WriteToLog "\t `${GETTEXT} 'CREATING HADB DATABASE...'` "
+          WriteToLog " "
+          #WriteToLog "\t $CMD \n\n"
+          $CMD 1>>${LOGFILE} 2>>${LOGFILE}
+          if [ $? = 0 ]
+          then
+             WriteToLog	"\t `${GETTEXT} 'HADB Database created successfully.'`"
+          else
+             WriteToLog	"\t `${GETTEXT} 'HADB Database creation failed.'`"
+             EndScript ${AMCLSETUP_HADBDB_FAILED}
+          fi
+      fi
+   fi
+}
+
+
+InsertNewAttrValues()
+{
+    ATTR_NAME_OPEN_TAG="<Attribute name="
+    ATTR_VALUE_OPEN_TAG="<Value>"
+    ATTR_VALUE_CLOSE_TAG="</Value>"
+    CLOSING_BRACES="/>"
+    echo "\t\t   ${ATTR_NAME_OPEN_TAG}\"$2\"${CLOSING_BRACES}" >> $1
+    echo "\t\t   ${ATTR_VALUE_OPEN_TAG}$3${ATTR_VALUE_CLOSE_TAG}" >> $1
+}
+
+
+#This is a helper function that creates the Session Config file with 
+#the required parameter values
+InsertNewAttrElementValues()
+{
+    ELEMENT_SCHEMA_OPEN_TAG="<AttributeValuePair>"
+    ELEMENT_SCHEMA_CLOSE_TAG="</AttributeValuePair>"
+    TRUE="true"
+    FALSE="false"
+    ATTR_NAME_PREFIX="iplanet-am-session-"
+    if [ "x${JDBCURL}" = "x" ]; then
+        SESSIONSTOREURL=`${HADBM} get jdbcURL --quiet ${DBNAME} | ${CUT} -f2 -d ' '`
+        JDBCURL=`echo ${SESSIONSTOREURL} | ${SED} 's/jdbc:sun:hadb:/ /g' | tr -d " "`
+    fi
+    i=0
+    for part in failover store-username store-passwd cluster-serverlist store-cpl-max-wait-time JDBC-driver-Impl-classname jdbc-url min-pool-size max-pool-size
+    do
+        i=`expr $i + 1`
+        eval word_session$i="$part"
+    done
+    j=0
+    while [ $j -lt 9 ]
+    do
+        j=`expr $j + 1`
+        eval ATTR_NAME=${ATTR_NAME_PREFIX}\$word_session$j
+        echo "\t ${ELEMENT_SCHEMA_OPEN_TAG}" >> $1
+
+
+        case "${ATTR_NAME}" in
+            *failover*)
+                InsertNewAttrValues $1 ${ATTR_NAME} ${TRUE}
+                ;;
+            *store-username*)
+                USERNAME=`cat ${RESOURCEFILE}|grep storeuser| cut -d" " -f2`
+                InsertNewAttrValues $1 ${ATTR_NAME} ${USERNAME}
+                ;;
+            *store-passwd*)
+                PASSWORD=`cat ${RESOURCEFILE}|grep storepassword|cut -d" " -f2`
+                InsertNewAttrValues $1 ${ATTR_NAME} ${PASSWORD}
+                ;;
+            *cluster-serverlist*)
+                SERVER_LIST="`${AWK} -f ${AWKFILE} SECTIONNAME="[CLUSTER_SERVER_INFO]" ${RESOURCEFILE} | ${CUT} -f3 -d ' '`"
+                InsertNewAttrValues $1 ${ATTR_NAME} ${SERVER_LIST}
+                ;;
+            *store-cpl-max-wait-time*)
+                InsertNewAttrValues $1 ${ATTR_NAME} 60000
+                ;;
+            *store-datasource-classname*)
+                InsertNewAttrValues $1 ${ATTR_NAME} com.sun.hadb.ds.HadbDataSource
+                ;;
+            *JDBC-driver-Impl-classname*)
+                InsertNewAttrValues $1 ${ATTR_NAME} com.iplanet.dpro.session.jdbc.HADBConnectionImpl
+                ;;
+            *jdbc-url*)
+                InsertNewAttrValues $1 ${ATTR_NAME} ${JDBCURL}
+                ;;
+            *min-pool-size*)
+                InsertNewAttrValues $1 ${ATTR_NAME} 8
+                ;;
+            *max-pool-size*)
+                InsertNewAttrValues $1 ${ATTR_NAME} 32
+                ;;
+        esac
+        echo "\t ${ELEMENT_SCHEMA_CLOSE_TAG}" >> $1
+   done
+}
+
+
+#This is the helper function that creates the Session Config file with 
+#the required parameter values
+CreateXMLFile() 
+{
+    WriteToLog "\t `${GETTEXT} 'CREATING THE SESSION CONFIGURATION XML FILE...'`"
+    REQUEST_OPEN_TAG="<Requests>"
+    REQUEST_CLOSE_TAG="</Requests>"
+    SCHEMA_REQ_OPEN_TAG="<SchemaRequests"
+    SCHEMA_REQ_CLOSE_TAG="</SchemaRequests>"
+    MODIFY_DEFAULT_OPEN_TAG="<ModifyDefaultValues>"
+    MODIFY_DEFAULT_CLOSE_TAG="</ModifyDefaultValues>"
+
+    #Create the Session configuration file. 
+    echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" > $1
+    echo "<!--" >> $1
+    echo "\tCopyright (c) 2003 Sun Microsystems, Inc. All rights reserved" >> $1
+    echo "\tUse is subject to license terms." >> $1
+    echo "-->" >> $1
+    echo "" >> $1
+    echo "<!DOCTYPE Requests" >> $1
+    echo "\tPUBLIC \"-//iPlanet//OpenSSO 8 Admin CLI DTD//EN\"" >> $1
+    echo "\t\"jar://com/iplanet/am/admin/cli/amAdmin.dtd\"" >> $1
+    echo ">" >> $1 
+    echo "\n"
+    echo "<!--  MODIFY REQUESTS -->" >> $1
+    echo "\n"
+    echo "<!-- Default value cannot be set to choice values -->" >> $1
+    echo ""
+    echo "${REQUEST_OPEN_TAG}" >> $1
+    echo "${SCHEMA_REQ_OPEN_TAG} serviceName=\"iPlanetAMSessionService\" SchemaType=\"global\">" >> $1
+    echo "${MODIFY_DEFAULT_OPEN_TAG}" >> $1
+    InsertNewAttrElementValues $1 
+    echo "${MODIFY_DEFAULT_CLOSE_TAG}" >> $1
+    echo "${SCHEMA_REQ_CLOSE_TAG}" >> $1
+    echo "${REQUEST_CLOSE_TAG}" >> $1
+    WriteToLog "\t `${GETTEXT} 'Session Configuration XML File created successfully.'`"
+}
+
+#This is the main function that creates the Session Config file with 
+#the required parameter values
+CreateSessionConfigXML()
+{
+   if [ "${CREATE_DATABASE}" != "true" -a "${CREATE_SESSIONSTORE}" != "true" -a  "${CLEAR_SESSIONSTORE}" != "true" ]
+   then
+       WriteToLog " "
+       WriteToLog " "
+       WriteToLog "\t `${GETTEXT} 'CHECKING IF SESSION CONFIGURATION FILE ALREADY EXISTS...'`"
+       WriteToLog " "
+       if [ -f "${SESSIONCONFIGXML}" ]
+       then
+          ${ECHO} "`${GETTEXT} 'Session Configuration file already exist and will be overwritten. Do you want to continue....(Y/N):'`"
+          read prompt
+          reponse=`${ECHO} "$prompt" | tr "[a-z]" "[A-Z]"`
+          if [ "$reponse" != "`${GETTEXT} 'YES'`" -a "$reponse" != "`${GETTEXT} 'Y'`" ]
+          then
+             ${ECHO} "`${GETTEXT} 'Please rename the file and run the script again.'`" 
+             ${ECHO} "`${GETTEXT} 'Exiting upon your choice...'`"
+             return
+          fi
+       fi
+       CreateXMLFile ${SESSIONCONFIGXML}
+   fi
+}
+
+
+#This function loads the dynamically created Session Config file into LDAP 
+LoadConfigXML() 
+{
+   if [ "${CREATE_DATABASE}" != "true" -a "${CREATE_SESSIONSTORE}" != "true" -a  "${CLEAR_SESSIONSTORE}" != "true" ]
+   then
+      if [ "x${PSWD}" = "x" ]
+      then
+         GetAdminPassword "Please enter the LDAP Admin password:"
+      fi
+ 
+      CMD="${AMADMIN} -u ${AMADMIN_ID} --password ${PSWD} -t ${SESSIONCONFIGXML}"
+      WriteToLog " "
+      WriteToLog " "
+      WriteToLog "\t `${GETTEXT} 'LOADING THE SESSION CONFIGURATION SCHEMA FILE...'`"
+      WriteToLog " "
+      #WriteToLog "\t $CMD \n\n"
+      $CMD 1>>${LOGFILE} 2>>${LOGFILE}
+      if [ $? = 0 ]
+      then
+         WriteToLog	"\t `${GETTEXT} 'Session Configuration Schema loaded successfully.'`"
+         ${RM} -f ${SESSIONCONFIGXML}
+      else
+         WriteToLog	"\t `${GETTEXT} 'Failed to load Session Configuration Schema.'`"
+         EndScript ${AMCLSETUP_SESSIONSTORE_FAILED}
+      fi
+   fi
+}
+
+#--------------------------------------------------------------------
+EndScript()
+{
+    exitCode=$1
+    WriteToLog " "
+    WriteToLog " "
+    ${ECHO} "`${GETTEXT} 'Please refer to the log file'` ${LOGFILE} `${GETTEXT} 'for additional information.'`"
+    WriteToLog "###################################################################"
+    WriteToLog "`${GETTEXT} 'Cluster Setup Script. Execution end time'` `${DATE} +%D` `${DATE} +%H:%M:%S`"
+    WriteToLog "###################################################################"
+    exit ${exitCode}
+}
+
+#--------------------------------------------------------------------
+WriteToLog()
+{
+    Message=$1
+    ${ECHO} $1
+    ${ECHO} $1 >> ${LOGFILE}
+}
+
+
+#Script begins here...
+CheckUser
+CheckUsage $*
+WriteToLog " "
+WriteToLog " "
+${ECHO} "`${GETTEXT} 'Sun ONE Application Server 7.1 Enterprise Edition.'`" >> ${LOGFILE}
+${ECHO} "`${GETTEXT} 'Session Configuration Program Log.'`" >> ${LOGFILE}
+WriteToLog " "
+${ECHO} "#####################################################################" >> ${LOGFILE}
+${ECHO} "`${GETTEXT} 'Session Failover Setup Script. Execution start time'` `${DATE} +%D` `${DATE} +%H:%M:%S`"  >> ${LOGFILE}
+${ECHO} "#####################################################################" >> ${LOGFILE}
+ShowWelcome
+WriteToLog " "
+WriteToLog "\t `${GETTEXT} 'Running with the following Settings.'`"
+WriteToLog "\t -------------------------------------------------"
+WriteToLog "\t `${GETTEXT} 'Resource file'` -> ${RESOURCEFILE}"
+if [ "$CREATE_SESSIONSTORE" = "true" -o "$CLEAR_SESSIONSTORE" = "true" ]; then
+   if [ "x$PWDFILE" = "x" ]; then
+       WriteToLog "\t `${GETTEXT} 'Password file'` -> ${PASSWORDFILE}"
+   else
+       WriteToLog "\t `${GETTEXT} 'Password file'` -> ${PWDFILE}"
+   fi
+fi
+WriteToLog "\t -------------------------------------------------"
+
+CheckAmadmin
+CheckHadbm
+CheckHADBConfigFiles
+CreateHadbdb
+CreateSessionstore
+ClearSessionstore
+CreateSessionConfigXML
+LoadConfigXML
+EndScript ${AMCLSETUP_SUCCESS}

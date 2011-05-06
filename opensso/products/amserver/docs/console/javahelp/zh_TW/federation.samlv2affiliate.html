@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 SAMLv2 代管附屬提供者 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2affiliate"></a><h4>自訂 SAMLv2 代管附屬提供者</h4>
+<p>代管附屬提供者包含服務提供者的分組。附屬提供者是由附屬提供者的擁有者組成並維護，擁有者會從已配置的提供者實體中選擇成員提供者。附屬提供者可讓使用者在相關的網站群組之間進行聯合。選擇的提供者可以以附屬提供者成員的身份呼叫服務，或是以提供者身份單獨呼叫。如果以附屬提供者成員身份呼叫服務，服務提供者可能代表附屬提供者發出針對使用者的認證請求。若認證受到保護，使用者就可以透過附屬提供者的所有成員實現單次登入。</p><p>代管附屬提供者保留的中介資料定義了一或多個構成附屬提供者的提供者實體的分組。它不包含任何提供者 (於提供者實體中定義) 的配置資訊，只包含附屬提供者本身的配置資訊。如果同一信任圈內有數個服務提供者和身份識別提供者，請使用附屬提供者實體，以避免為常用的共用服務產生不同的名稱識別碼。</p><p>代管附屬提供者包含下列用於自訂的屬性：</p>
+<ul><li><p><a href="#ggwxt">中介別名</a></p></li>
+<li><p><a href="#ggwxj">成員</a></p></li>
+<li><p><a href="#ggwww">憑證別名</a></p></li></ul>
+
+
+<a name="ggwxt"></a><h5>中介別名</h5>
+<p>為配置的提供者指定 <tt>metaAlias</tt>。<tt>metaAlias</tt> 可用來尋找提供者的實體識別碼及其所在的組織。值為字串，等於範圍或組織名稱 (視 OpenSSO 中是否安裝 聯合服務的 SAML v2 外掛程式而定) 加上正斜線和提供者名稱。例如<tt> /suncorp/travelprovider</tt>。</p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> 中使用的名稱不得包含 <tt>/</tt>。</p>
+<hr>
+
+
+<a name="ggwxj"></a><h5>成員</h5>
+<p>提供者必須是信任圈的成員，否則無法參與基於 Liberty 的通訊。提供者可以屬於一個或多個附屬提供者。在 [新的值] 欄位中輸入提供者的實體 ID，然後按一下 [增加]。</p>
+
+<a name="ggwww"></a><h5>憑證別名</h5>
+<p>此屬性會定義提供者的憑證別名元素。<tt>簽署</tt>會指定用來尋找金鑰庫中正確的簽署憑證的提供者憑證別名。<tt>加密</tt>會指定用來尋找金鑰庫中正確的加密憑證的提供者憑證別名。</p>
+<br/>
+
+</body>
+</html>

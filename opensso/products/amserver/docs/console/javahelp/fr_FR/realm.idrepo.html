@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Magasins de donn&#233;es - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepo"></a><h3>Magasins de donn&#233;es</h3>
+<p><a name="indexterm-10"></a><a name="indexterm-11"></a>Un magasin de donn&#233;es est une base de donn&#233;es dans laquelle vous
+pouvez stocker des attributs utilisateur et des donn&#233;es de configuration utilisateur.</p><p>OpenSSO fournit des plug-ins du r&#233;f&#233;rentiel d'identit&#233;s qui se connectent &#224; une
+structure de r&#233;f&#233;rentiel d'identit&#233;s LDAPv3. Ceci vous permet de consulter et de
+r&#233;cup&#233;rer les informations utilisateur OpenSSO sans apporter de modification &#224; votre base
+de donn&#233;es utilisateur existante. La structure OpenSSO int&#232;gre les donn&#233;es du plug-in
+du r&#233;f&#233;rentiel d'identit&#233;s avec les donn&#233;es d'autres plug-ins OpenSSO afin de constituer
+une identit&#233; virtuelle pour chaque utilisateur. OpenSSO peut alors utiliser cette identit&#233;
+universelle dans les processus d'authentification et d'autorisation au sein de plusieurs r&#233;f&#233;rentiels
+d'identit&#233;s. L'identit&#233; d'utilisateur virtuelle est d&#233;truite lorsque la session de l'utilisateur prend
+fin.</p><p>OpenSSO prend en charge les magasins de donn&#233;es suivants&#160;:</p>
+<ul><li><p>Active Directory</p></li>
+<li><p>LDAPv3 g&#233;n&#233;rique</p></li>
+<li><p>Sun Directory Server avec sch&#233;ma OpenSSO</p></li></ul>
+<p>Pour plus d'informations sur la cr&#233;ation d'un magasin de donn&#233;es et sur
+la configuration des plug-ins du r&#233;f&#233;rentiel, reportez-vous &#224; la rubrique <a href="realm.idreposelecttype.html">Cr&#233;ation d'un magasin de donn&#233;es</a>.</p>
+<br/>
+
+</body>
+</html>

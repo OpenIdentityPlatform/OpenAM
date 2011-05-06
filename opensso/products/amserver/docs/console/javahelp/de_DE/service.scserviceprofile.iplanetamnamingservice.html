@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Namen - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamnamingservice"></a><h4>Namen</h4>
+<p><a name="indexterm-204"></a>Der Namensdienst wird zum Abrufen und Festlegen der URLs, Plugins und Konfigurationen
+sowie f&#252;r Anforderungsbenachrichtigungen f&#252;r verschiedene OpenSSO-Dienste verwendet, z. B. f&#252;r Sitzung, Authentifizierung,
+Protokollierung, SAML und Verbindung.</p><p>Dieser Dienst erm&#246;glicht es den Clients, den korrekten Dienst-URL zu finden, wenn
+OpenSSO auf der Plattform mehrfach ausgef&#252;hrt wird. Wenn eine Namens-URL gefunden wurde,
+entschl&#252;sselt der Namensdienst die Benutzersitzungsinformationen und ersetzt dynamisch die Werte f&#252;r Protokoll,
+Host und Anschluss mit den Parametern der Sitzung. Damit wird sichergestellt, dass
+der an den Dienst zur&#252;ckgegebene URL auf den Host verweist, auf dem
+die Benutzersitzung erstellt wurde. Es existieren folgende Namensattribute:</p>
+<ul><li><p><a href="#fwfgc">URL des Profildienstes</a></p></li>
+<li><p><a href="#fwfgg">URL des Sitzungsdienstes</a></p></li>
+<li><p><a href="#fwfgf">URL des Protokollierungsdienstes</a></p></li>
+<li><p><a href="#fwfgh">URL des Richtliniendienstes</a></p></li>
+<li><p><a href="#fwfge">URL des Authentifizierungsdienstes</a></p></li>
+<li><p><a href="#fwfgl">URL des SAML-Webprofil/-Produktdienstes</a></p></li>
+<li><p><a href="#fwfgm">URL des SAML-SOAP-Dienstes</a></p></li>
+<li><p><a href="#fwfgk">URL des SAML-Webprofil-/POST-Dienstes</a></p></li>
+<li><p><a href="#fwfgi">URL des SAML-Assertion-Manager-Dienstes</a></p></li>
+<li><p><a href="#fwfgn">Dienst-URL f&#252;r Verbindungassertions-Manager</a></p></li>
+<li><p><a href="#fwfgp">URL f&#252;r den Sicherheits-Token-Manager</a></p></li>
+<li><p><a href="#fwfgo">URL f&#252;r JAXRPC-Endpunkt</a></p></li></ul>
+
+
+<a name="fwfgc"></a><h5>URL des Profildienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/profileservice</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Profil-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="fwfgg"></a><h5>URL des Sitzungsdienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/sessionservice</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Sitzung-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="fwfgf"></a><h5>URL des Protokollierungsdienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/loggingservice</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Protokollierungs-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="fwfgh"></a><h5>URL des Richtliniendienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p> <tt>%protocol://%host:%port/Server_DEPLOY_URI/policyservice</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Richtlinien-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="fwfge"></a><h5>URL des Authentifizierungsdienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/authservice</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Authentifizierungs-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="fwfgl"></a><h5>URL des SAML-Webprofil/-Produktdienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLAwareServlet </tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der SAM-Webprofil/-Produktdienst-URL, basierend auf den sitzungsspezifischen
+Parametern. </p>
+
+<a name="fwfgm"></a><h5>URL des SAML-SOAP-Dienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLSOAPReceiver </tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der SAML-SOAP-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="fwfgk"></a><h5>URL des SAML-Webprofil-/POST-Dienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/SAMLPOSTProfileServlet </tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der SAM-Webprofil/-POST-URL, basierend auf den sitzungsspezifischen
+Parametern. </p>
+
+<a name="fwfgi"></a><h5>URL des SAML-Assertion-Manager-Dienstes</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/Server_DEPLOY_URI/AssertionManagerServlet/ AssertionManagerIF</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der SAML-Assertion-Manager-URL, basierend auf den sitzungsspezifischen
+Parametern. </p>
+
+<a name="fwfgn"></a><h5>Dienst-URL f&#252;r Verbindungassertions-Manager</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/amserver/FSAssertionManagerServlet/FSAssertionMana gerIF </tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Verbindungsassertions-Manager-URL, basierend auf den sitzungsspezifischen
+Parametern. </p>
+
+<a name="fwfgp"></a><h5>URL f&#252;r den Sicherheits-Token-Manager</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/amserver/SecurityTokenManagerServlet/SecurityToken ManagerIF/</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der Sicherheits-Token-URL, basierend auf den sitzungsspezifischen
+Parametern. </p>
+
+<a name="fwfgo"></a><h5>URL f&#252;r JAXRPC-Endpunkt</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port/amserver/jaxrpc/</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der JAXRPC-Endpunkt-URL, basierend auf den sitzungsspezifischen
+Parametern.</p>
+
+<a name="gguep"></a><h5>URL f&#252;r Identity-Webdienste-Endpunkt</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port%uri/identityservices/</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Identity-Webdienste-Endpunkt, basierend
+auf den sitzungsspezifischen Parametern.</p>
+
+<a name="ggudo"></a><h5>URL f&#252;r REST-Dienste-Endpunkt</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port%uri/identity//</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Identity REST-Denste-Endpunkt,
+basierend auf den sitzungsspezifischen Parametern.</p>
+
+<a name="ggueo"></a><h5>URL f&#252;r Sicherheitstoken-Dienst-Endpunkt</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port%uri/sts</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Sicherheitstoken-Dienst-Endpunkt, basierend
+auf den sitzungsspezifischen Parametern.</p>
+
+<a name="gguff"></a><h5>URL f&#252;r Sicherheitstoken-Dienst-MEX-Endpunkt</h5>
+<p>In diesem Feld ist ein Wert im folgenden Format zul&#228;ssig:</p><p><tt>%protocol://%host:%port%uri/sts/mex</tt></p><p>Diese Syntax erm&#246;glicht das dynamische Ersetzen der URL f&#252;r den Sicherheitstoken-Dienst-MEX-Endpunkt, basierend
+auf den sitzungsspezifischen Parametern.</p>
+<br/>
+
+</body>
+</html>

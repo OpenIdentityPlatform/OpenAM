@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So f&#252;gen Sie einer Anbieter-Entity einen neuen Remote-Identity-Anbieter hinzu - Online-Hilfe zur Sun Java System Federated Access Manager 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsidentityproviderremoteadd"></a><h4>So f&#252;gen Sie einer Anbieter-Entity einen neuen Remote-Identity-Anbieter hinzu</h4><p>Ein <b>Remote-Anbieter</b> befindet sich auf einem anderen Server als Access Manager. Das
+Konfigurieren der Attribute eines neuen Remote-Identity-Anbieters beinhaltet das Hinzuf&#252;gen der Metadaten des
+Identity-Anbieters zum Anbieter-Entity-Profil. Der Ausgangspunkt ist <a href="federation.fsidentityprovider.html">So f&#252;gen Sie einer Anbieter-Entity einen Identity-Anbieter hinzu</a>.</p>
+<hr><p><b>Hinweis &#8211; </b>Zus&#228;tzliche Attribute k&#246;nnen konfiguriert werden, sie werden jedoch auf der Seite f&#252;r
+die anf&#228;ngliche Konfiguration nicht angezeigt. Siehe <a href="federation.fsidentityproviderremoteprofile.html">So &#228;ndern Sie einen Remote-Identity-Anbieter in einer Anbieter-Entity</a>.</p>
+<hr>
+<ol>
+<li><b>Geben Sie Informationen f&#252;r die allgemeinen Attribute an.</b><p>Allgemeine Attribute enthalten Werte, die den Identity-Anbieter selbst allgemein beschreiben.</p><dl><dt>Beschreibung</dt>
+<dd><p>Der Wert dieses Attributs ist die Beschreibung, die Sie bei der Erstellung der Entity eingegeben haben. Sie k&#246;nnen die urspr&#252;nglich eingegebene Beschreibung &#228;ndern bzw. eine hinzuf&#252;gen, wenn noch keine vorhanden ist.</p></dd>
+<dt>Protokollunterst&#252;tzungsaufz&#228;hlung</dt>
+<dd><p>W&#228;hlen Sie die von dieser Entity unterst&#252;tzte Version von Liberty Alliance Project Liberty Identity Federation Framework (Liberty ID-FF) aus.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> bezieht sich auf Liberty ID-FF-Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> bezieht sich auf Liberty ID-FF-Version 1.1.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>Geben Sie Informationen f&#252;r die Kommunikations-URL-Attribute an.</b><p>Kommunikations-URL-Attribute enthalten Orte, an die die Anbieter &#220;bertragungen senden k&#246;nnen, die f&#252;r
+den betreffenden Identity-Anbieter vorgesehen sind.</p><dl><dt>Single Sign-On-Dienst-URL</dt>
+<dd><p>Geben Sie einen URL ein, an den die Dienstanbieter Single Sign-On- und Verbindungsanforderungen senden k&#246;nnen.</p></dd>
+</dl>
+</li>
+<li><b>Geben Sie Informationen f&#252;r die Kommunikationsprofil-Attribute an. </b><p>Ein Liberty Alliance Project-<b>Profil</b> legt die Kombination aus dem Inhalt einer Nachricht
+und dem zu ihrem Transport verwendeten Mechanismus fest. Die folgenden Kommunikationsprofilattribute legen
+die Profile fest, die vom Identity-Anbieter f&#252;r die einzelnen Funktionen verwendet werden.</p><dl><dt>Single Sign-On/Verbindung</dt>
+<dd><p>W&#228;hlen Sie das Profil aus, das dieser Identity-Anbieter beim Senden von Antworten zur Authentifizierung oder von Verbindungsanforderungen verwenden soll.</p>
+<ul><li><p>Browser-Ver&#246;ffentlichung (Browser-basiertes HTTP POST-Protokoll)</p></li>
+<li><p>Browser-Produkt (nicht Browser-basiertes SOAP-Protokoll)</p></li>
+<li><p>LECP (Liberty-f&#228;higer Client-Proxy)</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>W&#228;hlen Sie einen der verf&#252;gbaren Circles of Trust aus, der dem Anbieter
+zugewiesen werden soll.</b><p>Ein Anbieter kann zu mehreren Circles of Trust geh&#246;ren. Ein Anbieter, f&#252;r
+den kein Circle of Trust angegeben ist, kann jedoch nicht an Kommunikationen
+teilnehmen, die auf den  Liberty Alliance Project-Spezifikationen beruhen. Wenn keine Circles
+of Trust erstellt wurden, k&#246;nnen Sie dieses Attribut sp&#228;ter definieren.</p></li>
+<li><b>Klicken Sie auf "OK", um den Anbieter zur Entity hinzuzuf&#252;gen.</b></li>
+<li><b>W&#228;hlen Sie eine andere Option aus dem Men&#252; "Ansicht" aus, um weitere
+Einstellungen der Entity zu konfigurieren, oder klicken Sie auf "Speichern", um die
+Konfiguration abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

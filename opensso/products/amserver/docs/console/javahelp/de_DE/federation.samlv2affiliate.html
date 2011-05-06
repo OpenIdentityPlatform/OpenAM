@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2-Host-Zuordnungsanpassung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2affiliate"></a><h4>SAMLv2-Host-Zuordnungsanpassung</h4>
+<p>Eine Host-Zuordnung enth&#228;lt eine Zusammenstellung von Dienstanbietern. Die Zuordnung wird durch einen
+Zuordnungseigent&#252;mer gebildet und von diesem verwaltet. Dieser w&#228;hlt auch die Mitgliedsanbieter aus
+den bereits konfigurierten Anbieter-Entities. Die Zuordnung erm&#246;glicht dem Benutzer Verbindungen zwischen Gruppen
+miteinander verkn&#252;pfter Websites. Die ausgew&#228;hlten Anbieter k&#246;nnen Dienste als Mitglied der Zuordnung
+oder einzeln als Anbieter aufrufen. Wenn Dienste als Mitglied der Zuordnung aufgefrufen
+werden, kann ein Dienstanbieter eine Authentifizierungsabfrage f&#252;r einen Benutzer im Namen einer
+Zuordnung stellen. Wenn die Authentifizierung sicher ist, kann der Benutzer Single Sign-On
+mit allen Mitgliedern der Zuordnung erreichen. </p><p>Ein gehosteter Zuordnungsanbieter enth&#228;lt die Metadaten, die die Zusammenstellung einer oder mehrerer
+Anbieter-Entities definieren, aus denen die Zuordnung besteht.  Er enth&#228;lt nicht die
+Konfigurationsinformationen f&#252;r beliebige Anbieter (die in einer Anbieter-Entity definiert sind), sondern nur
+die Konfigurationsinformationen f&#252;r die Zuordnung selbst. Wenn verschiedene Dienstanbieter und Identity-Anbieter in
+demselben Circle of Trust vorliegen, verwenden Sie eine Zuordnungs-Entity, um zu vermeiden,
+dass verschiedene Namensbezeichner f&#252;r h&#228;ufig freigegebene Dienste erzeugt werden m&#252;sssen. </p><p>Die gehostete Zuordnung enth&#228;lt die folgenden Attribute zur Anpassung:</p>
+<ul><li><p><a href="#ggwxt">Meta-Alias</a></p></li>
+<li><p><a href="#ggwxj">Mitglieder</a></p></li>
+<li><p><a href="#ggwww">Cert-Alias</a></p></li></ul>
+
+
+<a name="ggwxt"></a><h5>Meta-Alias</h5>
+<p>Gibt einen <tt>metaAlias</tt> f&#252;r den zu konfigurierende Anbieter an. Der <tt>metaAlias</tt> wird
+verwendet, um nach dem Entity-Bezeichner des Anbieters und nach dem entsprechenden Unternehmen
+zu suchen. Der Wert ist eine Zeichenfolge, die dem Bereich oder Unternehmensnamen
+(je nachdem, ob das SAML v2-Plugin f&#252;r Verbindungsdienste in OpenSSO installiert ist),
+verbunden mit einem Schr&#228;gstrich und dem Anbieternamen entspricht. Z. B. <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Achtung &#8211; </b>Die im <tt>metaAlias</tt> verwendeten Namen d&#252;rfen keinen <tt>/</tt> enthalten.</p>
+<hr>
+
+
+<a name="ggwxj"></a><h5>Mitglieder</h5>
+<p>Ein Anbieter muss Mitglied eines Circle of Trust sein, anderenfalls kann er
+nicht an Liberty-basierten Kommunikationen teilnehmen. Der Anbieter darf zu einer oder mehreren
+Zuordnungen geh&#246;ren. Geben Sie die Entity-ID des Anbieters in das Feld "Neuer
+Wert" ein und klicken Sie auf "Hinzuf&#252;gen".</p>
+
+<a name="ggwww"></a><h5>Cert-Alias</h5>
+<p>Dieses Attribut definiert die Zertifikatalias-Elemente f&#252;r den Anbieter. <tt>Signieren</tt>Gibt den Anbieterzertifikatalias an,
+der f&#252;r die Suche nach dem richtigen Signaturzertifikat im Schl&#252;sselspeicher verwendet wird.
+<tt>Verschl&#252;sselung</tt>Gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Verschl&#252;sselungszertifikat
+im Schl&#252;sselspeicher verwendet wird.</p>
+<br/>
+
+</body>
+</html>

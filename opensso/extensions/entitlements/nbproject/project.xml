@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>opensso-entitlements</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>opensso-entitlements</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>opensso-entitlements</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>web</label>
+                    <type>doc_root</type>
+                    <location>web</location>
+                </source-folder>
+                <source-folder>
+                    <label>WEB-INF</label>
+                    <type>web_inf</type>
+                    <location>web/WEB-INF</location>
+                </source-folder>
+                <source-folder>
+                    <label>source</label>
+                    <type>java</type>
+                    <location>source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>unittest/source</label>
+                    <type>java</type>
+                    <location>unittest/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="tree">
+                        <label>Web Pages</label>
+                        <location>web</location>
+                    </source-folder>
+                    <source-folder style="tree">
+                        <label>WEB-INF Content</label>
+                        <location>web/WEB-INF</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>source</label>
+                        <location>source</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>unittest/source</label>
+                        <location>unittest/source</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/2">
+            <compilation-unit>
+                <package-root>source</package-root>
+                <classpath mode="compile">built/classes:build-lib/asm-3.1.jar:build-lib/el-api-1.0.jar:build-lib/j2ee.jar:build-lib/jersey-core-1.1.0-ea.jar:build-lib/jersey-server-1.1.0-ea.jar:build-lib/json.jar:build-lib/jsr311-api-1.1.jar:extlib/amserver.jar:extlib/j2ee.jar:extlib/opensso-sharedlib.jar:extlib/testng-5.9-jdk15.jar:extlib/openfedlib.jar:extlib/opensso.jar:war-lib/asm-3.1.jar:war-lib/backport-util-concurrent-2.2.jar:war-lib/commons-beanutils-1.6.jar:war-lib/commons-collections-3.2.jar:war-lib/commons-digester-1.8.jar:war-lib/commons-fileupload-1.2.jar:war-lib/commons-logging-1.1.1.jar:war-lib/commons-logging-api-1.1.jar:war-lib/icefaces-comps.jar:war-lib/icefaces-facelets.jar:war-lib/icefaces.jar:war-lib/jdom.jar:war-lib/jersey-core-1.1.0-ea.jar:war-lib/jersey-server-1.1.0-ea.jar:war-lib/jsf-api.jar:war-lib/jsf-impl.jar:war-lib/jsr311-api-1.1.jar:war-lib/jstl.jar:war-lib/rome-1.0.jar:extlib/jato.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>unittest/source</package-root>
+                <unit-tests/>
+                <classpath mode="compile">built/classes:extlib/amserver.jar:extlib/opensso-sharedlib.jar:extlib/testng-5.9-jdk15.jar:build-lib/j2ee.jar:build-lib/json.jar:unittest/built/classes</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+            <module name="org-netbeans-modules-editor-indent">
+                <node name="text">
+                    <node name="x-java">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
+                    </node>
+                </node>
+                <node name="CodeStyle">
+                    <node name="project"/>
+                    <property name="usedProfile" value="default"/>
+                </node>
+            </module>
+        </preferences>
+        <web-data xmlns="http://www.netbeans.org/ns/freeform-project-web/1">
+            <web-module>
+                <doc-root>web</doc-root>
+                <classpath/>
+                <j2ee-spec-level>1.5</j2ee-spec-level>
+            </web-module>
+        </web-data>
+    </configuration>
+</project>

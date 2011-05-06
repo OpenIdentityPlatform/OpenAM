@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=EUC-JP">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>LDAPv3 リポジトリプラグインの属性
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="realm.idrepoadd"></A><h3>LDAPv3 リポジトリプラグインの属性</h3>
+<p><A NAME="indexterm-13"></A>次の属性は、LDAPv3 リポジトリプラグインを設定するために使用されます。</p>
+<ul><li><p><A HREF="realm.idrepoadd.html#fyfdo">「プライマリ LDAP サーバー」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdt">「LDAP バインド DN」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfds">「LDAP バインドパスワード」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdu">「LDAP バインドパスワード (確認)」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdv">「LDAP 組織 DN」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdw">「LDAP SSL を有効」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfej">「LDAP 接続プールの最小サイズ」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfee">「LDAP 接続プールの最大サイズ」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdx">「検索で返される結果の最大数」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfen">「検索タイムアウト」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfdz">「LDAP の従う参照」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffh">「LDAPv3 リポジトリプラグインクラス名」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeu">「属性名マッピング」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffb">「LDAPv3 プラグインでサポートされるタイプおよび操作」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffj">「LDAP ユーザー検索属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeo">「LDAP ユーザー検索フィルタ」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffi">「LDAP ユーザーオブジェクトクラス」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfez">「LDAP ユーザー属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfeb">「LDAP グループ検索属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfep">「LDAP グループ検索フィルタ」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfed">「LDAP グループコンテナネーミング属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfec">「LDAP グループコンテナ値」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffc">「LDAP グループオブジェクトクラス」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfff">「LDAP グループ属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfea">「グループメンバーシップの属性名」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfes">「グループメンバーの属性名」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfev">「グループメンバー URL の属性名」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfem">「LDAP ピープルコンテナネーミング属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffe">「LDAP ピープルコンテナ値」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffk">「LDAP エージェント検索属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffl">「LDAP エージェントコンテナネーミング属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffa">「LDAP エージェントコンテナ値」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffd">「LDAP エージェント検索フィルタ」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfey">「LDAP エージェントオブジェクトクラス」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfew">「LDAP エージェント属性」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfef">「持続検索ベース DN」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffz">「再起動前の持続検索の最大アイドル時間」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfgh">「エラーコードの後の再試行の最大数」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyfge">「再試行の間の遅延時間」</A></p>
+</li>
+<li><p><A HREF="realm.idrepoadd.html#fyffr">「再試行する LDAPException エラーコード」</A></p>
+</li>
+</ul>
+<A NAME="fyfdo"></A><h4>プライマリ LDAP サーバー</h4>
+<p>接続する LDAP サーバーの名前を入力します。形式は <tt>hostname.domainname:portnumber</tt> です。</p>
+<p><tt>host:portnumber</tt> エントリを複数入力した場合、リストの先頭にあるホストへの接続が試みられます。リスト内の次のエントリへの接続が試みられるのは、現在のホストへの接続が失敗した場合だけです。</p>
+<A NAME="fyfdt"></A><h4>LDAP バインド DN</h4>
+<p>現在接続されている LDAP サーバーへの認証時に Access Manager が使用する DN 名を指定します。このバインド用 DN 名を持つユーザーは、<A HREF="realm.idrepoadd.html#fyffb">「LDAPv3 プラグインでサポートされるタイプおよび操作」</A>属性に設定された正しい追加/変更/削除権限を持っている必要があります。</p>
+<A NAME="fyfds"></A><h4>LDAP バインドパスワード</h4>
+<p>現在接続されている LDAP サーバーへの認証時に Access Manager が使用する DN パスワードを指定します。</p>
+<A NAME="fyfdu"></A><h4>LDAP バインドパスワード (確認)</h4>
+<p>パスワードを確認します。</p>
+<A NAME="fyfdv"></A><h4>LDAP 組織 DN</h4>
+<p>このデータストアリポジトリのマッピング先となる DN。これが、このデータストア内で実行されるすべての操作のベース DN になります。</p>
+<A NAME="fyfdw"></A><h4>LDAP SSL を有効</h4>
+<p>これを有効にした場合、Access Manager は HTTPS プロトコルを使ってプライマリサーバーに接続します。</p>
+<A NAME="fyfej"></A><h4>LDAP 接続プールの最小サイズ</h4>
+<p>接続プール内の接続の初期数を指定します。接続プールを使用すると、新しい接続を毎回作成する必要がなくなります。</p>
+<A NAME="fyfee"></A><h4>LDAP 接続プールの最大サイズ</h4>
+<p>使用可能な接続の最大数を指定します。</p>
+<A NAME="fyfdx"></A><h4>検索で返される結果の最大数</h4>
+<p>1 回の検索操作で返されるエントリの最大数を指定します。この制限値に達すると、Directory Server は検索要求に一致するすべてのエントリを返します。</p>
+<A NAME="fyfen"></A><h4>検索タイムアウト</h4>
+<p>1 回の検索要求に割り当てられる秒数の最大値を指定します。この制限値に達すると、Directory Server は検索要求に一致するすべての検索エントリを返します。</p>
+<A NAME="fyfdz"></A><h4>LDAP の従う参照</h4>
+<p>このオプションを有効にした場合、この LDAP サーバーはほかの LDAP サーバーへの参照に自動的に従います。</p>
+<A NAME="fyffh"></A><h4>LDAPv3 リポジトリプラグインクラス名</h4>
+<p>LDAPv3 リポジトリを実装するクラスファイルの場所を指定します。</p>
+<A NAME="fyfeu"></A><h4>属性名マッピング</h4>
+<p>これにより、フレームワークが認識している共通属性をネイティブデータストアへマッピングすることが可能になります。たとえば、フレームワークが <tt>inetUserStatus</tt> に基づいてユーザーの状態を判断している場合に、ネイティブデータストアが実際には <tt>userStatus</tt> を使用している可能性があります。この属性定義では大文字と小文字が区別されます。</p>
+<A NAME="fyffb"></A><h4>LDAPv3 プラグインでサポートされるタイプおよび操作</h4>
+<p>この LDAP サーバー上で許可される (実行可能な) 操作を指定します。この LDAPv3 リポジトリプラグインでサポートされている唯一の操作であるデフォルト操作。次に示すのは、LDAPv3 リポジトリプラグインでサポートされている操作です。</p>
+<ul><li><p>グループ -- 読み取り、作成、編集、削除</p>
+</li>
+<li><p>レルム -- 読み取り、作成、編集、削除、サービス</p>
+</li>
+<li><p>ユーザー -- 読み取り、作成、編集、削除、サービス</p>
+</li>
+<li><p>エージェント -- 読み取り、作成、編集、削除</p>
+</li>
+</ul>
+<p>使用する LDAP サーバーの設定や</p>
+<p>作業に応じて上記から不要なアクセス権を削除することはできますが、その他のアクセス権を追加することはできません。</p>
+<A NAME="fyffj"></A><h4>LDAP ユーザー検索属性</h4>
+<p>このフィールドは、ユーザーに対して検索を行うための属性タイプを定義します。たとえば、ユーザーの DN が <tt>uid=user1,ou=people,dc=iplanet,dc=com</tt> である場合、ネーミング属性は <tt>uid</tt> です。</p>
+<A NAME="fyfeo"></A><h4>LDAP ユーザー検索フィルタ</h4>
+<p>ユーザーエントリの検索に使用する検索フィルタを指定します。</p>
+<A NAME="fyffi"></A><h4>LDAP ユーザーオブジェクトクラス</h4>
+<p>ユーザーのオブジェクトクラスを指定します。ユーザー作成時に、このユーザーオブジェクトクラスのリストがユーザーの属性リストに追加されます。</p>
+<A NAME="fyfez"></A><h4>LDAP ユーザー属性</h4>
+<p>ユーザーに関連付けられた属性のリストを定義します。このリストに含まれていないユーザー属性の読み取りや書き込みは許可されません。これらの属性では大文字と小文字が区別されます。オブジェクトクラスと属性スキーマをここで定義する前に、それらが Directory Server 内で定義されている必要があります。</p>
+<A NAME="fyfeb"></A><h4>LDAP グループ検索属性</h4>
+<p>このフィールドは、グループに対して検索を行うための属性タイプを定義します。デフォルトは <tt>cn</tt> です。</p>
+<A NAME="fyfep"></A><h4>LDAP グループ検索フィルタ</h4>
+<p>グループエントリの検索に使用する検索フィルタを指定します。デフォルトは、<tt>(objectclass=groupOfUniqueNames)</tt> です。</p>
+<A NAME="fyfed"></A><h4>LDAP グループコンテナネーミング属性</h4>
+<p>グループが特定のコンテナ内に存在している場合、そのグループコンテナのネーミング属性を指定します。それ以外の場合、この属性は空白のままにしておきます。たとえば、グループ DN <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> が <tt>ou=groups</tt> 内に存在している場合、グループコンテナのネーミング属性は <tt>ou</tt> になります。</p>
+<A NAME="fyfec"></A><h4>LDAP グループコンテナ値</h4>
+<p>グループコンテナの値を指定します。たとえば、グループ <tt>DN cn=group1,ou=groups,dc=iplanet,dc=com</tt> がコンテナ名 <tt>ou=groups</tt> 内に存在している場合、グループコンテナの値は <tt>groups</tt> になります。</p>
+<A NAME="fyffc"></A><h4>LDAP グループオブジェクトクラス</h4>
+<p>グループのオブジェクトクラスを指定します。グループ作成時に、このグループオブジェクトクラスのリストがグループの属性リストに追加されます。</p>
+<A NAME="fyfff"></A><h4>LDAP グループ属性</h4>
+<p>グループに関連付けられた属性のリストを定義します。このリストに含まれていないグループ属性の読み取りや書き込みは許可されません。これらの属性では大文字と小文字が区別されます。オブジェクトクラスと属性スキーマをここで定義する前に、それらが Directory Server 内で定義されている必要があります。</p>
+<A NAME="fyfea"></A><h4>グループメンバーシップの属性名</h4>
+<p>DN が属するすべてのグループの名前をその値に持つ属性の名前を指定します。デフォルトは <tt>memberOf</tt> です。</p>
+<A NAME="fyfes"></A><h4>グループメンバーの属性名</h4>
+<p>このグループに属する DN を値に持つ属性の名前を指定します。デフォルトは <tt>uniqueMember</tt> です。</p>
+<A NAME="fyfev"></A><h4>グループメンバー URL の属性名</h4>
+<p>このグループに属するメンバーに解決される LDAP URL を値に持つ属性の名前を指定します。デフォルトは <tt>memberUrl</tt> です。</p>
+<A NAME="fyfem"></A><h4>LDAP ピープルコンテナネーミング属性</h4>
+<p>ユーザーが特定のピープルコンテナ内に存在している場合、そのピープルコンテナのネーミング属性を指定します。ユーザーが特定のピープルコンテナ内に存在していない場合、このフィールドは空白のままにしておきます。</p>
+<A NAME="fyffe"></A><h4>LDAP ピープルコンテナ値</h4>
+<p>ピープルコンテナの値を指定します。デフォルトは <tt>people</tt> です。</p>
+<A NAME="fyffk"></A><h4>LDAP エージェント検索属性</h4>
+<p>このフィールドは、エージェントに対して検索を行うための属性タイプを定義します。デフォルトは <tt>uid</tt> です。</p>
+<A NAME="fyffl"></A><h4>LDAP エージェントコンテナネーミング属性</h4>
+<p>エージェントが特定のエージェントコンテナ内に存在している場合のエージェントコンテナのネーミング属性。エージェントが特定のエージェントコンテナ内に存在していない場合、このフィールドは空白のままにしておきます。</p>
+<A NAME="fyffa"></A><h4>LDAP エージェントコンテナ値</h4>
+<p>エージェントコンテナの値を指定します。デフォルトは <tt>agents</tt> です。</p>
+<A NAME="fyffd"></A><h4>LDAP エージェント検索フィルタ</h4>
+<p>エージェントの検索に使用するフィルタを定義します。このフィールドの前に「LDAP エージェント検索属性」を追加したものが、実際のエージェント検索フィルタになります。</p>
+<p>たとえば、「LDAP エージェント検索属性」が <tt>uid</tt> で、「LDAP ユーザー検索フィルタ」が <tt>(objectClass=sunIdentityServerDevice)</tt> である場合、実際のユーザー検索フィルタは次のようになります。<tt>(&amp;(uid=*)(objectClass=sunIdentityServ erDevice))</tt></p>
+<A NAME="fyfey"></A><h4>LDAP エージェントオブジェクトクラス</h4>
+<p>エージェントのオブジェクトクラスを定義します。エージェント作成時に、このエージェントオブジェクトクラスのリストがエージェントの属性リストに追加されます。</p>
+<A NAME="fyfew"></A><h4>LDAP エージェント属性</h4>
+<p>エージェントに関連付けられた属性のリストを定義します。このリストに含まれていないエージェント属性の読み取りや書き込みは許可されません。これらの属性では大文字と小文字が区別されます。オブジェクトクラスと属性スキーマをここで定義する前に、それらが Directory Server 内で定義されている必要があります。</p>
+<A NAME="fyfef"></A><h4>持続検索ベース DN</h4>
+<p>持続検索で使用するベース DN を定義します。LDAPv3 サーバーの中には、ルートサフィックスレベルでの持続検索しかサポートしないものもあります。</p>
+<A NAME="fyffz"></A><h4>再起動前の持続検索の最大アイドル時間</h4>
+<p>持続検索を再起動するまでの最大アイドル時間を定義します。1 より大きい値を指定する必要があります。1 以下の値を指定した場合、接続のアイドル時間にかかわらず検索が再起動されます。</p>
+<p>Access Manager がロードバランサとともに配備されている場合、そうしたロードバランサの中には、指定された期間アイドル状態が続くとタイムアウトするものもあります。その場合、ロードバランサに指定された時間よりも小さい値を「再起動前の持続検索の最大アイドル時間」に設定することをお勧めします。</p>
+<A NAME="fyfgh"></A><h4>エラーコードの後の再試行の最大数</h4>
+<p>「再試行する LDAPException エラーコード」に指定されたエラーコードが発生した場合の、持続検索操作の最大再試行回数を定義します。</p>
+<A NAME="fyfge"></A><h4>再試行の間の遅延時間</h4>
+<p>各再試行間の待機時間を指定します。これは持続検索接続にのみ適用されます。</p>
+<A NAME="fyffr"></A><h4>再試行する LDAPException エラーコード</h4>
+<p>持続検索操作の再試行を起動するエラーコードを指定します。この属性は持続検索にのみ適用されます。すべての LDAP 操作に適用されるわけではありません。</p>
+
+<br />
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>STS-Client - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.stsclientedit"></a><h4>STS-Client</h4>
+<p>Die Schnittstelle des STS-Clients (Security Token Service, Sicherheitstoken-Dienst) erm&#246;glicht das Erstellen und
+Konfigurieren eines Clients, der mit dem Sicherheitstoken-Dienst von OpenSSO kommuniziert, um ein
+Sicherheitstoken abzurufen. OpenSSO bietet einen Mechanismus zum Erstellen der folgenden Typen von
+STS-Client-Agenten:</p><dl><dt>Discovery Agent</dt>
+<dd><p>Erm&#246;glicht die Konfiguration eines Discovery Agent-Clients, der mit dem Liberty Discovery-Dienst kommuniziert, um ein Liberty-basiertes Sicherheits-Token abzurufen. Diese Konfiguration definiert die Attribute f&#252;r die Sicherung von Liberty-Anforderungen vom Discovery-Client bis zum Liberty Discovery-Endpunkt.</p></dd>
+</dl>
+<dl><dt>Security Token Service-Agent</dt>
+<dd><p>Erm&#246;glicht die Konfiguration eines Sicherheitstoken-Dienst-Agenten, der mit dem Sicherheitstoken-Dienst von OpenSSO kommuniziert, um webbasierte Sicherheits-Token abzurufen. Diese Konfiguration definiert die Attribute f&#252;r die Sicherung von Webdienst-Trust-Anforderungen vom STS-Client bis zum STS-Endpunkt.</p></dd>
+</dl>
+<p>An der Schnittstelle des STS-Clients k&#246;nnen Sie folgende Aktionen ausf&#252;hren.</p>
+<ul><li><p><a href="agentconfig.discoveryagentprofile.html">Discovery Agent-Attribute</a> konfigurieren</p></li></ul>
+
+<ul><li><p><a href="agentconfig.webservicestsedit.html">Attribute des Agenten f&#252;r den Sicherheitstoken-Dienst</a> konfigurieren</p></li></ul>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Personalizaci&#243;n de consultas de atributos SAMLv2 - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrquery"></a><h4>Personalizaci&#243;n de consultas de atributos SAMLv2</h4>
+<p>La Consulta de atributo SAMLv2 contiene los siguientes atributos que se pueden
+personalizar:</p>
+<ul><li><p><a href="#ggwht">Formato de Id. de nombre</a></p></li>
+<li><p><a href="#ggwgs">Alias de certificado</a></p></li></ul>
+
+
+<a name="ggwht"></a><h5>Formato de Id. de nombre</h5>
+<p>Define los formatos de identificador de nombre compatibles con el proveedor de
+consulta de atributo. Los identificadores de nombre son una forma de que
+los proveedores se comuniquen entre s&#237; en relaci&#243;n a un usuario. Las
+interacciones de inicio de sesi&#243;n &#250;nico admiten tres tipos de identificadores: </p>
+<ul><li><p><b>X509SubjectName</b> define el nombre de asunto del tipo de cifrado X509.</p></li>
+<li><p>Se guarda un <b>identificador persistente</b> en la entrada del almac&#233;n de datos de un usuario determinado como el valor de dos atributos. </p></li>
+<li><p>Un <b>identificador transitorio</b> es temporal, por lo que no se escribir&#225;n datos en el almac&#233;n de datos persistente del usuario.</p></li></ul>
+
+
+<a name="ggwgs"></a><h5>Alias de certificado</h5>
+<p>Este atributo define los elementos de alias de certificado para el proveedor.
+  La <tt>firma</tt> especifica el alias de certificado de proveedor utilizado
+para encontrar el certificado firmante correcto en el almac&#233;n de claves. 
+ El <tt>cifrado</tt> especifica el alias de certificado de proveedor utilizado para
+encontrar en el almac&#233;n de claves el certificado de cifrado correcto.</p>
+<br/>
+
+</body>
+</html>

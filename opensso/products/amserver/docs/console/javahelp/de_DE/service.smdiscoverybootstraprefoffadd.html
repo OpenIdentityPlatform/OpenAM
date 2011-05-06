@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So konfigurieren Sie ein Ressourcenangebot f&#252;r Bootstrapping - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverybootstraprefoffadd"></a><h5>So konfigurieren Sie ein Ressourcenangebot f&#252;r Bootstrapping</h5>
+<a name="indexterm-146"></a><a name="indexterm-147"></a><p>F&#252;r Bootstrapping ist nur ein Ressourcenangebot zul&#228;ssig. Standardm&#228;&#223;ig enth&#228;lt dieses Angebot Informationen
+&#252;ber den  Discovery-Dienst. Wenn ein Ressourcenangebot bereits definiert wurde, k&#246;nnen Sie
+die Attribute &#228;ndern, indem Sie auf den Namen des Ressourcenangebots klicken. Sie
+k&#246;nnen auch das das Kontrollk&#228;stchen neben dem Namen aktivieren und das vorhandene
+Ressourcenangebot l&#246;schen. Um anschlie&#223;end ein neues Ressourcenangebot zu konfigurieren, klicken Sie auf
+"Neu".</p><ol>
+<li><b>Klicken Sie auf "Neu", um die neuen Mapper-Attribute anzuzeigen, bzw. auf den
+Namen eines konfigurierten Mappers, um ihn zu &#228;ndern.</b></li>
+<li><b>Geben Sie optional eine Beschreibung des Ressourcenangebots ein.</b></li>
+<li><b>Legen Sie die Werte der Dienstinstanz-Attribute entsprechend der folgenden Informationen fest:</b><dl><dt>Diensttyp</dt>
+<dd><p>Der Wert f&#252;r dieses Attribut ist ein URI, der den vom Ressourcenangebot implementierten Diensttyp festlegt. Beispiel: <tt><b> urn:liberty:disco:2003-08</b></tt>.</p>
+<hr><p><b>Hinweis &#8211; </b>Es wird empfohlen, den gleichen URI zu w&#228;hlen, der f&#252;r <tt>targetNamespace</tt> der abstrakten WSDL-Beschreibung des Dienstes festgelegt ist.</p>
+<hr>
+</dd>
+<dt>Provider ID</dt>
+<dd><p>Der Wert f&#252;r dieses Attribut ist ein URI des Anbieters der Dienstinstanz. Beispiel: <tt><b>http://daiquiri.sun.com:80/amserver/Liberty/disco </b></tt>.</p></dd>
+<dt>Dienstbeschreibung</dt>
+<dd><p>Dieses Attribut definiert einen laufenden Webdienst an einem gegebenen Protokollendpunkt. Die Informationen &#252;ber Dienstinstanzen m&#252;ssen in verschiedenen Kontexten bereitgestellt werden. Der in dieser Spezifikation definierte Discovery-Dienst ist beispielsweise ein Identity-Dienst, der eine Aufz&#228;hlung der Ressourcenangebote bereitstellt (wobei jedes der Angebote eine Dienstinstanzbeschreibung enth&#228;lt). Siehe <a href="service.smdiscoverydescriptionadd.html">So konfigurieren Sie eine Dienstbeschreibung</a>.</p></dd>
+</dl>
+</li>
+<li><b>Legen Sie die Werte der Resssourcenangebot-Optionen entsprechend der folgenden Informationen fest:</b><dl><dt>Optionen</dt>
+<dd><p>Aktivieren Sie dieses Kontrollk&#228;stchen, wenn der Dienst keine verf&#252;gbaren Optionen f&#252;r das Ressourcenangebot enth&#228;lt. Optionen bieten einem potentiellen anfordernden Benutzer Hinweise dar&#252;ber, ob bestimmte Daten oder Vorg&#228;nge in einem bestimmten Ressourcenangebot verf&#252;gbar sind. Eine Option kann beispielsweise darauf hinweisen, dass Kontaktinformationen verf&#252;gbar sind.</p></dd>
+<dt>Optionsliste</dt>
+<dd><p>Dieses Attribut enth&#228;lt eine Liste der Optionen f&#252;r die Dienstinstanz. Die Option wird als URI festgelegt. Der Satz g&#252;ltiger URIs ist in der Regel vom Diensttyp standardisiert.</p></dd>
+</dl>
+</li>
+<li><b>Aktivieren Sie Richtlinien basierend auf folgende Informationen:</b><dl><dt>Beschreibungs-ID-Verweise f&#252;r: GenerateBearerToken</dt>
+<dd><p>Alle <a href="supporteddirectives.html">Unterst&#252;tzte Richtlinien</a> k&#246;nnen einen Beschreibungsverweis enthalten. Wenn f&#252;r eine Richtlinie kein ID-Verweisattribut aktiviert ist, wird die Richtlinie auf alle im Ressourcenangebot enthaltenen Authentifizierungsmechanismen angewendet. Wenn das ID-Verweisattribut f&#252;r eine Richtlinie aktiviert ist, MUSS es eine Liste mit ID-Verweisen enthalten, die auf den in der Richtlinie festgelegten Authentifizierungsmechanismus verweisen. Ist das Attribut vorhanden, DARF die Richtlinie nur auf diejenigen Beschreibungen angewendet werden, auf die in der ID-Verweisliste verwiesen wird. Dies ist eventuell von Vorteil, wenn eine Richtlinie bestimmte Sicherheitsmechanismen nicht unterst&#252;tzt.</p></dd>
+<dt>Beschreibungs-ID-Verweise f&#252;r: Authenticate Requestor</dt>
+<dd><p>Alle <a href="supporteddirectives.html">Unterst&#252;tzte Richtlinien</a> k&#246;nnen einen Beschreibungsverweis enthalten. Wenn f&#252;r eine Richtlinie kein ID-Verweisattribut aktiviert ist, wird die Richtlinie auf alle im Ressourcenangebot enthaltenen Authentifizierungsmechanismen angewendet. Wenn das ID-Verweisattribut f&#252;r eine Richtlinie aktiviert ist, MUSS es eine Liste mit ID-Verweisen enthalten, die auf den in der Richtlinie festgelegten Authentifizierungsmechanismus verweisen. Ist das Attribut vorhanden, DARF die Richtlinie nur auf diejenigen Beschreibungen angewendet werden, auf die in der ID-Verweisliste verwiesen wird. Dies ist eventuell von Vorteil, wenn eine Richtlinie bestimmte Sicherheitsmechanismen nicht unterst&#252;tzt.</p></dd>
+<dt>Beschreibungs-ID-Verweise f&#252;r: Encrypt ResourceID</dt>
+<dd><p>Alle <a href="supporteddirectives.html">Unterst&#252;tzte Richtlinien</a> k&#246;nnen einen Beschreibungsverweis enthalten. Wenn f&#252;r eine Richtlinie kein ID-Verweisattribut aktiviert ist, wird die Richtlinie auf alle im Ressourcenangebot enthaltenen Authentifizierungsmechanismen angewendet. Wenn das ID-Verweisattribut f&#252;r eine Richtlinie aktiviert ist, MUSS es eine Liste mit ID-Verweisen enthalten, die auf den in der Richtlinie festgelegten Authentifizierungsmechanismus verweisen. Ist das Attribut vorhanden, DARF die Richtlinie nur auf diejenigen Beschreibungen angewendet werden, auf die in der ID-Verweisliste verwiesen wird. Dies ist eventuell von Vorteil, wenn eine Richtlinie bestimmte Sicherheitsmechanismen nicht unterst&#252;tzt.</p></dd>
+<dt>Beschreibungs-ID-Verweise f&#252;r: AuthenticateSessionContext</dt>
+<dd><p>Alle <a href="supporteddirectives.html">Unterst&#252;tzte Richtlinien</a> k&#246;nnen einen Beschreibungsverweis enthalten. Wenn f&#252;r eine Richtlinie kein ID-Verweisattribut aktiviert ist, wird die Richtlinie auf alle im Ressourcenangebot enthaltenen Authentifizierungsmechanismen angewendet. Wenn das ID-Verweisattribut f&#252;r eine Richtlinie aktiviert ist, MUSS es eine Liste mit ID-Verweisen enthalten, die auf den in der Richtlinie festgelegten Authentifizierungsmechanismus verweisen. Ist das Attribut vorhanden, DARF die Richtlinie nur auf diejenigen Beschreibungen angewendet werden, auf die in der ID-Verweisliste verwiesen wird. Dies ist eventuell von Vorteil, wenn eine Richtlinie bestimmte Sicherheitsmechanismen nicht unterst&#252;tzt.</p></dd>
+<dt>Beschreibungs-ID-Verweise f&#252;r: Authorize Requester</dt>
+<dd><p>Alle <a href="supporteddirectives.html">Unterst&#252;tzte Richtlinien</a> k&#246;nnen einen Beschreibungsverweis enthalten. Wenn f&#252;r eine Richtlinie kein ID-Verweisattribut aktiviert ist, wird die Richtlinie auf alle im Ressourcenangebot enthaltenen Authentifizierungsmechanismen angewendet. Wenn das ID-Verweisattribut f&#252;r eine Richtlinie aktiviert ist, MUSS es eine Liste mit ID-Verweisen enthalten, die auf den in der Richtlinie festgelegten Authentifizierungsmechanismus verweisen. Ist das Attribut vorhanden, DARF die Richtlinie nur auf diejenigen Beschreibungen angewendet werden, auf die in der ID-Verweisliste verwiesen wird. Dies ist eventuell von Vorteil, wenn eine Richtlinie bestimmte Sicherheitsmechanismen nicht unterst&#252;tzt.</p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "Speichern", um die Konfiguration abzuschlie&#223;en.</b></li>
+<li><b>Klicken Sie auf der  Discovery-Dienst-Seite auf "Speichern", um die Konfiguration des
+Dienstes abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

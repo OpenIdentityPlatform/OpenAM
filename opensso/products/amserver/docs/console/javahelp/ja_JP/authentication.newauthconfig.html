@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>新しい認証連鎖を作成する - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.newauthconfig"></a><h4>新しい認証連鎖を作成する</h4><ol>
+<li><b><a name="indexterm-7"></a>新しい認証連鎖を追加するレルムの名前をクリックします。</b></li>
+<li><b>「認証」タブを選択します。</b></li>
+<li><b>「認証連鎖」リストの「新規」をクリックします。</b></li>
+<li><b>認証連鎖の名前を入力します。</b></li>
+<li><b>「了解」をクリックします。</b></li>
+<li><b>「追加」をクリックし、連鎖に含める認証モジュールインスタンスを定義します。そのためには、モジュールインスタンスの名前を「インスタンス」リストから選択します。このリストに表示されるモジュールインスタンス名は、「モジュールインスタンス」属性で作成されたものです。 </b></li>
+<li><b>連鎖の条件を選択します。認証モジュールにこれらのフラグを定義することにより、認証モジュールの適用基準が確立されます。適用には階層があります。「必須」がもっとも高く、「オプション」がもっとも低くなっています。</b><dl><dt>必要</dt>
+<dd><p>このモジュールインスタンスは成功する必要があります。成功した場合は、「認証連鎖」リストの順に認証が続行されます。失敗した場合、「認証連鎖」リストの順に認証が続行されることはなく、すぐに制御がアプリケーションに戻ります。</p></dd>
+<dt>必須</dt>
+<dd><p>このモジュールに対する認証は成功する必要があります。連鎖内の必須モジュールのいずれかが失敗すると、認証連鎖全体は最終的に失敗となります。ただし、1 つの必須モジュールの成功や失敗にかかわらず、制御は連鎖内の次のモジュールに移ります。</p></dd>
+<dt>十分</dt>
+<dd><p>このモジュールインスタンスは成功する必要がありません。成功した場合、モジュールインスタンスリストの順に認証が続行されることはなく、すぐに制御がアプリケーションに戻ります。失敗した場合は、「認証連鎖」リストの順に認証が続行されます。</p></dd>
+<dt>オプション</dt>
+<dd><p>このモジュールインスタンスは成功する必要がありません。その成功や失敗にかかわらず、「認証連鎖」リストの順に認証が続行されます。</p></dd>
+</dl>
+</li>
+<li><b>連鎖のオプションを入力します。これにより、モジュールの追加オプションをキーと値のペアで設定できます。複数のオプションはスペースで区切ります。</b></li>
+<li><b>次の属性を定義します。</b><dl><dt>ログイン成功時に返す URL</dt>
+<dd><p>認証の成功時にユーザーをリダイレクトする URL を指定します。</p></dd>
+<dt>ログイン失敗時に返す URL</dt>
+<dd><p>認証の失敗時にユーザーをリダイレクトする URL を指定します。</p></dd>
+<dt>Authentication Post Processing Class</dt>
+<dd><p>ログインの成功または失敗後に実行する認証後プロセスをカスタマイズするための Java クラス名を定義します。</p></dd>
+</dl>
+</li>
+<li><b>「保存」をクリックします。</b></li></ol>
+<br/>
+
+</body>
+</html>

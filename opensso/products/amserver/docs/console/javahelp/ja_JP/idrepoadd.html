@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>OpenSSO のデータストアの種類 - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="idrepoadd"></a><h4>OpenSSO のデータストアの種類</h4>
+<p>OpenSSO のデータストア選択画面で作成できるデータストアの種類は次のとおりです。</p>
+
+<a name="gdlmv"></a><h5>Active Directory</h5>
+<p>このタイプのデータストアは、LDAP version 3 仕様に基づいて、Microsoft Active Directory インスタンスにアイデンティティーデータを書き込みます。</p><p>属性の定義については、<a href="realm.idrepoeditad.html">「Active Directory の属性」</a>を参照してください。</p>
+
+<a name="gdlmr"></a><h5>汎用 LDAPv3</h5>
+<p>このタイプのデータストアは、アイデンティティーデータを任意の LDAPv3 準拠データベースに書き込むことができます。使用している LDAPv3 データベースが持続検索をサポートしない場合は、キャッシュ機能を利用できません。</p><p>属性の定義については、<a href="realm.idrepoeditldapv3.html">「汎用 LDAPv3 属性」</a>を参照してください。</p>
+
+<a name="gdlnw"></a><h5>OpenSSO スキーマを含んだ Sun Directory Server</h5>
+<p>このタイプのデータストアは Sun Java System Directory Server インスタンス内に存在し、そこに OpenSSO 情報ツリーが格納されます。 </p><p>属性の定義については、<a href="realm.idrepoeditfamschema.html">「OpenSSO スキーマ属性を含んだ Sun Directory Server」</a>を参照してください。</p>
+<br/>
+
+</body>
+</html>

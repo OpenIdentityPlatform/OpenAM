@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>資料存放區 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepo"></a><h3>資料存放區</h3>
+<p><a name="indexterm-10"></a><a name="indexterm-11"></a>資料存放區是一個資料庫，您可在其中儲存使用者屬性與使用者配置資料。</p><p>OpenSSO 提供可連接至 LDAPv3 身份識別儲存庫架構的身份識別儲存庫外掛程式。這樣便可讓您檢視並擷取 OpenSSO 使用者資訊，而無需對您現有的使用者資料庫進行變更。OpenSSO 架構會整合身份識別儲存庫外掛程式與其他 OpenSSO 外掛程式的資料，以組成每個使用者的虛擬身份。OpenSSO 稍後可在多個身份識別儲存庫間的認證與授權程序中使用通用識別。當使用者階段作業結束時，將銷毀虛擬使用者識別。</p><p>OpenSSO 支援以下資料存放區：</p>
+<ul><li><p>Active Directory</p></li>
+<li><p>通用 LDAPv3</p></li>
+<li><p>具有 OpenSSO 模式的 Sun Directory Server</p></li></ul>
+<p>請參閱<a href="realm.idreposelecttype.html">建立新的資料存放區</a>，以取得如何建立新的資料存放區及配置儲存庫外掛程式的相關資訊。</p>
+<br/>
+
+</body>
+</html>

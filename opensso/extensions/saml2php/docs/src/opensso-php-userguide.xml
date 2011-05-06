@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <title>User's Guide for OpenSSO PHP Extension</title>
+
+  <articleinfo>
+    <date>2007-04-11</date>
+
+    <author>
+      <firstname>Andreas Åkre</firstname>
+
+      <surname>Solberg</surname>
+    </author>
+
+    <author>
+      <surname>Pat Patterson</surname>
+    </author>
+  </articleinfo>
+
+  <section>
+    <title>Overview</title>
+
+    <para>To OpenSSO PHP Extension up running, you need to perform the
+    following steps:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Install the software, see <xref
+        linkend="sect.installation" /></para>
+      </listitem>
+
+      <listitem>
+        <para>Configure the software, see <xref
+        linkend="sect.configuration" /></para>
+      </listitem>
+
+      <listitem>
+        <para>Setup SP and IdP meta data for OpenSSO PHP Extension, see <xref
+        linkend="sect.metadata" /></para>
+      </listitem>
+
+      <listitem>
+        <para>Write and load SP meta data for the SAML 2.0 SP into your IdP,
+        see <xref linkend="sect.metadata" /></para>
+      </listitem>
+    </orderedlist>
+  </section>
+
+  <section id="sect.installation">
+    <title>Installation</title>
+
+    <para>To install OpenSSO PHP Extension is as simple as just dropping the
+    <filename>openssophp</filename> folder on a webaccessible area on your
+    webserver. You are strongly advised to configure your web server to use
+    HTTPS, because OpenSSO PHP Extension is using
+    <literal>Browser/POST</literal> meaning that private data flows through
+    HTTP. After you have installed the software, you should configure
+    it.</para>
+
+    <important>
+      <para>The instructions above will help you perform a basic installation.
+      Some of the available plugins may require further steps. Please read the
+      documentation of the combination of plugins you are using for more
+      instructions in <xref linkend="sect.plugins" />. A basic installation
+      will at least work with <literal>namemapping/transient</literal> and
+      <literal>sessionmanagement/phpsession</literal>.</para>
+    </important>
+  </section>
+
+  <section id="sect.configuration">
+    <title>Configuration</title>
+
+    <para>There is one configuration file and it is located in
+    <filename>openssophp/config/config.php</filename>. Here is an example of a
+    configuration:</para>
+
+    <programlisting>$LIGHTBULB_CONFIG = array (
+	'basedir' 				=&gt; '/home/as/erlang/feide/openssophp/',
+	'baseurl'				=&gt; 'https://feide.erlang.no/openssophp/',
+	
+ 	'spi-sessionhandling' 	=&gt; 'phpsession',
+ 	'spi-namemapping' 		=&gt; 'database',
+ 	
+ 	'userdatabase'			=&gt; array (
+ 		'username'			=&gt; 'openssodemo',
+ 		'password'			=&gt; 'abc123',
+ 		'host'				=&gt; 'localhost',
+ 		'database'			=&gt; 'openssodemo'
+ 	),
+	
+	'defaultLandingPage'	=&gt; 'https://feide.erlang.no/example-andreas/test.php'
+);</programlisting>
+
+    <para>Here follows a description of each configuration entry:</para>
+
+    <glosslist>
+      <glossentry>
+        <glossterm>basedir</glossterm>
+
+        <glossdef>
+          <para>This is the path on the server where the OpenSSO PHP Extension
+          is installed. You may safely rename the openssophp folder to
+          something different if you also update the path here in the
+          configuration and in the meta data.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>baseurl</glossterm>
+
+        <glossdef>
+          <para>This is the url where the <filename>openssophp</filename>
+          folder is accessible from the web.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>spi-sessionhandling</glossterm>
+
+        <glossdef>
+          <para>Type in the ID of the name mapping plugin that you want to
+          use, see <xref linkend="sect.sessionmanagement" /> for more
+          information.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>spi-namemapping</glossterm>
+
+        <glossdef>
+          <para>Type in the ID of the session handling plugin that you want to
+          use, see <xref linkend="sect.namemapping" /> for more
+          information.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>userdatabase</glossterm>
+
+        <glossdef>
+          <para>This is the configuration of how to connect to the user
+          database. This is only required for the
+          <literal>namemapping/database</literal> plugin, see <xref
+          linkend="sect.namemapping-database" /> for more information. If you
+          are not using this plugin you can leave the default unchanged, or
+          you can safely remote that section from the configuration
+          file.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>defaultLandingPage</glossterm>
+
+        <glossdef>
+          <para>If a SAML authentication response is received with no
+          RelayState parameter, then the browser is redirected to this
+          page.</para>
+        </glossdef>
+      </glossentry>
+    </glosslist>
+  </section>
+
+  <section id="sect.metadata">
+    <title>Meta Data</title>
+
+    <para>To setup trust and relation between a OpenSSO PHP Extension SAML 2.0
+    SP and a SAML 2.0 IdP, the following steps needs to be performed:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Setup SP meta data for OpenSSO PHP Extension SAML 2.0 SP</para>
+      </listitem>
+
+      <listitem>
+        <para>Setup IdP meta data for OpenSSO PHP Extension SAML 2.0 SP</para>
+      </listitem>
+
+      <listitem>
+        <para>Create and load SP meta data for a SAML 2.0 IdP</para>
+      </listitem>
+    </orderedlist>
+
+    <para>To configure OpenSSO PHP Extension to work with mulitple IdPs, step
+    2 and 3 should be repeated.</para>
+
+    <section>
+      <title>Setup SP meta data for Service Provider</title>
+
+      <para>The meta data for SPs is located in
+      <filename>openssophp/config/saml-metadata-SP.php</filename>. This file
+      contains a list of SP meta data, each identified by a meta alias. For
+      most use cases configuring one SP should be sufficient. The meta alias
+      "<literal>/sp</literal>" can be left as it is. For each SP the following
+      needs to be specified:</para>
+
+      <glosslist>
+        <glossentry>
+          <glossterm>assertionConsumerServiceURL</glossterm>
+
+          <glossdef>
+            <para>The URL where the Browser/POST authentication response is
+            sent. Make sure the hostname is correct.</para>
+          </glossdef>
+        </glossentry>
+
+        <glossentry>
+          <glossterm>issuer</glossterm>
+
+          <glossdef>
+            <para>This is the SAML 2.0 entity ID of the SP. If you unsure on
+            what entity id to use, using the hostname of the SP is a good
+            idea.</para>
+          </glossdef>
+        </glossentry>
+
+        <glossentry>
+          <glossterm>spNameQualifier</glossterm>
+
+          <glossdef>
+            <para>This value can be used to affiliate multiple SPs. If you are
+            not using SAML 2.0 affiliations, you probably want to leave this
+            field identical to the issuer.</para>
+          </glossdef>
+        </glossentry>
+      </glosslist>
+
+      <para>Below is a sample meta data for one SP.</para>
+
+      <programlisting>    $spMetadata = array( "/sp" =&gt; 
+      array( "assertionConsumerServiceURL"=&gt;"https://feide.erlang.no/openssophp/AssertionConsumerService.php",
+             "issuer"=&gt;"feide.erlang.no",
+             "spNameQualifier" =&gt; "feide.erlang.no")); </programlisting>
+    </section>
+
+    <section>
+      <title>Setp IdP meta data for Service Provider</title>
+
+      <para>Next, we want to configure the SP to talk to a SAML 2.0 IdP. The
+      meta data is located in
+      <filename>openssophp/config/saml-metadata-IdP.php</filename>. Below is a
+      sample of three IdPs.</para>
+
+      <programlisting>    $idpMetadata = array( 
+    	"sam.feide.no" =&gt; 
+			array( "SingleSignOnUrl"=&gt;"https://sam.feide.no/amserver/SSORedirect/metaAlias/idp",
+             "SingleLogOutUrl"=&gt;"https://sam.feide.no/amserver/IDPSloRedirect/metaAlias/idp",
+             "certFingerprint"=&gt;"3a:e7:d3:d3:06:ba:57:fd:7f:62:6a:4b:a8:64:b3:4a:53:d9:5d:d0" ),
+             
+        "mars.feide.no" =&gt; 
+			array( "SingleSignOnUrl"=&gt;"https://mars.feide.no/amserver/SSORedirect/metaAlias/idp",
+             "SingleLogOutUrl"=&gt;"https://mars.feide.no/amserver/IDPSloRedirect/metaAlias/idp",
+             "certFingerprint"=&gt;"d8:ee:63:c8:c3:0a:9d:f2:4b:7f:c2:7b:43:4c:85:8c:62:c7:8c:69" )
+   		"idp.simplesign.com" =&gt;
+			array( 
+			 "SingleSignOnBinding" =&gt; "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign",
+			 "certificate" =&gt; "-----BEGIN CERTIFICATE-----\n"
+								."MIIhjkHDEJKjbjkebjkEBKJEBKJebjkebkjEBJEBKJbejkebJKEBJKbejkbjkeBJ\n"
+								."FLEHOhohoehOEOBNFojenbjNBJOFEBNJOFEBOJbnjbJEJFBEFBJbjBJIFEBJIFBI\n"
+								."...\n"
+								."FHJKEFJEbjkebjkebRBBJKbjekbJKEBJKEBJKbfBJKEBJKEBJKbBEJKBJE==\n"
+								."-----END CERTIFICATE-----" )
+    );</programlisting>
+
+      <para>Each IdP is identified by the SAML 2.0 Entity ID, and has a subset
+      of the following properties associated with it:</para>
+
+      <glosslist>
+        <glossentry>
+          <glossterm>SingleSignOnUrl</glossterm>
+
+          <glossdef>
+            <para>The URL to where the authentication request HTTP-REDIRECT is
+            sent.</para>
+          </glossdef>
+        </glossentry>
+
+        <glossentry>
+          <glossterm>SingleLogOutUrl</glossterm>
+
+          <glossdef>
+            <para>The URL to where the logout request HTTP-REDIRECT is
+            sent.</para>
+          </glossdef>
+        </glossentry>
+
+        <glossentry>
+          <glossterm>certFingerprint</glossterm>
+
+          <glossdef>
+            <para>The value of the fingerprint of the certificate the IdP is
+            using to sign the assertion. The fingerprint should be in
+            lowercase hex format, as seen in the example above. This property
+            is currently only used with the
+            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" binding.</para>
+          </glossdef>
+        </glossentry>
+
+        <glossentry>
+          <glossterm>SingleSignOnBinding</glossterm>
+
+          <glossdef>
+            <para>The SAML 2.0 binding in use for single sign-on. If omitted,
+            defaults to "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST". Only
+            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" and
+            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" are
+            currently supported.</para>
+          </glossdef>
+        </glossentry>
+
+        <glossentry>
+          <glossterm>certificate</glossterm>
+
+          <glossdef>
+            <para>The value of the certificate the IdP is using to sign the
+            assertion. The fingerprint should be in Privacy-Enhanced Mail
+            (PEM) format, as seen in the example above. This property is
+            currently only used with the
+            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign"
+            binding.</para>
+          </glossdef>
+        </glossentry>
+      </glosslist>
+    </section>
+
+    <section>
+      <title>Load SP meta data in your SAML 2.0 IdP</title>
+
+      <para>First create a SAML 2.0 meta data document matching your OpenSSO
+      PHP Extension SAML 2.0 SP. You may use the document below as a
+      template:</para>
+
+      <programlisting>&lt;EntityDescriptor
+    xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    entityID="feide.erlang.no"&gt;
+    &lt;SPSSODescriptor
+        AuthnRequestsSigned="false"
+        WantAssertionsSigned="false"
+        protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"&gt;
+        &lt;SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="https://feide.erlang.no/openssophp/SingleLogoutService.php" /&gt;
+        &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:2.0:nameid-format:transient&lt;/NameIDFormat&gt;
+        &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:2.0:nameid-format:persistent&lt;/NameIDFormat&gt;
+        &lt;AssertionConsumerService isDefault="true" index="0"
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://feide.erlang.no/openssophp/AssertionConsumerService.php" /&gt;
+    &lt;/SPSSODescriptor&gt;
+&lt;/EntityDescriptor&gt;
+</programlisting>
+
+      <para>Remember to replace the hostnames of the SAML endpoints to match
+      the host where you run the SP. You also must set the entityID.</para>
+
+      <para>Consult the documentation of your SAML 2.0 IdP software for how to
+      load meta data for new service providers.</para>
+
+      <example>
+        <title>Loading meta data in an OpenSSO IdP</title>
+
+        <para>To load meta data for a SP into an OpenSSO IdP, you can run a
+        command similar to:</para>
+
+        <screen>saml2meta import -u uid=amAdmin,ou=People,dc=feide,dc=no -w PASSWORD -m /opt/SUNWam/saml2/meta/feide.erlang.no-spMeta.xml -t feidecot</screen>
+
+        <para>If you already have import that meta data and want to upload
+        with changes, you first have to delete the entity, and then reload
+        again with the command above. Here is a command to delete the
+        entity:</para>
+
+        <screen>saml2meta delete -u  uid=amAdmin,ou=People,dc=feide,dc=no -w PASSWORD -e feide.erlang.no</screen>
+      </example>
+    </section>
+  </section>
+
+  <section id="sect.plugins">
+    <title>Plugins</title>
+
+    <para>Currently OpenSSO PHP Extension has two plugin APIs. One API for
+    custom name mapping and one for session management. At configuration time
+    you will choose exactly one name mapping plugin and one session management
+    plugin to be active, see more in <xref
+    linkend="sect.configuration" />.</para>
+
+    <section id="sect.namemapping">
+      <title>Name Mapping Plugins</title>
+
+      <para>The name mapping plugin is responsible for transforming a NameID
+      to a local user ID. It has one function for setting the mapping, and one
+      for looking up a mapping.</para>
+
+      <section>
+        <title>namemapping/transient</title>
+
+        <para>The <literal>namemapping/transient</literal> plugin is extremely
+        simple. It requires no database, and does not really transform the
+        NameID to a local ID, but just returns a transient NameID as the local
+        ID. This plugin shuold be used together with transient NameIDMapping,
+        but can also be used for persistent mapping. The typical use case for
+        this plugin is where no user accounts exist in the service, but the
+        service want to use attributes to perform access control. Another use
+        case is a demo example, when you want to get OpenSSO PHP Extension up
+        and running without the extra hassle with a database.</para>
+      </section>
+
+      <section id="sect.namemapping-database">
+        <title>namemapping/database</title>
+
+        <para>The <literal>namemapping/database</literal> plugin will store
+        and retrieve mappings from NameID to local IDs in a MySQL database.
+        This database contains a table with all users in the system, and
+        another table that contains the NameID mappings. The plugin it self
+        will not do user administration for you, you will need to setup your
+        user administration tool to work towards this database, or make
+        changes to this plugin to access your existing userdatabase.</para>
+
+        <para>Before you can use this plugin, you must prepare the database.
+        First, you should create a new MySQL database, and optionally a new
+        database user. Next, you should initialize the database. A complete
+        SQL initialization script is located under
+        <filename>etc/dbinit.sql</filename>. This sript will create the tables
+        and two users, <literal>johns</literal> and <literal>admin</literal>.
+        Look in the script to see the local password. To execute the SQL
+        script you will need to run a command similar to:</para>
+
+        <screen>mysql -u openssodemo -p openssodemo &lt; etc/dbinit.sql</screen>
+
+        <para>After setting up a database, you have to configure access to the
+        database in the OpenSSO PHP Extension config file (see <xref
+        linkend="sect.configuration" />). This includes username, password,
+        hostname and database.</para>
+
+        <para>If you want to understand this namemapping plugin better, you
+        can access the mysql database, and query the content of the tables.
+        Here are some examples:</para>
+
+        <para>To list all users:</para>
+
+        <screen>mysql&gt; select * from users;
++--------+----------+---------------+
+| userid | password | username      |
++--------+----------+---------------+
+| johns  | 123      | John Smith    |
+| admin  | 456      | Administrator |
++--------+----------+---------------+
+2 rows in set (0.01 sec) </screen>
+
+        <para>To add a new user:</para>
+
+        <screen>mysql&gt; insert into users (userid,password,username) values ('andreas', 'foobar', 'Andreas Solberg');
+Query OK, 1 row affected (0.01 sec)  </screen>
+
+        <para>To list all current namemappings:</para>
+
+        <screen>mysql&gt; select * from nameidmapping;
++---------------+-----------------+------------------------------+---------+
+| idp           | sp              | nameid                       | localid |
++---------------+-----------------+------------------------------+---------+
+| sam.feide.no  | feide.erlang.no | BfLY1GOZyc8dKE8AW5ELUH/EvfEZ | johns   |
+| mars.feide.no | feide.erlang.no | LyDwR+FODi5sXwDYOIOAxw7R9ybl | johns   |
++---------------+-----------------+------------------------------+---------+
+2 rows in set (0.01 sec)</screen>
+
+        <para>To delete all namemappings. This will mean that all users will
+        be defederated. Look at Pat's example (see <xref
+        linkend="sect.pat" />) for more information of how federating users
+        works in real life.</para>
+
+        <screen>mysql&gt; delete from nameidmapping;
+Query OK, 2 rows affected (0.02 sec)  </screen>
+      </section>
+    </section>
+
+    <section id="sect.sessionmanagement">
+      <title>Session Management Plugins</title>
+
+      <para>A session management plugin will create user sessions, usually by
+      adding cookies to the user's browser, and allow the software to store
+      and retrieve session attributes.</para>
+
+      <section>
+        <title>sessionmanagement/phpsession</title>
+
+        <para>The <literal>sessionmanagement/phpsession</literal> plugin
+        reuses the built-in session management in PHP.</para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Examples</title>
+
+    <para>Currently two examples are provided with the OpenSSO PHP Extentsion
+    package. You will find two folders, <literal>example-andreas</literal> and
+    <literal>example-pat</literal>. These examples will help you verify your
+    configuration, perform demonstrations, test your IdP, better understand
+    OpenSSO PHP Extension and use as inspiration for how to integrate your
+    service with OpenSSO PHP Extension.</para>
+
+    <section>
+      <title>Andreas' Example</title>
+
+      <para>This example is extremely simple to setup, and requires no
+      databases.</para>
+
+      <para>Start with editing the config file (see <xref
+      linkend="sect.configuration" />) to use these two plugins:
+      namemapping/transient and <literal>sessionhandling/</literal>phpsession.
+      Next, configiure one SP and one IdP, as described in <xref
+      linkend="sect.metadata" />.</para>
+
+      <para>The example consist of one file only:
+      <filename>example-andreas/test.php</filename>. You will not need to edit
+      anything in that file.</para>
+
+      <warning>
+        <para>If you have tested another example earlier and not properly
+        logged out, you need to clear your cookies before testing this
+        example.</para>
+      </warning>
+
+      <para>Go to the URL pointing at the example, similar to
+      <literal>https://feide.erlang.no/example-andreas/test.php</literal>, but
+      at your server. You will then see that you are unauthenticated:</para>
+
+      <screenshot>
+        <screeninfo>Unauthenticated at Andreas' example</screeninfo>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resources/opensso-php-userguide/andreas1.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+
+      <para>When you click on the link, you are redirected to your IdP, and
+      you will be able to enter the credentials. Next, you should be
+      redirected back to the example, and a page similar to this should show
+      up:</para>
+
+      <screenshot>
+        <screeninfo>Authenticated at Andreas' example</screeninfo>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resources/opensso-php-userguide/andreas2.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+
+      <para>The page shows your transient nameidentifier, which will not tell
+      you anything, and some debug information. Hopefully your attribtues
+      should also appear. You could use this example as a basis if you want a
+      service that does not need to know the identity of the user, but instead
+      need to perform access controll validation based on some of the user's
+      attributes.</para>
+    </section>
+
+    <section id="sect.pat">
+      <title>Pat's Example</title>
+
+      <para>This example is a bit more complex. It demonstrates federating
+      local user accounts with a remote IdP.</para>
+
+      <para>Start with editing the config file (see <xref
+      linkend="sect.configuration" />) to use these two plugins:
+      <literal>namemapping/database</literal> and
+      <literal>sessionhandling/phpsession</literal>. Remember to setup the
+      database as described earlier to be able to use the
+      <literal>namemapping/database</literal> plugin.</para>
+
+      <para>This example contains a set of files, all located in
+      <filename>example-pat/</filename>. You do not need to edit any of the
+      files, it will adapt to your installation based on the config
+      file.</para>
+
+      <warning>
+        <para>If you have tested another example earlier and not properly
+        logged out, you need to clear your cookies before testing this
+        example.</para>
+      </warning>
+
+      <para>Start by accessing the URL pointing to the
+      <filename>home.php</filename> file of the example, similar to
+      <literal>https://feide.erlang.no/example-pat/home.php</literal>, but at
+      your server.</para>
+
+      <screenshot>
+        <screeninfo>First page at Pat's example</screeninfo>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resources/opensso-php-userguide/pat1.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+
+      <para>You will see a page like the one above, saying that you are not
+      authenticated. Click on the "Please log in" link.</para>
+
+      <screenshot>
+        <screeninfo>Local login page at Pat's example</screeninfo>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resources/opensso-php-userguide/pat2.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+
+      <para>What you see is a local login page
+      (<filename>prompt.php</filename>). All the users have a local username
+      and password, and you may log in locally without communicating with an
+      IdP. But, off course we want exactly that, communicating with an IdP, so
+      we click on the "Login via IdP" link. If your meta data is configured
+      correctly you will now see the login page at your IdP, please enter your
+      credentials, and you will be redirected back to the example.</para>
+
+      <screenshot>
+        <screeninfo>Federating user accounts in Pat's example</screeninfo>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resources/opensso-php-userguide/pat3.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+
+      <para>You are now back at the example service, but Hey! - Why are you
+      presented with a login sreen? You have already logged in at your IdP!
+      The reason is simple, even though the IdP have presented your identity,
+      the service needs to map that identity to a local user account. If you
+      log in a local user account, a namemapping entry will be stored in the
+      database, mapping the identity from your IdP to a local identity.</para>
+
+      <tip>
+        <para>This example demonstration manually federating users (creating
+        mapping between IdP and SP identities), but there also are other ways
+        of doing federation. You may perform auto-federation, mapping to a
+        local user account based on a provided attribute. You can also do
+        auto-account-creation, automatily creating a local account the first
+        time the user logs in, and then federate it automaticly (then there is
+        no need for local passwords). You can also do batch federation, having
+        a script updating the namemapping table regularly. Batch federation
+        requires you to have access to both IdP and SP data storages, not
+        always an option.</para>
+      </tip>
+
+      <screenshot>
+        <screeninfo>Successfully logged in at Pat's example</screeninfo>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="resources/opensso-php-userguide/pat4.png" />
+          </imageobject>
+        </mediaobject>
+      </screenshot>
+
+      <para>As you see, you are successfully authenticated. Now, logout, and
+      do the thing above one more time! What happens? As your user accounts
+      already are federated you will now be directly authenticated from the
+      IdP, not asked to log in locally. Cool, isn't it?</para>
+    </section>
+  </section>
+</article>

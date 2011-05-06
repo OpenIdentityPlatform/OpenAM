@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Service Web d'authentification - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>Service Web d'authentification</h3>
+<a name="indexterm-159"></a><p>Le Service Web d'authentification d&#233;finit le mode d'authentification avec SOAP. L'&#233;change des
+informations d'authentification entre un consommateur de services Web (WSC) et le fournisseur
+de services Web (WSP) est r&#233;alis&#233; &#224; l'aide de messages de liaison
+SOAP. Ces messages forment une s&#233;rie de demandes du client et de
+r&#233;ponses du serveur propre au m&#233;canisme SASL (Simple Authentication and Security Layer)
+d&#233;fini (ou mode d'authentification). Lorsqu'il re&#231;oit une demande d'authentification (ou une r&#233;ponse
+du WSC), le WSP peut exiger d'autres informations, ou indiquer la r&#233;ussite
+ou l'&#233;chec de l'authentification. Le Service Web d'authentification est permet d'authentifier un
+service aupr&#232;s d'un autre service (et non un utilisateur aupr&#232;s d'un autre
+utilisateur). Les &#233;tapes suivantes d&#233;crivent en d&#233;tail la s&#233;quence d'actions entre le
+WSC et le Service Web d'authentification (un WSP).</p>
+<ol><li><p>L'&#233;change d'authentification d&#233;bute par l'envoi par le WSC d'une demande d'authentification SASL au Service Web d'authentification pour le compte d'une identit&#233; principale.</p><p>Le message de demande contient un identificateur pour l'entit&#233; principale et propose un ou plusieurs m&#233;canismes SASL que le service peut choisir.</p></li>
+<li><p>Le Service Web d'authentification r&#233;pond en d&#233;finissant la m&#233;thode &#224; utiliser et, le cas &#233;ch&#233;ant, en exigeant d'autres informations.</p><p> Si le Service Web d'authentification ne prend pas en charge les m&#233;thodes propos&#233;es, il r&#233;pond en mettant fin &#224; l'&#233;change. </p></li>
+<li><p>Le WSC r&#233;pond en fournissant les donn&#233;es d'identit&#233; requises pour la m&#233;thode d'authentification choisie.</p></li>
+<li><p>Le Service Web d'authentification r&#233;pond en approuvant ou en d&#233;sapprouvant l'authentification.</p><p> Si la demande est approuv&#233;e, la r&#233;ponse inclut les informations d'authentification dont le WSC a besoin pour appeler d'autres services Web (comme le Service de d&#233;couverte). </p></li></ol>
+<p>Les attributs g&#233;n&#233;raux suivants du Service Web d'authentification peuvent &#234;tre configur&#233;s pour
+votre impl&#233;mentation.</p>
+<ul><li><p><a href="mechanismhandlerslist.html">Liste des gestionnaires de m&#233;canismes</a></p></li>
+<li><p>Question/r&#233;ponse intervalle de nettoyage &#8212; Cet attribut sp&#233;cifie l'intervalle de nettoyage (en secondes) dans la classe d'impl&#233;mentation de gestionnaire de m&#233;canismes CRAM-MD5 <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler </tt>. Le thread d'intervalle commence &#224; nettoyer la carte de questions/r&#233;ponses en fonction de cette valeur.</p></li>
+<li><p>Classes de transformation &#8212; Cet attribut sp&#233;cifie le nom de transformation au mappage de classe d'impl&#233;mentation. Les valeurs sont s&#233;par&#233;es par une virgule avec "|" comme d&#233;limiteur pour le nom de transformation et le nom de classe d'impl&#233;mentation. Par exemple, <tt>nom1|classe1, nom2|classe2</tt>.</p></li></ul>
+<p>La t&#226;che suivante est associ&#233;e &#224; la configuration du Service Web d'authentification
+:</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">Configuration d'un nouveau gestionnaire de m&#233;canismes</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>階段作業 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>階段作業</h4>
+<p>階段作業屬性可讓您為額外的網站和伺服器實例配置階段作業資訊。</p>
+
+<a name="ggkab"></a><h5>階段作業限制</h5>
+<p>下列屬性會設定伺服器階段作業限制：</p>
+
+<a name="ggkat"></a><h5>最大階段作業數</h5>
+<p>預設值為 5000。請指定允許的同步運作階段作業的最大數目。如果同步運作的階段作業最大值超過此數目，登入就會傳回「最大階段作業數」錯誤。</p>
+
+<a name="ggkac"></a><h5>使階段作業無效的最長時間</h5>
+<p>預設值為 10。指定當階段作業建立後且使用者未登入時，從階段作業表格中移除該無效階段作業之前的期限 (以分鐘為單位)。此值應始終大於「認證」模組特性檔中的逾時值。</p>
+
+<a name="ggkaf"></a><h5>階段作業清除延遲</h5>
+<p>預設值為 60。指定清除階段作業操作的延遲時間 (以分鐘為單位)。在階段作業逾時之後，階段作業將在這段延長的時間內繼續位於階段作業伺服器上。用戶端應用程式使用此特性來檢查階段作業是否經由 SSO API 而逾時。這段延長的時間快結束時，階段作業就會被銷毀。如果使用者登出或 OpenSSO 元件明確銷毀階段作業，則階段作業不會在這段延長的時間內持續不變。階段作業在這段延長的時間內會處於「無效」狀態。</p>
+
+<a name="ggkbl"></a><h5>統計</h5>
+<p>下列屬性會設定統計配置：</p>
+
+<a name="ggkbf"></a><h5>記錄間隔</h5>
+<p>預設值為 60。指定兩次統計記錄之間經過的時間 (以分鐘為單位)。最小值為 5 秒，以避免 CPU 飽和。OpenSSO 會將任何少於 5 秒的值視為 5 秒。</p>
+
+<a name="ggkbn"></a><h5>狀態</h5>
+<p>預設值為「檔案」。指定統計記錄的位置。可能的值包括：</p>
+<ul><li><p>關閉 &#8212; 不會記錄任何統計資料。</p></li>
+<li><p>檔案 &#8212; 統計資料會寫入所指定目錄下的某個檔案中。</p></li>
+<li><p>主控台 &#8212; 統計資料會寫入 Web 伺服器記錄檔中。</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>目錄</h5>
+<p>值會在安裝期間設定。範例：<tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server-URI</i><tt>/stats</tt>。指定建立除錯檔的目錄。</p>
+
+<a name="ggkca"></a><h5>啟用主機查找</h5>
+<p>預設值為 false。啟用或停用在階段作業登入期間執行主機查找。</p>
+
+<a name="ggkas"></a><h5>通知</h5>
+<p>下列屬性會設定通知配置：</p>
+
+<a name="ggkbz"></a><h5>通知池大小</h5>
+<p>預設值為 10。透過指定執行緒總數定義池的大小。</p>
+
+<a name="ggkao"></a><h5>通知執行緒池臨界值</h5>
+<p>預設值為 100。指定工作佇列的最大長度。收到通知作業時，會將其傳送至作業佇列進行處理。如果佇列達到最大長度，之後收到的請求將會遭拒，並且發出 <tt>ThreadPoolException</tt>，直到佇列有空閒為止。</p>
+
+<a name="ggkar"></a><h5>驗證</h5>
+<p>下列屬性會設定驗證配置：</p>
+
+<a name="ggkcg"></a><h5>不區分大小寫的用戶端 DN 比較</h5>
+<p>預設值為 true。比較代理程式 DN。如果值為 false，則比較時會區分大小寫。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>创建 ID-FF 实体提供者 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.createidffprovider"></a><h5>创建 ID-FF 实体提供者</h5>
+<p>使用以下步骤基于联合服务的 ID-FF 协议创建实体提供者。可以将身份认证提供者或服务提供者角色（或这两者一起）指定给实体，但多个角色属于相同的实体提供者。</p><ol>
+<li><b>以管理员身份登录。</b></li>
+<li><b>转至控制台中的“联合”选项卡，然后单击“实体提供者”表中的“新建”。</b></li>
+<li><b>如果出现提示，则选择“ID-FF”作为实体提供者。</b></li>
+<li><b>选择实体提供者所属的“领域”。</b></li>
+<li><b>在“实体标识符”字段键入名称。</b></li>
+<li><b>选择希望指定给实体提供者的实体提供者角色。</b><p>在“元数据别名”字段中完成数据输入后，会自动为实体提供者创建并指定实体提供者角色 。</p></li>
+<li><b>为一个或多个角色的以下属性输入值：</b><dl><dt>元数据别名</dt>
+<dd><p>为正在配置的提供者角色指定 <tt>metaAlias</tt>。<tt>metaAlias</tt> 用于查找提供者的实体标识符和它所属的组织。该值是一个字符串，由领域名称或组织名称加上正斜杠和提供者名称组成。例如，<tt>/suncorp/travelprovider</tt>。</p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> 中使用的名称绝不能包含 <tt>/</tt>。</p>
+<hr>
+</dd>
+<dt>签署证书别名</dt>
+<dd><p>指定用于在密钥库中查找正确的签署证书的提供者证书别名。</p></dd>
+<dt>加密证书别名</dt>
+<dd><p>指定用于在密钥库中查找正确的加密证书的提供者证书别名。</p></dd>
+</dl>
+</li>
+<li><b>单击“创建”。</b><p>在“实体提供者”列表中将显示实体提供者、为其指定的提供者角色以及位置。</p></li>
+<li><b>要自定义实体提供者的角色行为，可单击实体提供者的名称，并且选择要自定义的角色所对应的选项卡。</b></li></ol>
+<br/>
+
+</body>
+</html>

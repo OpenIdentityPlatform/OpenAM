@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Active Directory - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthadservice"></a><h4>Active Directory</h4>
+<p><a name="indexterm-166"></a>此模組類型的運作方式類似於 LDAP 認證模組類型，但使用 Microsoft Active Directory 而非 LDAP 目錄。使用此模組可讓 LDAP 與 Active
+Directory 同時存在於相同範圍之下。Active Directory 認證屬性為範圍屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwfdx">主要 Active Directory 伺服器</a></p></li>
+<li><p><a href="#fwbmo">輔助 Active Directory 伺服器</a></p></li>
+<li><p><a href="#fwfeb">啟動使用者搜尋之 DN</a></p></li>
+<li><p><a href="#fwbjl">超級使用者連結之 DN</a></p></li>
+<li><p><a href="#fwbix">超級使用者連結之密碼</a></p></li>
+<li><p><a href="#fwbnt">超級使用者連結之密碼 (確認)</a></p></li>
+<li><p><a href="#fwblg">用於擷取使用者設定檔的屬性</a></p></li>
+<li><p><a href="#fwbpi">用於搜尋要認證的使用者之屬性</a></p></li>
+<li><p><a href="#fwbmh">使用者搜尋過濾</a></p></li>
+<li><p><a href="#fwbju">搜尋範圍</a></p></li>
+<li><p><a href="#fwbmt">對 Active Directory 伺服器的 SSL 存取</a></p></li>
+<li><p><a href="#fwbpx">傳回認證的使用者 DN</a></p></li>
+<li><p><a href="#fwbjb">使用中的目錄伺服器檢查間隔</a></p></li>
+<li><p><a href="#fwbtk">使用者建立屬性</a></p></li>
+<li><p><a href="#fwboz">認證級別</a></p></li></ul>
+
+
+<a name="fwfdx"></a><h5>主要 Active Directory 伺服器</h5>
+<p>指定在 OpenSSO 安裝期間所指定之主要 Active Directory 伺服器的主機名稱及連接埠號。這是 Active Directory 認證將連絡的首選伺服器。格式為 <tt></tt><i>hostname:port</i><tt></tt>。如果沒有連接埠號，則假定為 <tt>389</tt>。</p><p>如果您使用多重網域部署 OpenSSO，則可按以下格式 (多重項目必須以本機伺服器名稱為字首) 指定 OpenSSO 和 Directory Server 特定實例之間的通訊連結：</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>例如，若您有兩個在不同位置部署的 OpenSSO 實例 (L1-machine1-IS 及 L2- machine2-IS)，且與不同的 Directory Server 實例 (L1-machine1-DS 及
+L2-machine2-DS) 通訊，它將如下所示：</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fwbmo"></a><h5>輔助 Active Directory 伺服器</h5>
+<p>指定 OpenSSO 平台可用的輔助 Active Directory 伺服器的主機名稱及連接埠號。如果主要 Active Directory 伺服器未回應認證請求，則會連絡此伺服器。如果主伺服器啟動，OpenSSO 將切換回主伺服器。格式也為 <tt></tt><i>hostname:port</i><tt></tt>。多重項目必須以本機伺服器名稱為字首。</p>
+<hr><p><b>注意 &#8211; </b>當認證來自 OpenSSO 遠端的 Directory Server 的使用者時，主 LDAP 伺服器與輔助 LDAP 伺服器連接埠有值是很重要的。兩個欄位可使用一個 Directory Server
+位置的值。</p>
+<hr>
+
+
+<a name="fwfeb"></a><h5>啟動使用者搜尋之 DN</h5>
+<p>指定使用者搜尋起始處的節點 DN。(出於效能原因，此 DN 應該儘可能明確。)預設值是目錄樹的根。將識別任何有效 DN。若搜尋範圍屬性中的 OBJECT 已被選取，則 DN 應指定一個比設定檔所在層級還高一級的層級。多重項目必須以本機伺服器名稱為字首。格式為 <tt></tt><i>servername|search dn</i><tt></tt>。</p><p>對於多個項目：</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>如果在具有同一使用者 ID 的根組織之下有多個項目，則應該將此參數設定為只能搜尋或尋找一個項目進行認證。例如，當代理程式 ID 與使用者 ID 都在根組織下時，若根組織使用代理程式 ID 進行認證，此參數應該為 <tt>ou=Agents</tt>；若根組織採用使用者 ID 進行認證，此參數應該為
+<tt>ou=People</tt>。</p>
+
+<a name="fwbjl"></a><h5>超級使用者連結之 DN</h5>
+<p>指定使用者的 DN，該使用者將做為管理員連結至 [主 LDAP 伺服器與連接埠] 欄位中指定的 Directory Server。認證服務需要以此 DN 連結，才能根據使用者登入 ID 搜尋相符的使用者
+DN。預設值為 <tt>amldapuser</tt>。將能夠識別任何有效的 DN。</p><p>登出之前確保密碼正確。如果不正確，您將被封鎖。如果發生這種情況，您可以使用超級使用者 DN 登入。雖然您將使用完整的 DN，但依預設這才是您通常用於登入的 <tt>amAdmin</tt> 帳號。例如：</p><p><tt>uid_amAdmin,ou=People,</tt><i>OpenSSO-base</i><tt></tt></p>
+
+<a name="fwbix"></a><h5>超級使用者連結之密碼</h5>
+<p>帶有在 [超級使用者連結之 DN] 欄位中指定的管理員設定檔的密碼。此欄位沒有預設值。僅會辨識管理員的有效 Active Directory 密碼。</p>
+
+<a name="fwbnt"></a><h5>超級使用者連結之密碼 (確認)</h5>
+<p>確認密碼。</p>
+
+<a name="fwblg"></a><h5>用於擷取使用者設定檔的屬性</h5>
+<p>指定用於使用者項目命名慣例的屬性。依預設，OpenSSO 會假定透過 uid 屬性來識別使用者項目。如果您的 Directory Server 使用不同的屬性 (例如 <i>givenname</i>)，請在此欄位中指定屬性名稱。</p>
+
+<a name="fwbpi"></a><h5>用於搜尋要認證的使用者之屬性</h5>
+<p>列出用於構成搜尋篩選器，以搜尋要認證之使用者的屬性，並允許使用者以使用者項目中的多個屬性進行認證。例如，若此欄位設定為 <i>uid</i>、<i>employeenumber</i> 和 <i>mail</i>，則使用者可以利用其中任一名稱進行認證。</p>
+
+<a name="fwbmh"></a><h5>使用者搜尋過濾</h5>
+<p>指定一個屬性，用於在 [啟動使用者搜尋之 DN] 欄位下尋找使用者。它與 [使用者命名屬性] 配合使用。此欄位沒有預設值。將會辨識任何有效的使用者項目屬性。</p>
+
+<a name="fwbju"></a><h5>搜尋範圍</h5>
+<p>指示 Directory Server 中將於其中搜尋相符使用者設定檔的層級數。搜尋會從 [啟動使用者搜尋之 DN] 中指定的節點開始。預設值為 SUBTREE。可以從清單中選取以下其中一個選項：</p><dl><dt>OBJECT</dt>
+<dd><p>僅搜尋指定的節點。</p></dd>
+<dt>ONELEVEL</dt>
+<dd><p>搜尋指定節點的層級以及下一個層級。</p></dd>
+<dt>SUBTREE</dt>
+<dd><p>搜尋指定的節點及以下的所有項目。</p></dd>
+</dl>
+
+
+<a name="fwbmt"></a><h5>對 Active Directory 伺服器的 SSL 存取</h5>
+<p>對在 [主要/輔助伺服器與連接埠] 欄位中指定的 Directory Server 啟用 SSL 存取。依預設不會核取此方塊，將不使用 SSL 協定存取 Directory Server。</p><p>如果 Active Directory 伺服器執行時已啟用 SSL (LDAPS)，您必須確保 OpenSSO 已經配置了正確的 SSL 信任憑證，以便讓 AM 透過
+LDAPS 協定來連接 Directory Server。</p>
+
+<a name="fwbpx"></a><h5>傳回認證的使用者 DN</h5>
+<p>當 OpenSSO 目錄與為 Active Directory 配置的目錄相同時，則可以啟用此選項。如果啟用了此選項，則允許 Active Directory 認證模組實例傳回 DN，而不是使用者 ID，並且不必進行任何搜尋。通常，認證模組實例僅傳回使用者 ID，而且認證服務會在本機
+OpenSSO 實例中搜尋使用者。如果使用外部 Active Directory，則通常不啟用此選項。</p>
+
+<a name="fwbjb"></a><h5>使用中的目錄伺服器檢查間隔</h5>
+<p>此屬性用於對 Active Directory 伺服器進行故障修復。它定義驗證主要 Active Directory 伺服器是否正在執行前，執行緒將「休息」的分鐘數。</p>
+
+<a name="fwbtk"></a><h5>使用者建立屬性</h5>
+<p>此屬性在 Active Directory 伺服器被配置為外部 Active Directory 伺服器時，由 Active Directory 認證模組實例使用。它包含本機 Directory Server
+和外部 Directory Server 之間的屬性對映。此屬性具有以下格式：</p><p><i>attr1|externalattr1</i></p><p><i>attr2|externalattr2</i></p><p>植入此屬性後，會從外部 Directory Server 讀取外部屬性的值，並將之設定為內部 Directory Server 屬性。僅當 <tt>User Profile</tt> 屬性 (在核心認證模組類型中) 設定為「動態建立」，並且本機 Directory
+Server 實例中不存在使用者時，才在內部屬性中設定外部屬性的值。新建立的使用者將包含內部屬性的值 (如使用者建立屬性清單中所指定) 及它們對映的外部屬性的值。</p>
+
+<a name="fwboz"></a><h5>認證級別</h5>
+<p>會分別為每個認證方法設定認證層級。此值指示 認證機制的程度。使用者進行認證後，此值便會儲存在階段作業的 SSO 記號中。SSO 記號呈現給使用者要存取的應用程式時，應用程式將使用此儲存值以決定此層級是否達到了允許使用者存取的層級。如果儲存在 SSO 記號中的認證層級不滿足最小值需求，應用程式可以提示使用者透過具有較高認證層級的服務重新進行認證。預設值為 0。</p>
+<hr><p><b>備註 &#8211; </b>如果未指定任何認證層級，SSO 記號會將核心認證屬性中指定的值儲存為<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">預設認證層級</a>。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>
