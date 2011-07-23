@@ -1,0 +1,147 @@
+ <test name="PolicyallowDenyTestP5_E0 ">
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="/"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+        </classes>
+    </test>
+    
+    <test name="PolicyallowDenyTest_P5_E1 ">
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="/"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+        </classes>
+    </test>
+    <test name="PolicyallowDenyTest_P5_E2 ">
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <parameter name="peAtOrg" value="/"/>
+        <parameter name="dynamic" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+        </classes>
+    </test>  
+
+    <test name="PolicyallowDenyTestSubrealmDynamicTest_P5_E0 ">
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="realm115"/>
+        <parameter name="dynamic" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+        </classes>
+    </test>
+    <test name="PolicyallowDenyTestSubrealmDynamicTest_P5_E1 ">
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <parameter name="peAtOrg" value="realm115"/>
+        <parameter name="dynamic" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+        </classes>
+    </test>
+    <test name="PolicyallowDenyTestSubrealmDynamicTest_P5_E2 ">
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <parameter name="peAtOrg" value="realm115"/>
+        <parameter name="dynamic" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+        </classes>
+    </test>
+<test name="PolicyallowDenyTestSubrealm_P5_E0 ">
+	<parameter name="policyIdx" value="5"/>
+	<parameter name="evaluationIdx" value="0"/>
+	<parameter name="setup" value="true"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm1"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyallowDenyTestSubrealm_P5_E1 ">
+	<parameter name="policyIdx" value="5"/>
+	<parameter name="evaluationIdx" value="1"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm1"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyallowDenyTestSubrealm_P5_E2 ">
+	<parameter name="policyIdx" value="5"/>
+	<parameter name="evaluationIdx" value="2"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="true"/>
+	<parameter name="peAtOrg" value="realm1"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+

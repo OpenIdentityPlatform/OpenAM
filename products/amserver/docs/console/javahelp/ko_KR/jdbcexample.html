@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>연결 풀 구성 - 예제 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="jdbcexample"></a><h5>연결 풀 구성 - 예제</h5>
+<p>다음은 Web Server 및 MySQL 4.0용으로 연결 풀을 설정하는 예입니다.</p><ol>
+<li><b>Web Server 콘솔에서 다음 속성을 가진 JDBC 연결 풀을 만듭니다.</b><dl><dt>풀 이름</dt>
+<dd><p><tt>samplePool</tt></p></dd>
+<dt>데이터 소스 클래스 이름</dt>
+<dd><p><tt>com.mysql.jdbc.jdbc2.optional.MysqlDatacSource</tt></p></dd>
+<dt>서버 이름</dt>
+<dd><p>mySQL 서버의 이름</p></dd>
+<dt>포트</dt>
+<dd><p>mySQL 서버가 실행 중인 포트 번호</p></dd>
+<dt>사용자</dt>
+<dd><p>데이터베이스 비밀번호의 사용자 이름</p></dd>
+<dt>비밀번호</dt>
+<dd><p>해당 사용자의 비밀번호</p></dd>
+<dt>데이터베이스 이름</dt>
+<dd><p>데이터베이스의 이름</p></dd>
+</dl>
+
+<hr><p><b>주 &#8211; </b> 다음 단계에서 설명하는 <i>데이터 소스</i> 클래스 및 JDBC 드라이버 클래스를 포함하는 jar
+파일을 응용 프로그램 클래스 경로에 추가해야 합니다.</p>
+<hr>
+</li>
+<li><b>JDBC 자원을 구성합니다. Web Server 콘솔에서 다음 속성을 가진 JDBC 자원을 만듭니다.</b><dl><dt>JNDI 이름</dt>
+<dd><p><i>jdbc/samplePool</i></p></dd>
+<dt>풀 이름</dt>
+<dd><p><i>samplePool</i></p></dd>
+<dt>데이터 자원 사용</dt>
+<dd><p><i>on</i></p></dd>
+</dl>
+</li>
+<li><b>응용 프로그램의 <tt>sun-web.xml</tt> 파일에 다음 행을 추가합니다.</b><pre>&#60;resource-ref>
+      &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+      &#60;jndi-name>jdbc/samplePool&#60;/jndi-name>
+&#60;/resource-ref></pre></li>
+<li><b>응용 프로그램의 web.xml 파일에 다음 행을 추가합니다. </b><pre>&#60;resource-ref>
+       &#60;description>mySQL Database&#60;/description>
+       &#60;res-ref-name>jdbc/mySQL&#60;/res-ref-name>
+       &#60;res-type>javax.sql.DataSource&#60;/res-type>
+       &#60;res-auth>Container&#60;/res-auth>
+&#60;/resource-ref></pre></li>
+<li><b>설정을 완료하면 이 속성 값은 <i>java:comp/env/jdbc/mySQL</i>이 됩니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>2.2 策略代理程式 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.22agentprofile"></a><h4>2.2 策略代理程式</h4>
+<p>OpenSSO 與策略代理程式 2.2 向下相容。策略代理程式 2.2 必須從本身安裝所在的部署容器進行本機配置。因此，只有非常有限的策略代理程式 2.2 選項可從 OpenSSO 主控台配置。</p>
+
+<a name="ggmti"></a><h5>密碼</h5>
+<p>密碼是在您建立代理程式設定檔時設定的。不過，您以後隨時可以變更密碼。</p>
+
+<a name="ggmvn"></a><h5>密碼確認</h5>
+<p>密碼確認是在您建立代理程式設定檔時執行。如果您變更密碼，則必須確認變更。</p>
+
+<a name="ggmsq"></a><h5>狀態</h5>
+<p>建立代理程式時，選取 <tt>[使用中]</tt> 選項。僅在要移除代理程式提供的保護時，才選擇 <tt>[非使用中]</tt>。</p>
+
+<a name="ggoub"></a><h5>描述</h5>
+<p>代理程式的描述，您可以視需要增加。</p>
+
+<a name="ggowa"></a><h5>代理程式金鑰值</h5>
+<p>在啟用 CDSSO 及配置部署以避免 Cookie 遭劫持時的必要設定。</p><p>此屬性可做為金鑰和值配對中的金鑰。OpenSSO 會使用此屬性接收有關使用者的憑證指定的代理程式請求。此金鑰-值配對中只有一個屬性有效。所有其他屬性都會忽略。請使用以下格式：</p><pre>agentRootURL=protocol://<i>hostname</i>:<i>port</i>/</pre><p>必須準確地輸入。例如，代表金鑰的字串 <tt>agentRootURL</tt> 區分大小寫。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>實體：提供者及附屬提供者 - Sun Java System Federated Access Manager 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptors"></a><h3>實體：提供者及附屬提供者</h3>
+<a name="indexterm-62"></a><a name="indexterm-63"></a><a name="indexterm-64"></a><a name="indexterm-65"></a><p>使用<b>中介資料</b> (即配置資訊，用於定義特定識別服務架構) 可針對個別識別提供者、個別服務提供者，或分別為二者配置一個<b>實體</b>。相對地，可將實體配置為附屬提供者，亦即其中任一類型的選定提供者群組。提供者和附屬提供者實體都可以使用 Federation Access Manager 主控台配置。</p>
+<hr><p><b>備註 &#8211; </b>可以建立實體，但是在該實體中寫入提供者之前，無法將其指定給信任圈。</p>
+<hr>
+<p>下列表格中將介紹兩種實體類型。</p><a name="gbxxa"></a><h6>表&#160;1 實體類型</h6><table><col width="50%"><col width="50%"><tr><td align="left" valign="top" scope="row"><p><b>提供者實體</b></p></td>
+<td align="left" valign="top" scope="row"><p><b>提供者實體</b>保留任一類型的個別提供者的中介資料。必須在提供者實體內配置所有身份識別提供者及服務提供者，然後才能將它們與信任圈產生關聯，或選擇它們以併入<b>附屬提供者實體</b>。使用 Access Manager 主控台中提供的屬性，即可在提供者實體內定義一個個別識別提供者、一個個別服務提供者或兩者中的一個。提供者實體設定檔包含下列屬性群組：</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">一般屬性</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">識別提供者</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">服務提供者</a></p></li></ul>
+</td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><b>附屬提供者實體</b></p></td>
+<td align="left" valign="top" scope="row"><p>配置的<b>附屬提供者</b>可讓使用者與相關聯的網站群組聯合。例如，當服務提供者代表附屬提供者向使用者發出認證請求，且獲得認證時，使用者便可以利用附屬提供者的所有成員身份完成單次登入。附屬提供者的構成與信任圈的界限無關。</p><p><b>附屬提供者實體</b>保留中介資料，此資料係用來定義一或多個構成附屬提供者之服務提供者實體的分組。它不包含任何提供者的配置資訊，只包含附屬提供者本身的配置資訊。附屬提供者實體設定檔包含下列屬性群組：</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">一般屬性</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">附屬提供者</a></p></li></ul>
+
+<hr><p><b>備註 &#8211; </b>附屬提供者的成員會以附屬提供者的成員身份呼叫服務，或個別呼叫服務。</p>
+<hr>
+</td>
+</tr>
+</table><p>任一類型的所有已配置實體均列於 [實體] 之下。以下的作業與實體相關聯：</p>
+<ul><li><p><a href="federation.fsentitydescriptorsadd.html">建立提供者實體或附屬提供者實體</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsprofile.html">修改提供者實體或是附屬提供者實體的一般屬性</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">新增識別提供者至提供者實體</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedadd.html">新增一個新的代管識別提供者至提供者實體</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteadd.html">新增一個新的遠端識別提供者至提供者實體</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">新增服務提供者至提供者實體</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedadd.html">新增一個新的代管服務提供者至提供者實體</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteadd.html">新增一個新的遠端服務提供者至提供者實體</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedprofile.html">修改提供者實體內的代管識別提供者屬性</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteprofile.html">修改提供者實體內的遠端識別提供者屬性</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedprofile.html">修改提供者實體內的代管服務提供者屬性</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteprofile.html">修改提供者實體內的遠端服務提供者屬性</a></p></li>
+<li><p><a href="federation.fscreatecontactperson.html">新增連絡人員至提供者實體內的提供者</a></p></li>
+<li><p><a href="federation.fseditcontactperson.html">修改提供者實體內的連絡人員設定檔</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">新增成員至附屬提供者實體</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

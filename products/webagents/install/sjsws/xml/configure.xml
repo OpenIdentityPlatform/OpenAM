@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<configure>
+	<class-prefix>
+		<package type="system" name="com.sun.identity.install.tools.configurator"/>
+		<package type="custom" name="com.sun.identity.agents.install.sjsws"/>
+		<package type="common" name="com.sun.identity.agents.install.configurator"/>
+	</class-prefix>
+	<welcome-message>
+		<i18n key="WELCOME_MESSAGE" group="sjswsTools"/>
+	</welcome-message>
+	<exit-message>
+		<i18n key="EXIT_MESSAGE" group="sjswsTools"/>
+	</exit-message>
+	<instance-finder>	
+		<home-dir-locator>
+			<class name="HomeDirLocator" type="custom"/>
+		</home-dir-locator>
+		<instance-finder-interactions>
+			<interaction lookupkey="CONFIG_DIR">
+				<i18n key="INT_CONFIG_DIR" group="sjswsTools"/>
+				<default-value-finder>
+					<class name="ConfigFinder" type="custom"/>
+				</default-value-finder>
+				<validations>
+					<validation name="DIR_EXISTS">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="VALID_SWS_CONFIG_DIR">
+						<class name="ConfigDirValidator" type="custom"/>
+					</validation>
+				</validations>
+				<value-normalizer>
+					<class name="PathNormalizer" type="system"/>
+				</value-normalizer>
+			</interaction>
+		</instance-finder-interactions>
+	</instance-finder>	
+	<install>
+		<common-interactions>
+		    <interaction lookupkey="AM_SERVICES_HOST">
+				<i18n key="INT_AM_SERVICES_HOST" group="amToolsMessages"/>
+				<validations>			
+				    <validation name="VALID_FULLY_QUALIFIED_HOST">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+					<validation name="VALID_HOST">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AM_SERVICES_PORT">
+				<i18n key="INT_AM_SERVICES_PORT" group="amToolsMessages"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="80"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_PORT">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AM_SERVICES_PROTO">
+				<i18n key="INT_AM_SERVICES_PROTO" group="amToolsMessages"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="http"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_CHOICE">
+						<class name="ChoiceValidator" type="system"/>
+						<property name="value1" value="http"/>
+						<property name="value2" value="https"/>
+						<property name="ignorecase" value="false"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AM_SERVICES_DEPLOY_URI">
+				<i18n key="INT_AM_SERVICES_DEPLOY_URI" group="amToolsMessages"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="/amserver"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_URI">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_HOST">
+				<i18n key="INT_AGENT_HOST" group="amToolsMessages"/>
+				<validations>	
+				    <validation name="VALID_FULLY_QUALIFIED_HOST">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+					<validation name="VALID_HOST">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>	
+		</common-interactions>
+		<instance-interactions>
+		    <interaction lookupkey="AGENT_PREF_PORT">
+				<i18n key="INT_AGENT_PREF_PORT" group="amToolsMessages"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="80"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_PORT">
+						<class name="NetworkValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_PREF_PROTO">
+				<i18n key="INT_AGENT_PREF_PROTO" group="amToolsMessages"/>
+				<default-value-finder>
+					<class name="StaticDefaultValueFinder" type="system"/>
+					<static value="http"/>
+				</default-value-finder>
+				<validations>
+					<validation name="VALID_CHOICE">
+						<class name="ChoiceValidator" type="system"/>
+						<property name="value1" value="http"/>
+						<property name="value2" value="https"/>
+						<property name="ignorecase" value="false"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_PROFILE_NAME">
+				<i18n key="INT_AGENT_PROFILE_NAME" group="amToolsMessages"/>
+                                <default-value-finder>
+                                        <class name="StaticDefaultValueFinder" type="system"/>
+                                        <static value="UrlAccessAgent"/>
+                                </default-value-finder>
+				<validations>
+					<validation name="VALID_STRING">
+						<class name="StringValidator" type="system"/>
+					</validation>
+				</validations>
+			</interaction>
+			<interaction lookupkey="AGENT_PASSWORD_FILE" persistent="false">
+				<i18n key="INT_AGENT_PASSWORD_FILE" group="amToolsMessages"/>
+				<validations>
+					<validation name="FILE_VALID">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="FILE_READABLE">
+						<class name="FileSystemValidator" type="system"/>
+					</validation>
+					<validation name="VALID_PASSWORD">
+						<class name="PasswordValidator" type="system"/>
+						<property name="minLen" value="1"/>
+						<property name="maxLen" value="256"/>
+					</validation>
+				</validations>
+				<value-normalizer>
+					<class name="PathNormalizer" type="system"/>
+				</value-normalizer>
+			</interaction>
+		</instance-interactions>
+		<common-tasks/>
+		<instance-tasks>
+        	<task name="CREATE_LAYOUT">
+            	<class name="CreateLayoutTask" type="system"/>
+           	</task>
+            <task name="ENCRYPT_DATA">
+            	 <class name="EncryptTask" type="common"/>
+            	 <property name="DATA_FILE_LOOKUP_KEY" 
+            	 			value="AGENT_PASSWORD_FILE"/>
+                 <property name="ENCRYPTION_KEY_LOOKUP_KEY" 
+                 			value="AGENT_ENCRYPT_KEY"/>
+                 <property name="ENCRYPTED_VALUE_KEY_LOOKUP_KEY" 
+                 			value="AGENT_ENCRYPTED_PASSWORD"/>
+            </task>
+            <task name="GENERATE_AUDIT_LOGFILE_NAME">
+           		<class name="AuditLogFileNameTask" type="system"/>
+           		<property name="HOSTNAME_LOOKUP_KEY"
+           				  value="AGENT_HOST"/>
+           	    <property name="PORT_LOOKUP_KEY"
+           	    		  value="AGENT_PREF_PORT"/>
+           	    <property name="LOGFILE_NAME_OUTPUT_KEY"
+           	    		  value="AUDIT_LOG_FILENAME"/>
+           	</task>
+            <task name="CONFIGURE_AGENT_PROPS">
+                <class name="ConfigurePropertiesTask" type="system"/>
+                <property name="CONFIG_FILENAME_TEMPLATE"
+                                          value="AMAgent.template"/>
+                <property name="CONFIG_FILENAME"
+                                          value="AMAgent.properties"/>
+            </task>
+            <task name="BACKUP_FILE">
+           	 	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="SWS_OBJ_FILE"/>
+            </task>                                                         
+            <task name="BACKUP_FILE">
+           	 	<class name="BackupFileTask" type="system"/>
+                <property name="BACK_UP_FILE_LOOKUP_KEY" 
+                          value="SWS_MAGNUS_FILE"/>
+            </task>                                                         
+            <task name="CONFIGURE_MAGNUS_CONF">                  
+ 	            <class name="ConfigureMagnusConfTask" type="custom"/>                                
+            </task>                        
+            <task name="CONFIGURE_HTTPD_XML">                  
+ 	            <class name="ConfigureObjConfTask" type="custom"/>                                
+            </task>                        
+		</instance-tasks>
+	</install>
+	<uninstall>
+		<common-interactions/>
+		<instance-interactions/>
+		<common-tasks/>
+		<instance-tasks>
+                        <task name="DELETE_LAYOUT">
+                                <class name="DeleteLayoutTask" type="system"/>
+                        </task>
+
+            <task name="UNCONFIGURE_OBJ_CONF">                  
+ 	            <class name="UnconfigureObjConfTask" type="custom"/>                                
+            </task>                        
+            <task name="UNCONFIGURE_MAGNUS_CONF">                  
+ 	            <class name="UnconfigureMagnusConfTask" type="custom"/>                                
+            </task>                        
+		</instance-tasks>
+	</uninstall>	
+</configure>

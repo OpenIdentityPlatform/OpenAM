@@ -1,0 +1,16 @@
+<o:section
+    [visibile="..."]
+    [rendered="..."]>
+<ui:define name="section-title">
+    ...
+</ui:define>
+<ui:define name="section-details">
+    ...
+</ui:define>
+<ui:define name="section-links">
+    ...
+</ui:define>
+<ui:define name="section-body">
+    ...
+</ui:define>
+</o:section>

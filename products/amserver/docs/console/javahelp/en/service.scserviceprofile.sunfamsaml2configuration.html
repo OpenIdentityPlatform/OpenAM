@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 Service Configuration - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunfamsaml2configuration"></a><h4>SAMLv2 Service Configuration</h4>
+
+
+<a name="ggolz"></a><h5>Cache Cleanup Interval</h5>
+<p>This attribute specifies the duration (in seconds) between each cache cleanup.</p>
+
+<a name="ggokj"></a><h5>Attribute Name for Name ID Information</h5>
+<p>Specifies the attribute name used to store name identifier information on a user's
+entry. If nothing is specified, the default attribute (<tt>sun-fm-saml2-nameid-info</tt>) will be used. The corresponding
+datastore bind user must have read/write/search/compare permission to this attribute.</p>
+
+<a name="ggolv"></a><h5>Attribute Name for Name ID Information Key</h5>
+<p>Specifies the attribute name used to store name identifier key on a user's
+entry. If not specified, the default attribute (<tt>sun-fm-saml2-nameid-infokey</tt>) will be used. The
+corresponding datastore bind user must have read/write/search/compare permission to this attribute. You must also
+must make sure that the <tt>equality</tt> type index is added.</p>
+
+<a name="ggojr"></a><h5>Cookie Domain for IDP Discovery Service</h5>
+<p>Specifies the cookie domain for the SAMLv2 IDP discovery cookie. </p>
+
+<a name="ggomp"></a><h5>Cookie Type for IDP Discovery Service</h5>
+<p>Specifies cookie type used in SAMLv2 IDP Discovery Service, either Persistent or Session.
+Default is Session.</p>
+
+<a name="ggomt"></a><h5>URL Scheme for IDP Discovery Service</h5>
+<p>Specifies URL scheme used in SAMLv2 IDP Discovery Service. </p>
+
+<a name="ggoje"></a><h5>XML Encryption SPI Implementation Class</h5>
+<p>Specifies implementation class name for the SAMLv2 Encryption Provider interface. The class is
+used to perform XML encryption and decryption in SAMLv2 profiles.</p>
+
+<a name="ggomb"></a><h5>Include Encrypted Key Inside KeyInfo Element</h5>
+<p>This is used in the <tt>com.sun.identity.saml2.xmlenc.FMEncProvider</tt> class. If enabled, it will include
+<tt>EncryptedKey</tt> inside a <tt>KeyInfo</tt> in the <tt>EncryptedData</tt> element when performing XML encryption operation. If
+it is not enabled, <tt>EncryptedKey</tt> is paralleled to the <tt>EncryptedData</tt> element. Default is
+enabled.</p>
+
+<a name="ggoks"></a><h5>XML Signing Implementation Class</h5>
+<p>If enabled, the signing certificate used by identity provider and service provider will
+be validated against certificate revocation list (CRL) configured in the Security settings under
+the Sites and Servers tab. If the certificate is not validated and accepted,
+it will  stop and return a validation error without doing further XML signature
+validation. </p>
+
+<a name="ggokx"></a><h5>XML Signing Certificate Validation</h5>
+<p>If enabled, the SAML identity provider or service provider will validate the certificate
+that is used in signing .  If the certificate is validated and
+accepted, the provider will validate the signature. If not, it will stop and
+return a validation error. </p>
+
+<a name="ggoiv"></a><h5>CA Certificate Validation</h5>
+<p>If enabled, the signing certificate used by identity provider and service provider will
+be validated against the trusted CA list. If the certificate is not validated
+and accepted, it will  stop and return a validation error without doing
+further XML signature validation. </p>
+<br/>
+
+</body>
+</html>

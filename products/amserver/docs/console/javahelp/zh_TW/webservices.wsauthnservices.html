@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>認證 Web 服務 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="webservices.wsauthnservices"></a><h3>認證 Web 服務</h3>
+<a name="indexterm-159"></a><p>認證 Web 服務定義如何使用 SOAP 執行認證。在 Web 服務使用者 (WSC) 與 Web 服務提供者 (WSP)
+之間交換認證資訊是使用 SOAP 連結訊息來完成的。訊息是已定義的簡單認證與安全層 (SASL) 機制 (或認證模式) 特有的一系列用戶端請求及伺服器回應。在收到認證的請求 (或任何來自 WSC 的回應) 之後，WSP 可以發出其他質疑，或指出認證失敗或成功。認證
+Web 服務用於服務 (非使用者) 之間的認證。以下步驟詳述了 WSC 與認證 Web 服務 (WSP) 之間的順序。</p>
+<ol><li><p>認證交換是從代表主體將 SASL 認證請求傳送至認證 Web 服務的 WSC 開始。</p><p>請求訊息包含主體的識別碼，並指出服務可以從中選擇的一或多個 SASL 機制。</p></li>
+<li><p>認證 Web 服務透過指定要使用的方法以及初始化一個質疑 (如果適用的話) 進行回應。</p><p>如果認證 Web 服務不支援任何引用的方法，它會透過中斷交換進行回應。</p></li>
+<li><p>WSC 會利用所選擇的認證方法必需的憑證來做出回應。</p></li>
+<li><p>認證 Web 服務透過核准或不核准認證進行回應。</p><p>如果核准，回應包括 WSC 呼叫其他 Web 服務 (如認證 Web 服務) 所需的憑證。</p></li></ol>
+<p>可以針對您的實作配置以下認證 Web 服務全域屬性。</p>
+<ul><li><p><a href="mechanismhandlerslist.html">機制處理程式清單</a></p></li>
+<li><p>質疑清除間隔 &#8212; 這指定預設 CRAM-MD5 機制處理程式實作類別 <tt>com.sun.identity.liberty.ws.authnsvc.mechanism.CramMD5MechanismHandler</tt> 中的清除間隔 (以秒為單位)。內部執行緒將會根據此值，開始清除質疑對映。</p></li>
+<li><p>變換類別 &#8212; 這會將變換名稱指定給實作類別對映。值會以逗號分隔，而以 "|" 做為變換名稱和實作類別名稱的分割元。例如，<tt>name1|class1, name2|class2</tt>。</p></li></ul>
+<p>以下的作業與配置認證 Web 服務相關聯：</p>
+<ul><li><p><a href="webservices.wsauthnserviceshandlersadd.html">配置新的機制處理程式</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

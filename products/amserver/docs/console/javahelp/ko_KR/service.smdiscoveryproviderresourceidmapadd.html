@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>자원 아이디 매퍼 구성 - Sun Java System Federated Access Manager 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryproviderresourceidmapadd"></a><h5>자원 아이디 매퍼 구성</h5>
+<p><tt>com.sun.identity.liberty.ws.interfaces.</tt><tt>ResourceIDMapper</tt>는 사용자 아이디를 연관된 자원 아이디에 매핑하는 데 사용하는 인터페이스입니다. 구현 클래스를
+사용하여 다른 구현을 만들고 이를 속성에 추가할 수 있습니다. 다음은 새 자원
+아이디 매퍼를 검색 서비스에 추가하는 절차입니다. 시작 위치는 웹 서비스 모듈 안에
+있는 검색 서비스 구성 화면입니다.</p><ol>
+<li><b>[새로 만들기]를 눌러 새 매퍼 속성을 표시하거나 구성된 매퍼 이름을 눌러 매퍼를
+수정합니다.</b></li>
+<li><b>다음 정보를 기반으로 매퍼 속성에 대한 값을 제공합니다.</b><dl><dt>공급자 아이디</dt>
+<dd><p>이 속성은 검색 서비스를 가리키는 URI를 값으로 가집니다. 이 값은 <tt><b>http://</tt><i>host</i><tt>:</tt><i> port</i><tt>/amserver/Liberty/disco</b></tt> 형식으로 기록됩니다.</p></dd>
+<dt>아이디 매퍼</dt>
+<dd><p>구현 클래스의 이름을 입력합니다.</p></dd>
+</dl>
+</li>
+<li><b>[확인]을 눌러 매퍼 구성을 완료합니다.</b></li>
+<li><b>검색 서비스 페이지에서 [저장]을 눌러 서비스 구성을 완료합니다.</b></li></ol>
+<br/>
+
+</body>
+</html>

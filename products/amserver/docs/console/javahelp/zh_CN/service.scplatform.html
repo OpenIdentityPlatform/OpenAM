@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>平台 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>平台</h4>
+<p><a name="indexterm-205"></a>“平台”服务是可将其他服务器添加到 OpenSSO 配置的位置，也是其他应用于 OpenSSO 应用程序顶层的选项。平台服务属性是全局属性。这些属性包括：</p>
+<ul><li><p><a href="#fxcgy">平台语言环境</a></p></li>
+<li><p><a href="#fxcpo">Cookie 域</a></p></li>
+<li><p><a href="#fxcmi">可用的语言环境</a></p></li>
+<li><p><a href="#fxctg">客户机字符集</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>平台语言环境</h5>
+<p>平台语言环境的值是安装 OpenSSO 时使用的默认语言子类型。验证、记录和管理服务是用该默认值的语言进行管理的。默认值为 en_US。有关支持的语言子类型列表，参见<a href="supportedlang.html">支持的语言环境</a>。</p>
+
+<a name="fxcpo"></a><h5>Cookie 域</h5>
+<p>这是一个域列表，当在验证过程中向用户的浏览器设置了 Cookie 时，Cookie 标头中将返回该列表。如果列表为空，则不设置 Cookie 域。换句话说，只会将 OpenSSO 会话 Cookie 转发到 OpenSSO 本身，而不转发到域中的其他服务器。</p><p>如果域中的其他服务器需要 SSO，该属性必须和 Cookie 域一同设置。如果在一个 OpenSSO 上的不同域中有两个接口，则需要在该属性中对两个 Cookie 域进行设置。如果使用了负载平衡器，则 Cookie 域必须是负载平衡器的域，而不是负载平衡器背后的服务器。该字段的默认值是安装的 OpenSSO 的域。</p>
+
+<a name="fxcmi"></a><h5>可用的语言环境</h5>
+<p>该属性用于存储为平台配置的所有可用的语言环境。以一个允许用户选择自身语言环境的应用程序为例。该应用程序将从平台配置文件中获取该属性，并向用户提供语言环境列表。用户可选择一个语言环境，应用程序随即会在用户条目 <i>preferredLocale</i> 中设置该语言环境。</p>
+
+<a name="fxctg"></a><h5>客户机字符集</h5>
+<p>该属性用于为位于平台级别上的不同客户机指定字符集。它包含一个客户机类型及其相应字符集的列表。有关详细信息，参见<a href="service.scplatformclientcharsetsadd.html">创建新的字符集</a>。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>常规 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>常规</h4>
+<p>“常规”属性用于配置集中式服务器管理的基本配置数据。</p>
+
+<a name="ggjyg"></a><h5>站点属性</h5>
+<p>站点属性包括：</p>
+
+<a name="ggjxc"></a><h5>父站点</h5>
+<p>此属性将负载平衡器的“站点名称”（站点 ID）映射至 OpenSSO 服务器。请注意，必须先创建站点，然后才能添加该站点。</p>
+
+<a name="ggjwl"></a><h5>系统属性</h5>
+<p>系统属性列出服务器实例的位置信息：</p>
+
+<a name="ggjyj"></a><h5>基安装目录</h5>
+<p>指定产品数据所驻留的基目录。</p>
+
+<a name="ggjxz"></a><h5>默认语言环境</h5>
+<p>语言环境的值是安装 OpenSSO 时使用的默认语言子类型。默认值为 <tt>en_us</tt>。</p>
+
+<a name="ggjwq"></a><h5>通知 URL</h5>
+<p>通知服务端点的位置。在安装期间设置该值。</p>
+
+<a name="ggjzq"></a><h5>XML 验证</h5>
+<p>默认值为“否”。用于确定在使用 OpenSSO <tt>XMLUtils</tt> 类解析 XML 文档时是否需要进行验证。此属性仅在“调试级别”属性设置为“警告”或“消息”时有效。允许的值可以为“是”和“否”。仅在该属性的值为“是”且“调试级别”属性设置为“警告”或“消息”时才会打开 XML 文档验证。</p>
+
+<a name="ggjzy"></a><h5>调试属性</h5>
+<p>“调试”属性列出基本的错误检查信息：</p>
+
+<a name="ggjzc"></a><h5>调试级别</h5>
+<p>指定调试级别。默认值为“错误”。可能的值为：</p>
+<ul><li><p>关 &#8212; 不创建调试文件。</p></li>
+<li><p>错误 &#8212; 只记录错误消息。</p></li>
+<li><p>警告 &#8212; 只记录警告消息。</p></li>
+<li><p>消息 &#8212; 记录错误、警告和信息消息。</p></li></ul>
+
+
+<a name="ggjze"></a><h5>调试目录</h5>
+<p>指定要在其中创建调试文件的输出目录。在安装期间设置该值。示例：<tt></tt><i>OpenSSO-base</i><tt>/</tt><i>debug_URI</i><tt>/debug</tt>。</p>
+
+<a name="ggjwr"></a><h5>Mail Server</h5>
+<p>Mail Server 属性列出邮件服务器的主机名和端口：</p>
+
+<a name="ggkax"></a><h5>Mail Server 主机名</h5>
+<p>默认值为 <tt>localhost</tt>。指定邮件服务器的主机。</p>
+
+<a name="ggkbx"></a><h5>Mail Server 端口号</h5>
+<p>默认值为 25。指定邮件服务器的端口号。</p>
+<br/>
+
+</body>
+</html>

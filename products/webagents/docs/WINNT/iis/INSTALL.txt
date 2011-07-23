@@ -1,0 +1,235 @@
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https:\\opensso.dev.java.net\public\CDDLv1.0.html or
+# opensso\legal\CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+# 
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso\legal\CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: INSTALL.txt,v 1.1 2007/06/05 19:36:43 subbae Exp $
+#
+# Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+#
+------------------------------------------------------------------------------
+Installation instructions file for Open Web Single Sign-On - Web Agents
+------------------------------------------------------------------------------
+
+%% Contents:
+    %% 1. Agent Installation
+    %% 2. Agent Uninstallation
+
+%% 1. Agent Installation
+
+Please make sure that the IIS 6 Server is installed and running. Also
+make sure that the IIS 6 Agent is compiled with steps indicated in README.txt.
+
+Installation does the following:
+
+    - Creates the IIS 6 Agent Instance Directory
+    - Tag Swapping in AMAgent.properties file
+    - Updating IIS 6 web site: adds agent filter
+
+%% 1.1 Steps
+
+1.1.1 Extract  iis_v6_WINNT_agent.zip installation bits.
+1.1.2 Goto web_agents\iis6_agent\bin
+1.1.3 Execute: cscript.exe IIS6CreateConfig.vbs <config_file>
+Follow the installation interactions and provide these details:
+
+    - IIS 6 Web site id
+    - Agent Host name
+    - Agent Host port
+    - Agent Host protocol
+    - Access Manager Services Host
+    - Access Manager Services port
+    - Access Manager Services Protocol
+    - Access Manager Services Deployment URI
+    - Agent Profile's plain text password (this is the password of amldapuser by default).
+
+1.1.4 Execute: cscript.exe IIS6admin.vbs -config <config_file>
+
+1.1.5 Restart the server
+
+
+Here is the sample of the above steps:
+
+[:C\]> unzip iis_v6_WINNT_agent.zip 
+Archive:  iis_v6_WINNT_agent.zip
+   creating: web_agents/
+   creating: web_agents/iis6_agent/
+   creating: web_agents/iis6_agent/bin/
+   creating: web_agents/iis6_agent/config/
+  inflating: web_agents/iis6_agent/.version  
+  inflating: web_agents/iis6_agent/README  
+  inflating: web_agents/iis6_agent/bin/IIS6AuthAdmin.vbs  
+  inflating: web_agents/iis6_agent/bin/IIS6CreateConfig.vbs  
+  inflating: web_agents/iis6_agent/bin/IIS6Resource.en  
+  inflating: web_agents/iis6_agent/bin/IIS6admin.vbs  
+  inflating: web_agents/iis6_agent/bin/amiis6.dll  
+  inflating: web_agents/iis6_agent/bin/amiis6auth.dll  
+  inflating: web_agents/iis6_agent/bin/amsdk.dll  
+  inflating: web_agents/iis6_agent/bin/certutil.exe  
+  inflating: web_agents/iis6_agent/bin/cryptit.exe  
+  inflating: web_agents/iis6_agent/bin/freebl3.chk  
+  inflating: web_agents/iis6_agent/bin/freebl3.dll  
+  inflating: web_agents/iis6_agent/bin/libnspr4.dll  
+  inflating: web_agents/iis6_agent/bin/libplc4.dll  
+  inflating: web_agents/iis6_agent/bin/libplds4.dll  
+  inflating: web_agents/iis6_agent/bin/libxml2.dll  
+  inflating: web_agents/iis6_agent/bin/msvcp71.dll  
+  inflating: web_agents/iis6_agent/bin/msvcr71.dll  
+  inflating: web_agents/iis6_agent/bin/nss3.dll  
+  inflating: web_agents/iis6_agent/bin/smime3.dll  
+  inflating: web_agents/iis6_agent/bin/softokn3.chk  
+  inflating: web_agents/iis6_agent/bin/softokn3.dll  
+  inflating: web_agents/iis6_agent/bin/ssl3.dll  
+  inflating: web_agents/iis6_agent/config/AMAgent.template  
+  inflating: web_agents/iis6_agent/license.txt  
+
+[C:]> cd web_agents\iis6_agent\bin\
+
+C:\web_agents\iis6_agent\bin> cscript.exe IIS6CreateConfig.vbs test1
+
+Microsoft (R) Windows Script Host Version 5.6
+Copyright (C) Microsoft Corporation 1996-2001. All rights reserved.
+
+
+Copyright c 2007 Sun Microsystems, Inc. All rights reserved
+Use is subject to license terms
+---------------------------------------------------------
+    Microsoft (TM) Internet Information Server (6.0)
+---------------------------------------------------------
+Enter the Agent Resource File Name [IIS6Resource.en] :
+
+Fully Qualified Host Name :
+agent.host.com
+
+Displaying the list of Web Sites and its corresponding Identifiers
+Site Name (Site Id)
+Default Web Site (1)
+test (87257621)
+
+Web Site Identifier :
+87257621
+
+Agent Protocol [http] :
+
+
+Agent Port Number [80] :
+8080
+
+Agent Deployment URI [/amagent] :
+
+------------------------------------------------
+Sun Java (TM) Enterprise System Access Manager
+------------------------------------------------
+Primary Server Host :
+am.host.com
+
+Primary Server Protocol [http] :
+
+
+Primary Server Port Number [58080] :
+8080
+
+Primary Server Deployment URI [/amserver] :
+
+
+Primary Server Console URI [/amconsole] :
+
+
+Agent-Access Manager Shared Secret :
+
+Re-enter Shared Secret :
+-----------------------------------------------------
+Agent Configuration file created ==>  test1
+Execute the below command for Agent Configuration :
+      cscript.exe IIS6admin.vbs -config test1
+
+
+
+C:\web_agents\iis6_agent\bin> cscript.exe IIS6admin.vbs -config test1
+Microsoft (R) Windows Script Host Version 5.6
+Copyright (C) Microsoft Corporation 1996-2001. All rights reserved.
+
+Copyright c 2004 Sun Microsystems, Inc. All rights reserved
+Use is subject to license terms
+
+Enter the Agent Resource File Name [IIS6Resource.en] :
+
+Creating the Agent Config Directory
+Creating the AMAgent.properties File
+Updating the Windows Product Registry
+Loading the IIS 6.0 Agent
+Completed Configuring the IIS 6.0 Agent
+
+
+Configures IIS web site, given above, with the agent ISAPI extension.
+
+
+%% 2. Agent Uninstallation
+
+2.1. Remove the Agent ISAPI extension from the configured IIS web site.
+
+	cscript.exe IIS6admin.vbs -unconfig <config_file>
+
+Sample:
+
+C:\web_agents\iis6_agent\bin> cscript.exe IIS6admin.vbs -unconfig test1
+
+
+Microsoft (R) Windows Script Host Version 5.6
+Copyright (C) Microsoft Corporation 1996-2001. All rights reserved.
+
+Copyright c 2004 Sun Microsystems, Inc. All rights reserved
+Use is subject to license terms
+
+Enter the Agent Resource File Name [IIS6Resource.en] :
+
+Removing the Agent Config file
+Removing the Agent Config Directory
+C:\web_agents\iis6_agent\Identifier_87257621\config
+Removing the entries from Windows Product Registry
+Unloading the IIS6 Agent
+Completed Unconfiguring the IIS 6.0 Agent
+
+2.2 Remove the web_agents/ directory.
+
+
+
+%% 3. Overriding IIS6's BASIC_AUTH mechanism. (Optional)
+
+If BASIC_AUTH is enabled in IIS 6, IIS prompts a pop-up window to enter credentials.
+This can be overridden using agent functionality. This means the additional pop-up window
+won't show up. 
+
+In order to achieve this, agent provides an additional component, authentication extension.
+
+3.1 Adding the authentication ISAPI extension
+
+Example:
+
+C:\web_agents\iis6_agent\bin>cscript.exe IIS6AuthAdmin.vbs -a ADDFILTER -i
+ 87257621 -p c:\web_agents\iis6_agent\bin\amiis6auth.dll
+
+
+3.2 Removing the authentication ISAPI extension
+
+Example:
+
+C:\web_agents\iis6_agent\bin>cscript.exe IIS6AuthAdmin.vbs -a REMOVEFILTER
+ -i 87257621 -p c:\web_agents\iis6_agent\bin\amiis6auth.dll
+
+

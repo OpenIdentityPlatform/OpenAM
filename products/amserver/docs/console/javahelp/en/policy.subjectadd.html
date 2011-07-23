@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Add a Subject to a Policy - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.subjectadd"></a><h5>To Add a Subject to a Policy</h5>
+<ol>
+<li><b><a name="indexterm-28"></a>If you have already created the policy, click the name of the policy
+for which you wish to add the subject. If you have not yet
+created the policy, see <a href="policy.policynormaladd.html">To Create a New Normal Policy</a>.</b></li>
+<li><b>Under the Subject list, click New.</b></li>
+<li><b>Select one of the default subject types. For descriptions of the subject types,
+see <a href="policy.selectsubjecttype.html">Subjects</a></b></li>
+<li><b>Click Next.</b></li>
+<li><b>Enter a name for the subject.</b></li>
+<li><b>Select or deselect the Exclusive field.</b><p>If this field is not selected (default), the policy applies to the identity that
+is a member of the subject. If the field is selected, the
+policy applies to the identity that is <b>not</b> a member of the subject.</p><p>If multiple subjects exist in the policy, the policy applies to the identity
+when at least one of the subjects implies that the policy applies to
+the given identity.</p></li>
+<li><b>Perform a search in order to display the identities to add to the
+subject. This step is not applicable for the Authenticated Users subject or Web
+Services Client subjects.</b><p>The default (*) search pattern will display all qualified entries.</p></li>
+<li><b>Select the individual identities you wish to add for the subject, or click
+Add All to add all of the identities at once. Click Add to
+move the identities to the Selected list. This step is not applicable for
+the Authenticated Users subject.</b></li>
+<li><b>Click Finish.</b></li>
+<li><b>To remove a subject from a policy, select the subject and click Delete.
+You can edit any subject definition by clicking on the subject name.</b></li></ol>
+<br/>
+
+</body>
+</html>

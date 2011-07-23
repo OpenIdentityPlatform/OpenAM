@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置请求处理程序 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>配置请求处理程序</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p><tt>RequestHandler</tt> 接口必须由每一个使用 SOAP 绑定服务 的 SAMLv2 服务在服务器端实现。请求处理程序列表属性存储有关实现请求处理程序的实现类的信息。而且请求处理程序列表显示包含关键字/值对的条目。</p><ol>
+<li><b>单击“新建”以显示“新建请求处理程序”属性，或单击已配置的关键字值以修改现有属性。</b></li>
+<li><b>基于以下信息，为属性提供值：</b><dl><dt>关键字</dt>
+<dd><p><i>关键字</i>是策略决策点元数据别名。</p></dd>
+<dt>类</dt>
+<dd><p><i>类</i>是 Java 类名，该类是处理 XACML 请求的 RequestHandler 接口的实现。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”完成“请求处理程序”的配置操作。</b></li>
+<li><b>单击“SAMLv2 SOAP 绑定”页面上的“保存”完成服务的配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

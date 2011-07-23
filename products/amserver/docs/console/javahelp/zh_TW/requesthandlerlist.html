@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>請求處理程式清單 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="requesthandlerlist"></a><h4>請求處理程式清單</h4>
+<a name="indexterm-151"></a><a name="indexterm-152"></a><p>SOAP 連結服務提供 <tt>RequestHandler</tt> 介面，以處理請求訊息並傳回一個回應。每一個使用 SOAP 連結服務並基於 Liberty 的識別服務都必須在伺服器端實作此介面。請求處理程式清單屬性會儲存 Web 服務 (用來執行請求處理程式) 實作類別的相關資訊。請求處理程式清單會顯示包含以管道分隔的鍵/值對的項目，如下所示：<tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>。下表將說明各參數。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>參數</p></th>
+<th align="left" valign="top" scope="column"><p>標頭</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>key</tt></p></td>
+<td align="left" valign="top" scope="row"><p>必需的
+<tt>key</tt> 參數是 SOAP 端點的 URI 路徑的最後部份。OpenSSO 中的 SOAP 端點是 SOAP 收件者 Servlet。SOAP
+接收器的 URI 為：<tt><b></tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/key</b></tt>。如果您將 <tt><b>disco</b></tt> 定義為 key，則對應探索服務的 SOAP 端點的 URI 路徑將是：<tt><b></tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>。當連接到 SOAP 接收器時，不同的服務用戶端會使用不同的鍵值。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>class</tt></p></td>
+<td align="left" valign="top" scope="row"><p>必需的
+<tt>class</tt> 參數指定特殊識別服務的請求處理程式實作類別的名稱。例如：<tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>。</p></td>
+</tr>
+</table><p>若要新增請求處理程式，請參閱<a href="service.scsoapbindingrequesthandlerlistadd.html">配置請求處理程式</a>。</p>
+<br/>
+
+</body>
+</html>

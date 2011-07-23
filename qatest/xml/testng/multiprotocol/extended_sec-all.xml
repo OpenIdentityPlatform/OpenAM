@@ -1,0 +1,18 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="MultiProtocolTests">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.ConfigureSAMLv2"/>
+            <class name="com.sun.identity.qatest.idff.ConfigureIDFF"/>
+            <class name="com.sun.identity.qatest.wsfed.ConfigureWSFed"/>
+            <class name="com.sun.identity.qatest.multiprotocol.MultiProtocolSmokeTest"/>
+            <class name="com.sun.identity.qatest.samlv2.UnconfigureSAMLv2"/> 
+            <class name="com.sun.identity.qatest.idff.UnconfigureIDFF"/> 
+            <class name="com.sun.identity.qatest.wsfed.UnconfigureWSFed"/> 
+        </classes>
+    </test>
+

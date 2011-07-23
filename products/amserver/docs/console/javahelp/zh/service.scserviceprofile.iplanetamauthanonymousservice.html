@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>匿名 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthanonymousservice"></a><h4>匿名</h4>
+<p><a name="indexterm-167"></a>此模块类型允许用户直接登录，无需指定证书。您可以创建一个匿名用户，以使任何人不必提供密码即可匿名登录。匿名连接通常由 OpenSSO 管理员自定义，使匿名用户能对服务器进行有限访问。匿名验证属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fwblp">匿名用户有效</a></p></li>
+<li><p><a href="#fwbnz">默认匿名用户名</a></p></li>
+<li><p><a href="#fwbto">区分大小写的用户 ID</a></p></li>
+<li><p><a href="#fwbli">验证级别</a></p></li></ul>
+
+
+<a name="fwblp"></a><h5>匿名用户有效</h5>
+<p>包含登录时不需要提供证书的用户 ID 列表。如果用户的登录名称与此列表中的用户 ID 匹配，则允许访问并将会话分配给指定的用户 ID。</p><p>如果此列表为空，访问以下默认模块实例登录 URL 将作为“默认匿名用户名”进行验证：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>如果此列表不为空，访问默认模块实例登录 URL（同上）将提示用户输入任意有效的匿名用户名。如果此列表不为空，则用户可以通过访问以下 URL 登录而无需进入登录页面：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1=&#60;valid Anonymous username></tt></p>
+
+<a name="fwbnz"></a><h5>默认匿名用户名</h5>
+<p>如果“有效的匿名用户”列表为空并且访问以下默认模块实例登录 URL，则该字段用于定义为会话指定的用户 ID：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name </tt></p><p>默认值是 anonymous。还必须在领域中创建匿名用户。</p>
+<hr><p><b>注 &#8211; </b>如果活动匿名用户列表不为空，则可以使用默认匿名用户名中定义的用户登录而无需访问登录页面。可以通过访问以下 URL 来完成此操作：</p><p><tt>protocol://server_host.server_domain:server_port/server_deploy_uri/UI/Login?module=Anonymous&#38;org=org_name&#38;IDToken1= </tt> <tt></tt><i>DefaultAnonymous User Name</i><tt></tt></p>
+<hr>
+
+
+<a name="fwbto"></a><h5>区分大小写的用户 ID</h5>
+<p>如果启用，该选项允许对用户 ID 区分大小写。默认情况下，不启用该属性。</p>
+
+<a name="fwbli"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

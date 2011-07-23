@@ -1,0 +1,7 @@
+dn: ROOT_SUFFIX
+changetype: modify
+delete: sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMProviderConfigService
+-
+delete: sunRegisteredServiceName
+sunRegisteredServiceName: iPlanetAMAuthenticationDomainConfigService

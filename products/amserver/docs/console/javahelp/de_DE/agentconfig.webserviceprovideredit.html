@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Webdienstanbieter - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.webserviceprovideredit"></a><h4>Webdienstanbieter</h4>
+<p>Das Agentenprofil "Webdienstanbieter" beschreibt die Konfiguration, die zur Validierung von Webdienstanforderungen von
+Webdienst-Clients und zur Sicherung von Webdienstantworten von einem Webdienstanbieter verwendet wird. Der
+Name des Webdienstanbieters muss f&#252;r alle Agenten eindeutig sein.</p>
+
+<a name="ggouz"></a><h5>Allgemein</h5>
+<p>Folgende allgemeine Attribute definieren die grundlegenden Eigenschaften f&#252;r Webdienstanbieter:</p>
+
+<a name="ggovu"></a><h5>Gruppe</h5>
+<p>Mit dem Gruppenmechanismus k&#246;nnen Sie eine Sammlung &#228;hnlicher Agententypen definieren. Die Gruppe
+muss definiert sein, bevor der betreffende Agent in die Sammlung aufgenommen wird.
+</p>
+
+<a name="ggotz"></a><h5>Password</h5>
+<p>Definiert das Passwort f&#252;r dan Webdienstanbieter-Agenten.</p>
+
+<a name="ggotl"></a><h5>Passwortbest&#228;tigung</h5>
+<p> Best&#228;tigen Sie das Passwort.</p>
+
+<a name="ggova"></a><h5>Status</h5>
+<p>Legt fest, ob der Webdienstanbieter-Agent im System aktiv oder inaktiv sein soll.
+Standardm&#228;&#223;ig ist er auf "Aktiv" gesetzt, was bedeutet, dass der Agent an
+der Validierung von Webdienstanforderungen von Webdienst-Clients und der Sicherung von Webdienstantworten von
+einem Webdienstanbieter beteiligt ist.</p>
+
+<a name="ggowp"></a><h5>Universalbezeichner</h5>
+<p>Listet die grundlegenden LDAP-Eigenschaften auf, die den Webdienstanbieter-Agenten eindeutig definieren.</p>
+
+<a name="gglej"></a><h5>Sicherheit</h5>
+<p>Folgende Attribute definieren die Sicherheitsattribute f&#252;r den Webdienstanbieter: </p>
+
+<a name="gglhw"></a><h5>Sicherheitsmechanismus</h5>
+<p>Legt den Sicherheitsnachweistyp fest, der zur Validierung der Webdienst-Anforderung verwendet wird. 
+Dise Art von Sicherheitsmechanismus ist Teil der Webdienstanforderung von einem Webdienst-Client und
+wird von einem Webdienstanbieter akzeptiert. Es stehen folgende Typen zur Auswahl: </p>
+<ul><li><p>Anonymous (Anonym) &#8211; Der anonyme Sicherheitsmechanismus enth&#228;lt keine Sicherheitsnachweise.</p></li>
+<li><p>KerberosToken &#8211; Es werden Kerberos-Sicherheitstoken verwendet.</p></li>
+<li><p>LibertyBearerToken &#8211; Verwendet das Liberty-definierte Bearer-Token.</p></li>
+<li><p>LibertySAMLToken &#8211; Verwendet das Liberty-definierte SAML-Token.</p></li>
+<li><p>LibertyX509Token &#8211; Verwendet das Libery-defined X509-Zertifikat.</p></li>
+<li><p>SAML-HolderOfKey &#8211; Verwendet den SAML 1.1-Behauptungstyp "Holder-Of-Key".</p></li>
+<li><p>SAML-SenderVouches &#8211; Verwendet den SAML 1.1-Behauptungstyp "Sender Vouches".</p></li>
+<li><p>SAML2&#8211;HolderOfKey &#8211; Verwendet den SAML 2.0-Behauptungstoken-Typ "Holder-Of-Key".</p></li>
+<li><p>SAML2&#8211;SenderVouches &#8211; Verwendet den SAML 2.0-Behauptungstoken-Typ " Sender Vouches".</p></li>
+<li><p>UserNameToken &#8211; Verwendet ein Benutzernamenstoken.</p></li>
+<li><p>UserNameToken-Plain &#8211; Verwendet ein Benutzernamenstoken mit einem Klartextpasswort.</p></li>
+<li><p>X509Token &#8211; Verwendet das X509-Zertifikat.</p></li></ul>
+
+
+<a name="gglfy"></a><h5>Authentifizierungskette</h5>
+<p>Definiert den Namen der Authentifizierungskette bzw. des Authentifizierungsdiensts, der zur Authentifizierung beim
+OpenSSO-Authentifizierungsdienst mithilfe des Berechtigungsnachweises aus dem Sicherheitstoken einer eingehenden Webdienstanforderung verwendet werden
+kann, um das authentifizierte SSOToken von OpenSSO zu erstellen.</p>
+
+<a name="ghbbd"></a><h5>Token-Konvertierungstyp</h5>
+<p>Definiert den Typ des Tokens, das konvertiert wird, wenn ein Webdienstanbieter eine
+Token-Konvertierung vom Sicherheitstoken-Dienst anfordert. Das Token wird mit derselben Identit&#228;t, jedoch mit
+spezifischen Attributdefinitionen f&#252;r den Tokentyp in das angegebene SAML- oder SSOToken (Sitzungstoken)
+konvertiert. Der Webdienstanbieter kann dieses neue Token f&#252;r einen Webdienstaufruf an einen
+anderen Webdienstanbieter verwenden. Sie k&#246;nnen folgende Tokentypen definieren:</p>
+<ul><li><p>SAML 1.1-Token</p></li>
+<li><p>SAML2-Token</p></li>
+<li><p>SSOToken</p></li></ul>
+<p>Damit dieses Attribut verwendet werden kann, m&#252;ssen alle SAML-Token im Attribut <a href="#gglhw">Sicherheitsmechanismus</a>
+und in jeder f&#252;r den Webdienstanbieter definierten <a href="#gglfy">Authentifizierungskette</a> ausgew&#228;hlt werden.</p>
+
+<a name="ggoum"></a><h5>Sicherheits-Header in Nachricht beibehalten</h5>
+<p>Wenn dieses Attribut aktiviert ist, legt es fest, dass die SOAP-Sicherheits-Header vom
+Webdienstanbieter zur weiteren Verarbeitung beibehalten werden.</p>
+
+<a name="gglhq"></a><h5>Typ des privaten Schl&#252;ssels</h5>
+<p>Definiert den Schl&#252;sseltyp, der vom Webdienstanbieter w&#228;hrend der Signaturverifizierung f&#252;r die Webdienstanforderung
+verwendet wird. Der Standardwert lautet <tt>PublicKey</tt>.</p>
+
+<a name="ggovi"></a><h5>URN des Liberty-Diensttyps</h5>
+<p>Der URN (Universal Resource Name) beschreibt einen Liberty-Diensttyp, den der Webdienstanbieter f&#252;r
+Dienst-Nachschlagevorg&#228;nge verwendet.</p>
+
+<a name="ggovn"></a><h5>Berechtigungsnachweis f&#252;r Benutzertoken</h5>
+<p>Das Attribut stellt die gemeinsamen Grundschl&#252;ssel (Shared Secrets) f&#252;r  Benutzername/Passwort dar,
+die vom Webdienstanbieter zur Validierung eines Benutzernamens-Sicherheitstokens aus einer eingehenden Webdienstanforderung verwendet
+werden. Diese Berechtigungsnachweise werden mit den Berechtigungsnachweisen aus dem Benutzernamen-Sicherheitsschl&#252;ssel f&#252;r eine
+eingehende Webdienstanforderung verglichen.</p>
+
+<a name="gglfz"></a><h5>SAML-Konfiguration</h5>
+<p>Folgende Attribute konfigurieren die Security Assertion Markup Language (SAML) f&#252;r den Webdienstanbieter.</p>
+
+<a name="gglfx"></a><h5>SAML-Attributzuordnung</h5>
+<p>Diese Konfiguration stellt ein SAML-Attribut dar, das w&#228;hrend der Erstellung einer SAML-Anweisung
+durch den Sicherheitstoken-Dienst f&#252;r einen Webdienstanbieter als Attributanweisung generiert werden muss. Das
+Format lautet: <tt></tt><i>SAML_Attributname</i><tt></tt>=<tt></tt><i> Tats&#228;chlicher_Attributname</i><tt></tt>.</p><p><tt></tt><i>SAML_Attributname</i><tt></tt> ist der SAML-Attributname aus einer SAML-Behauptung, die aus einer eingehenden Webdienstanforderung
+stammt. <tt></tt><i>Tats&#228;chlicher_Attributname</i><tt></tt> ist der Attributname der entweder aus dem authentifizierten SSOToken oder
+aus dem Identit&#228;ts-Repository abgerufen wird.</p>
+
+<a name="gglgf"></a><h5>SAML NameID-Zuordnungs-Plugin</h5>
+<p>Definiert die Klasse des NameID-Zuordnungs-Plugins, die f&#252;r die SAML-Kontozuordnung verwendet wird.</p>
+
+<a name="gglhk"></a><h5>Namespace f&#252;r SAML-Attribute</h5>
+<p>Definiert den f&#252;r die Generierung von SAML-Attributen verwendeten Namespace.</p>
+
+<a name="gglfv"></a><h5>Mitgliedschaften einschlie&#223;en</h5>
+<p>Wenn dieses Attribut aktiviert ist, legt es fest, dass die Mitgliedschaft des
+Principal als SAML-Attribut aufgenommen werden muss.</p>
+
+<a name="ggovx"></a><h5>Signierung und Verschl&#252;sselung</h5>
+<p>Folgende Attribute definieren die Signierungs- und Verschl&#252;sselungskonfiguration f&#252;r die Webanbieter-Sicherheit:</p>
+
+<a name="ggowr"></a><h5>Ist Antwort signiert</h5>
+<p>Wenn diese Option aktiviert ist, signiert der Webdienstanbieter die Antwort mithilfe des
+X509-Zertifikats.</p>
+
+<a name="ggouo"></a><h5>Ist Antwort verschl&#252;sselt</h5>
+<p>Wenn diese Option aktiviert ist, wird die Webdienstantwort verschl&#252;sselt.</p>
+
+<a name="ggowz"></a><h5>Ist die Anforderungssignatur verifiziert</h5>
+<p>Wenn diese Option aktiviert ist, ist die Signatur der  Webdienstanforderung verifiziert.</p>
+
+<a name="ggouw"></a><h5>Ist Anforderungskopfzeile entschl&#252;sselt</h5>
+<p>Wenn diese Option aktiviert ist, wird der Sicherheits-Header der Webdienst-Client -Anforderung verschl&#252;sselt.</p>
+
+<a name="ggotr"></a><h5>Ist Anforderung entschl&#252;sselt</h5>
+<p>Wenn diese Option aktiviert ist, wird die Anforderung des Webdienst-Clients entschl&#252;sselt.</p>
+
+<a name="gglls"></a><h5>Schl&#252;sselspeicher</h5>
+<p>Folgende Attribute konfigurieren den Schl&#252;sselspeicher, der zum Speichern und Abrufen des Zertifikats
+verwendet werden soll: </p>
+
+<a name="gglld"></a><h5>Alias von &#246;ffentlichem Schl&#252;ssel des Webdienst-Client</h5>
+<p>Dieses Attribut definiert den Alias des &#246;ffentlichen Zertifikatschl&#252;ssels, der verwendet wird, um
+die Webdienstantwort zu verschl&#252;sseln oder die Signatur der Webdienstanforderung zu verifizieren.</p>
+
+<a name="gglmc"></a><h5>Alias des privaten Schl&#252;ssels</h5>
+<p>Dieses Attribut definiert den Alias des privaten Zertifikatschl&#252;ssels, der verwendet wird, um
+die Webdienstantwort zu signieren oder die Webdienstanforderung zu entschl&#252;sseln.</p>
+
+<a name="ggljf"></a><h5>Schl&#252;sselspeichernutzung</h5>
+<p>Diese Konfiguration definiert, ob der Standardschl&#252;sselspeicher oder ein benutzerdefinierter Schl&#252;sselspeicher verwendet werden
+soll. Folgende Werte m&#252;ssen f&#252;r einen benutzerdefinierten Schl&#252;sselspeicher definiert werden:</p>
+<ul><li><p>Speicherort des Schl&#252;sselspeichers</p></li>
+<li><p>Passwort des Schl&#252;sselspeichers</p></li>
+<li><p>Passwort des Schl&#252;ssels</p></li></ul>
+
+
+<a name="gglko"></a><h5>Endpunkte</h5>
+<p>Folgende Attribute definieren Webdienst-Endpunkte:</p>
+
+<a name="gglmp"></a><h5>Endpunkt des Webdienst-Proxy</h5>
+<p>Dieses Attribut definiert einen Webdienst-Endpunkt, an den der Webdienstclient eine Anforderung stellt.
+Der Endpunkt ist optional, es sei denn, er ist f&#252;r die Verwendung
+eines Webdienstsicherheit-Proxy konfiguriert. </p>
+
+<a name="ghbed"></a><h5>Webdienst-Endpunkt</h5>
+<p>Dieses Attribut definiert einen Webdienst-Endpunkt, an den der Webdienstclient eine Anforderung stellt.</p>
+
+<a name="ghbay"></a><h5>Kerberos-Konfiguration</h5>
+<p>Kerberos ist ein von der Webdienstsicherheit unterst&#252;tztes Sicherheitsprofil zur Sicherung der Webdienstkommunikation
+zwischen einem Webdienstclient und einem Webdienstanbieter. In einem typischen Szenario authentifiziert sich
+ein Benutzer beim Desktop und ruft einen Webdienst und den Webdienstclient auf.
+Hierbei ist ein Kerberos-Ticket zur Sicherung der Anforderung an den Webdienstanbieter durch
+Identifizierung seines Principals als Kerberos-Token erforderlich. Normalerweise wird die Kerberos-basierte Webdienstsicherheit im
+selben Kontext der Kerberos-Dom&#228;ne (Bereich) und nicht &#252;ber Grenzen hinweg wie beispielsweise
+die SAML-basierte Webdienstsicherheit verwendet. Kerberos ist jedoch einer der leistungsst&#228;rksten Authentifizierungsmechanismen, insbesondere
+in Umgebungen mit Windows-Dom&#228;nencontroller.</p>
+
+<a name="ghbbv"></a><h5>Kerberos-Domain-Server</h5>
+<p>Gibt den Hostnamen des Kerberos-Verteilungscenters (Dom&#228;nencontroller) an. Hier ist der vollst&#228;ndig qualifizierte
+Dom&#228;nenname (FQDN) des Dom&#228;nencontrollers erforderlich.</p>
+
+<a name="ghbdx"></a><h5>Kerberos-Domain</h5>
+<p>Gibt den Dom&#228;nennamen des Kerberos-Verteilungscenters (Dom&#228;nencontroller) an. Je nach Konfiguration ist der
+Dom&#228;nenname des Dom&#228;nencontrollers nicht identisch mit dem Dom&#228;nennamen von OpenSSO.</p>
+
+<a name="ghbcq"></a><h5>Kerberos-Dienstprincipal</h5>
+<p>Legt den Kerberos-Principal als Eigent&#252;mer des generierten Sicherheitstokens fest.</p><p>Verwenden Sie die folgende Syntax: </p><p><tt>HTTP/hostname.domainname&#64;dc_domain_name</tt> </p><p><tt>hostname</tt> und <tt>domainame</tt> stehen f&#252;r den Hostnamen und den Dom&#228;nennamen der OpenSSO-Instanz.
+<tt>dc_domain_name</tt> is the Kerberos domain in which the Windows Kerberos server (domain
+controller) resides. Der Kerberos-Server unterscheidet sich m&#246;glicherweise vom Dom&#228;nennamen der OpenSSO-Instanz.</p>
+
+<a name="ghbae"></a><h5>Kerberos-Schl&#252;ssel-Tabdatei</h5>
+<p>Gibt die zur Ausgabe des Tokens verwendete Kerberos-Keytab-Datei an. Folgendes Format wird
+empfohlen, auch wenn es nicht vorgeschrieben ist:</p><p><tt>hostname.HTTP.keytab</tt> </p><p><tt>hostname</tt> ist der Hostname der OpenSSO-Instanz.</p>
+
+<a name="ghbep"></a><h5>Kerberos-Signatur verifizieren</h5>
+<p>Wenn es aktiviert ist, wird mit diesem Attribut angegeben, dass das Kerberos-Token
+signiert ist.</p>
+<br/>
+
+</body>
+</html>

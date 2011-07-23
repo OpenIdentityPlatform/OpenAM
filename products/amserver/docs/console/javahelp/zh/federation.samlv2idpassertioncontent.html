@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自定义 SAMLv2 身份认证提供者 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2idpassertioncontent"></a><h4>自定义 SAMLv2 身份认证提供者</h4>
+<p>SAMLv2 身份认证提供者包含以下属性组：</p>
+<ul><li><p><a href="#ggwdf">声明内容</a></p></li>
+<li><p><a href="#ggwca">声明处理</a></p></li>
+<li><p><a href="#ggwyj">本地配置</a></p></li>
+<li><p><a href="#ggwaw">服务</a></p></li>
+<li><p><a href="#ggwli">高级</a></p></li></ul>
+
+
+<a name="ggwdf"></a><h5>声明内容</h5>
+
+<ul><li><p><a href="#ggwad">请求/响应签署</a></p></li>
+<li><p><a href="#ggwby">加密</a></p></li>
+<li><p><a href="#ggwcz">证书别名</a></p></li>
+<li><p><a href="#ggwbz">名称 ID 格式</a></p></li>
+<li><p><a href="#ggyoq">名称 ID 值映射</a></p></li>
+<li><p><a href="#ggwer">验证环境</a></p></li>
+<li><p><a href="#ggwec">声明时间</a></p></li>
+<li><p><a href="#ggwce">基本验证</a></p></li>
+<li><p><a href="#ggwaj">声明高速缓存</a></p></li>
+<li><p><a href="#ggwcd">引导</a></p></li></ul>
+
+
+<a name="ggwad"></a><h5>请求/响应签署</h5>
+<p>设置下列标志以向身份认证提供者说明服务提供者如何签署特定消息：</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>验证请求</p></td>
+<td align="left" valign="top" scope="row"><p>必须签署此身份认证提供者接收的所有验证请求。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>工件解析</p></td>
+<td align="left" valign="top" scope="row"><p>服务提供者必须签署 <tt>ArtifactResolve</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>注销请求</p></td>
+<td align="left" valign="top" scope="row"><p>服务提供者必须签署 <tt>LogoutRequest</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>注销响应</p></td>
+<td align="left" valign="top" scope="row"><p>服务提供者必须签署 <tt>LogoutResponse</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>管理名称 ID 请求</p></td>
+<td align="left" valign="top" scope="row"><p>服务提供者必须签署 <tt>ManageNameIDRequst</tt> 元素。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>管理名称 ID
+响应</p></td>
+<td align="left" valign="top" scope="row"><p>服务提供者必须签署 <tt>ManageNameIDResponse</tt> 元素。</p></td>
+</tr>
+</table>
+
+<a name="ggwby"></a><h5>加密</h5>
+<p>选中复选框来为以下元素启用加密：</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>NameID</p></td>
+<td align="left" valign="top" scope="row"><p>服务提供者必须加密所有 <tt>NameID</tt> 元素。</p></td>
+</tr>
+</table>
+
+<a name="ggwcz"></a><h5>证书别名</h5>
+<p>此属性为身份认证提供者定义证书别名元素。<tt>签署</tt>指定用于在密钥库中查找正确的签署证书的提供者证书别名。<tt>加密</tt>指定用于在密钥库中查找正确的加密证书的提供者证书别名。</p>
+
+<a name="ggwbz"></a><h5>名称 ID 格式</h5>
+<p>定义身份认证提供者所支持的名称标识符格式。提供者可通过名称标识符进行涉及到用户的通信。单点登录交互支持以下标识符类型：</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</tt></p></li></ul>
+<p><b>持久标识符</b>作为两个属性的值保存到特定的用户数据存储库条目中。<b>临时标识符</b>是临时的，不会有任何数据写入用户的持久数据存储库。</p>
+
+<a name="ggyoq"></a><h5>名称 ID 值映射</h5>
+<p>此属性指定 NameID 格式属性和用户配置文件属性之间的映射。如果在协议中使用定义的名称 ID 格式，配置文件属性值将用作主体中的格式的 NameID 值。每个条目的语法为：</p><p><tt></tt><i>NameID Format</i><tt>=</tt><i>User profile attribute</i><tt></tt></p><p>例如：</p><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress=mail</tt></p><p>要添加新的 NameID 格式，需要使用对应的条目来更新“NameID 值映射”属性。 <tt>持久</tt>、<tt>临时</tt>和<tt>未指定</tt>是例外。对于<tt>持久</tt>和<tt>临时</tt>，将随机生成 NameID 值。此属性的<tt>未指定</tt>是可选的。如果已指定，NameID 值将是用户配置文件属性的值。如果未指定，则生成一个随机数。</p>
+
+<a name="ggwer"></a><h5>验证环境</h5>
+<p>此属性将 SAMLv2 定义的验证环境类映射到身份认证提供者提供的验证方法。</p><dl><dt>映射程序</dt>
+<dd><p>指定 <tt>IDPAuthnContextMapper</tt> 接口的实现，该接口用于创建请求的验证环境。默认实现是 <tt>com.sun.identity.saml2.plugins.</tt><tt>DefaultIDPAttributeMapper</tt>。</p></dd>
+<dt>默认验证环境</dt>
+<dd><p>指定服务提供者没有发送验证环境请求时，身份认证提供者使用的默认验证环境类型。</p></dd>
+<dt>支持</dt>
+<dd><p>如果身份认证提供者支持验证环境类，请选中其旁边的复选框。</p></dd>
+<a name="indexterm-68"></a><a name="indexterm-69"></a><a name="indexterm-70"></a><dt>环境参考</dt>
+<dd><p>SAMLv2 定义的验证环境类为：</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Telephony</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Unspecified</p></li></ul>
+</dd>
+<dt>键</dt>
+<dd><p>选择环境所映射到的 OpenSSO 验证类型。</p></dd>
+<dt>值</dt>
+<dd><p>键入 OpenSSO 验证选项。</p></dd>
+<dt>级别</dt>
+<dd><p>映射到 OpenSSO 验证框架中定义的验证级别的正数值。验证级别表示验证方法的可信程度。</p><p>在此框架中，每个身份认证提供者都配置了默认验证环境（首选验证方法）。然而，提供者可能想将指定的验证环境更改为基于已定义验证级别的验证环境。例如，提供者 B 想要生成验证级别为 3 的本地会话，所以它请求身份认证提供者使用指定为该级别的验证环境对用户进行验证。此查询参数的值确定身份认证提供者使用的验证环境。</p></dd>
+</dl>
+
+
+<a name="ggwec"></a><h5>声明时间</h5>
+<p>声明在一段时间内有效，在这之前或之后都无效。此属性为 <tt>Not Before Time Skew</tt> 值指定宽限期（以秒为单位）。默认值为 <tt>600</tt>。它与 <tt>notAfter</tt> 值无关。</p><p><tt>有效时间</tt>指定从声明的发出时间开始计算的声明有效时间（以秒为单位）。默认值为 <tt>600</tt> 秒。</p>
+
+<a name="ggwce"></a><h5>基本验证</h5>
+<p>可启用基本验证来保护 SOAP 端点。任何访问这些端点的提供者必须具有以下两个属性中定义的用户和密码：<tt>用户名</tt>和<tt>密码</tt>。</p>
+
+<a name="ggwaj"></a><h5>声明高速缓存</h5>
+<p>如果启用，则会允许身份认证提供者高速缓存之后要检索的声明。</p>
+
+<a name="ggwcd"></a><h5>引导</h5>
+<p>如果想在基于 Liberty 的单点登录过程中生成搜索服务的资源提供以进行引导，请选中该复选框。</p>
+
+<a name="ggwca"></a><h5>声明处理</h5>
+
+<ul><li><p><a href="#ggwdy">属性映射程序</a></p></li>
+<li><p><a href="#ggwcl">帐户映射程序</a></p></li></ul>
+
+
+<a name="ggwdy"></a><h5>属性映射程序</h5>
+<p>指定值，用于定义默认属性映射程序插件所使用的映射。默认的插件类为 <tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</tt>。</p><p>映射应该按以下格式配置：</p><p><i>SAML-attribute</i>=<i>local-attribute</i></p><p>例如，<tt>EmailAddress=mail</tt> 或 <tt>Address=postaladdress</tt>。将映射作为“新值”键入，并单击“添加”。</p>
+
+<a name="ggwcl"></a><h5>帐户映射程序</h5>
+<p>指定 <tt>AccountMapper</tt> 接口的实现，该接口用于将远程用户帐户映射到本地用户帐户以进行单点登录。默认值是 <tt>com.sun.identity.saml2.plugins.</tt><tt>DefaultIDPAccountMapper</tt>，即默认实现。</p>
+
+<a name="ggwyj"></a><h5>本地配置</h5>
+<p>这些属性包含特定于 OpenSSO 实例的配置。</p>
+
+<a name="ggwwx"></a><h5>验证 URL</h5>
+<p>定义验证 URL，身份认证提供者将重定向到该 URL 以进行验证。</p>
+
+<a name="ghcia"></a><h5>外部应用程序注销 URL</h5>
+<p>“外部应用程序注销 URL”定义外部应用程序的注销 URL。一旦服务器接收到来自远程伙伴的注销请求，就会使用反向通道 <tt>HTTP POST</tt> 向包含所有 cookie 的注销 URL 发送请求。可以选择在 URL 中含有查询参数 <tt>appsessionproperty</tt>（设置为会话属性名称）时，将用户会话属性作为
+<tt>HTTP 标头</tt>和 <tt>POST</tt> 参数发送。</p>
+
+<a name="ggwaw"></a><h5>服务</h5>
+
+<ul><li><p><a href="#ggwbs">元数据别名</a></p></li>
+<li><p><a href="#ggwip">工件解析服务</a></p></li>
+<li><p><a href="#ggwcq">单点注销服务</a></p></li>
+<li><p><a href="#ggwdm">管理名称 ID 服务</a></p></li>
+<li><p><a href="#ggwhr">单点登录服务</a></p></li></ul>
+
+
+<a name="ggwbs"></a><h5>元数据别名</h5>
+<p>为正在配置的提供者指定 <tt>metaAlias</tt>。<tt>metaAlias</tt> 用于查找提供者的实体标识符和它所属的组织。该值是一个字符串，由领域名称或组织名称（这取决于 OpenSSO 中是否安装了 SAML v2 Plug-in for Federation Services）加上正斜杠和提供者名称组成。例如，<tt>/suncorp/travelprovider</tt>。</p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> 中使用的名称绝不能包含 <tt>/</tt>。</p>
+<hr>
+
+
+<a name="ggwip"></a><h5>工件解析服务</h5>
+<p>定义支持工件解析配置文件的端点。<tt>位置</tt>指定请求所发送到的提供者的 URL。<tt>索引</tt>给端点指定唯一整数值，以便可在协议消息中引用端点。</p>
+
+<a name="ggwcq"></a><h5>单点注销服务</h5>
+<p>单点注销服务会在身份认证提供者验证的所有会话间对注销功能进行同步。</p><p><tt>位置</tt>指定请求所发送到的提供者的 URL。<tt>响应位置</tt>指定响应所发送到的提供者的 URL。绑定类型为：</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdm"></a><h5>管理名称 ID 服务</h5>
+<p>此服务定义特定 URL，当与服务提供者进行通信来为主体指定新的名称标识符时，会使用这些 URL。（只能在建立联合会话后注册。）</p><p><tt>位置</tt>指定请求所发送到的提供者的 URL。<tt>响应位置</tt>指定响应所发送到的提供者的 URL。绑定类型为：</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwhr"></a><h5>单点登录服务</h5>
+<p>定义支持验证请求协议的配置文件的端点。所有身份认证提供者必须至少支持一个这样的端点。</p><p><tt>位置</tt>指定请求所发送到的提供者的 URL。绑定类型为：</p>
+<ul><li><p>重定向 HTTP</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwli"></a><h5>高级</h5>
+
+<ul><li><p><a href="#ggwjs">IDP URL</a></p></li>
+<li><p><a href="#ggwix">应用程序密钥列表</a></p></li>
+<li><p><a href="#ggwir">IDP 映射程序会话</a></p></li></ul>
+
+
+<a name="ggwjs"></a><h5>IDP URL</h5>
+<p>在能处理 SAE（Secure Attribute Exchange, 安全属性交换）请求的身份认证提供者上定义 URL 端点。</p>
+
+<a name="ggwix"></a><h5>应用程序密钥列表</h5>
+<p>定义应用程序安全配置。每个应用程序必须有一个条目。每个条目具有以下格式：</p><p><tt>url=IDPAppURL|type=</tt><i>symmetric_orAsymmetric</i><tt>|secret=</tt><i> ampassword encoded shared secret</i><tt></tt> 或 <tt>pubkeyalias=</tt><i>idp app signing cert</i><tt></tt></p>
+
+<a name="ggwir"></a><h5>IDP 映射程序会话</h5>
+<p>为会话映射程序 SPI 定义实现类。映射程序会在含有 ECP 配置文件的身份认证提供者上的 HTTP servlet 请求中查找有效会话。</p>
+<br/>
+
+</body>
+</html>

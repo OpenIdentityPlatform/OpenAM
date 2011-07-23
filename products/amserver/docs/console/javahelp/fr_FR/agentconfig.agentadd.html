@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Cr&#233;ation d'un agent - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentadd"></a><h5>Cr&#233;ation d'un agent</h5>
+<p>Cr&#233;er un agent est &#233;galement appel&#233; cr&#233;er un profil d'agent. Vous pouvez
+effectuer cette t&#226;che dans la console d'administration d'OpenSSO. Certaines &#233;tapes ne concernent
+que les agents de strat&#233;gie J2EE et Web.</p><ol>
+<li><b>Cliquez sur l'onglet Contr&#244;le d'acc&#232;s.</b></li>
+<li><b>Cliquez sur le nom du domaine auquel l'agent appartiendra.</b></li>
+<li><b>Cliquez sur l'onglet Agents.</b></li>
+<li><b>Cliquez sur l'onglet correspondant au type d'agent appropri&#233;.</b><ul>
+<li><b>Agents Web</b></li>
+<li><b>Agents J2EE</b></li>
+<li><b>Agents de fournisseur de services Web</b></li>
+<li><b>Agents de client de services Web</b></li>
+<li><b>Agent de client STS</b><p>L'agent de client du service de jeton de s&#233;curit&#233; existe en deux
+types&#160;: Agent de d&#233;couverte et Agent STS. Pour plus d'informations sur ces
+types d'agent, reportez-vous &#224; la rubrique <a href="agentconfig.stsclientedit.html">Client STS</a>.</p></li>
+<li><b>Agents 2.2</b><p>L'onglet Agents&#160;2.2 est destin&#233; aux agents de la suite logicielle Policy Agent&#160;2.2.</p></li>
+<li><b>Authentificateur d'agent</b></li></ul></li>
+<li><b>Dans la section Agent, cliquez sur Nouveau.</b></li>
+<li><b>Dans le champ Nom, entrez le nom du nouveau profil d'agent.</b></li>
+<li><b>Entrez et confirmez le mot de passe.</b>
+<hr><p><b>Attention &#8211; </b>Ce mot de passe doit &#234;tre le mot de passe entr&#233; dans
+le fichier de mots de passe de profil d'agent que vous sp&#233;cifiez
+lorsque vous ex&#233;cutez le programme <tt>agentadmin</tt> pour installer l'agent.</p>
+<hr>
+<p><b>Les &#233;tapes 8 &#224; 10 ne concernent que les agents de strat&#233;gie Web et J2EE.</b></p></li>
+<li><b>S&#233;lectionnez la configuration appropri&#233;e (locale ou centralis&#233;e).</b><p>Si vous choisissez la configuration locale, vous ne pouvez pas modifier les
+propri&#233;t&#233;s de cet agent dans la console. Dans ce cas, l'agent extrait
+les informations de configuration des fichiers locaux <tt>OpenSSOAgentBootstrap.properties</tt> et <tt>OpenSSOAgentConfiguration.properties</tt>, situ&#233;s dans
+le r&#233;pertoire d'installation de l'agent. Pour un agent configur&#233; localement, modifiez la
+valeur des propri&#233;t&#233;s directement dans le fichier <tt>OpenSSOAgentConfiguration.properties</tt>.</p></li>
+<li><b>Dans le champ URL du serveur, saisissez l'URL du serveur OpenSSO.</b><p>Par exemple :</p><pre>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</pre></li>
+<li><b>Dans le champ URL de l'agent, saisissez l'URL de l'application agent <tt>agentapp</tt>
+.</b><p>Par exemple :</p><dl><dt>Agents Web</dt>
+<dd><p><tt>http://agentHost.example.com:8090</tt></p></dd>
+<dt>Agents J2EE</dt>
+<dd><p><tt>http://agentHost.example.com:8090/agentapp</tt></p></dd>
+</dl>
+</li>
+<li><b>Cliquez sur Cr&#233;er.</b><p>La console cr&#233;e le profil de l'agent et affiche de nouveau sa
+page avec un lien pointant vers le nouveau profil.</p><p>Pour effectuer d'autres t&#226;ches de configuration du profil d'agent, cliquez sur ce
+lien afin d'afficher la page Modification de groupe d'agents.</p></li></ol>
+<br/>
+
+</body>
+</html>

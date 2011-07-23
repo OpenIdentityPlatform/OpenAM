@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<project name="Authnicrp" default="default" basedir=".">
+    <description>Builds, tests, and runs of project authnicrp.
+    Information Cards Authentication Module
+    </description>
+    <import file="nbproject/build-impl.xml"/>
+    
+    <!--
+
+    There exist several targets which are by default empty and which can be 
+    used for execution of your tasks. These targets are usually executed 
+    before and after some main targets. They are: 
+
+      -pre-init:                 called before initialization of project properties
+      -post-init:                called after initialization of project properties
+      -pre-compile:              called before javac compilation
+      -post-compile:             called after javac compilation
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-jar:                  called before JAR building
+      -post-jar:                 called after JAR building
+      -post-clean:               called after cleaning build products
+
+    (Targets beginning with '-' are not intended to be called on their own.)
+
+    Example of inserting an obfuscator after compilation could look like this:
+
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
+
+    For list of available properties check the imported 
+    nbproject/build-impl.xml file. 
+
+
+    Another way to customize the build is by overriding existing main targets.
+    The targets of interest are: 
+
+      -init-macrodef-javac:     defines macro for javac compilation
+      -init-macrodef-junit:     defines macro for junit execution
+      -init-macrodef-debug:     defines macro for class debugging
+      -init-macrodef-java:      defines macro for class execution
+      -do-jar-with-manifest:    JAR building (if you are using a manifest)
+      -do-jar-without-manifest: JAR building (if you are not using a manifest)
+      run:                      execution of project 
+      -javadoc-build:           Javadoc generation
+      test-report:              JUnit report generation
+
+    An example of overriding the target for project execution could look like this:
+
+        <target name="run" depends="AuthInfocard-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
+
+    Notice that the overridden target depends on the jar target and not only on 
+    the compile target as the regular run target does. Again, for a list of available 
+    properties which you can use, check the target you are overriding in the
+    nbproject/build-impl.xml file. 
+
+    -->
+
+    <!-- Check project properties correctness before invoking the install target -->
+    <target name="-post-jar">
+        <property file="nbproject/project.properties"/>
+        <property file="nbproject/private/private.properties"/>
+        
+        <!-- define opensso-root.dir property in this file or in private.properties
+             if you build the module from Netbeans -->
+        <!--
+        <property name="opensso-root.dir" value="/Users/Patrick/Downloads/opensso/deployable-war/opensso" />
+        -->
+        <property name="opensso-root.dir" value="/Users/Patrick/opensso" />
+        <property name="opensso-lib.dir" value="${opensso-root.dir}/WEB-INF/lib" />
+        <property name="opensso-config.dir" value="${opensso-root.dir}/config/auth/" />
+        <property name="opensso-images.dir" value="${opensso-root.dir}/images" />
+
+        <copy file="${dist.jar}" todir="${opensso-lib.dir}" />
+        <copy file="extlib/xmldap-1.0.jar" todir="${opensso-lib.dir}" />
+        <copy file="xml/services/amAuthInfocard.xml" todir="${opensso-root.dir}/WEB-INF/classes" />
+        <copy file="xml/services/amUser.xml" todir="${opensso-root.dir}/WEB-INF/classes" />
+        <copy file="resources/locale/amAuthInfocard.properties" todir="${opensso-root.dir}/WEB-INF/classes" />
+        <copy file="resources/locale/amAuthInfocard.properties" tofile="${opensso-root.dir}/WEB-INF/classes/amAuthInfocard_en.properties" />
+        <copy file="resources/locale/amUser.properties" todir="${opensso-root.dir}/WEB-INF/classes" />
+        <copy file="resources/locale/amUser.properties" tofile="${opensso-root.dir}/WEB-INF/classes/amUser_en.properties" />
+        <copy file="xml/auth-module/Infocard.xml" todir="${opensso-config.dir}/default" />
+        <copy file="xml/auth-module/Infocard.xml" todir="${opensso-config.dir}/default_en" />
+        <copy file="www/jsp/infocardException.jsp" todir="${opensso-config.dir}/default" />
+        <copy file="www/jsp/infocard.jsp" todir="${opensso-config.dir}/default" />
+        <copy file="www/js/infocard.js" todir="${opensso-root.dir}/js" />
+        <copy file="www/css/infocard.css" todir="${opensso-root.dir}/css" />
+        <copy file="www/images/infocard_81x57.png" todir="${opensso-images.dir}" />
+        <copy file="www/images/infocard_81x57_on.png" todir="${opensso-images.dir}" />
+        <copy file="www/images/ic-outline-icon-61x42.png" todir="${opensso-images.dir}" />
+        <copy file="www/images/openssoex.gif" todir="${opensso-images.dir}" />
+        <copy file="www/PrivacyPolicy.html" todir="${opensso-root.dir}" />
+
+    </target>
+</project>

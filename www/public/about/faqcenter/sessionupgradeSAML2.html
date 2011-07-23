@@ -1,0 +1,212 @@
+<div><table cellpadding="0" cellspacing="10" border="0" align="left" valign="top">
+  <col WIDTH=100%>
+
+    <tr><td><img src="../../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+
+    <tr><td><font size="2"><i>You can post comments and questions regarding the documentation provided below on the <a href="http://wiki.java.net/bin/view/Projects/DocFeedback" target="_blank">Documentation Feedback Wiki Page</a>. The page will open in a new window.</i>
+</font></td></tr>
+
+    <tr><td><h2>SAML2 session upgrade setup</h2></td></tr>
+    
+    <tr><td><font size="2">
+    
+    <body>
+<span style="font-weight: bold;">How to Setup SAMLv2 Session Upgrade
+with J2EE Policy Agent</span><br>
+<br>
+<span style="text-decoration: underline;">Systems to setup</span>:<br>
+<br>
+- agentsample(url resources) installed on a web container which is
+protected by J2EE policy agent<br>
+- Opensso SP<br>
+- Opensso IDP<br>
+<br>
+<span style="text-decoration: underline;">Setup steps</span>:<br>
+<br>
+<span style="font-weight: bold;">Step 1: Setup Opensso server, j2ee
+policy agent and agentsample as John Domenichini specified in his blogs:</span><br>
+<a class="moz-txt-link-freetext"
+ href="http://blogs.sun.com/JohnD/entry/glassfish_domain1_opensso_domain2_policy">http://blogs.sun.com/JohnD/entry/glassfish_domain1_opensso_domain2_policy</a><br>
+<br>
+<span style="font-weight: bold;"></span>and <a
+ href="http://blogs.sun.com/JohnD/entry/policy_agent_3_0_learning">http://blogs.sun.com/JohnD/entry/policy_agent_3_0_learning</a><br>
+<br>
+After this step, agentsample should work.<br>
+<br>
+<span style="font-weight: bold;">Step 2: Setup SAML2 Opensso IDP and
+Opensso SP. </span><br>
+<span style="font-style: italic;"></span><br>
+<span style="font-style: italic;">2.1 Install Opensso server in another
+machine/web container, let this one be Opensso IDP.</span>&nbsp; <br>
+Use the instructions specified in
+http://OpenssoIDP:port/idp_deploy_uri/samples/saml2/idp/configure.jsp
+to configure it as SAML2 IDP.<br>
+<span style="font-style: italic;"></span><br>
+<span style="font-style: italic;">2.2 Create a user "chris" on Opensso
+IDP</span>.<br>
+Login to Opensso IDP admin console, navigate to Access Control -&gt;
+/(Top Level Realm) -&gt; Subjects<br>
+Click "New" to create a new user, <br>
+enter "chris" for all the fields<br>
+Click "OK" to create user chris<br>
+<br>
+Logout of Opensso IDP admin console.<br>
+<br>
+<span style="font-style: italic;">2.3 The Opensso server used in step 1
+will become Opensso SP. </span><br>
+<br>
+Use
+http://OpenssoSP:port/sp_deploy_uri/samples/saml2/sp/configure.jsp to
+configure it as SAML2 SP.<br>
+<br>
+Logout of Opensso SP admin console.<br>
+<br>
+After this setup, samples/saml2/useCaseDemo should work for user chris.<br>
+<br>
+<span style="font-weight: bold;">Step 3: Modify agent LoginURL and
+LogoutURL to use saml2 sso/slo with agent.</span><br>
+<br>
+Login to Opensso SP admin console using amadmin;<br>
+Navigate to Access Control -&gt; / (Top Level Realm) -&gt; Agents -&gt;
+J2EE -&gt; glassfishagent -&gt; OpenSSO Services:<br>
+Under section "Login URL", change attribute "OpenSSO Login URL" from<br>
+http://openssoSP:port/sp_deploy_rui/UI/Login to<br>
+http://openssoSP:port/sp_deploy_uri/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&amp;idpEntityID=http://openssoIDP:port/idp_deploy_uri<br>
+<br>
+Under section "Logout URL", change attribute "OpenSSO Logout URL" from<br>
+http://openssoSP:port/sp_deploy_uri/UI/Logout to<br>
+http://openssoSP:port/sp_deploy_uri/saml2/jsp/spSingleLogoutInit.jsp?metaAlias=/sp&amp;idpEntityID=http://openssoIDP:port/idp_deploy_uri<br>
+<br>
+Click "Save" to save the changes.<br>
+<br>
+Logout from Opensso SP admin console.<br>
+<br>
+After this setup, agentsample should work with saml2 sso/slo.<br>
+Access to http://agentHost:port/agentsample, invoke URL Policy
+Enforcement, will redirect to Opensso IDP's login page.<br>
+Access to http://agentHost:port/agentsample/logout will log you out
+from agent sample, Opensso SP and Opensso IDP.<br>
+<br>
+<span style="font-weight: bold;">Step 4: Setup session upgrade</span><br>
+<br>
+<span style="font-style: italic;">4.1 Setup authncontext mapping on
+Opensso SP and Opensso IDP, create a new auth</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">module instance on Opensso IDP.</span><br>
+<br>
+<span style="font-style: italic;">4.1.1 Login to Opensso IDP admin
+console using amadmin</span><br>
+<br>
+<span style="font-style: italic;">4.1.1.1 Navigate to Access Control
+-&gt; /(Top Level Realm) -&gt; Authentication</span><br>
+<br>
+Under Module Instances, click on "New",<br>
+Under "New Module Instance" page, enter "TestModule" for "Name", select
+the rado button next to "Data Store". Note: this module is created for
+testing only. For real deployment, you should pick a module that
+coresponding to authncontext "X.509", such as certificate, and setup
+that authentication appropriately.<br>
+Click "OK" to create this module instance.<br>
+Under "Module Instances" section, click on the newly created auth
+module "TestModule",<br>
+Change "Authentication Level" from "0" to "1".<br>
+Click "Save" to save the changes.<br>
+go back to Authentication tab, click "Save" to save the changes.<br>
+<br>
+<span style="font-style: italic;">4.1.1.2 Navigate to Federation</span><br>
+<br>
+Under section "Entity providers", click on the hosted IDP link<br>
+Under "Assertion Content" tab, section "Authentication Context", for
+attribute "Authentication Context",<br>
+- the check box next to "PasswordProtectedTransport" should be
+selected. Select<br>
+"Module" from the drop down box for its "Key", enter "DataStore" for
+its "Value". Leave<br>
+"Level" as "0".<br>
+- select the check box next to "X.509", select "Module" from the<br>
+drop down box for its "Key", enter "TestModule" for its "Value", change
+its "Level" from "0" to "1".<br>
+- Click on "Save" to save the changes<br>
+<br>
+Logout from Opensso IDP admin console.<br>
+<br>
+<span style="font-style: italic;">4.1.2 Login to Opensso SP admin
+console using amadmin.</span><br>
+<br>
+Navigate to Federation<br>
+Under section "Entity providers", click on the hosted SP link<br>
+Under "Assertion Content" tab, section "Authentication Context",<br>
+For attribute "Authentication Context", select the check box next to
+"X.509", change the "Level" from "0" to "1".<br>
+Click "Save" to save the changes.<br>
+<br>
+<span style="font-style: italic;">4.2 Modify policy to add a
+AuthenticationLevel condition</span><br>
+<br>
+Login to Opensso SP admin console using amadmin;<br>
+Navigate to Access Control -&gt; /(Top Level Realm) -&gt; Policies
+-&gt; The policy you created in step 1 for agentsample;<br>
+Under section "Conditions", click on "New" to create a new condition:<br>
+Select "Authentication Level (greater than or equal to)" radio
+button,click next;<br>
+for "Name" of the condition: enter any name, say "con1";<br>
+for "Authentication Level" of the condition: enter "1";<br>
+Click "Finish" to go back to the policy page;<br>
+Click "Save" to save the policy.<br>
+<br>
+<br>
+<span style="font-style: italic;">4.3 Enable attribute based session
+notification for AuthLevel on OpenSSO SP.</span><br>
+<br>
+Login to SP admin console using amadmin;<br>
+Navigate to Configuration -&gt; Global -&gt; Session;<br>
+Under section "Global Attributes", change the value for "Enable
+Property Change<br>
+Notifications" from "OFF" to "ON";<br>
+Add "AuthLevel" to attribute "Notification Properties".<br>
+Click on "Save" to save the changes.<br>
+<br>
+Note: The agent must use notification (instead of polling) to receive
+session updates. By default, notification mechanism is used. To verify:<br>
+Login to SP admin console using amadmin;<br>
+Navigate to Access Control -&gt; /(Top Level Realm) -&gt; Agents -&gt;
+J2EE -&gt; glassfishagent -&gt; OpenSSO Services:<br>
+Under section "Session Client Service", make sure the check box for
+attribute "Enable Client Polling" is not checked.<br>
+<br>
+Logout from Opensso SP admin console.<br>
+<br>
+After this setup, agentsample should work with saml2 sso/slo with
+session upgrade.<br>
+<br>
+<span style="text-decoration: underline;">To test</span>:<br>
+<br>
+<span style="font-weight: bold;">Test single sign on</span>:<br>
+- On a browser, access to http://agentHost:port/agentsample, page
+http://agentHost:port/agentsample/public/welcome.html will be displayed<br>
+- Click "URL Policy Enforcement" from the left panel, then "Invoke a
+Servlet Protected by URL Policy"<br>
+- The browser is redirected to
+http://openssoIDP:port/idp_deploy_uri/UI/Login?realm=/&amp;module=DataStore...<br>
+enter chris/chris<br>
+- now the browser is redirected to
+http://openssoIDP:port/idp_deploy_uri/UI/Login?realm=/&amp;module=TestModule&amp;ForceAuth=true...<br>
+enter chris/chris<br>
+- Now the brower shows "Successful Invocation: Please Verify". This
+means sso is successful.<br>
+<br>
+<span style="font-weight: bold;">Test single log out</span>:<br>
+- access http://agentHost:port/agentsample/logout, all sessions on
+agent, opensso SP and opensso IDP should be logged out.<br>
+<br>
+<br>
+</body>       
+
+</font></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

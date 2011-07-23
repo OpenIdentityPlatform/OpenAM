@@ -1,0 +1,95 @@
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ */ 
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+ECHO=/bin/echo
+
+HOST_NAME="`hostname`"
+DOMAIN_NAME="`domainname`"
+HOST_DOMAIN_NAME="$HOST_NAME.$DOMAIN_NAME"
+NAMING_SERVICE_URL="http://$HOST_DOMAIN_NAME:58080/amserver/namingservice"
+NAMING_SERVICE_FAILOVER_URL=""
+LOGGING_ROOT_DIR=/var/opt/$PRODUCT_DIR
+LOGGING_SUB_DIR=
+
+
+##############################################################
+#
+#
+#
+
+get_base_directory() {
+  $ECHO "What is the base installation directory? [$BASEDIR] \c"
+  read ANS
+  if [ "$ANS" != "" ]
+  then
+    BASEDIR=$ANS
+  fi
+}
+
+##############################################################
+#
+#
+#
+
+get_naming_service_url() {
+  $ECHO "What is the naming service URL? [$NAMING_SERVICE_URL] \c"
+  read ANS
+  if [ "$ANS" != "" ]
+  then
+     NAMING_SERVICE_URL=$ANS
+  fi
+}
+
+##############################################################
+#
+#
+#
+
+get_naming_service_failover_url() {
+  $ECHO "What is the naming service failover URL? [$NAMING_SERVICE_FAILOVER_URL] \c"
+  read ANS
+  if [ "$ANS" != "" ]
+  then
+     NAMING_SERVICE_FAILOVER_URL=$ANS
+  fi
+}
+
+##############################################################
+#
+# starting main routine
+#
+
+umask 077
+
+get_base_directory
+get_naming_service_url
+get_naming_service_failover_url
+
+cat > $1 << EOF
+BASEDIR=$BASEDIR
+PRIMARY_NAMING_URL=$NAMING_SERVICE_URL
+FAILOVER_NAMING_URL=$NAMING_SERVICE_FAILOVER_URL
+TEMP_DIR_PREFIXDEBUG_DIR_PREFIX=$LOGGING_ROOT_DIR
+WS_DEBUG_DIR=$LOGGING_SUB_DIR
+EOF

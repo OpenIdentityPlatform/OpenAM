@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Active Directory Attributes - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepoeditad"></a><h4>Active Directory Attributes</h4>
+<p><a name="indexterm-13"></a>When configuring Microsoft Active Directory to work with OpenSSO, you have to map
+the predefined properties to properties defined in your instance of Active Directory; this
+is called attribute mapping. Following are the attributes that need to be defined when
+adding Active Directory as a data store to a realm.</p>
+
+<a name="fyfdo"></a><h5>LDAP Server</h5>
+<p>Enter the name of the LDAP server to which you will be
+connected. The format should be <tt>hostname.domainname:portnumber</tt>.</p><p>If more than one <tt>host:portnumber</tt> entries are entered, an attempt is made to
+connect to the first host in the list. The next entry in the
+list is tried only if the attempt to connect to the current host
+fails.</p>
+
+<a name="fyfdt"></a><h5>LDAP Bind DN</h5>
+<p>Specifies the DN name that OpenSSO will use to authenticate to the LDAP
+server to which you are currently connected. The user with the DN name
+used to bind should have the correct add/modification/delete privileges that you configured in
+the <a href="#fyffb">LDAPv3 Plugin Supported Types and Operations</a> attribute.</p>
+
+<a name="fyfds"></a><h5>LDAP Bind Password</h5>
+<p>Specifies the DN password that OpenSSO will use to authenticate to the LDAP
+server to which you are currently connected</p>
+
+<a name="fyfdu"></a><h5>LDAP Bind Password (confirm)</h5>
+<p>Confirm the password.</p>
+
+<a name="fyfdv"></a><h5>LDAP Organization DN</h5>
+<p>The DN to which this data store repository will map. This will be
+the base DN of all operations performed in this data store. </p>
+
+<a name="fyfdw"></a><h5>LDAP SSL</h5>
+<p>When enabled, OpenSSO will connect to the primary server using the HTTPS protocol.</p>
+
+<a name="fyfej"></a><h5>LDAP Connection Pool Minimum Size</h5>
+<p>Specifies the initial number of connections in the connection pool. The use of
+connection pool avoids having to create a new connection each time.</p>
+
+<a name="fyfee"></a><h5>LDAP Connection Pool Maximum Size</h5>
+<p>Specifies the maximum number of connections to allowed.</p>
+
+<a name="fyfdx"></a><h5>Maximum Results Returned from Search</h5>
+<p>Specifies the maximum number of entries returned from a search operation. If this
+limit is reached, Directory Server returns any entries that match the search request.</p>
+
+<a name="fyfen"></a><h5>Search Timeout</h5>
+<p>Specifies the maximum number of seconds allocated for a search request. If this
+limit is reached, Directory Server returns any search entries that match the search
+request.</p>
+
+<a name="fyfdz"></a><h5>LDAP Follows Referral</h5>
+<p>If enabled, this option specifies that referrals to other LDAP servers are followed
+automatically.</p>
+
+<a name="fyffh"></a><h5>LDAPv3 Repository Plugin Class Name</h5>
+<p>Specifies the location of the class file which implements the LDAPv3 repository.</p>
+
+<a name="fyfeu"></a><h5>Attribute Name Mapping</h5>
+<p>Enables common attributes known to the framework to be mapped to the native
+data store. For example, if the framework uses <tt>inetUserStatus</tt>  to determine
+user status, it is possible that the native data store actually uses <tt>userStatus</tt>.
+The attribute definitions are case-sensitive. The defaults are:</p>
+<ul><li><p><tt>employeeNumber=distinguishedName</tt></p></li>
+<li><p><tt>iplanet-am-user-alias-list=objectGUID</tt></p></li>
+<li><p><tt>mail=userPrincipalName</tt></p></li>
+<li><p><tt>portalAddress=sAMAccountName</tt></p></li>
+<li><p><tt>telephonenumber=displayName</tt></p></li>
+<li><p><tt>uid=sAMAccountName</tt> </p></li></ul>
+
+
+<a name="fyffb"></a><h5>LDAPv3 Plugin Supported Types and Operations</h5>
+<p>Specifies the operations that are permitted to or can be performed on this
+LDAP server. The default operations that are the only operations that are supported
+by this LDAPv3 repository plug-in. The following are operations supported by LDAPv3 Repository
+Plugin:</p>
+<ul><li><p>agent &#8212; read, create, edit, delete</p></li>
+<li><p>group &#8212; read, create, edit, delete</p></li>
+<li><p>realm&#8212; read, create, edit, delete, service</p></li>
+<li><p>user &#8212; read, create, edit, delete, service</p></li></ul>
+<p>You can remove permissions from the above list based on your LDAP server
+settings and the tasks, but you can not add more permissions.</p><p>If the configured LDAPv3 Repository plug-in is pointing to an instance of Sun
+Directory Server, then permissions for the type <tt>role</tt> can be added. Otherwise,
+this permission may not be added because other data stores may not support
+roles. The permission for the type 'role' is:</p>
+<ul><li><p>role &#8212; read, create, edit, delete </p></li></ul>
+<p>If you have <tt>user</tt> as a supported type for the LDAPv3 repository, the
+read, create, edit, and delete service operations are possible for that user. In
+other words, if <tt>user</tt> is a supported type, then the read, edit, create,
+and delete operations allow you to read, edit, create, and delete user entries
+from the identity repository. The <tt>user=service</tt> operation lets OpenSSO services access attributes in user
+entries.  Additionally, the user is allowed to access the dynamic service attributes
+if the service is assigned to the realm or role to which the
+user belongs. </p><p>The user is also allowed to manage the user attributes for any assigned
+service.  If the user has <tt>service</tt> as the operation (<tt>user=service</tt>), then it
+specifies that all service-related operations are supported. These operations are <tt>assignService,</tt> <tt>unassignService,</tt> <tt>getAssignedServices,</tt> <tt>getServiceAttributes, removeServiceAttributes</tt>
+and <tt>modifyService.</tt></p>
+
+<a name="gdlmc"></a><h5>LDAPv3 Plug-in Search Scope</h5>
+<p>Defines the scope to be used to find LDAPv3 plug-in entries. The scope
+must be one of the following:</p>
+<ul><li><p>SCOPE_BASE &#8211; searches only the base DN.</p></li>
+<li><p>SCOPE_ONE &#8211; searches only the entries under the base DN.</p></li>
+<li><p>SCOPE_SUB (default) &#8211; searched the base DN and all entries within its subtree.</p></li></ul>
+
+
+<a name="fyffj"></a><h5>LDAP Users Search Attribute</h5>
+<p>This field defines the attribute type to conduct a search for a user.
+For example, if the user's DN is <tt>uid=user1, ou=people, dc=example, dc=com</tt>, then you would specify
+<tt>uid</tt> in this field.  </p>
+
+<a name="fyfeo"></a><h5>LDAP Users Search Filter</h5>
+<p>Specifies the search filter to be used to find user entries.</p>
+
+<a name="fyffi"></a><h5>LDAP User Object Class</h5>
+<p>Specifies the object classes for a user. When a user is created, this
+list of user object classes will be added to the user's attributes list.</p>
+
+<a name="fyfez"></a><h5>LDAP User Attributes</h5>
+<p>Defines the list of attributes associated with a user. Any attempt to read/write
+user attributes that are not on this list is not allowed. The attributes
+are case-sensitive. The object classes and attribute schema must be defined in Directory
+Server before you define the object classes and attribute schema here.</p>
+
+<a name="gdlms"></a><h5>Create User Attribute Mapping</h5>
+<p>Specifies which attributes are required when a user is created. This attribute uses
+the following syntax:</p><p><tt>DestinationAttributeName=SourceAttributeName</tt></p><p>If the source attribute name is missing, the default is the user ID
+(<tt>uid</tt>). For example:</p>cn sn=givenName<p>Both <tt>cn</tt> and <tt>sn</tt> are required in order to create a user profile.
+<tt>cn</tt> gets the value of the attribute named <tt>uid</tt>, and <tt>sn</tt> gets the
+value of the attribute named <tt>givenName.</tt></p>
+
+<a name="gdlmi"></a><h5>Attribute Name of User Status</h5>
+<p>Specifies the attribute name to indicate if the user is active or inactive.</p>
+
+<a name="gdopm"></a><h5>User Status Active Value</h5>
+<p>This attribute value is assigned to the user when the user is created.
+For a user to be active, the Active Directory value is 544. For
+a user to be inactive, the Active Directory value is 546.</p>
+
+<a name="gdoqh"></a><h5>User Status Inactive Value</h5>
+<p>For Active Directory, this field is not used.</p>
+
+<a name="fyfeb"></a><h5>LDAP Groups Search Attribute</h5>
+<p>This field defines the attribute type for which to conduct a search on
+a group. The default is <tt>cn</tt>.</p>
+
+<a name="fyfep"></a><h5>LDAP Group Search Filter</h5>
+<p>Specifies the search filter to be used to find group entries. The default
+is <tt>(objectclass=groupOfUniqueNames)</tt>.</p>
+
+<a name="fyfed"></a><h5>LDAP Groups Container Naming Attribute</h5>
+<p>Specifies the naming attribute for a group container, if groups resides in a
+container. Otherwise, this attribute is left empty. For example, if a group DN
+of <tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt>resides in <tt>ou=groups</tt>, then the group container naming attribute is <tt>ou</tt>.</p>
+
+<a name="fyfec"></a><h5>LDAP Groups Container Value</h5>
+<p>Specifies the value for the group container. For example, a group DN of
+<tt>cn=group1,ou=groups,dc=iplanet,dc=com</tt> resides in a container name <tt>ou=groups</tt>, then the group container value would be
+<tt>groups</tt>.</p>
+
+<a name="fyffc"></a><h5>LDAP Groups Object Classes</h5>
+<p>Specifies the object classes for groups. When a group is created, this list
+of group object classes will be added to the group's attributes list.</p>
+
+<a name="fyfff"></a><h5>LDAP Groups Attributes</h5>
+<p>Defines the list of attributes associated with a group. Any attempt to read/write
+group attributes that are not on this list is not allowed. The attributes
+are case-sensitive. The object classes and attribute schema must be defined in Directory
+Server before you define the object classes and attribute schema here.</p>
+
+<a name="fyfea"></a><h5>Attribute Name for Group Membership</h5>
+<p>Specifies the name of the attribute whose values are the names of all
+the groups to which DN belongs. The default is <tt>memberOf</tt>.</p>
+
+<a name="fyfes"></a><h5>Attribute Name of Unique Member</h5>
+<p>Specifies the attribute name whose values is a DN belonging to this group.
+The default is <tt>uniqueMember</tt>.</p>
+
+<a name="fyfev"></a><h5>Attribute Name of Group Member URL</h5>
+<p>Specifies the name of the attribute whose value is an LDAP URL which
+resolves to members belonging to this group. The default is  <tt>memberUrl</tt>.</p>
+
+<a name="fyfem"></a><h5>LDAP People Container Naming Attribute</h5>
+<p>Specifies the naming attribute of the people container if a user resides in
+a people container. This field is left blank if the user does not
+reside in a people container.</p>
+
+<a name="fyffe"></a><h5>LDAP People Container Value</h5>
+<p>Specifies the value of the people container. The default is  <tt>people</tt>.</p>
+
+<a name="gdlns"></a><h5>Identity Types That Can be Authenticated</h5>
+<p>Specifies that this data store can authenticate user and/or agent identity types when
+the authentication module mode for the realm is set to Data Store.</p>
+
+<a name="ggtnu"></a><h5>Authentication Naming Attribute</h5>
+<p>This value is currently not used.</p>
+
+<a name="fyfef"></a><h5>Persistent Search Base DN</h5>
+<p>Defines the base DN to use for persistent search. Some LDAPv3 servers only
+support persistent search at the root suffix level.</p>
+
+<a name="gdlmx"></a><h5>Persistent Search Filter</h5>
+<p>Defines the filter that will return the specific changes to directory server entries.
+The data store will only receive the changes that match the defined filter.</p>
+
+<a name="ggudj"></a><h5>Persistent Search Scope</h5>
+<p>Defines the scope to be used in a persistent search. The scope must
+be one of the following:</p>
+<ul><li><p>SCOPE_BASE &#8211; searches only the base DN.</p></li>
+<li><p>SCOPE_ONE &#8211; searches only the entries under the base DN.</p></li>
+<li><p>SCOPE_SUB (default) &#8211; searched the base DN and all entries within its subtree.</p></li></ul>
+
+
+<a name="fyffz"></a><h5>Persistent Search Maximum Idle Time Before Restart</h5>
+<p>Defines the maximum idle time before restarting the persistence search. The value must
+be great than 1. Values less than or equal to 1 will restart
+the search irrespective of the idle time of the connection.</p><p>If OpenSSO is deployed with a load balancer, some load balancers will time
+out if it has been idle for a specified amount of time. In
+this case, you should set the Persistent Search Maximum Idle Time Before Restart
+to a value less than the specified time for the load balancer.</p>
+
+<a name="fyfgh"></a><h5>Maximum Number of Retries After Error Code</h5>
+<p>Defines the maximum number of retries for the persistent search operation if it
+encounters the error codes specified in LDAPException Error Codes to Retry On.</p>
+
+<a name="fyfge"></a><h5>The Delay Time Between Retries</h5>
+<p>Specifies the time to wait before each retry. This only applies to persistent
+search connection.</p>
+
+<a name="fyffr"></a><h5>LDAPException Error Codes to Retry</h5>
+<p>Specifies the error codes to initiate a retry for the persistent search operation.
+This attribute is only applicable for the persistent search, and not for all
+LDAP operations.</p>
+
+<a name="gdlnn"></a><h5>Caching</h5>
+<p>If enabled, this allows OpenSSO to cache data retrieved from the data store.</p>
+
+<a name="gdlnm"></a><h5>Maximum Age of Cached Items</h5>
+<p>Specifies the maximum time data is stored in the cache before it is
+removed. The values are defined in seconds.</p>
+
+<a name="gdlnd"></a><h5>Maximum Size of the Cache</h5>
+<p>Specifies the maximum size of the cache. The larger the value, the more
+data can be stored, but it will require more memory. The values are
+defined in bytes.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<script type="text/javascript">
+function next(){
+	AjaxUtils.load('container', '$context/config/identityProvider/remoteServiceProvider.htm');       
+}
+</script>
+<div id="mainPanel" align="center">
+	<div id="createPanel" class="createpanel">
+		<br />
+		<div class="bodywhite" align="left">
+			<h2>Your configurations have been created</h2>										
+			<p class="OrangeSmall">Service URLs:<p>
+			<p>Pellentesque libero diam, ultrices sed, cursus non, vulputate ac, tortor. Cras eros. Aenean eget felis. Aenean varius, nisi a consequat rutrum, justo sapien sagittis turpis, facilisis facilisis sem justo non tellus. Donec iaculis dolor a tortor. Nulla metus. Donec id dui.</p>
+			<p class="OrangeSmall">Download Standard</p>
+			<p>Aenean eget felis. Aenean varius, nisi a consequat rutrum, justo sapien sagittis turpis, facilisis facilisis sem justo non tellus. Donec iaculis dolor a tortor.<a class="blue pointer">Download</a></p>					
+			<p class="OrangeSmall">Download extended metadata</p>
+			<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus tristique volutpat dolor. Etiam ac elit. Integer vitae lorem vel ante tincidunt rhoncus. Duis dolor. Vivamus pharetra tristique dui.<a class="blue pointer">Download</a></p>					
+		</div>
+		<br />
+		<div class="subbody">
+			<button id="btnCancel" type="button" value="close" onclick="next();">NEXT</button>
+		</div>			
+	</div>
+</div>

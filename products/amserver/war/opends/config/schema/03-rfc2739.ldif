@@ -1,0 +1,72 @@
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE
+# or https://OpenDS.dev.java.net/OpenDS.LICENSE.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE.  If applicable,
+# add the following below this CDDL HEADER, with the fields enclosed
+# by brackets "[]" replaced with your own identifying information:
+#      Portions Copyright [yyyy] [name of copyright owner]
+#
+# CDDL HEADER END
+#
+#
+#      Copyright 2006-2008 Sun Microsystems, Inc.
+#
+#
+# This file contains schema definitions from RFC 2739, which defines a
+# mechanism for storing calendar and vCard objects in the Directory Server.
+# Note that the definition in RFC 2739 contains a number of errors, and this
+# schema file has been altered from the standard definition in order to fix
+# a number of those problems.
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+attributeTypes: ( 1.2.840.113556.1.4.478 NAME 'calCalURI'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.479 NAME 'calFBURL'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.480 NAME 'calCAPURI'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.481 NAME 'calCalAdrURI'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.482 NAME 'calOtherCalURIs'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.483 NAME 'calOtherFBURLs'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.484 NAME 'calOtherCAPURIs'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+attributeTypes: ( 1.2.840.113556.1.4.485 NAME 'calOtherCalAdrURIs'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 USAGE userApplications
+  X-ORIGIN 'RFC 2739' )
+objectClasses: ( 1.2.840.113556.1.5.87 NAME 'calEntry' SUP top AUXILIARY
+  MAY ( calCalURI $ calFBURL $ calOtherCalURIs $ calOtherFBURLs $ calCAPURI $
+  calOtherCAPURIs $ calCalAdrURI $ calOtherCalAdrURIs )
+  X-ORIGIN 'RFC 2739' )
+

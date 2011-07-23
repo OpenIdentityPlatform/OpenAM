@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>验证 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>验证</h3>
+<p><a name="indexterm-5"></a>必须先将常规验证服务注册为领域的服务，用户才能使用其他验证模块类型登录。核心验证服务允许 OpenSSO 管理员为领域的验证参数定义默认值。如果在指定的验证模块里没有定义替代值，那么便可使用这些值。核心验证服务的默认值在 <tt>amAuth.xml</tt> 文件中定义，并于安装结束后存储在 Directory Server 中。</p><p>这些验证属性包括：</p><dl><dt>高级属性</dt>
+<dd><p>单击“高级属性”按钮，可显示能为领域进行定义的核心验证属性。全局属性不适用于领域，因而不会显示出来。</p></dd>
+<dt>默认验证链</dt>
+<dd><p>定义领域将使用的验证链。当您在验证链属性中创建了一个新的验证链时，它将出现在下拉列表中，以供您选择。有关详细信息，参见<a href="authentication.newauthconfig.html">创建新的验证链</a>。</p></dd>
+<dt>管理员验证链</dt>
+<dd><p>定义仅用于管理员的验证链。如果需要将管理员的验证链与最终用户的验证链区别开，则可使用该属性。访问 OpenSSO 控制台时，将继承在该属性中配置的模块。</p></dd>
+<dt>默认成功 URL</dt>
+<dd><p>指定用户验证领域成功后，重定向的 URL。</p></dd>
+<dt>模块实例</dt>
+<dd><p>使您能够定义和配置 OpenSSO 默认的领域验证模块。可以添加多个同一验证模块的实例。有关详细信息，参见<a href="authentication.newauthinstance.html">创建新的验证模块实例</a>。</p></dd>
+<dt>验证链</dt>
+<dd><p>可以配置一个或多个验证模块，用户必须将验证证书传递到这些验证模块中。这称为验证链。通过此属性可以定义领域的验证链选项。在默认验证链列表中将显示您所创建的验证链。有关详细信息，参见<a href="authentication.newauthconfig.html">创建新的验证链</a>。</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

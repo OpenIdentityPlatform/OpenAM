@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with jLaTeX2HTML 2002-2-1 (1.70) JA patch-2.0
+patched version by:  Kenshi Muto, Debian Project.
+* modified by:  Shige TAKENO
+LaTeX2HTML 2002-2-1 (1.70),
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Comments</TITLE>
+<META NAME="description" CONTENT="Comments">
+<META NAME="keywords" CONTENT="paper">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8895-1">
+<META NAME="Generator" CONTENT="jLaTeX2HTML v2002-2-1 JA patch-2.0">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="paper.css">
+
+<LINK REL="next" HREF="node19.html">
+<LINK REL="previous" HREF="node15.html">
+<LINK REL="up" HREF="paper.html">
+<LINK REL="next" HREF="node17.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html199"
+  HREF="node17.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html197"
+  HREF="paper.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html191"
+  HREF="node15.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html200"
+  HREF="node17.html">Documentation comments</A>
+<B> Up:</B> <A NAME="tex2html198"
+  HREF="paper.html">Coding Guidelines for OpenSSO</A>
+<B> Previous:</B> <A NAME="tex2html192"
+  HREF="node15.html">Continuation lines</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00070000000000000000">
+Comments</A>
+</H1>
+Java supports three kinds of comments: documentation, block, and single-line comments. These are described separately in the subsequent sections below. Here are some general guidelines for comment usage:
+
+<OL>
+<LI>Comments should help a reader understand the purpose of the code. They should guide the reader through the flow of the program, focusing especially on areas which might be confusing or obscure. 
+</LI>
+<LI>Avoid comments that are obvious from the code, as in this famously bad comment example:
+      <PRE>
+      i = i + 1;// Add one to i
+</PRE>
+</LI>
+<LI>Remember that misleading comments are worse than no comments at all. 
+</LI>
+<LI>Avoid putting any information into comments that is likely to become out-of-date.
+</LI>
+<LI>Avoid enclosing comments in boxes drawn with asterisks or other fancy typography.
+</LI>
+<LI>Commented code is good; Commented out code is bad. If there is any dead code that is history, do not comment the code out. Just remove them for the sake of readability. Version control systems already do a good job of storing previous revisions.
+</LI>
+<LI>Temporary comments that are expected to be changed or removed later should be marked with the special tag "TODO:" so that they can easily be found afterwards. Ideally, all temporary comments should have been removed by the time a program is ready to be shipped. Example:
+      <PRE>
+      // XXX: Change this to call sort() when the bugs in it are fixed
+      list->mySort();
+</PRE>
+</LI>
+</OL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html201"
+  HREF="node17.html">Documentation comments</A>
+<LI><A NAME="tex2html202"
+  HREF="node18.html">Block comments</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html199"
+  HREF="node17.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html197"
+  HREF="paper.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html191"
+  HREF="node15.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html200"
+  HREF="node17.html">Documentation comments</A>
+<B> Up:</B> <A NAME="tex2html198"
+  HREF="paper.html">Coding Guidelines for OpenSSO</A>
+<B> Previous:</B> <A NAME="tex2html192"
+  HREF="node15.html">Continuation lines</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+Dennis Seah
+Mon Jul 17 11:43:42 2006
+</ADDRESS>
+</BODY>
+</HTML>

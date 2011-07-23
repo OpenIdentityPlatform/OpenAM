@@ -1,0 +1,55 @@
+<link href="$context/assets/css/Specific/protectResource.css" rel="stylesheet" type="text/css" />
+<script language="javascript">
+
+YAHOO.namespace("sun.container");
+
+function init() {
+    AjaxUtils.load( 'resource', '$context/config/dlg/popupResource.htm');
+    YAHOO.sun.container.resource = new YAHOO.widget.Panel("resource", { width:"280px", fixedcenter: true, modal: true, close: false, visible:false, constraintoviewport:true } );
+    YAHOO.sun.container.resource.render();
+}
+
+YAHOO.util.Event.onDOMReady( init );
+
+function closed(){
+	document.location = "$context/commonTasks.htm";
+}
+function protectresource(){
+	YAHOO.sun.container.resource.show();
+	setTimeout("YAHOO.sun.container.resource.hide()",1250);
+	setTimeout("AjaxUtils.load('container', '$context/config/resource/protected.htm')",1250);
+}
+</script>
+<div id="mainPanel" align="center">
+    <div id="createPanel" class="createpanel" align="left">
+        <br />
+        <div class="bodywhite">
+            <h2>$page.getLocalizedString("configuration.protect.summary.title")</h2>
+            <small>$page.getLocalizedString("configuration.protect.summary.comment")</small>
+        </div>
+        <br />
+        <div class="bodywhite">
+            <div id="names">
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.protect.summary.selectedURL"):</p>
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.protect.summary.users"):</p>
+                <br>
+                <p class="OrangeSmall">$page.getLocalizedString("configuration.protect.summary.condition"):</p>
+            </div>
+            
+            <div style="float:left">HTTP://someserver.com/finance/*</div>
+            <div align="right"><a class="blue">$page.getLocalizedString("configuration.protect.summary.edit")</a></div>
+
+            <p>User FirstName, Lastname</p>
+
+            <p>User FirstName, Lastname</p>
+
+            <p>The condition name is displayed here</p>
+
+        </div>
+        <div class="subbody">
+            <button type="button" value="close" onClick="javascript:closed();">$page.getLocalizedString("configuration.protect.summary.close")</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" value="next" onClick="javascript:protectresource();">$page.getLocalizedString("configuration.protect.summary.protect")</button>
+        </div>
+    </div>
+</div>
+<div id="resource" style="visibility:hidden"></div>

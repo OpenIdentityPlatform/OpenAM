@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Supported Directives - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>Supported Directives</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>This attribute allows you to specify a policy-related directive for a resource. If
+a service provider wants to use an unsupported directive, the request will fail.
+The following table details the available options.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Directive</p></th>
+<th align="left" valign="top" scope="column"><p>Purpose</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>The Discovery Service should include a SAML
+assertion (containing an <tt>AuthenticationStatement</tt>) in its responses to enable the client to authenticate
+to the service instance hosting the resource.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>The Discovery Service should include a
+SAML assertion (containing a <tt>SessionContextStatement</tt>) in its responses that indicate the status of
+the session.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p> The Discovery Service should include a SAML assertion (containing a
+<tt>ResourceAccessStatement</tt>) in its responses that indicate whether the client is allowed to access
+the resource.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>The Discovery Service should encrypt the resource identifier in responses to all
+clients.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>For use with Bearer Token Authentication, the Discovery Service should generate a token
+that grants the bearer permission to access the resource.</p></td>
+</tr>
+</table>
+<hr><p><b>Caution &#8211; </b>The <tt>AuthorizeRequestor</tt> and <tt>EncryptResourceID</tt> directives can not be used together.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

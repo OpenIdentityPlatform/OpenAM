@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE index PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 2.0//EN" "index_1_0.dtd">
+<index version="2.0">
+
+ <indexitem target="ppldapattributemaplist" text="PPLDAP 属性映射列表"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="RelayState"></indexitem><indexitem target="federation.wsfedsp" text="RelayState"></indexitem>
+ <indexitem target="federation.fssamlservice" text="SAML">
+    <indexitem text="可信赖的伙伴">
+        <indexitem target="federation.fssamlselecttrustedpartnertype" text="配置步骤 1"></indexitem>
+        <indexitem target="federation.fssamltrustedpartnersadd" text="配置步骤 2"></indexitem></indexitem>
+    <indexitem target="federation.fssamltargeturlsadd" text="目标 URL"></indexitem>
+    <indexitem text="站点标识符">
+        <indexitem target="federation.fssamlsiteidadd" text="配置"></indexitem></indexitem></indexitem>
+ <indexitem target="service.scsoapbinding" text="SOAP 绑定服务">
+    <indexitem target="ggodb" text="Web 服务验证程序"></indexitem>
+    <indexitem target="mechanismhandlerslist" text="机制处理程序列表"></indexitem><indexitem target="webservices.wsauthnserviceshandlersadd" text="机制处理程序列表"></indexitem>
+    <indexitem target="requesthandlerlist" text="请求处理程序列表"></indexitem><indexitem target="service.scsoapbindingrequesthandlerlistadd" text="请求处理程序列表"></indexitem><indexitem target="service.scsaml2soapbinding" text="请求处理程序列表"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="请求处理程序列表"></indexitem>
+    <indexitem target="ggodb" text="支持的验证机制"></indexitem></indexitem>
+ <indexitem target="ggodb" text="Web 服务验证程序"></indexitem>
+ <indexitem target="alternatesecuritymechanisms" text="备用安全机制"></indexitem>
+ <indexitem target="alternateendpoint" text="备用端点"></indexitem>
+ <indexitem target="policy.policy" text="策略">
+    <indexitem target="normalpolicy" text="常规策略"></indexitem>
+    <indexitem target="policy.policyreferraladd" text="创建新的引用策略"></indexitem>
+    <indexitem target="policy.selectservicetype" text="规则"></indexitem>
+    <indexitem target="policy.ruleadd" text="添加规则"></indexitem>
+    <indexitem target="policy.selectconditiontype" text="添加条件"></indexitem>
+    <indexitem target="policy.responseprovideradd" text="添加响应提供者"></indexitem>
+    <indexitem target="policy.selectreferraltype" text="添加引用"></indexitem>
+    <indexitem target="policy.subjectadd" text="添加主体"></indexitem>
+    <indexitem target="policy.selectcondition" text="条件"></indexitem>
+    <indexitem target="responseprovider" text="响应提供者"></indexitem>
+    <indexitem target="fyfby" text="引用策略"></indexitem>
+    <indexitem target="policy.selectsubjecttype" text="主体"></indexitem></indexitem>
+ <indexitem target="viewsession" text="查看会话"></indexitem>
+ <indexitem target="accesscontrol" text="访问控制, 简介"></indexitem>
+ <indexitem target="serviceupdateenabled" text="服务更新"></indexitem>
+ <indexitem target="serviceinstanceupdateclass" text="服务实例更新类"></indexitem>
+ <indexitem target="service.smdiscoverydescriptionadd" text="服务说明, 配置"></indexitem>
+ <indexitem target="webservices.wspersonalprofileservice" text="个人配置文件服务">
+    <indexitem target="ppldapattributemaplist" text="PPLDAP 属性映射列表"></indexitem>
+    <indexitem target="alternatesecuritymechanisms" text="备用安全机制"></indexitem>
+    <indexitem target="alternateendpoint" text="备用端点"></indexitem>
+    <indexitem target="serviceupdateenabled" text="服务更新"></indexitem>
+    <indexitem target="serviceinstanceupdateclass" text="服务实例更新类"></indexitem>
+    <indexitem target="extensioncontainerattributes" text="扩充容器属性"></indexitem>
+    <indexitem target="extensionattributesnamespaceprefix" text="扩充属性名称空间前缀"></indexitem>
+    <indexitem target="namescheme" text="名称方案"></indexitem>
+    <indexitem target="namespaceprefix" text="名称空间前缀"></indexitem>
+    <indexitem target="authorizer" text="授权者"></indexitem>
+    <indexitem target="attributemapper" text="属性映射程序"></indexitem>
+    <indexitem target="ppproviderid" text="提供者 ID"></indexitem>
+    <indexitem target="requirequery" text="要求查询策略评估"></indexitem>
+    <indexitem target="requiremodify" text="要求修改策略评估"></indexitem>
+    <indexitem target="supportedcontainers" text="支持的容器"></indexitem>
+    <indexitem target="resourceidmapper" text="资源 ID 映射程序"></indexitem></indexitem>
+ <indexitem target="policy.selectservicetype" text="规则"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="环境参考属性"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="环境参考属性"></indexitem><indexitem target="federation.idffidp" text="环境参考属性"></indexitem><indexitem target="federation.idffsp" text="环境参考属性"></indexitem>
+ <indexitem target="session.smprofile" text="会话窗口"></indexitem>
+ <indexitem target="sessions" text="会话模块"></indexitem>
+ <indexitem target="service.subconfigadd" text="会话属性, 添加子配置"></indexitem>
+ <indexitem target="mechanismhandlerslist" text="机制处理程序列表">
+    <indexitem target="webservices.wsauthnserviceshandlersadd" text="配置"></indexitem></indexitem>
+ <indexitem target="encryptnameidentifier" text="加密会话上下文中用于引导的名称标识符"></indexitem>
+ <indexitem target="federation.fssamlselecttrustedpartnertype" text="可信赖的伙伴"></indexitem>
+ <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机管理器"></indexitem>
+ <indexitem target="service.mapcreatedevice" text="客户机检测, 添加新的客户机"></indexitem>
+ <indexitem text="控制台属性">
+    <indexitem target="service.scserviceprofile.amadminconsoleservice" text="管理"></indexitem>
+    <indexitem target="service.smg11n" text="全局化设置"></indexitem></indexitem>
+ <indexitem target="extensioncontainerattributes" text="扩充容器属性"></indexitem>
+ <indexitem target="extensionattributesnamespaceprefix" text="扩充属性名称空间前缀"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="联合提供者实体"></indexitem>
+ <indexitem target="realm.rmrealm" text="领域">
+    <indexitem target="policy.policy" text="策略"></indexitem>
+    <indexitem target="realm.realmproperties" text="常规属性"></indexitem>
+    <indexitem target="realm.rmrealmadd" text="创建新的领域"></indexitem>
+    <indexitem target="authentication.newauthconfig" text="创建新的验证链"></indexitem>
+    <indexitem target="authentication.newauthinstance" text="创建新的验证模块"></indexitem>
+    <indexitem target="realm.services" text="服务"></indexitem>
+    <indexitem target="realm.servicesadd" text="将服务添加到"></indexitem>
+    <indexitem target="delegation.delegation" text="权限"></indexitem><indexitem target="delegation.delegationproperties" text="权限"></indexitem>
+    <indexitem target="realm.idrepo" text="数据存储库"></indexitem>
+    <indexitem target="authentication.authproperties" text="验证"></indexitem>
+    <indexitem target="idm.entities" text="主体"></indexitem></indexitem>
+ <indexitem target="namescheme" text="名称方案"></indexitem>
+ <indexitem target="namespaceprefix" text="名称空间前缀"></indexitem>
+ <indexitem target="federation.fssamltargeturlsadd" text="目标 URL"></indexitem>
+ <indexitem target="dirmang" text="目录管理"></indexitem>
+ <indexitem target="service.scconfig" text="配置">
+    <indexitem target="service.scconfigconsole" text="控制台属性"></indexitem>
+    <indexitem target="servic.scconfigglobal" text="全局属性"></indexitem>
+    <indexitem target="service.scfonfigsystem" text="系统属性"></indexitem>
+    <indexitem target="service.scconfigauth" text="验证"></indexitem></indexitem>
+ <indexitem target="service.scplatformclientcharsetsadd" text="平台, 创建新的字符集"></indexitem>
+ <indexitem target="requesthandlerlist" text="请求处理程序列表"></indexitem><indexitem target="service.scsaml2soapbinding" text="请求处理程序列表">
+    <indexitem target="service.scsoapbindingrequesthandlerlistadd" text="配置"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="配置"></indexitem></indexitem>
+ <indexitem text="全局属性">
+    <indexitem target="service.scpolicy" text="策略配置"></indexitem>
+    <indexitem target="service.scserviceprofile.amsessionservice" text="会话"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetampasswordresetservice" text="密码重置"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamuserservice" text="用户"></indexitem></indexitem>
+ <indexitem target="delegation.delegation" text="权限"></indexitem><indexitem target="delegation.delegationproperties" text="权限"></indexitem>
+ <indexitem text="身份管理">
+    <indexitem text="用户">
+        <indexitem target="idm.entitymembership" text="添加到服务、角色和组"></indexitem></indexitem></indexitem>
+ <indexitem text="实体">
+    <indexitem target="federation.createsaml2metadata" text="联合提供者"></indexitem>
+    <indexitem target="federation.createsaml2metadata" text="提供者"></indexitem></indexitem>
+ <indexitem target="invalidatesession" text="使会话无效"></indexitem>
+ <indexitem target="authorizer" text="授权者"></indexitem>
+ <indexitem target="authorizerpluginclass" text="授权者插件类"></indexitem>
+ <indexitem text="属性">
+    <indexitem target="federation.samlv2spassertioncontent" text="环境参考"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="环境参考"></indexitem><indexitem target="federation.idffidp" text="环境参考"></indexitem><indexitem target="federation.idffsp" text="环境参考"></indexitem></indexitem>
+ <indexitem target="attributemapper" text="属性映射程序"></indexitem>
+ <indexitem target="realm.idrepo" text="数据存储库">
+    <indexitem target="realm.idrepoeditad" text="Active Directory 属性"></indexitem>
+    <indexitem target="realm.idrepoeditldapv3" text="LDPAv3 系统信息库插件属性"></indexitem>
+    <indexitem target="realm.idreposelecttype" text="创建新的数据存储库"></indexitem>
+    <indexitem target="realm.idrepoeditfamschema" text="使用 AM 模式的 Sun Directory Server 属性"></indexitem></indexitem>
+ <indexitem target="sessionsearch" text="搜索"></indexitem>
+ <indexitem target="policyevaldiscolookup" text="搜索查找的策略评估"></indexitem>
+ <indexitem target="service.smdiscoveryservice" text="搜索服务">
+    <indexitem target="service.smdiscoverydescriptionadd" text="服务说明"></indexitem>
+    <indexitem target="encryptnameidentifier" text="加密会话上下文中用于引导的名称标识符"></indexitem>
+    <indexitem target="authorizerpluginclass" text="授权者插件类"></indexitem>
+    <indexitem target="policyevaldiscolookup" text="搜索查找的策略评估"></indexitem>
+    <indexitem target="policyevaldiscoupdate" text="搜索更新的策略评估"></indexitem>
+    <indexitem target="dsproviderid" text="提供者 ID"></indexitem>
+    <indexitem target="entryhandlerpluginclass" text="条目处理程序插件类"></indexitem>
+    <indexitem target="authresponsemessage" text="验证响应消息"></indexitem>
+    <indexitem target="useimpliedresource" text="隐含资源"></indexitem>
+    <indexitem target="generatesessioncontext" text="用于引导的会话上下文语句"></indexitem>
+    <indexitem target="resourceofferingsbootstrapping" text="用于引导的资源提供"></indexitem><indexitem target="service.smdiscoverybootstraprefoffadd" text="用于引导的资源提供"></indexitem>
+    <indexitem target="supportedauthmechanisms" text="支持的验证机制"></indexitem>
+    <indexitem target="supporteddirectives" text="支持的指令"></indexitem>
+    <indexitem target="resourceidmapperpluginclass" text="资源 ID 映射程序插件类"></indexitem></indexitem>
+ <indexitem target="policyevaldiscoupdate" text="搜索更新的策略评估"></indexitem>
+ <indexitem target="ppproviderid" text="提供者 ID"></indexitem>
+ <indexitem target="dsproviderid" text="提供者 ID（搜索服务）"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="提供者实体"></indexitem>
+ <indexitem target="policy.selectcondition" text="条件">
+    <indexitem target="policy.pmdefaultipcondition" text="IP 地址/DNS 名称"></indexitem>
+    <indexitem target="policy.conditionadd" text="LDAP 过滤器"></indexitem>
+    <indexitem target="policy.authtoserviceadd" text="按模块链进行验证"></indexitem>
+    <indexitem target="policy.pmdefaultauthschemeconditionadd" text="按模块实例进行验证"></indexitem>
+    <indexitem target="policy.pmdefaultsessioncondtionadd" text="会话"></indexitem>
+    <indexitem target="policy.sessionpropertyconditionadd" text="会话属性"></indexitem>
+    <indexitem target="policy.authtorealmadd" text="领域验证"></indexitem>
+    <indexitem target="policy.pmdefaulttimeconditionadd" text="时间"></indexitem>
+    <indexitem target="policy.pmdefaultauthlevelconditionadd" text="验证级别"></indexitem></indexitem>
+ <indexitem target="entryhandlerpluginclass" text="条目处理程序插件类"></indexitem>
+ <indexitem text="系统属性">
+    <indexitem target="service.scserviceprofile.iplanetamloggingservice" text="记录"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="客户机检测"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamnamingservice" text="命名"></indexitem>
+    <indexitem target="service.scplatform" text="平台"></indexitem></indexitem>
+ <indexitem target="federation.fsauthdomains" text="信任环">
+    <indexitem target="federation.createcot" text="创建"></indexitem>
+    <indexitem target="deleteauthdomain" text="删除"></indexitem>
+    <indexitem target="federation.fsauthdomainsselectprovider" text="添加提供者"></indexitem>
+    <indexitem target="federation.fsauthdomainsedit" text="修改"></indexitem></indexitem>
+ <indexitem target="webservices.wsauthnservices" text="验证 Web 服务"></indexitem>
+ <indexitem text="验证环境">
+    <indexitem target="federation.samlv2spassertioncontent" text="属性"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="属性"></indexitem><indexitem target="federation.idffidp" text="属性"></indexitem><indexitem target="federation.idffsp" text="属性"></indexitem></indexitem>
+ <indexitem text="验证属性">
+    <indexitem target="service.scserviceprofile.sunamauthadservice" text="Active Directory"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP Basic"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows 桌面 SSO"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="成员资格"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthservice" text="核心"></indexitem>
+    <indexitem target="ggulh" text="联合"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="匿名"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthdatastoreservice" text="数据存储库"></indexitem>
+    <indexitem target="authentication.authconfig" text="验证配置"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthcertservice" text="证书"></indexitem></indexitem>
+ <indexitem target="authresponsemessage" text="验证响应消息"></indexitem>
+ <indexitem target="requirequery" text="要求查询策略评估"></indexitem>
+ <indexitem target="requiremodify" text="要求修改策略评估"></indexitem>
+ <indexitem target="fyfby" text="引用策略"></indexitem>
+ <indexitem target="useimpliedresource" text="隐含资源"></indexitem>
+ <indexitem target="idm.entitymembership" text="用户, 添加到服务、角色和组"></indexitem>
+ <indexitem target="dm.home" text="用户管理"></indexitem>
+ <indexitem target="generatesessioncontext" text="用于引导的会话上下文语句"></indexitem>
+ <indexitem target="resourceofferingsbootstrapping" text="用于引导的资源提供">
+    <indexitem target="service.smdiscoverybootstraprefoffadd" text="配置"></indexitem></indexitem>
+ <indexitem target="federation.fssamlsiteidadd" text="站点标识符"></indexitem>
+ <indexitem target="supportedcontainers" text="支持的容器"></indexitem>
+ <indexitem target="ggodb" text="支持的验证机制（SOAP 绑定）"></indexitem>
+ <indexitem target="supportedauthmechanisms" text="支持的验证机制（搜索服务）"></indexitem>
+ <indexitem target="supportedlang" text="支持的语言环境"></indexitem>
+ <indexitem target="supporteddirectives" text="支持的指令（搜索服务）"></indexitem>
+ <indexitem target="policy.selectsubjecttype" text="主体"></indexitem><indexitem target="idm.entities" text="主体">
+    <indexitem target="subjectuser" text="用户"></indexitem>
+    <indexitem target="idm.entitiesgroup" text="组"></indexitem></indexitem>
+ <indexitem target="resourceidmapper" text="资源 ID 映射程序"></indexitem>
+ <indexitem target="resourceidmapperpluginclass" text="资源 ID 映射程序插件类"></indexitem>
+</index>

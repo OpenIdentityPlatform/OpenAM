@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: liberty-idwsf-soap-binding-v1.1.xsd,v 1.2 2008/06/25 05:48:42 qcheng Exp $
+
+-->
+
+
+<xs:schema targetNamespace="urn:liberty:sb:2004-04"
+    xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:sb-ext="urn:liberty:sb:2004-04"
+    xmlns:lib="urn:liberty:iff:2003-08"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:liberty:sb:2004-04"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <!-- Author: John Kemp -->
+    <!-- Last editor: $Author: qcheng $ -->
+    <!-- $Date: 2008/06/25 05:48:42 $ -->
+    <!-- $Revision: 1.2 $ -->
+
+    <xs:import
+        namespace="http://schemas.xmlsoap.org/soap/envelope/"
+        schemaLocation="soap.xsd"/>
+
+    <xs:import
+        namespace="urn:liberty:iff:2003-08"
+        schemaLocation="lib-arch-protocols-schema.xsd"/>
+
+    <xs:include schemaLocation="lib-arch-iwsf-utility.xsd"/>
+
+    <xs:annotation>
+        <xs:documentation>
+            Liberty ID-WSF SOAP Binding Specification Extension XSD
+        </xs:documentation>
+        <xs:documentation>
+            The source code in this XSD file was excerpted verbatim from:
+
+            Liberty ID-WSF SOAP Binding Specification
+            Version 1.1
+            April 2004
+
+            Copyright (c) 2004 Liberty Alliance participants, see
+            http://www.projectliberty.org/specs/idwsf_copyrights.html
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType name="CredentialsContextType">
+        <xs:sequence>
+            <xs:element ref="lib:RequestAuthnContext" minOccurs="0"/>
+            <xs:element name="SecurityMechID" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+        <xs:attribute ref="S:mustUnderstand" use="optional"/>
+        <xs:attribute ref="S:actor" use="optional"/>
+    </xs:complexType>
+
+    <xs:element name="CredentialsContext" type="CredentialsContextType"/>
+
+    <xs:complexType name="ServiceInstanceUpdateType">
+        <xs:sequence>
+            <xs:element name="SecurityMechID" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Credential" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                   <xs:sequence>
+                       <xs:any namespace="##any" processContents="lax"/>
+                   </xs:sequence>
+                   <xs:attribute name="notOnOrAfter" type="xs:dateTime" use="optional"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="Endpoint" type="xs:anyURI" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+        <xs:attribute ref="S:mustUnderstand" use="optional"/>
+        <xs:attribute ref="S:actor" use="optional"/>
+    </xs:complexType>
+
+    <xs:element name="ServiceInstanceUpdate" type="ServiceInstanceUpdateType"/>
+
+    <xs:complexType name="TimeoutType">
+        <xs:attribute name="maxProcessingTime" type="xs:integer" use="required"/>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+        <xs:attribute ref="S:mustUnderstand" use="optional"/>
+        <xs:attribute ref="S:actor" use="optional"/>
+    </xs:complexType>
+
+    <xs:element name="Timeout" type="TimeoutType"/>
+
+</xs:schema>

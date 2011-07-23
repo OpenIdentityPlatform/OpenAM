@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ディスカバリサービス - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoveryservice"></a><h3>ディスカバリサービス</h3>
+<a name="indexterm-119"></a><p>アイデンティティーデータにアクセスするための最初の手順は、情報のある場所を見極めることです。たとえば、主体のクレジットカード情報を保持しているアイデンティティーサービスや、主体のカレンダサービスを格納しているサーバーなどを判断します。通常、ネットワーク上には、ほかのエンティティーがアイデンティティーデータに対して動作を行えるようにするサービスが 1 つ以上あります。クライアントにディスカバリサービスが必要な理由は、クライアントがこれらのサービスを追跡すること、または、どのサービスが信頼できるかをクライアントが認識していることが想定されていないためです。「ディスカバリサービス」は、基本的にはディスカバリリソース用の Web サービスインタフェースです。<b></b>「ディスカバリリソース」とは、リソースオファリングのレジストリの一種です。<b></b>「リソースオファリング」では、アイデンティティーデータと、そのデータへのアクセスを提供するサービスインスタンスとの間の関連付けが定義されます。<b></b>「リソース ID」はディスカバリサービスに登録された一意のリソース識別子 (URI) で、特定のディスカバリリソースを指します。<b></b>クライアントがある種類のデータの要求を送信する場合、要求にはリソース ID が含まれており、OpenSSO ディスカバリサービスはこれを使用して、要求された属性の Web
+サービスプロバイダを見つけます。ディスカバリサービスは、データを見つけるために必要な情報を含むリソースオファリングを返します。</p>
+<hr><p><b>注 &#8211; </b>アクセスが発生するためには、各アイデンティティー主体の代わりに、Liberty 個人プロファイルサービスのホスティングプロバイダをディスカバリサービスに登録する必要があります。</p>
+<hr>
+<p>実装環境には、次のディスカバリサービスのグローバル属性を設定できます。</p>
+<ul><li><p><a href="dsproviderid.html">「プロバイダ ID」</a></p></li>
+<li><p><a href="supportedauthmechanisms.html">「サポートされている認証メカニズム」</a></p></li>
+<li><p><a href="supporteddirectives.html">「サポートされているディレクティブ」</a></p></li>
+<li><p><a href="policyevaldiscolookup.html">「ディスカバリ検索のポリシー評価」</a></p></li>
+<li><p><a href="policyevaldiscoupdate.html">「ディスカバリ更新のポリシー評価」</a></p></li>
+<li><p><a href="authorizerpluginclass.html">「オーサライザプラグインクラス:」</a></p></li>
+<li><p><a href="entryhandlerpluginclass.html">「エントリハンドラプラグインクラス:」</a></p></li>
+<li><p><a href="resourceidmapperpluginclass.html">「リソース ID マッパープラグイン用のクラス」</a></p></li>
+<li><p><a href="authresponsemessage.html">「応答メッセージの認証」</a></p></li>
+<li><p><a href="generatesessioncontext.html">「ブートストラップ用のセッションコンテキストステートメント」</a></p></li>
+<li><p><a href="encryptnameidentifier.html">「ブートストラップ用のセッションコンテキスト内での NameIdentifier の暗号化」</a></p></li>
+<li><p><a href="useimpliedresource.html">「暗黙のリソース」</a></p></li>
+<li><p><a href="resourceofferingsbootstrapping.html">「ブートストラップのリソースオファリング」</a></p></li></ul>
+<p>ディスカバリサービスの設定に関連している作業は、次のとおりです。</p>
+<ul><li><p><a href="service.smdiscoverybootstraprefoffadd.html">「ブートストラップのリソースオファリングを設定する」</a></p></li>
+<li><p><a href="service.smdiscoverydescriptionadd.html">「サービス記述を設定する」</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

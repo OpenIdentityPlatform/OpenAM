@@ -1,0 +1,62 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: sampleAuthnResponse.xml,v 1.2 2008/06/25 05:48:19 qcheng Exp $
+                                                                                
+-->
+<lib:AuthnResponse InResponseTo="sb8ad421458e395fc7f53a769b47e327be5663b57" IssueInstant="2004-09-15T00:39:15Z" MajorVersion="1" MinorVersion="2" ResponseID="s6a5ea9d517819bbc9ec3857f0a865d2821ff2788" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:lib="urn:liberty:iff:2003-08" xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><samlp:Status>
+<samlp:StatusCode Value="samlp:Success">
+</samlp:StatusCode>
+</samlp:Status>
+<saml:Assertion AssertionID="s461b592e0701d949f4cfee57957898e7f9afb0fc01" InResponseTo="sb8ad421458e395fc7f53a769b47e327be5663b57" IssueInstant="2004-09-15T00:39:15Z" Issuer="http://ide-16.red.iplanet.com" MajorVersion="1" MinorVersion="2" xsi:type="lib:AssertionType">
+<saml:Conditions NotOnOrAfter="2004-09-15T00:40:15Z">
+<saml:AudienceRestrictionCondition>
+<saml:Audience>http://ide-14.red.iplanet.com</saml:Audience>
+</saml:AudienceRestrictionCondition>
+</saml:Conditions>
+<saml:AuthenticationStatement AuthenticationInstant="2004-09-15T00:39:15Z" AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password" ReauthenticateOnOrAfter="2004-09-15T00:40:15Z" SessionIndex="sad3b019c0290fa13414d242e2e0e1faf6b80933a" xsi:type="lib:AuthenticationStatementType"><saml:Subject xsi:type="lib:SubjectType"><saml:NameIdentifier Format="urn:liberty:iff:nameid:federated" NameQualifier="http://ide-14.red.iplanet.com">qaipbgnur3xahj75dnh5dojfc501</saml:NameIdentifier>
+<saml:SubjectConfirmation>
+<saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:bearer</saml:ConfirmationMethod>
+</saml:SubjectConfirmation>
+<lib:IDPProvidedNameIdentifier Format="urn:liberty:iff:nameid:federated" NameQualifier="http://ide-14.red.iplanet.com">qaipbgnur3xahj75dnh5dojfc501</lib:IDPProvidedNameIdentifier>
+</saml:Subject><saml:SubjectLocality DNSAddress="ide-16.red.iplanet.com" IPAddress="192.18.72.89"/><lib:AuthnContext><lib:AuthnContextClassRef>http://www.projectliberty.org/schemas/authctx/classes/Password</lib:AuthnContextClassRef><lib:AuthnContextStatementRef>http://www.projectliberty.org/schemas/authctx/classes/Password</lib:AuthnContextStatementRef></lib:AuthnContext></saml:AuthenticationStatement><Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#s461b592e0701d949f4cfee57957898e7f9afb0fc01">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>IofVd4aM0OtTbp3jEEm8emwAN5U=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>
+AQD4TuOeRY9ZcT58z4vT1u9TGP343GNJlgDsFUFUkPuYMZEXnDO3vFh1i8pWllHZPKXMOJ3YGmKP
+y9tUBKiThWHaW1BT8uShX2WOLxfO61B8ivfFGj6a44Mmx7ZKm28ESWsYC5nkzOVvBf2Frhu1Kf6Q
+CeroRYCrl+yjqiIYI+o=
+</SignatureValue>
+</Signature></saml:Assertion>
+<lib:ProviderID>http://ide-16.red.iplanet.com</lib:ProviderID><lib:RelayState>/lh/protected.jsp</lib:RelayState></lib:AuthnResponse>

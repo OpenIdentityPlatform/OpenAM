@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: editableSelectOne.xhtml,v 1.2 2009/09/30 22:01:29 ggennaro Exp $
+
+-->
+
+<ui:composition
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net"
+    xmlns:f="http://java.sun.com/jsf/core">
+
+    <f:subview>
+
+        <ice:panelGroup style="margin-bottom: 10px;">
+            <ice:selectOneListbox
+                size="4"
+                style="height:75px; width:375px"
+                valueChangeListener="#{editableSelectOneHandler.madeSelectionListener}">
+                <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                <f:selectItems value="#{editableSelectOneBean.selectItemList}"/>
+            </ice:selectOneListbox>
+            
+            <ice:panelGrid 
+                columns="3"
+                visible="#{!editableSelectOneBean.showingNewItemInput}"
+                style="height: 27px; width: 375px;">
+                <ice:panelGroup style="text-align: left;">
+                    <ice:commandLink
+                       actionListener="#{editableSelectOneHandler.addNewListener}"
+                       style="padding: 0px;">
+                        <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                        <img 
+                           src="../image/add.png"
+                           style="vertical-align: middle;" />
+                        <ice:outputText 
+                           style="color: #5382A1; padding: 0px 0px 0px 3px; text-decoration: underline;"
+                           value="#{resources['editableSelectOne.addNew']}" />
+                    </ice:commandLink> 
+                </ice:panelGroup>
+                <ice:panelGroup style="text-align: center;">
+                    <ice:commandLink 
+                       actionListener="#{editableSelectOneHandler.editSelectionListener}"
+                       visible="#{o:size(editableSelectOneBean.items) > 0}"
+                       style="padding: 0px;">
+                        <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                        <img 
+                           src="../image/edit.png"
+                           style="vertical-align: middle;" />
+                        <ice:outputText 
+                           style="color: #5382A1; padding: 0px 0px 0px 3px; text-decoration: underline;"
+                           value="#{resources['editableSelectOne.editSelected']}" />
+                    </ice:commandLink> 
+                </ice:panelGroup>
+                <ice:panelGroup style="text-align: right;">
+                    <ice:commandLink 
+                       actionListener="#{editableSelectOneHandler.removeSelectionListener}"
+                       visible="#{o:size(editableSelectOneBean.items) > 0}"
+                       style="padding: 0px;">
+                        <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                        <img 
+                           src="../image/remove.png"
+                           style="vertical-align: middle;" />
+                        <ice:outputText 
+                           style="color: #5382A1; padding: 0px 0px 0px 3px; text-decoration: underline;"
+                           value="#{resources['editableSelectOne.removeSelected']}" />
+                    </ice:commandLink> 
+                </ice:panelGroup>
+            </ice:panelGrid>
+            
+            <ice:panelGrid
+                columns="3"
+                visible="#{editableSelectOneBean.showingNewItemInput}"
+                style="">
+                <ice:inputText
+                    autocomplete="off" 
+                    style="padding: 1px; width: 250px;"
+                    value="#{editableSelectOneBean.newItem}" />
+                <ice:commandLink 
+                   actionListener="#{editableSelectOneHandler.addItemListener}"
+                   style="padding: 0px;"
+                   rendered="#{!editableSelectOneBean.editingExisting}">
+                    <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                    <img 
+                       src="../image/add.png"
+                       style="vertical-align: middle;" />
+                    <ice:outputText 
+                       style="color: #5382A1; padding: 0px 5px 0px 3px; text-decoration: underline;"
+                       value="#{resources['editableSelectOne.add']}" />
+                </ice:commandLink> 
+                <ice:commandLink 
+                   actionListener="#{editableSelectOneHandler.editItemListener}"
+                   style="padding: 0px;"
+                   rendered="#{editableSelectOneBean.editingExisting}">
+                    <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                    <img 
+                       src="../image/edit.png"
+                       style="vertical-align: middle;" />
+                    <ice:outputText 
+                       style="color: #5382A1; padding: 0px 5px 0px 3px; text-decoration: underline;"
+                       value="#{resources['editableSelectOne.edit']}" />
+                </ice:commandLink> 
+                <ice:commandLink 
+                   actionListener="#{editableSelectOneHandler.cancelItemListener}"
+                   style="padding: 0px;">
+                    <f:attribute name="editableSelectOneBean" value="#{editableSelectOneBean}" />
+                    <img 
+                       src="../image/cancel.png"
+                       style="vertical-align: middle;" />
+                    <ice:outputText 
+                       style="color: #5382A1; padding: 0px 5px 0px 3px; text-decoration: underline;"
+                       value="#{resources['editableSelectOne.cancel']}" />
+                </ice:commandLink> 
+            </ice:panelGrid>
+        </ice:panelGroup>
+
+    </f:subview>
+</ui:composition>

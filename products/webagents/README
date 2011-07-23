@@ -1,0 +1,270 @@
+-------------------------------------------------------------
+  Sun(TM) Java(tm) System Access Manager Policy Agents 2.2 
+-------------------------------------------------------------
+
+The following web agents have been developed as part of the OpenSSO project
+and have features that are unique from other version 2.2 web agents:
+
+- Apache HTTP Server 2.2 agent
+- Sun Java System Web Server 7.0 agent
+- BEA WebSphere Portal 6.0 agent
+
+More information on these unique features and all product documentation can 
+be accessed at the following URL:
+
+  http://docs.sun.com/app/docs/coll/1322.1
+
+
+Sun Java System Web Agents 2.2-04 ER 2
+=============================================
+
+Bug(s) fixed in 2.2-04 ER 2
+
+(1)
+
+Bug#: 6937941
+Agent type: IIS6 Agent
+Description: 2.2 IIS6 64-bit agent installer script failing in Windows 2008/7/Vista versions.
+
+
+Sun Java System Web Agents 2.2-02 Hotpatch 2
+=============================================
+
+This cumulative patch fixes the following bugs:
+
+Bug(s) fixed in 2.2-02 Hotpatch 2
+---------------------------------
+
+(1)
+
+Bug#: 6785022
+Agent type: All Agents
+Description: Web agent2.2 cannot handle new AM 7.1 advices
+
+(2)
+
+Bug#: 6744530 
+Agent type: All Agents
+Description: Remote logging - Log message sent by WS7.0 2.2 agent had an empty recMsg
+
+
+
+Bug(s) fixed in 2.2-02 Hotpatch 1
+---------------------------------
+
+(1)
+
+Bug#: 6789020
+Agent type: All Agents
+Description: In CDSSO mode non enforced POST requests cannot be accessed
+
+(2)
+Bug#: 6797023
+Agent type: Sun Web Server 7 Agent
+Description: Web Server 7 agent always set path info to null
+
+
+ 
+Sun Java System Web Agents Web Agents 2.2-02 hotpatches
+========================================================
+
+
+Fixed after Hotpatch 4:
+-------------------------
+
+(1)
+
+Bug#: 6676032
+Agent type: All Agents
+Description: Possibility to add composite advice in the query instead of sending it through a POST request
+Note: The following property has been added in the AMAgent.properties file:
+       com.sun.am.use_redirect_for_advice
+
+(2)
+
+Bug#: 6747546
+Agent type: All Agents
+Description: Apache Agent, ignore_path_info sending PATH_INFO
+
+(3)
+
+Bug#: 6736820
+Agent type: IIS 6 Agent
+Description: IIS 6 agent doesn't work properly with ASP pages in CDSSO mode
+
+(4)
+
+Bug#: 6725383
+Agent type: All Agents
+Description:  remove the sunwMethod parameter from the URL in CSDSSO 
+Note: The following property has been added in the AMAgent.properties file:
+       com.sun.am.policy.agents.config.use.sunwmethod = false 
+
+(5)
+
+Bug#: 6766307
+Agent type: All Agents
+Description: NSS Initialize is failing when the cert db is not present
+
+(6)
+
+Bug#: 6766389
+Agent type: IIS 6 Agent
+Description: In IIS6 agent the reconstructed url doesn't contain the path info
+
+(7)
+
+Bug#: 6739060
+Agent type: All Agents
+Description: Ldap/session attributes with empty values are added in the request header
+
+(8)
+
+Bug#: 6768406
+Agent type: All Agents
+Description: Performance issue in agent 2.2-01 hp3
+Note: The following property has been added in the AMAgent.properties file:
+       com.sun.am.policy.agents.config.policy_number_of_tries = 0 
+
+
+
+Fixed in Hotpatch 4:
+--------------------
+
+(1)
+
+Bug#: 6723849
+Agent type: All Agents
+Description: PA 2.2-01 Hotpatch 2 Performance drops by 3 times when SSO-Only is enabled
+
+(2)
+
+Bug#: 6672424
+Agent type: All Agents
+Description: Security issue:- PA 2.2 -policy-agent-protected page displays in accordance with the value for header
+
+(3)
+
+Bug#:6728280
+Agent type: Sun Java System Web Server 6.1 Agent
+Description: Security issue:ldap/session attributes with empty values are added in the request header
+
+
+Fixed in Hotpatch 3:
+--------------------
+
+(1)
+
+Bug#: 6707603
+Agent type: All Agents
+Description: Web agent crashes when trying to erase a query parameter that doesn't exist
+
+
+Fixed in Hotpatch 2:
+--------------------
+
+(1)
+
+Bug#: 6654718
+Agent type: All Agents
+Description: 403 http error encounter when protected pages has multiple frames and auto reload.
+
+
+(2)
+
+Bug#: 6664608
+Agent type: All Agents
+Description: High CPU consumption by IIS6 running Sun Policy Agent 2.2-01.
+
+
+(3)
+
+Bug#: 6663489
+Agent type: All Agents
+Description: Web agent modifies the query part of the url when redirecting the request after login
+
+
+
+Fixed in Hotpatch 1:
+--------------------
+
+(1)
+
+Bug#: 6629988
+Agent type: All Agents
+Description: Memory corruption resulting in web server crash.
+
+(2)
+
+Bug#: 6608463 
+Agent type: All Agents
+Description: Web Agent support for policy clock skew.
+Note: The following property has been added in the AMAgent.properties file:
+       com.sun.am.policy.agents.config.policy_clock_skew 
+
+(3)
+
+Bug#: 6595643
+Agent type: All Agents
+Description: Possibility to add a "landing page" to the cdcservlet url
+
+(4)
+
+Bug#: 6653582
+Agent type: All Agents
+Description: CPU spike in Web agent 2.2 due to sunwErrCode and goto parameters
+
+(5)
+
+Bug#: 6647805
+Agent type: All Agents
+Description: Need to add HTTP methods for Subversion in Apache agent
+       
+(6)
+
+Bug#: 6640911
+Agent type: All Agents
+Description: In web agents stale policies are not removed creating an infinite loop
+
+(7)
+
+Bug#: 6631862
+Agent type: All Agents
+Description: Memory leak in Web Agents
+
+
+
+Sun Java System Web Agents 2.2-01
+==================================
+
+This cumulative patch fixes the following bugs:
+
+(1)
+
+Bug#: 6642255
+Agent type: All agents
+Description: More complete version information when running "agentadmin --version"
+
+(2)
+
+Bug#: 6570155
+Agent type: All agents
+Description: Apache Agent needs to initialize its thread pool much earlier.
+
+(3)
+
+Bug#: 6567164
+Agent type: Apache 2.2 agent
+Description: WebDAV support in Web Agents (Apache 2.2 agent specific code change)
+
+(4)
+
+Bug#: 6589691
+Agent type: Apache 2.2 agent
+Description: Corrections in Apache agent related to request method strings and numbers
+
+(3)
+
+Bug#: 6531050
+Agent type: Apache 2.2 agent
+Description: Segmentation fault issue starting Apache server post agent install.

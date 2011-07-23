@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: multipanel.xhtml,v 1.11 2009/06/11 15:25:50 farble1670 Exp $
+
+-->
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:o="http://opensso.dev.java.net"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component">
+    <ice:panelGroup
+        effect="#{bean.panelEffect}"
+        styleClass="multipanel">
+        <o:box>
+            <ui:define name="body">
+                <ice:panelGroup
+                    styleClass="multipanel-header">
+                    <ice:panelGrid
+                        style="width: 100%"
+                        columns="2">
+                        <ice:panelGroup
+                            styleClass="multipanel-title">
+                            <ui:insert name="panel-title"/>
+                        </ice:panelGroup>
+                        <ice:panelGroup
+                            styleClass="multipanel-controls">
+                            <ice:commandLink
+                                rendered="#{collapsible == true}"
+                                actionListener="#{handler.panelExpandListener}"
+                                partialSubmit="true"
+                                styleClass="command-link">
+                                <ice:graphicImage
+                                    style="vertical-align: middle;"
+                                    value="#{bean.panelExpanded ? '../image/hide.png' : '../image/show.png'}"/>
+                                <ice:outputText
+                                    style="margin-left: 2px"
+                                    value="#{bean.panelExpanded ? resources['multipanel.hide'] : resources['multipanel.show']}"/>
+                                <f:attribute
+                                    name="bean"
+                                    value="#{bean}"/>
+                            </ice:commandLink>
+                            <ice:outputText
+                                rendered="#{collapsible == true &amp;&amp; removeable == true}"
+                                value="|"/>
+                            <ice:commandLink
+                                rendered="#{removeable == true}"
+                                actionListener="#{handler.panelRemoveListener}"
+                                partialSubmit="true"
+                                styleClass="command-link">
+                                <ice:graphicImage
+                                    style="vertical-align: middle;"
+                                    value="../image/remove.png"/>
+                                <ice:outputText
+                                    style="margin-left: 2px"
+                                    value="#{resources['multipanel.remove']}"/>
+                                <f:attribute
+                                    name="bean"
+                                    value="#{bean}"/>
+                            </ice:commandLink>
+                        </ice:panelGroup>
+                    </ice:panelGrid>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    visible="#{bean.panelExpanded}"
+                    effect="#{bean.panelExpandEffect}"
+                    styleClass="multipanel-body">
+                    <ui:insert name="panel-body"/>
+                </ice:panelGroup>
+            </ui:define>
+        </o:box>
+    </ice:panelGroup>
+</ui:composition>

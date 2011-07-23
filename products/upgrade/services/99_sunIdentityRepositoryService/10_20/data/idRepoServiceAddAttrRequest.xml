@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="XML_ENCODING"?>
+<!--
+
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems, Inc. All Rights Reserved.
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: idRepoServiceAddAttrRequest.xml,v 1.3 2008/06/25 05:54:07 qcheng Exp $
+-->
+
+
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun Java System Access Manager 2005Q4 Admin CLI DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd"
+>
+
+<Requests>
+
+	<AttributeSchema name="sun-idrepo-ldapv3-config-search-scope"
+	    type="single_choice"
+	    syntax="string"
+	    i18nKey="a2014a">
+	    <ChoiceValues>
+		<ChoiceValue i18nKey="a2040">SCOPE_BASE</ChoiceValue>
+		<ChoiceValue i18nKey="a2041">SCOPE_ONE</ChoiceValue>
+		<ChoiceValue i18nKey="a2042">SCOPE_SUB</ChoiceValue>
+	    </ChoiceValues>
+	    <DefaultValues>
+		<Value>SCOPE_BASE</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+
+        <AttributeSchema name="sun-idrepo-ldapv3-config-createuser-attr-mapping"
+            type="list"
+            syntax="string"
+            i18nKey="a201711">
+            <DefaultValues>
+		<Value>cn</Value>
+		<Value>sn</Value>
+	    </DefaultValues>
+        </AttributeSchema>
+
+	<AttributeSchema name="sun-idrepo-ldapv3-ldapv3Generic"
+	    type="single"
+	    syntax="string"
+	    i18nKey="">
+	    <DefaultValues>
+	        <Value>ldapv3Generic</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+
+        <AttributeSchema name="sun-idrepo-ldapv3-config-active"
+            type="single"
+            syntax="string"
+            i18nKey="a20173">
+            <DefaultValues>
+                <Value>Active</Value>
+           </DefaultValues>
+       </AttributeSchema>
+
+       <AttributeSchema name="sun-idrepo-ldapv3-config-inactive"
+           type="single"
+           syntax="string"
+           i18nKey="a20174">
+           <DefaultValues>
+               <Value>Inactive</Value>
+           </DefaultValues>
+       </AttributeSchema>
+
+
+        <AttributeSchema name="sun-idrepo-ldapv3-config-authenticatable-type"
+            type="multiple_choice"
+            syntax="string"
+            i18nKey="a20385">
+            <ChoiceValues>
+                <ChoiceValue i18nKey="choiceUSER">User</ChoiceValue>
+                <ChoiceValue i18nKey="choiceAGENT">Agent</ChoiceValue>
+            </ChoiceValues>
+            <DefaultValues>
+                <Value>User</Value>
+                <Value>Agent</Value>
+            </DefaultValues>
+        </AttributeSchema>
+
+        <AttributeSchema name="sun-idrepo-ldapv3-config-auth-naming-attr"
+            type="single"
+            syntax="string"
+            i18nKey="a20386">
+            <DefaultValues>
+                <Value>USER_NAMING_ATTR</Value>
+            </DefaultValues>
+        </AttributeSchema>
+
+
+        <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
+            type="single"
+            syntax="string"
+            i18nKey="a20431">
+            <DefaultValues>
+                <Value>(objectclass=*)</Value>
+            </DefaultValues>
+        </AttributeSchema>
+
+	<AttributeSchema name="sun-idrepo-ldapv3-config-cache-enabled"
+	    type="single"
+	    syntax="boolean"
+	    i18nKey="a2048">
+	    <DefaultValues>
+		<Value>true</Value>
+            </DefaultValues>
+	</AttributeSchema>
+
+	<AttributeSchema name="sun-idrepo-ldapv3-config-cache-ttl"
+	    type="single"
+	    syntax="number"
+	    i18nKey="a2049">
+            <DefaultValues>
+		<Value>600</Value>
+            </DefaultValues>
+	</AttributeSchema>
+
+        <AttributeSchema name="sun-idrepo-ldapv3-config-cache-size"
+	    type="single"
+	    syntax="number"
+	    i18nKey="a2050">
+	    <DefaultValues>
+		<Value>10240</Value>
+	    </DefaultValues>
+	</AttributeSchema>
+
+
+</Requests>

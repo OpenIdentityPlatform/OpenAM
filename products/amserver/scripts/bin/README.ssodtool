@@ -1,0 +1,242 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.ssodtool,v 1.3 2008/12/19 00:28:24 ak138937 Exp $
+
+-->
+
+OpenSSO Diagnostic Tool
+=======================
+
+This file contains information about the OpenSSO diagnostic tool.
+It is assumed that OpenSSO Server is available.
+
+Table of contents:
+------------------
+1. About Diagnostic Tool 
+2. Supported versions of Java Runtime
+3. Architecture
+4. Contents of this package
+5. Adding new services  
+6. Compilation of the sample code 
+7. Invoking the diagnostic tool 
+
+1. About Diagnostic Tool
+------------------------
+OpenSSO Diagnostic Tool provides a means to validate the sanity of configured
+instance and environment. The tool can be used to verify the configuration 
+settings and identify any possible issues. The issues that can occur after the 
+product is installed/deployed/configured can be either static or dynamic. Static
+issues pertain to misconfigurations, while the dynamic issues occur during 
+run-time. The tool does not address the dynamic issues. 
+
+2. Supported versions of Java Runtime
+-------------------------------------
+J2SE 1.5 or higher.
+
+Note: Embedded quotes in JAVA_HOME environment variable are not supported.
+
+3. Architecture
+---------------
+This tool can be extended since the implementation is based on a plug-in model. 
+Product/field teams or partners can build custom diagnostic tool services 
+(plug-ins) for new services that can be seamlessly integrated with the existing 
+services.
+
+Each feature that is part of the tool and provides certain functionality in a 
+domain, is viewed as a service.  For example, a tool that provides OpenSSO 
+Server configuration related feature is viewed as "Server configuration service"
+or in the server domain. A given service can provide one or more related 
+operations in a particular functional area. For example, "Server configuration 
+service" may provide features to view server configuration parameters, validate 
+session-failover configuration etc.  
+
+4. Contents of this package 
+---------------------------
+The directory in which the tool is unzipped is referred as ZIP_ROOT.
+
+The directory layout would look something as :
+
+	<ZIP_ROOT>
+	|
+	|----README (file containing the information about the Tool)
+	|
+	|----license.txt
+	|	
+	|----ssodtool.sh
+	|	
+	|----ssodtool.bat
+	|	
+	|----config (Any configuration related files required by the Tool)
+	|     
+	|---lib (jar files that are required by the tool to operate)
+	| 
+	|----services (All the services implemented should be under this 
+        |     |        directory, including service descriptor files 
+        |     |        i.e. service.xml, jar files, resource files etc)        
+	|     |
+	|     |----resources (Properties file, images etc required by the 
+	|     |               services)
+	|     |----lib (Jar files required by the services)
+        |     |
+	|     |----sample 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the sample service)
+        |        |
+	|     	 |---- sample_service.xml (Defines the sample service)
+	|    	 |     (This is a sample service used to illustrate the 
+        |        |      structure of service descriptor file. Any new service 
+        |        |      can use this file as a reference for integration into 
+        |        |      the tool. Once a new service is implemented, create a 
+        |        |      separate directory if the need be and place all the 
+        |        |      related files under this new directory. The tool when 
+        |        |      started will pick this new service and shall display
+        |        |      in the GUI or CLI.   
+        |        |
+	|     	 |---- SampleService.java (Sample source for writing a service)
+        |        |
+	| 	 | 
+	|     |----server 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to server)
+	| 	 | 
+	| 	 |---- config (Any configuration related files required by the 
+        |        |            server. This is handled by the implementation of 
+        |        |            the service)
+	| 	 | 
+	|     |----agent 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to agent(s) 
+        |        |                  i.e. Web 3.0 and J2EE 3.0 agents)
+	| 	 | 
+	| 	 |---- config (Any configuration related files required by the 
+        |        |            agent service. This is handled by the 
+        |        |            implementation of the service)
+	| 	 | 
+	|     |----connect 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to connectivity
+        |        |                  of servers. It includes directory server, 
+        |        |                  session failover and site)
+	| 	 | 
+	| 	 |---- config (Any configuration related files required by the 
+        |        |            connectivity service. This is handled by the 
+        |        |            implementation of the service)
+	| 	 | 
+	|     |----tamperdetection 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to detecting 
+        |        |                  changes to files of the configured server 
+        |        |                  instance) 
+	| 	 | 
+	| 	 |---- config (Any configuration related files required by the 
+        |        |            tamperdetection service. This is handled by the 
+        |        |            implementation of the service)
+	| 	 | 
+	|     |----reports 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to reporting 
+        |        |                  service)
+	| 	 | 
+	| 	 |---- config (Any configuration related files required by the 
+        |        |            reporting service. This is handled by the 
+        |        |            implementation of the service)
+	| 	 | 
+	|     |----webcontainer 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to web container 
+        |        |                  service.)
+	| 	 | 
+	| 	 |---- config (Any configuration related files required by the 
+        |        |            web container service. This is handled by the 
+        |        |            implementation of the service)
+	| 	 | 
+	|     |----system 
+	|    	 |                    
+	|     	 |---- service.xml (Defines the service related to system 
+        |        |                  information)
+	| 	 | 
+
+
+5. Adding new services  
+-----------------------
+New services can be seamlessly added to the Diagnostic Tool. Refer to the sample
+java code provided under the sample service. The new service can provide 
+additional functionality as a service or as a feature to an existing service 
+domain. Adding a new service domain or functionality needs to add a new 
+directory with the domain specific name under the services directory. 
+Additionally, the service should provide a service descriptor file providing the 
+service specific details.  
+
+In order to add a new feature to an existing service domain, the service 
+descriptor file of that service needs to be updated with the corresponding 
+entry. 
+
+6. Compilation of the sample code 
+-----------------------------------
+The sample java source code under <ZIP_ROOT>/services/sample can be compiled as
+follows:
+
+   %<JAVA_HOME>/bin/javac -classpath .:<ZIP_ROOT>/lib/toolbase.jar SampleService.java
+
+7. Invoking the diagnostic tool 
+--------------------------------
+Diagnostic Tool can be invoked in two modes i.e. CLI or GUI. The default 
+behavior is GUI mode and can be overridden as shown in step 7b and 7c. 
+
+a. Invoking the diagnostic tool in GUI mode.
+   %cd <ZIP_ROOT>  
+
+   For Unix platforms:
+   >ssodtool.sh
+
+   For Windows platforms:
+   >ssodtool.bat
+
+b. Invoking the diagnostic tool in CLI mode using the "--console" option.
+   %cd <ZIP_ROOT> 
+
+   For Unix platforms:
+   >ssodtool.sh --console
+
+   For Windows platforms:
+   >ssodtool.bat --console
+
+c. Invoking the diagnostic tool in CLI mode using the configuration 
+   property. 
+ 
+   The default behavior can be changed to CLI mode by editing the 
+   configuration file (DTConfig.properties) under 
+   <ZIP_ROOT>/config directory.
+
+   %cd <ZIP_ROOT>/config  
+
+   Set the property as follows to override the default GUI mode:
+   odt.application.runmode=CLI
+
+   Invoke the tool in CLI mode for Unix platforms:
+   >ssodtool.sh 
+
+   Invoke the tool in CLI mode for Windows platforms:
+   >ssodtool.bat 

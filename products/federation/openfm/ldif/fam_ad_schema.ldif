@@ -1,0 +1,763 @@
+dn: CN=iplanet-am-user-federation-info,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: iplanet-am-user-federation-info
+adminDescription: Attribute to store federation info
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.74
+attributeSyntax: 2.5.5.3
+cn: iplanet-am-user-federation-info
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: iplanet-am-user-federation-info
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 6qtapF1UN0etonPyrYO9Ng==
+systemOnly: FALSE
+
+dn: CN=iplanet-am-user-federation-info-key,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: iplanet-am-user-federation-info-key
+adminDescription: Attribute to store federation info key
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.73
+attributeSyntax: 2.5.5.3
+cn: iplanet-am-user-federation-info-key
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: iplanet-am-user-federation-info-key
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+searchFlags: 1
+schemaIDGUID:: iZqXZrA2L0OuaEaooEs06A==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerDiscoEntries,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerDiscoEntries
+adminDescription: Discovery Service Attribute to store entries
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.200
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerDiscoEntries
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: sunIdentityServerDiscoEntries
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: Uaj/XqSYtUycBnhxwbHaSg==
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=sunFederationManagerDataStore,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunFederationManagerDataStore
+adminDescription: Object Class to store Federation Manager attributes
+cn: sunFederationManagerDataStore
+governsID: 1.3.6.1.4.1.42.2.27.9.2.76
+instanceType: 4
+lDAPDisplayName: sunFederationManagerDataStore
+mayContain: iplanet-am-user-federation-info
+mayContain: iplanet-am-user-federation-info-key
+mayContain: sunIdentityServerDiscoEntries
+objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: classSchema
+objectClassCategory: 3
+rDNAttID: cn
+subClassOf: top
+schemaIDGUID:: 4dGbEuNKUkm+QLx9nnpHYA==
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: sunFederationManagerDataStore
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+
+
+dn: CN=sunIdentityServerPPCommonNameCN,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPCommonNameCN
+adminDescription: Liberty PP CommonName CN
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.201
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPCommonNameCN
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPCommonNameCN
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: Ww5QNKMqdkaQyAfpp1tfBg==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPCommonNameMN,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPCommonNameMN
+adminDescription: Liberty PP CommonName MN
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.202
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPCommonNameMN
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPCommonNameMN
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 0R6pcceLPU6ASwaR9RPPiA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPCommonNameFN,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPCommonNameFN
+adminDescription: Liberty PP CommonName FN
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.203
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPCommonNameFN
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPCommonNameFN
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: eRg7WOUAHE2/pZ8zV2j6cQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPCommonNameAltcn,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPCommonNameAltcn
+adminDescription: Liberty PP CommonName AltCN
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.204
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPCommonNameAltcn
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: sunIdentityServerPPCommonNameAltcn
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: CLyTn45q8EqcTfotya6dyg==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPCommonNamePT,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPCommonNamePT
+adminDescription: Liberty PP CommonName Personal Title
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.205
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPCommonNamePT
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPCommonNamePT
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 2nRdbeQCH024ipXGYLOSLw==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPInformalName,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPInformalName
+adminDescription: Liberty PP Informal Name
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.206
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPInformalName
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPInformalName
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: RCY0dlq9qkm50lWfrBks5Q==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPCommonNameSN,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPCommonNameSN
+adminDescription: Liberty PP CommonName SN
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.207
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPCommonNameSN
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPCommonNameSN
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 4QXK/jcMtEC64OMC00DGNw==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityLegalName,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityLegalName
+adminDescription: Liberty PP Legal Identity Legal Name 
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.208
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityLegalName
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityLegalName
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: q/9ATAtebkCDcr0YgSuZYQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityDOB,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityDOB
+adminDescription: Liberty PP Legal Identity DOB
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.209
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityDOB
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityDOB
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: gYyW8yO+6kyXvwmBfiMRxQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityMaritalStatus,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityMaritalStatus
+adminDescription: Liberty PP Legal Identity MaritalStatus
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.215
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityMaritalStatus
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityMaritalStatus
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: pOLxogWLnEajNltQqmsHmQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityGender,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityGender
+adminDescription: Liberty PP Legal Identity Gender
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.210
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityGender
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityGender
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: GMRPawIH3U6mWUI3tZ4koA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityAltIDType,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityAltIDType
+adminDescription: Liberty PP Legal Identity Alternate ID Type
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.211
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityAltIDType
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityAltIDType
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: qFC6NFQP9kWfjQ7Cg8lc0A==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityAltIDValue,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityAltIDValue
+adminDescription: Liberty PP Legal Identity Alternate ID Value
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.212
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityAltIDValue
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityAltIDValue
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: xfFa2Njj5kS13P4FV7z4LA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityVATIDType,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityVATIDType
+adminDescription: Liberty PP Legal Identity VAT ID Type
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.213
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityVATIDType
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityVATIDType
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 5ZGM+StQdU+e/aOrO+a+4w==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPLegalIdentityVATIDValue,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPLegalIdentityVATIDValue
+adminDescription: Liberty PP Legal Identity VAT ID Value
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.214
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPLegalIdentityVATIDValue
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPLegalIdentityVATIDValue
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: RhtQ4QfNj0u2ZpydjYD2dQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPEmploymentIdentityJobTitle,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPEmploymentIdentityJobTitle
+adminDescription: Liberty PP Employment Identity Job Title
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.216
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPEmploymentIdentityJobTitle
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPEmploymentIdentityJobTitle
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: RKMPdkxuJU+qJcvseKK/4w==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPEmploymentIdentityOrg,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPEmploymentIdentityOrg
+adminDescription: Liberty PP Employment Identity Organization
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.217
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPEmploymentIdentityOrg
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPEmploymentIdentityOrg
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: Zwp1YhQq9EiR8F29oMgVSQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPEmploymentIdentityAltO,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPEmploymentIdentityAltO
+adminDescription: Liberty PP Employment Identity Alternate Organization
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.218
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPEmploymentIdentityAltO
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPEmploymentIdentityAltO
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: mc2q9nUmOkqo8GbN2gPiDg==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPAddressCard,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPAddressCard
+adminDescription: Liberty PP AddressCard
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.219
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPAddressCard
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: sunIdentityServerPPAddressCard
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: K3rQxySkEkKjDhJ/fSXnxQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPMsgContact,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPMsgContact
+adminDescription: Liberty PP Message Contact
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.220
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPMsgContact
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: sunIdentityServerPPMsgContact
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: zV34oXedvUCt/agmWG3SoA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPFacadeMugShot,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPFacadeMugShot
+adminDescription: Liberty PP Facade MugShot
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.221
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPFacadeMugShot
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPFacadeMugShot
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 2z3WxrZbBUe/J+/yvavR3Q==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPFacadeWebSite,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPFacadeWebSite
+adminDescription: Liberty PP Facade WebSite
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.222
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPFacadeWebSite
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPFacadeWebSite
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: ySslfvTb2k2Hk3XgNW4oVQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPFacadeNamePronounced,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPFacadeNamePronounced
+adminDescription: Liberty PP Facade Name Pronounced
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.223
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPFacadeNamePronounced
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPFacadeNamePronounced
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: F7RXxSZ5/EyiqpfRn515/g==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPFacadeGreetSound,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPFacadeGreetSound
+adminDescription: Liberty PP Facade Name Greet Sound
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.224
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPFacadeGreetSound
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPFacadeGreetSound
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: /9Cq435ee0KQvhDHHCbpdg==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPFacadeGreetMeSound,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPFacadeGreetMeSound
+adminDescription: Liberty PP Facade Name Greet Me Sound
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.225
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPFacadeGreetMeSound
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPFacadeGreetMeSound
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: gJ49ZflDgUi25fz3KstDNA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPDemographicsDisplayLanguage,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPDemographicsDisplayLanguage
+adminDescription: Liberty PP Demographics Display Language
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.226
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPDemographicsDisplayLanguage
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPDemographicsDisplayLanguage
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: PlFXNjskS0mOUrhZcD7YhQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPDemographicsLanguage,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPDemographicsLanguage
+adminDescription: Liberty PP Demographisc Language
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.227
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPDemographicsLanguage
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPDemographicsLanguage
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: eKmYF56iukeFhbHZ1cMsNw==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPDemographicsAge,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPDemographicsAge
+adminDescription: Liberty PP Demographisc Age
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.228
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPDemographicsAge
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPDemographicsAge
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: lAOzmZmvgEyjGHafCfFkqA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPDemographicsBirthday,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPDemographicsBirthday
+adminDescription: Liberty PP Demographisc Birth Day
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.229
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPDemographicsBirthday
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPDemographicsBirthday
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: NG5kJHmwskqvXtdp8sMLAw==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPDemographicsTimeZone,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPDemographicsTimeZone
+adminDescription: Liberty PP Demographisc Timezone
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.230
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPDemographicsTimeZone
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPDemographicsTimeZone
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: xZZrB78nR0Cf5b3h25qmCQ==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPSignKey,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPSignKey
+adminDescription: Liberty PP SignKey
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.231
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPSignKey
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPSignKey
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: Y80rD1a6MkK2vCVCMYwFrA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPEncryptKey,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPEncryptKey
+adminDescription: Liberty PP SignKey
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.232
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPEncryptKey
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPEncryptKey
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: vprXEy8p2EKseaRdVcQsvA==
+systemOnly: FALSE
+
+dn: CN=sunIdentityServerPPEmergencyContact,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerPPEmergencyContact
+adminDescription: Liberty PP Emergency Contact
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.233
+attributeSyntax: 2.5.5.3
+cn: sunIdentityServerPPEmergencyContact
+instanceType: 4
+isSingleValued: TRUE
+lDAPDisplayName: sunIdentityServerPPEmergencyContact
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+oMSyntax: 27
+schemaIDGUID:: 8GQHXQVEPEq61SfK2OrtiA==
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=sunIdentityServerLibertyPPService,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: add
+adminDisplayName: sunIdentityServerLibertyPPService
+adminDescription: Liberty PP Service
+objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: classSchema
+objectClassCategory:3
+governsID: 1.3.6.1.4.1.42.2.27.9.2.77
+instanceType: 4
+lDAPDisplayName: sunIdentityServerLibertyPPService
+mayContain: sunIdentityServerPPCommonNameCN
+mayContain: sunIdentityServerPPCommonNameFN
+mayContain: sunIdentityServerPPCommonNameMN
+mayContain: sunIdentityServerPPCommonNameSN
+mayContain: sunIdentityServerPPCommonNamePT
+mayContain: sunIdentityServerPPCommonNameAltCN
+mayContain: sunIdentityServerPPInformalName
+mayContain: sunIdentityServerPPLegalIdentityLegalName
+mayContain: sunIdentityServerPPLegalIdentityDOB
+mayContain: sunIdentityServerPPLegalIdentityMaritalStatus
+mayContain: sunIdentityServerPPLegalIdentityGender
+mayContain: sunIdentityServerPPLegalIdentityAltIDType
+mayContain: sunIdentityServerPPLegalIdentityAltIDValue
+mayContain: sunIdentityServerPPLegalIdentityVATIDType
+mayContain: sunIdentityServerPPLegalIdentityVATIDValue
+mayContain: sunIdentityServerPPEmploymentIdentityJobTitle
+mayContain: sunIdentityServerPPEmploymentIdentityOrg
+mayContain: sunIdentityServerPPEmploymentIdentityAltO
+mayContain: sunIdentityServerPPAddressCard
+mayContain: sunIdentityServerPPMsgContact
+mayContain: sunIdentityServerPPFacadeMugShot
+mayContain: sunIdentityServerPPFacadeWebSite
+mayContain: sunIdentityServerPPFacadeNamePronounced
+mayContain: sunIdentityServerPPFacadeGreetSound
+mayContain: sunIdentityServerPPFacadeGreetMeSound
+mayContain: sunIdentityServerPPDemographicsDisplayLanguage
+mayContain: sunIdentityServerPPDemographicsLanguage
+mayContain: sunIdentityServerPPDemographicsBirthday
+mayContain: sunIdentityServerPPDemographicsAge
+mayContain: sunIdentityServerPPDemographicsTimeZone
+mayContain: sunIdentityServerPPSignKey
+mayContain: sunIdentityServerPPEncryptKey
+mayContain: sunIdentityServerPPEmergencyContact
+subClassOf: top
+schemaIDGUID:: RK2beXmoPU632Ib1i/FRug==
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: sunIdentityServerLibertyPPService
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+
+
+dn: CN=sun-fm-saml2-nameid-info,CN=Schema,CN=Configuration,ROOT_SUFFIX
+adminDisplayName: sun-fm-saml2-nameid-info
+adminDescription: Attribute to store SAML 2.0 name identifier information
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.990
+attributeSyntax: 2.5.5.3
+cn: sun-fm-saml2-nameid-info
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: sun-fm-saml2-nameid-info
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+schemaIDGUID:: 238t8KMH1k+kpLe2+TL46g==
+oMSyntax: 27
+systemOnly: FALSE
+
+dn: CN=sun-fm-saml2-nameid-infokey,CN=Schema,CN=Configuration,ROOT_SUFFIX
+adminDisplayName: sun-fm-saml2-nameid-infokey
+adminDescription: Attribute to store SAML2.0 name identifier info key
+attributeID: 1.3.6.1.4.1.42.2.27.9.1.989
+attributeSyntax: 2.5.5.3
+cn: sun-fm-saml2-nameid-infokey
+instanceType: 4
+isSingleValued: FALSE
+lDAPDisplayName: sun-fm-saml2-nameid-infokey
+objectCategory: CN=Attribute-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: attributeSchema
+schemaIDGUID:: rxSSaDGM1E26OyMoDhfqoA==
+oMSyntax: 27
+searchFlags: 1
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=sunFMSAML2NameIdentifier,CN=Schema,CN=Configuration,ROOT_SUFFIX
+adminDisplayName: sunFMSAML2NameIdentifier
+adminDescription: Object Class to store SAML 2.0 Name Identifier attributes
+cn: sunFMSAML2NameIdentifier
+governsID: 1.3.6.1.4.1.42.2.27.9.2.148
+instanceType: 4
+lDAPDisplayName: sunFMSAML2NameIdentifier
+mayContain: sun-fm-saml2-nameid-info
+mayContain: sun-fm-saml2-nameid-infokey
+objectCategory: CN=Class-Schema,CN=Schema,CN=Configuration,ROOT_SUFFIX
+objectClass: classSchema
+objectClassCategory: 3
+rDNAttID: cn
+subClassOf: top
+systemOnly: FALSE
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,ROOT_SUFFIX
+changetype: modify
+add: auxiliaryClass
+auxiliaryClass: sunFMSAML2NameIdentifier
+
+dn:
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+

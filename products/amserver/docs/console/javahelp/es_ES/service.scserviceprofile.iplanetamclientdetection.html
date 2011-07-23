@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Detecci&#243;n de cliente - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamclientdetection"></a><h4>Detecci&#243;n de cliente</h4>
+<p><a name="indexterm-200"></a>Un paso inicial del proceso de autenticaci&#243;n consiste en identificar el tipo
+de cliente que realiza la solicitud HTTP(S). Esta funci&#243;n de OpenSSO se
+conoce como detecci&#243;n de cliente. La informaci&#243;n de la direcci&#243;n URL se
+utiliza para recuperar las caracter&#237;sticas del cliente. En funci&#243;n de estas caracter&#237;sticas,
+se mostrar&#225;n las p&#225;ginas de autenticaci&#243;n adecuadas. Por ejemplo, cuando se utiliza
+el navegador Netscape para solicitar una p&#225;gina web, OpenSSO 8.0 muestra una
+p&#225;gina de inicio de sesi&#243;n HTML. Una vez validado el usuario, el
+tipo de cliente (explorador Netscape) se agrega al token de sesi&#243;n. Los
+atributos definidos en el servicio de detecci&#243;n de cliente son atributos globales.</p>
+<ul><li><p><a href="#fxcei">Tipos de cliente</a></p></li>
+<li><p><a href="#fxbxh">Tipo de cliente predeterminado</a></p></li>
+<li><p><a href="#fxccp">Clase de detecci&#243;n de cliente</a></p></li>
+<li><p><a href="#fxbvy">Detecci&#243;n de cliente</a></p></li></ul>
+
+
+<a name="fxcei"></a><h5>Tipos de cliente</h5>
+<p>Para poder detectar los tipos de clientes, OpenSSO debe reconocer sus caracter&#237;sticas
+de identificaci&#243;n. Estas caracter&#237;sticas identifican las propiedades de todos los tipos admitidos
+en forma de datos del cliente. Este atributo permite modificar los datos
+de cliente mediante la interfaz de Client Manager. Para acceder a Client
+Manager, haga clic en el v&#237;nculo Editar. OpenSSO contiene los siguientes tipos
+de clientes de serie:</p>
+<ul><li><p>HDML</p></li>
+<li><p>HTML</p></li>
+<li><p>JHTML</p></li>
+<li><p>VoiceX</p></li>
+<li><p>WML</p></li>
+<li><p>XHTML</p></li>
+<li><p>cHTML</p></li>
+<li><p>iHTML</p></li></ul>
+<p>For descriptions of these client types, see the <a href="http://docs.sun.com/app/docs/coll/1483.1">http://docs.sun.com/app/docs/coll/1483.1</a>.</p>
+
+<a name="gciwk"></a><h5>Administrador de cliente</h5>
+<p><a name="indexterm-201"></a>El Administrador de cliente es la interfaz que muestra los clientes base,
+los estilos y las propiedades asociadas, y permite agregar y configurar dispositivos.
+Los tipos de cliente base se muestran en la parte superior del
+Administrador de cliente. Estos tipos de cliente contienen las propiedades predeterminadas que
+pueden heredar todos los dispositivos que pertenezcan al tipo de cliente.</p>
+
+<a name="gcivx"></a><h5>Tipo de cliente</h5>
+<p>El Administrador de cliente agrupa a todos los clientes disponibles, incluido el
+propio tipo de cliente base, en la lista de tipos de cliente.
+Puede modificar las propiedades de cada cliente haciendo clic en el nombre
+del dispositivo. A continuaci&#243;n, las propiedades se mostrar&#225;n en la ventana Client
+Editor (Editor de cliente). Para editar las propiedades, seleccione las siguientes clasificaciones
+en la lista desplegable:</p><dl><dt>Plataforma de hardware</dt>
+<dd><p>Contiene las propiedades del hardware del dispositivo, como el tama&#241;o de visualizaci&#243;n, los conjuntos de caracteres admitidos, etc.</p></dd>
+<dt>Plataforma de software</dt>
+<dd><p>Contiene las propiedades del entorno de aplicaci&#243;n del dispositivo, el sistema operativo y el software instalado. </p></dd>
+<dt>Caracter&#237;sticas de red</dt>
+<dd><p>Contiene las propiedades que describen el entorno de red, incluidos los portadores compatibles.</p></dd>
+<dt>BrowserUA</dt>
+<dd><p>Contiene los atributos relacionados con el agente de usuario del explorador que se ejecuta en el dispositivo.</p></dd>
+<dt>WapCharacteristics</dt>
+<dd><p>Contiene las propiedades del entorno del Protocolo de aplicaciones inal&#225;mbricas (WAP) admitido por el dispositivo.</p></dd>
+<dt>PushCharacteristicNames</dt>
+<dd><p>Contiene las propiedades del entorno WAP admitido por el dispositivo.</p></dd>
+<dt>Propiedades adicionales</dt>
+<dd><p>Contiene las propiedades del entorno del Protocolo de aplicaciones inal&#225;mbricas (WAP) admitido por el dispositivo.</p></dd>
+</dl>
+
+<hr><p><b>Nota &#8211; </b>Para obtener definiciones de propiedades espec&#237;ficas, consulte el <b>Protocolo de aplicaciones inal&#225;mbricas Open Mobile Alliance Ltd. (OMA), versi&#243;n del 20-Oct-2001</b>.</p><p>Es posible que para acceder a este documento tenga que registrarse en
+WAP Forum<sup>TM</sup>. For information, please visit <a href="http://www.wapforum.org/faqs/index.htm">http://www.wapforum.org/faqs/index.htm </a>.</p>
+<hr>
+
+
+<a name="fxbxh"></a><h5>Tipo de cliente predeterminado</h5>
+<p>Este atributo define el tipo de cliente predeterminado obtenido a partir de
+la lista de tipos de cliente en el atributo Client Types (Tipos
+de cliente). El valor predeterminado es genericHTML.</p>
+
+<a name="fxccp"></a><h5>Clase de detecci&#243;n de cliente</h5>
+<p>Este atributo define la clase de detecci&#243;n del cliente para el que
+se enrutan todas las solicitudes de detecci&#243;n de clientes. La cadena que
+este atributo devuelve debe coincidir con uno de los tipos de cliente
+que se indican en el atributo Client Types (Tipos de cliente). La
+clase de detecci&#243;n de cliente predeterminada es <tt>com.sun.mobile.cdm.FEDIClientDetector</tt>. OpenSSO contiene tambi&#233;n <tt>com.iplanet.services.cdm.ClientDetectionDefaultImpl </tt>
+.</p>
+
+<a name="fxbvy"></a><h5>Detecci&#243;n de cliente</h5>
+<p>Habilita la detecci&#243;n de clientes. Si se habilita la detecci&#243;n de clientes
+(valor predeterminado), cada solicitud se enruta mediante la clase especificada en el
+atributo Client Detection Class (Clase de detecci&#243;n de cliente). De forma predeterminada,
+la capacidad de detecci&#243;n de cliente est&#225; habilitada. Si no se selecciona
+este atributo, OpenSSO supone que el cliente es genericHTML y el acceso
+se obtendr&#225; desde un navegador HTML.</p>
+<br/>
+
+</body>
+</html>

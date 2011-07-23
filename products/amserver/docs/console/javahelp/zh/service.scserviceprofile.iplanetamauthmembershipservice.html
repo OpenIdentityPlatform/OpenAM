@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>成员资格 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthmembershipservice"></a><h4>成员资格</h4>
+<p><a name="indexterm-176"></a>“成员资格验证”模块是针对个性化站点实现的。当启用了成员资格验证时，用户可以进行自注册。这意味着用户可以创建帐户、对其进行个性化设置以及在无需管理员帮助下将其作为一个已注册用户进行访问。这些属性是领域属性。这些属性包括：</p>
+<ul><li><p><a href="#fumys">最小密码长度</a></p></li>
+<li><p><a href="#fumyr">默认用户角色</a></p></li>
+<li><p><a href="#fumyt">注册后的用户状态</a></p></li>
+<li><p><a href="#fumzm">验证级别</a></p></li></ul>
+
+
+<a name="fumys"></a><h5>最小密码长度</h5>
+<p>用于指定自注册过程中设置密码时要求的最小字符数。默认值为 8。</p><p>如果更改该默认值，还需更改注册中的该值和以下文件的错误文本中的该值：</p><p><tt></tt><i>AcessManager-base</i><tt>/locale/amAuthMembership.properties</tt>（<i>PasswdMinChars</i> 项）</p>
+
+<a name="fumyr"></a><h5>默认用户角色</h5>
+<p>指定分配给其配置文件是在自注册过程中创建的新用户的角色。该字段没有默认值。管理员必须指定要分配给新用户的角色的 DN。</p>
+<hr><p><b>注 &#8211; </b>所指定的角色必须属于正在为其配置验证的领域。在自注册过程中，只能添加可以指派给用户的角色。所有其他 DN 将被忽略。该角色既可以是 OpenSSO 角色，也可以是 LDAP 角色，但不接受已过滤角色。</p>
+<hr>
+
+
+<a name="fumyt"></a><h5>注册后的用户状态</h5>
+<p>指定服务是否立即可以供已自注册的用户使用。默认值为活动，服务可供新用户使用。通过选中不活动，管理员不对新用户提供服务。</p>
+
+<a name="fumzm"></a><h5>验证级别</h5>
+<p>各种验证方法都单独设置了验证级别。验证级别值表示信任验证机制的程度。用户进行验证之后，该值将存储在会话的 SSO 令牌中。当 SSO 令牌传递到用户要访问的应用程序时，应用程序将根据存储的值来确定级别是否足以授予用户访问权限。如果 SSO 令牌中存储的验证级别没有达到所需的最小级别，应用程序将提示用户使用具有较高验证级别的服务再次进行验证。默认值为 0。</p>
+<hr><p><b>注 &#8211; </b>如果未指定任何验证级别，则在核心验证属性<a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">默认验证级别</a>中所指定的值将会存储到 SSO 令牌中。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

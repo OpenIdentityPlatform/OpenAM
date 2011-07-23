@@ -1,0 +1,118 @@
+ <div><table cellpadding="0" cellspacing="10" border="0" align="center" valign="top">
+  <col WIDTH=100%>
+	<tr><td><img src="../../../images/logo.gif" width="179" height="68" border="0" alt="OpenSSO"></td></tr>
+	<tr><td><h2>Getting Started FAQ</h2></td></tr>
+	<tr><td><font size="2">
+<ol>
+<li><a href="#browse">How do I browse the source code?</a></li>
+<li><a href="#checkout">How do I checkout the source code?</a></li>
+<li><a href="#download">How do I download OpenSSO?</a></li>
+<li><a href="#information">Where do I find information about setting up the environment, getting the right tools, and actually building the source?</a></li>
+<li><a href="#built">Now that I've built the code, what can I do?</a></li>
+<li><a href="#bug">How do I report a bug?</a></li>
+<li><a href="#changes">How do I make changes to files in the source?</a></li>
+<li><a href="#patch">What is a patch and how do I submit one?</a></li>
+</ol>
+</font></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="browse"></a> How do I browse the source code?</b></b></p>
+
+<p>You can browse the source code without a java.net account by going to the <a href="https://opensso.dev.java.net/source/browse/opensso/">Source - CVS</a> page.</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="checkout"></a> How do I checkout the source code?</b></b></p>
+
+<p>To checkout the project source as a registered java.net user, see <a href="https://opensso.dev.java.net/servlets/ProjectSource">https://opensso.dev.java.net/servlets/ProjectSource</a>. As a registered user, you will be able to commit changes back to the tree if you have been approved as an OpenSSO <i>Committer</i>. (See the <a href="https://opensso.dev.java.net/public/about/governance/index.html">governance</a> for more details on OpenSSO project roles).
+</p>
+<p>
+You can also checkout the source code with a CVS client as a <i>guest</i>. Use <i>guest</i> as a username and password with the following command:
+</p>
+<p>
+<code>cvs -d :pserver:guest:guest@cvs.dev.java.net:/cvs checkout opensso<code>
+</p>
+<p>
+<i>Note: You cannot commit changes back to CVS as guest!</i>
+</p>
+
+</td></tr>
+
+<tr><td><p><b>Q:<b><a name="download"></a> How do I download OpenSSO?</b></b></p>
+<p>
+You can download built binaries from the <a href="https://opensso.dev.java.net/public/use/index.html">Downloads</a> page.
+</p>
+</td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="information"></a> Where do I find information about setting up the environment, getting the right tools, and actually building the source?</b></b></p>
+
+
+<p>On the <a href="https://opensso.dev.java.net/source/browse/opensso/">Source - CVS</a> page, change into the <code>products/amserver</code> directory. The README in this directory contains information on requirements and dependencies. This information is reproduced in the <a href="faqbuild.html">FAQ Build Requirements and Dependencies</a>.       
+
+</p></td></tr>
+
+<tr><td><p><b>Q:<b><a name="built"></a> Now that I've built the code, what can I do?</b></b></p>
+
+
+<p>To particpate in the OpenSSO project, you must <a href="https://www.dev.java.net/servlets/Login?cookieCheck=on">register</a> with <code>java.net</code> and join <a href="https://opensso.dev.java.net/public/about/governance/index.html">OpenSSO</a>. After this, you can:
+</P>
+<ul>
+<li>Participate in discussions on <a href="https://opensso.dev.java.net/servlets/ProjectMailingListList">mailing lists</a> and in <a href="https://opensso.dev.java.net/servlets/ForumMessageList?forumID=1554">community forums</a>.</li>
+<li>Find and report bugs.</li>
+<li>Write documentation or source code.</li>
+<li>Give feedback on how to make the project more successful.</li>
+</ul>
+</td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="bug"></a> How do I report a bug?</b></b></p>
+
+
+<p>See the <a href="faqbugs.html">Reporting Bugs and Security Bugs FAQ</a> for information.
+
+</p></td></tr>
+
+
+<tr><td><p><b>Q:<b><a name="changes"></a> How do I make changes to files in the OpenSSO source?</b></b></p>
+
+<p>An OpenSSO contributor may resolve an issue by applying new code to files in the source tree. This is the process for making changes to files in the OpenSSO source:
+<ol>
+<li>Check out the latest copy of the source files.</li>
+<li>Make modifications to the appropriate files.</li>
+<li>Write comments to explain the changes you have made.</li>
+<li>Modify the comments that will be generated using the Javadoc<sup>TM</sup> tool and any other appropriate documentation.</li>
+<li>Build the software and verify your fix.</li>
+<li>Run the relevant sanity and regression tests to make sure that the fix has not broken anything.</li>
+</ol>
+
+<tr><td><p><b>Q:<b><a name="patch"></a> What is a patch and how do I submit one?</b></b></p>
+
+<p>Running <pre>cvs diff</pre> reports the differences between two versions of the same file. A <i>patch</i> captures these exact changes. The receiver of a patch applies it to their workspace to merge the changes and bring their version up-to-date with your version. <i>All patches must be reviewed before adding them back to the source tree.</i>
+
+<p>This is the process for submitting a patch file for review:
+
+<ol>
+<li>Create a patch file:
+<ol type="a">
+<li> % cd <i>checkedout_source</i></li>
+<li> % cvs diff -u > <i>patch_report_name</i></li>
+</ol> 
+
+<p><li>Enter an issue in Issue Tracker that corresponds to the patch, if none exists.</li>
+<p><i>Submit only one patch per issue. Do not submit a patch to fix more than one issue unless they are closely related.</i>
+<p><li>Submit your patch along with the issue number to <a href="mailto:code-review@opensso.dev.java.net">code-review@opensso.dev.java.net</a>.</li>
+<p><li>If approved, attach the patch file to the issue in Issue Tracker. This can be attached as a file or copied directly into the Suggested Fix field.</li>
+<p><li>Send the approved patch to <a href="mailto:committers@opensso.dev.java.net">committers@opensso.dev.java.net</a> to have it applied to the source tree.</li>
+<p><li>Once the patch is applied, the committer will update the issue in Issue Tracker as fixed.</li>
+</ol>
+
+<p>If you have found a critical security issue, please follow the <a href="faqbugs.html">guidelines for filing critical security issues</a>. 
+<p>If your patch is big or you intend to develop a product enhancement, you must follow the architecture review guidelines before submitting the patch. For more information, send an email to <a href="mailto:code-review@opensso.dev.java.net">code-review@opensso.dev.java.net</a>.
+
+</p></td></tr>
+
+</table>
+
+</p>
+
+<!-- content boundary -->
+</div>

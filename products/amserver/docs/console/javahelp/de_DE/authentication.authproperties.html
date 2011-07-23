@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Authentifizierung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="authentication.authproperties"></a><h3>Authentifizierung</h3>
+<p><a name="indexterm-5"></a>Der allgemeine Authentifizierungsdienst muss f&#252;r einen Bereich als Dienst registriert werden, bevor
+sich ein Benutzer &#252;ber die anderen Authentifizierungsmodultypen anmelden kann. &#220;ber den Core-Authentifizierungsdienst
+kann der OpenSSO-Administrator Standardwerte f&#252;r die Authentifizierungsparameter eines Bereichs festlegen. Diese Werte
+werden verwendet, wenn keine vorrangigen Werte in den betreffenden Authentifizierungsmodulen angegeben sind.
+Die Standardwerte des Core-Authentifizierungsdienstes werden nach der Installation in der Datei <tt>amAuth.xml </tt>festgelegt
+und in Directory Server gespeichert.</p><p>Es gibt folgende Authentifizierungseigenschaften:</p><dl><dt>Erweiterte Eigenschaften</dt>
+<dd><p>&#220;ber diese Schaltfl&#228;che zeigen Sie die Core-Authentifizierungsattribute an, die f&#252;r den Bereich festgelegt werden k&#246;nnen. Die globalen Attribute sind auf einen Bereich nicht anwendbar und werden daher nicht angezeigt.</p></dd>
+<dt>Standard-Authentifizierungskette</dt>
+<dd><p>Legt die Authentifizierungskette f&#252;r den Bereich fest. Jede Kette, die Sie im Attribut Authentifizierungsverkettung erstellen, wird in der Pulldown-Liste angezeigt und kann ausgew&#228;hlt werden. Weitere Informationen finden Sie unter <a href="authentication.newauthconfig.html">So erstellen Sie eine neue Authentifizierungskette</a>.</p></dd>
+<dt>Administrator-Authentifizierungskette</dt>
+<dd><p>Definiert die Authentifizierungskette ausschlie&#223;lich f&#252;r Administratoren. Dieses Attribut kann verwendet werden, wenn f&#252;r Administratoren eine andere Authentifizierungskette verwendet werden soll als f&#252;r Endbenutzer. Die in diesem Attribut konfigurierten Module werden beim Zugriff auf die OpenSSO-Konsole &#252;bernommen.</p></dd>
+<dt>Standarderfolgs-URL</dt>
+<dd><p>Gibt den URL an, an den der Benutzer nach erfolgreicher Authentifizierung beim Bereich weitergeleitet wird.</p></dd>
+<dt>Modulinstanzen</dt>
+<dd><p>Definiert und konfiguriert die Standard-Authentifizierungsmodule von OpenSSO f&#252;r den Bereich. Sie k&#246;nnen auch mehrere Instanzen des gleichen Authentifizierungsmoduls hinzuf&#252;gen. Weitere Informationen finden Sie unter <a href="authentication.newauthinstance.html">So erstellen Sie eine neue Authentifizierungsmodulinstanz</a>.</p></dd>
+<dt>Authentifizierungsverkettung</dt>
+<dd><p>Sie k&#246;nnen ein oder mehrere Authentifizierungsmodule konfigurieren, denen ein Benutzer seine Anmeldeinformationen vorlegen muss. Dieser Vorgang wird als Authentifizierungsverkettung bezeichnet. Mit diesem Attribut k&#246;nnen Sie die Optionen f&#252;r die Authentifizierungsverkettung f&#252;r den Bereich definieren. Die von Ihnen erstellten Ketten werden in der Liste Standard-Authentifizierungskette angezeigt. Weitere Informationen finden Sie unter <a href="authentication.newauthconfig.html">So erstellen Sie eine neue Authentifizierungskette</a>.</p></dd>
+</dl>
+
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>General - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditgeneral"></a><h4>General</h4>
+<p>Los atributos generales permiten configurar los datos de configuraci&#243;n b&#225;sicos para la
+administraci&#243;n centralizada del servidor.</p>
+
+<a name="ggjyg"></a><h5>Atributos del sitio</h5>
+<p>El atributo del sitio es:</p>
+
+<a name="ggjxc"></a><h5>Sitio principal</h5>
+<p>Este atributo asigna el nombre del sitio (Id. de sitio) del equilibrador
+de carga al servidor de OpenSSO. Tenga en cuenta que debe crear
+primero el sitio para poder agregarlo.  </p>
+
+<a name="ggjwl"></a><h5>Atributos del sistema</h5>
+<p>Los atributos del sistema enumeran la informaci&#243;n de ubicaci&#243;n de la instancia
+del servidor:</p>
+
+<a name="ggjyj"></a><h5>Directorio de instalaci&#243;n base</h5>
+<p>Especifica el directorio base en el que residen los datos del producto.
+</p>
+
+<a name="ggjxz"></a><h5>Configuraci&#243;n regional predeterminada</h5>
+<p>El valor de configuraci&#243;n regional es el subtipo de idioma predeterminado con
+el que se instal&#243; OpenSSO. El valor predeterminado es <tt>en_us</tt>.</p>
+
+<a name="ggjwq"></a><h5>URL de notificaci&#243;n</h5>
+<p>La ubicaci&#243;n del punto final del servicio de notificaci&#243;n. Este valor se
+establece durante la instalaci&#243;n.</p>
+
+<a name="ggjzq"></a><h5>Validaci&#243;n XML</h5>
+<p>El valor predeterminado es no. Determina si la validaci&#243;n es necesaria al
+analizar documentos XML utilizando la clase <tt>XMLUtils </tt> de OpenSSO. Esta propiedad s&#243;lo
+se aplica cuando el valor del atributo de nivel de depuraci&#243;n se
+establece en advertencia o mensaje. Los valores permitidos son "yes" (s&#237;) y
+"no". La validaci&#243;n de documentos XML s&#243;lo se activa si el valor
+de esta propiedad es "yes" (s&#237;) y el valor del atributo de
+nivel de depuraci&#243;n se ha establecido en advertencia o mensaje.</p>
+
+<a name="ggjzy"></a><h5>Atributos de depuraci&#243;n</h5>
+<p>Los atributos de depuraci&#243;n muestran la informaci&#243;n b&#225;sica de comprobaci&#243;n de errores:</p>
+
+<a name="ggjzc"></a><h5>Nivel de depuraci&#243;n</h5>
+<p>Especifica el nivel de depuraci&#243;n. El valor predeterminado es "error". Los valores
+posibles son:</p>
+<ul><li><p>off (desactivado): no se crea ning&#250;n archivo de depuraci&#243;n.</p></li>
+<li><p>error: s&#243;lo se registran los mensajes de error.</p></li>
+<li><p>warning (advertencia): s&#243;lo se registran los mensajes de advertencia.</p></li>
+<li><p>message (mensaje): se registran los mensajes de error, advertencia o de car&#225;cter informativo.</p></li></ul>
+
+
+<a name="ggjze"></a><h5>Directorio de depuraci&#243;n</h5>
+<p>Especifica el directorio de salida en el que se crear&#225;n los archivos
+de depuraci&#243;n. Este valor se establece durante la instalaci&#243;n. Ejemplo: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>debug_URI</i><tt>/debug</tt>.</p>
+
+<a name="ggjwr"></a><h5>Servidor de correo</h5>
+<p>Los atributos del servidor de correo muestran el nombre de host y
+el puerto del servidor de correo:</p>
+
+<a name="ggkax"></a><h5>Nombre de host del servidor de correo</h5>
+<p>El valor predeterminado es <tt>localhost</tt>. Especifica el host del servidor de correo.</p>
+
+<a name="ggkbx"></a><h5>N&#250;mero de puerto del servidor de correo</h5>
+<p>El valor predeterminado es 25. Especifica el puerto del servidor de correo.</p>
+<br/>
+
+</body>
+</html>

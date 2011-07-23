@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Noyau - Aide en ligne de la console Sun OpenSSO&#160;8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthservice"></a><h4>Noyau</h4>
+<p><a name="indexterm-170"></a>Ce module contient la configuration g&#233;n&#233;rale de base des services d'authentification d'OpenSSO.
+Il doit &#234;tre enregistr&#233; et configur&#233; pour utiliser toute instance de module
+d'authentification sp&#233;cifique. Il permet &#224; l'administrateur de d&#233;finir des valeurs par d&#233;faut
+qui seront choisies pour les valeurs non d&#233;finies dans les modules d'authentification
+par d&#233;faut d'OpenSSO. Les attributs Core (Noyau) sont des attributs globaux et
+de domaine. Ces attributs sont les suivants :</p>
+<ul><li><p><a href="#gcnje">Classes du module d'authentification enfichable</a></p></li>
+<li><p><a href="#gcnjc">Module d'authentification pris en charge pour les clients</a></p></li>
+<li><p><a href="#gcnir">Taille de pool de connexion LDAP</a></p></li>
+<li><p><a href="#gcnkh">Taille de pool de connexions LDAP par d&#233;faut</a></p></li>
+<li><p><a href="#gcnkq">Profil utilisateur</a></p></li>
+<li><p><a href="#gcnks">Configuration d'authentification des administrateurs</a></p></li>
+<li><p><a href="#gcnjw">R&#244;les par d&#233;faut de cr&#233;ation dynamique de profil utilisateur</a></p></li>
+<li><p><a href="#gcnjn">Mode de cookie permanent</a></p></li>
+<li><p><a href="#gcnke">D&#233;lai maximal de cookie permanent</a></p></li>
+<li><p><a href="#gcnlc">Nom d'attribut de recherche du pseudo</a></p></li>
+<li><p><a href="#gcnkt">Langue d'authentification par d&#233;faut</a></p></li>
+<li><p><a href="#gcnjj">Configuration de l'authentification des organisations</a></p></li>
+<li><p><a href="#gcnkl">Mode de verrouillage d'&#233;chec de connexion</a></p></li>
+<li><p><a href="#gcnjz">Comptage des verrouillages d'&#233;chec de connexion</a></p></li>
+<li><p><a href="#gcnko">Intervalle de verrouillage d'&#233;chec de connexion</a></p></li>
+<li><p><a href="#gcnkd">Adresse &#233;lectronique o&#249; envoyer la notification de verrouillage</a></p></li>
+<li><p><a href="#gcnkr">Avertir utilisateur apr&#232;s N &#233;checs</a></p></li>
+<li><p><a href="#gcnkc">Dur&#233;e de verrouillage d'&#233;chec de connexion</a></p></li>
+<li><p><a href="#gcnjy">Nom d'attribut de verrouillage</a></p></li>
+<li><p><a href="#gcnle">Valeur d'attribut de verrouillage</a></p></li>
+<li><p><a href="#gcnkz">URL par d&#233;faut de connexion r&#233;ussie</a></p></li>
+<li><p><a href="#gcnlf">URL par d&#233;faut d'&#233;chec de connexion</a></p></li>
+<li><p><a href="#gcnlb">Classe de post-traitement de l'authentification</a></p></li>
+<li><p><a href="#gcnjl">G&#233;n&#233;rer le mode ID utilisateur</a></p></li>
+<li><p><a href="#gcnjq">Classe du g&#233;n&#233;rateur de nom d'utilisateur enfichable</a></p></li>
+<li><p><a href="#gcnki">Types d'identit&#233;</a></p></li>
+<li><p><a href="#gcnlh">Classes d'&#233;v&#233;nement de l'&#233;tat de l'utilisateur enfichable</a></p></li>
+<li><p><a href="#gcnjv">Stocker les tentatives non valides dans le magasin de donn&#233;es</a></p></li>
+<li><p><a href="#gcnjo">Authentification sur module</a></p></li>
+<li><p><a href="#fwbfn">Niveau d'authentification par d&#233;faut</a></p></li></ul>
+
+
+<a name="gcnje"></a><h5>Classes du module d'authentification enfichable</h5>
+<p>Indique les classes Java des modules d'authentification disponibles pour tout domaine configur&#233;
+&#224; l'aide de la plate-forme OpenSSO. Vous pouvez &#233;crire des modules d'authentification
+personnalis&#233;s en impl&#233;mentant le SPI AMLoginModule ou le SPI JAAS LoginModule. Pour
+plus d'informations, reportez-vous au guide du d&#233;veloppeur OpenSSO. Pour permettre la d&#233;finition
+de nouveaux services, ce champ doit accepter une cha&#238;ne de texte sp&#233;cifiant
+le nom complet de la classe (incluant le nom de package) de
+chaque service d'authentification.</p>
+
+<a name="gcnjc"></a><h5>Module d'authentification pris en charge pour les clients</h5>
+<p>Sp&#233;cifie une liste de modules d'authentification pris en charge pour un client
+sp&#233;cifique. Le format est le suivant :</p><p><tt>typeClient | module1,module2,module3</tt></p><p>Cet attribut est appliqu&#233; lorsque la d&#233;tection de client est activ&#233;e.</p>
+
+<a name="gcnir"></a><h5>Taille de pool de connexion LDAP</h5>
+<p>Sp&#233;cifie le pool de connexions minimal et maximal &#224; utiliser sur un
+serveur et un port LDAP sp&#233;cifiques. Cet attribut s'applique uniquement aux services
+d'authentification LDAP et Appartenance. Le format est le suivant :</p><p><tt>h&#244;te:port:min:max</tt></p>
+<hr><p><b>Remarque &#8211; </b>Ce pool de connexions est diff&#233;rent de celui du SDK configur&#233; dans
+le fichier <tt>serverconfig.xml</tt>.</p>
+<hr>
+
+
+<a name="gcnkh"></a><h5>Taille de pool de connexions LDAP par d&#233;faut</h5>
+<p>D&#233;finit le pool de connexions minimal et maximal &#224; utiliser avec toutes
+les configurations de module d'authentification LDAP. Si une entr&#233;e pour l'h&#244;te et
+le port existe dans l'attribut Taille de pool de connexions LDAP, les
+param&#232;tres minimaux et maximaux ne seront pas utilis&#233;s &#224; partir de Taille
+de pool par d&#233;faut de connexion LDAP.</p>
+
+<a name="gcnkq"></a><h5>Profil utilisateur</h5>
+<p>Cette option vous permet de sp&#233;cifier des options pour un profil utilisateur.
+Les options sont les suivantes :</p><dl><dt><b>Requis</b></dt>
+<dd><p>Cette option indique qu'en cas d'authentification r&#233;ussie, le service d'authentification pourra &#233;mettre un jeton SSO uniquement si l'utilisateur poss&#232;de un profil dans l'instance locale de Directory Server install&#233;e avec OpenSSO.</p></dd>
+<dt><b>Dynamique</b></dt>
+<dd><p>Cette option indique qu'en cas d'authentification r&#233;ussie, le service d'authentification cr&#233;e le profil utilisateur s'il n'en existe pas d&#233;j&#224; un. Le jeton SSO est alors &#233;mis. Le profil utilisateur est cr&#233;&#233; dans l'instance locale de Directory Server install&#233;e avec OpenSSO.</p></dd>
+<dt><b>Dynamique avec alias utilisateur</b></dt>
+<dd><p>Cette option indique qu'en cas d'authentification r&#233;ussie, le service d'authentification cr&#233;e le profil utilisateur avec l'attribut Liste d'alias utilisateur. </p></dd>
+<dt><b>Ignorer</b></dt>
+<dd><p>Cette option indique que le service d'authentification ne requiert pas de profil utilisateur pour &#233;mettre le jeton SSO en cas d'authentification r&#233;ussie.</p></dd>
+</dl>
+
+
+<a name="ggukq"></a><h5>S&#233;curit&#233; auth distante</h5>
+<p>Si cet attribut est activ&#233;, toutes les demandes d'authentification distante requi&#232;rent le
+jeton SSO de l'application pour valider l'identit&#233; de l'appelant, afin que les
+informations de configuration d'OpenSSO puissent obtenir le nom d'utilisateur et le mot
+de passe associ&#233;s &#224; l'application.</p>
+
+<a name="ggull"></a><h5>Conserver les objets post-traitement pour le traitement de d&#233;connexion</h5>
+<p>Si cet attribut est activ&#233;, les instances des plug-ins d'authentification du post-traitement
+utilis&#233;s lors de la connexion sont conserv&#233;es lors de la session OpenSSO.
+Lorsque la d&#233;connexion est demand&#233;e ult&#233;rieurement, la m&#233;thode <tt>onLogout</tt> de ces instances
+est appel&#233;e. Si cet attribut n'est pas activ&#233;, les instances de post-traitement
+du processus de connexion ne sont pas conserv&#233;es. Les nouvelles instances des
+plug-ins de post-traitement sont cr&#233;&#233;es lorsque la d&#233;connexion est demand&#233;e et que
+la m&#233;thode <tt>onLogout</tt> est appel&#233;e. </p>
+
+<a name="gguji"></a><h5>Conserver le module d'authentification pour le traitement de d&#233;connexion</h5>
+<p>Si cet attribut est activ&#233;, toutes les instances des modules d'authentification utilis&#233;s
+pendant le processus d'authentification sont conserv&#233;es dans la session OpenSSO. Plus tard,
+lors de la d&#233;connexion, la m&#233;thode logout/destroyModulestate est appel&#233;e sur ces m&#234;mes
+instances. Si cet attribut n'est pas activ&#233;, les instances de module d'authentification
+du processus de d&#233;connexion ne sont pas conserv&#233;es. Aucune m&#233;thode des modules
+d'authentification n'est appel&#233;e lors de la d&#233;connexion.</p>
+
+<a name="gcnks"></a><h5>Configuration d'authentification des administrateurs</h5>
+<p>D&#233;finit le service d'authentification pour les administrateurs uniquement. Cet attribut peut &#234;tre
+utilis&#233; si le module d'authentification pour les administrateurs doit &#234;tre diff&#233;rent du
+module pour les utilisateurs finaux. Les modules configur&#233;s dans cet attribut sont
+choisis lors de l'acc&#232;s &#224; la console OpenSSO. Par exemple :</p><p><tt><b>http://</tt><i>nomserveur.port/uri_d&#233;ploiement_console</i><tt></b></tt></p>
+
+<a name="gcnjw"></a><h5>R&#244;les par d&#233;faut de cr&#233;ation dynamique de profil utilisateur</h5>
+<p>Ce champ indique les r&#244;les attribu&#233;s &#224; un nouvel utilisateur dont les
+profils sont cr&#233;&#233;s si la cr&#233;ation dynamique est s&#233;lectionn&#233;e par l'interm&#233;diaire du
+profil utilisateur. Il n'y a pas de valeur par d&#233;faut. L'administrateur doit
+sp&#233;cifier les DN des r&#244;les qui seront affect&#233;s au nouvel utilisateur.  </p>
+<hr><p><b>Remarque &#8211; </b>Le r&#244;le sp&#233;cifi&#233; doit se trouver sous le domaine dont l'authentification est
+configur&#233;e. Ce r&#244;le peut &#234;tre un r&#244;le OpenSSO ou LDAP, mais pas
+un r&#244;le filtr&#233;.</p><p>Si vous souhaitez affecter automatiquement des services sp&#233;cifiques &#224; l'utilisateur, vous devez
+configurer l'attribut Services requis dans le profil utilisateur.</p>
+<hr>
+
+
+<a name="gcnjn"></a><h5>Mode de cookie permanent</h5>
+<p>Cette option d&#233;termine si les utilisateurs peuvent red&#233;marrer le navigateur et revenir
+cependant &#224; leur session authentifi&#233;e. Il est possible de conserver les sessions
+utilisateur en s&#233;lectionnant l'option Activer le mode de cookie permanent. Lorsque cette
+option est s&#233;lectionn&#233;e, une session utilisateur n'expire pas avant l'expiration de son
+cookie permanent ou avant la d&#233;connexion explicite de l'utilisateur. Le d&#233;lai d'expiration
+est d&#233;fini dans l'attribut D&#233;lai maximal de cookie permanent. Par d&#233;faut, l'option
+Mode de cookie permanent n'est pas activ&#233;e et le service d'authentification utilise
+uniquement des cookies de m&#233;moire.</p>
+<hr><p><b>Remarque &#8211; </b>Un cookie permanent doit &#234;tre explicitement demand&#233; par le client &#224; l'aide
+du param&#232;tre <i>iPSPCookie=yes</i> dans l'URL de connexion.</p>
+<hr>
+
+
+<a name="gcnke"></a><h5>D&#233;lai maximal de cookie permanent</h5>
+<p>Indique le d&#233;lai au bout duquel un cookie permanent expire. Cette p&#233;riode
+commence d&#232;s l'authentification r&#233;ussie de la session de l'utilisateur. La valeur maximale
+est 2147483647 (d&#233;lai en secondes). Le champ accepte tout nombre entier inf&#233;rieur
+&#224; la valeur maximale.</p>
+
+<a name="gcnlc"></a><h5>Nom d'attribut de recherche du pseudo</h5>
+<p>Apr&#232;s toute authentification r&#233;ussie par un utilisateur, le profil de l'utilisateur est
+r&#233;cup&#233;r&#233;. Ce champ sp&#233;cifie un deuxi&#232;me attribut LDAP dans lequel effectuer une
+recherche, en cas d'&#233;chec de la recherche dans le premier attribut LDAP
+d'un profil utilisateur correspondant. Cet attribut sera principalement utilis&#233; lorsque l'identification de
+l'utilisateur renvoy&#233;e &#224; partir d'un module d'authentification n'est pas identique &#224; celle
+sp&#233;cifi&#233;e dans le champ Attribut d'affectation de nom pour l'utilisateur. Par exemple,
+un serveur RADIUS peut renvoyer <tt>abc1234</tt> mais le nom d'utilisateur est <tt>abc</tt>.
+Il n'existe pas de valeur par d&#233;faut pour cet attribut.</p><p>Ce champ accepte tout attribut LDAP valide (par exemple, cn).</p>
+
+<a name="gcnkt"></a><h5>Langue d'authentification par d&#233;faut</h5>
+<p>Sp&#233;cifie le sous-type de langue par d&#233;faut &#224; utiliser par le service
+d'authentification. La valeur par d&#233;faut est en_US (anglais am&#233;ricain). Pour consulter la
+liste des sous-types de langues valides, reportez-vous &#224; <a href="supportedlang.html">Environnements linguistiques pris en charge</a>.  </p><p>Pour permettre l'utilisation d'une langue diff&#233;rente, tous les mod&#232;les d'authentification pour cette
+langue doivent avoir &#233;t&#233; pr&#233;alablement cr&#233;&#233;s. Un nouveau r&#233;pertoire doit alors &#234;tre
+cr&#233;&#233; pour ces mod&#232;les. Pour plus d'informations, reportez-vous &#224; la section &#171;
+Login URL Parameters &#187; (Param&#232;tres d'URL de connexion) du manuel Administration Guide.</p>
+
+<a name="gcnjj"></a><h5>Configuration de l'authentification des organisations</h5>
+<p>D&#233;finit le module d'authentification pour l'organisation. Le module d'authentification par d&#233;faut est
+LDAP.</p>
+
+<a name="gcnkl"></a><h5>Mode de verrouillage d'&#233;chec de connexion</h5>
+<p>Indique si un utilisateur peut tenter une seconde authentification en cas d'&#233;chec
+de la premi&#232;re. Si cet attribut est s&#233;lectionn&#233;, le verrouillage est activ&#233;
+et l'utilisateur peut effectuer une seule tentative d'authentification. Par d&#233;faut, la fonction
+de verrouillage n'est pas activ&#233;e. Cet attribut fonctionne conjointement avec les attributs
+li&#233;s au verrouillage et les attributs de notification.</p>
+
+<a name="gcnjz"></a><h5>Comptage des verrouillages d'&#233;chec de connexion</h5>
+<p>D&#233;finit le nombre de tentatives d'authentification qu'un utilisateur peut effectuer, dans le
+d&#233;lai d&#233;fini dans le champ Intervalle de verrouillage d'&#233;chec de connexion, avant
+d'&#234;tre bloqu&#233;.</p>
+
+<a name="gcnko"></a><h5>Intervalle de verrouillage d'&#233;chec de connexion</h5>
+<p>D&#233;finit (en minutes) le d&#233;lai entre deux tentatives de connexion sans succ&#232;s.
+En cas d'&#233;chec d'une tentative de connexion suivi de l'&#233;chec d'une seconde
+tentative dans le d&#233;lai de verrouillage, le nombre de verrouillages est incr&#233;ment&#233;.
+Sinon, le comptage des verrouillages est r&#233;initialis&#233;.</p>
+
+<a name="gcnkd"></a><h5>Adresse &#233;lectronique o&#249; envoyer la notification de verrouillage</h5>
+<p>Indique une adresse e-mail &#224; laquelle sera envoy&#233;e la notification en cas
+de blocage d'un utilisateur. Pour envoyer une notification par e-mail &#224; plusieurs
+adresses; indiquez une liste d'adresses e-mail s&#233;par&#233;es un espace. Pour les langues
+autres que l'anglais, le format est le suivant :</p><p><tt>email_address|locale|charset</tt> </p>
+
+<a name="gcnkr"></a><h5>Avertir utilisateur apr&#232;s N &#233;checs</h5>
+<p>Indique le nombre d'&#233;checs d'authentification au-del&#224; duquel OpenSSO envoie un message d'avertissement
+signalant que l'utilisateur sera bloqu&#233;.</p>
+
+<a name="gcnkc"></a><h5>Dur&#233;e de verrouillage d'&#233;chec de connexion</h5>
+<p>Active le verrouillage de la m&#233;moire. Par d&#233;faut, le m&#233;canisme de verrouillage
+d&#233;sactive le profil utilisateur (apr&#232;s un &#233;chec de connexion) d&#233;fini dans le
+champ <i>Nom d'attribut de verrouillage</i>. Si la valeur du param&#232;tre Dur&#233;e de verrouillage d'&#233;chec de
+connexion est sup&#233;rieure &#224; 0, le verrouillage de la m&#233;moire et du
+compte utilisateur durera le nombre de minutes indiqu&#233;.</p>
+
+<a name="ggulj"></a><h5>Multiplicateur dur&#233;e verrouillage</h5>
+<p>Cet attribut d&#233;finit pour chaque d&#233;connexion successive le coefficient de multiplication de
+la valeur de l'attribut Dur&#233;e de verrouillage d'&#233;chec de connexion. Par exemple,
+si l'attribut Dur&#233;e de verrouillage d'&#233;chec de connexion a pour valeur 3
+minutes et que l'attribut Multiplicateur dur&#233;e verrouillage a pour valeur 2, le
+compte de l'utilisateur sera verrouill&#233; pendant 6 minutes.</p>
+
+<a name="gcnjy"></a><h5>Nom d'attribut de verrouillage</h5>
+<p>D&#233;signe tout attribut LDAP d&#233;fini pour le verrouillage. La valeur indiqu&#233;e dans
+le champ Valeur d'attribut de verrouillage doit &#233;galement &#234;tre modifi&#233;e pour activer
+le verrouillage pour ce nom d'attribut. Par d&#233;faut, le champ Nom d'attribut
+de verrouillage est vide dans la console d'OpenSSO. Les valeurs d'impl&#233;mentation par
+d&#233;faut sont <i>inetuserstatus</i> (attribut LDAP) et <i>inactive</i> lorsque l'utilisateur est verrouill&#233; et
+que le param&#232;tre Dur&#233;e de verrouillage d'&#233;chec de connexion a pour valeur
+0.</p>
+
+<a name="gcnle"></a><h5>Valeur d'attribut de verrouillage</h5>
+<p>Cet attribut indique si le verrouillage est activ&#233; ou d&#233;sactiv&#233; pour l'attribut
+d&#233;fini dans le champ Nom d'attribut de verrouillage. Par d&#233;faut, le param&#232;tre
+<i>inetuserstatus</i> est d&#233;sactiv&#233;.</p>
+
+<a name="gcnkz"></a><h5>URL par d&#233;faut de connexion r&#233;ussie</h5>
+<p>Ce champ accepte une liste de valeurs multiples qui sp&#233;cifie l'URL vers
+laquelle les utilisateurs sont redirig&#233;s en cas d'authentification r&#233;ussie. Le format de
+cet attribut est <tt>typeClient|URL</tt>, bien que vous puissiez ne sp&#233;cifier que la
+valeur de l'URL qui utilise le HTML comme type par d&#233;faut. La
+valeur par d&#233;faut est <i>/amserver/console</i>.</p>
+
+<a name="gcnlf"></a><h5>URL par d&#233;faut d'&#233;chec de connexion</h5>
+<p>Ce champ accepte une liste de valeurs multiples qui sp&#233;cifie l'URL vers
+laquelle les utilisateurs sont redirig&#233;s en cas d'&#233;chec de l'authentification. Le format
+de cet attribut est <tt>typeClient|URL</tt>, bien que vous puissiez ne sp&#233;cifier que
+la valeur de l'URL qui utilise le HTML comme type par d&#233;faut.</p>
+
+<a name="gcnlb"></a><h5>Classe de post-traitement de l'authentification</h5>
+<p>Indique le nom de la classe Java utilis&#233;e pour personnaliser les processus
+de post-authentification en cas d'&#233;chec ou de r&#233;ussite des connexions. Exemple :</p><p><tt>com.abc.authentication.PostProcessClass</tt> </p><p>La classe Java doit impl&#233;menter l'interface Java suivante :</p><p><tt>com.sun.identity.authentication.spi.AMPostAuthProcessInterface </tt></p><p>De plus, vous devez ajouter le chemin dans lequel la classe est
+situ&#233;e dans l'attribut Chemin de classe Java de Web Server.</p>
+
+<a name="gcnjl"></a><h5>G&#233;n&#233;rer le mode ID utilisateur</h5>
+<p>Cet attribut est utilis&#233; par le module d'authentification Appartenance. Si ce champ
+d'attribut est activ&#233;, le module Appartenance peut g&#233;n&#233;rer des ID utilisateur, durant
+le processus d'auto-enregistrement, pour un utilisateur d&#233;termin&#233; si l'ID utilisateur existe d&#233;j&#224;.
+Les ID utilisateur sont g&#233;n&#233;r&#233;s &#224; partir de la classe Java sp&#233;cifi&#233;e
+dans l'attribut Classe du g&#233;n&#233;rateur de nom d'utilisateur enfichable.</p>
+
+<a name="gcnjq"></a><h5>Classe du g&#233;n&#233;rateur de nom d'utilisateur enfichable</h5>
+<p>Indique le nom de la classe Java utilis&#233;e pour g&#233;n&#233;rer des ID
+utilisateur lorsque l'option Activer le mode de g&#233;n&#233;ration de l'ID utilisateur est
+utilis&#233;e.</p>
+
+<a name="gcnki"></a><h5>Types d'identit&#233;</h5>
+<p>R&#233;pertorie les types d'identit&#233; recherch&#233;s par OpenSSO.</p>
+
+<a name="gcnlh"></a><h5>Classes d'&#233;v&#233;nement de l'&#233;tat de l'utilisateur enfichable</h5>
+<p>&#201;tend les SPI d'authentification pour fournir un m&#233;canisme de rappel pour les
+modifications de statut de l'utilisateur durant le processus d'authentification. Les modifications de
+statut suivantes sont prises en charge :</p><dl><dt><tt>verrouillage du compte</tt></dt>
+<dd><p>L'&#233;v&#233;nement verrouillage du compte est disponible pour tout module d'authentification. Ces fonctions sont configurables &#224; l'aide de l'attribut <a href="#gcnkl">Mode de verrouillage d'&#233;chec de connexion</a>.</p></dd>
+<dt><tt>modification du mot de passe</tt></dt>
+<dd><p>Disponible uniquement par l'interm&#233;diaire du type de module d'authentification LDAP, car la fonction de modification du mot de passe est disponible uniquement pour ce module.</p></dd>
+</dl>
+
+
+<a name="gcnjv"></a><h5>Stocker les tentatives non valides dans le magasin de donn&#233;es</h5>
+<p>S'il est activ&#233;, cet attribut autorise le partage des tentatives d'&#233;chec de
+connexion dans un r&#233;f&#233;rentiel d'identit&#233;s partag&#233; par plusieurs instances d'OpenSSO. Par exemple,
+si le r&#233;f&#233;rentiel d'identit&#233;s utilis&#233; pour un d&#233;ploiement est Directory Server, les
+tentatives non valides sont stock&#233;es dans le fichier <tt>sunAMAuthInvalidAttemptsData</tt> (qui appartient &#224;
+la classe d'objets <tt>sunAMAuthAccountLockout). </tt> Le format des donn&#233;es stock&#233;es est :</p><p><tt>&#60;InvalidPassword&#62;&#60;InvalidCount&#62;&#60;/InvalidCount&#62;&#60;LastInvalidAt&#62;&#60;/LastInvalidAt&#62;&#60;LockedoutAt&#62;&#60;/LockedoutAt&#62;&#60;ActualLockoutDuration&#62;&#60;/ActualLockoutDuration&#62;&#60;/InvalidPassword&#62; </tt></p><p>Ces informations sont conserv&#233;es dans le serveur Directory Server pour chaque utilisateur.
+D&#232;s que des tentatives non valides sont d&#233;tect&#233;es, la valeur de <tt>&#60;InvalidCount&#62;</tt>
+est augment&#233;e.</p>
+
+<a name="gcnjo"></a><h5>Authentification sur module</h5>
+<p>S'il est activ&#233;, cet attribut permet aux utilisateurs de s'authentifier avec l'authentification
+sur module. S'il n'est pas activ&#233;, la connexion sur module n'est pas
+autoris&#233;e. Toutes les tentatives de connexion avec <tt>module=&#60;</tt><i>module_instance_name</i><tt>&#62;</tt> sont vou&#233;es &#224; l'&#233;chec.</p>
+
+<a name="ggurt"></a><h5>Mappage d'attribut d'utilisateur &#224; l'attribut de session</h5>
+<p>Ceci permet de d&#233;finir les attributs en tant que propri&#233;t&#233;s de session
+entre le profil utilisateur d'authentification (stock&#233; dans un magasin de donn&#233;es) et
+le jeton SSO de l'utilisateur. Le format est le suivant&#160;:</p><p><tt>UserProfile_Attribute|Session_Attribute_name</tt></p><p>Si <tt>Session_Attribute_name</tt> n'est pas sp&#233;cifi&#233;, le nom de propri&#233;t&#233; de la session
+est r&#233;cup&#233;r&#233; comme valeur de l'attribut Profil utilisateur. Tous les attributs de
+session contiennent le pr&#233;fixe am.<tt>protected</tt> pour emp&#234;cher toute modification &#224; partir du
+SDK du client.</p>
+
+<a name="fwbfn"></a><h5>Niveau d'authentification par d&#233;faut</h5>
+<p>Cette valeur indique le niveau de confiance pouvant &#234;tre accord&#233; aux authentifications.
+Une fois qu'un utilisateur s'est authentifi&#233;, cette valeur est stock&#233;e dans le
+jeton SSO pour la session. Lorsque le jeton SSO est pr&#233;sent&#233; &#224;
+une application &#224; laquelle l'utilisateur souhaite acc&#233;der, l'application peut utiliser la valeur
+stock&#233;e pour d&#233;terminer si le niveau est suffisant pour accorder l'acc&#232;s &#224;
+l'utilisateur. Si le niveau d'authentification enregistr&#233; dans le jeton SSO ne correspond
+pas &#224; la valeur minimale requise, l'application peut inviter l'utilisateur &#224; s'authentifier
+&#224; nouveau par l'interm&#233;diaire d'un service avec un niveau d'authentification plus &#233;lev&#233;.</p><p>Le niveau d'authentification doit &#234;tre d&#233;fini dans le mod&#232;le d'authentification sp&#233;cifique du
+domaine. La valeur Niveau d'authentification par d&#233;faut d&#233;crite ici s'applique uniquement lorsqu'aucun
+niveau d'authentification n'a &#233;t&#233; sp&#233;cifi&#233; dans le champ Niveau d'authentification pour un
+mod&#232;le d'authentification sp&#233;cifique au domaine. La valeur par d&#233;faut de Niveau d'authentification
+par d&#233;faut est 0. Notez que la valeur de cet attribut n'est
+pas utilis&#233;e par OpenSSO mais peut l'&#234;tre par n'importe quelle application ext&#233;rieure.</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2-Identity-Anbieteranpassung  - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2idpassertioncontent"></a><h4>SAMLv2-Identity-Anbieteranpassung </h4>
+<p>SAMLv2-Identity-Anbieter umfassen die folgenden Attributgruppen:</p>
+<ul><li><p><a href="#ggwdf">Assertion-Inhalt</a></p></li>
+<li><p><a href="#ggwca">Assertion-Verarbeitung</a></p></li>
+<li><p><a href="#ggwyj">Lokale Konfiguration</a></p></li>
+<li><p><a href="#ggwaw">Dienste</a></p></li>
+<li><p><a href="#ggwli">Erweitert</a></p></li></ul>
+
+
+<a name="ggwdf"></a><h5>Assertion-Inhalt</h5>
+
+<ul><li><p><a href="#ggwad">Anforderungs-/Antwort-Signierung</a></p></li>
+<li><p><a href="#ggwby">Verschl&#92;u00fcsselung</a></p></li>
+<li><p><a href="#ggwcz">Zertifikatsaliasse</a></p></li>
+<li><p><a href="#ggwbz">Namens-ID-Format</a></p></li>
+<li><p><a href="#ggyoq">Namens-ID-Wertzuordnung</a></p></li>
+<li><p><a href="#ggwer">Authentifizierungskontext</a></p></li>
+<li><p><a href="#ggwec">Assertion-Zeit</a></p></li>
+<li><p><a href="#ggwce">Basisauthentifizierung</a></p></li>
+<li><p><a href="#ggwaj">Best&#228;tigungsanweisungs-Cache</a></p></li>
+<li><p><a href="#ggwcd">Bootstrapping</a></p></li></ul>
+
+
+<a name="ggwad"></a><h5>Anforderungs-/Antwort-Signierung</h5>
+<p>Das Festlegen der folgenden Flags gibt dem Identity-Anbieter an, wie der Dienstanbieter
+bestimmte Nachrichten signiert:</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>Authentifizierungsanforderung</p></td>
+<td align="left" valign="top" scope="row"><p> Alle Authentifizierungsanforderungen, die von diesem Identity-Anbieter empfangen werden, m&#252;ssen
+signiert werden.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Artifact-Aufl&#246;sung</p></td>
+<td align="left" valign="top" scope="row"><p>Der Dienstanbieter muss das <tt>ArtifactResolve</tt>-Element signieren.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Abmeldungsanforderung</p></td>
+<td align="left" valign="top" scope="row"><p>Der Dienstanbieter muss das <tt>LogoutRequest</tt>-Element signieren.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Abmeldungsantwort</p></td>
+<td align="left" valign="top" scope="row"><p>Der
+Dienstanbieter muss das <tt>LogoutResponse</tt>-Element signieren.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Anforderung f&#252;r Verwaltung von Namens-ID </p></td>
+<td align="left" valign="top" scope="row"><p>Der Dienstanbieter muss
+das <tt>ManageNameIDRequst</tt>-Element signieren.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>Antwort f&#252;r Verwaltung von Namens-ID</p></td>
+<td align="left" valign="top" scope="row"><p>Der Dienstanbieter muss das <tt>ManageNameIDResponse</tt>-Element signieren.</p></td>
+</tr>
+</table>
+
+<a name="ggwby"></a><h5>Verschl&#92;u00fcsselung</h5>
+<p>W&#228;hlen Sie das Kontrollk&#228;stchen aus, um die Verschl&#252;sselung f&#252;r die folgenden Elemente
+zu aktivieren:</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>NameID</p></td>
+<td align="left" valign="top" scope="row"><p>Der Dienstanbieter muss alle <tt>NameID</tt>-Elemente verschl&#252;sseln.</p></td>
+</tr>
+</table>
+
+<a name="ggwcz"></a><h5>Zertifikatsaliasse</h5>
+<p>Dieses Attribut definiert die Zertifikatalias-Elemente f&#252;r den Identity-Anbieter. <tt>Signieren</tt>Gibt den Anbieterzertifikatalias an,
+der f&#252;r die Suche nach dem richtigen Signaturzertifikat im Schl&#252;sselspeicher verwendet wird.
+<tt>Verschl&#252;sselung</tt>Gibt den Anbieterzertifikatalias an, der f&#252;r die Suche nach dem richtigen Verschl&#252;sselungszertifikat
+im Schl&#252;sselspeicher verwendet wird.</p>
+
+<a name="ggwbz"></a><h5>Namens-ID-Format</h5>
+<p>Definiert das Format f&#252;r den Namensbezeichner, der vom Identity-Anbieter unterst&#252;tzt wird. Namensbezeichner
+sind eine M&#246;glichkeit f&#252;r Anbieter, miteinander im Hinblick auf einen Benutzer zu
+kommunizieren. Single Sign-On-Interaktionen unterst&#252;tzen die folgenden Bezeichnertypen:</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</tt></p></li></ul>
+<p>Ein <b>best&#228;ndiger Bezeichner</b> wird im Datenspeichereintrag eines bestimmten Benutzers als der Wert von
+zwei Attributen gespeichert. Ein <b>tempor&#228;rer Bezeichner</b> ist vor&#252;bergehend und es werden keine Daten
+in den best&#228;ndigen Datenspeicher des Benutzers geschrieben.</p>
+
+<a name="ggyoq"></a><h5>Namens-ID-Wertzuordnung</h5>
+<p>Dieses Attribut gint die Zuordnung zwischen dem NameID Format-Attribut und einem Benutzerprofilattribut
+an. Falls das definierte Namens-ID-Format im Protokoll verwendet wird, wird der Profilattributwert
+als NameID-Wert f&#252;r das Format im Betreff verwendet. Die Syntax jedes Eintrags
+ist:</p><p><tt></tt><i>NameID Format</i><tt>=</tt><i>Benutzerprofilattribut</i><tt></tt></p><p> Beispiel:</p><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress=mail </tt></p><p>Um das neue NameID-Format hinzuzuf&#252;gen, muss das NameID Value Map-Attribut mit dem
+entsprechenden Eintrag aktualisiert werden. Die Ausnahmen sind <tt>best&#228;ndig</tt>, <tt>tempor&#228;r</tt> und <tt>nicht angegeben</tt>. F&#252;r
+<tt>best&#228;ndig</tt> und <tt>tempor&#228;r</tt> wird der NameID-Wert nach dem Zufallsprinzip erstellt. F&#252;r dieses
+Attribut ist <tt>nicht angegeben</tt> optional. Wenn es angegeben ist, ist der NameID-Wert der
+Wert des Benutzerprofilattributs. Wenn es nicht angegeben ist, wird eine zuf&#252;llige Nummer
+erzeugt. </p>
+
+<a name="ggwer"></a><h5>Authentifizierungskontext</h5>
+<p>Dieses Attribut ordnet SAMLv2-definierte Authentifizierungskontext-Klassen zu den Authentifizierungsmethoden hinzu, die der Identity-Anbieter
+verf&#252;gbar macht.</p><dl><dt>Mapper</dt>
+<dd><p>Gibt die Implementierung der <tt>IDPAuthnContextMapper</tt>-Schnittstelle an, die f&#252;r die Erstellung des angeforderten Authentifizierungskontexts verwendet wird. Die Standardimplementierung ist <tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper </tt>.</p></dd>
+<dt>Standardm&#228;&#223;iger Authentifizierungskontext</dt>
+<dd><p>Gibt den standardm&#228;&#223;igen Authentifizierungskontexttyp an, der vom Identity-Anbieter verwendet wird, falls der Diensanbieter keine Authentifizierungskontextanforderung sendet.</p></dd>
+<dt>Unterst&#252;tzt</dt>
+<dd><p>W&#228;hlen Sie das Kontrollk&#228;stchen neben der Authentifizierungskontext-Klasse aus, wenn diese vom Identity-Anbieter unterst&#252;tzt wird.</p></dd>
+<a name="indexterm-68"></a><a name="indexterm-69"></a><a name="indexterm-70"></a><dt>Kontextreferenz</dt>
+<dd><p>Die SAMLv2-definierten Authentifizierungskontext-Klassen sind:</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password</p></li>
+<li><p>Passwort-ProtectedTransport</p></li>
+<li><p>Zur&#252;ck-Sitzung</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Telefonie</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Nicht angegeben</p></li></ul>
+</dd>
+<dt>Schl&#252;ssel</dt>
+<dd><p>W&#228;hlen Sie den OpenSSO-Authentifizierungstyp aus, dem der Kontext zugeordnet ist.</p></dd>
+<dt>Wert</dt>
+<dd><p>Geben Sie die OpenSSO-Authentifizierungsoption ein.</p></dd>
+<dt>Ebene</dt>
+<dd><p>Nimmt eine positive Zahl als Wert, der einer Authentifizierungsebene zugeordnet wird, die im OpenSSO Authentication Framework definiert ist. Die Authentifizierungsebene gibt an, inwieweit einer Authentifizierungsmethode vertraut werden kann.</p><p>In dieser Struktur ist jeder Identity-Anbieter mit einem Standardauthentifizierungskontext (die bevorzugte Authentifizierungsmethode) konfiguriert. Der Anbieter m&#246;chte jedoch vielleicht den zugewiesenen Authentifizierungskontext in einen &#228;ndern, der auf der definierten Authentifizierungsebene basiert. Anbieter B m&#246;chte beispielsweise eine lokale Sitzung mit der Authentifizierungsebene 3 erzeugen, also sendet er eine Anforderung an den Identity-Anbieter, um den Benutzer mit einem Authentifizierungskontext zu authentifizieren, dem diese Ebene zugewiesen ist. Der Wert dieses Abfrageparameters bestimmt den Authentifizierungskontext, der durch den Identity-Anbieter verwendet wird.</p></dd>
+</dl>
+
+
+<a name="ggwec"></a><h5>Assertion-Zeit</h5>
+<p>Behauptungen sind w&#228;hrend eines bestimmten Zeitraums g&#252;ltig, und nicht davor oder danach.
+Dieses Attribut gibt eine Frist (in Sekunden) f&#252;r den <tt>Nicht vor Zeitverzerrung</tt>-Wert an. Der
+Standardwert ist <tt>600</tt>.  Er hat keine Bedeutung f&#252;r den <tt>notAfter</tt>-Wert.</p><p><tt>Effektive Zeit</tt> gibt den Zeitraum (in Sekunden) an, w&#228;hrend dessen eine Assertion g&#252;ltig
+ist, und zwar ab der Ausstellungszeit der Assertion. Der Standardwert ist 
+<tt>600</tt> Sekunden.</p>
+
+<a name="ggwce"></a><h5>Basisauthentifizierung</h5>
+<p>Die Basisauthentifizierung kann zum Schutz von SOAP-Endpunkten aktiviert werden. S&#228;mtliche Anbieter, die
+auf diese Endpunkte zugreifen, m&#252;ssen &#252;ber einen definierten Benutzer und ein Passwort
+in den folgenden beiden Eigenschaften verf&#252;gen: <tt>Benutzername</tt> und <tt>Passwort</tt>.</p>
+
+<a name="ggwaj"></a><h5>Best&#228;tigungsanweisungs-Cache</h5>
+<p>Falls aktiviert, erlaubt dies dem Identity-Anbieter, Assertions im Cache zu speichern und
+zu einem sp&#228;teren Zeitpunkt abzurufen.</p>
+
+<a name="ggwcd"></a><h5>Bootstrapping</h5>
+<p>W&#228;hlen Sie das Kontrollk&#228;stchen aus, wenn Sie m&#246;chten, dass ein Discovery-Dienst Resource
+Offering w&#228;hrend dem Liberty-basierten Single Sign-On-Vorgang zu Bootstrapping-Zwecken erstellt wird.</p>
+
+<a name="ggwca"></a><h5>Assertion-Verarbeitung</h5>
+
+<ul><li><p><a href="#ggwdy">Attribut-Mapper</a></p></li>
+<li><p><a href="#ggwcl">Konto-Mapper</a></p></li></ul>
+
+
+<a name="ggwdy"></a><h5>Attribut-Mapper</h5>
+<p>Gibt die Werte an, die die Zuordnungen definieren, die vom standardm&#228;&#223;igen Attribut-Mapper-Plugin
+verwendet werden.  Die standardm&#228;&#223;ige Plugin-Klasse lautet <tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</tt>.</p><p>Zuordnungen sollen in folgendem Format konfiguriert werden:</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>Beispiel: <tt>EmailAddress=mail</tt> oder <tt>Address=postaladdress </tt>. Geben Sie die Zuordnung als neuen Wert ein
+und klicken Sie auf "Hinzuf&#252;gen".</p>
+
+<a name="ggwcl"></a><h5>Konto-Mapper</h5>
+<p>Gibt die Implementierung der <tt>AccountMapper</tt>-Schnittstelle an, die f&#252;r die Zuordnung eines Remote-Benutzerkontos
+zu einem lokalen Benutzerkonto zum Zwecke des Single Sign-On verwendet wird. Der
+Standardwert ist <tt>com.sun.identity.saml2.plugins.DefaultIDPAccountMapper </tt>, die Standardimplementierung.</p>
+
+<a name="ggwyj"></a><h5>Lokale Konfiguration</h5>
+<p>Dieses Attribut enth&#228;lt die f&#252;r die OpenSSO-Instanz spezifische Konfiguration. </p>
+
+<a name="ggwwx"></a><h5>Auth-URL</h5>
+<p>Definiert die Authentifizierungs-URL, zu der der Identity-Anbieter zur Authentifizierung umleitet.</p>
+
+<a name="ghcia"></a><h5>Abmelde-URL f&#252;r externe Anwendungen</h5>
+<p>&#220;ber die Abmelde-URL f&#252;r externe Anwendungen wird die Abmelde-URL f&#252;r eine externe
+Anwendung definiert. Sobald der Server eine Aufforderung zum Abmelden vom Remote-Partner erh&#228;lt,
+wird mittels <tt>HTTP POST</tt> (Back Channel) eine Anforderung mit allen Cookies an die
+Abmelde-URL gesendet. Wahlweise kann eine Benutzer-Sitzungseigenschaft als <tt>HTTP header</tt>- und <tt> POST</tt>-Parameter gesendet werden,
+wenn die URL den Abfrageparameter <tt>appsessionproperty </tt> (auf den Namen der Sitzungseigenschaft gesetzt)
+enth&#228;lt.</p>
+
+<a name="ggwaw"></a><h5>Dienste</h5>
+
+<ul><li><p><a href="#ggwbs">Meta-Alias</a></p></li>
+<li><p><a href="#ggwip">Artifact-Aufl&#246;sungs-Dienst</a></p></li>
+<li><p><a href="#ggwcq">Einzelabmeldungsdienst</a></p></li>
+<li><p><a href="#ggwdm">Dienst f&#252;r Verwaltung von Namens-ID</a></p></li>
+<li><p><a href="#ggwhr">Single Sign-On-Dienst</a></p></li></ul>
+
+
+<a name="ggwbs"></a><h5>Meta-Alias</h5>
+<p>Gibt einen <tt>metaAlias</tt> f&#252;r den zu konfigurierende Anbieter an. Der <tt>metaAlias</tt> wird
+verwendet, um nach dem Entity-Bezeichner des Anbieters und nach dem entsprechenden Unternehmen
+zu suchen. Der Wert ist eine Zeichenfolge, die dem Bereich oder Unternehmensnamen
+(je nachdem, ob das SAML v2-Plugin f&#252;r Verbindungsdienste in OpenSSO installiert ist),
+verbunden mit einem Schr&#228;gstrich und dem Anbieternamen entspricht. Z. B. <tt>/suncorp/travelprovider</tt>.</p>
+<hr><p><b>Achtung &#8211; </b>Die im <tt>metaAlias</tt> verwendeten Namen d&#252;rfen keinen <tt>/</tt> enthalten.</p>
+<hr>
+
+
+<a name="ggwip"></a><h5>Artifact-Aufl&#246;sungs-Dienst</h5>
+<p>Definiert den/die Endpunkt(e), die das Artifact Resolution-Profil unterst&#252;tzen. <tt>Speicherort</tt> gibt den URL
+des Anbieters an, an den die Anforderung gesendet wird. <tt>Index</tt> gibt eine
+eindeutige Ganzzahl f&#252;r den Endpunkt an, sodass auf sie in einer Protokollmeldung
+verwiesen werden kann. </p>
+
+<a name="ggwcq"></a><h5>Einzelabmeldungsdienst</h5>
+<p>Der Einzelabmeldungsdienst synchronisiert die Abmeldefunktion f&#252;r alle von diesem Identity-Anbieter authentifizierten Sitzungen.
+</p><p><tt>Speicherort</tt> gibt den URL des Anbieters an, an den die Anforderung gesendet
+wird. <tt>Antwort-Speicherort</tt> gibt den URL des Anbieters an, an den die Antwort
+gesendet wird. Die Binding-Typen sind:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdm"></a><h5>Dienst f&#252;r Verwaltung von Namens-ID</h5>
+<p>Dieser Dienst definiert URLs, die f&#252;r die Kommunikation mit dem Dienstanbieter verwendet
+werden, um einen neuen Namensbezeichner f&#252;r den Principal anzugeben. (Die Registrierung kann
+erst stattfinden, nachdem eine Verbindungssitzung eingerichtet wurde.)</p><p><tt>Speicherort</tt> gibt den URL des Anbieters an, an den die Anforderung gesendet
+wird. <tt>Antwort-Speicherort</tt> gibt den URL des Anbieters an, an den die Antwort
+gesendet wird. Die Binding-Typen sind:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwhr"></a><h5>Single Sign-On-Dienst</h5>
+<p>Definiert den/die Endpunkt(e), die die Profile des Authentifizierungsanforderungs-Protokolls unterst&#252;tzen. Alle Identity-Anbieter m&#252;ssen
+mindestens einen solchen Endpunkt unterst&#252;tzen. </p><p><tt>Speicherort</tt> gibt den URL des Anbieters an, an den die Anforderung gesendet
+wird. Die Binding-Typen sind:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwli"></a><h5>Erweitert</h5>
+
+<ul><li><p><a href="#ggwjs">IDP-URL</a></p></li>
+<li><p><a href="#ggwix">Anw-Geheimnis-Liste</a></p></li>
+<li><p><a href="#ggwir">IDP-Mapper-Sitzung</a></p></li></ul>
+
+
+<a name="ggwjs"></a><h5>IDP-URL</h5>
+<p>Definiert den URL-Endpunkt bei einem Dienstanbieter, der SAE (Secure Attribute Exchange)-Anforderungen verarbeiten
+kann. </p>
+
+<a name="ggwix"></a><h5>Anw-Geheimnis-Liste</h5>
+<p>Definiert die Anwendungssicherheitskonfiguration. Jede Anwendung muss &#252;ber einen Eintrag verf&#252;gen. Alle Eintr&#228;ge
+weisen das folgende Format auf: </p><p><tt>url=IDPAppURL|type=</tt><i>symmetric_orAsymmetric</i><tt>|secret=</tt><i> ampassword encoded shared secret</i><tt></tt> ODER <tt>or pubkeyalias=</tt><i>idp app signing cert</i><tt></tt></p>
+
+<a name="ggwir"></a><h5>IDP-Mapper-Sitzung</h5>
+<p>Definiert eine Implementierungsklasse f&#252;r das Sitzungs-Mapper-SPI. Der Mapper findet eine g&#252;ltige Sitzung
+aus einer HTTP-Servlet-Anforderung bei dem Identity-Anbieter mit einem ECP-Profil. </p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Create a New Group - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="agentconfig.agentgroupadd"></a><h5>To Create a New Group</h5>
+<p>Create a group if you want agents to inherit specific properties from the
+group. Agents can inherit properties only from their group type. For example, Web
+agents can inherit properties from a web agent group.</p><ol>
+<li><b>Click the Access Control tab.</b></li>
+<li><b>Click the name of the realm to which the group will belong.</b></li>
+<li><b>Click the Agents tab.</b></li>
+<li><b>If necessary, select the tab for the appropriate agent type.</b></li>
+<li><b>In the Group section, click New.</b><p>In the Name field, enter the name for the new group name.</p></li>
+<li><b>For Web agents and J2EE agents only, enter the OpenSSO Server URL.</b><p>For example, <tt>http://OpenSSO_EnterpriseHost.example.com:8080/OpenSSO</tt>.</p></li>
+<li><b>Click Create.</b><p>The Console creates the agent group and displays the agent page again, with
+a link to the group.</p><p>To do additional configuration of the group, click this link to display the
+Edit agent group page.</p><p>The properties you can set to configure a group are the same as
+they are for an individual agent except that the Group, Password, and Password
+Confirm properties are not available at the group level.</p>
+<hr><p><b>Note &#8211; </b>Also, be aware that some group properties already have variable values assigned that
+in most cases should not be changed. The following is one example of
+such a value:</p><pre>@AGENT_PROTO@://@AGENT_HOST@:@AGENT_PORT@/amagent</pre>
+<hr>
+</li></ol>
+<br/>
+
+</body>
+</html>

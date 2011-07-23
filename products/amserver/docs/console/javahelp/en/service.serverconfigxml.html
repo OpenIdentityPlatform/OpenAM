@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Directory Configuration - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serverconfigxml"></a><h4>Directory Configuration</h4>
+<p>The Directory Configuration attributes define basic configuration information for the embedded directory store:</p>
+
+<a name="ggkdy"></a><h5>Directory Configuration</h5>
+<p>The Directory Configuration attributes are:</p>
+
+<a name="ggkeu"></a><h5>Minimum Connection Pool</h5>
+<p>Specifies the minimal size of connection pools to be used for connecting to
+the Directory Server, as specified in the LDAP server attribute. The default is
+1.</p>
+
+<a name="ggkdx"></a><h5>Maximum Connection Pool</h5>
+<p>This attribute specifies the maximum size of connection pools to be used for
+connecting to the Directory Server, as specified in the LDAP server attribute. The
+default is 10.</p>
+
+<a name="ggket"></a><h5>Bind DN</h5>
+<p>Specifies the bind DN in the LDAP server.</p>
+
+<a name="ggkdn"></a><h5>Bind Password</h5>
+<p>Defines the password to be used for binding to the LDAP server. By
+default, the amldapuser password that was entered during installation is used as the
+bind user.</p>
+
+<a name="ghama"></a><h5>Server</h5>
+<p>This attribute defines the directory server that will serve as the configuration data
+store for the OpenSSO instance. To add a configuration server, click the Add
+button, and provide values for the following attributes:</p><dl><dt>Name</dt>
+<dd><p>Enter a name for the server.</p></dd>
+<dt>Host Name</dt>
+<dd><p>Specifies fully-qualified host name of the Directory Server. For example:</p><p><tt></tt><i>DirectoryServerHost.domainName</i><tt>.com</tt></p></dd>
+<dt>Port Number</dt>
+<dd><p>Specifies the Directory Server port number .</p></dd>
+<dt>Connection Type</dt>
+<dd><p>Defines the connection type for the Directory Server. By default, SIMPLE is selected. You can also choose SSL.</p></dd>
+</dl>
+
+
+<a name="ggkdu"></a><h5>Legacy Configuration</h5>
+<p>The following attribute define basic directory-server configurations for Legacy mode instances of OpenSSO.
+These attributes will only appear in a Legacy mode installation.</p>
+
+<a name="ggkej"></a><h5>Minimum Connection Pool</h5>
+<p>Specifies the minimal size of connection pools to be used for connecting to
+the Directory Server, as specified in the LDAP server attribute. The default is
+1.</p>
+
+<a name="ggkdw"></a><h5>Maximum Connection Pool</h5>
+<p>This attribute specifies the maximum size of connection pools to be used for
+connecting to the Directory Server, as specified in the LDAP server attribute. The
+default is 10.</p>
+
+<a name="ggkey"></a><h5>Server</h5>
+<p>This attribute lists the load balancer protocol, host name, and port. For example:
+<tt>http://lb.example.com:80</tt>.</p>
+<br/>
+
+</body>
+</html>

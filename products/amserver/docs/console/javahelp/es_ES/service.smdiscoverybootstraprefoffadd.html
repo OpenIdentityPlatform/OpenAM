@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para configurar una oferta de recursos para Bootstrapping - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.smdiscoverybootstraprefoffadd"></a><h5>Para configurar una oferta de recursos para Bootstrapping</h5>
+<a name="indexterm-146"></a><a name="indexterm-147"></a><p>S&#243;lo est&#225; permitida una oferta de recursos para bootstrapping; de forma predeterminada,
+esta oferta contiene informaci&#243;n relacionada con el Servicio de detecci&#243;n. Si ya
+se ha definido una oferta de recursos, puede modificar los atributos haciendo
+clic en su nombre. Tambi&#233;n puede seleccionar la casilla situada al lado
+del nombre y eliminar la oferta de recursos existente. Para configurar una
+nueva oferta de recursos, deber&#237;a hacer clic en Nuevo.</p><ol>
+<li><b>Haga clic en &#8220;Nuevo&#8221; (New) para mostrar los nuevos atributos del asignador
+o seleccione el nombre de un asignador configurado para modificarlo.</b></li>
+<li><b>Escriba una descripci&#243;n opcional para la oferta de recursos.</b></li>
+<li><b>Proporcione los valores de los atributos de la instancia del servicio seg&#250;n
+la siguiente informaci&#243;n:</b><dl><dt>Tipo de servicio</dt>
+<dd><p>Este atributo toma como valor un URI que define el tipo de servicio que implementa la oferta de recursos. Por ejemplo, <tt><b> urn:liberty:disco:2003-08</b></tt>.</p>
+<hr><p><b>Nota &#8211; </b>Se recomienda que este URI sea el mismo que el URI de <tt>targetNamespace</tt> de la descripci&#243;n WSDL abstracta para el servicio.</p>
+<hr>
+</dd>
+<dt>Provider ID</dt>
+<dd><p>Este atributo toma como valor un URI del proveedor de la instancia de servicios. Por ejemplo, <tt><b>http://daiquiri.sun.com:80/amserver/Liberty/disco </b></tt>.</p></dd>
+<dt>Descripci&#243;n del servicio</dt>
+<dd><p>Estos atributos definen un servicio Web que se est&#225; ejecutando en un punto final de protocolo distinto. La informaci&#243;n sobre las instancias de servicio debe comunicarse en distintos contextos. Por ejemplo, el Servicio de detecci&#243;n definido en esta especificaci&#243;n es un servicio de identidades que proporciona una enumeraci&#243;n de las ofertas de recursos (cada una de las cuales incluye una descripci&#243;n de la instancia de servicio). Consulte <a href="service.smdiscoverydescriptionadd.html">Para configurar una descripci&#243;n de servicio</a>.</p></dd>
+</dl>
+</li>
+<li><b>Proporcione los valores de los atributos de opciones de ofertas de recursos
+seg&#250;n la siguiente informaci&#243;n:</b><dl><dt>Opciones</dt>
+<dd><p>Marque esta casilla si el servicio no tiene opciones disponibles para la oferta de recursos. Las opciones proporcionan indicaciones a un solicitante potencial sobre si determinados datos u operaciones pueden estar disponibles con una oferta concreta de recursos. Por ejemplo, se puede proporcionar una opci&#243;n que indique que hay disponible informaci&#243;n de contacto personal.</p></dd>
+<dt>Lista de opciones</dt>
+<dd><p>Este atributo contiene una lista de las opciones para la instancia del servicio. La opci&#243;n se define como un URI. El conjunto de posibles URI est&#225; normalmente estandarizado por el tipo de servicio.</p></dd>
+</dl>
+</li>
+<li><b>Habilita las directivas en funci&#243;n de la siguiente informaci&#243;n:</b><dl><dt>Referencias de Id. de descripci&#243;n para: GenerateBearerToken</dt>
+<dd><p>Todas las <a href="supporteddirectives.html">Directivas admitidas</a> pueden incluir una referencia descriptiva. Si el atributo de referencias de ID no est&#225; habilitado para una directiva, &#233;sta se aplicar&#225; a todos los mecanismos de autenticaci&#243;n proporcionados en la oferta de recursos. Si el atributo de referencias de ID est&#225; habilitado para una directiva, DEBE incluir una lista de referencias de ID que se&#241;ale el mecanismo de autenticaci&#243;n al que est&#225; asociada la directiva. Si el atributo est&#225; presente, la directiva s&#243;lo DEBE aplicarse a aquellas descripciones a las que se hace referencia en la lista de referencias de ID. Esto puede ser &#250;til si algunas directivas son incompatibles con algunos mecanismos de seguridad.</p></dd>
+<dt>Referencias de Id. de descripci&#243;n para: Autenticar solicitante</dt>
+<dd><p>Todas las <a href="supporteddirectives.html">Directivas admitidas</a> pueden incluir una referencia descriptiva. Si el atributo de referencias de ID no est&#225; habilitado para una directiva, &#233;sta se aplicar&#225; a todos los mecanismos de autenticaci&#243;n proporcionados en la oferta de recursos. Si el atributo de referencias de ID est&#225; habilitado para una directiva, DEBE incluir una lista de referencias de ID que se&#241;ale el mecanismo de autenticaci&#243;n al que est&#225; asociada la directiva. Si el atributo est&#225; presente, la directiva s&#243;lo DEBE aplicarse a aquellas descripciones a las que se hace referencia en la lista de referencias de ID. Esto puede ser &#250;til si algunas directivas son incompatibles con algunos mecanismos de seguridad.</p></dd>
+<dt>Referencias de Id. de descripci&#243;n para: Cifrar Id. de recurso</dt>
+<dd><p>Todas las <a href="supporteddirectives.html">Directivas admitidas</a> pueden incluir una referencia descriptiva. Si el atributo de referencias de ID no est&#225; habilitado para una directiva, &#233;sta se aplicar&#225; a todos los mecanismos de autenticaci&#243;n proporcionados en la oferta de recursos. Si el atributo de referencias de ID est&#225; habilitado para una directiva, DEBE incluir una lista de referencias de ID que se&#241;ale el mecanismo de autenticaci&#243;n al que est&#225; asociada la directiva. Si el atributo est&#225; presente, la directiva s&#243;lo DEBE aplicarse a aquellas descripciones a las que se hace referencia en la lista de referencias de ID. Esto puede ser &#250;til si algunas directivas son incompatibles con algunos mecanismos de seguridad.</p></dd>
+<dt>Referencias de Id. de descripci&#243;n para: AuthenticateSessionContext</dt>
+<dd><p>Todas las <a href="supporteddirectives.html">Directivas admitidas</a> pueden incluir una referencia descriptiva. Si el atributo de referencias de ID no est&#225; habilitado para una directiva, &#233;sta se aplicar&#225; a todos los mecanismos de autenticaci&#243;n proporcionados en la oferta de recursos. Si el atributo de referencias de ID est&#225; habilitado para una directiva, DEBE incluir una lista de referencias de ID que se&#241;ale el mecanismo de autenticaci&#243;n al que est&#225; asociada la directiva. Si el atributo est&#225; presente, la directiva s&#243;lo DEBE aplicarse a aquellas descripciones a las que se hace referencia en la lista de referencias de ID. Esto puede ser &#250;til si algunas directivas son incompatibles con algunos mecanismos de seguridad.</p></dd>
+<dt>Referencias de Id. de descripci&#243;n para: Autorizar solicitante</dt>
+<dd><p>Todas las <a href="supporteddirectives.html">Directivas admitidas</a> pueden incluir una referencia descriptiva. Si el atributo de referencias de ID no est&#225; habilitado para una directiva, &#233;sta se aplicar&#225; a todos los mecanismos de autenticaci&#243;n proporcionados en la oferta de recursos. Si el atributo de referencias de ID est&#225; habilitado para una directiva, DEBE incluir una lista de referencias de ID que se&#241;ale el mecanismo de autenticaci&#243;n al que est&#225; asociada la directiva. Si el atributo est&#225; presente, la directiva s&#243;lo DEBE aplicarse a aquellas descripciones a las que se hace referencia en la lista de referencias de ID. Esto puede ser &#250;til si algunas directivas son incompatibles con algunos mecanismos de seguridad.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Guardar para completar la configuraci&#243;n.</b></li>
+<li><b>Haga clic en Guardar en la p&#225;gina del Servicio de detecci&#243;n para
+completar la configuraci&#243;n del servicio.</b></li></ol>
+<br/>
+
+</body>
+</html>

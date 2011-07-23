@@ -1,0 +1,1462 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-utils,v 1.6 2008/08/19 19:08:32 veiming Exp $
+#
+#
+
+#===============================================================================
+# amtune Functions
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+# Function      :   getSystemMemory
+# Parameters    :   -None-
+# Output        :   Returns memory (RAM) available in MB in a Solaris system
+# Description   :   This function returns memory available in Megabytes in a Solaris
+#                   box as reported by prtconf command
+#-------------------------------------------------------------------------------
+getSystemMemory() {
+    if [ "$OSTYPE" = "Linux" ]; then
+        lin_mem_in_bytes=`$GREP "MemTotal:" /proc/meminfo | $AWK '{print $2}'`
+        $ECHO " scale=0; $lin_mem_in_bytes / 1024 " | $BC
+    elif [ "$OSTYPE" = "HP-UX" ]; then
+        # hpux-dev : We will get this in terms of MB
+        memory=`echo "selclass qualifier memory;info;wait;infolog" | /usr/sbin/cstm | grep "System Total" | cut -f2 -d:`
+        echo $memory
+    else
+        /usr/sbin/prtconf | $GREP Mem | $AWK '{print $3}'
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   getNumberOfCPUS
+# Parameters    :   -None-
+# Output        :   Returns number of "on-line" CPUs in a Solaris system   
+# Description   :   This function returns the number of on-line CPUs in a Solaris
+#                   box as reported by psrinfo command
+#-------------------------------------------------------------------------------
+getNumberOfCPUS() {
+
+    MIN_NUM_CPU=1
+    DIV_NUM_CPU=4
+
+    if [ "$OSTYPE" = "Linux" ]; then
+        $GREP processor /proc/cpuinfo | $WC -l
+    elif [ "$OSTYPE" = "HP-UX" ]; then
+        #hpux-dev : Added this condition
+        num_cpu=`echo "selclass qualifier cpu;info;wait;infolog" | /usr/sbin/cstm  | grep "Processor Number" | wc -l`
+        echo $num_cpu
+    else
+        num_cpu=`/usr/sbin/psrinfo | $GREP -i "on-line" | $WC -l`
+        # if this box is Niagara, divide the number of CPU by 4
+        if [ "$HWPLATFORM" = "Sun-Fire-T" ]; then
+            if [ $num_cpu -ge $DIV_NUM_CPU ]; then
+               $ECHO `expr $num_cpu / $DIV_NUM_CPU`
+            else
+               $ECHO $MIN_NUM_CPU
+            fi
+        else
+            $ECHO $num_cpu
+        fi
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   removeDecimals
+# Parameters    :   1. number input (most likely with decimals)
+# Output        :   Returns a whole number stripping out decimals
+# Description   :   This function returns a whole number stripping out decimals
+#                   from the input number. The call does not round the input 
+#                   values
+#-------------------------------------------------------------------------------
+removeDecimals() {
+value=$1
+
+z=`$ECHO "
+scale=0
+$value/1
+" | $BC`
+$ECHO $z
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   roundOf
+# Parameters    :   1. number input (with or without decimals)
+#                   2. roundoff - How many digits from the right to round of
+# Output        :   Returns a rounded off number 
+# Description   :   This function returns a rounded off number derived from
+#                   the input number. 
+#                   - Round off works on both numbers with decimals
+#                   and numbers without decimals. 
+#                   - Rounds off numbers to the position passed in as the second
+#                   parameter
+#                   - If you would like to round off only the left of the decimal,
+#                   then you will need to call removeDecimals first and then call
+#                   roundOf.
+#-------------------------------------------------------------------------------
+roundOf() {
+value=$1
+roundoff=$2
+
+z=`$ECHO "
+a=length ( $value )
+if ( a > $roundoff ) {
+    scale=scale( $value)
+    ($value / 10 ^ $roundoff) * (10 ^ $roundoff)
+}" | $BC`
+$ECHO $z
+}
+
+#-------------------------------------------------------------------------------
+# Function      : test_bc_dc
+# Description   : Just some testing routine...
+#-------------------------------------------------------------------------------
+test_bc_dc() {
+$ECHO "bc/dc command testing..."
+x=`$ECHO 'scale=0; 104348/33215' | $BC`
+$ECHO "1:" $x
+y=`$ECHO "length ( $x ) " | $BC`
+$ECHO "Length of 1:" $y
+z=`$ECHO "scale ( $x ) " | $BC`
+$ECHO "Scale of 1:" $z
+
+x=`$ECHO 'scale=10; 104348/33215*1000000' | $BC`
+$ECHO "2:" $x
+y=`$ECHO "length ( $x ) " | $BC`
+$ECHO "Length of 2:" $y
+z=`$ECHO "scale ( $x ) " | $BC`
+$ECHO "Scale of 2:" $z
+i=`roundOf $x 4`
+$ECHO "RoundOff:" $i
+
+x=`printf "%s" '1000' `
+$ECHO "3:" $x
+y=`$ECHO "length ( $x ) " | $BC`
+$ECHO "Length of 3:" $y
+z=`$ECHO "scale ( $x ) " | $BC`
+$ECHO "Scale of 3:" $z
+
+x=`printf "%s\n" 'scale = 10; 104348/33215'  | $BC`
+$ECHO "4:" $x
+y=`$ECHO "length ( $x ) " | $BC`
+$ECHO "Length of 4:" $y
+z=`$ECHO "scale ( $x ) " | $BC`
+$ECHO "Scale of 4:" $z
+i=`roundOf $x 4`
+$ECHO "RoundOff:" $i
+
+x=`$ECHO "
+scale=0
+104348*1000000/33215
+" | $BC`
+$ECHO "5:" $x
+y=`$ECHO "length ( $x ) " | $BC`
+$ECHO "Length of 5:" $y
+z=`$ECHO "scale ( $x ) " | $BC`
+$ECHO "Scale of 5:" $z
+i=`roundOf $x 3`
+$ECHO "RoundOff:" $i
+
+x=`printf "%s\n" 'scale = 0; 100/100'  | $BC`
+$ECHO "6:" $x
+y=`$ECHO "length ( $x ) " | $BC`
+$ECHO "Length of 6:" $y
+z=`$ECHO "scale ( $x ) " | $BC`
+$ECHO "Scale of 6:" $z
+
+$ECHO "
+scale = 20
+define e(x){
+auto a, b, c, i, s
+a = 1
+b = 1
+s = 1
+for(i=1; 1==1; i++){
+a = a*x
+b = b*i
+c = a/b
+if(c == 0) return(s)
+s = s+c
+}
+}
+for (i = 1; i <= 10; ++i) { e(i) }
+" | $BC
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   ECHO_MESG
+# Parameters    :   Message
+# Output        :   Display the output on terminal and/or debug log file
+# Description   :   if AMTUNE_LOG_LEVEL = NONE, the output is not displayed or logged in the debug file
+#                   if AMTUNE_LOG_LEVEL = TERM, the output is displayed on the terminal
+#                   if AMTUNE_LOG_LEVEL = FILE, the output is displayed on the terminal and logged in the debug file    
+#-------------------------------------------------------------------------------
+ECHO_MSG()
+{
+    output_msg1=$1
+    output_msg2=$2
+
+    output_msg="$output_msg1 $output_msg2"
+   
+    $ECHO "$output_msg" | eval $OUTPUT_TYPE
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   setLogOutput
+# Parameters    :   Log directory
+# Output        :   -None-
+# Description   :   Determinate the device type to display the output.
+#-------------------------------------------------------------------------------
+setLogOutput() 
+{
+
+    log_dir=$1
+
+    if [ "$AMTUNE_LOG_LEVEL" = "NONE" ]; then
+        OUTPUT_TYPE="tee -a /dev/null > /dev/null"
+        $ECHO `$gettext "Current setting: "` "AMTUNE_MODE=$AMTUNE_MODE and AMTUNE_LOG_LEVEL=$AMTUNE_LOG_LEVEL"
+        if [ "$AMTUNE_MODE" = "REVIEW" ]; then
+           $ECHO "AMTUNE_LOG_LEVEL" `$gettext "should be "` "TERM or FILE in REVIEW mode." `$gettext "Cannot proceed."`
+           exit 1
+        else
+           $ECHO `$gettext "No output will be displayed."`
+        fi
+    elif [ "$AMTUNE_LOG_LEVEL" = "TERM" ]; then
+        OUTPUT_TYPE="tee -a /dev/null"
+    elif [ "$AMTUNE_LOG_LEVEL" = "FILE" ]; then
+        DEBUG_FILE=$AMTUNE_DEBUG_FILE_PREFIX-`$DATE +'%Y%m%d'`-$$
+
+        if [ "$log_dir" != "" ]; then
+           if [ -d $log_dir ]; then
+              DEBUG_FILE=$log_dir/$AMTUNE_DEBUG_FILE_PREFIX-`$DATE +'%Y%m%d'`-$$
+           fi
+        fi
+        #Make sure you can write to the debug file
+        $TOUCH $DEBUG_FILE 1> /dev/null 2>&1
+        if [ $? -eq 1 ]; then
+           $ECHO `$gettext "Cannot create amtune debug file. "` `$gettext "Cannot proceed."`
+           $ECHO `$gettext "Debug file location: "` "$DEBUG_FILE"
+           exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+        OUTPUT_TYPE="tee -a $DEBUG_FILE"
+
+        $ECHO `$gettext "Debug information log can be found in file: "` "$DEBUG_FILE"
+    else
+        $ECHO `$gettext "ERROR: Invalid "` "AMTUNE_LOG_LEVEL: $AMTUNE_LOG_LEVEL." `$gettext "Cannot proceed."`
+        exit 1
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   checkJDKVersion
+# Parameters    :   JDK version to be checked
+#                   Sign to compare (optional).  Default is >=              
+# Output        :   1 if the comparison is true; else is 0
+# Description   :   Retrieve JDK version configured with WS and compared to version to be checked
+#-------------------------------------------------------------------------------
+checkJDKVersion() {
+    checkVersion=$1
+    sign=$2
+  
+    if [ "$sign" = "" ]; then
+        sign=">="
+    fi
+
+    version_temp_file=/tmp/amtune_java_version.txt
+    javaHome=`getWebContainerJavaHome`
+    $javaHome/bin/java -version 1> $version_temp_file 2>&1
+    if [ $? -eq 0 ]; then
+        javaVersion=`$CAT $version_temp_file | $GREP -i "java version" | $AWK -F" " '{ print $3 }' | $SED -e 's/"//g' | $CUT -c1-3`
+        result=`$ECHO "scale=1; 
+if ( $javaVersion $sign $checkVersion ) {
+1
+} " | $BC`
+    fi
+
+    if [ "$result" = "" ]; then
+        result=0
+    fi
+    $RM $version_temp_file 
+    $ECHO $result
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   getWebContainerJavaHome
+# Parameters    :   -None-
+# Output        :   Java JDK location that is used by WS or AS
+# Description   :   Return the java JDK location that is configured and used by WS or AS
+#-------------------------------------------------------------------------------
+getWebContainerJavaHome()
+{
+
+   if [ "$WEB_CONTAINER" = "WS7" ] || [ "$WEB_CONTAINER" = "" ]; then
+        config_file=$CONTAINER_INSTANCE_DIR/config/server.xml
+        if [ ! -f $config_file ]; then
+            $ECHO `$gettext "Web Server configuration file "` "$config_file" `$gettext "not found.\n  Cannot retrieve "` "JAVA_HOME."
+            exit 1
+        fi
+        wc_java_home=`getXMLElementValue $config_file 'java-home'`
+   elif [ "$WEB_CONTAINER" = "WS61" ]; then
+        config_file=$CONTAINER_INSTANCE_DIR/config/server.xml
+        if [ ! -f $config_file ]; then
+            $ECHO `$gettext "Web Server 6.1 configuration file "` "$config_file" `$gettext "not found.\n  Cannot retrieve "` "JAVA_HOME."
+            exit 1
+        fi
+        wc_java_home=`get_token_in_line $config_file 'javahome' 'javahome'`
+   elif [ "$WEB_CONTAINER" = "AS8" ] || [ "$WEB_CONTAINER" = "AS91" ]; then 
+        config_file=$ASADMIN_DIR/config/asenv.conf
+        if [ ! -f $config_file ]; then
+            $ECHO `$gettext "Application Server configuration file "` "$config_file" `$gettext "not found.\n  Cannot retrieve "` "JAVA_HOME."
+            exit 1
+        fi
+        wc_java_home=`getEntry 'AS_JAVA=' $config_file | $SED -e 's/"//g'`
+   fi
+   $ECHO $wc_java_home
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   checkWebContainer64BitEnabled
+# Parameters    :   -None-
+# Output        :   1 if web container is running with 64-bit JVM
+#                   0 if web container is running with 32-bit JVM
+#                   2 if can't be determined
+# Description   :   Check and return the status if web container is running with 64-bit JVM or not
+#-------------------------------------------------------------------------------
+checkWebContainer64BitEnabled() {
+
+   if [ -f $WSADMIN_PASSFILE ]; then
+        $RM $WSADMIN_PASSFILE
+   fi
+
+   if [ "$AMTUNE_SCRIPT_TYPE" = "ds" ] || [ "$AMTUNE_SCRIPT_TYPE" = "os" ]; then
+        return 1
+   fi
+
+   if [ "$WEB_CONTAINER" = "WS7" ] || [ "$WEB_CONTAINER" = "" ]; then
+
+        ECHO_MSG "`$gettext 'Checking Web Server JVM mode (32-bit or 64-bit) for web server 7...'`"
+
+        if [ ! -f "$WSADMIN" ]; then
+            ECHO_MSG "`$gettext 'Web server or the CLI tool (wadm) not found on your system. '` `$gettext 'Cannot proceed.'`"
+            ECHO_MSG "`$gettext 'Please check the web server installation directory defined in parameter '`WSADMIN_DIR"
+            ECHO_MSG "`$gettext 'Current WSADMIN_DIR setting is $WSADMIN_DIR and WSADMIN is $WSADMIN'`"
+            ECHO_MSG "`$gettext 'You may need to customize the following file appropriately: '`amtune-env"
+            return 100
+        elif [ "$WSADMIN_PASSWORD" = "" ]; then
+            ECHO_MSG "`$gettext 'Cannot verify web server JVM mode because web server admin password is not found.'`"
+            ECHO_MSG "`$gettext 'If the Web Server is running in 64-bit mode, please run the script with'`"
+            ECHO_MSG "`$gettext 'web server admin password to tune the server in 64-bit environment.'`"
+            return 2
+        else
+           $ECHO "$WSADMIN_PASSWORD_SYNTAX$WSADMIN_PASSWORD" > $WSADMIN_PASSFILE
+           if [ `$WSADMIN get-config-prop $WSADMIN_COMMON_PARAMS platform | $GREP "64" | wc -l` -eq 1 ]; then
+                return 0
+           else
+                return 1
+           fi
+        fi
+   elif [ "$WEB_CONTAINER" = "WS61" ]; then
+
+        ECHO_MSG "`$gettext 'Checking Web Server JVM mode (32-bit or 64-bit) for web server 6.1...'`"
+        ws61_log=$CONTAINER_INSTANCE_DIR/logs/errors
+        if [ ! -f "$ws61_log" ]; then
+           $ECHO `$gettext "ERROR: Web server log "` "$ws61_log" `$gettext "not found"`
+           return 100
+        fi
+
+        if [ `$CAT $ws61_log | $GREP "64-Bit Server VM" | $WC -l` -gt 0 ]; then
+           return 0
+        else 
+           return 1
+        fi
+
+   else
+        return 1
+   fi
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   displayJVM64bitMessage
+# Parameters    :   -None-
+# Output        :   -None-
+# Description   :   Display the message to recommend the user to customize the parameter
+#                   in amtune-env for JVM 64-bit.
+#-------------------------------------------------------------------------------
+displayJVM64bitMessage()
+{
+
+    calculatedMaxHeapSize=$1
+    calculatedMinHeapSize=$2
+    $ECHO `$gettext "Recommended Value    : The Web Container's JVM on your system supports 64-bit data model with "`
+    $ECHO "                     : ${memToUse}" `$gettext "MB memory available to use."`
+    $ECHO "                     : " `$gettext "We recommend you modify a parameter, "` "AMTUNE_MEM_MAX_HEAP_SIZE_RATIO, in amtune-env"
+    $ECHO "                     : " `$gettext "that is used to calculate the Max Heap and Min Heap sizes."`
+    $ECHO "                     : " `$gettext "Please make sure this ratio is not set too high if the available physical memory"`
+    $ECHO "                     : " `$gettext "is very large - i.e., if the available physical memory is a big multiple of 32-bit"`
+    $ECHO "                     : " `$gettext "JVM memory limit, 4 GB."`
+    $ECHO
+    $ECHO "                     : " `$gettext "The current setting for Max Heap size ratio is:"`
+    $ECHO "                     :       AMTUNE_MEM_MAX_HEAP_SIZE_RATIO=$AMTUNE_MEM_MAX_HEAP_SIZE_RATIO"
+    # Currently Max Heap Size and Min Heap Size are the same so we don't use a parameter below
+    # $ECHO "                   :       AMTUNE_MEM_MIN_HEAP_SIZE_RATIO=$AMTUNE_MEM_MIN_HEAP_SIZE_RATIO"
+    $ECHO "                     : " `$gettext "The current JVM Max Heap and Min Heap sizes calculated from the above ratio are:"`
+    $ECHO "                     :       Min Heap: ${calculatedMaxHeapSize} Max Heap: ${calculatedMinHeapSize}"
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   backupConfigFile
+# Parameters    :   configuration file, backup directory (optional).  Default
+#                   is current directory
+# Output        :   <none>
+# Description   :   Backup an existing configuration file 
+#-------------------------------------------------------------------------------
+backupConfigFile()
+{
+    configFile=$1
+    backupDir=$2
+
+    if [ "$configFile" = "" ] || 
+       [ ! -f "$configFile" ]; then
+       $ECHO `$gettext "ERROR: Configuration file missing : "` "$configFile"
+       exit
+    fi
+
+    if [ "$backupDir" != "" ] && 
+       [ ! -d "$backupDir" ]; then
+       $MKDIR $backupDir
+    fi
+ 
+    # Backup the file if it already exists. 
+    base_file_name=`$BASENAME $configFile`
+    if [ "$backupDir" = "" ]; then
+       dir_name=`$DIRNAME $configFile`
+    else
+       dir_name=$backupDir
+    fi
+    backup_file_name=$dir_name/$base_file_name-orig-$$
+    $ECHO `$gettext "Backup file "` "$configFile to $backup_file_name"
+    $ECHO
+    $CP $configFile $backup_file_name
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   webContainerToTune
+# Parameters    :   -None-
+# Output        :   Sets a variable WC_CONFIG 
+# Description   :   Identifies what container the identity is installed on and
+#                   returns the script name to run for tuning the container
+#-------------------------------------------------------------------------------
+webContainerToTune()
+{
+    if [ "$WEB_CONTAINER" = "WS7" ]; then
+        WC_CONFIG=./amtune-ws7
+    elif [ "$WEB_CONTAINER" = "WS61" ]; then
+        WC_CONFIG=./amtune-ws61
+    elif [ "$WEB_CONTAINER" = "AS7" ]; then
+        WC_CONFIG=./amtune-as7
+    elif [ "$WEB_CONTAINER" = "AS8" ]; then
+        WC_CONFIG=./amtune-as8
+    elif [ "$WEB_CONTAINER" = "AS91" ]; then
+        WC_CONFIG=./amtune-as91
+    else
+        WC_CONFIG=
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   getEntry
+# Parameters    :   1. Entry to fetch
+# Output        :   Returns the the config entry value read from AMConfig.properties
+# Description   :   This function reads a configuration entry from AMConfig.properties
+#-------------------------------------------------------------------------------
+getEntry() {
+    property=$1
+    file=$2
+
+    if [ "$property" = "" ]; then
+        return
+    fi
+
+    if [ "$file" = "" ] || [ ! -f $file ]; then
+        return
+    fi
+
+    propStr=`$GREP $property $file`
+    if [ "$propStr" = "" ]; then
+        return
+    fi
+
+    $ECHO $propStr | $CUT -f2- -d"="
+    return
+}
+#-------------------------------------------------------------------------------
+# Function      :   getAMVersion, getFAMVersion
+# Parameters    :   None
+# Output        :   Returns the version string of OpenSSO to be tuned.
+# Description   :   This function runs amadmin to get the version string for 
+#               :   AM 6.x and AM 7.x and famadm for FAM 8.x or later. 
+#-------------------------------------------------------------------------------
+
+getAMVersion() {
+
+    $ECHO `$ADMIN_CLIENT --version`
+
+}
+
+getFAMVersion() {
+
+    $ECHO `$FAMADM --version`
+
+}
+#-------------------------------------------------------------------------------
+# Function      :   getConfigEntry
+# Parameters    :   1. Config Entry to fetch
+# Output        :   Returns the the config entry value read from AMConfig.properties
+# Description   :   This function reads a configuration entry from AMConfig.properties
+#-------------------------------------------------------------------------------
+getConfigEntry() {
+    # Dont have to check for existence of AMConfig. Its already being done in amtune-env
+    property=$1
+    if [ "$property" = "" ]; then
+        return
+    fi
+    
+    setAMConfigPropertyFile
+
+    propStr=`$GREP $property $AMCONFIG_PROPERTY_FILE`
+    if [ "$propStr" = "" ]; then
+        return
+    fi
+
+    $ECHO $propStr | $CUT -f2- -d"="
+    return
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   setAMConfigPropertyFile
+# Parameters    :   <none>
+# Output        :   Returns the AMConfig.properties file name
+#                   AMConfig.properties coule be instance specific
+# Description   :
+#-------------------------------------------------------------------------------
+setAMConfigPropertyFile() {
+
+    if [ "$IS_INSTANCE_NAME" != "" ]; then
+        AMCONFIG_PROPERTY_FILE=$IS_CONFIG_DIR/AMConfig-$IS_INSTANCE_NAME.properties
+    elif [ "$WEB_CONTAINER_INSTANCE_NAME" != "" ]; then
+        AMCONFIG_PROPERTY_FILE=$IS_CONFIG_DIR/AMConfig-$WEB_CONTAINER_INSTANCE_NAME.properties
+    fi
+
+    if [ ! -f $AMCONFIG_PROPERTY_FILE ]; then
+        AMCONFIG_PROPERTY_FILE=$IS_CONFIG_DIR/AMConfig.properties
+    fi
+
+}
+
+getMagnusEntry() {
+    entry_file=$1
+    entry_key=$2
+   
+    entry_value=`$GREP -i "$entry_key " $entry_file`
+    if [ "$entry_value" = "" ]; then
+        $ECHO "<No value set>"
+        return
+    fi
+
+    $ECHO $entry_value | $AWK '{print $2}'
+    return
+}
+
+getServerXMLJVMOptionEntry() {
+    entry_file=$1
+    entry_key='\'$2
+    jvmoption_key=$3
+
+    if [ "$jvmoption_key" = "" ]; then
+        jvmoption_key="JVMOPTIONS"
+    fi
+    
+    entry_value=`$GREP -i $jvmoption_key $entry_file | $GREP -i "$entry_key"`
+    if [ "$entry_value" = "" ]; then
+        $ECHO "<No value set>"
+        return
+    fi
+
+    $ECHO $entry_value | $NAWK 'BEGIN { FS= ">" } {print $2}' | $NAWK 'BEGIN { FS="<" } {print $1}'
+    return
+}
+
+getXMLElementValue() {
+    xml_file=$1
+    xml_tag=$2
+
+    if [ "$xml_tag" = "" ]; then
+        $ECHO `$gettext "ERROR: Search XML tag not found in "` "getXMLNodeValue"
+        exit 1
+    fi
+
+    entry_value=`$GREP -i $xml_tag $xml_file`
+    if [ "$entry_value" = "" ]; then
+        $ECHO "<No value set>"
+        return
+    fi
+
+    $ECHO $entry_value | $NAWK 'BEGIN { FS= ">" } {print $2}' | $NAWK 'BEGIN { FS="<" } {print $1}'
+    return
+}
+
+get_token_in_line(){
+    file=$1
+    match=$2
+    token=$3
+    option_type=$4
+    file_or_stream=$5
+    field_separator=$6
+    nvp_separator=$7
+
+    if [ "$field_separator" = "" ]; then
+        field_separator=" "
+    fi
+
+    if [ "$option_type" = "" ]; then
+        option_type="nvp_quoted"
+    fi
+
+    if [ "$nvp_separator" = "" ]; then
+        nvp_separator="="
+    fi
+
+    if [ "$file_or_stream" = "" ] || [ "$file_or_stream" = "file" ]; then
+        if [ ! -f $file ]; then
+            #file does not exists. So just return silently
+            return
+        fi
+        #step1: get the line in the file
+        orig_line=`$GREP $match $file`
+    else
+        #step1: get the line in the stream
+        orig_line=`$ECHO $file | $GREP '\'$match`
+        orig_line=$file
+    fi
+
+    if [ "$orig_line" = "" ]; then
+        $ECHO "<No value set>"
+        return
+    fi
+
+    #step2: Get the number of tokens in the line
+
+    if [ "$field_separator" = " " ]; then
+         if [ "$OSTYPE" = "HP-UX" ]; then
+             number_of_tokens=`$ECHO $orig_line | $XARGS | $NAWK ' { print NF } '`
+         else 
+        number_of_tokens=`$ECHO $orig_line | $NAWK ' { print NF } '`
+         fi
+    else
+         if [ "$OSTYPE" = "HP-UX" ]; then
+             number_of_tokens=`$ECHO $orig_line | $XARGS | $NAWK ' BEGIN { FS='\"$field_separator\"' } { print NF } '`
+    else
+        number_of_tokens=`$ECHO $orig_line | $NAWK ' BEGIN { FS='\"$field_separator\"' } { print NF } '`
+    fi
+    fi
+    #step3: Get the value for the token
+    count=1
+    newline=""
+    while [ $count -le $number_of_tokens ]
+    do
+        currentToken=`$ECHO $orig_line | $CUT -f$count -d "$field_separator"`
+
+        abc1=`$ECHO $currentToken | $CUT -f$count -d "$field_separator"` 
+
+        desiredTokenStr=`$ECHO $currentToken | $CUT -f$count -d "$field_separator" | $GREP '\'$token`
+        if [ "$desiredTokenStr" != "" ]; then
+            if [ "$option_type" = "flag" ]; then
+                desiredTokenValue=$desiredTokenStr
+            else
+                desiredTokenValue=`$ECHO $desiredTokenStr | $AWK ' BEGIN { FS='\"$nvp_separator\"' } { print $2 } '`
+            fi
+
+            if [ "$option_type" = "nvp_quoted" ]; then
+                    desiredTokenValue=`$ECHO $desiredTokenValue | $CUT -f2 -d "\""`
+            fi
+
+
+            if [ "$desiredTokenValue" = "" ]; then
+                $ECHO "<Empty Value>"
+            else
+                $ECHO $desiredTokenValue
+            fi
+            return
+       fi
+       count=`expr $count + 1`
+    done
+    $ECHO "<No value set>"
+    return
+}
+
+#-------------------------------------------------------------------------------
+# Function      :   setServerConfigXMLFile
+# Parameters    :   <none>
+# Output        :   Returns the serverconfig.xml file name
+#                   Currently, serverconfig.xml file could be instance specific
+# Description   :
+#-------------------------------------------------------------------------------
+setServerConfigXMLFile() {
+
+    if [ "$IS_INSTANCE_NAME" != "" ]; then
+        SERVERCONFIG_XML_FILE=$IS_CONFIG_DIR/serverconfig-$IS_INSTANCE_NAME.xml
+    elif [ "$WEB_CONTAINER_INSTANCE_NAME" != "" ]; then
+        SERVERCONFIG_XML_FILE=$IS_CONFIG_DIR/serverconfig-$WEB_CONTAINER_INSTANCE_NAME.xml
+    fi
+
+    if [ ! -f $SERVERCONFIG_XML_FILE ]; then
+        SERVERCONFIG_XML_FILE=$IS_CONFIG_DIR/serverconfig.xml
+    fi
+
+}
+#===============================================================================
+# WS 7.x related functions
+#===============================================================================
+validateWSConfig() {
+    wsconfig=$1
+
+    if [ ! -f $WSADMIN_PASSFILE ]; then
+        $ECHO "$WSADMIN_PASSWORD_SYNTAX$WSADMIN_PASSWORD" > $WSADMIN_PASSFILE
+    fi
+
+    ws_result=`$WSADMIN list-configs $WSADMIN_COMMON_PARAMS_NO_CONFIG`
+
+    if [ $? -eq 0 ]; then
+        if  [ `$ECHO $ws_result | $GREP -i "$wsconfig" | $WC -l` -eq 0 ]; then
+            $ECHO `$gettext "ERROR: Web Server Configuration in "` "WSADMIN_CONFIG" `$gettext "is invalid."`
+            $ECHO `$gettext "Current WSADMIN_CONFIG setting: "` "$WSADMIN_CONFIG"
+            $ECHO `$gettext "Current Configuration(s) from web server: "` "$ws_result"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            $ECHO 
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+    else
+        $ECHO `$gettext "ERROR: Cannot validate Web Server Configuration. Please see the wadm error message below:"`
+        $ECHO "$ws_result"
+        $ECHO 
+        exit 1
+    fi
+
+}
+
+validateWSHttpListener() {
+    httplistener=$1
+
+    if [ ! -f $WSADMIN_PASSFILE ]; then
+        $ECHO "$WSADMIN_PASSWORD_SYNTAX$WSADMIN_PASSWORD" > $WSADMIN_PASSFILE
+    fi
+
+    ws_result=`$WSADMIN list-http-listeners $WSADMIN_COMMON_PARAMS` 
+
+    if [ $? -eq 0 ]; then
+        if  [ `$ECHO $ws_result | $GREP -i "$httplistener" | $WC -l` -eq 0 ]; then
+            $ECHO `$gettext "ERROR: Web Server Http Listener in "` "WSADMIN_HTTPLISTENER" `$gettext "is invalid"`
+            $ECHO `$gettext "Current WSADMIN_HTTPLISTENER setting: "` "$WSADMIN_HTTPLISTENER"
+            $ECHO `$gettext "Current Htpp Listener(s) from web server: "` "$ws_result"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            $ECHO 
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+    else
+        $ECHO `$gettext "ERROR: Cannot validate Web Server Http Listener. Please see the wadm error message below:"`
+        $ECHO "$ws_result"
+        $ECHO 
+        exit 1
+    fi
+
+}
+
+#===============================================================================
+# AS 8.x related functions
+#===============================================================================
+validateASInstance() {
+    astarget=$1
+
+    if [ ! -f $ASADMIN_PASSFILE ]; then
+        $ECHO "$ASADMIN_PASSWORD_SYNTAX$ASADMIN_PASSWORD" > $ASADMIN_PASSFILE
+    fi
+
+    as_result=`$ASADMIN list-virtual-servers --user $ASADMIN_USER --passwordfile $ASADMIN_PASSFILE --host $ASADMIN_HOST --port $ASADMIN_PORT $ASADMIN_SECURE --interactive=$ASADMIN_INTERACTIVE` 
+
+    if [ $? -eq 0 ]; then
+        if  [ `$ECHO $as_result | $GREP -i $astarget | $WC -l` -eq 0 ]; then
+            $ECHO `$gettext "ERROR: Application Server Instance/Target in "` "ASADMIN_TARGET" `$gettext "is invalid."`
+            $ECHO `$gettext "Current ASADMIN_TARGET setting: "` "$ASADMIN_TARGET"
+            $ECHO `$gettext "Current Instance(s)/Target(s) from application server: "` "$as_result"
+            $ECHO `$gettext "You may need to customize the following file appropriately: "` "amtune-env"
+            $ECHO 
+            exit $AMTUNE_INVALID_ENVIRON_SETTING
+        fi
+    else
+        $ECHO `$gettext "ERROR: Cannot validate Application Server Instance/Target. Please see the asadmin error message below:"`
+        $ECHO "$as_result"
+        $ECHO 
+        exit 1
+    fi
+
+    $RM $ASADMIN_PASSFILE
+
+}
+
+getASJVMOption() {
+    option_key=$1
+    option_type=$2
+    field_separator=$3
+    nvp_separator=$4
+
+    #----------------------------------------------------------------------------------------
+    #if [ "$option_string" = "" ]; then
+    #    option_string=`$ASADMIN get --user $ASADMIN_USER --passwordfile $ASADMIN_PASSFILE --host $ASADMIN_HOST --port $ASADMIN_PORT $ASADMIN_SECURE --interactive=$ASADMIN_INTERACTIVE "$ASADMIN_TARGET.java-config.jvm-options"`
+    #fi
+    #
+    #if [ "$option_string" = "" ]; then
+    #    return
+    #fi
+    #----------------------------------------------------------------------------------------
+
+    get_token_in_line "$option_string" "$option_key" "$option_key" "$option_type" "stream" "$field_separator" "$nvp_separator"
+
+}
+
+getASVersionUsingASAdmin() {
+
+    if [ ! -f $ASADMIN_PASSFILE ]; then
+        $ECHO "$ASADMIN_PASSWORD_SYNTAX$ASADMIN_PASSWORD" > $ASADMIN_PASSFILE
+    fi
+
+    $ECHO `$ASADMIN version --user $ASADMIN_USER --passwordfile $ASADMIN_PASSFILE --host $ASADMIN_HOST --port $ASADMIN_PORT $ASADMIN_SECURE --interactive=$ASADMIN_INTERACTIVE | $GREP -i "version"` 
+
+}
+
+#===============================================================================
+# LDAP related functions
+#===============================================================================
+getNumberOfWorkerThreads() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" -s "base" "(objectclass=*)" "nsslapd-threadnumber" | $GREP "nsslapd-threadnumber:" | $CUT -f2 -d":"`
+}
+
+getAccessLogStatus() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" -s "base" "(objectclass=*)" "nsslapd-accesslog-logging-enabled" | $GREP "nsslapd-accesslog-logging-enabled:" | $CUT -f2 -d":"`
+}
+
+getInstanceDir() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" -s "base" "(objectclass=*)" "nsslapd-instancedir" | $GREP "nsslapd-instancedir:" | $CUT -f2 -d":"`
+}
+
+getDSVersion() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" -s "base" "(objectclass=*)" "nsslapd-versionstring" | $GREP "nsslapd-versionstring:" | $CUT -f2 -d"/" | $CUT -c1-3`
+}
+
+getDBDirectory() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(nsslapd-suffix=$ROOT_SUFFIX)" "nsslapd-directory" | $GREP "nsslapd-directory:" | $CUT -f2 -d":"`
+}
+
+getDBDN() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(nsslapd-suffix=$ROOT_SUFFIX)" "dn" | $GREP "dn:" | $CUT -f2 -d":"`
+}
+
+getDBDNbyBackend() {
+        backend_name=$1
+
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(&(nsslapd-suffix=*$ROOT_SUFFIX)(cn=$backend_name))" "dn" | $GREP "dn:" | $CUT -f2 -d":"`
+}
+
+# Retrieve the suffix and sub-suffix in the same root DN.
+getBackend() {
+
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=mapping tree,cn=config" "(&(|(cn=$ROOT_SUFFIX)(cn=\"$ROOT_SUFFIX\")(nsslapd-parent-suffix=$ROOT_SUFFIX))(nsslapd-backend=*))" "nsslapd-backend" | $GREP "nsslapd-backend" | $GREP -v "NetscapeRoot" | $CUT -f2 -d":"`
+}
+
+
+getDBEntryCacheSize() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(nsslapd-suffix=$ROOT_SUFFIX)" "nsslapd-cachememsize" | $GREP "nsslapd-cachememsize:" | $CUT -f2 -d":"`
+}
+
+getDBEntryCacheSizebyBackend() {
+        backend_name=$1
+
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(&(nsslapd-suffix=*$ROOT_SUFFIX)(cn=$backend_name))" "nsslapd-cachememsize" | $GREP "nsslapd-cachememsize:" | $CUT -f2 -d":"`
+}
+
+getSuffixbyBackend() {
+        backend_name=$1
+
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config" "(cn=$backend_name)" "nsslapd-suffix" | $GREP "nsslapd-suffix:" | $CUT -f2 -d":"`
+}
+
+getDBCacheSize() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config,cn=ldbm database,cn=plugins,cn=config" -s "base" "(objectclass=*)" "nsslapd-dbcachesize" | $GREP "nsslapd-dbcachesize:" | $CUT -f2 -d":"`
+}
+
+getDBLocation() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config,cn=ldbm database,cn=plugins,cn=config" -s "base" "(objectclass=*)" "nsslapd-directory" | $GREP "nsslapd-directory:" | $CUT -f2 -d":"`
+}
+
+getDBHomeLocation() {
+        $ECHO `$LDAPSEARCH -h $DS_HOST -p $DS_PORT -D "$DIRMGR_UID" -j $DSADMIN_PASSFILE -b "cn=config,cn=ldbm database,cn=plugins,cn=config" -s "base" "(objectclass=*)" "nsslapd-db-home-directory" | $GREP "nsslapd-db-home-directory:" | $CUT -f2 -d":"`
+}
+#===============================================================================
+# Functions imported from amutils
+#===============================================================================
+replace_line() {
+  file=$1
+  match=$2
+  new=$3
+
+  if [ ! -f $file-orig-$$ ]; then
+     if [ -f $file ]; then
+        $CP $file $file-orig-$$
+     fi
+  fi
+
+  sed -e "
+/$match/ {
+c\\
+$new
+}" $file > $file-tmp
+$CP $file-tmp $file
+$RM -f $file-tmp
+}
+
+
+cat_line() {
+  file=$1
+  new=$2
+
+  if [ ! -f $file-orig-$$ ]; then
+      if [ -f $file ]; then
+        $CP $file $file-orig-$$
+      fi
+  fi
+
+  $ECHO "$new" >> $file
+}
+
+insert_line() {
+  file=$1
+  match=$2
+  new=$3
+
+  if [ ! -f $file-orig-$$ ]; then
+     if [ -f $file ]; then
+        $CP $file $file-orig-$$
+     fi
+  fi
+
+  sed -e "
+/$match/ {
+i\\
+$new
+}" $file > $file-tmp
+$CP $file-tmp $file
+$RM -f $file-tmp
+}
+
+delete_line() {
+  file=$1
+  match=$2
+
+  if [ ! -f $file-orig-$$ ]; then
+     if [ -f $file ]; then
+        $CP $file $file-orig-$$
+     fi
+  fi
+
+  sed -e "
+/$match/ {
+d
+}" $file > $file-tmp
+$CP $file-tmp $file
+$RM -f $file-tmp
+}
+
+append_line() {
+  file=$1
+  match=$2
+  new=$3
+
+  if [ ! -f $file-orig-$$ ]; then
+     if [ -f $file ]; then
+        $CP $file $file-orig-$$
+     fi
+  fi
+
+  sed -e "
+/$match/ {
+a\\
+$new
+}" $file > $file-tmp
+$CP $file-tmp $file
+$RM -f $file-tmp
+}
+
+add_to_end() {
+  file=$1
+  new=$2
+
+  if [ ! -f $file-orig-$$ ]; then
+     if [ -f $file ]; then
+        $CP $file $file-orig-$$
+     else
+        touch $file
+    fi
+  fi
+
+length=`cat $file | wc -l`
+if [ $length -eq 0 ] ; then
+    $ECHO $new > $file
+else
+  sed -e "
+$ {
+a\\
+$new
+}" $file > $file-tmp
+
+  $CP $file-tmp $file
+  $RM -f $file-tmp
+fi
+
+}
+
+#----------------------------------------------------------------
+# Check local box environment
+#----------------------------------------------------------------
+check_env()
+{
+
+#hpux-dev : added 'if' condition because -p is not available for HP-UX
+if [ "$OSTYPE" = "HP-UX" ]; then
+ box_type="PA_RISC"
+else
+ box_type=`/bin/uname -p`
+fi
+
+ os_ver=`/bin/uname -r | $SED -e "s#5.##" | $SED -e "s#.[1-9]##"`
+ os_type=`/bin/uname -s`
+if [ $os_type = "SunOS" ];then
+ if [ $box_type = "sparc" -o $box_type = "i?86" ];then
+  if [ $os_ver -gt 7 ];then
+        continue
+  else
+        $ECHO "`$gettext 'Unsupported Solaris version'`"
+        exit 1
+  fi
+ fi
+elif [ $os_type = "Linux" ];then
+ continue
+elif [ $os_type = "HP-UX" ]; then
+ #hpux-dev : Added this elif condition
+ # we need to get the OS_type once again because the above uname/sed 
+ # combined operation will change HP os type as B1.11, which is wrong.
+ os_type=`/bin/uname -r`
+ continue
+else
+ $ECHO "`$gettext 'Unsupported OS'`"
+ exit 1
+fi
+}
+
+#----------------------------------------------------------------
+# Test for root user
+#----------------------------------------------------------------
+check_root_user() {
+
+   if [ `/bin/uname -s` = "SunOS" ]; then
+     uid=`/usr/xpg4/bin/id -un`
+   else
+     uid=`/usr/bin/id -un`
+   fi
+   if [ "$uid" != "root" ]; then
+     if [ "$DEPLOY_LEVEL" = "21" ] || [ "$DEPLOY_LEVEL" = "26" ] && [ "$NEW_OWNER" = "$uid" ]
+     then
+        continue
+     else
+          eval $ECHO "`$gettext 'You must be either root user or the system user to run'` $0."
+           exit 1
+      fi
+   fi
+  create_safeword_config_dir
+}
+
+#----------------------------------------------------------------
+# Check file for write permission
+#----------------------------------------------------------------
+check_file_for_write() {
+    file=$1
+    verbose=$2
+
+    if [ "$verbose" = "" ]; then
+        verbose=1
+    fi
+    if [ ! -f $file ]; then
+        if [ "$verbose" = "1" ]; then
+            $ECHO "`$gettext 'File not found: '`" $file
+        fi
+        return 100
+    fi
+
+    touch $file
+
+    if [ $? -eq 1 ]; then
+        return 100
+    fi
+}
+
+#--------------------------------------------------------------------------------------------------
+# substitute_token_in_line
+# This function is useful in replacing tokens of the type token="value" in any line of a given file
+# (especially useful in replacing values for certain tokens in XML files
+# match     - matching pattern which identifies the line where the token is to be replaced
+# token     - token name fully spelt
+# newvalue  - new value to be used
+# mode      - 0 is replace
+#             1 is prepend
+#             2 is append
+# delimiter - delimiter to be used while appending or prepending b/w the old and new values
+#--------------------------------------------------------------------------------------------------
+substitute_token_in_line(){
+    file=$1
+    match=$2
+    token=$3
+    newvalue=$4
+    mode=$5
+    delimiter=$6
+
+    #step1: grep for classpath suffix in server.xml
+    orig_line=`grep $match $file`
+
+    #step2: Get the number of tokens in the line
+    number_of_tokens=`$ECHO $orig_line | $NAWK ' { print NF } '`
+
+    #step3: Replace the value for the token
+    count=1
+    newline=""
+    while [ $count -le $number_of_tokens ]
+    do
+        currentToken=`$ECHO $orig_line | cut -f$count -d " "`
+        desiredTokenStr=`$ECHO $currentToken | cut -f$count -d " " | grep $token`
+        if [ "$desiredTokenStr" != "" ]; then
+            desiredTokenValue=`$ECHO $desiredTokenStr | $NAWK ' BEGIN { FS="=" } { print $2 } ' | cut -f2 -d "\""`
+            left_over_str=`$ECHO $desiredTokenStr | $NAWK ' BEGIN { FS="=" } { print $2 } ' | cut -f3 -d "\""`
+
+            if [ "$mode" -eq "0" ] || [ "`$ECHO $desiredTokenValue | wc -m`" -eq "1" ]; then
+                desiredTokenValue="\"$newvalue\""
+            elif [ "$mode" -eq "1" ]; then
+                desiredTokenValue="\"$newvalue$delimiter$desiredTokenValue\""
+            else
+                desiredTokenValue="\"$desiredTokenValue$delimiter$newvalue\""
+            fi
+
+            new_token_str="$token=$desiredTokenValue$left_over_str"
+            newline="$newline $new_token_str"
+        else
+            newline="$newline $currentToken"
+       fi
+       count=`expr $count + 1`
+    done
+    replace_line "$file" $match "$newline"
+}
+
+#----------------------------------------------------------------
+# This function determines if a given package
+# is installed or not.
+# Returns 0 if installed, 1 otherwise.
+#----------------------------------------------------------------
+is_pkg_installed()
+{
+        PKG=$1
+
+        if [ "$PKG" = "" ]; then
+           rc=-1
+        fi
+
+        if [ "$OSTYPE" = "Linux" ]; then
+                rpm -q --quiet $PKG
+        elif [ "$OSTYPE" = "SunOS" ]; then
+                pkginfo -q $PKG
+        elif [ "$OSTYPE" = "HP-UX" ]; then
+                # hpux-dev: Added elif condition for HP-UX
+                swlist -l product $PKG > /dev/null 2>&1
+        else
+                rc=1
+        fi
+
+        if [ $? -ne 0 ]; then
+                rc=1
+        else
+                rc=0
+        fi
+        $ECHO $rc
+}
+
+#----------------------------------------------------------------
+# This function searches a package to find the base directory
+# It doesn't check if the package is installed or not.
+# Call function is_pkg_installed() to check before calling
+# this one.
+#
+# Param 1: package name
+# Return : package directory
+#----------------------------------------------------------------
+getBaseDir()
+{
+  pkgname=$1
+  PKG_DIR=
+
+  if [ "$OSTYPE" = "Linux" ]; then
+    PKG_DIR=`rpm --queryformat '%{DIRNAMES}' -q $pkgname`
+  elif [ "$OSTYPE" = "SunOS" ]; then
+    PKG_DIR=`pkginfo -i -l $pkgname 2>&1 |  awk '/BASEDIR/ { print $2 }'`
+  elif [ "$OSTYPE" = "HP-UX" ]; then
+    #hpux-dev : Added elif condition
+    PKG_DIR=`swlist -l product -a location $pkgname | grep -v "^#" | awk '{print $2}'`
+  fi
+  echo $PKG_DIR
+}
+
+#----------------------------------------------------------------
+# This function validate safeword directory.  This function is 
+# called by check_root_user
+#----------------------------------------------------------------
+create_safeword_config_dir() {
+    safeworddir=$VAR_SUBDIR/auth/safeword
+    if [ ! -d $safeworddir ]
+    then
+        $MKDIR -p $safeworddir > /dev/null 2>&1
+    fi
+    chmod 700 $safeworddir
+}
+
+getModeEntry() {
+    property=$1
+    if [ "$property" = "" ]; then
+        return
+    fi
+
+    # Default mode is realm  
+    am_realm_mode="enabled"
+
+    AMSAMPLE_SILENT_FILE=$IS_INSTALL_DIR/bin/amsamplesilent
+    if [ -f $AMSAMPLE_SILENT_FILE ]; then
+      propStr=`$GREP $property $AMSAMPLE_SILENT_FILE`
+      if [ "$propStr" != "" ]; then
+        am_realm_mode=`$ECHO $propStr | $CUT -f2- -d"="`
+      fi
+    fi
+
+    $ECHO $am_realm_mode
+ 
+    return
+}
+
+NormalizeDNandReplaceComma() {
+
+    NMDN=`$ECHO "$1" | awk '{
+
+        dn = $0
+        result = ""
+        size = split(dn, rdns, ",")
+        for(i=1; i<size+1; i++) {
+            if (i>1) result = result newch
+            rdn = rdns[i]
+            size2 = split(rdn, attrs, "=")
+            for(j=1; j<size2+1; j++) {
+                if (j>1) result = result  "="
+                str = attrs[j]
+                strlen = length(str)
+                start = 1
+                end = strlen
+                for (k=1; k<strlen+1; k++) {
+                    ch = substr(str, k, 1);
+                    if (ch != " " && ch != "\t") {
+                        start = k
+                        break
+                    }
+                }
+                for(l=strlen; l>0; l--) {
+                    ch = substr(str, l, 1);
+                    if (ch != " " && ch != "\t") {
+                        end = l
+                        break
+                    }
+                }
+                result = result substr(str, start, end-start+1)
+            }
+        }
+        print result
+
+    }' newch=$2`
+
+export NMDN
+}
+
+replaceCharacter() {
+    NEWSTR=`$ECHO "$1" | awk -F"$2" '{
+        result = ""
+        for (i = 1; i < NF; i=i+1) { result = result $i newch }
+        result =  result $NF
+        print result
+    }' newch=$3`
+}
+
+check_ldap_packages() {
+
+   LDAP_DIR=""
+   if [ `is_pkg_installed $LDAP_PKGNAME` -eq 0 ]; then
+      LDAP_DIR=`getBaseDir $LDAP_PKGNAME`
+   fi
+
+   if [ "$LDAP_DIR" = "" ]; then
+     if [ "$OSTYPE" = "Linux" -o "$OSTYPE" = "HP-UX" ]; then
+       LDAP_DIR=/opt
+     else
+       LDAP_DIR=/opt/SUNWdsee
+     fi
+   fi
+ 
+   if [ "$OSTYPE" = "Linux" ]; then
+     LDAPSEARCH=$LDAP_DIR/sun/dsee6/bin/ldapsearch
+     LDAPMODIFY=$LDAP_DIR/sun/dsee6/bin/ldapmodify
+     LDAPDELETE=$LDAP_DIR/sun/dsee6/bin/ldapdelete
+     # library location is fixed
+     LDAPLIBS=/opt/sun/share/lib
+     LDAPJDK=/opt/sun/share/lib/ldapjdk.jar
+   elif [ "$OSTYPE" = "HP-UX" ]; then
+     LDAPSEARCH=/opt/sun/dsee6/bin/ldapsearch
+     LDAPMODIFY=/opt/sun/dsee6/bin/ldapmodify
+     LDAPDELETE=/opt/sun/dsee6/bin/ldapdelete
+     LDAPLIBS=/opt/sun/share/lib
+     LDAPJDK=/opt/sun/share/lib/ldapjdk.jar
+   else
+     LDAPSEARCH=$LDAP_DIR/dsee6/bin/ldapsearch
+     LDAPMODIFY=$LDAP_DIR/dsee6/bin/ldapmodify
+     LDAPDELETE=$LDAP_DIR/dsee6/bin/ldapdelete
+     # library location is fixed
+     LDAPLIBS=/usr/share/lib:/usr/lib/mps/secv1
+     LDAPJDK=/usr/share/lib/ldapjdk.jar
+   fi
+
+   if [ ! -f $LDAPSEARCH ]; then
+      if [ "$OSTYPE" = "Linux" ]; then
+        LDAP_FLAG="-x"
+      else
+        LDAP_FLAG=""
+      fi
+      LDAPSEARCH="/usr/bin/ldapsearch" $LDAP_FLAG
+      LDAPMODIFY="/usr/bin/ldapmodify" $LDAP_FLAG
+      LDAPDELETE="/usr/bin/ldapdelete" $LDAP_FLAG
+   fi
+ 
+}
+
+#===============================================================================
+# Environment Constants
+#-------------------------------------------------------------------------------
+# Its not recommended to modify any of the following env variables
+# But, in certain circumstances, you might have to change these
+#===============================================================================
+# Solaris var's
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+if [ "$OSTYPE" = "Linux" ]; then
+        LD_LIBRARY_PATH=$IS_INSTALL_DIR/ldaplib/ldapsdk:/opt/sun/private/lib
+elif [ "$OSTYPE" = "HP-UX" ];then
+        # hpux-dev : Added elif condition
+        SHLIB_PATH=$IS_INSTALL_DIR/ldaplib/ldapsdk:/opt/sun/private/lib
+        export SHLIB_PATH
+else
+        LD_LIBRARY_PATH=$IS_INSTALL_DIR/ldaplib/ldapsdk:/usr/lib/mps/secv1
+fi
+export PATH LD_LIBRARY_PATH
+
+OSTYPE=`/bin/uname -s`
+
+LDAP_PKGNAME=sun-ldapcsdk-tools
+ECHO=/bin/echo
+DIRNAME=/bin/dirname
+BASENAME=/bin/basename
+RM=/bin/rm
+CUT=/bin/cut
+DATE=/bin/date
+
+CP=/bin/cp
+SED=/bin/sed
+AWK=/bin/awk
+NAWK=/bin/nawk
+LS=/bin/ls
+NETSTAT=/bin/netstat
+CAT=/bin/cat
+CP="/bin/cp -p"
+gettext=/bin/gettext
+OPEN='('
+CLOSE=')'
+OMIT='\c'
+MKDIR=/bin/mkdir
+GREP=/bin/grep
+EGREP=/bin/egrep
+BC=/bin/bc
+TAIL=/bin/tail
+TOUCH=/bin/touch
+WC=/bin/wc
+NDD=/usr/sbin/ndd
+TAR=/bin/tar
+KILL=/bin/kill
+PS=/bin/ps
+TR_COMMAND=/usr/xpg4/bin/tr
+
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-utils
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+if [ "$OSTYPE" = "Linux" ]
+then
+    NAWK=/bin/awk
+    ECHO="/bin/echo"
+    BC=/usr/bin/bc
+    TAIL=/usr/bin/tail
+    DIRNAME=/usr/bin/dirname
+    WC=/usr/bin/wc
+    SYSCTL=/sbin/sysctl
+    TR_COMMAND=/usr/bin/tr
+fi
+if [ "$OSTYPE" = "HP-UX" ]
+then
+    NAWK=/usr/bin/awk
+    TR_COMMAND=/usr/bin/tr
+    gettext=/usr/local/bin/gettext
+    XARGS=/usr/bin/xargs
+    NDD=/usr/bin/ndd
+fi
+LINE_SEP="---------------------------------------------------------------------"
+PARA_SEP="====================================================================="
+CHAPTER_SEP="#####################################################################"

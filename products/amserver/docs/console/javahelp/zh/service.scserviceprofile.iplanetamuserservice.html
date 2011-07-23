@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>用户 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamuserservice"></a><h4>用户</h4>
+<p><a name="indexterm-198"></a>默认用户首选项是通过用户服务定义的。这些首选项包括时区、语言环境和 DN 起始视图。用户服务属性是动态属性。</p>
+<ul><li><p><a href="#fxckn">用户首选语言</a></p></li>
+<li><p><a href="#fxcnb">用户首选时区</a></p></li>
+<li><p><a href="#fxcte">继承的语言环境</a></p></li>
+<li><p><a href="#fxcpk">管理员起始视图</a></p></li>
+<li><p><a href="#fxciz">默认用户状态</a></p></li></ul>
+
+
+<a name="fxckn"></a><h5>用户首选语言</h5>
+<p>该字段指定用户选择在 OpenSSO 控制台中显示的文本语言。默认值为 en。该值会将一组本地化关键字映射到用户会话，这样，屏幕上的文本将以适合用户的语言显示。</p>
+
+<a name="fxcnb"></a><h5>用户首选时区</h5>
+<p>该字段指定用户访问 OpenSSO 控制台时所在的时区。该字段没有默认值。</p>
+
+<a name="fxcte"></a><h5>继承的语言环境</h5>
+<p>此字段指定用户的语言环境。默认值为 en_US。有关语言环境的列表，参见<a href="supportedlang.html">支持的语言环境</a>。</p>
+
+<a name="fxcpk"></a><h5>管理员起始视图</h5>
+<p>如果此用户为 OpenSSO 管理员，那么该字段指定此用户登录时作为起点显示在 OpenSSO 控制台中的节点。该字段没有默认值。可以使用用户至少拥有读取权限的有效 DN。</p>
+
+<a name="fxciz"></a><h5>默认用户状态</h5>
+<p>该选项用于指示新创建的用户的默认状态。该状态会由“用户项”的状态取代。只有活动的用户才能通过 OpenSSO 进行验证。默认值为“活动”。可以从下拉菜单中选择以下任意一个选项：</p><dl><dt>活动</dt>
+<dd><p>用户能通过 OpenSSO 进行验证。</p></dd>
+<dt>不活动</dt>
+<dd><p>用户不能通过 OpenSSO 进行验证，但用户配置文件仍会存储在目录中。</p></dd>
+</dl>
+<p>单个用户的状态可以通过以下操作设置：注册“用户”服务，选择相应的值并将其应用到某个角色，然后将该角色添加到用户的配置文件中。</p>
+<br/>
+
+</body>
+</html>

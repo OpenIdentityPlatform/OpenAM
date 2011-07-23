@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>配置站点标识符 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fssamlsiteidadd"></a><h5>配置站点标识符</h5>
+<a name="indexterm-79"></a><a name="indexterm-80"></a><p>此属性定义了由装有 OpenSSO 的服务器托管的任何站点。在安装过程中会为主机定义默认值和自动生成的站点 ID。可能有多个条目。例如，负载平衡或共享同一个 Directory Server 的多个 OpenSSO 实例都需要进行定义。起点是联合界面下的 "SAML" 屏幕上的“站点标识符”属性。站点 ID
+在“服务器和站点配置”屏幕中定义。有关详细信息，参见<a href="service.serversite.html">服务器和站点</a>。</p><ol>
+<li><b>单击“新建”以添加新的站点标识符；或单击已配置的站点标识符的名称，对其配置文件进行修改。</b><p>随即显示“站点标识符”属性。</p></li>
+<li><b>基于以下信息，为“站点标识符”属性提供值：</b><dl><dt>实例 ID</dt>
+<dd><p>此属性的值为 <i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i>。</p><p>如果要为 SSL 配置 SAML（同时在源站点和目标站点中），请确保此处定义的协议为 <tt>https//</tt>。</p></dd>
+<dt>站点 ID</dt>
+<dd><p>站点 ID 是为每个站点生成的标识符（尽管该值对于负载平衡器背后的多个服务器相同）。<tt>com.sun.identity.saml.common</tt> 软件包中有一个类，如果需要，可以使用该类手动生成此标识符。在命令行中键入以下命令：</p><pre>% <tt><b>java -classpath </tt><i>FM-classpath</i><tt> com.sun.identity.saml.common.SAMLSiteID </tt><i>protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port</i><tt></b></tt></pre></dd>
+<dt>发布者名称</dt>
+<dd><p>此属性的默认值为 <i>host</i><tt>:</tt><i>port</i>，但它可以是任何 URI。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”完成“站点标识符”的配置操作。</b></li>
+<li><b>单击“本地站点属性”页面上的“保存”以完成 SAML 的配置操作。</b></li></ol>
+<br/>
+
+</body>
+</html>

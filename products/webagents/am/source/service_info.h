@@ -1,0 +1,88 @@
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ *
+ * Abstract:
+ *
+ * Container class for the information needed to communicate with a
+ * AM service.
+ *
+ */
+
+#ifndef SERVICE_INFO_H
+#define SERVICE_INFO_H
+
+#include <vector>
+
+#include "internal_macros.h"
+#include "server_info.h"
+
+BEGIN_PRIVATE_NAMESPACE
+
+class ServiceInfo {
+private:
+    typedef std::vector<ServerInfo> ServerListType;
+
+public:
+    typedef ServerListType::iterator iterator;
+    typedef ServerListType::const_iterator const_iterator;
+    typedef ServerListType::reverse_iterator reverse_iterator;
+    typedef ServerListType::const_reverse_iterator const_reverse_iterator;
+
+    /* The constructors and methods throw std::invalid_argument 
+     * if the input argument is NULL, or if any url in a URL list argument 
+     * is invalid.
+     */
+    ServiceInfo();
+    ServiceInfo(const char *urlList);
+    ServiceInfo(const std::string& urlList);
+    ServiceInfo(const ServiceInfo& svcInfo):serverList(svcInfo.serverList){}
+
+    void addServer(const ServerInfo& server);
+    void addServer(const char *serverInfoString, std::size_t len = 0);
+    void addServer(const std::string& serverInfoString);
+
+    void setFromString(const char *urlList);
+    void setFromString(const std::string& urlList);
+
+    void setHostPort(const ServerInfo& serverInfo);
+
+    iterator begin() { return serverList.begin(); }
+    const_iterator begin() const { return serverList.begin(); }
+    iterator end() { return serverList.end(); }
+    const_iterator end() const { return serverList.end(); }
+
+    reverse_iterator rbegin() { return serverList.rbegin(); }
+    const_reverse_iterator rbegin() const { return serverList.rbegin(); }
+    reverse_iterator rend() { return serverList.rend(); }
+    const_reverse_iterator rend() const { return serverList.rend(); }
+
+    std::size_t getNumberOfServers() const { return serverList.size(); }
+
+private:
+    void parseServerList(const char *serverList);
+
+    ServerListType serverList;
+};
+
+END_PRIVATE_NAMESPACE
+
+#endif	// not SERVICE_INFO_H

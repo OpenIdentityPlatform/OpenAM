@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>To Add a Response Provider to a Policy - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.responseprovideradd"></a><h5>To Add a Response Provider to a Policy</h5>
+<ol>
+<li><b><a name="indexterm-42"></a>If you have already created the policy, click the name of the policy
+for which you wish to add the response provider. If you have not
+yet created the policy, see <a href="policy.policynormaladd.html">To Create a New Normal Policy</a>.</b></li>
+<li><b>Under the Response Providers list, click New.</b></li>
+<li><b>Enter a name for the response provider.</b></li>
+<li><b>Define the following values:</b><dl><dt>StaticAttribute</dt>
+<dd><p>These are static attributes in attribute value format, defined in an instance of <tt>IDResponseProvider</tt>stored in the policy.</p></dd>
+<dt>DynamicAttribute</dt>
+<dd><p>The response attributes chosen here need to first be defined in the <a href="service.scpolicy.html">Policy Configuration</a> service for the corresponding realm. The attribute names defined should be a subset of those existing in the configured datastore (ID Repository). For details on how to define the attributes see the Policy Configuration attribute definitions. To select specific or multiple attributes, hold the Control key and click the left mouse button.</p></dd>
+</dl>
+</li>
+<li><b>Click Finish.</b></li>
+<li><b>To remove response provider from a policy, select the subject and click Delete.
+You can edit any response provider definition by clicking on the name.</b></li></ol>
+<br/>
+
+</body>
+</html>

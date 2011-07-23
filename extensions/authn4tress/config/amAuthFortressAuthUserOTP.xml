@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunAMAuthFortressAuthUserOTPModuleService" version="2.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthFortressUserOTPModuleService"
+            i18nFileName="amAuthFortressUserOTP"
+	    revisionNumber="30"
+            i18nKey="Fortress-am-auth-service-description">
+
+            <Organization>
+	        <AttributeSchema name="fortress-am-auth-4Tress-endpoint-url"
+                    type="single"
+                    syntax="url"
+                    i18nKey="a101">
+		    <DefaultValues>
+                        <Value>/4TRESSSoap/services/Authenticator-11</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+		<AttributeSchema name="fortress-am-auth-4Tress-security-domain"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102">
+                </AttributeSchema>
+	        <AttributeSchema name="fortress-am-auth-4Tress-channel-code"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a103">
+                </AttributeSchema>
+                <AttributeSchema name="fortress-am-auth-type-code"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a104">
+                </AttributeSchema>
+                <AttributeSchema name="fortress-am-auth-mode-synchronous"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a105">
+		    <DefaultValues>
+                        <Value>1</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="Fortress-am-auth-AMUserOTPModule-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a106">
+		    <DefaultValues>
+                        <Value>0</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple">
+	        
+	        <AttributeSchema name="fortress-am-auth-4Tress-endpoint-url"
+                    type="single"
+                    syntax="url"
+                    i18nKey="a101">
+		    <DefaultValues>
+                        <Value>/4TRESSSoap/services/Authenticator-11</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+		<AttributeSchema name="fortress-am-auth-4Tress-security-domain"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102">
+                </AttributeSchema>
+	        <AttributeSchema name="fortress-am-auth-4Tress-channel-code"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a103">
+                </AttributeSchema>
+                <AttributeSchema name="fortress-am-auth-type-code"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a104">
+                </AttributeSchema>
+                <AttributeSchema name="fortress-am-auth-mode-synchronous"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a105">
+		    <DefaultValues>
+                        <Value>1</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="Fortress-am-auth-AMUserOTPModule-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a106">
+		    <DefaultValues>
+                        <Value>0</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+
+		</SubSchema>
+	</Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

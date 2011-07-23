@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Sitzung - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.servereditsession"></a><h4>Sitzung</h4>
+<p>Mit den Sitzungsattributen k&#246;nnen Sie Sitzungsinformationen f&#252;r eine zus&#228;tzliche Site und f&#252;r
+Serverinstanzen konfigurieren.</p>
+
+<a name="ggkab"></a><h5>Sitzungsgrenzwerte</h5>
+<p>Folgende Attribute legen Grenzwerte f&#252;r Serversitzungen fest:</p>
+
+<a name="ggkat"></a><h5>Maximale Sitzungen</h5>
+<p>Der Standardwert ist 5000.  Dient zur Angabe der maximalen Anzahl gleichzeitiger
+Sitzungen. Bei der Anmeldung wird der Fehler "Maximale Sitzungen" ausgegeben, wenn der
+Wert f&#252;r die maximale Anzahl gleichzeitiger Sitzungen diesen Wert &#252;bersteigt.</p>
+
+<a name="ggkac"></a><h5>Maximale Zeit f&#252;r Au&#223;erkraftsetzen der Sitzung</h5>
+<p>Der Standardwert ist 10. Gibt an, nach wie vielen Minuten die ung&#252;ltige
+Sitzung aus der Sitzungstabelle entfernt wird, wenn sie erstellt wurde und sich
+der Benutzer nicht anmeldet.  Dieser Wert sollte stets gr&#246;&#223;er sein als
+der Zeit&#252;berschreitungswert in der Eigenschaftsdatei des Authentifizierungsmoduls.</p>
+
+<a name="ggkaf"></a><h5>Verz&#246;gerung f&#252;r Sitzungsbereinigung</h5>
+<p>Der Standardwert ist 60. Gibt an, um wie viele Minuten die Bereinigung
+der Sitzung verz&#246;gert wird.  Nach der Zeit&#252;berschreitung bei einer Sitzung ist
+dies ein erweiterter Zeitraum, w&#228;hrend dessen die Sitzung noch auf dem Sitzungsserver
+gespeichert bleibt. Diese Eigenschaft wird von der Client-Anwendung verwendet, um durch SSO
+APIs zu &#252;berpr&#252;fen, ob eine Zeit&#252;berschreitung bei der Sitzung aufgetreten ist. Nach
+Ablauf dieses erweiterten Zeitraums wird die Sitzung vernichtet. Die Sitzung bleibt nicht
+w&#228;hrend des gesamten erweiterten Zeitraums erhalten, wenn der Benutzer sich abmeldet oder
+die Sitzung explizit durch eine OpenSSO-Komponente beendet wird. W&#228;hrend dieses erweiterten Zeitraums
+befindet sich die Sitzung im Zustand INVALID (ung&#252;ltig).</p>
+
+<a name="ggkbl"></a><h5>Statistiken</h5>
+<p>Folgende Attribute legen die statistische Konfiguration fest:</p>
+
+<a name="ggkbf"></a><h5>Protokollintervall</h5>
+<p>Der Standardwert ist 60. Gibt an, wie viele Minuten zwischen den einzelnen
+Statistikprotokollierungen verstreichen sollen. Der Mindestwert ist 5 Sekunden, um eine CPU-S&#228;ttigung zu
+vermeiden. OpenSSO interpretiert jeden Wert, der kleiner ist als 5 Sekunden, als
+5 Sekunden.</p>
+
+<a name="ggkbn"></a><h5>Status</h5>
+<p>Der Standardwert lautet "file" (Datei). Gibt den Speicherort des Statistikprotokolls an. M&#246;gliche
+Werte:  </p>
+<ul><li><p>off (Aus) &#8211; Es werden keine Statistiken protokolliert.</p></li>
+<li><p>file (Datei) &#8211; Statistiken werden in eine Datei im angegebenen Verzeichnis geschrieben.</p></li>
+<li><p>console (Konsole) &#8211; Statistiken werden in die Web-Server-Protokolldateien geschrieben.</p></li></ul>
+
+
+<a name="ggkcf"></a><h5>-Verzeichnis</h5>
+<p>Der  Wert wird w&#228;hrend der Installation festgelegt. Beispiel: <tt></tt><i>OpenSSO-base </i><tt>/</tt><i>server-URI</i><tt>/stats</tt>. Gibt das
+Verzeichnis an, in dem die Fehlersuchdateien erstellt werden.</p>
+
+<a name="ggkca"></a><h5>Nachschlagen des Hosts aktivieren</h5>
+<p>Der Standardwert lautet "false". Aktiviert bzw. deaktiviert das Nachschlagen des Hosts w&#228;hrend
+der Sitzungsprotokollierung.</p>
+
+<a name="ggkas"></a><h5>Benachrichtigung</h5>
+<p>Folgende Attribute legen die Benachrichtigungskonfiguration fest:</p>
+
+<a name="ggkbz"></a><h5>Gr&#246;&#223;e des Benachrichtigungspools</h5>
+<p>Der Standardwert ist 10. Definiert die Gr&#246;&#223;e des Pools durch Angabe der
+Gesamtzahl der Threads.</p>
+
+<a name="ggkao"></a><h5>Schwellenwert f&#252;r Benachrichtigungs-Thread-Pool</h5>
+<p>Der Standardwert ist 100.  Gibt die maximale L&#228;nge der Aufgabenwarteschlange an.
+Wenn eine Benachrichtigungsaufgabe eingeht, wird sie zur Verarbeitung an die Aufgabenwarteschlange gesendet.
+Wenn die Warteschlange die maximale L&#228;nge erreicht, werden weitere eingehende Anforderungen mit
+einer <tt>ThreadPoolException</tt> zur&#252;ckgewiesen, bis wieder ein Platz in der Warteschlange frei ist.</p>
+
+<a name="ggkar"></a><h5>Validierung</h5>
+<p>Das folgende Attribut legt die Benachrichtigungskonfiguration fest:</p>
+
+<a name="ggkcg"></a><h5>Client-DN-Vergleich ohne Ber&#252;cksichtigung der Gro&#223;- und Kleinschreibung</h5>
+<p>Der Standardwert lautet "wahr" (true). Vergleicht den  Agenten-DN. Wenn der Wert
+"falsch" (false) ist, wird bei dem Vergleich die Gro&#223;- und Kleinschreibung ber&#252;cksichtigt.
+</p>
+<br/>
+
+</body>
+</html>

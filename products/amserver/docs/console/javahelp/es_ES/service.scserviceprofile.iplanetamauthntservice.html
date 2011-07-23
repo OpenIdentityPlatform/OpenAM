@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Windows NT - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthntservice"></a><h4>Windows NT</h4>
+<p><a name="indexterm-184"></a>El m&#243;dulo de autenticaci&#243;n Windows NT permite realizar la autenticaci&#243;n en el
+servidor de Microsoft Windows NT. Los atributos son atributos de dominio. Los
+valores aplicados en Service Configuration (Configuraci&#243;n del servicio) son los valores predeterminados
+para la plantilla de autenticaci&#243;n de Windows NT. La plantilla de servicio
+debe crearse tras registrar el servicio para el dominio. El administrador del
+dominio puede cambiar los valores predeterminados despu&#233;s de realizar el registro. Las
+entradas no heredan los atributos de dominio en los &#225;rboles del dominio.</p><p>Para activar el m&#243;dulo de autenticaci&#243;n de Windows NT, Samba Client 2.2.2
+debe descargarse e instalarse en el siguiente directorio:</p><p><tt></tt><i>AcessManager-base</i><tt>/SUNWam/bin</tt></p><p>Samba Client es un servidor de impresi&#243;n y archivos que permite combinar
+m&#225;quinas Windows y UNIX sin necesidad de un servidor Windows NT/2000 independiente.</p><p>Red Hat Linux se comercializa con un cliente Samba que se encuentra
+en el directorio <tt>/usr/bin</tt>.</p><p>Para realizar la autenticaci&#243;n con el servicio de autenticaci&#243;n de Windows NT
+para Linux, copie el archivo binario del cliente en <tt></tt><i>OpenSSO-base </i><tt> /identity/bin</tt>.</p><p>Los atributos de Windows NT son:</p>
+<ul><li><p><a href="#fumve">Dominio de autenticaci&#243;n</a></p></li>
+<li><p><a href="#fumvp">Sistema anfitri&#243;n de autenticaci&#243;n</a></p></li>
+<li><p><a href="#fumvq">Nombre de archivo de la configuraci&#243;n Samba</a></p></li>
+<li><p><a href="#fumwi">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fumve"></a><h5>Dominio de autenticaci&#243;n</h5>
+<p>Define el nombre de dominio al que pertenece el usuario.</p>
+
+<a name="fumvp"></a><h5>Sistema anfitri&#243;n de autenticaci&#243;n</h5>
+<p>Define el nombre de host de autenticaci&#243;n en Windows NT. El nombre
+de host deber&#237;a ser el nombre de netBIOS, frente al nombre de
+dominio completo (FQDN). De forma predeterminada, la primera parte del FQDN es
+el nombre de netBIOS.</p><p>Si se utiliza DHCP (Protocolo de configuraci&#243;n de host din&#225;mico), deber&#225; insertar
+una entrada adecuada en el archivo HOSTS en la m&#225;quina Windows 2000.</p><p>La resoluci&#243;n del nombre se realizar&#225; bas&#225;ndose en el nombre de netBIOS.
+Si no tiene ning&#250;n servidor en la subred que aporte la resoluci&#243;n
+de nombre de netBIOS, las asignaciones se deber&#225;n codificar. Por ejemplo, el
+nombre de host debe ser <tt>example1</tt> y no <tt>example1.company1.com</tt>.</p>
+
+<a name="fumvq"></a><h5>Nombre de archivo de la configuraci&#243;n Samba</h5>
+<p>Define el nombre de archivo de configuraci&#243;n de Samba y admite la
+opci&#243;n <tt>-s</tt> en el comando <tt>smbclient</tt>. El valor debe ser la ruta
+completa del directorio en el que se encuentra la ubicaci&#243;n del archivo
+de configuraci&#243;n de Samba. For example: <tt>/etc/opt/SUNWam/config/smb.conf</tt></p>
+
+<a name="fumwi"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

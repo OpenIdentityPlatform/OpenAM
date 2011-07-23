@@ -1,0 +1,1451 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "toc_1_0.dtd">
+<toc version="2.0">
+
+ <tocitem target="aawelcome" text="SunTM OpenSSO 8.0 온라인 도움말" expand="false">
+    <tocitem target="intro" text="소개" expand="false"></tocitem></tocitem>
+ <tocitem target="commontasks" text="일반 작업" expand="false">
+    <tocitem target="task.home" text="일반 작업 구성 요소" expand="false"></tocitem></tocitem>
+ <tocitem target="accesscontrol" text="액세스 제어" expand="false">
+    <tocitem target="realm.rmrealm" text="영역" expand="false">
+        <tocitem target="realm.rmrealmadd" text="새 영역 만들기" expand="false"></tocitem>
+        <tocitem target="realm.realmproperties" text="일반 등록 정보" expand="false"></tocitem></tocitem>
+    <tocitem target="authentication.authproperties" text="인증" expand="false">
+        <tocitem target="authentication.newauthinstance" text="새 인증 모듈 인스턴스 만들기" expand="false"></tocitem>
+        <tocitem target="authentication.newauthconfig" text="새 인증 체인 만들기" expand="false"></tocitem></tocitem>
+    <tocitem target="realm.services" text="서비스" expand="false">
+        <tocitem target="realm.servicesadd" text="영역에 서비스 추가" expand="false"></tocitem></tocitem>
+    <tocitem target="realm.idrepo" text="데이터 저장소" expand="false">
+        <tocitem target="realm.idreposelecttype" text="새 데이터 저장소 만들기" expand="false"></tocitem>
+        <tocitem target="idrepoadd" text="OpenSSO 데이터 저장소 유형" expand="false">
+            <tocitem target="idrepoadd" text="활성 디렉토리" expand="false"></tocitem>
+            <tocitem target="idrepoadd" text="일반 LDAPv3" expand="false"></tocitem>
+            <tocitem target="idrepoadd" text="Sun Directory Server OpenSSO 스키마" expand="false"></tocitem></tocitem>
+        <tocitem target="realm.idrepoedit" text="데이터 저장소 구성" expand="false"></tocitem>
+        <tocitem target="realm.idrepoeditad" text="활성 디렉토리 속성" expand="false">
+            <tocitem target="realm.idrepoeditad" text="LDAP 서버" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 바인드 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 바인드 비밀번호" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 바인드 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 조직 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP SSL" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 연결 풀 최소 크기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 연결 풀 최대 크기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="검색에서 반환되는 최대 결과 수" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="검색 시간 초과" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP에서 참조를 따름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAPv3 저장소 플러그인 클래스 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="속성 이름 매핑" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAPv3 플러그인 지원 유형 및 작업" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAPv3 플러그인 검색 범위" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 사용자 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 사용자 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 사용자 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 사용자 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="사용자 속성 매핑 만들기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="사용자 상태의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="사용자 상태 활성 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="사용자 상태 비활성 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 그룹 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 그룹 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 그룹 컨테이너 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 그룹 컨테이너 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 그룹 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 그룹 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="그룹 구성원의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="고유 구성원의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="그룹 구성원 URL의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 사용자 컨테이너 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="LDAP 사용자 컨테이너 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="인증 가능한 Identity 유형" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="인증 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="영구 검색 기본 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="영구 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="영구 검색 범위" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="시스템 재시작 전의 최대 유휴 시간 영구 검색" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="오류 코드 후의 최대 재시도 횟수" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="재시도 사이의 지연 시간" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="재시도할 LDAP 예외 오류 코드" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="캐싱" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="캐시된 항목의 최대 기간" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditad" text="캐시의 최대 크기" expand="false"></tocitem></tocitem>
+        <tocitem target="realm.idrepoeditldapv3" text="일반 LDAPv3 속성" expand="false">
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 서버" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 바인드 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 바인드 비밀번호" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 바인드 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 조직 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP SSL" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 연결 풀 최소 크기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 연결 풀 최대 크기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="검색에서 반환되는 최대 결과 수" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="검색 시간 초과" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP에서 참조를 따름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAPv3 저장소 플러그인 클래스 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="속성 이름 매핑" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAPv3 플러그인 지원 유형 및 작업" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAPv3 플러그인 검색 범위" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 사용자 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 사용자 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 사용자 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 사용자 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="사용자 속성 매핑 만들기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="사용자 상태의 속성 이름 " expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="사용자 상태 활성 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="사용자 상태 비활성 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 그룹 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 그룹 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 그룹 컨테이너 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 그룹 컨테이너 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 그룹 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 그룹 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="그룹 구성원의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="고유 구성원의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="그룹 구성원 URL의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="기본 그룹 구성원의 사용자 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 사용자 컨테이너 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="LDAP 사용자 컨테이너 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="인증 가능한 Identity 유형" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="영구 검색 기본 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="영구 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="영구 검색 범위" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="시스템 재시작 전의 최대 유휴 시간 영구 검색" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="오류 코드 후의 최대 재시도 횟수" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="재시도 사이의 지연 시간" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="재시도할 LDAP 예외 오류 코드" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="캐싱" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="캐시된 항목의 최대 기간" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditldapv3" text="캐시의 최대 크기" expand="false"></tocitem></tocitem>
+        <tocitem target="realm.idrepoeditfamschema" text="Sun Directory Server(OpenSSO 스키마 속성 포함)" expand="false">
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 서버" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 바인드 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 바인드 비밀번호" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 바인드 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 조직 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP SSL" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 연결 풀 최소 크기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 연결 풀 최대 크기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="검색에서 반환되는 최대 결과 수" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="검색 시간 초과" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP에서 참조를 따름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAPv3 저장소 플러그인 클래스 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="속성 이름 매핑" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAPv3 플러그인 지원 유형 및 작업" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAPv3 플러그인 검색 범위" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 사용자 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 사용자 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 사용자 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 사용자 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="사용자 속성 매핑 만들기" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="사용자 상태의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 그룹 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 그룹 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 그룹 컨테이너 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 그룹 컨테이너 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 그룹 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 그룹 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="그룹 구성원의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="고유 구성원의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="그룹 구성원 URL의 속성 이름" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 역할 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 역할 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 역할 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 역할 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 필터 역할 검색 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 필터 역할 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 필터 역할 객체 클래스" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 필터 역할 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 사용자 컨테이너 이름 지정 속성" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="LDAP 사용자 컨테이너 값" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="인증 가능한 Identity 유형" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="영구 검색 기본 DN" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="영구 검색 필터" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="영구 검색 범위" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="시스템 재시작 전의 최대 유휴 시간 영구 검색" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="오류 코드 후의 최대 재시도 횟수" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="재시도 사이의 지연 시간" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="재시도할 LDAP 예외 오류 코드" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="캐싱" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="캐시된 항목의 최대 기간" expand="false"></tocitem>
+            <tocitem target="realm.idrepoeditfamschema" text="캐시의 최대 크기" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="delegation.delegation" text="권한" expand="false">
+        <tocitem target="delegation.delegationproperties" text="권한 등록 정보" expand="false"></tocitem></tocitem>
+    <tocitem target="policy.policy" text="정책" expand="false">
+        <tocitem target="normalpolicy" text="일반 정책" expand="false">
+            <tocitem target="policy.policynormaladd" text="새 일반 정책 만들기" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.selectservicetype" text="규칙" expand="false">
+            <tocitem target="policy.ruleadd" text="정책에 규칙 추가" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.selectsubjecttype" text="주제" expand="false">
+            <tocitem target="policy.subjectadd" text="정책에 주제 추가" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.selectcondition" text="조건" expand="false">
+            <tocitem target="policy.selectconditiontype" text="정책에 조건 추가" expand="false"></tocitem></tocitem>
+        <tocitem target="policy.pmdefaultsessioncondtionadd" text="활성 세션 시간" expand="false"></tocitem>
+        <tocitem target="policy.authtoserviceadd" text="모듈 체인별 인증" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultauthlevelconditionadd" text="인증 수준(보다 크거나 같음)" expand="false"></tocitem>
+        <tocitem target="gdovl" text="인증 수준(보다 낮거나 같음)" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultauthschemeconditionadd" text="모듈 인스턴스별 인증" expand="false"></tocitem>
+        <tocitem target="policy.sessionpropertyconditionadd" text="현재 세션 등록 정보" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaultipcondition" text="IP 주소/DNS 이름" expand="false"></tocitem>
+        <tocitem target="policy.membershipconditionadd" text="Identity 구성원" expand="false"></tocitem>
+        <tocitem target="policy.conditionadd" text="LDAP 필터 조건" expand="false"></tocitem>
+        <tocitem target="policy.authtorealmadd" text="영역 인증" expand="false"></tocitem>
+        <tocitem target="policy.pmdefaulttimeconditionadd" text="시간(요일, 날짜, 시간 및 표준 시간대)" expand="false"></tocitem>
+        <tocitem target="responseprovider" text="응답 공급자" expand="false">
+            <tocitem target="policy.responseprovideradd" text="정책에 응답 공급자 추가" expand="false"></tocitem></tocitem>
+        <tocitem target="fyfby" text="참조 정책" expand="false">
+            <tocitem target="policy.policyreferraladd" text="새 참조 정책 만들기" expand="false"></tocitem></tocitem>
+        <tocitem target="referrals" text="참조" expand="false">
+            <tocitem target="policy.selectreferraltype" text="정책에 참조 추가" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="idm.entities" text="주제" expand="false">
+        <tocitem target="idm.entityadd" text="주제 만들기" expand="false"></tocitem>
+        <tocitem target="subjectuser" text="사용자" expand="false">
+            <tocitem target="idm.entityadduser" text="사용자 만들기 또는 수정" expand="false"></tocitem>
+            <tocitem target="idm.entitymembership" text="그룹에 사용자를 추가하려면" expand="false"></tocitem>
+            <tocitem target="idm.entityservices" text="사용자에 서비스를 추가하려면" expand="false"></tocitem></tocitem>
+        <tocitem target="idm.entitiesgroup" text="그룹" expand="false">
+            <tocitem target="idm.entityaddgroup" text="그룹 만들기 또는 수정" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="agentconfig.agents" text="에이전트" expand="false">
+        <tocitem target="ggobs" text="새 그룹 및 에이전트 만들기" expand="false">
+            <tocitem target="agentconfig.agentadd" text="새 에이전트를 만들려면" expand="false"></tocitem>
+            <tocitem target="agentconfig.agentgroupadd" text="새 그룹을 만들려면" expand="false"></tocitem>
+            <tocitem target="ggouy" text="에이전트가 그룹에서 등록 정보를 상속받도록 하려면" expand="false"></tocitem></tocitem>
+        <tocitem target="agentconfig.genericagentprofile" text="에이전트 구성" expand="false"></tocitem>
+        <tocitem target="agentconfig.webagentprofile" text="웹 정책 에이전트" expand="false">
+            <tocitem target="agentconfig.webagentprofile" text="전역" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="그룹" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="비밀번호" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="비밀번호 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="상태" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 구성 저장소 위치" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 구성 변경 알림" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="알림 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 알림 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 배포 URI 접두어" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="구성 재로드 간격" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="구성 정리 간격" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="SSO 전용 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="자원 액세스 거부 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 디버그 수준" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 로컬 로그 파일 회전" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 로컬 로그 파일 크기" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 원격 로그 파일 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="URL 액세스 원격 로깅 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="FQDN 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="FQDN 기본값" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="FQDN 가상 호스트 맵" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="응용 프로그램" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="강제 적용되지 않는 URL 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="강제 적용되지 않는 URL 목록 확인 반전" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="강제 적용되지 않는 URL의 속성 불러오기" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="강제 적용되지 않는 클라이언트 IP 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="클라이언트 IP 유효성 검사" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="프로필 속성 불러오기 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="프로필 속성 맵" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="응답 속성 불러오기 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="응답 속성 맵" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="세션 속성 불러오기 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="세션 속성 맵" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="SSO" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="쿠키 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="쿠키 보안" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="쿠키 재설정" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="재설정할 쿠키 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="쿠키 도메인 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="CDSSO" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="CDSSO 서블릿 URL 목록" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="OpenSSO 서비스" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="OpenSSO 로그인 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 연결 시간 초과" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="기본 서버 폴링 기간" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="로그아웃 URL 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="재설정할 로그아웃 쿠키 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="정책 캐싱 폴링 기간" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="SSO 캐시 폴링 기간" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="사용자 아이디 매개 변수" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="사용자 아이디 매개 변수 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="루트 자원에서 정책 불러오기" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="클라이언트 호스트 이름 검색" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="정책 클럭 오차" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="기타" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="에이전트 로켈" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="익명 사용자 기본값" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="익명 사용자" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="프로필 속성 쿠키 접두어" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="프로필 속성 쿠키 최대 수명" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="URL 비교 대소문자 구분 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="URL 특수 문자 인코딩" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="이름 지정 요청에서 기본 이름 지정 URL 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="서버 확인 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="요청 URL의 경로 정보 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="원격 로그 실패 시 자원 액세스 거부" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="프로필 속성의 원시 인코딩" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webagentprofile" text="고급" expand="false">
+                <tocitem target="agentconfig.webagentprofile" text="로드 밸런서 설정" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="요청 URL 프로토콜 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="요청 URL 호스트 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="요청 URL 포트 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="알림 URL 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="POST 데이터 보존" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="POST 데이터 항목 캐시 기간" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="프록시 서버 호스트 이름 및 포트 무시" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="인증 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="비밀번호 키 재생" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="필터 우선 순위" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="OWA로 구성된 필터" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="URL 프로토콜을 https로 변경" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="유휴 세션 시간 초과 페이지 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="Domino 데이터베이스에서 사용자 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 토큰 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 토큰 쿠키 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 토큰 구성 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="LTPA 토큰 조직 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.webagentprofile" text="사용자 정의 등록 정보" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.j2eeagentprofile" text="J2EE 정책 에이전트" expand="false">
+            <tocitem target="agentconfig.j2eeagentprofile" text="전역" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="그룹" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="비밀번호" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="비밀번호 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="상태" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="에이전트 알림 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="에이전트 구성 저장소 위치" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="구성 재로드 간격" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="에이전트 구성 변경 알림" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="에이전트 필터 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="자원 액세스 거부 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="HTTP 세션 바인딩" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="GOTO 매개 변수 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 시도 한계" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 정의 응답 헤더" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="리디렉션 시도 한계" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="에이전트 디버그 수준" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 매핑 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 속성 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 기본 플래그" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 토큰 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="감사 액세스 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="감사 로그 위치" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="원격 로그 파일 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로컬 감사 로그 회전" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로컬 감사 로그 회전 크기" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="FQDN 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="FQDN 기본값" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="FQDN 가상 호스트 맵" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="응용 프로그램" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 양식 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 오류 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="내부 로그인 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 컨텐트 파일 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="응용 프로그램 로그아웃 처리기" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="응용 프로그램 로그아웃 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그아웃 요청 매개 변수" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그아웃 Introspect 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그아웃 시작 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 URI 반전" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 URI 캐시 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 URI 캐시 크기 " expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 클라이언트 IP 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 IP 반전 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 IP 캐시 플래그" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="강제 적용되지 않는 IP 캐시 크기 " expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="프로필 속성 불러오기 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="프로필 속성 매핑" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="응답 속성 불러오기 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="응답 속성 매핑" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="쿠키 구분 문자" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="불러오기 속성 날짜 형식" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="속성 쿠키 인코딩" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="세션 속성 불러오기 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="세션 속성 매핑" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="기본 권한 속성" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="권한 있는 속성 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="권한 있는 속성을 소문자로" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="권한 있는 세션 속성" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="권한 있는 속성 매핑 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="권한 있는 속성 매핑" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 정의 인증 처리기" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 정의 로그아웃 처리기" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 정의 검증 처리기" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="SSO" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="쿠키 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="SSO 캐시 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="도메인 간 SSO" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 리디렉션 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 서블릿 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 클럭 오차" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 신뢰할 수 있는 아이디 공급자" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 보안 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="CDSSO 도메인 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="쿠키 재설정" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="쿠키 재설정 이름 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="쿠키 재설정 도메인 맵" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="쿠키 재설정 경로 맵" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 서비스" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 로그인 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 URL 우선 순위 지정" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 URL 검사" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그인 URL 검사 시간 초과" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 로그아웃 URL" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그아웃 URL 우선 순위 지정" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그아웃 URL 검사" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로그아웃 URL 검사 시간 초과" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 인증 서비스 프로토콜" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 인증 서비스 호스트 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="OpenSSO 인증 서비스 포트" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="정책 알림 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="정책 클라이언트 폴링 간격" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="정책 클라이언트 캐시 모드" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="정책 클라이언트 부울 작업 값" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="정책 클라이언트 자원 비교기" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="정책 클라이언트 클럭 오차" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="URL 정책 환경 GET 매개 변수" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="URL 정책 환경 POST 매개 변수" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="URL 정책 환경 jsession 매개 변수" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 데이터 캐시 폴링 시간" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="서비스 데이터 캐시 알림 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="서비스 데이터 캐시 시간" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="클라이언트 폴링 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="클라이언트 폴링 기간" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="기타" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="로켈 언어 " expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="로켈 국가" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="포트 확인 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="포트 확인 파일" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="포트 확인 설정" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="우회 기본 목록" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="레거시 지원 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="레거시 사용자 에이전트" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="레거시 리디렉션 URI" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="암호화 공급자" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.j2eeagentprofile" text="고급" expand="false">
+                <tocitem target="agentconfig.j2eeagentprofile" text="클라이언트 IP 주소 헤더" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="클라이언트 호스트 이름 헤더" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="웹 서비스 사용 가능" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="웹 서비스 종단점" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="웹 서비스 프로세스 GET 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="웹 서비스 인증자" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="웹 서비스 내부 오류 컨텐트 파일" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="웹 서비스 인증 오류 컨텐트 파일" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="대체 에이전트 호스트 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="대체 에이전트 포트 이름" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="대체 에이전트 프로토콜" expand="false"></tocitem>
+                <tocitem target="agentconfig.j2eeagentprofile" text="사용자 정의 등록 정보" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.webserviceprovideredit" text="웹 서비스 공급자" expand="false">
+            <tocitem target="agentconfig.webserviceprovideredit" text="일반" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="그룹" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="비밀번호" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="비밀번호 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="상태" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="범용 식별자" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="보안" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="보안 메커니즘" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="인증 체인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="토큰 변환 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="메시지의 보안 헤더 보존" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="개인 키 유형" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="리버티 서비스 유형 URN" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="사용자 토큰의 자격 증명" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="SAML 구성" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="SAML 속성 매핑" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="SAML NameID Mapper 플러그인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="SAML 속성 이름 공간" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="구성원 포함" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="서명 및 암호화" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="응답 서명됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="응답 암호화됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="요청 서명 확인됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="요청 헤더 해독됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="요청 해독됨" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="키 저장소" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="웹 서비스 클라이언트의 공개 키 별칭" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="개인 키 별칭" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="키 저장소 사용" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="종단점" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="웹 서비스 프록시 종단점" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="웹 서비스 종단점" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceprovideredit" text="커버로스 구성" expand="false">
+                <tocitem target="agentconfig.webserviceprovideredit" text="커버로스 도메인 서버" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="커버로스 도메인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="커버로스 서비스 기본" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="커버로스 키 탭 파일" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceprovideredit" text="커버로스 서명 확인" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.webserviceclientedit" text="웹 서비스 클라이언트 속성" expand="false">
+            <tocitem target="agentconfig.webserviceclientedit" text="일반" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="그룹" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="비밀번호" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="비밀번호 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="상태" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="범용 식별자" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="보안" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="보안 메커니즘" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="STS 구성" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="검색 구성" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="사용자 인증 필요" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="메시지의 보안 헤더 보존" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="통과 보안 토큰 사용" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="리버티 서비스 유형 URN" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="사용자 토큰의 자격 증명" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="서명 및 암호화" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="요청 서명됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="요청 헤더 암호화됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="요청 암호화됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="응답 서명 확인됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="응답 해독됨" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="키 저장소" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="웹 서비스 공급자의 공개 키 별칭" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="개인 키 별칭" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="키 저장소 사용" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="종단점" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="웹 서비스 프록시 종단점" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="웹 서비스 종단점" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webserviceclientedit" text="커버로스 구성" expand="false">
+                <tocitem target="agentconfig.webserviceclientedit" text="커버로스 도메인 서버" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="커버로스 도메인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="커버로스 서비스 기본" expand="false"></tocitem>
+                <tocitem target="agentconfig.webserviceclientedit" text="커버로스 티켓 캐시 디렉토리" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.stsclientedit" text="STS 클라이언트" expand="false"></tocitem>
+        <tocitem target="agentconfig.discoveryagentprofile" text="검색 에이전트 속성" expand="false">
+            <tocitem target="agentconfig.discoveryagentprofile" text="그룹" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="비밀번호" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="비밀번호 확인" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="상태" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="에이전트 구성 저장소 위치" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="개인 키 별칭" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="검색 서비스 종단점" expand="false"></tocitem>
+            <tocitem target="agentconfig.discoveryagentprofile" text="인증 웹 서비스 종단점" expand="false"></tocitem></tocitem>
+        <tocitem target="agentconfig.webservicestsedit" text="보안 토큰 서비스 에이전트 속성" expand="false">
+            <tocitem target="agentconfig.webservicestsedit" text="일반" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="그룹" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="비밀번호" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="비밀번호 확인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="상태" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="범용 식별자" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="보안" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="보안 메커니즘" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="STS 구성" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="메시지의 보안 헤더 보존" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="사용자 토큰의 자격 증명" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="서명 및 암호화" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="요청 서명됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="요청 헤더 암호화됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="요청 암호화됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="응답 서명 확인됨" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="응답 해독됨" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="키 저장소" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="웹 서비스 공급자의 공개 키 별칭" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="개인 키 별칭" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="키 저장소 사용" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="종단점" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="보안 토큰 서비스 종단점" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="보안 토큰 서비스 MEX 종단점" expand="false"></tocitem></tocitem>
+            <tocitem target="agentconfig.webservicestsedit" text="커버로스 구성" expand="false">
+                <tocitem target="agentconfig.webservicestsedit" text="커버로스 도메인 서버" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="커버로스 도메인" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="커버로스 서비스 기본" expand="false"></tocitem>
+                <tocitem target="agentconfig.webservicestsedit" text="커버로스 티켓 캐시 디렉토리" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="agentconfig.22agentprofile" text="2.2 정책 에이전트" expand="false">
+            <tocitem target="agentconfig.22agentprofile" text="비밀번호" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="비밀번호 확인" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="상태" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="설명" expand="false"></tocitem>
+            <tocitem target="agentconfig.22agentprofile" text="에이전트 키 값" expand="false"></tocitem></tocitem>
+        <tocitem target="ghfif" text="에이전트 인증자" expand="false">
+            <tocitem target="ghfif" text="비밀번호" expand="false"></tocitem>
+            <tocitem target="ghfif" text="비밀번호 확인" expand="false"></tocitem>
+            <tocitem target="ghfif" text="상태" expand="false"></tocitem>
+            <tocitem target="ghfif" text="읽을 수 있는 에이전트 프로필" expand="false"></tocitem></tocitem></tocitem></tocitem>
+ <tocitem target="dirmang" text="디렉토리 관리" expand="false">
+    <tocitem target="dm.home" text="디렉토리 관리" expand="false"></tocitem></tocitem>
+ <tocitem target="federation.federation" text="연합" expand="false">
+    <tocitem target="federation.fsauthdomains" text="CoT(Circle of Trust)" expand="false">
+        <tocitem target="federation.createcot" text="새 CoT(Circle of Trust) 만들기" expand="false"></tocitem>
+        <tocitem target="federation.fsauthdomainsedit" text="CoT(Circle of Trust) 프로필 수정" expand="false"></tocitem>
+        <tocitem target="federation.fsauthdomainsselectprovider" text="CoT(Circle of Trust)에 공급자 추가" expand="false"></tocitem>
+        <tocitem target="deleteauthdomain" text="CoT(Circle of Trust) 프로필 삭제" expand="false"></tocitem></tocitem>
+    <tocitem target="federation.createsaml2metadata" text="엔티티 공급자" expand="false">
+        <tocitem target="ggwxp" text="SAMLv2 공급자 엔티티" expand="false">
+            <tocitem target="federation.createsaml2" text="SAMLv2 엔티티 공급자를 만들려면" expand="false"></tocitem></tocitem>
+        <tocitem target="ggwwz" text="ID-FF 공급자 엔티티 " expand="false">
+            <tocitem target="federation.createidffprovider" text="ID-FF 엔티티 공급자를 만들려면" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.createwsfedprovider" text="WS-FED 공급자 엔티티 " expand="false">
+            <tocitem target="ggwwr" text="WS-FED 엔티티 공급자를 만들려면" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2spassertioncontent" text="SAMLv2 서비스 공급자 사용자 정의 " expand="false">
+            <tocitem target="federation.samlv2spassertioncontent" text="명제 컨텐트" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="요청/응답 서명" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="암호화" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="인증서 별칭" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="이름 아이디 형식" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="인증 컨텍스트" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="명제 시간 오차" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="기본 인증" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2spassertioncontent" text="명제 처리" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="속성 매퍼" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="자동 연합" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="계정 매퍼" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="아티팩트 메시지 인코딩" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="일시적 사용자" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="기본 중계 상태" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="어댑터" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2spassertioncontent" text="서비스" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="메타 별칭" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="단일 로그아웃 서비스" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="이름 아이디 서비스 관리" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="명제 아티팩트 소비자 서비스" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2spassertioncontent" text="고급" expand="false">
+                <tocitem target="federation.samlv2spassertioncontent" text="SP URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="SP 로그아웃 URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="응용 프로그램 보안 목록" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="요청 IDP 목록 검색기 구현" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="요청 IDP 목록 가져오기 완료" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="요청 IDP 목록" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="IDP 프록시" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="소개" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="프록시 개수" expand="false"></tocitem>
+                <tocitem target="federation.samlv2spassertioncontent" text="IDP 프록시 목록" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.samlv2idpassertioncontent" text="SAMLv2 Identity 공급자 사용자 정의 " expand="false">
+            <tocitem target="federation.samlv2idpassertioncontent" text="명제 컨텐트" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="요청/응답 서명" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="암호화" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="인증서 별칭" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="이름 아이디 형식" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="이름 아이디 값 맵" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="인증 컨텍스트" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="명제 시간" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="기본 인증" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="명제 캐시" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="부트스트랩" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="명제 처리" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="속성 매퍼" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="계정 매퍼" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="로컬 구성" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="인증 URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="외부 응용 프로그램 로그아웃 URL" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="서비스" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="메타 별칭" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="아티팩트 확인 서비스" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="단일 로그아웃 서비스" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="이름 아이디 서비스 관리" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="단일 사인온(SSO) 서비스" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.samlv2idpassertioncontent" text="고급" expand="false">
+                <tocitem target="federation.samlv2idpassertioncontent" text="IDP URL" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="응용 프로그램 보안 목록" expand="false"></tocitem>
+                <tocitem target="federation.samlv2idpassertioncontent" text="IDP 매퍼 세션" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.samlv2pdp" text="SAMLv2 XACML PDP 사용자 정의 " expand="false">
+            <tocitem target="federation.samlv2pdp" text="프로토콜 지원 열거" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="서명 키 별칭" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="암호화 키 별칭" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="기본 인증" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="서명된 인증 결정 쿼리" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pdp" text="인증 서비스" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2pep" text="SAMLv2 XACML PEP 사용자 정의 " expand="false">
+            <tocitem target="federation.samlv2pep" text="프로토콜 지원 열거" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="서명 키 별칭" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="암호화 키 별칭" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="기본 인증" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="서명된 인증 결정 응답" expand="false"></tocitem>
+            <tocitem target="federation.samlv2pep" text="명제 암호화됨" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2attrauthority" text="SAMLv2 속성 권한 사용자 정의" expand="false">
+            <tocitem target="federation.samlv2attrauthority" text="서명 및 암호화" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="속성 서비스" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="AssertionID 요청" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="속성 프로필" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="인증서 별칭" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrauthority" text="주제 데이터 저장소" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2attrquery" text="SAMLv2 속성 쿼리 사용자 정의" expand="false">
+            <tocitem target="federation.samlv2attrquery" text="NameID 형식" expand="false"></tocitem>
+            <tocitem target="federation.samlv2attrquery" text="인증서 별칭" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2authnauthority" text="SAMLv2 인증 권한 사용자 정의" expand="false">
+            <tocitem target="federation.samlv2authnauthority" text="서명 및 암호화" expand="false"></tocitem>
+            <tocitem target="federation.samlv2authnauthority" text="인증 쿼리 서비스" expand="false"></tocitem>
+            <tocitem target="federation.samlv2authnauthority" text="AssertionID 요청" expand="false"></tocitem>
+            <tocitem target="federation.samlv2authnauthority" text="인증서 별칭" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.samlv2affiliate" text="SAMLv2 호스트 제휴 사용자 정의" expand="false">
+            <tocitem target="federation.samlv2affiliate" text="메타 별칭" expand="false"></tocitem>
+            <tocitem target="federation.samlv2affiliate" text="구성원" expand="false"></tocitem>
+            <tocitem target="federation.samlv2affiliate" text="인증서 별칭" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.idffidp" text="ID-FF Identity 공급자 사용자 정의 " expand="false">
+            <tocitem target="federation.idffidp" text="공통 속성" expand="false">
+                <tocitem target="federation.idffidp" text="공급자 유형" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="설명" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="프로토콜 지원 열거" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="서명 키" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="암호화 키" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="이름 식별자 암호화" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="통신 URL" expand="false">
+                <tocitem target="federation.idffidp" text="SOAP 엔드포인트" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="단일 사인온 서비스 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="단일 로그아웃 서비스 " expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="단일 로그아웃 반환" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="연합 종료 서비스" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="연합 종료 반환" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="이름 등록 서비스" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="이름 등록 반환" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="통신 프로필" expand="false">
+                <tocitem target="federation.idffidp" text="연합 종료" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="단일 로그아웃" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="이름 등록" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="단일 사인온(SSO)/연합" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="Identity 공급자 구성" expand="false">
+                <tocitem target="federation.idffidp" text="공급자 별칭" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="인증 유형" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="명제 발급자" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="응답 유형" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="공급자 상태" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="서비스 URL" expand="false">
+                <tocitem target="federation.idffidp" text="홈 페이지 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="단일 사인온 실패 리디렉션 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="연합 페이지 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="등록 완료 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="COT 페이지 URL 목록" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="종료 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="종료 완료 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="오류 페이지 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="로그아웃 완료 URL" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="플러그인" expand="false">
+                <tocitem target="federation.idffidp" text="이름 식별자 구현" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="속성 명령문 플러그인" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="사용자 공급자 클래스" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="Identity 공급자 속성 매퍼" expand="false">
+                <tocitem target="federation.idffidp" text="속성 매퍼 클래스" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="Identity 공급자 속성 매핑" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="부트스트랩" expand="false">
+                <tocitem target="federation.idffidp" text="부트스트랩 자원 오퍼링 검색 생성" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="자동 연합 " expand="false">
+                <tocitem target="federation.idffidp" text="자동 연합" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="자동 연합 공통 속성 이름" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffidp" text="인증 컨텍스트" expand="false"></tocitem>
+            <tocitem target="federation.idffidp" text="SAML 속성" expand="false">
+                <tocitem target="federation.idffidp" text="명제 간격" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="정리 간격" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="아티팩트 시간 초과" expand="false"></tocitem>
+                <tocitem target="federation.idffidp" text="명제 제한" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.idffsp" text="ID-FF 서비스 공급자 사용자 정의 " expand="false">
+            <tocitem target="federation.idffsp" text="공통 속성" expand="false">
+                <tocitem target="federation.idffsp" text="공급자 유형" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="설명" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="프로토콜 지원 열거" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="서명 키" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="암호화 키" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="이름 식별자 암호화" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="서명 인증 요청" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="통신 URL" expand="false">
+                <tocitem target="federation.idffsp" text="SOAP 엔드포인트" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="단일 로그아웃 서비스 " expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="단일 로그아웃 반환" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="연합 종료 서비스" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="연합 종료 반환" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="이름 등록 서비스" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="이름 등록 반환" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="명제 소비자 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="명제 소비자 서비스 URL 아이디" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="명제 소비자 서비스 URL을 기본값으로 설정" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="통신 프로필" expand="false">
+                <tocitem target="federation.idffsp" text="연합 종료" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="단일 로그아웃" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="이름 등록" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="지원되는 SSO 프로필" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="서비스 공급자 구성 " expand="false">
+                <tocitem target="federation.idffsp" text="공급자 별칭" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="인증 유형" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="Identity 공급자 강제 인증" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="Identity 공급자에게 준수 요청" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="연합 후 이름 등록" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="이름 아이디 정책" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="제휴 연합" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="공급자 상태" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="응답 유형" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="서비스 URL" expand="false">
+                <tocitem target="federation.idffsp" text="COT 페이지 URL 목록" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="연합 페이지 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="홈 페이지 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="단일 사인온 실패 리디렉션 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="종료 완료 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="오류 페이지 URL" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="로그아웃 완료 URL" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="플러그인" expand="false">
+                <tocitem target="federation.idffsp" text="서비스 공급자 어댑터" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="연합 SP 어댑터 환경" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="사용자 공급자 클래스" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="이름 식별자 구현" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="서비스 공급자 속성 매퍼" expand="false">
+                <tocitem target="federation.idffsp" text="속성 매퍼 클래스" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="서비스 공급자 속성 매핑" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="자동 연합 " expand="false">
+                <tocitem target="federation.idffsp" text="자동 연합" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="자동 연합 공통 속성 이름" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.idffsp" text="인증 컨텍스트" expand="false"></tocitem>
+            <tocitem target="federation.idffsp" text="프록시 인증 구성" expand="false">
+                <tocitem target="federation.idffsp" text="프록시 인증" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="프록시 Identity 공급자 목록" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="최대 프록시 수" expand="false"></tocitem>
+                <tocitem target="federation.idffsp" text="소개 쿠키를 사용하여 프록시" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="federation.wsfedgeneral" text="WS-FED 일반 속성" expand="false">
+            <tocitem target="federation.wsfedgeneral" text="SP 표시 이름" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="IDP 표시 이름" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="영역" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="토큰 발급자 이름" expand="false"></tocitem>
+            <tocitem target="federation.wsfedgeneral" text="토큰 발급자 엔드포인트" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.wsfedidp" text="WS-FED Identity 공급자 사용자 정의 " expand="false">
+            <tocitem target="federation.wsfedidp" text="NameID 형식" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="NameID 속성" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="이름에 도메인 포함" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="도메인 속성" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="UPN 도메인" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="서명 인증서 별칭" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="자격 유형" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="계정 매퍼" expand="false"></tocitem>
+            <tocitem target="federation.wsfedidp" text="속성 매퍼" expand="false">
+                <tocitem target="federation.wsfedidp" text="속성 맵" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.wsfedidp" text="명제 유효 시간" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.wsfedsp" text="WS-FED 서비스 공급자 사용자 정의 " expand="false">
+            <tocitem target="federation.wsfedsp" text="서명된 명제" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="계정 매퍼" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="속성 매퍼" expand="false">
+                <tocitem target="federation.wsfedsp" text="속성 맵" expand="false"></tocitem></tocitem>
+            <tocitem target="federation.wsfedsp" text="명제 유효 시간" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="명제 오차 시간" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="기본 중계 상태" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="홈 영역 검색" expand="false"></tocitem>
+            <tocitem target="federation.wsfedsp" text="계정 영역 선택" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="federation.fssamlservice" text="SAML1.x" expand="false">
+        <tocitem target="targetspecifier" text="대상 지정자" expand="false"></tocitem>
+        <tocitem target="siteidentifiers" text="사이트 식별자" expand="false">
+            <tocitem target="federation.fssamlsiteidadd" text="사이트 식별자 구성 " expand="false"></tocitem></tocitem>
+        <tocitem target="trustedpartners" text="신뢰할 수 있는 파트너" expand="false">
+            <tocitem target="federation.fssamlselecttrustedpartnertype" text="신뢰할 수 있는 파트너: 파트너 유형 및 프로필 선택" expand="false"></tocitem>
+            <tocitem target="federation.fssamltrustedpartnersadd" text="신뢰할 수 있는 파트너: 신뢰할 수 있는 파트너 속성 구성" expand="false"></tocitem></tocitem>
+        <tocitem target="federation.fsssamltargeturlsadd" text="대상 URL" expand="false">
+            <tocitem target="federation.fssamltargeturlsadd" text="대상 URL 구성" expand="false"></tocitem></tocitem>
+        <tocitem target="assertiontimeout" text="논리 검사 시간 초과" expand="false"></tocitem>
+        <tocitem target="assertionskew" text="notBefore 시간에 대한 스큐 팩터 단정" expand="false"></tocitem>
+        <tocitem target="artifacttimeout" text="아티팩트 시간 초과" expand="false"></tocitem>
+        <tocitem target="samlartifactname" text="SAML 아티팩트 이름" expand="false"></tocitem>
+        <tocitem target="signsamlassertion" text="SAML 명제에 서명" expand="false"></tocitem>
+        <tocitem target="signsamlrequest" text="SAML 요청에 서명" expand="false"></tocitem>
+        <tocitem target="signsamlresponse" text="SAML 응답에 서명" expand="false"></tocitem>
+        <tocitem target="ggyfk" text="속성 쿼리" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="webservices" text="웹 서비스" expand="false">
+    <tocitem target="webservices.wspersonalprofileservice" text="리버티 개인 프로필 서비스" expand="false">
+        <tocitem target="resourceidmapper" text="자원 아이디 매퍼" expand="false"></tocitem>
+        <tocitem target="authorizer" text="인증자" expand="false"></tocitem>
+        <tocitem target="attributemapper" text="속성 매퍼" expand="false"></tocitem>
+        <tocitem target="ppproviderid" text="공급자 아이디" expand="false"></tocitem>
+        <tocitem target="namescheme" text="이름 체계" expand="false"></tocitem>
+        <tocitem target="namespaceprefix" text="이름 공간 접두어" expand="false"></tocitem>
+        <tocitem target="supportedcontainers" text="지원되는 컨테이너" expand="false">
+            <tocitem target="webservices.wsppservicesupportedcontaineradd" text="지원되는 컨테이너 구성" expand="false"></tocitem></tocitem>
+        <tocitem target="ppldapattributemaplist" text="PPLDAP 속성 맵 목록" expand="false">
+            <tocitem target="webservices.wsppservicedsattributemaplistadd" text="속성 매핑 구성" expand="false"></tocitem></tocitem>
+        <tocitem target="requirequery" text="쿼리 정책 평가 요구" expand="false"></tocitem>
+        <tocitem target="requiremodify" text="수정 정책 평가 요구" expand="false"></tocitem>
+        <tocitem target="extensioncontainerattributes" text="확장 컨테이너 속성" expand="false"></tocitem>
+        <tocitem target="extensionattributesnamespaceprefix" text="확장 속성 이름 공간 접두어" expand="false"></tocitem>
+        <tocitem target="serviceupdateenabled" text="서비스 업데이트" expand="false"></tocitem>
+        <tocitem target="serviceinstanceupdateclass" text="서비스 인스턴스 업데이트 클래스" expand="false"></tocitem>
+        <tocitem target="alternateendpoint" text="대체 종점" expand="false"></tocitem>
+        <tocitem target="alternatesecuritymechanisms" text="대체 보안 기법" expand="false"></tocitem></tocitem>
+    <tocitem target="service.smdiscoveryservice" text="검색 서비스" expand="false">
+        <tocitem target="dsproviderid" text="공급자 아이디" expand="false"></tocitem>
+        <tocitem target="supportedauthmechanisms" text="지원되는 인증 기법" expand="false"></tocitem>
+        <tocitem target="supporteddirectives" text="지원되는 지시문" expand="false"></tocitem>
+        <tocitem target="policyevaldiscolookup" text="검색 조회에 대한 정책 평가" expand="false"></tocitem>
+        <tocitem target="policyevaldiscoupdate" text="검색 업데이트에 대한 정책 평가" expand="false"></tocitem>
+        <tocitem target="authorizerpluginclass" text="인증자 플러그인 클래스" expand="false"></tocitem>
+        <tocitem target="entryhandlerpluginclass" text="항목 처리기 플러그인 클래스" expand="false"></tocitem>
+        <tocitem target="resourceidmapperpluginclass" text="자원 아이디 매퍼 플러그인 클래스 " expand="false">
+            <tocitem target="service.smdiscoveryproviderresourceidmapperadd" text="자원 아이디 매퍼 구성" expand="false"></tocitem></tocitem>
+        <tocitem target="authresponsemessage" text="응답 메시지 인증" expand="false"></tocitem>
+        <tocitem target="generatesessioncontext" text="부트스트랩용 세션 컨텍스트 문" expand="false"></tocitem>
+        <tocitem target="encryptnameidentifier" text="부트스트랩용 세션 컨텍스트에서 NameIdentifier 암호화" expand="false"></tocitem>
+        <tocitem target="useimpliedresource" text="함축된 자원" expand="false"></tocitem>
+        <tocitem target="resourceofferingsbootstrapping" text="부트스트랩용 자원 오퍼링" expand="false">
+            <tocitem target="service.smdiscoverybootstraprefoffadd" text="부트스트랩용 자원 오퍼링 구성" expand="false"></tocitem>
+            <tocitem target="service.smdiscoverydescriptionadd" text="서비스 설명 구성" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="service.scsoapbinding" text="SOAP 바인드 서비스" expand="false">
+        <tocitem target="requesthandlerlist" text="요청 처리기 목록" expand="false">
+            <tocitem target="service.scsoapbindingrequesthandlerlistadd" text="요청 처리기 구성" expand="false"></tocitem></tocitem>
+        <tocitem target="ggodb" text="SOAP 바인딩 속성" expand="false">
+            <tocitem target="ggodb" text="웹 서비스 인증자" expand="false"></tocitem>
+            <tocitem target="ggodb" text="지원되는 인증 기법" expand="false"></tocitem>
+            <tocitem target="ggodb" text="알려진 공급자만 강제 실행" expand="false"></tocitem>
+            <tocitem target="ggodb" text="SSL 클라이언트 인증을 위한 인증서 별칭 " expand="false"></tocitem>
+            <tocitem target="ggodb" text="오래된 메시지의 시간 제한" expand="false"></tocitem>
+            <tocitem target="ggodb" text="메시지 아이디 캐시 정리 간격 " expand="false"></tocitem>
+            <tocitem target="ggodb" text="지원되는 SOAP 행위자(actor)" expand="false"></tocitem>
+            <tocitem target="ggodb" text="이름 공간 접두어 매핑" expand="false"></tocitem>
+            <tocitem target="ggodb" text="JAXB 패키지 목록" expand="false"></tocitem>
+            <tocitem target="ggodb" text="Liberty Identity 웹 서비스 버전" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="webservices.wsauthnservices" text="인증 웹 서비스" expand="false">
+        <tocitem target="mechanismhandlerslist" text="메커니즘 처리기 목록" expand="false">
+            <tocitem target="webservices.wsauthnserviceshandlersadd" text="새 메커니즘 처리기 구성" expand="false"></tocitem></tocitem></tocitem></tocitem>
+ <tocitem target="service.scconfig" text="구성 속성" expand="false">
+    <tocitem target="service.scconfigauth" text="인증" expand="false">
+        <tocitem target="service.scserviceprofile.sunamauthadservice" text="활성 디렉토리" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="주 활성 디렉토리 서버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="보조 활성 디렉토리 서버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="사용자 검색을 시작할 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="루트 사용자 바인드용 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="루트 사용자 바인드용 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="루트 사용자 바인드용 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="사용자 프로필 검색 시 사용되는 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="인증될 사용자 검색 시 사용되는 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="사용자 검색 필터" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="검색 범위" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="활성 디렉토리 서버에 대한 SSL 액세스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="인증할 사용자 DN 반환" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="활성 디렉토리 서버 확인 간격" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="사용자 작성 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthadservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="익명" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="유효한 익명 사용자" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="기본 익명 사용자 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="대소문자 구분 사용자 아이디" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="authentication.authconfig" text="인증 구성 " expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="인증서 " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP에서 인증서 일치" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP에서 인증서 검색 시 사용되는 주제 DN 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="CRL에 인증서 일치" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP에서 CRL 검색 시 사용되는 발급자 DN 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="CRL 업데이트용 HTTP 매개 변수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="OCSP 검증" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="인증서가 저장되는 LDAP 서버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP 시작 검색 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP 서버 기본 사용자" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP 서버 기본 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP 서버 기본 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="LDAP 액세스에 SSL 사용" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="사용자 프로필 액세스에 사용되는 인증서 필드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="사용자 프로필 액세스에 사용되는 기타 인증서 필드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="사용자 프로필에 액세스하는 데 필요한 SubjectAltNameExt 값 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="신뢰할 수 있는 원격 호스트" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="SSL 포트 번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="클라이언트 인증서의 HTTP 헤더 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthcertservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthservice" text="핵심" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="플러그 가능 인증 모듈 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="지원되는 클라이언트용 인증 모듈" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="LDAP 연결 풀 크기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="기본 LDAP 연결 풀 크기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="사용자 프로필" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="원격 인증 보안" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="로그아웃을 처리하는 동안 게시 프로세스 객체 유지" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="로그아웃을 처리하는 동안 인증 모듈 객체 유지" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="관리자 인증 구성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="사용자 프로필 동적 작성 기본 역할" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="영구 쿠키 모드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="영구 쿠키 최대 시간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="별칭 검색 속성 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="기본 인증 로켈" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="조직 인증 구성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="로그인 실패 잠금 모드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="로그인 실패 잠금 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="로그인 실패 잠금 간격" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="잠금 알림을 보낼 전자 메일 주소" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="N회 실패 후 사용자에게 경고" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="로그인 실패 잠금 기간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="잠금 기간 승수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="잠금 속성 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="잠금 속성 값" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="기본 성공 로그인 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="기본 실패 로그인 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="인증 사후 처리 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="사용자 아이디 생성 모드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="플러그 가능 사용자 이름 생성기 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="Identity 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="플러그 가능 사용자 상태 이벤트 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="데이터 저장소에 잘못된 저장 시도" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="모듈 기반 인증" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="세션 속성에 매핑된 사용자 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthservice" text="기본 인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthdatastoreservice" text="데이터 저장소" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthdatastoreservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="ggulh" text="연합" expand="false">
+            <tocitem target="ggulh" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP 기본" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="연결 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="연결 풀 JNDI 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC 드라이버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="이 사용자를 데이터베이스에 연결" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="데이터베이스 연결에 사용할 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="데이터베이스 연결에 사용할 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="비밀번호 열 문자열" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="준비된 명령문" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="비밀번호 구문 변환에 사용할 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthjdbcservice" text="인증 수준" expand="false"></tocitem>
+            <tocitem target="jdbcexample" text="연결 풀 구성 - 예제" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="기본 LDAP 서버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="보조 LDAP 서버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="사용자 검색을 시작할 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="루트 사용자 바인드용 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="루트 사용자 바인드용 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="루트 사용자 바인드용 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="사용자 프로필 검색 시 사용되는 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="인증될 사용자 검색 시 사용되는 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="사용자 검색 필터" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="검색 범위" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="SSL이 LDAP 서버에 액세스 가능" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="인증할 사용자 DN 반환" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP 서버 확인 간격" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="사용자 작성 속성 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthldapservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="구성원" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="최소 비밀번호 길이" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="기본 사용자 역할" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="등록 후 사용자 상태" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN " expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="신뢰할 수 있는 게이트웨이 IP 주소" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN 번호 인수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 서버 및 포트" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 시작 검색 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 검색에 사용할 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 서버 기본 사용자" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 서버 기본 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 서버 기본 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="LDAP 액세스에 SSL 사용" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="사용자 프로필 검색 시 사용되는 LDAP 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="인증 시에 사용자 DN 반환" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunamauthmsisdnservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="서버 1" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="서버 2" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="공유 비밀" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="공유 비밀 확인" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="포트 번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthradiusservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="서버" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="서버 검증 파일 디렉토리" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="로깅 사용 가능" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="로깅 수준" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="로그 파일" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="인증 연결 시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="클라이언트 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="EASSP 버전" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="최소 인증자 권한" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE" expand="false">
+            <tocitem target="service.scserviceprofile.sunamauthsaeservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="ACE/서버 구성 경로" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="구성 포트" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="인증 포트" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="스레드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="인증 수준" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthunixservice" text="PAM 서비스 이름" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows 데스크탑 SSO" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="서비스 기본" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="키탭 파일 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="커버로스 영역" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="커버로스 서버 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="도메인 이름과 함께 기본 반환" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="인증 도메인" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="인증 호스트" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="Samba 구성 파일 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamauthntservice" text="인증 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="supportedlang" text="지원되는 언어 로켈" expand="false"></tocitem></tocitem>
+    <tocitem target="service.scconfigconsole" text="콘솔 등록 정보" expand="false">
+        <tocitem target="service.scserviceprofile.amadminconsoleservice" text="관리 " expand="false">
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="연합 관리" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 관리" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="조직 구성 단위 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="그룹 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="관리 대상 그룹 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="기본 역할 권한" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="도메인 구성 요소 트리" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="관리 그룹" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="호환 사용자 삭제" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="동적 관리 역할 ACI" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 프로필 서비스 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="DC 노드 속성 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="삭제된 객체의 검색 필터" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="기본 사용자 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="기본 그룹 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="기본 에이전트 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="그룹 기본 사용자 컨테이너" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="그룹 사용자 컨테이너 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 프로필 디스플레이 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="최종 사용자 프로필 디스플레이 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 프로필 페이지에 역할 표시" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 프로필 페이지에 그룹 표시" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자의 그룹 직접 가입" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 프로필 디스플레이 옵션" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 작성 기본 역할" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="관리 콘솔 탭" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="검색에서 반환되는 최대 결과 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="검색 시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="JSP 디렉토리 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="온라인 도움말 문서" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="필수 서비스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 검색 키" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 검색 반환 속성" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 작성 알림 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 삭제 알림 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 수정 알림 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="페이지당 표시되는 최대 항목" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="Event Listener 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사전 처리 및 사후 처리 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="외부 속성 불러오기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="잘못된 사용자 아이디 문자" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amadminconsoleservice" text="사용자 아이디 및 비밀번호 검증 플러그인 클래스" expand="false"></tocitem></tocitem>
+        <tocitem target="service.smg11n" text="국제화 설정" expand="false">
+            <tocitem target="service.smg11n" text="각 로켈이 지원하는 문자 집합" expand="false"></tocitem>
+            <tocitem target="service.smg11n" text="문자 집합 별칭" expand="false"></tocitem>
+            <tocitem target="service.smg11n" text="자동 생성된 공통 이름 형식" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="servic.scconfigglobal" text="전역 등록 정보" expand="false">
+        <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="공통 연합 구성" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="Datastore SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="구성 인스턴스 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="로거 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="세션 공급자 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="허용되는 최대 컨텐트 길이" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="비밀번호 디코더 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="서명 공급자 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="키 공급자 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="인증서가 있는지 확인" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="XML 정규화 알고리즘" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="XML 서명 알고리즘" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamfederationcommon" text="XML 변환 알고리즘" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="Liberty ID-FF 서비스 구성" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="연합 쿠키 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="IDP 프록시 검색기 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="요청 캐시 정리 간격" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="요청 캐시 시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="IDP 로그인 URl" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamidffconfiguration" text="XML 서명" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="Liberty ID-WSF 보안 서비스" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="보안 속성 플러그인 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="KeyInfo 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="보안 토큰 공급자 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="기본 WSC 인증서 별칭" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="신뢰할 수 있는 기관이 서명한 인증서 별칭" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertysecurityservice" text="신뢰할 수 있는 CA가 서명한 인증서 별칭" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="Liberty 상호 작용 서비스" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="상호 작용을 위해 사용자를 리디렉션할 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="데이터에 대한 상호 작용을 위해 사용자를 리디렉션할 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSP의 예상 상호 작용 기간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="returnToURL을 SSL로 강제 지정할 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="요청 호스트와 동일한 호스트로 반환되도록 강제 지정할 WSP" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="HTML 스타일 시트 위치" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WML 스타일 시트 위치" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSP 상호 작용 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="로드 밸런서 뒤에 있는 경우 WSP 상호 작용 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="로드 밸런서 뒤에 있는 WSP 클러스터(사이트)의 상호 작용 URL 목록" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="상호 작용 구성 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="상호 작용에 참여할 WSC의 옵션" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="userInteractionHeader를 포함할 WSC" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="상호 작용을 위해 사용자를 리디렉션할 WSC" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="WSC의 예상 상호 작용 기간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamlibertyinteractionservice" text="리디렉션 URL을 SSL로 강제 지정할 WSC" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunmultifederationprotocol" text="다중 연합 프로토콜" expand="false">
+            <tocitem target="service.scserviceprofile.sunmultifederationprotocol" text="단일 로그아웃 처리기 목록" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="사용자 검증" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀 문제" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="검색 필터" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="기본 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="바인드 DN" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="바인드 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 옵션" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 변경 알림 옵션" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="개인 질문" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="최대 질문 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="다음 로그인 시 반드시 비밀번호 변경" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 실패 잠금" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 실패 잠금 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 실패 잠금 간격" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="잠금 알림을 보낼 전자 메일 주소" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="N회 실패 후 사용자에게 경고" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 실패 잠금 기간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 잠금 속성 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정 잠금 속성 값" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scpolicy" text="정책 구성" expand="false">
+            <tocitem target="service.scpolicy" text="전역 등록 정보" expand="false">
+                <tocitem target="service.scpolicy" text="자원 비교기" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="거부 결정에 대한 평가 계속" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="OpenSSO에서 처리 가능한 권고" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="조직 별칭 참조" expand="false"></tocitem></tocitem>
+            <tocitem target="service.scpolicy" text="영역 속성" expand="false">
+                <tocitem target="service.scpolicy" text="기본 LDAP 서버" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 기본 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 사용자 기본 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="OpenSSO 역할 기본 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 바인드 DN" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 바인드 비밀번호" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 조직 검색 필터" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 조직 검색 범위" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 그룹 검색 범위" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 그룹 검색 필터" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 사용자 검색 필터" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 사용자 검색 범위" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 역할 검색 필터" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 역할 검색 범위" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="OpenSSO 역할 검색 범위" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 조직 검색 속성" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 그룹 검색 속성" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 사용자 검색 속성" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 역할 검색 속성" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="검색에서 반환되는 최대 결과 수" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="검색 시간 초과" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP SSL" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="LDAP 연결 풀 최소 크기" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="연결 풀 최대 크기" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="선택한 정책 주제" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="선택한 정책 조건" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="선택한 정책 참조" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="주제 결과 유지 시간" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="사용자 별칭" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="선택한 응답 공급자" expand="false"></tocitem>
+                <tocitem target="service.scpolicy" text="선택한 동적 응답 속성" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="SAMLv2 서비스 구성" expand="false">
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="캐시 정리 간격" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="이름 아이디 정보의 속성 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="이름 아이디 정보 키의 속성 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="IDP 검색 서비스의 쿠키 도메인" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="IDP 검색 서비스의 쿠키 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="IDP 검색 서비스의 URL 체계" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="XML 암호화 SPI 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="KeyInfo 요소 내에 암호화 키 포함" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="XML 서명 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="XML 서명 인증서 유효성 검사" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.sunfamsaml2configuration" text="CA 인증서 유효성 검사" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scsaml2soapbinding" text="SAMLv2 SOAP 바인딩" expand="false">
+            <tocitem target="service.scsaml2soapbinding" text="요청 처리기 목록" expand="false"></tocitem></tocitem>
+        <tocitem target="service.securitytokenservice" text="보안 토큰 서비스" expand="false">
+            <tocitem target="service.securitytokenservice" text="발급자" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="엔드포인트" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="발급된 키 암호화" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="발급된 토큰 암호화" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="보안 토큰의 수명" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="토큰 구현 클래스" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="인증서 별칭 이름" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="STS 최종 사용자 토큰 플러그인 클래스" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="보안 메커니즘" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="인증 체인" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="사용자 자격 증명" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="요청 서명 확인됨" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="요청 헤더 해독됨" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="요청 해독됨" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="응답 서명됨" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="응답 암호화됨" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="서명 참조 유형" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="암호화 알고리즘" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="암호화 강도" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="개인 키 별칭" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="개인 키 유형" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="웹 서비스(WS-Trust) 클라이언트의 공개 키 별칭" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="커버로스 도메인 서버" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="커버로스 도메인" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="커버로스 서비스 기본" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="커버로스 키 탭 파일" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="커버로스 서명 확인" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="SAML 속성 매핑" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="NameID 매퍼" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="구성원이 포함되어야 함" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="속성 이름 공간" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="신뢰할 수 있는 발급자" expand="false"></tocitem>
+            <tocitem target="service.securitytokenservice" text="신뢰할 수 있는 IP 주소" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.amsessionservice" text="세션" expand="false">
+            <tocitem target="service.scserviceprofile.amsessionservice" text="보조 구성 인스턴스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="최대 검색 결과 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="검색 시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="등록 정보 변경 알림 사용" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="할당량 제약 조건 사용 가능" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="할당량 제약 조건의 읽기 시간 초과" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="제약 조건 검사에서 최상위 관리자 제외 " expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="세션 할당량이 모두 사용된 경우의 결과 동작" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="세션 저장소 중단 시 사용자 로그인 거부" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="알림 등록 정보" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="최대 세션 시간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="최대 유휴 시간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="최대 캐싱 시간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.amsessionservice" text="활성 사용자 세션" expand="false"></tocitem></tocitem>
+        <tocitem target="service.subconfigadd" text="하위 구성 추가" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamuserservice" text="사용자" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="사용자 기본 언어" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="사용자 기본 표준 시간대" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="상속된 로켈" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="관리자 시작 보기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamuserservice" text="기본 사용자 상태" expand="false"></tocitem></tocitem></tocitem>
+    <tocitem target="service.scfonfigsystem" text="시스템 등록 정보" expand="false">
+        <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 검색" expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 유형" expand="false">
+                <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 관리자" expand="false"></tocitem>
+                <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 유형" expand="false"></tocitem></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="기본 클라이언트 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 검색 클래스" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 검색" expand="false"></tocitem></tocitem>
+        <tocitem target="service.mapcreatedevice" text="새 클라이언트 추가" expand="false"></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로깅 " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="최대 로그 크기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="내역 파일 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로그 파일 위치" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로그 상태" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로그 레코드에서 호스트 이름 확인" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로깅 유형" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="데이터베이스 사용자 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="데이터베이스 사용자 비밀번호" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="데이터베이스 사용자 비밀번호(확인)" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="데이터베이스 드라이버 이름" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="구성 가능한 로그 필드" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로그 확인 빈도" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로그 서명 시간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="보안 로깅" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="보안 로깅 서명 알고리즘" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로깅 인증서 저장소 위치" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="최대 레코드 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="아카이브당 파일 수" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="버퍼 크기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="DB 실패 메모리 버퍼 크기" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="버퍼 시간" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="시간 버퍼링" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamloggingservice" text="로깅 수준" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="이름 지정 " expand="false">
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="프로필 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="세션 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="로깅 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="정책 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="인증 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML 웹 프로필/아티팩트 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML SOAP 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML 웹 프로필/POST 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="SAML 명제 관리자 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="연합 명제 관리자 서비스 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="보안 토큰 관리자 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="JAXRPC 종점 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="Identity 웹 서비스 엔드포인트 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="Identity REST 서비스 엔드포인트 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="보안 토큰 서비스 엔드포인트 URL" expand="false"></tocitem>
+            <tocitem target="service.scserviceprofile.iplanetamnamingservice" text="보안 토큰 서비스 MEX 엔드포인트 URL" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scplatform" text="플랫폼" expand="false">
+            <tocitem target="service.scplatform" text="플랫폼 로켈" expand="false"></tocitem>
+            <tocitem target="service.scplatform" text="쿠키 도메인" expand="false"></tocitem>
+            <tocitem target="service.scplatform" text="사용 가능한 로켈" expand="false"></tocitem>
+            <tocitem target="service.scplatform" text="클라이언트 문자 집합" expand="false"></tocitem></tocitem>
+        <tocitem target="service.scplatformclientcharsetsadd" text="새 문자 집합 만들기" expand="false"></tocitem></tocitem>
+    <tocitem target="service.serversite" text="서버 및 사이트" expand="false">
+        <tocitem target="service.serveradd" text="새 서버 인스턴스를 만들려면" expand="false"></tocitem>
+        <tocitem target="service.serverconfiginherit" text="상속 설정" expand="false"></tocitem>
+        <tocitem target="service.servereditgeneral" text="일반" expand="false">
+            <tocitem target="service.servereditgeneral" text="사이트 속성" expand="false">
+                <tocitem target="service.servereditgeneral" text="상위 사이트" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditgeneral" text="시스템 속성" expand="false">
+                <tocitem target="service.servereditgeneral" text="기본 설치 디렉토리" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="기본 로켈" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="알림 URL" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="XML 유효성 검사" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditgeneral" text="디버깅 속성" expand="false">
+                <tocitem target="service.servereditgeneral" text="디버그 수준" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="디버그 디렉토리" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditgeneral" text="메일 서버" expand="false">
+                <tocitem target="service.servereditgeneral" text="메일 서버 호스트 이름" expand="false"></tocitem>
+                <tocitem target="service.servereditgeneral" text="메일 서버 포트 번호" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.servereditsecurity" text="보안" expand="false">
+            <tocitem target="service.servereditsecurity" text="암호화" expand="false">
+                <tocitem target="service.servereditsecurity" text="비밀번호 암호화 키" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="인증 서비스 공유 비밀" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="암호화 클래스" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="보안 임의 팩토리 클래스" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="유효성 검사" expand="false">
+                <tocitem target="service.servereditsecurity" text="플랫폼 저수준 명령 최대 컨텐트 길이" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="클라이언트 IP 주소 확인" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="쿠키" expand="false">
+                <tocitem target="service.servereditsecurity" text="쿠키 이름" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="보안 쿠키" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="쿠키 값 인코딩" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="키 저장소" expand="false">
+                <tocitem target="service.servereditsecurity" text="키 저장소 파일" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="키 저장소 비밀번호 파일" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="개인 키 비밀번호 파일" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="인증서 별칭" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="인증서 해지 목록 캐싱" expand="false">
+                <tocitem target="service.servereditsecurity" text="LDAP 서버 호스트 이름" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 서버 포트 번호" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="SSL 사용 가능" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 서버 바인드 사용자 이름" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 서버 바인드 비밀번호" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="LDAP 검색 기본 DN" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="검색 속성" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="온라인 인증서 상태 프로토콜 확인" expand="false">
+                <tocitem target="service.servereditsecurity" text="확인 사용 가능" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="응답자 URL" expand="false"></tocitem>
+                <tocitem target="service.servereditsecurity" text="인증서 별명" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsecurity" text="미국 정보처리 표준(FIPS)" expand="false">
+                <tocitem target="service.servereditsecurity" text="FIPS 모드" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.servereditsession" text="세션" expand="false">
+            <tocitem target="service.servereditsession" text="세션 제한" expand="false">
+                <tocitem target="service.servereditsession" text="최대 세션" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="세션 최대 시간 무효화" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="세션 제거 지연" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsession" text="통계" expand="false">
+                <tocitem target="service.servereditsession" text="로깅 간격" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="상태" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="디렉토리" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="호스트 조회 사용" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsession" text="알림" expand="false">
+                <tocitem target="service.servereditsession" text="알림 풀 크기" expand="false"></tocitem>
+                <tocitem target="service.servereditsession" text="알림 스레드 풀 임계값" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsession" text="유효성 검사" expand="false">
+                <tocitem target="service.servereditsession" text="대소문자 구분 없이 클라이언트 DN 비교" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.servereditsdk" text="SDK" expand="false">
+            <tocitem target="service.servereditsdk" text="데이터 저장소 " expand="false">
+                <tocitem target="service.servereditsdk" text="데이터 저장소 알림 사용" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="디렉토리 프록시 사용" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsdk" text="이벤트 서비스" expand="false">
+                <tocitem target="service.servereditsdk" text="이벤트 서비스 연결 재시도 횟수" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 연결 시도 간의 지연" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 연결 시도 오류 코드" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="유휴 시간 초과" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="비활성화된 이벤트 서비스 연결" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsdk" text="LDAP 연결" expand="false">
+                <tocitem target="service.servereditsdk" text="LDAP 연결 재시도 횟수" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 연결 재시도 간의 지연" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="LDAP 연결 재시도 오류 코드" expand="false"></tocitem></tocitem>
+            <tocitem target="service.servereditsdk" text="캐싱 및 복제" expand="false">
+                <tocitem target="service.servereditsdk" text="SDK 캐싱 최대 크기" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="SDK 복제 재시도" expand="false"></tocitem>
+                <tocitem target="service.servereditsdk" text="SDK 복제 시도 간 지연" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="service.serverconfigxml" text="디렉토리 구성" expand="false">
+            <tocitem target="service.serverconfigxml" text="디렉토리 구성" expand="false">
+                <tocitem target="service.serverconfigxml" text="최소 연결 풀" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="최대 연결 풀" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="바인드 DN" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="바인드 비밀번호" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="서버" expand="false"></tocitem></tocitem>
+            <tocitem target="service.serverconfigxml" text="레거시 구성" expand="false">
+                <tocitem target="service.serverconfigxml" text="최소 연결 풀" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="최대 연결 풀" expand="false"></tocitem>
+                <tocitem target="service.serverconfigxml" text="서버" expand="false"></tocitem></tocitem></tocitem>
+        <tocitem target="ggwyq" text="고급" expand="false"></tocitem>
+        <tocitem target="service.siteadd" text="새 사이트 인스턴스를 만들려면" expand="false"></tocitem>
+        <tocitem target="service.siteedit" text="사이트 인스턴스를 편집하려면" expand="false"></tocitem>
+        <tocitem target="ggvwi" text="서버 및 사이트 콘솔 속성 맵" expand="false"></tocitem></tocitem></tocitem>
+ <tocitem target="sessions" text="세션" expand="false">
+    <tocitem target="sessionpage" text="세션 페이지" expand="false">
+        <tocitem target="sessionsearch" text="검색" expand="false"></tocitem>
+        <tocitem target="viewsession" text="보기 세션" expand="false"></tocitem>
+        <tocitem target="session.smprofile" text="세션 창" expand="false">
+            <tocitem target="session.smprofile" text="사용자 아이디" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="남은 시간(분)" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="최대 세션 시간(분)" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="유휴 시간(분)" expand="false"></tocitem>
+            <tocitem target="session.smprofile" text="최대 유휴 시간(분)" expand="false"></tocitem></tocitem>
+        <tocitem target="invalidatesession" text="세션 무효화" expand="false"></tocitem>
+</tocitem>
+</tocitem>
+</toc>

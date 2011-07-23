@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED 服務提供者自訂 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>WS-FED 服務提供者自訂</h4>
+<p>下列屬性套用於 WS-FED 服務提供者角色：</p>
+
+<a name="ggwtj"></a><h5>指定已簽名</h5>
+<p>此服務提供者收到的所有指定都必須簽名。</p>
+
+<a name="ggwsg"></a><h5>帳號對映程式</h5>
+<p>此屬性指定 <tt>AccountMapper</tt> 介面的實作，該介面用來將遠端使用者帳號對映至本機使用者帳號，以便進行單次登入。預設值為 <tt>com.sun.identity.wsfed.plugins.</tt></p><p><tt>DefaultADFSPartnerAccountMapper</tt> 為預設實作。</p>
+
+<a name="ggwrf"></a><h5>屬性對映程式</h5>
+<p>此屬性定義類別，該類別用來將指定中屬性對映至身份識別提供者在本機上定義的使用者屬性。預設類別為 <tt>com.sun.identity.wsfederation.plugins.</tt><tt>DefaultSPAttributeMapper</tt>。</p>
+
+<a name="ggwrq"></a><h5>屬性對映</h5>
+<p>指定值，以定義預設屬性對映程式外掛程式所使用的對映。對映應以下列格式配置：</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>例如 <tt>EmailAddress=mail</tt> 或 <tt>Address=postaladdress</tt>。鍵入對映做為 [新的值]，然後按一下 [增加]。</p>
+
+<a name="ggwvn"></a><h5>指定有效時間</h5>
+<p>指定在一段時間內有效，在這之前或之後都無效。</p><p><tt>有效時間</tt>會指定從指定的發出時間開始計算的指定有效時間，以秒為單位。預設值為 <tt>600</tt> 秒。</p>
+
+<a name="ggwsk"></a><h5>指定偏差時間</h5>
+<p>指定在一段時間內有效，在這之前或之後都無效。此屬性指定 <tt>notBefore</tt> 值的寬限期 (以秒為單位)。預設值為 <tt>300</tt>。這個值與 <tt>notAfter</tt> 值不相關。</p>
+
+<a name="ggwts"></a><h5>預設轉送狀態</h5>
+<p><a name="indexterm-77"></a>在成功的 WS-FED 作業 (單次登入、單一登出或聯合終止) 之後，會顯示一個頁面。此頁面通常為原始請求的資源，是在初始請求中使用 <tt>RelayState</tt> 元素指定。如果未指定 <tt>RelayState</tt>，則會顯示此 <tt>defaultRelayState</tt> 特性的值。</p>
+<hr><p><b>注意 &#8211; </b>當 <tt>RelayState</tt> 或 <tt>defaultRelayState</tt> 包含特殊字元 (例如 <tt>&#38;</tt>) 時，必須以 URL 編碼。例如，如果 <tt>RelayState </tt> 的值為
+<tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt>，則必須以 URL 編碼為：</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>然後附加至 URL。例如，服務提供者啟動的單次登入 URL 可能為：</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>主範圍探索</h5>
+<p>指定服務，讓服務提供者能夠識別喜好的身份識別提供者。服務提供者會將服務 URL 指定為連絡端點。</p>
+
+<a name="ggwwb"></a><h5>帳號範圍選取</h5>
+<p>指定身份識別提供者選取機制和配置。<tt>Cookie</tt> 或 <tt>HTTP Request</tt> 標頭屬性可以用來尋找身份識別提供者。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Servicio de configuraci&#243;n de pol&#237;ticas  - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &#169; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="ggdbu"></a><h4>Servicio de configuraci&#243;n de pol&#237;ticas </h4>
+<p>El servicio de configuraci&#243;n de pol&#237;ticas se utiliza para configurar atributos relacionados
+con pol&#237;ticas para cada organizaci&#243;n mediante la consola de Federated Access Manager.
+Tambi&#233;n puede definir implementaciones de nombres de recursos y almacenes de datos
+de Directory Server para utilizarlos con la estructura de pol&#237;ticas de Federated
+Access Manager. La instancia de Directory Server especificada en el servicio de
+configuraci&#243;n de pol&#237;ticas se utiliza para la evaluaci&#243;n de miembros de usuarios
+LDAP, grupos LDAP, roles LDAP y asuntos de pol&#237;tica de organizaci&#243;n.</p>
+
+<a name="ggdbf"></a><h5>Tiempo de vida de resultado de asuntos</h5>
+<p>Para mejorar el rendimiento de la evaluaci&#243;n de pol&#237;ticas, las evaluaciones de
+miembros se almacenan en cach&#233; durante un periodo de tiempo definido por
+el atributo de tiempo de vida de resultado de asuntos en el
+servicio de configuraci&#243;n de pol&#237;ticas. Estas decisiones de miembros almacenados en cach&#233;
+se utilizan hasta que haya transcurrido el tiempo definido en el atributo
+de tiempo de vida de resultado de asuntos. La evaluaci&#243;n de miembros
+posterior se utiliza para reflejar el estado actual de los usuarios en
+el directorio. </p>
+
+<a name="ggday"></a><h5>Atributos din&#225;micos</h5>
+<p>Estos son los nombres de atributos din&#225;micos permitidos que aparecen en una
+lista y se seleccionan para definir atributos din&#225;micos de proveedor de respuesta
+a una pol&#237;tica. Los nombres que se definen deben ser los mismos
+que los nombres de atributos definidos en el repositorio de datos.</p>
+
+<a name="ggdcj"></a><h5>Definici&#243;n de amldapuser</h5>
+<p><tt>amldapuser</tt> es un usuario creado durante la instalaci&#243;n que se utiliza de
+forma predeterminada en la instancia de Directory Server especificada en el servicio
+de configuraci&#243;n de pol&#237;ticas. El administrador o el administrador de pol&#237;ticas del
+dominio puede cambiarlo, si es necesario.</p>
+<br/>
+
+</body>
+</html>

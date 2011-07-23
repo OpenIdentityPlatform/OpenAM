@@ -1,0 +1,32 @@
+dn: cn=admin data
+objectClass: ds-cfg-branch
+objectClass: top
+cn: admin data
+
+dn: cn=instance keys,cn=admin data
+objectClass: ds-cfg-branch
+objectClass: top
+cn: instance keys
+
+dn: cn=secret keys,cn=admin data
+objectClass: ds-cfg-branch
+objectClass: top
+cn: secret keys
+
+dn: cn=Administrators,cn=admin data
+objectClass: top
+objectClass: groupofurls
+memberURL: ldap:///cn=Administrators,cn=admin data??one?(objectclass=*)
+description: Group of identities which have full access.
+cn: Administrators
+
+dn: cn=Server Groups,cn=admin data
+objectClass: ds-cfg-branch
+objectClass: top
+cn: Server Groups
+
+dn: cn=all-servers,cn=Server Groups,cn=admin data
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: all-servers
+

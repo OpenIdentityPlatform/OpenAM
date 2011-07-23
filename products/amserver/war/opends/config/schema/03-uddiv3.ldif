@@ -1,0 +1,321 @@
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE
+# or https://OpenDS.dev.java.net/OpenDS.LICENSE.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE.  If applicable,
+# add the following below this CDDL HEADER, with the fields enclosed
+# by brackets "[]" replaced with your own identifying information:
+#      Portions Copyright [yyyy] [name of copyright owner]
+#
+# CDDL HEADER END
+#
+#
+#      Copyright 2006-2008 Sun Microsystems, Inc.
+#
+#
+# This file contains schema definitions from RFC 4403,
+# which defines a mechanism for storing UDDIv3 information in the Directory
+# Server.
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+attributeTypes: ( 1.3.6.1.1.10.4.1 NAME 'uddiBusinessKey'
+  DESC 'businessEntity unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.2 NAME 'uddiAuthorizedName'
+  DESC 'businessEntity publisher name' EQUALITY distinguishedNameMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.3 NAME 'uddiOperator'
+  DESC 'registry site operator of businessEntitys master copy'
+  EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.4 NAME 'uddiName' DESC 'human readable name'
+  EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.5 NAME 'uddiDescription'
+  DESC 'short description' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.6 NAME 'uddiDiscoveryURLs'
+  DESC 'URL to retrieve a businessEntity instance' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.7 NAME 'uddiUseType'
+  DESC 'name of convention the referenced document follows'
+  EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.8 NAME 'uddiPersonName'
+  DESC 'name of person or job role available for contact'
+  EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.9 NAME 'uddiPhone'
+  DESC 'telephone number for contact' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.10 NAME 'uddiEMail'
+  DESC 'e-mail address for contact' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.11 NAME 'uddiSortCode'
+  DESC 'specifies an external disply mechanism' EQUALITY caseIgnoreMatch
+  ORDERING caseIgnoreOrderingMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.12 NAME 'uddiTModelKey'
+  DESC 'tModel unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.13 NAME 'uddiAddressLine' DESC 'address'
+  EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.14  NAME 'uddiIdentifierBag'
+  DESC 'identification information' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.15 NAME 'uddiCategoryBag'
+  DESC 'categorization information' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.16 NAME 'uddiKeyedReference'
+  DESC 'categorization information' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.17 NAME 'uddiServiceKey'
+  DESC 'businessService unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.18 NAME 'uddiBindingKey'
+  DESC 'bindingTemplate unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.19 NAME 'uddiAccessPoint'
+  DESC 'entry point address to call a web service' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.20 NAME 'uddiHostingRedirector'
+  DESC 'designates a pointer to another bindingTemplate'
+  EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.21 NAME 'uddiInstanceDescription'
+  DESC 'instance details description' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.22 NAME 'uddiInstanceParms'
+  DESC 'URL reference to required settings' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.23 NAME 'uddiOverviewDescription'
+  DESC 'outlines tModel usage' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.24 NAME 'uddiOverviewURL'
+  DESC 'URL reference to overview document' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.25 NAME 'uddiFromKey'
+  DESC 'unique businessEntity key reference' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.26 NAME 'uddiToKey'
+  DESC 'unique businessEntity key reference' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.27 NAME 'uddiUUID'
+  DESC 'unique attribute' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.28 NAME 'uddiIsHidden'
+  DESC 'isHidden attribute' EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.29 NAME 'uddiIsProjection'
+  DESC 'isServiceProjection attribute' EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.30 NAME 'uddiLang'
+  DESC 'xml:lang value in v3 Address structure' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.31 NAME 'uddiv3BusinessKey'
+  DESC 'UDDIv3 businessEntity unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.32 NAME 'uddiv3ServiceKey'
+  DESC 'UDDIv3 businessService unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.33 NAME 'uddiv3BindingKey'
+  DESC 'UDDIv3 BindingTemplate unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.34 NAME 'uddiv3TModelKey'
+  DESC 'UDDIv3 TModel unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.35 NAME 'uddiv3DigitalSignature'
+  DESC 'UDDIv3 entity digital signature' EQUALITY caseExactMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.36 NAME 'uddiv3NodeId'
+  DESC 'UDDIv3 Node Identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.37 NAME 'uddiv3EntityModificationTime'
+  DESC 'UDDIv3 Last Modified Time for Entity' EQUALITY generalizedTimeMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.38 NAME 'uddiv3SubscriptionKey'
+  DESC 'UDDIv3 Subscription unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.39 NAME 'uddiv3SubscriptionFilter'
+  DESC 'UDDIv3 Subscription Filter' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.40 NAME 'uddiv3NotificationInterval'
+  DESC 'UDDIv3 Notification Interval' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.41 NAME 'uddiv3MaxEntities'
+  DESC 'UDDIv3 Subscription maxEntities field' EQUALITY integerMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.42 NAME 'uddiv3ExpiresAfter'
+  DESC 'UDDIv3 Subscription ExpiresAfter field' EQUALITY generalizedTimeMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.43 NAME 'uddiv3BriefResponse'
+  DESC 'UDDIv3 Subscription ExpiresAfter field' EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.44 NAME 'uddiv3EntityKey'
+  DESC 'UDDIv3 Entity unique identifier' EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.45 NAME 'uddiv3EntityCreationTime'
+  DESC 'UDDIv3 Entity Creation Time' EQUALITY generalizedTimeMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+attributeTypes: ( 1.3.6.1.1.10.4.46 NAME 'uddiv3EntityDeletionTime'
+  DESC 'UDDIv3 Entity Deletion Time' EQUALITY generalizedTimeMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.1 NAME 'uddiBusinessEntity' SUP top
+  STRUCTURAL MUST ( uddiBusinessKey $  uddiName )
+  MAY ( uddiAuthorizedName $ uddiOperator $ uddiDiscoveryURLs $
+  uddiDescription $ uddiIdentifierBag $ uddiCategoryBag $uddiv3BusinessKey $
+  uddiv3DigitalSignature $ uddiv3EntityModificationTime $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.2 NAME 'uddiContact' SUP top STRUCTURAL
+  MUST ( uddiPersonName $ uddiUUID ) MAY ( uddiUseType $ uddiDescription $
+  uddiPhone $ uddiEMail ) X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.3 NAME 'uddiAddress' SUP top STRUCTURAL
+  MUST ( uddiUUID ) MAY ( uddiUseType $ uddiSortCode $ uddiTModelKey $
+  uddiv3TmodelKey $  uddiAddressLine $ uddiLang )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.4 NAME 'uddiBusinessService' SUP top
+  STRUCTURAL MUST ( uddiServiceKey ) MAY ( uddiName $ uddiBusinessKey $
+  uddiDescription $ uddiCategoryBag $ uddiIsProjection $ uddiv3ServiceKey $
+  uddiv3BusinessKey $ uddiv3DigitalSignature $ uddiv3EntityCreationTime $
+  uddiv3EntityModificationTime $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.5 NAME 'uddiBindingTemplate' SUP top
+  STRUCTURAL MUST ( uddiBindingKey ) MAY ( uddiServiceKey $ uddiDescription $
+  uddiAccessPoint $ uddiHostingRedirector $ uddiCategoryBag $
+  uddiv3BindingKey $ uddiv3ServiceKey $ uddiv3DigitalSignature $
+  uddiv3EntityCreationTime $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.6 NAME 'uddiTModelInstanceInfo' SUP top
+  STRUCTURAL MUST ( uddiTModelKey ) MAY ( uddiDescription $
+  uddiInstanceDescription $ uddiInstanceParms $ uddiOverviewDescription $
+  uddiOverviewURL $ uddiv3TmodelKey )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.7 NAME 'uddiTModel' SUP top STRUCTURAL
+  MUST ( uddiTModelKey $ uddiName ) MAY ( uddiAuthorizedName $ uddiOperator $
+  uddiDescription $ uddiOverviewDescription $ uddiOverviewURL $
+  uddiIdentifierBag $ uddiCategoryBag $ uddiIsHidden $ uddiv3TModelKey $
+  uddiv3DigitalSignature $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.8 NAME 'uddiPublisherAssertion' SUP top
+  STRUCTURAL MUST ( uddiFromKey $ uddiToKey $ uddiKeyedReference $ uddiUUID )
+  MAY ( uddiv3DigitalSignature $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.9 NAME 'uddiv3Subscription' SUP top
+  STRUCTURAL MUST ( uddiv3SubscriptionFilter $ uddiUUID )
+  MAY ( uddiAuthorizedName $ uddiv3SubscriptionKey $ uddiv3BindingKey $
+  uddiv3NotificationInterval $ uddiv3MaxEntities $ uddiv3ExpiresAfter $
+  uddiv3BriefResponse $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+objectClasses: ( 1.3.6.1.1.10.6.10 NAME 'uddiv3EntityObituary' SUP top
+  STRUCTURAL MUST ( uddiv3EntityKey $ uddiUUID ) MAY (  uddiAuthorizedName $
+  uddiv3EntityCreationTime $ uddiv3EntityDeletionTime $ uddiv3NodeId )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.1 NAME 'uddiBusinessEntityNameForm'
+  OC uddiBusinessEntity MUST ( uddiBusinessKey )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.2 NAME 'uddiContactNameForm' OC uddiContact
+  MUST ( uddiUUID ) X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.3 NAME 'uddiAddressNameForm' OC uddiAddress
+  MUST ( uddiUUID ) X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.4  NAME 'uddiBusinessServiceNameForm'
+  OC uddiBusinessService MUST ( uddiServiceKey )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.5 NAME 'uddiBindingTemplateNameForm'
+  OC uddiBindingTemplate MUST ( uddiBindingKey )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.6 NAME 'uddiTModelInstanceInfoNameForm'
+  OC uddiTModelInstanceInfo MUST ( uddiTModelKey )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.7 NAME 'uddiTModelNameForm' OC uddiTModel
+  MUST ( uddiTModelKey ) X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.8 NAME 'uddiPublisherAssertionNameForm'
+  OC uddiPublisherAssertion MUST ( uddiUUID )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.9 NAME 'uddiv3SubscriptionNameForm'
+  OC uddiv3Subscription MUST ( uddiUUID )
+  X-ORIGIN 'RFC 4403' )
+nameForms: ( 1.3.6.1.1.10.15.10 NAME 'uddiv3EntityObituaryNameForm'
+  OC uddiv3EntityObituary MUST ( uddiUUID )
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 1 NAME 'uddiBusinessEntityStructureRule'
+  FORM uddiBusinessEntityNameForm X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 2 NAME 'uddiContactStructureRule'
+  FORM uddiContactNameForm SUP ( 1 )
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 3 NAME 'uddiAddressStructureRule' FORM uddiAddressNameForm
+  SUP ( 2 ) X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 4 NAME 'uddiBusinessServiceStructureRule'
+  FORM uddiBusinessServiceNameForm SUP ( 1 )
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 5 NAME 'uddiBindingTemplateStructureRule'
+  FORM uddiBindingTemplateNameForm SUP ( 4 )
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 6 NAME 'uddiTModelInstanceInfoStructureRule'
+  FORM uddiTModelInstanceInfoNameForm SUP ( 5 )
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 7 NAME 'uddiTModelStructureRule' FORM uddiTModelNameForm
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 8 NAME 'uddiPublisherAssertionStructureRule'
+  FORM uddiPublisherAssertionNameForm
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 9 NAME 'uddiv3SubscriptionStructureRule'
+  FORM uddiv3SubscriptionNameForm
+  X-ORIGIN 'RFC 4403' )
+dITStructureRules: ( 10 NAME 'uddiv3EntityObituaryStructureRule'
+  FORM uddiv3EntityObituaryNameForm
+  X-ORIGIN 'RFC 4403' )
+

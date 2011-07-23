@@ -1,0 +1,191 @@
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.5.2.3 2009/04/23 19:11:03 dknab Exp $
+
+   Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<project name="open-source-web-agents" default="usage">
+                
+    <description>Open Web Single Sign-On Web Agents</description>
+
+    <import file="../products.xml" />
+    <import file="../installtools/installtools.xml" />
+    <import file="webagents.xml" />
+
+    <tstamp>
+        <format property="nightly.date" pattern="yyyyMMdd" offset="-1"
+            unit="day"/>
+    </tstamp>
+
+   <condition property="build.os" value="Linux">
+        <os name="linux"/>
+    </condition>
+
+    <condition property="build.os" value="SunOS">
+        <and>
+            <os name="sunos"/>
+            <and>
+                <os arch="sparc"/>
+            </and>
+        </and>
+    </condition>
+
+    <condition property="build.os" value="SunOS_x86">
+        <and>
+            <os name="sunos"/>
+            <and>
+                <os arch="x86"/>
+            </and>
+        </and>
+    </condition>
+
+    <condition property="build.os" value="WINNT">
+        <os family="windows"/>
+    </condition>
+
+    <condition property="iis.build.ok" value="true">
+        <os family="windows"/>
+    </condition>
+
+    <condition property="winnt.lib.ext" value="_64" else="">
+        <os family="windows" arch="amd64"/>
+    </condition>
+
+    <condition property="winnt.ext" value="_x64" else="">
+        <os family="windows" arch="amd64"/>
+    </condition>
+
+    <condition property="build.type.suffix" value="_64" else="">
+        <equals arg1="${build.type}" arg2="64"/>
+    </condition>
+
+    <!-- overridable properties -->
+    <!-- build.debug is used for c code. valid values are: optimize, full -->
+    <property name="build.debug" value="optimize"/>
+
+    <target name="preparebuild">
+        <mkdir dir="${webagents.built.dir}"/>
+        <mkdir dir="${webagents.dist.dir}"/>
+        <echo message="Dispatch to installtools to build install libraries"/>
+        <ant antfile="${installtools.base.dir}/build.xml" inheritRefs="true" />
+    </target>
+
+    <target name="clean">
+        <echo message="Dispatch to clean"/>
+        <exec executable="gmake" failonerror="true">
+           <arg value="clean" />
+        </exec>
+    </target>
+
+    <target name="all">
+        <antcall target="apache" />
+        <antcall target="sjsws" />
+        <antcall target="apache22" />
+        <antcall target="iis6"/>
+    </target>
+
+    <target name="apache" depends="preparebuild">
+        <echo message="Dispatch to apache"/>
+        <property name="containername" value="apache"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+            target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="sjsws" depends="preparebuild">
+        <echo message="Dispatch to SJSWS"/>
+        <property name="containername" value="sjsws"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+            target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="apache22" depends="preparebuild">
+        <echo message="Dispatch to Apache 22"/>
+        <property name="containername" value="apache22"/>
+        <antcall target="gmake" inheritRefs="true"/>
+        <ant antfile="${webagents.basedir}/build_agent.xml" 
+            target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="iis6" depends="preparebuild" if="iis.build.ok">
+         <echo message="Dispatch to iis6"/>
+         <property name="containername" value="iis6"/>
+         <antcall target="gmake" inheritRefs="true"/>
+         <ant antfile="${webagents.basedir}/build_agent.xml"
+             target="all" inheritRefs="true"/>
+     </target>
+
+    <target name="gmake">
+        <echo message="Dispatch to compile of agent c code"/>
+        <exec executable="gmake" failonerror="true">
+           <arg value="BUILD_DEBUG=${build.debug}" />
+           <arg value="BUILD_AGENT=${containername}" />
+           <arg value="BUILD_TYPE=${build.type}" />
+        </exec>
+    </target>
+
+    <target name="nightly">
+        <filter token="DATE" value="${nightly.date}" />
+        <filter token="OS" value="${build.os}" />
+        <antcall target="prenightly" inheritRefs="true"/>
+        <antcall target="all" inheritRefs="true"/>
+        <copy file="${webagents.docs.dir}/nightly.html" 
+              tofile="${webagents.dist.dir}/index.html" filtering="true" />
+        <antcall target="postnightly" inheritRefs="true"/>
+    </target>
+
+    <target name="prenightly" depends="preparebuild">
+        <copy todir="${webagents.basedir}/extlib" >
+            <fileset dir="${installtools.dist.dir}">
+                <include name="opensso-installtools.jar" />
+                <include name="opensso-installtools-launcher.jar" />
+            </fileset>
+        </copy>
+    </target>
+        
+    <target name="postnightly">
+        <copy todir="${prd.nightly.dist.dir}/webagents/${nightly.date}">
+            <fileset dir="${webagents.dist.dir}" />
+        </copy>
+    </target>
+
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available for Web Agents:"/>
+        <echo message=" "/>
+        <echo message=" all             : builds all the Web agents"/>
+        <echo message=" clean           : deletes all the generated files"/>
+        <echo message=" apache          : builds the Apache Web Server 2.0.x agent"/>
+        <echo message=" sjsws           : builds the Sun Java System Web Server 6.1/7.0 agent"/>
+        <echo message=" apache22        : builds the Apache Web Server 2.2.x agent"/>
+        <echo message=" iis6          : builds the Microsoft Internet Information Services 6 agent"/>
+        <echo message=" usage           : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+
+</project>

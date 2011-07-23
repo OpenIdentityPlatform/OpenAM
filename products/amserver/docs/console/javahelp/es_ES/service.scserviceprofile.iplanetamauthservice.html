@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Principal - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthservice"></a><h4>Principal</h4>
+<p><a name="indexterm-170"></a>Este m&#243;dulo es la base de configuraci&#243;n general de los servicios de
+autenticaci&#243;n de OpenSSO. Se debe registrar y configurar para utilizar cualquiera de
+las instancias del m&#243;dulo de autenticaci&#243;n espec&#237;ficas. Permite que el administrador defina
+los valores predeterminados que se seleccionar&#225;n para los valores que no se
+hayan definido espec&#237;ficamente en los m&#243;dulos de autenticaci&#243;n predeterminados de OpenSSO. Los
+atributos de m&#243;dulo principal son globales y de dominio. Los atributos son:</p>
+<ul><li><p><a href="#gcnje">Clases de m&#243;dulo de autenticaci&#243;n conectable</a></p></li>
+<li><p><a href="#gcnjc">M&#243;dulo de autenticaci&#243;n admitido para clientes</a></p></li>
+<li><p><a href="#gcnir">Tama&#241;o de grupo de conexi&#243;n LDAP</a></p></li>
+<li><p><a href="#gcnkh">Tama&#241;o de grupo predeterminado de conexi&#243;n LDAP</a></p></li>
+<li><p><a href="#gcnkq">Perfil de usuario</a></p></li>
+<li><p><a href="#gcnks">Configuraci&#243;n de autenticaci&#243;n del administrador</a></p></li>
+<li><p><a href="#gcnjw">Roles predeterminados de creaci&#243;n din&#225;mica de perfil de usuario</a></p></li>
+<li><p><a href="#gcnjn">Modo de cookie persistente</a></p></li>
+<li><p><a href="#gcnke">Tiempo m&#225;ximo de cookie persistente</a></p></li>
+<li><p><a href="#gcnlc">Nombre de atributo de b&#250;squeda de alias</a></p></li>
+<li><p><a href="#gcnkt">Idioma de autenticaci&#243;n predeterminado</a></p></li>
+<li><p><a href="#gcnjj">Configuraci&#243;n de autenticaci&#243;n de organizaci&#243;n</a></p></li>
+<li><p><a href="#gcnkl">Modo de bloqueo por fallo de inicio de sesi&#243;n</a></p></li>
+<li><p><a href="#gcnjz">Recuento de bloqueos por fallo de inicio de sesi&#243;n</a></p></li>
+<li><p><a href="#gcnko">Intervalo de bloqueo por fallo de inicio de sesi&#243;n</a></p></li>
+<li><p><a href="#gcnkd">Direcci&#243;n de correo electr&#243;nico para enviar notificaci&#243;n de bloqueo</a></p></li>
+<li><p><a href="#gcnkr">Avisar a usuario despu&#233;s de N fallos</a></p></li>
+<li><p><a href="#gcnkc">Duraci&#243;n del bloqueo por fallo de inicio de sesi&#243;n</a></p></li>
+<li><p><a href="#gcnjy">Nombre de atributo de bloqueo</a></p></li>
+<li><p><a href="#gcnle">Valor de atributo de bloqueo</a></p></li>
+<li><p><a href="#gcnkz">URL de inicio de sesi&#243;n con &#233;xito predeterminada</a></p></li>
+<li><p><a href="#gcnlf">URL de fallo de inicio de sesi&#243;n predeterminada</a></p></li>
+<li><p><a href="#gcnlb">Clase de procesamiento posterior de autenticaci&#243;n</a></p></li>
+<li><p><a href="#gcnjl">Modo de creaci&#243;n de Id. de usuario</a></p></li>
+<li><p><a href="#gcnjq">Clase de generador de nombre de usuario conectable</a></p></li>
+<li><p><a href="#gcnki">Tipos de identidad</a></p></li>
+<li><p><a href="#gcnlh">Clases de eventos de estado de usuario conectable</a></p></li>
+<li><p><a href="#gcnjv">Inclusi&#243;n de intentos no v&#225;lidos en un almac&#233;n de datos</a></p></li>
+<li><p><a href="#gcnjo">Autenticaci&#243;n basada en m&#243;dulos</a></p></li>
+<li><p><a href="#fwbfn">Nivel de autenticaci&#243;n predeterminado</a></p></li></ul>
+
+
+<a name="gcnje"></a><h5>Clases de m&#243;dulo de autenticaci&#243;n conectable</h5>
+<p>Especifica las clases Java de los m&#243;dulos de autenticaci&#243;n disponibles para cualquier
+dominio configurado en la plataforma OpenSSO. Puede escribir los m&#243;dulos de autenticaci&#243;n
+predeterminada implementando el SPI AMLoginModule o JAAS LoginModule. Para obtener m&#225;s informaci&#243;n
+consulte el documento "OpenSSO Developer's Guide". Para definir los nuevos servicios, este
+campo debe tener una cadena de texto que especifique el nombre completo
+de clase (incluido el nombre del paquete) de cada nuevo servicio de
+autenticaci&#243;n.</p>
+
+<a name="gcnjc"></a><h5>M&#243;dulo de autenticaci&#243;n admitido para clientes</h5>
+<p>Especifica una lista de los m&#243;dulos de autenticaci&#243;n admitidos para un cliente
+espec&#237;fico. El formato es el siguiente:</p><p><tt>clientType | module1,module2,module3</tt></p><p>Este atributo se aplica al habilitar la detecci&#243;n de clientes.</p>
+
+<a name="gcnir"></a><h5>Tama&#241;o de grupo de conexi&#243;n LDAP</h5>
+<p>Especifica la grupo de conexi&#243;n m&#225;ximo y m&#237;nimo que se debe utilizar
+en un puerto y servidor LDAP espec&#237;fico. Este atributo es v&#225;lido &#250;nicamente
+para los servicios de autenticaci&#243;n de miembros y LDAP. El formato es
+el siguiente:</p><p><tt>host:port:min:max</tt></p>
+<hr><p><b>Nota &#8211; </b>Este conjunto de conexiones es distinto al de SDK, configurado en <tt>serverconfig.xml</tt>.</p>
+<hr>
+
+
+<a name="gcnkh"></a><h5>Tama&#241;o de grupo predeterminado de conexi&#243;n LDAP</h5>
+<p>Define el grupo de conexi&#243;n m&#237;nimo y m&#225;ximo predeterminado que se debe
+utilizar con todas las configuraciones del m&#243;dulo de autenticaci&#243;n LDAP. Si ya
+existe una entrada para el host y puerto en el atributo LDAP
+Connection Pool Size (Tama&#241;o de grupo de conexi&#243;n LDAP), no se utilizar&#225;
+la configuraci&#243;n m&#237;nima y m&#225;xima definida en LDAP Connection Default Pool Size
+(Tama&#241;o de grupo predeterminado de conexi&#243;n LDAP).</p>
+
+<a name="gcnkq"></a><h5>Perfil de usuario</h5>
+<p>Esa opci&#243;n permite especificar las opciones de un perfil de usuario. Las
+opciones son:</p><dl><dt><b>Obligatorio</b></dt>
+<dd><p>Esta opci&#243;n especifica que, si la autenticaci&#243;n se realiza con &#233;xito, el usuario tendr&#225; que tener un perfil en la instancia local de Directory Server instalada con OpenSSO para el servicio de autenticaci&#243;n con el fin de emitir un SSOToken.</p></dd>
+<dt><b>Din&#225;mico</b></dt>
+<dd><p>Esta opci&#243;n especifica que, si la autenticaci&#243;n se realiza con &#233;xito, el servicio de autenticaci&#243;n crear&#225; el perfil de usuario si no existe uno. A continuaci&#243;n, se emitir&#225; SSOToken. El perfil de usuario se crea en la instancia local de Directory Server instalada con OpenSSO.</p></dd>
+<dt><b>Din&#225;mico con alias de usuario</b></dt>
+<dd><p>Esta opci&#243;n especifica que, si la autenticaci&#243;n se realiza con &#233;xito, los servicios de autenticaci&#243;n crear&#225;n el perfil de usuario con el atributo User Alias List (Lista de alias de usuario). </p></dd>
+<dt><b>Omitir</b></dt>
+<dd><p>Esta opci&#243;n especifica que el servicio de autenticaci&#243;n no requiere el perfil de usuario para emitir SSOToken para realizar una autenticaci&#243;n con &#233;xito.</p></dd>
+</dl>
+
+
+<a name="ggukq"></a><h5>Seguridad de autenticaci&#243;n remota</h5>
+<p>Si se habilita, todas las solicitudes de autenticaci&#243;n remotas requieren que el
+SSOToken de la aplicaci&#243;n valide la identidad del remitente, de forma que
+la informaci&#243;n de configuraci&#243;n de OpenSSO pueda obtener los valores v&#225;lidos del
+nombre de usuario y la contrase&#241;a asociada a la aplicaci&#243;n.</p>
+
+<a name="ggull"></a><h5>Conservar objetos de procesos POST para el procesamiento de cierre de sesi&#243;n</h5>
+<p>Si se habilita, las instancias de los complementos de autenticaci&#243;n posteriores al
+proceso utilizados durante el proceso de inicio de sesi&#243;n se conservar&#225;n en
+la sesi&#243;n de OpenSSO. Cuando posteriormente se invoca el cierre de sesi&#243;n,
+se llama al m&#233;todo <tt>onLogout </tt> de estas instancias. Si este atributo no
+est&#225; habilitado, no se conservan las instancias posteriores al proceso de inicio
+de sesi&#243;n. Cuando se invoca el cierre de sesi&#243;n y se llama
+al m&#233;todo <tt>onLogout</tt> se crean nuevas instancias de los complementos posteriores al
+proceso. </p>
+
+<a name="gguji"></a><h5>Conservar objetos de m&#243;dulos de autenticaci&#243;n para el procesamiento de cierre de sesi&#243;n</h5>
+<p>Si se habilita, todas las instancias de los m&#243;dulos de autenticaci&#243;n utilizados
+durante el proceso de autenticaci&#243;n se conservan en la sesi&#243;n de OpenSSO.
+Posteriormente, cuando se invoca el cierre de sesi&#243;n, se llama al m&#233;todo
+logout/destroyModulestate en las mismas instancias. Si este atributo no est&#225; habilitado, no
+se conservan las instancias del m&#243;dulo de autenticaci&#243;n del proceso de cierre
+de sesi&#243;n. Tras el cierre de sesi&#243;n no se llama a ninguno
+de los m&#233;todos de los m&#243;dulos de autenticaci&#243;n.</p>
+
+<a name="gcnks"></a><h5>Configuraci&#243;n de autenticaci&#243;n del administrador</h5>
+<p>Define el servicio de autenticaci&#243;n s&#243;lo para los administradores. Este atributo se
+puede utilizar si el m&#243;dulo de autenticaci&#243;n de los administradores tiene que
+ser distinto del m&#243;dulo de los usuarios finales. Los m&#243;dulos configurados en
+este atributo se seleccionan cuando se accede a la consola de OpenSSO.
+Por ejemplo:</p><p><tt><b>http://</tt><i>servername.port/console_deploy_uri</i><tt></b></tt></p>
+
+<a name="gcnjw"></a><h5>Roles predeterminados de creaci&#243;n din&#225;mica de perfil de usuario</h5>
+<p>Este campo especifica los roles asignados a un nuevo usuario cuyos perfiles
+se crean si se ha seleccionado Creaci&#243;n din&#225;mica mediante Perfil de usuario.
+No hay ning&#250;n valor predeterminado. El administrador debe especificar los DN de
+los roles que se asignar&#225;n al nuevo usuario.  </p>
+<hr><p><b>Nota &#8211; </b>El rol especificado debe encontrarse debajo del dominio para el que se
+est&#225; configurando la autenticaci&#243;n. Este rol puede ser un rol de OpenSSO
+o LDAP, pero no puede ser un rol filtrado.</p><p>Si desea asignar autom&#225;ticamente servicios espec&#237;ficos al usuario, tendr&#225; que configurar el
+atributo Required Services (Servicios requeridos)  en User Profile (Perfil de usuario).</p>
+<hr>
+
+
+<a name="gcnjn"></a><h5>Modo de cookie persistente</h5>
+<p>Esta opci&#243;n determina si los usuarios pueden reiniciar el explorador y volver
+a su sesi&#243;n autenticada. Las sesiones de usuario pueden mantenerse habilitando Enable
+Persistent Cookie Mode (Activar el modo de cookie persistente). Si se habilita
+esta opci&#243;n, una sesi&#243;n de usuario no caduca hasta que su cookie
+persistente caduque o el usuario cierre la sesi&#243;n expl&#237;citamente. El tiempo de
+caducidad se especifica en  Persistent Cookie Maximum Time (Tiempo m&#225;ximo de
+cookie persistente). El valor predeterminado es que el modo de cookie persistente
+no est&#233; habilitado y el servicio de autenticaci&#243;n utilice &#250;nicamente cookies de
+memoria.</p>
+<hr><p><b>Nota &#8211; </b>El cliente debe solicitar expl&#237;citamente una cookie persistente utilizando el par&#225;metro <i>iPSPCookie=yes</i>
+en la direcci&#243;n URL de inicio de sesi&#243;n.</p>
+<hr>
+
+
+<a name="gcnke"></a><h5>Tiempo m&#225;ximo de cookie persistente</h5>
+<p>Especifica el intervalo tras el que caduca una cookie persistente. El intervalo
+comienza cuando se autentica con &#233;xito la sesi&#243;n de usuario. El valor
+m&#225;ximo es 2147483647 (tiempo en segundos). El campo aceptar&#225; cualquier valor entero
+inferior al valor m&#225;ximo.</p>
+
+<a name="gcnlc"></a><h5>Nombre de atributo de b&#250;squeda de alias</h5>
+<p>Una vez que el usuario se haya autenticado con &#233;xito, se recuperar&#225;
+el perfil del usuario. Este campo especifica un segundo atributo LDAP desde
+el que se buscar&#225; si la b&#250;squeda en el primer atributo LDAP
+no encuentra un perfil de usuario coincidente. Principalmente, este atributo se utilizar&#225;
+cuando la identificaci&#243;n de usuario obtenida en un m&#243;dulo de autenticaci&#243;n no
+sea igual a la que se especifica en el atributo de nombre
+de usuario. Por ejemplo, un servidor RADIUS puede devolver <tt>abc1234</tt>, pero el
+nombre de usuario es <tt>abc</tt>. No existe ning&#250;n valor predeterminado para este
+atributo.</p><p>El campo tomar&#225; cualquier atributo LDAP v&#225;lido (por ejemplo, cn).</p>
+
+<a name="gcnkt"></a><h5>Idioma de autenticaci&#243;n predeterminado</h5>
+<p>Especifica el subtipo de idioma predeterminado que utilizar&#225; el servicio de autenticaci&#243;n.
+El valor predeterminado es en_US. Consulte <a href="supportedlang.html">Idiomas admitidos</a> para obtener una lista de
+los subtipos de idioma v&#225;lidos.  </p><p>Para utilizar una configuraci&#243;n regional distinta, primero se deber&#225;n crear todas las
+plantillas de autenticaci&#243;n para dicho configuraci&#243;n. A continuaci&#243;n, debe crearse un directorio
+nuevo para estas plantillas. Consulte "Login URL Parameters" (Par&#225;metros de direcci&#243;n URL
+de inicio de sesi&#243;n) en la Administration Guide (Gu&#237;a de administraci&#243;n) para
+obtener m&#225;s informaci&#243;n.</p>
+
+<a name="gcnjj"></a><h5>Configuraci&#243;n de autenticaci&#243;n de organizaci&#243;n</h5>
+<p>Define el m&#243;dulo de autenticaci&#243;n para la organizaci&#243;n. El m&#243;dulo de autenticaci&#243;n
+predeterminado es LDAP.</p>
+
+<a name="gcnkl"></a><h5>Modo de bloqueo por fallo de inicio de sesi&#243;n</h5>
+<p>Especifica si un usuario puede intentar una segunda autenticaci&#243;n si falla el
+primer intento. Si se selecciona este atributo, se activa un bloqueo y
+el usuario s&#243;lo tendr&#225; una oportunidad para realizar la autenticaci&#243;n. De forma
+predeterminada, esta funci&#243;n no est&#225; habilitada. Este atributo funciona junto con atributos
+de notificaci&#243;n y relacionados con el bloqueo.</p>
+
+<a name="gcnjz"></a><h5>Recuento de bloqueos por fallo de inicio de sesi&#243;n</h5>
+<p>Define el n&#250;mero de intentos que un usuario tiene para autenticarse en
+el intervalo de tiempo definido en Login Failure Lockout Interval (Intervalo de
+bloqueo por fallo de inicio de sesi&#243;n) antes de que se le
+bloquee.</p>
+
+<a name="gcnko"></a><h5>Intervalo de bloqueo por fallo de inicio de sesi&#243;n</h5>
+<p>Define (en minutos) el tiempo entre dos intentos fallidos de inicio de
+sesi&#243;n. Si se produce un error en un inicio de sesi&#243;n y
+est&#225; seguido por otro inicio de sesi&#243;n fallido en el intervalo de
+bloqueo, el recuento de bloqueo aumenta. En caso contrario, el recuento de
+bloqueos se restablece.</p>
+
+<a name="gcnkd"></a><h5>Direcci&#243;n de correo electr&#243;nico para enviar notificaci&#243;n de bloqueo</h5>
+<p>Especifica la direcci&#243;n de correo electr&#243;nico que recibir&#225; la notificaci&#243;n en caso
+de un bloqueo de usuario. Para enviar una notificaci&#243;n de correo electr&#243;nico
+a varias direcciones, separe cada direcci&#243;n de correo electr&#243;nico con un espacio.
+Para configuraciones regionales distintas al ingl&#233;s, el formato es:</p><p><tt>email_address|locale|charset</tt> </p>
+
+<a name="gcnkr"></a><h5>Avisar a usuario despu&#233;s de N fallos</h5>
+<p>Especifica el n&#250;mero de errores de autenticaci&#243;n que pueden producirse antes de
+que OpenSSO env&#237;e un mensaje de advertencia en el que se indique
+que se bloquear&#225; el usuario.</p>
+
+<a name="gcnkc"></a><h5>Duraci&#243;n del bloqueo por fallo de inicio de sesi&#243;n</h5>
+<p>Habilita el bloqueo de memoria. De forma predeterminada, el mecanismo de bloqueo
+inactivar&#225; el perfil de usuario (tras un fallo de inicio de sesi&#243;n)
+definido en <i>Nombre de atributo de bloqueo</i>. Si el valor de la duraci&#243;n de bloqueo por
+fallo de inicio de sesi&#243;n es superior a 0, el bloqueo de
+memoria se activar&#225; y la cuenta de usuario se bloquear&#225; durante el
+n&#250;mero de minutos especificado.</p>
+
+<a name="ggulj"></a><h5>Multiplicador de la duraci&#243;n del bloqueo</h5>
+<p>Este atributo define el valor multiplicado por la Duraci&#243;n de bloqueo de
+fallo de inicio de sesi&#243;n para cada bloqueo sucesivo. Por ejemplo, si
+el valor Duraci&#243;n de bloqueo de fallo de inicio de sesi&#243;n est&#225;
+establecido en 3 minutos, y el Multiplicador de duraci&#243;n de bloqueo est&#225;
+establecido en 2, se impedir&#225; al usuario acceder a la cuenta durante
+6 minutos.</p>
+
+<a name="gcnjy"></a><h5>Nombre de atributo de bloqueo</h5>
+<p>Designa cualquier atributo LDAP que se vaya a definir para el bloqueo.
+El valor en Lockout Attribute Value (Valor de atributo de bloqueo) tambi&#233;n
+debe cambiarse para habilitar el bloqueo de este nombre de atributo. De
+forma predeterminada, el nombre de atributo de bloqueo est&#225; vac&#237;o en la
+consola de OpenSSO. Los valores de implementaci&#243;n predeterminados son <i>inetuserstatus</i> (atributo LDAP)
+e <i>inetuserstatus</i> cuando se bloquea el usuario y la opci&#243;n Duraci&#243;n de
+bloqueo por fallo de inicio de sesi&#243;n se define en 0.</p>
+
+<a name="gcnle"></a><h5>Valor de atributo de bloqueo</h5>
+<p>Este atributo especifica si el bloqueo est&#225; habilitado o deshabilitado para el
+atributo definido en nombre de atributo de bloqueo. De forma predeterminada, el
+valor se define como inactivo para <i>inetuserstatus</i>.</p>
+
+<a name="gcnkz"></a><h5>URL de inicio de sesi&#243;n con &#233;xito predeterminada</h5>
+<p>El campo acepta una lista de los distintos valores que especifican la
+direcci&#243;n URL a la que se redirige a los usuarios tras una
+autenticaci&#243;n con &#233;xito. El formato de este atributo es <tt>clientType|URL</tt>, aunque se
+puede especificar s&#243;lo el valor de la direcci&#243;n URL, que asume un
+tipo predeterminado de HTML. El valor predeterminado es <i>/amserver/console</i>.</p>
+
+<a name="gcnlf"></a><h5>URL de fallo de inicio de sesi&#243;n predeterminada</h5>
+<p>El campo acepta una lista de los distintos valores que especifican la
+direcci&#243;n URL a la que se redirige a los usuarios tras un
+error en la autenticaci&#243;n. El formato de este atributo es <tt>clientType|URL</tt>, aunque
+se puede especificar s&#243;lo el valor de la direcci&#243;n URL, que asume
+un tipo predeterminado de HTML.</p>
+
+<a name="gcnlb"></a><h5>Clase de procesamiento posterior de autenticaci&#243;n</h5>
+<p>Especifica el nombre de la clase Java utilizada para personalizar los procesos
+posteriores a la autenticaci&#243;n para inicios de sesi&#243;n v&#225;lidos o err&#243;neos. Ejemplo:</p><p><tt>com.abc.authentication.PostProcessClass</tt> </p><p>La clase Java debe implementar la siguiente interfaz de Java:</p><p><tt>com.sun.identity.authentication.spi.AMPostAuthProcessInterface </tt></p><p>Adem&#225;s, debe agregar la ruta de la ubicaci&#243;n de la clase al
+atributo Java Classpath de Web Server.</p>
+
+<a name="gcnjl"></a><h5>Modo de creaci&#243;n de Id. de usuario</h5>
+<p>El m&#243;dulo de autenticaci&#243;n de miembros utiliza este atributo. Si el campo
+del atributo est&#225; habilitado, el m&#243;dulo de miembros puede generar los Id.
+usuario durante el proceso de autorregistro para un usuario espec&#237;fico si el
+Id. de usuario existe. Los ID de usuario se generan a partir
+de la clase Java especificada en Pluggable User Name Generator Class (Clase
+de generador de nombre de usuario conectable).</p>
+
+<a name="gcnjq"></a><h5>Clase de generador de nombre de usuario conectable</h5>
+<p>Especifica el nombre de la clase Java que se utiliza para generar
+los Id. de usuario cuando se utiliza Enable Generate UserID Mode (Activar
+generar modo UserID).</p>
+
+<a name="gcnki"></a><h5>Tipos de identidad</h5>
+<p>Muestra el tipo o tipos de identidades que buscar&#225; OpenSSO.</p>
+
+<a name="gcnlh"></a><h5>Clases de eventos de estado de usuario conectable</h5>
+<p>Ampl&#237;a los SPI de autenticaci&#243;n para proporcionar un mecanismo de devoluci&#243;n de
+llamada para los cambios de estado del usuario durante el proceso de
+autenticaci&#243;n. Se admiten los siguientes cambios de estado:</p><dl><dt><tt>account lockout</tt></dt>
+<dd><p>El bloqueo de cuenta est&#225; disponible para todos los m&#243;dulos de autenticaci&#243;n. Se puede configurar esta funci&#243;n mediante el atributo <a href="#gcnkl">Modo de bloqueo por fallo de inicio de sesi&#243;n</a>.</p></dd>
+<dt><tt>password change</tt></dt>
+<dd><p>S&#243;lo est&#225; disponible para el tipo de m&#243;dulo de autenticaci&#243;n LDAP.</p></dd>
+</dl>
+
+
+<a name="gcnjv"></a><h5>Inclusi&#243;n de intentos no v&#225;lidos en un almac&#233;n de datos</h5>
+<p>Si se habilita, este atributo permite compartir los intentos fallidos de inicio
+de sesi&#243;n en un repositorio de identidades compartido por varias instancias de
+OpenSSO. Por ejemplo, si el repositorio de identidades que se utiliza para
+una implementaci&#243;n espec&#237;fica es Directory Server, los intentos no v&#225;lidos se almacenan
+en <tt>sunAMAuthInvalidAttemptsData</tt> (que pertenece a la clase de objeto <tt>sunAMAuthAccountLockout). </tt> Los datos
+se almacenan con el siguiente formato:</p><p><tt>&#60;InvalidPassword&#62;&#60;InvalidCount&#62;&#60;/InvalidCount&#62;&#60;LastInvalidAt&#62;&#60;/LastInvalidAt&#62;&#60;LockedoutAt&#62;&#60;/LockedoutAt&#62;&#60;ActualLockoutDuration&#62;&#60;/ActualLockoutDuration&#62;&#60;/InvalidPassword&#62; </tt></p><p>Esta informaci&#243;n se conserva en Directory Server para cada usuario. Cuanto mayor
+sea el n&#250;mero de intentos no v&#225;lidos, aumentar&#225; el valor de <tt>&#60;InvalidCount&#62;</tt>.</p>
+
+<a name="gcnjo"></a><h5>Autenticaci&#243;n basada en m&#243;dulos</h5>
+<p>Si se habilita, este atributo permite a los usuarios realizar una autenticaci&#243;n
+basada en m&#243;dulos. Si, por el contrario, no se habilita, no se
+permite el inicio de sesi&#243;n basado en m&#243;dulos. Todos los intentos de
+inicio de sesi&#243;n con <tt>module=&#60; </tt><i> module_instance_name</i><tt>&#62;</tt> fallar&#225;n.</p>
+
+<a name="ggurt"></a><h5>Asignaci&#243;n de atributos de usuario al atributo de sesi&#243;n</h5>
+<p>Permite definir los atributos como propiedades de sesi&#243;n desde el perfil de
+usuario (almacenado en un almac&#233;n de datos) que est&#225; autenticando en el
+SSOToken del usuario. El formato es:</p><p><tt>UserProfile_Attribute|Session_Attribute_name</tt></p><p>Si no est&#225; especificado <tt>Session_Attribute_name</tt>, el nombre de la propiedad de la
+sesi&#243;n se recupera como el valor del atributo Perfil de usuario. Todos
+los atributos de la sesi&#243;n contienen el prefijo am.<tt>protegido </tt> para asegurarse de
+que no pueden editarse desde el SDK cliente.</p>
+
+<a name="fwbfn"></a><h5>Nivel de autenticaci&#243;n predeterminado</h5>
+<p>El valor de nivel de autenticaci&#243;n indica en qu&#233; medida se debe
+confiar en una autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n.</p><p>El nivel de autenticaci&#243;n se debe definir en la plantilla de autenticaci&#243;n
+espec&#237;fica del dominio. El valor de nivel de autenticaci&#243;n predeterminado descrito aqu&#237;
+se aplicar&#225; s&#243;lo cuando no se haya especificado ning&#250;n nivel de autenticaci&#243;n
+en el campo Authentication Level (Nivel de autenticaci&#243;n) para una plantilla de
+autenticaci&#243;n de un determinado dominio. The Default Authentication Level default value is
+0. (El valor de este atributo no se utiliza con OpenSSO, sino
+con cualquier aplicaci&#243;n externa seleccionada para utilizarlo).</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>记录  - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamloggingservice"></a><h4>记录 </h4>
+<p><a name="indexterm-203"></a>“记录”服务用于提供与 OpenSSO 管理相关的状态和错误消息。管理员可以配置日志文件大小和日志文件位置等值。OpenSSO 可以在平面文本文件或关系数据库中记录事件。记录服务属性是全局属性。这些属性包括：</p>
+<ul><li><p><a href="#fxbsv">最大日志大小</a></p></li>
+<li><p><a href="#fxbsg">历史文件数目</a></p></li>
+<li><p><a href="#fxbzh">日志文件位置</a></p></li>
+<li><p><a href="#fxbwg">日志类型</a></p></li>
+<li><p><a href="#fxbrd">数据库用户名</a></p></li>
+<li><p><a href="#fxcdf">数据库用户密码</a></p></li>
+<li><p><a href="#fxcep">数据库用户密码（确认）</a></p></li>
+<li><p><a href="#fxbvb">数据库驱动程序名</a></p></li>
+<li><p><a href="#fxbsb">可配置日志字段</a></p></li>
+<li><p><a href="#fxccb">日志检验频率</a></p></li>
+<li><p><a href="#fxbxe">日志签名时间</a></p></li>
+<li><p><a href="#fxcbz">安全日志</a></p></li>
+<li><p><a href="#fxbxt">最大记录数目</a></p></li>
+<li><p><a href="#fxbwp">每个归档文件中的文件数目</a></p></li>
+<li><p><a href="#fxbyw">缓冲大小</a></p></li>
+<li><p><a href="#fxbvh">DB 失败内存缓冲区大小</a></p></li>
+<li><p><a href="#fxcea">缓冲时间</a></p></li>
+<li><p><a href="#fxbsn">时间缓冲</a></p></li></ul>
+
+
+<a name="fxbsv"></a><h5>最大日志大小</h5>
+<p>该属性接受 OpenSSO 日志文件的最大值（以字节为单位）。默认值为 1000000。</p>
+
+<a name="fxbsg"></a><h5>历史文件数目</h5>
+<p>该属性的值与为进行历史分析而保留的备份日志文件的数目相等。在本地系统的分区大小和可用磁盘空间允许的情况下，可以输入任何整数。默认值为 3。</p><p>该文件仅适用于 FILE 日志类型。当“日志类型”属性设置为 DB 时，就不会有历史文件，OpenSSO 也不会明确设置其大小限制。</p>
+<hr><p><b>注 &#8211; </b>对输入值 0 和输入值 1 的解释相同，即如果指定 0，则会创建历史日志文件。</p>
+<hr>
+
+
+<a name="fxbzh"></a><h5>日志文件位置</h5>
+<p>基于文件的日志记录功能需要一个可以存储日志文件的位置。默认位置为：</p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt></p><p><tt>CONFIG_DIR_SERVER_URI/logs</tt> 是一个标签，代表基配置目录和 OpenSSO 的服务器的 URI。运行时，记录服务确定日志实例的正确目录。可将属性的值设置为显式路径，但基本路径应为其配置目录。</p><p>如果指定的不是默认目录，那么 OpenSSO 会在此目录不存在时创建它。然后您应该为此目录设置合适的权限（例如，0700）。</p><p>配置 DB（数据库）日志（如 Oracle 或 MySQL）的日志位置时，日志位置的有些部分区分大小写。例如，如果记录到 Oracle 数据库，日志位置应为（注意区分大小写）：</p><p><tt>jdbc:oracle:thin:@machine.domain:port:DBName</tt></p><p>要对 DB 配置日志，请将 JDBC 驱动程序文件添加到 Web 容器的 JVM 类路径。需要将 JDBC 驱动程序文件手动添加到 <tt>amadmin</tt>
+脚本的类路径中，否则，<tt>amadmin</tt> 记录将无法加载 JDBC 驱动程序。</p><p>通常只有保存以后对日志属性的更改才会生效。您不需要重启服务器。如果您要更改安全日志，则应该重启服务器。</p>
+
+<a name="ggyhl"></a><h5>日志状态</h5>
+<p>指定日志是打开（ACTIVE）还是关闭（INACTIVE）。安装过程中将该值设置为 ACTIVE。</p>
+
+<a name="ggydj"></a><h5>日志记录解析主机名</h5>
+<p>如果设置为假，则不会执行主机查找以填充“日志记录”的“主机名”字段。</p>
+
+<a name="fxbwg"></a><h5>日志类型</h5>
+<p>允许您为平面文件日志指定文件或为数据库日志指定 DB。</p><p>如果“数据库用户名”或“数据库用户密码”无效，将严重影响 OpenSSO 的处理。如果 OpenSSO 或控制台变得不稳定，请将“日志状态”属性设置为“不活动”。</p><p>属性设置完毕后，请重启服务器。然后您可以登录控制台来重设日志属性。接下来将“日志状态”属性改为<i>活动</i>，然后重新启动服务器。</p>
+
+<a name="fxbrd"></a><h5>数据库用户名</h5>
+<p>当“日志类型”属性设置为 DB 时，该属性采用要连接到数据库的用户的名称。</p>
+
+<a name="fxcdf"></a><h5>数据库用户密码</h5>
+<p>当“日志类型”属性设置为 DB 时，该属性采用数据库用户密码。</p>
+
+<a name="fxcep"></a><h5>数据库用户密码（确认）</h5>
+<p>确认数据库密码。</p>
+
+<a name="fxbvb"></a><h5>数据库驱动程序名</h5>
+<p>该属性可使您指定用于日志实现类的驱动程序。</p>
+
+<a name="fxbsb"></a><h5>可配置日志字段</h5>
+<p>指定将被记录的字段列表。默认情况下，将记录所有的字段。这些字段包括：</p>
+<ul><li><p>CONTEXTID</p></li>
+<li><p>DOMAIN</p></li>
+<li><p>HOSTNAME</p></li>
+<li><p>IPADDRESS</p></li>
+<li><p>LOGGED BY</p></li>
+<li><p>LOGLEVEL</p></li>
+<li><p>LOGINID</p></li>
+<li><p>MESSAGEID</p></li>
+<li><p>MODULENAME</p></li></ul>
+<p>您至少应该记录 CONTEXTID、DOMAIN、HOSTNAME、LOGINID 和 MESSAGEID。</p>
+
+<a name="fxccb"></a><h5>日志检验频率</h5>
+<p>该属性用于设置服务器为检测篡改而检验日志的频率（以秒为单位）。默认时间为 3600 秒。该参数仅适用于安全日志。</p>
+
+<a name="fxbxe"></a><h5>日志签名时间</h5>
+<p>该参数用于设置对日志进行签名的频率（以秒为单位）。默认时间为 900 秒。该参数仅适用于安全日志。</p>
+
+<a name="fxcbz"></a><h5>安全日志</h5>
+<p>此属性用于启用或禁用安全日志。默认情况下，安全日志为关闭状态。启用安全日志后，可以检测对安全日志进行的未授权更改或篡改。</p>
+<hr><p><b>注 &#8211; </b>安全日志仅可用于平面文件。该选项不适用于数据库 (DB) 日志。</p>
+<hr>
+
+
+<a name="ggdct"></a><h5>安全日志签署算法</h5>
+<p>该属性定义了 RSA 和 DSA（Digital Signature Algorithm，数字签名算法），它们拥有一个用于签署的私钥和用于检验的公钥。可以从以下项中进行选择：</p>
+<ul><li><p>MD2 w/RSA</p></li>
+<li><p>MD5 w/RSA</p></li>
+<li><p>SHA1 w/DSA</p></li>
+<li><p>SHA1 w/RSA</p></li></ul>
+<p>MD2、MD5 和 RSA 是单向散列。例如，如果选择了签署算法 MD2 w/RSA，则安全日志功能会使用 MD2 生成一组消息，并使用 RSA 私钥对值进行加密。经过加密的值是原始日志记录的签名，并将附加在最近签名的最后一个记录中。对于验证，将使用 RSA 公钥解密签名，并将解密值与日志记录组进行对比。然后，安全日志功能会检测对所有日志记录进行的任何修改。</p>
+
+<a name="ghaeg"></a><h5>日志证书存储库位置</h5>
+<p>如果启用安全日志，则记录服务会在该属性指定的位置查找其证书。在运行时确定实际的目录路径。可将该值设置为显式路径，但 OpenSSO 实例应该可以访问基路径。</p>
+
+<a name="fxbxt"></a><h5>最大记录数目</h5>
+<p>该属性用于设置 Java LogReader 接口返回的最大记录数目，而不管有多少记录与读取查询相匹配。默认情况下，将其设置为 500。日志 API 的呼叫者可通过 <i>LogQuery</i> 类覆盖此属性。</p>
+
+<a name="fxbwp"></a><h5>每个归档文件中的文件数目</h5>
+<p>该属性仅适用于安全日志。该属性用于指定对于后续安全日志，何时需要归档日志文件和密钥库以及何时重新生成安全密钥库。默认情况下每个记录器中含有五个文件。</p>
+
+<a name="fxbyw"></a><h5>缓冲大小</h5>
+<p>该属性用于指定在记录服务尝试将日志记录写入日志库之前，内存缓冲区中可以存储的最大日志记录数目。默认情况下是一条记录。</p>
+
+<a name="fxbvh"></a><h5>DB 失败内存缓冲区大小</h5>
+<p>该属性定义数据库 (DB) 日志记录失败时内存中可保留的最大日志记录数目。该属性仅当指定 DB 日志时适用。当 OpenSSO 记录服务丢失与 DB 的连接时，它将缓冲，最多可达指定记录的数目。该属性默认为“缓冲大小”属性中定义的值的两倍。</p>
+
+<a name="fxcea"></a><h5>缓冲时间</h5>
+<p>该属性定义日志记录在被发送到记录服务进行记录之前，日志记录将在内存缓冲区中存储的时间。如果已经“启用时间缓冲”，该属性适用。默认值为 3600 秒。</p>
+
+<a name="fxbsn"></a><h5>时间缓冲</h5>
+<p>选择“开”时，OpenSSO 会为即将在内存中缓存的日志记录设置时间限制。时间值在“缓冲时间”属性中设置。</p>
+
+<a name="ghaer"></a><h5>日志记录的级别</h5>
+<p>选择某个选项，从而使用该属性配置特定日志文件中要记录内容的详细级别。OpenSSO 服务的日志为 INFO 级。SAML 和身份认证联合服务的日志拥有更详细的级别（FINE、FINER、FINEST）。另外，可用来关闭日志记录的级别为 OFF，可用来启用所有消息的日志记录的级别为 ALL。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Cr&#233;ation d'un r&#244;le filtr&#233; - Aide en ligne de la console Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="subject.createfiltrole"></a><h5>Cr&#233;ation d'un r&#244;le filtr&#233;</h5>
+<ol>
+<li><b>Dans le volet de navigation, acc&#233;dez &#224; l'organisation dans laquelle le r&#244;le
+sera cr&#233;&#233;.</b></li>
+<li><b>Cliquez sur Nouveau.</b></li>
+<li><b>Entrez le nom du r&#244;le filtr&#233;.</b></li>
+<li><b>Entrez les informations relatives aux crit&#232;res de recherche.</b><p>Par exemple\~:</p><pre>(&#38;(uid=user1)(|(inetuserstatus=active)(!(inetuserstatus=*))))</pre><p>Si le filtre est laiss&#233; vide, par d&#233;faut, le r&#244;le suivant est
+cr&#233;&#233; :</p><pre>(objectclass = inetorgperson)</pre></li>
+<li><b>Cliquez sur OK pour lancer la recherche sur la base des crit&#232;res
+de filtrage. Les identit&#233;s d&#233;finies par les crit&#232;res de filtrage sont affect&#233;es
+automatiquement au r&#244;le.</b></li>
+<li><b>Une fois le r&#244;le filtr&#233; cr&#233;&#233;, cliquez sur le nom du r&#244;le
+pour afficher les utilisateurs appartenant &#224; ce r&#244;le. Vous pouvez &#233;galement ajouter
+des services au r&#244;le en cliquant sur l'onglet Services. Reportez-vous &#224; <a href="idm.entityservices.html">Ajout de services &#224; une identit&#233;</a>.</b></li></ol>
+<br/>
+
+</body>
+</html>

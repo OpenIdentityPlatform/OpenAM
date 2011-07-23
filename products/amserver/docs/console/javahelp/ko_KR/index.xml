@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ident   "%Z%%M% %I%   %E% SMI" -->
+<!DOCTYPE index PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 2.0//EN" "index_1_0.dtd">
+<index version="2.0">
+
+ <indexitem target="federation.fsauthdomains" text="CoT(Circle of Trust)">
+    <indexitem target="federation.fsauthdomainsselectprovider" text="공급자 추가"></indexitem>
+    <indexitem target="federation.createcot" text="만들기"></indexitem>
+    <indexitem target="deleteauthdomain" text="삭제"></indexitem>
+    <indexitem target="federation.fsauthdomainsedit" text="수정"></indexitem></indexitem>
+ <indexitem text="Identity 관리">
+    <indexitem text="사용자">
+        <indexitem target="idm.entitymembership" text="서비스, 역할 및 그룹에 추가"></indexitem></indexitem></indexitem>
+ <indexitem target="ppldapattributemaplist" text="PPLDAP 속성 맵 목록"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="RelayState"></indexitem><indexitem target="federation.wsfedsp" text="RelayState"></indexitem>
+ <indexitem target="federation.fssamlservice" text="SAML">
+    <indexitem target="federation.fssamltargeturlsadd" text="대상 URL"></indexitem>
+    <indexitem text="사이트 식별자">
+        <indexitem target="federation.fssamlsiteidadd" text="구성"></indexitem></indexitem>
+    <indexitem text="신뢰할 수 있는 파트너">
+        <indexitem target="federation.fssamlselecttrustedpartnertype" text="1단계 구성"></indexitem>
+        <indexitem target="federation.fssamltrustedpartnersadd" text="2단계 구성"></indexitem></indexitem></indexitem>
+ <indexitem target="service.scsoapbinding" text="SOAP 바인드 서비스">
+    <indexitem target="ggodb" text="웹 서비스 인증자"></indexitem></indexitem>
+ <indexitem text="SOAP 바인딩 서비스">
+    <indexitem target="mechanismhandlerslist" text="메커니즘 처리기 목록"></indexitem><indexitem target="webservices.wsauthnserviceshandlersadd" text="메커니즘 처리기 목록"></indexitem>
+    <indexitem target="requesthandlerlist" text="요청 처리기 목록"></indexitem><indexitem target="service.scsoapbindingrequesthandlerlistadd" text="요청 처리기 목록"></indexitem><indexitem target="service.scsaml2soapbinding" text="요청 처리기 목록"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="요청 처리기 목록"></indexitem>
+    <indexitem target="ggodb" text="지원되는 인증 기법"></indexitem></indexitem>
+ <indexitem target="webservices.wspersonalprofileservice" text="개인 프로필 서비스">
+    <indexitem target="ppldapattributemaplist" text="PPLDAP 속성 맵 목록"></indexitem>
+    <indexitem target="ppproviderid" text="공급자 아이디"></indexitem>
+    <indexitem target="alternatesecuritymechanisms" text="대체 보안 기법"></indexitem>
+    <indexitem target="alternateendpoint" text="대체 종점"></indexitem>
+    <indexitem target="serviceupdateenabled" text="서비스 업데이트"></indexitem>
+    <indexitem target="serviceinstanceupdateclass" text="서비스 인스턴스 업데이트 클래스"></indexitem>
+    <indexitem target="attributemapper" text="속성 매퍼"></indexitem>
+    <indexitem target="requiremodify" text="수정 정책 평가 요구"></indexitem>
+    <indexitem target="namespaceprefix" text="이름 공간 접두어"></indexitem>
+    <indexitem target="namescheme" text="이름 체계"></indexitem>
+    <indexitem target="authorizer" text="인증자"></indexitem>
+    <indexitem target="resourceidmapper" text="자원 아이디 매퍼"></indexitem>
+    <indexitem target="supportedcontainers" text="지원되는 컨테이너"></indexitem>
+    <indexitem target="requirequery" text="쿼리 정책 평가 요구"></indexitem>
+    <indexitem target="extensionattributesnamespaceprefix" text="확장 속성 이름 공간 접두어"></indexitem>
+    <indexitem target="extensioncontainerattributes" text="확장 컨테이너 속성"></indexitem></indexitem>
+ <indexitem target="sessionsearch" text="검색"></indexitem>
+ <indexitem target="service.smdiscoveryservice" text="검색 서비스">
+    <indexitem target="policyevaldiscoupdate" text="검색 업데이트에 대한 정책 평가"></indexitem>
+    <indexitem target="policyevaldiscolookup" text="검색 조회에 대한 정책 평가"></indexitem>
+    <indexitem target="dsproviderid" text="공급자 아이디"></indexitem>
+    <indexitem target="generatesessioncontext" text="부트스트랩용 세션 컨텍스트 문"></indexitem>
+    <indexitem target="encryptnameidentifier" text="부트스트랩용 세션 컨텍스트에서 이름 식별자 암호화"></indexitem>
+    <indexitem target="resourceofferingsbootstrapping" text="부트스트랩용 자원 오퍼링"></indexitem><indexitem target="service.smdiscoverybootstraprefoffadd" text="부트스트랩용 자원 오퍼링"></indexitem>
+    <indexitem target="service.smdiscoverydescriptionadd" text="서비스 설명"></indexitem>
+    <indexitem target="authresponsemessage" text="응답 메시지 인증"></indexitem>
+    <indexitem target="authorizerpluginclass" text="인증자 플러그인 클래스"></indexitem>
+    <indexitem target="resourceidmapperpluginclass" text="자원 아이디 매퍼 플러그인 클래스"></indexitem>
+    <indexitem target="supportedauthmechanisms" text="지원되는 인증 기법"></indexitem>
+    <indexitem target="supporteddirectives" text="지원되는 지시문"></indexitem>
+    <indexitem target="useimpliedresource" text="함축된 자원"></indexitem>
+    <indexitem target="entryhandlerpluginclass" text="항목 처리기 플러그인 클래스"></indexitem></indexitem>
+ <indexitem target="policyevaldiscoupdate" text="검색 업데이트에 대한 정책 평가"></indexitem>
+ <indexitem target="policyevaldiscolookup" text="검색 조회에 대한 정책 평가"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="계열사 엔티티"></indexitem>
+ <indexitem target="ppproviderid" text="공급자 아이디"></indexitem>
+ <indexitem target="dsproviderid" text="공급자 아이디(검색 서비스)"></indexitem>
+ <indexitem target="federation.createsaml2metadata" text="공급자 엔티티"></indexitem>
+ <indexitem target="service.scconfig" text="구성">
+    <indexitem target="service.scfonfigsystem" text="시스템 등록 정보"></indexitem>
+    <indexitem target="service.scconfigauth" text="인증"></indexitem>
+    <indexitem target="servic.scconfigglobal" text="전역 등록 정보"></indexitem>
+    <indexitem target="service.scconfigconsole" text="콘솔 등록 정보"></indexitem></indexitem>
+ <indexitem target="delegation.delegation" text="권한"></indexitem><indexitem target="delegation.delegationproperties" text="권한"></indexitem>
+ <indexitem target="policy.selectservicetype" text="규칙"></indexitem>
+ <indexitem target="federation.fssamltargeturlsadd" text="대상 URL"></indexitem>
+ <indexitem target="alternatesecuritymechanisms" text="대체 보안 기법"></indexitem>
+ <indexitem target="alternateendpoint" text="대체 종점"></indexitem>
+ <indexitem target="realm.idrepo" text="데이터 저장소">
+    <indexitem target="realm.idrepoeditfamschema" text="Access Manager 스키마 속성을 사용하는 Sun Directory Server"></indexitem>
+    <indexitem target="realm.idrepoeditldapv3" text="LDPAv3 저장소 플러그인 속성"></indexitem>
+    <indexitem target="realm.idreposelecttype" text="새 데이터 저장소 만들기"></indexitem>
+    <indexitem target="realm.idrepoeditad" text="활성 디렉토리 속성"></indexitem></indexitem>
+ <indexitem target="dirmang" text="디렉토리 관리"></indexitem>
+ <indexitem target="mechanismhandlerslist" text="메커니즘 처리기 목록">
+    <indexitem target="webservices.wsauthnserviceshandlersadd" text="구성"></indexitem></indexitem>
+ <indexitem target="viewsession" text="보기 세션"></indexitem>
+ <indexitem target="generatesessioncontext" text="부트스트랩용 세션 컨텍스트 문"></indexitem>
+ <indexitem target="encryptnameidentifier" text="부트스트랩용 세션 컨텍스트에서 이름 식별자 암호화"></indexitem>
+ <indexitem target="resourceofferingsbootstrapping" text="부트스트랩용 자원 오퍼링">
+    <indexitem target="service.smdiscoverybootstraprefoffadd" text="구성"></indexitem></indexitem>
+ <indexitem target="idm.entitymembership" text="사용자, 서비스, 역할 및 그룹에 추가"></indexitem>
+ <indexitem target="dm.home" text="사용자 관리"></indexitem>
+ <indexitem target="federation.fssamlsiteidadd" text="사이트 식별자"></indexitem>
+ <indexitem target="service.smdiscoverydescriptionadd" text="서비스 설명, 구성"></indexitem>
+ <indexitem target="serviceupdateenabled" text="서비스 업데이트"></indexitem>
+ <indexitem target="serviceinstanceupdateclass" text="서비스 인스턴스 업데이트 클래스"></indexitem>
+ <indexitem target="service.subconfigadd" text="세션 등록 정보, 하위 구성 추가"></indexitem>
+ <indexitem target="sessions" text="세션 모듈"></indexitem>
+ <indexitem target="invalidatesession" text="세션 무효화"></indexitem>
+ <indexitem target="session.smprofile" text="세션 창"></indexitem>
+ <indexitem text="속성">
+    <indexitem target="federation.samlv2spassertioncontent" text="컨텍스트 참조"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="컨텍스트 참조"></indexitem><indexitem target="federation.idffidp" text="컨텍스트 참조"></indexitem><indexitem target="federation.idffsp" text="컨텍스트 참조"></indexitem></indexitem>
+ <indexitem target="attributemapper" text="속성 매퍼"></indexitem>
+ <indexitem target="requiremodify" text="수정 정책 평가 요구"></indexitem>
+ <indexitem text="시스템 등록 정보">
+    <indexitem target="service.scserviceprofile.iplanetamloggingservice" text="로깅"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamnamingservice" text="이름 지정"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 검색"></indexitem>
+    <indexitem target="service.scplatform" text="플랫폼"></indexitem></indexitem>
+ <indexitem target="federation.fssamlselecttrustedpartnertype" text="신뢰할 수 있는 파트너"></indexitem>
+ <indexitem target="accesscontrol" text="액세스 제어, 소개"></indexitem>
+ <indexitem text="엔티티">
+    <indexitem target="federation.createsaml2metadata" text="계열사"></indexitem>
+    <indexitem target="federation.createsaml2metadata" text="공급자"></indexitem></indexitem>
+ <indexitem target="realm.rmrealm" text="영역">
+    <indexitem target="delegation.delegation" text="권한"></indexitem><indexitem target="delegation.delegationproperties" text="권한"></indexitem>
+    <indexitem target="realm.idrepo" text="데이터 저장소"></indexitem>
+    <indexitem target="realm.rmrealmadd" text="새 영역 만들기"></indexitem>
+    <indexitem target="authentication.newauthinstance" text="새 인증 모듈 만들기"></indexitem>
+    <indexitem target="authentication.newauthconfig" text="새 인증 체인 만들기"></indexitem>
+    <indexitem target="realm.services" text="서비스"></indexitem>
+    <indexitem target="realm.servicesadd" text="서비스 추가"></indexitem>
+    <indexitem target="authentication.authproperties" text="인증"></indexitem>
+    <indexitem target="realm.realmproperties" text="일반 등록 정보"></indexitem>
+    <indexitem target="policy.policy" text="정책"></indexitem>
+    <indexitem target="idm.entities" text="주제"></indexitem></indexitem>
+ <indexitem target="requesthandlerlist" text="요청 처리기 목록"></indexitem><indexitem target="service.scsaml2soapbinding" text="요청 처리기 목록">
+    <indexitem target="service.scsoapbindingrequesthandlerlistadd" text="구성"></indexitem><indexitem target="service.scsaml2soapbindingrequesthandlerlistadd" text="구성"></indexitem></indexitem>
+ <indexitem target="ggodb" text="웹 서비스 인증자"></indexitem>
+ <indexitem target="authresponsemessage" text="응답 메시지 인증"></indexitem>
+ <indexitem target="namespaceprefix" text="이름 공간 접두어"></indexitem>
+ <indexitem target="namescheme" text="이름 체계"></indexitem>
+ <indexitem text="인증 속성">
+    <indexitem target="service.scserviceprofile.iplanetamauthhttpbasicservice" text="HTTP 기본"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthjdbcservice" text="JDBC"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthmsisdnservice" text="MSISDN"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthradiusservice" text="RADIUS"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthsaeservice" text="SAE"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsafewordservice" text="SafeWord"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthsecuridservice" text="SecurID"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthunixservice" text="UNIX"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthntservice" text="Windows NT"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice" text="Windows 데스크탑 SSO"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthdatastoreservice" text="데이터 저장소"></indexitem>
+    <indexitem target="ggulh" text="연합"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthanonymousservice" text="익명"></indexitem>
+    <indexitem target="authentication.authconfig" text="인증 구성"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthcertservice" text="인증서"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthservice" text="핵심"></indexitem>
+    <indexitem target="service.scserviceprofile.sunamauthadservice" text="활성 디렉토리"></indexitem></indexitem>
+ <indexitem text="인증 수준">
+    <indexitem target="service.scserviceprofile.iplanetamauthldapservice" text="LDAP"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamauthmembershipservice" text="구성원"></indexitem></indexitem>
+ <indexitem target="webservices.wsauthnservices" text="인증 웹 서비스"></indexitem>
+ <indexitem text="인증 컨텍스트">
+    <indexitem target="federation.samlv2spassertioncontent" text="속성"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="속성"></indexitem><indexitem target="federation.idffidp" text="속성"></indexitem><indexitem target="federation.idffsp" text="속성"></indexitem></indexitem>
+ <indexitem target="authorizer" text="인증자"></indexitem>
+ <indexitem target="authorizerpluginclass" text="인증자 플러그인 클래스"></indexitem>
+ <indexitem target="resourceidmapper" text="자원 아이디 매퍼"></indexitem>
+ <indexitem target="resourceidmapperpluginclass" text="자원 아이디 매퍼 플러그인 클래스"></indexitem>
+ <indexitem text="전역 등록 정보">
+    <indexitem target="service.scserviceprofile.iplanetampasswordresetservice" text="비밀번호 재설정"></indexitem>
+    <indexitem target="service.scserviceprofile.iplanetamuserservice" text="사용자"></indexitem>
+    <indexitem target="service.scserviceprofile.amsessionservice" text="세션"></indexitem>
+    <indexitem target="service.scpolicy" text="정책 구성"></indexitem></indexitem>
+ <indexitem target="policy.policy" text="정책">
+    <indexitem target="policy.selectservicetype" text="규칙"></indexitem>
+    <indexitem target="policy.ruleadd" text="규칙 추가"></indexitem>
+    <indexitem target="policy.policyreferraladd" text="새 참조 정책 만들기"></indexitem>
+    <indexitem target="responseprovider" text="응답 공급자"></indexitem>
+    <indexitem target="policy.responseprovideradd" text="응답 공급자 추가"></indexitem>
+    <indexitem target="normalpolicy" text="일반 정책"></indexitem>
+    <indexitem target="policy.selectcondition" text="조건"></indexitem>
+    <indexitem target="policy.selectconditiontype" text="조건 추가"></indexitem>
+    <indexitem target="policy.selectsubjecttype" text="주제"></indexitem>
+    <indexitem target="policy.subjectadd" text="주제 추가"></indexitem>
+    <indexitem target="fyfby" text="참조 정책"></indexitem>
+    <indexitem target="policy.selectreferraltype" text="참조 추가"></indexitem></indexitem>
+ <indexitem target="policy.selectcondition" text="조건">
+    <indexitem target="policy.pmdefaultipcondition" text="IP 주소/DNS 이름"></indexitem>
+    <indexitem target="policy.conditionadd" text="LDAP 필터"></indexitem>
+    <indexitem target="policy.pmdefaultauthschemeconditionadd" text="모듈 인스턴스별 인증"></indexitem>
+    <indexitem target="policy.authtoserviceadd" text="모듈 체인별 인증"></indexitem>
+    <indexitem target="policy.pmdefaultsessioncondtionadd" text="세션"></indexitem>
+    <indexitem target="policy.sessionpropertyconditionadd" text="세션 등록 정보"></indexitem>
+    <indexitem target="policy.pmdefaulttimeconditionadd" text="시간"></indexitem>
+    <indexitem target="policy.authtorealmadd" text="영역 인증"></indexitem>
+    <indexitem target="policy.pmdefaultauthlevelconditionadd" text="인증 수준"></indexitem></indexitem>
+ <indexitem target="policy.selectsubjecttype" text="주제"></indexitem><indexitem target="idm.entities" text="주제">
+    <indexitem target="idm.entitiesgroup" text="그룹"></indexitem>
+    <indexitem target="subjectuser" text="사용자"></indexitem></indexitem>
+ <indexitem target="supportedlang" text="지원되는 언어 로켈"></indexitem>
+ <indexitem target="ggodb" text="지원되는 인증 기법(SOAP 바인딩)"></indexitem>
+ <indexitem target="supportedauthmechanisms" text="지원되는 인증 기법(검색 서비스)"></indexitem>
+ <indexitem target="supporteddirectives" text="지원되는 지시문(검색 서비스)"></indexitem>
+ <indexitem target="supportedcontainers" text="지원되는 컨테이너"></indexitem>
+ <indexitem target="fyfby" text="참조 정책"></indexitem>
+ <indexitem target="federation.samlv2spassertioncontent" text="컨텍스트 참조 속성"></indexitem><indexitem target="federation.samlv2idpassertioncontent" text="컨텍스트 참조 속성"></indexitem><indexitem target="federation.idffidp" text="컨텍스트 참조 속성"></indexitem><indexitem target="federation.idffsp" text="컨텍스트 참조 속성"></indexitem>
+ <indexitem text="콘솔 등록 정보">
+    <indexitem target="service.scserviceprofile.amadminconsoleservice" text="관리"></indexitem>
+    <indexitem target="service.smg11n" text="국제화 설정"></indexitem></indexitem>
+ <indexitem target="requirequery" text="쿼리 정책 평가 요구"></indexitem>
+ <indexitem target="service.mapcreatedevice" text="클라이언트 검색, 새 클라이언트 추가"></indexitem>
+ <indexitem target="service.scserviceprofile.iplanetamclientdetection" text="클라이언트 관리자"></indexitem>
+ <indexitem target="service.scplatformclientcharsetsadd" text="플랫폼, 새 문자 집합 만들기"></indexitem>
+ <indexitem target="useimpliedresource" text="함축된 자원"></indexitem>
+ <indexitem target="entryhandlerpluginclass" text="항목 처리기 플러그인 클래스"></indexitem>
+ <indexitem target="extensionattributesnamespaceprefix" text="확장 속성 이름 공간 접두어"></indexitem>
+ <indexitem target="extensioncontainerattributes" text="확장 컨테이너 속성"></indexitem>
+</index>

@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>会话 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amsessionservice"></a><h4>会话</h4>
+<p><a name="indexterm-196"></a>“会话”服务用于定义已验证用户会话的值，如最长会话时间和最长空闲时间。“会话”属性可以是全局、动态或用户属性。这些属性包括：</p>
+<ul><li><p><a href="#fwfeu">辅助配置实例</a></p></li>
+<li><p><a href="#fwfew">搜索结果的最大数目</a></p></li>
+<li><p><a href="#fwfex">搜索超时</a></p></li>
+<li><p><a href="#fwfez">启用属性更改通知</a></p></li>
+<li><p><a href="#fwfey">启用配额限制</a></p></li>
+<li><p><a href="#fwffa">配额限制读取超时</a></p></li>
+<li><p><a href="#fwffb">免除顶层管理员的限制检查</a></p></li>
+<li><p><a href="#fwffc">会话配额用尽时的操作</a></p></li>
+<li><p><a href="#fwffd">通知属性</a></p></li>
+<li><p><a href="#fwffe">最长会话时间</a></p></li>
+<li><p><a href="#fwfff">最长空闲时间</a></p></li>
+<li><p><a href="#fwffh">最长缓存时间</a></p></li>
+<li><p><a href="#fwffi">活动用户会话</a></p></li></ul>
+
+
+<a name="fwfeu"></a><h5>辅助配置实例</h5>
+<p>为 OpenSSO 会话故障转移功能所使用的会话系统信息库提供连接信息。负载平衡器的 URL 应作为此辅助配置的标识符给出。如果此时定义了辅助配置，则会话故障转移功能将自动启用并在服务器重新启动后生效。有关详细信息，参见<a href="service.subconfigadd.html">添加子配置</a>。</p>
+
+<a name="fwfew"></a><h5>搜索结果的最大数目</h5>
+<p>该属性指定会话搜索返回的结果的最大数目。默认值为 120。</p>
+
+<a name="fwfex"></a><h5>搜索超时</h5>
+<p>该属性定义在会话搜索终止前，允许的最长搜索时间。默认值为 5 秒。</p>
+
+<a name="fwfez"></a><h5>启用属性更改通知</h5>
+<p>启用或禁用特性会话属性更改通知。在单点登录环境下，一个 OpenSSO 会话可以被多个应用程序共享。如果将此功能设置为 ON，则当某个应用程序更改“通知属性”列表中所指定的任何会话属性（被定义为独立会话服务属性）时，便会向参与相同单点登录环境的其他应用程序发送通知。</p>
+
+<a name="fwfey"></a><h5>启用配额限制</h5>
+<p>启用或禁用会话配额限制。通过执行会话配额限制，管理员能够基于全局级别上的限制设置来限制一个用户拥有特定数目的活动/可同时进行的会话，或与该特殊用户所属的条目（领域/角色/用户）相关的配置。</p><p>该属性的默认设置是“关闭”。如果更改了设置，则必须重新启动服务器。</p>
+
+<a name="fwffa"></a><h5>配额限制读取超时</h5>
+<p>定义对会话系统信息库进行活动用户会话计数查询多长时间（以毫秒为单位）后将超时。</p><p>达到最长读取时间后，将返回错误信息。该属性只有在会话故障转移部署中启用了会话配额限制时才生效。默认值为 6000 毫秒。如果更改了设置，则必须重新启动服务器。</p>
+
+<a name="fwffb"></a><h5>免除顶层管理员的限制检查</h5>
+<p>指定“顶层管理员角色”的用户是否应免除会话限制检查。如果“是”，即使启用会话限制，也不会对这些管理员进行会话配额检查。</p><p>该属性的默认设置为“否”。如果更改了设置，则必须重新启动服务器。只有启用会话配额限制时此属性才会生效。</p>
+<hr><p><b>注 &#8211; </b>在 <tt>AMConfig.properties</tt> (<tt>com.sun.identity.authentication.super.user</tt>) 中定义的 OpenSSO 超级用户可始终免除会话配额限制检查。</p>
+<hr>
+
+
+<a name="fwffc"></a><h5>会话配额用尽时的操作</h5>
+<p>指定用户会话配额用尽时的操作。该属性有两个可选项：</p><dl><dt>DESTROY_OLD_SESSION</dt>
+<dd><p>将会终止下一即将过期的会话。</p></dd>
+<dt>DENY_ACCESS</dt>
+<dd><p>将会拒绝新建会话请求。</p></dd>
+</dl>
+<p>仅当会话配额限制已启用且默认设置为 DESTROY_OLD_SESSION 时，此属性才生效。</p>
+
+<a name="ggyer"></a><h5>当会话系统信息库关闭时拒绝用户登录</h5>
+<p>如果设置为“是”，则该属性在会话系统信息库关闭时强制将用户锁定到服务器。选中会话的“启用配额限制”后，该属性才生效。</p>
+
+<a name="fwffd"></a><h5>通知属性</h5>
+<p>当列表中定义的会话属性发生更改时，将向已注册的侦听器发送通知。该属性只有在会话属性更改通知启用时才生效。</p>
+
+<a name="fwffe"></a><h5>最长会话时间</h5>
+<p>该属性的值以分钟为单位，这个值表示经过多长时间后会话将过期，过期后用户就必须重新验证才能重新获得访问权。它接受 1 以上（含 0）的值。默认值为 120。（为了同时实现安全和方便两方面的要求，可以考虑将“最长会话时间”的时间间隔设置为一个较大的值，而将“最长空闲时间”的时间间隔设置为一个相对小的值。）“最长会话时间”限制了会话的有效性。会话不能超过设定的“最长会话时间”。</p>
+
+<a name="fwfff"></a><h5>最长空闲时间</h5>
+<p>该属性的值以分钟为单位，这个值表示会话在过期以前能够处于非活动状态的最长时间，过期后用户就必须重新验证才能重新获得访问权。它接受 1 以上（含 0）的值。默认值为 30。（为了同时满足安全与方便这两方面的要求，可以考虑将“最长会话时间”的时间间隔设置为一个较大的值，而将“最长空闲时间”的时间间隔设置为一个相对小的值。）</p>
+
+<a name="fwffh"></a><h5>最长缓存时间</h5>
+<p>该属性的值以分钟为单位，这个值表示客户机联系 OpenSSO 来刷新缓存的会话信息的最长时间间隔。它接受 0 或更大的值。默认值为 3。建议最长缓存时间应始终小于最长空闲时间。</p>
+
+<a name="fwffi"></a><h5>活动用户会话</h5>
+<p>指定一个用户可同时进行的最大会话数。</p>
+<br/>
+
+</body>
+</html>

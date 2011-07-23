@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自定义 SAMLv2 属性授权 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>自定义 SAMLv2 属性授权</h4>
+<p>SAMLv2 属性授权包含以下自定义的属性：</p>
+<ul><li><p><a href="#ggwhl">签署和加密</a></p></li>
+<li><p><a href="#ggwgh">属性服务</a></p></li>
+<li><p><a href="#ggwjy">AssertionID 请求</a></p></li>
+<li><p><a href="#ggwju">属性配置文件</a></p></li>
+<li><p><a href="#ggwha">证书别名</a></p></li>
+<li><p><a href="#ggwjj">主体数据存储库</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>签署和加密</h5>
+<dl><dt>密钥大小</dt>
+<dd><p>属性授权实体与其他实体交互时使用的密钥的长度。</p></dd>
+<dt>算法</dt>
+<dd><p>与其他实体交互时使用的加密算法。</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>属性服务</h5>
+<p>此属性定义将接收属性查询请求的 URL 端点。<tt>位置</tt>指定请求所发送到的提供者的 URL。<tt>映射程序</tt>定义 SPI，该 SPI 查找属性映射授权以返回响应中包括的属性列表。SAMLv2 定义的属性查询配置文件为：</p>
+<ul><li><p>Basic</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>AssertionID 请求</h5>
+<p>定义身份认证提供者的 URL，AssertionID 会从客户机发送到这些 URL 以检索对应的声明。<tt>位置</tt>指定请求所发送到的提供者的 URL。<tt>映射程序</tt>定义 SPI，该 SPI 查找 AssertionID 映射授权以返回响应中包括的属性列表。绑定是：</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>属性配置文件</h5>
+<p>定义由 SAMLv2 定义的支持属性配置文件的类型。默认类型为 <tt>Basic</tt>。</p>
+
+<a name="ggwha"></a><h5>证书别名</h5>
+<p>定义证书别名元素。<tt>签署</tt>指定用于在密钥库中查找正确的签署证书的提供者证书别名。<tt>加密</tt>指定用于在密钥库中查找正确的加密证书的提供者证书别名。</p>
+
+<a name="ggwjj"></a><h5>主体数据存储库</h5>
+<p>指定包含 X509 主体 DN 的数据存储库属性的名称。它用于查找其属性值匹配 X.509 主体 DN 的用户。此字段仅用于 X.509 主体的属性查询配置文件中。</p>
+<br/>
+
+</body>
+</html>

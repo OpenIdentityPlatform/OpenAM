@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+        *** GENERATED - DO NOT EDIT  ***
+        -->
+<project name="C1DemoServer-rest-build" basedir=".." xmlns:webproject3="http://www.netbeans.org/ns/web-project/3" xmlns:webproject2="http://www.netbeans.org/ns/web-project/2" xmlns:webproject1="http://www.netbeans.org/ns/web-project/1" xmlns:jaxrs="http://www.netbeans.org/ns/jax-rs/1">
+    <target name="-check-trim">
+        <condition property="do.trim">
+            <and>
+                <isset property="client.urlPart"/>
+                <length string="${client.urlPart}" when="greater" length="0"/>
+            </and>
+        </condition>
+    </target>
+    <target name="-trim-url" if="do.trim">
+        <pathconvert pathsep="/" property="rest.base.url">
+            <propertyset>
+                <propertyref name="client.url"/>
+            </propertyset>
+            <globmapper from="*${client.urlPart}" to="*/"/>
+        </pathconvert>
+    </target>
+    <target name="-spare-url" unless="do.trim">
+        <property name="rest.base.url" value="${client.url}"/>
+    </target>
+    <target name="test-restbeans" depends="run-deploy,-init-display-browser,-check-trim,-trim-url,-spare-url">
+        <xmlproperty file="${webinf.dir}/web.xml"/>
+        <replace file="${restbeans.test.file}" token="${base.url.token}" value="${rest.base.url}||${web-app.servlet-mapping.servlet-name}||${web-app.servlet-mapping.url-pattern}"/>
+        <condition property="do.browse-url">
+            <istrue value="${display.browser}"/>
+        </condition>
+        <antcall target="browse-url"/>
+    </target>
+    <target name="browse-url" if="do.browse-url">
+        <nbbrowse url="${restbeans.test.url}"/>
+    </target>
+</project>

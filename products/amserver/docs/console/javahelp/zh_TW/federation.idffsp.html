@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>自訂 ID-FF 服務提供者 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffsp"></a><h4>自訂 ID-FF 服務提供者</h4>
+<p>ID-FF 服務提供者屬性分成下列各區段：</p>
+<ul><li><p><a href="#ggwvs">共用屬性</a></p></li>
+<li><p><a href="#ggwvp">通訊 URL</a></p></li>
+<li><p><a href="#ggwrw">通訊設定檔</a></p></li>
+<li><p><a href="#ggwud">服務提供者配置</a></p></li>
+<li><p><a href="#ggwyd">服務 URL</a></p></li>
+<li><p><a href="#ggwsf">外掛程式</a></p></li>
+<li><p><a href="#ggwtb">服務提供者屬性對映程式</a></p></li>
+<li><p><a href="#ggwtp">自動聯合</a></p></li>
+<li><p><a href="#ggwrv">認證環境</a></p></li>
+<li><p><a href="#ggwub">代理伺服器認證配置</a></p></li></ul>
+
+
+<a name="ggwvs"></a><h5>共用屬性</h5>
+
+<ul><li><p><a href="#ggwwh">提供者類型</a></p></li>
+<li><p><a href="#ggwrt">描述</a></p></li>
+<li><p><a href="#ggwuu">協定支援列舉</a></p></li>
+<li><p><a href="#ggwwn">簽署金鑰</a></p></li>
+<li><p><a href="#ggwuj">加密金鑰</a></p></li>
+<li><p><a href="#ggwsc">名稱識別碼加密</a></p></li>
+<li><p><a href="#ggwwa">簽署認證請求</a></p></li></ul>
+
+
+<a name="ggwwh"></a><h5>提供者類型</h5>
+<p>此屬性的靜態值是正在配置的提供者類型：代管或遠端。</p>
+
+<a name="ggwrt"></a><h5>描述</h5>
+<p>此屬性的值為服務提供者的描述。</p>
+
+<a name="ggwuu"></a><h5>協定支援列舉</h5>
+<p>選擇此提供者支援的 Liberty ID-FF 發行版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 是指 Liberty Identity Federation Framework 1.2 版。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 是指 Liberty Identity Federation Framework 1.1 版。</p></li></ul>
+
+
+<a name="ggwwn"></a><h5>簽署金鑰</h5>
+<p>定義用來簽署請求和回應的安全性憑證別名。憑證儲存在 Java 金鑰庫檔案中。每一個特定憑證都會對映到用來擷取憑證的別名。</p>
+
+<a name="ggwuj"></a><h5>加密金鑰</h5>
+<p>定義用於加密簽署金鑰或加密金鑰的憑證儲存在 Java 金鑰庫檔案中。每一個特定憑證都會對映到用來擷取憑證的別名。</p>
+
+<a name="ggwsc"></a><h5>名稱識別碼加密</h5>
+<p>選取核取方塊以啟用名稱識別碼的加密。</p>
+
+<a name="ggwwa"></a><h5>簽署認證請求</h5>
+<p>如果啟用，服務提供者將簽署所有認證請求。</p>
+
+<a name="ggwvp"></a><h5>通訊 URL</h5>
+
+<ul><li><p><a href="#ggwrz">SOAP 端點</a></p></li>
+<li><p><a href="#ggwun">單一登出服務</a></p></li>
+<li><p><a href="#ggwrn">單一登出回傳</a></p></li>
+<li><p><a href="#ggwvg">聯合終止服務</a></p></li>
+<li><p><a href="#ggwup">聯合終止回傳</a></p></li>
+<li><p><a href="#ggwry">名稱註冊服務</a></p></li>
+<li><p><a href="#ggwvd">名稱註冊回傳</a></p></li>
+<li><p><a href="#ggwtq">指定用戶 URL</a></p></li>
+<li><p><a href="#ggwrh">指定用戶服務 URL ID</a></p></li>
+<li><p><a href="#ggwvi">將指定用戶服務 URL 設定為預設值</a></p></li></ul>
+
+
+<a name="ggwrz"></a><h5>SOAP 端點</h5>
+<p>定義服務提供者的 SOAP 訊息收件者的 URI。此值以非瀏覽器通訊的方式傳送 SOAP 收件者位置。</p>
+
+<a name="ggwun"></a><h5>單一登出服務</h5>
+<p>定義身份識別提供者可以向其傳送登出請求的 URL。單一登出會同步處理所有由身份識別提供者所認證的階段作業之登出功能。</p>
+
+<a name="ggwrn"></a><h5>單一登出回傳</h5>
+<p>定義身份識別提供者可以向其傳送單一登出回應的 URL。</p>
+
+<a name="ggwvg"></a><h5>聯合終止服務</h5>
+<p>定義身份識別提供者會將聯合終止請求傳送到的 URL。</p>
+
+<a name="ggwup"></a><h5>聯合終止回傳</h5>
+<p>定義身份識別提供者會將聯合終止回應傳送到的 URL。</p>
+
+<a name="ggwry"></a><h5>名稱註冊服務</h5>
+<p>定義特定 URL，當與身份識別提供者進行通訊以指定主體的新名稱識別碼時，使用該 URL。(註冊只能在聯合階段作業建立之後進行。)</p>
+
+<a name="ggwvd"></a><h5>名稱註冊回傳</h5>
+<p>定義身份識別提供者會將名稱註冊回應傳送到的 URL。(註冊只能在聯合階段作業建立之後進行。)</p>
+
+<a name="ggwtq"></a><h5>指定用戶 URL</h5>
+<p>定義身份識別提供者可向其傳送 SAML 指定的 URL。</p>
+
+<a name="ggwrh"></a><h5>指定用戶服務 URL ID</h5>
+<p>如果 [協定支援列舉] 共用屬性的值是 <tt>urn:liberty:iff:2003-08</tt>，請鍵入必要的 ID。</p>
+
+<a name="ggwvi"></a><h5>將指定用戶服務 URL 設定為預設值</h5>
+<p>當請求中並未提供識別碼時，選取核取方塊可使用指定使用者服務 URL 做為預設值。</p>
+
+<a name="ggwrw"></a><h5>通訊設定檔</h5>
+
+<ul><li><p><a href="#ggwwg">聯合終止</a></p></li>
+<li><p><a href="#ggwuc">單一登出</a></p></li>
+<li><p><a href="#ggwsy">名稱註冊</a></p></li>
+<li><p><a href="#ggwuk">支援的 SSO 設定檔</a></p></li></ul>
+
+
+<a name="ggwwg"></a><h5>聯合終止</h5>
+<p>選取要通知其他提供者主體聯合終止的設定檔：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuc"></a><h5>單一登出</h5>
+<p>選取通知其他提供者主體登出的設定檔：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>HTTP 取得</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwsy"></a><h5>名稱註冊</h5>
+<p>選取要通知其他提供者主體名稱註冊的設定檔：</p>
+<ul><li><p>HTTP 重新導向</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwuk"></a><h5>支援的 SSO 設定檔</h5>
+<p>選取傳送認證請求的設定檔：</p>
+<ul><li><p>瀏覽器 Post (指定基於瀏覽器的 HTTP POST 協定)</p></li>
+<li><p>瀏覽器 Artifact (指定一個基於 (非瀏覽器) SOAP 的協定)</p></li>
+<li><p>WML (指定無線標記語言協定)</p></li>
+<li><p>LECP (指定一個啟用 Liberty 的用戶端代理)</p>
+<hr><p><b>備註 &#8211; </b>OpenSSO 可處理來自啟用了 Liberty 的用戶端代理伺服器設定檔的請求，但是它需要的某些配置不在本手冊討論範圍內。</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwud"></a><h5>服務提供者配置</h5>
+
+<ul><li><p><a href="#ggwtx">提供者別名</a></p></li>
+<li><p><a href="#ggwuf">認證類型</a></p></li>
+<li><p><a href="#ggwvl">身份識別提供者的強制認證</a></p></li>
+<li><p><a href="#ggwrk">請求身份識別提供者為被動</a></p></li>
+<li><p><a href="#ggwwi">聯合後的名稱註冊 </a></p></li>
+<li><p><a href="#ggwsq">名稱 ID 策略</a></p></li>
+<li><p><a href="#ggwvr">附屬提供者聯合</a></p></li>
+<li><p><a href="#ggwwp">提供者狀態</a></p></li>
+<li><p><a href="#ggwti">回應內容</a></p></li></ul>
+
+
+<a name="ggwtx"></a><h5>提供者別名</h5>
+<p>定義本機服務提供者的別名名稱。</p>
+
+<a name="ggwuf"></a><h5>認證類型</h5>
+<p>選擇用於本機代管的提供者之認證請求的提供者：</p>
+<ul><li><p><b>遠端</b>指定本機代管的提供者在接收認證請求時將連絡遠端身份識別提供者。</p></li>
+<li><p><b>本機</b>指定本機代管的提供者在接收認證請求時應連絡本機身份識別提供者 (實質上就是本身)。</p></li></ul>
+
+
+<a name="ggwvl"></a><h5>身份識別提供者的強制認證</h5>
+<p>選擇此核取方塊以指示在收到認證請求時，身份識別提供者必須再次認證 (甚至在階段作業作用期間)。依預設會啟用此屬性。</p>
+
+<a name="ggwrk"></a><h5>請求身份識別提供者為被動</h5>
+<p>選取此核取方塊，以指定身份識別提供者不得與主體互動，必須與使用者互動。</p>
+
+<a name="ggwwi"></a><h5>聯合後的名稱註冊 </h5>
+<p>若啟用此選項，則會在服務提供者被聯合之後，允許其參與名稱註冊。</p>
+
+<a name="ggwsq"></a><h5>名稱 ID 策略</h5>
+<p>列舉允許的要求程式會影響身份識別提供者的名稱識別碼策略。</p>
+
+<a name="ggwvr"></a><h5>附屬提供者聯合</h5>
+<p>選取核取方塊以啟用附屬提供者聯合。</p>
+
+<a name="ggwwp"></a><h5>提供者狀態</h5>
+<p>定義服務提供者為使用中或非使用中。預設值為使用中，表示服務提供者可以處理請求並產生回應。</p>
+
+<a name="ggwti"></a><h5>回應內容</h5>
+<p>指定服務提供者可產生的敘述類型。例如 <tt>lib:AuthenticationStatement</tt>。</p>
+
+<a name="ggwyd"></a><h5>服務 URL</h5>
+
+<ul><li><p><a href="#ggwro">COT 頁面 URL 的清單</a></p></li>
+<li><p><a href="#ggwri">聯合頁面 URL</a></p></li>
+<li><p><a href="#ggwtf">首頁 URL</a></p></li>
+<li><p><a href="#ggwsa">單一登入失敗重新導向 URL</a></p></li>
+<li><p><a href="#ggwta">終止完成 URL</a></p></li>
+<li><p><a href="#ggwrd">錯誤頁面 URL</a></p></li>
+<li><p><a href="#ggwth">登出完成 URL</a></p></li></ul>
+
+
+<a name="ggwro"></a><h5>COT 頁面 URL 的清單</h5>
+<p>定義列出提供者所屬的所有信任圈的 URL。</p>
+
+<a name="ggwri"></a><h5>聯合頁面 URL</h5>
+<p>指定執行聯合作業的 URL。</p>
+
+<a name="ggwtf"></a><h5>首頁 URL</h5>
+<p>定義身份識別提供者的首頁的 URL。</p>
+
+<a name="ggwsa"></a><h5>單一登入失敗重新導向 URL</h5>
+<p>定義當單次登入失敗時，將主體重新導向到的 URL。</p>
+
+<a name="ggwta"></a><h5>終止完成 URL</h5>
+<p>定義聯合終止完成後，將主體重新導向到的 URL。</p>
+
+<a name="ggwrd"></a><h5>錯誤頁面 URL</h5>
+<p>定義發生錯誤時將主體導向到的 URL。</p>
+
+<a name="ggwth"></a><h5>登出完成 URL</h5>
+<p>定義登出後將主體導向到的 URL。</p>
+
+<a name="ggwsf"></a><h5>外掛程式</h5>
+
+<ul><li><p><a href="#ggwuh">服務提供者介面</a></p></li>
+<li><p><a href="#ggwtd">聯合 SP 介面環境</a></p></li>
+<li><p><a href="#ggwuv">使用者提供者類別</a></p></li>
+<li><p><a href="#ggwsu">名稱識別碼完成</a></p></li></ul>
+
+
+<a name="ggwuh"></a><h5>服務提供者介面</h5>
+<p>定義 <tt>com.sun.identity.federation.plugins.FSSPAdapter </tt>介面的實作類別。預設值為：</p><p><tt>com.sun.identity.federation.plugins.FSDefaultSPAdapter</tt></p>
+
+<a name="ggwtd"></a><h5>聯合 SP 介面環境</h5>
+<p>定義服務提供者介面 SPI 實作類別所使用的環境特性的清單。</p>
+
+<a name="ggwuv"></a><h5>使用者提供者類別</h5>
+<p>指定可外掛的類別，用來提供使用者作業，例如尋找使用者、取得使用者屬性等。預設值為：</p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider </tt></p>
+
+<a name="ggwsu"></a><h5>名稱識別碼完成</h5>
+<p>此欄位定義服務提供者用來參加名稱註冊的類別。名稱註冊是一種設定檔，服務提供者透過它指定身份識別提供者在與服務提供者進行通訊時使用的主體名稱識別碼。值為 <tt>com.sun.identity.</tt><tt>federation.services.</tt><tt>util.FSNameIdentifierImpl</tt>。</p>
+
+<a name="ggwtb"></a><h5>服務提供者屬性對映程式</h5>
+
+<ul><li><p><a href="#ggwvz">屬性對映程式類別</a></p></li>
+<li><p><a href="#ggwsh">服務提供者屬性對映</a></p></li></ul>
+
+
+<a name="ggwvz"></a><h5>屬性對映程式類別</h5>
+<p>用來將本機上定義的使用者屬性對映至 SAML 指定中屬性的類別。沒有預設類別。</p>
+
+<a name="ggwsh"></a><h5>服務提供者屬性對映</h5>
+<p>指定值，以定義上面指定的預設屬性對映程式外掛程式所使用的對映。對映應以下列格式配置：</p><p><i>SAML-attribute</i>=<i>local-attribute </i></p><p>例如 <tt>Email=emailaddress</tt> 或 <tt>Address=postaladdress</tt>。鍵入對映做為 [新的值]，然後按一下 [增加]。</p>
+
+<a name="ggwtp"></a><h5>自動聯合</h5>
+
+<ul><li><p><a href="#ggwrl">自動聯合</a></p></li>
+<li><p><a href="#ggwsd">自動聯合共用屬性名稱</a></p></li></ul>
+
+
+<a name="ggwrl"></a><h5>自動聯合</h5>
+<p>選取核取方塊以啟用自動聯合。</p>
+
+<a name="ggwsd"></a><h5>自動聯合共用屬性名稱</h5>
+<p>定義使用者的共用 LDAP 屬性名稱，例如 <tt>telephonenumber</tt>。用於建立自動聯合屬性敘述。建立自動聯合屬性敘述時，將會使用此屬性的值。敘述將包含屬性元素及此共用屬性做為其值。</p>
+
+<a name="ggwrv"></a><h5>認證環境</h5>
+<p>此屬性會定義服務提供者的預設認證環境類別 (認證方法)。總是在服務提供者傳送認證請求時呼叫此方法。這個值還指定在未知使用者嘗試存取受保護資源時，服務提供者使用的認證環境。選項如下：</p><dl><dt>支援的</dt>
+<dd><p>如果服務提供者支援認證環境類別，請選取它旁邊的核取方塊。</p></dd>
+<a name="indexterm-74"></a><a name="indexterm-75"></a><a name="indexterm-76"></a><dt>環境參照</dt>
+<dd><p>Liberty 定義的認證環境類別包括：</p>
+<ul><li><p>Mobile Contract</p></li>
+<li><p>Mobile Digital ID</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Time-Sync-Token</p></li></ul>
+</dd>
+<dt>層級</dt>
+<dd><p>選擇有多個環境時的優先層級。</p></dd>
+</dl>
+
+
+<a name="ggwub"></a><h5>代理伺服器認證配置</h5>
+
+<ul><li><p><a href="#ggwur">代理伺服器認證</a></p></li>
+<li><p><a href="#ggwrs">代理伺服器身份識別提供者清單</a></p></li>
+<li><p><a href="#ggwsr">最大代理伺服器數目</a></p></li>
+<li><p><a href="#ggwtu">使用簡介 Cookie 執行代理作業</a></p></li></ul>
+<p>代理伺服器認證配置屬性定義動態提供者代理作業的值。</p>
+
+<a name="ggwur"></a><h5>代理伺服器認證</h5>
+<p>選取此核取方塊，以啟用服務提供者的代理伺服器認證。</p>
+
+<a name="ggwrs"></a><h5>代理伺服器身份識別提供者清單</h5>
+<p>在 [新的值] 中鍵入用於代理伺服器認證的身份識別提供者的識別碼，然後按一下 [增加]。此值是定義為提供者識別碼的 URI。</p>
+
+<a name="ggwsr"></a><h5>最大代理伺服器數目</h5>
+<p>輸入可用於代理伺服器認證的身份識別提供者的最大數目。</p>
+
+<a name="ggwtu"></a><h5>使用簡介 Cookie 執行代理作業</h5>
+<p>若要使用簡介 Cookie 來尋找代理身份識別提供者，請選取核取方塊。</p>
+<br/>
+
+</body>
+</html>

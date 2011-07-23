@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 属性権限のカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>SAMLv2 属性権限のカスタマイズ</h4>
+<p>SAMLv2 属性権限には、カスタマイズ用に次の属性が含まれています。</p>
+<ul><li><p><a href="#ggwhl">「署名と暗号化」</a></p></li>
+<li><p><a href="#ggwgh">「属性サービス」</a></p></li>
+<li><p><a href="#ggwjy">「AssertionID 要求」</a></p></li>
+<li><p><a href="#ggwju">「属性プロファイル」</a></p></li>
+<li><p><a href="#ggwha">「証明書エイリアス」</a></p></li>
+<li><p><a href="#ggwjj">「対象データストア」</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>署名と暗号化</h5>
+<dl><dt>キーサイズ</dt>
+<dd><p>属性権限エンティティーが別のエンティティーと対話するときに使用するキーの長さ。</p></dd>
+<dt>アルゴリズム</dt>
+<dd><p>別のエンティティーと対話するときに使用される暗号化アルゴリズム。</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>属性サービス</h5>
+<p>この属性は、属性クエリー要求を受信する URL エンドポイントを定義します。「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>マッパー</tt>」は、応答に含める属性のリストを返すために属性のマッピング権限を検索する SPI を定義します。SAMLv2 で定義されている属性クエリープロファイルは次のとおりです。</p>
+<ul><li><p>基本</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>AssertionID 要求</h5>
+<p>対応する表明を取得するためにクライアントからアイデンティティープロバイダに送信される AssertionID の送信先 URL を定義します。「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>マッパー</tt>」は、応答に含める属性のリストを返すために AssertionID のマッピング権限を検索する SPI を定義します。バインドは次のとおりです。</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>属性プロファイル</h5>
+<p>SAMLv2 で定義されている、サポートされる属性プロファイルのタイプを定義します。デフォルトのタイプは「<tt>基本</tt>」です。</p>
+
+<a name="ggwha"></a><h5>証明書エイリアス</h5>
+<p>証明書エイリアス要素を定義します。「<tt>署名</tt>」は、キーストアで正しい署名証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。「<tt>暗号化</tt>」は、キーストアで正しい暗号化証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。</p>
+
+<a name="ggwjj"></a><h5>対象データストア</h5>
+<p>X509 対象 DN を含むデータストア属性名を指定します。属性値が X.509 対象 DN と一致するユーザーを検索するために使用されます。このフィールドは、X.509 対象専用の属性クエリープロファイルで使用されます。 </p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 サービスプロバイダのカスタマイズ  - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2spassertioncontent"></a><h4>SAMLv2 サービスプロバイダのカスタマイズ </h4>
+<p>SAMLv2 サービスプロバイダには、次の属性グループが含まれています。</p>
+<ul><li><p><a href="#ggvhb">「表明コンテンツ」</a></p></li>
+<li><p><a href="#ggvgt">「表明処理」</a></p></li>
+<li><p><a href="#ggvfs">「サービス」</a></p></li>
+<li><p><a href="#ggvgp">「拡張」</a></p></li></ul>
+
+
+<a name="ggvhb"></a><h5>表明コンテンツ</h5>
+
+<ul><li><p><a href="#ggvyt">「要求/応答署名」</a></p></li>
+<li><p><a href="#ggvyf">「暗号化」</a></p></li>
+<li><p><a href="#ggvzm">「証明書エイリアス」</a></p></li>
+<li><p><a href="#ggvxx">「名前 ID の形式」</a></p></li>
+<li><p><a href="#ggvzv">「認証コンテキスト」</a></p></li>
+<li><p><a href="#ggvyc">「表明タイムスキュー係数」</a></p></li>
+<li><p><a href="#ggvyr">「基本認証」</a></p></li></ul>
+
+
+<a name="ggvyt"></a><h5>要求/応答署名</h5>
+<p>次の SAMLv2 サービスプロバイダ要求または応答の署名を有効にするチェックボックスをオンにします。</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>認証要求が署名されました</p></td>
+<td align="left" valign="top" scope="row"><p> このサービスプロバイダによって受信されるすべての認証要求が署名済みである必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>表明が署名されました</p></td>
+<td align="left" valign="top" scope="row"><p>このサービスプロバイダによって受信されるすべての表明が署名済みである必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>POST 応答が署名されました</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、<tt>PostResponse</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>アーティファクト応答</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、<tt>ArtifactResponse</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>ログアウト要求</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、<tt>LogoutRequest</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>ログアウト応答</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、<tt>LogoutResponse</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>名前 ID 要求の管理 </p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、<tt>ManageNameIDRequst</tt>
+要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>名前 ID 応答の管理</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、<tt>ManageNameIDResponse</tt> 要素に署名する必要があります。</p></td>
+</tr>
+</table>
+
+<a name="ggvyf"></a><h5>暗号化</h5>
+<p>次の要素の暗号化を有効にするチェックボックスをオンにします。</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>属性</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、すべての <tt>AttributeStatement</tt> 要素を暗号化する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>表明</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、すべての <tt>Assertion</tt> 要素を暗号化する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>NameID</p></td>
+<td align="left" valign="top" scope="row"><p>アイデンティティープロバイダは、すべての <tt>NameID</tt> 要素を暗号化する必要があります。</p></td>
+</tr>
+</table>
+
+<a name="ggvzm"></a><h5>証明書エイリアス</h5>
+<p>この属性は、サービスプロバイダ用の証明書エイリアス要素を定義します。「<tt>署名</tt>」は、キーストアで正しい署名証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。「<tt>暗号化</tt>」は、キーストアで正しい暗号化証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。</p>
+
+<a name="ggvxx"></a><h5>名前 ID の形式</h5>
+<p>サービスプロバイダによってサポートされる名前 ID の形式を定義します。名前 ID は、プロバイダがユーザーに関して相互に通信するための手段です。シングルサインオンの対話では、次のタイプの識別子がサポートされます。</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified </tt></p></li></ul>
+<p><b>持続識別子</b>は、特定のユーザーのデータストアエントリに 2 つの属性の値として保存されます。<b>一時識別子</b>は一時的なものであり、ユーザーの永続的なデータストアにデータは書き込まれません。</p>
+
+<a name="ggvzv"></a><h5>認証コンテキスト</h5>
+<p>この属性は、SAMLv2 で定義されている認証コンテキストクラスをサービスプロバイダ側で利用可能な認証方法にマップします。</p><dl><dt>マッパー</dt>
+<dd><p>要求された認証コンテキストを作成するために使用される <tt>SPAuthnContextMapper</tt> インタフェースの実装を指定します。デフォルトの実装は、<tt>com.sun.identity.saml2.plugins.DefaultSPAuthnContexteMapper</tt> です。</p></dd>
+<dt>サポート</dt>
+<dd><p>アイデンティティープロバイダによるサポートがある場合は、認証コンテキストクラスの横にあるチェックボックスをオンにします。</p></dd>
+<a name="indexterm-64"></a><a name="indexterm-65"></a><a name="indexterm-66"></a><dt>コンテキスト参照</dt>
+<dd><p>SAMLv2 で定義されている認証コンテキストクラスは、次のとおりです。</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password</p></li>
+<li><p>PasswordProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Telephony</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Unspecified</p></li></ul>
+</dd>
+<dt>レベル</dt>
+<dd><p>値として、OpenSSO の認証フレームワークで定義されている認証レベルに対応する正数を取ります。認証レベルは、認証方法がどの程度信頼できるかを示します。</p><p>このフレームワークでは、デフォルトの認証コンテキスト (優先される認証方法) を使用して各サービスプロバイダが設定されます。ただし、プロバイダは割り当てられた認証コンテキストを定義された認証レベルに基づく認証コンテキストに変更することがあります。たとえば、プロバイダ B は認証レベルが 3 のローカルセッションを生成する必要があるため、そのレベルが割り当てられた認証コンテキストを使用してユーザーを認証するようにアイデンティティープロバイダに要求します。このクエリーパラメータの値は、アイデンティティープロバイダが使用する認証コンテキストを決定します。</p></dd>
+<dt>比較タイプ</dt>
+<dd><p>認証コンテキストをこのプロパティーの値と比較するときの条件を指定します。指定可能な値は、次のとおりです。</p>
+<ul><li><p><b>exact</b>: 表明に含まれる認証コンテキストステートメントが指定された認証コンテキストの少なくとも 1 つと完全一致でなければならない場合に指定します。</p></li>
+<li><p><b>minimum</b>: 表明に含まれる認証コンテキストステートメントが指定された認証コンテキストの少なくとも 1 つと同じ強度 (とアイデンティティープロバイダがみなすもの) でなければならない場合に指定します。</p></li>
+<li><p><b>maximum</b>: 表明に含まれる認証コンテキストステートメントの強度が、指定されたどの認証コンテキストステートメントよりも低くなければならない場合に指定します。</p></li>
+<li><p><b>better</b>: 表明に含まれる認証コンテキストステートメントの強度が、指定されたどの認証コンテキストステートメントよりも高くなければならない場合に指定します。</p></li></ul>
+<p>デフォルト値は <b>exact</b> です。</p></dd>
+</dl>
+
+
+<a name="ggvyc"></a><h5>表明タイムスキュー係数</h5>
+<p>表明は、一定の期間だけ有効であり、その前後は無効です。この属性は、<tt>notBefore</tt> 値の猶予期間を秒単位で指定します。デフォルト値は <tt>300</tt> です。<tt>notAfter</tt> 値とは無関係です。</p>
+
+<a name="ggvyr"></a><h5>基本認証</h5>
+<p>基本認証を有効にすると、SOAP エンドポイントを保護できます。SOAP エンドポイントにアクセスするプロバイダは、「<tt>ユーザー名</tt>」と「<tt>パスワード</tt>」の 2 つのプロパティーでユーザーとパスワードを定義する必要があります。</p>
+
+<a name="ggvgt"></a><h5>表明処理</h5>
+
+<ul><li><p><a href="#ggvym">「属性マッパー」</a></p></li>
+<li><p><a href="#ggvyk">「自動連携」</a></p></li>
+<li><p><a href="#ggvyb">「アカウントマッパー」</a></p></li>
+<li><p><a href="#ggvyy">「一時ユーザー」</a></p></li>
+<li><p><a href="#ggvzn">「URL」</a></p></li>
+<li><p><a href="#ggvze">「デフォルトの中継状態」</a></p></li>
+<li><p><a href="#ggvzo">「アダプタ」</a></p></li></ul>
+
+
+<a name="ggvym"></a><h5>属性マッパー</h5>
+<p>デフォルトの属性マッパープラグインによって使用されるマッピングを定義する値を指定します。デフォルトのプラグインクラスは、<tt>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper</tt> です。</p><p>マッピングは次の形式で設定してください。</p><p><i>SAML 属性</i>=<i>ローカル属性</i></p><p>たとえば、<tt>EmailAddress=mail</tt> や <tt>Address=postaladdress</tt> のようにします。「新しい値」としてマッピングを入力し、「追加」をクリックします。</p>
+
+<a name="ggvyk"></a><h5>自動連携</h5>
+<p>これを有効にすると、自動連携によって、同じユーザーの異なるプロバイダアカウントが共有の属性に基づいて自動的に連携されます。「属性」フィールドには、自動連携を有効にしたときに同じユーザーの異なるプロバイダアカウントを照合するために使用される属性を指定します。</p>
+
+<a name="ggvyb"></a><h5>アカウントマッパー</h5>
+<p>シングルサインオンを目的としてリモートユーザーアカウントをローカルユーザーアカウントにマップするために使用される <tt>AccountMapper</tt> インタフェースの実装を指定します。デフォルトの値は、<tt>com.sun.identity.saml2.plugins.DefaultSPAccountMapper </tt> で、これはデフォルトの実装です。</p>
+
+<a name="ghclu"></a><h5>アーティファクトメッセージのエンコーディング</h5>
+<p>この属性は、アーティファクトのメッセージエンコーディング書式を <tt>URI</tt> または <tt>FORM</tt> のいずれかで定義します。 </p>
+
+<a name="ggvyy"></a><h5>一時ユーザー</h5>
+<p>この属性は、一時的な名前識別子を使用するシングルサインオンの場合に、すべてのアイデンティティープロバイダユーザーをマップするサービスプロバイダ側のユーザーの識別子を指定します。</p>
+
+<a name="ggvzn"></a><h5>URL</h5>
+<p>「ローカル認証 URL」は、ローカルログインページの URL を指定します。</p><p>「中間 URL」は、認証後、元の要求の URL の前にユーザーを誘導する URL を指定します。たとえば、ユーザーアカウントの自動作成後にアカウントの作成に成功したことを示すページなどを指定します。</p><p>「外部アプリケーションログアウト URL」は、外部アプリケーション用のログアウト URL を定義します。サーバーがログアウト要求をリモートのパートナーから受け取ると、バックチャネル <tt>HTTP POST</tt> とすべての Cookie を使用してログアウト URL に要求が送信されます。オプションで、セッションプロパティー名に設定されたクエリーパラメータ <tt>appsessionproperty</tt> が
+URL に含まれる場合は、ユーザーセッションプロパティーを <tt>HTTP ヘッダー</tt>および <tt> POST</tt> パラメータとして送信できます。</p>
+
+<a name="ggvze"></a><h5>デフォルトの中継状態</h5>
+<p><a name="indexterm-67"></a>SAML v2 の処理 (シングルサインオン、シングルログアウト、または連携終了) に成功すると、ページが表示されます。このページは、通常は最初に要求されたリソースであり、最初の要求で <tt>RelayState</tt> 要素を使用して指定されます。<tt>RelayState</tt> が指定されなかった場合は、この <tt>defaultRelayState</tt> プロパティーの値が表示されます。</p>
+<hr><p><b>注意 &#8211; </b><tt>RelayState</tt> または <tt>defaultRelayState</tt> に特殊文字 (<tt>&#38;</tt> など) が含まれている場合は、その値を URL エンコードする必要があります。たとえば、<tt>RelayState</tt> の値が <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt> である場合は、次のように
+URL エンコードする必要があります。</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p><p>その上で、URL に付加します。たとえば、シングルサインオン URL を開始したサービスプロバイダは次のようになります。</p><p><tt> http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i> deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz </tt></p>
+<hr>
+
+
+<a name="ggvzo"></a><h5>アダプタ</h5>
+<p>com.sun.identity.federation.plugins.FederationSPAdapter インタフェースの <tt>実装クラスを定義します。</tt> これは、連携処理中にアプリケーション固有の処理を追加するのに使用されます。</p>
+
+<a name="ggvfs"></a><h5>サービス</h5>
+
+<ul><li><p><a href="#ggwas">「メタエイリアス」</a></p></li>
+<li><p><a href="#ggvzy">「シングルログアウトサービス」</a></p></li>
+<li><p><a href="#ggwbo">「名前 ID の管理サービス」</a></p></li>
+<li><p><a href="#ggwdw">「表明アーティファクトコンシューマサービス」</a></p></li></ul>
+
+
+<a name="ggwas"></a><h5>メタエイリアス</h5>
+<p>設定するプロバイダの <tt>metaAlias</tt> を指定します。<tt>metaAlias</tt> は、プロバイダのエンティティー識別子と配置されている組織を特定するために使用されます。値は、レルムまたは組織 (OpenSSO に SAML v2 Plug-in for Federation Servicesがインストールされているかどうかによる)
+を表す文字列と、スラッシュ「/」およびプロバイダ名を組み合わせたものです。次に例を示します。<tt>/suncorp/travelprovider</tt></p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> で使用する名前に <tt>/</tt> を含めることはできません。</p>
+<hr>
+
+
+<a name="ggvzy"></a><h5>シングルログアウトサービス</h5>
+<p>シングルログアウトサービスは、サービスプロバイダが認証したすべてのセッションで、ログアウト機能の同期を取ります。 </p><p>「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>応答場所</tt>」は、予期されている応答プロバイダの URL を指定します。バインドのタイプは次のとおりです。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwbo"></a><h5>名前 ID の管理サービス</h5>
+<p>このサービスは、主体の新しい名前 ID を指定するためにサービスプロバイダと通信するときに使用される URL を定義します。登録は、連携セッションが確立されたあとでのみ行われます。</p><p>「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>応答場所</tt>」は、予期されている応答プロバイダの URL を指定します。バインドのタイプは次のとおりです。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdw"></a><h5>表明アーティファクトコンシューマサービス</h5>
+<p>このサービスは、サービスプロバイダがアイデンティティープロバイダから受信した応答を処理します。サービスプロバイダは、ユーザーを認証する必要があるときに、アイデンティティープロバイダに認証要求を送信します。 </p>
+<ul><li><p>「HTTP-ARTIFACT」は、ブラウザを使用しない SOAP ベースのプロトコルを指定します。</p></li>
+<li><p>「HTTP-POST」は、ブラウザベースの HTTP POST プロトコルを指定します。</p></li>
+<li><p>「PAOS」は、PAOS バインドの URL の場所を定義します。</p></li></ul>
+<p>「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>インデックス</tt>」は、標準メタデータに含まれる URL を指定します。「<tt>デフォルト</tt>」は、バインドに使用されるデフォルトの URL です。 </p>
+
+<a name="ggvgp"></a><h5>拡張</h5>
+
+<ul><li><p><a href="#ggwds">「SP URL」</a></p></li>
+<li><p><a href="#ggwdj">「SP ログアウト URL」</a></p></li>
+<li><p><a href="#ggwbl">「App シークレットリスト」</a></p></li>
+<li><p><a href="#ggweh">「IDP リスト検索実装の要求」</a></p></li>
+<li><p><a href="#ggwfa">「IDP リスト取得完了の要求」</a></p></li>
+<li><p><a href="#ggwav">「IDP リストの要求」</a></p></li>
+<li><p><a href="#ggway">「IDP プロキシ」</a></p></li>
+<li><p><a href="#ggwak">「概要」</a></p></li>
+<li><p><a href="#ggwcp">「プロキシカウント」</a></p></li>
+<li><p><a href="#ggwdz">「IDP プロキシリスト」</a></p></li></ul>
+
+
+<a name="ggwds"></a><h5>SP URL</h5>
+<p>SAE (Secure Attribute Exchange) の要求を処理できるサービスプロバイダの URL エンドポイントを定義します。この URL が空である (設定されていない) 場合は、SAE のシングルサインオンが有効になりません。通常の
+SAMLv2 シングルサインオンの応答は、サービスプロバイダに送信されます。</p>
+
+<a name="ggwdj"></a><h5>SP ログアウト URL</h5>
+<p>SAE のグローバルログアウト要求を処理できるサービスプロバイダの URL エンドポイントを定義します。  </p>
+
+<a name="ggwbl"></a><h5>App シークレットリスト</h5>
+<p>この属性は、アプリケーションのセキュリティー設定を定義します。アプリケーションごとに 1 つのエントリが必要です。各エントリの形式は次のとおりです。 </p><p><tt>url=SPAppURL|type=</tt><i>symmetric または Asymmetric</i><tt>|secret=</tt><i>ampassword でエンコードされた共有シークレット</i><tt></tt></p>
+
+<a name="ggweh"></a><h5>IDP リスト検索実装の要求</h5>
+<p>IDP リスト検索 SPI の実装クラスを定義します。これは、ECP によって信頼されている優先アイデンティティープロバイダのリストを返します。</p>
+
+<a name="ggwfa"></a><h5>IDP リスト取得完了の要求</h5>
+<p><tt>IDPList</tt> 要素が完全でない場合に、完全なアイデンティティープロバイダリストを取得するために使用できる URI 参照を指定します。 </p>
+
+<a name="ggwav"></a><h5>IDP リストの要求</h5>
+<p>ECP が通信するアイデンティティープロバイダのリストを定義します。これは、IDP 検索のデフォルト実装 (たとえば、<tt>com.sun.identity.saml2.plugins.ECPIDPFinder</tt>) によって使用されます。</p>
+
+<a name="ggway"></a><h5>IDP プロキシ</h5>
+<p>「プロキシ認証設定」属性は、動的アイデンティティープロバイダプロキシの値を定義します。サービスプロバイダのプロキシ認証を有効にするには、このチェックボックスをオンにします。</p>
+
+<a name="ggwak"></a><h5>概要</h5>
+<p>プロキシとして機能しているアイデンティティープロバイダを検索するために Introduction Cookie を使用するには、このチェックボックスをオンにします。</p>
+
+<a name="ggwcp"></a><h5>プロキシカウント</h5>
+<p>プロキシ認証に使用できるアイデンティティープロバイダの最大数を入力します。</p>
+
+<a name="ggwdz"></a><h5>IDP プロキシリスト</h5>
+<p>プロキシ認証に使用できるアイデンティティープロバイダのリストを追加します。「新しい値」にプロバイダの識別子として定義されている URI を入力し、「追加」をクリックします。</p>
+<br/>
+
+</body>
+</html>

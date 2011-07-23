@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 アイデンティティープロバイダのカスタマイズ - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2idpassertioncontent"></a><h4>SAMLv2 アイデンティティープロバイダのカスタマイズ</h4>
+<p>SAMLv2 アイデンティティープロバイダには、次の属性グループが含まれています。</p>
+<ul><li><p><a href="#ggwdf">「表明コンテンツ」</a></p></li>
+<li><p><a href="#ggwca">「表明処理」</a></p></li>
+<li><p><a href="#ggwyj">「ローカル設定」</a></p></li>
+<li><p><a href="#ggwaw">「サービス」</a></p></li>
+<li><p><a href="#ggwli">「拡張」</a></p></li></ul>
+
+
+<a name="ggwdf"></a><h5>表明コンテンツ</h5>
+
+<ul><li><p><a href="#ggwad">「要求/応答署名」</a></p></li>
+<li><p><a href="#ggwby">「暗号化」</a></p></li>
+<li><p><a href="#ggwcz">「証明書エイリアス」</a></p></li>
+<li><p><a href="#ggwbz">「名前 ID の形式」</a></p></li>
+<li><p><a href="#ggyoq">「名前 ID の値マップ」</a></p></li>
+<li><p><a href="#ggwer">「認証コンテキスト」</a></p></li>
+<li><p><a href="#ggwec">「表明時間」</a></p></li>
+<li><p><a href="#ggwce">「基本認証」</a></p></li>
+<li><p><a href="#ggwaj">「表明キャッシュ」</a></p></li>
+<li><p><a href="#ggwcd">「ブートストラップ」</a></p></li></ul>
+
+
+<a name="ggwad"></a><h5>要求/応答署名</h5>
+<p>次のフラグを設定すると、サービスプロバイダによる特定メッセージの署名方法がアイデンティティープロバイダに指示されます。</p><table><col width="27%"><col width="72%"><tr><td align="left" valign="top" scope="row"><p>認証要求</p></td>
+<td align="left" valign="top" scope="row"><p> このアイデンティティープロバイダによって受信されるすべての認証要求が署名済みである必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>アーティファクト解決処理</p></td>
+<td align="left" valign="top" scope="row"><p>サービスプロバイダは、<tt>ArtifactResolve</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>ログアウト要求</p></td>
+<td align="left" valign="top" scope="row"><p>サービスプロバイダは、<tt>LogoutRequest</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>ログアウト応答</p></td>
+<td align="left" valign="top" scope="row"><p>サービスプロバイダは、<tt>LogoutResponse</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>名前 ID 要求の管理 </p></td>
+<td align="left" valign="top" scope="row"><p>サービスプロバイダは、<tt>ManageNameIDRequst</tt> 要素に署名する必要があります。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p>名前 ID 応答の管理</p></td>
+<td align="left" valign="top" scope="row"><p>サービスプロバイダは、<tt>ManageNameIDResponse</tt> 要素に署名する必要があります。</p></td>
+</tr>
+</table>
+
+<a name="ggwby"></a><h5>暗号化</h5>
+<p>次の要素の暗号化を有効にするチェックボックスをオンにします。</p><table><col width="16%"><col width="83%"><tr><td align="left" valign="top" scope="row"><p>NameID</p></td>
+<td align="left" valign="top" scope="row"><p>サービスプロバイダは、すべての <tt>NameID</tt> 要素を暗号化する必要があります。</p></td>
+</tr>
+</table>
+
+<a name="ggwcz"></a><h5>証明書エイリアス</h5>
+<p>この属性は、アイデンティティープロバイダ用の証明書エイリアス要素を定義します。「<tt>署名</tt>」は、キーストアで正しい署名証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。「<tt>暗号化</tt>」は、キーストアで正しい暗号化証明書を見つけるために使用されるプロバイダ証明書エイリアスを指定します。</p>
+
+<a name="ggwbz"></a><h5>名前 ID の形式</h5>
+<p>アイデンティティープロバイダによってサポートされる名前 ID の形式を定義します。名前 ID は、プロバイダがユーザーに関して相互に通信するための手段です。シングルサインオンの対話では、次のタイプの識別子がサポートされます。</p>
+<ul><li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:2.0:nameid-format:transient </tt> </p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress </tt></p></li>
+<li><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified </tt></p></li></ul>
+<p><b>持続識別子</b>は、特定のユーザーのデータストアエントリに 2 つの属性の値として保存されます。<b>一時識別子</b>は一時的なものであり、ユーザーの永続的なデータストアにデータは書き込まれません。</p>
+
+<a name="ggyoq"></a><h5>名前 ID の値マップ</h5>
+<p>この属性は、「名前 ID の形式」属性とユーザープロファイル属性とのマッピングを指定します。定義済みの名前 ID の形式がプロトコルで使用される場合は、対象の形式に対する名前 ID の値としてこのプロファイル属性値が使用されます。各エントリの構文は次のとおりです。</p><p><tt></tt><i>名前 ID の形式</i><tt>=</tt><i>ユーザープロファイル属性</i><tt></tt></p><p> 次に例を示します。</p><p><tt>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress=mail</tt></p><p>新しい名前 ID 形式を追加するには、「名前 ID の値マップ」属性を対応するエントリで更新する必要があります。ただし、<tt>persistent</tt>、<tt>transient</tt>、および <tt>unspecified</tt> は例外です。<tt>persistent</tt> および <tt>transient</tt> の場合、名前 ID の値はランダムに生成されます。この属性では、<tt>unspecified</tt>
+は省略可能です。指定された場合、名前 ID の値はユーザープロファイル属性の値になります。指定されなかった場合は、乱数が生成されます。 </p>
+
+<a name="ggwer"></a><h5>認証コンテキスト</h5>
+<p>この属性は、SAMLv2 で定義されている認証コンテキストクラスをアイデンティティープロバイダ側で利用可能な認証方法にマップします。</p><dl><dt>マッパー</dt>
+<dd><p>要求された認証コンテキストを作成するために使用される <tt>IDPAuthnContextMapper</tt> インタフェースの実装を指定します。デフォルトの実装は、<tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</tt> です。</p></dd>
+<dt>デフォルト認証コンテキスト</dt>
+<dd><p>サービスプロバイダが認証コンテキスト要求を送信しなかった場合に、アイデンティティープロバイダが使用するデフォルトの認証コンテキストタイプを指定します。</p></dd>
+<dt>サポート</dt>
+<dd><p>アイデンティティープロバイダによるサポートがある場合は、認証コンテキストクラスの横にあるチェックボックスをオンにします。</p></dd>
+<a name="indexterm-68"></a><a name="indexterm-69"></a><a name="indexterm-70"></a><dt>コンテキスト参照</dt>
+<dd><p>SAMLv2 で定義されている認証コンテキストクラスは、次のとおりです。</p>
+<ul><li><p>InternetProtocol</p></li>
+<li><p>InternetProtocolPassword</p></li>
+<li><p>Kerberos</p></li>
+<li><p>MobileOneFactorUnregistered</p></li>
+<li><p>MobileTwoFactorUnregistered</p></li>
+<li><p>MobileOneFactorContract</p></li>
+<li><p>MobileTwoFactorContract</p></li>
+<li><p>Password</p></li>
+<li><p>PasswordProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>X509</p></li>
+<li><p>PGP</p></li>
+<li><p>SPKI</p></li>
+<li><p>XMLDSig</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Telephony</p></li>
+<li><p>NomadTelephony</p></li>
+<li><p>PersonalTelephony</p></li>
+<li><p>AuthenticaionTelephony</p></li>
+<li><p>SecureRemotePassword</p></li>
+<li><p>TLSClient</p></li>
+<li><p>Time-Sync-Token</p></li>
+<li><p>Unspecified</p></li></ul>
+</dd>
+<dt>キー</dt>
+<dd><p>コンテキストをマップする OpenSSO 認証タイプを選択します。</p></dd>
+<dt>値</dt>
+<dd><p>OpenSSO 認証オプションを入力します。</p></dd>
+<dt>レベル</dt>
+<dd><p>値として、OpenSSO の認証フレームワークで定義されている認証レベルに対応する正数を取ります。認証レベルは、認証方法がどの程度信頼できるかを示します。</p><p>このフレームワークでは、デフォルトの認証コンテキスト (優先される認証方法) を使用して各アイデンティティープロバイダが設定されます。ただし、プロバイダは割り当てられた認証コンテキストを定義された認証レベルに基づく認証コンテキストに変更することがあります。たとえば、プロバイダ B は認証レベルが 3 のローカルセッションを生成する必要があるため、そのレベルが割り当てられた認証コンテキストを使用してユーザーを認証するようにアイデンティティープロバイダに要求します。このクエリーパラメータの値は、アイデンティティープロバイダが使用する認証コンテキストを決定します。</p></dd>
+</dl>
+
+
+<a name="ggwec"></a><h5>表明時間</h5>
+<p>表明は、一定の期間だけ有効であり、その前後は無効です。この属性は、<tt>Not Before Time Skew</tt> 値の猶予期間を秒単位で指定します。デフォルト値は <tt>600</tt> です。<tt>notAfter</tt> 値とは無関係です。</p><p>「<tt>有効な時間</tt>」は、表明の発行時間を起点とする表明の有効期間を秒単位で指定します。デフォルト値は <tt>600</tt> 秒です。</p>
+
+<a name="ggwce"></a><h5>基本認証</h5>
+<p>基本認証を有効にすると、SOAP エンドポイントを保護できます。SOAP エンドポイントにアクセスするプロバイダは、「<tt>ユーザー名</tt>」と「<tt>パスワード</tt>」の 2 つのプロパティーでユーザーとパスワードを定義する必要があります。</p>
+
+<a name="ggwaj"></a><h5>表明キャッシュ</h5>
+<p>これが有効になっている場合、アイデンティティープロバイダは表明をあとで取得するためにキャッシュできます。</p>
+
+<a name="ggwcd"></a><h5>ブートストラップ</h5>
+<p>ブートストラップを目的とする Liberty ベースのシングルサインオンの処理中に ディスカバリサービス リソースオファリングを生成する場合は、このチェックボックスをオンにします。</p>
+
+<a name="ggwca"></a><h5>表明処理</h5>
+
+<ul><li><p><a href="#ggwdy">「属性マッパー」</a></p></li>
+<li><p><a href="#ggwcl">「アカウントマッパー」</a></p></li></ul>
+
+
+<a name="ggwdy"></a><h5>属性マッパー</h5>
+<p>デフォルトの属性マッパープラグインによって使用されるマッピングを定義する値を指定します。デフォルトのプラグインクラスは、<tt>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</tt> です。</p><p>マッピングは次の形式で設定してください。</p><p><i>SAML 属性</i>=<i>ローカル属性</i></p><p>たとえば、<tt>EmailAddress=mail</tt> や <tt>Address=postaladdress</tt> のようにします。「新しい値」としてマッピングを入力し、「追加」をクリックします。</p>
+
+<a name="ggwcl"></a><h5>アカウントマッパー</h5>
+<p>シングルサインオンを目的としてリモートユーザーアカウントをローカルユーザーアカウントにマップするために使用される <tt>AccountMapper</tt> インタフェースの実装を指定します。デフォルトの値は、<tt>com.sun.identity.saml2.plugins.DefaultIDPAccountMapper</tt> で、これはデフォルトの実装です。</p>
+
+<a name="ggwyj"></a><h5>ローカル設定</h5>
+<p>これらの属性には、OpenSSO インスタンスに固有の設定が含まれます。 </p>
+
+<a name="ggwwx"></a><h5>認証 URL</h5>
+<p>アイデンティティープロバイダが認証時にリダイレクトする認証 URL を定義します。</p>
+
+<a name="ghcia"></a><h5>外部アプリケーションログアウト URL</h5>
+<p>「外部アプリケーションログアウト URL」は、外部アプリケーション用のログアウト URL を定義します。サーバーがログアウト要求をリモートのパートナーから受け取ると、バックチャネル <tt>HTTP POST</tt> とすべての Cookie を使用してログアウト URL に要求が送信されます。オプションで、セッションプロパティー名に設定されたクエリーパラメータ <tt>appsessionproperty</tt> が
+URL に含まれる場合は、ユーザーセッションプロパティーを <tt>HTTP ヘッダー</tt>および <tt> POST</tt> パラメータとして送信できます。</p>
+
+<a name="ggwaw"></a><h5>サービス</h5>
+
+<ul><li><p><a href="#ggwbs">「メタエイリアス」</a></p></li>
+<li><p><a href="#ggwip">「アーティファクト解決サービス」</a></p></li>
+<li><p><a href="#ggwcq">「シングルログアウトサービス」</a></p></li>
+<li><p><a href="#ggwdm">「名前 ID の管理サービス」</a></p></li>
+<li><p><a href="#ggwhr">「シングルサインオンサービス」</a></p></li></ul>
+
+
+<a name="ggwbs"></a><h5>メタエイリアス</h5>
+<p>設定するプロバイダの <tt>metaAlias</tt> を指定します。<tt>metaAlias</tt> は、プロバイダのエンティティー識別子と配置されている組織を特定するために使用されます。値は、レルムまたは組織 (OpenSSO に SAML v2 Plug-in for Federation Servicesがインストールされているかどうかによる)
+を表す文字列と、スラッシュ「/」およびプロバイダ名を組み合わせたものです。次に例を示します。<tt>/suncorp/travelprovider</tt></p>
+<hr><p><b>注意 &#8211; </b><tt>metaAlias</tt> で使用する名前に <tt>/</tt> を含めることはできません。</p>
+<hr>
+
+
+<a name="ggwip"></a><h5>アーティファクト解決サービス</h5>
+<p>アーティファクト解決プロファイルをサポートするエンドポイントを定義します。「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>インデックス</tt>」は、プロトコルメッセージでエンドポイントを参照できるように、エンドポイントに対して一意の整数値を指定します。 </p>
+
+<a name="ggwcq"></a><h5>シングルログアウトサービス</h5>
+<p>シングルログアウトサービスは、アイデンティティープロバイダが認証したすべてのセッションで、ログアウト機能の同期を取ります。 </p><p>「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>応答場所</tt>」は、応答の送信先となるプロバイダの URL を指定します。バインドのタイプは次のとおりです。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwdm"></a><h5>名前 ID の管理サービス</h5>
+<p>このサービスは、主体の新しい名前 ID を指定するためにサービスプロバイダと通信するときに使用される URL を定義します。登録は、連携セッションが確立されたあとでのみ行われます。</p><p>「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。「<tt>応答場所</tt>」は、応答の送信先となるプロバイダの URL を指定します。バインドのタイプは次のとおりです。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwhr"></a><h5>シングルサインオンサービス</h5>
+<p>認証要求プロトコルのプロファイルをサポートするエンドポイントを定義します。すべてのアイデンティティープロバイダは、このようなエンドポイントを少なくとも 1 つサポートする必要があります。 </p><p>「<tt>場所</tt>」は、要求の送信先となるプロバイダの URL を指定します。バインドのタイプは次のとおりです。</p>
+<ul><li><p>HTTP リダイレクト</p></li>
+<li><p>POST</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwli"></a><h5>拡張</h5>
+
+<ul><li><p><a href="#ggwjs">「IDP URL」</a></p></li>
+<li><p><a href="#ggwix">「App シークレットリスト」</a></p></li>
+<li><p><a href="#ggwir">「IDP マッパーセッション」</a></p></li></ul>
+
+
+<a name="ggwjs"></a><h5>IDP URL</h5>
+<p>SAE (Secure Attribute Exchange) の要求を処理できるアイデンティティープロバイダの URL エンドポイントを定義します。 </p>
+
+<a name="ggwix"></a><h5>App シークレットリスト</h5>
+<p>アプリケーションのセキュリティー設定を定義します。アプリケーションごとに 1 つのエントリが必要です。各エントリの形式は次のとおりです。 </p><p><tt>url=IDPAppURL|type=</tt><i>symmetric または Asymmetric</i><tt>|secret=</tt><i> ampassword でエンコードされた共有シークレット</i><tt></tt> OR <tt>or pubkeyalias=</tt><i>IDP アプリケーション署名証明書</i><tt></tt></p>
+
+<a name="ggwir"></a><h5>IDP マッパーセッション</h5>
+<p>セッションマッパー SPI の実装クラスを定義します。このマッパーは、ECP プロファイルを持つアイデンティティープロバイダの HTTP サーブレット要求から有効なセッションを検出します。 </p>
+<br/>
+
+</body>
+</html>

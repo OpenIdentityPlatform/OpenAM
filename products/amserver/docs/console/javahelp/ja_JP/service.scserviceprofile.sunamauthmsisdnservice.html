@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>MSISDN - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.sunamauthmsisdnservice"></a><h4>MSISDN</h4>
+<p><a name="indexterm-177"></a>MSISDN (Mobile Station Integrated Services Digital Network) 認証モジュールにより、携帯電話などのデバイスと関連付けられたモバイルサブスクライバ ISDN を使用した認証が可能になります。このモジュールは対話型ではありません。このモジュールでは加入者 ISDN を取得して、Directory
+Server と照合し、番号に一致するユーザーを見つけます。MSISDN 認証属性はレルム属性です。MSISDN 認証属性は次のとおりです。</p>
+<ul><li><p><a href="#fumxe">「信頼できるゲートウェイの IP アドレス」</a></p></li>
+<li><p><a href="#fumxg">「MSISDN 番号引数」</a></p></li>
+<li><p><a href="#fumxf">「LDAP サーバーおよびポート」</a></p></li>
+<li><p><a href="#fumxi">「LDAP 検索開始 DN」</a></p></li>
+<li><p><a href="#fumxk">「LDAP の検索に使用する属性」</a></p></li>
+<li><p><a href="#fumxl">「LDAP サーバーの主体ユーザー」</a></p></li>
+<li><p><a href="#fumxn">「LDAP サーバーの主体パスワード」</a></p></li>
+<li><p><a href="#fumxm">「LDAP サーバーの主体パスワード (確認)」</a></p></li>
+<li><p><a href="#fumxo">「LDAP アクセス用に SSL を有効」</a></p></li>
+<li><p><a href="#fumxp">「ユーザープロファイルの取得に使用する LDAP 属性」</a></p></li>
+<li><p><a href="#fumxr">「認証時のユーザー DN を返す」</a></p></li>
+<li><p><a href="#fumxs">「認証レベル」</a></p></li></ul>
+
+
+<a name="fumxe"></a><h5>信頼できるゲートウェイの IP アドレス</h5>
+<p>MSIDSN モジュールにアクセスできる信頼できるクライアントの IP アドレスのリストを指定します。入力フィールドにクライアントの IP アドレス (<tt>123.456.123.111</tt> など) を入力して、「追加」をクリックすることにより、MSISDN モジュールへのアクセスを許可するすべてのクライアントを設定することができます。デフォルトでは、このリストは空です。この属性が空のままの場合には、すべてのクライアントにアクセスが許可されます。「none」を指定した場合は、どのクライアントにもアクセスが許可されません。</p>
+
+<a name="fumxg"></a><h5>MSISDN 番号引数</h5>
+<p>要求ヘッダーまたは Cookie ヘッダーのどのパラメータで MSISDN 番号を検索するかを指定するために、パラメータ名のリストを指定します。たとえば、<i>x-Cookie-Param</i>、<i>AM_NUMBER</i>、および <i>COOKIE-ID</i> を定義した場合、MSISDN 認証サービスはそれらのパラメータで MSISDN 番号を検索します。</p>
+
+<a name="fumxf"></a><h5>LDAP サーバーおよびポート</h5>
+<p>MSISDN 番号を使用してユーザーの検索を行う Directory Server の、ホスト名とポート番号を指定します。形式は <tt></tt><i>hostname:port</i><tt></tt> です。ポート番号がないときは、<tt>389</tt> と想定します。</p><p>OpenSSO に複数のドメインが配備されている場合、OpenSSO と Directory Server の特定のインスタンス間の通信リンクを次の形式で指定できます。複数のエントリの場合は、ローカルサーバー名を先頭に付ける必要があります。</p><p><tt>local_servername|server:port local_servername2|server2:port2 ...</tt></p><p>たとえば、異なる場所に配備された 2 つの OpenSSO インスタンス (L1-machine1-IS および L2- machine2-IS) が、それぞれ別の Directory Server
+インスタンス (L1-machine1-DS および L2-machine2-DS) と通信する場合、次のように指定します。</p><p><tt>L1-machine1-IS.example.com|L1-machine1-DS.example.com:389 </tt></p><p><tt>L2-machine2-IS.example.com|L2-machine2-DS.example.com:389 </tt></p>
+
+<a name="fumxi"></a><h5>LDAP 検索開始 DN</h5>
+<p>ユーザーの MSISDN 番号に対する検索を開始するノードの DN を指定します。デフォルト値は存在しません。このフィールドは有効な DN をすべて認識します。複数のエントリの場合は、ローカルサーバー名をプレフィックスとして付ける必要があります。形式は <tt></tt><i>servername|search dn</i><tt></tt> です。</p><p>複数のエントリの場合は、次のようになります。</p><p><tt></tt><i>servername1|search dn servername2|search dn servername3|search dn</i><tt>...</tt></p><p>ルート組織の下に同じユーザー ID で複数のエントリが存在する場合、認証が正しく行われるためには、1 つのエントリだけを検索または発見できるようにこのパラメータを設定する必要があります。たとえば、ルート組織の下でエージェント ID とユーザー ID が同じである場合、ルート組織でエージェント ID を使用して認証するにはこのパラメータを <tt>ou=Agents</tt> に、ユーザー
+ID を使用して認証するにはこのパラメータを <tt>ou=People</tt> にしてください。</p>
+
+<a name="fumxk"></a><h5>LDAP の検索に使用する属性</h5>
+<p>ユーザープロファイルの属性のうち、特定のユーザーを検索するための MSISDN 番号が含まれる属性の名前を指定します。デフォルト値は <i>sunIdentityMSISDNNumber</i> です。この値は、ユーザープロファイルの別の属性にその MSISDN 番号が確実に含まれていることがわかっている場合を除いて、変更しないでください。</p>
+
+<a name="fumxl"></a><h5>LDAP サーバーの主体ユーザー</h5>
+<p>Directory Server で MSISDN を検索するために必要な、LDAP バインド DN を指定します。デフォルトバインド DN は <tt>cn=amldapuser,ou=DSAME Users,dc=sun,dc=com</tt> です。</p>
+
+<a name="fumxn"></a><h5>LDAP サーバーの主体パスワード</h5>
+<p>「LDAP サーバーの主体ユーザー」に定義したバインド DN の、LDAP バインドパスワードを指定します。</p>
+
+<a name="fumxm"></a><h5>LDAP サーバーの主体パスワード (確認)</h5>
+<p>パスワードを確認します。</p>
+
+<a name="fumxo"></a><h5>LDAP アクセス用に SSL を有効</h5>
+<p>LDAP サーバーとポートの属性で指定される Directory Server への SSL アクセスを有効にします。デフォルトでは、この属性は無効なので、Directory Server へのアクセスに SSL プロトコルは使用されません。ただし、この属性が有効にされている場合でも、非 SSL
+サーバーにバインドすることができます。</p>
+
+<a name="fumxp"></a><h5>ユーザープロファイルの取得に使用する LDAP 属性</h5>
+<p>要求された MSISDN 番号の検索に使用するヘッダーを指定します。サポートされる値は次のとおりです。</p><dl><dt>Cookie ヘッダー</dt>
+<dd><p>Cookie で検索を実行します。</p></dd>
+<dt>要求ヘッダー</dt>
+<dd><p>要求ヘッダーで検索を実行します。 </p></dd>
+<dt>要求パラメータ</dt>
+<dd><p>要求パラメータで検索を実行します。デフォルトでは、すべてのオプションが選択されます。</p></dd>
+</dl>
+
+
+<a name="fumxr"></a><h5>認証時のユーザー DN を返す</h5>
+<p>OpenSSO ディレクトリが MSDISN 用に設定されたディレクトリと同じ場合、このオプションを有効にすることができます。オプションを有効にすると、このオプションによって認証モジュールがユーザー ID ではなく DN を返すことができるため、検索が不要になります。通常、認証モジュールはユーザー ID だけを返すため、認証サービスはローカルの OpenSSO でユーザーを検索します。外部のディレクトリが使用された場合、通常このオプションは有効になりません。</p>
+
+<a name="fumxs"></a><h5>認証レベル</h5>
+<p>認証レベルは認証方法ごとに個別に設定します。この値は、認証メカニズムの信頼度を示します。ユーザーが認証を受けると、この値がセッションの SSO トークンに格納されます。ユーザーがアクセスするアプリケーションに SSO トークンが提供されると、そのアプリケーションは格納されている値を使用して、ユーザーにアクセスを許可するのに十分なレベルかどうかを判別します。SSO トークンに格納されている認証レベルが必要な最小値に満たない場合、アプリケーションはユーザーにより高い認証レベルのサービスで認証を再度受けるよう要求することがあります。デフォルト値は 0 です。</p>
+<hr><p><b>注 &#8211; </b>認証レベルの指定がない場合、SSO トークンはコア認証属性の <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">「デフォルト認証レベル」</a>で指定した値を格納します。</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

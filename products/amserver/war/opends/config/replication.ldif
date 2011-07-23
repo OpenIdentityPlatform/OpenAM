@@ -1,0 +1,30 @@
+# Use this file as an example of the Multi-master replication configuration.
+# The content of this file should be edited and 
+# added to the config.ldif file to enable replication.
+#
+# Each synchronized base DN must be specified using entry similar to 
+# cn=example, cn=domains, cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config.
+# Each server must have its own unique server ID defined in ds-cfg-server-id.
+# Each replication server must be enabled using the
+# cn=Replication Server, cn=Multimaster Synchronization, cn=Synchronization Providers, cn=config
+# entry.
+
+dn: cn=example,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-replication-domain
+cn: example
+ds-cfg-base-dn: dc=example,dc=com
+ds-cfg-replication-server: localhost:8989
+ds-cfg-replication-server: localhost:8990
+ds-cfg-server-id: 1
+ds-cfg-receive-status: true
+
+dn: cn=Replication Server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-replication-server
+cn: Replication Server
+ds-cfg-replication-port: 8989
+ds-cfg-replication-server: localhost:8989
+ds-cfg-replication-server: localhost:8990
+ds-cfg-replication-server-id: 1
+

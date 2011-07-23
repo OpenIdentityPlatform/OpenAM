@@ -1,0 +1,2233 @@
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE
+# or https://OpenDS.dev.java.net/OpenDS.LICENSE.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE.  If applicable,
+# add the following below this CDDL HEADER, with the fields enclosed
+# by brackets "[]" replaced with your own identifying information:
+#      Portions Copyright [yyyy] [name of copyright owner]
+#
+# CDDL HEADER END
+#
+#      Copyright 2006-2008 Sun Microsystems, Inc.
+#
+#
+# This file contains the primary Directory Server configuration.  It must not
+# be directly edited while the server is online.  The server configuration
+# should only be managed using the administration utilities provided with the
+# Directory Server.
+
+dn: cn=config
+objectClass: top
+objectClass: ds-cfg-root-config
+cn: config
+ds-cfg-check-schema: true
+ds-cfg-add-missing-rdn-attributes: true
+ds-cfg-allow-attribute-name-exceptions: false
+ds-cfg-invalid-attribute-syntax-behavior: reject
+ds-cfg-single-structural-objectclass-behavior: reject
+ds-cfg-notify-abandoned-operations: false
+ds-cfg-proxied-authorization-identity-mapper: cn=Exact Match,cn=Identity Mappers,cn=config
+ds-cfg-size-limit: 1000
+ds-cfg-time-limit: 60 seconds
+ds-cfg-lookthrough-limit: 5000
+ds-cfg-writability-mode: enabled
+ds-cfg-bind-with-dn-requires-password: true
+ds-cfg-reject-unauthenticated-requests: false
+ds-cfg-default-password-policy: cn=Default Password Policy,cn=Password Policies,cn=config
+ds-cfg-return-bind-error-messages: false
+ds-cfg-idle-time-limit: 0 seconds
+ds-cfg-save-config-on-successful-startup: true
+ds-cfg-etime-resolution: milliseconds
+ds-cfg-entry-cache-preload: false
+ds-cfg-max-allowed-client-connections: 0
+ds-cfg-allowed-task: org.opends.server.tasks.AddSchemaFileTask
+ds-cfg-allowed-task: org.opends.server.tasks.BackupTask
+ds-cfg-allowed-task: org.opends.server.tasks.DisconnectClientTask
+ds-cfg-allowed-task: org.opends.server.tasks.EnterLockdownModeTask
+ds-cfg-allowed-task: org.opends.server.tasks.ExportTask
+ds-cfg-allowed-task: org.opends.server.tasks.ImportTask
+ds-cfg-allowed-task: org.opends.server.tasks.InitializeTargetTask
+ds-cfg-allowed-task: org.opends.server.tasks.InitializeTask
+ds-cfg-allowed-task: org.opends.server.tasks.SetGenerationIdTask
+ds-cfg-allowed-task: org.opends.server.tasks.LeaveLockdownModeTask
+ds-cfg-allowed-task: org.opends.server.tasks.RebuildTask
+ds-cfg-allowed-task: org.opends.server.tasks.RestoreTask
+ds-cfg-allowed-task: org.opends.server.tasks.ShutdownTask
+
+dn: cn=Access Control Handler,cn=config
+objectClass: top
+objectClass: ds-cfg-access-control-handler
+objectClass: ds-cfg-dsee-compat-access-control-handler
+ds-cfg-global-aci: (extop="1.3.6.1.4.1.26027.1.6.1 || 1.3.6.1.4.1.26027.1.6.3 || 1.3.6.1.4.1.4203.1.11.1 || 1.3.6.1.4.1.1466.20037 || 1.3.6.1.4.1.4203.1.11.3") (version 3.0; acl "Anonymous extended operation access"; allow(read) userdn="ldap:///anyone";)
+ds-cfg-global-aci: (targetcontrol="2.16.840.1.113730.3.4.2 || 2.16.840.1.113730.3.4.17 || 2.16.840.1.113730.3.4.19 || 1.3.6.1.4.1.4203.1.10.2 || 1.3.6.1.4.1.42.2.27.8.5.1 || 2.16.840.1.113730.3.4.16") (version 3.0; acl "Anonymous control access"; allow(read) userdn="ldap:///anyone";)
+ds-cfg-global-aci: (targetattr!="userPassword||authPassword")(version 3.0; acl "Anonymous read access"; allow (read,search,compare) userdn="ldap:///anyone";)
+ds-cfg-global-aci: (targetattr="*")(version 3.0; acl "Self entry modification"; allow (write) userdn="ldap:///self";)
+ds-cfg-global-aci: (target="ldap:///cn=schema")(targetscope="base")(targetattr="objectClass||attributeTypes||dITContentRules||dITStructureRules||ldapSyntaxes||matchingRules||matchingRuleUse||nameForms||objectClasses")(version 3.0; acl "User-Visible Schema Operational Attributes"; allow (read,search,compare) userdn="ldap:///anyone";)
+ds-cfg-global-aci: (target="ldap:///")(targetscope="base")(targetattr="objectClass||namingContexts||supportedAuthPasswordSchemes||supportedControl||supportedExtension||supportedFeatures||supportedLDAPVersion||supportedSASLMechanisms||vendorName||vendorVersion")(version 3.0; acl "User-Visible Root DSE Operational Attributes"; allow (read,search,compare) userdn="ldap:///anyone";)
+ds-cfg-global-aci: (targetattr="createTimestamp||creatorsName||modifiersName||modifyTimestamp||entryDN||entryUUID||subschemaSubentry")(version 3.0; acl "User-Visible Operational Attributes"; allow (read,search,compare) userdn="ldap:///anyone";)
+ds-cfg-global-aci: (target="ldap:///dc=replicationchanges")(targetattr="*")(version 3.0; acl "Replication backend access"; deny (all) userdn="ldap:///anyone";)
+cn: Access Control Handler
+ds-cfg-java-class: org.opends.server.authorization.dseecompat.AciHandler
+ds-cfg-enabled: true
+
+dn: cn=Crypto Manager,cn=config
+objectClass: top
+objectClass: ds-cfg-crypto-manager
+cn: Crypto Manager
+ds-cfg-ssl-cert-nickname: ads-certificate
+ds-cfg-ssl-encryption: false
+
+dn: cn=Account Status Notification Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Account Status Notification Handlers
+
+dn: cn=Error Log Handler,cn=Account Status Notification Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-account-status-notification-handler
+objectClass: ds-cfg-error-log-account-status-notification-handler
+cn: Error Log Handler
+ds-cfg-java-class: org.opends.server.extensions.ErrorLogAccountStatusNotificationHandler
+ds-cfg-enabled: true
+ds-cfg-account-status-notification-type: account-temporarily-locked
+ds-cfg-account-status-notification-type: account-permanently-locked
+ds-cfg-account-status-notification-type: account-unlocked
+ds-cfg-account-status-notification-type: account-idle-locked
+ds-cfg-account-status-notification-type: account-reset-locked
+ds-cfg-account-status-notification-type: account-disabled
+ds-cfg-account-status-notification-type: account-enabled
+ds-cfg-account-status-notification-type: account-expired
+ds-cfg-account-status-notification-type: password-expired
+ds-cfg-account-status-notification-type: password-expiring
+ds-cfg-account-status-notification-type: password-reset
+ds-cfg-account-status-notification-type: password-changed
+
+dn: cn=SMTP Handler,cn=Account Status Notification Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-account-status-notification-handler
+objectClass: ds-cfg-smtp-account-status-notification-handler
+cn: SMTP Handler
+ds-cfg-java-class: org.opends.server.extensions.SMTPAccountStatusNotificationHandler
+ds-cfg-enabled: false
+ds-cfg-sender-address: opends-notifications@example.com
+ds-cfg-email-address-attribute-type: mail
+ds-cfg-send-message-without-end-user-address: false
+ds-cfg-message-template-file: account-temporarily-locked:config/messages/account-temporarily-locked.template
+ds-cfg-message-template-file: account-permanently-locked:config/messages/account-permanently-locked.template
+ds-cfg-message-template-file: account-unlocked:config/messages/account-unlocked.template
+ds-cfg-message-template-file: account-idle-locked:config/messages/account-idle-locked.template
+ds-cfg-message-template-file: account-reset-locked:config/messages/account-reset-locked.template
+ds-cfg-message-template-file: account-disabled:config/messages/account-disabled.template
+ds-cfg-message-template-file: account-enabled:config/messages/account-enabled.template
+ds-cfg-message-template-file: account-expired:config/messages/account-expired.template
+ds-cfg-message-template-file: password-expired:config/messages/password-expired.template
+ds-cfg-message-template-file: password-expiring:config/messages/password-expiring.template
+ds-cfg-message-template-file: password-reset:config/messages/password-reset.template
+ds-cfg-message-template-file: password-changed:config/messages/password-changed.template
+ds-cfg-message-subject: account-temporarily-locked:Your directory account has been locked
+ds-cfg-message-subject: account-permanently-locked:Your directory account has been locked
+ds-cfg-message-subject: account-unlocked:Your directory account has been unlocked
+ds-cfg-message-subject: account-idle-locked:Your directory account has been locked
+ds-cfg-message-subject: account-reset-locked:Your directory account has been locked
+ds-cfg-message-subject: account-disabled:Your directory account has been disabled
+ds-cfg-message-subject: account-enabled:Your directory account has been re-enabled
+ds-cfg-message-subject: account-expired:Your directory account has expired
+ds-cfg-message-subject: password-expired:Your directory password has expired
+ds-cfg-message-subject: password-expiring:Your directory password is going to expire
+ds-cfg-message-subject: password-reset:Your directory password has been reset
+ds-cfg-message-subject: password-changed:Your directory password has been changed
+
+dn: cn=Alert Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Alert Handlers
+
+dn: cn=JMX Alert Handler,cn=Alert Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-alert-handler
+objectClass: ds-cfg-jmx-alert-handler
+cn: JMX Alert Handler
+ds-cfg-java-class: org.opends.server.extensions.JMXAlertHandler
+ds-cfg-enabled: false
+
+dn: cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Backends
+
+dn: ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-local-db-backend
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.jeb.BackendImpl
+ds-cfg-backend-id: userRoot
+ds-cfg-writability-mode: enabled
+ds-cfg-base-dn: dc=example,dc=com
+ds-cfg-db-directory: db
+ds-cfg-db-directory-permissions: 700
+ds-cfg-index-entry-limit: 4000
+ds-cfg-preload-time-limit: 0 seconds
+ds-cfg-import-queue-size: 100
+ds-cfg-import-thread-count: 8
+ds-cfg-entries-compressed: false
+ds-cfg-compact-encoding: true
+ds-cfg-db-cache-percent: 10
+ds-cfg-db-cache-size: 0 megabytes
+ds-cfg-db-txn-no-sync: false
+ds-cfg-db-txn-write-no-sync: true
+ds-cfg-db-run-cleaner: true
+ds-cfg-db-num-cleaner-threads: 1
+ds-cfg-db-cleaner-min-utilization: 75
+ds-cfg-db-evictor-lru-only: true
+ds-cfg-db-evictor-nodes-per-scan: 10
+ds-cfg-db-log-file-max: 50 megabytes
+ds-cfg-db-logging-file-handler-on: true
+ds-cfg-db-logging-level: CONFIG
+ds-cfg-db-checkpointer-bytes-interval: 20 megabytes
+ds-cfg-db-checkpointer-wakeup-interval: 30 seconds
+ds-cfg-db-num-lock-tables: 19
+
+dn: cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Index
+
+dn: ds-cfg-attribute=aci,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: aci
+ds-cfg-index-type: presence
+
+dn: ds-cfg-attribute=cn,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: cn
+ds-cfg-index-type: equality
+ds-cfg-index-type: substring
+
+dn: ds-cfg-attribute=ds-sync-hist,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: ds-sync-hist
+ds-cfg-index-type: ordering
+
+dn: ds-cfg-attribute=entryUUID,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: entryUUID
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=givenName,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: givenName
+ds-cfg-index-type: equality
+ds-cfg-index-type: substring
+
+dn: ds-cfg-attribute=mail,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: mail
+ds-cfg-index-type: equality
+ds-cfg-index-type: substring
+
+dn: ds-cfg-attribute=member,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: member
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=objectClass,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: objectClass
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=sn,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: sn
+ds-cfg-index-type: equality
+ds-cfg-index-type: substring
+
+dn: ds-cfg-attribute=telephoneNumber,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: telephoneNumber
+ds-cfg-index-type: equality
+ds-cfg-index-type: substring
+
+dn: ds-cfg-attribute=uid,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: uid
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=uniqueMember,cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: uniqueMember
+ds-cfg-index-type: equality
+
+dn: cn=VLV Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: VLV Index
+
+dn: ds-cfg-backend-id=backup,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-backup-backend
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.BackupBackend
+ds-cfg-backend-id: backup
+ds-cfg-writability-mode: disabled
+ds-cfg-base-dn: cn=backups
+ds-cfg-backup-directory: bak
+
+dn: ds-cfg-backend-id=config,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-config-file-handler-backend
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.extensions.ConfigFileHandler
+ds-cfg-backend-id: config
+ds-cfg-writability-mode: enabled
+ds-cfg-base-dn: cn=config
+
+dn: ds-cfg-backend-id=ads-truststore,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-trust-store-backend
+ds-cfg-backend-id: ads-truststore
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.TrustStoreBackend
+ds-cfg-writability-mode: enabled
+ds-cfg-base-dn: cn=ads-truststore
+ds-cfg-trust-store-type: JKS
+ds-cfg-trust-store-file: config/ads-truststore
+ds-cfg-trust-store-pin-file: config/ads-truststore.pin
+
+dn: ds-cfg-backend-id=monitor,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-monitor-backend
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.MonitorBackend
+ds-cfg-backend-id: monitor
+ds-cfg-writability-mode: disabled
+ds-cfg-base-dn: cn=monitor
+
+dn: ds-cfg-backend-id=schema,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-schema-backend
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.SchemaBackend
+ds-cfg-backend-id: schema
+ds-cfg-writability-mode: enabled
+ds-cfg-base-dn: cn=schema
+ds-cfg-show-all-attributes: false
+
+dn: ds-cfg-backend-id=tasks,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-task-backend
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.task.TaskBackend
+ds-cfg-backend-id: tasks
+ds-cfg-writability-mode: enabled
+ds-cfg-base-dn: cn=tasks
+ds-cfg-task-backing-file: config/tasks.ldif
+ds-cfg-task-retention-time: 24 hours
+
+dn: ds-cfg-backend-id=adminRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend
+objectClass: ds-cfg-ldif-backend
+ds-cfg-backend-id: adminRoot
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.backends.LDIFBackend
+ds-cfg-writability-mode: enabled
+ds-cfg-base-dn: cn=admin data
+ds-cfg-ldif-file: config/admin-backend.ldif
+ds-cfg-is-private-backend: true
+
+dn: cn=Certificate Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Certificate Mappers
+
+dn: cn=Subject Equals DN,cn=Certificate Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-certificate-mapper
+objectClass: ds-cfg-subject-equals-dn-certificate-mapper
+cn: Subject Equals DN
+ds-cfg-java-class: org.opends.server.extensions.SubjectEqualsDNCertificateMapper
+ds-cfg-enabled: true
+
+dn: cn=Subject DN to User Attribute,cn=Certificate Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-certificate-mapper
+objectClass: ds-cfg-subject-dn-to-user-attribute-certificate-mapper
+cn: Subject DN to User Attribute
+ds-cfg-java-class: org.opends.server.extensions.SubjectDNToUserAttributeCertificateMapper
+ds-cfg-enabled: true
+ds-cfg-subject-attribute: ds-certificate-subject-dn
+
+dn: cn=Subject Attribute to User Attribute,cn=Certificate Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-certificate-mapper
+objectClass: ds-cfg-subject-attribute-to-user-attribute-certificate-mapper
+cn: Subject Attribute to User Attribute
+ds-cfg-java-class: org.opends.server.extensions.SubjectAttributeToUserAttributeCertificateMapper
+ds-cfg-enabled: true
+ds-cfg-subject-attribute-mapping: cn:cn
+ds-cfg-subject-attribute-mapping: e:mail
+
+dn: cn=Fingerprint Mapper,cn=Certificate Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-certificate-mapper
+objectClass: ds-cfg-fingerprint-certificate-mapper
+cn: Fingerprint Mapper
+ds-cfg-java-class: org.opends.server.extensions.FingerprintCertificateMapper
+ds-cfg-enabled: true
+ds-cfg-fingerprint-attribute: ds-certificate-fingerprint
+ds-cfg-fingerprint-algorithm: MD5
+
+dn: cn=Connection Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Connection Handlers
+
+dn: cn=LDAP Connection Handler,cn=Connection Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-connection-handler
+objectClass: ds-cfg-ldap-connection-handler
+cn: LDAP Connection Handler
+ds-cfg-java-class: org.opends.server.protocols.ldap.LDAPConnectionHandler
+ds-cfg-enabled: true
+ds-cfg-listen-address: 0.0.0.0
+ds-cfg-listen-port: 389
+ds-cfg-accept-backlog: 128
+ds-cfg-allow-ldap-v2: true
+ds-cfg-keep-stats: true
+ds-cfg-use-tcp-keep-alive: true
+ds-cfg-use-tcp-no-delay: true
+ds-cfg-allow-tcp-reuse-address: true
+ds-cfg-send-rejection-notice: true
+ds-cfg-max-request-size: 5 megabytes
+ds-cfg-max-blocked-write-time-limit: 2 minutes
+ds-cfg-num-request-handlers: 2
+ds-cfg-allow-start-tls: false
+ds-cfg-use-ssl: false
+ds-cfg-ssl-client-auth-policy: optional
+ds-cfg-ssl-cert-nickname: server-cert
+
+dn: cn=LDAPS Connection Handler,cn=Connection Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-connection-handler
+objectClass: ds-cfg-ldap-connection-handler
+cn: LDAPS Connection Handler
+ds-cfg-java-class: org.opends.server.protocols.ldap.LDAPConnectionHandler
+ds-cfg-enabled: false
+ds-cfg-listen-address: 0.0.0.0
+ds-cfg-listen-port: 636
+ds-cfg-accept-backlog: 128
+ds-cfg-allow-ldap-v2: true
+ds-cfg-keep-stats: true
+ds-cfg-use-tcp-keep-alive: true
+ds-cfg-use-tcp-no-delay: true
+ds-cfg-allow-tcp-reuse-address: true
+ds-cfg-send-rejection-notice: true
+ds-cfg-max-request-size: 5 megabytes
+ds-cfg-max-blocked-write-time-limit: 2 minutes
+ds-cfg-num-request-handlers: 2
+ds-cfg-allow-start-tls: false
+ds-cfg-use-ssl: true
+ds-cfg-ssl-client-auth-policy: optional
+ds-cfg-ssl-cert-nickname: server-cert
+ds-cfg-key-manager-provider: cn=JKS,cn=Key Manager Providers,cn=config
+ds-cfg-trust-manager-provider: cn=JKS,cn=Trust Manager Providers,cn=config
+
+dn: cn=LDIF Connection Handler,cn=Connection Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-connection-handler
+objectClass: ds-cfg-ldif-connection-handler
+cn: LDIF Connection Handler
+ds-cfg-java-class: org.opends.server.protocols.LDIFConnectionHandler
+ds-cfg-enabled: true
+ds-cfg-ldif-directory: config/auto-process-ldif
+ds-cfg-poll-interval: 5 seconds
+
+dn: cn=JMX Connection Handler,cn=Connection Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-connection-handler
+objectClass: ds-cfg-jmx-connection-handler
+cn: JMX Connection Handler
+ds-cfg-java-class: org.opends.server.protocols.jmx.JmxConnectionHandler
+ds-cfg-enabled: false
+ds-cfg-use-ssl: false
+ds-cfg-listen-port: 1689
+ds-cfg-ssl-cert-nickname: server-cert
+
+dn: cn=Entry Caches,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Entry Caches
+
+dn: cn=FIFO,cn=Entry Caches,cn=config
+objectClass: top
+objectClass: ds-cfg-entry-cache
+objectClass: ds-cfg-fifo-entry-cache
+cn: FIFO
+ds-cfg-enabled: false
+ds-cfg-cache-level: 1
+ds-cfg-java-class: org.opends.server.extensions.FIFOEntryCache
+
+dn: cn=Soft Reference,cn=Entry Caches,cn=config
+objectClass: top
+objectClass: ds-cfg-entry-cache
+objectClass: ds-cfg-soft-reference-entry-cache
+cn: Soft Reference
+ds-cfg-enabled: false
+ds-cfg-cache-level: 2
+ds-cfg-java-class: org.opends.server.extensions.SoftReferenceEntryCache
+
+dn: cn=File System,cn=Entry Caches,cn=config
+objectClass: top
+objectClass: ds-cfg-entry-cache
+objectClass: ds-cfg-file-system-entry-cache
+cn: File System
+ds-cfg-enabled: false
+ds-cfg-cache-level: 3
+ds-cfg-java-class: org.opends.server.extensions.FileSystemEntryCache
+
+dn: cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Extended Operations
+
+dn: cn=Cancel,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-cancel-extended-operation-handler
+cn: Cancel
+ds-cfg-java-class: org.opends.server.extensions.CancelExtendedOperation
+ds-cfg-enabled: true
+
+dn: cn=Get Connection ID,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-get-connection-id-extended-operation-handler
+cn: Get Connection ID
+ds-cfg-java-class: org.opends.server.extensions.GetConnectionIDExtendedOperation
+ds-cfg-enabled: true
+
+dn: cn=Password Modify,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-password-modify-extended-operation-handler
+cn: Password Modify
+ds-cfg-java-class: org.opends.server.extensions.PasswordModifyExtendedOperation
+ds-cfg-enabled: true
+ds-cfg-identity-mapper: cn=Exact Match,cn=Identity Mappers,cn=config
+
+dn: cn=Password Policy State,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-password-policy-state-extended-operation-handler
+cn: Password Policy State
+ds-cfg-java-class: org.opends.server.extensions.PasswordPolicyStateExtendedOperation
+ds-cfg-enabled: true
+
+dn: cn=StartTLS,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-start-tls-extended-operation-handler
+cn: StartTLS
+ds-cfg-java-class: org.opends.server.extensions.StartTLSExtendedOperation
+ds-cfg-enabled: true
+
+dn: cn=Get Symmetric Key,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-get-symmetric-key-extended-operation-handler
+cn: Get Symmetric Key
+ds-cfg-java-class: org.opends.server.crypto.GetSymmetricKeyExtendedOperation
+ds-cfg-enabled: true
+
+dn: cn=Who Am I,cn=Extended Operations,cn=config
+objectClass: top
+objectClass: ds-cfg-extended-operation-handler
+objectClass: ds-cfg-who-am-i-extended-operation-handler
+cn: Who Am I
+ds-cfg-java-class: org.opends.server.extensions.WhoAmIExtendedOperation
+ds-cfg-enabled: true
+
+dn: cn=Group Implementations,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Group Implementations
+
+dn: cn=Dynamic,cn=Group Implementations,cn=config
+objectClass: top
+objectClass: ds-cfg-group-implementation
+objectClass: ds-cfg-dynamic-group-implementation
+cn: Dynamic
+ds-cfg-java-class: org.opends.server.extensions.DynamicGroup
+ds-cfg-enabled: true
+
+dn: cn=Static,cn=Group Implementations,cn=config
+objectClass: top
+objectClass: ds-cfg-group-implementation
+objectClass: ds-cfg-static-group-implementation
+cn: Static
+ds-cfg-java-class: org.opends.server.extensions.StaticGroup
+ds-cfg-enabled: true
+
+dn: cn=Virtual Static,cn=Group Implementations,cn=config
+objectClass: top
+objectClass: ds-cfg-group-implementation
+objectClass: ds-cfg-virtual-static-group-implementation
+cn: Virtual Static
+ds-cfg-java-class: org.opends.server.extensions.VirtualStaticGroup
+ds-cfg-enabled: true
+
+dn: cn=Identity Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Identity Mappers
+
+dn: cn=Exact Match,cn=Identity Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-identity-mapper
+objectClass: ds-cfg-exact-match-identity-mapper
+cn: Exact Match
+ds-cfg-java-class: org.opends.server.extensions.ExactMatchIdentityMapper
+ds-cfg-enabled: true
+ds-cfg-match-attribute: uid
+
+dn: cn=Regular Expression,cn=Identity Mappers,cn=config
+objectClass: top
+objectClass: ds-cfg-identity-mapper
+objectClass: ds-cfg-regular-expression-identity-mapper
+cn: Regular Expression
+ds-cfg-java-class: org.opends.server.extensions.RegularExpressionIdentityMapper
+ds-cfg-enabled: true
+ds-cfg-match-attribute: uid
+ds-cfg-match-pattern: ^([^@]+)@.+$
+ds-cfg-replace-pattern: $1
+
+dn: cn=Key Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Key Manager Providers
+
+dn: cn=JKS,cn=Key Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-key-manager-provider
+objectClass: ds-cfg-file-based-key-manager-provider
+cn: JKS
+ds-cfg-java-class: org.opends.server.extensions.FileBasedKeyManagerProvider
+ds-cfg-enabled: false
+ds-cfg-key-store-type: JKS
+ds-cfg-key-store-file: config/keystore
+ds-cfg-key-store-pin-file: config/keystore.pin
+
+dn: cn=PKCS12,cn=Key Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-key-manager-provider
+objectClass: ds-cfg-file-based-key-manager-provider
+cn: PKCS12
+ds-cfg-java-class: org.opends.server.extensions.FileBasedKeyManagerProvider
+ds-cfg-enabled: false
+ds-cfg-key-store-type: PKCS12
+ds-cfg-key-store-file: config/keystore.p12
+ds-cfg-key-store-pin-file: config/keystore.pin
+
+dn: cn=PKCS11,cn=Key Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-key-manager-provider
+objectClass: ds-cfg-pkcs11-key-manager-provider
+cn: PKCS11
+ds-cfg-java-class: org.opends.server.extensions.PKCS11KeyManagerProvider
+ds-cfg-enabled: false
+ds-cfg-key-store-pin-file: config/keystore.pin
+
+dn: cn=Loggers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Loggers
+
+dn: cn=File-Based Access Logger,cn=Loggers,cn=config
+objectClass: top
+objectClass: ds-cfg-log-publisher
+objectClass: ds-cfg-access-log-publisher
+objectClass: ds-cfg-file-based-access-log-publisher
+cn: File-Based Access Logger
+ds-cfg-java-class: org.opends.server.loggers.TextAccessLogPublisher
+ds-cfg-enabled: true
+ds-cfg-log-file: logs/access
+ds-cfg-log-file-permissions: 640
+ds-cfg-suppress-internal-operations: true
+ds-cfg-suppress-synchronization-operations: false
+ds-cfg-asynchronous: true
+ds-cfg-rotation-policy: cn=24 Hours Time Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-rotation-policy: cn=Size Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-retention-policy: cn=File Count Retention Policy,cn=Log Retention Policies,cn=config
+
+dn: cn=File-Based Audit Logger,cn=Loggers,cn=config
+objectClass: top
+objectClass: ds-cfg-log-publisher
+objectClass: ds-cfg-access-log-publisher
+objectClass: ds-cfg-file-based-access-log-publisher
+cn: File-Based Audit Logger
+ds-cfg-java-class: org.opends.server.loggers.TextAuditLogPublisher
+ds-cfg-enabled: false
+ds-cfg-log-file: logs/audit
+ds-cfg-log-file-permissions: 640
+ds-cfg-suppress-internal-operations: true
+ds-cfg-suppress-synchronization-operations: false
+ds-cfg-asynchronous: true
+ds-cfg-rotation-policy: cn=24 Hours Time Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-rotation-policy: cn=Size Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-retention-policy: cn=File Count Retention Policy,cn=Log Retention Policies,cn=config
+
+dn: cn=File-Based Error Logger,cn=Loggers,cn=config
+objectClass: top
+objectClass: ds-cfg-log-publisher
+objectClass: ds-cfg-error-log-publisher
+objectClass: ds-cfg-file-based-error-log-publisher
+cn: File-Based Error Logger
+ds-cfg-java-class: org.opends.server.loggers.TextErrorLogPublisher
+ds-cfg-enabled: true
+ds-cfg-log-file: logs/errors
+ds-cfg-log-file-permissions: 640
+ds-cfg-default-severity: severe-warning
+ds-cfg-default-severity: severe-error
+ds-cfg-default-severity: fatal-error
+ds-cfg-default-severity: notice
+ds-cfg-asynchronous: false
+ds-cfg-rotation-policy: cn=7 Days Time Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-rotation-policy: cn=Size Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-retention-policy: cn=File Count Retention Policy,cn=Log Retention Policies,cn=config
+
+dn: cn=Replication Repair Logger,cn=Loggers,cn=config
+objectClass: top
+objectClass: ds-cfg-log-publisher
+objectClass: ds-cfg-error-log-publisher
+objectClass: ds-cfg-file-based-error-log-publisher
+cn: Replication Repair Logger
+ds-cfg-java-class: org.opends.server.loggers.TextErrorLogPublisher
+ds-cfg-enabled: true
+ds-cfg-log-file: logs/replication
+ds-cfg-log-file-permissions: 640
+ds-cfg-default-severity: none
+ds-cfg-override-severity: SYNC=INFO,MILD_ERROR,MILD_WARNING,NOTICE
+ds-cfg-asynchronous: false
+ds-cfg-rotation-policy: cn=7 Days Time Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-rotation-policy: cn=Size Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+ds-cfg-retention-policy: cn=File Count Retention Policy,cn=Log Retention Policies,cn=config
+
+dn: cn=File-Based Debug Logger,cn=Loggers,cn=config
+objectClass: top
+objectClass: ds-cfg-log-publisher
+objectClass: ds-cfg-debug-log-publisher
+objectClass: ds-cfg-file-based-debug-log-publisher
+cn: File-Based Debug Logger
+ds-cfg-java-class: org.opends.server.loggers.debug.TextDebugLogPublisher
+ds-cfg-enabled: false
+ds-cfg-log-file: logs/debug
+ds-cfg-log-file-permissions: 640
+ds-cfg-default-debug-level: error
+ds-cfg-asynchronous: false
+
+dn: cn=Log Rotation Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Log Rotation Policies
+
+dn: cn=24 Hours Time Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-rotation-policy
+objectClass: ds-cfg-time-limit-log-rotation-policy
+cn: Time Limit Rotation Policy
+ds-cfg-java-class: org.opends.server.loggers.TimeLimitRotationPolicy
+ds-cfg-rotation-interval: 24 hours
+
+dn: cn=7 Days Time Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-rotation-policy
+objectClass: ds-cfg-time-limit-log-rotation-policy
+cn: Time Limit Rotation Policy
+ds-cfg-java-class: org.opends.server.loggers.TimeLimitRotationPolicy
+ds-cfg-rotation-interval: 7 days
+
+dn: cn=Size Limit Rotation Policy,cn=Log Rotation Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-rotation-policy
+objectClass: ds-cfg-size-limit-log-rotation-policy
+cn: Size Limit Rotation Policy
+ds-cfg-java-class: org.opends.server.loggers.SizeBasedRotationPolicy
+ds-cfg-file-size-limit: 100 megabytes
+
+dn: cn=Fixed Time Rotation Policy,cn=Log Rotation Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-rotation-policy
+objectClass: ds-cfg-fixed-time-log-rotation-policy
+cn: Fixed Time Rotation Policy
+ds-cfg-java-class: org.opends.server.loggers.FixedTimeRotationPolicy
+ds-cfg-time-of-day: 2359
+
+dn: cn=Log Retention Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Log Retention Policies
+
+dn: cn=File Count Retention Policy,cn=Log Retention Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-retention-policy
+objectClass: ds-cfg-file-count-log-retention-policy
+cn: File Count Retention Policy
+ds-cfg-java-class: org.opends.server.loggers.FileNumberRetentionPolicy
+ds-cfg-number-of-files: 10
+
+dn: cn=Free Disk Space Retention Policy,cn=Log Retention Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-retention-policy
+objectClass: ds-cfg-free-disk-space-log-retention-policy
+cn: Free Disk Space Retention Policy
+ds-cfg-java-class: org.opends.server.loggers.FreeDiskSpaceRetentionPolicy
+ds-cfg-free-disk-space: 500 megabytes
+
+dn: cn=Size Limit Retention Policy,cn=Log Retention Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-log-retention-policy
+objectClass: ds-cfg-size-limit-log-retention-policy
+cn: Size Limit Retention Policy
+ds-cfg-java-class: org.opends.server.loggers.SizeBasedRetentionPolicy
+ds-cfg-disk-space-used: 500 megabytes
+
+dn: cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Matching Rules
+
+dn: cn=Auth Password Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Auth Password Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.AuthPasswordEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Auth Password Exact Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Auth Password Exact Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.AuthPasswordExactEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Bit String Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Bit String Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.BitStringEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Boolean Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Boolean Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.BooleanEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Exact Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Case Exact Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseExactEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Exact Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: Case Exact Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseExactOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Exact Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Case Exact Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseExactSubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Exact IA5 Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Case Exact IA5 Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseExactIA5EqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Exact IA5 Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Case Exact IA5 Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseExactIA5SubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Case Ignore Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: Case Ignore Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Case Ignore Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreSubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore IA5 Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Case Ignore IA5 Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreIA5EqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore IA5 Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Case Ignore IA5 Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreIA5SubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore List Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Case Ignore List Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreListEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Case Ignore List Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Case Ignore List Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.CaseIgnoreListSubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Directory String First Component Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Directory String First Component Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.DirectoryStringFirstComponentEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Distinguished Name Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Distinguished Name Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.DistinguishedNameEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Double Metaphone Approximate Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-approximate-matching-rule
+cn: Double Metaphone Approximate Matching Rule
+ds-cfg-java-class: org.opends.server.schema.DoubleMetaphoneApproximateMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Generalized Time Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Generalized Time Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.GeneralizedTimeEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Generalized Time Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: Generalized Time Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.GeneralizedTimeOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Historical CSN Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: ds-cfg-ordering-matching-rule
+objectClass: top
+objectClass: ds-cfg-matching-rule
+ds-cfg-java-class: org.opends.server.replication.plugin.HistoricalCsnOrderingMatchingRule
+ds-cfg-enabled: true
+cn: Historical CSN Ordering Matching Rule
+
+dn: cn=Integer Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Integer Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.IntegerEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Integer Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: Integer Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.IntegerOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Integer First Component Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Integer First Component Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.IntegerFirstComponentEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Keyword Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Keyword Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.KeywordEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Numeric String Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Numeric String Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.NumericStringEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Numeric String Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: Numeric String Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.NumericStringOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Numeric String Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Numeric String Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.NumericStringSubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Object Identifier Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Object Identifier Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.ObjectIdentifierEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Object Identifier First Component Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Object Identifier First Component Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.ObjectIdentifierFirstComponentEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Octet String Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Octet String Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.OctetStringEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Octet String Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: Octet String Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.OctetStringOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Octet String Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Octet String Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.OctetStringSubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Presentation Address Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Presentation Address Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.PresentationAddressEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Protocol Information Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Protocol Information Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.ProtocolInformationEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Telephone Number Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Telephone Number Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.TelephoneNumberEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Telephone Number Substring Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-substring-matching-rule
+cn: Telephone Number Substring Matching Rule
+ds-cfg-java-class: org.opends.server.schema.TelephoneNumberSubstringMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Unique Member Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Unique Member Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.UniqueMemberEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=User Password Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: User Password Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.UserPasswordEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=User Password Exact Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: User Password Exact Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.UserPasswordExactEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=UUID Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: UUID Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.UUIDEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=UUID Ordering Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-ordering-matching-rule
+cn: UUID Ordering Matching Rule
+ds-cfg-java-class: org.opends.server.schema.UUIDOrderingMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Word Equality Matching Rule,cn=Matching Rules,cn=config
+objectClass: top
+objectClass: ds-cfg-matching-rule
+objectClass: ds-cfg-equality-matching-rule
+cn: Word Equality Matching Rule
+ds-cfg-java-class: org.opends.server.schema.WordEqualityMatchingRule
+ds-cfg-enabled: true
+
+dn: cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Monitor Providers
+
+dn: cn=Client Connections,cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-monitor-provider
+objectClass: ds-cfg-client-connection-monitor-provider
+cn: Client Connections
+ds-cfg-java-class: org.opends.server.monitors.ClientConnectionMonitorProvider
+ds-cfg-enabled: true
+
+dn: cn=Entry Caches,cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-monitor-provider
+objectClass: ds-cfg-entry-cache-monitor-provider
+cn: Entry Caches
+ds-cfg-java-class: org.opends.server.monitors.EntryCacheMonitorProvider
+ds-cfg-enabled: true
+
+dn: cn=JVM Memory Usage,cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-monitor-provider
+objectClass: ds-cfg-memory-usage-monitor-provider
+cn: JVM Memory Usage
+ds-cfg-java-class: org.opends.server.monitors.MemoryUsageMonitorProvider
+ds-cfg-enabled: true
+
+dn: cn=JVM Stack Trace,cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-monitor-provider
+objectClass: ds-cfg-stack-trace-monitor-provider
+cn: JVM Stack Trace
+ds-cfg-java-class: org.opends.server.monitors.StackTraceMonitorProvider
+ds-cfg-enabled: true
+
+dn: cn=System Info,cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-monitor-provider
+objectClass: ds-cfg-system-info-monitor-provider
+cn: System Info
+ds-cfg-java-class: org.opends.server.monitors.SystemInfoMonitorProvider
+ds-cfg-enabled: true
+
+dn: cn=Version,cn=Monitor Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-monitor-provider
+objectClass: ds-cfg-version-monitor-provider
+cn: Version
+ds-cfg-java-class: org.opends.server.monitors.VersionMonitorProvider
+ds-cfg-enabled: true
+
+dn: cn=Password Generators,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Password Generators
+
+dn: cn=Random Password Generator,cn=Password Generators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-generator
+objectClass: ds-cfg-random-password-generator
+cn: Random Password Generator
+ds-cfg-java-class: org.opends.server.extensions.RandomPasswordGenerator
+ds-cfg-enabled: true
+ds-cfg-password-character-set: alpha:abcdefghijklmnopqrstuvwxyz
+ds-cfg-password-character-set: numeric:0123456789
+ds-cfg-password-format: alpha:3,numeric:2,alpha:3
+
+dn: cn=Password Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Password Policies
+
+dn: cn=Default Password Policy,cn=Password Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-password-policy
+cn: Default Password Policy
+ds-cfg-password-attribute: userPassword
+ds-cfg-default-password-storage-scheme: cn=Salted SHA-1,cn=Password Storage Schemes,cn=config
+ds-cfg-allow-expired-password-changes: false
+ds-cfg-allow-multiple-password-values: false
+ds-cfg-allow-pre-encoded-passwords: false
+ds-cfg-allow-user-password-changes: true
+ds-cfg-expire-passwords-without-warning: false
+ds-cfg-force-change-on-add: false
+ds-cfg-force-change-on-reset: false
+ds-cfg-grace-login-count: 0
+ds-cfg-idle-lockout-interval: 0 seconds
+ds-cfg-lockout-failure-count: 0
+ds-cfg-lockout-duration: 0 seconds
+ds-cfg-lockout-failure-expiration-interval: 0 seconds
+ds-cfg-min-password-age: 0 seconds
+ds-cfg-max-password-age: 0 seconds
+ds-cfg-max-password-reset-age: 0 seconds
+ds-cfg-password-expiration-warning-interval: 5 days
+ds-cfg-password-generator: cn=Random Password Generator,cn=Password Generators,cn=config
+ds-cfg-password-change-requires-current-password: false
+ds-cfg-require-secure-authentication: false
+ds-cfg-require-secure-password-changes: false
+ds-cfg-skip-validation-for-administrators: false
+ds-cfg-state-update-failure-policy: reactive
+ds-cfg-password-history-count: 0
+ds-cfg-password-history-duration: 0 seconds
+
+dn: cn=Root Password Policy,cn=Password Policies,cn=config
+objectClass: top
+objectClass: ds-cfg-password-policy
+cn: Root Password Policy
+ds-cfg-password-attribute: userPassword
+ds-cfg-default-password-storage-scheme: cn=Salted SHA-512,cn=Password Storage Schemes,cn=config
+ds-cfg-allow-expired-password-changes: false
+ds-cfg-allow-multiple-password-values: false
+ds-cfg-allow-pre-encoded-passwords: false
+ds-cfg-allow-user-password-changes: true
+ds-cfg-expire-passwords-without-warning: false
+ds-cfg-force-change-on-add: false
+ds-cfg-force-change-on-reset: false
+ds-cfg-grace-login-count: 0
+ds-cfg-idle-lockout-interval: 0 seconds
+ds-cfg-lockout-failure-count: 0
+ds-cfg-lockout-duration: 0 seconds
+ds-cfg-lockout-failure-expiration-interval: 0 seconds
+ds-cfg-min-password-age: 0 seconds
+ds-cfg-max-password-age: 0 seconds
+ds-cfg-max-password-reset-age: 0 seconds
+ds-cfg-password-expiration-warning-interval: 5 days
+ds-cfg-password-change-requires-current-password: true
+ds-cfg-require-secure-authentication: false
+ds-cfg-require-secure-password-changes: false
+ds-cfg-skip-validation-for-administrators: false
+ds-cfg-state-update-failure-policy: ignore
+ds-cfg-password-history-count: 0
+ds-cfg-password-history-duration: 0 seconds
+
+dn: cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Password Storage Schemes
+
+dn: cn=Base64,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-base64-password-storage-scheme
+cn: Base64
+ds-cfg-java-class: org.opends.server.extensions.Base64PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Clear,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-clear-password-storage-scheme
+cn: Clear
+ds-cfg-java-class: org.opends.server.extensions.ClearPasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=CRYPT,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-crypt-password-storage-scheme
+cn: CRYPT
+ds-cfg-java-class: org.opends.server.extensions.CryptPasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=MD5,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-md5-password-storage-scheme
+cn: MD5
+ds-cfg-java-class: org.opends.server.extensions.MD5PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Salted MD5,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-salted-md5-password-storage-scheme
+cn: Salted MD5
+ds-cfg-java-class: org.opends.server.extensions.SaltedMD5PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Salted SHA-1,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-salted-sha1-password-storage-scheme
+cn: Salted SHA-1
+ds-cfg-java-class: org.opends.server.extensions.SaltedSHA1PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Salted SHA-256,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-salted-sha256-password-storage-scheme
+cn: Salted SHA-256
+ds-cfg-java-class: org.opends.server.extensions.SaltedSHA256PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Salted SHA-384,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-salted-sha384-password-storage-scheme
+cn: Salted SHA-384
+ds-cfg-java-class: org.opends.server.extensions.SaltedSHA384PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Salted SHA-512,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-salted-sha512-password-storage-scheme
+cn: Salted SHA-512
+ds-cfg-java-class: org.opends.server.extensions.SaltedSHA512PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=SHA-1,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-sha1-password-storage-scheme
+cn: SHA-1
+ds-cfg-java-class: org.opends.server.extensions.SHA1PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=3DES,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-triple-des-password-storage-scheme
+cn: 3DES
+ds-cfg-java-class: org.opends.server.extensions.TripleDESPasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=AES,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-aes-password-storage-scheme
+cn: AES
+ds-cfg-java-class: org.opends.server.extensions.AESPasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Blowfish,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-blowfish-password-storage-scheme
+cn: Blowfish
+ds-cfg-java-class: org.opends.server.extensions.BlowfishPasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=RC4,cn=Password Storage Schemes,cn=config
+objectClass: top
+objectClass: ds-cfg-password-storage-scheme
+objectClass: ds-cfg-rc4-password-storage-scheme
+cn: RC4
+ds-cfg-java-class: org.opends.server.extensions.RC4PasswordStorageScheme
+ds-cfg-enabled: true
+
+dn: cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Password Validators
+
+dn: cn=Attribute Value,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-attribute-value-password-validator
+cn: Attribute Value
+ds-cfg-java-class: org.opends.server.extensions.AttributeValuePasswordValidator
+ds-cfg-enabled: true
+ds-cfg-test-reversed-password: true
+
+dn: cn=Character Set,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-character-set-password-validator
+cn: Character Set
+ds-cfg-java-class: org.opends.server.extensions.CharacterSetPasswordValidator
+ds-cfg-enabled: true
+ds-cfg-character-set: 1:abcdefghijklmnopqrstuvwxyz
+ds-cfg-character-set: 1:ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ds-cfg-character-set: 1:0123456789
+ds-cfg-character-set: 1:~!@#$%^&*()-_=+[]{}|;:,.<>/?
+ds-cfg-allow-unclassified-characters: true
+
+dn: cn=Dictionary,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-dictionary-password-validator
+cn: Dictionary
+ds-cfg-java-class: org.opends.server.extensions.DictionaryPasswordValidator
+ds-cfg-enabled: false
+ds-cfg-dictionary-file: config/wordlist.txt
+ds-cfg-case-sensitive-validation: false
+ds-cfg-test-reversed-password: true
+
+dn: cn=Length-Based Password Validator,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-length-based-password-validator
+cn: Length-Based Password Validator
+ds-cfg-java-class: org.opends.server.extensions.LengthBasedPasswordValidator
+ds-cfg-enabled: true
+ds-cfg-min-password-length: 6
+ds-cfg-max-password-length: 0
+
+dn: cn=Repeated Characters,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-repeated-characters-password-validator
+cn: Repeated Characters
+ds-cfg-java-class: org.opends.server.extensions.RepeatedCharactersPasswordValidator
+ds-cfg-enabled: true
+ds-cfg-max-consecutive-length: 2
+ds-cfg-case-sensitive-validation: false
+
+dn: cn=Similarity-Based Password Validator,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-similarity-based-password-validator
+cn: Similarity-Based Password Validator
+ds-cfg-java-class: org.opends.server.extensions.SimilarityBasedPasswordValidator
+ds-cfg-enabled: true
+ds-cfg-min-password-difference: 3
+
+dn: cn=Unique Characters,cn=Password Validators,cn=config
+objectClass: top
+objectClass: ds-cfg-password-validator
+objectClass: ds-cfg-unique-characters-password-validator
+cn: Unique Characters
+ds-cfg-java-class: org.opends.server.extensions.UniqueCharactersPasswordValidator
+ds-cfg-enabled: true
+ds-cfg-min-unique-characters: 5
+ds-cfg-case-sensitive-validation: false
+
+dn: cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+objectClass: ds-cfg-plugin-root
+cn: Plugins
+
+dn: cn=7-Bit Clean,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-seven-bit-clean-plugin
+cn: 7-Bit Clean
+ds-cfg-java-class: org.opends.server.plugins.SevenBitCleanPlugin
+ds-cfg-enabled: false
+ds-cfg-plugin-type: ldifImport
+ds-cfg-plugin-type: preParseAdd
+ds-cfg-plugin-type: preParseModify
+ds-cfg-plugin-type: preParseModifyDN
+ds-cfg-attribute-type: uid
+ds-cfg-attribute-type: mail
+ds-cfg-attribute-type: userPassword
+ds-cfg-invoke-for-internal-operations: true
+
+dn: cn=Entry UUID,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-entry-uuid-plugin
+cn: Entry UUID
+ds-cfg-java-class: org.opends.server.plugins.EntryUUIDPlugin
+ds-cfg-enabled: true
+ds-cfg-plugin-type: ldifImport
+ds-cfg-plugin-type: preOperationAdd
+ds-cfg-invoke-for-internal-operations: true
+
+dn: cn=LastMod,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-last-mod-plugin
+cn: LastMod
+ds-cfg-java-class: org.opends.server.plugins.LastModPlugin
+ds-cfg-enabled: true
+ds-cfg-plugin-type: preOperationAdd
+ds-cfg-plugin-type: preOperationModify
+ds-cfg-plugin-type: preOperationModifyDN
+ds-cfg-invoke-for-internal-operations: true
+
+dn: cn=LDAP Attribute Description List,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-ldap-attribute-description-list-plugin
+cn: LDAP Attribute Description List
+ds-cfg-java-class: org.opends.server.plugins.LDAPADListPlugin
+ds-cfg-enabled: true
+ds-cfg-plugin-type: preParseSearch
+ds-cfg-invoke-for-internal-operations: true
+
+dn: cn=Password Policy Import,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-password-policy-import-plugin
+cn: Password Policy Import
+ds-cfg-java-class: org.opends.server.plugins.PasswordPolicyImportPlugin
+ds-cfg-enabled: true
+ds-cfg-plugin-type: ldifImport
+ds-cfg-default-user-password-storage-scheme: cn=Salted SHA-1,cn=Password Storage Schemes,cn=config
+ds-cfg-default-auth-password-storage-scheme: cn=Salted SHA-1,cn=Password Storage Schemes,cn=config
+ds-cfg-invoke-for-internal-operations: false
+
+dn: cn=Profiler,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-profiler-plugin
+cn: Profiler
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.plugins.profiler.ProfilerPlugin
+ds-cfg-plugin-type: startup
+ds-cfg-enable-profiling-on-startup: false
+ds-cfg-profile-directory: logs
+ds-cfg-profile-sample-interval: 10 milliseconds
+ds-cfg-invoke-for-internal-operations: false
+
+dn: cn=Referential Integrity,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-referential-integrity-plugin
+cn: Referential Integrity
+ds-cfg-java-class: org.opends.server.plugins.ReferentialIntegrityPlugin
+ds-cfg-enabled: false
+ds-cfg-plugin-type: postOperationDelete
+ds-cfg-plugin-type: postOperationModifyDN
+ds-cfg-plugin-type: subordinateModifyDN
+ds-cfg-attribute-type: member
+ds-cfg-attribute-type: uniqueMember
+ds-cfg-invoke-for-internal-operations: true
+
+dn: cn=UID Unique Attribute,cn=Plugins,cn=config
+objectClass: top
+objectClass: ds-cfg-plugin
+objectClass: ds-cfg-unique-attribute-plugin
+cn: UID Unique Attribute
+ds-cfg-java-class: org.opends.server.plugins.UniqueAttributePlugin
+ds-cfg-enabled: false
+ds-cfg-plugin-type: preOperationAdd
+ds-cfg-plugin-type: preOperationModify
+ds-cfg-plugin-type: preOperationModifyDN
+ds-cfg-plugin-type: postSynchronizationAdd
+ds-cfg-plugin-type: postSynchronizationModify
+ds-cfg-plugin-type: postSynchronizationModifyDN
+ds-cfg-type: uid
+ds-cfg-invoke-for-internal-operations: true
+
+dn: cn=Root DNs,cn=config
+objectClass: top
+objectClass: ds-cfg-root-dn
+cn: Root DNs
+ds-cfg-default-root-privilege-name: bypass-acl
+ds-cfg-default-root-privilege-name: modify-acl
+ds-cfg-default-root-privilege-name: config-read
+ds-cfg-default-root-privilege-name: config-write
+ds-cfg-default-root-privilege-name: ldif-import
+ds-cfg-default-root-privilege-name: ldif-export
+ds-cfg-default-root-privilege-name: backend-backup
+ds-cfg-default-root-privilege-name: backend-restore
+ds-cfg-default-root-privilege-name: server-shutdown
+ds-cfg-default-root-privilege-name: server-restart
+ds-cfg-default-root-privilege-name: disconnect-client
+ds-cfg-default-root-privilege-name: cancel-request
+ds-cfg-default-root-privilege-name: password-reset
+ds-cfg-default-root-privilege-name: update-schema
+ds-cfg-default-root-privilege-name: privilege-change
+ds-cfg-default-root-privilege-name: unindexed-search
+
+dn: cn=Directory Manager,cn=Root DNs,cn=config
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: ds-cfg-root-dn-user
+cn: Directory Manager
+givenName: Directory
+sn: Manager
+userPassword: {SSHA512}l1t43vVl7Uh03PpQ2vCsT0B7Q0HTi+tKJmH7tZTmSGaKrMHWHO1czfwEsjMgfbeQoiYQDGDuxolipR0H6ajMu1YHlTjPNG9Z
+ds-cfg-alternate-bind-dn: cn=Directory Manager
+ds-rlim-size-limit: 0
+ds-rlim-time-limit: 0
+ds-rlim-idle-time-limit: 0
+ds-rlim-lookthrough-limit: 0
+ds-pwp-password-policy-dn: cn=Root Password Policy,cn=Password Policies,cn=config
+
+dn: cn=Root DSE,cn=config
+objectClass: top
+objectClass: ds-cfg-root-dse-backend
+cn: Root DSE
+ds-cfg-show-all-attributes: false
+
+dn: cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: SASL Mechanisms
+
+dn: cn=ANONYMOUS,cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-sasl-mechanism-handler
+objectClass: ds-cfg-anonymous-sasl-mechanism-handler
+cn: ANONYMOUS
+ds-cfg-java-class: org.opends.server.extensions.AnonymousSASLMechanismHandler
+ds-cfg-enabled: false
+
+dn: cn=CRAM-MD5,cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-sasl-mechanism-handler
+objectClass: ds-cfg-cram-md5-sasl-mechanism-handler
+cn: CRAM-MD5
+ds-cfg-java-class: org.opends.server.extensions.CRAMMD5SASLMechanismHandler
+ds-cfg-enabled: true
+ds-cfg-identity-mapper: cn=Exact Match,cn=Identity Mappers,cn=config
+
+dn: cn=DIGEST-MD5,cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-sasl-mechanism-handler
+objectClass: ds-cfg-digest-md5-sasl-mechanism-handler
+cn: DIGEST-MD5
+ds-cfg-java-class: org.opends.server.extensions.DigestMD5SASLMechanismHandler
+ds-cfg-enabled: true
+ds-cfg-identity-mapper: cn=Exact Match,cn=Identity Mappers,cn=config
+
+dn: cn=EXTERNAL,cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-sasl-mechanism-handler
+objectClass: ds-cfg-external-sasl-mechanism-handler
+cn: EXTERNAL
+ds-cfg-java-class: org.opends.server.extensions.ExternalSASLMechanismHandler
+ds-cfg-enabled: true
+ds-cfg-certificate-validation-policy: ifpresent
+ds-cfg-certificate-attribute: userCertificate
+ds-cfg-certificate-mapper: cn=Subject Equals DN,cn=Certificate Mappers,cn=config
+
+dn: cn=GSSAPI,cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-sasl-mechanism-handler
+objectClass: ds-cfg-gssapi-sasl-mechanism-handler
+cn: GSSAPI
+ds-cfg-java-class: org.opends.server.extensions.GSSAPISASLMechanismHandler
+ds-cfg-enabled: false
+ds-cfg-identity-mapper: cn=Regular Expression,cn=Identity Mappers,cn=config
+ds-cfg-keytab: /etc/krb5/krb5.keytab
+
+dn: cn=PLAIN,cn=SASL Mechanisms,cn=config
+objectClass: top
+objectClass: ds-cfg-sasl-mechanism-handler
+objectClass: ds-cfg-plain-sasl-mechanism-handler
+cn: PLAIN
+ds-cfg-java-class: org.opends.server.extensions.PlainSASLMechanismHandler
+ds-cfg-enabled: true
+ds-cfg-identity-mapper: cn=Exact Match,cn=Identity Mappers,cn=config
+
+dn: cn=Synchronization Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Synchronization Providers
+
+dn: cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-synchronization-provider
+objectClass: ds-cfg-replication-synchronization-provider
+cn: Multimaster Synchronization
+ds-cfg-enabled: true
+ds-cfg-java-class: org.opends.server.replication.plugin.MultimasterReplication
+
+dn: cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: domains
+
+dn: cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Syntaxes
+
+dn: cn=Absolute Subtree Specification,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Absolute Subtree Specification
+ds-cfg-java-class: org.opends.server.schema.AbsoluteSubtreeSpecificationSyntax
+ds-cfg-enabled: true
+
+dn: cn=Sun-defined Access Control Information,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Sun-defined Access Control Information
+ds-cfg-java-class: org.opends.server.schema.AciSyntax
+ds-cfg-enabled: true
+
+dn: cn=Attribute Type Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+objectClass: ds-cfg-attribute-type-description-attribute-syntax
+cn: Attribute Type Description
+ds-cfg-java-class: org.opends.server.schema.AttributeTypeSyntax
+ds-cfg-enabled: true
+ds-cfg-strip-syntax-min-upper-bound: false
+
+dn: cn=Authentication Password,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Authentiation Password
+ds-cfg-java-class: org.opends.server.schema.AuthPasswordSyntax
+ds-cfg-enabled: true
+
+dn: cn=Binary,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Binary
+ds-cfg-java-class: org.opends.server.schema.BinarySyntax
+ds-cfg-enabled: true
+
+dn: cn=Bit String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Bit String
+ds-cfg-java-class: org.opends.server.schema.BitStringSyntax
+ds-cfg-enabled: true
+
+dn: cn=Boolean,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Boolean
+ds-cfg-java-class: org.opends.server.schema.BooleanSyntax
+ds-cfg-enabled: true
+
+dn: cn=Certificate,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Certificate
+ds-cfg-java-class: org.opends.server.schema.CertificateSyntax
+ds-cfg-enabled: true
+
+dn: cn=Certificate List,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Certificate List
+ds-cfg-java-class: org.opends.server.schema.CertificateListSyntax
+ds-cfg-enabled: true
+
+dn: cn=Certificate Pair,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Certificate Pair
+ds-cfg-java-class: org.opends.server.schema.CertificatePairSyntax
+ds-cfg-enabled: true
+
+dn: cn=Country String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Country String
+ds-cfg-java-class: org.opends.server.schema.CountryStringSyntax
+ds-cfg-enabled: true
+
+dn: cn=Delivery Method,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Delivery Method
+ds-cfg-java-class: org.opends.server.schema.DeliveryMethodSyntax
+ds-cfg-enabled: true
+
+dn: cn=Directory String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+objectClass: ds-cfg-directory-string-attribute-syntax
+cn: Directory String
+ds-cfg-java-class: org.opends.server.schema.DirectoryStringSyntax
+ds-cfg-enabled: true
+ds-cfg-allow-zero-length-values: false
+
+dn: cn=Distinguished Name,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Distinguished Name
+ds-cfg-java-class: org.opends.server.schema.DistinguishedNameSyntax
+ds-cfg-enabled: true
+
+dn: cn=DIT Content Rule Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: DIT Content Rule Description
+ds-cfg-java-class: org.opends.server.schema.DITContentRuleSyntax
+ds-cfg-enabled: true
+
+dn: cn=DIT Structure Rule Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: DIT Structure Rule Description
+ds-cfg-java-class: org.opends.server.schema.DITStructureRuleSyntax
+ds-cfg-enabled: true
+
+dn: cn=Enhanced Guide,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Enhanced Guide
+ds-cfg-java-class: org.opends.server.schema.EnhancedGuideSyntax
+ds-cfg-enabled: true
+
+dn: cn=Facsimile Telephone Number,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Facsimile Telephone Number
+ds-cfg-java-class: org.opends.server.schema.FaxNumberSyntax
+ds-cfg-enabled: true
+
+dn: cn=Fax,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Fax
+ds-cfg-java-class: org.opends.server.schema.FaxSyntax
+ds-cfg-enabled: true
+
+dn: cn=Generalized Time,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Generalized Time
+ds-cfg-java-class: org.opends.server.schema.GeneralizedTimeSyntax
+ds-cfg-enabled: true
+
+dn: cn=Guide,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Guide
+ds-cfg-java-class: org.opends.server.schema.GuideSyntax
+ds-cfg-enabled: true
+
+dn: cn=IA5 String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: IA5 String
+ds-cfg-java-class: org.opends.server.schema.IA5StringSyntax
+ds-cfg-enabled: true
+
+dn: cn=Integer,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Integer
+ds-cfg-java-class: org.opends.server.schema.IntegerSyntax
+ds-cfg-enabled: true
+
+dn: cn=JPEG,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: JPEG
+ds-cfg-java-class: org.opends.server.schema.JPEGSyntax
+ds-cfg-enabled: true
+
+dn: cn=LDAP Syntax Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: LDAP Syntax Description
+ds-cfg-java-class: org.opends.server.schema.LDAPSyntaxDescriptionSyntax
+ds-cfg-enabled: true
+
+dn: cn=Matching Rule Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Matching Rule Description
+ds-cfg-java-class: org.opends.server.schema.MatchingRuleSyntax
+ds-cfg-enabled: true
+
+dn: cn=Matching Rule Use Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Matching Rule Use Description
+ds-cfg-java-class: org.opends.server.schema.MatchingRuleUseSyntax
+ds-cfg-enabled: true
+
+dn: cn=Name and Optional UID,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Name and Optional UID
+ds-cfg-java-class: org.opends.server.schema.NameAndOptionalUIDSyntax
+ds-cfg-enabled: true
+
+dn: cn=Name Form Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Name Form Description
+ds-cfg-java-class: org.opends.server.schema.NameFormSyntax
+ds-cfg-enabled: true
+
+dn: cn=Numeric String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Numeric String
+ds-cfg-java-class: org.opends.server.schema.NumericStringSyntax
+ds-cfg-enabled: true
+
+dn: cn=Object Class Description,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Object Class Description
+ds-cfg-java-class: org.opends.server.schema.ObjectClassSyntax
+ds-cfg-enabled: true
+
+dn: cn=Object Identifier,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Object Identifier
+ds-cfg-java-class: org.opends.server.schema.OIDSyntax
+ds-cfg-enabled: true
+
+dn: cn=Octet String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Octet String
+ds-cfg-java-class: org.opends.server.schema.OctetStringSyntax
+ds-cfg-enabled: true
+
+dn: cn=Other Mailbox,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Other Mailbox
+ds-cfg-java-class: org.opends.server.schema.OtherMailboxSyntax
+ds-cfg-enabled: true
+
+dn: cn=Postal Address,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Postal Address
+ds-cfg-java-class: org.opends.server.schema.PostalAddressSyntax
+ds-cfg-enabled: true
+
+dn: cn=Presentation Address,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Presentation Address
+ds-cfg-java-class: org.opends.server.schema.PresentationAddressSyntax
+ds-cfg-enabled: true
+
+dn: cn=Printable String,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Printable String
+ds-cfg-java-class: org.opends.server.schema.PrintableStringSyntax
+ds-cfg-enabled: true
+
+dn: cn=Protocol Information,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Protocol Information
+ds-cfg-java-class: org.opends.server.schema.ProtocolInformationSyntax
+ds-cfg-enabled: true
+
+dn: cn=Relative Subtree Specification,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Relative Subtree Specification
+ds-cfg-java-class: org.opends.server.schema.RelativeSubtreeSpecificationSyntax
+ds-cfg-enabled: true
+
+dn: cn=Substring Assertion,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Substring Assertion
+ds-cfg-java-class: org.opends.server.schema.SubstringAssertionSyntax
+ds-cfg-enabled: true
+
+dn: cn=Subtree Specification,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Subtree Specification
+ds-cfg-java-class: org.opends.server.schema.RFC3672SubtreeSpecificationSyntax
+ds-cfg-enabled: true
+
+dn: cn=Supported Algorithm,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Supported Algorithm
+ds-cfg-java-class: org.opends.server.schema.SupportedAlgorithmSyntax
+ds-cfg-enabled: true
+
+dn: cn=Telephone Number,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+objectClass: ds-cfg-telephone-number-attribute-syntax
+cn: Telephone Number
+ds-cfg-java-class: org.opends.server.schema.TelephoneNumberSyntax
+ds-cfg-enabled: true
+ds-cfg-strict-format: false
+
+dn: cn=Teletex Terminal Identifier,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Teletex Terminal Identifier
+ds-cfg-java-class: org.opends.server.schema.TeletexTerminalIdentifierSyntax
+ds-cfg-enabled: true
+
+dn: cn=Telex Number,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: Telex Number
+ds-cfg-java-class: org.opends.server.schema.TelexNumberSyntax
+ds-cfg-enabled: true
+
+dn: cn=UTC Time,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: UTC Time
+ds-cfg-java-class: org.opends.server.schema.UTCTimeSyntax
+ds-cfg-enabled: true
+
+dn: cn=User Password,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: User Password
+ds-cfg-java-class: org.opends.server.schema.UserPasswordSyntax
+ds-cfg-enabled: true
+
+dn: cn=UUID,cn=Syntaxes,cn=config
+objectClass: top
+objectClass: ds-cfg-attribute-syntax
+cn: UUID
+ds-cfg-java-class: org.opends.server.schema.UUIDSyntax
+ds-cfg-enabled: true
+
+dn: cn=Trust Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Trust Manager Providers
+
+dn: cn=Blind Trust,cn=Trust Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-trust-manager-provider
+objectClass: ds-cfg-blind-trust-manager-provider
+cn: Blind Trust
+ds-cfg-java-class: org.opends.server.extensions.BlindTrustManagerProvider
+ds-cfg-enabled: false
+
+dn: cn=JKS,cn=Trust Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-trust-manager-provider
+objectClass: ds-cfg-file-based-trust-manager-provider
+cn: JKS
+ds-cfg-java-class: org.opends.server.extensions.FileBasedTrustManagerProvider
+ds-cfg-enabled: false
+ds-cfg-trust-store-type: JKS
+ds-cfg-trust-store-file: config/truststore
+
+dn: cn=PKCS12,cn=Trust Manager Providers,cn=config
+objectClass: top
+objectClass: ds-cfg-trust-manager-provider
+objectClass: ds-cfg-file-based-trust-manager-provider
+cn: PKCS12
+ds-cfg-java-class: org.opends.server.extensions.FileBasedTrustManagerProvider
+ds-cfg-enabled: false
+ds-cfg-trust-store-type: PKCS12
+ds-cfg-trust-store-file: config/truststore.p12
+
+dn: cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Virtual Attributes
+
+dn: cn=entryDN,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-entry-dn-virtual-attribute
+cn: entryDN
+ds-cfg-java-class: org.opends.server.extensions.EntryDNVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: entryDN
+ds-cfg-conflict-behavior: virtual-overrides-real
+
+dn: cn=entryUUID,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-entry-uuid-virtual-attribute
+cn: entryUUIUD
+ds-cfg-java-class: org.opends.server.extensions.EntryUUIDVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: entryUUID
+ds-cfg-conflict-behavior: real-overrides-virtual
+
+dn: cn=hasSubordinates,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-has-subordinates-virtual-attribute
+cn: hasSubordinates
+ds-cfg-java-class: org.opends.server.extensions.HasSubordinatesVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: hasSubordinates
+ds-cfg-conflict-behavior: virtual-overrides-real
+
+dn: cn=isMemberOf,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-is-member-of-virtual-attribute
+cn: isMemberOf
+ds-cfg-java-class: org.opends.server.extensions.IsMemberOfVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: isMemberOf
+ds-cfg-filter: (objectClass=person)
+ds-cfg-conflict-behavior: virtual-overrides-real
+
+dn: cn=numSubordinates,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-num-subordinates-virtual-attribute
+cn: numSubordinates
+ds-cfg-java-class: org.opends.server.extensions.NumSubordinatesVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: numSubordinates
+ds-cfg-conflict-behavior: virtual-overrides-real
+
+dn: cn=subschemaSubentry,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-subschema-subentry-virtual-attribute
+cn: subschemaSubentry
+ds-cfg-java-class: org.opends.server.extensions.SubschemaSubentryVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: subschemaSubentry
+ds-cfg-conflict-behavior: virtual-overrides-real
+
+dn: cn=Virtual Static member,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-member-virtual-attribute
+cn: Virtual Static member
+ds-cfg-java-class: org.opends.server.extensions.MemberVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: member
+ds-cfg-conflict-behavior: virtual-overrides-real
+ds-cfg-filter: (&(objectClass=groupOfNames)(objectClass=ds-virtual-static-group))
+ds-cfg-allow-retrieving-membership: false
+
+dn: cn=Virtual Static uniqueMember,cn=Virtual Attributes,cn=config
+objectClass: top
+objectClass: ds-cfg-virtual-attribute
+objectClass: ds-cfg-member-virtual-attribute
+cn: Virtual Static uniqueMember
+ds-cfg-java-class: org.opends.server.extensions.MemberVirtualAttributeProvider
+ds-cfg-enabled: true
+ds-cfg-attribute-type: uniqueMember
+ds-cfg-conflict-behavior: virtual-overrides-real
+ds-cfg-filter: (&(objectClass=groupOfUniqueNames)(objectClass=ds-virtual-static-group))
+ds-cfg-allow-retrieving-membership: false
+
+dn: cn=Work Queue,cn=config
+objectClass: top
+objectClass: ds-cfg-work-queue
+objectClass: ds-cfg-traditional-work-queue
+cn: Work Queue
+ds-cfg-java-class: org.opends.server.extensions.TraditionalWorkQueue
+ds-cfg-num-worker-threads: 24
+ds-cfg-max-work-queue-capacity: 0
+
+
+dn: cn=SNMP Connection Handler,cn=Connection Handlers,cn=config
+objectClass: top
+objectClass: ds-cfg-connection-handler
+objectClass: ds-cfg-snmp-connection-handler
+cn: SNMP Connection Handler
+ds-cfg-java-class: org.opends.server.snmp.SNMPConnectionHandler
+ds-cfg-enabled: false
+ds-cfg-trap-port: 162
+ds-cfg-listen-port: 161
+

@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>WS-FED Service Provider Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.wsfedsp"></a><h4>WS-FED Service Provider Customization</h4>
+<p>The following attributes apply to the WS-FED service provider role:</p>
+
+<a name="ggwtj"></a><h5>Assertion Signed</h5>
+<p>All assertions received by this service provider must be signed.</p>
+
+<a name="ggwsg"></a><h5>Account Mapper</h5>
+<p>This attribute specifies the implementation of the <tt>AccountMapper</tt> interface used to map
+a remote user account to a local user account for purposes of single
+sign-on. The default value is <tt>com.sun.identity.wsfed.plugins.</tt> </p><p> <tt>DefaultADFSPartnerAccountMapper</tt> is the default implementation.</p>
+
+<a name="ggwrf"></a><h5>Attribute Mapper</h5>
+<p>This defines the class used to map attributes in the assertion to user
+attributes defined locally by the identity provider. The default class is <tt>com.sun.identity.wsfederation.plugins.DefaultSPAttributeMapper</tt>.</p>
+
+<a name="ggwrq"></a><h5>Attribute Map</h5>
+<p>Specifies values to define the mappings used by the default attribute mapper plug-in.
+Mappings should be configured in the format:</p><p><i>SAML_attr</i>=<i>local-attribute</i></p><p>For example, <tt>EmailAddress=mail</tt> or <tt>Address=postaladdress</tt>. Type the mapping as a New Value
+and click Add.</p>
+
+<a name="ggwvn"></a><h5>Assertion Effective Time</h5>
+<p>Assertions are valid for a period of time and not before or after.
+</p><p><tt>Effective Time</tt> specifies (in seconds) the amount of time that an assertion is valid
+counting from the assertion's issue time. The default value is <tt>600</tt> seconds.</p>
+
+<a name="ggwsk"></a><h5>Assertion Skew Time</h5>
+<p>Assertions are valid for a period of time and not before or after.
+This attribute specifies a grace period (in seconds) for the <tt>notBefore</tt> value.
+The default value is <tt>300</tt>. It has no relevance to the <tt>notAfter</tt> value.</p>
+
+<a name="ggwts"></a><h5>Default Relay State</h5>
+<p><a name="indexterm-77"></a>After a successful WS-FED operation (single sign-on, single logout, or federation termination), a
+page is displayed. This page, generally the originally requested resource, is specified in
+the initiating request using the <tt>RelayState</tt> element. If a <tt>RelayState</tt> is not specified,
+the value of this <tt>defaultRelayState</tt> property is displayed.</p>
+<hr><p><b>Caution &#8211; </b>When <tt>RelayState</tt> or <tt>defaultRelayState</tt> contains special characters (such as <tt>&#38;</tt>), it must be
+URL-encoded. For example, if the value of <tt>RelayState</tt> is <tt>http://www.sun.com/apps/myapp.jsp?param1=abc&#38;param2=xyz</tt>, it must
+be URL-encoded as:</p><p><tt>http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz</tt></p><p>and then appended to the URL. For example, the service provider initiated single
+sign-on URL would be:</p><p><tt>http://</tt><i>host</i><tt>:</tt><i>port</i><tt>/</tt><i>deploy-uri</i><tt>/saml2/jsp/spSSOInit.jsp?metaAlias=/sp&#38;idpEntityID=http://www.idp.com&#38;RelayState=http%3A%2F%2Fwww.sun.com%2Fapps%2Fmyapp.jsp%3Fparam1%3Dabc%26param2%3Dxyz</tt></p>
+<hr>
+
+
+<a name="ggwvk"></a><h5>Home Realm Discovery</h5>
+<p>Specifies the service so that the service provider can identify the preferred identity
+provider. The service URL is specified as a contact endpoint by the service
+provider. </p>
+
+<a name="ggwwb"></a><h5>Account Realm Selection</h5>
+<p>Specifies the identity provider selection mechanism and configuration. Either the <tt>cookie</tt> or <tt>HTTP Request</tt>
+header attribute can be used to locate the identity provider.</p>
+<br/>
+
+</body>
+</html>

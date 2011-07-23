@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: webex-config-opensso.xhtml,v 1.2 2009/12/19 00:27:38 babysunil Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['webex-configuration.opensso.idp.section-title']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['webex-configuration.opensso.idp.section-details']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGrid columns="3"
+                columnClasses="fedattributesCol1,fedattributesCol2,fedattributesCol3">
+                <ice:panelGroup visible="#{webExConfigWizardBean.createNew}">
+                    <ice:outputLabel value="#{resources['webex-configuration.opensso.hosted.idp.name']}"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.createNew}">
+
+                    <ice:selectOneMenu
+                        id="selectedIdp"
+                        style="width: 150px"
+                        partialSubmit="true"
+                        value="#{webExConfigWizardBean.selectedIdp}">
+                        <f:selectItems
+                            value="#{webExConfigWizardBean.availableIdpItems}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.createNew}">
+                    <ice:commandLink
+                        actionListener="#{webExConfigWizardHandler.addIdpListener}"
+                        styleClass="command-link">
+                        <ice:outputText
+                            value="#{resources['webex-configuration.opensso.create.new']}"/>
+                    </ice:commandLink>
+                </ice:panelGroup>
+
+            </ice:panelGrid>
+
+            <ice:panelGrid columns="3"
+                columnClasses="fedattributesCol1,fedattributesCol2,fedattributesCol3">
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseExistng}">
+                    <ice:outputLabel value="#{resources['webex-configuration.opensso.idp.provider.name']}"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseExistng}">
+                    <ice:inputText
+                        id="newidpname"
+                        value="#{webExConfigWizardBean.newIdpName}"
+                        style="width: 250px;"
+                        maxlength="256"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseExistng}">
+                    <ice:commandLink
+                        actionListener="#{webExConfigWizardHandler.chooseIdpListener}"
+                        styleClass="command-link">
+                        <ice:outputText
+                            value="#{resources['webex-configuration.opensso.undo']}"/>
+                    </ice:commandLink>
+                </ice:panelGroup>
+
+            </ice:panelGrid>
+
+            <ice:panelGrid columns="3"
+                columnClasses="fedattributesCol1,fedattributesCol2,fedattributesCol3">
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseExistng}">
+                    <ice:outputLabel value="#{resources['webex-configuration.opensso.signing.key']}"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseExistng}">
+                    <ice:selectOneMenu
+                        id="selectedSigningKey"
+                        value="#{webExConfigWizardBean.selectedSigningKey}">
+                        <f:selectItems
+                            value="#{webExConfigWizardBean.availableSigningKeyItems}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseExistng}" >
+                    <ice:outputLabel value="#{resources['webex-configuration.webexconfig.step3.pubKey.test']}"/>
+                </ice:panelGroup>
+
+            </ice:panelGrid>
+
+            <ice:panelGrid columns="3"
+                columnClasses="fedattributesCol1,fedattributesCol2,fedattributesCol3">
+                <ice:panelGroup visible="#{webExConfigWizardBean.createCot}">
+                    <ice:outputLabel value="#{resources['webex-configuration.opensso.circle.of.trust']}"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.createCot}">
+                    <ice:selectOneMenu
+                        id="selectedCot"
+                        style="width: 150px"
+                        value="#{webExConfigWizardBean.selectedCot}"
+                        valueChangeListener="#{wizardHandler.selectedCotChangeListener}"
+                        partialSubmit="true">
+                        <f:selectItems
+                            value="#{webExConfigWizardBean.availableCotItems}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.createCot}">
+                    <ice:commandLink
+                        actionListener="#{webExConfigWizardHandler.addCotListener}"
+                        styleClass="command-link">
+                        <ice:outputText
+                            value="#{resources['webex-configuration.opensso.create.new']}"/>
+                    </ice:commandLink>
+                </ice:panelGroup>
+
+            </ice:panelGrid>
+
+            <ice:panelGrid columns="3"
+                columnClasses="fedattributesCol1,fedattributesCol2,fedattributesCol3">
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseCot}">
+                    <ice:outputLabel value="#{resources['webex-configuration.opensso.circle.of.trust.name']}"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseCot}">
+                    <ice:inputText
+                        id="newcotname"
+                        value="#{webExConfigWizardBean.newCotName}"
+                        style="width: 250px;"
+                        maxlength="256"/>
+                </ice:panelGroup>
+
+                <ice:panelGroup visible="#{webExConfigWizardBean.chooseCot}">
+                    <ice:commandLink
+                        actionListener="#{webExConfigWizardHandler.chooseCotListener}"
+                        styleClass="command-link">
+                        <ice:outputText
+                            value="#{resources['webex-configuration.opensso.undo']}"/>
+                    </ice:commandLink>
+                </ice:panelGroup>
+
+            </ice:panelGrid>
+
+        </ui:define>
+    </o:section>
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['webex-configuration.opensso.sp.section-title']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['webex-configuration.opensso.sp.section-details']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+            <ice:panelGrid columns="2">
+                <ice:outputLabel
+                       value="#{resources['webex-configuration.opensso.remote.service.provider']}"/>
+                <ice:inputText id="remspname" disabled="true" readonly="true"
+                       style="width:250px;" maxlength="256" value="#{webExConfigWizardBean.webexSiteUrl}"/>
+            </ice:panelGrid>
+        </ui:define>
+    </o:section>
+
+    <ice:outputLabel
+        value="#{resources['webex-configuration.opensso.side.finish.configuration']}"/>
+        
+</span>
+

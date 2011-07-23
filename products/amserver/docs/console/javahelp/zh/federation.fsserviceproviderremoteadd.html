@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>向提供者实体添加新的远程服务提供者 - Sun Java System Federated Access Manager 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteadd"></a><h4>向提供者实体添加新的远程服务提供者</h4><p><b>远程提供者</b>的托管服务器不同于 Federated Access Manager 所在的服务器。配置“新建远程服务提供者”属性时，需要向实体配置文件添加与服务提供者有关的元数据。此过程的起点是<a href="federation.fsserviceprovider.html">向提供者实体添加服务提供者</a>。</p>
+<hr><p><b>注 &#8211; </b>在此初始配置页面中，可配置但无法看到其他属性。参见<a href="federation.fsserviceproviderremoteprofile.html">修改提供者实体中的远程服务提供者属性</a>。</p>
+<hr>
+<ol>
+<li><b>提供“公共属性”信息。</b><p>一般而言，“公共属性”所含的值定义了身份认证提供者本身。</p><dl><dt>说明</dt>
+<dd><p>该属性的值是您创建实体时提供的说明。可以修改原来输入的说明，如果不存在，则可添加一条说明。</p></dd>
+<dt>协议支持枚举</dt>
+<dd><p>选择此实体所支持的自由联盟计划自由身份联合框架 (Liberty Identity Federation Framework, Liberty ID-FF) 发行版本。</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> 指的是 Liberty ID-FF 版本 1.2。</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> 指的是 Liberty ID-FF 版本 1.1。</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>选择任何可用信任环以分配给提供者。</b><p>提供者可以属于一个或多个信任环。但是，没有指定信任环的提供者不能参与基于 自由联盟计划 规范的通信。如果未曾创建信任环，可在以后定义此属性。</p></li>
+<li><b>提供“服务提供者”属性信息。</b><p>“服务提供者”属性定义了关于服务提供者的一般信息。</p><dl><dt>声明使用方 URL</dt>
+<dd><p>键入端点的 URL，该端点将接收和处理所有发送给服务提供者的 SAML 声明。</p></dd>
+<dt>声明使用方服务 URL ID</dt>
+<dd><p>如果“协议支持枚举”公共属性的值为 <tt>urn:liberty:iff:2003-08</tt>，请键入所需的 ID。</p></dd>
+<dt>将声明使用方服务 URL 设置为默认值</dt>
+<dd><p>如果请求中未提供标识符，选中此复选框，以默认值使用“声明使用方服务 URL”。</p></dd>
+</dl>
+</li>
+<li><b>单击“确定”以向实体添加提供者。</b></li>
+<li><b>从“查看”菜单中选择另一选项，继续配置实体，或单击“保存”以完成配置。</b></li></ol>
+<br/>
+
+</body>
+</html>

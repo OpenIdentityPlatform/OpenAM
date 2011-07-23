@@ -1,0 +1,148 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: amtune-prepareDSTuner,v 1.6 2008/08/19 19:08:32 veiming Exp $
+#
+#
+
+getListDefaultAMIndexes() {
+
+        index_ldif_file=$IS_CONFIG_DIR/ldif/index.ldif
+        if [ ! -f "$index_ldif_file" ]; then
+           index_ldif_file=$IS_CONFIG_DIR/index.ldif
+           if [ ! -f "$index_ldif_file" ]; then
+              $ECHO
+              exit 1
+           fi
+        fi
+
+        $ECHO `$GREP "dn: " $index_ldif_file | $AWK -F" " '{ print $2 }' | $AWK -F"," '{ print $1 }' | $AWK -F"=" '{ print $2 }'`
+}
+
+prepareDirectoryTuner() {
+    if [ "$OSTYPE" = "HP-UX" ]; then
+            gettext=/usr/local/bin/gettext
+    else
+        gettext=/bin/gettext
+    fi
+    $ECHO `$gettext "Preparing Directory Server Tuner..."`
+    $ECHO $LINE_SEP
+    $ECHO `$gettext "Determining Current Settings..."`
+
+    ###############ACI############################
+    NormalizeDNandReplaceComma "$ROOT_SUFFIX" "_"
+    
+    if [ "$OSTYPE" = "Linux" ]; then
+        replaceCharacter "$NMDN" "&" "\\\&"
+    else
+        replaceCharacter "$NMDN" "&" "\&"
+    fi
+    NM_SUFFIX=$NEWSTR
+
+    tmp_file=/tmp/amtune-directory
+    ds_tar_file=$DS_TAR_DIR/amtune-directory.tar
+
+    if [ -f $ds_tar_file ]; then
+       $RM $ds_tar_file
+    fi
+
+    $ECHO `$gettext "Creating Directory Server Tuner tar file: "` "$ds_tar_file"
+
+    list_default_am_indexes=`getListDefaultAMIndexes`
+    if [ "$list_default_am_indexes" = "" ]; then
+        $ECHO `$gettext "WARNING: Can't find OpenSSO Index file.  Using the default list in amtune-directory-template."`
+    fi
+
+    $CP $AMTUNE_UTILS_SCRIPT /tmp/amtune-utils
+    $CP $SCRIPT_LOCATION/amtune-directory-template $tmp_file
+
+    ###########################################ACI#######################################################
+    NormalizeDNandReplaceComma "$ROOT_SUFFIX" "_"
+    ###########################################ACI#######################################################
+
+    chmod +x $tmp_file
+
+    $TAR cvf $ds_tar_file remacis.ldif amtune-samplepasswordfile -C /tmp amtune-directory -C /tmp amtune-utils
+
+    $RM $tmp_file
+
+    $ECHO 
+    $ECHO `$gettext "Directory Server Tuner tar file: $ds_tar_file"`
+    $ECHO `$gettext "Steps to tune directory server:"`
+    $ECHO `$gettext "1.  Copy the DS Tuner tar to the DS System"`
+    $ECHO `$gettext "2.  Untar the DS Tuner in a temporary location"`
+    $ECHO `$gettext "3.  Execute the following script in 'REVIEW' mode : amtune-directory"`
+    $ECHO `$gettext "4.  Review carefully the recommended tunings for DS"`
+    $ECHO `$gettext "5.  If you are sure of applying these changes to DS, modify the following lines in amtune-directory"`
+    $ECHO `$gettext "    or in amtune-directory-template before running this script."`
+    $ECHO `$gettext "   a.  "` "AMTUNE_MODE="
+    $ECHO `$gettext "   These parameters can also be modified or left unchanged to use default values"`
+    $ECHO `$gettext "   b.  "` "AMTUNE_LOG_LEVEL="
+    $ECHO `$gettext "   c.  "` "AMTUNE_DEBUG_FILE_PREFIX="
+    $ECHO `$gettext "   d.  "` "DB_BACKUP_DIR_PREFIX="
+    $ECHO `$gettext "   e.  "` "DS_HOST="
+    $ECHO `$gettext "   f.  "` "DS_PORT="
+    $ECHO `$gettext "   g.  "` "ROOT_SUFFIX="
+    $ECHO `$gettext "   h.  "` "DIRMGR_UID="
+    $ECHO `$gettext "   i.  "` "DS_INSTANCE_DIR="
+    $ECHO `$gettext "   j.  "` "DS_VERSION="
+    $ECHO `$gettext "   k.  "` "ENABLE_MODE="
+    $ECHO `$gettext "   l.  "` "NM_SUFFIX="
+    $ECHO `$gettext "   m.  "` "ORG_OBJECT_CLASS="
+    $ECHO `$gettext "It's highly recommended to run db2bak before running amtune-directory in case of Sun DS 5.x."`
+    $ECHO `$gettext "or dsadm backup before running amtune-directory in case of Sun DS 6.x."`
+    $ECHO 
+}
+#############################################################################
+# Start of main program
+#############################################################################
+# This flag is used only when OpenSSO is deployed as single
+# web-application.
+##@SINGLEWAR_FLAG@
+
+SCRIPT_LOCATION=`dirname $0`
+AMTUNE_SCRIPT_RECORD_STRING="AMTUNE_DS_SCRIPT"
+TOOLS_HOME="@TOOLS_HOME@"
+TEXTDOMAIN=amtune-prepareDSTuner
+TEXTDOMAINDIR=$TOOLS_HOME/locale
+export TEXTDOMAIN
+export TEXTDOMAINDIR
+
+# import the environment
+if [ -f $SCRIPT_LOCATION/amtune-env ]; then
+    if [ ! "$INIT_STATUS" = "INIT_COMPLETE" ]; then
+        . $SCRIPT_LOCATION/amtune-env
+    fi
+fi
+
+ECHO_MSG "`$gettext 'OpenSSO - Directory Server Tuner Preparation Script'`"
+
+DS_TAR_DIR=$SCRIPT_LOCATION
+
+prepareDirectoryTuner   | eval $OUTPUT_TYPE
+
+$RM $DSADMIN_PASSFILE
+
+ECHO_MSG $PARA_SEP 

@@ -1,0 +1,195 @@
+G<test name="PolicyMergeDecisionTestP10_E0 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="0"/>
+	<parameter name="setup" value="true"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+  <test name="PolicyMergeDecisionTestP10_E1 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="1"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+		<run>
+                <include name="@mode@"/>
+		</run>
+	</groups>
+	<classes>
+		<class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+	</test>
+	<test name="PolicyMergeDecisionTestP10_E2 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="2"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+		<run>
+		<include name="@mode@"/>
+		</run>
+	</groups>
+	<classes>
+		<class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+	<test name="PolicyMergeDecisionTestP10_E3 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="3"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="true"/>
+	<parameter name="peAtOrg" value="/"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+		<include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+		<class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealm_P10_E0 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="0"/>
+	<parameter name="setup" value="true"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm3"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealm_P10_E1 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="1"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm3"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealm_P10_E2 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="2"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm3"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealm_P10_E3 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="3"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="true"/>
+	<parameter name="peAtOrg" value="realm3"/>
+	<parameter name="dynamic" value="false"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealmDynamic_P10_E0 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="0"/>
+	<parameter name="setup" value="true"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm300"/>
+	<parameter name="dynamic" value="true"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealmDynamic_P10_E1 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="1"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm300"/>
+	<parameter name="dynamic" value="true"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealmDynamic_P10_E2 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="2"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="false"/>
+	<parameter name="peAtOrg" value="realm300"/>
+	<parameter name="dynamic" value="true"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+	</classes>
+    </test>
+    <test name="PolicyMergeDecisionTestSubrealmDynamic_P10_E3 ">
+	<parameter name="policyIdx" value="10"/>
+	<parameter name="evaluationIdx" value="3"/>
+	<parameter name="setup" value="false"/>
+	<parameter name="cleanup" value="true"/>
+	<parameter name="peAtOrg" value="realm300"/>
+	<parameter name="dynamic" value="true"/>
+	<groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+	</groups>
+	<classes>
+            <class name="com.sun.identity.qatest.policy.PolicyTests"/>
+       	</classes>
+    </test>
+ 
+
+ 

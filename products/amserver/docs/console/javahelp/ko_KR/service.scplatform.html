@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>플랫폼 - Sun OpenSSO 8.0 콘솔 온라인 도움말
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>플랫폼</h4>
+<p><a name="indexterm-205"></a>플랫폼 서비스는 OpenSSO 응용 프로그램의 최상위에서 적용된 기타 옵션뿐만 아니라 OpenSSO 구성에
+서버를 더 추가할 수 있는 서비스입니다. 플랫폼 서비스 속성은 전역 속성입니다. 속성은
+다음과 같습니다.</p>
+<ul><li><p><a href="#fxcgy">플랫폼 로켈</a></p></li>
+<li><p><a href="#fxcpo">쿠키 도메인</a></p></li>
+<li><p><a href="#fxcmi">사용 가능한 로켈</a></p></li>
+<li><p><a href="#fxctg">클라이언트 문자 집합</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>플랫폼 로켈</h5>
+<p>플랫폼 로켈 값은 OpenSSO 설치 시 사용된 기본 언어 하위 유형입니다. 인증,
+로깅 및 관리 서비스는 이 값의 언어로 관리됩니다. 기본값은 en_US입니다. 지원되는 언어
+하위 유형의 목록은 <a href="supportedlang.html">지원되는 언어 로켈</a>을 참조하십시오.</p>
+
+<a name="fxcpo"></a><h5>쿠키 도메인</h5>
+<p>인증하는 동안 사용자의 브라우저에 쿠키를 설정한 경우 쿠키 헤더에서 반환되는 도메인 목록입니다.
+이 목록이 비어 있으면 쿠키 도메인이 설정되지 않습니다. 즉, OpenSSO 세션 쿠키는
+OpenSSO 자체에만 전달되며 도메인의 다른 서비스에는 전달되지 않습니다.</p><p>도메인의 다른 서버에서 SSO가 필요할 경우 쿠키 도메인으로 이 속성을 설정해야 합니다.
+하나의 OpenSSO에서 서로 다른 도메인에 두 개의 인터페이스가 있을 경우 이 속성에서
+두 쿠키 도메인을 모두 설정해야 합니다. 로드 밸런서가 사용된 경우 쿠키 도메인은
+로드 밸런서 뒤에 있는 서버가 아니라 로드 밸런서 도메인의 쿠키 도메인이어야 합니다.
+이 필드의 기본값은 설치된 OpenSSO의 도메인입니다.</p>
+
+<a name="fxcmi"></a><h5>사용 가능한 로켈</h5>
+<p>이 속성은 플랫폼용으로 구성된 사용 가능한 모든 로켈을 저장합니다. 사용자가 로켈을 선택할
+수 있는 응용 프로그램이 있다고 가정합니다. 이 응용 프로그램은 플랫폼 프로필에서 이
+속성을 가져와 로켈 목록을 사용자에게 제공합니다. 사용자는 로켈을 선택하고 응용 프로그램은 사용자
+항목 <i>preferredLocale</i>에서 이를 설정합니다.</p>
+
+<a name="fxctg"></a><h5>클라이언트 문자 집합</h5>
+<p>이 속성은 플랫폼 수준에서 다른 클라이언트의 문자 집합을 지정합니다. 이 속성에는 클라이언트
+유형과 해당 문자 집합의 목록이 포함됩니다. 자세한 내용은 <a href="service.scplatformclientcharsetsadd.html">새 문자 집합 만들기</a>를 참조하십시오.</p>
+<br/>
+
+</body>
+</html>

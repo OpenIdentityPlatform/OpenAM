@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Unterst&#252;tzte Richtlinien - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="supporteddirectives"></a><h4>Unterst&#252;tzte Richtlinien</h4>
+<a name="indexterm-124"></a><a name="indexterm-125"></a><p>Mit diesem Attribut geben Sie eine Richtlinie f&#252;r eine Ressource an. Wenn
+der Dienstanbieter eine nicht unterst&#252;tzte Richtlinie verwendet, wird die Anforderung abgelehnt. Die
+folgende Tabelle enth&#228;lt Einzelheiten zu den verf&#252;gbaren Optionen.</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>Richtlinie</p></th>
+<th align="left" valign="top" scope="column"><p>Zweck</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateRequester</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Der Discovery-Dienst soll in Antworten
+eine SAML-Assertion (mit <tt>AuthenticationStatement</tt>) enthalten, damit der Client sich bei der Dienstinstanz
+authentifizieren kann, die als Host f&#252;r die Ressource fungiert.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthenticateSessionContext</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Der Discovery-Dienst soll in
+Antworten mit Angaben zum Sitzungsstatus eine SAML-Assertion (mit <tt>SessionContextStatement</tt>) enthalten.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>AuthorizeRequestor</tt></p></td>
+<td align="left" valign="top" scope="row"><p> Der 
+Discovery-Dienst soll in Antworten, in denen angegeben wird, ob der Client &#252;ber
+eine Zugriffsberechtigung f&#252;r die Ressource verf&#252;gt, eine SAML-Assertion (mit <tt>ResourceAccessStatement</tt>) enthalten.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>EncryptResourceID</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Der Discovery-Dienst
+soll in Antworten f&#252;r Clients immer den Ressourcenbezeichner verschl&#252;sseln.</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>GenerateBearerToken</tt></p></td>
+<td align="left" valign="top" scope="row"><p>Wenn die Bearer Token-Authentifizierung
+verwendet wird, soll der Discovery-Dienst einen Token generieren, der dem Tr&#228;ger die
+Zugriffsberechtigung f&#252;r die Ressource erteilt.</p></td>
+</tr>
+</table>
+<hr><p><b>Achtung &#8211; </b>Die Richtlinien <tt>AuthorizeRequestor</tt> und <tt>EncryptResourceID </tt> k&#246;nnen nicht gemeinsam verwendet werden.</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

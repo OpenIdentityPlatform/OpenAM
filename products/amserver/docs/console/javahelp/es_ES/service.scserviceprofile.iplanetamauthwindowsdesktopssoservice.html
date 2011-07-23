@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SSO de Windows Desktop - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.iplanetamauthwindowsdesktopssoservice"></a><h4>SSO de Windows Desktop</h4>
+<p><a name="indexterm-183"></a>Este m&#243;dulo es espec&#237;fico de Windows y recibe tambi&#233;n el nombre de
+autenticaci&#243;n Kerberos. El usuario presenta un token de Kerberos a OpenSSO mediante
+el Protocolo de mecanismo de negociaci&#243;n GSS-API protegido y sencillo (SPNEGO). El
+m&#243;dulo de complemento de autenticaci&#243;n de SSO de Windows Desktop proporciona un
+cliente (usuario) con inicio de sesi&#243;n &#250;nico de escritorio. Esto implica que
+un usuario que ya se ha autenticado con un centro de distribuci&#243;n
+de claves se puede autenticar con OpenSSO sin tener que proporcionar la
+informaci&#243;n de inicio de sesi&#243;n de nuevo. Los atributos de SSO de
+Windows Desktop son globales. Los atributos son:</p>
+<ul><li><p><a href="#fwbfr">Servicio principal</a></p></li>
+<li><p><a href="#fwbfo">Nombre de archivo Keytab</a></p></li>
+<li><p><a href="#fwbhy">Kerberos Realm</a></p></li>
+<li><p><a href="#fwbid">Nombre de servidor Kerberos</a></p></li>
+<li><p><a href="#fwbhw">Mostrar Principal con nombre de dominio</a></p></li>
+<li><p><a href="#fwbic">Nivel de autenticaci&#243;n</a></p></li></ul>
+
+
+<a name="fwbfr"></a><h5>Servicio principal</h5>
+<p>Especifica el servicio principal Kerberos que se utiliza para la autenticaci&#243;n. Use
+el siguiente formato:</p><p><tt><b>HTTP/</tt><i>hostname.domainname&#64;dc_domain_name</i><tt></b></tt></p><p><b>hostname</b> y <b>domainame</b> representan el nombre de host y el nombre de
+dominio de la instancia de OpenSSO. <b>dc_domain_name </b> es el dominio de Kerberos
+en el que reside el servidor Windows Kerberos (controlador de dominio). Es
+posible que sea distinto del nombre de dominio de OpenSSO.</p>
+
+<a name="fwbfo"></a><h5>Nombre de archivo Keytab</h5>
+<p>Este atributo especifica el archivo Keytab de Kerberos que se utiliza para
+la autenticaci&#243;n. Puede utilizar el siguiente formato, aunque no es necesario:</p><p><tt><b></tt><i>hostname</i><tt>.HTTP.keytab</b></tt></p><p><b>hostname</b> es el nombre de host de la instancia de OpenSSO.</p>
+
+<a name="fwbhy"></a><h5>Kerberos Realm</h5>
+<p>Este atributo especifica el nombre de dominio del centro de distribuci&#243;n Kerberos
+(controlador de dominio). En funci&#243;n de la configuraci&#243;n, el nombre de dominio
+del controlador de dominio puede ser distinto del nombre de dominio de
+OpenSSO.</p>
+
+<a name="fwbid"></a><h5>Nombre de servidor Kerberos</h5>
+<p>Este atributo especifica el nombre de host del centro de distribuci&#243;n Kerberos
+(controlador de dominio). Debe introducir el nombre de dominio completo (FQDN) del
+controlador de dominio.</p>
+
+<a name="fwbhw"></a><h5>Mostrar Principal con nombre de dominio</h5>
+<p>Si se habilita, este atributo permite que OpenSSO devuelva autom&#225;ticamente el principal
+de Kerberos con el nombre de dominio del controlador de dominio durante
+la autenticaci&#243;n.</p>
+
+<a name="fwbic"></a><h5>Nivel de autenticaci&#243;n</h5>
+<p>El nivel de autenticaci&#243;n se define de forma independiente para cada m&#233;todo
+de autenticaci&#243;n. El valor indica en qu&#233; medida se debe confiar en
+un mecanismo de autenticaci&#243;n. Una vez que el usuario se ha autenticado,
+este valor se guarda en el token SSO de la sesi&#243;n. Cuando
+se presenta el token SSO a una aplicaci&#243;n a la que desea
+acceder el usuario, la aplicaci&#243;n utiliza el valor almacenado para determinar si
+el nivel es suficiente para permitir el acceso al usuario. Si el
+nivel de autenticaci&#243;n guardado en un token SSO no satisface el valor
+m&#237;nimo necesario, la aplicaci&#243;n puede solicitar al usuario que se autentique de
+nuevo mediante un servicio con un mayor nivel de autenticaci&#243;n. El valor
+predeterminado es 0.</p>
+<hr><p><b>Nota &#8211; </b>Si no se especifica ning&#250;n nivel de autenticaci&#243;n, el token SSO almacena
+el valor especificado en el <a href="service.scserviceprofile.iplanetamauthservice.html#fwbfn">Nivel de autenticaci&#243;n predeterminado</a> del atributo de autenticaci&#243;n "Principal".</p>
+<hr>
+
+<br/>
+
+</body>
+</html>

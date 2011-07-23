@@ -1,0 +1,127 @@
+<style>	 
+	input{
+	 width:250px;
+	}
+</style>
+
+<script language="javascript">
+
+    YAHOO.util.Event.onDOMReady(initWindowDesktop);
+
+    var servicePrincipalValid = false;
+    var fileNameValid = false;
+    var realmValid = false;
+    var serviceNameValid = false;
+    var domainNameValid = false;
+
+
+    function initWindowDesktop() {
+        pageURI = "$context$path";
+        afterAddToStoreSuccessFunction = windowAfterAddToStore;
+        validateFormFunction = validateWindowForm;
+        adjustAddStoreButton();
+    }
+
+    function windowAfterAddToStore() {
+        YAHOO.sun.container.addStore.show();
+        setTimeout("YAHOO.sun.container.addStore.hide()",1250);
+        setTimeout("document.location = '$context/commonTasks.htm'",1250);
+    }
+
+    function validateServicePrincipal() {
+        var callUrl = pageURI + "?actionLink=validateServicePrincipal&kerberosServicePrincipal=" + DOM.get("kerberosServicePrincipal").value;
+        AjaxUtils.call(callUrl, servicePrincipalValidated);
+    }
+
+    function validateFileName() {
+        var callUrl = pageURI + "?actionLink=validateFileName&kerberosFileName=" + DOM.get("kerberosFileName").value;
+        AjaxUtils.call(callUrl, fileNameValidated);
+    }
+
+    function validateRealm() {
+        var callUrl = pageURI + "?actionLink=validateRealm&kerberosRealm=" + DOM.get("kerberosRealm").value;
+        AjaxUtils.call(callUrl, realmValidated);
+    }
+
+    function validateServiceName() {
+        var callUrl = pageURI + "?actionLink=validateServiceName&kerberosServiceName=" + DOM.get("kerberosServiceName").value;
+        AjaxUtils.call(callUrl, serviceNameValidated);
+    }
+
+    function validateDomainName() {
+        var callUrl = pageURI + "?actionLink=validateDomainName&domainName=" + DOM.get("domainName").value;
+        AjaxUtils.call(callUrl, domainNameValidated);
+    }            
+
+    function servicePrincipalValidated(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        servicePrincipalValid = (response.isValid);
+        DOM.get("servicePrincipalStatus").innerHTML = "<small>" + response.errorMessage + "</small>";
+        adjustAddStoreButton();
+    }
+
+    function fileNameValidated(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        fileNameValid = (response.isValid);
+        DOM.get("fileNameStatus").innerHTML = "<small>" + response.errorMessage + "</small>";
+        adjustAddStoreButton();
+    }
+
+    function realmValidated(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        realmValid = (response.isValid);
+        DOM.get("realmStatus").innerHTML = "<small>" + response.errorMessage + "</small>";
+        adjustAddStoreButton();
+    }
+
+    function serviceNameValidated(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        serviceNameValid = (response.isValid);
+        DOM.get("serviceNameStatus").innerHTML = "<small>" + response.errorMessage + "</small>";
+        adjustAddStoreButton();
+    }
+
+    function domainNameValidated(pResponse) {
+        var response = pResponse.responseText.parseJSON();
+        domainNameValid = (response.isValid);
+        DOM.get("domainNameStatus").innerHTML = "<small>" + response.errorMessage + "</small>";
+        adjustAddStoreButton();
+    }
+
+    function validateWindowForm() {
+        return (servicePrincipalValid
+                && servicePrincipalValid
+                && fileNameValid
+                && realmValid
+                && serviceNameValid
+                && domainNameValid);
+    }
+
+</script>
+
+<div id="windowDesktopMainPanel" align="center">
+    <div id="windowDesktopCreatePanel" class="createpanel">
+        <div class="bodywhite">
+            <div class="middletitle OrangeSmall">$page.getLocalizedString("configuration.authentication_store.window.enter_store_details")</div><div class="OrangeVerySmall" id="allfields">* ALL Fields are Required</div><br />
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.window.kerberos_service_principal")<br />
+            <input type="text" id="kerberosServicePrincipal" name="kerberosServicePrincipal" value="$!windowStore.kerberosServicePrincipal" onkeyup="APP.callDelayed(this, validateServicePrincipal);"/>
+            <span id="servicePrincipalStatus"></span></p>
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.window.key_tab_file_name")&nbsp;<a id="ttprealm" href="#" onmouseover="AjaxUtils.ajax_showTooltip('$context/config/authc/keytabFileTooltip.htm',this);return false;"  onmouseout="AjaxUtils.ajax_hideTooltip();" ><img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/></a><br />
+            <input type="text" id="kerberosFileName" name="kerberosFileName" value="$!windowStore.kerberosFileName" onkeyup="APP.callDelayed(this, validateFileName);"/>
+            <span id="fileNameStatus"></span></p>
+
+             <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.window.kerberos_realm")&nbsp;<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+            <input type="text" id="kerberosRealm" name="kerberosRealm" value="$!windowStore.kerberosRealm" onkeyup="APP.callDelayed(this, validateRealm);"/>
+            <span id="realmStatus"></span></p>
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.window.kerberos_service_name")&nbsp;<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+            <input type="text" id="kerberosServiceName" name="kerberosServiceName" value="$!windowStore.kerberosServiceName" onkeyup="APP.callDelayed(this, validateServiceName);"/>
+            <span id="serviceNameStatus"></span></p>
+
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.window.domain_name")&nbsp;<img class="balloonIcon" src="$context/assets/images/balloon_icon.png" alt="#"/><br />
+            <input type="text" id="domainName" name="domainName" value="$!windowStore.domainName" onkeyup="APP.callDelayed(this, validateDomainName);"/>
+            <span id="domainNameStatus"></span></p>
+        </div>
+    </div>
+</div>

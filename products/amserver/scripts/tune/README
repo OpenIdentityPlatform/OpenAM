@@ -1,0 +1,186 @@
+------------------------------------------------------------------------------
+README file for OpenSSO amtune/amtune.bat (amtune)
+------------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.11 2008/10/03 20:06:18 ykwon Exp $
+
+------------------------------------------------------------------------------
+
+%% Contents:
+    %% 1. About amtune
+    %% 2. Setup amtune
+    %% 3. Running amtune
+
+
+%% 1. About amtune
+--------------------------
+The OpenSSO amtune allows you to tune OpenSSO and other components of your 
+deployment, including Sun Directory Server, two web containers from Sun - Sun 
+Web Server 7 and Sun Application Servr 9.1 (aka Glassfish v2) - and operating 
+system kernel and TCP/IP parameters.  
+
+Currently amtune tunes the operating system parameters only on Solaris and 
+Linux, but not on AIX, Windows, MacOS or BSD variants.  Also amtune tunes only 
+Sun Web Server 7 and Sun Application Server 9.1/Glassfish v2.  
+
+However, amtune enables tuning of OpenSSO parameters - e.g., session/SDK cache
+entries, logging buffer, notification thread pool/queue and LDAP connection 
+pool sizes for service management, global authentication service and user data 
+store - when OpenSSO is deployed on supported web containers (Geronimo 2.x, 
+JBoss 4.2.x, Oracle Application Server 10g, Tomcat 5.5.x/6.x, WebLogic 9.2 
+MP2/10, WebSphere 6.1, in addition to Sun web containers) and supported 
+operating systems (Solaris 9/10, Red Hat Enterprise 4/5, Windows 2003/Vista, 
+Ubuntu 8.04 for some containers and AIX 5.3 for only WebSphere 6.1).
+
+For Sun Web Server 7 and Sun Application Server 9.1/Glassfish v2, amtune tunes 
+JVM heap and JVM per-thread stack sizes, JVM garbage collection algorithms, 
+container worker/acceptor threads and queue sizes.
+
+For Sun Directory Server 5.2 and 6.3, amtune tunes its worker threads, database
+cache and entry cache sizes and changes database home directory to RAM disk - 
+i.e, /tmp.  Please note that Sun Directory Server 6.2 is not supported for 
+tuning due to its data corruption issues. 
+
+
+%% 2. Setup amtune
+---------------------------
+Step 1: Unzip ssoAdminTools.zip to the desired directory - e.g., /opensso/tools
+        /ssoAdminTools.zip.
+
+Step 2: Go to the directory which has the ssoAdminTools.zip unzipped.
+        Run the setup command as follows:
+        "./setup" or "setup" for Unix and Windows respectively.
+        Then enter the configuration directory when prompted.
+        "Path to config files of OpenSSO (example: /opensso_config/opensso):"
+
+Step 3: After step 2 is performed, ssoadm CLI can be run under the following
+        directory: <TOOLS_DIR>/<OPENSSO_URI>/bin, where <TOOLS_DIR> is the 
+        directory, in which ssoAdminTools.zip is unzipped- i.e., the current 
+        directory - and <OPENSSO_URI> is the deployment URI of OpenSSO.
+
+After step 3 is performed, you would find amtune scripts under <TOOLS_DIR>/
+<OPENSSO_URI>/bin/amtune directory.
+
+
+%% 3. Running amtune
+---------------------------
+3.1 Tuning Modes
+
+The OpenSSO amtune can be run in the following modes, as determined by the 
+AMTUNE_MODE parameter in the amtune-env.properties file.
+
+    * 	REVIEW mode (default). The scripts return tuning recommendations for an
+        OpenSSO deployment, but they do not make any actual changes to the 
+        environment.
+
+    * 	CHANGE mode.  The scripts make all of the tuning modifications that are
+        defined in amtune-env.properties file.  Use CHANGE mode only after you 
+        have reviewed and understand the tuning changes that will be applied to
+        your deployment.
+
+In either mode, the scripts return a list of tuning recommendations in the 
+<TOOLS_DIR>/<OPENSSO_URI>/logs/amtune-config.<timestamp>.log file and/or to the 
+terminal window.  
+
+Any error message occurring while running amtune due to any missing and/or 
+invalid input parameters in amtune-env.properties will be present in the file,
+<TOOLS_DIR>/<OPENSSO_URI>/logs/amtune-errors, and to the terminal.  All other 
+errors and exceptions triggered by the underlying components - e.g., OpenSSO, 
+Sun Web Server 7 - will be also present in the same errors file.
+
+
+3.2 Running amtune
+
+3.2.1 Running amtune to tune the operating system, the web container and the 
+OpenSSO
+
+	* Log in as or become the superuser.
+
+	* If you have not run amtune in REVIEW mode, ensure that 
+          AMTUNE_MODE is set to REVIEW in the 
+          <TOOLS_DIR>/<OPENSSO_URI>/bin/amtune/amtune-env.properties file.
+
+       	* Edit other parameters in amtune-env.properties file, depending on the
+          components you want to tune.
+
+ 	* Execute <TOOLS_DIR>/<OPENSSO_URI>/bin/amtune/amtune on Solaris/Linux/
+          AIX and <TOOLS_DIR>\<OPENSSO_URI>\bin\amtune\amtune.bat on Windows 
+          with a password file for ssoadm (admin for OpenSSO), wadm (admin for 
+          WS7), asadmin (admin for AS9.1) or dirmgr (directory manager for Sun 
+          DS), which has one or more of the following strings, where passwords 
+          follow the strings: SSOADM_PASSWORD=, WADM_PASSWORD=, 
+          ASADMIN_PASSWORD= and DIRMGR_PASSWORD=.  Please look at the amtune-
+          samplepasswordfile for sample entries.  
+
+          On Solaris/Linux/AIX, the password file must be inaccessible by its
+          non-owners and only readable by its owner - i.e., set "chmod 400" for
+          the password file.  On Windows, amtune.bat does not check the 
+          password file's permission.
+
+          Tuning operating system parameters does not require a password
+          file.  
+
+        * Note that amtune currently is not interactive: that is, it does not 
+          prompt for more user inputs after the script is run for the first 
+          time. 
+
+	* Review the tuning recommendations on the terminal or in 
+          <TOOLS_DIR>/<OPENSSO_URI>/logs/amtune-config.<timestamp>.log file.  
+          If necessary, make changes to amtune-env.properties file based on
+          this run.
+
+	* If you are satisfied with the tuning recommendations from the REVIEW 
+          mode run, set AMTUNE_MODE to CHANGE in amtune-env.properties file.
+
+	* Check the <TOOLS_DIR>/<OPENSSO_URI>/logs/amtune-errors for the 
+          detailed messages from each run.
+
+	Note: In CHANGE mode, the amtune script may need to restart the web 
+              container and OpenSSO.  If operating system's kernel parameters 
+              are changed, amtune will recommend a system restart.  
+
+3.2.2 Executing amtune on a remote Sun Directory Server machine.
+
+Step 1. FTP or copy over amtune.zip generated by amtune to the remote Sun 
+        Directory Server machine.
+
+Step 2. Unzip amtune.zip.
+
+Step 3. Set values for TOOLS_HOME and JAVA_HOME in
+        <TOOLS_DIR>/bin/unix/amtune on Solaris/Linux/AIX and
+        <TOOLS_DIR>\bin\windows\amtune.bat on Windows.   
+
+Step 4. Edit amtune-env.properties file with Sun Directory Server information.
+
+Step 5. Execute amtune on Solaris/Linux/AIX with a password file for the Sun  
+        Directory Server's Directory Manager, set to be inaccessible by its
+        non-owners and only readable by its owner - i.e., set "chmod 400" for 
+        the password file.  On Windows, execute amtune.bat with a password file
+        also, but amtune.bat does not check its file permission on Windows.
+
+Note: In CHANGE mode, if AMTUNE_TUNE_DS=true, then the amtune script will 
+      restart Sun Directory Server instance and if AMTUNE_TUNE_OS=true, then 
+      amtune will tune the operating system's kernel parameters and will 
+      recommend a system restart.

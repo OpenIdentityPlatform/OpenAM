@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>数据存储库 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="realm.idrepo"></a><h3>数据存储库</h3>
+<p><a name="indexterm-10"></a><a name="indexterm-11"></a>数据存储库是一个可以存储用户属性和用户配置数据的数据库。</p><p>OpenSSO 提供连接到 LDAPv3 身份系统信息库框架的身份系统信息库插件。从而不必在现有用户数据库中做任何更改，便可查看和检索 OpenSSO 用户信息。OpenSSO 框架将来自身份系统信息库插件的数据和其他 OpenSSO 插件里的数据整合在一起，为每个用户形成了一个虚拟身份。而后，OpenSSO 能使用通用身份在多个身份系统信息库之间进行验证和授权过程。在用户会话结束后将会销毁虚拟用户身份。</p><p>OpenSSO 支持以下数据存储库：</p>
+<ul><li><p>Active Directory</p></li>
+<li><p>普通 LDAPv3</p></li>
+<li><p>使用 OpenSSO 模式的 Sun Directory Server</p></li></ul>
+<p>有关创建新数据存储库以及配置系统信息库插件的信息，参见<a href="realm.idreposelecttype.html">创建新的数据存储库</a>。</p>
+<br/>
+
+</body>
+</html>

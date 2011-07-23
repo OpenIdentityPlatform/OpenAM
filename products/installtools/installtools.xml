@@ -1,0 +1,4 @@
+<project name="installtools">
+    <dirname property="installtools.basedir" file="${ant.file.installtools}"/>
+    <property file="${installtools.basedir}/installtools.properties"/>
+</project>

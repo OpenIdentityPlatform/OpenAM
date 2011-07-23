@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>將規則增加至策略 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="policy.ruleadd"></a><h5>將規則增加至策略</h5>
+<ol>
+<li><b><a name="indexterm-25"></a>若您已建立策略，按一下您要增加規則的策略名稱。如果未建立，請參閱<a href="policy.policynormaladd.html">建立新的一般策略</a>。</b></li>
+<li><b>於 [規則] 功能表下，按一下 [新建]。</b></li>
+<li><b>為規則選取下列預設服務類型之一。啟用策略的服務越多，您可以參閱的清單就越大：</b><dl><dt>探索服務</dt>
+<dd><p>定義探索服務查詢的授權動作，並修改 Web 服務用戶端對特定資源的協定呼叫。</p></dd>
+<dt>Liberty 個人設定檔服務</dt>
+<dd><p>定義 Liberty 個人設定檔服務查詢的授權動作，並修改 Web 服務用戶端對特定資源的協定呼叫。</p></dd>
+<dt>URL 策略代理程式</dt>
+<dd><p>定義 URL 策略代理程式服務的授權動作。可用來定義保護 HTTP 及 HTTPS URL 的策略。這是 OpenSSO 策略最常用的方式。</p></dd>
+</dl>
+</li>
+<li><b>按 [下一步]。</b></li>
+<li><b>輸入規則的名稱與資源名稱。</b><p>目前，OpenSSO 策略代理程式僅支援 <tt>http://</tt> 與 <tt>https://</tt> 資源，而不支援以 IP 位址取代主機名稱。</p><p>協定、主機、連接埠及資源名稱等均支援使用萬用字元。例如：</p><pre>http*://*:*/*.html</pre><p>對 URL 策略代理程式服務而言，若未輸入連接埠埠號，則 <tt>http://</tt> 的預設埠號為 80、<tt>https://</tt> 的預設埠號為 443。</p>
+<hr><p><b>備註 &#8211; </b>步驟 6 與 7 不適用於參照策略。</p>
+<hr>
+</li>
+<li><b>為此規則選取動作。依據服務類型，您可選取下列項目：</b>
+<ul><li><p>查尋 (探索服務)</p></li>
+<li><p>更新 (探索服務)</p></li>
+<li><p>修改 (Liberty 個人設定檔服務)</p></li>
+<li><p>查詢 (Liberty 個人設定檔服務)</p></li>
+<li><p>GET (URL 策略代理程式)</p></li>
+<li><p>POST (URL 策略代理程式)</p></li></ul>
+</li>
+<li><b>選取動作值。</b>
+<ul><li><p>互動同意 &#8212; 呼叫 Liberty 互動協定以達成資源同意。此值僅用於 Liberty 個人設定檔服務類型。</p></li>
+<li><p>互動值 &#8212; 呼叫 Liberty 互動協定以取得資源上的值。此值僅用於 Liberty 個人設定檔服務類型。</p></li>
+<li><p>允許 &#8212; 可讓您存取與規則中定義的資源相符的資源。</p></li>
+<li><p>拒絕 &#8212; 不允許您存取與規則中定義的資源相符的資源。</p><p>策略中的拒絕規則總是要優先於允許規則。例如，如果指定的資源有兩種策略，一種是拒絕存取，另一種是允許存取，則結果是拒絕存取 (假如同時滿足這兩種策略條件)。由於拒絕策略可能導致這兩種策略之間產生潛在的衝突，因此建議您使用拒絕策略時要非常謹慎。通常，策略定義程序應該僅使用允許規則，在所有策略均不適於完成此拒絕存取時才使用預設拒絕規則。</p><p>如果使用明確的拒絕規則，即使有一個或多個策略允許存取，透過不同主體如角色和或群組成員身份為給定使用者指定的策略也可能會導致拒絕對資源存取。例如，如果存在一個適用於員工角色之資源的拒絕策略，還存在另一個適用於管理員角色之相同資源的允許策略，系統將會拒絕指定給使用者 (員工角色和管理員角色) 的策略決策。</p><p>解決此問題的一種方法為使用條件外掛程式設計策略。在上述情況中，「角色條件」(將拒絕策略套用於認證為員工角色之使用者，並將允許策略套用至認證為經理角色之使用者) 協助區分這兩種策略。另一種方法為使用 <tt>authentication level</tt> 條件，其中管理員角色是在較高認證層級進行認證。</p></li></ul>
+</li>
+<li><b>按一下 [完成]。</b></li></ol>
+<br/>
+
+</body>
+</html>

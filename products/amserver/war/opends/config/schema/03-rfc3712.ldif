@@ -1,0 +1,215 @@
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE
+# or https://OpenDS.dev.java.net/OpenDS.LICENSE.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE.  If applicable,
+# add the following below this CDDL HEADER, with the fields enclosed
+# by brackets "[]" replaced with your own identifying information:
+#      Portions Copyright [yyyy] [name of copyright owner]
+#
+# CDDL HEADER END
+#
+#
+#      Copyright 2006-2008 Sun Microsystems, Inc.
+#
+#
+# This file contains schema definitions from RFC 3712, which defines a
+# mechanism for storing printer information in the Directory Server.
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+attributeTypes: ( 1.3.18.0.2.4.1140 NAME 'printer-uri'
+  DESC 'A URI supported by this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1107 NAME 'printer-xri-supported'
+  DESC 'The unordered list of XRI (extended resource identifiers) supported by
+  this printer.' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1135 NAME 'printer-name'
+  DESC 'The site-specific administrative name of this printer.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127} SINGLE-VALUE
+  X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1119 NAME 'printer-natural-language-configured'
+  DESC 'The configured natural language in which error and status messages will
+  be generated (by default) by this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1136 NAME 'printer-location'
+  DESC 'The physical location of this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1139 NAME 'printer-info'
+  DESC 'Descriptive information about this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1134 NAME 'printer-more-info'
+  DESC 'A URI for more information about this specific printer.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1138 NAME 'printer-make-and-model'
+  DESC 'Make and model of this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1133 NAME 'printer-ipp-versions-supported'
+  DESC 'IPP protocol version(s) that this printer supports.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1132
+  NAME 'printer-multiple-document-jobs-supported'
+  DESC 'Indicates whether or not this printer supports more than one document
+  per job.' EQUALITY booleanMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.7
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1109 NAME 'printer-charset-configured'
+  DESC 'The configured charset in which error and status messages will be
+  generated (by default) by this printer.' EQUALITY caseIgnoreMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{63} SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1131 NAME 'printer-charset-supported'
+  DESC 'Set of charsets supported for the attribute values of syntax
+  DirectoryString for this directory entry.' EQUALITY caseIgnoreMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{63} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1137
+  NAME 'printer-generated-natural-language-supported'
+  DESC 'Natural language(s) supported for this directory entry.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{63} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1130 NAME 'printer-document-format-supported'
+  DESC 'The possible source document formats which may be interpreted and
+  printed by this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1129 NAME 'printer-color-supported'
+  DESC 'Indicates whether this printer is capable of any type of color printing
+  at all, including highlight color.' EQUALITY booleanMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1128 NAME 'printer-compression-supported'
+  DESC 'Compression algorithms supported by this printer.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1127 NAME 'printer-pages-per-minute'
+  DESC 'The nominal number of pages per minute which may be output by this
+  printer.' EQUALITY integerMatch ORDERING integerOrderingMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1126 NAME 'printer-pages-per-minute-color'
+  DESC 'The nominal number of color pages per minute which may be output by
+  this printer.' EQUALITY integerMatch ORDERING integerOrderingMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1125 NAME 'printer-finishings-supported'
+  DESC 'The possible finishing operations supported by this printer.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1124 NAME 'printer-number-up-supported'
+  DESC 'The possible numbers of print-stream pages to impose upon a single side
+  of an instance of a selected medium.' EQUALITY integerMatch
+  ORDERING integerOrderingMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+  X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1123 NAME 'printer-sides-supported'
+  DESC 'The number of impression sides (one or two) and the two-sided
+  impression rotations supported by this printer.' EQUALITY caseIgnoreMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1122 NAME 'printer-media-supported'
+  DESC 'The standard names/types/sizes (and optional color suffixes) of the
+  media supported by this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255}
+  X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1117 NAME 'printer-media-local-supported'
+  DESC 'Site-specific names of media supported by this printer.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1121 NAME 'printer-resolution-supported'
+  DESC 'List of resolutions supported for printing documents by this printer.'
+  EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1120 NAME 'printer-print-quality-supported'
+  DESC 'List of print qualities supported for printing documents on this
+  printer.' EQUALITY caseIgnoreMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1110 NAME 'printer-job-priority-supported'
+  DESC 'Indicates the number of job priority levels supported by this printer.'
+  EQUALITY integerMatch ORDERING integerOrderingMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1118 NAME 'printer-copies-supported'
+  DESC 'The maximum number of copies of a document that may be printed as a
+  single job on this printer.' EQUALITY integerMatch
+  ORDERING integerOrderingMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1111 NAME 'printer-job-k-octets-supported'
+  DESC 'The maximum size in kilobytes (1,024 octets actually) incoming print
+  job that this printer will accept.' EQUALITY integerMatch
+  ORDERING integerOrderingMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1112 NAME 'printer-current-operator'
+  DESC 'The identity of the current human operator responsible for operating
+  this printer.' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127} SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1113 NAME 'printer-service-person'
+  DESC 'The identity of the current human service person responsible for
+  servicing this printer.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  SINGLE-VALUE X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1114
+  NAME 'printer-delivery-orientation-supported'
+  DESC 'The possible delivery orientations of pages as they are printed and
+  ejected from this printer.' EQUALITY caseIgnoreMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1115 NAME 'printer-stacking-order-supported'
+  DESC 'The possible stacking order of pages as they are printed and ejected
+  from this printer.' EQUALITY caseIgnoreMatch
+  SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127} X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1116 NAME 'printer-output-features-supported'
+  DESC 'The possible output features supported by this printer.'
+  EQUALITY caseIgnoreMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  X-ORIGIN 'RFC 3712' )
+attributeTypes: ( 1.3.18.0.2.4.1108 NAME 'printer-aliases'
+  DESC 'List of site-specific administrative names of this printer in addition
+  to the value specified for printer-name.' EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+  X-ORIGIN 'RFC 3712' )
+objectClasses: ( 1.3.18.0.2.6.254 NAME 'slpServicePrinter'
+  DESC 'Service Location Protocol (SLP) information.' AUXILIARY SUP slpService
+  X-ORIGIN 'RFC 3712' )
+objectClasses: ( 1.3.18.0.2.6.258 NAME 'printerAbstract'
+  DESC 'Printer related information.' ABSTRACT SUP top
+  MAY ( printer-name $ printer-natural-language-configured $
+  printer-location $ printer-info $ printer-more-info $
+  printer-make-and-model $ printer-multiple-document-jobs-supported $
+  printer-charset-configured $ printer-charset-supported $
+  printer-generated-natural-language-supported $
+  printer-document-format-supported $ printer-color-supported $
+  printer-compression-supported $ printer-pages-per-minute $
+  printer-pages-per-minute-color $ printer-finishings-supported $
+  printer-number-up-supported $ printer-sides-supported $
+  printer-media-supported $ printer-media-local-supported $
+  printer-resolution-supported $ printer-print-quality-supported $
+  printer-job-priority-supported $ printer-copies-supported $
+  printer-job-k-octets-supported $ printer-current-operator $
+  printer-service-person $ printer-delivery-orientation-supported $
+  printer-stacking-order-supported $ printer-output-features-supported )
+  X-ORIGIN 'RFC 3712' )
+objectClasses: ( 1.3.18.0.2.6.255 NAME 'printerService'
+  DESC 'Printer information.' STRUCTURAL SUP printerAbstract
+  MAY ( printer-uri $ printer-xri-supported ) X-ORIGIN 'RFC 3712' )
+objectClasses: ( 1.3.18.0.2.6.257 NAME 'printerServiceAuxClass'
+  DESC 'Printer information.' AUXILIARY SUP printerAbstract
+  MAY ( printer-uri $ printer-xri-supported ) X-ORIGIN 'RFC 3712' )
+objectClasses: ( 1.3.18.0.2.6.256 NAME 'printerIPP'
+  DESC 'Internet Printing Protocol (IPP) information.' AUXILIARY SUP top
+  MAY ( printer-ipp-versions-supported $
+  printer-multiple-document-jobs-supported ) X-ORIGIN 'RFC 3712' )
+objectClasses: ( 1.3.18.0.2.6.253 NAME 'printerLPR' DESC 'LPR information.'
+  AUXILIARY SUP top MUST ( printer-name ) MAY ( printer-aliases )
+  X-ORIGIN 'RFC 3712' )
+

@@ -1,0 +1,6 @@
+DESCRIPTION 'ISAPI Filter Agent for DSAME policy'
+
+EXPORTS
+	GetFilterVersion
+	HttpFilterProc
+	TerminateFilter

@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>So konfigurieren Sie einen Anforderungs-Handler - Online-Hilfe zur Sun OpenSSO 8.0-Konsole
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>So konfigurieren Sie einen Anforderungs-Handler</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p>Die <tt>RequestHandler</tt>-Schnittstelle muss von jedem SAMLv2 -Dienst, der SOAP Binding-Dienst verwendet, auf
+der Serverseite implementiert werden. Das Attribut "Anforderungs-Handler-Liste" speichert Informationen &#252;ber die Implementierungsklassen,
+die den Anforderungs-Handler implementieren.  Die Anforderungs-Handler-Liste zeigt Eintr&#228;ge an, die Schl&#252;ssel/Wert-Paare
+enthalten.</p><ol>
+<li><b>Klicken Sie auf "Neu", um die neuen Anforderungshandler-Attribute anzuzeigen, oder klicken Sie
+auf einen konfigurierten Schl&#252;sselwert, um vorhandene Attribute zu bearbeiten.</b></li>
+<li><b>Legen Sie die Attributwerte entsprechend der folgenden Informationen fest:</b><dl><dt>key</dt>
+<dd><p>Der <i>Schl&#252;ssel</i> ist der Meta-Alias des Policy Decision Point. </p></dd>
+<dt>Klasse</dt>
+<dd><p>Die <i>KLasse</i> ist der Name der Java-Klasse, bei der es sich um die Implementierung der Anforderungs-Handler-Schnitttelle handelt, die XACML-Anforderungen verarbeiten kann </p></dd>
+</dl>
+</li>
+<li><b>Klicken Sie auf "OK", um die Konfiguration des Anforderungs-Handlers abzuschlie&#223;en.</b></li>
+<li><b>Klicken Sie auf der SAMLv2 SOAP Binding-Seite auf "Speichern", um die Konfiguration
+des Dienstes abzuschlie&#223;en.</b></li></ol>
+<br/>
+
+</body>
+</html>

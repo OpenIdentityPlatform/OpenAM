@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>ID-FF Identity Provider Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.idffidp"></a><h4>ID-FF Identity Provider Customization</h4>
+<p>The ID-FF identity provider attributes are grouped as follows:</p>
+<ul><li><p><a href="#ggwkz">Common Attributes</a></p></li>
+<li><p><a href="#ggwne">Communication URLs</a></p></li>
+<li><p><a href="#ggwms">Communication Profiles</a></p></li>
+<li><p><a href="#ggwnv">Identity Provider Configuration</a></p></li>
+<li><p><a href="#ggwmr">Service URL</a></p></li>
+<li><p><a href="#ggwqu">Plug-ins</a></p></li>
+<li><p><a href="#ggwow">Identity Provider Attribute Mapper</a></p></li>
+<li><p><a href="#ggwmp">Bootstrapping</a></p></li>
+<li><p><a href="#ggwor">Auto Federation </a></p></li>
+<li><p><a href="#ggwnn">Authentication Context</a></p></li>
+<li><p><a href="#ggwmz">SAML Attributes</a></p></li></ul>
+
+
+<a name="ggwkz"></a><h5>Common Attributes</h5>
+
+<ul><li><p><a href="#ggwqt">Provider Type</a></p></li>
+<li><p><a href="#ggwpg">Description</a></p></li>
+<li><p><a href="#ggwqp">Protocol Support Enumeration</a></p></li>
+<li><p><a href="#ggwra">Signing Key</a></p></li>
+<li><p><a href="#ggwob">Encryption Key</a></p></li>
+<li><p><a href="#ggwmo">Name Identifier Encryption</a></p></li></ul>
+
+
+<a name="ggwqt"></a><h5>Provider Type</h5>
+<p>The static value of this attribute is the type of provider being configured:
+hosted or remote</p>
+
+<a name="ggwpg"></a><h5>Description</h5>
+<p>The value of this attribute is a description of the identity provider.</p>
+
+<a name="ggwqp"></a><h5>Protocol Support Enumeration</h5>
+<p>Choose the Liberty ID-FF release that is supported by this provider.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> refers to the Liberty Identity Federation Framework Version 1.2.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> refers to the Liberty Identity Federation Framework Version 1.1.</p></li></ul>
+
+
+<a name="ggwra"></a><h5>Signing Key</h5>
+<p>Defines the security certificate alias that is used to sign requests and responses.</p>
+
+<a name="ggwob"></a><h5>Encryption Key</h5>
+<p>Defines the security certificate alias that is used for encryption for the Signing
+Key and Encryption Key. Certificates are stored in a Java keystore file. Each
+specific certificate is mapped to an alias that is used to fetch the
+certificate.</p>
+
+<a name="ggwmo"></a><h5>Name Identifier Encryption</h5>
+<p>Select the check box to enable encryption of the name identifier.</p>
+
+<a name="ggwne"></a><h5>Communication URLs</h5>
+
+<ul><li><p><a href="#ggwqz">SOAP Endpoint</a></p></li>
+<li><p><a href="#ggwls">Single Sign-on Service URL</a></p></li>
+<li><p><a href="#ggwoh">Single Logout Service </a></p></li>
+<li><p><a href="#ggwln">Single Logout Return</a></p></li>
+<li><p><a href="#ggwpl">Federation Termination Service</a></p></li>
+<li><p><a href="#ggwna">Federation Termination Return</a></p></li>
+<li><p><a href="#ggwqn">Name Registration Service</a></p></li>
+<li><p><a href="#ggwmy">Name Registration Return</a></p></li></ul>
+
+
+<a name="ggwqz"></a><h5>SOAP Endpoint</h5>
+<p>Defines a URI to the identity provider&#8217;s SOAP message receiver. This value communicates
+the location of the SOAP receiver in non browser communications.</p>
+
+<a name="ggwls"></a><h5>Single Sign-on Service URL</h5>
+<p>Defines a URL to which service providers can send single sign-on and federation
+requests.</p>
+
+<a name="ggwoh"></a><h5>Single Logout Service </h5>
+<p>Defines a URL to which service providers can send logout requests. Single logout
+synchronizes the logout functionality across all sessions authenticated by the identity provider.</p>
+
+<a name="ggwln"></a><h5>Single Logout Return</h5>
+<p>Defines a URL to which the service providers can send single logout responses.
+</p>
+
+<a name="ggwpl"></a><h5>Federation Termination Service</h5>
+<p>Defines a URL to which a service provider will send federation termination requests.</p>
+
+<a name="ggwna"></a><h5>Federation Termination Return</h5>
+<p>Defines a URL to which the service providers can send federation termination responses.
+</p>
+
+<a name="ggwqn"></a><h5>Name Registration Service</h5>
+<p>Defines a URL to which a service provider will send requests to specify
+a new name identifier to be used when communicating with the identity provider
+about a principal. This service can only be used after a federation session
+is established.</p>
+
+<a name="ggwmy"></a><h5>Name Registration Return</h5>
+<p>Defines a URL to which the service providers can send name registration responses.</p>
+
+<a name="ggwms"></a><h5>Communication Profiles</h5>
+
+<ul><li><p><a href="#ggwol">Federation Termination</a></p></li>
+<li><p><a href="#ggwlm">Single Logout</a></p></li>
+<li><p><a href="#ggwng">Name Registration</a></p></li>
+<li><p><a href="#ggwoo">Single Sign-on/Federation</a></p></li></ul>
+
+
+<a name="ggwol"></a><h5>Federation Termination</h5>
+<p>Select a profile to notify other providers of a principal&#8217;s federation termination:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwlm"></a><h5>Single Logout</h5>
+<p>Select a profile to notify other providers of a principal&#8217;s logout:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>HTTP Get</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwng"></a><h5>Name Registration</h5>
+<p>Select a profile to notify other providers of a principal&#8217;s name registration:</p>
+<ul><li><p>HTTP Redirect</p></li>
+<li><p>SOAP</p></li></ul>
+
+
+<a name="ggwoo"></a><h5>Single Sign-on/Federation</h5>
+<p>Select a profile for sending authentication requests:</p>
+<ul><li><p>Browser Post (specifies a browser-based HTTP POST protocol)</p></li>
+<li><p>Browser Artifact (specifies a non-browser SOAP-based protocol)</p></li>
+<li><p>LECP (specifies a Liberty-enabled Client Proxy)</p>
+<hr><p><b>Note &#8211; </b>OpenSSO can handle requests that come from a Liberty-enabled client proxy profile, but it requires additional configuration that is beyond the scope of this manual.</p>
+<hr>
+</li></ul>
+
+
+<a name="ggwnv"></a><h5>Identity Provider Configuration</h5>
+
+<ul><li><p><a href="#ggwpf">Provider Alias</a></p></li>
+<li><p><a href="#ggwoz">Authentication Type</a></p></li>
+<li><p><a href="#ggwmt">Assertion Issuer</a></p></li>
+<li><p><a href="#ggwys">Responds With</a></p></li>
+<li><p><a href="#ggwmv">Provider Status</a></p></li></ul>
+
+
+<a name="ggwpf"></a><h5>Provider Alias</h5>
+<p>Defines the alias name for the local identity provider.</p>
+
+<a name="ggwoz"></a><h5>Authentication Type</h5>
+<p>Select the provider that should be used for authentication requests from a provider
+hosted locally:</p>
+<ul><li><p><b>Remote</b> specifies that the provider hosted locally would contact a remote identity provider upon receiving an authentication request.</p></li>
+<li><p><b>Local</b> specifies that the provider hosted locally should contact a local identity provider upon receiving an authentication request (essentially, itself).</p></li></ul>
+
+
+<a name="ggwmt"></a><h5>Assertion Issuer</h5>
+<p>Defines the name of the host that issues the assertion. This value might
+be the load balancer's host name if OpenSSO is behind one.</p>
+
+<a name="ggwys"></a><h5>Responds With</h5>
+<p>Specifies the type of statements the identity provider can generate. For example 
+<tt>lib:AuthenticationStatement</tt>.</p>
+
+<a name="ggwmv"></a><h5>Provider Status</h5>
+<p>Defines whether the identity provider is active or inactive. Active, the default, means
+the identity provider can process requests and generate responses. </p>
+
+<a name="ggwmr"></a><h5>Service URL</h5>
+
+<ul><li><p><a href="#ggwlo">Home Page URL</a></p></li>
+<li><p><a href="#ggwnh">Single Sign-on Failure Redirect URL</a></p></li>
+<li><p><a href="#ggwnq">Federate Page URL</a></p></li>
+<li><p><a href="#ggwqh">Registration Done URL</a></p></li>
+<li><p><a href="#ggwmu">List of COTs Page URL</a></p></li>
+<li><p><a href="#ggwqk">Termination URL</a></p></li>
+<li><p><a href="#ggwqb">Termination Done URL</a></p></li>
+<li><p><a href="#ggwme">Error Page URL</a></p></li>
+<li><p><a href="#ggwon">Logout Done URL</a></p></li></ul>
+
+
+<a name="ggwlo"></a><h5>Home Page URL</h5>
+<p>Defines the URL of the home page of the identity provider.</p>
+
+<a name="ggwnh"></a><h5>Single Sign-on Failure Redirect URL</h5>
+<p>Defines the URL to which a principal will be redirected if single sign-on
+has failed.</p>
+
+<a name="ggwnq"></a><h5>Federate Page URL</h5>
+<p>Specifies the URL which performs the federation operation. </p>
+
+<a name="ggwqh"></a><h5>Registration Done URL</h5>
+<p>Defines the URL to which a principal will be directed upon successful Federation
+registration.</p>
+
+<a name="ggwmu"></a><h5>List of COTs Page URL</h5>
+<p>Defines the URL that lists all of the circle of trusts to
+which the provider belongs.</p>
+
+<a name="ggwqk"></a><h5>Termination URL</h5>
+<p>Defines the URL to which a principal is directed upon Federation termination.</p>
+
+<a name="ggwqb"></a><h5>Termination Done URL</h5>
+<p>Defines the URL to which a principal is redirected after federation termination is
+completed.</p>
+
+<a name="ggwme"></a><h5>Error Page URL</h5>
+<p>Defines the URL to which a principal is directed upon an error.
+</p>
+
+<a name="ggwon"></a><h5>Logout Done URL</h5>
+<p>Defines the URL to which a principal is directed after logout.</p>
+
+<a name="ggwqu"></a><h5>Plug-ins</h5>
+
+<ul><li><p><a href="#ggwmm">Name Identifier Implementation</a></p></li>
+<li><p><a href="#ggwlq">Attribute Statement Plug-in</a></p></li>
+<li><p><a href="#ggwpm">User Provider Class</a></p></li></ul>
+
+
+<a name="ggwmm"></a><h5>Name Identifier Implementation</h5>
+<p>This field defines the class used by an identity provider to participate in
+name registration. Name registration is a profile by which service providers specify a
+principal&#8217;s name identifier that an identity provider will use when communicating with the
+service provider. The value is <tt>com.sun.identity.federation.services.util.FSNameIdentifierImpl</tt>.</p>
+
+<a name="ggwlq"></a><h5>Attribute Statement Plug-in</h5>
+<p>Specifies a plug-able class used for adding attribute statements to an assertion that
+is generated during the Liberty-based single sign-on process.</p>
+
+<a name="ggwpm"></a><h5>User Provider Class</h5>
+<p>Specifies a plug-able class used to provide user operations such as finding a
+user, getting user attributes, and so forth . The default value is: </p><p><tt>com.sun.identity.federation.accountmgmt.DefaultFSUserProvider</tt> </p>
+
+<a name="ggwow"></a><h5>Identity Provider Attribute Mapper</h5>
+
+<ul><li><p><a href="#ggwpa">Attribute Mapper Class</a></p></li>
+<li><p><a href="#ggwmn">Identity Provider Attribute Mapping</a></p></li></ul>
+
+
+<a name="ggwpa"></a><h5>Attribute Mapper Class</h5>
+<p>The class used to map user attributes defined locally to attributes in the
+SAML assertion. There is no default class.</p>
+
+<a name="ggwmn"></a><h5>Identity Provider Attribute Mapping</h5>
+<p>Specify values to define the mappings used by the default attribute mapper plug-in.
+Mappings should be configured in the format:</p><p><i>SAML-attribute</i>=<i>local-attribute</i></p><p>For example, <tt>Email=emailaddress</tt> or <tt>Address=postaladdress</tt>. Type the mapping as a New Value
+and click Add.</p>
+
+<a name="ggwmp"></a><h5>Bootstrapping</h5>
+<p>The bootstrapping attribute is:</p>
+
+<a name="ggwqa"></a><h5>Generate Discovery Bootstrapping Resource Offering</h5>
+<p>Select the check box if you want a Discovery Service Resource Offering to
+be generated during the Liberty-based single sign-on process for bootstrapping purposes.</p>
+
+<a name="ggwor"></a><h5>Auto Federation </h5>
+
+<ul><li><p><a href="#ggwpc">Auto Federation</a></p></li>
+<li><p><a href="#ggwqf">Auto Federation Common Attribute Name</a></p></li></ul>
+
+
+<a name="ggwpc"></a><h5>Auto Federation</h5>
+<p>Select the check box to enable auto-federation.</p>
+
+<a name="ggwqf"></a><h5>Auto Federation Common Attribute Name</h5>
+<p>When creating an Auto Federation Attribute Statement, the value of this attribute will
+be used. The statement will contain the attribute element and this common attribute
+as its value. </p>
+
+<a name="ggwnn"></a><h5>Authentication Context</h5>
+<p>This attribute defines the identity provider's default authentication context class (method of authentication).
+This method will always be called when the service provider sends an authentication
+request. This value also specifies the authentication context used by the service provider when
+an unknown user tries to access a protected resource.</p><dl><dt>Supported</dt>
+<dd><p>Select the check box next to the authentication context class if the identity provider supports it.</p></dd>
+<a name="indexterm-71"></a><a name="indexterm-72"></a><a name="indexterm-73"></a><dt>Context Reference</dt>
+<dd><p>The Liberty-defined authentication context classes are:</p>
+<ul><li><p>Mobile Contract</p></li>
+<li><p>Mobile Digital ID</p></li>
+<li><p>MobileUnregistered</p></li>
+<li><p>Password</p></li>
+<li><p>Password-ProtectedTransport</p></li>
+<li><p>Previous-Session</p></li>
+<li><p>Smartcard</p></li>
+<li><p>Smartcard-PKI</p></li>
+<li><p>Software-PKI</p></li>
+<li><p>Time-Sync-Token</p></li></ul>
+</dd>
+<dt>Key</dt>
+<dd><p>Choose the OpenSSO authentication type to which the context is mapped.</p></dd>
+<dt>Value</dt>
+<dd><p>Type the OpenSSO authentication option.</p></dd>
+<dt>Level</dt>
+<dd><p>Choose a priority level for cases where there are multiple contexts.</p></dd>
+</dl>
+
+
+<a name="ggwmz"></a><h5>SAML Attributes</h5>
+
+<ul><li><p><a href="#ggwnd">Assertion Interval</a></p></li>
+<li><p><a href="#ggwqq">Cleanup Interval</a></p></li>
+<li><p><a href="#ggwlp">Artifact Timeout</a></p></li>
+<li><p><a href="#ggwoe">Assertion Limit</a></p></li></ul>
+
+
+<a name="ggwnd"></a><h5>Assertion Interval</h5>
+<p>Type the interval of time (in seconds) that an assertion issued by the
+identity provider will remain valid. </p>
+
+<a name="ggwqq"></a><h5>Cleanup Interval</h5>
+<p>Type the interval of time (in seconds) before a cleanup is performed to
+expired assertions.</p>
+
+<a name="ggwlp"></a><h5>Artifact Timeout</h5>
+<p>Type the interval of time (in seconds) to specify the timeout for assertion
+artifacts.</p>
+
+<a name="ggwoe"></a><h5>Assertion Limit</h5>
+<p>Type a number to define how many assertions an identity provider can issue,
+or how many assertions that can be stored.</p>
+<br/>
+
+</body>
+</html>

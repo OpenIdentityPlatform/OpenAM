@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><!-- GenHTML@14981-->
+<head>
+  <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=EUC-JP">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>データストア
+  </title>
+  <script type="text/javascript" src="/com_sun_web_ui/js/browserVersion.js"></script>
+  <script type="text/javascript" src="/com_sun_web_ui/js/stylesheet.js"></script>
+  <script type="text/javascript"><!-- Empty script so IE5.0 Windows will draw table and button borders --></script>
+  <meta name="Copyright" content="Copyright &copy; 2006 by Sun Microsystems, Inc. All Rights Reserved." />
+</head>
+
+<body class="HlpBdy">
+
+<A NAME="datastore"></A><h2>データストア</h2>
+<p><A NAME="indexterm-10"></A><A NAME="indexterm-11"></A>データストアは、ユーザー属性とユーザー設定データを格納することができるデータベースです。</p>
+<p>Access Manager には、LDAPv3 アイデンティティーリポジトリフレームワークに接続するアイデンティティーリポジトリプラグインが用意されています。この新しいモデルでは、既存のユーザーデータベースに変更を加えることなく、Access Manager のユーザー情報を表示したり取得したりできます。Access Manager フレームワークは、アイデンティティーリポジトリプラグインからのデータとほかの Access Manager プラグインからのデータを統合して、各ユーザーの仮想アイデンティティーを形成します。その後 Access Manager は、複数のアイデンティティーリポジトリの間で、この汎用アイデンティティーを認証プロセスや承認プロセスに使用できます。仮想ユーザーアイデンティティーは、ユーザーのセッションが終了したときに破棄されます。</p>
+<p>新しいデータストアの作成方法とリポジトリプラグインの設定方法については、<A HREF="datastore.html#realm.idrepo">「新しい LDAPv3 データストアを作成する」</A>を参照してください。</p>
+<p>Access Manager をレルムモードでインストールした場合は、Access Manager SDK を設定して Directory Server データを管理できます。<A HREF="amsdkrepo.html#amsdkrepo">「新しい Access Manager リポジトリプラグインの作成」</A>を参照してください。</p>
+<A NAME="realm.idrepo"></A><h3><IMG border="0" alt="Procedure" src="graphics/procedure.gif">新しい LDAPv3 データストアを作成する</h3>
+<ol><li><p><b><A NAME="indexterm-12"></A>新しいデータストアを追加するレルムを選択します。</b></p></li>
+<li><p><b>「データストア」タブをクリックします。</b></p></li>
+<li><p><b>「データストア」リストの「新規」をクリックします。</b></p></li>
+<li><p><b>データストアの名前を入力します。</b></p></li>
+<li><p><b>LDAPv3 リポジトリプラグインの属性を定義します。属性の説明は、<A HREF="realm.idrepoadd.html#realm.idrepoadd">「LDAPv3 リポジトリプラグインの属性」</A>を参照してください。</b></p></li>
+<li><p><b>「終了」をクリックします。</b></p></li>
+</ol>
+<br />
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>请求处理程序列表 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="requesthandlerlist"></a><h4>请求处理程序列表</h4>
+<a name="indexterm-151"></a><a name="indexterm-152"></a><p>SOAP 绑定服务提供 <tt>RequestHandler</tt> 接口以处理请求消息和返回响应。此接口必须由每一个使用 SOAP 绑定服务且基于 Liberty 的身份服务在服务器端实现。请求处理程序列表属性存储有关实现请求处理程序的 Web 服务实现类的信息。请求处理程序列表显示的条目包含用竖线分隔的关键字/值对，格式如下：<tt>key=disco|class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>。这些参数将在以下表格中加以说明。</p><table><col width="50%"><col width="50%"><tr><th align="left" valign="top" scope="column"><p>参数</p></th>
+<th align="left" valign="top" scope="column"><p>标头</p></th>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>关键字</tt></p></td>
+<td align="left" valign="top" scope="row"><p><tt>关键字</tt>参数是必填参数，它是 SOAP 端点
+URI 路径的最后一部分。OpenSSO 中的 SOAP 端点是 SOAP 接收方 servlet。SOAP 接收方的 URI 为：<tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/</tt><i>deploy-uri</i><tt>/Liberty/key</b></tt>。如果您将 <tt><b>disco</b></tt>
+定义为关键字，则相应搜索服务的 SOAP 端点 URI 路径应为：<tt><b></tt><i> protocol</i><tt>://</tt><i>host</i><tt>:</tt><i>port </i><tt>/amserver/Liberty/disco</b></tt>。在与 SOAP 接收方连接时，不同的服务客户机使用的关键字不同。</p></td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><tt>类</tt></p></td>
+<td align="left" valign="top" scope="row"><p><tt>类</tt>参数是必填参数，它用于为特定身份服务指定请求处理程序实现类的名称。例如：<tt>class=com.example.identity.liberty.ws.disco.DiscoveryService</tt>。</p></td>
+</tr>
+</table><p>要添加新的“请求处理程序”，参见<a href="service.scsoapbindingrequesthandlerlistadd.html">配置请求处理程序</a>。</p>
+<br/>
+
+</body>
+</html>

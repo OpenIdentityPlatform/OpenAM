@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+
+
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthUnixService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthUnixService"
+            i18nFileName="amAuthUnix"
+	    revisionNumber="30"
+            i18nKey="iplanet-am-auth-unix-service-description">
+
+	    <Global>
+                <AttributeSchema name="iplanet-am-auth-unix-config-port"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>58946</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="iplanet-am-auth-unix-helper-port"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a102">
+                    <DefaultValues>
+                        <Value>57946</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="iplanet-am-auth-unix-helper-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>3</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="iplanet-am-auth-unix-helper-threads"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a104">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+	    </Global>
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-unix-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a105">
+                    <DefaultValues>
+                        <Value>4</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+		<AttributeSchema name="iplanet-am-auth-unix-pam-service-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a106">
+                    <DefaultValues>
+                        <Value>PAM_SERVICE_NAME</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+		<SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="iplanet-am-auth-unix-auth-level"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a105">
+                        <DefaultValues>
+                            <Value>4</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+		    <AttributeSchema name="iplanet-am-auth-unix-pam-service-name"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a106">
+                        <DefaultValues>
+                            <Value>PAM_SERVICE_NAME</Value>
+                        </DefaultValues>
+                </AttributeSchema>
+		</SubSchema>
+            </Organization>
+
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+
+
+
+
+

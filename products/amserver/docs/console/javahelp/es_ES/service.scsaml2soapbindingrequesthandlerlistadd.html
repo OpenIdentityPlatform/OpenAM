@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para configurar un administrador de solicitudes - Ayuda en l&#237;nea de la consola de Sun OpenSSO 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbindingrequesthandlerlistadd"></a><h5>Para configurar un administrador de solicitudes</h5>
+<a name="indexterm-194"></a><a name="indexterm-195"></a><p>La interfaz <tt>RequestHandler</tt> debe implementarse en el servidor por parte de cada
+servicio SAMLv2 que utilice el Servicio de enlace de SOAP. El atributo
+&#8220;Lista de administradores de solicitudes&#8221; guarda informaci&#243;n sobre las clases de implementaci&#243;n
+que implementa el administrador de solicitudes.  La Lista de administradores de
+solicitudes muestra entradas que contienen pares clave/valor.</p><ol>
+<li><b>Haga clic en Nuevo para ver los atributos del nuevo administrador de
+solicitudes o haga clic en un valor de clave configurado para modificar
+los atributos existentes.</b></li>
+<li><b>Proporcione los valores de los atributos seg&#250;n la siguiente informaci&#243;n:</b><dl><dt>key</dt>
+<dd><p>La <i>Clave</i> es el alias meta del Punto de decisi&#243;n de directivas. </p></dd>
+<dt>class</dt>
+<dd><p>La <i>Clase</i> es el nombre de clase Java, que es la implementaci&#243;n de la interfaz RequestHandler que puede procesar solicitudes XACML. </p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Aceptar para completar la configuraci&#243;n del administrador de solicitudes.</b></li>
+<li><b>Haga clic en Guardar en la p&#225;gina de enlace SAMLv2 SOAP para
+completar la configuraci&#243;n del servicio.</b></li></ol>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,3010 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris Sparc)">
+	<META NAME="CREATED" CONTENT="20080130;7101600">
+	<META NAME="CHANGEDBY" CONTENT="Michael Teger">
+	<META NAME="CHANGED" CONTENT="20080130;7103800">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<CENTER>
+	<TABLE WIDTH=1332 BORDER=1 CELLPADDING=2 CELLSPACING=3 FRAME=VOID RULES=GROUPS STYLE="page-break-before: always">
+		<COLGROUP>
+			<COL WIDTH=50>
+			<COL WIDTH=40>
+			<COL WIDTH=40>
+			<COL WIDTH=4>
+			<COL WIDTH=16>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=17>
+			<COL WIDTH=0>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=14>
+			<COL WIDTH=0>
+			<COL WIDTH=0>
+			<COL WIDTH=90>
+			<COL WIDTH=29>
+			<COL WIDTH=68>
+			<COL WIDTH=147>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=1>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=30>
+			<COL WIDTH=19>
+			<COL WIDTH=0>
+			<COL WIDTH=132>
+			<COL WIDTH=0>
+			<COL WIDTH=3>
+			<COL WIDTH=29>
+		</COLGROUP>
+		<COLGROUP>
+			<COL WIDTH=1>
+			<COL WIDTH=102>
+			<COL WIDTH=0>
+			<COL WIDTH=0>
+			<COL WIDTH=337>
+		</COLGROUP>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<P><IMG SRC="../../../images/logo.gif" NAME="graphics1" ALT="Open Federation" ALIGN=BOTTOM WIDTH=179 HEIGHT=68 BORDER=0></P>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<H2>How Do I... FAQ</H2>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<OL>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#IDFFsample">How
+						do I set up and run the Liberty ID-FF sample?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#IDWSFsample">How
+						do I set up and run the Liberty ID-WSF sample?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#turnonsaml1">How
+						do I turn on signing using SAML v1.x?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#turnonIDFFsigning">How
+						do I turn on signing using the Liberty ID-FF?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#keystore">How
+						do I setup a keystore?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><A HREF="#setupsaml1"><FONT SIZE=2>How
+						do I setup single sign-on using SAML v1.x and the </FONT><CODE><FONT SIZE=2>famadm</FONT></CODE><FONT SIZE=2>
+						command line interface?</FONT></A><FONT SIZE=2> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><A HREF="#setupFFSSO"><FONT SIZE=2>How
+						do I set up single sign-on using the Liberty ID-FF and the
+						</FONT><CODE><FONT SIZE=2>famadm</FONT></CODE><FONT SIZE=2>
+						command line interface?</FONT></A><FONT SIZE=2> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><A HREF="#setupsaml2"><FONT SIZE=2>How
+						do I setup single sign-on using SAML v2 and the </FONT><CODE><FONT SIZE=2>famadm</FONT></CODE><FONT SIZE=2>
+						command line interface?</FONT></A><FONT SIZE=2> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#turnonsaml2">How
+						do I turn on signing and encryption using SAML v2?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#setupauth">How
+						do I setup authentication using the Authentication Web Service?</A>
+						</FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#discotokens">How
+						do I setup the Discovery Service to issue X509, Bearer, and
+						SAML tokens?</A> </FONT>
+						</P>
+						<LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="#pa3profile">How
+						do I setup a profile for Policy Agents 3.0 using famadm CLI?</A>
+						</FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#configdsfailover">How do I setup
+						the OpenSSO configuration data store for failover?</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#websphereAIX">How do I deploy OpenSSO on Websphere 6.1 for AIX?</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#authws1">How do I configure for authentication on OpenSSO using an identity web service?</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#authws2">How do I configure for authorization on OpenSSO using an identity web service?</A> </FONT>
+						</P>
+						<LI><P><FONT SIZE=2><A HREF="#idpproxy">How do I setup a SAMLv2 IDP Proxy?</A> </FONT>
+						</P>
+                                                <LI><P><FONT SIZE=2><A HREF="#confwithout">How do I configure OpenSSo without using <code>configurator.jsp</code>?</A></FONT>
+                                                </P>
+
+                                                <LI><P STYLE="margin-bottom: 0in"><FONT SIZE=2><A HREF="https://opensso.dev.java.net/public/about/faqcenter/sessionupgradeSAML2.html">How do I upgrade a SAMLv2 session when the resource is protected by a J2EE policy agent?</a>
+                                                </P> 
+					</OL>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<P><A NAME="IDFFsample"></A><B>Q: How do I set up and run the
+					Liberty ID-FF sample?</B></P>
+					<P>The Liberty ID-FF sample demonstrates the interactions
+					involved when federating one user between two instances of
+					OpenSSO using ID-FF protocol. There are two parts to deploying
+					and running the Liberty ID-FF sample. Make sure you complete the
+					procedures documented in both of the following sections: 
+					</P>
+					<UL>
+						<LI><P><A HREF="#setupIDFFsample">How do I set up the Liberty
+						ID-FF sample?</A> 
+						</P>
+						<LI><P><A HREF="#runIDFFsample">How do I run the Liberty ID-FF
+						sample?</A> 
+						</P>
+					</UL>
+					<P><A NAME="setupIDFFsample"></A><B>How do I set up the Liberty
+					ID-FF sample?</B> 
+					</P>
+					<P>To set up the Liberty ID-FF sample, you need access to two
+					running instances of Open Federation. You will deploy and
+					configure the <CODE>opensso.war</CODE> on each instance. 
+					</P>
+					<UL>
+						<LI><P><I>machine-IDP</I> will be configured as the identity
+						provider. 
+						</P>
+						<LI><P><I>machine-SP</I> will be configured as the service
+						provider. 
+						</P>
+					</UL>
+					<HR>
+					<H3><FONT FACE="Times New Roman, serif">BEFORE YOU BEGIN</FONT></H3>
+					<P><FONT FACE="Times New Roman, serif">If <I>machine-IDP</I> and
+					<I>machine-SP</I> are running on the same physical machine but
+					using two web containers running on different ports, make sure
+					of the following: </FONT>
+					</P>
+					<UL>
+						<LI><P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">Each
+						instance of the sample WAR is deployed using a different URI. </FONT>
+						</P>
+						<LI><P><FONT FACE="Times New Roman, serif">The default cookie
+						name of one of the instances is changed. For example, you can
+						goto console on <I>machine-IDP</I> to change the cookie name to
+						a non-default value (default is &quot;iPlanetDirectoryPro&quot;).
+						Restart the web container to complete the process. </FONT>
+						</P>
+					</UL>
+					<HR>
+					<P>Following is the procedure to deploy the Liberty ID-FF sample
+					WAR. <A HREF="#runIDFFsample">How do I run the Liberty ID-FF
+					sample?</A> describes how to run it. 
+					</P>
+					<OL>
+						<LI><P>Download the <CODE>opensso.war</CODE> or build the WAR
+						from the workspace. 
+						</P>
+						<LI><P>Deploy <CODE>opensso.war</CODE> on <I>machine-IDP</I>.</P>
+						<P>This instance will be configured as the identity provider. 
+						</P>
+						<LI><P>Access the configurator page on <I>machine-IDP</I> at: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE>
+												</P>
+						<P>Enter the appropriate values to configure this instance. 
+						</P>
+						<LI><P>Deploy <CODE>opensso.war</CODE> on <I>machine-SP</I>.</P>
+						<P>This instance will be configured as the service provider. 
+						</P>
+						<LI><P>Access the configurator page on <I>machine-SP</I> at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE>
+												</P>
+						<P>Enter the appropriate values to configure this instance. 
+						</P>
+						<LI><P>Access the sample's <CODE>configure.jsp</CODE> on
+						<I>machine-IDP</I> at: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE><CODE>/samples/idff/idp/configure.jsp</CODE>
+												</P>
+						<P>Enter values for the following fields regarding the remote
+						service provider and click Configure when finished. 
+						</P>
+					</OL>
+				</TD>
+			</TR>
+			<TR>
+				<TD ROWSPAN=4 WIDTH=50 VALIGN=TOP></TD>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Protocol</P>
+				</TD>
+				<TD COLSPAN=9 WIDTH=409>
+					<P>Protocol used by <I>machine-SP</I> (for example, <CODE>http</CODE>
+					or <CODE>https</CODE>)</P>
+				</TD>
+				<TD ROWSPAN=4 COLSPAN=13 WIDTH=720 VALIGN=TOP></TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Host</P>
+				</TD>
+				<TD COLSPAN=9 WIDTH=409>
+					<P>Host name for for <I>machine-SP</I></P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Port</P>
+				</TD>
+				<TD COLSPAN=9 WIDTH=409>
+					<P>Port number for for <I>machine-SP</I></P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Deployment URI</P>
+				</TD>
+				<TD COLSPAN=9 WIDTH=409>
+					<P>Deployment URI for <I>machine-SP</I> (for example, <CODE>/sp</CODE>)</P>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<OL START=6>
+						<P>Following these configurations <I>machine-IDP</I> is
+						configured as the hosted identity provider available at: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE>
+												</P>
+						<P>and 
+						</P>
+						<P><I>machine-SP</I> is configured as the remote service
+						provider available at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE>
+												</P>
+						<P>Additionally, a circle of trust named <CODE>sampleidffcot</CODE>
+						has been created and the two providers are assigned as members.
+												</P>
+						<LI><P>Access the sample's <CODE>configure.jsp</CODE> on
+						<I>machine-SP</I> at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/samples/idff/sp/configure.jsp</CODE>
+												</P>
+						<P>Enter values for the following fields regarding the remote
+						identity provider and click Configure when finished. 
+						</P>
+					</OL>
+				</TD>
+			</TR>
+			<TR>
+				<TD ROWSPAN=4 WIDTH=50 VALIGN=TOP></TD>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Protocol</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P>Protocol used by <I>machine-IDP</I> (for example, <CODE>http</CODE>
+					or <CODE>https</CODE>)</P>
+				</TD>
+				<TD ROWSPAN=4 COLSPAN=12 WIDTH=712 VALIGN=TOP></TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Host</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P>Host name for for <I>machine-IDP</I></P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Port</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P>Port number for for <I>machine-IDP</I></P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=4 WIDTH=121>
+					<P>Deployment URI</P>
+				</TD>
+				<TD COLSPAN=10 WIDTH=417>
+					<P>Deployment URI for <I>machine-IDP</I> (for example, <CODE>/idp</CODE>)</P>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+					<OL START=7>
+						<P>Following the configuration <I>machine-SP</I> is configured
+						as the hosted service provider available at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE>
+												</P>
+						<P>and 
+						</P>
+						<P><I>machine-IDP</I> is configured as the remote identity
+						provider available at: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE>
+												</P>
+						<P>Additionally, a circle of trust named <CODE>sampleidffcot</CODE>
+						has been created and the two providers are assigned as members.
+												</P>
+						<LI><P>Access the OpenSSO login page on <I>machine-IDP</I> at: 
+						</P>
+						<P><CODE><I>machine-IDP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-IDP_host</I></CODE><CODE>:</CODE><CODE><I>machine-IDP_port</I></CODE><CODE>/</CODE><CODE><I>machine-IDP_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+												</P>
+						<LI><P>Login as the top level administrator (<CODE>amadmin</CODE>,
+						by default), create a user named <CODE>idpuser</CODE> and
+						logout. 
+						</P>
+						<LI><P>Access the OpenSSO login page on <I>machine-SP</I> at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+												</P>
+						<LI><P>Login as the top level administrator (<CODE>amadmin</CODE>,
+						by default), create a user named <CODE>spuser</CODE> and
+						logout. 
+						</P>
+						<LI><P>Continue the procedure described in <A HREF="#runIDFFsample">How
+						do I run the Liberty ID-FF sample?</A> 
+						</P>
+					</OL>
+					<P><A NAME="runIDFFsample"></A><B>How do I run the Liberty ID-FF
+					sample?</B></P>
+					<P>Assuming you have completed the procedure documented in <A HREF="#setupIDFFsample">How
+					do I set up the Liberty ID-FF sample?</A>, you have two deployed
+					instances of Open Federation. On each is deployed an instance of
+					the sample WAR. The following procedure describes how to
+					federate the user accounts that had been created previously. 
+					</P>
+					<OL>
+						<LI><P>Access the OpenSSO login page on <I>machine-SP</I> at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+												</P>
+						<P>and login as <CODE>spuser</CODE>. 
+						</P>
+						<LI><P>Access the sample's service provider home page on
+						<I>machine-SP</I> at: 
+						</P>
+						<P><CODE><I>machine-SP_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-SP_host</I></CODE><CODE>:</CODE><CODE><I>machine-SP_port</I></CODE><CODE>/</CODE><CODE><I>machine-SP_deploy_uri</I></CODE><CODE>/samples/idff/sp/index.jsp</CODE>
+												</P>
+						<LI><P>Before doing this step, be sure to login to SP as spuser, as mentioned in step 1. <BR>Click the Federate link. 
+						</P>
+						<LI><P>Choose <I>machine-IDP</I> from the provided list and
+						click Submit. 
+						</P>
+						<P>You will be directed to the login page on <I>machine-IDP</I>.
+												</P>
+						<LI><P>Login to <I>machine-IDP</I> as <CODE>idpuser</CODE>. 
+						</P>
+						<P>You will be redirected back to <I>machine-SP</I>. 
+						</P>
+						<LI><P>Click Continue. 
+						</P>
+						<P>You will be redirected back to the service provider home
+						page. This is your confirmation that federation between <CODE>spuser</CODE>
+						and <CODE>idpuser</CODE> has been established. 
+						</P>
+						<HR>
+						<H3><FONT FACE="Times New Roman, serif">OPTIONAL CONFIGURATION</FONT></H3>
+						<P><FONT FACE="Times New Roman, serif">At this point, you can
+						configure <I>machine-SP</I> to create a name identifier for the
+						purpose of communicating with <I>machine-IDP</I>:</FONT></P>
+						<OL>
+							<LI><P><FONT FACE="Times New Roman, serif">Click Register Name
+							Identifier on the service provider home page. </FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">Select <I>machine-IDP</I>
+							from the IDP list. </FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">Click Submit.</FONT></P>
+							<P><FONT FACE="Times New Roman, serif">A page is displayed. </FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">Click Continue on
+							the displayed page to return to the service provider home
+							page. </FONT>
+							</P>
+							<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">Returning
+							to the service provider home page is confirmation that a name
+							identifier has been created. </FONT>
+							</P>
+						</OL>
+						<HR>
+						<P>Click Logout on the service provider home page.</P>
+						<P>A message is displayed that the user has been successfully
+						logged out. 
+						</P>
+						<LI><P>Click Continue on the service provider home page.</P>
+						<P>This will begin the single sign-on process by redirecting
+						you to the login page on <I>machine-IDP</I>. 
+						</P>
+						<LI><P>Login to <I>machine-IDP</I> as <CODE>idpuser</CODE>.</P>
+						<P>Assuming successful single sign-on, a user token will be
+						created on <I>machine-SP</I> and you will be returned to the
+						service provider home page. 
+						</P>
+						<LI><P>Click Terminate Federation on the service provider home
+						page.</P>
+						<P>This will begin the process to terminate federation. 
+						</P>
+						<LI><P>Choose <I>machine-IDP</I> from the provided list and
+						click Submit.</P>
+						<P>A message is displayed that federation has been terminated. 
+						</P>
+						<LI><P>Click Continue.</P>
+						<P>Returning to the service provider home page is confirmation
+						that federation between <CODE>idpuser</CODE> and <CODE>spuser</CODE>
+						has been terminated. You may click Federate to begin federation
+						again. 
+						</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="IDWSFsample"></A><B>Q: How do I set up and run the
+						Liberty ID-WSF sample?</B></P>
+						<P>The Liberty ID-WSF sample demonstrates the interactions
+						between a web service client (WSC) and a web service provider
+						(WSP). Specifically, it demonstrates how to query and modify
+						the Discovery Service, and how to query and modify the Personal
+						Profile Service. Additionally, policy driven interactions can
+						be configured to access Personal Profile Service attributes
+						using this sample. 
+						</P>
+						<P>There are two parts to deploy and run the Liberty ID-WSF
+						sample. Make sure you complete the procedures documented in the
+						following sections: 
+						</P>
+						<UL>
+							<LI><P><A HREF="#setupIDFFsample">How do I set up the Liberty
+							ID-WSF sample?</A> 
+							</P>
+							<LI><P><A HREF="#runIDFFsample">How do I run the Liberty
+							ID-WSF sample?</A> 
+							</P>
+						</UL>
+						<P><A NAME="setupIDWSFsample"></A><B>How do I setup the Liberty
+						ID-WSF sample?</B></P>
+						<P>To setup the Liberty ID-WSF sample, you need access to two
+						instances of Open Federation and one instance of Open
+						Federation client instance. 
+						</P>
+						<UL>
+							<LI><P><I>machine-A</I> will be configured as the identity
+							provider, discovery service, and Personal Profile service. 
+							</P>
+							<LI><P><I>machine-B</I> will be configured as the service
+							provider and a web service client. 
+							</P>
+							<LI><P><B>OPTIONAL:</B> <I>machine-C</I> can be configured as
+							a web service client. More information can be found in the
+							procedure. 
+							</P>
+						</UL>
+						<P STYLE="margin-bottom: 0in">You will configure an instance of
+						<CODE>opensso.war</CODE> on both <I>machine-A</I> and <I>machine-B</I>
+						and an instance of <CODE>fam-client-jdk15.war</CODE> or
+						<CODE>fam-client-jdk14.war</CODE> on <I>machine-B</I> (or
+						<I>machine-C</I>). <CODE>fam-client-jdk1x.war</CODE> contains
+						the web service client sample. 
+						</P>
+						<HR>
+						<H3><FONT FACE="Times New Roman, serif">BEFORE YOU BEGIN</FONT></H3>
+						<P><FONT FACE="Times New Roman, serif">If <I>machine-A</I> and
+						<I>machine-B</I> are running on the same physical machine but
+						using two web containers running on different ports, make sure
+						of the following: </FONT>
+						</P>
+						<UL>
+							<LI><P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">Each
+							instance of the sample WAR is deployed with a different URI. </FONT>
+							</P>
+							<LI><P><FONT FACE="Times New Roman, serif">The default cookie
+							name of one of the instances is changed. For example, you can
+							goto console on machine-IDP to change the cookie name to a
+							non-default value (default is &quot;iPlanetDirectoryPro&quot;).
+							Restart the web container to complete the process. </FONT>
+							</P>
+						</UL>
+						<HR>
+						<P>Following is the procedure to set up the Liberty ID-WSF
+						sample. <A HREF="#runIDWSFsample">How do I run the Liberty
+						ID-WSF sample?</A> describes how to run it.</P>
+						<OL>
+							<LI><P>Deploy the <CODE>opensso.war</CODE> on <I>machine-A</I>
+							and configure the Liberty ID-FF sample to run as an identity
+							provider.</P>
+							<P>See <A HREF="#setupIDFFsample">How do I set up the Liberty
+							ID-FF sample?</A> for details. 
+							</P>
+							<LI><P>Deploy the <CODE>opensso.war</CODE> on <I>machine-B</I>
+							and configure the Liberty ID-FF sample to run as a service
+							provider.</P>
+							<P>See <A HREF="#setupIDFFsample">How do I set up the Liberty
+							ID-FF sample?</A> for details. 
+							</P>
+							<LI><P>Create a user account on <I>machine-A</I> and a user
+							account on <I>machine-B</I>. 
+							</P>
+							<LI><P>Federate the two accounts and accomplish single
+							sign-on.</P>
+							<P>See <A HREF="#runIDFFsample">How do I run the Liberty ID-FF
+							sample?</A> for details. 
+							</P>
+							<LI><P>Deploy the <CODE>fam-client-jdk15.war</CODE> or
+							<CODE>fam-client-jdk14.war</CODE> on <I>machine-B</I>.</P>
+							<HR>
+							<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+							<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">If
+							you choose the three server configuration, you will be asked
+							for the path to the </FONT><FONT FACE="Times New Roman, serif"><I>machine-C</I></FONT><FONT FACE="Times New Roman, serif">
+							configuration directory in the next step. A configuration
+							directory is configured on any machine when the </FONT><CODE><FONT FACE="Times New Roman, serif">opensso.war</FONT></CODE><FONT FACE="Times New Roman, serif">
+							is deployed. </FONT><CODE><FONT FACE="Times New Roman, serif">fam-client-jdk1x.war</FONT></CODE><FONT FACE="Times New Roman, serif">
+							does not create a configuration directory. </FONT>
+							</P>
+							<HR>
+							<P STYLE="margin-bottom: 0in">Access the sample URI on
+							<I>machine-B</I> (or <I>machine-C</I> if using the three
+							server configuration)
+							at:<BR><CODE><I>machine-B_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-B_host</I></CODE><CODE>:</CODE><CODE><I>machine-B_port</I></CODE><CODE>/</CODE><CODE><I>machine-B_deploy_uri</I></CODE><CODE>/wsc<BR>Enter
+							Protocol/Hostname/Port/Deployment URI of Machine-B in the
+							fields. </CODE>
+							</P>
+							<LI><P><CODE>Access the sample's configure.jsp on </CODE><CODE><I>machine-B</I></CODE><CODE>
+							(or </CODE><CODE><I>machine-C</I></CODE><CODE> if using the
+							three server configuration)
+							at:<BR></CODE><CODE><I>machine-B_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-B_host</I></CODE><CODE>:</CODE><CODE><I>machine-B_port</I></CODE><CODE>/</CODE><CODE><I>machine-B_deploy_uri</I></CODE><CODE>/wsc/configure.jsp
+							</CODE>
+							</P>
+							<LI><P><CODE>Enter values for the following fields regarding
+							</CODE><CODE><I>machine-B</I></CODE><CODE> (or </CODE><CODE><I>machine-C</I></CODE><CODE>
+							if using the three server configuration) and click Configure
+							when finished. </CODE>
+							</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 WIDTH=50 VALIGN=TOP></TD>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Protocol</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P>Protocol used by the web container on which <I>machine-A</I>
+						is deployed (for example, <CODE>http</CODE> or <CODE>https</CODE>)</P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=5 WIDTH=457 VALIGN=TOP></TD>
+				</TR>
+			</TBODY>
+			<TBODY>
+				<TR>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Host</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P>Host name for <I>machine-A</I></P>
+					</TD>
+				</TR>
+			</TBODY>
+			<TBODY>
+				<TR>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Port</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P>Port number for the <I>machine-A</I> web container (for
+						example, <CODE>8080</CODE>)</P>
+					</TD>
+				</TR>
+			</TBODY>
+			<TBODY>
+				<TR>
+					<TD COLSPAN=6 WIDTH=150>
+						<P>IDP Deployment URI</P>
+					</TD>
+					<TD COLSPAN=15 WIDTH=643>
+						<P>Deployment URI for the deployed sample WAR on <I>machine-A</I>
+						(for example, <CODE>/idp</CODE>)</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="runIDWSFsample"></A><B>How do I run the Liberty
+						ID-WSF sample?</B></P>
+						<P>Assuming you have completed <A HREF="#setupIDWSFsample">How
+						do I set up the Liberty ID-WSF sample?</A>, access the
+						following URL in a browser and follow the link to execute the
+						sample: 
+						</P>
+						<P><CODE><I>machine-B_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-B_hostname</I></CODE><CODE>:</CODE><CODE><I>port</I></CODE><CODE>/</CODE><CODE><I>deployment_uri</I></CODE><CODE>/wsc/index.jsp</CODE>
+												</P>
+						<P>The following procedures are optional setups: 
+						</P>
+						<UL>
+							<LI><P><A HREF="#PPinteractions">How do I enable interactions
+							for querying and modifying the Personal Profile service?</A> 
+							</P>
+							<LI><P><A HREF="#nameIDencrypt">How do I enable name ID
+							encryption in the session context of a discovery bootstrap?</A>
+														</P>
+						</UL>
+						<P><A NAME="PPinteractions"></A><B>1</B>. <B>How do I enable
+						interactions for querying and modifying the Personal Profile
+						service?</B> 
+						</P>
+						<OL TYPE=a>
+							<LI><P>Run the following commands to turn on policy evaluation
+							for all queries to, and modifications of, the Personal Profile
+							service:</P>
+							<UL>
+								<LI><P STYLE="margin-bottom: 0in"><CODE>famadm set-attr-defs
+								-s sunIdentityServerLibertyPPService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a &quot;sunIdentityServerPPisQueryPolicyEvalRequired=true&quot;</CODE>
+																</P>
+								<LI><P><CODE>famadm set-attr-defs -s
+								sunIdentityServerLibertyPPService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a
+								&quot;sunIdentityServerPPisModifyPolicyEvalRequired=true&quot;</CODE>
+																</P>
+							</UL>
+							<LI><P>Create a policy for the Personal Profile service with
+							the following procedure:</P>
+							<UL>
+								<LI><P>Access the OpenSSO login page on <I>machine-A</I> at: 
+								</P>
+								<P><CODE><I>machine-A_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-A_host</I></CODE><CODE>:</CODE><CODE><I>machine-A_port</I></CODE><CODE>/</CODE><CODE><I>machine-A_deploy_uri</I></CODE><CODE>/UI/Login</CODE>
+																</P>
+								<P>and login as the top-level administrator (by default,
+								<CODE>amadmin</CODE>). 
+								</P>
+								<LI><P>Click the top-level realm <CODE>opensso</CODE>. 
+								</P>
+								<LI><P>Click the Policies tab. 
+								</P>
+								<LI><P>Click New Policy. 
+								</P>
+								<LI><P>Enter a name for the policy as a value for Name. 
+								</P>
+								<LI><P>Click New... under Rules. 
+								</P>
+								<LI><P>Select Liberty Personal Profile Service (with resource
+								name) and click Next. 
+								</P>
+								<LI><P>Enter a rule name as a value for Name. 
+								</P>
+								<LI><P>Enter <CODE>*</CODE> (an asterisk) as the value of
+								Resource Name. 
+								</P>
+								<LI><P>Select the MODIFY and QUERY action boxes. 
+								</P>
+								<LI><P>Select <CODE>interactForConsent</CODE> in both drop
+								down menus under Value and click Finish. 
+								</P>
+								<LI><P>Click New... under Subjects. 
+								</P>
+								<LI><P>Select Authenticated Users and click Next. 
+								</P>
+								<LI><P>Enter the name of the user created for the identity
+								provider in Name and click Finish. 
+								</P>
+								<LI><P>Click OK to save this policy. 
+								</P>
+							</UL>
+							<P>Completing this procedure ensures that only authenticated
+							users are allowed access to the Personal Profile service. 
+							</P>
+						</OL>
+						<P><A NAME="nameIDencrypt"></A><B>2</B>. <B>How do I enable
+						name ID encryption in the session context of a discovery
+						bootstrap?</B> 
+						</P>
+						<OL TYPE=a>
+							<LI><P>Set up a keystore.</P>
+							<P>This needs to be done on both <I>machine-A</I> and
+							<I>machine-B</I>. If <I>machine-C</I> is different from
+							<I>machine-B</I>, copy <CODE>keystore.jks</CODE>, <CODE>.keypass</CODE>
+							and <CODE>.storepass</CODE> from <I>machine-B</I> to
+							corresponding directory on <I>machine-C</I>. See <A HREF="#keystore">How
+							do I setup a keystore?</A>. 
+							</P>
+							<LI><P>Use the following procedure to set up <I>machine-A</I>
+							as the identity provider:</P>
+							<OL TYPE=i>
+								<LI><P>Run the following command to set the default attribute
+								values for the discovery service:</P>
+								<P><CODE>famadm set-attr-defs -s
+								sunIdentityServerDiscoveryService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a
+								&quot;sunIdentityServerDiscoProviderID=</CODE><CODE><I>machine-A_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-A_host</I></CODE><CODE>:</CODE><CODE><I>machine-A_port</I></CODE><CODE>/</CODE><CODE><I>machine-A_deploy_uri</I></CODE><CODE>&quot;</CODE>
+																</P>
+								<LI><P>Run the following command to set the default attribute
+								values for name ID encryption:</P>
+								<P><CODE>famadm set-attr-defs -s
+								sunIdentityServerDiscoveryService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a
+								&quot;sunIdentityServerBootstrappingEncryptNIinSessionContext=true&quot;</CODE>
+																</P>
+								<LI><P>Run the following command to display the default
+								attribute values for bootstrapping:</P>
+								<P><CODE>famadm get-attr-defs -s
+								sunIdentityServerDiscoveryService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -a sunIdentityServerBootstrappingDiscoEntry</CODE> 
+								</P>
+								<LI><P>From the previous step's output, save the entire line
+								beginning with <CODE>sunIdentityServerBootstrappingDiscoEntry=</CODE>
+								to a file.</P>
+								<P>In this case, we will call the file <CODE>datafile</CODE>.
+																</P>
+								<LI><P>Change the <CODE>datafile</CODE> you just created as
+								follows: 
+								</P>
+								<UL>
+									<LI><P>Replace 
+									</P>
+									<P><CODE>&lt;ProviderID&gt;</CODE><CODE><I>machine-A_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-A_host</I></CODE><CODE>:</CODE><CODE><I>machine-A_port</I></CODE><CODE>/</CODE><CODE><I>machine-A_deploy_uri</I></CODE><CODE>/Liberty/disco&lt;/ProviderID&gt;</CODE>
+																		</P>
+									<P>with 
+									</P>
+									<P><CODE>&lt;ProviderID&gt;</CODE><CODE><I>machine-A_protocol</I></CODE><CODE>://</CODE><CODE><I>machine-A_host</I></CODE><CODE>:</CODE><CODE><I>machine-A_port</I></CODE><CODE>/</CODE><CODE><I>machine-A_deploy_uri</I></CODE><CODE>&lt;/ProviderID&gt;</CODE>
+																		</P>
+									<LI><P>Replace 
+									</P>
+									<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																		</P>
+									<P>with 
+									</P>
+									<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:SAML&lt;/SecurityMechID&gt;</CODE>
+																		</P>
+									<LI><P>Replace 
+									</P>
+									<P><CODE>&lt;/ResourceOffering&gt;&lt;/DiscoEntry&gt;</CODE>
+																		</P>
+									<P>with 
+									</P>
+									<P><CODE>&lt;/ResourceOffering&gt;&lt;AuthorizeRequester
+									xmlns=&quot;urn:liberty:disco:2003-08&quot;/&gt;&lt;/DiscoEntry&gt;</CODE>
+																		</P>
+								</UL>
+								<LI><P>Run the following command to set the default attribute
+								values for the discovery service in <CODE>datafile</CODE>: 
+								</P>
+								<P><CODE>famadm set-attr-defs -s
+								sunIdentityServerDiscoveryService -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+								Global -D datafile</CODE> 
+								</P>
+								<LI><P STYLE="margin-bottom: 0in">Logon to console as top
+								level administrator. Goto Configuration -&gt; Global -&gt;
+								Liberty ID-WSF Security Service, edit the values of the
+								following properties:</P>
+								<UL>
+									<LI><P><CODE>Trusted Authority signing certificate alias</CODE>
+									to <CODE>test</CODE> 
+									</P>
+									<LI><P><CODE>Default WSC certificate alias</CODE> to <CODE>test</CODE>
+																		</P>
+									<LI><P><CODE>Trusted CA signing certificate aliases</CODE>
+									to <CODE>test</CODE> 
+									</P>
+								</UL>
+								<P><CODE>test</CODE> is the sample value. 
+								</P>
+								<LI><P>Run the following command to delete the identity
+								provider metadata: 
+								</P>
+								<P><CODE>famadm delete-entity -y </CODE><CODE><I>machine-A_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=7 WIDTH=126 VALIGN=TOP>
+						<P><I>machine-A_entityid</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>The provider's entity ID in the format:
+						<I>machine-A_protocol</I>://<I>machine-A_host</I>:<I>machine-A_port</I>/<I>machine-A_deploy_uri</I>
+						<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=2 COLSPAN=2 WIDTH=339 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=7 WIDTH=126 VALIGN=TOP>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=9>
+								<LI><P>Run the following command to delete the service
+								provider metadata: 
+								</P>
+								<P><CODE>famadm delete-entity -y </CODE><CODE><I>machine-B_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=6 WIDTH=124 VALIGN=TOP>
+						<P><I>machine-B_entityid</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>The provider's entity ID in the format:
+						<I>machine-A_protocol</I>://<I>machine-A_host</I>:<I>machine-A_port</I>/<I>machine-A_deploy_uri</I>
+						<BR>For example, <CODE>http://sad.red.sun.com:80/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=2 COLSPAN=3 WIDTH=341 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=6 WIDTH=124>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=10>
+								<LI><P>Run the following command to create a metadata file
+								for the identity provider: 
+								</P>
+								<P><CODE>famadm create-metadata-templ -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -y
+								</CODE><CODE><I>machine-A_entityid</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -i
+								</CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+								</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -g
+								</CODE><CODE><I>idpeCertAlias</I></CODE><CODE> -c
+								</CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=7 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+						<P><I>machine-A_entityid</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>The provider's entity ID in the format:
+						<I>machine-A_protocol</I>://<I>machine-A_host</I>:<I>machine-A_port</I>/<I>machine-A_deploy_uri</I>
+						<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=7 WIDTH=337 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Path to, and name of, the extended metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>idpMetaAlias</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Specify a metaAlias for the identity provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>idpSCertAlias</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Specify a signing certificate alias for the identity
+						provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>idpeCertAlias</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Specify an encryption certificate alias for the identity
+						provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=16 WIDTH=738>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=11>
+								<LI><P>Change the value of the <CODE>enableNameIDEncryption</CODE>
+								attribute in the extended metadata file just created to <CODE>true</CODE>.
+																</P>
+								<LI><P>Run the following command to import the standard and
+								extended metadata files into the circle of trust previously
+								created:</P>
+								<P><CODE>famadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+								</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>Path to, and name of, the extended metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>cot_name</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>The name of the circle into which the files are being
+						imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=13>
+								<LI><P>Copy the standard metadata file (created during the
+								service provider procedure documented in the next step) from
+								<I>machine-B</I> to the <CODE>/tmp</CODE> directory on this
+								machine. 
+								</P>
+								<LI><P>Run the following command to import the standard
+								metadata file just copied from <I>machine-B</I>: 
+								</P>
+								<P><CODE>famadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -t
+								</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=3 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+					<TD ROWSPAN=3 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>cot_name</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>The name of the circle into which the files are being
+						imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=582>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a START=3>
+							<LI><P>Use the following procedure to set up <I>machine-B</I>
+							as the service provider:</P>
+							<OL TYPE=i>
+								<LI><P>Run the following command to delete the sample
+								identity provider entity:</P>
+								<P><CODE>famadm delete-entity -y </CODE><CODE><I>sample_idp_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<LI><P>Run the following command to delete the sample service
+								provider entity:</P>
+								<P><CODE>famadm delete-entity -y </CODE><CODE><I>sample_sp_entityid</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<LI><P>Run the following command to create a metadata file
+								for the service provider:</P>
+								<P><CODE>famadm create-metadata-templ -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -y
+								</CODE><CODE><I>machine-B_entityid</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -s
+								</CODE><CODE><I>spMetaAlias</I></CODE><CODE> -a </CODE><CODE><I>spSCertAlias</I></CODE><CODE>
+								-r </CODE><CODE><I>speCertAlias</I></CODE><CODE> -c
+								</CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=7 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+						<P><I>machine-B_entityid</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>The provider's entity ID in the format:
+						<I>machine-B_protocol</I>://<I>machine-B_host</I>:<I>machine-B_port</I>/<I>machine-B_deploy_uri</I>
+						<BR>For example, <CODE>http://sad.red.sun.com:80/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=7 COLSPAN=3 WIDTH=341 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Path to, and name of, the extended metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>spMetaAlias</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Specify a metaAlias for the service provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>spSCertAlias</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Specify a signing certificate alias for the identity
+						provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>speCertAlias</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Specify an encryption certificate alias for the identity
+						provider being created.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=14 WIDTH=734>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=4>
+								<LI><P>Run the following command to import the metadata file
+								just created:</P>
+								<P><CODE>famadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+								</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=7 WIDTH=503 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Path to, and name of, the extended metadata XML file</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>cot_name</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Name of the circle to which the metadata is being imported;
+						in this case, <CODE>sampleidffcot</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a>
+							<OL TYPE=i START=5>
+								<LI><P>Copy the standard metadata file (created during the
+								identity provider procedure documented in the previous step)
+								from <CODE>machine-A</CODE> to the <CODE>/tmp</CODE>
+								directory on this machine. 
+								</P>
+								<LI><P>Run the following command to import the sample
+								identity provider entity into the circle of trust: 
+								</P>
+								<P><CODE>famadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -t
+								</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<P>where 
+								</P>
+							</OL>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=3 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Path to, and name of, the standard metadata XML file</P>
+					</TD>
+					<TD ROWSPAN=3 COLSPAN=7 WIDTH=503 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>cot_name</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Name of the circle to which the metadata is being imported;
+						in this case, <CODE>sampleidffcot</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=10 WIDTH=572>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<OL TYPE=a START=4>
+							<LI><P>Restart web containers on all three machines and you
+							have enabled name ID encryption in the session context of a
+							discovery bootstrap. 
+							</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="turnonsaml1"></A><B>Q: How do I turn on signing
+						using SAML v1.x?</B></P>
+						<P>When used, the SAML POST Profile automatically turns on
+						signing. The following procedure illustrates how to turn on
+						signing using the SAML v1.x SAML Artifact Profile. 
+						</P>
+						<OL>
+							<LI><P>Run the following command to turn on signing for all
+							SAML responses: 
+							</P>
+							<P><CODE>famadm set-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							--attributevalues iplanet-am-saml-signresponse=true -d</CODE> 
+							</P>
+							<LI><P>Run the following command to turn on signing for all
+							SAML requests: 
+							</P>
+							<P><CODE>famadm set-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							--attributevalues iplanet-am-saml-signrequest=true -d</CODE> 
+							</P>
+							<LI><P>Run the following command to turn on signing for all
+							SAML assertions: 
+							</P>
+							<P><CODE>famadm set-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							--attributevalues iplanet-am-saml-signassertion=true -d</CODE>
+														</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="turnonIDFFsigning"></A><B>Q: How do I turn on
+						signing using the Liberty ID-FF?</B></P>
+						<P>If all of the following points are true, Liberty ID-FF
+						signing is enabled. If not, follow the procedures below to make
+						the necessary modifications and then restart the web
+						containers.</P>
+						<UL>
+							<LI><P>A keystore is set up on the hosted provider. See <A HREF="#keystore">How
+							do I setup a keystore?</A> for the procedure. 
+							</P>
+							<LI><P>The <CODE>signingCertAlias</CODE> and <CODE>KeyDescriptor</CODE>
+							attributes in the hosted provider's standard metadata XML file
+							are set properly. 
+							</P>
+							<P>To verify this: 
+							</P>
+							<OL>
+								<LI><P>Run the following command on the hosted provider to
+								export the metadata XML files. 
+								</P>
+								<P><CODE>famadm export-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -c
+								</CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<P>where 
+								</P>
+							</OL>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+					<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+						<P><I>hosted_entityid</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>The provider's entity ID in the format:
+						<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+						<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+					</TD>
+					<TD ROWSPAN=4 COLSPAN=9 WIDTH=645 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>The standard metadata file being exported.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>The extended metadata file being exported.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=8 WIDTH=128>
+						<P><I>metadata_spec</I></P>
+					</TD>
+					<TD COLSPAN=8 WIDTH=430>
+						<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+						case, <CODE>idff</CODE>.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<UL>
+							<OL>
+								<P>If a value is set for <CODE>signingCertAlias</CODE> in
+								<I>extended_metadata</I> and <CODE>KeyDescriptor</CODE> in
+								<I>standard_metadata</I>, you are finished. If there is no
+								value set, continue to the next step. 
+								</P>
+								<LI><P>Re-generate the hosted provider's metadata with the
+								security information as follows: 
+								</P>
+								<UL>
+									<LI><P>For a hosted identity provider, run the following
+									command: 
+									</P>
+									<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>extended_metadata</I></CODE><CODE> -i
+									</CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+									</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -c
+									</CODE><CODE><I>metadata_spec</I></CODE> 
+									</P>
+									<LI><P>For a hosted service provider, run the following
+									command: 
+									</P>
+									<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>extended_metadata</I></CODE><CODE> -s
+									</CODE><CODE><I>spMetaAlias</I></CODE><CODE> -a </CODE><CODE><I>spSCertAlias</I></CODE><CODE>
+									-c </CODE><CODE><I>metadata_spec</I></CODE> 
+									</P>
+									<P>You may modify the extended metadata attributes (for
+									example, <CODE>providerHomePageURL</CODE>) as needed. 
+									</P>
+								</UL>
+								<LI><P>Run the following command on the hosted provider to
+								delete the metadata XML files. 
+								</P>
+								<P><CODE>famadm delete-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<LI><P>Run the following command on the hosted provider to
+								load the modified metadata XML files. 
+								</P>
+								<P><CODE>famadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+								</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+							</OL>
+							<LI><P>Logon to console as top level administrator, goto
+							Configuration -&gt; Global -&gt; Liberty ID-FF Service
+							Configuration, set the &quot;XML signing on&quot; field to
+							&quot;true&quot;. 
+							</P>
+							<LI><P>The <CODE>KeyDescriptor</CODE> attribute in the remote
+							provider's standard metadata XML file is set properly.</P>
+							<P>To verify this: 
+							</P>
+							<OL>
+								<LI><P>Run the following command on the hosted provider to
+								export the remote provider's standard metadata XML file.</P>
+								<P><CODE>famadm export-entity -y </CODE><CODE><I>remote_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-m </CODE><CODE><I>remote_standard_metadata</I></CODE><CODE>
+								-x </CODE><CODE><I>remote_extended_metadata</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<LI><P>Search the XML file(s) for the <CODE>KeyDescriptor</CODE>
+								attribute and make sure it contains a value.</P>
+								<P>If none exists, get the updated standard metadata XML file
+								from the remote provider using the following procedure: 
+								</P>
+								<UL>
+									<LI><P>Run the following command to delete the remote
+									provider metadata from the hosted provider machine. 
+									</P>
+									<P><CODE>famadm delete-entity -y </CODE><CODE><I>remote_entity_id</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<LI><P>Run the following command to import the updated
+									remote provider metadata (retrieved from the remote provider
+									machine) to the hosted provider machine. 
+									</P>
+									<P><CODE>famadm import-entity -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+									</CODE><CODE><I>new_remote_standard_metadata</I></CODE><CODE>
+									-t </CODE><CODE><I>circle-of-trust_name</I></CODE><CODE> -c
+									</CODE><CODE><I>metadata_spec</I></CODE> 
+									</P>
+									<P>where 
+									</P>
+								</UL>
+							</OL>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD ROWSPAN=2 COLSPAN=3 WIDTH=144 VALIGN=TOP></TD>
+					<TD COLSPAN=9 WIDTH=214>
+						<P><I>new_remote_standard_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=492>
+						<P>The standard metadata file to which a value for
+						<CODE>KeyDescriptor</CODE> was added.</P>
+					</TD>
+					<TD ROWSPAN=2 COLSPAN=4 WIDTH=450 VALIGN=TOP></TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=9 WIDTH=214>
+						<P><I>remote_extended_metadata</I></P>
+					</TD>
+					<TD COLSPAN=11 WIDTH=492>
+						<P>The extended metadata file that was previously exported.</P>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<HR>
+						<UL>
+							<OL>
+								<UL>
+									<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+								</UL>
+								<P><FONT FACE="Times New Roman, serif">If the remote provider
+								is running on an instance of Sun Java System Federation
+								Manager, the standard metadata (including the </FONT><CODE><FONT FACE="Times New Roman, serif">KeyDescriptor</FONT></CODE><FONT FACE="Times New Roman, serif">
+								attribute) can be obtained by running the following command
+								on the machine in which the remote provider is hosted.</FONT></P>
+								<P STYLE="margin-bottom: 0in"><CODE><FONT FACE="Times New Roman, serif">famadm
+								export-entity -y </FONT></CODE><CODE><FONT FACE="Times New Roman, serif"><I>remote_entity_id</I></FONT></CODE><CODE><FONT FACE="Times New Roman, serif">
+								-u amadmin -f </FONT></CODE><CODE><FONT FACE="Times New Roman, serif"><I>admin_password_file_name</I></FONT></CODE><CODE><FONT FACE="Times New Roman, serif">
+								-m </FONT></CODE><CODE><FONT FACE="Times New Roman, serif"><I>remote_standard_metadata</I></FONT></CODE><CODE><FONT FACE="Times New Roman, serif">
+								-x </FONT></CODE><CODE><FONT FACE="Times New Roman, serif"><I>remote_extended_metadata</I></FONT></CODE><CODE><FONT FACE="Times New Roman, serif">
+								-c </FONT></CODE><CODE><FONT FACE="Times New Roman, serif"><I>metadata_spec</I></FONT></CODE><FONT FACE="Times New Roman, serif">
+								</FONT>
+								</P>
+								<HR>
+								<P><B>Optional:</B> To enable signing of authentication
+								requests on a hosted service provider, verify (or modify, if
+								applicable) the hosted service provider's standard metadata
+								using the following procedure: 
+								</P>
+								<LI><P>Run the following command to export the standard and
+								extended metadata from the hosted service provider: 
+								</P>
+								<P><CODE>famadm export-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+								-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+								-c </CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+								<LI><P>Make sure the value of the <CODE>AuthnRequestsSigned</CODE>
+								attribute in the <I>hosted_standard_metadata</I> is set to
+								<CODE>true</CODE>. 
+								</P>
+								<P>If not set the value correctly and proceed. 
+								</P>
+								<LI><P>Run the following command to delete the hosted
+								provider's metadata: 
+								</P>
+								<P><CODE>famadm delete-entity -y </CODE><CODE><I>hosted_entity_id</I></CODE><CODE>
+								-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																</P>
+								<LI><P>Run the following command to import the hosted
+								provider's updated metadata: 
+								</P>
+								<P><CODE>famadm import-entity -u amadmin -f
+								</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+								</CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE> -x
+								</CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE> -c
+								</CODE><CODE><I>metadata_spec</I></CODE> 
+								</P>
+							</OL>
+						</UL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="keystore"></A><B>Q: How do I setup a keystore?</B></P>
+						<P>The following procedure illustrates how to setup a keystore
+						using the <CODE>keytool</CODE> command line interface which is
+						part of the Java Development Kit (JDK).</P>
+						<OL>
+							<LI><P>Run the following command: 
+							</P>
+							<P><CODE><I>JDK Home</I></CODE><CODE>/bin/keytool -genkey
+							-keyalg rsa -alias test -dname &quot;cn=sun-unix,ou=SUN Java
+							System Access Manager,o=Sun, c=US&quot; -keypass 11111111
+							-keystore keystore.jks -storepass 11111111</CODE> <BR>Copy the
+							<CODE>keystore.jks</CODE> file to
+							<I>&lt;configuration_dir&gt;/&lt;deploy_uri&gt;</I> directory,
+							where <I>&lt;configuration_dir&gt;</I> is the directory name
+							entered when configuring the opensso WAR and <I>&lt;deploy_uri&gt;</I>
+							is the opensso WAR deployment URI. 
+							</P>
+							<LI><P>Access the <CODE>encode.jsp</CODE> file on the instance
+							to encrypt the keystore password: 
+							</P>
+							<P><CODE><I>server_protocol</I></CODE><CODE>://</CODE><CODE><I>server_host</I></CODE><CODE>:</CODE><CODE><I>server_port</I></CODE><CODE>/</CODE><CODE><I>server_deploy_uri</I></CODE><CODE>/encode.jsp</CODE>
+														</P>
+							<P><CODE>opensso.war</CODE> must be deployed for access to
+							<CODE>encode.jsp</CODE>. 
+							</P>
+							<LI><P>Enter the text password and click Encode.</P>
+							<P>For example, <CODE>11111111</CODE> becomes
+							<CODE>AQICQS+KlLm9oNd2l98bnkd7TraHI/cv8B1p</CODE>. 
+							</P>
+							<LI><P>Create a new file named <CODE>.storepass</CODE> under
+							<I>&lt;configuration_dir&gt;/&lt;deploy_uri&gt;</I> directory
+							and paste the encrypted password for the keystore in it. 
+							</P>
+							<P>In this case, we paste <CODE>AQICQS+KlLm9oNd2l98bnkd7TraHI/cv8B1p</CODE>
+							into <CODE>.storepass</CODE>. 
+							</P>
+							<LI><P>Create a new file named <CODE>.keypass</CODE> under
+							<I>&lt;configuration_dir&gt;/&lt;deploy_uri&gt;</I> directory
+							and paste the encrypted password for the private key in it.</P>
+							<P>In this case, we again paste
+							<CODE>AQICQS+KlLm9oNd2l98bnkd7TraHI/cv8B1p</CODE> into
+							<CODE>.keypass</CODE>. 
+							</P>
+							<LI><P>Restart web container. 
+							</P>
+						</OL>
+					</TD>
+				</TR>
+				<TR>
+					<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+						<P><A NAME="setupsaml1"></A><B>Q: How do I setup single sign-on
+						using SAML 1.x and the </B><CODE><B>famadm</B></CODE><B>
+						command line interface?</B></P>
+						<P>To accomplish single sign-on using SAML 1.x, follow this
+						procedure on the instances of Open Federation that will serve
+						as the SAML producer and the SAML consumer.</P>
+						<OL>
+							<LI><P>Run the following command on the remote site to get the
+							site ID: 
+							</P>
+							<P><CODE>famadm get-attr-defs -s iPlanetAMSAMLService -t
+							global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+							-a iplanet-am-saml-siteid-issuername-list</CODE> 
+							</P>
+							<P>The output of this command is</P>
+							<P><CODE>iplanet-am-saml-siteid-issuername-list=instanceID=http://host.exampleA.com:58080|siteid=VhqieajnHbbNX1usZkmnQLTxNeQ=|issuerName=host.exampleA.com:58080</CODE>
+														</P>
+							<P>The site ID is the value of the <CODE>siteid</CODE>
+							property, <CODE>VhqieajnHbbNX1usZkmnQLTxNeQ=</CODE>. 
+							</P>
+							<LI><P>Configure a trusted partner entry for the remote site
+							in the hosted site's SAML Service using the following
+							procedure:</P>
+							<OL TYPE=a>
+								<LI><P>Display any existing trusted partners by running the
+								following command: 
+								</P>
+								<P><CODE>famadm get-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-a iplanet-am-saml-partner-urls</CODE> 
+								</P>
+								<P>The output will be 
+								</P>
+								<P><CODE>iplanet-am-saml-partner-urls=</CODE> 
+								</P>
+								<LI><P>Put the remote partner's information in a new file
+								called, for this procedure, <CODE>partner.txt</CODE>. 
+								</P>
+								<P>The file will contain the following attributes and
+								corresponding values: 
+								</P>
+								<UL>
+									<LI><P STYLE="margin-bottom: 0in">target=<I>partner_hostname</I>
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">sourceid=<I>remote_siteid_from_previous_step</I>
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">samlurl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLAwareServlet</CODE>
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">soapurl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLSOAPReceiver</CODE>
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">posturl=<CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>partner_hostname</I></CODE><CODE>:</CODE><CODE><I>partner_port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLPOSTProfileServlet</CODE>
+																		</P>
+									<LI><P STYLE="margin-bottom: 0in">issuer=<I>partner_hostname</I>:<I>partner_port</I>
+																		</P>
+									<LI><P>hostlist=<I>partner_hostname</I> 
+									</P>
+								</UL>
+								<P>For example: 
+								</P>
+								<PRE>iplanet-am-saml-partner-urls=target=provider.com|sourceid=VhqieajnHbbNX1usZkmnQLTxNeQ=|samlurl=http://host.exampleA.com:58080/amserver/SAMLAwareServlet|
+soapurl=http://host.exampleA.com:58080/amserver/SAMLSOAPReceiver|posturl=http://host.exampleA.com:58080/amserver/SAMLPOSTProfileServlet|
+issuer=host.exampleA.com:58080|hostlist=host.exampleA.com</PRE><P>
+								Other keys that can also be used for
+								<CODE>iplanet-am-saml-partner-urls</CODE> include: 
+								</P>
+								<UL>
+									<LI><P STYLE="margin-bottom: 0in">Version 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">Certalias 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">AuthType 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">authuser 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">authpassword 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">AttributeMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">PartnerAccountMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">SiteAttributeMapper 
+									</P>
+									<LI><P STYLE="margin-bottom: 0in">ActionMapper 
+									</P>
+									<LI><P>nameidentifiermapper 
+									</P>
+								</UL>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">These
+								keys are case insensitive. Refer to the <A HREF="http://docs.sun.com/app/docs/doc/819-4674/6n6qelg7r?a=view">Sun
+								Java System Access Manager 7.1 Federation and SAML Guide</A>
+								for details. </FONT>
+								</P>
+								<HR>
+								<P>Import the file you just created using the following
+								command: 
+								</P>
+								<P><CODE>famadm add-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								--datafile ./partner.txt</CODE> 
+								</P>
+								<LI><P>To verify that the file was imported correctly, run
+								the following command on the hosted site to display the
+								information: 
+								</P>
+								<P><CODE>famadm get-attr-defs -s iPlanetAMSAMLService -t
+								global -u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+								-a iplanet-am-saml-partner-urls</CODE> 
+								</P>
+								<P>In this case, the output will be: 
+								</P>
+								<PRE>iplanet-am-saml-partner-urls=target=iplanet.com|sourceid=VhqieajnHbbNX1usZkmnQLTxNeQ=|samlurl=http://host.exampleA.com:58080/amserver/SAMLAwareServlet|
+soapurl=http://host.exampleA.com:58080/amserver/SAMLSOAPReceiver|posturl=http://host.exampleA.com:58080/amserver/SAMLPOSTProfileServlet|
+issuer=host.exampleA.com:58080|hostlist=host.exampleA.com</PRE>
+							</OL>
+							<LI><P>Restart the hosted site's web container. 
+							</P>
+							<LI><P>To access the SAML Artifact Profile or the SAML POST
+							Profile, login to the SAML source site and: 
+							</P>
+							<OL TYPE=a>
+								<LI><P>Access the SAML Artifact Profile at this URL: 
+								</P>
+								<P><CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>hostname</I></CODE><CODE>:</CODE><CODE><I>port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLAwareServlet?TARGET=</CODE><CODE><I>target_protocol</I></CODE><CODE>://</CODE><CODE><I>target_hostname</I></CODE><CODE>:</CODE><CODE><I>target_port</I></CODE><CODE>/</CODE><CODE><I>target_uri</I></CODE><CODE>/UI/Login</CODE>
+																</P>
+								<P>You will be redirected to the target site without
+								authentication. 
+								</P>
+								<LI><P>Access the SAML POST Profile at this URL: 
+								</P>
+								<P><CODE><I>protocol</I></CODE><CODE>://</CODE><CODE><I>hostname</I></CODE><CODE>:</CODE><CODE><I>port</I></CODE><CODE>/</CODE><CODE><I>uri</I></CODE><CODE>/SAMLPOSTProfileServlet?TARGET=</CODE><CODE><I>target_protocol</I></CODE><CODE>://</CODE><CODE><I>target_hostname</I></CODE><CODE>:</CODE><CODE><I>target_port</I></CODE><CODE>/</CODE><CODE><I>target_uri</I></CODE><CODE>/UI/Login</CODE>
+																</P>
+								<P STYLE="margin-bottom: 0in">You will be redirected to the
+								target site without authentication. 
+								</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">You
+								must setup a keystore before accessing the SAML POST Profile.
+								See <A HREF="#keystore">How do I setup a keystore?</A> for
+								the procedure. </FONT>
+								</P>
+								<HR>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="setupFFSSO"></A><B>Q: How do I set up single
+								sign-on using the Liberty ID-FF and the </B><CODE><B>famadm</B></CODE><B>
+								command line interface?</B></P>
+								<P>To set up single sign-on using the Liberty ID-FF and the
+								famadm command line interface, repeat the following procedure
+								on both the identity provider instance and the service
+								provider instance of Open Federation. 
+								</P>
+								<OL>
+									<LI><P>Run the following command to create a circle of
+									trust. 
+									</P>
+									<P><CODE>famadm create-cot -t </CODE><CODE><I>cot_name</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-e </CODE><CODE><I>realm</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<P>where 
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=3 WIDTH=50 VALIGN=TOP></TD>
+							<TD COLSPAN=3 WIDTH=98>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=278>
+								<P>The name of the circle being created.</P>
+							</TD>
+							<TD ROWSPAN=3 COLSPAN=14 WIDTH=874 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=3 WIDTH=98>
+								<P><I>realm</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=278>
+								<P>The realm into which the circle will be put.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=3 WIDTH=98>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=278>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL START=2>
+									<LI><P>Use one of the following procedures to generate the
+									standard and extended metadata files for a hosted identity
+									provider or a hosted service provider. 
+									</P>
+									<UL>
+										<LI><P>To generate metadata for a hosted identity provider
+										run the command that matches the status of your keystore: 
+										</P>
+										<OL TYPE=a>
+											<LI><P>Run the following command if a keystore has already
+											been set up: 
+											</P>
+											<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-i </CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+											</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+											<P>where 
+											</P>
+										</OL>
+									</UL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=6 COLSPAN=3 WIDTH=144 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=178 VALIGN=TOP>
+								<P><I>idp_entity_id</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>The provider's entity ID in the format:
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=6 COLSPAN=8 WIDTH=506 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Path to, and name of, the extended metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>idpMetaAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Specify a metaAlias for the hosted identity provider to be
+								created.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>idpSCertAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Specify a signing certificate alias for the hosted
+								identity provider to be created.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<UL>
+										<OL TYPE=a>
+											<LI><P>Run the following command if a keystore has NOT
+											been set up: 
+											</P>
+											<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-i </CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+										</OL>
+										<LI><P>To generate metadata for a hosted service provider
+										run the command that matches the status of your keystore: 
+										</P>
+										<OL TYPE=a>
+											<LI><P>Run the following command if a keystore has already
+											been set up: 
+											</P>
+											<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-i </CODE><CODE><I>spMetaAlias</I></CODE><CODE> -b
+											</CODE><CODE><I>spSCertAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+											<P>where 
+											</P>
+										</OL>
+									</UL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=6 COLSPAN=3 WIDTH=144 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=178 VALIGN=TOP>
+								<P><I>sp_entity_id</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>The provider's entity ID in the format:
+								<I>protocol</I>://<I>mhost</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=6 COLSPAN=8 WIDTH=506 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>hosted_extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Path to, and name of, the extended metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>spMetaAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Specify a metaAlias for the hosted identity provider to be
+								created.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>spSCertAlias</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Specify a signing certificate alias for the hosted
+								identity provider to be created.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=178>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=8 WIDTH=472>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<UL>
+										<OL TYPE=a>
+											<LI><P>Run the following command if a keystore has NOT
+											been set up: 
+											</P>
+											<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+											-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+											-m </CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE>
+											-x </CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE>
+											-i </CODE><CODE><I>spMetaAlias</I></CODE><CODE> -c
+											</CODE><CODE><I>metadata_spec</I></CODE> 
+											</P>
+										</OL>
+									</UL>
+									<LI><P>Use the procedures in the previous step to get the
+									metadata for the remote provider.</P>
+									<P>If the hosted provider is an identity provider, the
+									remote provider will be a service provider. Conversely, if
+									the hosted provider is a service provider, the remote
+									provider will be an identity provider. 
+									</P>
+									<HR>
+									<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+									<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">If
+									the remote provider is hosted on Sun Java System Federation
+									Manager, you can run the command documented previously on
+									the remote machine and copy the generated standard metadata
+									file to the hosted machine. </FONT>
+									</P>
+									<HR>
+									<P>Run the following command to load hosted metadata. 
+									</P>
+									<P><CODE>famadm import-entity -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+									</CODE><CODE><I>hosted_standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>hosted_extended_metadata</I></CODE><CODE> -t
+									</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<P>The value of <I>cot_name</I> is the name of the circle of
+									trust created in the first step. 
+									</P>
+									<LI><P>Run the following command to load remote metadata. 
+									</P>
+									<P><CODE>famadm import-entity -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -m
+									</CODE><CODE><I>remote_standard_metadata</I></CODE><CODE> -t
+									</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																		</P>
+									<P>The value of <I>cot_name</I> is the name of the circle of
+									trust created in the first step. 
+									</P>
+									<LI><P>Restart the web container(s). 
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="setupsaml2"></A><B>Q: How do I setup single
+								sign-on using SAML v2 and the </B><CODE><B>famadm</B></CODE><B>
+								command line interface?</B></P>
+								<P>To accomplish single sign-on using SAML v2, follow this
+								procedure on the instances of Open Federation that will serve
+								as the identity provider and the service provider.</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">BEFORE YOU BEGIN</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">Decide
+								which instance you are configuring as the service provider
+								and as the identity provider. </FONT>
+								</P>
+								<HR>
+								<OL>
+									<LI><P>Create the service provider metadata files.</P>
+									<OL TYPE=a>
+										<LI><P>Run the following command on the service provider
+										instance to create the service provider metadata files.</P>
+										<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>sp_entity_id</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -s
+										</CODE><CODE><I>sp_meta_alias</I></CODE> 
+										</P>
+										<LI><P>Edit the default values of any attributes in the
+										<I>sp_extended_metadata</I> to reflect your deployment, if
+										required. 
+										</P>
+										<P>For example, attribute mappers might need to be changed.
+																				</P>
+									</OL>
+									<LI><P>Create the identity provider metadata files. 
+									</P>
+									<OL TYPE=a>
+										<LI><P>Run the following command on the identity provider
+										instance to create the Identity Provider metadata file.</P>
+										<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>idp_entity_id</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-i </CODE><CODE><I>idp_meta_alias</I></CODE> 
+										</P>
+										<LI><P>Edit the default values of any attributes in the
+										<I>idp_extended_metadata</I> to reflect your deployment, if
+										required. 
+										</P>
+										<P>For example, attribute mappers might need to be changed.
+																				</P>
+									</OL>
+									<LI><P>Import the metadata files into the service provider
+									instance. 
+									</P>
+									<OL TYPE=a>
+										<LI><P>Run the following command on the service provider
+										instance to create a circle of trust. 
+										</P>
+										<P><CODE>famadm create-cot -t </CODE><CODE><I>cot_name</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>Run the following command to import the service
+										provider metadata files into the circle just created.</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>Copy the standard identity provider metadata file
+										from the identity provider instance to the service provider
+										instance. 
+										</P>
+										<LI><P>Run the following command to import the identity
+										provider metadata files to the service provider instance.</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>Run the following command to verify that the files
+										have been imported successfully. 
+										</P>
+										<P><CODE>famadm list-cot-members -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<P>This will display all members of the named circle of
+										trust. In this case, the hosted service provider and remote
+										identity provider are listed. You can also export the
+										metadata files for verification using the following
+										command: 
+										</P>
+										<P><CODE>famadm export-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE><I>provider_entityid</I></CODE><CODE> -m
+										</CODE><CODE><I>provider_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>provider_extended_metadata</I></CODE> 
+										</P>
+										<LI><P>Restart the Web Container. 
+										</P>
+									</OL>
+									<LI><P>Import the metadata files into the identity provider
+									instance. 
+									</P>
+									<OL TYPE=a>
+										<LI><P>Run the following command on the identity provider
+										instance to create a circle of trust. 
+										</P>
+										<P><CODE>famadm create-cot -t </CODE><CODE><I>cot_name</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>Run the following command to import the identity
+										provider metadata files.</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>Copy the standard service provider metadata file
+										from the service provider instance to the identity provider
+										instance. 
+										</P>
+										<LI><P>Run the following command to import the service
+										provider metadata files to the identity provider instance.</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>Run the following command to verify that the files
+										have been imported successfully. 
+										</P>
+										<P><CODE>famadm list-cot-members -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<P>This will display all members of the named circle of
+										trust. In this case, the remote service provider and hosted
+										identity provider are listed. You can also export the
+										metadata files, using the following command, for
+										verification: 
+										</P>
+										<P><CODE>famadm export-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE><I>provider_entityid</I></CODE><CODE> -m
+										</CODE><CODE><I>provider_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>provider_extended_metadata</I></CODE> 
+										</P>
+										<LI><P>Restart the web container. 
+										</P>
+									</OL>
+									<LI><P>Verify single sign-on using one of the following
+									URLs: 
+									</P>
+									<OL TYPE=a>
+										<LI><P>To initiate single sign-on from the Service
+										Provider, access the following URL: 
+										</P>
+										<P><CODE><I>sp_protocol</I></CODE><CODE>://</CODE><CODE><I>sp_host</I></CODE><CODE>:</CODE><CODE><I>sp_port</I></CODE><CODE>/</CODE><CODE><I>sp_deploy_URI</I></CODE><CODE>/spssoinit?metaAlias=</CODE><CODE><I>spMetaAlias</I></CODE><CODE>&amp;idpEntityID=</CODE><CODE><I>idp_entityID</I></CODE>
+																				</P>
+										<LI><P>To initiate single sign-on from the Identity
+										Provider, access the following URL: 
+										</P>
+										<P><CODE><I>sp_protocol</I></CODE><CODE>://</CODE><CODE><I>idp_host</I></CODE><CODE>:</CODE><CODE><I>idp_port</I></CODE><CODE>/</CODE><CODE><I>idp_deploy_URI</I></CODE><CODE>/idpssoinit?metaAlias=</CODE><CODE><I>idpMetaAlias</I></CODE><CODE>&amp;spEntityID=</CODE><CODE><I>sp_entityID</I></CODE>
+																				</P>
+									</OL>
+									<P>Initially, you will need to authenticate to both the
+									service provider and the identity provider site to establish
+									federation. After that, you will be redirected to the remote
+									partner site without re-authentication. 
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="turnonsaml2"></A><B>Q: How do I turn on signing
+								and encryption using SAML v2?</B></P>
+								<P STYLE="margin-bottom: 0in">The following procedure
+								illustrates how you turn on signing and encryption using SAML
+								v2. 
+								</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">BEFORE YOU BEGIN</FONT></H3>
+								<P><FONT FACE="Times New Roman, serif">Setup a keystore using
+								the </FONT><CODE><FONT FACE="Times New Roman, serif">keytool</FONT></CODE><FONT FACE="Times New Roman, serif">
+								command line interface on the machines acting as service
+								provider and identity provider. See <A HREF="#keystore">How
+								do I setup a keystore?</A> for details.</FONT></P>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">After
+								setting up the keystore, import the applicable signing and
+								encryption certificates into it, again, using the </FONT><CODE><FONT FACE="Times New Roman, serif">keytool</FONT></CODE><FONT FACE="Times New Roman, serif">
+								command line interface. </FONT>
+								</P>
+								<HR>
+								<OL>
+									<LI><P>Run the following command on the service provider
+									machine to regenerate the service provider metadata
+									(including the newly added signing and encryption key
+									information).</P>
+									<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -s
+									</CODE><CODE><I>sp_metaAlias</I></CODE><CODE> -a
+									</CODE><CODE><I>sp_certalias</I></CODE><CODE> -r
+									</CODE><CODE><I>sp_enc_alias</I></CODE> 
+									</P>
+									<LI><P>Run the following command on the identity provider
+									machine to regenerate the identity provider metadata
+									(including the newly added signing and encryption key
+									information).</P>
+									<P><CODE>famadm create-metadata-templ -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+									-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+									-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE> -x
+									</CODE><CODE><I>idp_extended_metadata</I></CODE><CODE> -i
+									</CODE><CODE><I>idp_metaAlias</I></CODE><CODE> -b
+									</CODE><CODE><I>idp_certalias</I></CODE><CODE> -g
+									</CODE><CODE><I>idp_enc_alias</I></CODE> 
+									</P>
+									<LI><P>Modify the values of the following attributes in the
+									appropriate file to enable signing and encryption. 
+									</P>
+									<UL>
+										<LI><P>Identity Provider Standard Metadata Configuration
+										File Attribute 
+										</P>
+										<UL>
+											<LI><P><CODE>wantAuthnRequestsSigned</CODE> 
+											</P>
+										</UL>
+										<LI><P>Service Provider Standard Metadata Configuration
+										File Attributes 
+										</P>
+										<UL>
+											<LI><P><CODE>AuthnRequestsSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantAssertionsSigned</CODE> 
+											</P>
+										</UL>
+										<LI><P>Identity Provider Extended Metadata Configuration
+										File Attributes 
+										</P>
+										<UL>
+											<LI><P><CODE>wantNameIDEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantArtifactResolveSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantLogoutRequestSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantLogoutResponseSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantMNIRequestSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantMNIResponseSigned</CODE></P>
+										</UL>
+										<LI><P>Service Provider Extended Metadata Configuration
+										File Attributes 
+										</P>
+										<UL>
+											<LI><P><CODE>wantAttributeEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantAssertionEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantNameIDEncrypted</CODE> 
+											</P>
+											<LI><P><CODE>wantArtifactResponseSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantLogoutRequestSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantLogoutResponseSigned</CODE> 
+											</P>
+											<LI><P><CODE>WantMNIRequestSigned</CODE> 
+											</P>
+											<LI><P STYLE="margin-bottom: 0in"><CODE>WantMNIResponseSigned</CODE>
+																						</P>
+										</UL>
+									</UL>
+									<HR>
+									<H3><FONT FACE="Times New Roman, serif">NOTE</FONT></H3>
+									<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">To
+									use the SAML POST profile, signing must be enabled. It is
+									enabled automatically when using the SAML Artifact profile. </FONT>
+									</P>
+									<HR>
+									<P>Use the following procedure to remove the old metadata
+									from, and import the new metadata to, the service provider
+									machine: 
+									</P>
+									<UL>
+										<LI><P>Run the following command to remove the old hosted
+										service provider metadata: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>Run the following command to remove the old remote
+										identity provider metadata: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>Run the following command to import the new hosted
+										service provider metadata: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>Copy the new standard and extended metadata files
+										from the remote identity provider machine to the hosted
+										service provider machine. 
+										</P>
+										<LI><P>Change the <CODE>hosted=&quot;1&quot;</CODE>
+										attribute to <CODE>hosted=&quot;0&quot;</CODE> in the
+										extended metadata file that was just copied from the remote
+										identity provider to the service provider side. 
+										</P>
+										<LI><P>Run the following command to import the newly
+										modified remote identity provider metadata: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+									</UL>
+									<LI><P>Use the following procedure to remove the old
+									metadata from, and import the new metadata to, the identity
+									provider machine: 
+									</P>
+									<UL>
+										<LI><P>Run the following command to remove the old hosted
+										identity provider metadata: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>Run the following command to remove the old remote
+										service provider metadata: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE>
+																				</P>
+										<LI><P>Run the following command to import the new hosted
+										identity provider metadata: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>idp_standard_metadata</I></CODE><CODE>
+										-x </CODE><CODE><I>idp_extended_metadata</I></CODE><CODE>
+										-t </CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+										<LI><P>Copy the new standard and extended metadata files
+										from the remote service provider machine to the hosted
+										identity provider machine. 
+										</P>
+										<LI><P>Change the <CODE>hosted=&quot;1&quot;</CODE>
+										attribute to <CODE>hosted=&quot;0&quot;</CODE> in the
+										extended metadata file that was just copied from the remote
+										service provider to the identity provider side. 
+										</P>
+										<LI><P>Run the following command to import the newly
+										modified remote service provider metadata: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>sp_standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>sp_extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE> 
+										</P>
+									</UL>
+									<LI><P>Restart the web containers hosting both providers. 
+									</P>
+									<LI><P>Verify single sign-on using one of the following
+									URLs: 
+									</P>
+									<UL>
+										<LI><P>To initiate single sign-on from the service
+										provider, access the following URL: 
+										</P>
+										<P><CODE><I>sp_protocol</I></CODE><CODE>://</CODE><CODE><I>sp_host</I></CODE><CODE>:</CODE><CODE><I>sp_port</I></CODE><CODE>/</CODE><CODE><I>sp_deploy_URI</I></CODE><CODE>/spssoinit?metaAlias=</CODE><CODE><I>spMetaAlias</I></CODE><CODE>&amp;idpEntityID=</CODE><CODE><I>idp_entityID</I></CODE>
+																				</P>
+										<LI><P>To initiate single sign-on from the identity
+										provider, access the following URL: 
+										</P>
+										<P><CODE><I>idp_protocol</I></CODE><CODE>://</CODE><CODE><I>idp_host</I></CODE><CODE>:</CODE><CODE><I>idp_port</I></CODE><CODE>/</CODE><CODE><I>idp_deploy_URI</I></CODE><CODE>/idpssoinit?metaAlias=</CODE><CODE><I>idpMetaAlias</I></CODE><CODE>&amp;spEntityID=</CODE><CODE><I>sp_entityID</I></CODE>
+																				</P>
+									</UL>
+									<P>Initially, you will need to authenticate to both the
+									service provider and the identity provider site to establish
+									federation. After that, you will be redirected to the remote
+									partner site without re-authentication. 
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="setupauth"></A><B>Q: How do I setup
+								authentication using the Authentication Web Service?</B></P>
+								<P>The following procedure illustrates how to setup for
+								authentication using the Authentication Web Service. 
+								</P>
+								<OL>
+									<LI><P>Run the following command to get the current value
+									for the defined Authentication Web Service attribute: 
+									</P>
+									<P><CODE>famadm get-attr-defs -s
+									sunIdentityServerAuthnService -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+									Global -a MechanismHandlerList</CODE> 
+									</P>
+									<LI><P>From the previous command's output, save the entire
+									line beginning with <CODE>MechanismHandlerList=</CODE> to a
+									file. 
+									</P>
+									<P>In this case, we will call the file <CODE>datafile</CODE>.
+																		</P>
+									<LI><P>Edit <CODE>datafile</CODE> to change the existing
+									handler class or add a new one.</P>
+									<P>The syntax of the value of the <CODE>MechanismHandlerList</CODE>
+									attribute is
+									<CODE>key=</CODE><CODE><I>mechanism_name</I></CODE><CODE>|class=</CODE><CODE><I>handler_class_for_mechanism_specified_in_key</I></CODE>.
+									You can change this value by modifying the existing line or
+									adding a new one. 
+									</P>
+									<LI><P>Run the following command to change the value of
+									<CODE>MechanismHandlerList</CODE>: 
+									</P>
+									<P><CODE>famadm set-attr-defs -s
+									sunIdentityServerAuthnService -u amadmin -f
+									</CODE><CODE><I>admin_password_file_name</I></CODE><CODE> -t
+									Global -D datafile</CODE> 
+									</P>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="discotokens"></A><B>Q: How do I setup the
+								Discovery Service to issue X509, Bearer, and SAML tokens?</B></P>
+								<P>The following procedure illustrates how to configure the
+								Discovery Service to issue x509, Bearer, and SAML tokens.</P>
+								<HR>
+								<H3><FONT FACE="Times New Roman, serif">BEFORE YOU BEGIN</FONT></H3>
+								<P STYLE="margin-bottom: 0in"><FONT FACE="Times New Roman, serif">Setup
+								an identity provider, a service provider, and a keystore on
+								each by following the procedures documented in <A HREF="#IDFFsample">How
+								do I set up and run the Liberty ID-FF sample?</A> and <A HREF="#keystore">How
+								do I setup a keystore?</A>, respectively.</FONT> 
+								</P>
+								<HR>
+								<OL>
+									<LI><P><A NAME="idpm"></A>On the identity provider machine: 
+									</P>
+									<OL TYPE=a>
+										<LI><P>Run the following command to get the current value
+										for the defined Discovery Service attribute: 
+										</P>
+										<P><CODE>famadm get-attr-defs -s
+										sunIdentityServerDiscoveryService -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t Global -a sunIdentityServerBootstrappingDiscoEntry</CODE>
+																				</P>
+										<LI><P>From the previous step's output, save the entire
+										line beginning with
+										<CODE>sunIdentityServerBootstrappingDiscoEntry=</CODE> to a
+										file. 
+										</P>
+										<P>In this case, we will call the file <CODE>datafile</CODE>.
+																				</P>
+										<LI><P>Edit <CODE>datafile</CODE> to setup for the specific
+										token: 
+										</P>
+										<UL>
+											<LI><P>For SAML tokens, replace the following: 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>with 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:SAML&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>and 
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;/DiscoEntry&gt;</CODE>
+																						</P>
+											<P>with 
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;AuthorizeRequester
+											xmlns=&quot;urn:liberty:disco:2003-08&quot;/&gt;&lt;/DiscoEntry&gt;</CODE>
+																						</P>
+											<LI><P>For X509 tokens, replace the following: 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>with 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:X509&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<LI><P>For Bearer tokens, replace the following: 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>with 
+											</P>
+											<P><CODE>&lt;SecurityMechID&gt;urn:liberty:security:2004-04:null:Bearer&lt;/SecurityMechID&gt;</CODE>
+																						</P>
+											<P>and 
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;/DiscoEntry&gt;</CODE>
+																						</P>
+											<P>with 
+											</P>
+											<P><CODE>&lt;/ResourceOffering&gt;&lt;AuthenticateRequester
+											xmlns=&quot;urn:liberty:disco:2003-08&quot;/&gt;&lt;GenerateBearerToken
+											xmlns=&quot;urn:liberty:disco:2004-04&quot;/&gt;&lt;/DiscoEntry&gt;</CODE>
+																						</P>
+										</UL>
+										<LI><P>Run the following command (using as <CODE>datafile</CODE>
+										input) to change the values of the attributes: 
+										</P>
+										<P><CODE>famadm set-attr-defs -s
+										sunIdentityServerDiscoveryService -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-t Global -D datafile</CODE> 
+										</P>
+										<LI><P STYLE="margin-bottom: 0in">Logon to console as top
+										level administrator. Goto Configuration -&gt; Global -&gt;
+										Liberty ID-WSF Security Service, edit the values of the
+										following properties:</P>
+										<UL>
+											<LI><P><CODE>Trusted Authority signing certificate alias</CODE>
+											to <CODE>test</CODE> 
+											</P>
+											<LI><P><CODE>Default WSC certificate alias</CODE> to <CODE>test</CODE>
+																						</P>
+											<LI><P><CODE>Trusted CA signing certificate aliases</CODE>
+											to <CODE>test</CODE> 
+											</P>
+										</UL>
+										<P><CODE>test</CODE> is the sample value. 
+										</P>
+										<LI><P>Run the following command to delete the identity
+										provider: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<P>where 
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=4 WIDTH=98 VALIGN=TOP>
+								<P><I>idp_entityid</I></P>
+							</TD>
+							<TD COLSPAN=10 WIDTH=430>
+								<P>The provider's entity ID in the format:
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=2 COLSPAN=11 WIDTH=675 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=4 WIDTH=98>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=10 WIDTH=430>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=7>
+										<LI><P>Run the following command to delete the remote
+										service provider: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>remote_sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<P>where 
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=2 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=6 WIDTH=124 VALIGN=TOP>
+								<P><I>remote_sp_entityid</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=430>
+								<P>The provider's entity ID in the format:
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=2 COLSPAN=10 WIDTH=649 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=6 WIDTH=124>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=9 WIDTH=430>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=8>
+										<LI><P>Run the following command to create new standard and
+										extended metadata files for the identity provider: 
+										</P>
+										<P><CODE>famadm create-metadata-templ -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE><I>idp_entityid</I></CODE><CODE> -m
+										</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -i
+										</CODE><CODE><I>idpMetaAlias</I></CODE><CODE> -b
+										</CODE><CODE><I>idpSCertAlias</I></CODE><CODE> -c
+										</CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<P>where 
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=7 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=128 VALIGN=TOP>
+								<P><I>idp_entityid</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The provider's entity ID in the format:
+								<I>protocol</I>://<I>host</I>:<I>port</I>/<I>deploy_uri</I>
+								<BR>For example, <CODE>http://happy.red.sun.com:80/openfm</CODE></P>
+							</TD>
+							<TD ROWSPAN=7 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the extended metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>idpMetaAlias</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Specify a metaAlias for the identity provider being
+								created.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>idpSCertAlias</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Specify a signing certificate alias for the identity
+								provider being created.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The name of the circle into which the files are being
+								imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=9>
+										<LI><P>Run the following command to import the new metadata
+										files into the defined circle: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<P>where 
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=4 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+							<TD ROWSPAN=4 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>extended_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the extended metadata XML file</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The name of the circle into which the files are being
+								imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a START=10>
+										<LI><P>Copy the standard metadata file from the service
+										provider (created during the service provider procedure
+										documented in the next step) to the <CODE>/tmp</CODE>
+										directory on this machine. 
+										</P>
+										<P>See <A HREF="#spm">On the service provider machine</A>. 
+										</P>
+										<LI><P>Run the following command to import the standard
+										metadata file for the service provider into the defined
+										circle: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<P>where 
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD ROWSPAN=3 COLSPAN=2 WIDTH=97 VALIGN=TOP></TD>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>standard_metadata</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Path to, and name of, the standard metadata XML file</P>
+							</TD>
+							<TD ROWSPAN=3 COLSPAN=6 WIDTH=493 VALIGN=TOP></TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>cot_name</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>The name of the circle into which the files are being
+								imported; in this case, <CODE>sampleidffcot</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=8 WIDTH=128>
+								<P><I>metadata_spec</I></P>
+							</TD>
+							<TD COLSPAN=11 WIDTH=582>
+								<P>Either <CODE>idff</CODE> or <CODE>saml2</CODE>; in this
+								case, <CODE>idff</CODE>.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<OL>
+									<OL TYPE=a>
+										<LI><P>Restart the web container. 
+										</P>
+									</OL>
+									<LI><P><A NAME="spm"></A>On the service provider machine: 
+									</P>
+									<OL TYPE=a>
+										<LI><P>Run the following command to delete the service
+										provider: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>sp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<LI><P>Run the following command to delete the remote
+										identity provider: 
+										</P>
+										<P><CODE>famadm delete-entity -y </CODE><CODE><I>idp_entityid</I></CODE><CODE>
+										-u amadmin -f </CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-c </CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<LI><P>Run the following command to create new standard and
+										extended metadata files for the service provider: 
+										</P>
+										<P><CODE>famadm create-metadata-templ -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-y </CODE><CODE><I>sp_entityid</I></CODE><CODE> -m
+										</CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -s
+										</CODE><CODE><I>spMetaAlias</I></CODE><CODE> -a
+										</CODE><CODE><I>spSCertAlias</I></CODE><CODE> -c
+										</CODE><CODE><I>metadata_spec</I></CODE> 
+										</P>
+										<LI><P>Run the following command to import the new metadata
+										files into the defined circle: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -x
+										</CODE><CODE><I>extended_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<LI><P>Copy the standard metadata file from the identity
+										provider (created during the identity provider procedure
+										documented in the previous step) to the <CODE>/tmp</CODE>
+										directory on this machine. 
+										</P>
+										<P>See <A HREF="#idpm">On the identity provider machine</A>.
+																				</P>
+										<LI><P>Run the following command to import the new standard
+										metadata file for the identity provider into the defined
+										entity: 
+										</P>
+										<P><CODE>famadm import-entity -u amadmin -f
+										</CODE><CODE><I>admin_password_file_name</I></CODE><CODE>
+										-m </CODE><CODE><I>standard_metadata</I></CODE><CODE> -t
+										</CODE><CODE><I>cot_name</I></CODE><CODE> -c </CODE><CODE><I>metadata_spec</I></CODE>
+																				</P>
+										<LI><P>Logon to console as top level administrator. Goto
+										Configuration -&gt; Global -&gt; Liberty ID-WSF Security
+										Service, edit the values of the <CODE>Default WSC
+										certificate alias</CODE> field to correct certificate
+										alias.<BR>The certificate alias will be used to generate
+										X509 tokens for the web service client. 
+										</P>
+										<LI><P>Restart the web container. 
+										</P>
+									</OL>
+								</OL>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="pa3profile"></A><B>Q: How do I setup a profile
+								for Policy Agents 3.0 using </B><CODE><B>famadm</B></CODE><B>
+								CLI?</B></P>
+								<P>See the <A HREF="http://wikis.sun.com/display/OpenSSO/famadmAgents">OpenSSO
+								wiki</A> for this procedure.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="configdsfailover"></A><B>Q: How do I setup the
+								OpenSSO configuration data store for failover?</B></P>
+								<P>See DocTeger's blog entry <A HREF="http://blogs.sun.com/docteger/entry/opensso_bootstrap_file_now_with">The
+								OpenSSO Bootstrap File Deconstructed</A> for this procedure.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="websphereAIX"></A><B>Q: How do I deploy OpenSSO on Websphere 6.1 for AIX?</B></P>
+								<P>See DocTeger's blog entry <A HREF="http://blogs.sun.com/docteger/entry/deploying_opensso_on_websphere_6">Deploying OpenSSO on WebSphere 6.1 AIX</A> for this procedure.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="authws1"></A><B>Q: How do I configure for authentication on OpenSSO using an identity web service?</B></P>
+								<P>See the first part of software architect Aravindan Ranganathan's article <A HREF="http://developers.sun.com/identity/reference/techart/id-svcs.html">Securing Applications with Identity Services, Part 1: Authentication</A> for this procedure.</P>
+							</TD>
+						</TR>
+						<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="authws2"></A><B>Q: How do I configure for authorization on OpenSSO using an identity web service?</B></P>
+								<P>See the second part of software architect Aravindan Ranganathan's article <A HREF="http://developers.sun.com/identity/reference/techart/id-svcs2.html">Securing Applications with Identity Services, Part 2: Authorization</A> for this procedure.</P>
+							</TD>
+						</TR>
+<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="idpproxy"></A><B>Q: How do I setup a SAMLv2 IDP Proxy?</B></P>
+								<P>See DocTeger's blog entry <A HREF="http://blogs.sun.com/docteger/entry/setting_up_an_idp_proxy">Setting Up a SAMLv2 IDP Proxy</A> for this procedure.</P></TD>
+						</TR>
+<TR>
+							<TD COLSPAN=27 WIDTH=1322 VALIGN=TOP>
+								<P><A NAME="confwithout"></A><B>Q: How do I configure OpenSSO without using the <code>configurator.jsp</code>?</B></P>
+								<P>See DocTeger's blog entry <A HREF="http://blogs.sun.com/docteger/entry/configuring_opensso_without_configurator_jsp">Configuring OpenSSO without <code>configurator.jsp</A> for this procedure. Be sure to read the first comment for special instructions if configuring using the Linux or Windows operating environments.</P></TD></TR>
+					</TBODY>
+				</TABLE>
+			</CENTER>
+			<P><!-- content boundary --><BR><BR>
+			</P>
+			</BODY>
+			</HTML>

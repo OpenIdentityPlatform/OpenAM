@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 SOAP 绑定 - Sun OpenSSO 8.0 控制台联机帮助
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scsaml2soapbinding"></a><h4>SAMLv2 SOAP 绑定</h4>
+<p>SAMLv2 SOAP 绑定服务在 OpenSSO 客户机和 OpenSSO 服务器之间提供基于 SOAP 的 SAMLv2 请求和响应消息交换。收到的请求将委托给请求处理程序进行进一步处理。请求处理程序和元数据别名的关键字位于 SOAP
+绑定服务 URL 中。元数据别名和 RequestHandler 的映射保存在 SAMLv2 SOAP 绑定服务中，可从 OpenSSO 配置存储库读取。</p>
+
+<a name="ggokv"></a><h5>请求处理程序列表</h5>
+<a name="indexterm-192"></a><a name="indexterm-193"></a><p>RequestHandlerList 是关键字/值对的条目列表，包含元数据别名与 RequestHandler 实现的映射。如果将 OpenSSO 8.0 服务器配置成策略决策点 (Policy Decision Point, PDP)，则必须设置该属性。</p><p><i>关键字</i>是策略决策点元数据别名，<i>类</i>是 Java 类名，该类是处理 XACML 请求的 RequestHandler 接口的实现。</p><p>例如，如果 XACML 策略决策点的元数据别名是 <tt>/pdp</tt>，接口实现是 <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>，则应将关键字设置为 <tt>/pdp</tt>，将类设置为 <tt>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</tt>。</p>
+<br/>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ */ 
+
+##############################################################
+#
+# Configure an Apache Server (version 1.3.29 and 2.0.48)
+#
+##############################################################
+
+agent_configure() {
+    typeset -i status=0
+    typeset apache_config_file=dsame.conf
+    APACHE_VERSION=`$SERVER_BINARY/httpd -v |grep "Server version"|awk '{print $3}' |sed -n 's/Apache\///p' | awk -F'.' '{print $1}'`
+
+                                                                                                                                                                            
+    $ECHO "`$GETTEXT 'Configuring Apache Web Server ...'`"
+    $ECHO "`$GETTEXT 'Server version:' $APACHE_VERSION` "
+                                                                                                                                                                            
+    if [[ "$APACHE_VERSION" == "2" ]]; then
+        EAPI="2";
+    elif [[ "$EAPI" == "true" ]]; then
+        EAPI="_ssl";
+    else
+        EAPI="";
+    fi
+
+    CERT_DIR="$SERVER_INSTANCE/cert"
+
+    # the following echo are use for debug 
+    # $ECHO CERT_DIR=$CERT_DIR
+    # $ECHO "$PKG_DIR/config/$apache_config_file.orig"
+    # $ECHO AGENT_CONFIG_DIR=$AGENT_CONFIG_DIR
+    # $ECHO apache_config_file=$apache_config_file
+    # $ECHO APACHE_PKG_BASEDIR=$APACHE_PKG_BASEDIR
+    # $ECHO APACHE_PKG_PRODUCT_DIR=$APACHE_PKG_PRODUCT_DIR
+
+    common_agent_dir=$APACHE_PKG_BASEDIR/$APACHE_PKG_PRODUCT_DIR
+
+    # $ECHO common_agent_dir=$common_agent_dir
+    # $ECHO "$SED -e 's#MODULE#$PKG_DIR/lib#g' -e 's#DSAMECONFIG#$AGENT_CONFIG_DIR/$AGENT_PROPERTIES_FILE_NAME#g' -e 's#SHAREDLIBDIR#$PKG_DIR/lib#g' $PKG_DIR/config/$apache_config_file.orig > $AGENT_CONFIG_DIR/$apache_config_file"
+
+#    $SED -e "s#MODULE#$common_agent_dir/apache/lib#g" \
+#	 -e "s#DSAMECONFIG#$AGENT_CONFIG_DIR/$AGENT_PROPERTIES_FILE_NAME#g" \
+    $SED -e "s#MODULE#$common_agent_dir/apache/lib#g" \
+	 -e "s#DSAMECONFIG#$AGENT_CONFIG_DIR/$AGENT_PROPERTIES_FILE_NAME#g" \
+	 -e "s#EAPI#$EAPI#g" \
+	 $PKG_DIR/config/$apache_config_file.orig > $AGENT_CONFIG_DIR/$apache_config_file
+
+    if [[ $? -eq 0 ]]; then
+	cd $SERVER_INSTANCE
+        $ECHO SERVER_INSTANCE=$SERVER_INSTANCE
+
+	cat_line httpd.conf "include $AGENT_CONFIG_DIR/$apache_config_file"
+	status=$(($status + $?))
+        
+        # orig
+	# typeset agent_doc_dir=`$GREP \^DocumentRoot httpd.conf | $TAIL -1 | $SED -e "s/DocumentRoot//" | $TR -d '" '`$AGENT_DEPLOY_URI/html
+
+        APACHEDOCROOT=`grep \^DocumentRoot httpd.conf|tail -1 | sed -e "s/DocumentRoot//" | $TR -d '"' | $TR -d ' '`
+        typeset agent_doc_dir=$APACHEDOCROOT$AGENT_DEPLOY_URI/html
+
+        # $ECHO APACHEDOCROOT=$APACHEDOCROOT
+        # $ECHO AGENT_DEPLOY_URI=$AGENT_DEPLOY_URI
+        # $ECHO agent_doc_dir=$agent_doc_dir
+        # $ECHO AGENT_ACCESS_DENY_FILE=$AGENT_ACCESS_DENY_FILE
+
+	$MKDIR -p $agent_doc_dir
+	status=$(($status + $?))
+
+	if [[ $status -eq 0 ]]; then
+
+            if [ ! -d $CERT_DIR ]; then
+                mkdir $CERT_DIR
+            fi
+	    cd $CERT_DIR
+
+	    if [ -z "$LD_LIBRARY_PATH" ] ; then
+	        LD_LIBRARY_PATH="$PKG_DIR/lib:$common_agent_dir/lib"
+	    else
+		LD_LIBRARY_PATH="$PKG_DIR/lib:$common_agent_dir/lib:$LD_LIBRARY_PATH"
+	    fi
+	    export LD_LIBRARY_PATH
+            # $ECHO LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+
+	    if [ ! -f cert7.db ]; then
+		$ECHO "password" > password.txt
+		#$PKG_DIR/cert/certutil -N -d . -f password.txt
+		status=$(($status + $?))
+		$CHMOD 644 *.db
+		$RM -f password.txt
+	    fi
+
+	    NEW_OWNER=`$GREP "^User[^a-zA-Z0-9]" $SERVER_INSTANCE/httpd.conf | $AWK '{ print $2 }'`
+            # $ECHO NEW_OWNER=$NEW_OWNER
+	    if [[ -z "$NEW_OWNER" ]]; then
+		NEW_OWNER=nobody
+	    fi
+	fi
+
+	if [[ $status -ne 0 ]]; then
+	    restore_backup_file httpd.conf
+            if [ -d $CERT_DIR ]; then
+               $RM -rf $CERT_DIR
+            fi
+	    $RM -rf $agent_doc_dir
+	fi
+    else
+	$RM -f $AGENT_CONFIG_DIR/$apache_config_file
+	status = 1
+    fi
+    
+    # For apache, check for both sides SSL/nonSSL     
+    #if [[ "$PRIMARY_SERVER_PROTOCOL" == "https" ]] && [[ "$AGENT_PROTOCOL" == "https" ]]; then
+        NOTIFICATION_ENABLE=false;
+        LOG_ROTATION=false;
+    #fi
+
+    
+    # $ECHO status=$status
+    return $status
+}
+
+##############################################################
+#
+# Additional callback routines.
+#
+##############################################################
+
+is_apache_instance() {
+    is_apache_binary $1	
+    SERVER_BINARY=$1
+    [[ -f "$SERVER_INSTANCE"/httpd.conf ]]
+}
+
+agent_get_config() {
+    get_web_service_instance "Enter the Apache Server Binary Directory:" "Invalid Apache server binary !" "$SERVER_BINARY" is_apache_instance
+    agent_get_eapi "SSL Ready:" "Please enter true or false" "true" is_true_false
+}
+
+agent_init_variables() {
+    SERVER_BINARY=/usr/sbin
+}
+
+agent_get_eapi() {
+    typeset value=
+    get_value "$1" "$2" "$3" $4
+    EAPI=$value
+}
+
+is_true_false() {
+   [[ "x$1" == "xtrue" ]] || [[ "x$1" == "xfalse" ]]
+}
+
+is_apache_binary() {
+    if [[ -f $1/"httpd" ]]; then
+        HTTPD_ROOT=`"$1"/httpd -V|grep "HTTPD_ROOT"|awk '{print $2}'|tr -d [\"][\ ]|sed -n 's/HTTPD_ROOT=//p'`
+        SERVER_CONFIG_DIR=`"$1"/httpd -V|grep "SERVER_CONFIG_FILE"|awk '{print $2}'|tr -d [\"][\ ]|sed -n 's#\/httpd.conf$##p'|sed -n 's#SERVER_CONFIG_FILE=##p'`
+        SERVER_INSTANCE=$HTTPD_ROOT/$SERVER_CONFIG_DIR
+	value=$SERVER_INSTANCE
+    else
+	value=$1
+    fi
+}
+
+
+
+##############################################################
+#
+# The script itself, beginning with the standard preamble.
+#
+##############################################################
+
+GETTEXT=/bin/gettext
+RPM=/bin/rpm
+APACHE_PKG_BASEDIR=`$RPM -q --queryformat '%{INSTALLPREFIX}' apcagent-2.2-0`
+if [ $? = 1 ]; then
+    echo "`$GETTEXT 'Required package apcagent-2.2-0 is not installed. Exit...'`"
+    exit 1
+fi
+APACHE_PKG_PRODUCT_DIR=agents
+. $APACHE_PKG_BASEDIR/$APACHE_PKG_PRODUCT_DIR/apache/bin/comlib_linux
+
+#$ECHO APACHE_PKG_BASEDIR=$APACHE_PKG_BASEDIR
+#$ECHO APACHE_PKG_PRODUCT_DIR=$APACHE_PKG_PRODUCT_DIR
+init_variables $APACHE_PKG_BASEDIR $APACHE_PKG_PRODUCT_DIR apache
+
+configure "$@"

@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>階段作業 - Sun OpenSSO 8.0 主控台線上說明
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amsessionservice"></a><h4>階段作業</h4>
+<p><a name="indexterm-196"></a>階段作業服務定義已認證之使用者階段作業的值，例如最長階段作業時間及最長閒置時間。階段作業屬性為全域屬性、動態屬性或使用者屬性。這些屬性包括：</p>
+<ul><li><p><a href="#fwfeu">輔助配置實例</a></p></li>
+<li><p><a href="#fwfew">搜尋結果的最大數量</a></p></li>
+<li><p><a href="#fwfex">搜尋逾時</a></p></li>
+<li><p><a href="#fwfez">啟用特性變更通知</a></p></li>
+<li><p><a href="#fwfey">啟用配額限制</a></p></li>
+<li><p><a href="#fwffa">讀取配額限制時逾時</a></p></li>
+<li><p><a href="#fwffb">免除頂層管理員的限制檢查</a></p></li>
+<li><p><a href="#fwffc">若用盡階段作業的配額將導致</a></p></li>
+<li><p><a href="#fwffd">通知特性</a></p></li>
+<li><p><a href="#fwffe">最長階段作業時間</a></p></li>
+<li><p><a href="#fwfff">最長閒置時間</a></p></li>
+<li><p><a href="#fwffh">最長快取時間</a></p></li>
+<li><p><a href="#fwffi">使用中的使用者階段作業</a></p></li></ul>
+
+
+<a name="fwfeu"></a><h5>輔助配置實例</h5>
+<p>為 OpenSSO 中用於階段作業容錯移轉功能的階段作業儲存庫提供連線資訊。負載平衡器的 URL應指定為此輔助配置的識別碼。如果在此情況下定義了輔助配置，將自動啟用階段作業容錯移轉功能，而且在伺服器重新啟動之後即會生效。請參閱<a href="service.subconfigadd.html">新增子配置</a>，以取得更多資訊。</p>
+
+<a name="fwfew"></a><h5>搜尋結果的最大數量</h5>
+<p>此屬性指定階段作業搜尋傳回的最大結果數。預設值為 120。</p>
+
+<a name="fwfex"></a><h5>搜尋逾時</h5>
+<p>此屬性定義階段作業搜尋終止前的最長時間。預設值為 5 秒。</p>
+
+<a name="fwfez"></a><h5>啟用特性變更通知</h5>
+<p>啟用或停用功能階段作業特性變更通知。在單次登入環境中，多個應用程式可以共用一個 OpenSSO 階段作業。啟用此功能時，如果某個應用程式變更了 [通知特性] 清單 (定義為單獨的階段作業服務屬性) 中所指定的任一個階段作業特性，通知將被傳送到其他參與同一單次登入環境的應用程式。</p>
+
+<a name="fwfey"></a><h5>啟用配額限制</h5>
+<p>啟用或停用階段作業配額限制。執行階段作業配額限制可讓管理員根據全域層級中的限制設定，限制使用者具有特定數目的使用中/並行階段作業，或與此特殊使用者所屬之實體 (範圍/角色/使用者) 相關聯的配置。</p><p>此屬性的預設設定為關閉。如果變更了設定，您必須重新啟動伺服器。</p>
+
+<a name="fwffa"></a><h5>讀取配額限制時逾時</h5>
+<p>定義在發生逾時之前，將繼續查詢即時使用者階段作業計數的階段作業儲存庫的時間量 (以毫秒計算)。</p><p>達到最大讀取時間後，會傳回一個錯誤。只有在階段作業容錯移轉部署中啟用了階段作業配額限制時，此屬性才會生效。預設值為 6000 毫秒。如果變更了設定，您必須重新啟動伺服器。</p>
+
+<a name="fwffb"></a><h5>免除頂層管理員的限制檢查</h5>
+<p>指定具有頂層管理員角色的使用者是否應該免除階段作業限制檢查。若為是，即使啟用了階段作業限制，將不會對這些管理員進行階段作業配額檢查。</p><p>此屬性的預設值為否。若設定變更，您必須重新啟動伺服器。此屬性僅當啟用了階段作業配額限制時才生效。</p>
+<hr><p><b>備註 &#8211; </b>在 <tt>AMConfig.properties</tt> (<tt>com.sun.identity.authentication.super.user</tt>) 中為 OpenSSO 定義的超級使用者永遠免除階段作業配額限制檢查。</p>
+<hr>
+
+
+<a name="fwffc"></a><h5>若用盡階段作業的配額將導致</h5>
+<p>指定若用盡階段作業的配額將導致的行為。此屬性有兩個可選取的選項：</p><dl><dt>DESTROY_OLD_SESSION</dt>
+<dd><p>將銷毀下一個過期的階段作業。</p></dd>
+<dt>DENY_ACCESS</dt>
+<dd><p>將拒絕新的階段作業建立請求。</p></dd>
+</dl>
+<p>只有在啟用了階段作業配額限制且預設設定為 DESTROY_OLD_SESSION 時，此屬性才會生效。</p>
+
+<a name="ggyer"></a><h5>當階段作業儲存庫中斷時拒絕使用者登入</h5>
+<p>如果設定為 [是]，當階段作業儲存庫中斷時，此屬性會強制伺服器封鎖使用者。只有在選取階段作業的 [啟用配額限制] 時，此屬性才會生效。</p>
+
+<a name="fwffd"></a><h5>通知特性</h5>
+<p>當清單中定義的階段作業特性發生變更時，通知將傳送到已註冊的偵聽程式。當啟用了 [階段作業特性變更通知] 功能時，此屬性將生效。</p>
+
+<a name="fwffe"></a><h5>最長階段作業時間</h5>
+<p>此屬性的值以分鐘計算，表示階段作業過期而使用者必須重新蓋證以重新取得存取權限之前的最大時間。將接受等於或大於 1 的值。預設值為 120。(若要兼顧安全性與方便性，請考量將最大階段作業時間間隔設定為較大值，將最大閒置時間間隔設定為相對較小的值。) 「最長階段作業時間」限制階段作業的有效性。它不會超過配置的值。</p>
+
+<a name="fwfff"></a><h5>最長閒置時間</h5>
+<p>此屬性接受的值等於階段作業過期、使用者必須重新認證以重新取得存取權限之前閒置的最大時間 (以分鐘計算)。將接受等於或大於 1 的值。預設值為 30。(若要兼顧安全性與方便性，請考量將最長階段作業時間間隔設定為較大值，將最長閒置時間間隔設定為相對較小的值。)</p>
+
+<a name="fwffh"></a><h5>最長快取時間</h5>
+<p>此屬性的值以分鐘計算，等於用戶端連絡 OpenSSO 以重新整理快取階段作業資訊之前的最長時間間隔。將接受等於或大於 0 的值。預設值為 3。建議最大快取時間應該永遠小於最大閒置時間。</p>
+
+<a name="fwffi"></a><h5>使用中的使用者階段作業</h5>
+<p>指定允許使用者使用的最大並行階段作業數。</p>
+<br/>
+
+</body>
+</html>

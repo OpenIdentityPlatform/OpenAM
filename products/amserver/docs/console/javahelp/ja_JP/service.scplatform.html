@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>プラットフォーム - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scplatform"></a><h4>プラットフォーム</h4>
+<p><a name="indexterm-205"></a>プラットフォームサービスでは、OpenSSO 設定にサーバーを追加したり、OpenSSO アプリケーションの最上位レベルで適用されるその他のオプションを設定したりすることができます。プラットフォームサービスの属性は、グローバル属性です。属性は次のとおりです。</p>
+<ul><li><p><a href="#fxcgy">「プラットフォームロケール」</a></p></li>
+<li><p><a href="#fxcpo">「Cookie ドメイン」</a></p></li>
+<li><p><a href="#fxcmi">「使用可能なロケール」</a></p></li>
+<li><p><a href="#fxctg">「クライアント文字セット」</a></p></li></ul>
+
+
+<a name="fxcgy"></a><h5>プラットフォームロケール</h5>
+<p>プラットフォームロケールの値は、OpenSSO とともにインストールしたデフォルト言語のサブタイプです。認証サービス、ログサービス、および管理サービスは、この値の言語で管理されます。デフォルトは en_US です。サポートされている言語サブタイプのリストについては、<a href="supportedlang.html">「サポートされている言語ロケール」</a>を参照してください。</p>
+
+<a name="fxcpo"></a><h5>Cookie ドメイン</h5>
+<p>認証中にユーザーのブラウザに Cookie を設定するときに Cookie ヘッダーで返される、ドメインのリストです。空の場合、Cookie ドメインは設定されません。言い換えると、OpenSSO セッション Cookie は OpenSSO 自体にだけ転送され、ドメインのほかのサーバーには転送されません。</p><p>ドメインのほかのサーバーで SSO が必要な場合は、Cookie ドメインでこの属性を設定する必要があります。1 つの OpenSSO 上で異なるドメインに 2 つのインタフェースがある場合、両方の Cookie ドメインをこの属性に設定する必要があります。ロードバランサを使用する場合、Cookie ドメインは、ロードバランサの背後にあるサーバーではなく、ロードバランサのドメインのものであることが必要です。このフィールドのデフォルト値は、インストールされている
+OpenSSO のドメインです。</p>
+
+<a name="fxcmi"></a><h5>使用可能なロケール</h5>
+<p>この属性は、プラットフォーム用に設定したすべての使用可能なロケールを格納します。たとえば、ユーザーにロケールを選択させるアプリケーションを考えます。このアプリケーションは、プラットフォームのプロファイルからこの属性を取得して、ロケールのリストをユーザーに提示します。ユーザーがロケールを選択すると、アプリケーションがそれをユーザーエントリ <i>preferredLocale</i> に設定します。</p>
+
+<a name="fxctg"></a><h5>クライアント文字セット</h5>
+<p>この属性は、プラットフォームレベルのさまざまなクライアント用の文字セットを指定します。これには、クライアントタイプのリスト、および対応する文字セットも含まれます。詳細については、<a href="service.scplatformclientcharsetsadd.html">「新しい文字セットを作成する」</a>を参照してください。</p>
+<br/>
+
+</body>
+</html>

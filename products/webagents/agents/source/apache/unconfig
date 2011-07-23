@@ -1,0 +1,132 @@
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+ *
+ */ 
+
+TAIL="/usr/bin/tail"
+TR="/usr/bin/tr"
+
+##############################################################
+#
+# Unconfigure an Apache Web Server 
+#
+##############################################################
+
+agent_unconfigure() {
+    $ECHO "`$GETTEXT 'Unconfiguring Apache Server ...'` \c"
+
+    cd $SERVER_INSTANCE
+    CERT_DIR="$SERVER_INSTANCE/cert"
+
+    # echo APACHE_CONFIG_DIR=$APACHE_CONFIG_DIR
+
+    delete_line httpd.conf "dsame.conf"
+    # typeset apachedocroot=$($GREP \^DocumentRoot $APACHE_CONFIG_DIR/httpd.conf | $TAIL -1 | $SED -e "s/DocumentRoot//" | $TR -d '"' | $TR -d ' ')
+    typeset apachedocroot=$($GREP \^DocumentRoot httpd.conf | $TAIL -1 | $SED -e "s/DocumentRoot//" | $TR -d '"' | $TR -d ' ')
+    if [ "#$apachedocroot" != "#" ]; then
+	$RM -rf  $apachedocroot$AGENT_DEPLOY_URI
+    fi
+    if [ -d $CERT_DIR ]; then
+        $RM -rf $CERT_DIR
+    fi
+}
+
+##############################################################
+#
+# Additional callback routines.
+#
+##############################################################
+
+agent_check_instance_dir() {
+    if [[ ! -f $1/httpd.conf ]]; then
+	$ECHO "`$GETTEXT 'Invalid web server instance!'` \c"
+	$ECHO ""
+	exit 2
+    fi
+}
+
+agent_init_variables() {
+    return;
+}
+
+##############################################################
+#
+# The script itself, beginning with the standard preamble.
+#
+##############################################################
+
+GETTEXT=/usr/bin/gettext
+PKGPARAM=/usr/bin/pkgparam
+COMMON_PKG_BASEDIR=`$PKGPARAM SUNWamapc BASEDIR 2>/dev/null`
+if [ $? = 1 ]; then
+    echo "`$GETTEXT 'Required package SUNWamapc is not installed. Exit...'`"
+    exit 1
+fi
+COMMON_PKG_PRODUCT_DIR=`$PKGPARAM SUNWamapc PRODUCT_DIR 2>/dev/null`
+. $COMMON_PKG_BASEDIR/$COMMON_PKG_PRODUCT_DIR/apache/bin/comlib
+
+##############################################################
+#
+# end of standard preamble
+#
+##############################################################
+
+init_variables $COMMON_PKG_BASEDIR $COMMON_PKG_PRODUCT_DIR SUNWamapc
+
+    if [ $# != 0 ]; then
+	if [ "$1" = "-h" ]; then
+	    unconfig_show_usage
+	    exit 5
+        elif [ "$1" = "-r" ]; then
+	    check_root
+	    . "$2"
+            if [[ -f "$SERVER_INSTANCE"/httpd ]]; then
+                HTTPD_ROOT=`"$1"/httpd -V|grep "HTTPD_ROOT"|awk '{print $2}'|tr -d [\"][\ ]|sed -n 's/HTTPD_ROOT=//p'`
+                SERVER_CONFIG_DIR=`"$1"/httpd -V|grep "SERVER_CONFIG_FILE"|awk '{print $2}'|tr -d [\"][\ ]|sed -n 's#\/httpd.conf$##p'|sed -n 's#SERVER_CONFIG_FILE=##p'`
+                SERVER_INSTANCE=$HTTPD_ROOT$SERVER_CONFIG_DIR
+            elif [[ -f "$SERVER_INSTANCE"/httpd.conf ]]; then
+		$ECHO $SERVER_INSTANCE
+            else	
+	        $ECHO "`$GETTEXT 'Invalid web server instance!'` \c"
+	        $ECHO ""
+	        exit 2
+            fi
+	else    
+	    check_root
+            if [[ -f "$1"/httpd ]]; then
+                HTTPD_ROOT=`"$1"/httpd -V|grep "HTTPD_ROOT"|awk '{print $2}'|tr -d [\"][\ ]|sed -n 's/HTTPD_ROOT=//p'`
+                SERVER_CONFIG_DIR=`"$1"/httpd -V|grep "SERVER_CONFIG_FILE"|awk '{print $2}'|tr -d [\"][\ ]|sed -n 's#\/httpd.conf$##p'|sed -n 's#SERVER_CONFIG_FILE=##p'`
+                SERVER_INSTANCE=$HTTPD_ROOT$SERVER_CONFIG_DIR
+            elif [[ -f "$1"/httpd.conf ]]; then
+		SERVER_INSTANCE=$1
+            else	
+	        $ECHO "`$GETTEXT 'Invalid web server instance!'` \c"
+	        $ECHO ""
+	        exit 2
+	    fi	
+        fi
+    else
+        unconfig_show_usage
+	exit 1
+    fi	
+
+
+unconfigure "$SERVER_INSTANCE"

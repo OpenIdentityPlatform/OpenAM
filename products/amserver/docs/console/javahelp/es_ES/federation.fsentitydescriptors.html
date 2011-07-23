@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Entidades: proveedor o afiliado - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsentitydescriptors"></a><h3>Entidades: proveedor o afiliado</h3>
+<a name="indexterm-62"></a><a name="indexterm-63"></a><a name="indexterm-64"></a><a name="indexterm-65"></a><p>Una <b>entidad</b> puede configurarse con <b>metadatos</b> (informaci&#243;n de configuraci&#243;n que define una
+determinada arquitectura de servicios de identidades) para un proveedor de identidades o
+un proveedor de servicios individual, o para cada uno de ellos. Por
+el contrario, una entidad tambi&#233;n puede configurarse como una afiliaci&#243;n, es decir,
+un grupo seleccionado de proveedores de cualquiera de los dos tipos. Tanto
+las entidades de proveedores como de afiliaci&#243;n pueden configurarse en la consola
+de Federation Access Manager.</p>
+<hr><p><b>Nota &#8211; </b>Se puede crear una entidad, pero no estar&#225; disponible para asignarla a
+un c&#237;rculo de confianza hasta que se hayan agregado los proveedores.</p>
+<hr>
+<p>Los dos tipos de entidades se describen en la siguiente tabla.</p><a name="gbxxa"></a><h6>Tabla&#160;1 Tipo de entidades</h6><table><col width="50%"><col width="50%"><tr><td align="left" valign="top" scope="row"><p><b>Entidad de proveedores</b></p></td>
+<td align="left" valign="top" scope="row"><p>Una <b>entidad de proveedores</b>
+contiene los metadatos para los proveedores individuales de cada tipo. Todos los
+proveedores de identidades y servicios deben configurarse en una entidad de proveedores
+para poder asociarlos a un c&#237;rculo de confianza o seleccionarlos para incluirlos
+en una <b>entidad de afiliaci&#243;n</b>. Mediante los atributos proporcionados en la consola de Access
+Manager, un proveedor de identidades o un proveedor de servicios individual, o
+una de cada tipo puede definirse en una entidad de proveedores. Un
+perfil de entidad de proveedores contiene los siguientes grupos de atributos:</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">General Attributes</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">Identity Provider</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">Service Provider</a></p></li></ul>
+</td>
+</tr>
+<tr><td align="left" valign="top" scope="row"><p><b>Affiliate Entity</b></p></td>
+<td align="left" valign="top" scope="row"><p>Una <b>afiliaci&#243;n</b>
+configurada permite al usuario realizar la federaci&#243;n con un grupo de sitios
+asociados. Por ejemplo, cuando un proveedor de servicios emite una solicitud de
+autenticaci&#243;n para un usuario en nombre de una afiliaci&#243;n, y se ha
+protegido la autenticaci&#243;n, el usuario puede realizar un inicio de sesi&#243;n &#250;nico
+con todos los miembros de la afiliaci&#243;n. La afiliaci&#243;n se forma sin
+tener en cuenta los l&#237;mites de un c&#237;rculo de confianza.</p><p>Una <b>entidad de afiliaci&#243;n</b> contiene
+los metadatos que definen el grupo de una o varias de las
+entidades de proveedores que conforman la aplicaci&#243;n. No contiene la informaci&#243;n de
+configuraci&#243;n de ning&#250;n proveedor, s&#243;lo la informaci&#243;n de configuraci&#243;n del propio afiliado.
+Un perfil de entidad de afiliaci&#243;n contiene los siguientes grupos de atributos:</p>
+<ul><li><p><a href="federation.fsentitydescriptorsprofile.html">General Attributes</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">Affiliate</a></p></li></ul>
+
+<hr><p><b>Nota &#8211; </b>Los
+miembros de una afiliaci&#243;n puede llamar a servicios como miembro de la
+afiliaci&#243;n o individualmente.</p>
+<hr>
+</td>
+</tr>
+</table><p>Todos las entidades configuradas de ambos tipos se muestran en Entidades. A
+continuaci&#243;n se muestran distintas tareas asociadas con las entidades:</p>
+<ul><li><p><a href="federation.fsentitydescriptorsadd.html">Para crear una entidad de proveedores o una entidad de afiliaci&#243;n</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsprofile.html">Para modificar los atributos generales de una entidad de proveedores o una entidad de afiliaci&#243;n</a></p></li>
+<li><p><a href="federation.fsidentityprovider.html">Para agregar un proveedor de identidades a una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedadd.html">Para agregar un nuevo proveedor de identidades alojado a una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteadd.html">Para agregar un nuevo proveedor de identidades remoto a una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsserviceprovider.html">Para agregar un proveedor de servicios a una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedadd.html">Para agregar un nuevo proveedor de servicios alojado a una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteadd.html">Para agregar un nuevo proveedor de servicios remoto a una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsidentityproviderhostedprofile.html">Para modificar atributos de un proveedor de identidades alojado en una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsidentityproviderremoteprofile.html">Para modificar atributos de un proveedor de identidades remoto en una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsserviceproviderhostedprofile.html">Para modificar atributos de un proveedor de servicios alojado en una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsserviceproviderremoteprofile.html">Para modificar atributos de un proveedor de servicios remoto en una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fscreatecontactperson.html">Para agregar una persona de contacto a un proveedor en una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fseditcontactperson.html">Para modificar el perfil de una persona de contacto en una entidad de proveedores</a></p></li>
+<li><p><a href="federation.fsentitydescriptorsaffiliate.html">Para agregar miembros a una entidad de afiliaci&#243;n</a></p></li></ul>
+
+<br/>
+
+</body>
+</html>

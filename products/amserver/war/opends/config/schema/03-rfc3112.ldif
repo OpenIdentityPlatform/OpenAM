@@ -1,0 +1,43 @@
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE
+# or https://OpenDS.dev.java.net/OpenDS.LICENSE.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at
+# trunk/opends/resource/legal-notices/OpenDS.LICENSE.  If applicable,
+# add the following below this CDDL HEADER, with the fields enclosed
+# by brackets "[]" replaced with your own identifying information:
+#      Portions Copyright [yyyy] [name of copyright owner]
+#
+# CDDL HEADER END
+#
+#
+#      Copyright 2006-2008 Sun Microsystems, Inc.
+#
+#
+# This file contains schema definitions from RFC 3112, which defines the
+# authentication password schema.
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+attributeTypes: ( 1.3.6.1.4.1.4203.1.3.3 NAME 'supportedAuthPasswordSchemes'
+  DESC 'supported password storage schemes' EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{32} USAGE dSAOperation
+  X-ORIGIN 'RFC 3112' )
+attributeTypes: ( 1.3.6.1.4.1.4203.1.3.4 NAME 'authPassword'
+  DESC 'password authentication information' EQUALITY 1.3.6.1.4.1.4203.1.2.2
+  SYNTAX 1.3.6.1.4.1.4203.1.1.2 X-ORIGIN 'RFC 3112' )
+objectClasses: ( 1.3.6.1.4.1.4203.1.4.7 NAME 'authPasswordObject'
+  DESC 'authentication password mix in class' MAY authPassword AUXILIARY
+  X-ORIGIN 'RFC 3112' )
+

@@ -1,0 +1,119 @@
+Patch-ID# 
+
+Keywords: 
+
+Synopsis: 
+
+Date:
+
+Solaris Release: 
+
+SunOS Release: 
+
+Unbundled Product: Policy Agent
+
+Unbundled Release: 2.2-03
+
+Xref:
+
+Topic: Policy Agent
+
+Relevant Architectures: all
+
+BugId's fixed with this patch: 6795157 6672424 6812084 6788038 6789020 6804139 6744530 6774751 6817868 6785022 6714995 6794995 6788032 6735280 6797023 6676032 6747546 6725383 6766307 6739060 6768406 6723849 6707603 6654718 6736820 6766389 6663489 6629988 6608463 6595643 6653582 6640911 6631862 6728280 6664608 6647805 6642255 6570155 6567164 6589691 6531050 6829880 6835807
+
+Changes incorporated in this version: 6795157 6672424 6812084 6788038 6789020 6804139 6744530 6774751 6817868 6785022 6714995 6794995 6788032 6735280 6797023 6829880 6835807
+
+Patches accumulated and obsoleted by this patch:
+
+Patches which conflict with this patch:
+
+Patches required with this patch:
+
+Obsoleted by:
+
+Files included with this patch:
+
+Problem Description:
+
+Bugs fixed in 2.2-03
+--------------------
+6795157 PA 2.2-01 crashes
+6672424 PA 2.2 -policy-agent-protected page displays in accordance with the value for header
+6812084 Mapped session or profile attrib to HTTP HEADER crashes if too large
+6788038 Memory corruption with POST data preservation
+6789020 In CDSSO mode non enforced POST requests cannot be accessed
+6804139 Web agent causes Web Server hangs if agent's log rotation fails
+6744530 Remote logging - Log message sent by WS7.0 2.2 agent had an empty recMsg
+6774751 AM 7.1 protected page is jumbled when session is upgraded
+6817868 Web agents 2.1 & 2.2: libxml2 library has security vulnerability
+6785022 Web agent2.2 cannot handle new AM 7.1 advices
+6714995 PA didn't reflected the changes in the PA Session Cache when AM Enabled Property
+6794995 WebAgents 2.2: Bundle NSS/NSPR libs with Agent on Solaris & Linux instead of sys
+6788032 Random crashes with IIS666 agent (IIS 6 Agent only)
+6735280 IIS6 Policy Agent should support POST data preservation (IIS 6 Agent only)
+6797023 Web Server 6.1/7.0 agent always set path info to null (SJS Web Server Agent only)
+6829880 IIS6 PA does not support agent url override functionality (IIS 6 Agent only)
+6835807 Problem with post data preservation feature in (SJS Web Server 6.1 & 7.0 agents only)
+
+Bugs fixed in 2.2-02
+--------------------
+6676032 Possibility to add composite advice in the query instead of sending it through a POST request
+6747546 ignore_path_info sending PATH_INFO
+6725383 Remove the sunwMethod parameter from the URL in CSDSSO 
+6766307 NSS Initialize is failing when the cert db is not present
+6739060 Ldap/session attributes with empty values are added in the request header
+6768406 Performance issue in agent 2.2-01 hp3
+6723849 PA 2.2-01 Hotpatch 2 Performance drops by 3 times when SSO-Only is enabled
+6672424 Security issue:- PA 2.2 -policy-agent-protected page displays in accordance with the value for header
+6707603 Web agent crashes when trying to erase a query parameter that doesn't exist
+6654718 403 http error encounter when protected pages has multiple frames and auto reload
+6663489 Web agent modifies the query part of url when redirecting the request after login
+6629988 Memory corruption resulting in web server crash
+6608463 Web Agent support for policy clock skew
+6595643 Possibility to add a "landing page" to the cdcservlet url
+6653582 CPU spike in Web agent 2.2 due to sunwErrCode and goto parameters
+6640911 In web agents stale policies are not removed creating an infinite loop
+6631862 Memory leak in Web Agents
+6647805 Need to add HTTP methods for Subversion in (Apache agent only)
+6664608 High CPU consumption by IIS6 running Sun Policy Agent 2.2-01. (IIS 6 Agent only)
+6736820 IIS 6 agent doesn't work properly with ASP pages in CDSSO mode (IIS 6 Agent only)
+6766389 In IIS6 agent the reconstructed url doesn't contain the path info (IIS 6 Agent only)
+6728280 Security issue:ldap/session attributes with empty values are added in the request header (SJS Web Server 7.0 Agent only)
+
+Bugs fixed in 2.2-01
+--------------------
+6642255 More complete version information when running "agentadmin --version"
+6570155 Agent needs to initialize its thread pool much earlier
+6567164 WebDAV support in Web Agents (Apache agent only)
+6589691 Corrections in Apache agent related to request method strings and numbers (Apache Agent only)
+6531050 Segmentation fault issue starting Apache server post agent install (Apache Agent only)
+
+
+Patch Installation Instructions:
+----------------------------------
+
+1. Download and untar the patch bits to a temporary location.
+2. This will contain Agent bits for the specific container, packaged as separate bundles,
+   one for each Operating system/supported platform.
+3. These bundles are full Agent installation bits.
+4. For detailed installation and configuration instructions for a specific Agent/platform,
+   refer to release notes
+   http://docs.sun.com/app/docs/doc/819-2796/adtaa?a=view
+
+Special installation Instructions:
+Note:
+
+Following bug-fixes have corresponding new properties added to AMAgent.properties file.
+Please review the AMAgent.properties file as well as the 2.2-0x release notes thoroughly
+to learn how to set these properties and understand their purpose.
+
+6676032 - property com.sun.am.use_redirect_for_advice
+6725383 - property com.sun.am.policy.agents.config.use.sunwmethod
+6768406 - property com.sun.am.policy.agents.config.policy_number_of_tries
+6608463 - property com.sun.am.policy.agents.config.policy_clock_skew
+
+More information on these unique features and all product documentation can
+be accessed at the following URL:
+
+ http://docs.sun.com/app/docs/coll/1322.1 

@@ -1,0 +1,27 @@
+<script language="javascript">
+
+    YAHOO.util.Event.onDOMReady(initAnonymous);
+
+    function initAnonymous() {
+        pageURI = "$context$path";
+        afterAddToStoreSuccessFunction = anonymousAfterAddToStore;
+        validateFormFunction = null;
+        adjustAddStoreButton();        
+    }
+
+    function anonymousAfterAddToStore() {
+        YAHOO.sun.container.addStore.show();
+        setTimeout("YAHOO.sun.container.addStore.hide()", 1250);
+        setTimeout("document.location = '$context/commonTasks.htm'", 1250);
+    }
+
+</script>
+
+<div id="anonymousMainPanel" align="center">
+    <div id="anonymousCreatePanel" class="createpanel">
+        <div class="bodywhite">
+            <p class="OrangeSmall">$page.getLocalizedString("configuration.authentication_store.anonymous.enter_default_anonymous_username")</p>
+            <input type="text" id="anonymousName" name="anonymousName" value="$!anonymousStore.anonymousName"/>
+        </div>
+    </div>
+</div>

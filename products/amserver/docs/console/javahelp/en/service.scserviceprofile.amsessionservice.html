@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Session - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.scserviceprofile.amsessionservice"></a><h4>Session</h4>
+<p><a name="indexterm-196"></a>The Session service defines values for an authenticated user session such as maximum
+session time and maximum idle time. The Session attributes are global, dynamic, or
+user attributes. The attributes are:</p>
+<ul><li><p><a href="#fwfeu">Secondary Configuration Instance</a></p></li>
+<li><p><a href="#fwfew">Maximum Number of Search Results</a></p></li>
+<li><p><a href="#fwfex">Timeout for Search</a></p></li>
+<li><p><a href="#fwfez">Enable Property Change Notifications</a></p></li>
+<li><p><a href="#fwfey">Enable Quota Constraints</a></p></li>
+<li><p><a href="#fwffa">Read Timeout for Quota Constraint</a></p></li>
+<li><p><a href="#fwffb">Exempt Top-Level Admins From Constraint Checking</a></p></li>
+<li><p><a href="#fwffc">Resulting Behavior If Session Quota Exhausted</a></p></li>
+<li><p><a href="#fwffd">Notification Properties</a></p></li>
+<li><p><a href="#fwffe">Maximum Session Time</a></p></li>
+<li><p><a href="#fwfff">Maximum Idle Time</a></p></li>
+<li><p><a href="#fwffh">Maximum Caching Time</a></p></li>
+<li><p><a href="#fwffi">Active User Sessions</a></p></li></ul>
+
+
+<a name="fwfeu"></a><h5>Secondary Configuration Instance</h5>
+<p>Provides the connection information for the session repository used for the session failover
+functionality in OpenSSO. The URL of the load balancer should be given as
+the identifier to this secondary configuration. If the secondary configuration is defined in
+this case, the session failover feature will be automatically enabled and become effective after
+the server restart. See <a href="service.subconfigadd.html">To Add a Sub Configuration</a> for more information.</p>
+
+<a name="fwfew"></a><h5>Maximum Number of Search Results</h5>
+<p>This attribute specifies the maximum number of results returned by a session search.
+The default value is 120.</p>
+
+<a name="fwfex"></a><h5>Timeout for Search</h5>
+<p>This attributed defines the maximum amount of time before a session search terminates.
+The default value is 5 seconds.</p>
+
+<a name="fwfez"></a><h5>Enable Property Change Notifications</h5>
+<p>Enables or disables the feature session property change notification. In a single sign-on
+environment, one OpenSSO session can be shared by multiple applications. If this feature
+is set to ON, if one application changes any of the session properties
+specified in the Notification Properties list (defined as a separate session service attribute), the
+notification will be sent to other applications participating in the same single sign-on
+environment.</p>
+
+<a name="fwfey"></a><h5>Enable Quota Constraints</h5>
+<p>Enables or disables session quota constraints. The enforcement of session quota constraints enables
+administrators to limit a user to have a specific number of active/concurrent sessions
+based on the constraint settings at the global level, or the configurations associated with
+the entities (realm/role/user) to which this particular user belongs.</p><p>The default setting for this attribute is OFF. You must restart the server
+if the settings are changed.</p>
+
+<a name="fwffa"></a><h5>Read Timeout for Quota Constraint</h5>
+<p>Defines the amount of time (in number of milliseconds) that an inquiry to
+the session repository for the live user session counts will continue before timing
+out.</p><p>After the maximum read time is reached, an error is returned. This attribute
+will take effect only when the session quota constraint is enabled in the
+session failover deployment. The default value is 6000 milliseconds. You must restart the
+server if the settings are changed.</p>
+
+<a name="fwffb"></a><h5>Exempt Top-Level Admins From Constraint Checking</h5>
+<p>Specifies whether the users with the Top-level Admin Role should be exempt from
+the session constraint checking. If YES, even though the session constraint is enabled,
+there will be no session quota checking for these administrators.</p><p>The default setting for this attribute is NO. You must restart the server
+if the settings are changed. This attribute will take effect only when the
+session quota constraint is enabled.</p>
+<hr><p><b>Note &#8211; </b>the super user defined for the OpenSSO in <tt>AMConfig.properties</tt>  (<tt>com.sun.identity.authentication.super.user</tt>) is always
+exempt from the session quota constraint checking. </p>
+<hr>
+
+
+<a name="fwffc"></a><h5>Resulting Behavior If Session Quota Exhausted</h5>
+<p>Specifies the resulting behavior when the user session quota is exhausted. There are
+two selectable options for this attribute:</p><dl><dt>DESTROY_OLD_SESSION</dt>
+<dd><p>The next expiring session will be destroyed.</p></dd>
+<dt>DENY_ACCESS</dt>
+<dd><p>The new session creation request will be denied.</p></dd>
+</dl>
+<p>This attribute will take effect only when the session quota constraint is enabled
+and the default setting is DESTROY_OLD_SESSION .</p>
+
+<a name="ggyer"></a><h5>Deny User Login When Session Repository is Down</h5>
+<p>If set to YES, this attribute will enforce user lockout to the server
+when the session repository is down. This attribute takes effect only when the
+session Enable Quota Constrain is selected.</p>
+
+<a name="fwffd"></a><h5>Notification Properties</h5>
+<p>When a change occurs on a session property defined in the list, the
+notification will be sent to the registered listeners. The attribute will take effect
+when the feature of Session Property Change Notification is enabled.</p>
+
+<a name="fwffe"></a><h5>Maximum Session Time</h5>
+<p>This attribute accepts a value in minutes to express the maximum time before
+the session expires and the user must reauthenticate to regain access. A value
+of 1 or higher will be accepted. The default value is 120. (To
+balance the requirements of security and convenience, consider setting the Max Session Time
+interval to a higher value and setting the Max Idle Time interval to
+a relatively low value.) Max Session Time limits the validity of the session.
+It does not get extended beyond the configured value.</p>
+
+<a name="fwfff"></a><h5>Maximum Idle Time</h5>
+<p>This attribute accepts a value (in minutes) equal to the maximum amount of
+time without activity before a session expires and the user must reauthenticate to
+regain access. A value of 1 or higher will be accepted. The default
+value is 30. (To balance the requirements of security and convenience, consider setting
+the Max Session Time interval to a higher value and setting the Max
+Idle Time interval to a relatively low value.)</p>
+
+<a name="fwffh"></a><h5>Maximum Caching Time</h5>
+<p>This attribute accepts a value (in minutes) equal to the maximum interval before
+the client contacts OpenSSO to refresh cached session information. A value of 0
+or higher will be accepted. The default value is 3. It is recommended
+that the maximum caching time should always be less than the maximum idle
+time.</p>
+
+<a name="fwffi"></a><h5>Active User Sessions</h5>
+<p>Specifies the maximum number of concurrent sessions allowed for a user.</p>
+<br/>
+
+</body>
+</html>

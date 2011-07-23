@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>Para agregar un nuevo proveedor de servicios remoto a una entidad de proveedores - Ayuda en l&#237;nea de la consola de Sun Java System Federated Access Manager 8.0
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.fsserviceproviderremoteadd"></a><h4>Para agregar un nuevo proveedor de servicios remoto a una entidad de proveedores</h4><p>Un <b>proveedor remoto</b> no est&#225; alojado en el mismo servidor que Federated Access
+Manager. La configuraci&#243;n de los atributos del nuevo proveedor de servicios remoto
+incluye la adici&#243;n de metadatos relacionados con el proveedor de servicios al
+perfil de la entidad. El punto de partida de este procedimiento es
+<a href="federation.fsserviceprovider.html">Para agregar un proveedor de servicios a una entidad de proveedores</a>.</p>
+<hr><p><b>Nota &#8211; </b>Los atributos adicionales se pueden configurar, pero no est&#225;n visibles en la
+p&#225;gina de configuraci&#243;n inicial. Consulte <a href="federation.fsserviceproviderremoteprofile.html">Para modificar atributos de un proveedor de servicios remoto en una entidad de proveedores</a>.</p>
+<hr>
+<ol>
+<li><b>Proporcione informaci&#243;n para los atributos comunes.</b><p>Los atributos comunes contienen valores que definen generalmente el propio proveedor de
+identidades.</p><dl><dt>Descripci&#243;n</dt>
+<dd><p>El valor de este atributo es la descripci&#243;n proporcionada al crear la entidad. Puede modificar la descripci&#243;n introducida originalmente y agregar una si no hay ninguna.</p></dd>
+<dt>Enumeraci&#243;n de compatibilidad de protocolos</dt>
+<dd><p>Seleccione la versi&#243;n del Marco de federaci&#243;n de identidades Liberty (ID-FF de Liberty) de Liberty Alliance Project admitida por esta entidad.</p>
+<ul><li><p><tt>urn:liberty:iff:2003-08</tt> hace referencia a la versi&#243;n 1.2 de ID-FF de Liberty.</p></li>
+<li><p><tt>urn:liberty:iff:2002-12</tt> hace referencia a la versi&#243;n 1.1 de ID-FF de Liberty.</p></li></ul>
+</dd>
+</dl>
+</li>
+<li><b>Seleccione cualquiera de los c&#237;rculos de confianza disponibles para asignarlo al proveedor.</b><p>Un proveedor puede pertenecer a uno o varios c&#237;rculos de confianza. Sin
+embargo, un proveedor sin un c&#237;rculo de confianza especificado no puede participar
+en las comunicaciones basadas en las especificaciones de Liberty Alliance Project. Si
+no se ha creado ning&#250;n c&#237;rculo de confianza, puede definir este atributo
+m&#225;s adelante.</p></li>
+<li><b>Proporcione informaci&#243;n para los atributos de proveedores de servicios.</b><p>Los atributos de proveedores de servicios definen informaci&#243;n general acerca del proveedor
+de servicios.</p><dl><dt>URL de consumidor de aserci&#243;n</dt>
+<dd><p>Escriba una URL al punto final en el que se recibir&#225;n y procesar&#225;n todas las aserciones SAML enviadas al proveedor de servicios.</p></dd>
+<dt>Id. de URL de servicio de consumidor de aserci&#243;n</dt>
+<dd><p>Si el atributo com&#250;n Enumeraci&#243;n de compatibilidad de protocolos es <tt>urn:liberty:iff:2003-08</tt>, escriba el Id. necesario.</p></dd>
+<dt>Establecer la URL del servicio de consumidor de aserci&#243;n como predeterminada</dt>
+<dd><p>Marque la casilla para utilizar la direcci&#243;n URL del servicio del consumidor de aserciones como valor predeterminado si no se especifica ning&#250;n identificador en la solicitud.</p></dd>
+</dl>
+</li>
+<li><b>Haga clic en Aceptar para agregar el proveedor a la entidad.</b></li>
+<li><b>Seleccione otra opci&#243;n del men&#250; Ver para continuar con la configuraci&#243;n de
+la entidad o haga clic en Guardar para completar la configuraci&#243;n.</b></li></ol>
+<br/>
+
+</body>
+</html>

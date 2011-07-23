@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>SAMLv2 Attribute Authority Customization - Sun OpenSSO 8.0 Console Online Help
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="federation.samlv2attrauthority"></a><h4>SAMLv2 Attribute Authority Customization</h4>
+<p>SAMLv2 Attribute Authority contains the following attributes for customization:</p>
+<ul><li><p><a href="#ggwhl">Signing and Encryption</a></p></li>
+<li><p><a href="#ggwgh">Attribute Service</a></p></li>
+<li><p><a href="#ggwjy">AssertionID Request</a></p></li>
+<li><p><a href="#ggwju">Attribute Profile</a></p></li>
+<li><p><a href="#ggwha">Cert Alias</a></p></li>
+<li><p><a href="#ggwjj">Subject Data Store</a></p></li></ul>
+
+
+<a name="ggwhl"></a><h5>Signing and Encryption</h5>
+<dl><dt>Key Size</dt>
+<dd><p>The length for keys used by the Attribute Authority entity when interacting with another entity.</p></dd>
+<dt>Algorithm</dt>
+<dd><p>The encryption algorithm used to interact with another entity.</p></dd>
+</dl>
+
+
+<a name="ggwgh"></a><h5>Attribute Service</h5>
+<p>This attribute defines the URL endpoints that will receive attribute query requests. <tt>Location</tt>
+specifies the URL of the provider to which the request is sent. <tt>Mapper</tt>
+defines the SPI that finds the attribute mapping authority to return a list of
+attributes that will be included in a response. The SAMLv2&#8211;defined attribute query profiles
+are:</p>
+<ul><li><p>Basic</p></li></ul>
+
+<ul><li><p>X509</p></li></ul>
+
+
+<a name="ggwjy"></a><h5>AssertionID Request</h5>
+<p>Defines the URLs to which the AssertionIDs are sent from a client to
+an identity provider in order to retrieve the corresponding assertion. <tt>Location</tt> specifies
+the URL of the provider to which the request is sent. <tt>Mapper</tt> defines
+the SPI that finds the AssertionID mapping authority to return a list of
+attributes that will be included in a response. The bindings are:</p>
+<ul><li><p>SOAP</p></li>
+<li><p>URI</p></li></ul>
+
+
+<a name="ggwju"></a><h5>Attribute Profile</h5>
+<p>Defines the type of SAMLv2&#8211;defined supported attribute profile. <tt>Basic</tt> is the default type.</p>
+
+<a name="ggwha"></a><h5>Cert Alias</h5>
+<p>Defines the certificate alias elements. <tt>Signing</tt> specifies the provider certificate alias used to
+find the correct signing certificate in the keystore. <tt>Encryption</tt> specifies the provider certificate alias
+used to find the correct encryption certificate in the keystore.</p>
+
+<a name="ggwjj"></a><h5>Subject Data Store</h5>
+<p>Specifies the data store attribute name which contains the X509 subject DN. It
+is used to find a user whose attribute value matches the X. 509
+subject DN. This field is used in the Attribute Query Profile for X.
+509 subject only. </p>
+<br/>
+
+</body>
+</html>

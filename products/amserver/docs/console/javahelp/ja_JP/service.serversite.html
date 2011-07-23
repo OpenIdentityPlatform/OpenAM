@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<!--
+
+-->
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <!-- ident      "%Z%%M% %I%     %E% SMI" -->
+
+  <title>サーバーおよびサイト - Sun OpenSSO 8.0 コンソールオンラインヘルプ
+  </title>
+  <script language="JavaScript1.2">
+    linktag = window.parent.frames[0].document.getElementsByTagName('link');
+    for (var i = 0; i < linktag.length; i++) {
+        if (linktag[i].rel == "stylesheet") {
+            var s = "<link rel=" + linktag[i].rel + " type='text/css' href=" + linktag[i].href + " />";
+            document.write(s);
+        }
+    }
+  </script>
+  <meta name="Copyright" content="Copyright &copy; 2008 by Sun Microsystems, Inc. All Rights Reserved." />
+
+</head>
+
+<body class="HlpBdy">
+
+
+
+<a name="service.serversite"></a><h3>サーバーおよびサイト</h3>
+<p>「サーバーおよびサイト」設定属性を使用すると、配備全体のサイトとサーバーの設定を集中管理することができます。 </p><p>少なくとも 2 台の異なるホストサーバーに、複数 (2 つ以上) の OpenSSO インスタンスを配備することができます。たとえば、1 台のサーバーに 2 つのインスタンスを配備し、もう 1
+台のサーバーに 3 番目のインスタンスを配備することができます。または、すべてのインスタンスを別々のサーバーに配備することもできます。また、配備に必要な場合は、OpenSSO インスタンスをセッションフェイルオーバーモードに設定することもできます。</p><p>1 つ以上のロードバランサが、クライアント要求をさまざまな OpenSSO インスタンスに経路指定します。配備の要件 (たとえば、ラウンドロビンまたは負荷平均値の使用) に従って各ロードバランサを設定し、OpenSSO インスタンス間で負荷を分散します。ロードバランサを使用すると配備が簡単になり、クライアントとバックエンドの OpenSSO サーバー間のファイアウォールなどの問題も解決されます。OpenSSO の配備にハードウェアロードバランサまたはソフトウェアロードバランサを使用することができます。すべての OpenSSO インスタンスが、同じ
+Directory Server にアクセスします。 </p>
+<br/>
+
+</body>
+</html>
