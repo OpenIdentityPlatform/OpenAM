@@ -1,0 +1,931 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ <modelVersion>4.0.0</modelVersion>
+ <parent>
+  <groupId>org.forgerock</groupId>
+  <artifactId>forgerock-parent</artifactId>
+  <version>1.0.0</version>
+ </parent>
+ <repositories>
+  <repository>
+   <id>forgerock-staging-repository</id>
+   <name>ForgeRock Release Repository</name>
+   <url>http://maven.forgerock.org/repo/releases</url>
+   <snapshots>
+    <enabled>false</enabled>
+   </snapshots>
+  </repository>
+  <repository>
+   <id>forgerock-snapshots-repository</id>
+   <name>ForgeRock Snapshot Repository</name>
+   <url>http://maven.forgerock.org/repo/snapshots</url>
+   <releases>
+    <enabled>false</enabled>
+   </releases>
+  </repository>
+ </repositories>
+ <groupId>org.forgerock.openam</groupId>
+ <artifactId>openam-site</artifactId>
+ <version>10</version>
+ <name>OpenAM Project</name>
+ <inceptionYear>2011</inceptionYear>
+ <packaging>pom</packaging>
+ <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated from OpenAM source code.</description>
+ <url>http://openam.forgerock.org/</url>
+ <mailingLists>
+  <mailingList>
+   <name>OpenAM Users Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+   <post>openam@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Developers Mailing List</name>
+   <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+   <post>openam-dev@forgerock.org</post>
+  </mailingList>
+  <mailingList>
+   <name>OpenAM Commit Notifications</name>
+   <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+   <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+   <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+   <post>commitopenam@forgerock.org</post>
+  </mailingList>
+ </mailingLists>
+ <scm>
+  <url>https://svn.forgerock.org/openam/trunk/opensso/</url>
+  <connection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</connection>
+  <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/opensso/</developerConnection>
+  <tag>HEAD</tag>
+ </scm>
+ <issueManagement>
+  <system>Jira</system>
+  <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+ </issueManagement>
+ <licenses>
+  <license>
+   <name>CDDL-1.0</name>
+   <url>http://www.opensource.org/licenses/cddl1.php</url>
+   <comments>Common Development and Distribution License (CDDL) 1.0.
+   This license applies to OpenAM source code as indicated in the
+   sources themselves.
+   </comments>
+   <distribution>repo</distribution>
+  </license>
+  <license>
+   <name>CC BY-NC-ND 3.0</name>
+   <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+   <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+   Unported. This license applies to the site content, and to the
+   documentation as indicated in the documentation source code.
+   </comments>
+   <distribution>repo</distribution>
+  </license>
+ </licenses>
+ <properties>
+  <serverDocTargetVersion>10</serverDocTargetVersion>
+  <agentsDocTargetVersion>3</agentsDocTargetVersion>
+  <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
+  <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
+  <docbkx-src>${basedir}/src/main/docbkx</docbkx-src>
+  <dbstyle-dir>${basedir}/src/main/docbkx-stylesheets</dbstyle-dir>
+  <docbkx-out>${basedir}/target/docbkx</docbkx-out>
+  <site-out>${basedir}/target/site</site-out>
+  <legalnotice>${basedir}/legalnotice.html</legalnotice>
+  <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+  <fonts-src>${basedir}/src/fonts</fonts-src>
+  <fonts-gen>${basedir}/target/fonts</fonts-gen>
+  <products-basedir>${basedir}/../products</products-basedir>
+ </properties>
+ <distributionManagement>
+  <site>
+   <id>forgerock.org</id>
+   <name>OpenAM Project</name>
+   <url>${siteDistributionURL}</url>
+  </site>
+ </distributionManagement>
+ <build>
+  <plugins>
+   <plugin>
+    <groupId>com.agilejava.docbkx</groupId>
+    <artifactId>docbkx-fop-support</artifactId>
+    <version>2.0.13</version>
+    <inherited>false</inherited>
+    <executions>
+     <execution>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>generate</goal>
+      </goals>
+      <configuration>
+       <ansi>true</ansi>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+   <plugin>
+    <groupId>com.agilejava.docbkx</groupId>
+    <artifactId>docbkx-maven-plugin</artifactId>
+    <version>2.0.13</version>
+    <inherited>false</inherited>
+    <configuration>
+     <sourceDirectory>${basedir}/src/main/docbkx</sourceDirectory>
+    
+     <highlightSource>1</highlightSource>
+     <!-- Comment the draft elements out for final build -->
+     <draftMode>yes</draftMode>
+     <draftWatermarkImage>http://docbook.sourceforge.net/release/images/draft.png</draftWatermarkImage>
+     
+     <includes>*/OpenAM-*.xml</includes>
+     <xincludeSupported>true</xincludeSupported>
+     
+     <fonts>
+      <font>
+       <name>DejaVuSans</name>
+       <style>normal</style>
+       <weight>normal</weight>
+       <embedFile>${fonts-src}/DejaVuSans.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSans-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSans</name>
+       <style>normal</style>
+       <weight>bold</weight>
+       <embedFile>${fonts-src}/DejaVuSansCondensed-Bold.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSansCondensed-Bold-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSans</name>
+       <style>italic</style>
+       <weight>normal</weight>
+       <embedFile>${fonts-src}/DejaVuSans-Oblique.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSans-Oblique-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSans</name>
+       <style>italic</style>
+       <weight>bold</weight>
+       <embedFile>${fonts-src}/DejaVuSansCondensed-BoldOblique.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSansCondensed-BoldOblique-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSansMono</name>
+       <style>normal</style>
+       <weight>normal</weight>
+       <embedFile>${fonts-src}/DejaVuSansMono.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSansMono-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSansMono</name>
+       <style>normal</style>
+       <weight>bold</weight>
+       <embedFile>${fonts-src}/DejaVuSansMono-Bold.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSansMono-Bold-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSansMono</name>
+       <style>italic</style>
+       <weight>normal</weight>
+       <embedFile>${fonts-src}/DejaVuSansMono-Oblique.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSansMono-Oblique-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSansMono</name>
+       <style>italic</style>
+       <weight>bold</weight>
+       <embedFile>${fonts-src}/DejaVuSansMono-BoldOblique.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSansMono-BoldOblique-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSerif</name>
+       <style>normal</style>
+       <weight>normal</weight>
+       <embedFile>${fonts-src}/DejaVuSerif.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSerif-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSerif</name>
+       <style>normal</style>
+       <weight>bold</weight>
+       <embedFile>${fonts-src}/DejaVuSerifCondensed-Bold.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSerifCondensed-Bold-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSerif</name>
+       <style>italic</style>
+       <weight>normal</weight>
+       <embedFile>${fonts-src}/DejaVuSerif-Italic.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSerif-Italic-metrics.xml</metricsFile>
+      </font>
+      <font>
+       <name>DejaVuSerif</name>
+       <style>italic</style>
+       <weight>bold</weight>
+       <embedFile>${fonts-src}/DejaVuSerifCondensed-BoldItalic.ttf</embedFile>
+       <metricsFile>${fonts-gen}/DejaVuSerifCondensed-BoldItalic-metrics.xml</metricsFile>
+      </font>
+     </fonts>
+
+     <sectionAutolabel>true</sectionAutolabel>
+     <sectionLabelIncludesComponentLabel>true</sectionLabelIncludesComponentLabel>
+    </configuration>
+    <executions>
+     <execution>
+      <id>olinkdb-admin-guide</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Admin-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/admin-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/admin-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-agent-install-guide</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Agent-Install-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/agent-install-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/agent-install-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-agent-release-notes</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Agent-Release-Notes.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/agent-release-notes.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/agent-release-notes' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-dev-guide</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Dev-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/dev-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/dev-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-install-guide</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Install-Guide.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/install-guide.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/install-guide' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-reference</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Reference.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/reference.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/reference' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>olinkdb-release-notes</id>
+      <phase>pre-site</phase>
+      <configuration>
+       <includes>*/OpenAM-Release-Notes.xml</includes>
+       <collectXrefTargets>only</collectXrefTargets>
+       <targetsFilename>${project.build.directory}/release-notes.target.db</targetsFilename>
+       <postProcess>
+        <delete dir='${docbkx-out}/html/release-notes' />
+        </postProcess>
+      </configuration>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>doc-epub</id>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>generate-epub</goal>
+      </goals>
+      <configuration>
+       <epubCustomization>${dbstyle-dir}/epub/coredoc.xsl</epubCustomization>
+       <preProcess>
+        <copy todir='${docbkx-out}/epub/admin-guide/OpenAM-Admin-Guide/images'>
+         <fileset dir='${docbkx-src}/admin-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/admin-guide/OpenAM-Admin-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/agent-install-guide/OpenAM-Agent-Install-Guide/images'>
+         <fileset dir='${docbkx-src}/agent-install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/agent-install-guide/OpenAM-Agent-Install-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/agent-release-notes/OpenAM-Agent-Release-Notes/images'>
+         <fileset dir='${docbkx-src}/agent-release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/agent-release-notes/OpenAM-Agent-Release-Notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/dev-guide/OpenAM-Dev-Guide/images'>
+         <fileset dir='${docbkx-src}/dev-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/dev-guide/OpenAM-Dev-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/install-guide/OpenAM-Install-Guide/images'>
+         <fileset dir='${docbkx-src}/install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/install-guide/OpenAM-Install-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/reference/OpenAM-Reference/images'>
+         <fileset dir='${docbkx-src}/reference/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/reference/OpenAM-Reference'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/release-notes/OpenAM-Release-Notes/images'>
+         <fileset dir='${docbkx-src}/release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/epub/release-notes/OpenAM-Release-Notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+       </preProcess>
+      </configuration>
+     </execution>
+     <execution>
+      <id>doc-fo</id>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>generate-pdf</goal>
+       <goal>generate-rtf</goal>
+      </goals>
+      <configuration>
+       <foCustomization>${dbstyle-dir}/fo/coredoc.xsl</foCustomization>
+      </configuration>
+     </execution>
+     <execution>
+      <id>doc-manpages</id>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>generate-manpages</goal>
+      </goals>
+      <configuration>
+       <manpagesCustomization>${dbstyle-dir}/man/manpages.xsl</manpagesCustomization>
+      </configuration>
+     </execution>
+     <execution>
+      <id>doc-single-html</id>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+      <configuration>
+       <chunkedOutput>false</chunkedOutput>
+       <htmlCustomization>${dbstyle-dir}/html/coredoc.xsl</htmlCustomization>
+       <olinkDebug>true</olinkDebug>
+       <targetDatabaseDocument>${docbkx-src}/olinkdb-single-html-pages.xml</targetDatabaseDocument>
+       <preProcess>
+        <copy todir='${docbkx-out}/html/admin-guide/images'>
+         <fileset dir='${docbkx-src}/admin-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/admin-guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-install-guide/images'>
+         <fileset dir='${docbkx-src}/agent-install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-install-guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes/images'>
+         <fileset dir='${docbkx-src}/agent-release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/dev-guide/images'>
+         <fileset dir='${docbkx-src}/dev-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/dev-guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/install-guide/images'>
+         <fileset dir='${docbkx-src}/install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/install-guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/reference/images'>
+         <fileset dir='${docbkx-src}/reference/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/reference'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/release-notes/images'>
+         <fileset dir='${docbkx-src}/release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/release-notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+       </preProcess>
+       <postProcess>
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/admin-guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-install-guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-release-notes' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/dev-guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/install-guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/reference' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/release-notes' />
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="target/docbkx/html/legalnotice.html"
+                 value="legalnotice.html">
+         <include name="**/**/*.html" />
+        </replace>
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="&lt;/head&gt;">
+         <include name="**/**/*.html" />
+         <replacevalue>
+&lt;script src="http://code.jquery.com/jquery-latest.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+// On double-click, reformat &lt;pre class="screen"&gt; for easy copying.
+$(document).ready(function() {
+  $(".screen").attr("title", "Double-click [-] to flatten lines.");
+  $(".screen").prepend('&lt;img src="./images/minus.png" class="toggle"&gt;');
+});
+$(".screen").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"flat\" title=\"Double-click [+] to wrap long lines.\"&gt;" +
+    $(this).html().replace(/minus\.png/,"plus.png").replace(/\n /g," ") + "\n&lt;!--" + $(this).html() + "--&gt;" +
+    "&lt;/pre&gt;");
+});
+$(".flat").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"screen\" title=\"Double-click [-] to flatten lines.\"&gt;" +
+    $(this).html().replace(/(.|\n)+&lt;!\-\-/m,"").replace(/\-\-\&gt;/,"").replace(/plus\.png/,"minus.png") +
+    "&lt;/pre&gt;");
+});
+&lt;/script&gt;
+&lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;
+&lt;/head &gt;</replacevalue>
+        </replace>
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="&lt;/body&gt;">
+         <include name="**/**/*.html" />
+         <replaceValue>&lt;script type="text/javascript"&gt;
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23412190-7']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+&lt;/script&gt;&lt;/body &gt;</replaceValue>
+        </replace>
+       </postProcess>
+      </configuration>
+     </execution>
+     <execution>
+      <id>doc-chunked-html</id>
+      <phase>pre-site</phase>
+      <goals>
+       <goal>generate-html</goal>
+      </goals>
+      <configuration>
+       <chunkedOutput>true</chunkedOutput>
+       <htmlCustomization>${dbstyle-dir}/html/chunked.xsl</htmlCustomization>
+       <preProcess>
+        <copy todir='${docbkx-out}/html/admin-guide/OpenAM-Admin-Guide/images'>
+         <fileset dir='${docbkx-src}/admin-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/admin-guide/OpenAM-Admin-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-install-guide/OpenAM-Agent-Install-Guide/images'>
+         <fileset dir='${docbkx-src}/agent-install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-install-guide/OpenAM-Agent-Install-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes/images'>
+         <fileset dir='${docbkx-src}/agent-install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/dev-guide/OpenAM-Dev-Guide/images'>
+         <fileset dir='${docbkx-src}/dev-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/dev-guide/OpenAM-Dev-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/install-guide/OpenAM-Install-Guide/images'>
+         <fileset dir='${docbkx-src}/install-guide/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/install-guide/OpenAM-Install-Guide'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/reference/OpenAM-Reference/images'>
+         <fileset dir='${docbkx-src}/reference/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/reference/OpenAM-Reference'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+        <copy todir='${docbkx-out}/html/release-notes/OpenAM-Release-Notes/images'>
+         <fileset dir='${docbkx-src}/release-notes/images' />
+        </copy>
+        <copy todir='${docbkx-out}/html/release-notes/OpenAM-Release-Notes'>
+         <fileset dir='${basedir}/src/main/resources' />
+        </copy>
+       </preProcess>
+       <postProcess>
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/admin-guide/OpenAM-Admin-Guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-install-guide/OpenAM-Agent-Install-Guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/agent-release-notes/OpenAM-Agent-Release-Notes' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/dev-guide/OpenAM-Dev-Guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/install-guide/OpenAM-Install-Guide' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/reference/OpenAM-Reference' />
+        <copy file='${legalnotice}' todir='${docbkx-out}/html/release-notes/OpenAM-Release-Notes' />
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="target/docbkx/html/legalnotice.html"
+                 value="legalnotice.html">
+         <include name="**/**/**/*.html" />
+        </replace>
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="&lt;/head&gt;">
+         <include name="**/**/**/*.html" />
+         <replacevalue>
+&lt;script src="http://code.jquery.com/jquery-latest.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+// On double-click, reformat &lt;pre class="screen"&gt; for easy copying.
+$(document).ready(function() {
+  $(".screen").attr("title", "Double-click [-] to flatten lines.");
+  $(".screen").prepend('&lt;img src="../images/minus.png" class="toggle"&gt;');
+});
+$(".screen").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"flat\" title=\"Double-click [+] to wrap long lines.\"&gt;" +
+    $(this).html().replace(/minus\.png/,"plus.png").replace(/\n /g," ") + "\n&lt;!--" + $(this).html() + "--&gt;" +
+    "&lt;/pre&gt;");
+});
+$(".flat").live("dblclick", function() {
+  $(this).replaceWith(
+    "&lt;pre class=\"screen\" title=\"Double-click [-] to flatten lines.\"&gt;" +
+    $(this).html().replace(/(.|\n)+&lt;!\-\-/m,"").replace(/\-\-\&gt;/,"").replace(/plus\.png/,"minus.png") +
+    "&lt;/pre&gt;");
+});
+&lt;/script&gt;
+&lt;link rel="shortcut icon" href="http://forgerock.org/favicon.ico"&gt;
+&lt;/head &gt;</replacevalue>
+        </replace>
+        <replace dir="${basedir}/target/docbkx/html/"
+                 token="&lt;/body&gt;">
+         <include name="**/**/**/*.html" />
+         <replaceValue>&lt;script type="text/javascript"&gt;
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23412190-7']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+&lt;/script&gt;&lt;/body&gt;</replaceValue>
+        </replace>
+       </postProcess>
+      </configuration>
+     </execution>
+    </executions>
+    <dependencies>
+     <dependency>
+      <groupId>net.sf.docbook</groupId>
+      <artifactId>docbook-xml</artifactId>
+      <version>5.0-all</version>
+      <classifier>resources</classifier>
+      <type>zip</type>
+      <scope>runtime</scope>
+     </dependency>
+     <dependency>
+      <groupId>net.sf.offo</groupId>
+      <artifactId>fop-hyph</artifactId>
+      <version>1.2</version> <!-- Should use 2.0, but it doesn't exist -->
+      <scope>runtime</scope>
+     </dependency>
+     <dependency>
+      <groupId>net.sf.xslthl</groupId>
+      <artifactId>xslthl</artifactId>
+      <version>2.0.2</version>
+      <scope>runtime</scope>
+     </dependency>
+    </dependencies>
+   </plugin>
+   <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>xml-maven-plugin</artifactId>
+    <version>1.0</version>
+    <executions>
+     <execution>
+      <phase>generate-resources</phase>
+      <goals>
+       <goal>transform</goal>
+      </goals>
+      <configuration>
+       <transformationSets>
+        <transformationSet>
+         <dir>../products</dir>
+         <includes>
+          <include>amserver/xml/log/AuthenticationLogMessageIDs.xml</include>
+          <include>amserver/xml/log/CLILogMessageIDs.xml</include>
+          <include>amserver/xml/log/ConsoleLogMessageIDs.xml</include>
+          <include>amserver/xml/log/CoreTokenLogMessageIDs.xml</include>
+          <include>amserver/xml/log/EntitlementLogMessageIDs.xml</include>
+          <include>amserver/xml/log/LoggingLogMessageIDs.xml</include>
+          <include>amserver/xml/log/PolicyLogMessageIDs.xml</include>
+          <include>amserver/xml/log/SessionLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/COTLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/IDFFLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/LibertyLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/SAML2LogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/SAMLLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/WebServicesSecurityLogMessageIDs.xml</include>
+          <include>federation/openfm/xml/log/WSFederationLogMessageIDs.xml</include>
+          <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>
+         </includes>
+         <stylesheet>src/main/xslt/logs.xsl</stylesheet>
+         <outputProperties>
+          <outputProperty>
+           <name>omit-xml-declaration</name>
+           <value>yes</value>
+          </outputProperty>
+         </outputProperties>
+         <validating>false</validating>
+        </transformationSet>
+       </transformationSets>
+       <catalogs>
+        <catalog>src/main/xslt/catalog.xml</catalog>
+       </catalogs>
+       <validating>true</validating>
+      </configuration>
+     </execution>
+    </executions>
+    <dependencies>
+     <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.1</version>
+     </dependency>
+    </dependencies>
+   </plugin>
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-antrun-plugin</artifactId>
+    <executions>
+     <execution>
+      <id>generate-log-message-ref</id>
+      <phase>generate-resources</phase>
+      <inherited>false</inherited>
+      <goals>
+       <goal>run</goal>
+      </goals>
+      <configuration>
+       <detail>true</detail>
+       <target>
+        <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
+         <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header" />
+         <fileset dir="${project.build.directory}/generated-resources/xml/xslt" includes="**/*.xml"/>
+         <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer" />
+        </concat>
+       </target>
+      </configuration>
+     </execution>
+     <execution>
+      <id>generate-javadoc</id>
+      <phase>generate-resources</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/shared/build.xml">
+         <target name="all" />
+        </ant>
+        <ant antfile="${products-basedir}/federation/library/build.xml">
+         <target name="build" />
+        </ant>
+        <ant antfile="${products-basedir}/federation/openfm/build.xml">
+         <target name="publicdoc" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>unpack-javadoc</id>
+      <phase>site</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <mkdir dir="${site-out}/doc/public-api" />
+        <unjar
+         src="${products-basedir}/federation/openfm/built/dist/opensso-public-javadocs.jar"
+         dest="${site-out}/doc/public-api" />
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+     <execution>
+      <id>clean</id>
+      <phase>clean</phase>
+      <inherited>false</inherited>
+      <configuration>
+       <target>
+        <ant antfile="${products-basedir}/build.xml">
+         <target name="clean" />
+        </ant>
+       </target>
+      </configuration>
+      <goals>
+       <goal>run</goal>
+      </goals>
+     </execution>
+    </executions>
+   </plugin>
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <executions>
+     <execution>
+      <phase>site</phase>
+      <inherited>false</inherited>
+      <goals>
+       <goal>copy-resources</goal>
+      </goals>
+      <configuration>
+       <encoding>UTF-8</encoding>
+       <outputDirectory>${site-out}/doc</outputDirectory>
+       <resources>
+        <resource>
+         <directory>${docbkx-out}/epub/admin-guide</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/agent-install-guide</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/agent-release-notes</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/dev-guide</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/install-guide</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/reference</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/epub/release-notes</directory>
+         <includes>
+          <include>**/*.epub</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/html/</directory>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/pdf</directory>
+         <includes>
+          <include>**/*.pdf</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${docbkx-out}/rtf</directory>
+         <includes>
+          <include>**/*.rtf</include>
+         </includes>
+        </resource>
+        <resource>
+         <directory>${basedir}/src/main/resources/docs-redirect</directory>
+         <includes>
+          <include>**/index.html</include>
+         </includes>
+        </resource>
+       </resources>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+   <plugin>
+    <groupId>org.forgerock.maven.plugins</groupId>
+    <artifactId>linktester-maven-plugin</artifactId>
+    <version>1.0.0</version>
+    <inherited>false</inherited>
+    <executions>
+     <execution>
+      <goals>
+       <goal>check</goal>
+      </goals>
+      <phase>pre-site</phase>
+     </execution>
+    </executions>
+    <configuration>
+     <includes>
+      <include>**/OpenAM-*.xml</include>
+     </includes>
+     <validating>true</validating>
+     <xIncludeAware>true</xIncludeAware>
+     <failOnError>false</failOnError>
+     <outputFile>linktester.err</outputFile>
+    </configuration>
+   </plugin>
+  </plugins>
+ </build>
+ <modules>
+  <module>site-helper</module>
+ </modules>
+</project>

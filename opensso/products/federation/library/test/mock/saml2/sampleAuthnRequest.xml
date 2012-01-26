@@ -1,0 +1,90 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: sampleAuthnRequest.xml,v 1.2 2008/06/25 05:48:22 qcheng Exp $
+                                                                                
+-->
+<samlp:AuthnRequest 
+    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+    ID="d2b7c388cec36fa7c39"
+    Version="2.0"  
+    IssueInstant="2006-11-30T22:32:20Z"
+    Destination="http://www.sp.com/sp"
+    Consent="http://www.sp.com/consent"
+    ForceAuthn="false"
+    isPassive="false"
+    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+    AssertionConsumerServiceIndex="2"
+    AssertionConsumerServiceURL="http://sp.sun.com/sp/assertionConsumer.jsp"
+    AttributeConsumingServiceIndex="4"
+    ProviderName="TEST SAML2">
+    <saml:Issuer
+	xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+	NameQualifier="test.com"
+	SPNameQualifier="sp.test.com"
+	Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+	SPProvidedID="sp1.test.com">
+	oCd/Q2KH7rgOSdX8KiIW54t4EUbC
+    </saml:Issuer>
+    <samlp:Extensions
+         xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+         <SAML1Element name="Extension1"/>
+         <SAML2Element name="Extension2"/>
+    </samlp:Extensions>
+    <samlp:NameIDPolicy 
+           xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+           Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
+           SPNameQualifier="https://sp.example.org/sunsaml" 
+           AllowCreate="false"> 
+     </samlp:NameIDPolicy> 
+     <saml:Conditions NotBefore="2006-12-13T02:22:30Z" NotOnOrAfter="2006-12-13T02:32:30Z">
+        <saml:AudienceRestriction>
+            <saml:Audience>sp.test.sun.com</saml:Audience>
+        </saml:AudienceRestriction>
+    </saml:Conditions>
+    <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>
+            urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport
+        </saml:AuthnContextClassRef>          
+    </samlp:RequestedAuthnContext>
+     <samlp:Scoping
+         xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+         ProxyCount="1"> 
+         <samlp:IDPList xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"> 
+              <samlp:IDPEntry 
+                   xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
+                   ProviderID="http://www.sp1.org" 
+                   Name="SAML TEST" 
+                   Loc="http://www.sun.com"> 
+              </samlp:IDPEntry> 
+              <samlp:GetComplete xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"> 
+                     http://www.sun.com 
+              </samlp:GetComplete> 
+         </samlp:IDPList> 
+      <samlp:RequesterID xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"> 
+            http://www.sun.com 
+      </samlp:RequesterID> 
+     </samlp:Scoping> 
+</samlp:AuthnRequest>

@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-identity-repo-spi'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Customizing Identity Data Storage</title>
+ <indexterm>
+  <primary>User data</primary>
+  <secondary>Custom repository</secondary>
+ </indexterm>
+ <!-- Another chapter based on Steve Ferris's work on the OpenAM wiki at
+ https://wikis.forgerock.org/confluence/display/openam/Develop+and+Deploy+a+Custom+IdRepo+Plugin -->
+
+ <para>OpenAM maps user and group identities into a realm using data stores.
+ An OpenAM data store relies on a Java identity repository (IdRepo) plugin to
+ implement interaction with the identity repository where the users and groups
+ are stored.</para>
+ 
+ <section xml:id="about-idrepo-plugin">
+  <title>About the Identity Repository Plugin</title>
+
+  <para>This chapter describes how to create a custom identity repository plugin.
+  OpenAM includes built-in support for LDAP and JDBC identity repositories. For
+  most deployments, you therefore do not need to create your own custom identity
+  repository plugin. Only create custom identity repository plugins for
+  deployments with particular requirements not met by built-in OpenAM
+  functionality.</para>
+
+  <tip>
+   <para>Before creating your own identity repository plugin, start by reading
+   the OpenAM source code for the <literal>FilesRepo</literal> or
+   <literal>DatabaseRepo</literal> plugins under
+   <literal>com.sun.identity.idm.plugins</literal>.</para>
+  </tip>
+
+  <section xml:id="idrepo-plugin-inheritance">
+   <title>IdRepo Inheritance</title>
+   
+   <para>Your identity repository plugin class must extend the
+   <literal>com.sun.identity.idm.IdRepo</literal> abstract class, and must
+   include a constructor method that takes no arguments.</para>
+  </section>
+
+  <section xml:id="idrepo-plugin-lifecycle">
+   <title>IdRepo Lifecycle</title>
+   
+   <para>When OpenAM instantiates your IdRepo plugin, it calls the
+   <literal>initialize()</literal> method.</para>
+   
+   <programlisting language="java">public void initialize(Map configParams)</programlisting>
+   
+   <para>The <literal>configParams</literal> are service configuration
+   parameters for the realm where the IdRepo plugin is configured. The
+   <literal>configParams</literal> normally serve to set up communication with
+   the underlying identity data store. OpenAM calls the
+   <literal>initialize()</literal> method once, and considers the identity
+   repository ready for use.</para>
+   
+   <para>If you encounter errors or exceptions during initialization, catch
+   and store them in your plugin for use later when OpenAM calls other plugin
+   methods.</para>
+   
+   <para>After initialization, OpenAM calls the <literal>addListener()</literal>
+   and <literal>removeListener()</literal> methods to register listeners that
+   inform OpenAM client code of changes to identities managed by your
+   IdRepo.</para>
+   
+   <programlisting language="java">public int addListener(SSOToken token, IdRepoListener listener)
+public void removeListener()</programlisting>
+   
+   <para>You must handle listener registration in your IdRepo plugin, and also
+   return events to OpenAM through the <literal>IdRepoListener</literal>.</para>
+   
+   <para>When stopping, OpenAM calls your IdRepo plugin
+   <literal>shutdown()</literal> method.</para>
+   
+   <programlisting language="java">public void shutdown()</programlisting>
+   
+   <para>You are not required to implement <literal>shutdown()</literal> unless
+   your IdRepo plugin has shut down work of its own to do, such as close
+   connections to the underlying identity data store.</para>
+  </section>
+
+  <section xml:id="idrepo-plugin-capabilties">
+   <title>IdRepo Plugin Capabilities</title>
+   
+   <para>Your IdRepo plugin provides OpenAM with a generic means to manage
+   subjects&#8212;including users and groups but also special types such as
+   roles, realms, and agents&#8212; and to create, read, update, delete, and
+   search subjects. In order for OpenAM to determine your plugin's capabilities,
+   it calls the methods described in this section.</para>
+   
+   <programlisting language="java">public Set getSupportedTypes()</programlisting>
+   
+   <para>The <literal>getSupportedTypes()</literal> method returns a set of
+   <literal>IdType</literal> objects, such as <literal>IdType.USER</literal>
+   and <literal>IdType.GROUP</literal>. You can either hard-code the supported
+   types into your plugin, or make them configurable through the IdRepo
+   service.</para>
+   
+   <programlisting language="java">public Set getSupportedOperations(IdType type)</programlisting>
+   
+   <para>The <literal>getSupportedOperations()</literal> method returns a set
+   of <literal>IdOperation</literal> objects, such as
+   <literal>IdOperation.CREATE</literal> and
+   <literal>IdOperation.EDIT</literal>. You can also either hard-code these, or
+   make them configurable.</para>
+   
+   <programlisting language="java">public boolean supportsAuthentication()</programlisting>
+   
+   <para>The <literal>supportsAuthentication()</literal> method returns true if
+   your plugin supports the <literal>authenticate()</literal> method.</para>
+  </section>
+ </section>
+
+ <section xml:id="idrepo-plugin-implementation">
+  <title>Identity Repository Plugin Implementation</title>
+
+  <para>Your IdRepo plugin implements operational methods depending on what
+  you support. These methods perform the operations in your data store.</para>
+  
+  <variablelist>
+   <varlistentry>
+    <term>Create</term>
+    <listitem>
+     <para>OpenAM calls <literal>create()</literal> to provision a new identity
+     in the repository, where <literal>name</literal> is the new identity's
+     name, and <literal>attrMap</literal> holds the attributes names and
+     values.</para>
+     <programlisting language="java">public String create(SSOToken token, IdType type, String name, Map attrMap)
+  throws IdRepoException, SSOException</programlisting>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Read</term>
+    <listitem>
+     <para>OpenAM calls the following methods to retrieve subjects in the
+     identity repository, and to check account activity. If your data store
+     does not support binary attributes, return an empty <literal>Map</literal>
+     for <literal>getBinaryAttributes()</literal>.</para>
+     <programlisting language="java">public boolean isExists(
+  SSOToken token,
+  IdType type,
+  String name
+) throws IdRepoException, SSOException
+
+public boolean isActive(
+  SSOToken token,
+  IdType type,
+  String name
+) throws IdRepoException, SSOException
+
+public Map getAttributes(
+  SSOToken token,
+  IdType type,
+  String name
+) throws IdRepoException, SSOException
+
+public Map getAttributes(
+  SSOToken token,
+  IdType type,
+  String name,
+  Set attrNames
+) throws IdRepoException, SSOException
+
+public Map getBinaryAttributes(
+  SSOToken token,
+  IdType type,
+  String name,
+  Set attrNames
+) throws IdRepoException, SSOException
+
+public RepoSearchResults search(
+  SSOToken token,
+  IdType type,
+  String pattern,
+  Map avPairs,
+  boolean recursive,
+  int maxResults,
+  int maxTime,
+  Set returnAttrs
+) throws IdRepoException, SSOException
+
+public RepoSearchResults search(
+  SSOToken token,
+  IdType type,
+  String pattern,
+  int maxTime,
+  int maxResults,
+  Set returnAttrs,
+  boolean returnAllAttrs,
+  int filterOp,
+  Map avPairs,
+  boolean recursive
+) throws IdRepoException, SSOException</programlisting>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Edit</term>
+    <listitem>
+     <para>OpenAM calls the following methods to update a subject in the
+     identity repository.</para>
+     <programlisting language="java">public void setAttributes(
+  SSOToken token,
+  IdType type,
+  String name,
+  Map attributes,
+  boolean isAdd
+) throws IdRepoException, SSOException
+
+public void setBinaryAttributes(
+  SSOToken token,
+  IdType type,
+  String name,
+  Map attributes,
+  boolean isAdd
+) throws IdRepoException, SSOException
+
+public void removeAttributes(
+  SSOToken token,
+  IdType type,
+  String name,
+  Set attrNames
+) throws IdRepoException, SSOException
+
+public void modifyMemberShip(
+  SSOToken token,
+  IdType type,
+  String name,
+  Set members,
+  IdType membersType,
+  int operation
+) throws IdRepoException, SSOException
+
+public void setActiveStatus(
+  SSOToken token,
+  IdType type,
+  String name,
+  boolean active
+)</programlisting>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Authenticate</term>
+    <listitem>
+     <para>OpenAM calls <literal>authenticate()</literal> with the credentials
+     from the <literal>DataStore</literal> authentication module.</para>
+     <programlisting language="java">public boolean authenticate(Callback[] credentials)
+  throws IdRepoException, AuthLoginException</programlisting>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Delete</term>
+    <listitem>
+     <para>The <literal>delete()</literal> method removes the subject from
+     the identity repository. The <literal>name</literal> specifies the
+     subject.</para>
+     <programlisting language="java">public void delete(SSOToken token, IdType type, String name)
+  throws IdRepoException, SSOException</programlisting>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Service</term>
+    <listitem>
+     <para>The <literal>IdOperation.SERVICE</literal> operation is rarely used
+     in recent OpenAM deployments.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="idrepo-plugin-deployment">
+  <title>Identity Repository Plugin Deployment</title>
+
+  <para>Your IdRepo plugin must link to <filename>amserver.jar</filename>,
+  which when you deploy OpenAM is
+  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/amserver.jar</filename>.</para>
+  
+  <para>You can either package your plugin as a .jar, and then add it to
+  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>,
+  or add the classes under
+  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>.</para>
+  
+  <para>To register your plugin with OpenAM, you add a
+  <literal>SubSchema</literal> to the
+  <literal>sunIdentityRepositoryService</literal> using the
+  <command>ssoadm</command> command. First, you create the
+  <literal>SubSchema</literal> document having the following structure.</para>
+  
+  <programlisting language="xml">&lt;SubSchema i18nKey=&quot;x4000&quot; inheritance=&quot;multiple&quot; maintainPriority=&quot;no&quot;
+           name=&quot;CustomRepo&quot; supportsApplicableOrganization=&quot;no&quot; validate=&quot;yes&quot;&gt;
+ &lt;AttributeSchema cosQualifier=&quot;default&quot; isSearchable=&quot;no&quot;
+                  name=&quot;RequiredValueValidator&quot; syntax=&quot;string&quot;
+                  type=&quot;validator&quot; &gt;
+  &lt;DefaultValues&gt;
+   &lt;Value&gt;com.sun.identity.sm.RequiredValueValidator&lt;/Value&gt;
+  &lt;/DefaultValues&gt;
+ &lt;/AttributeSchema&gt;
+ &lt;AttributeSchema any=&quot;required&quot; cosQualifier=&quot;default&quot;
+                  i18nKey=&quot;x4001&quot; isSearchable=&quot;no&quot;
+                  name=&quot;sunIdRepoClass&quot; syntax=&quot;string&quot;
+                  type=&quot;single&quot; validator=&quot;RequiredValueValidator&quot; &gt;
+  &lt;DefaultValues&gt;
+   &lt;Value&gt;org.test.CustomRepo&lt;/Value&gt;
+  &lt;/DefaultValues&gt;
+ &lt;/AttributeSchema&gt;
+ &lt;AttributeSchema cosQualifier=&quot;default&quot; i18nKey=&quot;x4002&quot; isSearchable=&quot;no&quot;
+                  name=&quot;sunIdRepoAttributeMapping&quot; syntax=&quot;string&quot; type=&quot;list&quot;&gt;
+  &lt;DefaultValues&gt;
+    &lt;Value&gt;&lt;/Value&gt;
+  &lt;/DefaultValues&gt;
+ &lt;/AttributeSchema&gt;
+&lt;/SubSchema&gt;</programlisting>
+  
+  <para>Also include the <literal>AttributeSchema</literal> required to
+  configure your IdRepo plugin.</para>
+  
+  <para>Notice the <literal>i18nKey</literal> attributes on
+  <literal>SubSchema</literal> elements. The <literal>i18nKey</literal>
+  attribute values correspond to properties in the
+  <filename>amIdRepoService.properties</filename> file, stored under
+  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>.
+  OpenAM console displays the label for the configuration user interface that
+  it retrieves from the value of the <literal>i18nKey</literal> property in the
+  <filename>amIdRepoService.properties</filename> file.</para>
+  
+  <para>Register your plugin using the <command>ssoadm</command> command after
+  copy the files into place.</para>
+  
+  <screen>$ ssoadm
+ add-sub-schema
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --servicename sunIdentityRepositoryService
+ --schematype Organization
+ --filename customIdRepo.xml
+ --subschemaname CustomRepo</screen>
+  
+  <para>Login to OpenAM console as administrator, then then Browse to Access
+  Control &gt; <replaceable>Realm Name</replaceable> &gt; Data Stores. In the
+  Data Stores table, click New... to create a Data Store corresponding to your
+  custom IdRepo plugin. In the first screen of the wizard, name the Data Store
+  and select the type corresponding to your plugin. In the second screen of the
+  wizard, add the configuration for your plugin.</para>
+  
+  <para>After creating the Data Store, create a new subject in the realm to
+  check that your plugin works as expected. You can do this under Access
+  Control &gt; <replaceable>Realm Name</replaceable> &gt; Subjects.</para>
+  
+  <para>If your plugin supports authentication, then users should now be able
+  to authenticate using the <literal>DataStore</literal> module for the
+  realm.</para>
+  
+  <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=test&amp;module=DataStore</literallayout>
+ </section>
+</chapter>

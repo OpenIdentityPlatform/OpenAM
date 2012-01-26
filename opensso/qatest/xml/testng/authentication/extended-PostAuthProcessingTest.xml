@@ -1,0 +1,27 @@
+
+    <test name="MapUserAttrToSSOTokenRootRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.PostAuthProcessingTest"/>
+        </classes>
+    </test>
+    <test name="MapUserAttrToSSOTokenSubRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="postrealm"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.PostAuthProcessingTest"/>
+        </classes>
+    </test>
+    

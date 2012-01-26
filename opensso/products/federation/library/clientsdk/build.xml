@@ -1,0 +1,95 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.2 2008/06/25 05:46:14 qcheng Exp $
+
+-->
+
+<project name="fedlibrary-clientsdk" default="package-clientsdk">
+                
+    <description>OpenSSO Federation Library Client SDK</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** clientsdk may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="fedlibrary.clientsdkbase.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <!-- properties for clientsdk -->
+    <property name="clientsdk.name" value="fedlibrary_client_sdk"/>
+    <property name="clientsdk.version" value="${library.version}"/>
+    <tstamp>
+        <format property="pstamp" pattern="yyyy-MMMM-d hh:mm"/>
+    </tstamp>
+    <property name="clientsdk.stamp" 
+        value="${clientsdk.version}_${DSTAMP}${TSTAMP}_${build.number.set}"/>
+
+    <target name="package-clientsdk" depends="preparebuild">
+        <echo message="Building federation library client sdk"/>
+
+        <tstamp>
+            <format property="touch.time" pattern="yyyy-MMMM-d hh:mm"/>
+        </tstamp>
+
+        <jar destfile="${fedlibrary.dist.dir}/openfedclientsdk.jar">
+            <manifest>
+                <attribute name="Version" value="${clientsdk.version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+
+            <fileset dir="${library.classes.dir}">
+                <includesfile name="${fedlibrary.clientsdkbase.dir}/ClientSDKClasses"/>
+            </fileset>
+            <fileset dir="${library.res.i18n.dir}">
+                <includesfile name="${fedlibrary.clientsdkbase.dir}/ClientSDKProperties"/>
+            </fileset>
+            <manifest>
+               <attribute name="Created-On" value="${pstamp}" />
+	<section name="com.sun.identity">
+                     <attribute name="Implementation-Title"
+                         value="OpenAM Client SDK"/>
+                     <attribute name="Implementation-Version"
+                         value="${clientsdk.stamp}"/>
+                     <attribute name="Implementation-Vendor"
+                         value="ForgeRock AS"/>
+	</section>
+            </manifest>
+        </jar>
+
+        <checksum file="${fedlibrary.dist.dir}/openfedclientsdk.jar"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${fedlibrary.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${fedlibrary.dist.dir}"/>
+    </target>
+   
+</project>

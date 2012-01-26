@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>4TRESSOnePager</title>
+</head>
+<body>
+<h1><span style="font-weight: bold;">Sun and ActivIdentity 4TRESS OTP Authentication Module as an OpenSSO Extension.
+&nbsp; </span></h1>
+<br>
+The auth4TRESS OpenSSO extension is an OpenSSO authentication module that interfaces with the 
+one-time password (OTP) methods supported by ActivIdentity 4TRESS Authentication Server. 
+The integration of OpenSSO with 4TRESS Authentication Server allows enterprises to incorporate 
+any OTP authentication method into the OpenSSO authentication framework<br>
+<br>
+<h2>4TRESS OTP Authentication Module Features</h2>
+1. Support of all OTP authentication methods supported by 4TRESS
+Authentication Server including:<br>
+<ul>
+  <li>&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-family: Times;">ActivIdentity
+SKI algorithm (as supported by the ActivIdentity</span><span
+ style="font-family: Times;">/tokens)</span> </li>
+  <li style="font-family: Times New Roman,Times,serif;">&nbsp;&nbsp;&nbsp;&nbsp;
+Open Authentication (OATH) based OTP (as supported by<span
+ style="font-family: monospace;"> </span>ActivIdentity DisplayCard
+and 3rd party token vendors)</li>
+  <li style="font-family: Times New Roman,Times,serif;">&nbsp;&nbsp;&nbsp;&nbsp;
+MasterCard's Chip Authentication Program (CAP) and Visa Dynamic
+Passcode Authentication (DPA) for EMV Authentication</li>
+  <li style="font-family: Times New Roman,Times,serif;"><big><small>&nbsp;&nbsp;&nbsp;&nbsp;
+Static passwords (either as a primary authenticator or temporary login
+while waiting for a replacement device)<br>
+    </small></big></li>
+</ul>
+2. The Authentication module works with OpenSSO and has been tested
+against Sun Java System Access Manager 7.0 and 7.1<br>
+<br>
+3. This module only works for 4TRESS Authentication Server 3.5 and
+above.<br>
+<br>
+4. Version 1 features:<br>
+<ul>
+  <li>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Supports retrieving the
+outcome of an authentication request to a 4TRESS Authentication Server.
+This version does not maintain a 4TRESS Session Identifier. </li>
+  <li>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This module supports
+username/OTP credentials and not Challenge/Response OTP methods.</li>
+  <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4TRESS Authentication
+Server exposes an Apache Axis 1.2 web services for authentication. The
+authentication module uses this interface and needs to be installed
+with Apache Axis 1.2</li>
+  <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The authentication
+module supports localization, however only the
+.en_US properties files are currently distributed.<br>
+  </li>
+</ul>
+<h2>References</h2>
+<a
+ href="http://www.actividentity.com/products/4TRESS_auth_server__home.php"></a>
+<pre wrap=""><big><a style="font-family: Times New Roman,Times,serif;"
+ href="http://www.actividentity.com/products/4tress_auth_server__home.php">4TRESS Authentication Server</a><br
+ style="font-family: Times New Roman,Times,serif;"><a
+ style="font-family: Times New Roman,Times,serif;"
+ href="http://www.actividentity.com/products/tokens_otp__home.php">ActivIdentity Token Range</a><br
+ style="font-family: Times New Roman,Times,serif;"><a
+ style="font-family: Times New Roman,Times,serif;"
+ href="http://www.actividentity.com/products/tokens_displaycard__home.php">ActivIdentity DisplayCard</a></big><br></pre>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

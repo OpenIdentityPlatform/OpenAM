@@ -1,0 +1,244 @@
+/*
+ * CCPL HEADER START
+ *
+ * This work is licensed under the Creative Commons
+ * Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+ * To view a copy of this license, visit
+ * http://creativecommons.org/licenses/by-nc-nd/3.0/
+ * or send a letter to Creative Commons, 444 Castro Street,
+ * Suite 900, Mountain View, California, 94041, USA.
+ * 
+ * You can also obtain a copy of the license at
+ * src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * If applicable, add the following below this CCPL HEADER, with the fields
+ * enclosed by brackets "[]" replaced with your own identifying information:
+ *     Portions Copyright [yyyy] [name of copyright owner]
+ *
+ * CCPL HEADER END
+ *
+ *     Copyright 2011-2012 ForgeRock AS
+ *    
+*/
+
+/*
+ * ForgeRock core documentation styles to be used with HTML
+ * generated from DocBook 5 XML source.
+ */
+ 
+/*
+ * Basic content and text styles
+ */
+body
+{
+    font-family: DejaVu, Verdana, Helvetica, Arial, sans-serif;
+    /* TODO: is this the right way to restrict width? */
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    color: #333;
+}
+
+/* START advice from http://diveintoaccessibility.org/day_26_using_relative_font_sizes.html */
+
+p {
+  font-size: 12px;
+  line-height: 1.3em;
+}
+
+/*/*/a{}
+body p {
+  font-size: x-small;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  font-size: small;
+}
+html>body p {
+  font-size: small;
+}
+/* */
+
+/* END advice from http://diveintoaccessibility.org/day_26_using_relative_font_sizes.html */
+
+a
+{
+    text-decoration: none; /* Do not underline links. */
+    font-size: 12px;
+}
+
+a:link {
+    color:#47a;
+}
+
+a:visited {
+    color:#68a;
+}
+
+a:active, a:hover {
+    color:#990000;
+}
+
+code,.command>strong,div.literallayout,.filename
+{
+ font-family: monospace;
+ font-weight: normal; 
+}
+
+code,.command,.copyright,div.index,div.literallayout>p,.filename,h3.author,.term,.step
+{
+ font-size: 12px;
+    font-weight: normal;
+}
+
+h1
+{
+    color: #626D75; /* ForgeRock gray */
+    font-size: 24px;
+}
+
+h2,h3,h4,h5,h6
+{
+    color: #333;
+}
+
+h2
+{
+ font-size: 17px;
+}
+
+h3
+{
+ font-size: 15px;
+}
+
+h4
+{
+ font-size: 14px;
+}
+
+h5
+{
+ font-size: 13px;
+}
+
+hr
+{
+ display: none;
+}
+
+ul
+{
+    list-style-image: url("../images/bulletpoint.png");
+}
+
+/*
+ * Page navigation for chunked HTML
+ */
+div.navfooter,div.navheader,div.nukefooter
+{
+    background-color: #fafafa;
+}
+
+div.navheader
+{
+ border-bottom: thin solid #ccc;
+}
+
+/* Do not repeat the title at the top of the page. */
+.navheader th
+{
+    color: #fafafa; /* Same color as background. */
+    font-size: 0px; /* Take up as little space as possible. */
+}
+
+.navheader td,.navfooter td,.nukefooter td
+{
+    font-size: x-small;
+    font-style: italic;
+}
+
+/*
+ * Block elements
+ */
+pre.programlisting,pre.screen,pre.flat
+{
+    font-family: monospace;
+    white-space: pre;
+    background-color: #fafafa;
+    border: thin dashed #ccc;
+    padding: 6px;
+}
+
+pre.screen,pre.flat
+{
+    text-indent: -18px;
+}
+
+.toggle
+{
+ position: relative;
+ left: -40px;
+ float:left;
+}
+
+div.abstract,div.important,div.caution,div.note,div.tip,div.warning,div.example,div.toc
+{
+    border: thin dotted #ccc;
+    padding: 6px;
+}
+
+div.appendix,div.chapter,div.preface
+{
+ border-bottom: thin solid #ccc; 
+}
+
+.important,.caution,.note,.tip,.warning
+{
+    font-style: italic;
+}
+
+.abstract,.example,.toc
+{
+    margin: 6px;
+    font-size: 12px;
+}
+
+img
+{
+    max-width: 640px;
+    height: auto;
+    max-height: 480px;
+}
+
+ol,th,td
+{
+    font-size: 12px;
+}
+
+.table-contents
+{
+ border-top: thin solid #ccc;
+ border-bottom: thin solid #ccc;
+}
+
+.table-contents thead
+{
+ text-align: left;
+}
+
+.table-contents th, .table-contents td
+{
+ padding: 5px;
+}
+
+/*
+ * Man pages
+ */
+.refnamediv>h2,.refsect1>h2,.refsynopsisdiv>h2
+{
+    font-size: 13px;
+}
+
+/* TODO: Man page div content should be indented more than the title. */

@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <title>Access rights validated</title>
+    </head>
+    <body onload="document.forms[0].submit()">
+        <form method="post" action="@TARGET_URL@">
+            <input type="hidden" name="@SAML_MESSAGE_NAME@" value="@SAML_MESSAGE_VALUE@" />
+            <input type="hidden" name="@RELAY_STATE_NAME@" value="@RELAY_STATE_VALUE@" />
+            <noscript>
+            <center>
+                <input type="submit" value="@SAML_POST_KEY@" />
+            </center>
+            </noscript>
+        </form>
+    </body>
+</html>

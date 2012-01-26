@@ -1,0 +1,84 @@
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: override.css,v 1.25 2009/08/13 13:27:01 farble1670 Exp $
+ *
+*/
+
+.iceMnuBarItem span {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #707277;
+}
+
+.iceMnuBarItem img {
+    position: absolute;
+    top: 5px;
+}
+
+.iceMnuBarSubMenu, .iceMnuBarVrtSubMenu {
+    margin-top: -2px;
+    width: 160px;
+}
+
+.iceSelInpTxtTxt {
+    margin: 2px;
+}
+
+.iceMnuItm a,
+.iceMnuItm a:hover {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.iceMnuItm a span,
+.iceMnuItm a:hover span {
+    position: relative;
+    left: -18px;
+}
+
+.iceMnuItm a img {
+    padding-left: 3px;
+}
+
+
+.iceMnuItm a, .iceMnuItmVrt a {
+    color: #707277;
+}
+
+.iceCmdSrtHdr * {
+    font-weight: bold;
+}
+
+.iceDatTbl td span.iceOutTxt {
+    display: inline;
+}
+
+.iceOutFrmt, .iceOutTxt, .iceOutLbl  {
+    color: #707277;
+}
+
+.iceSelOneMnu, .iceSelMnyLb, .iceSelMnyMnu, .iceSelOneLb {
+    color: #707277;
+}

@@ -1,0 +1,272 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: fmDisco.xml,v 1.6 2008/06/25 05:51:14 qcheng Exp $
+                                                                                
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunIdentityServerDiscoveryService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/sunIdentityServerDiscoveryService"
+            i18nFileName="fmDiscoConfiguration"
+            revisionNumber="40"
+            i18nKey="sunIdentityServerDiscoServiceDescription"
+            propertiesViewBeanURL="../service/SMDiscoveryService">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>sunFederationManagerDataStore</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoProviderID"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g101">
+                    <DefaultValues>
+                       <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/disco</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoSupportedAuthnMechs"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="g102">
+                    <ChoiceValues>
+                        <ChoiceValue>urn:liberty:security:2003-08:null:null</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:null:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:null:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2004-04:null:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:TLS:null</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:TLS:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:TLS:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2004-04:TLS:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:ClientTLS:null</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:ClientTLS:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:ClientTLS:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2004-04:ClientTLS:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:null:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:null:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:null:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:TLS:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:TLS:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:TLS:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:ClientTLS:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:ClientTLS:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2005-02:ClientTLS:Bearer</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>urn:liberty:security:2003-08:null:null</Value>
+                        <Value>urn:liberty:security:2003-08:null:X509</Value>
+                        <Value>urn:liberty:security:2003-08:null:SAML</Value>
+                        <Value>urn:liberty:security:2004-04:null:Bearer</Value>
+                        <Value>urn:liberty:security:2003-08:TLS:null</Value>
+                        <Value>urn:liberty:security:2003-08:TLS:X509</Value>
+                        <Value>urn:liberty:security:2003-08:TLS:SAML</Value>
+                        <Value>urn:liberty:security:2004-04:TLS:Bearer</Value>
+                        <Value>urn:liberty:security:2003-08:ClientTLS:null</Value>
+                        <Value>urn:liberty:security:2003-08:ClientTLS:X509</Value>
+                        <Value>urn:liberty:security:2003-08:ClientTLS:SAML</Value>
+                        <Value>urn:liberty:security:2004-04:ClientTLS:Bearer</Value>
+                        <Value>urn:liberty:security:2005-02:null:X509</Value>
+                        <Value>urn:liberty:security:2005-02:null:SAML</Value>
+                        <Value>urn:liberty:security:2005-02:null:Bearer</Value>
+                        <Value>urn:liberty:security:2005-02:TLS:X509</Value>
+                        <Value>urn:liberty:security:2005-02:TLS:SAML</Value>
+                        <Value>urn:liberty:security:2005-02:TLS:Bearer</Value>
+                        <Value>urn:liberty:security:2005-02:ClientTLS:X509</Value>
+                        <Value>urn:liberty:security:2005-02:ClientTLS:SAML</Value>
+                        <Value>urn:liberty:security:2005-02:ClientTLS:Bearer</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoSupportedDirectives"
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="g103">
+                    <ChoiceValues>
+                        <ChoiceValue>AuthenticateRequester</ChoiceValue>
+                        <ChoiceValue>AuthorizeRequester</ChoiceValue>
+                        <ChoiceValue>AuthenticateSessionContext</ChoiceValue>
+                        <ChoiceValue>EncryptResourceID</ChoiceValue>
+                        <ChoiceValue>GenerateBearerToken</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>AuthenticateRequester</Value>
+                        <Value>AuthorizeRequester</Value>
+                        <Value>AuthenticateSessionContext</Value>
+                        <Value>EncryptResourceID</Value>
+                        <Value>GenerateBearerToken</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                    name="sunIdentityServerDiscoLookupNeedPolicyEval"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g104">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                    name="sunIdentityServerDiscoUpdateNeedPolicyEval"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g105">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                    name="sunIdentityServerDiscoAuthorizer"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g106">
+                    <DefaultValues>
+                        <Value>@DISCO_AUTHORIZER@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoEntryHandler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g107">
+                    <DefaultValues>
+                        <Value>@DISCO_ENTRY_HANDLER@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoProviderResourceIDMapper"
+                    type="list"
+                    syntax="string"
+                    uitype="name_value_list"
+                    i18nKey="g108">
+                    <DefaultValues>
+                        <Value>providerid=@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/disco|idmapper=com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoOptionSecurityResponse"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g109">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerBootstrappingDiscoEntry"
+                    type="single"
+                    syntax="xml"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;&lt;DiscoEntry xmlns="urn:com:sun:identityserver:liberty:ws:disco:discoentry"&gt;&lt;ResourceOffering xmlns="urn:liberty:disco:2003-08"&gt;&lt;ResourceID&gt;&lt;/ResourceID&gt;&lt;ServiceInstance&gt;&lt;ServiceType&gt;urn:liberty:disco:2003-08&lt;/ServiceType&gt;&lt;ProviderID&gt;%SERVER_PROTO%://%SERVER_HOST%:%SERVER_PORT%%SERVER_URI%/Liberty/disco&lt;/ProviderID&gt;&lt;Description&gt;&lt;SecurityMechID&gt;urn:liberty:security:2003-08:null:null&lt;/SecurityMechID&gt;&lt;Endpoint&gt;%SERVER_PROTO%://%SERVER_HOST%:%SERVER_PORT%%SERVER_URI%/Liberty/disco&lt;/Endpoint&gt;&lt;/Description&gt;&lt;/ServiceInstance&gt;&lt;/ResourceOffering&gt;&lt;/DiscoEntry&gt;</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerBootstrappingSessionContext"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g202">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerBootstrappingEncryptNIinSessionContext"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g203">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerBootstrappingImpliedResource"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g204">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerDiscoNameIdentifierMapper"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g205">
+                    <DefaultValues>
+                        <Value>com.sun.identity.liberty.ws.disco.plugins.IDFFNameIdentifierMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerGlobalDiscoEntryHandler"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g206">
+                    <DefaultValues>
+                        <Value>@DISCO_GLOBAL_ENTRY_HANDLER@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+            <Dynamic>
+                <AttributeSchema name="sunIdentityServerDynamicDiscoEntries"
+                    type="list"
+                    syntax="xml"
+                    i18nKey="">
+                </AttributeSchema>
+            </Dynamic>
+            <Policy>
+                <AttributeSchema name="LOOKUP"
+                    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+                    i18nKey="p101">
+                    <IsResourceNameAllowed/>
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="UPDATE"
+                    type="single"
+                    syntax="boolean"
+                    uitype="radio"
+                    i18nKey="p102">
+                    <IsResourceNameAllowed/>
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+            </Policy>
+            <User>
+                <AttributeSchema name="sunIdentityServerDiscoEntries"
+                    type="list"
+                    syntax="xml"
+                    i18nKey="p103">
+                </AttributeSchema>
+            </User>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

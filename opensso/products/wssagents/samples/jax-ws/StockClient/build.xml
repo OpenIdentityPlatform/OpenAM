@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.7 2010/01/15 18:54:36 mrudul_uchil Exp $
+
+-->
+
+<project name="Stock Client Sample" default="usage">
+
+	<property file="../jaxws.properties"/>
+
+	<taskdef name="wsimport" classname="com.sun.tools.ws.ant.WsImport"
+		  	 classpath="${jaxws.lib}/jaxws-tools.jar" />
+
+	<target name="all"  
+      depends="clean, generate-from-wsdl, compile, build, war,
+               secure-war" />
+
+	<target name="generate-from-wsdl" depends="clean">
+
+		<!-- Make the directory for storing the generated .class files -->
+		<mkdir dir="build/classes"/>
+		
+		<!-- Run wsimport command with the wsdl to generate the stubs -->
+		<wsimport
+        		wsdl="web/WEB-INF/wsdl/stockservice.wsdl"
+        		destdir="build/classes" />
+
+	</target>
+
+	<path id="jaxws.classpath">
+		<fileset dir="${jaxws.lib}">
+			<include name="**/*.jar" />
+		</fileset>
+        <fileset dir="src/lib">
+			<include name="**/*.jar" />
+		</fileset>        
+        <fileset dir="../../lib">
+			<include name="**/openssowssagents.jar" />
+		</fileset>
+		<fileset dir="build/classes/com/sun/stockquote/">
+			<include name="**/*.class" />
+		</fileset>
+	</path>
+
+	<!-- Compile all the classes -->
+	<target name="compile" depends="generate-from-wsdl">
+		<javac
+  	   		srcdir="src/com/sun/stockquote" 
+  	   		destdir="build/classes"
+  	   		includes="**/*.java">
+			<classpath refid="jaxws.classpath" />
+		</javac>
+
+	</target>
+
+	<!-- Copy all artifacts to the "web" folder to be included in the WAR-->
+	<target name="build-base" depends="compile">
+
+		<copy file="src/com/sun/stockquote/client_handlers.xml"
+              todir="build/classes/com/sun/stockquote/" />
+
+		<copy todir="web/WEB-INF">
+			<fileset dir="build/"/>
+		</copy>
+	</target>
+
+    <!-- Copy all Tomcat specific unsecure files to the "src" folder to be included in the WAR-->
+	<target name="tomcat-build">
+		<copy file="../etc/Tomcat/StockClient/unsecure/GetQuote.java"
+              todir="src/com/sun/stockquote" overwrite="true"/>
+        <antcall target="build-base" />
+	</target>
+
+    <!-- Copy all Tomcat specific secure files to the "src" folder to be included in the secure WAR-->
+	<target name="tomcat-secure-build">
+		<copy file="../etc/Tomcat/StockClient/secure/GetQuote.java"
+              todir="src/com/sun/stockquote" overwrite="true"/>
+        <antcall target="build-base" />
+	</target>
+
+    <!-- Copy all general files to the "src" folder to be included in the WAR / secure WAR-->
+	<target name="build">
+		<copy file="../etc/config/StockClient/GetQuote.java"
+              todir="src/com/sun/stockquote" overwrite="true"/>
+        <antcall target="build-base" />
+	</target>
+
+    <!--Create the unsecure WAR file for the Stock Client for Tomcat deployment-->
+	<target name="tomcat-war">
+        <antcall target="tomcat-build" />
+		<antcall target="war-base" />
+	</target>
+
+	<!--Create the secure WAR file for the Stock Client for Tomcat deployment-->
+	<target name="tomcat-secure-war">
+        <antcall target="tomcat-secure-build" />
+		<antcall target="secure-war-base" />
+	</target>
+
+    <!--Create the unsecure WAR file for the Stock Client -->
+	<target name="war">
+        <antcall target="build" />
+		<antcall target="war-base" />
+	</target>
+
+	<!--Create the secure WAR file for the Stock Client -->
+	<target name="secure-war">
+        <antcall target="build" />
+		<antcall target="secure-war-base" />
+	</target>
+
+	<!--Create the unsecure WAR file for the Stock Client -->
+	<target name="war-base">
+		<mkdir dir="dist"/>
+		<war destfile="dist/StockClient.war" 
+  	  	  basedir="web">
+		</war>
+	</target>
+
+	<!--Create the secure WAR file for the Stock Client -->
+	<target name="secure-war-base">
+ 		<!-- Create a new WAR -->
+        <mkdir dir="web/WEB-INF/lib" />
+		<copy todir="web/WEB-INF/lib" overwrite="true">
+			<fileset dir="../../lib"/>
+		</copy>
+		<copy file="../../config/AMConfig.properties"
+              todir="web/WEB-INF/classes" overwrite="true"/>
+		<copy file="../etc/config/StockClient/client_handlers.xml"
+              todir="web/WEB-INF/classes/com/sun/stockquote/" overwrite="true"/>
+        <copy file="../etc/config/StockClient/web.xml"
+              todir="web/WEB-INF/" overwrite="true"/>
+
+		<mkdir dir="dist"/>
+		<war destfile="dist/StockClient.war" 
+		  basedir="web">
+		</war>
+        <copy file="../etc/config/StockClient/web_orig.xml"
+              tofile="web/WEB-INF/web.xml" overwrite="true"/>
+	</target>
+
+	<!-- Start afresh! Delete all artifacts created so far. -->
+	<target name="clean">
+		<delete dir="build">
+		</delete>
+		<delete dir="dist">
+		</delete>
+ 		<delete dir="web/WEB-INF/classes">
+		</delete>
+
+	<!-- Delete the existing jars added to secure the web-service-->
+		<delete dir="web/WEB-INF/lib">
+		</delete>
+	</target>
+
+	<target name="usage">
+		<echo message=" "/>
+		<echo message=" Following targets are available:"/>
+		<echo message=" "/>
+		<echo message=" clean              : Deletes all generated artifacts"/>
+		<echo message=" generate-from-wsdl : Generates web-service stubs from
+                                             wsdl to be used by the service and
+                                             the client"/>
+		<echo message=" compile            : Compiles all files in the project"/>
+		<echo message=" build              : Copy all artifacts to the web
+                                             folder to be included in the WAR"/>
+        <echo message=" tomcat-build       : Copy all java files to the src
+                                             folder to be included in the
+                                             unsecure WAR for Tomcat container"/>
+        <echo message=" tomcat-secure-build: Copy all java files to the src
+                                             folder to be included in the
+                                             secure WAR for Tomcat container"/>
+		<echo message=" war                : Creates the deployable WAR with
+                                             no security"/>
+		<echo message=" secure-war         : Creates the deployable WAR with
+                                             security"/>
+        <echo message=" tomcat-war         : Creates the deployable WAR with no
+                                             security for Tomcat container"/>
+		<echo message=" tomcat-secure-war  : Creates the deployable WAR with
+                                             security for Tomcat container"/>
+		<echo message=" all                : Runs all the targets in the above
+                                             order"/>
+		<echo message=" usage              : Displays this usage message"/>
+		<echo message=" "/>
+		<echo message=" To run a target, issue the following command:"/>
+		<echo message=" "/>
+		<echo message=" ant &lt;target-name&gt;"/>
+		<echo message=" "/>
+	</target>
+
+</project>

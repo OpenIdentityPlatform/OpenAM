@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE Requests
+    PUBLIC "-//iPlanet//Sun ONE Access Manager 2005Q3 Admin CLI DTD//EN"
+    "jar://com/iplanet/am/admin/cli/amAdmin.dtd"
+>
+
+<Requests>
+    <AttributeSchema name="iplanet-am-session-dnrestrictiononly"
+            type="single" syntax="boolean" i18nKey="a121b">
+        <BooleanValues>
+            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+        </BooleanValues>
+        <DefaultValues>
+            <Value>false</Value>
+        </DefaultValues>
+    </AttributeSchema>
+</Requests>
+

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-fedlet-java'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Using Fedlets in Java Web Applications</title>
+ <indexterm>
+  <primary>Fedlets</primary>
+  <secondary>Java</secondary>
+ </indexterm>
+ <para>This chapter introduces OpenAM Fedlets, and shows how to use the Fedlet
+ as part of your Java web application.</para>
+
+ <para>An OpenAM <firstterm>Fedlet</firstterm> is a small web application that
+ can do federation in your service provider application with OpenAM acting as
+ the identity provider. The Fedlet does not require an entire OpenAM
+ installation alongside your application, but instead can redirect to OpenAM
+ for single sign on, and to retrieve SAML assertions.</para>
+
+ <procedure xml:id="create-a-java-fedlet">
+  <title>To Create a Fedlet</title>
+  <para>The OpenAM administrator running the identity provider server creates
+  a <filename>Fedlet.zip</filename> file for your service provider application,
+  and then sends you the .zip.</para>
+  
+  <step performance="optional">
+   <para>Before creating the Fedlet, create a Hosted Identity Provider if
+   you have not already done so.</para>
+  </step>
+  <step>
+   <para>On the Common Tasks page of the OpenAM console, click Create
+   Fedlet.</para>
+  </step>
+  <step>
+   <para>Note that the Circle of Trust includes your hosted identity provider,
+   and that Identity Provider is set to your to hosted identity
+   provider.</para>
+  </step>
+  <step>
+   <para>Name the Fedlet, and also set the Destination URL.</para>
+   <para>You can use the deployment URL, such as
+   <literal>http://www.example.com:8080/fedlet</literal> as both the name and
+   the destination URL.</para>
+  </step>
+  <step>
+   <para>If you must map attributes to match profiles on the service provider,
+   set up the attribute mapping.</para>
+  </step>
+  <step>
+   <para>Click create to generate the Fedlet.zip file, such as
+   <filename>$HOME/openam/myfedlets/httpwwwexamplecom8080myapp/Fedlet.zip</filename>.</para>
+  </step>
+  <step>
+   <para>Provide the Fedlet to the service provider.</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="install-fedlet-as-demo">
+  <title>To Install the Fedlet as a Demo Application</title>
+  <para><filename>Fedlet.zip</filename> includes the
+  <filename>fedlet.war</filename> archive corresponding to the identity
+  provider, and a <filename>README</filename> file.</para>
+  <itemizedlist>
+   <listitem>
+    <para>The <filename>fedlet.war</filename> archive contains both the Fedlet
+    as a demo web application, and also the files you use to include the Fedlet
+    in your service provider application.</para>
+   </listitem>
+   <listitem>
+    <para>The README file describes how to use the Fedlet.</para>
+   </listitem>
+  </itemizedlist>
+
+  <step>
+   <para>Deploy the Fedlet in your web container.</para>
+   <screen>$ unzip Fedlet.zip
+$ mv fedlet.war /path/to/tomcat/webapps</screen>
+  </step>
+  <step>
+   <para>Browse to the Fedlet URL, and then click the links to set up the
+   configuration directory in <filename>$HOME/fedlet</filename>, where $HOME
+   corresponds to the user running the web application container.</para>
+  </step>
+  <step>
+   <para>In the Fedlet configuration directory, set up a JKS keystore file,
+   keystore password file, and key password file.</para>
+   <para>For demo purposes, you can copy the test
+   <filename>keystore.jks</filename>, <filename>.keypass</filename>, and
+   <filename>.storepass</filename> from the OpenAM identity provider.</para>
+  </step>
+  <step>
+   <para>Try one or more examples from the Fedlet home page to validate Fedlet
+   setup.</para>
+   <mediaobject>
+    <alt>Home page for demo Fedlet</alt>
+    <imageobject>
+     <imagedata fileref="images/fedlet-demo.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>The home page for the demo Fedlet lets you try Fedlet and IDP
+     initiated single sign on.</para>
+    </textobject>
+   </mediaobject>
+   <para>After setting up OpenAM with the default subjects, you can login on
+   the identity provider with user name <literal>demo</literal> and password
+   <literal>changeit</literal>.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="hello-world-with-fedlet">
+  <title>To Add Your Application</title>
+  
+  <variablelist>
+   <para>The Fedlet includes the following files that you use when building
+   your own service provider application based on the demo web application,
+   including a set of JavaServer Pages (JSP) examples.</para>
+   <varlistentry>
+    <term><filename>conf/</filename></term>
+    <listitem>
+     <para>Configuration files copied to <filename>$HOME/fedlet</filename> when
+     you first deploy and configure the Fedlet. When deploying your application,
+     you can move these to an alternate location passed to the Java virtual
+     machine for the web application container at startup. For example, if
+     you store the configuration under <filename>/export/fedlet/</filename>,
+     then you could pass the following property to the JVM.</para>
+     <literallayout class="monospaced">-Dcom.sun.identity.fedlet.home=/export/fedlet/conf</literallayout>
+     <para>You do not need to include these files in your application.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>fedletAttrQuery.jsp</filename></term>
+    <term><filename>fedletAttrResp.jsp</filename></term>
+    <listitem>
+     <para>Sample SAML attribute query and response handlers. See the Fedlet
+     README file for more information.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>fedletEncode.jsp</filename></term>
+    <listitem>
+     <para>Utility JSP to encode a password, such as the password used to
+     protect a Java keystore</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>fedletSampleApp.jsp</filename></term>
+    <term><filename>index.jsp</filename></term>
+    <listitem>
+     <para>Demo application. You can remove these before deployment to replace
+     them with your application.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>fedletXACMLQuery.jsp</filename></term>
+    <term><filename>fedletXACMLResp.jsp</filename></term>
+    <listitem>
+     <para>Sample SAML XACML query and response handlers. See the Fedlet
+     README file for more information.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>logout.jsp</filename></term>
+    <listitem>
+     <para>Utility page to perform single log out</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>saml2/jsp/</filename></term>
+    <listitem>
+     <para>JSPs to initiate single sign on and single logout, and to handle
+     error, and also a JSP for obtaining Fedlet metadata,
+     <filename>saml2/jsp/exportmetadata.jsp</filename></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>WEB-INF/classes/</filename></term>
+    <listitem>
+     <para>Localized Java properties files for strings used in the Fedlet user
+     interface</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>WEB-INF/lib/</filename></term>
+    <listitem>
+     <para>Fedlet libraries required by your application</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>WEB-INF/web.xml</filename></term>
+    <listitem>
+     <para>Fedlet web application configuration, showing how JSPs map to URLs
+     used in the Fedlet. Add mappings for your application before
+     deployment.</para>
+     <para>In the <filename>web.xml</filename> mappings, your application must
+     be mapped to <literal>/fedletapplication</literal>, as this is the
+     assertion consumer URL set in the Fedlet metadata.</para>
+     <programlisting language="xml">&lt;servlet&gt;
+    &lt;servlet-name&gt;yourApp&lt;/servlet-name&gt;
+    &lt;jsp-file&gt;/fedletSampleApp.jsp&lt;/jsp-file&gt;
+&lt;/servlet&gt;
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;yourApp&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/fedletapplication&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</programlisting>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <!-- Here, it would be nice to demo a page that returns to the identity
+  provider to login, then shows a Hello, user page with the common name from
+  the provider. -->
+  <para>Follow these steps for a very simple demonstration of how to customize
+  the Fedlet.</para>
+  <step>
+   <para>Backup <filename>fedletSampleApp.jsp</filename>.</para>
+   <screen>$ cd /path/to/tomcat/webapps/fedlet/
+$ cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</screen>
+  </step>
+  <step>
+   <para>Edit <filename>fedletSampleApp.jsp</filename> to reduce it to a single
+   redirection to <filename>myapp.jsp</filename>. An implementation of the
+   &lt;html&gt; element of the file follows below.</para>
+   <programlisting language="html">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Fedlet Sample Application&lt;/title&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=iso-8859-1&quot; /&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;%
+    // BEGIN : following code is a must for Fedlet (SP) side application
+    Map map;
+    try {
+        // invoke the Fedlet processing logic. this will do all the
+        // necessary processing conforming to SAMLv2 specifications,
+        // such as XML signature validation, Audience and Recipient
+        // validation etc.  
+        map = SPACSUtils.processResponseForFedlet(request, response);
+        response.sendRedirect(&quot;myapp.jsp&quot;);
+    } catch (SAML2Exception sme) {
+        SAMLUtils.sendError(request, response,
+            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
+            sme.getMessage());
+        return;
+    } catch (IOException ioe) {
+        SAMLUtils.sendError(request, response,
+            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
+            ioe.getMessage());
+        return;
+    } catch (SessionException se) {
+        SAMLUtils.sendError(request, response, 
+            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
+            se.getMessage());
+        return;
+    } catch (ServletException se) {
+        SAMLUtils.sendError(request, response,
+            response.SC_BAD_REQUEST, &quot;failedToProcessSSOResponse&quot;,
+            se.getMessage());
+        return;
+    }
+    // END : code is a must for Fedlet (SP) side application
+%&gt;
+&lt;/body&gt;
+&lt;/html&gt;</programlisting>
+  </step>
+  <step>
+   <para>Add a <filename>myapp.jsp</filename> page to the Fedlet, such as the
+   following.</para>
+   <programlisting language="html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;My Application&lt;/title&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html&quot; /&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;h1&gt;My Application&lt;/h1&gt;
+&lt;p&gt;After you change the &lt;code&gt;fedletSampleApp.jsp&lt;/code&gt;,
+   all it does is redirect to this home page after
+   successful login.&lt;/p&gt;
+&lt;p&gt;See the fedlet README file and example JSPs for hints
+   on how to retrieve attributes from OpenAM, or to send
+   XACML queries for policy decisions.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</programlisting>
+  </step>
+  <step>
+   <para>Browse to the Fedlet URL, such as
+   <literal>http://www.example.com:8080/fedlet/</literal>, and try one
+   of the login methods.</para>
+   <para>After login you are redirected to <filename>myapp.jsp</filename>.</para>
+  </step>
+ </procedure>
+</chapter>

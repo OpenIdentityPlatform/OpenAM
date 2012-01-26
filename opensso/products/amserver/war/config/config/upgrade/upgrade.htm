@@ -1,0 +1,67 @@
+<script type="text/javascript">
+    YAHOO.namespace("sun.identity.config.options.upgrade");
+
+    //convenient alias:
+    var $ = YAHOO.util.Dom.get;
+    
+    function cancelUpgrade() {
+        YAHOO.sun.identity.config.options.upgrade.hide();
+    }
+
+    function saveReport() {
+        window.open("$context$path?actionLink=saveReport", "Download");
+    }
+
+    function writeUpgradeAsync() {
+        ie7fix++;
+        AjaxUtils.call("$context$path?actionLink=doUpgrade&ie7fix=" + ie7fix, writeConfigResponse);
+    }
+
+    function doUpgrade() {
+        document.getElementById("returnToConfig").style.display = "none";
+        document.getElementById("setupMessage").innerHTML = "";
+        YAHOO.sun.identity.config.options.inProgress.show();
+
+        var fr1 = window.frames['progressIframe'];
+        if (fr1) {
+            fr1.location = "$context/upgrade/setUpgradeProgress";
+        }
+        setTimeout('writeUpgradeAsync()', 2000);
+    }
+</script>
+<div id="upgrade" style="width: 500px; background-color: #FFFFFF">
+    <div class="header">$page.getLocalizedString("upgrade.main.title")</div>
+    #if ($error)
+    <div id="content" class="tabContent">
+        <div class="bodyPopup borderPopUpGray" align="center" style="background:#FFFFFF">
+            <p class="blueSmall">$page.getLocalizedString("upgrade.init.error")</p>
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+        </div>
+    </div>
+    #else
+    <div id="content" class="tabContent">
+        <div style="margin: 10px 23px">
+            $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
+            $page.getLocalizedString("upgrade.new.version") $newVersion
+        </div>
+        <div style="overflow: auto; border: solid 1px; height: 180px; width: 90%; margin: 0 auto;">
+            $changelist
+        </div>
+    </div>
+    <!--    </div>-->
+    <div id="upgradeFooter" style="padding-bottom: 10px">
+        <div class="col1">&nbsp;</div>
+
+        <div style="float: left; margin-left: 23px">
+            <button id="upgradeButton" type="button" onclick="doUpgrade()">$page.getLocalizedString("upgrade.button")</button>
+        </div>
+        <div style="float: right; margin-right: 23px">
+            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+        </div>
+        <div style="text-align: center">
+            <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue">$page.getLocalizedString("save.report.button")</button>
+        </div>
+    </div>
+    #end
+</div>
+

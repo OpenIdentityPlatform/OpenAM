@@ -1,0 +1,26 @@
+dn: ds-cfg-attribute=sunxmlkeyvalue,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: sunxmlkeyvalue
+ds-cfg-index-type: equality
+ds-cfg-index-type: substring
+
+dn: ds-cfg-attribute=memberof,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: memberof
+ds-cfg-index-type: equality
+ds-cfg-index-type: presence
+
+dn: ds-cfg-attribute=iplanet-am-user-federation-info-key,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: iplanet-am-user-federation-info-key
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=sun-fm-saml2-nameid-infokey,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: sun-fm-saml2-nameid-infokey
+ds-cfg-index-type: equality
+

@@ -1,0 +1,13 @@
+amclientsdk.jar
+commons-codec-1.3.jar
+commons-httpclient-3.0.1.jar
+commons-logging-1.03.jar
+el-api-1.0.jar
+el-impl-1.0.jar
+jdom.jar
+jsf-api-1.2_04-p02.jar
+jsf-facelets.jar
+myfaces-all.jar
+nekohtml-1.9.7.jar
+openid4java.jar
+xercesImpl-2.8.1.jar

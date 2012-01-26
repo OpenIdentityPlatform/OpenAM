@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: web.xml,v 1.1 2008/11/21 22:21:52 leiming Exp $
+
+-->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
+
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" id="WebApp_agentsample">
+    <display-name>
+        OpenSSO J2EE Policy Agent Sample Application
+    </display-name>
+    <description>
+        An application to demonstrate the features of J2EE Policy Agents.
+    </description>
+    <filter id="Filter_PolicyAgent">
+        <description>J2EE Policy Agent Filter</description>
+        <display-name>Agent</display-name>
+        <filter-name>Agent</filter-name>
+        <filter-class>
+            com.sun.identity.agents.filter.AmAgentFilter
+        </filter-class>
+    </filter>
+    <filter-mapping id="FilterMapping_PolicyAgent">
+        <filter-name>Agent</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet id="Servlet_ProtectedServlet">
+        <description>
+            A Servlet protected by web-tier declarative security
+            constraints and requires the user to be in the group
+            manager for access.
+        </description>
+        <display-name>ProtectedServlet</display-name>
+        <servlet-name>ProtectedServlet</servlet-name>
+        <servlet-class>
+            com.sun.identity.agents.sample.ProtectedServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet id="Servlet_ProtectedCallerServlet">
+        <description>
+            A Servlet that accesses an EJB which is protected
+            by a declarative constraint that requires the user
+            to be in the group employee for access.
+        </description>
+        <display-name>PotectedCallerServlet</display-name>
+        <servlet-name>ProtectedCallerServlet</servlet-name>
+        <servlet-class>
+            com.sun.identity.agents.sample.ProtectedCallerServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet id="Servlet_SecurityAwareServlet">
+        <description>
+            A Servlet that invokes J2EE Security APIs.
+        </description>
+        <display-name>SecurityAwareServlet</display-name>
+        <servlet-name>SecurityAwareServlet</servlet-name>
+        <servlet-class>
+            com.sun.identity.agents.sample.SecurityAwareServlet
+        </servlet-class>
+        <security-role-ref>
+            <role-name>MANAGER_ROLE</role-name>
+            <role-link>MANAGER_ROLE</role-link>
+        </security-role-ref>
+        <security-role-ref>
+            <role-name>EMPLOYEE_ROLE</role-name>
+            <role-link>EMPLOYEE_ROLE</role-link>
+        </security-role-ref>
+    </servlet>
+
+    <servlet id="Servlet_InvokerServlet">
+        <description>
+            A Servlet that accesses an EJB which in turn
+            invokes security APIs available in the EJB tier.
+        </description>
+        <display-name>InvokerServlet</display-name>
+        <servlet-name>InvokerServlet</servlet-name>
+        <servlet-class>
+            com.sun.identity.agents.sample.InvokerServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet id="Servlet_URLPolicyServlet">
+        <description>
+            A Servlet that is protected by a URL policy
+            which requires the user to be in LDAP Group
+            called customer.
+        </description>
+        <display-name>URLPolicyServlet</display-name>
+        <servlet-name>URLPolicyServlet</servlet-name>
+        <servlet-class>
+            com.sun.identity.agents.sample.URLPolicyServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ProtectedServlet</servlet-name>
+        <url-pattern>/protectedservlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ProtectedCallerServlet</servlet-name>
+        <url-pattern>/protectedcallerservlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SecurityAwareServlet</servlet-name>
+        <url-pattern>/securityawareservlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>InvokerServlet</servlet-name>
+        <url-pattern>/invokerservlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>URLPolicyServlet</servlet-name>
+        <url-pattern>/urlpolicyservlet</url-pattern>
+    </servlet-mapping>
+
+    <session-config>
+        <session-timeout>54</session-timeout>
+    </session-config>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/authentication/accessdenied.html</location>
+    </error-page>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/public/notfound.html</location>
+    </error-page>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Protected Servlet</web-resource-name>
+            <url-pattern>/protectedservlet</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>MANAGER_ROLE</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Security Aware Servlets</web-resource-name>
+            <url-pattern>/securityawareservlet</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>MANAGER_ROLE</role-name>
+            <role-name>EMPLOYEE_ROLE</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Security Aware Servlets</web-resource-name>
+            <url-pattern>/invokerservlet</url-pattern>
+            <url-pattern>/protectedcallerservlet</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>EMPLOYEE_ROLE</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <form-login-config>
+            <form-login-page>/authentication/login.html</form-login-page>
+            <form-error-page>/authentication/accessdenied.html</form-error-page>
+        </form-login-config>
+    </login-config>   
+
+    <security-role id="SR_MANAGER_ROLE">
+        <role-name>MANAGER_ROLE</role-name>
+    </security-role>
+
+    <security-role id="SR_EMPLOYEE_ROLE">
+        <role-name>EMPLOYEE_ROLE</role-name>
+    </security-role>   
+</web-app>

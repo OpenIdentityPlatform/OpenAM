@@ -1,0 +1,1220 @@
+    <test name="CLI_create-identity01">
+        <parameter name="testName" value="createidentity-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity02">
+        <parameter name="testName" value="createidentity-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity03">
+        <parameter name="testName" value="createidentity-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity04">
+        <parameter name="testName" value="createidentity-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity05">
+        <parameter name="testName" value="createidentity-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity06">
+        <parameter name="testName" value="createidentity-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity07">
+        <parameter name="testName" value="createidentity-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity08">
+        <parameter name="testName" value="createidentity-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity09">
+        <parameter name="testName" value="createidentity-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity10">
+        <parameter name="testName" value="createidentity-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity11">
+        <parameter name="testName" value="createidentity-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity12">
+        <parameter name="testName" value="createidentity-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity19">
+        <parameter name="testName" value="createidentity-test19"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity20">
+        <parameter name="testName" value="createidentity-test20"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity21">
+        <parameter name="testName" value="createidentity-test21"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity22">
+        <parameter name="testName" value="createidentity-test22"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity25">
+        <parameter name="testName" value="createidentity-test25"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity27">
+        <parameter name="testName" value="createidentity-test27"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity28">
+        <parameter name="testName" value="createidentity-test28"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity29">
+        <parameter name="testName" value="createidentity-test29"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity30">
+        <parameter name="testName" value="createidentity-test30"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity31">
+        <parameter name="testName" value="createidentity-test31"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_create-identity32">
+        <parameter name="testName" value="createidentity-test32"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>      
+    <test name="CLI_create-identity33">
+        <parameter name="testName" value="createidentity-test33"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>          
+    <test name="CLI_create-identity35">
+        <parameter name="testName" value="createidentity-test35"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateIdentityTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_delete-identities01">
+        <parameter name="testName" value="deleteidentities-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities02">
+        <parameter name="testName" value="deleteidentities-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities03">
+        <parameter name="testName" value="deleteidentities-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities04">
+        <parameter name="testName" value="deleteidentities-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities05">
+        <parameter name="testName" value="deleteidentities-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities10">
+        <parameter name="testName" value="deleteidentities-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_delete-identities11">
+        <parameter name="testName" value="deleteidentities-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities12">
+        <parameter name="testName" value="deleteidentities-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities13">
+        <parameter name="testName" value="deleteidentities-test13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities14">
+        <parameter name="testName" value="deleteidentities-test14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities15">
+        <parameter name="testName" value="deleteidentities-test15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities16">
+        <parameter name="testName" value="deleteidentities-test16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities17">
+        <parameter name="testName" value="deleteidentities-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>  
+    <test name="CLI_delete-identities22">
+        <parameter name="testName" value="deleteidentities-test22"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_delete-identities23">
+        <parameter name="testName" value="deleteidentities-test23"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-identities24">
+        <parameter name="testName" value="deleteidentities-test24"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteIdentitiesTest"/>
+        </classes>
+   </test> 
+   <test name="CLI_list-identities01">
+        <parameter name="testName" value="listidentities-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities02">
+        <parameter name="testName" value="listidentities-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities03">
+        <parameter name="testName" value="listidentities-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities04">
+        <parameter name="testName" value="listidentities-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities05">
+        <parameter name="testName" value="listidentities-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities06">
+        <parameter name="testName" value="listidentities-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities07">
+        <parameter name="testName" value="listidentities-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities08">
+        <parameter name="testName" value="listidentities-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities09">
+        <parameter name="testName" value="listidentities-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>     
+    <test name="CLI_list-identities10">
+        <parameter name="testName" value="listidentities-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_list-identities11">
+        <parameter name="testName" value="listidentities-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities12">
+        <parameter name="testName" value="listidentities-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities13">
+        <parameter name="testName" value="listidentities-test13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities14">
+        <parameter name="testName" value="listidentities-test14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities15">
+        <parameter name="testName" value="listidentities-test15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities16">
+        <parameter name="testName" value="listidentities-test16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities17">
+        <parameter name="testName" value="listidentities-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities18">
+        <parameter name="testName" value="listidentities-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_list-identities28">
+        <parameter name="testName" value="listidentities-test28"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities29">
+        <parameter name="testName" value="listidentities-test29"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities30">
+        <parameter name="testName" value="listidentities-test30"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>
+    <test name="CLI_list-identities31">
+        <parameter name="testName" value="listidentities-test31"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ListIdentitiesTest"/>
+        </classes>
+    </test>  
+    <test name="CLI_add-member01">
+        <parameter name="testName" value="addmember-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member02">
+        <parameter name="testName" value="addmember-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member03">
+        <parameter name="testName" value="addmember-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member04">
+        <parameter name="testName" value="addmember-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member05">
+        <parameter name="testName" value="addmember-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member06">
+        <parameter name="testName" value="addmember-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member07">
+        <parameter name="testName" value="addmember-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_add-member08">
+        <parameter name="testName" value="addmember-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.AddMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member01">
+        <parameter name="testName" value="removemember-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member02">
+        <parameter name="testName" value="removemember-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member03">
+        <parameter name="testName" value="removemember-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member04">
+        <parameter name="testName" value="removemember-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member05">
+        <parameter name="testName" value="removemember-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member06">
+        <parameter name="testName" value="removemember-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member07">
+        <parameter name="testName" value="removemember-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member08">
+        <parameter name="testName" value="removemember-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member17">
+        <parameter name="testName" value="removemember-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_remove-member18">
+        <parameter name="testName" value="removemember-test18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.RemoveMemberTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members01">
+        <parameter name="testName" value="showmembers-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members02">
+        <parameter name="testName" value="showmembers-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members03">
+        <parameter name="testName" value="showmembers-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members04">
+        <parameter name="testName" value="showmembers-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members05">
+        <parameter name="testName" value="showmembers-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members06">
+        <parameter name="testName" value="showmembers-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members07">
+        <parameter name="testName" value="showmembers-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-members08">
+        <parameter name="testName" value="showmembers-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembersTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-memberships01">
+        <parameter name="testName" value="showmemberships-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembershipsTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-memberships02">
+        <parameter name="testName" value="showmemberships-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembershipsTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-memberships03">
+        <parameter name="testName" value="showmemberships-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembershipsTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-memberships04">
+        <parameter name="testName" value="showmemberships-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembershipsTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-memberships05">
+        <parameter name="testName" value="showmemberships-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.ShowMembershipsTest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-types01">
+        <parameter name="testName" value="showidentitytypes-test1"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityTypesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-types02">
+        <parameter name="testName" value="showidentitytypes-test2"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityTypesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations05">
+        <parameter name="testName" value="showidentityoperations-test5"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations06">
+        <parameter name="testName" value="showidentityoperations-test6"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations07">
+        <parameter name="testName" value="showidentityoperations-test7"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations08">
+        <parameter name="testName" value="showidentityoperations-test8"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations13">
+        <parameter name="testName" value="showidentityoperations-test13"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations14">
+        <parameter name="testName" value="showidentityoperations-test14"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations15">
+        <parameter name="testName" value="showidentityoperations-test15"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test>
+    <test name="CLI_show-identity-operations16">
+        <parameter name="testName" value="showidentityoperations-test16"/>
+        <parameter name="propFile" value="GenericCLITest_ShowIdentityOperationsTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GenericCLITest"/>
+        </classes>
+    </test> 
+    <test name="CLI_get-identity03">
+        <parameter name="testName" value="getidentity-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GetIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_get-identity04">
+        <parameter name="testName" value="getidentity-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GetIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_get-identity05">
+        <parameter name="testName" value="getidentity-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GetIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_get-identity06">
+        <parameter name="testName" value="getidentity-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GetIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_get-identity07">
+        <parameter name="testName" value="getidentity-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GetIdentityTest"/>
+        </classes>
+    </test>
+    <test name="CLI_get-identity08">
+        <parameter name="testName" value="getidentity-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.GetIdentityTest"/>
+        </classes>
+    </test>    

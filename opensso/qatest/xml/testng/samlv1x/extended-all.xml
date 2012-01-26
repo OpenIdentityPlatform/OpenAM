@@ -1,0 +1,365 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="samlv1xTestsSPArtifactProfile">
+        <parameter name="ptestName" value="SP-Inited-ArtifactProfile-Test"/>
+        <parameter name="ptestType" value="artifact"/>
+        <parameter name="ptestInit" value="sp"/>
+        <parameter name="nameidformatIndex" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.ConfigureSAMLv1x"/>
+            <class name="com.sun.identity.qatest.samlv1x.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+            <class name="com.sun.identity.qatest.samlv1x.UnconfigureSAMLv1x"/> 
+        </classes>
+    </test>
+    <test name="samlv1xTestsSPPostProfile">
+        <parameter name="ptestName" value="SP-Inited-PostProfile-Test"/>
+        <parameter name="ptestType" value="post"/>
+        <parameter name="ptestInit" value="sp"/>
+        <parameter name="nameidformatIndex" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test>
+    <test name="samlv1xTestsIDPArtifactProfile">
+        <parameter name="ptestName" value="IDP-Inited-ArtifactProfile-Test"/>
+        <parameter name="ptestType" value="artifact"/>
+        <parameter name="ptestInit" value="idp"/>
+        <parameter name="nameidformatIndex" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test>
+    <test name="samlv1xTestsIDPPostProfile">
+        <parameter name="ptestName" value="IDP-Inited-PostProfile-Test"/>
+        <parameter name="ptestType" value="post"/>
+        <parameter name="ptestInit" value="idp"/>
+        <parameter name="nameidformatIndex" value="0"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test>
+    <test name="samlv1xTestsEmailAttrIDPArtifactProfile">
+        <parameter name="ptestName" value="IDP-Initiated-emailArtifactProfile-Test"/>
+        <parameter name="ptestType" value="artifact"/>
+        <parameter name="ptestInit" value="idp"/>
+        <parameter name="nameidformatIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test> 
+    <test name="samlv1xTestsEmailAttrIDPPostProfile">
+        <parameter name="ptestName" value="IDP-Initiated-emailPostProfile-Test"/>
+        <parameter name="ptestType" value="post"/>
+        <parameter name="ptestInit" value="idp"/>
+        <parameter name="nameidformatIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test> 
+    <test name="samlv1xTestsEmailAttrSPArtifactProfile">
+        <parameter name="ptestName" value="SP-Initiated-emailArtifactProfile-Test"/>
+        <parameter name="ptestType" value="artifact"/>
+        <parameter name="ptestInit" value="sp"/>
+        <parameter name="nameidformatIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTestsEmailAttrSPPostProfile">
+        <parameter name="ptestName" value="SP-Initiated-emailPostProfile-Test"/>
+        <parameter name="ptestType" value="post"/>
+        <parameter name="ptestInit" value="sp"/>
+        <parameter name="nameidformatIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test> 
+    <test name="samlv1xTestsTelephoneAttrIDPArtifactProfile">
+        <parameter name="ptestName" value="IDP-Initiated-telephoneArtifactProfile-Test"/>
+        <parameter name="ptestType" value="artifact"/>
+        <parameter name="ptestInit" value="idp"/>
+        <parameter name="nameidformatIndex" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTestsTelephoneAttrIDPPostProfile">
+        <parameter name="ptestName" value="IDP-Initiated-telephonePostProfile-Test"/>
+        <parameter name="ptestType" value="post"/>
+        <parameter name="ptestInit" value="idp"/>
+        <parameter name="nameidformatIndex" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test> 
+    <test name="samlv1xTestsTelephoneAttrSPArtifactProfile">
+        <parameter name="ptestName" value="SP-Initiated-telephoneArtifactProfile-Test"/>
+        <parameter name="ptestType" value="artifact"/>
+        <parameter name="ptestInit" value="sp"/>
+        <parameter name="nameidformatIndex" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+    </test> 
+    <test name="samlv1xTestsTelephoneAttrSPPostProfile">
+        <parameter name="ptestName" value="SP-Initiated-emailtelephoneProfile-Test"/>
+        <parameter name="ptestType" value="post"/>
+        <parameter name="ptestInit" value="sp"/>
+        <parameter name="nameidformatIndex" value="2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1xProfileTests"/>
+        </classes>
+     </test>
+     <test name="samlv1xTests-IDPArtifact-MultiValAttribute-cn">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-cn"/>        
+        <parameter name="ptestIndex" value="0"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                        
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-cn">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-cn"/>        
+        <parameter name="ptestIndex" value="1"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-cn">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-cn"/>        
+        <parameter name="ptestIndex" value="2"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-cn">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-cn"/>        
+        <parameter name="ptestIndex" value="3"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test>     
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-mail">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-mail"/>        
+        <parameter name="ptestIndex" value="4"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-mail">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-mail"/>        
+        <parameter name="ptestIndex" value="5"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-mail">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-mail"/>        
+        <parameter name="ptestIndex" value="6"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-mail">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-mail"/>        
+        <parameter name="ptestIndex" value="7"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-telephoneNumber">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-telephoneNumber"/>        
+        <parameter name="ptestIndex" value="8"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>           
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-telephoneNumber">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-telephoneNumber"/>        
+        <parameter name="ptestIndex" value="9"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-telephoneNumber">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-telephoneNumber"/>        
+        <parameter name="ptestIndex" value="10"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-telephoneNumber">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-telephoneNumber"/>        
+        <parameter name="ptestIndex" value="11"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-IDPArtifact-MultiValAttribute-MSISDN">
+        <parameter name="ptestName" value="IDPArtifact-MultiValAttribute-MSISDN"/>        
+        <parameter name="ptestIndex" value="12"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>               
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-IDPPost-MultiValAttribute-MSISDN">
+        <parameter name="ptestName" value="IDPPost-MultiValAttribute-MSISDN"/>        
+        <parameter name="ptestIndex" value="13"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test> 
+    <test name="samlv1xTests-SPArtifact-MultiValAttribute-MSISDN">
+        <parameter name="ptestName" value="SPArtifact-MultiValAttribute-MSISDN"/>        
+        <parameter name="ptestIndex" value="14"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>                        
+        </classes>
+    </test>
+    <test name="samlv1xTests-SPPost-MultiValAttribute-MSISDN">
+        <parameter name="ptestName" value="SPPost-MultiValAttribute-MSISDN"/>        
+        <parameter name="ptestIndex" value="15"/>        
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>    
+            <class name="com.sun.identity.qatest.samlv1x.SAMLv1MultiValueAttrTests"/>            
+        </classes>
+    </test>       
+   
