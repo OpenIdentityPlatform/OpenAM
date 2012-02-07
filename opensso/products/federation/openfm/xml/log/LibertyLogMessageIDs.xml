@@ -1,0 +1,303 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: LibertyLogMessageIDs.xml,v 1.4 2008/08/19 19:13:01 veiming Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="LIBERTY">
+    <logmessage name="AS_Abort" id="1"
+        loglevel="LL_INFO"
+        description="Unable to process SASL Request">
+        <datainfo>
+            <item>message id</item>
+            <item>authentication mechanism</item>
+            <item>authorization id</item>
+            <item>advisory authentication id</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to process SASL Request.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="AS_OK" id="2"
+        loglevel="LL_INFO"
+        description="SASL Response Ok">
+        <datainfo>
+            <item>message id</item>
+            <item>authentication mechanism</item>
+            <item>authorization id</item>
+            <item>advisory authentication id</item>
+        </datainfo>
+        <triggers>
+            <item>SASL Response Ok.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="AS_Continue" id="3"
+        loglevel="LL_INFO"
+        description="Return SASL Authenticaton Response">
+        <datainfo>
+            <item>message id</item>
+            <item>authentication mechanism</item>
+            <item>authorization id</item>
+            <item>advisory authentication id</item>
+        </datainfo>
+        <triggers>
+            <item>Returned SASL Response , continue Authentication.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="DS_Lookup_Failure" id="4"
+        loglevel="LL_INFO"
+        description="User not found in Data store">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User not found in Data store</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="DS_Lookup_Success" id="5"
+        loglevel="LL_INFO"
+        description="User found in Data Store">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User found in Data Store</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="DS_Update_Failure" id="6"
+        loglevel="LL_INFO"
+        description="Cannot locate user from resourceID">
+        <datainfo>
+            <item>resourceID</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot locate user from resourceID</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="DS_Update_Success" id="7"
+        loglevel="LL_INFO"
+        description="Successfully updated user profile">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+                <item>Successfully updated user profile</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="PP_Query_Failure" id="8"
+        loglevel="LL_INFO"
+        description="UnAuthorized. Failed to Query Personal Profile Service">
+        <datainfo>
+            <item>resource id</item>
+        </datainfo>
+        <triggers>
+                <item>Failed to Query Personal Profile Service</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="PP_Interaction_Failure" id="9"
+        loglevel="LL_INFO"
+        description="Interaction Failed">
+        <datainfo>
+            <item>resource id</item>
+        </datainfo>
+        <triggers>
+                <item>Interaction with Personal Profile Service Failed</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="PP_Query_Success" id="10"
+        loglevel="LL_INFO"
+        description="Successfully queried PP Service">
+        <datainfo>
+            <item>resource id</item>
+        </datainfo>
+        <triggers>
+                <item>Personal Profile Service Query Succeeded</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="PP_Modify_Failure" id="11"
+        loglevel="LL_INFO"
+        description="Modify Failure ">
+        <datainfo>
+            <item>resource id </item>
+        </datainfo>
+        <triggers>
+                <item>Failed to modify Personal Profile Service</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="PP_Modify_Success" id="12"
+        loglevel="LL_INFO"
+        description="Modify Success">
+        <datainfo>
+            <item>resource id</item>
+        </datainfo>
+        <triggers>
+                <item>Personal Profile Service Successfully modified.</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="PP_Interaction_Success" id="13"
+        loglevel="LL_INFO"
+        description="Interaction Successful">
+        <datainfo>
+            <item>successful interaction message</item>
+        </datainfo>
+        <triggers>
+                <item>Successful interaction with Personal Profile Service </item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Sending_Message" id="14"
+        loglevel="LL_INFO"
+        description="Sending Message">
+        <datainfo>
+            <item>request message id</item>
+        </datainfo>
+        <triggers>
+                <item>Sending SOAP Request Message to WSP.</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Returning_Response_Message" id="15"
+        loglevel="LL_INFO"
+        description="Returning Response Message">
+        <datainfo>
+            <item>response message id</item>
+            <item>request message id</item>
+        </datainfo>
+        <triggers>
+                <item>Returning Response Message for SOAP Request.</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Resending_Message" id="16"
+        loglevel="LL_INFO"
+        description="Resending Message">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+                <item>Resending SOAP Request Message to WSP</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Redirected_User_Agent" id="17"
+        loglevel="LL_INFO"
+        description="Interaction manager redirecting user agent 
+                     to interaction service">
+        <datainfo>
+            <item>request message id</item>
+        </datainfo>
+        <triggers>
+                <item>Interaction manager redirecting user agent to 
+                      interaction service</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Returning_Response_Element" id="18"
+        loglevel="LL_INFO"
+        description="Interaction manager returning response element">
+        <datainfo>
+            <item>message id</item>
+            <item>reference message id</item>
+            <item>cache entry status</item>
+        </datainfo>
+        <triggers>
+                <item>Interaction manager returning response element</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Presented_Query_To_User_Agent" id="19"
+        loglevel="LL_INFO"
+        description="Interaction query presented to user agent">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+                <item>Interaction query presented to user agent</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Collected_Response_From_User_Agent" id="20"
+        loglevel="LL_INFO"
+        description="User agent responded to interaction query">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+                <item>User agent responded to interaction query</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="IS_Redirected_User_Agent_Back" id="21"
+        loglevel="LL_INFO"
+        description="User agent redirected back to SP">
+        <datainfo>
+            <item>message id</item>
+        </datainfo>
+        <triggers>
+                <item>User agent redirected back to SP</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="WS_Success" id="22"
+        loglevel="LL_INFO"
+        description="Webservices Success">
+        <datainfo>
+            <item>message id</item>
+            <item>handler key</item>
+        </datainfo>
+        <triggers>
+                <item>Webservices success.</item>
+        </triggers>
+            <actions />
+    </logmessage>
+    <logmessage name="WS_Failure" id="23"
+        loglevel="LL_INFO"
+        description="Webservices Failure">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+                <item>Webservices Failure.</item>
+        </triggers>
+            <actions />
+    </logmessage>
+</logmessages>

@@ -1,0 +1,61 @@
+
+    <test name="AuthContextLogoutSubRealm">
+        <parameter name="testRealm" value="logoutrealm"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgTest">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testModule" value="datastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgTestSubRealm">
+        <parameter name="testRealm" value="nssubrealm"/>
+        <parameter name="testModule" value="datastore"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgAnonymousTest">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="testModule" value="anonymous"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>
+    <test name="NewSessionArgTestSubRealm">
+        <parameter name="testRealm" value="nssubrealm2"/>
+        <parameter name="testModule" value="anonymous"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.AuthContextLogout"/>
+        </classes>
+    </test>

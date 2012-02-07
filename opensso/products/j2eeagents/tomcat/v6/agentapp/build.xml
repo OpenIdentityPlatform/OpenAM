@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.2 2008/11/28 12:25:01 saueree Exp $
+
+-->
+
+<project name="agentApp" basedir = "." default="rebuild">
+
+    <target name="rebuild" depends="clean,build6"/>
+    <property name="built.dir" value="built"/>
+    <property name="current.module.root" value="."/>
+ 
+    <target name="clean">
+        <delete dir="${built.dir}"/>
+    </target>
+
+    <target name="build6">
+       <antcall target="buildWAR">
+          <param name="server.version" value="v6" />
+       </antcall>
+    </target>
+
+    <target name="buildWAR" depends="init">
+        <echo message="Building server ${server.version}"/>
+
+        <property name="built.agentapp.dir" value="${built.dir}/${server.version}"/>
+        <property name="built.agentapp.web.dir" value="${built.agentapp.dir}/web"/>
+
+        <property name="webxml" value="${server.version}-web.xml"/>
+
+        <mkdir dir="${built.dir}"/>
+        <mkdir dir="${built.agentapp.dir}"/>
+        <mkdir dir="${built.agentapp.web.dir}"/>
+        <mkdir dir="${built.agentapp.web.dir}/WEB-INF"/>
+
+      	<copy todir="${built.agentapp.web.dir}/">
+            <fileset dir="${agentapp.jsp.dir}">
+	        <include name="*.jsp"/>
+	    </fileset>
+	</copy>
+
+        <copy file="${agentapp.etc.dir}/${webxml}"
+            tofile="${built.agentapp.web.dir}/WEB-INF/web.xml" >
+        </copy>
+
+        <jar basedir="${built.agentapp.web.dir}" jarfile="${built.agentapp.dir}/${appname}.war"/>
+
+    </target>
+
+    <target name="deploy6" depends="init,build6">
+        <copy file="${built.dir}/v6/${appname}.war" tofile="${tomcat_v6.source.etc.dir}/${appname}.war"/>
+    </target>
+
+    <target name="init">
+        <property name="appname" value="agentapp"/>
+        <property name="agentapp.jsp.dir" value="${current.module.root}/jsp"/>
+        <property name="agentapp.etc.dir" value="${current.module.root}/etc"/>
+        <echo message="Initialize ${current.module.root}"/>
+    </target>
+
+</project>

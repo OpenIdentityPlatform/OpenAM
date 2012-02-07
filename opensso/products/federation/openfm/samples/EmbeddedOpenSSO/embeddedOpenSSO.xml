@@ -1,0 +1,4 @@
+<project name="embeddedOpenSSO">
+    <dirname property="embedded.base.dir" file="${ant.file.embeddedOpenSSO}"/>
+    <property file="${embedded.base.dir}/embeddedOpenSSO.properties"/>
+</project>

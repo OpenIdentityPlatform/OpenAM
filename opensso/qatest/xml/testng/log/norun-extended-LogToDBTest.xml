@@ -1,0 +1,574 @@
+    <test name="Write_log_to_db_0">
+        <parameter name="testName" value="LogToDBTest0"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_1">
+        <parameter name="testName" value="LogToDBTest1"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_2">
+        <parameter name="testName" value="LogToDBTest2"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_3">
+        <parameter name="testName" value="LogToDBTest3"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_4">
+        <parameter name="testName" value="LogToDBTest4"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_5">
+        <parameter name="testName" value="LogToDBTest5"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_6">
+        <parameter name="testName" value="LogToDBTest6"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_7">
+        <parameter name="testName" value="LogToDBTest7"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_8">
+        <parameter name="testName" value="LogToDBTest8"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+     <test name="Write_log_to_db_9">
+        <parameter name="testName" value="LogToDBTest9"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+     <test name="Write_log_to_db_10">
+        <parameter name="testName" value="LogToDBTest10"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+     <test name="Write_log_to_db_11">
+        <parameter name="testName" value="LogToDBTest11"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_12">
+        <parameter name="testName" value="LogToDBTest12"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_13">
+        <parameter name="testName" value="LogToDBTest13"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_14">
+        <parameter name="testName" value="LogToDBTest14"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_15">
+        <parameter name="testName" value="LogToDBTest15"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_16">
+        <parameter name="testName" value="LogToDBTest16"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_17">
+        <parameter name="testName" value="LogToDBTest17"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_18">
+        <parameter name="testName" value="LogToDBTest18"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_19">
+        <parameter name="testName" value="LogToDBTest19"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_20">
+        <parameter name="testName" value="LogToDBTest20"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_21">
+        <parameter name="testName" value="LogToDBTest21"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_22">
+        <parameter name="testName" value="LogToDBTest22"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_23">
+        <parameter name="testName" value="LogToDBTest23"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_24">
+        <parameter name="testName" value="LogToDBTest24"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_25">
+        <parameter name="testName" value="LogToDBTest25"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_26">
+        <parameter name="testName" value="LogToDBTest26"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_27">
+        <parameter name="testName" value="LogToDBTest27"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_28">
+        <parameter name="testName" value="LogToDBTest28"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_29">
+        <parameter name="testName" value="LogToDBTest29"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_30">
+        <parameter name="testName" value="LogToDBTest30"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_31">
+        <parameter name="testName" value="LogToDBTest31"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_32">
+        <parameter name="testName" value="LogToDBTest32"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_33">
+        <parameter name="testName" value="LogToDBTest33"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_34">
+        <parameter name="testName" value="LogToDBTest34"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_35">
+        <parameter name="testName" value="LogToDBTest35"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_36">
+        <parameter name="testName" value="LogToDBTest36"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_37">
+        <parameter name="testName" value="LogToDBTest37"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_38">
+        <parameter name="testName" value="LogToDBTest38"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_39">
+        <parameter name="testName" value="LogToDBTest39"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_db_40">
+        <parameter name="testName" value="LogToDBTest40"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="true"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToDBTest"/>
+        </classes>
+    </test>

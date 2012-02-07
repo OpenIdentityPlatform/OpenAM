@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted 2008 Miguel Angel Alonso Negro <miguelangel.alonso@gmail.com>"
+
+   $Id: ac-security.xml,v 1.6 2009/12/09 17:36:20 wstrange Exp $
+
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:security="http://www.springframework.org/schema/security"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.1.xsd">
+
+
+    <!-- Allows us to access parameters in AMConfig.properties  -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+       <property name="location" value="classpath:AMConfig.properties" />
+   </bean>
+
+    <bean id="filterChainProxy"
+            class="org.springframework.security.util.FilterChainProxy">
+        <security:filter-chain-map path-type="ant">
+            <security:filter-chain pattern="/**" filters="httpSessionContextIntegrationFilter,logoutFilter,openssoFilter,exceptionTranslationFilter,filterInvocationInterceptor"/>
+        </security:filter-chain-map>
+    </bean>
+    <alias name="filterChainProxy" alias="springSecurityFilterChain"/>
+    <!-- 
+        Postions of filters:
+            httpSessionContextIntegrationFilter,
+            logoutFilter,
+            openssoFilter,
+            exceptionTranslationFilter,
+            filterInvocationInterceptor      
+    
+        Postions of every filters:
+                      CHANNEL_FILTER              
+                      CONCURRENT_SESSION_FILTER                         
+                      HTTP_SESSION_CONTEXT_FILTER                       
+                      SESSION_FIXATION_FILTER                               
+                      LOGOUT_FILTER                                     
+                      X509_FILTER                                       
+                      PRE_AUTH_FILTER                                   
+                      CAS_PROCESSING_FILTER                             
+                      AUTHENTICATION_PROCESSING_FILTER                       
+                      OPENID_PROCESSING_FILTER                              
+                      LOGIN_PAGE_FILTER                                 
+                      BASIC_PROCESSING_FILTER                           
+                      SERVLET_API_SUPPORT_FILTER                       
+                      REMEMBER_ME_FILTER                                
+                      ANONYMOUS_FILTER                       
+                      EXCEPTION_TRANSLATION_FILTER                       
+                      NTLM_FILTER                                       
+                      FILTER_SECURITY_INTERCEPTOR                       
+                      SWITCH_USER_FILTER                                
+    -->
+
+    <bean id="httpSessionContextIntegrationFilter"
+            class="org.springframework.security.context.HttpSessionContextIntegrationFilter">
+        <property name="allowSessionCreation" value="true"/>
+        <property name="forceEagerSessionCreation" value="true"/>
+    </bean>
+
+    <bean id="filterInvocationInterceptor" 
+            class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="accessDecisionManager"/>
+        <property name="objectDefinitionSource">
+            <bean class="com.sun.identity.provider.springsecurity.OpenSSOObjectDefinitionSource">
+                <property name="anonymousUrls">
+                    <list>
+                        <value>/faces/logout*</value>
+                        <value>/faces/denied*</value>
+                        <value>/index.html</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="authenticationManager"
+            class="org.springframework.security.providers.ProviderManager">
+        <property name="providers">
+            <list>
+                <bean class="com.sun.identity.provider.springsecurity.OpenSSOAuthenticationProvider"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openssoFilter" class="com.sun.identity.provider.springsecurity.OpenSSOProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+
+        <property name="authenticationFailureUrl" value="/faces/loginfailure.jsp"/>
+        <property name="defaultTargetUrl" value="/"/>
+        <property name="filterProcessesUrl" value="/j_spring_security_check"/>
+    </bean>
+    
+    <bean id="authenticationEntryPoint" class="com.sun.identity.provider.springsecurity.OpenSSOProcessingFilterEntryPoint">
+        <property name="loginUrl" value="${com.sun.identity.loginurl}"/>
+        <property name="filterProcessesUrl" value="/j_spring_security_check"/>
+    </bean>
+    
+    <bean id="exceptionTranslationFilter" class="org.springframework.security.ui.ExceptionTranslationFilter">
+        <property name="authenticationEntryPoint" ref="authenticationEntryPoint"/>
+        <property name="accessDeniedHandler">
+            <bean class="org.springframework.security.ui.AccessDeniedHandlerImpl">
+                <property name="errorPage" value="/faces/deniedAccess.jsp"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="logoutFilter" class="org.springframework.security.ui.logout.LogoutFilter">
+        <constructor-arg value="/faces/logoutSuccess.jsp"/>
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.ui.logout.SecurityContextLogoutHandler">
+                    <property name="invalidateHttpSession" value="true"/>
+                </bean>
+                <bean id="openSsoLogoutHandler" class="com.sun.identity.provider.springsecurity.OpenSSOLogoutHandler"/>
+            </list>
+        </constructor-arg>
+        <property name="filterProcessesUrl" value="/faces/logout.jsp"/>
+    </bean>
+
+    <!-- 
+    Using Affirmative voter will DENY all that which is not
+    explicitly allowed.
+    
+    -->
+     <bean name="accessDecisionManager" class="org.springframework.security.vote.AffirmativeBased">
+        <property name="decisionVoters">
+            <list>
+                <bean class="com.sun.identity.provider.springsecurity.OpenSSOVoter"/>
+            </list>
+        </property>
+        <property name="allowIfAllAbstainDecisions" value="false"/>
+    </bean>
+</beans>

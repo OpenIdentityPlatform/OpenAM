@@ -1,0 +1,96 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-jars.xml,v 1.11 2009/10/21 01:11:03 veiming Exp $
+
+-->
+<!--
+	Portions Copyrighted 2011 ForgeRock AS
+-->
+
+<project name="opensso-jars" default="all">
+    <description>Open Web Single Sign-On: Jars Creation</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** nightly build may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.built.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <target name="all" depends="preparebuild,amserverjar">
+    </target>
+
+    <target name="amserverjar" depends="preparebuild">
+        <jar destfile="${amserver.dist.dir}/amserver.jar">
+            <manifest>
+                <attribute name="Version" value="${version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <fileset dir="${products.license.dir}" includes="license.txt" />
+            <zipfileset dir="${amserver.built.dir}/classes"
+                excludes="${console.packages},com/sun/enterprise/**" />
+            <zipfileset dir="${amserver.services}/amserver"
+                prefix="META-INF/services" />
+        </jar>
+
+        <antcall target="jar-legacy" />
+
+        <jar destfile="${amserver.dist.dir}/console.jar">
+            <zipfileset dir="${amserver.built.dir}/classes"
+                includes="${console.packages}" />
+            <zipfileset dir="${amserver.console.res.dir}" />
+            <zipfileset dir="${amserver.console.xml.dir}/components"
+                prefix="com/sun/identity/console"/>
+        </jar>
+
+        <checksum file="${amserver.dist.dir}/amserver.jar" 
+            algorithm="SHA" fileext=".sha" />
+        <checksum file="${amserver.dist.dir}/console.jar" 
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="jar-legacy" if="legacy">
+        <ant antfile="${legacy.base.dir}/build.xml" inheritRefs="true"
+            target="build" />
+        <jar destfile="${amserver.dist.dir}/amserver.jar" update="true">
+            <zipfileset dir="${legacy.built.dir}/classes" />
+        </jar>
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${amserver.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete file="${amserver.dist.dir}/amserver.jar"/>
+        <delete file="${amserver.dist.dir}/amserver.jar.sha"/>
+        <delete file="${amserver.dist.dir}/console.jar"/>
+        <delete file="${amserver.dist.dir}/console.jar.sha"/>
+        <delete file="${amserver.dist.dir}/opensso-register.jar"/>
+        <delete file="${amserver.dist.dir}/opensso-register.jar.sha"/>
+    </target>
+</project>

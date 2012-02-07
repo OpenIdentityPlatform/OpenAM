@@ -1,0 +1,12 @@
+    <test name="GroupNotification">
+    <parameter name="idtype" value="GROUP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.notification.IDRepoNotificationTests"/> 
+        </classes>
+    </test> 
+

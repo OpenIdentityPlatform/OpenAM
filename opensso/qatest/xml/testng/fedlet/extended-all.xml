@@ -1,0 +1,160 @@
+<parameter name="groupName" value="@mode@"/>
+    <test name="FedletTests-Attr-cn">
+        <parameter name="ptestName" value="AttrMultiValue-cn"/>        
+        <parameter name="pAttribute" value="cn"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.fedlet.ConfigureFedlet"/>
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                     
+            <class name="com.sun.identity.qatest.fedlet.UnconfigureFedlet"/> 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-mail">
+        <parameter name="ptestName" value="AttrMultiValue-mail"/>        
+        <parameter name="pAttribute" value="mail"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-sn">
+        <parameter name="ptestName" value="AttrMultiValue-sn"/>        
+        <parameter name="pAttribute" value="sn"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-telephonenumber">
+        <parameter name="ptestName" value="AttrMultiValue-telephonenumber"/>        
+        <parameter name="pAttribute" value="telephonenumber"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-employeenumber">
+        <parameter name="ptestName" value="AttrSingleValue-employeenumber"/>        
+        <parameter name="pAttribute" value="employeenumber"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-givenname">
+        <parameter name="ptestName" value="AttrMultiValue-givenname"/>        
+        <parameter name="pAttribute" value="givenname"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-manager">
+        <parameter name="ptestName" value="AttrMultiValue-manager"/>        
+        <parameter name="pAttribute" value="manager"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>  
+    <test name="FedletTests-Attr-postaladdress">
+        <parameter name="ptestName" value="AttrSingleValue-postaladdress"/>        
+        <parameter name="pAttribute" value="postaladdress"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>  
+    <test name="FedletTests-Attr-uid">
+        <parameter name="ptestName" value="AttrMultiValue-uid"/>        
+        <parameter name="pAttribute" value="uid"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>                        
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>            
+        </classes>
+    </test>  
+    <test name="FedletTests-Attr-MSISDN">
+        <parameter name="ptestName" value="AttrMultiValue-MSISDN"/>        
+        <parameter name="pAttribute" value="sunIdentityMSISDNNumber"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test>
+    <test name="FedletTests-Attr-inetuserstatus">
+        <parameter name="ptestName" value="AttrSingleValue-inetuserstatus"/>        
+        <parameter name="pAttribute" value="inetuserstatus"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test> 
+    <test name="FedletTests-Attr-title">
+        <parameter name="ptestName" value="AttrSingleValue-title"/>        
+        <parameter name="pAttribute" value="title"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletTests"/>                                 
+        </classes>
+    </test> 
+    <test name="FedletTests-Attr-cn-SLO">
+        <parameter name="ptestName" value="AttrMultiValue-cn-SLO"/>
+        <parameter name="pAttribute" value="cn"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.fedlet.FedletSingleLogoutTests"/>            
+        </classes>
+    </test>    
+    

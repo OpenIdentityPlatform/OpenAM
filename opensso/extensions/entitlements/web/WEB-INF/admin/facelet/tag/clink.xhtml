@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: clink.xhtml,v 1.8 2009/06/11 15:25:50 farble1670 Exp $
+
+-->
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component">
+    <ice:commandLink
+        actionListener="#{handler[listenerMethod]}"
+        bean="#{bean}"
+        rendered="#{type == 'add'}"
+        partialSubmit="true"
+        styleClass="command-link">
+        <f:attribute name="bean" value="#{bean}"/>
+        <ui:insert name="attributes"/>
+        <img src="../image/add.png"/>
+        <ice:outputText 
+            value="#{linkLabel != null ? linkLabel : resources['clink.add']}"/>
+    </ice:commandLink>
+    <ice:commandLink
+        actionListener="#{handler[listenerMethod]}"
+        bean="#{bean}"
+        rendered="#{type == 'search'}"
+        partialSubmit="true"
+        styleClass="command-link">
+        <f:attribute name="bean" value="#{bean}"/>
+        <ui:insert name="attributes"/>
+        <img src="../image/search.png"/>
+        <ice:outputText 
+            value="#{linkLabel != null ? linkLabel : resources['clink.search']}"/>
+    </ice:commandLink>
+    <ice:commandLink
+        actionListener="#{handler[listenerMethod]}"
+        bean="#{bean}"
+        rendered="#{type == 'remove'}"
+        partialSubmit="true"
+        styleClass="command-link">
+        <f:attribute name="bean" value="#{bean}"/>
+        <ui:insert name="attributes"/>
+        <img src="../image/remove.png"/>
+        <ice:outputText 
+            value="#{linkLabel != null ? linkLabel : resources['clink.remove']}"/>
+    </ice:commandLink>
+    <ice:commandLink
+        actionListener="#{handler[listenerMethod]}"
+        bean="#{bean}"
+        rendered="#{type == 'view-options'}"
+        partialSubmit="true"
+        styleClass="command-link">
+        <f:attribute name="bean" value="#{bean}"/>
+        <ui:insert name="attributes"/>
+        <img src="../image/view-options.png"/>
+        <ice:outputText 
+            value="#{linkLabel != null ? linkLabel : resources['clink.view-options']}"/>
+    </ice:commandLink>
+</ui:composition>

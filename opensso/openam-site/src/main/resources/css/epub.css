@@ -1,0 +1,151 @@
+/*
+ * CCPL HEADER START
+ *
+ * This work is licensed under the Creative Commons
+ * Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+ * To view a copy of this license, visit
+ * http://creativecommons.org/licenses/by-nc-nd/3.0/
+ * or send a letter to Creative Commons, 444 Castro Street,
+ * Suite 900, Mountain View, California, 94041, USA.
+ * 
+ * You can also obtain a copy of the license at
+ * trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * If applicable, add the following below this CCPL HEADER, with the fields
+ * enclosed by brackets "[]" replaced with your own identifying information:
+ *     Portions Copyright [yyyy] [name of copyright owner]
+ *
+ * CCPL HEADER END
+ *
+ *     Copyright 2011 ForgeRock AS
+ *    
+ */
+
+/*
+ * ForgeRock core documentation styles to be used with EPUB
+ * generated from DocBook 5 XML source.
+ */
+ 
+/*
+ * Basic content and text styles
+ */
+body
+{
+  font-size: small;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333;
+}
+
+a
+{
+  text-decoration: none; /* Do not underline links. */
+}
+
+a:link {
+  color:#47a;
+}
+
+a:visited {
+  color:#68a;
+}
+
+a:active, a:hover {
+  color:#990000;
+}
+
+code,.command>strong,div.literallayout,.filename
+{
+  font-family: monospace;
+}
+
+code,.command,.copyright,div.index,div.literallayout>p,.filename,h3.author,.term,.step
+{
+  font-weight: normal;
+}
+
+h1
+{
+  color: #626D75; /* ForgeRock gray */
+  font-size: x-large;
+}
+
+h2,h3,h4,h5,h6
+{
+  color: #333;
+}
+
+h2
+{
+  font-size: large;
+}
+
+h3
+{
+  font-size: medium;
+}
+
+h4
+{
+  font-size: medium;
+}
+
+h5
+{
+  font-size: medium;
+}
+
+ul
+{
+  list-style-image: url("../images/bulletpoint.png");
+}
+
+/*
+ * Block elements
+ */
+pre.programlisting,pre.screen
+{
+  font-size: xx-small;
+  white-space: pre;
+  background-color: #fafafa;
+  border: thin dashed #ccc;
+  padding: 3px;
+}
+
+div.abstract,div.important,div.caution,div.note,div.tip,div.warning,div.example,div.toc
+{
+  border: thin dotted #ccc;
+  padding: 3px;
+}
+
+div.chapter,div.preface
+{
+  border-bottom: thin solid #ccc; 
+}
+
+.important,.caution,.note,.tip,.warning
+{
+  font-style: italic;
+}
+
+.abstract,.example,.toc
+{
+  margin: 3px;
+}
+
+img
+{
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+/*
+ * Man pages
+ */
+.refnamediv>h2,.refsect1>h2,.refsynopsisdiv>h2
+{
+  font-size: medium;
+}

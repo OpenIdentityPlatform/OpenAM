@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-post-auth'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Creating a Post Authentication Plugin</title>
+ <indexterm>
+  <primary>Authentication</primary>
+  <secondary>Post authentication plugins</secondary>
+ </indexterm>
+
+ <para>Post authentication plugins (PAP) let you include custom processing at
+ the end of the authentication process, immediately before the subject is
+ authenticated. Common uses of post authentication plugins include setting
+ cookies and session variables. Post authentication plugins are often used in
+ conjunction with policy agents. The post authentication plugin sets custom
+ session properties, and then the policy agent injects the custom properties
+ into the request header to the protected application.</para>
+ 
+ <para>This chapter explains how to create a post authentication plugin.</para>
+ 
+ <!-- Taken from Steve's wiki article,
+ https://wikis.forgerock.org/confluence/display/openam/Write+a+Post+Authentication+Plug-in -->
+
+ <section xml:id="design-post-authentication-plugin">
+  <title>Designing Your Post Authentication Plugin</title>
+  
+  <para>Your post authentication plugin class implements the
+  <literal>AMPostAuthProcessInterface</literal> interface, and in particular
+  the following three methods.</para>
+  
+  <programlisting language="java">public void onLoginSuccess(
+  Map requestParamsMap, 
+  HttpServletRequest request,
+  HttpServletResponse response,
+  SSOToken token
+) throws AuthenticationException
+
+public void onLoginFailure(
+  Map requestParamsMap, 
+  HttpServletRequest request,
+  HttpServletResponse response
+) throws AuthenticationException
+
+public void onLogout(
+  HttpServletRequest request, 
+  HttpServletResponse response,
+  SSOToken token
+) throws AuthenticationException</programlisting>
+  
+  <para>OpenAM calls the <literal>onLoginSuccess()</literal> and
+  <literal>onLoginFailure()</literal> methods immediately before informing the
+  user of login success or failure, respectively. OpenAM calls the
+  <literal>onLogout()</literal> method only when the user actively logs out,
+  not when a user's session times out.</para>
+  
+  <para>See the <link
+  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
+  reference.</para>
+
+  <para>These methods can perform whatever processing you require. Yet, know
+  that OpenAM calls your methods synchronously as part of the authentication
+  process. Therefore, if your methods take a long time to complete, you will
+  keep users waiting. Minimize the processing done in your post authentication
+  methods.</para>
+ </section>
+
+ <section xml:id="build-post-authentication-plugin">
+  <title>Building Your Sample Post Authentication Plugin</title>
+  
+  <para>The following example post authentication plugin sets a session
+  property during successful login, writing to its debug log if the operation
+  fails.</para>
+  
+  <programlisting language="java">package com.forgerock.openam.examples;
+
+import java.util.Map;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
+import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.shared.debug.Debug;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class SamplePAP implements AMPostAuthProcessInterface
+{
+  private final static String PROP_NAME = "MyProperty";
+  private final static String PROP_VALUE = "MyValue";
+  private final static String DEBUG_FILE = "SamplePAP";
+
+  protected Debug debug = Debug.getInstance(DEBUG_FILE);
+
+  public void onLoginSuccess(
+    Map requestParamsMap, 
+    HttpServletRequest request,
+    HttpServletResponse response,
+    SSOToken token
+  ) throws AuthenticationException
+  {
+    try {
+      token.setProperty(PROP_NAME, PROP_VALUE);
+    } catch (SSOException ssoe) {
+      debug.error("Unable to set property");
+    }
+  }
+
+  public void onLoginFailure(
+    Map requestParamsMap, 
+    HttpServletRequest request,
+    HttpServletResponse response
+  ) throws AuthenticationException
+  {
+    ; // Not used
+  }
+
+  public void onLogout(
+    HttpServletRequest request, 
+    HttpServletResponse response,
+    SSOToken token
+  ) throws AuthenticationException
+  {
+    ; // Not used
+  }
+}</programlisting>
+  
+  <para>A post authentication plugin code relies on three .jar files, two
+  of which are deployed with OpenAM, and the third which is provided by your
+  web application container.</para>
+  <variablelist>
+   <varlistentry>
+    <term><filename>amserver.jar</filename></term>
+    <listitem>
+     <para>When you deploy OpenAM, the file is
+     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/amserver.jar</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>opensso-sharedlib.jar</filename></term>
+    <listitem>
+     <para>When you deploy OpenAM, the file is
+     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/opensso-sharedlib.jar</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>servlet-api.jar</filename></term>
+    <listitem>
+     <para>This .jar provides the Java EE Servlet API.</para>
+     <para>If you use Apache Tomcat as your web application container, the file
+     is <filename>/path/to/tomcat/lib/servlet-api.jar</filename>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <para>Put the sample plugin in
+  <filename>src/com/forgerock/openam/examples/SamplePAP.java</filename>,
+  and compile the class.</para>
+  
+  <screen>$ cd src
+$ mkdir ../classes
+$ javac
+ -d ../classes
+ -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/amserver.jar:
+ /path/to/tomcat/webapps/openam/WEB-INF/lib/opensso-sharedlib.jar:
+ /path/to/tomcat/lib/servlet-api.jar
+ com/forgerock/openam/examples/SamplePAP.java</screen>
+  
+  <para>Copy the classes to the <filename>WEB-INF/classes</filename> directory
+  where you deployed OpenAM.</para>
+  
+  <screen>$ cp -r ../classes/* /path/to/tomcat/webapps/openam/WEB-INF/classes/</screen>
+  
+  <para>Restart OpenAM or your web container to ensure the post authentication
+  plugin class is loaded.</para>
+  
+  <screen>$ /etc/init.d/tomcat stop
+$ /etc/init.d/tomcat start
+$ tail -1 /path/to/tomcat/logs/catalina.out
+INFO: Server startup in 32070 ms</screen>
+ </section>
+
+ <section xml:id="configure-post-authentication-plugin">
+  <title>Configuring Your Post Authentication Plugin</title>
+  
+  <para>You can configure the post authentication plugin for a realm, for a
+  service (authentication chain), or for a role. Where you configure the plugin
+  depends on the scope to which the plugin should apply. Configuring the plugin
+  at the realm level as shown here, for example, ensures that OpenAM calls your
+  plugin for all authentications to the realm.</para>
+  
+  <para>In the OpenAM console, browse to Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Authentication &gt; All Core Settings... In the
+  Authentication Post Processing Classes list, add the sample plugin class,
+  <literal>com.forgerock.openam.examples.SamplePAP</literal>, and then click
+  Save.</para>
+  
+  <para>Alternatively, you can configure sample plugin for the realm by using
+  the <command>ssoadm</command> command.</para>
+  
+  <screen>$ ssoadm
+ set-svc-attrs
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --servicename iPlanetAMAuthService
+ --realm /realm
+ --attributevalues iplanet-am-auth-post-login-process-class=
+ com.forgerock.openam.examples.SamplePAP
+
+iPlanetAMAuthService under /realm was modified.</screen>
+ </section>
+
+ <section xml:id="test-post-authentication-plugin">
+  <title>Testing Your Post Authentication Plugin</title>
+  
+  <para>To test the sample post authentication plugin, login successfully to
+  OpenAM in the scope where the plugin is configured. For example, if you
+  configured your plugin for the realm, <literal>/realm</literal>, specify the
+  realm in the login URL.</para>
+  
+  <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=realm</literallayout>
+  
+  <para>Although as a user you do not notice anywhere in the user interface
+  that OpenAM calls your plugin, a policy agent or custom client code could
+  retrieve the session property your plugin added to the user session.</para>
+ </section>
+</chapter>

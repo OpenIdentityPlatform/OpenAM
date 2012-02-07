@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthSecurIDService" version="1.0">
+        <Schema
+	    serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthSecurIDService"
+            i18nFileName="amAuthSecurID"
+	    revisionNumber="40"
+            i18nKey="iplanet-am-auth-securid-service-description">
+
+            <Organization>
+		<AttributeSchema name="iplanet-am-auth-securid-config-port"
+		    type="single"
+		    syntax="number"
+		    i18nKey="">
+		    <DefaultValues>
+			<Value>58943</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+
+		<AttributeSchema name="iplanet-am-auth-securid-helper-port"
+		    type="single"
+		    syntax="number"
+		    i18nKey="">
+		    <DefaultValues>
+			<Value>57943</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+
+	        <AttributeSchema name="iplanet-am-auth-securid-server-config-path"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1">
+		    <DefaultValues>
+                        <Value>@BASE_DIR@/@SERVER_URI@/auth/ace/data</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-securid-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a900">
+		    <DefaultValues>
+                        <Value>0</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+		<SubSchema name="serverconfig" inheritance="multiple">
+    		    <AttributeSchema name="iplanet-am-auth-securid-config-port"
+    		    type="single"
+    		    syntax="number"
+    		    i18nKey="">
+    		    <DefaultValues>
+    			<Value>58943</Value>
+    		        </DefaultValues>
+    		    </AttributeSchema>
+    
+    		    <AttributeSchema name="iplanet-am-auth-securid-helper-port"
+    		        type="single"
+    		        syntax="number"
+    		        i18nKey="">
+    		        <DefaultValues>
+    			    <Value>57943</Value>
+    		        </DefaultValues>
+    		    </AttributeSchema>
+    
+    	            <AttributeSchema name="iplanet-am-auth-securid-server-config-path"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a1">
+    		    <DefaultValues>
+                            <Value>@BASE_DIR@/@SERVER_URI@/auth/ace/data</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-securid-auth-level"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a900">
+    		    <DefaultValues>
+                            <Value>0</Value>
+    		    </DefaultValues>
+                    </AttributeSchema>
+		</SubSchema>
+	    </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
