@@ -1,0 +1,483 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: fmLibertyPersonalProfile.xml,v 1.4 2008/12/19 19:02:22 weisun2 Exp $
+                                                                                
+-->
+
+
+<!DOCTYPE ServicesConfiguration 
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" 
+    "jar://com/sun/identity/sm/sms.dtd"> 
+
+<ServicesConfiguration> 
+    <Service name="sunIdentityServerLibertyPPService" version="1.0"> 
+        <Schema 
+            serviceHierarchy="/DSAMEConfig/sunIdentityServerLibertyPPService"
+            i18nFileName="fmLibertyPersonalProfileConfiguration" 
+            revisionNumber="40"
+            i18nKey="sunIdentityServerLibertyPPService">
+
+            <Global> 
+                <!-- service object class definition --> 
+                <AttributeSchema name="serviceObjectClasses" 
+                    type="list" 
+                    syntax="string" 
+                    i18nKey=""> 
+                    <DefaultValues> 
+                        <Value>sunIdentityServerLibertyPPService</Value> 
+                    </DefaultValues> 
+                </AttributeSchema> 
+                <AttributeSchema name="sunIdentityServerPPResourceIDMapper"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p101">
+                    <DefaultValues>
+                        <Value>com.sun.identity.liberty.ws.idpp.plugin.IDPPResourceIDMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPAuthorizer" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p102">
+                    <DefaultValues>
+                        <Value>@IDPP_AUTHORIZER@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPAttributeMapper" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p103">
+                    <DefaultValues>
+                        <Value>com.sun.identity.liberty.ws.idpp.plugin.IDPPAttributeMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPProviderID"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p104">
+                    <DefaultValues>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/Liberty/idpp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPNameScheme"
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="p105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="FirstLast">urn:liberty:id-sis-pp:nameScheme:firstlast</ChoiceValue>
+                        <ChoiceValue i18nKey="FirstMiddleLast">urn:liberty:id-sis-pp:nameScheme:firstmiddlelast</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>urn:liberty:id-sis-pp:nameScheme:firstmiddlelast</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPNameSpacePrefix"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p106">
+                    <DefaultValues>
+                        <Value>pp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPSupportedContainers" 
+                    type="list" 
+                    syntax="string" 
+                    uitype="name_value_list"
+                    i18nKey="p107">
+                    <DefaultValues>
+                        <Value>container=CommonName</Value>
+                        <Value>container=InformalName</Value>
+                        <Value>container=LegalIdentity</Value>
+                        <Value>container=EmploymentIdentity</Value>
+                        <Value>container=AddressCard</Value>
+                        <Value>container=MsgContact</Value>
+                        <Value>container=Demographics</Value>
+                        <Value>container=SignKey</Value>
+                        <Value>container=EncryptKey</Value>
+                        <Value>container=EmergencyContact</Value>
+                        <Value>container=Extension</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPDSAttributeMapList" 
+                    type="list" 
+                    syntax="string" 
+                    i18nKey="p108">
+                    <DefaultValues>
+                        <Value>CN=sunIdentityServerPPCommonNameCN</Value>
+                        <Value>FN=sunIdentityServerPPCommonNameFN</Value>
+                        <Value>MN=sunIdentityServerPPCommonNameMN</Value>
+                        <Value>SN=sunIdentityServerPPCommonNameSN</Value>
+                        <Value>PersonalTitle=sunIdentityServerPPCommonNamePT</Value>
+                        <Value>AltCN=sunIdentityServerPPCommonNameAltCN</Value>
+                        <Value>InformalName=sunIdentityServerPPInformalName</Value>
+                        <Value>LegalName=sunIdentityServerPPLegalIdentityLegalName</Value>
+                        <Value>DOB=sunIdentityServerPPLegalIdentityDOB</Value>
+                        <Value>MaritalStatus=sunIdentityServerPPLegalIdentityMaritalStatus</Value>
+                        <Value>Gender=sunIdentityServerPPLegalIdentityGender</Value>
+                        <Value>IDType=sunIdentityServerPPLegalIdentityVATIDType</Value>
+                        <Value>IDValue=sunIdentityServerPPLegalIdentityVATIDValue</Value>
+                        <Value>AltIDType=sunIdentityServerPPLegalIdentityAltIDType</Value>
+                        <Value>AltIDValue=sunIdentityServerPPLegalIdentityAltIDValue</Value>
+                        <Value>JobTitle=sunIdentityServerPPEmploymentIdentityJobTitle</Value>
+                        <Value>O=sunIdentityServerPPEmploymentIdentityOrg</Value>
+                        <Value>AltO=sunIdentityServerPPEmploymentIdentityAltO</Value>
+                        <Value>AddressCard=sunIdentityServerPPAddressCard</Value>
+                        <Value>MsgContact=sunIdentityServerPPMsgContact</Value>
+                        <Value>MugShot=sunIdentityServerPPFacadeMugShot</Value>
+                        <Value>WebSite=sunIdentityServerPPFacadeWebSite</Value>
+                        <Value>NamePronounced=sunIdentityServerPPFacadeNamePronounced</Value>
+                        <Value>GreetSound=sunIdentityServerPPFacadeGreetSound</Value>
+                        <Value>GreetMeSound=sunIdentityServerPPFacadeGreetMeSound</Value>
+                        <Value>DisplayLanguage=sunIdentityServerPPDemographicsDisplayLanguage</Value>
+                        <Value>Language=sunIdentityServerPPDemographicsLanguage</Value>
+                        <Value>Birthday=sunIdentityServerPPDemographicsBirthday</Value>
+                        <Value>Age=sunIdentityServerPPDemographicsAge</Value>
+                        <Value>TimeZone=sunIdentityServerPPDemographicsTimeZone</Value>
+                        <Value>SignKey=sunIdentityServerPPSignKey</Value>
+                        <Value>EncryptKey=sunIdentityServerPPEncryptKey</Value>
+                        <Value>EmergencyContact=sunIdentityServerPPEmergencyContact</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPisQueryPolicyEvalRequired" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="p109">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPisModifyPolicyEvalRequired" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="p110">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPExtensionAttributes" 
+                    type="list" 
+                    syntax="string" 
+                    i18nKey="p111">
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPExtensionPrefix" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p112">
+                    <DefaultValues>
+                        <Value>ispp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPServiceInstanceUpdateEnabled" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="p113">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPServiceInstanceUpdateClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p114">
+                    <DefaultValues>
+                        <Value>com.sun.identity.liberty.ws.idpp.plugin.IDPPServiceInstanceUpdate</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPAlternateEndPoint" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p115">
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPAlternateSecurityMechs" 
+                    type="multiple_choice" 
+                    syntax="string" 
+                    i18nKey="p116">
+                    <ChoiceValues>
+                        <ChoiceValue>urn:liberty:security:2003-08:null:null</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:null:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:null:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2004-04:null:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:TLS:null</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:TLS:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:TLS:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2004-04:TLS:Bearer</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:ClientTLS:null</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:ClientTLS:X509</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2003-08:ClientTLS:SAML</ChoiceValue>
+                        <ChoiceValue>urn:liberty:security:2004-04:ClientTLS:Bearer</ChoiceValue>
+                    </ChoiceValues>
+                </AttributeSchema>
+            </Global> 
+            <Policy>
+                <AttributeSchema name="QUERY"
+                    type="single_choice"
+                    syntax="string"
+                    any="display"
+                    i18nKey="QUERY">
+                    <IsResourceNameAllowed/>
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="allow">allow</ChoiceValue>
+                        <ChoiceValue i18nKey="deny">deny</ChoiceValue>
+                        <ChoiceValue i18nKey="interactForValue">interactForValue</ChoiceValue>
+                        <ChoiceValue i18nKey="interactForConsent">interactForConsent</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>deny</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MODIFY"
+                    type="single_choice"
+                    syntax="string"
+                    any="display"
+                    i18nKey="MODIFY">
+                    <IsResourceNameAllowed/>
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="allow">allow</ChoiceValue>
+                        <ChoiceValue i18nKey="deny">deny</ChoiceValue>
+                        <ChoiceValue i18nKey="interactForValue">interactForValue</ChoiceValue>
+                        <ChoiceValue i18nKey="interactForConsent">interactForConsent</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>deny</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Policy>
+            <User> 
+                <AttributeSchema name="sunIdentityServerPPCommonNameCN"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p120"/>
+                <AttributeSchema name="sunIdentityServerPPCommonNameAltCN"
+                    type="list" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p121"/>
+                <AttributeSchema name="sunIdentityServerPPCommonNameFN"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p122"/>
+                <AttributeSchema name="sunIdentityServerPPCommonNameSN"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p123"/>
+                <AttributeSchema name="sunIdentityServerPPCommonNamePT"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p124"/>
+                <AttributeSchema name="sunIdentityServerPPCommonNameMN"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p125"/>
+                <AttributeSchema name="sunIdentityServerPPInformalName"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p126"/>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityLegalName"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p127"/>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityDOB"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p128"/>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityMaritalStatus"
+                    type="single_choice" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p129">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="Single">urn:liberty:id-sis-pp:maritalstatus:single</ChoiceValue>
+                        <ChoiceValue i18nKey="Married">urn:liberty:id-sis-pp:maritalstatus:married</ChoiceValue>
+                        <ChoiceValue i18nKey="CommonLawMarriage">urn:liberty:id-sis-pp:maritalstatus:commonlawmarriage</ChoiceValue>
+                        <ChoiceValue i18nKey="Separated">urn:liberty:id-sis-pp:maritalstatus:separated</ChoiceValue>
+                        <ChoiceValue i18nKey="Divorced">urn:liberty:id-sis-pp:maritalstatus:divorced</ChoiceValue>
+                        <ChoiceValue i18nKey="Widowed">urn:liberty:id-sis-pp:maritalstatus:widowed</ChoiceValue>
+                        <ChoiceValue i18nKey="Dead">urn:liberty:id-sis-pp:maritalstatus:dead</ChoiceValue>
+                        <ChoiceValue i18nKey="NA">urn:liberty:id-sis-pp:maritalstatus:notapplicable</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>urn:liberty:id-sis-pp:maritalstatus:single</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityGender"
+                    type="single_choice" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p130">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="Male">urn:liberty:id-sis-pp:gender:m</ChoiceValue>
+                        <ChoiceValue i18nKey="Female">urn:liberty:id-sis-pp:gender:f</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>urn:liberty:id-sis-pp:gender:m</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityAltIDType"
+                    type="single_choice" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p131">
+                    <ChoiceValues>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:ukvat</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:itcif</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:ptnif</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:fialv</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:rfid</ChoiceValue>
+                     </ChoiceValues>
+                     <DefaultValues>
+                          <Value>urn:liberty:id-sis-pp:IDType:ukvat</Value>
+                     </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityAltIDValue"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p132"/>
+                <!-- We can have I18n keys if we know what these types are really:-->
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityVATIDType"
+                    type="single_choice" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p133">
+                    <ChoiceValues>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:ukvat</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:itcif</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:ptnif</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:fialv</ChoiceValue>
+                        <ChoiceValue>urn:liberty:id-sis-pp:IDType:rfid</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>urn:liberty:id-sis-pp:IDType:ukvat</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunIdentityServerPPLegalIdentityVATIDValue"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p134"/>
+                <AttributeSchema name="sunIdentityServerPPEmploymentIdentityJobTitle"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p135"/>
+                <AttributeSchema name="sunIdentityServerPPEmploymentIdentityOrg"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p136"/>
+                <AttributeSchema name="sunIdentityServerPPEmploymentIdentityAltO"
+                    type="list" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p137"/>
+                <AttributeSchema name="sunIdentityServerPPAddressCard"
+                    type="list" 
+                    syntax="string" 
+                    uitype="name_value_list"
+                    any="display"
+                    i18nKey="p138"/>
+                <AttributeSchema name="sunIdentityServerPPMsgContact"
+                    type="list" 
+                    syntax="string" 
+                    uitype="name_value_list"
+                    any="display"
+                    i18nKey="p139"/>
+                <AttributeSchema name="sunIdentityServerPPFacadeMugShot"
+                    type="single" 
+                    syntax="url" 
+                    any="display"
+                    i18nKey="p140"/>
+                <AttributeSchema name="sunIdentityServerPPFacadeWebSite"
+                    type="single" 
+                    syntax="url" 
+                    any="display"
+                    i18nKey="p141"/>
+                <AttributeSchema name="sunIdentityServerPPFacadeNamePronounced"
+                    type="single" 
+                    syntax="url" 
+                    any="display"
+                    i18nKey="p142"/>
+                <AttributeSchema name="sunIdentityServerPPFacadeGreetSound"
+                    type="single" 
+                    syntax="url" 
+                    any="display"
+                    i18nKey="p143"/>
+                <AttributeSchema name="sunIdentityServerPPFacadeGreetMeSound"
+                    type="single" 
+                    syntax="url" 
+                    any="display"
+                    i18nKey="p144"/>
+                <AttributeSchema name="sunIdentityServerPPDemographicsDisplayLanguage"
+                    type="single" 
+                    syntax="url" 
+                    any="display"
+                    i18nKey="p145"/>
+                <AttributeSchema name="sunIdentityServerPPDemographicsLanguage"
+                    type="list" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p146"/>
+                <AttributeSchema name="sunIdentityServerPPDemographicsBirthday"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p147"/>
+                <AttributeSchema name="sunIdentityServerPPDemographicsAge"
+                    type="single" 
+                    syntax="number" 
+                    any="display"
+                    i18nKey="p148"/>
+                <AttributeSchema name="sunIdentityServerPPDemographicsTimeZone"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p149"/>
+                <AttributeSchema name="sunIdentityServerPPSignKey"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p150"/>
+                <AttributeSchema name="sunIdentityServerPPEncryptKey"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="p151"/>
+                <AttributeSchema name="sunIdentityServerPPEmergencyContact"
+                    type="single" 
+                    syntax="string" 
+                    any="display"
+                    i18nKey="p152"/>
+            </User> 
+        </Schema> 
+    </Service> 
+</ServicesConfiguration> 

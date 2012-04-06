@@ -1,0 +1,50 @@
+
+    <test name="ApplicationAuthTest">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="negativeTest" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="ApplicationAuthTestNegative">
+        <parameter name="testRealm" value="/"/>
+        <parameter name="negativeTest" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="ApplicationAuthTestSubRealm">
+        <parameter name="testRealm" value="apprealm"/>
+        <parameter name="negativeTest" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>
+    <test name="ApplicationAuthTestSubRealmNegative">
+        <parameter name="testRealm" value="apprealm2"/>
+        <parameter name="negativeTest" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ApplicationAuthTest"/>
+        </classes>
+    </test>

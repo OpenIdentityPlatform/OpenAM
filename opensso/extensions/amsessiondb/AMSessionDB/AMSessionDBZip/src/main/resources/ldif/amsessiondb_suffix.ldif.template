@@ -1,0 +1,14 @@
+dn: @AMSESSIONDB_BASEDN@
+objectClass: domain
+objectClass: top
+dc: @AMSESSIONDB_RDN@
+aci: (target="ldap:///@AMSESSIONDB_BASEDN@")(targetattr = "*")(version 3.0; acl "OpenAM amsessiondb anonymous access"; deny (all) userdn = "ldap:///anyone";)
+
+dn: ou=famrecords,@AMSESSIONDB_BASEDN@
+ou: famrecords
+objectClass: organizationalUnit
+
+dn: ou=amsessiondb,@AMSESSIONDB_BASEDN@
+ou: amsessiondb
+objectClass: organizationalUnit
+

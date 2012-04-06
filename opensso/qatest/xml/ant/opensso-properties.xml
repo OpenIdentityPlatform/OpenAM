@@ -1,0 +1,87 @@
+<!--
+ The contents of this file are subject to the terms
+ of the Common Development and Distribution License
+ (the License). You may not use this file except in
+ compliance with the License.
+
+ You can obtain a copy of the License at
+ https://opensso.dev.java.net/public/CDDLv1.0.html or
+ opensso/legal/CDDLv1.0.txt
+ See the License for the specific language governing
+ permission and limitations under the License.
+
+ When distributing Covered Code, include this CDDL
+ Header Notice in each file and include the License file
+ at opensso/legal/CDDLv1.0.txt.
+ If applicable, add the following below the CDDL Header,
+ with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
+
+ $Id: opensso-properties.xml,v 1.10 2009/07/15 00:04:58 rmisra Exp $
+
+ Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<project>
+    <property environment="env"/>
+    <property name="single_modules" value="idm,delegation,policy,session,authentication,notification,idsvcs" />
+   
+    <target name="init-common"
+        depends="setTimeStamp,setOSVariables">
+    </target>
+
+    <target name="setOSVariables"
+        depends="setOSConditions,setVariables">
+    </target>
+
+    <target name="setVariables">
+        <property name="base.report.dir" value="./${SERVER_DIR}/docs/reports/${EXECUTION_MODE}/${date}"/>
+        <property name="built.classes.dir" value="./${SERVER_DIR}/built/classes"/>
+        <property name="debug.dir" value="./${SERVER_DIR}/debug"/>
+        <property name="ldif.dir" value="./${SERVER_DIR}/ldif"/>
+        <path id="client.classpath">
+            <pathelement location="${built.classes.dir}"/>
+	    <fileset dir="./lib">
+		    <include name="**/*.jar"/>
+		    <exclude name="**/opensso-sharedlib.jar"/>
+	    </fileset>
+	    <fileset dir="./lib">
+		    <include name="**/opensso-sharedlib.jar"/>
+	    </fileset>
+        </path>
+        <property name="client.cp" refid="client.classpath"/>
+
+        <path id="module.directories">
+            <pathelement location="${.}"/>
+            <fileset dir="./resources">
+                <include name="**"/>
+            </fileset>
+        </path>
+        <property name="modules" refid="module.directories"/>
+    </target>
+
+    <exec executable="hostname" outputproperty="hostname"/>
+
+    <target name="setOSConditions">
+        <condition property="isUnix">
+            <os family="unix"/>
+        </condition>
+        <condition property="isWindows">
+            <os family="windows" />
+        </condition>
+        <condition property="isMac">
+            <os family="mac" />
+        </condition>
+    </target>
+
+    <target name="setTimeStamp">
+     <tstamp>
+         <format property="date" pattern="dd_MM_yyyy" locale="en"/>
+      </tstamp>
+     <tstamp>
+         <format property="current.timestamp" pattern="yyyy_MM_dd_HH_mm"
+         locale="en"/>
+      </tstamp>
+    </target>
+</project>

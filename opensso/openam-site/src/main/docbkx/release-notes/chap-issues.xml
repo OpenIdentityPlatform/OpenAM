@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-issues'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
+
+ <para>OpenAM issues are tracked at <link
+ xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
+ >https://bugster.forgerock.org/jira/browse/OPENAM</link>. This chapter
+ covers the status of key issues and limitations at release
+ <?eval ${serverDocTargetVersion}?>.</para>
+
+ <section xml:id="fixes">
+  <title>Fixes</title>
+
+  <para>The following issues were fixed in release
+  <?eval ${serverDocTargetVersion}?>.</para>
+  
+  <itemizedlist>
+  <!-- This list does not include some fixes for typos, doc issues, removed
+  functionality, and issues raised on new features during testing. -->
+<listitem><para>Identity web-services update call always removes group memberships (OPENAM-1043).</para></listitem>
+<listitem><para>isSessionQuotaReached in AMLoginModule does not work in single server mode (OPENAM-1042).</para></listitem>
+<listitem><para>Wildcards in referrals can be ignored due to invalid search filter (OPENAM-1006).</para></listitem>
+<listitem><para>OpenAM should not be shipped with JDMK monitoring enabled by default (OPENAM-1004).</para></listitem>
+<listitem><para>Deadlock during server startup (OPENAM-1003).</para></listitem>
+<listitem><para>Special character used in membership search filter should be escaped (rfc2254) (OPENAM-987).</para></listitem>
+<listitem><para>RuntimeException in Sufficient module breaks the chain (OPENAM-975).</para></listitem>
+<listitem><para>OpenAM 10 does not get deployed in JBoss 7.02 (OPENAM-949).</para></listitem>
+<listitem><para>Fedlet encounters error processing LogoutRequest as /saml2loginwithrelay.template is missing from the classpath (OPENAM-933).</para></listitem>
+<listitem><para>IdRepo log is spammed with agent attributes (OPENAM-923).</para></listitem>
+<listitem><para>SAML2Exception when fetching SP AuthnRequestInfo in multi server setup when IDP response is not sent to origin server (OPENAM-909).</para></listitem>
+<listitem><para>ServiceTypeManager can return invalid tokens (OPENAM-906).</para></listitem>
+<listitem><para>Javascript and CSS bugs on userstore wizard screen (OPENAM-896).</para></listitem>
+<listitem><para>Access to root realm after console deploy timeout occurs (OPENAM-895).</para></listitem>
+<listitem><para>REST logout does not perform actual logout on auth context (OPENAM-893).</para></listitem>
+<listitem><para>Relative (goto) redirects don't work with proxied requests (OPENAM-891).</para></listitem>
+<listitem><para>SAML2 Authentication Authority entity bindings are verified as if they were in an SAML2 IDP entity, this causes an NPE (OPENAM-888).</para></listitem>
+<listitem><para>After restoring backup OpenAM fails to load configuration (OPENAM-885).</para></listitem>
+<listitem><para>PagePropertiesCallback ignores attribute and require lists (OPENAM-883).</para></listitem>
+<listitem><para>empty passwords cause backup to fail during upgrade (OPENAM-881).</para></listitem>
+<listitem><para>new_org.jsp doesn't work, when the second auth request contains extra parameters (OPENAM-878).</para></listitem>
+<listitem><para>Configurator User Data Store selection not retrieving i18n values (OPENAM-871).</para></listitem>
+<listitem><para>OpenAM Console Session list throwing an exception (OPENAM-870).</para></listitem>
+<listitem><para>Upgrade fails to connect to external configuration store (OPENAM-866).</para></listitem>
+<listitem><para>A second GUI Configurator Exists (OPENAM-863).</para></listitem>
+<listitem><para>Exception handling in the REST interface (OPENAM-843).</para></listitem>
+<listitem><para>LDAP Auth Module doesn't remove terminated LDAP connection from pool and returns 401 error via REST interface (OPENAM-839).</para></listitem>
+<listitem><para>Character encoding problem on the password reset page (OPENAM-832).</para></listitem>
+<listitem><para>L10NMessageImpl can lose initCause (OPENAM-828).</para></listitem>
+<listitem><para>Creating a Identity Membership Condition in a sub-realm does not use the correct Datastore (OPENAM-827).</para></listitem>
+<listitem><para>Multiprotocol federation sample application failure (OPENAM-825).</para></listitem>
+<listitem><para>LoginViewBean UI does not implement new_org.jsp functionality (OPENAM-824).</para></listitem>
+<listitem><para>SFO scripts don't work on Debian GNU/Linux, because of /bin/awk path (OPENAM-818).</para></listitem>
+<listitem><para>ShutdownManager gets stuck in waiting state causing the server to be unavailable (OPENAM-817).</para></listitem>
+<listitem><para>Setup progress page is never closing the stream (OPENAM-814).</para></listitem>
+<listitem><para>Session timeout branding is not working (OPENAM-813).</para></listitem>
+<listitem><para>LDAPFilterCondition will try to bind using LDAPv2 even with LDAPv3 only servers (OPENAM-812).</para></listitem>
+<listitem><para>AMIdentityMembershipCondition is missing information about who the user is which is required to make the decision (OPENAM-811).</para></listitem>
+<listitem><para>In case of session upgrade requesting the page again can cause Session Timeout errors (OPENAM-807).</para></listitem>
+<listitem><para>Successful access to LoginViewBean still creates a new session (OPENAM-794).</para></listitem>
+<listitem><para>SAML2 Metadata for a remote service provider with Extensions breaks the console and Entity Providers no longer list under Federation (OPENAM-792).</para></listitem>
+<listitem><para>LDAPFilter conditions are not using the correct Policy config when used in a sub-realm policy definition (OPENAM-790).</para></listitem>
+<listitem><para>Combination of referral policy, self evaluation and super resource match fails to follow referral (OPENAM-788).</para></listitem>
+<listitem><para>AMSetupServlet::getRemoteServerInfo fails if the first instance SSL certificate is invalid (OPENAM-784).</para></listitem>
+<listitem><para>Config Wizard ignores server URL (OPENAM-778).</para></listitem>
+<listitem><para>When a SAML2 Request does not contain an Authentication Context, the Default Authentication Context mapper maps a level=0 (OPENAM-775).</para></listitem>
+<listitem><para>Radius auth module typo (wrong server configuration check) (OPENAM-767).</para></listitem>
+<listitem><para>Endless recursion in CachedRemoteServicesImpl (OPENAM-738).</para></listitem>
+<listitem><para>REST/SOAP API leaks information about users by returning an InvalidPassword exception when the users password is wrong. (OPENAM-735).</para></listitem>
+<listitem><para>AuthenticationFailureCount and AuthenticationFailureRate do not Update Correctly (OPENAM-734).</para></listitem>
+<listitem><para>JDBC authentication module fails to initialize in JNDI mode (OPENAM-733).</para></listitem>
+<listitem><para>LDAPConnectionPool has risk of dead lock (OPENAM-730).</para></listitem>
+<listitem><para>Multi-threaded entitlement evaluation gives wrong result (OPENAM-726).</para></listitem>
+<listitem><para>amsfo start results in repeat /t Wait for the broker to start properly messages (OPENAM-723).</para></listitem>
+<listitem><para>Shutting down DS when "sun-idrepo-ldapv3-config-idletimeout" is other than 0 (zero) can result in loop (OPENAM-716).</para></listitem>
+<listitem><para>REOPEN -LDAP Error 80 can result in build up of LDAPv3EventService::RetryTask objects (OPENAM-688).</para></listitem>
+<listitem><para>LDAPv3EventServicePolling can enter RetryTask loop if LDAP encounters a problem at the same time as the persistent searches are restarted (OPENAM-684).</para></listitem>
+<listitem><para>updateSiteNameToIDMappings will leave siteNameToIdTable null if sites are not configured (OPENAM-675).</para></listitem>
+<listitem><para>CachedSubEntries::getSubEntries returns the actual reference to the cache entry (OPENAM-673).</para></listitem>
+<listitem><para>AuthClientUtils::sendAuthRequestToOrigServer does not handle server errors (OPENAM-668).</para></listitem>
+<listitem><para>Persistent Cookie should only be set on success and not on AMAuthCookie (OPENAM-667).</para></listitem>
+<listitem><para>OpenAM complains about invalid character when the FedCOTMemberName has '=' in it (OPENAM-664).</para></listitem>
+<listitem><para>jaxrpc xml parser can introduce corruption in the output when parsing (OPENAM-656).</para></listitem>
+<listitem><para>amsessiondb should run with tx no sync in bdb (OPENAM-652).</para></listitem>
+<listitem><para>amsessiondb error messages are going to System.err and are getting lost (OPENAM-644).</para></listitem>
+<listitem><para>amsessiondb does not shutdown properly if the DB/MQ is broken (OPENAM-643).</para></listitem>
+<listitem><para>amsessiondb does not recover from db errors and can break the MQ (OPENAM-642).</para></listitem>
+<listitem><para>DAUI shutdown is not releasing resources correctly (OPENAM-639).</para></listitem>
+<listitem><para>Infinite loop in LoginViewBean during login using Membership login module (OPENAM-633).</para></listitem>
+<listitem><para>changing the debug level from message to error is ignored by the entitlements engine (OPENAM-622).</para></listitem>
+<listitem><para>Error while trying to import service configuration into OpenDJ (OPENAM-616).</para></listitem>
+<listitem><para>Session upgrade does not work if the second login is on a different server (OPENAM-615).</para></listitem>
+<listitem><para>LoginState looks up LDAP profile attributes for the session service when it doesn't need to. (OPENAM-612).</para></listitem>
+<listitem><para>javax.servlet.ServletException: missing jspFile on start up (OPENAM-608).</para></listitem>
+<listitem><para>Certificate module has a problem with OCSP validation if JCE is used (OPENAM-586).</para></listitem>
+<listitem><para>REST authentication interface does not differentiate between inactive and locked accounts (OPENAM-584).</para></listitem>
+<listitem><para>maximum session limit during rest authentication results in 200 and null return (OPENAM-583).</para></listitem>
+<listitem><para>Debug error log gets "unable to locate message ID object for FSAssertionManager" when using CDSSO (OPENAM-581).</para></listitem>
+<listitem><para>GOT_ALL_HOSTED_ENTITIES audit log is erroneusly logged (OPENAM-580).</para></listitem>
+<listitem><para>SecurID Authentication in New PIN mode and Change PIN mode fails in English locale (OPENAM-529).</para></listitem>
+<listitem><para>HOTP authentication module: If sms and/or email could not be sent no error is shown for the user (OPENAM-523).</para></listitem>
+<listitem><para>HOTP authentication module: Missing properties in resource bundle leads to internal authentication error (OPENAM-521).</para></listitem>
+<listitem><para>When a SAML2 Authentication Request is sent to an IdP with the IsPassive flag set to true and no valid session is present, the RelayState is dropped by the IdP (OPENAM-520).</para></listitem>
+<listitem><para>SecurID authentication exception: Logindisplay:Null (OPENAM-519).</para></listitem>
+<listitem><para>DAS configurator does not store OpenAM deployment URI (OPENAM-518).</para></listitem>
+<listitem><para>AuthUtils.isLocalServer method gets confused with the server URI when used on the DAS (OPENAM-509).</para></listitem>
+<listitem><para>lb cookie set on the DAS is used incorrectly in the PLLClient (OPENAM-508).</para></listitem>
+<listitem><para>Not every admin tool ignores version check by default (OPENAM-506).</para></listitem>
+<listitem><para>NotificationSender does not analyse the response from the client correctly. (OPENAM-498).</para></listitem>
+<listitem><para>Running in non c66encode mode can lead to dual URL decoding issue in the CDCClientServlet to CDCServlet communications (OPENAM-491).</para></listitem>
+<listitem><para>Multiple windows during SAML2 sign-on can lead to NPE (OPENAM-489).</para></listitem>
+<listitem><para>Multiple browser access can cause invalid redirects during SAML2 sign-on (OPENAM-488).</para></listitem>
+<listitem><para>In case of zero page session upgrade DAS does not set session cookie expiration (OPENAM-487).</para></listitem>
+<listitem><para>amMasterSessionTableStats can be negative in some cases (OPENAM-486).</para></listitem>
+<listitem><para>SAML validator.jsp breaks with NPE if it was unable to create ValidateSAML2 (OPENAM-485).</para></listitem>
+<listitem><para>create-server command returns success state when invalid properties were supplied (OPENAM-482).</para></listitem>
+<listitem><para>AuthClientUtils should forward requests with the same method in case of failover (OPENAM-478).</para></listitem>
+<listitem><para>SAML2 HTTPPOST Profil: Assertion not signed when response is signed (OPENAM-475).</para></listitem>
+<listitem><para>Build can't handle spaces in directory names (OPENAM-473).</para></listitem>
+<listitem><para>DAS LogoutViewBean should not accept invalid gotoURL's (OPENAM-470).</para></listitem>
+<listitem><para>HttpURLConnectionManager should set a connect timeout for the provided connections (OPENAM-468).</para></listitem>
+<listitem><para>Log file "amAuthentication.error" is not created (OPENAM-459).</para></listitem>
+<listitem><para>When changing the DNS alias in a realm, the Realm Alias Referrals are not updated until restart when using external configuration store (OPENAM-446).</para></listitem>
+<listitem><para>Agent inheriting Location of Agent Configuration Repository from Agent Group causes error (OPENAM-440).</para></listitem>
+<listitem><para>Missing files while creating console/noconsole wars (OPENAM-407).</para></listitem>
+<listitem><para>OpenAM's servlet API version does not officially support the included JSTL 1.1 (OPENAM-398).</para></listitem>
+<listitem><para>If the Session DB is offline, AMLoginModule::isSessionQuotaReached malfunctions (OPENAM-393).</para></listitem>
+<listitem><para>LoginViewBean NPE (OPENAM-370).</para></listitem>
+<listitem><para>Custom Response Providers are ignored by the Entitlements Framework (OPENAM-333).</para></listitem>
+<listitem><para>It is not possible to assign a Post Authentication Class plugin to a service chain with the ssoadm (OPENAM-318).</para></listitem>
+<listitem><para>OpenAM LDAP schema should conform to the expected structural objectclass usage (OPENAM-312).</para></listitem>
+<listitem><para>Distributed authentication UI not able to do resource based authentication (OPENAM-298).</para></listitem>
+<listitem><para>Blank in form can break fedlet creation (OPENAM-269).</para></listitem>
+<listitem><para>SAML2.0 isPassive attribute in the AuthnRequest is ignored by the IdP (OPENAM-261).</para></listitem>
+<listitem><para>Distributed Authentication UI Login URL not accepted (OPENAM-247).</para></listitem>
+<listitem><para>Remote SessionRequest.setProperty causes HTTP 500 for null property/value (OPENAM-191).</para></listitem>
+<listitem><para>SetupDistAuthWAR does not support the ability to set the lb value (OPENAM-188).</para></listitem>
+<listitem><para>"Authentication by Module Chain" fails when used in a sub-realm (OPENAM-171).</para></listitem>
+<listitem><para>updating service to include new PluginSchems, ssoadm command is counterintuitive (OPENAM-109).</para></listitem>
+<listitem><para>Default top-level realm privileges block SMS access to policy agents (OPENAM-90).</para></listitem>
+<listitem><para>SessionCount.getDeploymentMode uses site rather than server count to determine multi server mode (OPENAM-87).</para></listitem>
+<listitem><para>SAML2 service provider initiated SSO does not check that the realm of the authenticated user matches the realm of the COT (OPENAM-77).</para></listitem>
+<listitem><para>RuntimeException does not updates the failureModuleSet in LoginState (OPENAM-74).</para></listitem>
+<listitem><para>No way of configuring CDC and federated authentication without writing custom code (OPENAM-28).</para></listitem>
+<listitem><para>Some classes of Policy Changes are not propagating to the agent (OPENAM-25).</para></listitem>
+<listitem><para>ssoadm versioncheck fails with encoded contents (OPENAM-20).</para></listitem>
+<listitem><para>Deadlock when making Entitlements REST requests (OPENAM-16).</para></listitem>
+<listitem><para>Wrong resource bundle in com.sun.identity.rest.RestException (OPENAM-15).</para></listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="limitations">
+  <title>Limitations</title>
+  
+  <para>ForgeRock supports the stable software releases that you can download
+  from ForgeRock, not nightly builds or pre-release software. ForgeRock
+  OpenAM downloads do not include OpenAM extensions. Therefore, ForgeRock does
+  not support OpenAM extensions. If you have a special request for capabilities
+  not currently in a software release, contact ForgeRock at <link
+  xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
+  
+  <para>Do not run different versions of OpenAM together in the same OpenAM
+  site.</para>
+
+  <para>Not all features of OpenAM work with IPv6.</para>
+
+  <para>The Database Repository type of data store is experimental and not
+  supported for production use.</para>
+
+  <!-- Fix for OPENAM-737: Add details to the release notes of OpenAM (for 735) -->
+  <para>By default, the REST and SOAP APIs return different responses depending
+  on whether the user name provided is valid or invalid. This behavior could
+  allow an attacker to build list of valid user names, after which only
+  passwords would be required to gain access to user account details. To
+  prevent this risk, set the server configuration property
+  <literal>openam.auth.soap.rest.generic.authentication.exception=true</literal>.
+  You can set this property in OpenAM console under Configuration &gt; Servers
+  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+
+  <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
+  <para>By default OpenAM does not enforce session quotas when running in Site
+  mode without session failover. To work around this behavior, set the server
+  configuration property
+  <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
+  You can set this property in OpenAM console under Configuration &gt; Servers
+  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+ </section>
+ 
+ <section xml:id="known-issues">
+  <title>Known Issues</title>
+
+  <para>The following known issues remained open at the time
+  release <?eval ${serverDocTargetVersion}?> became available.</para>
+
+  <itemizedlist>
+   <listitem>
+    <para>Web service library conflicts when deploying Oracle 11g Application
+    Server (OPENAM-1073).</para>
+    <para>OpenAM console and most features continue to function correctly,
+    but the conflicts can pose problems for STS.</para>
+   </listitem>
+   <listitem>
+    <para>When AM SDK cache is disabled, <literal>amadmin</literal> cannot
+    login (OPENAM-1071).</para>
+    <para>Avoid disabling AM SDK caching for this early access release.</para>
+    <para>If you do lock yourself out, edit the entry with DN
+    <literal>ou=server-default,ou=com-sun-identity-servers,ou=default,
+    ou=GlobalConfig,ou=1.0,ou=iPlanetAMPlatformService,ou=services,
+    %ROOT_SUFFIX%</literal> in an LDAP browser, manually changing the
+    AM SDK cache configuration value. Then restart OpenAM, or the web
+    application container.</para>
+   </listitem>
+   <listitem>
+    <para>The <filename>fam-noconsole.list</filename> file for building
+    a custom, no-console .war includes the wrong versions of OpenDJ LDAP SDK
+    and Grizzly Framework .jar files (OPENAM-1070).</para>
+    <para>To work around this issue, edit the file to include these versions
+    instead:</para>
+    <literallayout class="monospaced">./WEB-INF/lib/opendj-ldap-sdk-3.0.0-M1.jar
+./WEB-INF/lib/grizzly-framework-2.1.7.jar</literallayout>
+   </listitem>
+   <listitem>
+    <para>Clicking the Version button in the console for OpenAM installed in
+    JBoss 7.0.2 results in an uncaught exception page (OPENAM-1062).</para>
+   </listitem>
+   <listitem>
+    <para>The check whether session quota is reached does not work correctly
+    for users with multiple sessions (OPENAM-1047).</para>
+   </listitem>
+   <listitem>
+    <para>Remaining issues with upgrade (OPENAM-1044).</para>
+   </listitem>
+   <listitem>
+    <para>Agent users have permissions beyond what is strictly necessary
+    (OPENAM-1027).</para>
+   </listitem>
+   <listitem>
+    <para>The HTTP-Basic Auth Module returns an HTTP 200 OK on failure
+    (OPENAM-1024).</para>
+   </listitem>
+   <listitem>
+    <para>On startup OpenAM writes <literal>JCEEncryption:: Unsupported
+    version: -98</literal> in the Id Repo debug log (OPENAM-1001).</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM console front page includes incorrect and outdated references
+    (OPENAM-997).</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM distributed authentication user interface allows users to
+    send multiple requests, causing issues with modules that do not expect
+    multiple requests (OPENAM-990).</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM LDAP authentication module sometimes fails to fail over when
+    an LDAP server stops (OPENAM-986).</para>
+   </listitem>
+   <listitem>
+    <para>When creating a hosted identity provider, OpenAM creates provider
+    URLs based on host header name rather than the name you provide
+    (OPENAM-830).</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+</chapter>

@@ -1,0 +1,220 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: xacml-test.xml,v 1.4 2008/06/25 05:50:17 qcheng Exp $
+
+-->
+
+<project name="xacml-test" default="run-test">
+    <description>xacml test</description>
+
+    <property name="opensso.home" location="../../../.."/>
+
+    <!--fed lib dir includes testng jars --> 
+    <property name="shared.lib.dir" 
+        location="${opensso.home}/products/shared/extlib"/>
+    <property name="fedlib.lib.dir" 
+        location="${opensso.home}/products/federation/library/extlib"/>
+    <property name="amserver.lib.dir" 
+        location="${opensso.home}/products/amserver/extlib"/>
+
+    <property name="shared.classes.dir" 
+        location="${opensso.home}/products/shared/built/classes"/>
+    <property name="amserver.classes.dir" 
+        location="${opensso.home}/products/amserver/built/classes"/>
+
+    <property name="amserver.resources.dir" 
+        location="${opensso.home}/products/amserver/resources"/>
+    <property name="amserver.resources.locale.dir" 
+        location="${amserver.resources.dir}/locale"/>
+
+    <property name="fedlib.resources.dir" 
+        location="${opensso.home}/products/federation/library/resources"/>
+    <property name="fedlib.resources.locale.dir" 
+        location="${fedlib.resources.dir}/locale"/>
+
+    <property name="openfm.resources.dir" 
+        location="${opensso.home}/products/federation/openfm/resources"/>
+    <property name="openfm.resources.locale.dir" 
+        location="${openfm.resources.dir}/locale"/>
+
+    <property name="fedlib.src.dir" 
+        location="${opensso.home}/products/federation/library/source"/>
+    <property name="fedlib.classes.dir" 
+        location="${opensso.home}/products/federation/library/built/classes"/>
+
+    <property name="openfm.src.dir" 
+        location="${opensso.home}/products/federation/openfm/source"/>
+    <property name="openfm.classes.dir" 
+        location="${opensso.home}/products/federation/openfm/built/classes"/>
+
+    <property name="openfm.test.src.dir" 
+        location="${opensso.home}/products/federation/openfm/test/source"/>
+    <property name="openfm.test.classes.dir" 
+        location="${opensso.home}/products/federation/openfm/built/test/classes"/>
+
+    <property name="openfm.test.clientconfig.dir" 
+        location="${opensso.home}/products/federation/openfm/test/clientconfig"/>
+
+    <property name="openfm.test.clientlib.dir" 
+        location="${opensso.home}/products/federation/openfm/test/clientlib"/>
+
+    <property name="openfm.test.testlib.dir" 
+        location="${opensso.home}/products/federation/openfm/test/testlib"/>
+
+    <property name="output.dir" location="output"/>
+    <property name="logs.dir" location="logs"/>
+    <property name="template.dir" 
+        location="${opensso.home}/products/federation/library/test/www/template"/>
+    <property name="report.dir" location="report"/>
+    <property name="testng.dir" value="xml/testng"/>
+
+    <property name="log.level" value="ALL"/>
+
+    <path id="test.class.path">
+        <pathelement location="${openfm.test.classes.dir}"/>
+        <pathelement location="${openfm.test.clientconfig.dir}"/>
+        <pathelement location="${opensso.home}/products/federation/openfm/built/dist/openssoclientsdk.jar"/>
+        <pathelement location="${openfm.classes.dir}"/> <!-- required to test plugins -->
+        <fileset dir="${opensso.home}/products/extlib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="plugins.class.path">
+        <pathelement location="${shared.classes.dir}"/>
+        <pathelement location="${fedlib.classes.dir}"/>
+        <pathelement location="${amserver.classes.dir}"/>
+        <pathelement location="${openfm.classes.dir}"/>
+        <fileset dir="${opensso.home}/products/extlib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="compile.test.class.path">
+        <pathelement location="${openfm.test.classes.dir}"/>
+        <pathelement location="${shared.classes.dir}"/>
+        <pathelement location="${fedlib.classes.dir}"/>
+        <pathelement location="${amserver.classes.dir}"/>
+        <pathelement location="${openfm.classes.dir}"/>
+        <fileset dir="${opensso.home}/products/extlib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="compile-context">
+        <echo message="fedlib.src.dir=${fedlib.src.dir}" />
+        <echo message="fedlib.classes.dir=${fedlib.classes.dir}" />
+        <mkdir dir="${fedlib.classes.dir}"/>
+        <javac 
+                debug = "true"
+                debuglevel = "lines,vars,source"
+                fork="yes"
+                classpathref="test.class.path"
+                srcdir="${fedlib.src.dir}"
+                destdir="${fedlib.classes.dir}">
+            <include name="com/sun/identity/xacml/**" />
+            <include name="com/sun/identity/saml2/soapbinding/**" />
+        </javac>
+    </target>
+
+    <target name="compile-plugins" depends="compile-context">
+        <echo message="openfm.src.dir=${openfm.src.dir}" />
+        <echo message="openfm.classes.dir=${openfm.classes.dir}" />
+        <mkdir dir="${openfm.classes.dir}"/>
+        <javac 
+                debug = "true"
+                debuglevel = "lines,vars,source"
+                fork="yes"
+                classpathref="plugins.class.path"
+                srcdir="${openfm.src.dir}"
+                destdir="${openfm.classes.dir}">
+            <include name="com/sun/identity/xacml/**" />
+        </javac>
+    </target>
+
+    <target name="compile-test" depends="compile-plugins"> 
+        <echo message="${openfm.test.src.dir}" />
+        <echo message="${openfm.test.classes.dir}" />
+        <mkdir dir="${openfm.test.classes.dir}"/>
+        <javac 
+                debug = "true"
+                debuglevel = "lines,vars,source"
+                fork="yes"
+                classpathref="compile.test.class.path"
+                srcdir="${openfm.test.src.dir}"
+                destdir="${openfm.test.classes.dir}">
+            <include name="com/sun/identity/xacml/**" />
+        </javac>
+    </target>
+
+    <target name="run-test" depends="compile-test">
+        <delete dir="${output.dir}" />
+        <mkdir dir="${output.dir}" />
+        <delete dir="${logs.dir}" /> 
+        <mkdir dir="${logs.dir}" /> 
+
+        <java classname="org.testng.TestNG" fork="true">
+            <jvmarg value="-Xint"/>
+            <jvmarg value="-Dlog.level=${log.level}"/>
+            <jvmarg value="-Dcom.sun.identity.plugin.configuration.class=com.sun.identity.plugin.configuration.impl.ConfigurationInstanceImpl"/> 
+            <jvmarg value="-Damconfig=AMConfig"/> 
+            <!-- <jvmarg value="-Dcom.iplanet.am.serverMode=false"/> -->
+            <jvmarg value="-Dcom.iplanet.am.logstatus=INACTIVE"/>
+            <jvmarg value="-ea"/>
+            <arg value="-d"/>
+            <arg value="${output.dir}"/>
+            <arg value="${testng.dir}/xacml-testng.xml"/>
+            <classpath refid="test.class.path"/>
+        </java>
+
+        <!-- <antcall target="report" /> -->
+    </target>
+
+    <target name="report">
+        <delete dir="${report.dir}" />
+        <mkdir dir="${report.dir}" />
+        <copy file="${template.dir}/default.css" tofile="${report.dir}/default.css" />
+        <java classname="com.sun.identity.shared.test.tools.ReportGenerator" fork="true">
+            <arg value="${output.dir}"/>
+            <arg value="${template.dir}"/>
+            <arg value="${report.dir}"/>
+            <classpath refid="test.class.path"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${output.dir}" />
+        <delete dir="${logs.dir}" />
+        <delete dir="${report.dir}" />
+        <delete dir="${fedlib.classes.dir}/com/sun/identity/xacml" />
+        <delete dir="${openfm.classes.dir}/com/sun/identity/xacml" />
+        <delete dir="${openfm.test.classes.dir}/com/sun/identity/xacml" />
+    </target>
+
+    <target name="usage">
+        <echo message="opensso-home:${opensso.home}"/>
+    </target>
+
+</project>

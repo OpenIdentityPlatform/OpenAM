@@ -1,0 +1,62 @@
+
+    <test name="UserAuthAttributeTest_noneExist">
+        <parameter name="testCaseName" value="noneExist"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inetuserPositive">
+        <parameter name="testCaseName" value="inetuserPositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_loginPositive">
+        <parameter name="testCaseName" value="loginPositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lifePositive">
+        <parameter name="testCaseName" value="lifePositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inetuserNegative">
+        <parameter name="testCaseName" value="inetuserNegative"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>

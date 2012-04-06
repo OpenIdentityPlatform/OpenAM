@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: ejb-jar.xml,v 1.1 2008/12/11 14:56:50 naghaon Exp $
+
+-->
+
+<!DOCTYPE ejb-jar PUBLIC
+'-//Sun Microsystems, Inc.//DTD Enterprise JavaBeans 2.0//EN'
+'http://java.sun.com/dtd/ejb-jar_2_0.dtd'>
+
+<ejb-jar>
+
+    <enterprise-beans>
+        <session id="Session_ProtectedEJB">
+            <ejb-name>ProtectedEJB</ejb-name>
+            <home>com.sun.identity.agents.sample.ProtectedEJBHome</home>
+            <remote>com.sun.identity.agents.sample.ProtectedEJB</remote>
+            <ejb-class>com.sun.identity.agents.sample.ProtectedEJBImpl</ejb-class>
+            <session-type>Stateless</session-type>
+            <transaction-type>Container</transaction-type>
+        </session>
+        <session id="Session_SecurityAwareEJB">
+            <ejb-name>SecurityAwareEJB</ejb-name>
+            <home>com.sun.identity.agents.sample.SecurityAwareEJBHome</home>
+            <remote>com.sun.identity.agents.sample.SecurityAwareEJB</remote>
+            <ejb-class>com.sun.identity.agents.sample.SecurityAwareEJBImpl</ejb-class>
+            <session-type>Stateless</session-type>
+            <transaction-type>Container</transaction-type>
+            <security-role-ref>
+                <role-name>MANAGER_ROLE</role-name>
+                <role-link>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-link>
+            </security-role-ref>
+            <security-role-ref>
+                <role-name>EMPLOYEE_ROLE</role-name>
+                <role-link>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-link>
+            </security-role-ref>
+        </session>
+    </enterprise-beans>
+
+    <assembly-descriptor>      
+        <security-role id="SR_MANAGER_ROLE">
+                <role-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</role-name>
+        </security-role>
+        <security-role id="SR_EMPLOYEE_ROLE">
+                <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+        </security-role>
+        <method-permission>
+                <role-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</role-name>
+            <method>
+                <ejb-name>ProtectedEJB</ejb-name>
+                <method-name>*</method-name>
+            </method>
+        </method-permission>
+        <method-permission>
+                <unchecked/>
+            <method>
+                <ejb-name>SecurityAwareEJB</ejb-name>
+                <method-name>*</method-name>
+            </method>
+        </method-permission>
+    </assembly-descriptor>
+</ejb-jar>

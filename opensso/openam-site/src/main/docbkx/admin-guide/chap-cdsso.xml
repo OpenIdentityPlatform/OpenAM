@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-cdsso'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Configuring Cross-Domain Single Sign On</title>
+
+ <para>This chapter shows you how to configure cross-domain single sign on,
+ typically used when you have multiple domains in a single organization. For
+ single sign on across multiple organizations, typically federation is
+ used.</para>
+ <indexterm><primary>Cross-domain single sign on (CDSSO)</primary></indexterm>
+ <para><firstterm>Cross-domain single sign on</firstterm> (CDSSO) provides
+ a safe mechanism for managing access across multiple different domains that
+ you control. CDSSO lets OpenAM set up in <literal>example.org</literal>
+ manage access for <literal>example.com</literal>, and
+ <literal>example.net</literal>. Single sign on depends on cookies to store
+ session information. Yet to avoid cross-site scripting attacks, browsers
+ should not let a web site in one domain get a cookie from another domain.
+ CDSSO relies on OpenAM essentially to duplicate cookies on domains you control
+ so that a session valid in one domain is also valid in the other domains.
+ All the cookie duplication work takes place without users having to provide
+ new credentials.</para>
+ 
+ <procedure xml:id="enable-cdsso">
+  <title>To Enable CDSSO For a Web Policy Agent</title>
+  
+  <step>
+   <para>In the OpenAM console, browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable> &gt; Agents &gt; Web &gt;
+   <replaceable>Agent Name</replaceable> &gt; SSO.</para>
+  </step>
+  <step>
+   <para>Enable Cross Domain SSO (configuration file property:
+   <literal>com.sun.identity.agents.config.cdsso.enable</literal>).</para>
+  </step>
+  <step>
+   <para>Set the CDSSO Servlet URL to the Cross Domain Controller location,
+   such as <literal>http://openam.example.com:8080/openam/cdcservelet</literal>
+   (configuration file property:
+   <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal>).</para>
+  </step>
+  <step>
+   <para>Add the list of domains, such as <literal>.example.com</literal> to
+   the Cookies Domain List (configuration file property:
+   <literal>com.sun.identity.agents.config.cookie.domain</literal>).</para>
+  </step>
+  <step>
+   <para>Save your work.</para>
+  </step>
+ </procedure>
+</chapter>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : FortressAuthUserOTPModule.xml
+    Created on : March 28, 2007, 4:48 PM
+    Author     : mc116350
+    Description:
+        Purpose of the document follows.
+-->
+
+
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+
+<ModuleProperties moduleName="FortressAuthUserOTPModule" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120" header="This server uses 4Tress User and One-Time Password Authentication" >
+        <NameCallback>
+            <Prompt> User Name: </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" >
+            <Prompt> One-Time-Password: </Prompt>
+        </PasswordCallback>
+    </Callbacks>
+</ModuleProperties>
+

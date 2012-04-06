@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: idRepoAmSDK.xml,v 1.1 2008/08/07 17:22:02 arviranga Exp $
+  
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+
+<ServicesConfiguration>
+    <Service name="sunIdentityRepositoryService" version="1.0">
+        <Schema>
+            <Organization>
+                <!-- Schema for linking SMS's organization to
+                     AMSDK's organization. -->
+                <SubSchema name= "amSDK"
+                    inheritance = "multiple"
+                    i18nKey = "a101">
+
+                    <!-- The two attributes below, if defined, allow the IdRepo 
+                        SDK to map attribute names and to determine entities 
+                        supported and operations supported by this plugin. If 
+                        no mapping is provided,the assumption is that the 
+                        attribute names are the same (no mapping needed. If the 
+                        list of entities supported is not provided then the 
+                        assumption is that no entities are supported -->
+
+                    <AttributeSchema name="sunIdRepoClass"
+                        type = "single"
+                        syntax = "string"
+                        any="required"
+                        validator="RequiredValueValidator"
+                        i18nKey = "a102">
+                        <DefaultValues>
+                            <Value>com.iplanet.am.sdk.AMSDKRepo</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="RequiredValueValidator"
+                        type="validator"
+                        syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunIdRepoNamingAttribute"
+                        type="list"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>user=uid</Value>
+                            <Value>group=cn</Value>
+                            <Value>role=cn</Value>
+                            <Value>filteredrole=cn</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
+                        type="list"
+                        syntax="string"
+                        i18nKey="">
+                    </AttributeSchema>
+                    <AttributeSchema name="sunIdRepoSupportedOperations"
+                        type="list"
+                        syntax="string"
+                        validator="validatatorClass for verifying this list against supported list"
+                        i18nKey="">
+                        <DefaultValues>
+
+                            <!-- IdRepos can provide the object types
+                               it can manage and the operations that can
+                               be performed on these objects, as a key-value
+                               pair. Object types could be User, Group, Role,
+                               etc., and the operations are limited to create,
+                               read, edit and modify. The values are case
+                               insenstive. -->
+
+                               <Value>user=read,create,edit,delete,service</Value>
+                               <Value>role=read,edit,service</Value>
+                               <Value>filteredrole=read,edit,service</Value>
+                               <Value>group=read</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <!-- From here on the list of plugin specific attributes 
+                        for determining things like organization relating to 
+                        this realm, authentication source,
+                        user containers, group containers etc etc. -->
+
+                    <AttributeSchema name="amSDKOrgName"
+                        type = "single"
+                            syntax = "string"
+                            i18nKey = "a106">
+                            <DefaultValues>
+                                <Value>@NORMALIZED_ORGBASE@</Value>
+                            </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-amSDK-config-people-container-name"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a110">
+                        <DefaultValues>
+                            <Value>ou</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-amSDK-config-people-container-value"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a111">
+                        <DefaultValues>
+                            <Value>people</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-amSDK-config-recursive-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a112">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-amSDK-config-copyconfig-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a113">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

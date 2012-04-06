@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-issues'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Policy Agent Fixes, Limitations, &amp; Known Issues</title>
+
+ <para>OpenAM policy agent issues are tracked at <link
+ xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
+ >https://bugster.forgerock.org/jira/browse/OPENAM</link>.</para>
+
+ <section xml:id="web-agent-issues">
+  <title>Web Policy Agents <?eval ${webAgentsDocTargetVersion}?></title>
+  <para>This section covers the status of key issues and limitations at release
+  <?eval ${webAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="web-agent-fixes">
+   <title>Fixes Since Last Release</title>
+
+   <para>The following issues were fixed in this release.</para>
+
+   <para>TODO: build the list of fixes based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+
+  <section xml:id="web-agent-limitations">
+   <title>Limitations</title>
+
+   <para>OpenAM web policy agents do not currently support IPv6.</para>
+  </section>
+
+  <section xml:id="web-agent-known-issues">
+   <title>Known Issues At Release Time</title>
+
+   <para>The following known issues remained open at the time this release
+   became available.</para>
+
+   <para>TODO: build the known issues list based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-issues">
+  <title>Java EE Policy Agents <?eval ${javaEEAgentsDocTargetVersion}?></title>
+  <para>This section covers the status of key issues and limitations at release
+  <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="javaee-agent-fixes">
+   <title>Fixes Since Last Release</title>
+
+   <para>The following issues were fixed in this release.</para>
+
+   <para>TODO: build the list of fixes based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+
+  <section xml:id="javaee-agent-limitations">
+   <title>Limitations</title>
+
+   <para>Not all features of OpenAM Java EE policy agents work with IPv6.</para>
+  </section>
+
+  <section xml:id="javaee-agent-known-issues">
+   <title>Known Issues At Release Time</title>
+
+   <para>The following known issues remained open at the time this release
+   became available.</para>
+
+   <para>TODO: build the known issues list based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+ </section>
+</chapter>

@@ -1,0 +1,124 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.17 2009/07/09 17:04:17 veiming Exp $
+
+-->
+<!--
+   "Portions Copyrighted [2011] [ForgeRock AS]"
+-->
+
+<project name="openfm" default="all">
+    <description>Open Federation - test</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="openfm.unittest.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="test.package.dir" location="${openfm.built.dir}/test/package"/>
+    <property name="test.classes.dir" location="${openfm.built.dir}/test/classes"/>
+
+
+    <target name="build" depends="preparebuild">
+        <javac destdir="${test.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="on" debuglevel="lines,vars,source">
+            <compilerarg value="-Xlint:unchecked"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <src path="${openfm.unittest.dir}/source"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+    </target>
+
+    <target name="all" depends="build">
+        <mkdir dir="${test.package.dir}/classes" />
+        <mkdir dir="${test.package.dir}test/classes" />
+        <mkdir dir="${test.package.dir}/lib" />
+
+        <copy todir="${test.package.dir}/classes">
+            <fileset dir="${openfm.classes.dir}" />
+            <fileset dir="${library.classes.dir}" />
+            <fileset dir="${library.res.i18n.dir}" />
+            <fileset dir="${openfm.res.i18n.dir}" />
+        </copy>
+
+        <copy todir="${test.package.dir}/test/classes">
+            <fileset dir="${test.classes.dir}" />
+        </copy>
+        <copy todir="${test.package.dir}/test/classes"
+            file="${amserver.base.dir}/resources/config/bootstrapConfig.properties" />
+
+        <copy todir="${test.package.dir}/lib">
+            <fileset dir="${extlib.dir}" includes="jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, j2ee.jar, mail.jar, relaxngDatatype.jar, webservices-api.jar, webservices-rt.jar, webservices-tools.jar, webservices-extra-api.jar, webservices-extra.jar, testng-5.9-jdk15.jar, xsdlib.jar"/>
+            <fileset dir="${library.extlib.dir}" />
+            <fileset dir="${openfm.extlib.dir}" />
+        </copy>
+
+        <copy todir="${test.package.dir}">
+            <fileset dir="${openfm.unittest.dir}/xml/ant">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+        <copy file="${openfm.unittest.dir}/README"
+            tofile="${test.package.dir}/README" />
+
+        <copy todir="${test.package.dir}/testng">
+            <fileset dir="${openfm.unittest.dir}/xml/testng" />
+        </copy>
+
+        <copy todir="${test.package.dir}/template">
+            <fileset dir="${openfm.unittest.dir}/www/template" />
+            <fileset dir="${openfm.unittest.dir}/www/css" />
+        </copy>
+
+        <copy todir="${test.package.dir}/mock">
+            <fileset dir="${openfm.unittest.dir}/mock" />
+        </copy>
+
+        <zip destfile="${fm.dist.dir}/opensso-server-test.zip"
+            basedir="${test.package.dir}" />
+        <checksum file="${fm.dist.dir}/opensso-server-test.zip" algorithm="SHA" fileext=".sha" /> 
+    </target>
+
+    <target name="preparebuild">
+        <delete dir="${test.package.dir}" />
+        <delete file="${fm.dist.dir}/opensso-server-test.zip" />
+        <mkdir dir="${test.package.dir}"/>
+        <mkdir dir="${test.package.dir}/mock" />
+        <mkdir dir="${fm.dist.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${test.classes.dir}"/>
+        <delete dir="${test.package.dir}"/>
+        <delete dir="${fm.dist.dir}"/>
+    </target>
+</project>

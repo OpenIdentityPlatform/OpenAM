@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-external-tools.xml,v 1.3 2009/06/20 01:21:26 ak138937 Exp $
+-->
+
+<project name="opensso-external-tools" default="all" basedir=".">
+    <description>OpenSSO: ssoExternalTools.zip Creation</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** tools may be built from top level only ***">
+        <condition>
+            <not><isset property="openfm.built.dir"/></not>
+        </condition>
+    </fail>
+
+    <property name="externaltools.temp.dir" value="${openfm.built.dir}/.externaltools" />
+
+    <target name="all" depends="AG">
+        <delete dir="${externaltools.temp.dir}" />
+        <mkdir dir="${externaltools.temp.dir}/AssertionGenerator" />
+        <copy file="${fm.dist.dir}/AssertionGenerator.zip"
+            todir="${externaltools.temp.dir}/AssertionGenerator" />
+        <zip destfile="${fm.dist.dir}/ssoExternalTools.zip" whenempty="create">
+            <zipfileset dir="${externaltools.temp.dir}" filemode="755">
+                <include name="setup"/>
+            </zipfileset>
+            <zipfileset dir="${externaltools.temp.dir}">
+                <exclude name="setup"/>
+            </zipfileset>
+        </zip>
+
+        <checksum file="${fm.dist.dir}/ssoExternalTools.zip"
+            algorithm="SHA" fileext=".sha" />
+        <delete dir="${externaltools.temp.dir}" />
+    </target>
+
+    <target name="AG">
+        <delete file="${openfm.dir}/built/dist/AssertionGenerator.zip"/>
+        <java classname="com.sun.identity.fedlet.CreateAGZip">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement location="${library.res.i18n.dir}"/>
+                <pathelement location="${openfm.res.i18n.dir}"/>
+            </classpath>
+            <arg value="${openfm.dir}/resources/AGBits.properties"/>
+            <arg value="${openfm.dir}/resources/fedletJarExtract.properties"/>
+            <arg value="${openfm.dir}/built/war/package"/>
+            <arg value="${openfm.dir}/built/dist/AssertionGenerator.zip"/>
+            <arg value="${library.dir}/fedlet/AG/README"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${externaltools.temp.dir}" />
+    </target>
+</project>

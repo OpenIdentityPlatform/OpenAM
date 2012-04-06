@@ -1,0 +1,156 @@
+<!--
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: build.xml,v 1.1 2009/04/21 10:23:27 ja17658 Exp $
+
+-->
+
+<project name="authnvalid" default="usage">
+
+    <description>VALid Authentication Module</description>
+
+    <property name="valid.extlib.dir" location="extlib"/>
+    <property name="source.dir" location="source"/>
+
+    <property name="built.dir" location="built"/>
+    <property name="classes.dir" location="${built.dir}/classes"/>
+    <property name="dist.dir" location="${built.dir}/dist"/>
+    <property name="xml.dir" location="xml"/>
+    <property name="locale.dir" location="locale"/>
+    <property name="jarname" value="VALidOpenSSOAuthModule.jar"/>
+
+    <!-- Optional Properties for the quick-deploy target -->
+    <property name="opensso.deploy.dir" location="/opt/SUNWappserver/domains/domain1/applications/j2ee-modules/opensso/"/>
+    <property name="opensso.ssoadm.cmd" value="/opt/opensso/tools/ssoadm"/>
+    <property name="opensso.ssoadm.passwordfile" value="/space2/tools/.password.opensso"/>
+
+    <!-- Build CLASSPATH -->
+    <path id="build.classpath">
+      <fileset dir="${valid.extlib.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+
+    <!-- Clean directories containing all built elements -->
+    <target name="clean">
+        <delete dir="${built.dir}" />
+    </target>
+
+    <!-- Create the directories -->
+    <target name="prepare">
+        <mkdir dir="${built.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+    </target>
+
+    <!-- Compile and build the JAR file -->
+    <target name="build" depends="prepare">	
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${classes.dir}">
+            <src path="${source.dir}"/>
+            <classpath refid="build.classpath"/>
+        </javac>
+	<jar destfile="${dist.dir}/${jarname}" basedir="${classes.dir}"/>
+    </target>
+
+    <!-- Quick deploy the module in an OpenSSO instance -->
+    <target name="quick-deploy" depends="build">
+	<!-- Copy the JAR file -->
+	<copy file="${dist.dir}/${jarname}" todir="${opensso.deploy.dir}/WEB-INF/lib"/>
+
+	<!-- Copy the XML files -->
+        <copy file="${xml.dir}/VALid.xml" todir="${opensso.deploy.dir}/config/auth/default" />
+        <copy file="${xml.dir}/VALid.xml" todir="${opensso.deploy.dir}/config/auth/default_en" />
+
+	<!-- Copy the localization files -->
+	<copy todir="${opensso.deploy.dir}/WEB-INF/classes">
+            <fileset dir="${locale.dir}" includes="*.properties"/>
+        </copy>
+
+	<!-- Copy the VALid files -->
+	<copy todir="${opensso.deploy.dir}/WEB-INF/lib">
+            <fileset dir="${valid.extlib.dir}" includes="*.jar"/>
+        </copy>
+	<copy todir="${opensso.deploy.dir}/WEB-INF/classes">
+            <fileset dir="${valid.extlib.dir}" includes="*.xml"/>
+        </copy>
+	<copy todir="${opensso.deploy.dir}/WEB-INF/classes">
+            <fileset dir="${valid.extlib.dir}" includes="*.properties"/>
+        </copy>
+    </target>
+
+    <!-- Register the authentication module -->
+    <target name="register" depends="quick-deploy">
+        <exec dir="${basedir}" executable="${opensso.ssoadm.cmd}">
+            <arg line="create-svc"/>
+            <arg line="--adminid amadmin"/>
+            <arg line="--password-file ${opensso.ssoadm.passwordfile}"/>
+            <arg line="--xmlfile ${xml.dir}/amAuthVALid.xml"/>
+        </exec>
+        <exec dir="${basedir}" executable="${opensso.ssoadm.cmd}">
+            <arg line="register-auth-module"/>
+            <arg line="--adminid amadmin"/>
+            <arg line="--password-file ${opensso.ssoadm.passwordfile}"/>
+            <arg line="--authmodule com.sun.identity.authentication.modules.valid.VALid"/>
+        </exec>
+    </target>
+
+    <!-- Unregister the authentication module -->
+    <target name="unregister">
+        <exec dir="${basedir}" executable="${opensso.ssoadm.cmd}">
+            <arg line="delete-svc"/>
+            <arg line="--adminid amadmin"/>
+            <arg line="--password-file ${opensso.ssoadm.passwordfile}"/>
+            <arg line="--servicename sunAMAuthVALidService"/>
+        </exec>
+    </target>
+
+    <target name="run" depends="build">
+        <java fork="true" classname="com.sun.identity.authentication.modules.valid.VALidTester">
+            <classpath>
+                <path location="${dist.dir}/${jarname}"/>
+                <path location="${valid.extlib.dir}"/>
+                <fileset dir="${valid.extlib.dir}">
+        	    <include name="**/*.jar"/>
+      		</fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- Usage message -->
+    <target name="usage">
+        <echo message=" "/>
+	<echo message="The following targets are available:"/>
+	<echo message=" "/>
+	<echo message="  clean : cleans any generated files"/>
+	<echo message="  usage : displays this usage message"/>
+	<echo message="  build : compiles all the java source files"/>
+	<echo message="  quick-deploy : Copies files in existing OpenSSO deployment"/>
+	<echo message="  register : Registers module with OpenSSO instance"/>
+	<echo message="  unregister : Unregisters module with OpenSSO instance"/>
+	<echo message="  run : executes the VALidTester class"/>
+	<echo message=" "/>
+	<echo message="To run a target, issue the following command:"/>
+	<echo message=" "/>
+	<echo message="  ant (target-name)"/>
+	<echo message=" "/>
+    </target>
+
+</project>

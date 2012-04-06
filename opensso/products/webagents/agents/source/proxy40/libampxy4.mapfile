@@ -1,0 +1,11 @@
+SUNWprivate_1.0 {
+	global:
+		validate_session_policy;
+		web_agent_init;
+		process_notification;
+                add_agent_header;
+		agent_cleanup;
+
+	local:
+		*;
+};

@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-monitoring'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Monitoring OpenAM Services</title>
+
+ <para>This chapter covers how to monitor OpenAM services to ensure
+ appropriate performance and service availability.</para>
+ 
+ <section xml:id="monitoring-interfaces">
+  <title>Monitoring Interfaces</title>
+  <indexterm><primary>Monitoring</primary></indexterm>
+  
+  <para>OpenAM lets you monitor OpenAM over protocol through web pages,
+  Java Management Extensions (JMX), or Simple Network Management Protocol
+  (SNMP). The services are based on JMX.</para>
+  
+  <para>To configure monitoring services, login to OpenAM console as OpenAM
+  administrator, and browse to Configuration &gt; System &gt; Monitoring.
+  Alternatively you can use the <command>ssoadm set-attr-defs</command>
+  command.</para>
+
+  <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-enabled=true</screen>
+
+  <para>Restart OpenAM for the changes to take effect. You must also restart
+  OpenAM if you disable monitoring.</para>
+
+  <section xml:id="monitoring-web-pages">
+   <title>Web Based Monitoring</title>
+   
+   <para>You can configure OpenAM to allow you to access a web based view of
+   OpenAM MBeans on port 8082 where the core server runs, such as
+   <literal>http://openam-ter.example.com:8082/</literal>. Either use the
+   console, or use the <command>ssoadm</command> command.</para>
+
+   <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-http-enabled=true</screen>
+
+   <para>The default authentication file allows you to authenticate over HTTP
+   as user <literal>demo</literal>, password <literal>changeit</literal>. The
+   user name and password are kept in the file specified, with the password
+   encrypted.</para>
+   
+   <screen>$ cat openam/openam/opensso_mon_auth 
+demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
+   
+   <para>You can encrypt a new password using the <command>ampassword</command>
+   command. After changing the authentication file, you must restart OpenAM
+   for the changes to take effect.</para>
+   
+   <mediaobject xml:id="figure-web-based-monitoring">
+    <alt>OpenAM MBeans in a browser</alt>
+    <imageobject>
+     <imagedata fileref="images/web-based-monitoring.png" format="PNG" />
+    </imageobject>
+    <textobject><para>You can monitor OpenAM through a web browser.</para></textobject>
+   </mediaobject>
+  </section>
+  
+  <section xml:id="monitoring-jmx">
+   <title>JMX Monitoring</title>
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>JMX</secondary>
+   </indexterm>
+   <para>You can configure OpenAM to allow you to listen on port 9999 for JMX
+   monitoring. Either use the console, or use the <command>ssoadm</command>
+   command.</para>
+
+   <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-rmi-enabled=true</screen>
+
+   <para>You can then use <command>jconsole</command> or other JMX-enabled
+   tools to browse the MBeans. You can also browse the MBeans by connecting
+   to your web application container, and browsing to the OpenAM MBeans.</para>
+   
+   <mediaobject xml:id="figure-jconsole-to-openam">
+    <alt>Jconsole browsing OpenAM MBeans</alt>
+    <imageobject>
+     <imagedata fileref="images/jconsole-to-openam.png" format="PNG" />
+    </imageobject>
+    <textobject><para>You can monitor OpenAM over JMX.</para></textobject>
+   </mediaobject>
+  </section>
+  
+  <section xml:id="monitoring-snmp">
+   <title>SNMP Monitoring</title>
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>SNMP</secondary>
+   </indexterm>
+   
+   <para>You can configure OpenAM to allow you to listen on port 8085 for SNMP
+   monitoring. Either use the console, or use the <command>ssoadm</command>
+   command.</para>
+
+   <screen>$ ssoadm
+ set-attr-defs
+ --servicename iPlanetAMMonitoringService
+ --schematype Global
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --attributevalues iplanet-am-monitoring-snmp-enabled=true</screen>
+  </section>
+ </section>
+ 
+ <section xml:id="is-openam-alive">
+  <title>Is OpenAM Up?</title>
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>Health check</secondary>
+   </indexterm>
+  
+  <para>You can check over HTTP whether OpenAM is up, using
+  <filename>isAlive.jsp</filename>. Point your application to the file
+  under the OpenAM URL, such as
+  <literal>http://openam.example.com:8080/openam/isAlive.jsp</literal>.</para>
+  
+  <para>If you get a success code (with <literal>Server is ALIVE:</literal> in
+  the body of the page returned), then OpenAM is up.</para>
+ </section>
+ 
+ <section xml:id="log-mgmt">
+  <title>Log Management</title>
+  <indexterm><primary>Logging</primary></indexterm>
+  
+  <para>OpenAM implements logging as a service. This means remote clients
+  such as your OpenAM policy agents can log messages to the central logging
+  service.</para>
+  
+  <section xml:id="log-mgmt-core">
+   <title>Logging in OpenAM Core Services</title>
+   
+   <para>By default OpenAM logs to files in the configuration directory for
+   the instance, such as <filename>$HOME/openam/log/</filename> for log files,
+   and <filename>$HOME/openam/debug/</filename> for debug files. You can also
+   configure OpenAM to log through JDBC to a database such as MySQL or Oracle
+   DB.</para>
+   
+   <para>OpenAM sends messages to different log files, each named after the
+   service logging the message, with two different types log files per service:
+   <filename>.access</filename> and <filename>.error</filename>. Thus the
+   current log files for the authentication service are named
+   <filename>amAuthentication.access</filename> and
+   <filename>amAuthentication.error</filename>.</para>
+   
+   <para>See the <link xlink:href="reference#chap-log-messages"
+   xlink:role="http://docbook.org/xlink/role/olink">Log Messages</link>
+   reference for details.</para>
+   
+   <para>OpenAM lets you change the log level on the fly. OpenAM also supports
+   log rotation, secure logging, and log message buffering.</para>
+   
+   <para>To configure OpenAM logging properties overall, login to the OpenAM
+   console as OpenAM administrator, and browse to Configuration &gt; System &gt;
+   Logging.</para>
+
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Level</secondary>
+   </indexterm>
+   <para>To adjust the debug level while OpenAM is running, login to the OpenAM
+   console as OpenAM administrator, and browse to Configuration &gt; Servers
+   and Sites &gt; <replaceable>Server Name</replaceable> &gt; General, and then
+   scroll down to Debugging. The default level for debug logging is Error.
+   This level is appropriate for normal production operations, in which case
+   no debug log messages are expected.</para>
+
+   <para>Setting debug log level to Warning increases the volume of messages.
+   Setting debug log level to Message dumps detailed trace messages. Unless
+   told to do so by qualified support personnel, do not use Warning and Message
+   levels in production.</para>
+
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Single file</secondary>
+   </indexterm>
+   <para>During development, you might find it useful to log all debug messages
+   to a single file. In order to do so, set Merge Debug Files to
+   <literal>on</literal>.</para>
+
+   <para>After changing this setting, restart OpenAM or the container in which
+   it runs for the change to take effect.</para>
+  </section>
+  
+  <section xml:id="log-mgmt-agents">
+   <title>Logging in OpenAM Policy Agents</title>
+   
+   <para>By default, OpenAM Policy Agents log to local files in their
+   configuration directories for debugging. The exact location depends on
+   where you installed the agent.</para>
+   
+   <para>By default OpenAM policy agents send log messages remotely to OpenAM
+   when you log auditing information about URL access attempts. To configure
+   audit logging for a centrally managed policy agent, login to the OpenAM
+   console as administrator, and browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+   <replaceable>Agent Type</replaceable> &gt; <replaceable>Agent
+   Name</replaceable> &gt; Global, and then scroll down to the Audit
+   section.</para>
+  </section>
+
+  <section xml:id="log-debug-selective-capture">
+   <title>Debug Logging by Service</title>
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Service selection</secondary>
+   </indexterm>
+
+   <para>OpenAM lets you capture debug log messages selectively for a specific
+   service. This can be useful when you must turn on debugging in a production
+   system where you want to avoid excessive logging, but must gather messages
+   when you reproduce a problem.</para>
+
+   <orderedlist>
+    <para>Perform these steps to capture debug messages for a specific
+    service.</para>
+    <listitem>
+     <para>Login to OpenAM console as administrator,
+     <literal>amadmin</literal>.</para>
+    </listitem>
+    <listitem>
+     <para>Browse to <filename>Debug.jsp</filename>, for example
+     <literal>http://openam.example.com:8080/openam/Debug.jsp</literal>.</para>
+     <para>No links to this page are provided in the console.</para>
+    </listitem>
+    <listitem>
+     <para>Select the service to debug and also the level required given the
+     hints provided in the <filename>Debug.jsp</filename> page.</para>
+     <para>The change takes effect immediately.</para>
+    </listitem>
+    <listitem>
+     <para>Promptly reproduce the problem you are investigating.</para>
+    </listitem>
+    <listitem>
+     <para>After reproducing the problem, immediately return to the
+     <filename>Debug.jsp</filename> page, and revert to normal log levels
+     to avoid filling up the disk where debug logs are stored.</para>
+    </listitem>
+   </orderedlist>
+  </section>
+
+  <section xml:id="log-rotate-debug">
+   <title>Rotating Debug Logs</title>
+   <indexterm>
+    <primary>Debug logging</primary>
+    <secondary>Rotation</secondary>
+   </indexterm>
+
+   <para>By default OpenAM does not rotate debug logs. To rotate debug logs,
+   edit <filename>WEB-INF/classes/debugconfig.properties</filename> where
+   OpenAM is deployed.</para>
+
+   <variablelist>
+    <para>The <filename>debugconfig.properties</filename> file includes
+    the following properties.</para>
+    <varlistentry>
+     <term><literal>org.forgerock.openam.debug.prefix</literal></term>
+     <listitem>
+      <para>This property specifies the debug log file prefix applied when
+      OpenAM rotates a debug log file. The property has no default. It takes
+      a string as the property value.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>org.forgerock.openam.debug.suffix</literal></term>
+     <listitem>
+      <para>This property specifies the debug log file suffix applied when
+      OpenAM rotates a debug log file. The property takes a
+      <literal>SimpleDateFormat</literal> string. The default is
+      <literal>-MM.dd.yyyy-kk.mm</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>org.forgerock.openam.debug.rotation</literal></term>
+     <listitem>
+      <para>This property specifies an interval in minutes between debug
+      log rotations. Set this to a value greater than zero to enable debug
+      log rotation.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>After you edit the <filename>debugconfig.properties</filename> file,
+   you must restart OpenAM or the web container where it runs for the changes
+   to take effect.</para>
+  </section>
+ </section>
+ 
+ <section xml:id="session-mgmt">
+  <title>Session Management</title>
+  <indexterm><primary>Sessions</primary></indexterm>
+  
+  <para>OpenAM console lets the administrator view and manage current
+  user sessions under the Sessions tab page.</para>
+  
+  <mediaobject xml:id="figure-session-management">
+   <alt>Session management tab page</alt>
+   <imageobject>
+    <imagedata fileref="images/session-management.png" format="PNG" />
+   </imageobject>
+   <textobject><para>The OpenAM Administrator can view and end user
+   sessions.</para></textobject>
+  </mediaobject>
+  
+  <para>To end a user session manually, select the user's session, and then
+  click the Invalidate Session button. As a result, the user has to
+  authenticate again.</para>
+ </section>
+</chapter>

@@ -1,0 +1,142 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: Readme.xml,v 1.7 2008/09/04 20:58:06 beomsuk Exp $
+
+-->
+
+<sample title="OpenSSO - Samples"
+    relativePath="."  >
+                                                                                
+    <section title="Description">
+    <paragraph>
+    Here are a set of samples for OpenSSO. There are two parts to this set of
+    samples. It is the commandline and the Web ARchive (WAR) parts. The 
+    commandline samples can be executed from this directory by executing
+    the bat/script files. Please remember that they have to the executed
+    from this base directory otherwise the Java classpath will be incorrect.
+    You have to do the following to setup the samples.
+    </paragraph>
+
+    <paragraph>
+    on the shell prompt,<br />
+    <code>scripts/setup.sh</code> (have to <code>chmod</code> to make it
+    executable) for Unix and Linux; or<br />
+    <code>scripts/setup.bat</code> for Windows.<br />
+    This setup class will prompt for some server information; create the 
+    <code>AMConfig.properties</code> file under <code>war/WEB-INF/classes</code>
+    and <code>classes</code> directory; and create the distauth.war.
+    </paragraph>    
+    <paragraph>
+    Source code is found under source sub directory. Followings are the
+    standalone Java samples.
+    </paragraph>
+    <paragraph>
+    If the user is executing the sdk client samples against SSL enabled server, 
+    then the JVM on which the client samples will be executed must trust the 
+    server certificate on the OpenSSO server. To establish this trust the 
+    keytool utility should be used to import the root CA certificate of the 
+    OpenSSO server certificate into the JVM trust store.  See steps below to 
+    import the root CA certificate into the default JVM trust store, 
+    JAVA_HOME/jre/lib/security/cacerts, before executing the client samples.
+    </paragraph>
+    <paragraph>
+    on the shell prompt,<br />
+    <code>cd JAVA_HOME/jre/lib/security</code>
+    <code>JAVA_HOME/bin/keytool -import -keystore cacerts -alias
+    alias-name-of-your-choice -storepass changeit -file 
+    path-to-root-CA-certificate-file</code>
+    </paragraph>
+    <paragraph>
+    To verify that the certificate was successfully imported, following command
+    can be used.
+    </paragraph>
+    <paragraph>
+    <code>JAVA_HOME/bin/keytool -list -keystore cacerts -storepass changeit 
+    -alias alias-name-of-your-choice</code>
+    </paragraph>
+    <paragraph>
+    If the user is executing the war based client samples then the user must 
+    import the root CA certificate of the server certificate on the SSL-enabled 
+    OpenSSO server instance into the JVM trust store of the web container on 
+    which the client sample war is being deployed. The above procedure can be 
+    used to import the root CA certificate in the JVM trust store in this case 
+    as well.
+    </paragraph>
+    </section>
+
+    <section title="Authentication Samples">
+    <paragraph>
+    1. Login.java
+    This demonstrates logging in and out of OpenSSO server.
+    To execute this samples, type <br />
+        <code>scripts/Login.sh</code> for Unix and Linux; or<br />
+        <code>scripts/Login.bat</code> for Windows.
+    </paragraph>
+    </section>
+
+    <section title="Single Sign On Samples">
+    <paragraph>
+    1. CommandLineSSO.java
+    This creates a new Single Sign-On token and displays the user attributes.
+    To execute this samples, type <br />
+        <code>scripts/CommandLineSSO.sh</code> for Unix and Linux; or<br />
+        <code>scripts/CommandLineSSO.bat</code> for Windows.
+    </paragraph>
+
+    <paragraph>
+    2. SSOTokenSample.java
+    This takes a Single Sign-On token ID and displays the token attributes. It
+    also demonstrates how to set and get token Property.
+    To execute this samples, type <br />
+        <code>scripts/SSOTokenSample.sh</code> for Unix and Linux; or<br />
+        <code>scripts/SSOTokenSample.bat</code> for Windows.
+    You can get a Single Sign-On token ID by authenticating to the server; and
+    then visit the client SDK sample web application's Single Sign On Token
+    Verification Servlet.
+    </paragraph>
+    </section>
+
+    <section title="AMIdentityRepository Sample">
+    <paragraph>
+    1. IdRepoSample.java (plus the rest of the *.java files)
+    This demonstrates use of the <code>AMIdentityRepository</code> class.
+    To execute this sample, type <br />
+        <code>scripts/CommandLineIdrepo.sh</code> for Unix and Linux; or<br />
+        <code>scripts/CommandLineIdrepo.bat</code> for Windows.
+    </paragraph>
+    </section>
+
+    <section title="Logging Sample">
+    <paragraph>
+    1. LogSample.java
+    This demonstrates logging to an OpenSSO server.
+    To execute this sample, type <br />
+        <code>scripts/CommandLineLogging.sh</code> for Unix and Linux; or<br />
+        <code>scripts/CommandLineLogging.bat</code> for Windows.
+    </paragraph>
+    </section>
+
+    <!-- Add new sample info here -->
+</sample>

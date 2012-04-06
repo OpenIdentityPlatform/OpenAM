@@ -1,0 +1,61 @@
+
+# PROPRIETARY/CONFIDENTIAL.  Use of this product is subject to license terms.
+# Copyright 2006 Sun Microsystems, Inc.  All rights reserved.
+#
+
+#
+# NOTE:  The 'test/' in front of each reference to $dest_{inc,lib}_dir is
+# needed so the directory tree structure works out correctly, since the
+# dest_*_dir variables are defined relative to agents/common, which is
+# one level deeper in the tree than am.
+#
+
+d none $PRODUCT_DIR $def_dir_perm
+
+d none $PRODUCT_DIR/include $def_dir_perm
+f none $PRODUCT_DIR/include/am.h=test/$dest_inc_dir/am.h
+f none $PRODUCT_DIR/include/am_auth.h=test/$dest_inc_dir/am_auth.h
+f none $PRODUCT_DIR/include/am_log.h=test/$dest_inc_dir/am_log.h
+f none $PRODUCT_DIR/include/am_map.h=test/$dest_inc_dir/am_map.h
+f none $PRODUCT_DIR/include/am_notify.h=test/$dest_inc_dir/am_notify.h
+f none $PRODUCT_DIR/include/am_policy.h=test/$dest_inc_dir/am_policy.h
+f none $PRODUCT_DIR/include/am_properties.h=test/$dest_inc_dir/am_properties.h
+f none $PRODUCT_DIR/include/am_sso.h=test/$dest_inc_dir/am_sso.h
+f none $PRODUCT_DIR/include/am_string_set.h=test/$dest_inc_dir/am_string_set.h
+f none $PRODUCT_DIR/include/am_types.h=test/$dest_inc_dir/am_types.h
+f none $PRODUCT_DIR/include/am_utils.h=test/$dest_inc_dir/am_utils.h
+f none $PRODUCT_DIR/include/am_web.h=test/$dest_inc_dir/am_web.h
+
+d none $PRODUCT_DIR/lib $def_dir_perm
+f none $PRODUCT_DIR/lib/libamsdk.so.2=test/$dest_lib_dir/libamsdk.so.2 $def_exe_perm
+s none $PRODUCT_DIR/lib/libamsdk.so=libamsdk.so.2 $def_exe_perm
+
+d none $PRODUCT_DIR/samples $def_dir_perm
+d none $PRODUCT_DIR/samples/common $def_dir_perm
+f none $PRODUCT_DIR/samples/common/README.TXT=test/$dest_samples_dir/README.TXT
+f none $PRODUCT_DIR/samples/common/Makefile=test/$dest_samples_dir/samples.mk
+f none $PRODUCT_DIR/samples/common/am_sso_test.c=test/$dest_samples_dir/am_sso_test.c
+f none $PRODUCT_DIR/samples/common/am_auth_test.c=test/$dest_samples_dir/am_auth_test.c
+f none $PRODUCT_DIR/samples/common/am_policy_test.c=test/$dest_samples_dir/am_policy_test.c
+f none $PRODUCT_DIR/samples/common/am_log_test.c=test/$dest_samples_dir/am_log_test.c
+f none $PRODUCT_DIR/samples/common/apache_agent.c=test/$dest_samples_dir/apache_agent.c
+f none $PRODUCT_DIR/samples/common/am_web_agent_test.c=test/$dest_samples_dir/am_web_agent_test.c
+
+d none $PRODUCT_DIR/bin $def_exe_perm
+f none $PRODUCT_DIR/bin/crypt_util=crypt_util $crypt_util_perm
+
+#
+# XML Parser Runtime Library (LibXML2)
+#
+#f none $PRODUCT_DIR/lib/libxml2.so.2=$libxml_lib_dir/libxml2.so.2 $def_exe_perm
+s none $PRODUCT_DIR/lib/libxml2.so=libxml2.so.2 $def_exe_perm
+
+#
+# Links for Agents
+#
+d none $OPT_DIR/SUNWam $def_dir_perm
+d none $OPT_DIR/SUNWam/lib $def_dir_perm
+s none $OPT_DIR/SUNWam/lib/libamsdk.so=libamsdk.so.2 $def_exe_perm
+s none $OPT_DIR/SUNWam/lib/libamsdk.so.2=$BASEDIR/$PRODUCT_DIR/lib/libamsdk.so.2 $def_exe_perm
+s none $OPT_DIR/SUNWam/lib/libxml2.so=libxml2.so.2 $def_exe_perm
+s none $OPT_DIR/SUNWam/lib/libxml2.so.2=$BASEDIR/$PRODUCT_DIR/lib/libxml2.so.2 $def_exe_perm
