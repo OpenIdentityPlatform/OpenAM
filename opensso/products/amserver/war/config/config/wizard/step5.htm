@@ -1,0 +1,172 @@
+<script  type="text/javascript">
+    jQuery(function(){
+
+        if ($.amconfig.site_name == '' && $.amconfig.site_lburl == '') {
+            $.get("$context$path?actionLink=clear");
+        }
+
+        if ($.amconfig.site_lbenable) {
+            $('input:radio[name=lbEnable][value=true]').click();
+            enableLB(true);
+            isValid();
+        } else {
+            $('input:radio[name=lbEnable][value=false]').click();
+            enableLB(false);
+        }
+
+        $("input[name=lbEnable]:radio").click(function() {
+            if ($(this).val() == 'false') {
+                $.amconfig.site_lbenable = false;
+                $("#loadBalancerHostName").val("");
+                $("#loadBalancerPort").val("");
+                enableLB(false);
+                $("#loadBalancerHostNameError").hide();
+                $("#loadBalancerPortError").hide();
+                $.get("$context$path?actionLink=clear");
+            } else {
+                $.amconfig.site_lbenable = true;
+                enableLB(true);
+            }
+        });
+
+        function enableLB(enabled) {
+            if (enabled == true) {
+                $("#loadBalancerHostName").removeAttr("disabled");
+                $("#loadBalancerPort").removeAttr("disabled");
+                $("#loadBalancerHostNameLbl").text('$page.getLocalizedString("site.name.label")*');
+                $("#loadBalancerPortLbl").text('$page.getLocalizedString("primary.url.label")*');
+            } else {
+                $("#loadBalancerHostName").attr("disabled", true);
+                $("#loadBalancerPort").attr("disabled", true);
+                $("#loadBalancerHostNameLbl").text('$page.getLocalizedString("site.name.label")');
+                $("#loadBalancerPortLbl").text('$page.getLocalizedString("primary.url.label")');
+            }
+        }
+
+        function validatePrimaryURL() {
+            return validateFieldValue("$context$path?", "loadBalancerPort", "loadBalancerPortError", {
+                actionLink: 'validateURL',
+                port: $("#loadBalancerPort").val()
+            });
+        }
+
+        function validateSiteName() {
+            return validateFieldValue("$context$path?", "loadBalancerHostName", "loadBalancerHostNameError", {
+                actionLink: 'validateSite',
+                host: $("#loadBalancerHostName").val()
+            });
+        }
+
+        function validateSiteNameJSON() {
+            var retval = false;
+            $("#loadBalancerHostNameError").hide();
+            if ($("#loadBalancerHostName").val()=='') {
+                $("#loadBalancerHostName").after('<div id="loadBalancerHostNameError" class="message"><span class="icon error"></span>Missing Required Field</div>');
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '$context$path?',
+                data: {
+                    actionLink: 'validateSite',
+                    host: $("#loadBalancerHostName").val()
+                },
+                success : function(data) {
+                    var d = jQuery.parseJSON(data);
+                    if (d.valid == 'true') {
+                        $("#loadBalancerHostName").after('<div id="loadBalancerHostNameError" class="message"><span class="icon info"></span>$page.getLocalizedString("ok.string")</div>');
+                        retval = true;
+                    } else {
+                        $("#loadBalancerHostName").after('<div id="loadBalancerHostNameError" class="message"><span class="icon error"></span>'+d.body+'</div>');
+                        retval = false;
+                    }
+                },
+                async:false
+            });
+            return retval;
+        }
+
+        function isValid() {
+            return validateSiteName() && validatePrimaryURL();
+        }
+
+        $("#submit").click(function(){
+            if ($.amconfig.site_lbenable) {
+                if (!isValid()) {
+                    return false;
+                }
+            }
+            if ($.amconfig.add_to_existing) {
+                openWizardConfig("step7");
+            } else {
+                openWizardConfig("step6");
+            }
+        });
+        $("#back").click(function(){
+            if ($.amconfig.add_to_existing) {
+                openWizardConfig("step3");
+            } else {
+                openWizardConfig("step4");
+            }
+        });
+
+        //$('#loadBalancerHostName').val($.amconfig.site_name);
+        $('#loadBalancerHostName').bind('change', function(){
+            $.amconfig.site_name = $(this).val();
+        });
+        //$('#loadBalancerPort').val($.amconfig.site_lburl);
+        $('#loadBalancerPort').bind('change', function(){
+            $.amconfig.site_lburl = $(this).val();
+        });
+
+        $('#loadBalancerHostName').keyup(function() {
+            typewatch(validateSiteName, 500);
+        });
+
+        $('#loadBalancerPort').keyup(function() {
+            typewatch(validatePrimaryURL, 500);
+        });
+    });
+</script>
+<div id="modal" class="box clear-float">
+    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="done">$page.getLocalizedString("general.tab")</li>
+            <li class="done">$page.getLocalizedString("server.tab")</li>
+            <li class="done">$page.getLocalizedString("configuration.tab")</li>
+            <li class="done">$page.getLocalizedString("user.tab")</li>
+            <li class="on">$page.getLocalizedString("site.tab")</li>
+            <li>$page.getLocalizedString("agent.tab")</li>
+            <li>$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <h1>Configuration Options</h1>
+        <h3 class="message no-icon">$page.getLocalizedString("step5.title")</h3>
+        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+        <fieldset>
+            <legend>$page.getLocalizedString("step5.sub.title")</legend>
+            <p>$page.getLocalizedString("step5.description")</p>
+            <div class="row">
+                <div class="radios">
+                    <input type="radio" value="false" name="lbEnable" id="lbEnableNo" #if (!$host && !$port) checked="checked"#{end}/><label for="lbEnableNo">$page.getLocalizedString("no.label")</label>
+                    <input type="radio" value="true" name="lbEnable" id="lbEnableYes" #if ($host || $port) checked="checked"#{end}/><label for="lbEnableYes">$page.getLocalizedString("yes.label")</label>
+                </div>
+            </div>
+            <div class="row">
+                <label id="loadBalancerHostNameLbl" for="loadBalancerHostName">$page.getLocalizedString("site.name.label")</label>
+                <input class="textbox" type="text" id="loadBalancerHostName" value="#if($host)$host#{end}" name="loadBalancerHostName" />
+            </div>
+            <div class="row">
+                <label id="loadBalancerPortLbl" for="loadBalancerPort">$page.getLocalizedString("primary.url.label")</label>
+                <input class="textbox" type="text" id="loadBalancerPort" value="#if($port)$port#{end}" name="loadBalancerPort"/>
+            </div>
+        </fieldset>
+        <div class="row">
+            <input type="button" id="back" class="button" value='$page.getLocalizedString("previous.button")' />
+            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")' />
+            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+        </div>
+    </div>
+</div>

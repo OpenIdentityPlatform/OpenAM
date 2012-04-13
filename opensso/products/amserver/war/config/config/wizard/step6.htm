@@ -1,0 +1,76 @@
+<script  type="text/javascript">
+    jQuery(function() {
+
+        $('#agentPassword').val($.amconfig.pa_password);
+        if ($.amconfig.pa_password != '') {
+            $('#agentConfirm').val($.amconfig.pa_password);
+        }
+        $('#agentPassword').bind('change', function(){
+            $.amconfig.pa_password = $(this).val();
+        });
+
+        function validateAgentPasswords() {
+            return  validateFieldValue("$context$path?", "agentPassword", "agentPasswordError", {
+                actionLink: 'checkPasswords',
+                confirm: $("#agentConfirm").val(),
+                password: $("#agentPassword").val(),
+                otherPassword: $.amconfig.amadmin_password,
+                type: 'agent'
+            });
+        }
+
+        $("#agentPassword").keyup(function () {
+            typewatch(validateAgentPasswords, 500);
+        });
+        $("#agentConfirm").keyup(function () {
+            typewatch(validateAgentPasswords, 500);
+        });
+
+        $("#submit").click(function(){
+            if (validateAgentPasswords()) {
+                openWizardConfig("step7");
+            } else {
+                return false;
+            }
+        });
+        $("#back").click(function(){
+            openWizardConfig("step5");
+        });
+    });
+</script>
+<div id="modal" class="box clear-float">
+    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="done">$page.getLocalizedString("general.tab")</li>
+            <li class="done">$page.getLocalizedString("server.tab")</li>
+            <li class="done">$page.getLocalizedString("configuration.tab")</li>
+            <li class="done">$page.getLocalizedString("user.tab")</li>
+            <li class="done">$page.getLocalizedString("site.tab")</li>
+            <li class="on">$page.getLocalizedString("agent.tab")</li>
+            <li>$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <h1>Configuration Options</h1>
+        <h3 class="message no-icon">$page.getLocalizedString("agent.step.title")</h3>
+        <p>$page.getLocalizedString("agent.step.description")</p>
+        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+        <fieldset>
+            <legend>$page.getLocalizedString("agent.user.name")</legend>
+            <div class="row">
+                <label for="agentPassword">$page.getLocalizedString("password.label")*</label>
+                <input class="textbox" type="password" id="agentPassword" name="agentPassword"  />
+            </div>
+            <div class="row">
+                <label for="agentConfirm">$page.getLocalizedString("confirm.label")*</label>
+                <input class="textbox" type="password" id="agentConfirm" name="agentConfirm"  />
+            </div>
+        </fieldset>
+        <div class="row">
+            <input type="button" id="back" class="button" value='$page.getLocalizedString("previous.button")' />
+            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")'/>
+            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+        </div>
+    </div>
+</div>

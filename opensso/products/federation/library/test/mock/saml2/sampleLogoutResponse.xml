@@ -1,0 +1,60 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: sampleLogoutResponse.xml,v 1.2 2008/06/25 05:48:22 qcheng Exp $
+                                                                                
+-->
+<samlp:LogoutResponse
+    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" 
+    ID="s2bce4ff9358784da21bb21eb966521cedba45e290" 
+    InResponseTo="s25df5dafe64c471dfc0d111b54efae0a1abeb9b2a"
+    Version="2.0"
+    IssueInstant="2005-12-13T02:22:30Z"
+    Destination="http://sp.sun.com/saml2/StatusResonseServlet"
+    Consent="http://sp.sun.com/saml2/ConsentServlet">
+    <saml:Issuer
+	xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+	NameQualifier="test.com"
+	SPNameQualifier="sptest.com"
+	Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+	SPProvidedID="sp1.test.com">
+	oCd/Q2KH7rgOSdX8KiIW54t4EUbC
+    </saml:Issuer>
+    <samlp:Extensions
+	 xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+	 <SAML1Element name="Extension1"/>
+	 <SAML2Element name="Extension2"/>
+    </samlp:Extensions>
+    <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+        <samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+            Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+        </samlp:StatusCode>
+	<samlp:StatusMessage>
+		  Logout Response Successful
+	</samlp:StatusMessage>
+<samlp:StatusDetail xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+         <SAML1Detail name="Detail1" />"
+    </samlp:StatusDetail>
+    </samlp:Status>
+</samlp:LogoutResponse>

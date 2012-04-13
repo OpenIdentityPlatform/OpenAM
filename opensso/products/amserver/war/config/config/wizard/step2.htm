@@ -1,0 +1,127 @@
+<script  type="text/javascript">
+    jQuery(function() {
+        /* disabled while apache-click controls field values
+        $('#serverURL').val($.amconfig.server_url);
+        $('#cookieDomain').val($.amconfig.domain);
+        $('#platformLocale').val($.amconfig.locale);
+        $('#configDirectory').val($.amconfig.config_dir);*/
+
+        $('#serverURL').bind('change', function(){
+            $.amconfig.server_url = $(this).val();
+        });
+        $('#cookieDomain').bind('change', function(){
+            $.amconfig.domain = $(this).val();
+        });
+        $('#platformLocale').bind('change', function(){
+            $.amconfig.locale = $(this).val();
+        });
+        $('#configDirectory').bind('change', function(){
+            $.amconfig.config_dir = $(this).val();
+        });
+
+        function validateServerURL() {
+            return  validateFieldValue("$context$path?", "serverURL", "serverURLError", {
+                actionLink: 'validateInput',
+                key: 'serverURL',
+                value: $("#serverURL").val()
+            });
+        }
+        function validateCookieDomain() {
+            return validateFieldValue("$context$path?", "cookieDomain", "cookieDomainError", {
+                actionLink: 'validateCookieDomain',
+                serverurl: $("#serverURL").val(),
+                domain: $("#cookieDomain").val()
+            });
+        }
+        function validateLocale() {
+            return validateFieldValue("$context$path?", "platformLocale", "platformLocaleError", {
+                actionLink: 'validateInput',
+                key: 'platformLocale',
+                value: $("#platformLocale").val()
+            });
+        }
+        function validateConfigDir() {
+            return validateFieldValue("$context$path?", "configDirectory", "configDirectoryError", {
+                actionLink: 'validateConfigDir',
+                dir: $("#configDirectory").val()
+            });
+        }
+
+        $("#serverURL").keyup(function () {
+            typewatch(validateServerURL, 500);
+        });
+        $("#cookieDomain").keyup(function () {
+            typewatch(validateCookieDomain, 500);
+        });
+        $("#platformLocale").keyup(function () {
+            typewatch(validateLocale, 500);
+        });
+        $("#configDirectory").keyup(function () {
+            typewatch(validateConfigDir, 500);
+        });
+
+        $("#submit").click(function(){
+            if (!isValid()) {
+                return false;
+            }
+            openWizardConfig("step3");
+        });
+
+        function isValid() {
+            if (!validateServerURL() || !validateCookieDomain() || !validateLocale() || !validateConfigDir()) {
+                return false;
+            }
+            return true;
+        }
+
+        $("#back").click(function(){
+            openWizardConfig("step1");
+        });
+
+        isValid();
+    });
+</script>
+<div id="modal" class="box clear-float">
+    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="done">$page.getLocalizedString("general.tab")</li>
+            <li class="on">$page.getLocalizedString("server.tab")</li>
+            <li>$page.getLocalizedString("configuration.tab")</li>
+            <li>$page.getLocalizedString("user.tab")</li>
+            <li>$page.getLocalizedString("site.tab")</li>
+            <li>$page.getLocalizedString("agent.tab")</li>
+            <li>$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <h1>Configuration Options</h1>
+        <h3 class="message no-icon">$page.getLocalizedString("step2.title")</h3>
+        <p>$page.getLocalizedString("step2.description")</p>
+        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+        <fieldset>
+            <legend>$page.getLocalizedString("step2.server.settings")</legend>
+            <div class="row">
+                <label for="serverURL">$page.getLocalizedString("step2.server.url")*</label>
+                <input class="textbox" type="text" id="serverURL" value="$serverURL" name="serverURL"/>
+            </div>
+            <div class="row">
+                <label for="cookieDomain">$page.getLocalizedString("step2.cookie.domain")*</label>
+                <input class="textbox" type="text" id="cookieDomain" value="$cookieDomain" name="cookieDomain"  />
+            </div>
+            <div class="row">
+                <label for="platformLocale">$page.getLocalizedString("step2.platform.locale")*</label>
+                <input class="textbox" type="text" id="platformLocale" value="$platformLocale" name="platformLocale" />
+            </div>
+            <div class="row">
+                <label for="configDirectory">$page.getLocalizedString("step2.config.directory")*</label>
+                <input class="textbox" type="text" id="configDirectory" name="configDirectory" value="$configDirectory" />
+            </div>
+        </fieldset>
+        <div class="row">
+            <input type="button" id="back" class="button" value='$page.getLocalizedString("previous.button")' />
+            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")' />
+            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+        </div>
+    </div>
+</div>

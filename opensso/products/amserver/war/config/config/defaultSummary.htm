@@ -1,0 +1,160 @@
+<script type="text/javascript">
+    jQuery(function(){
+
+        $("#contentd").show();
+        $('#donedmy').show();
+        $('#doned').hide();
+        $('#canceld').hide();
+        $("#progressd").hide();
+
+        $('#defaultAdminPassword').val($.amconfig.amadmin_password);
+        if ($.amconfig.amadmin_password != '') {
+            $('#defaultAdminConfirm').val($.amconfig.amadmin_password);
+        }
+        $('#defaultAdminPassword').bind('change', function(){
+            $.amconfig.amadmin_password = $(this).val();
+        });
+        $('#defaultAgentPassword').val($.amconfig.pa_password);
+        if ($.amconfig.pa_password != '') {
+            $('#defaultAgentConfirm').val($.amconfig.pa_password);
+        }
+        $('#defaultAgentPassword').bind('change', function(){
+            $.amconfig.pa_password = $(this).val();
+        });
+
+        function validateDefaultAdminPasswords() {
+            return  validateFieldValue("$context$path?", "defaultAdminPassword", "defaultAdminPasswordError", {
+                actionLink: 'checkPasswords',
+                confirm: $("#defaultAdminConfirm").val(),
+                password: $("#defaultAdminPassword").val(),
+                otherPassword: $("#defaultAgentPassword").val(),
+                type: 'admin'
+            });
+        }
+
+        function validateDefaultAgentPasswords() {
+            return  validateFieldValue("$context$path?", "defaultAgentPassword", "defaultAgentPasswordError", {
+                actionLink: 'checkPasswords',
+                confirm: $("#defaultAgentConfirm").val(),
+                password: $("#defaultAgentPassword").val(),
+                otherPassword: $("#defaultAdminPassword").val(),
+                type: 'agent'
+            });
+        }
+
+        function createConfig() {
+            $("#setupMessage").text("");
+            $("#contentd").hide();
+            $("#progressd").show();
+            disableClose();
+            var fr1 = window.frames['progressIframe'];
+            if ( fr1 ) {
+                fr1.location = "$context/setup/setSetupProgress";
+            }
+            $.get("$context$path?actionLink=createDefaultConfig",
+            function( data ) {
+                if (data == 'true') {
+                    $('#donedmy').hide();
+                    $('#doned').show();
+                    $('#prgrbr').replaceWith('<h3 class="message no-icon">$page.getLocalizedString("configuration.option1.complete.message")</h3>');
+                } else {
+                    $('#donedmy').hide();
+                    $('#doned').hide();
+                    $('#prgrbr').replaceWith('<h3 class="message no-icon">Configuration error</h3>');
+                    $("#setupMessage").text(data);
+                    $('#canceld').show();
+                }
+            });
+        }
+
+        $("#defaultAdminPassword").keyup(function () {
+            typewatch(validateDefaultAdminPasswords, 500);
+        });
+        $("#defaultAdminConfirm").keyup(function () {
+            typewatch(validateDefaultAdminPasswords, 500);
+        });
+        $("#defaultAgentPassword").keyup(function () {
+            typewatch(validateDefaultAgentPasswords, 500);
+        });
+        $("#defaultAgentConfirm").keyup(function () {
+            typewatch(validateDefaultAgentPasswords, 500);
+        });
+    
+        $("#createDefaultConfig").click(function(){
+            if (!validateDefaultAdminPasswords() || !validateDefaultAgentPasswords()) {
+                return false;
+            }
+            createConfig();
+        });
+
+        $("#doned").click(function(){
+            gotoLoginPage();
+        });
+
+        function disableClose() {
+            $('#closeimg').removeAttr('href');
+            $('#closeimg').removeAttr('onclick').click(function(e) { e.preventDefault(); });
+        }
+
+        $(document).keydown(function(e) {
+            if (e.keyCode == 27) return false;
+        });
+    });
+</script>
+
+<div id="modal" class="box clear-float">
+    <a id="closeimg" class="close" href="javascript:;" onclick="closeDefaultConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="on">$page.getLocalizedString("general.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <div id="contentd">
+            <h1>$page.getLocalizedString("fam.configurator.title")</h1>
+            <h3 class="message no-icon">$page.getLocalizedString("default.config.title")</h3>
+            <p>$page.getLocalizedString("default.config.description")</p>
+            <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+            <fieldset>
+                <legend>$page.getLocalizedString("default.user.name")</legend>
+                <div class="row">
+                    <label for="defaultAdminPassword">$page.getLocalizedString("password.label")*</label>
+                    <input class="textbox" type="password" id="defaultAdminPassword" />
+                </div>
+                <div class="row">
+                    <label for="defaultAdminConfirm">$page.getLocalizedString("confirm.label")*</label>
+                    <input class="textbox" type="password" id="defaultAdminConfirm" />
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>$page.getLocalizedString("agent.user.name")</legend>
+                <div class="row">
+                    <label for="defaultAgentPassword">$page.getLocalizedString("password.label")*</label>
+                    <input class="textbox" type="password" id="defaultAgentPassword" />
+                </div>
+                <div class="row">
+                    <label for="defaultAgentConfirm">$page.getLocalizedString("confirm.label")*</label>
+                    <input class="textbox" type="password" id="defaultAgentConfirm" />
+                </div>
+            </fieldset>
+            <div class="row">
+                <button id="createDefaultConfig" type="button" class="button primary">$page.getLocalizedString("create.button")</button>
+                <input type="button" class="button right" value="Cancel" onclick="closeDefaultConfig();"/>
+            </div>
+        </div>
+        <div id="progressd">
+            <h1>Configuration Progress</h1>
+            <h3 id="prgrbr" class="message no-icon"><img width="640" height="11" src="$context/images/loading.gif" /></h3>
+            <fieldset>
+                <legend>Details</legend>
+                <iframe id="progressIframe" name="progressIframe" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
+                <h4 id="setupMessage"></h4>
+            </fieldset>
+            <div class="row">
+                <input type="submit" id="donedmy" class="button disabled" value="Processing..."/>
+                <input type="submit" id="doned" class="button primary" value='$page.getLocalizedString("go.to.login.screen")'/>
+                <input type="button" id="canceld" class="button right" value="Close" onclick="closeDefaultConfig();"/>
+            </div>
+        </div>
+    </div>
+</div>

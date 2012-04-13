@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE targetset SYSTEM "./targetdatabase.dtd"[
+<!ENTITY admin-guide SYSTEM "../../../target/admin-guide.target.db">
+<!ENTITY agent-install-guide SYSTEM "../../../target/agent-install-guide.target.db">
+<!ENTITY agent-release-notes SYSTEM "../../../target/agent-release-notes.target.db">
+<!ENTITY dev-guide SYSTEM "../../../target/dev-guide.target.db">
+<!ENTITY install-guide SYSTEM "../../../target/install-guide.target.db">
+<!ENTITY reference SYSTEM "../../../target/reference.target.db">
+<!ENTITY release-notes SYSTEM "../../../target/release-notes.target.db">
+]>
+<targetset>
+ <targetsetinfo>Target DB for OpenAM DocBook content, for use with single
+ HTML pages (non-chunked) only.</targetsetinfo>
+ <sitemap>
+  <dir name="doc">
+   <dir name="admin-guide">
+    <dir name="OpenAM-Admin-Guide">
+     <document targetdoc="admin-guide"
+               baseuri="../admin-guide/OpenAM-Admin-Guide.html">
+      &admin-guide;
+     </document>
+    </dir>
+   </dir>
+   <dir name="agent-install-guide">
+    <dir name="OpenAM-Agent-Install-Guide">
+     <document targetdoc="agent-install-guide"
+               baseuri="../agent-install-guide/OpenAM-Agent-Install-Guide.html">
+      &agent-install-guide;
+     </document>
+    </dir>
+   </dir>
+   <dir name="agent-release-notes">
+    <dir name="OpenAM-Agent-Release-Notes">
+     <document targetdoc="agent-release-notes"
+               baseuri="../agent-release-notes/OpenAM-Release-Notes.html">
+      &agent-release-notes;
+     </document>
+    </dir>
+   </dir>
+   <dir name="dev-guide">
+    <dir name="OpenAM-Dev-Guide">
+     <document targetdoc="dev-guide"
+               baseuri="../dev-guide/OpenAM-Dev-Guide.html">
+      &dev-guide;
+     </document>
+    </dir>
+   </dir>
+   <dir name="install-guide">
+    <dir name="OpenAM-Install-Guide">
+     <document targetdoc="install-guide"
+               baseuri="../install-guide/OpenAM-Install-Guide.html">
+      &install-guide;
+     </document>
+    </dir>
+   </dir>
+   <dir name="reference">
+    <dir name="OpenAM-Reference">
+     <document targetdoc="reference"
+               baseuri="../reference/OpenAM-Reference.html">
+      &reference;
+     </document>
+    </dir>
+   </dir>
+   <dir name="release-notes">
+    <dir name="OpenAM-Release-Notes">
+     <document targetdoc="release-notes"
+               baseuri="../release-notes/OpenAM-Release-Notes.html">
+      &release-notes;
+     </document>
+    </dir>
+   </dir>
+  </dir>
+ </sitemap>
+</targetset>

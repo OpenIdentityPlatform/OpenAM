@@ -1,0 +1,74 @@
+<script type="text/javascript">
+    var configOption = 0;
+    
+    function setOption(inOption) {
+        configOption = inOption;
+        jQuery.get("$context$path?actionLink=resetSessionAttributes", onSetOption);
+    }
+
+    function onSetOption(response) {
+        if (configOption == 1) {
+            openDefaultConfig();
+        } else if (configOption == 2) {
+            openWizardConfig("step1");
+        } else if (configOption == 3) {
+            openUpgradeConfig();
+        }
+    }    
+
+</script>
+
+<div class="grid_4 suffix_8">
+    <a class="logo" href="$context"></a>
+</div>
+<div id="ctrid" class="box #if ($upgradeCompleted) box-spaced #end clear-float">
+    <div class="grid_3">
+        <div class="product-logo"></div>
+    </div>
+    <div class="grid_9">
+        <div class="box-content clear-float">
+            #if ($upgradeCompleted)
+            <div class="message">
+                <span class="icon info"></span>
+                <h3>$page.getLocalizedString("upgrade.restart.container")</h3>
+            </div>
+            #elseif ($upgrade)
+            <h1>$page.getLocalizedString("upgrade.available")</h1>
+            <p class="message"><span class="icon info"></span>$page.getLocalizedString("upgrade.available.option")</p>
+            #else
+            <h1>$page.getLocalizedString("configuration.options.title")</h1>
+            <p class="message"><span class="icon info"></span>$page.getLocalizedString("configuration.options.subtitle")</p>
+            #end
+            <ul class="content-strips">
+                #if ($upgradeCompleted)
+                #elseif ($upgrade)
+                <li class="clear-float">
+                    <h3>$page.getLocalizedString("upgrade.title")</h3>
+                    <div>
+                        $page.getLocalizedString("upgrade.description")
+                        <a id="upgradeLink" href="javascript:;" class="button primary" onclick="setOption(3);">$page.getLocalizedString("upgrade.link")</a>
+                    </div>
+                </li>
+                #else
+                <li class="clear-float">
+                    <h3>$page.getLocalizedString("configuration.options.option1.title")</h3>
+                    <div>
+                        <p>$page.getLocalizedString("configuration.options.option1.description")</p>
+                        <a id="DemoConfiguration" href="javascript:;" class="button primary" onclick="setOption(1);">$page.getLocalizedString("configuration.options.option1.link")</a>
+                    </div>
+                </li>
+                #end
+                #if ($upgrade || $upgradeCompleted)
+                #else
+                <li class="clear-float">
+                    <h3>$page.getLocalizedString("configuration.options.option2.title")</h3>
+                    <div>
+                        <p>$page.getLocalizedString("configuration.options.option2.description")</p>
+                        <a id="CreateNewConf" href="javascript:;" class="button primary" onclick="setOption(2);">$page.getLocalizedString("configuration.options.option2.link")</a>
+                    </div>
+                </li>
+                #end
+            </ul>
+        </div>
+    </div>
+</div>

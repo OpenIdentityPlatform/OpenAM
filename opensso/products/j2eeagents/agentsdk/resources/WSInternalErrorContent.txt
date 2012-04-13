@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <soap:Body>
+      <soap:Fault>
+         <soap:faultcode>soap:Server</soap:faultcode>
+         <soap:faultstring>Internal Server Error: am.filter.ws.end.point</soap:faultstring>
+      </soap:Fault>
+   </soap:Body>
+</soap:Envelope>

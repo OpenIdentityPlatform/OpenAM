@@ -1,0 +1,66 @@
+ <test name="CSDKAuthTestADRole">
+        <parameter name="testModule" value="ad"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestNTRole">
+        <parameter name="testModule" value="nt"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestJDBCRole">
+        <parameter name="testModule" value="jdbc"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestRadiusRole">
+        <parameter name="testModule" value="radius"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test>
+    <test name="CSDKAuthTestUnixRole">
+        <parameter name="testModule" value="unix"/>
+        <parameter name="testMode" value="role"/>
+         <parameter name="testModeNo" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKAuthTest"/>
+        </classes>
+    </test> 
+

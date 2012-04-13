@@ -1,0 +1,223 @@
+    <test name="IdSvcs">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsREST"/> 
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsSOAP"/> 
+        </classes>
+    </test>    
+    <test name="IdSvcs_create_group_5">
+        <parameter name="testNumber" value="5"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    
+    <test name="IdSvcs_search_group_6">
+        <parameter name="testNumber" value="6"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_read_group_7">
+        <parameter name="testNumber" value="7"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_update_group_8">
+        <parameter name="testNumber" value="8"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/> 
+        </classes>
+    </test>
+    <test name="IdSvcs_delete_group_9">
+        <parameter name="testNumber" value="9"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_create_role_10">
+        <parameter name="testNumber" value="10"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_search_role_11">
+        <parameter name="testNumber" value="11"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_read_role_12">
+        <parameter name="testNumber" value="12"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_update_role_13">
+        <parameter name="testNumber" value="13"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/> 
+        </classes>
+    </test>
+    <test name="IdSvcs_delete_role_14">
+        <parameter name="testNumber" value="14"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_create_filteredrole_15">
+        <parameter name="testNumber" value="15"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_search_filteredrole_16">
+        <parameter name="testNumber" value="16"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_read_filteredrole_17">
+        <parameter name="testNumber" value="17"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_update_filteredrole_18">
+        <parameter name="testNumber" value="18"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>
+    <test name="IdSvcs_delete_filteredrole_19">
+        <parameter name="testNumber" value="19"/>
+    	<parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentityREST"/>
+            <class name="com.sun.identity.qatest.idsvcs.IdSvcsTestIdentitySOAP"/>
+        </classes>
+    </test>    
+    

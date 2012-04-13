@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+ The contents of this file are subject to the terms
+ of the Common Development and Distribution License
+ (the License). You may not use this file except in
+ compliance with the License.
+
+ You can obtain a copy of the License at
+ https://opensso.dev.java.net/public/CDDLv1.0.html or
+ opensso/legal/CDDLv1.0.txt
+ See the License for the specific language governing
+ permission and limitations under the License.
+
+ When distributing Covered Code, include this CDDL
+ Header Notice in each file and include the License file
+ at opensso/legal/CDDLv1.0.txt.
+ If applicable, add the following below the CDDL Header,
+ with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
+
+ $Id: amAuthInfocard.xml,v 1.4 2009/10/28 08:35:25 ppetitsm Exp $
+ 
+ Copyright 2008 Sun Microsystems Inc. All Rights Reserved
+ Portions Copyrighted 2008 Patrick Petit Consulting
+-->
+
+<!DOCTYPE ServicesConfiguration
+PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+"jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthInfocardService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/aMAuthInfocardService"
+            i18nFileName="amAuthInfocard"
+            revisionNumber="1"
+            i18nKey="iplanet-am-auth-infocard-service-description">
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-infocard-min-password-length"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a99">
+                    <DefaultValues>
+                        <Value>8</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-default-user-name"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a100">
+                    <DefaultValues>
+                        <Value>anonymous</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-default-roles"
+                                 type="list"
+                                 syntax="dn"
+                                 i18nKey="a101">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-default-user-status"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a102">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>Active</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-invalid-chars"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="">
+                    <DefaultValues>
+                        <Value>*|(|)|&amp;|!</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-keyStorePassword"
+                                 type="single"
+                                 syntax="password"
+                                 i18nKey="a104">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-keyStoreAlias"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>s1as</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-issuer"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a110">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-issuerPolicy"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a113">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-requiredClaims"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a111">
+                    <DefaultValues>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-check-requiredClaims"
+                   type="single"
+                   syntax="boolean"
+                   i18nKey="a125">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-optionalClaims"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a112">
+                    <DefaultValues>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-privacyUrl"
+                                 type="single"
+                                 syntax="url"
+                                 i18nKey="a115">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-privacyVersion"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a114">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-tokenType"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a116">
+                    <DefaultValues>
+                        <Value>urn:oasis:names:tc:SAML:1.0:assertion</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-verificationMethod"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a118">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-check-verificationMethod"
+                   type="single"
+                   syntax="boolean"
+                   i18nKey="a127">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-audience-url"
+                    type="single"
+                    syntax="url"
+                    i18nKey="a122">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-creation-attr-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a124">
+                    <DefaultValues>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname|givenname</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname|sn</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress|mail</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress|postaladdress</Value>
+                        <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone|telephonenumber</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-infocard-role-to-plugin-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a128">
+                    <DefaultValues>
+                        <Value>COME_OF_AGE_ROLE_DN|com.identarian.infocard.opensso.rp.rcheck.ComeOfAge</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="iplanet-am-auth-infocard-min-password-length"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a99">
+                        <DefaultValues>
+                            <Value>8</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-default-user-name"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a100">
+                        <DefaultValues>
+                            <Value>anonymous</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-default-roles"
+                                 type="list"
+                                 syntax="dn"
+                                 i18nKey="a101">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-default-user-status"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a102">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>Active</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a103">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-invalid-chars"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="">
+                        <DefaultValues>
+                            <Value>*|(|)|&amp;|!</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-keyStorePassword"
+                                 type="single"
+                                 syntax="password"
+                                 i18nKey="a104">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-keyStoreAlias"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a105">
+                        <DefaultValues>
+                            <Value>s1as</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-issuer"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a110">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-issuerPolicy"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a113">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-requiredClaims"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a111">
+                        <DefaultValues>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/privatepersonalidentifier</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-check-requiredClaims"
+                   type="single"
+                   syntax="boolean"
+                   i18nKey="a125">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-optionalClaims"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a112">
+                        <DefaultValues>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/stateorprovince</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/otherphone</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/dateofbirth</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/gender</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/webpage</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-privacyUrl"
+                                 type="single"
+                                 syntax="url"
+                                 i18nKey="a115">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-privacyVersion"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a114">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-tokenType"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a116">
+                        <DefaultValues>
+                            <Value>urn:oasis:names:tc:SAML:1.0:assertion</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-verificationMethod"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a118">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-check-verificationMethod"
+                   type="single"
+                   syntax="boolean"
+                   i18nKey="a127">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-audience-url"
+                    type="single"
+                    syntax="url"
+                    i18nKey="a122">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-creation-attr-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a124">
+                        <DefaultValues>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname|givenname</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname|sn</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress|mail</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/streetaddress|postaladdress</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/locality|localityname</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/postalcode|postalcode</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country|countryname</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/homephone|telephonenumber</Value>
+                            <Value>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone|mobile</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-infocard-role-to-plugin-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a128">
+                        <DefaultValues>
+                            <Value>COME_OF_AGE|com.identarian.infocard.opensso.rp.rcheck.ComeOfAge</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+        <Configuration>
+            <OrganizationConfiguration name="/">
+                <AttributeValuePair>
+                    <Attribute name="iplanet-am-auth-infocard-keyStorePassword"/>
+                    <Value>changeit</Value>
+                </AttributeValuePair>
+            </OrganizationConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>

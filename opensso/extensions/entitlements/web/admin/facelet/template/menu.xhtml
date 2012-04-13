@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: menu.xhtml,v 1.29 2009/08/03 22:25:32 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+    <ice:menuBar
+        orientation="horizontal"
+        styleClass="menu">
+        <ice:menuItem
+            action="home"
+            value="#{resources['menu.homeItemValue']}"/>
+        <ice:menuItem
+            rendered="#{permissionsBean.policyAllowed}"
+            value="#{resources['menu.policyItemValue']}"
+            action="policy">
+            <ice:menuItem
+                rendered="#{permissionsBean.policyAllowed}"
+                value="#{resources['menu.policiesItemValue']}">
+                <ice:menuItem
+                    rendered="#{permissionsBean.policyCreateAllowed}"
+                    value="#{resources['menu.policyCreateItemValue']}"
+                    action="#{policyCreateWizardHandler.createAction}"/>
+                <ice:menuItem
+                    rendered="#{permissionsBean.policyManageAllowed}"
+                    value="#{resources['menu.policyManageItemValue']}"
+                    action="policy-manage"/>
+            </ice:menuItem>
+            <ice:menuItem
+                rendered="#{o:size(realmsBean.realmBeans) &gt; 1}"
+                value="#{resources['menu.referralsItemValue']}">
+                <ice:menuItem
+                    rendered="#{permissionsBean.referralCreateAllowed &amp;&amp; o:size(realmsBean.realmBeans) &gt; 1}"
+                    value="#{resources['menu.referralCreateItemValue']}"
+                    action="#{referralCreateWizardHandler.createAction}"/>
+                <ice:menuItem
+                    rendered="#{permissionsBean.referralManageAllowed &amp;&amp; o:size(realmsBean.realmBeans) &gt; 1}"
+                    value="#{resources['menu.referralManageItemValue']}"
+                    action="referral-manage"/>
+            </ice:menuItem>
+            <ice:menuItem
+                value="#{resources['menu.applicationsItemValue']}">
+                <ice:menuItem
+                    rendered="#{permissionsBean.applicationCreateAllowed}"
+                    value="#{resources['menu.applicationCreateItemValue']}"
+                    action="application-create"/>
+            </ice:menuItem>
+        </ice:menuItem>
+        <ice:menuItem
+            rendered="#{permissionsBean.federationAllowed}"
+            value="#{resources['menu.federationItemValue']}"
+            action="federation">
+            <ice:menuItem
+                rendered="#{permissionsBean.samlV2HostedIdpCreateAllowed}"
+                value="#{resources['menu.federationSamlV2HostedIdpCreateItemValue']}"
+                action="samlv2-hosted-idp-create"/>
+            <ice:menuItem
+                rendered="#{permissionsBean.samlV2RemoteIdpCreateAllowed}"
+                value="#{resources['menu.federationSamlV2RemoteIdpCreateItemValue']}"
+                action="samlv2-remote-idp-create"/>
+            <ice:menuItem
+                rendered="#{permissionsBean.samlV2HostedSpCreateAllowed}"
+                value="#{resources['menu.federationSamlV2HostedSpCreateItemValue']}"
+                action="samlv2-hosted-sp-create"/>
+            <ice:menuItem
+                rendered="#{permissionsBean.samlV2RemoteSpCreateAllowed}"
+                value="#{resources['menu.federationSamlV2RemoteSpCreateItemValue']}"
+                action="samlv2-remote-sp-create"/>
+        </ice:menuItem>
+        <ice:menuItem
+            rendered="#{permissionsBean.webServiceSecurityAllowed}"
+            value="#{resources['menu.webServiceSecurityItemValue']}"
+            action="wss">
+            <ice:menuItem
+                rendered="#{permissionsBean.webServiceSecurityCreateAllowed}"
+                value="#{resources['menu.webServiceSecurityCreateItemValue']}"
+                action="wss-create" />
+            <ice:menuItem
+                rendered="#{permissionsBean.stsCreateAllowed}"
+                value="#{resources['menu.stsCreateItemValue']}"
+                action="sts-create" />
+        </ice:menuItem>
+    </ice:menuBar>
+</span>

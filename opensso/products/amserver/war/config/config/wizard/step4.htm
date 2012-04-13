@@ -1,0 +1,369 @@
+<script  type="text/javascript">
+    jQuery(function(){
+
+        $("#submit").click(function(){
+            if (!isValid()) {
+                return false;
+            }
+            openWizardConfig("step5");
+        });
+
+        $("#back").click(function(){
+            openWizardConfig("step3");
+        });
+
+        function isValid() {
+            if ($.amconfig.user_store_local == false) {
+                if ($.amconfig.ustore_type == 'LDAPv3ForADDC') {
+                    if (!validateUserStoreDomainName() || !validateADUserStoreLoginId() || !validateADUserStorePassword() || !validateUMDomainName(false)) return false;
+                } else {
+                    if (!validateUserStoreSSL() || !validateUserStoreHost() || !validateUserStorePort()
+                        || !validateUserStoreRootSuffix() || !validateUserStoreLoginId() || !validateUserStorePassword() || !validateUMHost(false)) return false;
+                }
+            }
+            return true;
+        }
+
+        function checkConnection(validator) {
+            if (validator()) {
+                if ($.amconfig.user_store_local === false) {
+                    if ($.amconfig.ustore_type === 'LDAPv3ForADDC') {
+                        if ($('#userStoreDomainName').val() && $('#ADuserStoreLoginId').val() && $('#ADuserStorePassword').val()) {
+                            validateUMDomainName(true);
+                        }
+                    } else {
+                        if ($('#userStoreHost').val() && $('#userStorePort').val() && $('#userStoreRootSuffix').val() && $('#userStoreLoginId').val() && $('#userStorePassword').val()) {
+                            validateUMHost(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        function validateUserStoreSSL() {
+            var value = ($.amconfig.ustore_ssl) ? "SSL" : "SIMPLE";
+            return validateFieldValue("$context$path?", "userStoreSSL", "userStoreSSLError", {
+                actionLink: 'setSSL',
+                ssl: value
+            });
+        }
+
+        function validateADUserStoreSSL() {
+            var value = ($.amconfig.ustore_adssl) ? "SSL" : "SIMPLE";
+            return validateFieldValue("$context$path?", "ADuserStoreSSL", "ADuserStoreSSLError", {
+                actionLink: 'setSSL',
+                ssl: value
+            });
+        }
+
+        function validateUserStoreDomainName() {
+            return validateFieldValue("$context$path?", "userStoreDomainName", "userStoreDomainNameError", {
+                actionLink: 'setDomainName',
+                domainname: $("#userStoreDomainName").val()
+            });
+        }
+
+        function validateADUserStoreLoginId() {
+            return validateFieldValue("$context$path?", "ADuserStoreLoginId", "ADuserStoreLoginIdError", {
+                actionLink: 'setLoginID',
+                dn: $("#ADuserStoreLoginId").val()
+            });
+        }
+
+        function validateADUserStorePassword() {
+            return validateFieldValue("$context$path?", "ADuserStorePassword", "ADuserStorePasswordError", {
+                actionLink: 'setPassword',
+                password: $("#ADuserStorePassword").val()
+            });
+        }
+
+        function validateUserStoreHost() {
+            return validateFieldValue("$context$path?", "userStoreHost", "userStoreHostError", {
+                actionLink: 'setHost',
+                host: $("#userStoreHost").val()
+            });
+        }
+
+        function validateUserStorePort() {
+            return validateFieldValue("$context$path?", "userStorePort", "userStorePortError", {
+                actionLink: 'setPort',
+                port: $("#userStorePort").val()
+            });
+        }
+
+        function validateUserStoreRootSuffix() {
+            return validateFieldValue("$context$path?", "userStoreRootSuffix", "userStoreRootSuffixError", {
+                actionLink: 'setRootSuffix',
+                rootsuffix: $("#userStoreRootSuffix").val()
+            });
+        }
+
+        function validateUserStoreLoginId() {
+            return validateFieldValue("$context$path?", "userStoreLoginId", "userStoreLoginIdError", {
+                actionLink: 'setLoginID',
+                dn: $("#userStoreLoginId").val()
+            });
+        }
+
+        function validateUserStorePassword() {
+            return validateFieldValue("$context$path?", "userStorePassword", "userStorePasswordError", {
+                actionLink: 'setPassword',
+                password: $("#userStorePassword").val()
+            });
+        }
+
+        function validateUMDomainName(async) {
+            return validateField("$context$path?", "userStoreDomainName", "userStoreDomainNameError", {
+                actionLink: 'validateUMDomainName'
+            }, async);
+        }
+
+        function validateUMHost(async) {
+            return validateField("$context$path?", "userStoreHost", "userStoreHostError", {
+                actionLink: 'validateUMHost'
+            }, async);
+        }
+
+        if ($.amconfig.user_store_local) {
+            $('input:radio[name=userStoreCustom][value=false]').click();
+            $("#openam").show();
+            $("#other").hide();
+            $.get("$context$path?actionLink=setUMEmbedded");
+        } else {
+            $('input:radio[name=userStoreCustom][value=true]').click();
+            $("#other").show();
+            $("#openam").hide();
+            $.get("$context$path?actionLink=resetUMEmbedded");
+        }
+        //local or external instance
+        $("input[name=userStoreCustom]:radio").click(function() {
+            if ($(this).val() == 'true') {
+                $.amconfig.user_store_local = false;
+                $("#other").show();
+                $("#openam").hide();
+                $.get("$context$path?actionLink=resetUMEmbedded");
+            } else {
+                $.amconfig.user_store_local = true;
+                $("#openam").show();
+                $("#other").hide();
+                $.get("$context$path?actionLink=setUMEmbedded");
+            }
+        });
+
+        $('input:radio[name=userStoreType][value='+$.amconfig.ustore_type+']').click();
+
+        //active directory in domain name mode
+        if ($.amconfig.ustore_type == 'LDAPv3ForADDC') {
+            $("#addn").show();
+            $("#noaddn").hide();
+        } else {
+            $("#noaddn").show();
+            $("#addn").hide();
+        }
+        $("input[name=userStoreType]:radio").click(function() {
+            $.amconfig.ustore_type = $(this).val();
+            if ($(this).val() == 'LDAPv3ForADDC') {
+                $("#addn").show();
+                $("#noaddn").hide();
+            } else {
+                $("#noaddn").show();
+                $("#addn").hide();
+            }
+            isValid();
+        });
+
+        if ($.amconfig.ustore_ssl) {
+            $('input[name=userStoreSSL]').attr('checked', true);
+        } else {
+            $('input[name=userStoreSSL]').attr('checked', false);
+        }
+        $('#userStoreSSL').bind('click', function(){
+            if ($('input[name=userStoreSSL]').is(':checked')) {
+                $.amconfig.ustore_ssl = true;
+            } else {
+                $.amconfig.ustore_ssl = false;
+            }
+        });
+        if ($.amconfig.ustore_adssl) {
+            $('input[name=ADuserStoreSSL]').attr('checked', true);
+        } else {
+            $('input[name=ADuserStoreSSL]').attr('checked', false);
+        }
+        $('#ADuserStoreSSL').bind('click', function(){
+            if ($('input[name=ADuserStoreSSL]').is(':checked')) {
+                $.amconfig.ustore_adssl = true;
+            } else {
+                $.amconfig.ustore_adssl = false;
+            }
+        });
+
+        //$('#userStoreHost').val($.amconfig.ustore_dname);
+        $('#userStoreHost').bind('change', function(){
+            $.amconfig.ustore_dname = $(this).val();
+        });
+        //$('#userStorePort').val($.amconfig.ustore_port);
+        $('#userStorePort').bind('change', function(){
+            $.amconfig.ustore_port = $(this).val();
+        });
+        //$('#userStoreRootSuffix').val($.amconfig.ustore_rsfx);
+        $('#userStoreRootSuffix').bind('change', function(){
+            $.amconfig.ustore_rsfx = $(this).val();
+        });
+        //$('#userStoreLoginId').val($.amconfig.ustore_user);
+        $('#userStoreLoginId').bind('change', function(){
+            $.amconfig.ustore_user = $(this).val();
+        });
+        $('#userStorePassword').val($.amconfig.ustore_pass);
+        $('#userStorePassword').bind('change', function(){
+            $.amconfig.ustore_pass = $(this).val();
+        });
+        $('#ADuserStoreLoginId').val($.amconfig.ustore_aduser);
+        $('#ADuserStoreLoginId').bind('change', function(){
+            $.amconfig.ustore_aduser = $(this).val();
+        });
+        $('#ADuserStorePassword').val($.amconfig.ustore_adpass);
+        $('#ADuserStorePassword').bind('change', function(){
+            $.amconfig.ustore_adpass = $(this).val();
+
+        });
+        $('#userStoreDomainName').val($.amconfig.ustore_addn);
+        $('#userStoreDomainName').bind('change', function(){
+            $.amconfig.ustore_addn = $(this).val();
+        });
+
+        $("#userStoreHost").keyup(function () {
+            typewatch(function(){checkConnection(validateUserStoreHost)}, 500);
+        });
+        $("#userStorePort").keyup(function () {
+            typewatch(function(){checkConnection(validateUserStorePort)}, 500);
+        });
+        $("#userStoreRootSuffix").keyup(function () {
+            typewatch(function(){checkConnection(validateUserStoreRootSuffix)}, 500);
+        });
+        $("#userStoreLoginId").keyup(function () {
+            typewatch(function(){checkConnection(validateUserStoreLoginId)}, 500);
+        });
+        $("#userStorePassword").keyup(function () {
+            typewatch(function(){checkConnection(validateUserStorePassword)}, 500);
+        });
+        $("#ADuserStoreLoginId").keyup(function () {
+            typewatch(function(){checkConnection(validateADUserStoreLoginId)}, 500);
+        });
+        $("#ADuserStorePassword").keyup(function () {
+            typewatch(function(){checkConnection(validateADUserStorePassword)}, 500);
+        });
+        $("#userStoreDomainName").keyup(function () {
+            typewatch(function(){checkConnection(validateUserStoreDomainName)}, 500);
+        });
+
+        $("input[name=userStoreType]:radio").click(function() {
+            var callUrl = "$context$path?actionLink=setStoreType";
+            $.get(callUrl + "&type=" + $(this).val());
+        });
+
+        isValid();
+    });
+</script>
+<div id="modal" class="box clear-float">
+    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="done">$page.getLocalizedString("general.tab")</li>
+            <li class="done">$page.getLocalizedString("server.tab")</li>
+            <li class="done">$page.getLocalizedString("configuration.tab")</li>
+            <li class="on">$page.getLocalizedString("user.tab")</li>
+            <li>$page.getLocalizedString("site.tab")</li>
+            <li>$page.getLocalizedString("agent.tab")</li>
+            <li>$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <h1>Configuration Options</h1>
+        <h3 class="message no-icon">$page.getLocalizedString("step4.title")</h3>
+        <p>$page.getLocalizedString("step4.description")</p>
+        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+        <fieldset>
+            <legend>User Store</legend>
+            <div class="row">
+                <div class="radios">
+                    <input type="radio" value="false" id="userStoreDefault" name="userStoreCustom"/><label for="userStoreDefault">$page.getLocalizedString("configurator.embedded")</label>
+                    <input type="radio" value="true" id="userStoreCustom" name="userStoreCustom" checked/><label for="userStoreCustom">$page.getLocalizedString("configurator.remote")</label>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset id="openam">
+            <legend>User Store Details</legend>
+            <div class="message">
+                <span class="icon info"></span>
+                <h3>$page.getLocalizedString("embedded.user.message")</h3>
+            </div>
+        </fieldset>
+        <fieldset id="other">
+            <legend>User Store Details</legend>
+            <div class="row">
+                <label>$page.getLocalizedString("store.type.label")*</label>
+                <div class="radios">
+                    <input type="radio" id="ldapv3sunds" value="LDAPv3ForSUNDS" name="userStoreType" $selectLDAPv3sunds/><label for="ldapv3sunds">$page.getLocalizedString("sunds.ldap.schema")</label>
+                    <input type="radio" id="ldapv3ad" value="LDAPv3ForAD" name="userStoreType" $selectLDAPv3ad/><label for="ldapv3ad">$page.getLocalizedString("activedirectory.ldap.schema")</label>
+                    <input type="radio" id="ldapv3adam" value="LDAPv3ForADAM" name="userStoreType" $selectLDAPv3adam/><label for="ldapv3adam">$page.getLocalizedString("adam.ldap.schema")</label>
+                    <input type="radio" id="ldapv3opends" value="LDAPv3ForOpenDS" name="userStoreType" $selectLDAPv3opends/><label for="ldapv3opends">$page.getLocalizedString("opends.ldap.schema")</label>
+                    <input type="radio" id="ldapv3adforDomainName" value="LDAPv3ForADDC" name="userStoreType" $selectLDAPv3addc/><label for="ldapv3adforDomainName">$page.getLocalizedString("activedirectoryfordomainname.ldap.schema")</label>
+                    <input type="radio" id="ldapv3tivoli" value="LDAPv3ForTivoli" name="userStoreType" $selectLDAPv3tivoli/><label for="ldapv3tivoli">$page.getLocalizedString("tivoli.ldap.schema")</label>
+                </div>
+            </div>
+            <div id="addn">
+                <div class="row">
+                    <label for="ADuserStoreSSL">$page.getLocalizedString("directory.ssl.label")*</label>
+                    <div class="checkbox">
+                        <input type="checkbox" id="ADuserStoreSSL" name="ADuserStoreSSL" value="SSL" $selectADUserStoreSSL/>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="userStoreDomainName">$page.getLocalizedString("domain.name.label")*</label>
+                    <input class="textbox" type="text" id="userStoreDomainName" name="userStoreDomainName" />
+                </div>
+                <div class="row">
+                    <label for="ADuserStoreLoginId">$page.getLocalizedString("login.id.label")*</label>
+                    <input class="textbox" type="text" id="ADuserStoreLoginId" name="ADuserStoreLoginId" />
+                </div>
+                <div class="row">
+                    <label for="ADuserStorePassword">$page.getLocalizedString("password.label")*</label>
+                    <input class="textbox" type="password" id="ADuserStorePassword" name="ADuserStorePassword"  />
+                </div>
+            </div>
+            <div id="noaddn">
+                <div class="row">
+                    <label for="userStoreSSL">$page.getLocalizedString("directory.ssl.label")*</label>
+                    <div class="checkbox">
+                        <input type="checkbox" id="userStoreSSL" name="userStoreSSL" value="SSL" $selectUserStoreSSL/>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="userStoreHost">$page.getLocalizedString("directory.name.label")*</label>
+                    <input class="textbox" type="text" id="userStoreHost" name="userStoreHost" value="$userStoreHost"/>
+                </div>
+                <div class="row">
+                    <label for="userStorePort">$page.getLocalizedString("port.label")*</label>
+                    <input class="textbox short" type="text" id="userStorePort" name="userStorePort" value="$userStorePort"/>
+                </div>
+                <div class="row">
+                    <label for="userStoreRootSuffix">$page.getLocalizedString("root.suffix.label")*</label>
+                    <input class="textbox" type="text" id="userStoreRootSuffix" name="userStoreRootSuffix" value="$userStoreRootSuffix"/>
+                </div>
+                <div class="row">
+                    <label for="userStoreLoginId">$page.getLocalizedString("login.id.label")*</label>
+                    <input class="textbox" type="text" id="userStoreLoginId" name="userStoreLoginId"  value="$userStoreLoginId" />
+                </div>
+                <div class="row">
+                    <label for="userStorePassword">$page.getLocalizedString("password.label")*</label>
+                    <input class="textbox" type="password" id="userStorePassword" name="userStorePassword"  />
+                </div>
+            </div>
+        </fieldset>
+        <div class="row">
+            <input type="button" id="back" class="button" value='$page.getLocalizedString("previous.button")' />
+            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")' />
+            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+        </div>
+    </div>
+</div>

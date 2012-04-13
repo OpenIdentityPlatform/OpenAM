@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: webex-config-questions.xhtml,v 1.1 2009/12/08 01:47:14 babysunil Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['webex-create.step1PanelDetails']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['webex-configuration.ssotype.section-textde']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+            <ice:outputLabel
+                value="#{resources['webex-configuration.ssotype.section-details']}"/>
+            <ice:panelGrid>
+                <ice:selectOneRadio
+                    layout="pageDirection"
+                    id="sporidpinicheck"
+                    partialSubmit="false"
+                    value="#{webExConfigWizardBean.spInit}">
+                    <f:selectItem
+                        id="spinicheck" itemValue="true"
+                        itemLabel="#{resources['webex-configuration.ssotype.sp.initiated']}"/>
+                    <f:selectItem
+                        id="idpinicheck" itemValue="false"
+                        itemLabel="#{resources['webex-configuration.ssotype.idp.initiated']}"/>
+                </ice:selectOneRadio>
+            </ice:panelGrid>
+
+            <ice:panelGrid>
+                <ice:outputLabel
+                    value="#{resources['webex-configuration.slo.section-details']}"/>
+
+                <ice:panelGroup>
+                    <ice:selectOneRadio
+                        layout="pageDirection"
+                        id="ssoonlycheck"
+                        partialSubmit="true"
+                        value="#{webExConfigWizardBean.ssoonly}">
+                        <f:selectItem
+                            id="signauth" itemValue="true"
+                            itemLabel="#{resources['webex-configuration.ssotype.ssoonly.initiated']}"/>
+                        <f:selectItem
+                            id="nosignauth" itemValue="false"
+                            itemLabel="#{resources['webex-configuration.ssotype.ssoslo.initiated']}"/>
+                    </ice:selectOneRadio>
+                </ice:panelGroup>
+            </ice:panelGrid>
+            <ice:panelGrid>
+                <ice:outputLabel
+                    value="#{resources['webex-configuration.signauthn.section-details']}"/>
+                <ice:panelGroup>
+                    <ice:selectOneRadio
+                        layout="pageDirection"
+                        id="signornotauthn"
+                        partialSubmit="true"
+                        value="#{webExConfigWizardBean.authnReq}">
+                        <f:selectItem id="signauth" itemValue="true"
+                           itemLabel="#{resources['webex-configuration.ssotype.yes.initiated']}"/>
+                        <f:selectItem id="nosignauth" itemValue="false"
+                           itemLabel="#{resources['webex-configuration.ssotype.no.initiated']}"/>
+                    </ice:selectOneRadio>
+                </ice:panelGroup>
+
+                <ice:panelGroup
+                    visible="#{webExConfigWizardBean.authnReq}">
+                    <ice:outputText
+                        value="#{resources['webex-configuration.nosignauthn.text']}"/>
+                </ice:panelGroup>
+               
+                <ice:panelGroup
+                    visible="#{webExConfigWizardBean.authnReq}">
+                    <ice:inputFile
+                        id="spcert"
+                        submitOnUpload="postUpload"
+                        actionListener="#{wizardHandler.spcertFileUploadListener}"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:outputText value="#{webExConfigWizardBean.spCertFilename}"/>
+                </ice:panelGroup>
+            </ice:panelGrid>
+            <ice:panelGrid>
+                <ice:outputLabel
+                    value="#{resources['webex-configuration.auto.section-details']}"/>
+                <ice:panelGroup>
+                    <ice:selectOneRadio
+                        layout="pageDirection"
+                        id="autocreatecheck"
+                        partialSubmit="true"
+                        value="#{webExConfigWizardBean.autocrup}">
+                        <f:selectItem id="autooption" itemValue="true"
+                           itemLabel="#{resources['webex-configuration.ssotype.yes.initiated']}"/>
+                        <f:selectItem id="noautooption" itemValue="false"
+                           itemLabel="#{resources['webex-configuration.ssotype.no.initiated']}"/>
+                    </ice:selectOneRadio>
+                </ice:panelGroup>
+            </ice:panelGrid>
+        </ui:define>
+
+    </o:section>
+
+</span>

@@ -1,0 +1,260 @@
+<html>
+    <head>
+        <title>$title</title>
+        <link href="$context/css/new_style.css" rel="stylesheet" type="text/css" />
+        <!--[if IE 9]> <link href="$context/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <!--[if lte IE 7]> <link href="$context/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <script type="text/javascript" src="$context/js/jquery.js"></script>
+        <script type="text/javascript" src="$context/js/jquery-ui.js"></script>
+        <script  type="text/javascript">
+
+            $.amconfig = {};
+
+            function clearVars() {
+                $.amconfig.amadmin_password = "";
+                $.amconfig.pa_password = "";
+                $.amconfig.server_url = "";
+                $.amconfig.domain = "";
+                $.amconfig.locale = "";
+                $.amconfig.config_dir = "";
+                $.amconfig.add_to_existing = false;
+
+                $.amconfig.config_store_local = true;
+                $.amconfig.config_ssl = false;
+                $.amconfig.config_host = "";
+                $.amconfig.config_port = "";
+                $.amconfig.config_aport = "";
+                $.amconfig.config_jmx = "";
+                $.amconfig.config_key = "";
+                $.amconfig.config_rsfx = "";
+                $.amconfig.config_user = "";
+                $.amconfig.config_pass = "";
+                $.amconfig.config_surl = "";
+
+                $.amconfig.user_store_local = false;
+                $.amconfig.ustore_type = "LDAPv3ForOpenDS";
+                $.amconfig.ustore_ssl = false;
+                $.amconfig.ustore_dname = "";
+                $.amconfig.ustore_port = "";
+                $.amconfig.ustore_rsfx = "";
+                $.amconfig.ustore_user = "";
+                $.amconfig.ustore_pass = "";
+                $.amconfig.ustore_adssl = false;
+                $.amconfig.ustore_addn = "";
+                $.amconfig.ustore_aduser = "";
+                $.amconfig.ustore_adpass = "";
+
+                $.amconfig.ustore_lcprt = "";
+                $.amconfig.ustore_lcaprt = "";
+                $.amconfig.ustore_lcrprt = "";
+                $.amconfig.ustore_lcjprt = "";
+                $.amconfig.ustore_lceprt = "";
+                $.amconfig.ustore_lcerpt = "";
+                $.amconfig.ustore_eshost = "";
+                $.amconfig.ustore_esport = "";
+
+                $.amconfig.site_name = "";
+                $.amconfig.site_lburl = "";
+                $.amconfig.site_lbenable = false;
+            }
+
+            var typewatch = function(){
+                var timer = 0;
+                return function(callback, ms){
+                    clearTimeout (timer);
+                    timer = setTimeout(callback, ms);
+                }
+            }();
+
+            String.prototype.startsWith = function(str)
+            {return (this.match("^"+str)==str)}
+
+            function getLocale() {
+                var queryString = window.top.location.search.substring(1);
+                var locale = 'locale=';
+                var localeValue = '';
+                if (queryString.length > 0) {
+                    var idx = queryString.indexOf(locale);
+                    if (idx != -1) {
+                        idx += locale.length;
+                        var idx1 = queryString.indexOf('&', idx);
+                        if (idx1 == -1) {
+                            idx1 = queryString.length;
+                        }
+                        localeValue = queryString.substring (idx, idx1);
+                    }
+                }
+                return locale + localeValue;
+            }
+
+            function windowSizeOK() {
+                var w = $(window).width();
+                var h = $(window).height();
+                if (w < 900 || h < 726) {
+                    return false;
+                }
+                return true;
+            }
+
+            function openDefaultConfig() {
+                $("#defaultSummaryContainer").load('$context/config/defaultSummary.htm?'+ getLocale()).dialog({
+                    modal:true,
+                    resizable: false,
+                    closeText: '',
+                    draggable: false,
+                    closeOnEscape: false,
+                    beforeClose: function(event, ui) {
+                        $("body").css({ overflow: 'inherit' });
+                    },
+                    open: function() {
+                        if (windowSizeOK()) $("body").css({ overflow: 'hidden' });
+                        $(this).position({
+                            my: "left top",
+                            at: "left top",
+                            offset: "25 -25",
+                            of: "#ctrid"
+                        });
+                    }
+                });
+            }
+
+            function closeDefaultConfig() {
+                clearVars();
+                $("#defaultSummaryContainer").dialog("close");
+            }
+
+            function openWizardConfig(step) {
+                if ($.amconfig.add_to_existing && (step == 'step4' || step == 'step6')) return;
+                $("#wizardContainer").load('$context/config/wizard/'+step+'.htm?'+ getLocale()).dialog({
+                    modal:true,
+                    resizable: false,
+                    closeText: '',
+                    draggable: false,
+                    closeOnEscape: false,
+                    beforeClose: function(event, ui) {
+                        $("body").css({ overflow: 'inherit' });
+                    },
+                    open: function() {
+                        if (windowSizeOK()) $("body").css({ overflow: 'hidden' });
+                        $(this).position({
+                            my: "left top",
+                            at: "left top",
+                            offset: "25 -25",
+                            of: "#ctrid"
+                        });
+                    }
+                });
+            }
+
+            function closeWizardConfig() {
+                clearVars();
+                $("#wizardContainer").dialog("close");
+            }
+
+            function openUpgradeConfig() {
+                $("#upgradeContainer").load('$context/config/upgrade/upgrade.htm?'+ getLocale()).dialog({
+                    modal:true,
+                    resizable: false,
+                    closeText: '',
+                    draggable: false,
+                    closeOnEscape: false,
+                    beforeClose: function(event, ui) {
+                        $("body").css({ overflow: 'inherit' });
+                    },
+                    open: function() {
+                        if (windowSizeOK()) $("body").css({ overflow: 'hidden' });
+                        $(this).position({
+                            my: "left top",
+                            at: "left top",
+                            offset: "25 -25",
+                            of: "#ctrid"
+                        });
+                    }
+                });
+            }
+
+            function closeUpgradeConfig() {
+                clearVars();
+                $("#upgradeContainer").dialog("close");
+            }
+
+            function gotoLoginPage() {
+                this.location.replace("$context");
+            }
+
+            function validateFieldValueLocal(field, errorfield) {
+                var fv = $('#'+field).val();
+                if (fv == '') {
+                    if ($('#'+errorfield).is(":visible")==false) {
+                        $('#'+field).after('<div id="'+errorfield+'" class="message"><span class="icon error"></span>Invalid value</div>');
+                    }
+                    return false;
+                } else $('#'+errorfield).hide();
+                return true;
+            }
+
+            function validateFieldValue(url, field, errorfield, postdata) {
+                return validateField(url, field, errorfield, postdata, false);
+            }
+
+            function validateFieldValueAsync(url, field, errorfield, postdata) {
+                return validateField(url, field, errorfield, postdata, true);
+            }
+
+            function validateField(url, field, errorfield, postdata, async) {
+                var result = false;
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: postdata,
+                    success : function(data) {
+                        if (data === 'ok' || data === 'true') {
+                            if ($('#'+errorfield).is(":visible")) {
+                                $('#'+errorfield).replaceWith('<div id="'+errorfield+'" class="message"><span class="icon info"></span>$page.getLocalizedString("ok.string")</div>');
+                            } else {
+                                $('#'+field).after('<div id="'+errorfield+'" class="message"><span class="icon info"></span>$page.getLocalizedString("ok.string")</div>');
+                            }
+                            result = true;
+                        } else if (data.startsWith('warning')) {
+                            if ($('#'+errorfield).is(":visible")) {
+                                $('#'+errorfield).replaceWith('<div id="'+errorfield+'" class="message"><span class="icon info"></span>'+data.substring(7)+'</div>');
+                            } else {
+                                $('#'+field).after('<div id="'+errorfield+'" class="message"><span class="icon info"></span>'+data.substring(7)+'</div>');
+                            }
+                            result = true;
+                        } else {
+                            if ($('#'+errorfield).is(":visible")) {
+                                $('#'+errorfield).replaceWith('<div id="'+errorfield+'" class="message"><span class="icon error"></span>'+data+'</div>');
+                            } else {
+                                $('#'+field).after('<div id="'+errorfield+'" class="message"><span class="icon error"></span>'+data+'</div>');
+                            }
+                            result = false;
+                        }
+                    },
+                    async: async
+                });
+                return result;
+
+            }
+
+            $(function() {
+                clearVars();
+            });
+        </script>
+    </head>
+    <body>
+        <div id="maincntr" class="container_12">
+            #parse($path)
+            <div id="defaultSummaryContainer"></div>
+            <div id="wizardContainer"></div>
+            <div id="upgradeContainer"></div>
+            <div class="footer alt-color">
+                <div class="grid_6 suffix_3">
+                    <p>$page.getLocalizedString("product.copyrights")</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+

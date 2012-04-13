@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: referral-create.xhtml,v 1.6 2009/06/10 20:59:07 farble1670 Exp $
+
+-->
+
+<ui:composition
+    template="template/page.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ui:define name="panel-title">
+        <ice:outputText value="#{resources['referral-create.panelTitle']}" />
+    </ui:define>
+    <ui:define name="panel-details">
+        <ice:outputText value="#{resources['referral-create.panelDetails']}" />
+    </ui:define>
+    <ui:define name="panel-body">
+        <o:wizard
+            steps="#{referralCreateWizardBean.steps}"
+            wizardHandler="#{referralCreateWizardHandler}"
+            wizardBean="#{referralCreateWizardBean}">
+            <ui:define name="wizard-steps">
+                <o:wstep
+                    step="0"
+                    label="#{referralCreateWizardBean.namePanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/referral-name.xhtml">
+                            <ui:param
+                                name="referralNameBean"
+                                value="#{referralCreateWizardBean}"/>
+                            <ui:param
+                                name="referralNameHandler"
+                                value="#{referralCreateWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="1"
+                    label="#{referralCreateWizardBean.resourcesPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/referral-resources.xhtml">
+                            <ui:param
+                                name="referralResourcesBean"
+                                value="#{referralCreateWizardBean}"/>
+                            <ui:param
+                                name="referralResourcesHandler"
+                                value="#{referralCreateWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="2"
+                    label="#{referralCreateWizardBean.subjectsPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/referral-subjects.xhtml">
+                            <ui:param
+                                name="referralSubjectsBean"
+                                value="#{referralCreateWizardBean}"/>
+                            <ui:param
+                                name="referralSubjectsHandler"
+                                value="#{referralCreateWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+                <o:wstep
+                    step="3"
+                    label="#{referralCreateWizardBean.summaryPanelLabel}">
+                    <ui:define name="wizard-step-body">
+                        <ui:include src="template/referral-summary.xhtml">
+                            <ui:param
+                                name="referralSummaryBean"
+                                value="#{referralCreateWizardBean}"/>
+                            <ui:param
+                                name="referralSummaryHandler"
+                                value="#{referralCreateWizardHandler}"/>
+                        </ui:include>
+                    </ui:define>
+                </o:wstep>
+            </ui:define>
+        </o:wizard>
+    </ui:define>
+</ui:composition>

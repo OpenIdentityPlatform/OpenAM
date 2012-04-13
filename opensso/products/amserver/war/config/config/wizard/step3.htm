@@ -1,0 +1,556 @@
+<script  type="text/javascript">
+    jQuery(function(){
+
+        var embedded = true;
+
+        $("#existingHost").keyup(function () {
+            typewatch(validateServerURL, 500);
+        });
+
+        $("#replicationPorts").hide();
+        $("#existingLDAP").hide();
+
+        if ($.amconfig.add_to_existing) {
+            $('input:radio[name=existingInstance][value=true]').click();
+            $("#fif").hide();
+            $("#eif").show();
+            $.get("$context$path?actionLink=setReplication&multi=enable");
+            $("#replicationPorts").hide();
+            $("#existingLDAP").hide();
+        } else {
+            $('input:radio[name=existingInstance][value=false]').click();
+            $("#fif").show();
+            $("#eif").hide();
+            $.get("$context$path?actionLink=setReplication&multi=disable");
+            $("#replicationPorts").hide();
+            $("#existingLDAP").hide();
+        }
+
+        if ($.amconfig.config_store_local) {
+            $('input:radio[name=configStoreCustom][value=false]').click();
+            $.get("$context$path?actionLink=setConfigType&type=embedded");
+            enableCustomStore(false);
+            $("#openam").show();
+            $("#opendj").hide();
+        } else {
+            $('input:radio[name=configStoreCustom][value=true]').click();
+            $.get("$context$path?actionLink=setConfigType&type=remote");
+            enableCustomStore(true);
+            $("#opendj").show();
+            $("#openam").hide();
+            isValid();
+        }
+
+        if ($.amconfig.config_ssl) {
+            $('input[name=configStoreSSL]').attr('checked', true);
+        } else {
+            $('input[name=configStoreSSL]').attr('checked', false);
+        }
+        $('#configStoreSSL').bind('click', function(){
+            if ($('input[name=configStoreSSL]').is(':checked')) {
+                $.amconfig.config_ssl = true;
+            } else {
+                $.amconfig.config_ssl = false;
+            }
+        });
+
+        function checkConnection(validator) {
+            if (validator()) {
+                if (!$.amconfig.add_to_existing && !$.amconfig.config_store_local) {
+                    if ($('#configStoreHost').val() && $('#configStorePort').val() && $('#configStoreLoginId').val() && $('#configStorePassword').val() && $('#rootSuffix').val()) {
+                        validateSMHost(true);
+                    }
+                }
+            }
+        }
+
+        //$('#configStoreHost').val($.amconfig.config_host);
+        $('#configStoreHost').bind('change', function(){
+            $.amconfig.config_host = $(this).val();
+        });
+        //$('#configStorePort').val($.amconfig.config_port);
+        $('#configStorePort').bind('change', function(){
+            $.amconfig.config_port = $(this).val();
+        });
+        //$('#configStoreAdminPort').val($.amconfig.config_aport);
+        $('#configStoreAdminPort').bind('change', function(){
+            $.amconfig.config_aport = $(this).val();
+        });
+        //$('#configStoreJmxPort').val($.amconfig.config_jmx);
+        $('#configStoreJmxPort').bind('change', function(){
+            $.amconfig.config_jmx = $(this).val();
+        });
+        //$('#encryptionKey').val($.amconfig.config_key);
+        $('#encryptionKey').bind('change', function(){
+            $.amconfig.config_key = $(this).val();
+        });
+        //$('#rootSuffix').val($.amconfig.config_rsfx);
+        $('#rootSuffix').bind('change', function(){
+            $.amconfig.config_rsfx = $(this).val();
+        });
+        //$('#configStoreLoginId').val($.amconfig.config_user);
+        $('#configStoreLoginId').bind('change', function(){
+            $.amconfig.config_user = $(this).val();
+        });
+        $('#configStorePassword').val($.amconfig.config_pass);
+        $('#configStorePassword').bind('change', function(){
+            $.amconfig.config_pass = $(this).val();
+        });
+        $('#existingHost').val($.amconfig.config_surl);
+        $('#existingHost').bind('change', function(){
+            $.amconfig.config_surl = $(this).val();
+        });
+        //$('#localConfigPort').val($.amconfig.ustore_lcprt);
+        $('#localConfigPort').bind('change', function(){
+            $.amconfig.ustore_lcprt = $(this).val();
+        });
+        //$('#localConfigAdminPort').val($.amconfig.ustore_lcaprt);
+        $('#localConfigAdminPort').bind('change', function(){
+            $.amconfig.ustore_lcaprt = $(this).val();
+        });
+        //$('#localRepPort').val($.amconfig.ustore_lcrprt);
+        $('#localRepPort').bind('change', function(){
+            $.amconfig.ustore_lcrprt = $(this).val();
+        });
+        //$('#localConfigJmxPort').val($.amconfig.ustore_lcjprt);
+        $('#localConfigJmxPort').bind('change', function(){
+            $.amconfig.ustore_lcjprt = $(this).val();
+        });
+        //$('#existingPort').val($.amconfig.ustore_lceprt);
+        $('#existingPort').bind('change', function(){
+            $.amconfig.ustore_lceprt = $(this).val();
+        });
+        //$('#existingRepPort').val($.amconfig.ustore_lcerpt);
+        $('#existingRepPort').bind('change', function(){
+            $.amconfig.ustore_lcerpt = $(this).val();
+        });
+        //$('#existingStoreHost').val($.amconfig.ustore_eshost);
+        $('#existingStoreHost').bind('change', function(){
+            $.amconfig.ustore_eshost = $(this).val();
+        });
+        //$('#existingStorePort').val($.amconfig.ustore_esport);
+        $('#existingStorePort').bind('change', function(){
+            $.amconfig.ustore_esport = $(this).val();
+        });
+
+        $('#configStoreHost').keyup(function() {
+            typewatch(function(){checkConnection(validateConfigStoreHost)}, 500);
+        });
+        $('#configStorePort').keyup(function() {
+            typewatch(function(){checkConnection(validatePort)}, 500);
+        });
+        $('#rootSuffix').keyup(function() {
+            typewatch(function(){checkConnection(validateRootSuffix)}, 500);
+        });
+        $('#configStoreLoginId').keyup(function() {
+            typewatch(function(){checkConnection(validateConfigStoreLoginId)}, 500);
+        });
+        $('#configStorePassword').keyup(function() {
+            typewatch(function(){checkConnection(validateConfigStorePassword)}, 500);
+        });
+
+        $("#submit").click(function(){
+            if (!isValid()) {
+                return false;
+            }
+            if ($.amconfig.add_to_existing) {
+                openWizardConfig("step5");
+            } else {
+                openWizardConfig("step4");
+            }
+        });
+        $("#back").click(function(){
+            openWizardConfig("step2");
+        });
+
+        function isValid() {
+            if ($.amconfig.add_to_existing) {
+                if (validateServerURL()) {
+                    if (embedded) {
+                        if (!validateLocalConfigPort() || !validateLocalConfigAdminPort() || !validateLocalConfigJmxPort() || !validateLocalRepPort()) {
+                            return false;
+                        }
+                    } else {
+                        if (!validateExistingPort() || !validateExistingRepPort()) {
+                            return false;
+                        }
+                    }
+                } else return false;
+            } else {
+                if ($.amconfig.config_store_local) {
+                    if (!validatePort() || !validateAdminPort() || !validateJmxPort() || !validateEncKey()
+                        || !validateConfigStoreSSL() || !validateConfigStoreHost() || !validateRootSuffix()) {
+                        return false;
+                    }
+                } else {
+                    if (!validateConfigStoreHost() || !validatePort() || !validateEncKey() || !validateConfigStoreLoginId() || !validateConfigStorePassword() || !validateConfigStoreSSL() || !validateRootSuffix() || !validateSMHost(false)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        $("input[name=existingInstance]:radio").click(function() {
+            if ($(this).val() == 'false') {
+                $.amconfig.add_to_existing = false;
+                $("#fif").show();
+                $("#eif").hide();
+                $.get("$context$path?actionLink=setReplication&multi=disable");
+            } else {
+                $.amconfig.add_to_existing = true;
+                $("#eif").show();
+                $("#fif").hide();
+                $.get("$context$path?actionLink=setReplication&multi=enable");
+            }
+        });
+
+        $("input[name=configStoreCustom]:radio").click(function() {
+            if ($(this).val() == 'false') {
+                $.amconfig.config_store_local = true;
+                $("#openam").show();
+                $("#opendj").hide();
+                enableCustomStore(false);
+                $.get("$context$path?actionLink=setConfigType&type=embedded");
+            } else {
+                $.amconfig.config_store_local = false;
+                $("#opendj").show();
+                $("#openam").hide();
+                enableCustomStore(true);
+                $.get("$context$path?actionLink=setConfigType&type=remote");
+                isValid();
+            }
+        });
+
+        function enableCustomStore(enabled) {
+            if (enabled == true) {
+                $("#configStoreSSL").removeAttr("disabled");
+                $("#configStoreHost").removeAttr("disabled");
+            } else {
+                $("input[name=configStoreSSL]").attr('checked', false);
+                $("#configStoreHost").val("localhost");
+                $.amconfig.config_ssl = false;
+                $("#configStoreSSL").attr("disabled", "disabled");
+                $("#configStoreHost").attr("disabled", "disabled");
+            }
+        }
+
+        function validateConfigStoreHost() {
+            return validateFieldValue("$context$path?", "configStoreHost", "configStoreHostError", {
+                actionLink: 'validateConfigStoreHost',
+                configStoreHost: $("#configStoreHost").val()
+            });
+        }
+
+        function validatePort() {
+            return validateFieldValue("$context$path?", "configStorePort", "configStorePortError", {
+                actionLink: 'validateLocalPort',
+                port: $("#configStorePort").val()
+            });
+        }
+
+        function validateAdminPort() {
+            return validateFieldValue("$context$path?", "configStoreAdminPort", "configStoreAdminPortError", {
+                actionLink: 'validateLocalAdminPort',
+                port: $("#configStoreAdminPort").val()
+            });
+        }
+
+        function validateJmxPort() {
+            return validateFieldValue("$context$path?", "configStoreJmxPort", "configStoreJmxPortError", {
+                actionLink: 'validateLocalJmxPort',
+                port: $("#configStoreJmxPort").val()
+            });
+        }
+
+        function validateEncKey() {
+            return validateFieldValue("$context$path?", "encryptionKey", "encryptionKeyError", {
+                actionLink: 'validateEncKey',
+                encKey: $("#encryptionKey").val()
+            });
+        }
+
+        function validateConfigStoreSSL() {
+            var value = $.amconfig.config_ssl ? "SSL" : "SIMPLE";
+            return validateFieldValue("$context$path?", "configStoreSSL", "configStoreSSLError", {
+                actionLink: 'validateInput',
+                key: 'configStoreSSL',
+                value: value
+            });
+        }
+
+        function validateRootSuffix() {
+            return validateFieldValue("$context$path?", "rootSuffix", "rootSuffixError", {
+                actionLink: 'validateRootSuffix',
+                rootSuffix: $("#rootSuffix").val()
+            });
+        }
+
+        function validateConfigStoreLoginId() {
+            return validateFieldValue("$context$path?", "configStoreLoginId", "configStoreLoginIdError", {
+                actionLink: 'validateInput',
+                key: 'configStoreLoginId',
+                value: $("#configStoreLoginId").val()
+            });
+        }
+
+        function validateConfigStorePassword() {
+            return validateFieldValue("$context$path?", "configStorePassword", "configStorePasswordError", {
+                actionLink: 'validateInput',
+                key: 'configStorePassword',
+                value: $("#configStorePassword").val()
+            });
+        }
+
+        function validateServerURL() {
+            $('#svrerr').hide();
+            if ($("#existingHost").val()=='') {
+                $('#existingHost').after('<div id="svrerr" class="message"><span class="icon error"></span>Missing Required Field</div>');
+                return false;
+            }
+            var retval = false;
+            $.ajax({
+                type: 'POST',
+                url: '$context$path?',
+                data: {
+                    actionLink: 'validateHostName',
+                    hostName: $("#existingHost").val()
+                },
+                success : function(data) {
+                    var message = "";
+                    try {
+                        console.log(data);
+                        var d = jQuery.parseJSON(data);
+                        if (d.code == '100') {
+                            $("#existingPort").val(d.existingPort);
+                            $("#existingPort").attr("disabled", true);
+                            if (d.embedded == 'true') {
+                                embedded = true;
+                                $("#replicationPorts").show();
+                                $("#existingLDAP").hide();
+                                if (d.replication == "true") {
+                                    $("#existingRepPort").attr("disabled", true);
+                                    message = '<h4 id="replicationMessage">$page.getQuoteEscapedLocalizedString("existing.port.values.replication")</h4>';
+                                } else {
+                                    $("#existingRepPort").removeAttr("disabled");
+                                    message='<h4 id="replicationMessage">$page.getQuoteEscapedLocalizedString("existing.port.values.noreplication")</h4>';
+                                }
+                                $("#replicationMessage").replaceWith(message);
+                                $("#existingRepPort").val(d.replicationPort);
+                                retval = true;
+                            } else {
+                                embedded = false;
+                                $("#existingLDAP").show();
+                                $("#replicationPorts").hide();
+                                $("#existingStoreHost").attr("disabled", true);
+                                $("#existingStorePort").attr("disabled", true);
+                                $("#existingStoreHost").val(d.existingStoreHost);
+                                $("#existingStorePort").val(d.existingStorePort);
+                                retval = true;
+                            }
+                        } else {
+                            $('#existingHost').after('<div id="svrerr" class="message"><span class="icon error"></span>'+d.message+'</div>');
+                            retval = false;
+                        }
+                    } catch(err){
+                        $('#existingHost').after('<div id="svrerr" class="message"><span class="icon error"></span>Server URL is not valid</div>');
+                        retval = false;
+                    }
+                },
+                async:false
+            });
+            return retval;
+        }
+
+        function validateLocalConfigPort() {
+            return validateFieldValue("$context$path?", "localConfigPort", "localConfigPortError", {
+                actionLink: 'validateLocalPort',
+                port: $("#localConfigPort").val()
+            });
+        }
+
+        function validateLocalConfigAdminPort() {
+            return validateFieldValue("$context$path?", "localConfigAdminPort", "localConfigAdminPortError", {
+                actionLink: 'validateLocalAdminPort',
+                port: $("#localConfigAdminPort").val()
+            });
+        }
+
+        function validateLocalConfigJmxPort() {
+            return validateFieldValue("$context$path?", "localConfigJmxPort", "localConfigJmxPortError", {
+                actionLink: 'validateLocalJmxPort',
+                port: $("#localConfigJmxPort").val()
+            });
+        }
+
+        function validateLocalRepPort() {
+            return validateFieldValue("$context$path?", "localRepPort", "localRepPortError", {
+                actionLink: 'validateInput',
+                key: 'localRepPort',
+                value: $("#localRepPort").val()
+            });
+        }
+
+        function validateExistingPort() {
+            return validateFieldValue("$context$path?", "existingPort", "existingPortError", {
+                actionLink: 'validateInput',
+                key: 'existingPort',
+                value: $("#existingPort").val()
+            });
+        }
+
+        function validateExistingRepPort() {
+            field = "existingRepPort";
+            return validateFieldValue("$context$path?", "existingRepPort", "existingRepPortError", {
+                actionLink: 'validateInput',
+                key: 'existingRepPort',
+                value: $("#existingRepPort").val()
+            });
+        }
+
+        function validateSMHost(async) {
+             return validateField("$context$path?", "configStoreHost", "configStoreHostError", {
+                 actionLink: 'validateSMHost'
+             }, async);
+        }
+
+        isValid();
+    });
+</script>
+<div id="modal" class="box clear-float">
+    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="done">$page.getLocalizedString("general.tab")</li>
+            <li class="done">$page.getLocalizedString("server.tab")</li>
+            <li class="on">$page.getLocalizedString("configuration.tab")</li>
+            <li>$page.getLocalizedString("user.tab")</li>
+            <li>$page.getLocalizedString("site.tab")</li>
+            <li>$page.getLocalizedString("agent.tab")</li>
+            <li>$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <h1>Configuration Options</h1>
+        <h3 class="message no-icon">$page.getLocalizedString("step3.title")</h3>
+        <p>$page.getLocalizedString("step3.description")</p>
+        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+        <fieldset>
+            <legend>Configuration Store</legend>
+            <div class="row">
+                <div class="radios">
+                    <input type="radio" value="false" name="existingInstance" id="existingNo" $selectFirstSetup/><label for="existingNo">$page.getLocalizedString("create.new.instance")</label>
+                    <input type="radio" value="true" name="existingInstance" id="existingYes" $selectExistingSetup/><label for="existingYes">$page.getLocalizedString("add.existing.instance")</label>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset id="fif">
+            <legend>Configuration Store Details </legend>
+            <div class="row">
+                <label>Configuration Data Store*</label>
+                <div class="radios">
+                    <input type="radio" value="false" name="configStoreCustom" id="configStoreDefault" $selectEmbedded/><label for="configStoreDefault">$page.getLocalizedString("step3.embedded.option")</label>
+                    <input type="radio" value="true" name="configStoreCustom" id="configStoreCustom" $selectExternal/><label for="configStoreCustom">$page.getLocalizedString("step3.external.option")</label>
+                </div>
+            </div>
+            <div class="row">
+                <label for="configStoreSSL">$page.getLocalizedString("ssl.label")*</label>
+                <div class="checkbox">
+                    <input type="checkbox" id="configStoreSSL" name="configStoreSSL" value="SSL" $selectConfigStoreSSL/>
+                </div>
+            </div>
+            <div class="row">
+                <label for="configStoreHost">$page.getLocalizedString("host.name.label")*</label>
+                <input class="textbox" type="text" id="configStoreHost" name="configStoreHost" value="$configStoreHost" />
+            </div>
+            <div class="row">
+                <label for="configStorePort">$page.getLocalizedString("port.label")*</label>
+                <input class="textbox short" type="text" id="configStorePort" name="configStorePort" value="$configStorePort" />
+            </div>
+            <div id="openam">
+                <div class="row">
+                    <label for="configStoreAdminPort">$page.getLocalizedString("admin.port.label")*</label>
+                    <input class="textbox short" type="text" id="configStoreAdminPort" name="configStoreAdminPort" value="$configStoreAdminPort" />
+                </div>
+                <div class="row">
+                    <label for="configStoreJmxPort">$page.getLocalizedString("jmx.port.label")*</label>
+                    <input class="textbox short" type="text" id="configStoreJmxPort" name="configStoreJmxPort" value="$configStoreJmxPort" />
+                </div>
+            </div>
+            <div id="opendj">
+                <div class="row">
+                    <label for="configStoreLoginId">$page.getLocalizedString("login.id.label")*</label>
+                    <input class="textbox" type="text" id="configStoreLoginId" name="configStoreLoginId" value="$configStoreLoginId"/>
+                </div>
+                <div class="row">
+                    <label for="configStorePassword">$page.getLocalizedString("password.label")*</label>
+                    <input class="textbox" type="password" id="configStorePassword" name="configStorePassword" value="#if($store.password)$store.password#{end}" />
+                </div>
+            </div>
+            <div class="row">
+                <label for="encryptionKey">$page.getLocalizedString("step2.encr.key")*</label>
+                <input class="textbox" type="text" id="encryptionKey" name="encryptionKey" value="$encryptionKey"/>
+            </div>
+            <div class="row">
+                <label for="rootSuffix">$page.getLocalizedString("root.suffix.label")*</label>
+                <input class="textbox" type="text" id="rootSuffix" name="rootSuffix" value="$rootSuffix"  />
+            </div>
+        </fieldset>
+        <fieldset id="eif">
+            <legend>Configuration Store Details </legend>
+            <div class="row">
+                <label for="existingHost">$page.getLocalizedString("host.url.label")*</label>
+                <input class="textbox" type="text" id="existingHost" name="existingHost"/>
+            </div>
+            <div class="row">
+                <label>&nbsp;</label>
+                <p>$page.getLocalizedString("url.server.help")<p>
+            </div>
+            <div id="replicationPorts">
+                <h4>$page.getLocalizedString("local.port.values")</h4><br/>
+                <div class="row">
+                    <label for="localConfigPort">$page.getLocalizedString("local.port.label")*</label>
+                    <input class="textbox short" type="text" id="localConfigPort" name="localConfigPort" value="$localConfigPort" />
+                </div>
+                <div class="row">
+                    <label for="localConfigAdminPort">$page.getLocalizedString("admin.port.label")*</label>
+                    <input class="textbox short" type="text" id="localConfigAdminPort" name="localConfigAdminPort" value="$localConfigAdminPort" />
+                </div>
+                <div class="row">
+                    <label for="localRepPort">$page.getLocalizedString("replication.port.label")*</label>
+                    <input class="textbox short" type="text" id="localRepPort" name="localRepPort" value="$localRepPort" />
+                </div>
+                <div class="row">
+                    <label for="localConfigJmxPort">$page.getLocalizedString("jmx.port.label")*</label>
+                    <input class="textbox short" type="text" id="localConfigJmxPort" name="localConfigJmxPort" value="$localConfigJmxPort" />
+                </div>
+                <h4 id="replicationMessage"></h4><br/>
+                <div class="row">
+                    <label for="existingPort">$page.getLocalizedString("existing.port.label")*</label>
+                    <input class="textbox short" type="text" id="existingPort" name="existingPort" value="$existingPort" />
+                </div>
+                <div class="row">
+                    <label for="existingRepPort">$page.getLocalizedString("existing.replication.port")*</label>
+                    <input class="textbox short" type="text" id="existingRepPort" name="existingRepPort" value="$existingRepPort" />
+                </div>
+            </div>
+            <div id="existingLDAP">
+                <h4>$page.getLocalizedString("existing.port.values.external")</h4><br/>
+                <div class="row">
+                    <label for="existingStoreHost">$page.getLocalizedString("existing.ldap.label")*</label>
+                    <input class="textbox" type="text" id="existingStoreHost" name="existingStoreHost" value="$existingStoreHost" />
+                </div>
+                <div class="row">
+                    <label for="existingStorePort">$page.getLocalizedString("port.label")*</label>
+                    <input class="textbox short" type="text" id="existingStorePort" name="existingStorePort" value="$existingStorePort" />
+                </div>
+            </div>
+
+        </fieldset>
+        <div class="row">
+            <input type="button" id="back" class="button" value='$page.getLocalizedString("previous.button")' />
+            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")' />
+            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+        </div>
+    </div>
+</div>

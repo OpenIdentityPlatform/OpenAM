@@ -1,0 +1,15 @@
+#!/bin/sh
+
+CLASSPATH=config:built/classes:../../products/federation/library/built/classes:../../products/federation/library/resources/locale:../../products/shared/built/classes:../../products/amserver/built/classes
+
+EXTLIB_DIR=../../products/extlib
+
+for i in $EXTLIB_DIR/*.jar
+do
+    CLASSPATH=${CLASSPATH}:$i
+done
+
+
+#DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=7007"
+
+java ${DEBUG} -Dcom.sun.identity.systemconfiguration=com.sun.identity.configuration.FedLibSystemProperties -classpath ${CLASSPATH} LEPStart $@

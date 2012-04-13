@@ -1,0 +1,1329 @@
+<!--
+ The contents of this file are subject to the terms
+ of the Common Development and Distribution License
+ (the License). You may not use this file except in
+ compliance with the License.
+
+ You can obtain a copy of the License at
+ https://opensso.dev.java.net/public/CDDLv1.0.html or
+ opensso/legal/CDDLv1.0.txt
+ See the License for the specific language governing
+ permission and limitations under the License.
+
+ When distributing Covered Code, include this CDDL
+ Header Notice in each file and include the License file
+ at opensso/legal/CDDLv1.0.txt.
+ If applicable, add the following below the CDDL Header,
+ with the fields enclosed by brackets [] replaced by
+ your own identifying information:
+ "Portions Copyrighted [year] [name of copyright owner]"
+
+ $Id: opensso-common.xml,v 1.28 2009/09/24 21:38:41 sridharev Exp $
+
+ Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<!-- Portions Copyrighted [2010] [ForgeRock AS] -->
+
+<project>
+    <dirname property="QATEST_HOME" file="build.xml"/>
+    <echo message="QATEST_HOME=${QATEST_HOME}"/>
+
+    <path id="client.classpath">
+        <pathelement path="${classpath}"/>
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <pathelement location="classes"/>
+    </path>
+
+    <property
+      name="configurator.server1.properties" 
+      value="${QATEST_HOME}/resources/Configurator-${SERVER_NAME1}.properties"/>
+    <property
+      name="configurator.server2.properties" 
+      value="${QATEST_HOME}/resources/Configurator-${SERVER_NAME2}.properties"/>
+
+    <condition property="report_dir.set" else="false">
+        <isset property="REPORT_DIR"/>
+    </condition>
+    <echo message="report_dir.set=${report_dir.set}"/>
+
+    <condition property="run_failed_testcase.set" value="${RUN_FAILED_TESTCASE}" else="false">
+        <isset property="RUN_FAILED_TESTCASE"/>
+    </condition>
+
+    <target name="checkReportDir">
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <equals arg1="${report_dir.set}" arg2="false"/>
+            <then>
+                <property name="REPORT_DIR" value="${QATEST_HOME}"/>
+            </then>
+        </if>
+        <echo message="REPORT_DIR=${REPORT_DIR}"/>
+    </target>
+
+    <target name="copyDebugFiles" depends="init-common">
+        <copy file="${SERVER_DIR}/test_env.txt" todir="${base.report.dir}"/>
+        <copy file="${SERVER_DIR}/logs" todir="${base.report.dir}"/>
+        <copy todir="${base.report.dir}">
+            <fileset dir="./${SERVER_DIR}">
+                <include name="**/*.output"/>
+                <include name="ldif/*"/>
+                <include name="debug/*"/>
+            </fileset>
+        </copy>
+        <available file="${base.report.dir}/${EXECUTION_MODE}-${ModuleToExecute}/testng-failed.xml"
+                type="file" property="tests_failed" />
+        <antcall target="copy_testng_failed_xml"/>
+    </target>
+     
+    <target name="copy_testng_failed_xml" if="tests_failed">
+        <copy file="${base.report.dir}/${EXECUTION_MODE}-${ModuleToExecute}/testng-failed.xml"
+        tofile="${QATEST_HOME}/xml/testng/${ModuleToExecute}/testng-failed.xml"
+        failonerror="false" overwrite="true" />
+    </target>
+
+    <target name="report" depends="checkReportDir">
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <equals arg1="${multimodule}" arg2="true"/>
+            <then>
+                <property name="runtime.report.dir" value="${REPORT_DIR}/${SERVER_DIR}/${EXECUTION_MODE}/${TEST_MODULE}_${current.timestamp}/${ModuleToExecute}"/>
+            </then>
+            <elseif>
+                <contains string="${TEST_MODULE}" substring="," casesensitive="No"/>
+                <then>
+                    <property name="runtime.report.dir" value="${REPORT_DIR}/${SERVER_DIR}/${EXECUTION_MODE}/multi_module_exec_${current.timestamp}/${ModuleToExecute}"/>
+                </then>
+            </elseif>
+            <else>
+                <property name="runtime.report.dir" value="${REPORT_DIR}/${SERVER_DIR}/${EXECUTION_MODE}/${TEST_MODULE}_${current.timestamp}"/>
+            </else>
+        </if>
+        
+        <mkdir dir="${runtime.report.dir}"/>
+        <copy todir="${runtime.report.dir}">
+            <fileset dir="${base.report.dir}"/>
+        </copy>
+        <mkdir dir="${runtime.report.dir}/properties"/>
+        <copy todir="${runtime.report.dir}/properties">
+            <fileset dir="${built.classes.dir}">
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+        <mkdir dir="${runtime.report.dir}/xml"/>
+        <copy todir="${runtime.report.dir}/xml">
+            <fileset dir="${built.classes.dir}">
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+        <copy todir="${runtime.report.dir}">
+            <fileset dir="${SERVER_DIR}">
+                <include name="**/*.html"/>
+            </fileset>
+        </copy>
+        <available file="${runtime.report.dir}/debug/client" type="dir"
+            property="client.dir.present"/>
+        <if>
+            <equals arg1="${client.dir.present}" arg2="true"/>
+            <then>
+                <copy todir="${runtime.report.dir}/debug/client">
+                    <fileset dir="${debug.dir}/client">
+                        <include name="**/*"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+        <echo message="The Automation reports are at ${runtime.report.dir}"/>
+        <java classname="com.sun.identity.qatest.report.GenerateReport">
+            <classpath>
+                <pathelement path="${client.cp}"/>
+                <pathelement path="${built.classes.dir}"/>
+            </classpath>
+            <arg value="${runtime.report.dir}" />
+            <arg value="${test.output.file}" />
+        </java>
+    </target>
+
+    <target name="check-idsvcs-cond" depends="init-common">
+        <echo message="TEST_MODULE=${TEST_MODULE}"/>
+        <condition property="compile.idsvcs">
+            <or>
+                <contains string="${TEST_MODULE}" substring="idsvcs"/>
+                <equals arg1="${TEST_MODULE}" arg2="all"/>
+                <equals arg1="${TEST_MODULE}" arg2="sanity"/>
+            </or>
+        </condition>
+        <echo message="compile.idsvcs=${compile.idsvcs}"/>
+    </target>
+
+    <target name="check-cond" depends="init-common">
+        <fail message="Logical modules sanity/all cannot be run as multiple modules">
+            <condition>
+                <and>
+                    <or>
+                        <contains string="${TEST_MODULE}" substring="all" casesensitive="No"/>
+                        <contains string="${TEST_MODULE}" substring="sanity" casesensitive="No"/>
+                    </or>
+                    <contains string="${TEST_MODULE}" substring="," casesensitive="No"/>
+                </and>
+            </condition>
+        </fail>
+
+        <condition property="server1.set" else="false">
+            <isset property="SERVER_NAME1"/>
+        </condition>
+        <echo message="server1.set=${server1.set}"/>
+
+        <condition property="server2.set" else="false">
+            <isset property="SERVER_NAME2"/>
+        </condition>
+        <echo message="server2.set=${server2.set}"/>
+
+        <available file="${configurator.server1.properties}" type="file" property="config.file1"/>
+        <echo message="config.file1=${config.file1}"/>
+
+        <available file="${configurator.server2.properties}" type="file" property="config.file2"/>
+        <echo message="config.file2=${config.file2}"/>
+
+        <condition property="config.file1.present" else="false">
+            <isset property="config.file1"/>
+        </condition>
+        <echo message="config.file1.present=${config.file1.present}"/>
+
+        <condition property="config.file2.present" else="false">
+            <isset property="config.file2"/>
+        </condition>
+        <echo message="config.file2.present=${config.file2.present}"/>
+
+        <condition property="all.server1.false" else="false">
+            <and>
+                <istrue value="${server1.set}"/>
+                <isfalse value="${config.file1.present}"/>
+            </and>
+        </condition>
+        <echo message="all.server1.false=${all.server1.false}"/>
+
+        <condition property="all.server2.false" else="false">
+            <and>
+                <istrue value="${server2.set}"/>
+                <isfalse value="${config.file2.present}"/>
+            </and>
+        </condition>
+        <echo message="all.server2.false=${all.server2.false}"/>
+
+        <condition property="all.server1.true" else="false">
+            <and>
+                <istrue value="${server1.set}"/>
+                <istrue value="${config.file1.present}"/>
+            </and>
+        </condition>
+        <echo message="all.server1.true=${all.server1.true}"/>
+
+        <condition property="all.server2.true" else="false">
+            <and>
+                <istrue value="${server2.set}"/>
+                <istrue value="${config.file2.present}"/>
+            </and>
+        </condition>
+        <echo message="all.server2.true=${all.server2.true}"/>
+
+        <condition property="cond-is-true1" else="false">
+            <and>
+                <istrue value="${all.server1.true}"/>
+                <isset property="EXECUTION_MODE"/>
+            </and>
+        </condition>
+        <echo message="cond-is-true1=${cond-is-true1}"/>
+
+        <condition property="cond-is-true2" else="false">
+            <and>
+                <istrue value="${all.server1.true}"/>
+                <istrue value="${all.server2.true}"/>
+                <isset property="EXECUTION_MODE"/>
+            </and>
+        </condition>
+        <echo message="cond-is-true2=${cond-is-true2}"/>
+
+        <condition property="cond-is-true" else="false">
+            <or>
+                <istrue value="${cond-is-true1}"/>
+                <istrue value="${cond-is-true2}"/>
+            </or>
+        </condition>
+        <echo message="cond-is-true=${cond-is-true}"/>
+
+        <fail message="*** Configuration file ${configurator.server1.properties} is missing ***">
+            <condition>
+                <istrue value="${all.server1.false}"/>
+            </condition>
+        </fail>
+
+        <fail message="*** Configuration file ${configurator.server2.properties} is missing ***">
+            <condition>
+                <istrue value="${all.server2.false}"/>
+            </condition>
+        </fail>
+
+        <fail message="*** EXECUTION_MODE not set ***">
+            <condition>
+                <not>
+                    <isset property="EXECUTION_MODE"/>
+                </not>
+            </condition>
+        </fail>
+        
+        <fail message="When running sanity module EXECUTION_MODE should be ldapv3.">
+            <condition>
+                <and>
+                    <equals arg1="${TEST_MODULE}" arg2="sanity" casesensitive="No"/>
+                    <not>
+                        <contains string="${EXECUTION_MODE}" substring="ldapv3" casesensitive="No"/>
+                    </not>
+                </and>
+            </condition>
+        </fail>
+        <loadfile property="ConfiguratorCommon" srcFile="${QATEST_HOME}/resources/config/default/ConfiguratorCommon.properties"/>
+        <fail message="When running idwsf module multiprotocol_enabled should be set to false in ${QATEST_HOME}/resources/config/default/ConfiguratorCommon.properties">
+            <condition>
+                <and>
+                    <contains string="${TEST_MODULE}" substring="idwsf" casesensitive="No"/>
+                    <contains string="${ConfiguratorCommon}" substring="multiprotocol_enabled=true"/>
+                </and>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="clean-all" depends="check-cond" if="cond-is-true">
+        <echo message="Cleaning all output, built and reports files and directories..."/>
+        <delete>
+            <fileset dir="${SERVER_DIR}" excludes="*.output, built/classes/com/**"/>
+        </delete>
+        <delete dir="${SERVER_DIR}/debug"/>
+        <delete dir="${SERVER_DIR}/docs"/>
+        <delete dir="${SERVER_DIR}/ldif"/>
+    </target>
+
+    <!--  compile  -->
+    <target name="compile-doc" depends="init-common">
+        <mkdir dir="./javadoc"/>
+        <echo message="Compiling test source files"/>
+        <echo message="classpath: ${client.cp}"/>
+        <javac destdir="./javadoc"
+        debug="on"
+        failonerror="true">
+            <src path="./source"/>
+            <exclude name="com/sun/identity/qatest/idsvcs/**"/>
+            <classpath refid="client.classpath"/>
+        </javac>
+    </target>
+
+    <taskdef name="wscompile" classname="com.sun.xml.rpc.tools.ant.Wscompile">
+        <classpath refid="client.classpath"/>
+    </taskdef>
+
+    <target name="compile-idsvcs-module" depends="check-idsvcs-cond" if="compile.idsvcs">
+        <antcall target="compile-idsvcs-all"/>
+    </target>
+
+    <target name="wscompile-idsvcs-all">
+        <copy file="./xml/idsvcs/idsvcsSoapTest.xml"
+              tofile="./xml/idsvcs/idsvcsSoapTest.xml.orig" 
+              overwrite="false" />
+
+        <!-- This stmt is a must for the below if task to work -->
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <equals arg1="${server1.set}" arg2="false" />
+            <then>
+                <echo message="Error: server1 not set." />
+            </then>
+
+            <elseif>
+                <equals arg1="${server1.set}" arg2="${server2.set}" />
+                <then>
+                    <echo message="Use server2." />
+                    <property file="${configurator.server2.properties}" />
+                </then>
+            </elseif>
+
+            <else>
+                <echo message="Use server1." />
+                <property file="${configurator.server1.properties}" />
+            </else>
+        </if>
+
+        <replace file="./xml/idsvcs/idsvcsSoapTest.xml"
+                 token="[PROTOCOL]://[HOST]:[PORT]/[DEPLOY_URI]"
+                 value="${com.iplanet.am.naming.url}" />
+        <replace file="./xml/idsvcs/idsvcsSoapTest.xml"
+                 token="/namingservice"
+                 value="" />
+
+        <wscompile
+            fork= "false"
+            base="${built.classes.dir}"
+            classpath="${client.cp}"
+            gen="true"
+            verbose="true"
+            config="./xml/idsvcs/idsvcsSoapTest.xml">
+        </wscompile>
+    </target>
+
+    <target name="compile-idsvcs-all" depends="wscompile-idsvcs-all">
+        <echo message="Compiling idsvcs test source files"/>
+        <javac destdir="${built.classes.dir}"
+        debug="on"
+        failonerror="true">
+            <src path="./source"/>
+            <include name="com/sun/identity/qatest/idsvcs/**"/>
+            <classpath refid="client.classpath"/>
+        </javac>
+
+        <move file="./xml/idsvcs/idsvcsSoapTest.xml.orig"
+              tofile="./xml/idsvcs/idsvcsSoapTest.xml" 
+              overwrite="true" />
+    </target>
+
+    <target name="compile-all" depends="clean-all">
+        <mkdir dir="${built.classes.dir}"/>
+        <mkdir dir="${debug.dir}"/>
+        <mkdir dir="${ldif.dir}"/>
+        <echo message="Compiling test source files"/>
+        <echo message="classpath: ${client.cp}"/>
+        <if>
+            <isset property="DEBUG"/>
+            <then>
+                <javac destdir="${built.classes.dir}"
+                debug="on"
+                failonerror="true">
+                    <src path="./source"/>
+                    <include name="com/sun/identity/qatest/common/**"/>
+                    <include name="com/sun/identity/qatest/${TEST_MODULE}/**"/>
+                    <exclude name="com/sun/identity/qatest/idsvcs/**"/>
+                    <classpath refid="client.classpath"/>
+                </javac>
+            </then>
+            <else>
+                <javac destdir="${built.classes.dir}"
+                debug="on"
+                failonerror="true">
+                    <src path="./source"/>
+                    <exclude name="com/sun/identity/qatest/idsvcs/**"/>
+                    <classpath refid="client.classpath"/>
+                </javac>
+            </else>
+        </if>
+    </target>
+
+    <target name="DeleteGeneratedXML">
+        <if>
+            <available file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" />
+            <then>
+                <delete file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml"/>
+            </then>
+        </if>
+    </target>
+
+<!-- This is the main target which calls other targets based on the module being executed-->
+    <target name="execute-module" depends="compile-all">
+        <echo message="execution.mode=${EXECUTION_MODE}"/>
+        <echo message="execution.module=${TEST_MODULE}"/>
+        <antcall target="print-test-env-start"/>
+
+        <java classname="com.sun.identity.qatest.setup.ClientConfigCreator"
+            fork="true"
+            failonerror="true">
+            <classpath refid="client.classpath"/>
+            <arg value="${QATEST_HOME}" />
+            <arg value="${SERVER_NAME1}" />
+            <arg value="${SERVER_NAME2}" />
+            <arg value="${TEST_MODULE}" />
+        </java>
+
+        <copy todir="${built.classes.dir}" flatten="false">
+            <fileset dir="./resources">
+                <include name="**/*.properties"/>
+                <exclude name="AMClient.properties"/>
+            </fileset>
+        </copy>
+
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <equals arg1="${TEST_MODULE}" arg2="sanity" />
+            <then>
+                <java classname="com.sun.identity.qatest.setup.SetupProduct">
+                    <classpath refid="client.classpath" />
+                    <arg value="${SERVER_NAME1}" />
+                    <arg value="${SERVER_NAME2}" />
+                    <arg value="${TEST_MODULE}" />
+                </java>
+            </then>
+            <else>
+                <java classname="com.sun.identity.qatest.setup.SetupProduct">
+                    <classpath refid="client.classpath" />
+                    <arg value="${SERVER_NAME1}" />
+                    <arg value="${SERVER_NAME2}" />
+                </java>
+            </else>
+        </if>
+        
+        <copy file="./resources/AMConfig.properties" tofile="${built.classes.dir}/AMConfig.properties"/>
+        <antcall target="compile-idsvcs-module"/>
+
+        <!-- Merge testng files based on module/mode-->
+        <copy todir="${built.classes.dir}/xml/testng" flatten="false">
+            <fileset dir="./xml/testng">
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+
+        <condition property="isSanity" value="true" else="false">
+            <contains string="${TEST_MODULE}" substring="sanity" casesensitive="No"/>
+        </condition>
+        <echo message="isSanity=${isSanity}" level="info"/>
+
+        <condition property="isMultipleModules" value="true" else="false">
+            <contains string="${TEST_MODULE}" substring="," casesensitive="No"/>
+        </condition>
+        <echo message="isMultipleModules=${isMultipleModules}" level="info"/>
+
+        <condition property="isAgents" value="true" else="false">
+            <contains string="${TEST_MODULE}" substring="agent" casesensitive="No"/>
+        </condition>
+        <echo message="isAgents=${isAgents}" level="info"/>
+        
+        <if>
+            <available file="${base.report.dir}" type="dir"/>
+            <then>
+                <delete>
+                    <fileset dir="${base.report.dir}"/>
+                </delete>
+            </then>
+        </if>
+
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+           <!-- If module to be executed is sanity -->
+            <equals arg1="${isSanity}" arg2="true" />
+            <then>
+                <echo message="Executing sanity module,for all physical modules in ${./xml/testng}" />
+                <antcall target="runsanity"/>
+            </then>
+          <!-- If multiple , seperated modules need to be executed -->  
+            <elseif>
+                <equals arg1="${isMultipleModules}" arg2="true" />
+                <then>
+                    <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" />
+                    <for list="${TEST_MODULE}" param="ModuleToExecute" >
+                        <sequential>
+                            <property name="ModuleToExecute" value="@{ModuleToExecute}"/>
+                    <!-- modules can be any combination of the physical modules, logical agent modules -->
+                            <echo message="Executing module @{ModuleToExecute}" />
+                            <if>
+                                <contains string="@{ModuleToExecute}" substring="agent" casesensitive="No"/>
+                                <then>
+                                    <antcall target="runagents">
+                                        <param name="ModuleToExecute" value="@{ModuleToExecute}"/>
+                                    </antcall>
+                                </then>
+                                <else>
+                                    <antcall target="runsinglemodule">
+                                        <param name="ModuleToExecute" value="@{ModuleToExecute}"/>
+                                    </antcall>
+                                </else>
+                            </if>
+                        </sequential>
+                    </for>
+                </then>
+            </elseif>
+            <elseif>
+                <contains string="${TEST_MODULE}" substring="agent" casesensitive="No"/>
+                <then>
+                    <antcall target="runagents">
+                        <param name="ModuleToExecute" value="${TEST_MODULE}"/>
+                    </antcall>
+                </then>
+            </elseif>
+            <elseif>
+                <equals arg1="${TEST_MODULE}" arg2="all" casesensitive="No"/>
+                <then>
+                    <echo message="Running all the single module tests"/>
+                    <echo message="Expecting dependencies to be in place"/>
+                    <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" />
+                    <for param="ModuleToExecuteList" list="${single_modules}" delimiter=",">
+                        <sequential>
+                            <echo message="@{ModuleToExecuteList}"/>
+                            <antcall target="runsinglemodule">
+                                <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                            </antcall>
+                        </sequential>
+                    </for>
+                </then>
+            </elseif>
+            <else>
+                <property name="ModuleToExecute" value="${TEST_MODULE}"/>
+                <echo message="Executing single module ${ModuleToExecute}" />
+                <antcall target="runsinglemodule">
+                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                </antcall>
+            </else>
+        </if>
+    </target>
+
+<!-- This target runs the testng task with the generated xml file-->
+    <target name="runTestng" >
+        <echo message="run_failed_testcase.set=${run_failed_testcase.set}" level="info"/>
+        <if>
+            <contains string="${run_failed_testcase.set}" substring="false" casesensitive="No"/>
+            <then>
+                <taskdef name="testng" classname="com.beust.testng.TestNGAntTask" classpathref="client.classpath"/>
+                <if>
+                    <isset property="DEBUG"/>
+                    <then>
+                        <testng classpathref="client.classpath" outputdir="${base.report.dir}" sourcedir="${built.classes.dir}">
+                            <classpath>
+                                <pathelement path="${client.cp}"/>
+                                <pathelement path="${built.classes.dir}"/>
+                            </classpath>
+                            <jvmarg value="-Xmx512m"/>
+                            <jvmarg value="-Xdebug"/>
+                            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y"/>
+                            <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="${ModuleToExecute}-${EXECUTION_MODE}-generated.xml"/>
+                        </testng>
+                    </then>
+                    <else>
+                        <testng classpathref="client.classpath" outputdir="${base.report.dir}" sourcedir="${built.classes.dir}">
+                            <classpath>
+                                <pathelement path="${client.cp}"/>
+                                <pathelement path="${built.classes.dir}"/>
+                            </classpath>
+                            <jvmarg value="-Xmx512m"/>
+                            <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="${ModuleToExecute}-${EXECUTION_MODE}-generated.xml"/>
+                        </testng>
+                    </else>
+                </if>
+            </then>
+            <else>
+                <taskdef name="testng" classname="com.beust.testng.TestNGAntTask" classpathref="client.classpath"/>
+                <if>
+                    <isset property="DEBUG"/>
+                    <then>
+                        <testng classpathref="client.classpath" outputdir="${base.report.dir}">
+                            <classpath>
+                                <pathelement path="${client.cp}"/>
+                                <pathelement path="${built.classes.dir}"/>
+                            </classpath>
+                            <jvmarg value="-Xmx512m"/>
+                            <jvmarg value="-Xdebug"/>
+                            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y"/>
+                            <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="testng-failed.xml"/>
+                        </testng>
+                    </then>
+                    <else>
+                        <testng classpathref="client.classpath" outputdir="${base.report.dir}">
+                            <classpath>
+                                <pathelement path="${client.cp}"/>
+                                <pathelement path="${built.classes.dir}"/>
+                            </classpath>
+                            <jvmarg value="-Xmx512m"/>
+                            <xmlfileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" includes="testng-failed.xml"/>
+                        </testng>
+                    </else>
+                </if>
+            </else>
+        </if>
+        <concat destfile="${SERVER_DIR}/logs" append="true">
+            <sort>
+                <last count="1">
+                    <fileset dir="${SERVER_DIR}" >
+                        <include name="logs.?"/>
+                    </fileset>
+                </last>
+            </sort>
+        </concat>
+        <java classname="com.sun.identity.qatest.setup.CleanupProduct">
+            <classpath>
+                <pathelement path="${client.cp}"/>
+                <pathelement path="${built.classes.dir}"/>
+            </classpath>
+            <arg value="${SERVER_NAME1}" />
+            <arg value="${SERVER_NAME2}" />
+        </java>
+        <concat destfile="${SERVER_DIR}/logs" append="true">
+            <sort>
+                <last count="1">
+                    <fileset dir="${SERVER_DIR}" >
+                        <include name="logs.?"/>
+                    </fileset>
+                </last>
+            </sort>
+        </concat>
+        <delete file="${SERVER_DIR}" >
+            <sort>
+                <last count="1">
+                    <fileset dir="${SERVER_DIR}" >
+                        <include name="logs.?"/>
+                    </fileset>
+                </last>
+            </sort>
+        </delete>
+        <antcall target="print-test-env-end"/>
+        <antcall target="copyDebugFiles"/>
+        <antcall target="report">
+            <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+        </antcall>
+        <delete>
+            <fileset dir="${SERVER_DIR}/docs"/>
+        </delete>
+        <touch file="${SERVER_DIR}/logs.1" />
+    </target>
+
+  <!--This target is for running the sanity module.
+  For each of the module having sanity xmls then the xmls are merged and 
+  runTestng is called -->
+    <target name="runsanity">
+    <!-- logic to iterate thru all modules and run just the sanity tests -->
+        <path id="sanity.modules">
+            <dirset dir="./xml/testng" includes="*" />
+        </path>
+        <dirname property="Moduledirname"  file="./xml/testng/**"/>
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <equals arg1="${isUnix}" arg2="true"/>
+            <then>
+                <pathconvert property="sanity.modules" refid="sanity.modules" pathsep=",">
+                    <map from="${Moduledirname}/" to=""/>
+                </pathconvert>
+            </then>
+            <elseif>
+                <equals arg1="${isWindows}" arg2="true"/>
+                <then>
+                    <pathconvert property="sanity.modules" refid="sanity.modules" pathsep=",">
+                        <map from="${Moduledirname}\" to=""/>
+                    </pathconvert>
+                </then>
+            </elseif>
+        </if>
+        <echo message="${sanity.modules}" level="info"/>
+        <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" />
+    
+        <for param="ModuleToExecuteList" list="${sanity.modules}" delimiter=",">
+            <sequential>
+                <echo message="@{ModuleToExecuteList}" level="info"/>
+<!-- check if base.report.dir already exists and delete it -->
+                <antcall target="check-sanity-files" >
+                    <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                </antcall>
+                <echo message="isSanityXMlsPresent=${isSanityXMlsPresent}" level="info"/>
+                <if>
+                    <not>
+                        <equals arg1="isSanityXMlsPresent" arg2="false"/>
+                    </not>
+                    <then>
+                        <antcall target="DeleteGeneratedXML">
+                            <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                        </antcall>
+                        <antcall target="merge-header">
+                            <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                        </antcall>
+                        <antcall target="merge-sanity">
+                            <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                        </antcall>
+                        <antcall target="merge-footer">
+                            <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                        </antcall>
+                        <if>
+                            <available file="${built.classes.dir}/xml/testng/@{ModuleToExecuteList}/@{ModuleToExecuteList}-${EXECUTION_MODE}-generated.xml" />
+                            <then>
+                                <replace file="${built.classes.dir}/xml/testng/@{ModuleToExecuteList}/@{ModuleToExecuteList}-${EXECUTION_MODE}-generated.xml" value="ldapv3">
+                                    <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+                                </replace>
+                                <loadfile property="@{ModuleToExecuteList}/@{ModuleToExecuteList}generated-xml" srcFile="${built.classes.dir}/xml/testng/@{ModuleToExecuteList}/@{ModuleToExecuteList}-${EXECUTION_MODE}-generated.xml">
+                                    <filterchain>
+                                        <expandproperties/>
+                                    </filterchain>
+                                </loadfile>
+                                <if>
+                                    <contains string="${@{ModuleToExecuteList}/@{ModuleToExecuteList}generated-xml}" substring="&lt;test" casesensitive="No" />
+                                    <then>
+                                        <antcall target="runTestng">
+                                            <param name="ModuleToExecute" value="@{ModuleToExecuteList}"/>
+                                        </antcall>
+                                    </then>
+                                </if>
+                            </then>
+                        </if>
+                    </then>
+                </if>
+            </sequential>
+        </for>
+    </target>
+
+    <target name="check-sanity-files">
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <not>
+                <contains string="${ModuleToExecute}" substring="agent" casesensitive="no"/>
+            </not>
+            <then>
+                <echo message="ModuleToExecute=${ModuleToExecute}" level="info"/>
+                <pathconvert property="isSanityXMlsPresent" setonempty="false" pathsep=" ">
+                    <path>
+                        <fileset dir="./xml/testng/${ModuleToExecute}/"
+                       includes="sanity-*.xml" />
+                    </path>
+                </pathconvert>
+                <echo message="isSanityXMlsPresent=${isSanityXMlsPresent}" level="info"/>
+            </then>
+        </if>
+    </target>
+    
+  <!-- This target merges the sanity xmls only -->
+    <target name="merge-sanity" depends="check-sanity-files" if="isSanityXMlsPresent">
+        <antcall target="check-sanity-files"/>
+        <echo message="isSanityXMlsPresent=${isSanityXMlsPresent}" level="info"/>
+        <echo message="${ModuleToExecute}-sanity-*.xmls are present." />
+        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+            <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                <include name="sanity-*.xml"/>
+            </fileset>
+        </concat>
+        <if>
+            <contains string="${EXECUTION_MODE}" substring="_sec" />
+            <then>
+                <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                        <include name="sanity_sec-*.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" token="sanity" value="${EXECUTION_MODE}"/>
+    </target>
+    
+    
+  <!-- This target merges xmls based on the TEST_NAME, only running tests of that name -->
+    <target name="merge-testname-xmls">
+        <echo message="Adding Tests=${TestToExecute}" level="info"/>
+        <!-- This loads any tests called TEST_NAME that are sanity tests -->
+        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+            <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                <include name="sanity-${TestToExecute}*.xml"/>
+            </fileset>
+        </concat>
+        <if>
+            <contains string="${EXECUTION_MODE}" substring="_sec" />
+            <then>
+                <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                        <include name="sanity_sec-${TestToExecute}*.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" token="sanity" value="${EXECUTION_MODE}"/>
+        <!-- This loads any tests called TEST_NAME that are extended tests -->
+        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+            <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                <include name="extended-${TestToExecute}*.xml"/>
+            </fileset>
+        </concat>
+        <if>
+            <contains string="${EXECUTION_MODE}" substring="_sec" />
+            <then>
+                <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                        <include name="extended_sec-${TestToExecute}*.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" token="sanity" value="${EXECUTION_MODE}"/>
+        <!-- This loads any tests called TEST_NAME for the given execution mode -->
+        <if>
+            <not>
+                <and>
+                    <equals arg1="${ModuleToExecute}" arg2="sae"/>
+                    <contains string="${EXECUTION_MODE}" substring="_sec"/>
+                </and>
+            </not>
+            <then>
+                <if>
+                    <contains string="${EXECUTION_MODE}" substring="s1ds" casesensitive="No"/>
+                    <then>
+                        <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                            <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                <include name="s1ds-${TestToExecute}*.xml"/>
+                            </fileset>
+                        </concat>
+                    </then>
+                    <elseif>
+                        <contains string="${EXECUTION_MODE}" substring="ldapv3" casesensitive="No"/>
+                        <then>
+                            <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                            <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                                <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                    <include name="ldapv3-${TestToExecute}*.xml"/>
+                                </fileset>
+                            </concat>
+                        </then>
+                    </elseif>
+                    <elseif>
+                        <contains string="${EXECUTION_MODE}" substring="amsdk" casesensitive="No"/>
+                        <then>
+                            <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                            <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                                <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                    <include name="amsdk-${TestToExecute}*.xml"/>
+                                </fileset>
+                            </concat>
+                        </then>
+                    </elseif>
+                    <elseif>
+                        <contains string="${EXECUTION_MODE}" substring="ad" casesensitive="No"/>
+                        <then>
+                            <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                            <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                                <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                    <include name="ad-${TestToExecute}*.xml"/>
+                                </fileset>
+                            </concat>
+                        </then>
+                    </elseif>
+                </if>
+            </then>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" value="ldapv3">
+            <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+        </replace>
+    </target>
+    
+    <!-- This target merges the xmls based on the EXECUTION_MODE-->
+    <target name="merge-mode-xmls" >
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <not>
+                <and>
+                    <equals arg1="${ModuleToExecute}" arg2="sae"/>
+                    <contains string="${EXECUTION_MODE}" substring="_sec"/>
+                </and>
+            </not>
+            <then>
+                <if>
+                    <contains string="${EXECUTION_MODE}" substring="s1ds" casesensitive="No"/>
+                    <then>
+                        <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                            <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                <include name="s1ds-*.xml"/>
+                            </fileset>
+                        </concat>
+                    </then>
+                    <elseif>
+                        <contains string="${EXECUTION_MODE}" substring="ldapv3" casesensitive="No"/>
+                        <then>
+                            <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                            <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                                <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                    <include name="ldapv3-*.xml"/>
+                                </fileset>
+                            </concat>
+                        </then>
+                    </elseif>
+                    <elseif>
+                        <contains string="${EXECUTION_MODE}" substring="amsdk" casesensitive="No"/>
+                        <then>
+                            <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                            <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                                <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                    <include name="amsdk-*.xml"/>
+                                </fileset>
+                            </concat>
+                        </then>
+                    </elseif>
+                    <elseif>
+                        <contains string="${EXECUTION_MODE}" substring="ad" casesensitive="No"/>
+                        <then>
+                            <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                            <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                                <fileset dir="./xml/testng/${ModuleToExecute}" >
+                                    <include name="ad-*.xml"/>
+                                </fileset>
+                            </concat>
+                        </then>
+                    </elseif>
+                </if>
+            </then>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" value="ldapv3">
+            <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+        </replace>
+    </target>
+    
+    <!-- This target merges the sec xmls based on the EXECUTION_MODE-->    
+    <target name="merge-mode_sec-xmls" >
+        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+        <if>
+            <contains string="${EXECUTION_MODE}" substring="s1ds" casesensitive="No"/>
+            <then>
+                <echo message="Execution mode is ${EXECUTION_MODE}." />
+                <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                        <include name="s1ds_sec-*.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+            <elseif>
+                <contains string="${EXECUTION_MODE}" substring="ldapv3" casesensitive="No"/>
+                <then>
+                    <echo message="Execution mode is ${EXECUTION_MODE}." />
+                    <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                        <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                            <include name="ldapv3_sec-*.xml"/>
+                        </fileset>
+                    </concat>
+                </then>
+            </elseif>
+            <elseif>
+                <contains string="${EXECUTION_MODE}" substring="amsdk" casesensitive="No"/>
+                <then>
+                    <echo message="Execution mode is ${EXECUTION_MODE}." />
+                    <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                        <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                            <include name="amsdk_sec-*.xml"/>
+                        </fileset>
+                    </concat>
+                </then>
+            </elseif>
+            <elseif>
+                <contains string="${EXECUTION_MODE}" substring="ad" casesensitive="No"/>
+                <then>
+                    <echo message="Execution mode is ${EXECUTION_MODE}." />
+                    <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                        <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                            <include name="ad_sec-*.xml"/>
+                        </fileset>
+                    </concat>
+                </then>
+            </elseif>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" value="ldapv3">
+            <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+        </replace>
+    </target>
+
+    <!-- This target merges the extended xmls which contain datastore agnostic 
+    tests, but are not a part of sanity since they have other depencies.
+    This target is run for all modules except agents,sanity-->
+    <target name="merge-extended">
+        <echo message="inside merge-extended ${ModuleToExecute}" level="info"/>
+        <if>
+            <not>
+                <and>
+                    <equals arg1="${ModuleToExecute}" arg2="sae"/>
+                    <contains string="${EXECUTION_MODE}" substring="_sec"/>
+                </and>
+            </not>
+            <then>
+                <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                        <include name="extended-*.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+        </if>
+        <if>
+            <contains string="${EXECUTION_MODE}" substring="_sec" />
+            <then>
+                <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="${built.classes.dir}/xml/testng/${ModuleToExecute}" >
+                        <include name="extended_sec-*.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+        </if>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" >
+            <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+        </replace>
+    </target>
+    
+    <target name="check-configurator-cond" depends="init-common">
+        <echo message="TEST_MODULE=${TEST_MODULE}" level="info"/>
+        <condition property="isModuleConfigurator">
+            <equals arg1="${TEST_MODULE}" arg2="configurator"/>
+        </condition>
+        <echo message="isModuleConfigurator=${isModuleConfigurator}" level="info"/>
+    </target>
+
+    <target name="run-configurator" depends="check-configurator-cond" if="isModuleConfigurator">
+        <antcall target="run-configurator"/>
+    </target>
+
+<!-- This target merges the common header file-->   
+    <target name="merge-header" >
+        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+            <filelist dir="${built.classes.dir}/xml/testng/" files="header.xml"/>
+        </concat>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" token="SuiteName" value="${EXECUTION_MODE}-${ModuleToExecute}"/>
+    </target>
+
+<!-- This target merges the common footer file-->   
+    <target name="merge-footer" >
+        <concat destfile="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" append="true">
+            <filelist dir="${built.classes.dir}/xml/testng/" files="footer.xml"/>
+        </concat>
+        <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" token="sanity" value="${EXECUTION_MODE}"/>
+    </target>
+
+<!-- This target is the core task for running any module other than sanity/agents
+ Calls the other targets to merge the xmls and to run testng-->       
+    <target name="runsinglemodule">
+        <echo message="${ModuleToExecute}"/>
+        <antcall target="DeleteGeneratedXML">
+            <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+        </antcall>
+        <antcall target="merge-header">
+            <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+        </antcall>
+        <if>
+            <isset property="TEST_NAME"/>
+            <then>
+                <!--if>
+                    <contains string="${TEST_NAME}" substring="," casesensitive="No"/>
+                    <then>
+                        <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" />
+                        <for list="${TEST_NAME}" param="TestToExecute" >
+                            <sequential>
+                                <property name="TestToExecute" value="@{TestToExecute}"/>
+                                <antcall target="merge-testname-xmls">
+                                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                                    <param name="TestToExecute" value="@{TestToExecute}"/>
+                                </antcall>
+                            </sequential>
+                        </for>
+                    </then>
+                    <else-->
+                <antcall target="merge-testname-xmls">
+                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                    <param name="TestToExecute" value="${TEST_NAME}"/>
+                </antcall>
+                    <!--/else>
+                </if-->
+            </then>
+            <else>
+                <antcall target="merge-sanity">
+                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                </antcall>
+                <antcall target="merge-extended">
+                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                </antcall>
+                <antcall target="merge-mode-xmls">
+                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                </antcall>
+                <if>
+                    <contains string="${EXECUTION_MODE}" substring="_sec" />
+                    <then>
+                        <antcall target="merge-mode_sec-xmls">
+                            <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                        </antcall>
+                    </then>
+                </if>
+            </else>
+        </if>
+        <antcall target="merge-footer">
+            <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+        </antcall>
+        <if>
+            <available file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" />
+            <then>
+                <replace file="${built.classes.dir}/xml/testng/${ModuleToExecute}/${ModuleToExecute}-${EXECUTION_MODE}-generated.xml" >
+                    <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+                </replace>
+                <antcall target="runTestng">
+                    <param name="ModuleToExecute" value="${ModuleToExecute}"/>
+                </antcall>
+            </then>
+        </if>
+    </target>
+
+<!-- This target is for running agents.Only the agents module merges xmls in a different way.
+This is to do away with skipping other agent related tests-->    
+    <target name="runagents">
+        <echo message="${ModuleToExecute}" level="info"/>
+        <antcall target="DeleteGeneratedXML">
+            <param name="ModuleToExecute" value="agents"/>
+        </antcall>
+        <antcall target="merge-header">
+            <param name="ModuleToExecute" value="agents"/>
+        </antcall>
+        <if>
+            <contains string="${ModuleToExecute}" substring="2.2WebAgent" casesensitive="No"/>
+            <then>
+                <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                <concat destfile="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml" append="true">
+                    <fileset dir="./xml/testng/agents" >
+                        <include name="extended-all.xml"/>
+                        <include name="s1ds-2.2web.xml"/>
+                        <include name="s1ds-all.xml"/>
+                    </fileset>
+                </concat>
+            </then>
+            <elseif>
+                <contains string="${ModuleToExecute}" substring="2.2J2EEAgent" casesensitive="No"/>
+                <then>
+                    <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                    <concat destfile="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml" append="true">
+                        <fileset dir="./xml/testng/agents" >
+                            <include name="extended-all.xml"/>
+                            <include name="s1ds-2.2j2ee.xml"/>
+                            <include name="s1ds-all.xml"/>
+                        </fileset>
+                    </concat>
+                </then>
+            </elseif>
+            <elseif>
+                <contains string="${ModuleToExecute}" substring="3.0WebAgent" casesensitive="No"/>
+                <then>
+                    <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                    <concat destfile="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml" append="true">
+                        <fileset dir="./xml/testng/agents" >
+                            <include name="extended-all.xml"/>
+                            <include name="s1ds-3.0web.xml"/>
+                            <include name="s1ds-all.xml"/>
+                        </fileset>
+                    </concat>
+                </then>
+            </elseif>
+            <elseif>
+                <contains string="${ModuleToExecute}" substring="3.0J2EEAgent" casesensitive="No"/>
+                <then>
+                    <echo message="Execution mode is ${EXECUTION_MODE}." level="info"/>
+                    <concat destfile="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml" append="true">
+                        <fileset dir="./xml/testng/agents" >
+                            <include name="extended-all.xml"/>
+                            <include name="s1ds-3.0j2ee.xml"/>
+                            <include name="s1ds-all.xml"/>
+                        </fileset>
+                    </concat>
+                </then>
+            </elseif>
+        </if>
+        <antcall target="merge-footer">
+            <param name="ModuleToExecute" value="agents"/>
+        </antcall>
+        <if>
+            <available file="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml" />
+            <then>
+                <replace file="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml" value="ldapv3">
+                    <replacefilter token="@mode@" value="${EXECUTION_MODE}"/>
+                </replace>
+                <!-- Check if file has tests to execute, else quit-->
+                <loadfile property="agents/agentsgenerated-xml" srcFile="${built.classes.dir}/xml/testng/agents/agents-${EXECUTION_MODE}-generated.xml">
+                    <filterchain>
+                        <expandproperties/>
+                    </filterchain><!--@{ModuleToExecuteList}/@{ModuleToExecuteList}generated-xml-->
+                </loadfile>
+                <if>
+                    <contains string="${agents/agentsgenerated-xml}" substring="&lt;test" casesensitive="No" />
+                    <then>
+                        <antcall target="runTestng">
+                            <param name="ModuleToExecute" value="agents"/>
+                        </antcall>
+                    </then>
+                </if>
+            </then>
+        </if>
+    </target>
+    <target name="doc">
+        <javadoc destdir="./javadoc" windowtitle="qatest javadoc">
+            <classpath refid="client.classpath"/>
+            <packageset dir="./source">
+                <include name="com/sun/identity/qatest/**"/>
+            </packageset>
+        </javadoc>
+    </target>
+
+    <!-- Display Testbase Runtime Environment -->
+    <target name="print-test-env-start">
+        <tstamp >
+            <format property="start.time" pattern="d-MMMM-yyyy hh:mm aa"/>
+        </tstamp>
+
+        <echo message="file name - ${test.env.outfile}"/>
+        <echo file="${test.env.outfile}">
+                      *** OpenSSO TestBase Runtime Environment ***
+        -----------------------------------------------------------------------
+        </echo>
+        <echo file="${test.env.outfile}" append="yes">
+            Start Time=[
+                ${start.time}
+            ]
+    
+            TestBase=[
+               Execution Mode[EXECUTION_MODE]  :${EXECUTION_MODE}	
+               Report Directory[REPORT_DIR]    :${REPORT_DIR}
+            ]
+      
+            Platform=[
+               Machine:${hostname}
+               OS     :${os.name}
+               Version:${os.version}
+               Arch   :${os.arch}
+            ]
+    
+            Java Platform=[
+               Path[JAVA_HOME]:${java.home}
+               Version        :${java.version}
+               VM             :${java.vm.vendor}
+            ]
+    
+            ANT=[
+               Version           :${ant.version}
+               Path[env.ANT_HOME]:${env.ANT_HOME}
+               OPTS[env.ANT_OPTS]:${env.ANT_OPTS}
+            ]
+    
+            USER=[
+               Name:${user.name}
+               Home:${user.home}
+               Dir :${user.dir}
+            ]
+
+        </echo>
+        <concat>
+            <filelist dir="." files="${test.env.outfile}"/>
+        </concat>
+    </target>
+
+    <target name="print-test-env-end">
+        <tstamp >
+            <format property="end.time" pattern="d-MMMM-yyyy hh:mm aa"/>
+        </tstamp>
+
+        <echo file="${test.env.outfile}" append="yes">
+            End Time=[
+              ${end.time}
+            ]
+        </echo>
+    </target>
+
+    <!-- 
+    Description: Target to send email  and mainly used for sending results.
+    Usage: Override the mail.subject, mail.to, mail.from and mail.file
+    properties in the lower built files.
+    -->
+    <target name="sendmail-common" depends="init-common">
+        <mail   mailhost="${mail.host}"
+		mailport="${mail.port}"
+                subject="${mail.subject}"
+		tolist="${mail.to}"
+		from="${mail.from}"
+		messagemimetype="${mail.mime.type}"
+		messagefile="${mail.file}">
+        </mail>
+    </target>
+</project>

@@ -1,0 +1,75 @@
+<script  type="text/javascript">
+    jQuery(function() {
+
+        $('#adminPassword').val($.amconfig.amadmin_password);
+        if ($.amconfig.amadmin_password != '') {
+            $('#adminConfirm').val($.amconfig.amadmin_password);
+        }
+        $('#adminPassword').bind('change', function(){
+            $.amconfig.amadmin_password = $(this).val();
+        });
+
+        function validateAdminPasswords() {
+            return  validateFieldValue("$context$path?", "adminPassword", "adminPasswordError", {
+                actionLink: 'checkPasswords',
+                confirm: $("#adminConfirm").val(),
+                password: $("#adminPassword").val(),
+                otherPassword: 'x',
+                type: 'admin'
+            });
+        }
+
+        $("#adminPassword").keyup(function () {
+            typewatch(validateAdminPasswords, 500);
+        });
+        $("#adminConfirm").keyup(function () {
+            typewatch(validateAdminPasswords, 500);
+        });
+
+        $("#submit").click(function(){
+            if (validateAdminPasswords()) {
+                openWizardConfig("step2");
+            } else {
+                return false;
+            }
+        });
+
+    });
+</script>
+
+<div id="modal" class="box clear-float">
+    <a class="close" href="javascript:;" onclick="closeWizardConfig();">Close</a>
+    <div class="col" id="left-col">
+        <ol id="steps">
+            <li class="on">$page.getLocalizedString("general.tab")</li>
+            <li>$page.getLocalizedString("server.tab")</li>
+            <li>$page.getLocalizedString("configuration.tab")</li>
+            <li>$page.getLocalizedString("user.tab")</li>
+            <li>$page.getLocalizedString("site.tab")</li>
+            <li>$page.getLocalizedString("agent.tab")</li>
+            <li>$page.getLocalizedString("summary.tab")</li>
+        </ol>
+    </div>
+    <div class="col left-seperator" id="main-col">
+        <h1>Custom Configuration Option</h1>
+        <h3 class="message no-icon">$page.getLocalizedString("step1.title")</h3>
+        <p>$page.getLocalizedString("step1.description")</p>
+        <em class="right">*&nbsp;$page.getLocalizedString("required.field.label")</em>
+        <fieldset>
+            <legend>$page.getLocalizedString("step1.admin.user.name")</legend>
+            <div class="row">
+                <label for="adminPassword">$page.getLocalizedString("password.label")*</label>
+                <input class="textbox" type="password" id="adminPassword" name="adminPassword" />
+            </div>
+            <div class="row">
+                <label for="adminConfirm">$page.getLocalizedString("confirm.label")*</label>
+                <input class="textbox" type="password" id="adminConfirm" name="adminConfirm"/>
+            </div>
+        </fieldset>
+        <div class="row">
+            <input type="button" class="button disabled" value='$page.getLocalizedString("previous.button")' />
+            <input type="submit" id="submit" class="button primary" value='$page.getLocalizedString("next.button")'/>
+            <input type="button" class="button right" value="Cancel" onclick="closeWizardConfig();"/>
+        </div>
+    </div>
+</div>

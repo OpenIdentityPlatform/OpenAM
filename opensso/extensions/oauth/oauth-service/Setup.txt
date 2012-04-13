@@ -1,0 +1,35 @@
+SETUP OF THE TOKEN SERVICE DATABASE AND GLASSFISH CONFIGURATION
+
+
+Configuring the Token Service Database:
+- If not already done, install db-derby (latest is 10.5.1.1)
+- Start the network server connection (startNetworkServer)
+- Move to the /etc directory of the OAuth Service extension - you should see the dbsetup.sql file.
+- Create the network DB (using Derby's command line tool ij).
+  For instance, assuming the db server is run locally:
+  ij> connect 'jdbc:derby://localhost:1527/TokenServiceDB;user=username;password=password;create=true';
+- Create tables by running the following commands:
+  ij> run 'dbsetup.sql';
+
+
+Configuring Glassfish:
+- Make sure GF points at the appropriate DERBY installation (AS_DERBY_INSTALL
+  variable in Glassfish's asenv.conf file)
+- Launch Glassfish and log in as administrator
+- Expand the Resources tab on the left and click on the Connection Pools folder.
+- Create a new Connection with the following General Settings:
+	Datasource Classname: org.apache.derby.jdbc.ClientDataSource
+	Resource Type: javax.sql.DataSource
+- In the Additional Properties tab of Connection Pools make sure the following
+  properties are defined (and only those)
+	User: username
+	DatabaseName: TokenServiceDB
+	Password: password
+	driverClass: org.apache.derby.jdbc.ClientDriver
+	URL: jdbc:derby://localhost:1527/TokenServiceDB
+	PortNumber: 1527
+	serverName: localhost
+- Click on JDBC Resources under the Resources tab on the left
+- Create a new resource (JNDI name: TokenServiceDB) and select the
+   connection pool you just created.
+

@@ -1,0 +1,153 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: xacml-test.xml,v 1.2 2008/06/25 05:48:18 qcheng Exp $
+
+-->
+
+<project name="xacml-test" default="run-test">
+    <description>xacml test</description>
+
+    <property name="opensso.home" location="../../../.."/>
+
+    <!--fed lib dir includes testng jars --> 
+    <property name="shared.lib.dir" 
+        location="${opensso.home}/products/shared/extlib"/>
+    <property name="fedlib.lib.dir" 
+        location="${opensso.home}/products/federation/library/extlib"/>
+
+    <property name="shared.classes.dir" 
+        location="${opensso.home}/products/shared/built/classes"/>
+
+    <property name="fedlib.resources.dir" 
+        location="${opensso.home}/products/federation/library/resources"/>
+    <property name="fedlib.resources.locale.dir" 
+        location="${fedlib.resources.dir}/locale"/>
+
+    <property name="fedlib.src.dir" 
+        location="${opensso.home}/products/federation/library/source"/>
+    <property name="fedlib.classes.dir" 
+        location="${opensso.home}/products/federation/library/built/classes"/>
+
+    <property name="fedlib.test.src.dir" 
+        location="${opensso.home}/products/federation/library/test/source"/>
+    <property name="fedlib.test.classes.dir" 
+        location="${opensso.home}/products/federation/library/built/test/classes"/>
+
+    <property name="output.dir" location="output"/>
+    <property name="logs.dir" location="logs"/>
+    <property name="template.dir" 
+        location="${opensso.home}/products/federation/library/test/www/template"/>
+    <property name="report.dir" location="report"/>
+    <property name="testng.dir" value="xml/testng"/>
+
+    <property name="log.level" value="ALL"/>
+
+    <path id="test.class.path">
+        <pathelement location="${shared.classes.dir}"/>
+        <pathelement location="${fedlib.classes.dir}"/>
+        <pathelement location="${fedlib.resources.locale.dir}"/>
+        <pathelement location="${fedlib.test.classes.dir}"/>
+        <fileset dir="${shared.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${fedlib.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="compile-context">
+        <echo message="fedlib.src.dir=${fedlib.src.dir}" />
+        <echo message="fedlib.classes.dir=${fedlib.classes.dir}" />
+        <mkdir dir="${fedlib.classes.dir}"/>
+        <javac 
+                debug = "true"
+                debuglevel = "lines,vars,source"
+                fork="yes"
+                classpathref="test.class.path"
+                srcdir="${fedlib.src.dir}"
+                destdir="${fedlib.classes.dir}">
+            <include name="com/sun/identity/xacml/**" />
+        </javac>
+    </target>
+
+    <target name="compile-test" depends="compile-context">
+        <echo message="${fedlib.test.src.dir}" />
+        <echo message="${fedlib.test.classes.dir}" />
+        <mkdir dir="${fedlib.test.classes.dir}"/>
+        <javac 
+                debug = "true"
+                debuglevel = "lines,vars,source"
+                fork="yes"
+                classpathref="test.class.path"
+                srcdir="${fedlib.test.src.dir}"
+                destdir="${fedlib.test.classes.dir}">
+            <include name="com/sun/identity/xacml/**" />
+        </javac>
+    </target>
+
+    <target name="run-test" depends="compile-test">
+        <delete dir="${output.dir}" />
+        <mkdir dir="${output.dir}" />
+        <delete dir="${logs.dir}" /> 
+        <mkdir dir="${logs.dir}" /> 
+
+        <java classname="org.testng.TestNG" fork="true">
+            <jvmarg value="-Xint"/>
+            <jvmarg value="-Dlog.level=${log.level}"/>
+            <jvmarg value="-ea"/>
+            <arg value="-d"/>
+            <arg value="${output.dir}"/>
+            <arg value="${testng.dir}/xacml-testng.xml"/>
+            <classpath refid="test.class.path"/>
+        </java>
+
+        <!-- <antcall target="report" /> -->
+    </target>
+
+    <target name="report">
+        <delete dir="${report.dir}" />
+        <mkdir dir="${report.dir}" />
+        <copy file="${template.dir}/default.css" tofile="${report.dir}/default.css" />
+        <java classname="com.sun.identity.shared.test.tools.ReportGenerator" fork="true">
+            <arg value="${output.dir}"/>
+            <arg value="${template.dir}"/>
+            <arg value="${report.dir}"/>
+            <classpath refid="test.class.path"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${output.dir}" />
+        <delete dir="${logs.dir}" />
+        <delete dir="${report.dir}" />
+        <delete dir="${fedlib.classes.dir}/com/sun/identity/xacml" />
+        <delete dir="${fedlib.test.classes.dir}/com/sun/identity/xacml" />
+    </target>
+
+    <target name="usage">
+        <echo message="opensso-home:${opensso.home}"/>
+    </target>
+
+</project>

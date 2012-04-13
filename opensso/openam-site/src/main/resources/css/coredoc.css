@@ -1,0 +1,248 @@
+body {
+  color: #333;
+  font-family: DejaVu, Verdana, Helvetica, Arial, sans-serif;
+  font-size: 84%; /* 100% would be medium, 16px. */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 800px;
+}
+
+dd,
+dl,
+dt,
+li,
+ol,
+p,
+td,
+th,
+ul {
+  font-size: 1em;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:link {
+  color: #47a;
+}
+
+a:visited {
+  color: #68a;
+}
+
+a:active, a:hover {
+  color: #990000;
+}
+
+.author {
+  font-size: 1em;
+  font-weight: normal;
+}
+
+code,
+.command>strong,
+div.literallayout,
+.filename {
+  font-family: monospace;
+  font-size: 1.1em;
+  font-weight: normal;
+}
+
+code,
+.command,
+.copyright,
+div.index,
+div.literallayout p,
+.filename,
+.term,
+.step {
+  font-weight: normal;
+}
+
+h1 {
+  color: #626D75;
+  font-size: 2em;
+}
+
+h2 {
+  color: #333
+  font-size: 1.8em;
+}
+
+h3 {
+  color: #333
+  font-size: 1.6em;
+}
+
+h4 {
+  color: #333
+  font-size: 1.4em;
+}
+
+h5 {
+  color: #333
+  font-size: 1.2em;
+}
+
+h6 {
+  color: #333
+  font-size: 1em;
+}
+
+hr {
+  display: none;
+}
+
+ul {
+  list-style-image: url("../images/bulletpoint.png");
+}
+
+div.refentry h2 {
+  font-size: 1.1em;
+}
+
+div.refentry h3 {
+  font-size: 1.0em;
+}
+
+div.navfooter,
+div.navheader,
+div.nukefooter {
+  background-color: #fafafa;
+}
+
+div.navheader {
+  border-bottom: thin solid #ccc;
+}
+
+.navheader th {
+  color: #fafafa;
+  font-size: 0em;
+}
+
+.navheader td,
+.navfooter td,
+.nukefooter td {
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+div.abstract,
+div.toc {
+  border: thin dotted #ccc;
+  margin-bottom: 0.25em;
+  margin-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.75em;
+}
+
+div.important,
+div.caution,
+div.note,
+div.tip,
+div.warning {
+  border: thin dotted #ccc;
+  font-style: italic;
+  margin-bottom: 0.25em;
+  margin-top: 0.25em;
+  padding-bottom: 0.25em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.25em;
+}
+
+div.appendix,
+div.chapter,
+div.index,
+div.preface {
+  border-bottom: thin solid #ccc;
+}
+
+img {
+  height: auto;
+  max-width: 640px;
+  max-height: 480px;
+}
+
+table {
+  font-size: 1em;
+}
+
+.table-contents {
+  border-bottom: thin solid #ccc;
+  border-spacing: 0.5em;
+  border-top: thin solid #ccc;
+}
+
+.table-contents thead {
+  text-align: left;
+}
+
+div.table-title {
+  margin-bottom: 0.5em;
+}
+
+div.abstract-title,
+div.blockquote-title,
+div.example-title,
+div.equation-title,
+div.figure-title,
+div.itemizedlist-title,
+div.orderedlist-title,
+div.procedure-title,
+div.sidebar-title,
+div.table-title,
+div.toc-title,
+div.variablelist-title
+{
+  font-weight: bold;
+}
+
+div.programlisting,
+div.flat,
+div.screen,
+div.synopsis {
+  background-color: #fafafa;
+  border: thin dashed #ccc;
+  font-family: monospace;
+  font-size: 1.1em;
+  margin-bottom: 1em;
+  padding: 0.5em;
+  white-space: pre;
+}
+
+div.flat,
+div.screen {
+  text-indent: -18px;
+}
+
+.toggle {
+  position: relative;
+  left: -40px;
+  float: left;
+}
+
+.formalpara-title {
+  font-weight: bold;
+}
+
+div.msglevel,
+div.msgorig,
+div.msgaud,
+div.msgexplan {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+span.msgmain-title,
+span.msgsub-title,
+span.msgrel-title,
+span.msglevel-title,
+span.msgorig-title,
+span.msgaud-title,
+span.msgexplan-title {
+  font-weight: bold;
+}

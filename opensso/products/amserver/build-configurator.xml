@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-configurator.xml,v 1.3 2009/08/19 05:40:29 veiming Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2011 ForgeRock AS
+-->
+
+<project name="configurator" default="createZipFile" basedir=".">
+    <description>OpenAM: amConfigurator.zip Creation</description>
+    <fail message="*** nightly build may be built from top level only ***">
+      <condition>
+            <or>
+                <not><isset property="amserver.warbase.dir"/></not>
+            </or>
+      </condition>
+    </fail>
+    <property name="configurator.dir"
+        value="${amserver.built.dir}/configurator"/>
+    <property name="configurator.scripts.dir"
+        value="${amserver.script.dir}/configurator"/>
+    
+    <target name="prepareBuild">
+        <mkdir dir="${configurator.dir}"/>
+    </target>
+
+    <target name="makeConfigJar" depends="prepareBuild">
+        <jar destfile="${configurator.dir}/configurator.jar">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="com.sun.identity.setup.OpenSSOConfigurator"/>
+            </manifest>
+            <zipfileset dir="${amserver.built.dir}/classes"
+                includes="com/sun/identity/setup/OpenSSOConfigurator*" />
+            <fileset dir="${amserver.res.dir}/locale"
+                includes="OpenSSOConfigurator.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/de_DE"
+                includes="OpenSSOConfigurator_de.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/es_ES"
+                includes="OpenSSOConfigurator_es.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/fr_FR"
+                includes="OpenSSOConfigurator_fr.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/ja_JP"
+                includes="OpenSSOConfigurator_ja.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/ko_KR"
+                includes="OpenSSOConfigurator_ko.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/zh_CN"
+                includes="OpenSSOConfigurator_zh.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/zh_TW"
+                includes="OpenSSOConfigurator_zh_TW.properties"/>
+        </jar>
+    </target>
+    
+    <target name="makeUpgradeJar" depends="prepareBuild">
+        <jar destfile="${configurator.dir}/upgrade.jar">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="org.forgerock.openam.setup.OpenAMUpgrade"/>
+            </manifest>
+            <zipfileset dir="${amserver.built.dir}/classes"
+                includes="org/forgerock/openam/setup/OpenAMUpgrade*" />
+            <fileset dir="${amserver.res.dir}/locale"
+                includes="OpenAMUpgrade.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/de_DE"
+                includes="OpenAMUpgrade_de.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/es_ES"
+                includes="OpenAMUpgrade_es.properties"/>
+            <fileset dir="${amserver.res.dir}/locale/fr_FR"
+                includes="OpenAMUpgrade_fr.properties"/>
+        </jar>
+    </target>
+
+    <target name="copyNeededFiles" depends="makeConfigJar, makeUpgradeJar">
+        <copy todir="${configurator.dir}" overwrite="yes" flatten="yes"
+            encoding="UTF-8">
+            <fileset dir="${products.basedir}" includes="license.txt"/>
+            <fileset dir="${configurator.scripts.dir}"
+                includes="configurator.jar, sampleconfiguration, sampleupgrade, README.setup"/>
+        </copy>
+    </target>
+
+    <target name="createZipFile" depends="copyNeededFiles">
+        <zip destfile="${amserver.dist.dir}/amConfiguratorTools.zip"
+            whenempty="create">
+            <zipfileset dir="${configurator.dir}" filemode="755">
+                <include name="configurator.jar"/>
+                <include name="upgrade.jar"/>
+                <include name="sampleconfiguration"/>
+                <include name="sampleupgrade"/>
+                <include name="license.txt"/>
+                <include name="README.setup"/>
+            </zipfileset>
+        </zip>
+        <checksum file="${amserver.dist.dir}/amConfiguratorTools.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+</project>
