@@ -52,7 +52,7 @@ endif
 endif
 
 ifeq ($(OS_ARCH), SunOS)
-CFLAGS += -DXP_UNIX
+CFLAGS += -DXP_UNIX $(PIC_FLAG)
 ES6_CFLAGS += -I$(SJSWS_INC_DIR)
 LDLIBS += $(LD_STATIC_FLAG) $(CXX_STD_LIBS) $(LD_SHARED_FLAG) -lc -lm
 LDLIBS += -Bdynamic -L$(NSPR_LIB_DIR) -L$(LIBXML_LIB_DIR) -L$(NSS_LIB_DIR) -lc -lnspr4 -lplds4 -lplc4 -lnss3 -lssl3 -lxml2

@@ -66,7 +66,7 @@ BEGIN_PRIVATE_NAMESPACE
 #define AGENT_CONFIGURATION "AgentConfiguration"
 
 typedef std::list<std::string> slist_t;
-typedef std::multimap<std::string, slist_t> smap_t;
+typedef std::map<std::string, slist_t> smap_t;
 typedef std::pair<std::string, slist_t> spair_t;
 
 template <class ContainerT >

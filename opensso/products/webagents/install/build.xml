@@ -139,16 +139,6 @@
                     <include name="libxml2.so.2"/>
             </fileset>
         </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS/stdcxx${build.type.suffix}/lib">
-                    <include name="libstdcxx.so"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS/stdcxx${build.type.suffix}">
-                    <include name="stdcxx_license.txt"/>
-            </fileset>
-        </copy>
     </target>
 
     <target name="copy-SunOS_x86-files">
@@ -180,16 +170,6 @@
         <copy todir="${container.web_agent.lib.dir}">
             <fileset dir="${webagents.basedir}/extlib/SunOS_i86pc/libxml2${build.type.suffix}/lib">
                     <include name="libxml2.so.2"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.lib.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS_i86pc/stdcxx${build.type.suffix}/lib">
-                    <include name="libstdcxx.so"/>
-            </fileset>
-        </copy>
-        <copy todir="${container.web_agent.dir}">
-            <fileset dir="${webagents.basedir}/extlib/SunOS_i86pc/stdcxx${build.type.suffix}">
-                    <include name="stdcxx_license.txt"/>
             </fileset>
         </copy>
     </target>

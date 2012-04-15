@@ -118,7 +118,7 @@ DEPENDS := $(OBJS:.o=.d)
 all: $(PROGRAMS)
 
 map_test$(EXE_EXT): $(map_test_OBJS)
-	$(MAKE_C_PROGRAM)
+	$(MAKE_CXX_PROGRAM)
 
 ifneq ($(CYGWIN_ARCH), WOW64)
 naming_test$(EXE_EXT): $(naming_test_OBJS)

@@ -161,8 +161,8 @@ LDLIBS = $($@_LDLIBS)
 # so that the OS-specific settings for versioning the library and the
 # local makefile setting of DEBUG_FLAGS are used.
 #
-MAKE_SHARED_LIB = $(CXX) $(LD_MAKE_SHARED_LIB_FLAG) $(DEBUG_FLAGS) \
-    $(LD_ORIGIN_FLAG) $(LDFLAGS) \
+MAKE_SHARED_LIB = $(CXX) $(LD_ORIGIN_FLAG) $(LD_MAKE_SHARED_LIB_FLAG) $(DEBUG_FLAGS) \
+        $(LDFLAGS) \
 	$(LD_VERSION_LIB_FLAG) $(LD_FILTER_SYMS_FLAG) \
 	$(filter %.o, $^) $(PLATFORM_SHARED_OBJS) $(LDLIBS) -o $@
 

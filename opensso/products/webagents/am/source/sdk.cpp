@@ -75,6 +75,7 @@ static char toLowerCase(char c) {
 void sdk::utils::url::parse(const std::string& url_s) {
     std::size_t lst;
     std::size_t lstp;
+    std::size_t dt = 0;
 #ifdef _MSC_VER
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -88,14 +89,26 @@ void sdk::utils::url::parse(const std::string& url_s) {
 #endif
         return;
     }
+#ifdef __SUNPRO_CC
+    std::distance(url_s.begin(), prot_i, dt);
+    protocol_.reserve(dt);
+    dt = 0;
+#else
     protocol_.reserve(std::distance(url_s.begin(), prot_i));
+#endif    
     std::transform(url_s.begin(), prot_i,
             std::back_inserter(protocol_),
             std::ptr_fun<char>(toLowerCase));
     std::advance(prot_i, prot_end.length());
     std::string::const_iterator path_i = std::find(prot_i, url_s.end(), ':');
     if (path_i != url_s.end()) {
+#ifdef __SUNPRO_CC
+        std::distance(prot_i, path_i, dt);
+        host_.reserve(dt);
+        dt = 0;
+#else
         host_.reserve(std::distance(prot_i, path_i));
+#endif  
         std::transform(prot_i, path_i,
                 std::back_inserter(host_),
                 std::ptr_fun<char>(toLowerCase));
@@ -106,7 +119,12 @@ void sdk::utils::url::parse(const std::string& url_s) {
     } else {
         //port is not available
         path_i = std::find(prot_i, url_s.end(), '/');
+#ifdef __SUNPRO_CC
+        std::distance(prot_i, path_i, dt);
+        host_.reserve(dt);
+#else
         host_.reserve(std::distance(prot_i, path_i));
+#endif 
         std::transform(prot_i, path_i,
                 std::back_inserter(host_),
                 std::ptr_fun<char>(toLowerCase));

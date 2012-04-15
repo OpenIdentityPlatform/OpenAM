@@ -104,19 +104,19 @@ EXPORTED_SAMPLES := \
 all: $(PROGRAMS) export_samples
 
 am_auth_test$(EXE_EXT): $(am_auth_test_OBJS)
-	$(MAKE_C_PROGRAM)
+	$(MAKE_CXX_PROGRAM)
 
 am_sso_test$(EXE_EXT): $(am_sso_test_OBJS)
-	$(MAKE_C_PROGRAM)
+	$(MAKE_CXX_PROGRAM)
 
 am_policy_test$(EXE_EXT): $(am_policy_test_OBJS)
-	$(MAKE_C_PROGRAM)
+	$(MAKE_CXX_PROGRAM)
 
 am_log_test$(EXE_EXT): $(am_log_test_OBJS)
-	$(MAKE_C_PROGRAM)
+	$(MAKE_CXX_PROGRAM)
 
 am_web_agent_test$(EXE_EXT): $(am_web_agent_test_OBJS)
-	$(MAKE_C_PROGRAM)
+	$(MAKE_CXX_PROGRAM)
 
 clean: clean_objs clean_samples
 	$(RM) $(PROGRAMS) *.ilk *.pdb *.exe.manifest
