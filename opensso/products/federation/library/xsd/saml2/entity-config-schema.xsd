@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: entity-config-schema.xsd,v 1.4 2008/06/25 05:48:43 qcheng Exp $
+
+-->
+
+
+<schema
+    targetNamespace="urn:sun:fm:SAML:2.0:entityconfig"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:fm="urn:sun:fm:SAML:2.0:entityconfig"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    elementFormDefault="unqualified"
+    attributeFormDefault="unqualified"
+    >
+    <import namespace="http://www.w3.org/2000/09/xmldsig#"
+	schemaLocation="xmldsig-core-schema.xsd"/>
+    <element name="EntityConfig" type="fm:EntityConfigType"/>
+    <complexType name="EntityConfigType">
+	<sequence>
+	    <element ref="ds:Signature" minOccurs="0"/>
+            <element ref="fm:Attribute" minOccurs="0" maxOccurs="unbounded"/>
+            <choice>
+		<choice maxOccurs="unbounded">
+		    <element ref="fm:IDPSSOConfig"/>
+		    <element ref="fm:SPSSOConfig"/>
+		    <element ref="fm:AuthnAuthorityConfig"/>
+		    <element ref="fm:AttributeAuthorityConfig"/>
+		    <element ref="fm:AttributeQueryConfig"/>
+		    <element ref="fm:PDPConfig"/>
+		    <element ref="fm:XACMLPDPConfig"/>
+		    <element ref="fm:XACMLAuthzDecisionQueryConfig"/>
+		</choice>
+		<element ref="fm:AffiliationConfig"/>
+            </choice>
+        </sequence>
+        <attribute name="entityID" type="anyURI" use="required"/>
+        <attribute name="hosted" type="boolean" use="optional"/>
+        <attribute name="ID" type="ID" use="optional"/>
+    </complexType>
+    <element name="IDPSSOConfig" type="fm:BaseConfigType"/>
+    <element name="SPSSOConfig" type="fm:BaseConfigType"/>
+    <element name="AuthnAuthorityConfig" type="fm:BaseConfigType"/>
+    <element name="AttributeAuthorityConfig" type="fm:BaseConfigType"/>
+    <element name="AttributeQueryConfig" type="fm:BaseConfigType"/>
+    <element name="PDPConfig" type="fm:BaseConfigType"/>
+    <element name="XACMLPDPConfig" type="fm:BaseConfigType"/>
+    <element name="XACMLAuthzDecisionQueryConfig" type="fm:BaseConfigType"/>
+    <element name="AffiliationConfig" type="fm:BaseConfigType"/>
+    <complexType name="BaseConfigType" abstract="true">
+        <sequence>
+            <element ref="fm:Attribute" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="metaAlias" type="string" use="optional"/>
+    </complexType>
+    <element name="Attribute" type="fm:AttributeType"/>
+    <complexType name="AttributeType">
+        <sequence>
+            <element ref="fm:Value" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="name" type="string" use="required"/>
+    </complexType>
+    <element name="Value" type="string"/>
+</schema>

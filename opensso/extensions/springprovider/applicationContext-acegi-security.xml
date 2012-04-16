@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+
+			   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+
+			   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy">
+        <property name="filterInvocationDefinitionSource">
+            <value>
+                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+                PATTERN_TYPE_APACHE_ANT
+                /**=opensssoLogoutFilter,openssoAuthenticationProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
+            </value>
+        </property>
+    </bean>
+    <bean id="openssoAuthenticationProvider" class="org.calgb.caaers.acegi.OpenSsoAuthenticationProvider">
+	</bean>
+    <bean id="openssoLogoutFilter"
+          class="org.acegisecurity.ui.logout.LogoutFilter">
+        <constructor-arg value="https://YOUR_SSO_SERVER/sso/UI/Logout"/>
+        <constructor-arg>
+            <list>
+                 <bean class="org.acegisecurity.ui.logout.SecurityContextLogoutHandler"/>
+                 <bean class="org.calgb.caaers.acegi.OpenSsoLogoutHandler"/>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean id="openssoAuthenticationProcessingFilter" class="org.calgb.caaers.acegi.OpenSsoProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureUrl" value="/"/>
+        <property name="defaultTargetUrl" value="/"/>
+        <property name="filterProcessesUrl" value="/ssologin"/>
+    </bean>
+    <bean id="openssoAuthenticationProcessingFilterEntryPoint" class="org.calgb.caaers.acegi.OpenSsoProcessingFilterEntryPoint">
+        <property name="loginUrl" value="https://YOUR_SSO_SERVER/sso/UI/Login"/>
+        <property name="filterProcessesUrl" value="/ssologin"/>
+
+<!-- The goto URL will be built automatically, but if you need to override it...
+        <property name="gotoUrl" value="https://myserver.com/myapp"/>
+
+OR piece-by-piece if you need to override only a certain part:
+
+        <property name="scheme" value="https"/>
+        <property name="serverName" value="myserver.com"/>
+        <property name="serverPort" value="8443"/>
+        <property name="webContext" value="/myapp"/>
+-->
+<!-- You add extra login parameters...
+        <property name="loginParameters" value="realm=foo&role=bar"/>
+-->
+
+    </bean>
+    <bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
+        <property name="authenticationEntryPoint" ref="openssoAuthenticationProcessingFilterEntryPoint"/>
+        <property name="accessDeniedHandler">
+            <bean class="org.acegisecurity.ui.AccessDeniedHandlerImpl">
+                <property name="errorPage" value="/accessDenied.jsp"/>
+            </bean>
+        </property>
+    </bean>
+</beans>
+

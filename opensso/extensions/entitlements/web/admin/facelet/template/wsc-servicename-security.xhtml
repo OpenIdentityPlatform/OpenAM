@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wsc-servicename-security.xhtml,v 1.3 2009/08/03 22:25:32 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['wsc-servicename-security.section-title']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['wsc-servicename-security.section-details']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGroup style="margin:10px;">
+                <ice:selectOneRadio 
+                    partialSubmit="true"
+                    value="#{wizardBean.configureWsc}">
+                    <f:selectItem 
+                        itemLabel="#{resources['wsc-servicename-security.configureWscTrueLabel']}"
+                        itemValue="true" />
+                    <f:selectItem 
+                        itemLabel="#{resources['wsc-servicename-security.configureWscFalseLabel']}"
+                        itemValue="false" />
+                </ice:selectOneRadio>
+            </ice:panelGroup>
+
+            <ice:panelGroup visible="#{wizardBean.configureWsc}">
+                <ice:outputText
+                    value="#{resources['wsc-servicename-security.configureWscLabel']}" />
+                <ice:panelGrid
+                    columns="2"
+                    columnClasses="label-column,input-column" >
+
+                    <ice:outputLabel 
+                        for="serviceName"
+                        effect="#{wizardBean.wscServiceNameMessageEffect}"
+                        style="float: right;"
+                        value="#{resources['wsc-servicename-security.serviceNameLabel']}" />
+                    <ice:inputText 
+                        id="serviceName"
+                        effect="#{wizardBean.wscServiceNameInputEffect}"
+                        size="70"
+                        maxlength="255"
+                        value="#{wizardBean.wscServiceName}" />
+
+                    <ice:outputLabel
+                        for="wscSecurityMechanism"
+                        style="float: right;"
+                        value="#{resources['wsc-servicename-security.wscSecurityMechanismLabel']}" />
+                    <ice:selectOneMenu 
+                        id="wscSecurityMechanism"
+                        value="#{wizardBean.wscSecurityMechanism}"
+                        valueChangeListener="#{wizardHandler.selectedWscSecurityMechanismListener}" >
+                        <f:selectItems
+                            value="#{wizardBean.securityMechanismForWscList}"/>
+                    </ice:selectOneMenu>
+
+                    <ice:outputText value="" />
+                    <ice:panelStack
+                        selectedPanel="#{wizardHandler.selectedSecurityPanel}">
+
+                        <ice:panelGroup id="noSettingsPanel" />
+
+                        <ice:panelGroup id="x509TokenSettingsPanel">
+                            <ice:panelGrid columns="1">
+                                <ice:outputLabel 
+                                    for="x509TokenSigningReferenceType"
+                                    value="#{resources['wsc-servicename-security.x509TokenSigningReferenceTypeLabel']}" />
+                                <ice:selectOneMenu
+                                    id="x509TokenSigningReferenceType"
+                                    value="#{wizardBean.x509TokenSigningReferenceType}">
+                                    <f:selectItems
+                                        value="#{wizardBean.x509SigningReferenceTypeList}" />
+                                </ice:selectOneMenu>
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <ice:panelGroup id="userNameTokenSettingsPanel">
+                            <ice:outputText
+                                value="#{resources['wsc-servicename-security.userNameTokenSettingsLabel']}" />
+                            <ice:panelGrid columns="2">
+                                <ice:outputLabel
+                                    for="userNameTokenUserName"
+                                    style="float: right;"
+                                    value="#{resources['wsc-servicename-security.userNameTokenUserNameLabel']}" />
+                                <ice:inputText
+                                    id="userNameTokenUserName"
+                                    size="50"
+                                    maxlength="50"
+                                    value="#{wizardBean.userNameTokenUserName}" />
+                                <ice:outputLabel
+                                    for="userNameTokenPassword"
+                                    style="float: right;"
+                                    value="#{resources['wsc-servicename-security.userNameTokenPasswordLabel']}" />
+                                <ice:inputSecret 
+                                    id="userNameTokenPassword"
+                                    size="50"
+                                    maxlength="50"
+                                    redisplay="true"
+                                    value="#{wizardBean.userNameTokenPassword}" />
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <ice:panelGroup id="kerberosSettingsPanel">
+                            <ice:outputText
+                                value="#{resources['wsc-servicename-security.kerberosSettingsLabel']}" />
+                            <ice:panelGrid columns="2">
+                                <ice:outputLabel
+                                    for="kerberosDomainServer"
+                                    style="float: right;"
+                                    value="#{resources['wsc-servicename-security.kerberosDomainServerLabel']}" />
+                                <ice:inputText
+                                    id="kerberosDomainServer"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosDomainServer}" />
+                                <ice:outputLabel
+                                    for="kerberosDomain"
+                                    style="float: right;"
+                                    value="#{resources['wsc-servicename-security.kerberosDomainLabel']}" />
+                                <ice:inputText
+                                    id="kerberosDomain"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosDomain}" />
+                                <ice:outputLabel
+                                    for="kerberosServicePrincipal"
+                                    style="float: right;"
+                                    value="#{resources['wsc-servicename-security.kerberosServicePrincipalLabel']}" />
+                                <ice:inputText
+                                    id="kerberosServicePrincipal"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosServicePrincipal}" />
+                                <ice:outputLabel
+                                    for="kerberosTicketCache"
+                                    style="float: right;"
+                                    value="#{resources['wsc-servicename-security.kerberosTicketCacheLabel']}" />
+                                <ice:inputText
+                                    id="kerberosTicketCache"
+                                    size="50"
+                                    maxlength="255"
+                                    value="#{wizardBean.kerberosTicketCache}" />
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <ice:panelGroup id="stsConfigSettingsPanel">
+                            <ice:panelGrid 
+                                columns="1"
+                                rendered="#{o:size(wizardBean.stsConfigurationNameList) > 1 }">
+                                <ice:outputLabel 
+                                    for="stsConfigurationName"
+                                    value="#{resources['wsc-servicename-security.stsConfigurationNameLabel']}" />
+                                <ice:selectOneMenu
+                                    id="stsConfigurationName"
+                                    value="#{wizardBean.stsConfigurationName}" >
+                                    <f:selectItems
+                                        value="#{wizardBean.stsConfigurationNameList}"/>
+                                </ice:selectOneMenu>
+                                <ice:outputText
+                                        style="font-style: italic;"
+                                        value="#{resources['wsc-servicename-security.stsHostedStsInlineHelp']}" />
+                            </ice:panelGrid>
+                        </ice:panelGroup>
+
+                    </ice:panelStack>
+
+                </ice:panelGrid>
+            </ice:panelGroup>
+
+        </ui:define>
+    </o:section>
+
+</span>

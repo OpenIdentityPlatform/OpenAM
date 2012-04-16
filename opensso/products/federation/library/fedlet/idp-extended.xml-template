@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EntityConfig entityID="IDP_ENTITY_ID" hosted="0" xmlns="urn:sun:fm:SAML:2.0:entityconfig">
+    <IDPSSOConfig>
+        <Attribute name="description">
+            <Value/>
+        </Attribute>
+        <Attribute name="cotlist">
+            <Value>fedletcot</Value>
+        </Attribute>
+    </IDPSSOConfig>
+    <AttributeAuthorityConfig>
+        <Attribute name="cotlist">
+            <Value>fedletcot</Value>
+        </Attribute>
+    </AttributeAuthorityConfig>
+    <XACMLPDPConfig>
+        <Attribute name="wantXACMLAuthzDecisionQuerySigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="cotlist">
+            <Value>fedletcot</Value>
+        </Attribute>
+    </XACMLPDPConfig>
+</EntityConfig>

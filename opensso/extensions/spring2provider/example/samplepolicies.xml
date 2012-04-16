@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE Policies PUBLIC "-//Sun Java System Access Manager 7.1 2006Q3 Admin CLI DTD//EN" "jar://com/sun/identity/policy/policyAdmin.dtd">
+
+<!-- Sample policies to test the app. You can import these with
+   opensso/ssoadm.jsp  - or use the ssoadm command line utility
+
+   Edit the URL's to match your environment
+ -->
+ 
+<Policies>
+
+    <Policy name="webaccess" referralPolicy="false" active="true" >
+        <Rule name="All Access to main page">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://opensso.my2do.com:8080/springex/faces/main.jsp" />
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects name="Subjects:1254945598536Qoa5c+c=" description="">
+            <Subject name="all auth" type="AuthenticatedUsers" includeType="inclusive">
+            </Subject>
+        </Subjects>
+    </Policy>
+<!-- extracted from realm, / -->
+<?xml version="1.0" encoding="UTF-8"?>
+    <Policy name="staff access"  referralPolicy="false" active="true" >
+        <Rule name="staff urls">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://opensso.my2do.com:8080/springex/faces/staff/*" />
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+    </Policy>
+</Policies>
+

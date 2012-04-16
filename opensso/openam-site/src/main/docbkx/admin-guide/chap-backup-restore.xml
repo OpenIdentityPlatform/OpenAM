@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-backup-restore'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Backing Up and Restoring OpenAM Configurations</title>
+ 
+ <para>This chapter shows how to backup and restore OpenAM configuration
+ data. This chapter <emphasis>does not cover backup and restore of user
+ data</emphasis>, which in a critical production system should be stored
+ separately.</para>
+ 
+ <procedure xml:id="backup-config-to-xml">
+  <title>To Back Up OpenAM Configuration</title>
+  <indexterm><primary>Backup</primary></indexterm>
+  <para>OpenAM stores service configuration data in a directory. During normal
+  production operations, you rely on directory replication to maintain multiple,
+  current copies of OpenAM service configuration. For disaster recovery,
+  however, you backup to and restore the service configuration from XML, using
+  the <command>ssoadm</command> command.</para>
+  
+  <step>
+   <para>Backup OpenAM service configuration using the
+   <command>ssoadm</command> command.</para>
+   <screen>$ ssoadm export-svc-cfg -u amadmin -e fZatIu68OiqccJMXosSRyVjMsWJIx+SA
+ -f /tmp/pwd.txt -o ~/backup-`date -u +%F-%m-%S`.xml
+
+Service Configuration was exported.</screen>
+   <para>In this example, the secret key for encrypting the password in
+   <option>-e fZatIu68OiqccJMXosSRyVjMsWJIx+SA</option> was taken from the
+   Password Encryption Key field in the OpenAM console under Configuration &gt;
+   Servers and Sites &gt; <replaceable>Server Name</replaceable> &gt;
+   Security.</para>
+  </step>
+  <step>
+   <para>Stop OpenAM.</para>
+  </step>
+  <step>
+   <para>Back up the instance file that points to the configuration
+   directory.</para>
+   <para>This file is named after the instance location, such as
+   <filename>$HOME/.openssocfg/AMConfig_path_to_tomcat_webapps_openam_</filename>,
+   where $HOME is that of the user running the web container where OpenAM
+   is deployed.</para>
+  </step>
+  <step>
+   <para>Back up the files in the configuration directory.</para>
+   <para>The content of the file you backed up in the previous step is the
+   path to the configuration directory, such as
+   <filename>$HOME/openam</filename>.</para>
+  </step>
+  <step>
+   <para>Start OpenAM.</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="restore-config-from-xml">
+  <title>To Restore OpenAM Configuration</title>
+  <indexterm><primary>Restoring</primary></indexterm>
+  <para>The following steps restore OpenAM configuration data from
+  backup as described in <xref linkend="backup-config-to-xml" />.</para>
+  
+  <tip>
+   <para>If using the default OpenAM configuration data store, run
+   <command>ssoadm embedded-status</command> to check the data store status
+   to determine whether you must restore the configuration files including
+   the embedded data store, or only the service configuration.</para>
+  </tip>
+  
+  <step>
+   <para>Deploy the OpenAM web application as you did for installation, but
+   do not start OpenAM or configure it.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
+  </step>
+  <step>
+   <para>Restore files in the configuration directory as necessary.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
+  </step>
+  <step>
+   <para>Restore the bootstrap files as necessary.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
+  </step>
+  <step>
+   <para>Start OpenAM.</para>
+   <para>In a site configuration, perform this step on all servers before
+   proceeding.</para>
+  </step>
+  <step>
+   <para>Restore OpenAM service configuration using the
+   <command>ssoadm</command> command.</para>
+   <screen>$ ssoadm import-svc-cfg -u amadmin -e fZatIu68OiqccJMXosSRyVjMsWJIx+SA
+ -f /tmp/pwd.txt -X ~/backup-2011-09-13-09-00.xml 
+
+Directory Service contains existing data. Do you want to delete it? [y|N] y
+Please wait while we import the service configuration...
+Service Configuration was imported.</screen>
+   <para>In a site configuration, you perform this step only once.</para>
+   <para>If the password for <literal>amadmin</literal> has been changed
+   through the OpenAM console, then use the bind password for the root DN of
+   the configuration store.</para>
+  </step>
+  <step>
+   <para>Restart OpenAM.</para>
+   <para>In a site configuration, perform this step on all servers.</para>
+  </step>
+ </procedure>
+</chapter>

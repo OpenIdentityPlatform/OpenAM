@@ -1,0 +1,174 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyWSFedSPViewRemote.xml,v 1.6 2008/06/27 21:17:02 babysunil Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+        <section name="assertsigned" defaultValue="wsfedsp.provider.section.title.assertionsigned">
+            <property>
+                <label name="lblSPAssertionSigned"
+                       defaultValue=
+                       "wsfedsp.attribute.label.spassertionsigned"
+                       labelFor="wantAssertionSigned" />
+                <cc name="wantAssertionSigned" 
+                    tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+            </property>
+        </section>
+        <section name="attrMap" defaultValue="wsfedidp.provider.section.title.attrMapper">
+            <property>
+                <label name="lblSPAttributeMapper"
+                       defaultValue="wsfedsp.attribute.label.spAttributeMapper"
+                       labelFor="spAttributeMapper" />
+                <cc name="spAttributeMapper" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="75" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+            </property>
+            <property>
+                <label name="lblSPAttributeMap"
+                       defaultValue="wsfedsp.attribute.label.spattributeMap"
+                       labelFor="attributeMap" />
+                <ccgroup>
+                    <property>
+                        <cc name="attributeMap" 
+                            tagclass=
+                            "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                            <attribute name="name" value="list" />
+                            <attribute name="listboxLabel"
+                                       value="label.current.value" />
+                            <attribute name="textboxLabel"
+                                       value="label.new.value" />
+                        </cc>
+                        <fieldhelp name="helpSPattributeMap" defaultValue="wsfedsp.provider.section.title.help.spattributeMap" />
+                    </property>
+                </ccgroup>
+            </property>
+        </section>
+        
+      
+        <section name="assertime" defaultValue="wsfedidp.provider.section.title.asserefftime">  
+            <property>
+                <label name="lblSPAssertionEffectiveTime"
+                       defaultValue=
+                       "wsfedsp.attribute.label.spassertionEffectiveTime"
+                       labelFor="assertionEffectiveTime" />
+                <cc name="assertionEffectiveTime" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="5" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpSPAssertionEffectiveTime" defaultValue="wsfedsp.provider.section.title.help.asserefftime" />
+            </property>
+        </section>
+        <section name="assertimesk" defaultValue="wsfedsp.provider.section.title.spassertimeskew"> 
+            <property>
+                <label name="lblSPassertionTimeSkew"
+                       defaultValue="wsfedsp.attribute.label.spassertionTimeSkew"
+                       labelFor="assertionTimeSkew" />
+                <cc name="assertionTimeSkew" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="5" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpSPassertionTimeSkew" defaultValue="wsfedsp.provider.section.title.help.spassertionTimeSkew" />
+            </property>
+        </section>
+        <section name="defaultrelay" defaultValue="wsfedsp.provider.section.title.defaultrelaystate">  
+            <property>
+                <label name="lblSPDefaultRelayState"
+                       defaultValue="wsfedsp.attribute.label.spDefaultRelayState"
+                       labelFor="defaultRelayState" />
+                <cc name="defaultRelayState" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="75" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpSPDefaultRelayState" defaultValue="wsfedsp.provider.section.title.help.defaultrelaystate" />
+            </property>
+        </section>
+        <section name="homerealmdisc" defaultValue="wsfedsp.provider.section.title.sphomeRealmDisc">
+            <property>
+                <label name="lblHomeRealmDiscovery"
+                       defaultValue=
+                       "wsfedsp.attribute.label.sphomerealmdiscoveryservice"
+                       labelFor="HomeRealmDiscoveryService" />
+                <cc name="HomeRealmDiscoveryService" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="80" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpHomeRealmDiscovery" defaultValue="wsfedsp.provider.section.title.help.sphomeRealmDisc" />
+            </property>
+        </section>
+        <section name="acctRealmSelection" defaultValue="wsfedsp.provider.section.title.spacctrealmselection">
+        <property>
+            <fieldhelp name="helpacctRealmSelection" defaultValue="wsfedsp.provider.section.title.help.acctRealmSelection" />
+                &lt;table border="0" cellspacing="0" cellpadding="0">&lt;tr>
+                &lt;td nowrap="nowrap">
+            <cc name="AccountRealmSelection" 
+                tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+                <attribute name="defaultValue" value="cookie"/>
+                <option label="label.cookie" value="cookie"/>
+                <option label="label.UserAgentKey" value="UserAgentKey"/>
+            </cc>
+            &lt;/td >
+            &lt;td valign="middle">
+            <cc name="space" 
+                tagclass="com.sun.web.ui.taglib.spacer.CCSpacerTag">
+                   <attribute name="Height" value="2"/>
+                   <attribute name="Width" value="8"/>
+            </cc>
+            &lt;/td>
+            &lt;td nowrap="nowrap">
+            <cc name="cookiname" 
+                tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+            <cc name="AccountRealmCookieName" 
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="size" value="72" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            &lt;br />
+            <cc name="useragentkey" 
+                tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+            <cc name="UserAgentKey" 
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="size" value="75" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            &lt;/td>&lt;/tr>&lt;/table>
+        </property>         
+    </section>
+</propertysheet>

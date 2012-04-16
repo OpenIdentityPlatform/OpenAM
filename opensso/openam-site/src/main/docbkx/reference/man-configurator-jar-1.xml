@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<refentry xml:id='man-configurator-jar-1'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <info><copyright><year>2011-2012</year><holder>ForgeRock AS</holder></copyright></info>
+ <refmeta>
+  <refentrytitle>configurator.jar</refentrytitle><manvolnum>1</manvolnum>
+  <refmiscinfo class="software">OpenAM</refmiscinfo>
+  <refmiscinfo class="version"><?eval ${serverDocTargetVersion}?></refmiscinfo>
+ </refmeta>
+ <refnamediv>
+  <refname>configurator.jar</refname>
+  <refpurpose>install or upgrade OpenAM using a configuration file</refpurpose>
+ </refnamediv>
+ <refsynopsisdiv>
+  <cmdsynopsis>
+   <command>configurator.jar</command>
+   <arg choice="req">options</arg>
+  </cmdsynopsis>
+ </refsynopsisdiv>
+ <refsect1>
+  <title>Description</title>
+  <para>This executable .jar file lets you perform silent installation,
+  configuring a deployed OpenAM server by applying settings from a configuration
+  file.</para>
+ </refsect1>
+ <refsect1>
+  <title>Options</title>
+  <para>The following options are supported.</para>
+  <variablelist>
+   <varlistentry>
+    <term><option>-f | --file <replaceable>configuration-file</replaceable></option></term>
+    <listitem>
+     <para>Configure a deployed OpenAM web application archive using the
+     specified configuration file. Installation and upgrade configuration
+     files are described in the sections below.</para>
+    </listitem>
+   </varlistentry>
+  <varlistentry>
+    <term><option>-? | --help</option></term>
+    <listitem>
+     <para>Display the usage message.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+ <refsect1>
+  <title>Installation Configuration File</title>
+  <para>Base your configuration on the <filename>sampleconfiguration</filename>
+  file delivered with OpenAM, and using the hints in this section, or the
+  comments included in the file.</para>
+  <variablelist>
+   <title>Server Properties</title>
+   <para>These properties pertain to the OpenAM server instance.</para>
+   <varlistentry>
+    <term>SERVER_URL</term>
+    <listitem>
+     <para>URL to the web container where you want OpenAM to run, such as
+     <literal>http://openam.example.com:8080</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DEPLOYMENT_URI</term>
+    <listitem>
+     <para>URI where you want to deploy OpenAM on the web container, such as
+     <literal>/openam</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>BASE_DIR</term>
+    <listitem>
+     <para>Configuration directory where OpenAM stores files and embedded
+     configuration directory servers, such as
+     <literal>$HOME/openam</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>locale</term>
+    <listitem>
+     <para>The user locale, such as <literal>en_GB</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>PLATFORM_LOCALE</term>
+    <listitem>
+     <para>The locale of the OpenAM server, such as
+     <literal>en_US</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>AM_ENC_KEY</term>
+    <listitem>
+     <para>The password encryption key, which must be the same on all servers
+     in a multi-server installation, such as
+     <literal>O6QWwHPO4os+zEz3Nqn/2daAYWyiFE32</literal>. If left blank,
+     installing OpenAM generates a random password encryption key that you can
+     later view in OpenAM console under Configuration &gt; Servers and Sites
+     &gt; <replaceable>Server Name</replaceable> &gt; Security.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>ADMIN_PWD</term>
+    <listitem>
+     <para>Password of the OpenAM administrator user
+     <literal>amadmin</literal>, which must be at least 8 characters in length
+     and must match that of other servers in a multiserver deployment</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>AMLDAPUSERPASSWD</term>
+    <listitem>
+     <para>Password of the default policy agent
+     <literal>UrlAccessAgent</literal>, which must be at least 8 characters in
+     length and must not be the same as the value of
+     <literal>ADMIN_PWD</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>COOKIE_DOMAIN</term>
+    <listitem>
+     <para>Name of the trusted DNS domain OpenAM returns to a browser when it
+     grants a session ID to a user, such as
+     <literal>.example.com</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <variablelist>
+   <title>Configuration Store Properties</title>
+   <para>These properties pertain to the directory server where OpenAM
+   stores its configuration.</para>
+   <varlistentry>
+    <term>DATA_STORE</term>
+    <listitem>
+     <para>Type of the configuration data store. The value
+     <literal>embedded</literal> means set up OpenAM with an embedded, OpenDJ
+     based configuration store. The value <literal>dirServer</literal> means
+     an external directory server, such as OpenDJ, or Sun Java System Directory
+     Server. If you set this to <literal>dirServer</literal>, and the
+     configuration store contains the configuration of other OpenAM servers,
+     then the server is added to the existing multiserver installation.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DIRECTORY_SSL</term>
+    <listitem>
+     <para>To use LDAP without SSL, set this to <literal>SIMPLE</literal>. To
+     use LDAP with SSL, set this to <literal>SSL</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DIRECTORY_SERVER</term>
+    <listitem>
+     <para>Fully qualified domain name of the configuration store directory
+     server host, such as <literal>opendj.example.com</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DIRECTORY_PORT</term>
+    <listitem>
+     <para>LDAP or LDAPS port number for the configuration store directory
+     server, such as 389 or 636</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DIRECTORY_ADMIN_PORT</term>
+    <listitem>
+     <para>Administration port number for the configuration store directory
+     server, such as 4444</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DIRECTORY_JMX_PORT</term>
+    <listitem>
+     <para>Java Management eXtension port number, such as
+     <literal>1689</literal>, used with the OpenDJ embedded configuration
+     store</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>ROOT_SUFFIX</term>
+    <listitem>
+     <para>Root suffix distinguished name (DN) for the configuration store,
+     such as <literal>o=openam</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_DIRMGRDN</term>
+    <listitem>
+     <para>Distinguished name of the directory manager of the configuration
+     store, such as <literal>cn=Directory Manager</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_DIRMGRPASSWD</term>
+    <listitem>
+     <para>Password for the directory manager of the configuration store</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <variablelist>
+   <title>User Data Store Properties</title>
+   <para>These properties pertain to the directory server where OpenAM stores
+   user profiles. If you do not include these properties, or you leave these
+   properties commented out, then OpenAM uses the same directory server as
+   it uses for the configuration store.</para>
+   <varlistentry>
+    <term>USERSTORE_TYPE</term>
+    <listitem>
+     <para>The type of directory server used. Valid values include the
+     following.</para>
+     <itemizedlist>
+      <listitem>
+       <para><literal>LDAPv3ForOpenDS</literal>: ForgeRock 0penDJ or
+       Sun OpenDS</para>
+      </listitem>
+      <listitem>
+       <para><literal>LDAPv3ForAD</literal>: Active Directory with
+       host and port settings</para>
+      </listitem>
+      <listitem>
+       <para><literal>LDAPv3ForADDC</literal>: Active Directory with a
+       Domain Name setting</para>
+      </listitem>
+      <listitem>
+       <para><literal>LDAPv3ForADAM</literal>: Active Directory Application
+       Mode</para>
+      </listitem>
+      <listitem>
+       <para><literal>LDAPv3ForSUNDS</literal>: Sun Java System Directory
+       Server</para>
+      </listitem>
+      <listitem>
+       <para><literal>LDAPv3ForTivoli</literal>: IBM Tivoli Directory
+       Server</para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_SSL</term>
+    <listitem>
+     <para>To use LDAP without SSL, set this to <literal>SIMPLE</literal>. To
+     use LDAP with SSL, set this to <literal>SSL</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_DOMAINNAME</term>
+    <listitem>
+     <para>If <literal>USERSTORE_TYPE</literal> is
+     <literal>LDAPv3ForADDC</literal>, you set this to the Active Directory
+     Domain Name, such as <literal>ad.example.com</literal>, and then set only
+     the <literal>USERSTORE_SSL</literal>, <literal>USERSTORE_MGRDN</literal>,
+     and <literal>USERSTORE_PASSWD</literal> additional parameters. This lets
+     Active Directory use DNS to retrieve service locations. Otherwise, do not
+     use.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_HOST</term>
+    <listitem>
+     <para>Fully qualified domain name of the user data store directory
+     server, such as <literal></literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_PORT</term>
+    <listitem>
+     <para>Port number of the user data store. Default for LDAP is 389, and
+     for LDAP over SSL is 636.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_SUFFIX</term>
+    <listitem>
+     <para>Root suffix distinguished name for the user data in the directory,
+     such as <literal>dc=example,dc=com</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_MGRDN</term>
+    <listitem>
+     <para>Distinguished name of the directory manager of the user data store,
+     such as <literal>cn=Directory Manager</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>USERSTORE_PASSWD</term>
+    <listitem>
+     <para>Password for the directory manager of the user data store</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <variablelist>
+   <title>Site Properties</title>
+   <para>These properties pertain when you configure multiple OpenAM servers
+   in a site deployment, where a load balancer spreads request across multiple
+   servers. Use the <literal>DS_EMB_REPL*</literal> and
+   <literal>existingserverid</literal> properties only for the second and
+   subsequent servers in a site configuration.</para>
+   <varlistentry>
+    <term>LB_SITE_NAME</term>
+    <listitem>
+     <para>The name of the OpenAM site</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>LB_PRIMARY_URL</term>
+    <listitem>
+     <para>The load balancer URL for the site, such as
+     <literal>http://lb.example.com:80/openam</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_EMB_REPL_FLAG</term>
+    <listitem>
+     <para>Enable use of the embedded configuration store by setting this
+     parameter to <literal>embReplFlag</literal>, only if the
+     <literal>DATA_STORE</literal> parameter is set to
+     <literal>embedded</literal>. Use the other <literal>DS_EMB_REPL*</literal>
+     parameters in this section to set up configuration store data
+     replication.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_EMB_REPL_REPLPORT1</term>
+    <listitem>
+     <para>Replication port number for the new OpenAM server you are
+     installing, such as 58989</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_EMB_REPL_HOST2</term>
+    <listitem>
+     <para>Host name of an existing OpenAM server housing the configuration
+     store directory server with which to replicate, such as
+     <literal>openam1.example.com</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_EMB_REPL_ADMINPORT2</term>
+    <listitem>
+     <para>Administration port number for the configuration store directory
+     server used by the existing OpenAM server, such as 4444</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DS_EMB_REPL_REPLPORT2</term>
+    <listitem>
+     <para>Replication port number for the configuration store directory
+     server used by the existing OpenAM server, such as 50899</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>existingserverid</term>
+    <listitem>
+     <para>Full URL of the existing OpenAM server, such as
+     <literal>http://server1.example.com:8080/openam</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+ <refsect1>
+  <title>Upgrade Configuration File</title>
+  <para>Base your configuration on the <filename>sampleconfiguration</filename>
+  file delivered with OpenAM, and using the hints in this section, or the
+  comments included in the file.</para>
+  <variablelist>
+   <title>Upgrade Properties</title>
+   <varlistentry>
+    <term>SERVER_URL</term>
+    <listitem>
+     <para>URL to the web container where OpenAM runs, such as
+     <literal>http://openam.example.com:8080</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>DEPLOYMENT_URI</term>
+    <listitem>
+     <para>URI where OpenAM is deployed on the web container, such as
+     <literal>/openam</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+ <refsect1>
+  <title>Examples</title>
+  <para>The following example shows a configuration file to install a server
+  with an external user data store.</para>
+  <programlisting># Server properties, AM_ENC_KEY="" means generate random key
+SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+BASE_DIR=$HOME/openam
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=change3me
+AMLDAPUSERPASSWD=secret12
+COOKIE_DOMAIN=.example.com
+
+# Embedded configuration data store
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=openam.example.com
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=o=openam
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=chang3me
+
+# External OpenDJ based user data store
+USERSTORE_TYPE=LDAPv3ForOpenDS
+USERSTORE_SSL=SIMPLE
+#USERSTORE_DOMAINNAME=ad.example.com 
+USERSTORE_HOST=opendj.example.com
+USERSTORE_PORT=389
+USERSTORE_SUFFIX=dc=example,dc=com
+USERSTORE_MGRDN=cn=Directory Manager
+USERSTORE_PASSWD=secret12
+
+# Uncomment to specify the site for the first server in a site configuration
+#LB_SITE_NAME=lb
+#LB_PRIMARY_URL=http://lb.example.com:80/openam</programlisting>
+
+  <para>The following example shows a configuration file to install the second
+  server in a site configuration.</para>
+  <programlisting># Server properties, AM_ENC_KEY from first server
+SERVER_URL=http://server2.example.com:8080
+DEPLOYMENT_URI=/openam
+BASE_DIR=$HOME/openam
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=O6QWwHPO4os+zEz3Nqn/2daAYWyiFE32
+ADMIN_PWD=change3me
+AMLDAPUSERPASSWD=secret12
+COOKIE_DOMAIN=.example.com
+
+# Embedded configuration data store
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=server2.example.com
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=o=openam
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=chang3me
+
+# External OpenDJ based user data store
+USERSTORE_TYPE=LDAPv3ForOpenDS
+USERSTORE_SSL=SIMPLE
+#USERSTORE_DOMAINNAME=ad.example.com 
+USERSTORE_HOST=opendj.example.com
+USERSTORE_PORT=389
+USERSTORE_SUFFIX=dc=example,dc=com
+USERSTORE_MGRDN=cn=Directory Manager
+USERSTORE_PASSWD=secret12
+
+# Site properties
+LB_SITE_NAME=lb
+LB_PRIMARY_URL=http://lb.example.com:80/openam
+DS_EMB_REPL_FLAG=embReplFlag
+DS_EMB_REPL_REPLPORT1=58989
+DS_EMB_REPL_HOST2=server1.example.com
+DS_EMB_REPL_ADMINPORT2=4444
+DS_EMB_REPL_REPLPORT2=50889
+existingserverid=http://server1.example.com:8080/openam</programlisting>
+
+  <para>The following example shows a configuration file to upgrade an
+  OpenAM server.</para>
+  <programlisting>SERVER_URL=https://openam.example.com:8080
+DEPLOYMENT_URI=/openam</programlisting>
+ </refsect1>
+</refentry>

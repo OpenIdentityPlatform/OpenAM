@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-zip.xml,v 1.38 2009/08/19 05:40:42 veiming Exp $
+
+-->
+
+<!--
+   Portions Copyrighted 2010-2011 ForgeRock AS
+-->
+
+<project name="openssozip" default="all" basedir=".">
+    <description>Open SSO: opensso.zip Creation</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** zip may be built from top level only ***">
+        <condition>
+            <not><isset property="openfm.built.dir"/></not>
+        </condition>
+    </fail>
+    
+    <property name="zip.temp.dir1" value="${openfm.built.dir}/.zip" />
+    <property name="zip.temp.dir" value="${zip.temp.dir1}/opensso" />
+
+    <target name="all" depends="consoleonlywebxml, noconsolewebxml, patchtools">
+        <copy todir="${zip.temp.dir}">
+            <fileset dir="${products.license.dir}" includes="*.txt" />
+        </copy>
+        <copy file="${openfm.dir}/docs/README.famzip"
+            tofile="${zip.temp.dir}/README" />
+            
+        <copy todir="${zip.temp.dir}/deployable-war">
+             <fileset dir="${openfm.dir}/deployable-war" includes="**/*" />
+        </copy>
+        <mkdir dir="${zip.temp.dir}/deployable-war/classes/com/sun/identity/tools/deployablewar" />
+        <copy todir="${zip.temp.dir}/deployable-war/classes/com/sun/identity/tools/deployablewar">
+             <fileset dir="${openfm.classes.dir}/com/sun/identity/tools/deployablewar" includes="*.class"/>
+        </copy>
+        <copy todir="${zip.temp.dir}/deployable-war/classes" flatten="true">
+             <fileset dir="${openfm.res.i18n.dir}" includes="**/deployablewar*.properties" />
+        </copy>
+        <copy tofile="${zip.temp.dir}/deployable-war/classes/deployablewar_en.properties" file="${openfm.res.i18n.dir}/deployablewar.properties" />
+
+
+        <copy todir="${zip.temp.dir}/integrations">
+             <fileset dir="${openfm.dir}/integrations" includes="**/*"/>
+        </copy>
+        <copy file="${fm.dist.dir}/opensso.war"
+            tofile="${zip.temp.dir}/deployable-war/opensso.war" />
+
+
+        <mkdir dir="${zip.temp.dir}/fedlet" />
+        <copy file="${fm.dist.dir}/Fedlet-unconfigured.zip"
+            todir="${zip.temp.dir}/fedlet" />
+
+        <!-- copy IDP discovery related files to deployable-war -->
+        <mkdir dir="${zip.temp.dir}/deployable-war/idpdiscovery" />
+        <copy todir="${zip.temp.dir}/deployable-war/idpdiscovery">
+             <fileset dir="${openfm.dir}/idpdiscovery">
+                 <include name="Configurator.jsp"/>
+                 <include name="index.html"/>
+                 <include name="WEB-INF/web.xml"/>
+             </fileset>
+        </copy>
+        <!-- Done copy IDP discovery related files to deployable-war -->
+
+        <!-- copy Distributed Authentication related files to deployable-war -->
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth" />
+        <copy todir="${zip.temp.dir}/deployable-war/distauth">
+            <fileset dir="${amserver.base.dir}/www/authentication/UI">
+                <include name="index.html"/>
+            </fileset>
+            <fileset dir="${amserver.base.dir}/distauth/configurator/jsp">
+                <include name="*.jsp" />
+            </fileset>
+        </copy>
+        <copy todir="${zip.temp.dir}/deployable-war/distauth/click">
+            <fileset dir="${amserver.www.dir}/click" />
+        </copy>        
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/config" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/config/auth" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/config/auth/default" />
+        <copy todir="${zip.temp.dir}/deployable-war/distauth/config/auth/default">
+            <fileset dir="${amserver.base.dir}/www/authentication/distUI">
+                <include name="*.jsp" />
+                <include name="*.html" />
+            </fileset>
+        </copy>
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/images/masthead" />
+        <copy todir="${zip.temp.dir}/deployable-war/distauth/images/masthead">
+            <fileset dir="${amserver.base.dir}/distauth/configurator/images/masthead">
+                <include name="*.jpg" />
+                <include name="*.gif" />
+            </fileset>
+        </copy>
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/images/other" />
+        <copy todir="${zip.temp.dir}/deployable-war/distauth/images/other">
+            <fileset dir="${amserver.base.dir}/distauth/configurator/images/other">
+                <include name="*.gif" />
+            </fileset>
+        </copy>
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/WEB-INF" />
+        <copy todir="${zip.temp.dir}/deployable-war/distauth/WEB-INF">
+            <fileset dir="${amserver.base.dir}/distauth/configurator/xml">
+                <include name="web.xml" />
+            </fileset>
+        </copy>
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/WEB-INF/lib" />
+        <copy file="${fm.dist.dir}/openssoclientsdk.jar"
+            todir="${zip.temp.dir}/deployable-war/distauth/WEB-INF/lib" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/distauth/WEB-INF/classes" />
+        <copy todir="${zip.temp.dir}/deployable-war/distauth/WEB-INF/classes">
+            <fileset dir="${amserver.base.dir}/built/classes">
+                <include name="com/sun/identity/authentication/distUI/*.class" />
+                <include name="com/sun/identity/authentication/UI/taglib/*.class" />
+                <include name="com/sun/identity/authentication/UI/AuthViewBeanBase.class" />
+                <include name="com/sun/identity/authentication/UI/ButtonTiledView.class" />
+                <include name="com/sun/identity/authentication/UI/CallBackChoiceTiledView.class" />
+                <include name="com/sun/identity/authentication/UI/CallBackTiledView.class" />
+            </fileset>  
+            <fileset dir="${amserver.base.dir}/built/distauth/classes">
+                <include name="com/sun/identity/distauth/setup/DistAuthConfiguratorFilter.class" />
+                <include name="com/sun/identity/distauth/setup/SetupDistAuthWAR.class" />
+                <include name="org/forgerock/openam/distauth/DistAuthConfiguratorHelper.class" />
+            </fileset>
+            <fileset dir="${amserver.base.dir}/distauth/configurator/resources">
+                <include name="AMDistAuthConfig.properties.template" />
+            </fileset>
+            <fileset dir="${openfm.built.dir}/classes">
+                <include name="com/iplanet/services/cdc/client/CDCClientServlet.class" />
+            </fileset>
+        </copy>
+        <!-- Done copy Distributed Authentication WAR related files -->
+
+        <!-- Copy console only WAR related files -->
+        <copy file="${amserver.base.dir}/www/console/html/index.html"
+            todir="${zip.temp.dir}/deployable-war/console" />
+        <copy file="${openfm.dir}/www/console/Configurator.jsp"
+            todir="${zip.temp.dir}/deployable-war/console" />
+        <copy file="${openfm.built.dir}/clientsamples/package/sdk/resources/AMConfig.properties.template"
+             todir="${zip.temp.dir}/deployable-war/console/WEB-INF/classes" />
+        <copy todir="${zip.temp.dir}/deployable-war/console/click">
+            <fileset dir="${amserver.www.dir}/click" />
+        </copy>              
+        <!-- Done copy console only related files -->
+            
+        <!-- Copy no console WAR related files -->
+        <mkdir dir="${zip.temp.dir}/deployable-war/noconsole/WEB-INF" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/classes" />
+        <copy file="${amserver.base.dir}/xml/services/amAuth.xml"
+            todir="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/classes" />
+        <replace file="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/classes/amAuth.xml"
+           token="&lt;Value&gt;/@SERVER_URI@/console&lt;/Value&gt;" 
+           value="&lt;Value/&gt;"/>
+        <copy todir="${zip.temp.dir}/deployable-war/noconsole/click">
+            <fileset dir="${amserver.www.dir}/click" />
+        </copy>            
+        <!-- Done copy console only related files -->
+            
+        <copy file="${openfm.dir}/docs/README"
+            tofile="${zip.temp.dir}/docs/README" />
+        <copy file="${fm.dist.dir}/opensso-public-javadocs.jar"
+            tofile="${zip.temp.dir}/docs/opensso-public-javadocs.jar" />
+ 
+        <copy todir="${zip.temp.dir}/ldif">
+            <fileset dir="${openfm.dir}/ldif" includes="**/*"/>
+        </copy>   
+
+        <copy todir="${zip.temp.dir}/ldif">
+            <fileset dir="${amserver.base.dir}/war/ldif">
+                <include name="am_remote_ad_schema.ldif" />
+                <include name="am_remote_basic.ldif" />
+                <include name="am_remote_opends_schema.ldif" />
+                <include name="am_remote_tivolids_schema.ldif" />
+                <include name="ds_remote_schema.ldif" />
+                <include name="ds_remote_s1ds_schema.ldif" />
+                <include name="index.ldif" />
+                <include name="plugin.ldif" />
+                <include name="sunone_schema2.ldif" />
+            </fileset>
+        </copy>
+
+        <copy file="${openfm.dir}/docs/README.libraries"
+            tofile="${zip.temp.dir}/libraries/README" />
+        <copy file="${openfm.dir}/docs/README.dll"
+            tofile="${zip.temp.dir}/libraries/native/dll/README" />
+        <copy file="${extlib.dir}/agent-csdk/README"
+             tofile="${zip.temp.dir}/libraries/native/agent-csdk/README" />
+        <copy file="${extlib.dir}/agent-csdk/agent-csdk.zip"
+             tofile="${zip.temp.dir}/libraries/native/agent-csdk/agent-csdk.zip" />
+        <copy file="${extlib.dir}/fmsae.dll"
+             tofile="${zip.temp.dir}/libraries/native/dll/fmsae.dll" /> 
+        <copy file="${extlib.dir}/fmsae64.dll"
+             tofile="${zip.temp.dir}/libraries/native/dll/fmsae64.dll" /> 
+        <copy file="${openfm.dir}/docs/README.jars"
+            tofile="${zip.temp.dir}/libraries/jars/README" />
+        <copy todir="${zip.temp.dir}/libraries/jars">
+            <fileset file="${fm.dist.dir}/openssoclientsdk.jar" />
+        </copy>
+        <copy file="${openfm.dir}/patches/README"
+            tofile="${zip.temp.dir}/patches/README" />
+
+        <copy todir="${zip.temp.dir}/samples">
+            <fileset file="${openfm.dir}/samples/README" />
+            <fileset file="${fm.dist.dir}/opensso-client.zip" />
+        </copy>
+
+        <copy file="${openfm.dir}/docs/README.tools"
+            tofile="${zip.temp.dir}/tools/README" />
+        <copy todir="${zip.temp.dir}/tools">
+            <fileset file="${fm.dist.dir}/ssoAdminTools.zip" />
+            <fileset file="${fm.dist.dir}/ssoSessionTools.zip" />
+            <fileset file="${amserver.dist.dir}/ssoDiagnosticTools.zip" />
+        </copy>
+        <copy file="${openfm.extlib.dir}/amConfiguratorTools.zip"
+            tofile="${zip.temp.dir}/tools/ssoConfiguratorTools.zip" />
+        
+        <copy todir="${zip.temp.dir}/xml">
+            <fileset dir="${openfm.services.xml.dir}" includes="**/*.xml"/>
+            <fileset dir="${amserver.services.xml.dir}" includes="**/*.xml"/>
+        </copy>
+
+        <zip destfile="${fm.dist.dir}/opensso.zip" whenempty="create">
+            <zipfileset dir="${zip.temp.dir1}" filemode="755">
+                <include name="opensso/deployable-war/create.sh"/>
+            </zipfileset>
+            <zipfileset dir="${zip.temp.dir1}">
+                <exclude name="opensso/deployable-war/create.sh"/>
+            </zipfileset>
+        </zip>
+
+        <checksum file="${fm.dist.dir}/opensso.zip"
+            algorithm="SHA" fileext=".sha" />
+        <delete dir="${zip.temp.dir}" />            
+    </target>
+    
+    <target name="patchtools" if="enterprise.authmodules.present">
+        <mkdir dir="${zip.temp.dir}/tools" />
+        <copy todir="${zip.temp.dir}/tools" >
+            <fileset file="${amserver.dist.dir}/ssoPatchTools.zip" />
+        </copy>
+    </target>
+
+    <target name="consoleonlywebxml">
+        <delete dir="${zip.temp.dir}" />
+        <mkdir dir="${zip.temp.dir}" />
+        <mkdir dir="${zip.temp.dir}/deployable-war" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/console" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/console/WEB-INF" />
+        <copy overwrite="true" file="${amserver.base.dir}/war/xml/console/web.xml" todir="${zip.temp.dir}/deployable-war/console/WEB-INF" />
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;" />
+            <arg value="${openfm.dir}/xml/console/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- context param --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${openfm.dir}/xml/console/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/console/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;filter&gt;.+?&lt;/filter&gt;" />
+            <arg value="${openfm.dir}/xml/console/web-console-only.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- filter definition --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${openfm.dir}/xml/console/web-console-only.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;filter-mapping&gt;.+?&lt;/filter-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/console/web-console-only.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- filter mapping --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/console/web-console-only.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/console/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+    </target>
+
+    <target name="noconsolewebxml">
+        <mkdir dir="${zip.temp.dir}/deployable-war/noconsole" />
+        <mkdir dir="${zip.temp.dir}/deployable-war/noconsole/WEB-INF" />
+        <copy overwrite="true" file="${amserver.base.dir}/war/xml/web.xml" todir="${zip.temp.dir}/deployable-war/noconsole/WEB-INF" />
+        <!-- update web.xml with fed library servlet info -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${library.xml.dir}/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${library.xml.dir}/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+        <!-- update web.xml with openfm servlet info -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${openfm.dir}/xml/noconsole/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/noconsole/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+        <!-- update web.xml with FAM STS info -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;listener&gt;.+?&lt;/listener&gt;" />
+            <arg value="${openfm.dir}/xml/wss/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- listener declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${openfm.dir}/xml/wss/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/wss/web.xml" />
+            <arg value="${zip.temp.dir}/deployable-war/noconsole/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${tools.temp.dir}" />
+    </target>
+</project>

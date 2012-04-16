@@ -1,0 +1,30 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="SAMLv2IDPProxySmokeTests">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.ConfigureSAMLv2IDPProxy"/> 
+            <class name="com.sun.identity.qatest.samlv2idpproxy.ConfigUnconfig"/> 
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxySmokeTest"/> 
+            <class name="com.sun.identity.qatest.samlv2idpproxy.UnconfigureSAMLv2IDPProxy"/> 
+        </classes>
+    </test>
+    <test name="SAMLv2IDPProxyFeatureTests">
+        <parameter name="ssoprofile" value="artifact"/>
+        <parameter name="sloprofile" value="http"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyAutoFederationTests"/>
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyRelayStateTests"/> 
+            <class name="com.sun.identity.qatest.samlv2idpproxy.SAMLv2IDPProxyDefaultRelayStateSPTests"/>
+        </classes>
+    </test>

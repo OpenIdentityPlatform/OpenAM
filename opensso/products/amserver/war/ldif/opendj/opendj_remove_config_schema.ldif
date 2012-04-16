@@ -1,0 +1,42 @@
+##
+##   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+##
+##   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+##
+##   The contents of this file are subject to the terms
+##   of the Common Development and Distribution License
+##   (the License). You may not use this file except in
+##   compliance with the License.
+##
+##   You can obtain a copy of the License at
+##   https://opensso.dev.java.net/public/CDDLv1.0.html or
+##   opensso/legal/CDDLv1.0.txt
+##   See the License for the specific language governing
+##   permission and limitations under the License.
+##
+##   When distributing Covered Code, include this CDDL
+##   Header Notice in each file and include the License file
+##   at opensso/legal/CDDLv1.0.txt.
+##   If applicable, add the following below the CDDL Header,
+##   with the fields enclosed by brackets [] replaced by
+##   your own identifying information:
+##   "Portions Copyrighted [year] [name of copyright owner]"
+##
+##   $Id: opends_remove_config_schema.ldif,v 1.2 2009/10/27 05:38:05 hengming Exp $
+##
+##   Portions Copyrighted 2011 ForgeRock AS
+##
+dn: cn=schema
+changetype: modify
+delete: objectClasses
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.25 NAME 'sunservice' DESC 'object containing service information' SUP top MUST ou MAY ( labeledURI $ sunServiceSchema $ sunKeyValue $ sunxmlKeyValue $ sunPluginSchema $ description ) X-ORIGIN 'Sun Java System Identity Management' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.104 NAME 'sunRealmService' DESC 'object containing service information for realms' SUP top MAY ( o $ labeledURI $ sunKeyValue $ sunxmlKeyValue $ description ) X-ORIGIN 'Sun Java System Identity Management' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.27 NAME 'sunservicecomponent' DESC 'Sub-components of the service' SUP organizationalUnit MUST ou MAY ( labeledURI $ sunserviceID $ sunsmspriority $ sunKeyValue $ sunxmlKeyValue $ description ) X-ORIGIN 'Sun Java System Identity Management' )
+-
+delete: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.78 NAME ( 'sunServiceSchema' ) DESC 'SMS Attribute to Store xml schema of a particular service' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.79 NAME ( 'sunserviceID' ) DESC 'Attribute to store the reference to the inherited object' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.81 NAME ( 'sunsmspriority' ) DESC 'To store the priority of the service with respect to its siblings' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.82 NAME ( 'sunPluginSchema' ) DESC 'To store the plugin schema information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.83 NAME ( 'sunKeyValue' ) DESC 'Attribute to store the encoded key values of the services' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.84 NAME ( 'sunxmlKeyValue' ) DESC 'Attribute to store the key values in xml format' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )

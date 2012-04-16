@@ -1,0 +1,323 @@
+------------------------------------------------------------------------------
+README file for Open Web Single Sign-On J2EE Agent
+------------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.23 2009/12/23 02:02:12 leiming Exp $
+
+------------------------------------------------------------------------------
+Portions Copyrighted 2010-2011 ForgeRock AS
+------------------------------------------------------------------------------
+
+%% Contents:
+    %% 1. Build requirements
+    %% 2. Library dependencies
+        %% 2.1 Obtaining OpenSSO Agents Common Installer libraries
+        %% 2.2 Obtaining OpenSSO ClientSDK library
+        %% 2.3 Obtaining J2EE container specific libraries
+        %% 2.4 Obtaining commons-io library
+        %% 2.5 Obtaining JAVA EE API
+    %% 3. Building the workspace
+        %% 3.1 all target
+        %% 3.2 clean target
+        %% 3.3 usage target
+        %% 3.4 appserver_v10 target
+        %% 3.5 weblogic_v10 target
+        %% 3.6 websphere_v61 target
+        %% 3.7 jboss_v42 target
+	%% 3.8 tomcat_v6 target
+        %% 3.9 jetty_v61 target
+        %% 3.10 jsr196_jsr115 target
+
+
+
+%% 1. Build requirements
+
+The OpenSSO J2EE Agent workspace uses Apache Ant as the build tool. 
+The build scripts in this workspace use features not present in 
+releases of Ant prior to 1.6.5.  Thus, in order to build this workspace 
+you must have Ant version 1.6.5 or above installed and available in 
+your system path.
+
+The sources in this workspace should be compiled using JDK 5.0 or newer with 
+the source and target levels set to "1.5". In order to allow this, you 
+must ensure that JDK 5.0 (or newer) is present in your system path and the
+JAVA_HOME environment variable is setup correctly pointing to its location.
+
+
+%% 2. Library dependencies
+
+The OpenSSO J2EE Agent sources depend upon a few third-party libraries 
+that are not included as a part of the workspace and must be obtained 
+directly from the library vendor or distributor. Some of these libraries 
+are available in source distribution form and must be built locally 
+before they can be used. 
+
+The libraries needed for compiling OpenSSO J2EE Agent sources are:
+
+   - OpenSSO Agents Common Installer libraries
+   - OpenSSO ClientSDK library
+   - J2EE Container specific libraries
+   - Commons IO library
+   - JAVA EE API library
+
+Once these libraries are available, they should be placed under the 
+extlib directory of the specific J2EE Container in workspace. For example,
+the libraries for Sun Application Server 8.1/8.2/9.0/9.1/10 agent should be placed
+under appserver/v10/extlib directory.  Any library placed in this directory 
+is automatically included in the classpath during the compilation phase of
+the build process.
+
+The following subsections briefly describe how these libraries may be 
+obtained. These instructions are provided for your convenience only and
+are not intended to replace or invalidate the procedures/guidelines set
+by the library vendor or distributor for obtaining those libraries. Before
+you follow these instructions, you must agree to abide by any terms and
+conditions set forth by the library vendor or distributor. In case any of
+these instructions are in contradiction to such terms or conditions, you 
+must disregard those instructions and instead follow the ones provided by
+the library vendor or distributor in accordance with their terms and 
+conditions.
+
+%% 2.1 Obtaining OpenSSO Agents Common Installer libraries
+
+The OpenSSO Agents Common installer libraries opensso-installtools.jar and 
+opensso-installtools-launcher.jar can be built from the OpenSSO Agents Common 
+Installer workspace, for example in opensso/products/installtools.
+
+Follow these steps to obtain the libraries:
+2.1.1 Check out the OpenSSO Agents Common installer workspace.
+2.1.2 Set JAVA_HOME to the location of JDK 1.5.
+2.1.3 At the root of the workspace, at opensso/products/installtools/, run: ant
+2.1.4 Copy the libraries opensso-installtools.jar, and opensso-installtools-launcher.jar 
+from the dist directory (opensso/products/installtools/built/dist) of the 
+OpenSSO Agents Common installer workspace into extlib directory in this 
+workspace (opensso/products/j2eeagents/extlib). 
+
+%% 2.2 Obtaining OpenSSO ClientSDK library
+
+2.2.1 The OpenSSO ClientSDK library openssoclientsdk.jar can be obtained from
+the OpenSSO nightly build.
+
+Follow these steps to obtain the library:
+2.2.1.1 Download the latest nightly build in ZIP format from:
+    http://www.forgerock.org/openam.html
+2.2.1.2 Unzip the nightly ZIP
+2.2.1.3 Copy the libraries/jars/openssoclientsdk.jar into opensso/products/j2eeagents/extlib
+directory.
+
+2.2.2 Alternatively the OpenSSO ClientSDK library openssoclientsdk.jar can be
+built from the OpenSSO workspace.
+
+Follow these steps to obtain the library:
+2.2.2.1 Check out the OpenSSO workspace.
+2.2.2.2 Set JAVA_HOME to the location of JDK 1.5.
+2.2.2.3 At the root of the workspace, run: ant server-nightly
+2.2.2.4 Copy the library openssoclientsdk.jar from the 
+opensso/products/federation/openfm/built/dist of
+the OpenSSO workspace into opensso/products/j2eeagents/extlib directory.
+
+%% 2.3 Obtaining J2EE container specific libraries
+The J2EE Container specific libraries can be obtained from the J2EE 
+container installation.
+
+2.3.1 Obtaining libraries for Sun Application Server 8.1/8.2/9.0/9.1/10
+Follow these steps to obtain the libraries for Sun Application Server 8.1 or 8.2 or 9.0 or 9.1 or 10:
+2.3.1.1 Install Sun Application Server 8.1 or 8.2 or 9.0 or 9.1 or 10
+2.3.1.2 If you are installing OpenSSO J2EE Agent on Sun Application Server 
+2.3.1.3 In case of 8.1-9.1 copy the appserv-ext.jar and appserv-rt.jar from the lib directory of the 
+server installation into the opensso/products/j2eeagents/extlib/appserver/v9
+directory of this workspace.
+2.3.1.4 In case of 10 copy the security.jar and glassfish-api.jar files from
+the modules directory of the server installation directory of this workspace.
+
+2.3.2 Obtaining libraries for WebLogic 10 
+Follow these steps to obtain the libraries for BEA WebLogic 10:
+2.3.2.1 Install BEA WebLogic 10 server 
+2.3.2.2 Copy weblogic.jar and api.jar both from the lib directory of the server 
+installation(for example from /bea/wlserver_10.0/server/lib) into 
+the opensso/products/j2eeagents/extlib/weblogic/v10 directory of this workspace 
+2.3.2.3.A If using WebLogic 10.0, then
+copy the com.bea.core.weblogic.security_2.0.0.0.jar from the 
+modules directory of the server installation(for example from /bea/modules) 
+into the opensso/products/j2eeagents/extlib/weblogic/v10 directory of this workspace.
+2.3.2.3.B If using WebLogic 10.3, then
+copy the com.bea.core.common.security.api_1.0.0.0_5-1-0-0.jar and
+com.bea.core.weblogic.security.auth_1.0.0.0.jar files from the
+modules directory of the server installation(for example from /bea/modules) 
+into the opensso/products/j2eeagents/extlib/weblogic/v10 directory of this workspace.
+
+2.3.3 Obtaining libraries for WebSphere 6.1 
+Follow these steps to obtain the libraries for IBM WebSphere 6.1:
+2.3.3.1 Install IBM WebSphere 6.1 server 
+2.3.3.2 Copy the com.ibm.ws.runtime_6.1.0.jar from the plugins directory of 
+the server installation(for example from /opt/IBM/WebSphere6.1/AppServer/plugins) 
+into the opensso/products/j2eeagents/extlib/websphere/v61 directory of this workspace.
+
+2.3.4 Obtaining libraries for JBoss Application Server 4.0.x/4.2.x 
+Follow these steps to obtain the libraries for JBoss Application Server 4.0.x/4.2.x :
+2.3.4.1 Install JBoss Application Server 4.0.x/4.2.x
+2.3.4.2 If you are installing OpenSSO J2EE Agent on JBoss Application Server 4.0.5/4.2.x 
+copy jboss-saaj.jar and jbosssx.jar from the lib directory
+of the JBoss4.2.x server installation and jbossweb-service.jar from the 
+<JBoss server installation directory>\server\default\deploy\jboss-web.deployer
+into the opensso/products/j2eeagents/extlib/jboss/v42.
+2.3.4.3 If you are installing OpenSSO J2EE Agent on JBoss Application Server 5.0.0 
+copy jbosssx.jar from the lib directory of the 
+JBoss5.0.x server installation and jboss-web-service.jar from the 
+<JBoss server installation directory>\server\default\deploy\jboss-web.deployer and 
+jboss-saaj.jar from the lib directory of JBoss-4.2.3.GA into the opensso/products/j2eeagents/extlib/jboss/v42.
+
+2.3.5 Obtaining libraries for Tomcat Server 6.0 
+Follow these steps to obtain the libraries for  Tomcat Server 6.0  :
+2.3.5.1 Install  Tomcat Server 6.0 
+2.3.5.2 If you are installing OpenSSO J2EE Agent on  Tomcat Server 6.0 , copy catalina.jar 
+from the lib directory of the server installation 
+into the opensso/products/j2eeagents/extlib/tomcat/v6.
+
+2.3.6 Obtaining libraries for Jetty Server 6.1.x
+Follow these steps to obtain the libraries for Jetty Server 6.1.x :
+2.3.6.1 Install Jetty Server 6.1.x
+2.3.6.2 Copy jetty-6.1.14.jar from <jetty-install-dir>/lib and copy 
+jetty-plus-6.1.14.jar from <jetty-install-dir>/lib/plus to 
+opensso/products/j2eeagents/extlib/jetty/v61.
+
+2.3.7 Obtaining libraries for JSR196/JSR115 Agent
+Follow these steps to obtain the libraries for JSR196/JSR115 agent:
+2.3.7.1 Install Glassfish 2.1
+2.3.7.2 Copy appserv-rt.jar and jmac-api.jar from
+<glassfish-install>/lib to opensso/products/j2eeagents/extlib/jsr196/jsr115
+
+%% 2.4 Obtaining commons-io library
+2.4.1 Visit http://commons.apache.org/io/, click on the Download Now! link
+2.4.2 Download commons-io-1.4-bin.zip
+2.4.3 Unzip this zip file in a temporary directory
+2.4.4 Copy <temporary directory>/commons-io-1.4/commons-io-1.4.jar to 
+      opensso/products/j2eeagents/extlib directory 
+
+%% 2.5 Obtaining JAVA EE API
+The javaee.jar library can be obtained from Java EE 5 SDK.
+Follow these steps to obtain the J2EE SDK:
+
+2.5.1 Open the web page: http://java.sun.com/javaee/downloads/index.jsp
+2.5.2 Depending on your choice of platform, you may choose to download any
+      one of the three distribution types available under Java EE 5 SDK
+      Update 1.
+2.5.3 Extract or extract and install the downloaded file as necessary to
+      have the SDK available on your system.
+
+Once the J2EE SDK is installed, you can get the javaee.jar from
+the lib directory of this SDK. Copy javaee.jar to the 
+"opensso/products/j2eeagents/extlib" directory of your workspace.
+
+
+%% 3. Building the workspace
+
+The workspace build system offers several build targets. You can view the
+available targets by issuing the ant command from the root of the
+workspace. The default target that is executed is the usage target which
+displays a brief description about the other targets. Currently the main
+targets available in the workspace are:
+   
+     - all           : build all the J2EE agents
+     - clean         : deletes the generated files
+     - usage         : displays this usage message
+     - appserver_v10 : build the Sun Appserver 8.1/8.2/9.0/9.1/10 agent
+     - weblogic_v10  : build the WebLogic 10.0 agent
+     - websphere_v61 : build the Websphere 6.1 agent
+     - jboss_v42     : build the JBoss 4.0.x and 4.2.x and 5.x agent
+     - tomcat_v6     : build the Tomcat 6.0 agent
+     - jetty_v61     : build the Jetty Server 6.1.x agent.
+     - jsr196_jsr115 : build the JSR196 and JSR115 agent
+
+%% 3.1 all target
+
+The all target builds all the J2EE agents.
+
+
+%% 3.2 clean target
+
+The clean target removes all the build output directories.
+
+
+%% 3.3 usage target
+
+Displays a list of available targets along with a brief description of
+each available target for quick reference.
+
+%% 3.4 appserver_v10 target
+
+The appserver_v10 target first invokes the build target and then 
+delegates the further processing to the build.xml files present under 
+the appserver and appserver/v10 directories.  Upon successful execution,
+a zip file appserver_v10_agent_3.zip will be created under built/dist 
+directory, and it can be used later to install the agent.
+
+%% 3.5 weblogic_v10 target
+
+The weblogic_v10 target first invokes the build target and then 
+delegates the further processing to the build.xml files present under 
+the weblogic and weblogic/v10 directories.  Upon successful execution,
+a zip file weblogic_v10_agent_3.zip will be created under built/dist 
+directory, and it can be used later to install the agent.
+
+%% 3.6 websphere_v61 target
+
+The websphere_v61 target first invokes the build target and then 
+delegates the further processing to the build.xml files present under 
+the websphere and websphere/v61 directories.  Upon successful execution,
+a zip file websphere_v61_agent_3.zip will be created under built/dist 
+directory, and it can be used later to install the agent.
+
+%% 3.7 jboss_v42 target
+
+The jboss_v42 target first invokes the build target and then 
+delegates the further processing to the build.xml files present under 
+the jboss and jboss/v42 directories.  Upon successful execution,
+a zip file jboss_v42_agent_3.zip will be created under built/dist 
+directory, and it can be used later to install the agent.
+
+%% 3.8 tomcat_v6 target
+
+The tomcat_v6 target first invokes the build target and then 
+delegates the further processing to the build.xml files present under 
+the tomcat and tomcat/v6 directories.  Upon successful execution,
+a zip file tomcat_v6_agent_3.zip will be created under built/dist 
+directory, and it can be used later to install the agent.
+
+%% 3.9 jetty_v61 target
+
+The jetty_v61 target first invokes the build target and then 
+delegates the further processing to the build.xml files present under
+the jetty and jetty/v61 directories.  Upon successful execution,
+a zip file jetty_v61_agent_3.zip will be created under built/dist
+directory, and it can be used later to install the agent.
+
+%% 3.10 jsr196_jsr115 target
+
+The jsr196_jsr115 target first invokes the build target and then
+delegates the further processing to the build.xml files present under
+the jsr196 and jsr196/jsr115 directories. Upon successful execution,
+a zip file jsr196_jsr115_agent_3.zip will be created under built/dist
+directory, and it can be used later to install the agent.

@@ -1,0 +1,1 @@
+var apache_v22_@OS@@ARCH@_build_date = "@BUILD_DATE@";

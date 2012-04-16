@@ -1,0 +1,13 @@
+
+    <test name="SessionServerTimeConstraintsTest">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.session.ConfigUnconfig"/>
+            <class name=
+            "com.sun.identity.qatest.session.SessionServerTimeConstraintsTest"/>
+        </classes>
+    </test>

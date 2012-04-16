@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-before-you-install'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Before You Install OpenAM Software</title>
+
+ <para>This chapter covers software and hardware prerequisites for installing
+ and running OpenAM software. If you have a special request to support a
+ component or combination not listed here, contact ForgeRock at <link
+ xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
+ 
+ <section xml:id="java-requirements">
+  <title>Java Requirements</title>
+
+  <para>This release of OpenAM requires Java Development Kit 1.6, at least
+  1.6.0_10. ForgeRock recommends that you use at least version 1.6.0_27 due
+  to security fixes.</para>
+  
+  <para>ForgeRock has tested this release of OpenAM primarily with Oracle
+  Java SE JDK.</para>
+
+  <para>OpenAM Java SDK requires Java Development Kit 1.5 or 1.6.</para>
+ </section>
+
+ <section xml:id="web-container-requirements">
+  <title>Web Application Container Requirements</title>
+
+  <itemizedlist>
+   <para>This release of OpenAM runs in the following web application
+   containers.</para>
+   <listitem>
+    <para>Apache Tomcat 6.0.x, 7.0.x</para>
+   </listitem>
+   <listitem>
+    <para>GlassFish v2</para>
+   </listitem>
+<!-- Commenting out WebSphere given OPENAM-1250
+   <listitem>
+    <para>IBM WebSphere 7.x</para>
+   </listitem>
+-->
+   <listitem>
+    <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
+    <para>JBoss Application Server 7.x</para>
+   </listitem>
+   <listitem>
+    <para>Jetty 7</para>
+   </listitem>
+   <listitem>
+    <para>Oracle WebLogic Server 11g</para>
+    <para>Oracle WebLogic Server 12c</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>If running as a non-root user, the web application container must be
+  able to write to its own home directory, where OpenAM stores configuration
+  files.</para>
+ </section>
+
+ <section xml:id="data-store-requirements">
+  <title>Data Store Requirements</title>
+
+  <itemizedlist>
+   <para>This release of OpenAM works with the following configuration data
+   stores.</para>
+   <listitem>
+    <para>Embedded (using ForgeRock OpenDJ 2.4.5 for the data store)</para>
+    <para>When using the embedded configuration store, you must deploy OpenAM
+    on a local file system and not on an NFS-mounted file system.</para>
+   </listitem>
+   <listitem>
+    <para>External ForgeRock OpenDJ data store</para>
+   </listitem>
+   <listitem>
+    <para>External Sun OpenDS data store</para>
+   </listitem>
+   <listitem>
+    <para>External Oracle Directory Server Enterprise Edition data store</para>
+   </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
+   <para>This release of OpenAM works with the following user profile data
+   stores.</para>
+   <listitem>
+    <para>ForgeRock OpenDJ</para>
+   </listitem>
+   <listitem>
+    <para>Microsoft Active Directory</para>
+   </listitem>
+   <listitem>
+    <para>IBM Tivoli Directory Server</para>
+   </listitem>
+   <listitem>
+    <para>OpenDS</para>
+   </listitem>
+   <listitem>
+    <para>Oracle Directory Server Enterprise Edition</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>OpenAM also works with OpenLDAP and other LDAPv3 compliant directory
+  servers. Some features of OpenAM depend on features supported by your
+  directory service, such as the following:</para>
+  <itemizedlist>
+   <listitem>
+    <para>Extensible LDAP schema, required to extend the schema for OpenAM.
+    First, install OpenAM to use a fresh instance of OpenDJ, such as the
+    embedded OpenDJ server. After installation, study the custom schema
+    definitions from the OpenDJ file,
+    <filename>config/schema/99-user.ldif</filename>, to see what schema
+    definitions you must add to your directory. You might need to adapt the
+    schema definition format before adding the definitions to your
+    directory.</para>
+   </listitem>
+   <listitem>
+    <para>The persistent search request control
+    (OID: <literal>2.16.840.1.113730.3.4.3</literal>).</para>
+   </listitem>
+   <listitem>
+    <para>The Behera Internet-Draft <link xlink:show="new"
+    xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+    >Password Policy for LDAP Directories</link> (for OpenAM password reset,
+    for example)</para>
+   </listitem>
+  </itemizedlist>
+  <para>If you plan to deploy with OpenLDAP or other LDAPv3 directory for
+  user data, make sure you test your solution before you deploy to ensure
+  all OpenAM features that you use work as expected.</para>
+ </section>
+
+ <section xml:id="browsers-tested">
+  <title>Browsers Tested</title>
+
+  <itemizedlist>
+   <para>ForgeRock has tested many browsers with OpenAM console and end user
+   pages, including the following browsers.</para>
+   <listitem>
+    <para>Chrome and Chromium 16 and later</para>
+   </listitem>
+   <listitem>
+    <para>Firefox 3.6 and later</para>
+   </listitem>
+   <listitem>
+    <para>Internet Explorer 7 and later</para>
+   </listitem>
+   <listitem>
+    <para>Safari 5 and later</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="platform-requirements">
+  <title>Platform Requirements</title>
+
+  <itemizedlist>
+   <para>ForgeRock has tested this release of OpenAM on the following
+   platforms.</para>
+   <listitem>
+    <para>Linux 2.6, 3.0</para>
+   </listitem>
+   <listitem>
+    <para>Microsoft Windows Server 2003, 2008</para>
+   </listitem>
+   <listitem>
+    <para>Oracle Solaris 10</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="hardware-requirements">
+  <title>Hardware Requirements</title>
+
+  <para>You can deploy OpenAM on any hardware supported for the combination of
+  software required. Deploying OpenAM requires a minimum of 1 GB free RAM over
+  and above the RAM used by all other software on the system.</para>
+  
+  <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
+  based systems.</para>
+ </section>
+</chapter>

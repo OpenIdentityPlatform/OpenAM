@@ -1,0 +1,106 @@
+
+<test name="PolicyallowDenyTest_P0_E0 ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="0"/>
+    <parameter name="setup" value="true"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="conditionName" value=""/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>        
+        <class name="com.sun.identity.qatest.csdk.CSDKPolicyTest"/>
+    </classes>
+</test>    
+<test name="PolicyallowDenyTest_P0_E1 ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="1"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="conditionName" value=""/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.csdk.CSDKPolicyTest"/>
+    </classes>
+</test>
+<test name="PolicyallowDenyTest_P0_E2 ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="2"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="conditionName" value=""/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.csdk.CSDKPolicyTest"/>
+    </classes>
+</test>
+
+<test name="PolicyallowDenyTest_P0_E3 ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="3"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="true"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="conditionName" value=""/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.csdk.CSDKPolicyTest"/>
+    </classes>
+</test> 
+
+<test name="PolicyallowDenyTest_P1_E0 ">
+    <parameter name="policyIdx" value="1"/>
+    <parameter name="evaluationIdx" value="0"/>
+    <parameter name="setup" value="true"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="conditionName" value="dnsname"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.csdk.CSDKPolicyTest"/>
+    </classes>
+</test>
+<test name="PolicyallowDenyTest_P1_E1 ">
+    <parameter name="policyIdx" value="1"/>
+    <parameter name="evaluationIdx" value="1"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="true"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="conditionName" value="dnsname"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.csdk.CSDKPolicyTest"/>
+    </classes>
+</test>
+    

@@ -1,0 +1,83 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.1 2009/11/20 19:21:09 huacui Exp $
+
+-->
+
+<project name="OpenSSO OAuth Service" default="usage">
+    <description>Open OAuth Service</description>
+    <import file="../products.xml" />
+    <import file="oauth.xml" />
+
+    <!-- build class path -->
+    <path id="build.class.path">
+        <pathelement location="${sharedlib.classes.dir}"/>
+        <pathelement location="${oauth.classes.dir}"/>
+        <fileset dir="${oauth.extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="preparebuild">
+        <mkdir dir="${oauth.built.dir}"/>
+        <mkdir dir="${oauth.classes.dir}"/>
+        <mkdir dir="${oauth.dist.dir}"/>
+    </target>
+    
+    <target name="all" depends="clean, preparebuild">
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true" destdir="${oauth.classes.dir}" debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${oauth.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+        <jar destfile="${oauth.dist.dir}/oauthservice.jar">
+            <manifest>
+                <attribute name="Version" value="${version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <fileset dir="${oauth.res.dir}">
+                <filename name="META-INF/services/*"/>
+            </fileset>
+            <zipfileset dir="${oauth.classes.dir}"/>
+        </jar>
+        <checksum file="${oauth.dist.dir}/oauthservice.jar"
+                  algorithm="SHA" fileext=".sha" />
+    </target>
+      
+
+    <target name="clean" >
+        <delete dir="${oauth.dist.dir}"/>
+        <delete dir="${oauth.classes.dir}"/>
+        <delete dir="${oauth.built.dir}"/>
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" all  : builds the OAuth Token Service"/>
+        <echo message=" clean  : deletes the generated files"/>
+        <echo message=" usage  : displays this usage message"/>
+    </target>
+</project>

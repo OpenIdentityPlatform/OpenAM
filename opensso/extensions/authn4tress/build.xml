@@ -1,0 +1,96 @@
+<!--
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: build.xml,v 1.1 2008/02/05 12:21:22 shellcope Exp $
+
+  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+  Portions Copyright 2007 Paul C. Bryan
+-->
+
+<project name="authn4Tress" default="usage">
+
+  <description>4Tress User/OTP Module</description>
+
+  <!-- library dependencies -->
+  <property name="extlib.dir" value="lib"/>
+
+  <!-- source directories -->  
+  <property name="source.dir" value="source"/>
+  <property name="resources.dir" value="resources"/>
+
+  <!-- directory to store intermediate files for build -->
+  <property name="built.dir" value="built"/>
+  <property name="classes.dir" value="${built.dir}/classes"/>
+  <property name="dist.dir" value="${built.dir}/dist"/>
+
+  <!-- overridable properties -->
+  <property name="build.debug" value="on"/>
+  <property name="build.debuglevel" value="lines,vars,source"/>
+
+  <!-- build class path -->
+  <path id="build.classpath">
+    <pathelement location="${classes.dir}"/>
+    <fileset dir="${extlib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- clean any directories created during build -->
+  <target name="clean">
+    <delete dir="${built.dir}"/>
+  </target>
+
+  <!-- compile java files -->
+  <target name="build">
+
+    <mkdir dir="${built.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+
+    <!-- compile classes into the target package -->
+    <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+     destdir="${classes.dir}" source="1.4" target="1.4" 
+     debug="${build.debug}" debuglevel="${build.debuglevel}">
+      <compilerarg value="-Xlint:unchecked"/>
+      <src path="${source.dir}"/>
+      <classpath refid="build.classpath"/>
+    </javac>
+
+
+    <mkdir dir="${dist.dir}"/>
+    <jar destfile="${dist.dir}/4TressAMLoginModule.jar" basedir="${built.dir}/classes"/>
+    
+  </target>
+
+  <!-- display usage message (default task) -->
+  <target name="usage">
+    <echo message=" "/>
+    <echo message="The following targets are available:"/>
+    <echo message=" "/>
+    <echo message="  clean : cleans any generated files"/>
+    <echo message="  usage : displays this usage message"/>
+    <echo message="  build : compiles all the java source files"/>
+    <echo message=" "/>
+    <echo message="To run a target, issue the following command:"/>
+    <echo message=" "/>
+    <echo message="  ant (target-name)"/>
+    <echo message=" "/>
+  </target>
+
+</project>

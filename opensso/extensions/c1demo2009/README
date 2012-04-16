@@ -1,0 +1,568 @@
+------------------------------------------------------------------------------
+README file for OpenSSO RESTful Secure Web Services Demo
+------------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.7 2009/06/25 13:58:35 superpat7 Exp $
+
+------------------------------------------------------------------------------
+
+This README describes how to run the 2009 CommunityOne/JavaOne RESTful Secure 
+Web Services Demo.
+
+NOTE - this is a fairly intricate setup, and not recommended for the novice 
+user. There are also almost certainly many errors in this first version of the
+instructions!
+
+Please direct feedback to the OpenSSO users mailing list at
+users@opensso.dev.java.net. To subscribe:
+
+1. Go to https://www.dev.java.net/servlets/Join and register for a java.net 
+account.
+
+2. Go to https://opensso.dev.java.net/servlets/ProjectMembershipRequest and 
+request 'Observer' role on OpenSSO.
+
+3. Go to https://opensso.dev.java.net/servlets/ProjectMailingListList and 
+subscribe to 'users@opensso.dev.java.net'.
+
+%% Contents:
+    %% 1. Prerequisites
+    %% 2. Checking Out the Demo Source Code
+    %% 3. Creating the Demo Database
+    %% 4. Deploying the Demo Web Service
+    %% 5. Deploying and Configuring OpenSSO with Entitlements 
+    %% 6. Deploying the OAuth Token Service
+    %% 7. Running the Demo Test Harness
+    %% 8. Running the Demo Client
+    
+%% 1. Prerequisites
+
+You must have the following software installed and running to be able to run 
+the demo:
+
+MySQL - I used 5.1.33, but I don't think the exact version is critical
+
+JDK 6 - http://java.sun.com/javase/downloads/index.jsp
+
+NetBeans IDE 6.5.1 for JavaFX 1.2 - http://java.sun.com/javafx/downloads/ - you
+can use NetBeans 6.5.0 as long as you have the JavaFX plugins installed (see 
+below).
+
+GlassFish v2 UR2 - https://glassfish.dev.java.net/downloads/v2ur2-b04.html
+
+Maven - I used 2.0.6, but, again, I don't think the exact version is critical
+
+The demo assumes that GlassFish is in its default configuration, with an HTTP 
+listener on port 8080.
+
+You will need to install the following plugins for NetBeans, if they are not 
+already installed:
+
+GlassFish v1, v2 version 1.6.2.1 (earlier versions may also work)
+JavaFX SDK for Mac OS X version 1.7
+JavaFX Kit version 1.8
+RESTful Web Services version 1.0.3
+Maven version 4.05
+
+You will also need to configure demo.example.com as a local DNS alias for 
+127.0.0.1 - you'll need to add demo.example.com to the end of the 127.0.0.1 
+line in /etc/hosts, or the corresponding hosts file for your version of 
+Windows:
+
+Windows 2000  - C:windows\system32\drivers\etc\hosts  Windows XP    - C:\windows\system32\drivers\etc\hosts  Windows NT    - C:\winnt\system32\drivers\etc\hosts  Windows Vista – C:\windows\system32\drivers\etc\hosts
+
+You should end up with a line in the hosts file of the form:
+
+127.0.0.1       localhost demo.example.com
+
+%% 2. Checking Out the Demo Source Code
+
+Checkout the demo source code from OpenSSO's CVS repository. See 
+https://opensso.dev.java.net/public/about/faqcenter/faqgetstart.html#checkout
+for instructions. The demo source code is located in 
+<source location>/opensso/extensions/c1demo2009
+
+NOTE - if you are checking the code out from CVS for the first time in 
+NetBeans, ensure that you leave the 'branch' empty - this will result in the 
+'trunk' being checked out from CVS.
+
+%% 3. Creating the Demo Database
+
+The scripts to create a demo database, demo users and create and populate the 
+demo tables are located in 
+<source location>/opensso/extensions/c1demo2009/C1DemoServer/src/conf/
+and can be run via:
+
+$ cd <source location>/opensso/extensions/c1demo2009/C1DemoServer/src/conf/
+$ mysql -uroot -p<password> < create_database.mysql
+$ mysql -uroot -p<password> -Dj1demodb < create_dbusers.sql
+$ mysql -uroot -p<password> -Dj1demodb < setup.sql
+
+If you ever need to recreate the database from scratch, you can drop it by 
+running:
+
+$ mysql -uroot -p<password> < drop_database.mysql
+
+%% 4. Deploying the Demo Web Service
+
+Start NetBeans and open the Demo Web Service project at 
+<source location>/opensso/extensions/c1demo2009/C1DemoServer. 
+
+You may need to create a data connection for j1demodb. Select the C1DemoServer 
+project, right click, select 'Resolve Data Sources', select 'Add Connection'.
+
+Enter the Name:  MySQL (Connector / J driver)
+Enter the host:  localhost
+Port:  3306
+Database:  j1demodb
+User Name:  j1demouser
+Password:  j1demouser
+select: Remember password
+
+In the 'Projects' pane, expand C1DemoServer, expand 'Configuration Files', 
+right-click C1DemoServer.dbschema and select 'Recapture Schema from Database'.
+  
+To test the demo web service, we will need to disable security: in NetBeans' 
+'Projects' pane, open the C1DemoServer project (click the triangle to the left 
+of the project name) and open 'Configuration Files'. Double click 'web.xml', 
+select 'XML' to see edit the contents of the file and comment out or remove the 
+two <filter> elements and the two <filter-mapping> elements - everything from 
+the end of the <web-app> opening tag to the start of the <servlet> opening tag. 
+It's OK to just delete the elements, since you can easily revert to the 
+original web.xml file later.
+
+Now right-click the C1DemoServer project in the 'Projects' pane, select 
+'Properties', go to the 'Run' category, and check that the GlassFish v2 UR2 
+server is selected.
+
+You can now deploy C1DemoServer - just right-click C1DemoServer in the 
+'Projects' pane and select 'Deploy'. Once the project is deployed, you can test
+the demo web service from a browser. Right-click C1DemoServer in the 'Projects' 
+pane, select 'Run', then visit the following URLs in your browser:
+
+http://localhost:8080/C1DemoServer/resources/phones/ should give a list of 
+phone elements
+
+http://localhost:8080/C1DemoServer/resources/phones/1234567890/ should give a 
+single phone element
+
+http://localhost:8080/C1DemoServer/resources/accounts/ should give a list of 
+accounts
+
+http://localhost:8080/C1DemoServer/resources/accounts/123456789012345 should 
+give a single account
+
+Alternately, select Project right click, select 'Test RESTful web services'. 
+This will bring up an HTML page with a test interface to test the RESTful 
+interface. Note: this does not currently work in Safari.
+
+%% 5. Deploying and Configuring OpenSSO with Entitlements
+
+At present, OpenSSO's fine-grained authorization functionality, also known as
+'Entitlements' is being developed as an OpenSSO extension. Unfortunately, it is
+not possible to build the WAR file for OpenSSO with Entitlements unless you are
+on the Sun internal network. For this reason, I have uploaded the WAR file to
+mediacast.sun.com. You can download it from
+
+http://mediacast.sun.com/users/metadaddy/media/entitlement.war
+
+Deploy the WAR file by copying it into GlassFish's autodeploy directory - 
+<glassfish directory>/domains/domain1/autodeploy/. It will likely take a minute
+or two to deploy; once deployment is complete, a file named 
+entitlement.war_deployed will be created in the autodeploy directory.
+
+Now we will need to configure OpenSSO. In your browser, go to 
+http://demo.example.com:8080/entitlement/ and you should see the OpenSSO 
+configurator. IMPORTANT - do NOT use localhost when deploying OpenSSO - OpenSSO
+needs a fully-qualified domain name to function correctly.
+
+Select the default configuration and supply the admin passwords. IMPORTANT -
+ensure you record or remember the admin passwords - if you forget them you will
+need to redeploy OpenSSO.
+
+Once OpenSSO has been configured, we need to create a JDBC data store. Follow
+the link to the OpenSSO login page and log in as amadmin with the password you
+supplied at configuration. Now click 'Access Control', then the top level realm
+listed under 'Realms'. Click 'Data Stores', then the 'New' button.
+
+Give the new Data Store name: 'JDBC', select 'Database Repository' as the type 
+and click 'Next'. You will need to enter the following data:
+
+	Password for Connecting to Database: <your password> (j1demouser)
+	
+	JDBC Driver URL: jdbc:mysql://127.0.0.1:3306/j1demodb
+	
+	Connect This User to Database: j1demouser
+	
+	Database User Table Name: phone
+	
+	List of User Attributes Names in Database: Delete all of the existing entries 
+	and add the following:
+	
+	user_name
+	allocated_minutes
+	phone_number
+	account_number
+	can_download_music
+	inetuserstatus
+	can_download_ringtones
+	can_download_video
+	password
+	head_of_household
+	
+	User Password Attribute Name: password
+	
+	User ID Attribute Name: phone_number
+	
+	Attribute Name of User Status: inetuserstatus
+	
+	Users Search Attribute in Database: phone_number
+	
+	Database Membership table name: account
+	
+	Membership ID Attribute Name: account_number
+	
+	Membership Search Attribute in Database: account_number
+
+Leave the remaining fields as-is, and click 'Save'. You should see the 'JDBC' 
+data store listed under the embedded store. Now click the 'Subjects' tab and 
+you should see a number of users in the store, identified by phone numbers.
+
+Note that the grouping functionality in the JDBC data store is not yet 
+functional, so you won't see an account listed in the 'Groups' tab. This isn't 
+a problem - we don't need it for the demo.
+
+Now we need to create policies for OpenSSO to protect our web service. The demo
+policies use custom condition classes, which are not supported by the current 
+version of the entitlements admin user interface, so we'll need to create them
+programmatically. Copy the two JSP files, javaoneDemo.jsp and 
+javaoneDemoEval.jsp from <source location>/opensso/extensions/entitlements/demo 
+to <glassfish directory>/domains/domain1/applications/j2ee-modules/entitlement/,
+then go to http://demo.example.com:8080/entitlement/javaoneDemo.jsp - this JSP
+will create the demo policies. You can now test the policies by going to
+http://demo.example.com:8080/entitlement/javaoneDemoEval.jsp - if all is well,
+you will see this:
+
+Subject  Action	Resource                                                                          Allow/Deny
+1234567890 GET  http://localhost:8080/C1DemoServer/resources/phones/1234567890                     allowed
+1234567890 GET  http://localhost:8080/C1DemoServer/resources/phones/1234567890/?param=value        allowed
+1234567890 GET  http://localhost:8080/C1DemoServer/resources/phones/1112223333                     allowed
+1234567890 GET  http://localhost:8080/C1DemoServer/resources/phones/1112223333/?param=value        allowed
+1234567890 POST http://localhost:8080/C1DemoServer/resources/phones/1234567890                     allowed
+1234567890 POST http://localhost:8080/C1DemoServer/resources/phones/1234567890/?param=value        allowed
+1234567890 POST http://localhost:8080/C1DemoServer/resources/phones/1112223333                     allowed
+1234567890 POST http://localhost:8080/C1DemoServer/resources/phones/1112223333/?param=value        allowed
+1112223333 GET  http://localhost:8080/C1DemoServer/resources/phones/1234567890                     denied
+1112223333 GET  http://localhost:8080/C1DemoServer/resources/phones/1234567890/?param=value        denied
+1112223333 GET  http://localhost:8080/C1DemoServer/resources/phones/1112223333                     allowed
+1112223333 GET  http://localhost:8080/C1DemoServer/resources/phones/1112223333/?param=value        allowed
+1112223333 POST http://localhost:8080/C1DemoServer/resources/phones/1234567890                     denied
+1112223333 POST http://localhost:8080/C1DemoServer/resources/phones/1234567890/?param=value        denied
+1112223333 POST http://localhost:8080/C1DemoServer/resources/phones/1112223333                     denied
+1112223333 POST http://localhost:8080/C1DemoServer/resources/phones/1112223333/?param=value        denied
+1234567890 GET  http://localhost:8080/C1DemoServer/resources/accounts/123456789012345              allowed
+1234567890 GET  http://localhost:8080/C1DemoServer/resources/accounts/123456789012345/?param=value allowed
+1234567890 POST http://localhost:8080/C1DemoServer/resources/accounts/123456789012345              allowed
+1234567890 POST http://localhost:8080/C1DemoServer/resources/accounts/123456789012345/?param=value allowed
+1112223333 GET  http://localhost:8080/C1DemoServer/resources/accounts/123456789012345              denied
+1112223333 GET  http://localhost:8080/C1DemoServer/resources/accounts/123456789012345/?param=value denied
+1112223333 POST http://localhost:8080/C1DemoServer/resources/accounts/123456789012345              denied
+1112223333 POST http://localhost:8080/C1DemoServer/resources/accounts/123456789012345/?param=value denied
+
+This shows that:
+
+1. Both users are able to GET their own phone records
+2. The user 1234567980 (which has the 'head_of_household' flag set) can GET and
+POST both his own and 1112223333's phone records
+3. The user 1234567980 is also able to GET and POST to the 123456789012345 
+account
+
+All other access is denied - 1112223333 can't POST to his own phone, or access 
+1234567890's phone or the account.
+
+You can also test OpenSSO's entitlement web service:
+
+http://localhost:8080/entitlement/ws/1/entitlement/decision?realm=/&subject=id=1112223333,ou=user,dc=opensso,dc=java,dc=net&action=GET&resource=http://localhost:8080/C1DemoServer/resources/phones/1112223333
+
+returns 'allow' - 1112223333 can GET his own phone,. while
+
+http://localhost:8080/entitlement/ws/1/entitlement/decision?realm=/&subject=id=1112223333,ou=user,dc=opensso,dc=java,dc=net&action=GET&resource=http://localhost:8080/C1DemoServer/resources/phones/1234567890
+
+returns 'deny' - 1234567890 is not allowed to GET 1234567890. You can 
+experiment by changing the subject and resource in the URL to check that the 
+policies are correctly evaluated.
+
+NOTE - there is currently a bug in the entitlements code which may result in a 
+null pointer exception when evaluating policy. To avoid this bug, you MUST 
+invoke http://demo.example.com:8080/entitlement/javaoneDemoEval.jsp after each 
+GlassFish restart. If you forget to invoke javaoneDemoEval.jsp and encounter 
+the null pointer exception, you must restart GlassFish and then invoke 
+javaoneDemoEval.jsp.
+
+%% 6. Deploying the OAuth Token Service
+
+Currently, the OAuth Token Service uses the Java DB ('Derby'), and requires 
+several steps of configuration before it is ready to run.
+
+First, you must ensure that the DERBY_HOME environment variable is correctly 
+set - on a *nix machine, you'll need to do the following:
+
+export DERBY_HOME=<glassfish directory>/javadb
+
+I set this in my ~/.bashrc file, which is, in turn, sourced by my 
+~/.bash_profile.
+
+Now, restart Glassfish and Derby:
+
+<glassfish directory>/bin/asadmin stop-domain
+<glassfish directory>/bin/asadmin start-database
+<glassfish directory>/bin/asadmin start-domain
+
+Create the OAuth Token Service tables using the Derby 'ij' utility. Before 
+running 'ij' for the first time, you may need to set its executable flag:
+
+sudo chmod a+x <glassfish directory>/javadb/bin/ij
+
+$ <glassfish directory>/javadb/bin/ij
+ij version 10.2
+ij> connect 'jdbc:derby://localhost:1527/TokenServiceDB;create=true;user=username;password=password';
+ij> run '<source location>/opensso/extensions/oauth/oauth-service/etc/dbsetup.sql';
+ij> quit;
+
+NOTE - since the dbsetup.sql script starts by dropping the reqtoken, acctoken 
+and consumer tables, it will show an error message the first time you run it. 
+This is expected.
+
+Next, we need to create a JDBC connection pool and resource. Go to 
+http://localhost:4848/ and login as admin with the password adminadmin. Open 
+the 'Resources' entry in the list on the left, then 'JDBC', and click 
+'Connection Pools' then the 'New' button.
+
+You'll need to change the following fields:
+
+Name: TokenServicePool
+Resource Type: javax.sql.DataSource
+Database Vendor: Derby
+
+(click 'Next', then Additional Properties)
+
+DatabaseName: TokenServiceDB
+Password: password
+User: username
+
+Click 'Finish'.
+
+Now, Click 'JDBC Resources' in the left hand pane, then 'New' on the right.
+
+JNDI Name: TokenServiceDB
+Pool Name: TokenServicePool
+
+(click 'OK').
+
+Now we can build and deploy the OAuth Token Service. NOTE - you must have 
+ensure that you are using JDK 1.6. On a Mac, you can use the 'Java Preferences' 
+app in /Applications/Utilities. Just drag 'Java SE 6' to the top of the 'Java 
+Applications' list.
+ 
+To build the OAuth Token Service:
+
+cd <source location>/opensso/extensions/oauth/oauth-service
+mvn install
+
+Deploy the oauth-service WAR file (target/oauth-service.war) via the GlassFish 
+admin console - log in to the GlassFish admin console again and click 'Web 
+Applications' in the list on the left, then the 'Deploy' button on the right.
+
+Select 'Local packaged file' and give it the location of the OAuth Token 
+Service WAR - <source location>/opensso/extensions/oauth/oauth-service/target/oauth-service.war
+
+IMPORTANT - you MUST change the 'Context Root' from the default 'oauth-service' 
+to 'TokenService'. Hit 'OK' to deploy the OAuth Token Service.
+
+You can also deploy from the command line with:
+
+/Applications/NetBeans/glassfish-v2ur2/bin/asadmin deploy --host localhost \
+--port 4848 --user admin --contextroot /TokenService --precompilejsp=false \
+--verify=false --name "oauth-service" --enabled=true \
+<source location>/opensso/extensions/oauth/oauth-service/target/oauth-service.war
+
+%% 7. Running the Demo Test Harness
+
+Now we have all of the infrastructure up and running, we can run the Demo Test 
+Harness. 
+
+The first thing to do is to re-enable security in C1DemoServer - go to the 
+web.xml file and uncomment the two <filter> elements and the two 
+<filter-mapping> elements, or just right click web.xml in the projects pane on 
+the left and select 'CVS', then 'Revert Modifications'. NetBeans should 
+automatically redeploy the project, but you can right-click C1DemoServer on the 
+left and click 'Deploy' to be sure.
+
+Once C1DemoServer has been redeployed, any attempt to access it from the 
+browser will result in a 401 error. You can try this by going to 
+http://localhost:8080/C1DemoServer/resources/phones/1234567890/. If you go to
+'Page Info' in the browser and look at the HTTP headers, you'll see that the
+WWW-Authenticate header is set to 'OAuth realm="http://www.example.com/"', 
+showing that OAuth is required.
+
+Now, open the Netbeans project 
+<source location>/opensso/extensions/c1demo2009/C1DemoHarness and built it. 
+The demo harness takes a username, password and a list of URLs. It will attempt 
+to obtain an OAuth token using the username and password, then GET each URL in 
+turn.
+
+Run the test harness from the command line:
+
+java -jar <source location>/opensso/extensions/c1demo2009/C1DemoHarness/dist/C1DemoHarness.jar 1112223333 abc123 http://localhost:8080/C1DemoServer/resources/phones/1112223333/
+
+You should see output similar to
+
+	Registering the OAuth consumer
+	
+	{consumer_key=[http://localhost:8080/TokenService/resources/oauth/v1/consumer/javafx], consumer_secret=[javafx_secret]}
+	
+	Getting an OAuth request token
+	
+	{oauth_token=[http://localhost:8080/TokenService/resources/oauth/v1/rtoken/226927044ec044cf9cfba5ae8be7722a], oauth_token_secret=[4a346889c8d347eaa2c393341b165daa]}
+	
+	Authenticating to OAuth token service
+	
+	Authenticated ok
+	
+	Getting an OAuth access token
+	
+	{oauth_token=[http://localhost:8080/TokenService/resources/oauth/v1/atoken/3e57b51c4ff64533a8b27e5afe3f87e8], oauth_token_secret=[fba125323cee4e39a40ce3ed0fb4643c]}
+	
+	GETting resource: http://localhost:8080/C1DemoServer/resources/phones/1112223333/
+	
+	<?xml version="1.0" encoding="UTF-8"?>
+	<phone uri="http://localhost:8080/C1DemoServer/resources/phones/1112223333/">
+	    <accountNumber uri="http://localhost:8080/C1DemoServer/resources/phones/1112223333/accountNumber/"/>
+	    <allocatedMinutes>250</allocatedMinutes>
+	    <callLogCollection uri="http://localhost:8080/C1DemoServer/resources/phones/1112223333/callLogCollection/">
+	        <callLog uri="http://localhost:8080/C1DemoServer/resources/phones/1112223333/callLogCollection/3/"/>
+	    </callLogCollection>
+	    <canDownloadMusic>false</canDownloadMusic>
+	    <canDownloadRingtones>true</canDownloadRingtones>
+	    <canDownloadVideo>false</canDownloadVideo>
+	    <headOfHousehold>false</headOfHousehold>
+	    <notificationCollection uri="http://localhost:8080/C1DemoServer/resources/phones/1112223333/notificationCollection/">
+	        <notification uri="http://localhost:8080/C1DemoServer/resources/phones/1112223333/notificationCollection/2/"/>
+	    </notificationCollection>
+	    <phoneNumber>1112223333</phoneNumber>
+	    <userName>Billy Spencer</userName>
+	</phone>
+
+User 1112223333 ('Billy') can GET his own phone. We can see the result of Billy
+trying to GET another phone on the account with
+
+java -jar <source location>/opensso/extensions/c1demo2009/C1DemoHarness/dist/C1DemoHarness.jar 1112223333 abc123 http://localhost:8080/C1DemoServer/resources/phones/123456790/
+
+	Registering the OAuth consumer
+	
+	{consumer_key=[http://localhost:8080/TokenService/resources/oauth/v1/consumer/javafx], consumer_secret=[javafx_secret]}
+	
+	Getting an OAuth request token
+	
+	{oauth_token=[http://localhost:8080/TokenService/resources/oauth/v1/rtoken/322d71d5583f4e728240e9ff521a14ee], oauth_token_secret=[a99a357269ea4c9780eea97fcde20ccf]}
+	
+	Authenticating to OAuth token service
+	
+	Authenticated ok
+	
+	Getting an OAuth access token
+	
+	{oauth_token=[http://localhost:8080/TokenService/resources/oauth/v1/atoken/5534dd98a19e40ccb77e62ae48bd7c62], oauth_token_secret=[95a69d3090304e3bb50a0ea722bfa668]}
+	
+	GETting resource: http://localhost:8080/C1DemoServer/resources/phones/1234567890/
+	
+	Server returned 403 Forbidden
+
+Billy can successfully GET his own phone, but is forbidden from GETting any 
+others.
+
+Again, you can experiment by changing the username and resource to check that 
+policy is being enforced correctly.
+
+NOTE - one user reported a 500 error when running the test harness. The 
+GlassFish log indicated that there was an unwanted 'ssl=off' property in 
+TokenServicePool's 'Additional Properties' tab. Deleting this property solved 
+the issue.
+
+%% 8. Running the Demo Client
+
+Now we're finally ready to run the JavaFX demo client! Open the C1DemoClient 
+project and build it. Now run the demo client from the command line. Note that
+we pass the phone number in on the command line to simulate the client being 
+deployed and configured on a phone.
+
+~/.netbeans/6.5/javafx-sdk/bin/javafx -jar <source location>/opensso/extensions/c1demo2009/C1DemoClient/dist/C1DemoClient.jar phoneNumber=1234567890
+
+Log in with password abc123 and you will see a menu with options for Statement, 
+Account Settings, Family Settings, Notifications and Logout. You can explore 
+the interface, but note that setting the account billing address is not 
+implemented. In particular, notice that as 'Frank', a 'head of household' on 
+the account, we can see calls for all phones on the account, and even set the 
+capabilities of other phones on the account, allowing the kids to download 
+ringtones, music and video.
+
+Now run the client as another user (you can leave the first instance running if
+you like):
+
+~/.netbeans/6.5/javafx-sdk/bin/javafx -jar <source location>/opensso/extensions/c1demo2009/C1DemoClient/dist/C1DemoClient.jar phoneNumber=1112223333
+
+Log in with password abc123, and, notice that the menu is different for 'Billy' 
+- he can only see Phone Statement, Phone Settings, Notifications and Logout. 
+Also, he can only see his phone settings, he can't change them.
+
+In the 'Frank' instance of the client (phone number 1234567890), you can go to
+Family Settings/Billy and check 'Allow Ringtones', then go look in Billy's 
+instance to see that the same item is checked.
+
+If you want to change the password for a user, click 'Set/Reset Password' on 
+the login page. The first time you do this, it will ask for the last 4 digits
+of a credit card and the card verification number - enter 3456 and 1234 
+respectively. Now you can set a password reset question and answer, and a 
+password. Subsequent password resets will use this question and answer rather
+than the credit card details.
+
+Finally, we can show that the web service is secure in the face of accidentally 
+or deliberately malicious clients. In the C1DemoClient project, navigate in the
+left hand pane to Source Packages/c1democlient/Home.fx and go to line 55. This 
+is where the client UI decides whether to show the 'head of household' menu, 
+depending on whether it has been able to obtain an Account object. Comment out
+this line and uncomment the following line, then build the project.
+
+Close any instances of the demo client, and restart it for Billy, with 
+
+~/.netbeans/6.5/javafx-sdk/bin/javafx -jar <source location>/opensso/extensions/c1demo2009/C1DemoClient/dist/C1DemoClient.jar phoneNumber=1112223333
+
+After logging in, you should see Frank's menu, but any attempt to access the 
+list of phones or account information results in an error. You can see the 403 
+(forbidden) errors in the terminal window. The service is secure, both against
+unauthenticated use and authenticated but unauthorized use.
+
+Now go and pour yourself a beverage of your choice - if you got this far, 
+you've earned it!
