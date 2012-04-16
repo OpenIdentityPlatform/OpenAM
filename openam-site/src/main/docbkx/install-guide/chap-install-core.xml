@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-core'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing OpenAM Core Services</title>
+
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Full install</secondary>
+ </indexterm>
+ <para>This chapter covers tasks required to install OpenAM core services,
+ and to ensure they run properly. It includes instructions on preparing your
+ application server to run OpenAM, preparing your identity repository to
+ handle OpenAM identities, deploying component .war files, installing
+ OpenAM administration tools, and performing post-installation
+ configuration.</para>
+ 
+ <para>To manage access to web resources on other servers, you can install
+ policy agents that provide tight integration with OpenAM. See the <link
+ xlink:href="http://openam.forgerock.org/doc/agent-install-guide/index.html"
+ xlink:show="new"><citetitle>Policy Agent Installation Guide</citetitle></link>
+ for instructions on installing OpenAM agents in supported web servers and
+ Java EE application containers.</para>
+
+ <section xml:id="prepare-prerequisites">
+  <title>Preparing Prerequisite Software</title>
+  <indexterm>
+   <primary>Software requirements</primary>
+  </indexterm>
+  <indexterm>
+   <primary>Memory requirements</primary>
+  </indexterm>
+  <itemizedlist>
+   <para>OpenAM core services require the following prerequisite
+   software installed before you begin OpenAM installation.</para>
+   <listitem>
+    <para>A Java 6 runtime environment</para>
+    <screen>$ java -version
+java version "1.6.0_29"
+Java(TM) SE Runtime Environment (build 1.6.0_29-b11-402-11D50)
+Java HotSpot(TM) 64-Bit Server VM (build 20.4-b02-402, mixed mode)</screen>
+   </listitem>
+   <listitem>
+
+    <para>A supported application server as the deployment container</para>
+    <para>See the <link xlink:href="release-notes#chap-before-you-install"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+    Notes</citetitle></link> for a list.</para>
+    
+    <para>OpenAM core services require a minimum JVM heap size of 1 GB,
+    and a permanent generation size of 256 MB. Apply the following JVM options
+    before start your application server.</para>
+    <programlisting>-Xmx1024m -XX:MaxPermSize=256m</programlisting>
+    
+    <para>If a Java Security Manager is enabled for your deployment container,
+    add permissions before installing OpenAM.</para>
+    <!-- TODO: Define permissions for supported containers. Could these be
+    separate files available in the product directory when you unpack?-->
+    
+    <para>OpenAM examples here use Apache Tomcat as the deployment container.
+    Tomcat is installed on <literal>openam.example.com</literal>, and listens
+    on the default ports, with no Java Security Manager enabled. The script
+    <filename>/etc/init.d/tomcat</filename> manages the service at system
+    startup and shutdown.</para>
+    
+    <programlisting language="shell">#!/bin/sh
+#
+# tomcat
+#
+# chkconfig: 345 95 5
+# description: Manage Tomcat web application container
+CATALINA_HOME="/path/to/tomcat"
+export CATALINA_HOME
+JAVA_HOME=/path/to/jdk1.6
+export JAVA_HOME
+JAVA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
+export JAVA_OPTS
+
+case "${1}" in
+start)
+  /bin/su mark -c "${CATALINA_HOME}/bin/startup.sh"
+  exit ${?}
+  ;;
+stop)
+  /bin/su mark -c "${CATALINA_HOME}/bin/shutdown.sh"
+  exit ${?}
+  ;;
+*)
+  echo "Usage:  $0 { start | stop }"
+  exit 1
+  ;;
+esac
+</programlisting>
+   
+   </listitem>
+   <listitem>
+    <para>A supported identity repository for user identity data</para>
+
+    <para>See the <link xlink:href="release-notes#chap-before-you-install"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+    Notes</citetitle></link> for a list. If you plan to use OpenAM for
+    evaluation or testing, definitely use the embedded LDAP server as a
+    configuration store and identity repository. ForgeRock also recommends
+    using the embedded LDAP server as the configuration store when you have
+    four or fewer instances of OpenAM in production.</para>
+    
+    <para>Examples here use OpenDJ as the identity repository. OpenDJ
+    is installed on <literal>openam.example.com</literal>, and listens
+    on the following ports.</para>
+    <itemizedlist>
+     <listitem><para>Port 1389 for LDAP requests and StartTLS</para></listitem>
+     <listitem><para>Port 1636 for LDAP requests over SSL</para></listitem>
+     <listitem><para>Port 4444 for administrative traffic</para></listitem>
+    </itemizedlist>
+    <para>The script <filename>/etc/init.d/opendj</filename>, created with the
+    OpenDJ <command>create-rc-script</command> command, manages the service
+    at system startup and shutdown.</para>
+    
+    <programlisting language="shell">#!/bin/sh
+#...
+# chkconfig: 345 95 5
+# description: Control the OpenDJ Directory Server
+
+
+# Set the path to the OpenDJ instance to manage
+INSTALL_ROOT="/path/to/OpenDJ"
+export INSTALL_ROOT
+
+cd ${INSTALL_ROOT}
+
+# Determine what action should be performed on the server
+case "${1}" in
+start)
+  /bin/su mark -c "${INSTALL_ROOT}/bin/start-ds --quiet"
+  exit ${?}
+  ;;
+stop)
+  /bin/su mark -c "${INSTALL_ROOT}/bin/stop-ds --quiet"
+  exit ${?}
+  ;;
+restart)
+  /bin/su mark -c "${INSTALL_ROOT}/bin/stop-ds --restart --quiet"
+  exit ${?}
+  ;;
+*)
+  echo "Usage:  $0 { start | stop | restart }"
+  exit 1
+  ;;
+esac
+</programlisting>
+    <para>The Example.com sample data loaded into OpenDJ are taken from
+    the file, <link xlink:href="http://mcraig.org/ldif/Example.ldif"
+    >Example.ldif</link>, that you can download.</para>
+    <para>See the <citetitle>OpenDJ Installation Guide</citetitle> for
+    detailed installation instructions.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="download-openam-software">
+  <title>Obtaining OpenAM Software</title>
+  <indexterm>
+   <primary>Downloading OpenAM</primary>
+  </indexterm>
+  <para>Download OpenAM releases from <link
+  xlink:href='http://forgerock.com/downloads.html'
+  >http://forgerock.com/downloads.html</link>. At the download location you
+  find links to stable releases, nightly builds for testing, previous
+  releases, and also OpenAM policy agent releases.</para>
+  
+  <para>For each release of the OpenAM core services, you can download the
+  entire package as a .zip archive, only the OpenAM .war file, only the
+  administrative tools as a .zip archive, or only the OpenAM source code
+  used to build the release.</para>
+  
+  <variablelist>
+   <para>After you unzip the archive of the entire package, you get an
+   <filename>opensso</filename> directory including a README, a set of license
+   files, and the following directories. See the <link
+   xlink:href="reference#chap-file-layout"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>File
+    Layout</citetitle> reference</link> for details.</para>
+   <varlistentry>
+    <term><filename>deployable-war</filename></term>
+    <listitem><para>The deployable .war file as well as the tools and files
+    required to create any specialized .war files you deploy.</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>docs</filename></term>
+    <listitem><para>Javadoc API specifications for the public APIs exposed by
+    OpenAM</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>fedlet</filename></term>
+    <listitem><para>The lightweight service provider implementations that you
+    can embed in your Java EE or ASP.NET application to enable it to use
+    federated access management</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>integrations</filename></term>
+    <listitem><para>Resources for integrating OpenAM with third-party access
+    and identity management software</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>ldif</filename></term>
+    <listitem><para>Schema and index definitions for use with external
+    LDAP identity repositories</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>libraries</filename></term>
+    <listitem><para>Client SDK and policy agent libraries</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>patches</filename></term>
+    <listitem><para>Location for patches to apply to OpenAM</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>samples</filename></term>
+    <listitem><para>Sample source files demonstrating how to use the OpenAM
+    client SDK</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>tools</filename></term>
+    <listitem><para>OpenAM tools for managing SSO, configuring deployed
+    .war files, patching deployed .war files, managing sessions, and diagnosing
+    deployment issues</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>xml</filename></term>
+    <listitem><para>OpenAM service and default delegation policy configuration
+    files</para></listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
+ <section xml:id="install-openam-web-application">
+  <title>Install the OpenAM Web Application</title>
+  <para>The <filename>deployable-war/opensso.war</filename> file contains all
+  OpenAM server components and samples. How you deploy the .war file depends
+  on your web application container.</para>
+  <procedure xml:id="deploy-openam-on-tomcat">
+   <title>To Deploy OpenAM on Tomcat</title>
+   <step>
+    <para>Copy the .war file to the directory where web applications are
+    stored.</para>
+    <screen>$ cp deployable-war/opensso.war /path/to/tomcat/webapps/openam.war</screen>
+   </step>
+   <step>
+    <para>Check that you see the initial configuration screen in your browser at
+    openam.example.com:8080/openam</para>
+    <note>
+     <para>You should NOT use localhost domain for accessing OpenAM, not even
+     for testing purposes, because OpenAM strongly relies on browser cookies.
+     Also the chosen domain name should contain at least 2 '.' (dot)
+     characters, like <literal>openam.example.com</literal>.
+     </para>
+    </note>
+    <mediaobject xml:id="figure-openam-start">
+     <alt>Initial OpenAM configuration screen</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-start.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The initial configuration screen lets you choose a
+     default or custom configuration path.</para></textobject>
+    </mediaobject>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="configure-openam-defaults">
+   <title>To Configure OpenAM With Defaults (For Testing)</title>
+   <para>The default configuration option will basically configure the
+   embedded OpenDJ instance on default ports (if the ports are already in use,
+   OpenAM will look for a free port) as both configuration store and identity
+   store. The install will create a standalone OpenAM instance using the
+   subset of the fully qualified hostname as the cookie domain.</para>
+   <step>
+    <para>In the initial configuration screen, click
+    Create Default Configuration under Default Configuration.</para>
+   </step>
+   <step>
+    <para>Provide different passwords for the default OpenAM administrator,
+    <literal>amadmin</literal>, and default Policy Agent users.</para>
+    <mediaobject xml:id="figure-openam-default-conf">
+     <alt>OpenAM default configuration</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-default-conf.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The default configuration asks only for two
+     passwords.</para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>When the configuration completes, click Proceed to Login, and then
+    login as OpenAM administrator with the first of the two passwords you
+    provided.</para>
+    <mediaobject xml:id="figure-openam-first-login">
+     <alt>OpenAM first login</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-first-login.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The home page for OpenAM when logged in as the OpenAM
+     Administrator, <literal>amadmin</literal></para></textobject>
+    </mediaobject>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="delete-config-start-over">
+   <title>To Delete an OpenAM Configuration Before Redeploying</title>
+   <indexterm>
+    <primary>Installing</primary>
+    <secondary>Starting over</secondary>
+   </indexterm>
+   <step>
+    <para>Stop the OpenAM web application to clear the configuration held
+    in memory.</para>
+    <para>The following example shuts down Tomcat configured as described
+    above.</para>
+    <screen>$ /etc/init.d/tomcat stop
+Password: 
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk1.6/jre
+Using CLASSPATH:
+       /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar</screen>
+   </step>
+   <step>
+    <para>Delete OpenAM configuration files, by default under the
+    <filename>$HOME</filename> of the user running the web application
+    container.</para>
+    <screen>$ rm -rf $HOME/openam $HOME/.openssocfg</screen>
+    <note>
+     <para>When using the internal OpenAM configuration store, this step
+     deletes the embedded directory server and all of its contents. You should
+     always stop the application server before removing the configuration
+     files. In case you're using external configuration store make sure you
+     delete the entries under the configured OpenAM suffix (by default
+     dc=opensso,dc=java,dc=net).</para>
+    </note>
+   </step>
+   <step>
+    <para>Restart the OpenAM web application.</para>
+    <para>The following example restarts the Tomcat container.</para>
+    <screen>$ /etc/init.d/tomcat start
+Password: 
+Using CATALINA_BASE:   /path/to/tomcat
+Using CATALINA_HOME:   /path/to/tomcat
+Using CATALINA_TMPDIR: /path/to/tomcat/temp
+Using JRE_HOME:        /path/to/jdk1.6/jre
+Using CLASSPATH:
+       /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar</screen>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="configure-openam-custom">
+   <title>To Configure OpenAM</title>
+   <indexterm>
+    <primary>Installing</primary>
+    <secondary>Interactive configuration</secondary>
+   </indexterm>
+   <step>
+    <para>In the initial configuration screen, click
+    Create New Configuration under Custom Configuration.</para>
+   </step>
+   <step>
+    <para>Provide a password having at least 8 characters for the OpenAM
+    Administrator, <literal>amadmin</literal>.</para>
+    <mediaobject xml:id="figure-openam-conf-amadmin">
+     <alt>OpenAM amadmin password</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-conf-amadmin.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The OpenAM Administrator has username
+     <literal>amadmin</literal>.</para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>Make sure the server settings are valid for your configuration.</para>
+    <mediaobject xml:id="figure-openam-conf-server-settings">
+     <alt>OpenAM server settings</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-conf-server-settings.png" format="PNG" />
+     </imageobject>
+     <textobject><para>See OpenAM server settings below</para></textobject>
+    </mediaobject>
+    <variablelist>
+     <varlistentry>
+      <term>Server URL</term>
+      <listitem>
+       <para>Provide a valid URL to the base of your OpenAM web
+       container, including a fully qualified domain name (FQDN).</para>
+       <para>In a test environment, you can fake the FQDN by adding it to
+       your <filename>/etc/hosts</filename> as an alias. The following excerpt
+       shows lines from the <filename>/etc/hosts</filename> file on a Linux
+       system where OpenAM is installed.</para>
+       <programlisting>127.0.0.1 localhost.localdomain localhost
+::1 localhost6.localdomain6 localhost6
+127.0.1.1 openam openam.example.com</programlisting>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Cookie Domain</term>
+      <listitem>
+       <para>Starts with a dot, <literal>.</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Platform Locale</term>
+      <listitem>
+       <para>Supported locales include en_US (English), de (German),
+       es (Spanish), fr (French), ja (Japanese), ko (Korean),
+       zh_CN (Simplified Chinese), and zh_TW (Traditional Chinese).</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Configuration Directory</term>
+      <listitem>
+       <para>Location on server for OpenAM configuration files. OpenAM must
+       be able to write to this directory.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>In the Configuration Store screen, you can accept the defaults
+    to allow OpenAM to store configuration data in an embedded directory.
+    The embedded directory can be configured separately to replicate data
+    for high availability if necessary.</para>
+    <para>You can also add this OpenAM installation to an existing deployment,
+    providing the URL to reach an existing OpenAM instance.</para>
+    <para>Alternatively, if you already manage an OpenDJ or DSEE deployment,
+    you can choose to store OpenAM configuration data in your existing
+    directory service.</para>
+   </step>
+   <step>
+    <para>In the User Store screen, you configure where OpenAM looks for
+    user identities.</para>
+    <para>OpenAM must have write access to the directory service you choose,
+    as it adds to the directory schema needed to allow OpenAM to manage access
+    for users in the user store.</para>
+    <mediaobject xml:id="figure-openam-conf-user-store">
+     <alt>OpenAM user store settings</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-conf-user-store.png" format="PNG" />
+     </imageobject>
+     <textobject><para>See OpenAM user store settings below</para></textobject>
+    </mediaobject>
+    <variablelist>
+     <varlistentry>
+      <term>User Data Store Type</term>
+      <listitem>
+       <para>If you have a directory service already provisioned with users in
+       a supported user data store, then select that type of directory from the
+       options available.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>SSL/TLS Enabled</term>
+      <listitem>
+       <para>To use a secure connection, check this box, then make sure
+       the Port you define corresponds to the port on which the directory
+       listens for StartTLS or SSL connections. When using this option you also
+       need to make sure the truststore used by the JVM running OpenAM has the
+       necessary certificates installed.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Directory Name</term>
+      <listitem>
+       <para>FQDN for the host housing the directory service</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Port</term>
+      <listitem>
+       <para>LDAP directory port. The default for LDAP and LDAP with StartTLS
+       to protect the connection is port 389. The default for LDAP over SSL
+       is port 636. Your directory service might use a different port.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Root Suffix</term>
+      <listitem>
+       <para>Base distinguished name (DN) where user data are stored</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Login ID</term>
+      <listitem>
+       <para>Directory administrator user DN. The administrator must be capable
+       of updating schema and user data.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password</term>
+      <listitem>
+       <para>Password for the directory administrator user</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>In the Site Configuration screen, you can set up OpenAM as part of
+    a site where the load is balanced across multiple OpenAM servers.</para>
+    <para>For your first OpenAM installation, accept the defaults.</para>
+    <mediaobject xml:id="figure-openam-conf-site">
+     <alt>OpenAM site configuration</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-conf-site.png" format="PNG" />
+     </imageobject>
+     <textobject><para>Accept the defaults unless you load balance across
+     multiple OpenAM servers.</para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>In the Agent Information screen, provide a password having at least
+    8 characters to be used by policy agents to connect to OpenAM.</para>
+    <mediaobject xml:id="figure-openam-conf-pa">
+     <alt>OpenAM policy agent password</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-conf-pa.png" format="PNG" />
+     </imageobject>
+     <textobject><para>OpenAM policy agents use the password you provide
+     to access centralized configuration information.</para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>When the configuration completes, click Proceed to Login, and then
+    login as OpenAM administrator.</para>
+    <mediaobject xml:id="figure-openam-first-login-admin">
+     <alt>OpenAM first login</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-first-login.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The home page for OpenAM when logged in as the OpenAM
+     Administrator, <literal>amadmin</literal></para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>Restrict permissions to the configuration directory (by default
+    <filename>$HOME/openam</filename>, where
+    $HOME corresponds to the user who runs the web container).</para>
+   </step>
+  </procedure>
+ </section>
+</chapter>

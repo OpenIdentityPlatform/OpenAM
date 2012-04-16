@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="system">
+	<name>System - OpenSSO</name>
+	<author>OpenSSO Project</author>
+	<creationDate>July 2009</creationDate>
+	<copyright>Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved.</copyright>
+	<license>Common Development and Distribution License</license>
+	<authorEmail>users@opensso.dev.java.net</authorEmail>
+	<authorUrl>https://opensso.dev.java.net/public/extensions/#authnproviders</authorUrl>
+	<version>1.0</version>
+	<description>OpenSSO Single Sign-on Plugin</description>
+	<files>
+		<filename plugin="opensso">opensso.php</filename>
+	</files>
+	<params>
+  		<param name="opensso_enabled" type="list" default="0" label="OpenSSO Enabled" description="Only enable this plugin once you're sure the following parameters are correct!">
+          <option value="0">Disabled</option>
+          <option value="1">Enabled</option>
+        </param>
+  		<param name="opensso_cookie_name" type="text" default="iPlanetDirectoryPro" label="OpenSSO Cookie Name" description="This will be iPlanetDirectoryPro unless you've changed it in OpenSSO." />
+  		<param name="opensso_base_url" type="text" size="48" default="http://demo.example.com:8080/opensso/" label="OpenSSO Server URL" description="For example: http://demo.example.com:8080/opensso/" />
+  		<param name="opensso_joomla_username_attribute" type="text" default="uid" label="OpenSSO Joomla Username Attribute" description="The name of the OpenSSO profile attribute to use as the Joomla username. Use the default, uid, if users have the same username in Joomla and OpenSSO." />
+	</params>
+</install>

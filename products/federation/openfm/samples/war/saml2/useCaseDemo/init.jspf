@@ -1,0 +1,239 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: init.jspf,v 1.5 2009/08/01 00:21:52 sean_brydon Exp $
+
+-->
+
+<%-- imports --%>
+<%@ page import="com.sun.identity.common.SystemConfigurationUtil" %>
+<%@ page import="com.sun.identity.saml2.common.AccountUtils" %>
+<%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
+<%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="com.sun.identity.saml2.meta.SAML2MetaManager" %>
+<%@ page import="com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement" %>
+<%@ page import="com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement" %>
+<%@ page import="com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement" %>
+<%@ page import="com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement" %>
+<%@ page import="java.util.*, java.net.URLEncoder" %>
+<%@ page import="com.iplanet.sso.SSOTokenManager,
+            com.iplanet.sso.SSOException,
+            com.iplanet.sso.SSOToken"
+%>
+
+<%-- functions --%>
+<%! 
+    private static final String UNIVERSAL_IDENTIFIER =
+	"sun.am.UniversalIdentifier";
+    String quote(String s) {
+        return (s != null) ? "\""  + s + "\"" : null;
+    }
+%>
+
+<% 
+    String deployuri = SystemConfigurationUtil.getProperty(
+        "com.iplanet.am.services.deploymentDescriptor");
+    if ((deployuri == null) || (deployuri.length() == 0)) {
+        deployuri = "../../..";
+    }
+
+    String utf8 = "UTF-8";
+
+    String REALM = "/";
+    String SAMPLES_DIR = "samples/saml2/useCaseDemo";
+
+    // Change the value if you want to show  a different title in your install
+    String idpTitle = "GreatAir";
+
+    // Change the value if you want to show  a different title in your install
+    String spTitle = "BestCars";
+
+    String partnerSampleHomeUrl = null;
+    String reserveCarWithPartnerUrl = null;
+
+    boolean iAmIdp = false;
+    boolean iAmSp = false;
+
+    String myMetaAlias = null;
+    String myEntityID = null;
+    String partnerEntityID = null;
+    String myTitle = null;
+    String partnerTitle = null;
+
+    String thisUrl = request.getRequestURL().toString();
+    String appBase = thisUrl.substring(0, thisUrl.lastIndexOf("/samples") + 1);
+    String localLoginUrl = appBase + "UI/Login";
+    String localLogoutUrl = appBase + "UI/Logout";
+    String saml2Base = appBase + "saml2/";
+    String jspBase = saml2Base + "useCaseDemo/";
+    String samplesBase = appBase + SAMPLES_DIR + "/";
+    String reserveFlightUrl = samplesBase + "reserveFlight.jsp";
+    String reserveCarUrl = samplesBase + "reserveCar.jsp";
+
+    SSOToken ssoToken = null;
+    boolean userLoggedIn = false;
+    String userName = "";
+    String userLabel = "";
+    boolean federatedWithPartner = false;
+    //To determine if user is logged in thru SAML or Local login
+    boolean isLocalLogin = true;
+
+    SAML2MetaManager mm = SAML2Utils.getSAML2MetaManager();
+    List idpMetaAliases = mm.getAllHostedIdentityProviderMetaAliases(REALM);
+    List spMetaAliases = mm.getAllHostedServiceProviderMetaAliases(REALM);
+    List idpEntities = mm.getAllRemoteIdentityProviderEntities(REALM);
+    List spEntities = mm.getAllRemoteServiceProviderEntities(REALM);
+
+    if (!idpMetaAliases.isEmpty()) {
+        iAmIdp = true;
+        myTitle = idpTitle;
+        partnerTitle = spTitle;
+        myMetaAlias = (String)idpMetaAliases.get(0);
+        myEntityID = mm.getEntityByMetaAlias(myMetaAlias);
+    } else if (!spMetaAliases.isEmpty()) {
+        iAmSp = true;
+        myTitle = spTitle;
+        partnerTitle = idpTitle;
+        myMetaAlias = (String)spMetaAliases.get(0);
+        myEntityID = mm.getEntityByMetaAlias(myMetaAlias);
+    } 
+
+    if(!iAmIdp && !iAmSp) {
+        response.sendError(response.SC_BAD_REQUEST, 
+                "No SAML2 Service Hosted Here, "
+                + " Verify SAML2 Metadata Configuration");
+    } else {
+        if (iAmIdp) {
+            if (spEntities.isEmpty()) {
+                response.sendError(response.SC_BAD_REQUEST, 
+                        "This is an IDP, "
+                        + "No SAML2 Trusted Partner SP Service Registered Here,"
+                        + " Verify SAML2 Metadata Configuration");
+            } else {
+                partnerEntityID = (String)spEntities.get(0);
+                idpTitle = idpTitle + "(IDP: " + myEntityID + ")";
+                myTitle = idpTitle;
+                spTitle = spTitle + "(SP: " + partnerEntityID + ")";
+                partnerTitle = spTitle;
+            }
+        }
+        
+        if (iAmSp) {
+            if (idpEntities.isEmpty()) {
+                response.sendError(response.SC_BAD_REQUEST, 
+                        "This is an SP, "
+                        + "No SAML2 Trusted IDP Service Registered Here, "
+                        + " Verify SAML2 Metadata Configuration");
+            } else {
+                partnerEntityID = (String)idpEntities.get(0);
+                spTitle = spTitle + "(SP: " + myEntityID + ")";
+                myTitle = spTitle;
+                idpTitle = idpTitle + "(IDP: " + partnerEntityID + ")";
+                partnerTitle = idpTitle;
+            }
+        }
+
+        //find partnerSampleHomeUrl
+        if (iAmIdp && (partnerEntityID != null)) {
+            SPSSODescriptorElement partnerDescriptor 
+                    = mm.getSPSSODescriptor(REALM, partnerEntityID);
+            List partnerSlosList 
+                    = partnerDescriptor.getSingleLogoutService();
+            if ((partnerSlosList == null) || partnerSlosList.isEmpty()) {
+                response.sendError(response.SC_BAD_REQUEST, 
+                        "Could not determine partner samples base"); 
+            } else {
+                SingleLogoutServiceElement slose
+                    = (SingleLogoutServiceElement)partnerSlosList.get(0);
+                String slosUrl = slose.getLocation();
+                partnerSampleHomeUrl = slosUrl.substring(0, 
+                    slosUrl.indexOf("SPSlo"))
+                    +  SAMPLES_DIR + "/home.jsp";
+                if (reserveCarWithPartnerUrl == null) {
+                    reserveCarWithPartnerUrl = partnerSampleHomeUrl.substring(0,
+                        partnerSampleHomeUrl.indexOf("home.jsp"))
+                        + "/reserveCar.jsp";
+                }
+            } 
+        } else if (iAmSp && (partnerEntityID != null)) { //i am sp
+            IDPSSODescriptorElement partnerDescriptor 
+                    = mm.getIDPSSODescriptor(REALM, partnerEntityID);
+            List partnerSlosList 
+                    = partnerDescriptor.getSingleLogoutService();
+            if ((partnerSlosList == null) || partnerSlosList.isEmpty()) {
+                response.sendError(response.SC_BAD_REQUEST, 
+                        "Could not determine partner samples base"); 
+            } else {
+                SingleLogoutServiceElement slose
+                    = (SingleLogoutServiceElement)partnerSlosList.get(0);
+                String slosUrl = slose.getLocation();
+                partnerSampleHomeUrl = slosUrl.substring(0, 
+                    slosUrl.indexOf("IDPSlo"))
+                    +  SAMPLES_DIR + "/home.jsp";
+            }
+        } 
+   
+        if ((partnerEntityID != null) && (partnerSampleHomeUrl != null)) { 
+            try {
+                SSOTokenManager tokenManager = SSOTokenManager.getInstance();
+                ssoToken = tokenManager.createSSOToken(request);
+                if ((ssoToken != null) && tokenManager.isValidToken(ssoToken)) {
+                    userLoggedIn = true;
+                    if(iAmSp) {
+                      String spMetaAlias = ssoToken.getProperty(SAML2Constants.SP_METAALIAS);
+                      if (spMetaAlias==null || spMetaAlias.trim().length() == 0){
+                        //if detect presence of SP MetaAlias property then
+                        //it means login was thru SAML, else if not then local
+                        isLocalLogin = true;
+                      } else {
+                        //login was thru SAML since SP_METAALIAS was set
+                        isLocalLogin = false;
+                      }
+                    }
+                    userName = ssoToken.getProperty(UNIVERSAL_IDENTIFIER);
+                    userLabel = userName;
+                    int j = userName.indexOf("=");
+                    int k = userName.indexOf(",");
+                    if ((j > 0) && (k > j)) {
+                        userLabel = userName.substring(j+1,k).trim();
+                    }
+                    userLabel = userLabel.substring(0,1).toUpperCase() 
+                        + ((userLabel.length() > 0) 
+                        ? userLabel.substring(1, userLabel.length())
+                        : "");
+                }
+            } catch (SSOException e) {
+                //response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+            }
+    
+            if (userLoggedIn) {
+               federatedWithPartner = (AccountUtils.getAccountFederation(
+                 userName, myEntityID, partnerEntityID) == null) ? false : true;
+            }
+        }
+    }
+%>
+

@@ -1,0 +1,4 @@
+<project name="oauth">
+    <dirname property="oauth.basedir" file="${ant.file.oauth}"/>
+    <property file="${oauth.basedir}/oauth.properties"/>
+</project>

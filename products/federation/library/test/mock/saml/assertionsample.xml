@@ -1,0 +1,29 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: assertionsample.xml,v 1.2 2008/06/25 05:48:21 qcheng Exp $
+                                                                                
+-->
+
+<saml:Assertion AssertionID="Assertion-uuida25b962e-010c-e0ba-4e53-ac300b3a3bda" IssueInstant="2006-07-24T21:05:46Z" Issuer="https://test.identity.com" MajorVersion="1" MinorVersion="1" xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"><saml:Conditions NotBefore="2006-07-24T21:04:46Z" NotOnOrAfter="2006-07-24T21:15:46Z"><saml:AudienceRestrictionCondition><saml:Audience>http://accessmgr.sun.com:8080/amserver/SAMLAwareServlet</saml:Audience></saml:AudienceRestrictionCondition></saml:Conditions><saml:AuthenticationStatement AuthenticationInstant="2006-07-24T21:05:46Z" AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password"><saml:Subject><saml:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">3333333333</saml:NameIdentifier><saml:SubjectConfirmation><saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:artifact</saml:ConfirmationMethod></saml:SubjectConfirmation></saml:Subject></saml:AuthenticationStatement><saml:AttributeStatement><saml:Subject><saml:NameIdentifier Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">3333333333</saml:NameIdentifier><saml:SubjectConfirmation><saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:artifact</saml:ConfirmationMethod></saml:SubjectConfirmation></saml:Subject><saml:Attribute AttributeName="EDIPI" AttributeNamespace="http://test.identity.com/federation"><saml:AttributeValue>3333333333</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion>

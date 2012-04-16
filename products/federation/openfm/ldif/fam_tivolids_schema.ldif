@@ -1,0 +1,204 @@
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.73 NAME 'iplanet-am-user-federation-info-key' DESC 'User Federation Information Key' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.74 NAME 'iplanet-am-user-federation-info' DESC 'User Federation Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.821 NAME 'sunIdentityServerDiscoEntries' DESC 'User DiscoEntries' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.825 NAME 'sunIdentityServerPPCommonNameCN' DESC 'Liberty PP CommonName CN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.826 NAME 'sunIdentityServerPPCommonNameFN' DESC 'Liberty PP CommonName FN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.827 NAME 'sunIdentityServerPPCommonNameSN' DESC 'Liberty PP CommonName SN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.828 NAME 'sunIdentityServerPPCommonNameMN' DESC 'Liberty PP CommonName MN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.829 NAME 'sunIdentityServerPPCommonNameAltCN' DESC 'Liberty PP CommonName Alt CN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.830 NAME 'sunIdentityServerPPCommonNamePT' DESC 'Liberty PP CommonName PersonalTitle' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.831 NAME 'sunIdentityServerPPInformalName' DESC 'Liberty PP InformalName' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.832 NAME 'sunIdentityServerPPLegalIdentityLegalName' DESC 'Liberty PP LegalName' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.833 NAME 'sunIdentityServerPPLegalIdentityDOB' DESC 'Liberty PP Date of Birth' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.834 NAME 'sunIdentityServerPPLegalIdentityMaritalStatus' DESC 'Liberty PP Marital Status' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.835 NAME 'sunIdentityServerPPLegalIdentityGender' DESC 'Liberty PP Gender' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.836 NAME 'sunIdentityServerPPLegalIdentityAltIdType' DESC 'Liberty PP AltID Type' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.837 NAME 'sunIdentityServerPPLegalIdentityAltIdValue' DESC 'Liberty PP AltID Type' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.838 NAME 'sunIdentityServerPPLegalIdentityVATIdType' DESC 'Liberty PP IDType' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.839 NAME 'sunIdentityServerPPLegalIdentityVATIdValue' DESC 'Liberty PP IDValue' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.840 NAME 'sunIdentityServerPPEmploymentIdentityJobTitle' DESC 'Liberty PP JobTitle' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.841 NAME 'sunIdentityServerPPEmploymentIdentityOrg' DESC 'Liberty PP Org' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.842 NAME 'sunIdentityServerPPEmploymentIdentityAltO' DESC 'Liberty PP Alt Orgs' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.848 NAME 'sunIdentityServerPPAddressCard' DESC 'Liberty PP AddressCard' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.849 NAME 'sunIdentityServerPPMsgContact' DESC 'Liberty PP MsgContact' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.850 NAME 'sunIdentityServerPPFacadeMugShot' DESC 'Liberty PP FacadeMugShot' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.851 NAME 'sunIdentityServerPPFacadeWebSite' DESC 'Liberty PP FacadeWebSite' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.852 NAME 'sunIdentityServerPPFacadeNamePronounced' DESC 'Liberty PP FacadeNamePronounced' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.853 NAME 'sunIdentityServerPPFacadeGreetSound' DESC 'Liberty PP FacadeGreetSound' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.854 NAME 'sunIdentityServerPPFacadegreetmesound' DESC 'Liberty PP FacadeMeGreetSound' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.855 NAME 'sunIdentityServerPPDemographicsDisplayLanguage' DESC 'Liberty PP DemographicsDisplayLanguage' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.856 NAME 'sunIdentityServerPPDemographicsLanguage' DESC 'Liberty PP DemographicsLanguage' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.857 NAME 'sunIdentityServerPPDemographicsAge' DESC 'Liberty PP DemographicsAge' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.858 NAME 'sunIdentityServerPPDemographicsBirthDay' DESC 'Liberty PP DemographicsBirthDay' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.859 NAME 'sunIdentityServerPPDemographicsTimeZone' DESC 'Liberty PP DemographicsTimeZone' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.860 NAME 'sunIdentityServerPPSignKey' DESC 'Liberty PP SignKey' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.861 NAME 'sunIdentityServerPPEncryPTKey' DESC 'Liberty PP EncryPTKey' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.862 NAME 'sunIdentityServerPPEmergencyContact' DESC 'Liberty PP EmergencyContact' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.989 NAME 'sun-fm-saml2-nameid-infokey' DESC 'SAML 2.0 Name Identifier Information Key' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.990 NAME 'sun-fm-saml2-nameid-info' DESC 'SAML 2.0 Name Identifier Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+dn: CN=schema
+changetype: modify
+add: objectClasses
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.76 NAME 'sunFederationManagerDataStore' DESC 'FSUser provider OC' SUP top AUXILIARY MAY ( iplanet-am-user-federation-info-key $ iplanet-am-user-federation-info $ sunIdentityServerDiscoEntries) )
+
+dn: CN=schema
+changetype: modify
+add: objectClasses
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.127 NAME 'sunIdentityServerLibertyPPService' DESC 'sunIdentityServerLibertyPPService OC' SUP top AUXILIARY MAY ( sunIdentityServerPPCommonNameCN $ sunIdentityServerPPCommonNameAltCN $ sunIdentityServerPPCommonNameFN $ sunIdentityServerPPCommonNameSN $ sunIdentityServerPPCommonNamePT $ sunIdentityServerPPCommonNameMN $ sunIdentityServerPPInformalName $ sunIdentityServerPPLegalIdentityLegalName $ sunIdentityServerPPLegalIdentityDOB $ sunIdentityServerPPLegalIdentityMaritalStatus $ sunIdentityServerPPLegalIdentityGender $ sunIdentityServerPPLegalIdentityAltIdType $ sunIdentityServerPPLegalIdentityAltIdValue $ sunIdentityServerPPLegalIdentityVATIdType $ sunIdentityServerPPLegalIdentityVATIdValue $sunIdentityServerPPEmploymentIdentityJobTitle $ sunIdentityServerPPEmploymentIdentityOrg $ sunIdentityServerPPEmploymentIdentityAltO $ sunIdentityServerPPAddressCard $ sunIdentityServerPPMsgContact $ sunIdentityServerPPFacadeMugShot $ sunIdentityServerPPFacadeWebSite $ sunIdentityServerPPFacadeNamePronounced $ sunIdentityServerPPFacadeGreetSound $ sunIdentityServerPPFacadegreetmesound $ sunIdentityServerPPDemographicsDisplayLanguage $ sunIdentityServerPPDemographicsLanguage $ sunIdentityServerPPDemographicsBirthDay $ sunIdentityServerPPDemographicsAge $ sunIdentityServerPPDemographicsTimeZone $ sunIdentityServerPPSignKey $ sunIdentityServerPPEncryPTKey $ sunIdentityServerPPEmergencyContact ) )
+
+dn: CN=schema
+changetype: modify
+add: objectClasses
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.148 NAME 'sunFMSAML2NameIdentifier' DESC 'SAML 2.0 name identifier objectclass' SUP top AUXILIARY MAY ( sun-fm-saml2-nameid-infokey $ sun-fm-saml2-nameid-info ) )

@@ -1,0 +1,83 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyConfigureGoogleApps.xml,v 1.7 2009/08/14 18:33:23 asyhuang Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="question" defaultValue="blank.header">
+        <property required="true">
+            <label name="lblRealm" defaultValue="configure.google.apps.label.realm" labelFor="tfRealm" />
+            <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <attribute name="onClick" value="realmSelect(this);" />
+                <attribute name="onChange" value="realmSelect(this);" />
+            </cc>
+        </property>
+        <property required="true">
+            <label name="lblCOT" defaultValue="configure.google.apps.label.cot" labelFor="choiceCOT" />
+            <cc name="choiceCOT" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <attribute name="onClick" value="cotSelect(this);" />
+                <attribute name="onChange" value="cotSelect(this);" />
+            </cc>
+        </property>
+        <property required="true">
+            <label name="lblIDP" defaultValue="configure.google.apps.label.idp" labelFor="choiceIDP" />
+            <cc name="choiceIDP" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+        </property>
+        <property span="true">
+            <cc name="lblIDPMsg" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="configure.google.apps.help.message" />
+            </cc>
+        </property>
+    </section>
+
+    <section name="question" defaultValue="configure.google.apps.section.setup">
+        <property required="true">
+            <label name="lblDomainId" defaultValue="configure.google.apps.label.domain.id" labelFor="tfDomainId" />
+            <cc name="tfDomainId" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpdomainName"
+	                       defaultValue="configure.google.apps.help.domainName" />
+        </property>
+        <property span="true">
+            <cc name="helpdomainNameMsg1" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="configure.google.apps.help.domainName.msg1" />
+                <attribute name="escape" value="false" />
+            </cc>
+        </property>
+        <property span="true">
+            <cc name="helpdomainNameMsg2" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="configure.google.apps.help.domainName.msg2" />
+                <attribute name="escape" value="false" />
+                </cc>
+            </property>
+        </section>
+    </propertysheet>

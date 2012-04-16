@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestRunConfiguration name="Local Test Run" id="1b54a4cb-973e-487b-9da6-33c209bd8240" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
+  <Description>This is a default test run configuration for a local test run.</Description>
+  <Deployment>
+    <DeploymentItem filename="C:\Users\ggennaro\Documents\Visual Studio 2008\Projects\FedletTests\TestData\" />
+    <DeploymentItem filename="FedletTests\TestData\" />
+  </Deployment>
+  <TestTypeSpecific />
+</TestRunConfiguration>

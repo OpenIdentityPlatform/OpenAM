@@ -1,0 +1,82 @@
+##
+##   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+##
+##   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+##
+##   The contents of this file are subject to the terms
+##   of the Common Development and Distribution License
+##   (the License). You may not use this file except in
+##   compliance with the License.
+##
+##   You can obtain a copy of the License at
+##   https://opensso.dev.java.net/public/CDDLv1.0.html or
+##   opensso/legal/CDDLv1.0.txt
+##   See the License for the specific language governing
+##   permission and limitations under the License.
+##
+##   When distributing Covered Code, include this CDDL
+##   Header Notice in each file and include the License file
+##   at opensso/legal/CDDLv1.0.txt.
+##   If applicable, add the following below the CDDL Header,
+##   with the fields enclosed by brackets [] replaced by
+##   your own identifying information:
+##   "Portions Copyrighted [year] [name of copyright owner]"
+##
+##   $Id: opends_userinit.ldif,v 1.2 2009/10/27 05:38:05 hengming Exp $
+##
+##
+dn: ou=people,@userStoreRootSuffix@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=groups,@userStoreRootSuffix@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=opensso adminusers,@userStoreRootSuffix@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: cn=openssouser,ou=opensso adminusers,@userStoreRootSuffix@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: openssouser
+sn: openssouser
+userPassword: @OPENSSO_USER_PASSWD@
+
+dn: cn=openssouser,ou=opensso adminusers,@userStoreRootSuffix@
+changetype: modify
+add: ds-privilege-name
+ds-privilege-name: password-reset
+
+dn: cn=ldapuser,ou=opensso adminusers,@userStoreRootSuffix@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: ldapuser
+sn: ldapuser
+userPassword: @LDAP_USER_PASSWD@
+
+dn:@userStoreRootSuffix@
+changetype:modify
+add:aci
+aci: (target="ldap:///@userStoreRootSuffix@")(targetattr="*")(version 3.0; acl "OpenSSO datastore configuration bind  user all rights under the root suffix"; allow (all) userdn = "ldap:///cn=openssouser,ou=opensso adminusers,@userStoreRootSuffix@"; )
+
+dn:@userStoreRootSuffix@
+changetype:modify
+add:aci
+aci: (target="ldap:///@userStoreRootSuffix@")(targetattr="*")(version 3.0; acl "OpenSSO Authn bind ldap user rights"; allow (read,search) userdn = "ldap:///cn=ldapuser,ou=opensso adminusers,@userStoreRootSuffix@"; )
+
+dn:@userStoreRootSuffix@
+changetype:modify
+add:aci
+aci:(targetcontrol = "2.16.840.1.113730.3.4.3")(version 3.0; acl "Allow Persistent Search for the OpenSSO datastore config bind user"; allow (all) userdn = "ldap:///cn=openssouser,ou=opensso adminusers,@userStoreRootSuffix@";)
+
+dn:@userStoreRootSuffix@
+changetype:modify
+add:aci
+aci: (targetattr = "objectclass || inetuserstatus || iplanet-am-user-login-status || iplanet-am-user-account-life || iplanet-am-session-quota-limit || iplanet-am-user-alias-list ||  iplanet-am-session-max-session-time || iplanet-am-session-max-idle-time || iplanet-am-session-get-valid-sessions || iplanet-am-session-destroy-sessions || iplanet-am-session-add-session-listener-on-all-sessions || iplanet-am-user-admin-start-dn || iplanet-am-auth-post-login-process-class || iplanet-am-user-federation-info || iplanet-am-user-federation-info-key || ds-pwp-account-disabled || sun-fm-saml2-nameid-info || sun-fm-saml2-nameid-infokey || sunAMAuthInvalidAttemptsData || memberof || member")(targetfilter="(!(userdn=cn=openssouser,ou=opensso adminusers,@userStoreRootSuffix@))")(version 3.0; acl "OpenSSO User self modification denied for these attributes"; deny (write) userdn ="ldap:///self";)
+

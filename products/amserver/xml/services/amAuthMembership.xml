@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amAuthMembership.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
+
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthMembershipService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthMembershipService"
+            i18nFileName="amAuthMembership"
+            revisionNumber="30"
+            i18nKey="iplanet-am-auth-membership-service-description">
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-membership-min-password-length"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>8</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-membership-default-roles"
+                    type="list"
+                    syntax="dn"
+                    i18nKey="a102">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-membership-default-user-status"
+                    type="single_choice"   
+                    syntax="string"    
+                    i18nKey="a103">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>Active</Value> 
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-membership-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a115">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-membership-invalid-chars"
+                    type="single"
+                    syntax="string"
+                    i18nKey="">
+                    <DefaultValues>
+                        <Value>*|(|)|&amp;|!</Value>
+                    </DefaultValues>
+                </AttributeSchema>                            
+                <SubSchema name="serverconfig" inheritance="multiple">
+                        <AttributeSchema name="iplanet-am-auth-membership-min-password-length"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a101">
+                        <DefaultValues>
+                            <Value>8</Value>
+                        </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-membership-default-roles"
+                        type="list"
+                        syntax="dn"
+                        i18nKey="a102">
+                        </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-membership-default-user-status"
+                        type="single_choice"   
+                        syntax="string"    
+                        i18nKey="a103">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceActive">Active</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceInactive">Inactive</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>Active</Value> 
+                        </DefaultValues>
+                        </AttributeSchema>             
+                        <AttributeSchema name="iplanet-am-auth-membership-auth-level"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a115">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-membership-invalid-chars"
+                        type="single"
+                        syntax="string"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>*|(|)|&amp;|!</Value>
+                        </DefaultValues>
+                        </AttributeSchema>                
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

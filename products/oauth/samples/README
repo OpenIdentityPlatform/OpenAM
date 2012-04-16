@@ -1,0 +1,114 @@
+------------------------------------------------------------------------
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+The contents of this file are subject to the terms
+of the Common Development and Distribution License
+(the License). You may not use this file except in
+compliance with the License.
+
+You can obtain a copy of the License at
+https://opensso.dev.java.net/public/CDDLv1.0.html or
+opensso/legal/CDDLv1.0.txt
+See the License for the specific language governing
+permission and limitations under the License.
+
+When distributing Covered Code, include this CDDL
+Header Notice in each file and include the License file
+at opensso/legal/CDDLv1.0.txt.
+If applicable, add the following below the CDDL Header,
+with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+$Id: README,v 1.4 2010/01/11 07:07:44 nithyas Exp $
+
+------------------------------------------------------------------------
+
+This README explains steps to configure and deploy a REST based sample
+and secure it using OpenSSO OAuth Token Service. 
+
+%% Contents:
+    %% 1. Prerequisites
+    %% 2. Deploy and configure OpenSSO
+    %% 3. Build and deploy the StockService.war 
+    %% 4. Build and run the Stock Client
+    
+%% 1. Prerequisites
+You must have the following software installed and running to be able 
+to run the sample:
+
+JDK 6 - http://java.sun.com/javase/downloads/index.jsp
+GlassFish v2 - https://glassfish.dev.java.net/downloads/v2ur2-b04.html
+OpenSSO build 9 - http://opensso.dev.java.net
+
+
+%% 2. Deploying OpenSSO
+Deploy and configure opensso.war using the Glassfish admin console. 
+
+
+% 3. Build and deploy the sample stock service StockService.war
+1. cd StockService; 
+2. copy ./web/WEB-INF/web.xml.template to ./web/WEB-INF/web.xml 
+   edit ./web/WEB-INF/web.xml
+   change the tags <PROTOCOL>, <HOST>, <PORT> and <DEPLOYURI> to the 
+   protocol, host(FQDN), and port of glassfish server on which the 
+   OpenSSO server is hosted. Save the change.
+3. run "ant"
+   This command creates a StockService.war under dist directory
+4. Deploy StockService.war using Glassfish administration console.
+
+
+% 4. Build and run the sample stock client StockClient.war
+1. cd StockClient
+2. copy ./src/com/sun/samples/GetQuote.java.template to 
+   ./src/com/sun/samples/GetQuote.java 
+   edit ./src/com/sun/samples/GetQuote.java
+   change the tags <PROTOCOL>, <HOST>, <PORT>, and <DEPLOYURI> to the 
+   protocol, host(FQDN), and port of the glassfish server on which the 
+   OpenSSO server is hosted.
+   change the tags <PROTOCOL-STOCKSERVICE>, <HOST-STOCKSERVICE>, and 
+   <PORT-STOCKSERVICE> to the protocol, host(FQDN), and port of the 
+   glassfish server on which the sample stock service is hosted.
+   The OpenSSO OAuth implementation supports all three signature
+   methods, i.e. HMAC-SHA1, RSA-SHA1, and PLAINTEXT.
+   By default, this sample uses HMAC-SHA1. You may test 
+   different signature methods from the jsp page.
+3. run "ant"
+   This command creates a StockClient.war under dist directory
+4. Deploy StockClient.war using Glassfish administration console.
+5. Access the URL 
+   <PROTOCOL-STOCKCLIENT>://<HOST-STOCKCLIENT>:<PORT-STOCKCLIENT>/StockClient
+   using a browser (replace the tags <PROTOCOL-STOCKCLIENT>, 
+   <HOST-STOCKCLIENT>, and <PORT-STOCKCLIENT> with the protocol, 
+   host(FQDN), and port of the glassfish server on which this sample 
+   stock client is hosted.)
+   A page diplayed with a text field labelled "Stock Symbol", list box 
+   labelled "Signature Method", and a button "GetQuote". 
+   Enter a valid stock symbol such as JAVA in the text field,
+   change the signature method, (if required)
+   and click on the GetQuote button.
+   The opensso server login page shows and you enter user/password, e.g.
+   demo/changeit.
+   After authentication is successful, an OAuth Authorization page is
+   displayed with the user's uuid and two buttons labelled "Authorize" 
+   and "Revoke". 
+   After clicking on the Authorize button, the stock quote should be 
+   shown in a format similar to the following:
+    <QuoteResponse>
+    <Company>Sun Microsystems</Company>
+    <Symbol>JAVA</Symbol>
+    <Time>10/14/2009 4:00pm</Time>
+    <Price>
+    <Last>9.15</Last>
+    <Open>9.15</Open>
+    <DayHigh>9.18</DayHigh>
+    <DayLow>9.12</DayLow>
+    <YearRange>9.12</YearRange>
+    </Price>
+    <Change>0.00</Change>
+    <Volume>0.00</Volume>
+    <MarketCap>0.00</MarketCap>
+    </QuoteResponse> 
+

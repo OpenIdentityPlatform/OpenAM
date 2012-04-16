@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<handler-chains xmlns="http://java.sun.com/xml/ns/javaee"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://java.sun.com/xml/ns/javaee javaee_web_services_1_2.xsd">
+
+   <handler-chain>
+      <protocol-bindings>##SOAP11_HTTP</protocol-bindings>
+      <handler>
+         <handler-name>ClientHandler</handler-name>
+         <handler-class>com.sun.identity.wssagents.jaxws.client.ClientHandler</handler-class>
+      </handler>
+      <handler>
+         <handler-name>LogClientHandler</handler-name>
+         <handler-class>com.sun.stockquote.LogClientHandler</handler-class>
+      </handler>
+   </handler-chain>
+</handler-chains>

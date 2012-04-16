@@ -1,0 +1,66 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="NameIdMngtSPHttpSPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtSPHttpSPHttpTest"/>
+        <parameter name="tinitor" value="SP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="SP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+        </classes>
+    </test>
+    <test name="NameIdMngtSPHttpIDPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtSPHttpIDPHttpTest"/>
+        <parameter name="tinitor" value="SP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="IDP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+        </classes>
+    </test>
+    <test name="NameIdMngtIDPHttpSPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtIDPHttpSPHttpTest"/>
+        <parameter name="tinitor" value="IDP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="SP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+        </classes>
+    </test>
+    <test name="NameIdMngtIDPHttpIDPHttpTest">
+        <parameter name="groupName" value="@mode@"/>
+        <parameter name="ptestName" value="NameIdMngtIDPHttpIDPHttpTest"/>
+        <parameter name="tinitor" value="IDP"/>
+        <parameter name="tbind" value="HTTP"/>
+        <parameter name="nidInitor" value="IDP"/>
+        <parameter name="nidBind" value="HTTP"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/> 
+        </classes>
+    </test>
+

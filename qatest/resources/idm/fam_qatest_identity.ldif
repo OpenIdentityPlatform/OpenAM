@@ -1,0 +1,43 @@
+dn: ou=people, @ROOT_SUFFIX@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=agents, @ROOT_SUFFIX@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=groups, @ROOT_SUFFIX@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=dsame users, @ROOT_SUFFIX@
+objectClass: top
+objectClass: organizationalUnit
+
+dn: cn=dsameuser,ou=DSAME Users, @ROOT_SUFFIX@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: dsameuser
+sn: dsameuser
+userPassword: secret12
+
+dn: cn=amldapuser,ou=DSAME Users, @ROOT_SUFFIX@
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: amldapuser
+sn: amldapuser
+userPassword: secret123
+
+dn: @ROOT_SUFFIX@
+changetype:modify
+add:aci
+aci: (target="ldap:///@ROOT_SUFFIX@")(targetattr="*")(version 3.0; acl "S1IS special dsame user rights for all under the root suffix"; allow (all) userdn = "ldap:///cn=dsameuser,ou=DSAME Users, @ROOT_SUFFIX@"; )
+
+dn:@ROOT_SUFFIX@
+changetype:modify
+add:aci
+aci: (target="ldap:///@ROOT_SUFFIX@")(targetattr="*")(version 3.0; acl "S1IS special ldap auth user rights"; allow (read,search) userdn = "ldap:///cn=amldapuser,ou=DSAME Users, @ROOT_SUFFIX@"; ) 

@@ -1,0 +1,1047 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: IDFFLogMessageIDs.xml,v 1.7 2008/12/19 06:53:11 exu Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="IDFF">
+    <logmessage name="WRITE_ACCOUNT_FED_INFO" id="14"
+        loglevel="LL_INFO"
+        description="Write Account Federation Info">
+        <datainfo>
+            <item>user DN</item>
+            <item>federation info key</item>
+            <item>federation info value</item>
+        </datainfo>
+        <triggers>
+            <item>Acccount Federation Info with key was added to user</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="REMOVE_ACCOUNT_FED_INFO" id="15"
+        loglevel="LL_INFO"
+        description="Remove Account Federation Info">
+        <datainfo>
+            <item>user DN</item>
+            <item>provider id</item>
+            <item>existing federation info key</item>
+        </datainfo>
+        <triggers>
+            <item>Account federation info with key and provider ID was removed 
+                  from user</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="CREATE_ASSERTION" id="16"
+        loglevel="LL_FINER"
+        description="Create Assertion">
+        <datainfo>
+            <item>assertion id or string</item>
+        </datainfo>
+        <triggers>
+            <item>Assertion Created</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="LOGOUT_REQUEST_PROCESSING_FAILED" id="18"
+        loglevel="LL_INFO"
+        description="Logout Request processing failed.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Logout Request processing failed</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="TERMINATION_REQUEST_PROCESSING_FAILED" id="19"
+        loglevel="LL_INFO"
+        description="Termination request processing failed">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Termination request processing failed</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_SOAP_URL_END_POINT_CREATION" id="20"
+        loglevel="LL_INFO"
+        description="Failed in creating SOAP URL End point.">
+        <datainfo>
+            <item>soap end point url</item>
+        </datainfo>
+        <triggers>
+            <item>Failed in creating SOAP URL End point</item>
+        </triggers>
+        <actions />
+    </logmessage>
+     <logmessage name="MISMATCH_AUTH_TYPE_AND_PROTOCOL" id="21"
+        loglevel="LL_INFO"
+        description="Mismatched AuthType and the protocol (based on SOAPUrl).">
+        <datainfo>
+            <item>protocol</item>
+            <item>authentication type</item>
+        </datainfo>
+        <triggers>
+            <item>AuthType and the protocol (based on SOAPUrl) 
+                  do not match.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="WRONG_AUTH_TYPE" id="22"
+        loglevel="LL_INFO"
+        description="Wrong Authentication type">
+        <datainfo>
+            <item>authentication type</item>
+        </datainfo>
+        <triggers>
+            <item>Wrong Authentication type</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SOAP_RECEIVER_URL" id="23"
+        loglevel="LL_FINER"
+        description="SAML SOAP Receiver URL">
+        <datainfo>
+            <item>soap url</item>
+        </datainfo>
+        <triggers>
+            <item>SAML SOAP Receiver URL</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_SOAP_RESPONSE" id="24"
+        loglevel="LL_INFO"
+        description="SOAP Response is Invalid">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>SOAP Response is Invalid.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_ASSERTION" id="25"
+        loglevel="LL_INFO"
+        description="Assertion is invalid">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>This Assertion is invalid</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SINGLE_SIGNON_FAILED" id="26"
+        loglevel="LL_INFO"
+        description="Single SignOn Failed">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Single SignOn Failed</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ACCESS_GRANTED_REDIRECT_TO" id="27"
+        loglevel="LL_INFO"
+        description="Redirect to URL after granting access.">
+        <datainfo>
+            <item>redirect url</item>
+        </datainfo>
+        <triggers>
+            <item>Redirecting to URL after granting access.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="MISSING_AUTHN_RESPONSE" id="28"
+        loglevel="LL_INFO"
+        description="Authentication Response is missing">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Authentication Response not found</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ACCOUNT_FEDERATION_FAILED" id="29"
+        loglevel="LL_INFO"
+        description="Account Federation Failed">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Account Federation Failed</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_SSO_TOKEN_GENERATION" id="30"
+        loglevel="LL_INFO"
+        description="SSOToken Generation Failed">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Failed to generate SSOToken</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_AUTHN_RESPONSE" id="31"
+        loglevel="LL_INFO"
+        description="Authentication Response is invalid">
+        <datainfo>
+            <item>invalid authentication response</item>
+        </datainfo>
+        <triggers>
+            <item>Authentication Response is invalid</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="AUTHN_REQUEST_PROCESSING_FAILED" id="32"
+        loglevel="LL_INFO"
+        description="Authentication Request processing failed">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Authentication Request processing failed.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SIGNATURE_VERIFICATION_FAILED" id="33"
+        loglevel="LL_INFO"
+        description="Signature Verification Failed.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Signature Verification Failed.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="CREATE_SAML_RESPONSE" id="34"
+        loglevel="LL_INFO"
+        description="Created SAML Response">
+        <datainfo>
+            <item>sending saml response to remote server's IP address</item>
+            <item>saml response or response ID and InResponseTo ID</item>
+        </datainfo>
+        <triggers>
+            <item>Created SAML Response</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="REDIRECT_TO" id="35"
+        loglevel="LL_FINER"
+        description="Redirect URL">
+        <datainfo>
+            <item>redirect url</item>
+        </datainfo>
+        <triggers>
+            <item>Redirect to :</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="COMMON_DOMAIN_META_DATA_NOT_FOUND" id="36"
+        loglevel="LL_INFO"
+        description="Common Domain Service Information not found">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Common Domain Service Information not found.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="PROVIDER_NOT_TRUSTED" id="37"
+        loglevel="LL_INFO"
+        description="Provider is not trusted">
+        <datainfo>
+            <item>provider id</item>
+        </datainfo>
+        <triggers>
+            <item>Provider is not trusted.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_AUTHN_REQUEST" id="38"
+        loglevel="LL_INFO"
+        description="Authentication Request is invalid">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Authentication Request is invalid</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="USER_ACCOUNT_FEDERATION_INFO_NOT_FOUND" id="39"
+        loglevel="LL_INFO"
+        description="Account Federation Information not found for user">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>Account Federation Information not found for 
+                  user :</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="USER_NOT_FOUND" id="40"
+        loglevel="LL_INFO"
+        description="User not found.">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User not found. </item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="LOGOUT_PROFILE_NOT_SUPPORTED" id="41"
+        loglevel="LL_INFO"
+        description="Logout profile not supported.">
+        <datainfo>
+            <item>logout profile</item>
+        </datainfo>
+        <triggers>
+            <item>Logout profile not supported.</item>
+        </triggers>
+        <actions>
+             <item>Verify metadata is correct.</item>
+        </actions>
+    </logmessage>
+     <logmessage name="LOGOUT_SUCCESS" id="42"
+        loglevel="LL_INFO"
+        description="Logout is successful.">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>Logout is successful.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+     <logmessage name="LOGOUT_REDIRECT_FAILED" id="43"
+        loglevel="LL_INFO"
+        description="Logout failed to redirect due to incorrect URL.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Logout failed to redirect due to incorrect URL.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="LOGOUT_FAILED_REQUEST_IMPROPER" id="44"
+        loglevel="LL_INFO"
+        description="Logout request not formed properly.">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>Logout request not formed properly.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="LOGOUT_FAILED_INVALID_HANDLER" id="45"
+        loglevel="LL_INFO"
+        description="Failed to get Pre/Logout handler.">
+        <datainfo>
+            <item>logout url</item>
+        </datainfo>
+        <triggers>
+            <item>Failed to get Pre/Logout handler.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="LOGOUT_FAILED" id="46"
+        loglevel="LL_INFO"
+        description="Single logout failed.">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>Single logout failed.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="REGISTRATION_FAILED_SP_NAME_IDENTIFIER" id="47"
+        loglevel="LL_INFO"
+        description="Failed to create SPProvidedNameIdentifier.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Failed to create SPProvidedNameIdentifier.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_SIGNATURE" id="48"
+        loglevel="LL_INFO"
+        description="Invalid Signature.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid Signature.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="TERMINATION_FAILED" id="49"
+        loglevel="LL_INFO"
+        description="Federation Termination failed.">
+        <datainfo>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>Federation Termination failed.
+                   Cannot update account.
+            </item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="TERMINATION_SUCCESS" id="50"
+        loglevel="LL_INFO"
+        description="Federation Termination succeeded.">
+        <datainfo>
+            <item>userDN</item>
+        </datainfo>
+        <triggers>
+            <item>Federation Termination succeeded. 
+                  User account updated.
+            </item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_RESPONSE" id="51"
+        loglevel="LL_INFO"
+        description="Response is Invalid">
+        <datainfo>
+            <item>saml response </item>
+        </datainfo>
+        <triggers>
+            <item>SAML Response is Invalid.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="INVALID_PROVIDER" id="52"
+        loglevel="LL_INFO"
+        description="Invalid Provider Registration.">
+        <datainfo>
+            <item>provider id</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid Provider.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ERROR_GET_IDFF_META_INSTANCE" id="61"
+        loglevel="LL_INFO"
+        description="Error getting Configuration instance.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to initialize IDFF Metadata configuration.</item>
+        </triggers>
+        <actions>
+            <item>
+            Check if the Data Repository has the IDFFMetaData Service.
+            If it is not present then it wil need to be loading
+            using the FM Administration command. Check the Administration
+            Guide on how to load services.
+            </item>
+         </actions>   
+    </logmessage>
+    <logmessage name="NULL_ENTITY_DESCRIPTOR" id="62"
+        loglevel="LL_INFO"
+        description="EntityDescriptor is null.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create EntityDescriptor.</item>
+        </triggers>
+        <actions>
+            <item>
+            Pass a valid non-null EntityDescriptorElement object to
+            the IDFFMetaManager:createEntityDescriptor method.
+            </item>
+         </actions>   
+    </logmessage>
+    <logmessage name="NULL_ENTITY_ID" id="63"
+        loglevel="LL_INFO"
+        description="Entity Identifier in the EntityDescriptor is null.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create, modify, retrieve or delete EntityDescriptor or extended Entity Config.</item>
+        </triggers>
+        <actions>
+            <item>
+            The EntityDescriptor Element passed should have the Entity
+            Identifier , this is the "providerID" attribute in the
+            IDFF MetaData schema.
+            </item>
+        </actions>
+    </logmessage>
+        <logmessage name="CREATE_ENTITY_SUCCEEDED" id="64"
+        loglevel="LL_INFO"
+        description="Creating of Entity Descriptor succeeded.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>EntityDescriptor is stored in the data repository.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="CREATE_ENTITY_FAILED" id="65"
+        loglevel="LL_INFO"
+        description="Storing of IDFF Meta Data in the repository failed.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create EntityDescriptor.</item>
+        </triggers>
+        <actions>
+            <item>
+            Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors.
+            Check if the data repository exists and is accessible.
+            Check if the IDFF Meta Data Service exists in the data repository.
+            </item>
+        </actions>       
+    </logmessage>
+    <logmessage name="UNSUPPORTED_OPERATION" id="66"
+        loglevel="LL_INFO"
+        description="Unsupported operation.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create, modify or delete EntityDescriptor or extended EntityConfig.</item>
+        </triggers>
+        <actions>
+            <item>
+            Check the System Configuration Implementation to 
+            find out how IDFF Meta Data can be stored in the repository.
+            </item>
+        </actions>       
+    </logmessage>
+    <logmessage name="INVALID_ENTITY_DESCRIPTOR" id="67"
+        loglevel="LL_INFO"
+        description="The EntityDescriptor object is not valid.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to retrieve or modify EntityDescriptor.</item>
+        </triggers>
+        <actions>
+            <item>
+            Check the EntityDescriptor Element is valid and follows the
+            IDFF Standard Meta Data Schema Description.
+            </item>
+        </actions>
+    </logmessage>
+    <logmessage name="GET_ENTITY_FAILED" id="68"
+        loglevel="LL_INFO"
+        description="Retrieval of Entity Configuration failed.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>EntityDescriptor is retrieved.</item>
+        </triggers>
+        <actions>
+            <item>Check if the entity identifier is correct.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GET_ENTITY_SUCCEEDED" id="69"
+        loglevel="LL_INFO"
+        description="Retrieval of Entity Descriptor succeeded.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Entity Configuration is returned to the requester.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SET_ENTITY_FAILED" id="70"
+        loglevel="LL_INFO"
+        description="Storing of Entity Configuration failed.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to modify IDFF Standard Meta data.</item>
+        </triggers>
+        <actions>
+            <item>Check if the entity identifier is correct.</item>
+            <item>Check if the data repository exists and is accessible.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_ENTITY_SUCCEEDED" id="71"
+        loglevel="LL_INFO"
+        description="Modifying Entity Descriptor succeeded.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Entity Descriptor is modified in the data repository.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="DELETE_ENTITY_SUCCEEDED" id="72"
+        loglevel="LL_INFO"
+        description="Deleting of IDFF Standard Meta Data succeeded.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>IDFF Standard Meta data for the entity is deleted in the data repository.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="DELETE_ENTITY_FAILED" id="73"
+        loglevel="LL_INFO"
+        description="Deleting of Standard Metadata for entity identifier failed.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to delete IDFF Standard Meta data for the entity.</item>
+        </triggers>
+        <actions>
+            <item>Check if the entity identifier is correct.</item>
+            <item>Check if the data repository exists and is accessible</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NULL_ENTITY_CONFIG" id="74"
+        loglevel="LL_INFO"
+        description="Extended Entity Configuration is null.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create IDFF extended Meta data.</item>
+        </triggers>
+        <actions>
+            <item>
+                Check the validity of the extended entity configuration.
+            </item>
+         </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_NOT_FOUND" id="75"
+        loglevel="LL_INFO"
+        description="Entity Configuration could not be found.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create IDFF extended Meta data.</item>
+        </triggers>
+        <actions>
+            <item>Check the validity of the entity configuration.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_EXISTS" id="76"
+        loglevel="LL_INFO"
+        description="Creation of Extended Entity Configuration failed since it already exists.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create IDFF extended Meta data.</item>
+        </triggers>
+        <actions>
+            <item>
+                Cannot create entity configuration if it already exists.
+                If new attributes are to be set in the extended entity configuration
+                then use the setConfiguration method or delete the existing
+                entity configuration and then try create again.
+            </item>
+         </actions>
+    </logmessage>
+    <logmessage name="GET_ENTITY_CONFIG_FAILED" id="77"
+        loglevel="LL_INFO"
+        description="Failed to get entity configuration.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to retrieve IDFF extended Meta data.</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+         </actions>
+    </logmessage>
+    <logmessage name="GET_ENTITY_CONFIG_SUCCEEDED" id="78"
+        loglevel="LL_INFO"
+        description="Retrieval of Entity Configuration succeeded.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Entity Configuration is retrieved from the data repository</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SET_ENTITY_CONFIG_SUCCEEDED" id="79"
+        loglevel="LL_INFO"
+        description="Extended Entity Configuration was modified.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Extended Entity Configuration is modified in the data repository</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SET_ENTITY_CONFIG_FAILED" id="80"
+        loglevel="LL_INFO"
+        description="Failed to modify Extended Entity Configuration.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Extended Entity Configuration is modified in the data repository</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+        </actions>       
+    </logmessage>
+    <logmessage name="CREATE_ENTITY_CONFIG_SUCCEEDED" id="81"
+        loglevel="LL_INFO"
+        description="Extended Entity Configuration was created.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Extended Entity Configuration is stored in the data repository</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="CREATE_ENTITY_CONFIG_FAILED" id="82"
+        loglevel="LL_INFO"
+        description="Storing of IDFF Extended Configuration in the repository failed.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create Extended Entity Configuration.</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="INVALID_ENTITY_CONFIG" id="83"
+        loglevel="LL_INFO"
+        description="The Extended Entity Configuration is invalid.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Trying to create, modify or retrieve Extended Entity Configuration.</item>
+        </triggers>
+        <actions>
+            <item>Check the Extended Entity Configuration is valid and retry creating the entity config.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GET_ALL_ENTITIES_SUCCEEDED" id="84"
+        loglevel="LL_INFO"
+        description="Retrieve all Entity Descriptors succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve all Entity Descriptors</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_ALL_ENTITIES_FAILED" id="85"
+        loglevel="LL_INFO"
+        description="Failed to get all Entity Descriptors.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve all Entity Descriptors</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="GET_ENTITY_NAMES_SUCCEEDED" id="86"
+        loglevel="LL_INFO"
+        description="Retrieve names of all Entities.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve names of all Entities.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_ENTITY_NAMES_FAILED" id="87"
+        loglevel="LL_INFO"
+        description="Failed to get names for all Entities.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieving names of all Entities.</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="GET_HOSTED_ENTITIES_SUCCEEDED" id="88"
+        loglevel="LL_INFO"
+        description="Retrieve all hosted Entities succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieving all hosted Entities.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_HOSTED_ENTITIES_FAILED" id="89"
+        loglevel="LL_INFO"
+        description="Failed to get all hosted Entities.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieving all hosted Entities.</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="GET_REMOTE_ENTITIES_SUCCEEDED" id="90"
+        loglevel="LL_INFO"
+        description="Retrieval of all remote Entities succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve all remote Entities.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_REMOTE_ENTITIES_FAILED" id="91"
+        loglevel="LL_INFO"
+        description="Failed to get all remote Entities.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieving all remote Entities.</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="GET_HOSTED_SERVICE_PROVIDERS_SUCCEEDED" id="92"
+        loglevel="LL_INFO"
+        description="Retrieval of all hosted services providers succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieving all hosted services providers.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_REMOTE_SERVICE_PROVIDERS_SUCCEEDED" id="93"
+        loglevel="LL_INFO"
+        description="Retrieval of all remote services providers succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve all remote services providers.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_HOSTED_IDENTITY_PROVIDERS_SUCCEEDED" id="94"
+        loglevel="LL_INFO"
+        description="Retrieval of all hosted identity providers succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve all hosted identity providers.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="GET_REMOTE_IDENTITY_PROVIDERS_SUCCEEDED" id="95"
+        loglevel="LL_INFO"
+        description="Retrieval of all remote identity providers succeeded.">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>Retrieve all remote identity providers.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="IS_AFFILIATE_MEMBER_SUCCEEDED" id="96"
+        loglevel="LL_INFO"
+        description="Checking Affiliation member succeeded.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Affiliation ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Checks if the provider is a member of the Affiliation.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="NO_ENTITY_CONFIG_TO_DELETE" id="97"
+        loglevel="LL_INFO"
+        description="No entity configuration to delete.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete Entity Configuration.</item>
+        </triggers>
+        <actions>
+            <item>Check the entityID to make sure the Entity Configuration does exist.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="DELETE_ENTITY_CONFIG_FAILED" id="98"
+        loglevel="LL_INFO"
+        description="Failed to delete entity configuration.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete Entity Configuration.</item>
+        </triggers>
+        <actions>
+            <item> Check the IDFF Meta Data Debug "libIDFFMeta" for specific errors. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="DELETE_ENTITY_CONFIG_SUCCEEDED" id="99"
+        loglevel="LL_INFO"
+        description="Entity configuration deleted successfully.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete Entity Configuration.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ENTITY_DOES_NOT_EXISTS" id="100"
+        loglevel="LL_INFO"
+        description="Entity does not exist.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or Organization Name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete Entity Descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check to make sure you have the right entity ID. </item>
+            <item>Check if the data repository exists and is accessible.</item>
+            <item>Check if the IDFF Meta Data Service exists in the data repository.</item>
+        </actions>       
+    </logmessage>
+    <logmessage name="CREATE_AUTHN_RESPONSE" id="101"
+        loglevel="LL_INFO"
+        description="Created Authn Response">
+        <datainfo>
+            <item>saml response or response ID and InResponseTo ID</item>
+        </datainfo>
+        <triggers>
+            <item>Created SAML Response</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SENT_AUTHN_RESPONSE" id="102"
+        loglevel="LL_INFO"
+        description="Sent Authn Response">
+        <datainfo>
+            <item>Service provider's assertion consumer service URL</item>
+            <item>response ID and InResponseTo ID</item>
+        </datainfo>
+        <triggers>
+            <item>Sent Authn Response</item>
+        </triggers>
+        <actions />
+    </logmessage>
+</logmessages>

@@ -1,0 +1,61 @@
+
+    <test name="ChainTestRequired">
+        <parameter name="testChainName" value="chain1"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="ChainTestRequisite">
+        <parameter name="testChainName" value="chain2"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="ChainTestOneUsernamePassword">
+        <parameter name="testChainName" value="chain3"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="ChainTestOptional">
+        <parameter name="testChainName" value="chain4"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="ChainTestOptionalAuthFails">
+        <parameter name="testChainName" value="chain5"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>

@@ -1,0 +1,68 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.tools,v 1.7 2008/10/10 18:45:31 kevinserwin Exp $
+
+-->
+
+OpenSSO - Tools
+
+Table of contents:
+-----------------
+1. Supported versions of Java Runtime
+2. What does this package contain?
+3. Installing Tools
+
+1. Supported versions of Java Runtime
+-------------------------
+J2SE 1.5 or higher.
+
+
+2. What does this package contain?
+----------------------------------
+
+The OpenSSO Tools are contained in the opensso/tools directory of opensso.zip
+
+ssoAdminTools.zip - Contains the ssoadm utility, amtume and related files.
+
+ssoConfiguratorTools.zip - Contains the configurator jar file and utilities for
+command line configuration of a deployed opensso.war.
+
+ssoPatchTools.zip - Contains the patch tool jar files for updating opensso.war
+from one build to another.
+
+ssoSessionTools.zip - Contains the session tools.
+
+
+3. Installing Tools
+------------------------------ 
+
+Before setting up and running the OpenSSO Tools, the JAVA_HOME environment 
+variable needs to be initialized to a path of a compatible Java Runtime.
+
+Steps involved in installing the Tools are:
+
+Step 1: Unzip the Tool zip file to the desired directory.
+Step 2: Go to the directory which has the Tool unzipped, and you will find
+    a README file with specific information for each Tool.

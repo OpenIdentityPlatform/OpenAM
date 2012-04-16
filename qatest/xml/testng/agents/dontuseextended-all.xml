@@ -1,0 +1,15 @@
+    <test name="CreateAgentProfile">
+            <parameter name="policyIdx" value="0"/>
+            <parameter name="evaluationIdx" value="0"/>
+            <parameter name="testIdx" value="0"/>
+            <parameter name="resourceIdx" value="21"/>
+            <parameter name="agentType" value="3.0J2EE"/>
+            <groups>
+                <run>
+                    <include name="@mode@"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sun.identity.qatest.agents.ConfigureUnconfigure"/>
+            </classes>
+    </test>
