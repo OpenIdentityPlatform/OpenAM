@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: fmSOAPBinding.xml,v 1.6 2008/06/25 05:51:14 qcheng Exp $
+                                                                                
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration> 
+    <Service name="sunIdentityServerSOAPBinding" version="1.0"> 
+        <Schema 
+            serviceHierarchy="/DSAMEConfig/sunIdentityServerSOAPBinding" 
+            i18nFileName="fmSOAPBindingConfiguration" 
+            revisionNumber="40"
+            i18nKey="sunIdentityServerSOAPBindingDescription"
+            propertiesViewBeanURL="../service/SCSOAPBinding"> 
+            <Global> 
+                <AttributeSchema name="RequestHandlerList" 
+                    type="list" 
+                    syntax="string"
+                    uitype="name_value_list"
+                    i18nKey="a101">
+                    <DefaultValues> 
+                        <Value>key=disco|class=com.sun.identity.liberty.ws.disco.DiscoveryService</Value> 
+                        <Value>key=idpp|class=com.sun.identity.liberty.ws.idpp.PPRequestHandler</Value>
+                        <Value>key=authnsvc|class=com.sun.identity.liberty.ws.authnsvc.AuthnSvcRequestHandlerImpl</Value>
+                    </DefaultValues> 
+                </AttributeSchema> 
+                <AttributeSchema name="WebServiceAuthenticator" 
+                    type="single"
+                    syntax="string"
+                    i18nKey="a104">
+                    <DefaultValues> 
+            <Value>@WEB_SERVICE_AUTHENTICATOR@</Value>
+                    </DefaultValues> 
+                </AttributeSchema> 
+                <AttributeSchema name="SupportedAuthenticationMechanisms" 
+                    type="multiple_choice"
+                    syntax="string"
+                    i18nKey="a105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a10501">urn:liberty:security:2003-08:null:null</ChoiceValue>
+                        <ChoiceValue i18nKey="a10502">urn:liberty:security:2003-08:null:X509</ChoiceValue>
+                        <ChoiceValue i18nKey="a10503">urn:liberty:security:2003-08:null:SAML</ChoiceValue>
+                        <ChoiceValue i18nKey="a10504">urn:liberty:security:2004-04:null:Bearer</ChoiceValue>
+                        <ChoiceValue i18nKey="a10505">urn:liberty:security:2003-08:TLS:null</ChoiceValue>
+                        <ChoiceValue i18nKey="a10506">urn:liberty:security:2003-08:TLS:X509</ChoiceValue>
+                        <ChoiceValue i18nKey="a10507">urn:liberty:security:2003-08:TLS:SAML</ChoiceValue>
+                        <ChoiceValue i18nKey="a10508">urn:liberty:security:2004-04:TLS:Bearer</ChoiceValue>
+                        <ChoiceValue i18nKey="a10509">urn:liberty:security:2003-08:ClientTLS:null</ChoiceValue>
+                        <ChoiceValue i18nKey="a10510">urn:liberty:security:2003-08:ClientTLS:X509</ChoiceValue>
+                        <ChoiceValue i18nKey="a10511">urn:liberty:security:2003-08:ClientTLS:SAML</ChoiceValue>
+                        <ChoiceValue i18nKey="a10512">urn:liberty:security:2004-04:ClientTLS:Bearer</ChoiceValue>
+                        <ChoiceValue i18nKey="a10513">urn:liberty:security:2005-02:null:X509</ChoiceValue>
+                        <ChoiceValue i18nKey="a10514">urn:liberty:security:2005-02:TLS:X509</ChoiceValue>
+                        <ChoiceValue i18nKey="a10515">urn:liberty:security:2005-02:ClientTLS:X509</ChoiceValue>
+                        <ChoiceValue i18nKey="a10516">urn:liberty:security:2005-02:null:SAML</ChoiceValue>
+                        <ChoiceValue i18nKey="a10517">urn:liberty:security:2005-02:TLS:SAML</ChoiceValue>
+                        <ChoiceValue i18nKey="a10518">urn:liberty:security:2005-02:ClientTLS:SAML</ChoiceValue>
+                        <ChoiceValue i18nKey="a10519">urn:liberty:security:2005-02:null:Bearer</ChoiceValue>
+                        <ChoiceValue i18nKey="a10520">urn:liberty:security:2005-02:TLS:Bearer</ChoiceValue>
+                        <ChoiceValue i18nKey="a10521">urn:liberty:security:2005-02:ClientTLS:Bearer</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues> 
+                        <Value>urn:liberty:security:2003-08:null:null</Value>
+                        <Value>urn:liberty:security:2003-08:null:X509</Value>
+                        <Value>urn:liberty:security:2003-08:null:SAML</Value>
+                        <Value>urn:liberty:security:2004-04:null:Bearer</Value>
+                        <Value>urn:liberty:security:2003-08:TLS:null</Value>
+                        <Value>urn:liberty:security:2003-08:TLS:X509</Value>
+                        <Value>urn:liberty:security:2003-08:TLS:SAML</Value>
+                        <Value>urn:liberty:security:2004-04:TLS:Bearer</Value>
+                        <Value>urn:liberty:security:2003-08:ClientTLS:null</Value>
+                        <Value>urn:liberty:security:2003-08:ClientTLS:X509</Value>
+                        <Value>urn:liberty:security:2003-08:ClientTLS:SAML</Value>
+                        <Value>urn:liberty:security:2004-04:ClientTLS:Bearer</Value>
+                        <Value>urn:liberty:security:2005-02:null:X509</Value>
+                        <Value>urn:liberty:security:2005-02:TLS:X509</Value>
+                        <Value>urn:liberty:security:2005-02:ClientTLS:X509</Value>
+                        <Value>urn:liberty:security:2005-02:null:SAML</Value>
+                        <Value>urn:liberty:security:2005-02:TLS:SAML</Value>
+                        <Value>urn:liberty:security:2005-02:ClientTLS:SAML</Value>
+                        <Value>urn:liberty:security:2005-02:null:Bearer</Value>
+                        <Value>urn:liberty:security:2005-02:TLS:Bearer</Value>
+                        <Value>urn:liberty:security:2005-02:ClientTLS:Bearer</Value>
+                    </DefaultValues> 
+                </AttributeSchema> 
+                <AttributeSchema name="EnforceOnlyKnownProvider"
+                  type="single"
+                  syntax="boolean"
+                  i18nKey="a106">
+                  <DefaultValues>
+                    <Value>true</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="CertAliasForSSLClientAuth"
+                  type="single"
+                  syntax="string"
+                  i18nKey="a107">
+                </AttributeSchema>
+                <AttributeSchema name="StaleTimeLimit"
+                  type="single"
+                  syntax="number"
+                  i18nKey="a108">
+                  <DefaultValues>
+                    <Value>300000</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MessageIDCacheCleanupInterval"
+                  type="single"
+                  syntax="number"
+                  i18nKey="a109">
+                  <DefaultValues>
+                    <Value>60000</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SupportedActors"
+                  type="single"
+                  syntax="string"
+                  i18nKey="a110">
+                  <DefaultValues>
+                    <Value>http://schemas.xmlsoap.org/soap/actor/next</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="NamespacePrefixMappingList"
+                  type="single"
+                  syntax="string"
+                  i18nKey="a111">
+                  <DefaultValues>
+                    <Value>S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/liberty/pp|is=urn:liberty:is:2003-08</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="JAXBPackageList"
+                  type="single"
+                  syntax="string"
+                  i18nKey="a112">
+                </AttributeSchema>
+                <AttributeSchema name="WSFVersion"
+                  type="single_choice"
+                  syntax="string"
+                  i18nKey="a113">
+                      <ChoiceValues>
+                        <ChoiceValue i18nKey="v1.1">1.1</ChoiceValue>
+                        <ChoiceValue i18nKey="v1.0">1.0</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>1.0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+        </Schema> 
+    </Service> 
+</ServicesConfiguration>

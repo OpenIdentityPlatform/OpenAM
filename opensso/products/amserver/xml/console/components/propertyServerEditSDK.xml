@@ -1,0 +1,243 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyServerEditSDK.xml,v 1.4 2008/07/18 00:41:53 kenwho Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="secDataStore" defaultValue="amconfig.header.datastore" >
+    <property>
+        <label name="lblcsccom-sun-identity-sm-enableDataStoreNotification"
+            defaultValue="amconfig.com.sun.identity.sm.enableDataStoreNotification"
+            labelFor="csccom-sun-identity-sm-enableDataStoreNotification" />
+        <cc name="csccom-sun-identity-sm-enableDataStoreNotification"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-sm-enableDataStoreNotification"
+            defaultValue="amconfig.help.com.sun.identity.sm.enableDataStoreNotification" />
+    </property>
+    <property>
+        <label name="lblcsccom-sun-identity-sm-ldap-enableProxy"
+            defaultValue="amconfig.com.sun.identity.sm.ldap.enableProxy"
+            labelFor="csccom-sun-identity-sm-ldap-enableProxy" />
+        <cc name="csccom-sun-identity-sm-ldap-enableProxy"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-sm-ldap-enableProxy"
+            defaultValue="amconfig.help.com.sun.identity.sm.ldap.enableProxy" />
+    </property>
+    <property>
+       <label name="lblcsccom-sun-identity-sm-notification-threadpool-size"
+           defaultValue="amconfig.com.sun.identity.sm.notification.threadpool.size"
+           labelFor="csccom-sun-identity-sm-notification-threadpool-size" />
+       <cc name="csccom-sun-identity-sm-notification-threadpool-size"
+           tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+           <attribute name="size" value="8" />
+       </cc>
+       <fieldhelp name="helpcsccom-sun-identity-sm-notification-threadpool-size"
+           defaultValue="amconfig.help.com.sun.identity.sm.notification.threadpool.size" />
+    </property>
+    </section>
+
+    <section name="secEventService" defaultValue="amconfig.header.eventservice" >
+    <property>
+        <label name="lblcsccom-iplanet-am-event-connection-num-retries"
+            defaultValue="amconfig.com.iplanet.am.event.connection.num.retries"
+            labelFor="csccom-iplanet-am-event-connection-num-retries" />
+        <cc name="csccom-iplanet-am-event-connection-num-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="8" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-event-connection-num-retries"
+            defaultValue="amconfig.help.com.iplanet.am.event.connection.num.retries" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-iplanet-am-event-connection-delay-between-retries"
+            defaultValue="amconfig.com.iplanet.am.event.connection.delay.between.retries"
+            labelFor="csccom-iplanet-am-event-connection-delay-between-retries" />
+        <cc name="csccom-iplanet-am-event-connection-delay-between-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="15" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-event-connection-delay-between-retries"
+            defaultValue="amconfig.help.com.iplanet.am.event.connection.delay.between.retries" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-iplanet-am-event-connection-ldap-error-codes-retries"
+            defaultValue="amconfig.com.iplanet.am.event.connection.ldap.error.codes.retries"
+            labelFor="csccom-iplanet-am-event-connection-ldap-error-codes-retries" />
+        <cc name="csccom-iplanet-am-event-connection-ldap-error-codes-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="25" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-event-connection-ldap-error-codes-retries"
+            defaultValue="amconfig.help.com.iplanet.am.event.connection.ldap.error.codes.retries" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-sun-am-event-connection-idle-timeout"
+            defaultValue="amconfig.com.sun.am.event.connection.idle.timeout"
+            labelFor="csccom-sun-am-event-connection-idle-timeout" />
+        <cc name="csccom-sun-am-event-connection-idle-timeout"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="8" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-am-event-connection-idle-timeout"
+            defaultValue="amconfig.help.com.sun.am.event.connection.idle.timeout" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-sun-am-event-connection-disable-list"
+            defaultValue="amconfig.com.sun.am.event.connection.disable.list"
+            labelFor="csccom-sun-am-event-connection-disable-list" />
+        <cc name="csccom-sun-am-event-connection-disable-list"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="25" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-am-event-connection-disable-list"
+            defaultValue="amconfig.help.com.sun.am.event.connection.disable.list" />
+    </property>
+    </section>
+
+    <section name="secLDAPConnection" defaultValue="amconfig.header.ldapconnection" >
+    <property>
+        <label name="lblcsccom-iplanet-am-ldap-connection-num-retries"
+            defaultValue="amconfig.com.iplanet.am.ldap.connection.num.retries"
+            labelFor="csccom-iplanet-am-ldap-connection-num-retries" />
+        <cc name="csccom-iplanet-am-ldap-connection-num-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="5" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-ldap-connection-num-retries"
+            defaultValue="amconfig.help.com.iplanet.am.ldap.connection.num.retries" />
+    </property>
+    <property>
+        <label name="lblcsccom-iplanet-am-ldap-connection-delay-between-retries"
+            defaultValue="amconfig.com.iplanet.am.ldap.connection.delay.between.retries"
+            labelFor="csccom-iplanet-am-ldap-connection-delay-between-retries" />
+        <cc name="csccom-iplanet-am-ldap-connection-delay-between-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="15" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-ldap-connection-delay-between-retries"
+            defaultValue="amconfig.help.com.iplanet.am.ldap.connection.delay.between.retries" />
+    </property>
+    <property>
+        <label name="lblcsccom-iplanet-am-ldap-connection-ldap-error-codes-retries"
+            defaultValue="amconfig.com.iplanet.am.ldap.connection.ldap.error.codes.retries"
+            labelFor="csccom-iplanet-am-ldap-connection-ldap-error-codes-retries" />
+        <cc name="csccom-iplanet-am-ldap-connection-ldap-error-codes-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="25" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-ldap-connection-ldap-error-codes-retries"
+            defaultValue="amconfig.help.com.iplanet.am.ldap.connection.ldap.error.codes.retries" />
+    </property>
+    </section>
+
+     <section name="secCachingReplica" defaultValue="amconfig.header.cachingreplica" >
+    <property>
+        <label name="lblcsccom-iplanet-am-sdk-cache-maxSize"
+            defaultValue="amconfig.com.iplanet.am.sdk.cache.maxSize"
+            labelFor="csccom-iplanet-am-sdk-cache-maxSize" />
+        <cc name="csccom-iplanet-am-sdk-cache-maxSize"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="15" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-sdk-cache-maxSize"
+            defaultValue="amconfig.help.com.iplanet.am.sdk.cache.maxSize" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-iplanet-am-replica-num-retries"
+            defaultValue="amconfig.com.iplanet.am.replica.num.retries"
+            labelFor="csccom-iplanet-am-replica-num-retries" />
+        <cc name="csccom-iplanet-am-replica-num-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="5" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-replica-num-retries"
+            defaultValue="amconfig.help.com.iplanet.am.replica.num.retries" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-iplanet-am-replica-delay-between-retries"
+            defaultValue="amconfig.com.iplanet.am.replica.delay.between.retries"
+            labelFor="csccom-iplanet-am-replica-delay-between-retries" />
+        <cc name="csccom-iplanet-am-replica-delay-between-retries"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="15" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-replica-delay-between-retries"
+            defaultValue="amconfig.help.com.iplanet.am.replica.delay.between.retries" />
+    </property>
+    </section>
+
+    <section name="secTTL" defaultValue="amconfig.header.sdktimetoliveconfig" >
+    <property>
+        <label name="lblcsccom-iplanet-am-sdk-cache-entry-expire-enabled"
+            defaultValue="amconfig.com.iplanet.am.sdk.cache.entry.expire.enabled"
+            labelFor="csccom-iplanet-am-sdk-cache-entry-expire-enabled" />
+        <cc name="csccom-iplanet-am-sdk-cache-entry-expire-enabled"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+        <fieldhelp name="helpcscccom-iplanet-am-sdk-cache-entry-expire-enabled"
+            defaultValue="amconfig.help.com.iplanet.am.sdk.cache.entry.expire.enabled" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-iplanet-am-sdk-cache-entry-user-expire-time"
+            defaultValue="amconfig.com.iplanet.am.sdk.cache.entry.user.expire.time"
+            labelFor="csccom-iplanet-am-sdk-cache-entry-user-expire-time" />
+        <cc name="csccom-iplanet-am-sdk-cache-entry-user-expire-time"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="15" />
+        </cc>
+        <fieldhelp name="helpcscccom-iplanet-am-sdk-cache-entry-user-expire-time"
+            defaultValue="amconfig.help.com.iplanet.am.sdk.cache.entry.user.expire.time" />
+    </property>
+
+    <property>
+        <label name="lblcsccom-iplanet-am-sdk-cache-entry-default-expire-time"
+            defaultValue="amconfig.com.iplanet.am.sdk.cache.entry.default.expire.time"
+            labelFor="csccom-iplanet-am-sdk-cache-entry-default-expire-time" />
+        <cc name="csccom-iplanet-am-sdk-cache-entry-default-expire-time"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="15" />
+        </cc>
+        <fieldhelp name="helpcscccom-iplanet-am-sdk-cache-entry-default-expire-time"
+            defaultValue="amconfig.help.com.iplanet.am.sdk.cache.entry.default.expire.time" />
+    </property>
+
+    </section>
+</propertysheet>
+

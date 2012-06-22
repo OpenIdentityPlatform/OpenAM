@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: project.xml,v 1.8 2009/11/16 21:53:00 mallas Exp $
+
+-->
+<!--
+    Portions Copyrighted 2010-2012 ForgeRock Inc
+-->
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>OpenAM</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>OpenAM</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>OpenAM</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>amserver/source</label>
+                    <type>java</type>
+                    <location>amserver/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>amserver/test/source</label>
+                    <type>java</type>
+                    <location>amserver/test/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>federation/library/source</label>
+                    <type>java</type>
+                    <location>federation/library/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>federation/openfm/source</label>
+                    <type>java</type>
+                    <location>federation/openfm/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>shared/source</label>
+                    <type>java</type>
+                    <location>shared/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>federation/openfm/unittest/source</label>
+                    <type>java</type>
+                    <location>federation/openfm/unittest/source</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>products</label>
+                    <type>doc_root</type>
+                    <location>.</location>
+                </source-folder>
+                <source-folder>
+                    <label>products</label>
+                    <type>web_inf</type>
+                    <location>.</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="clean">
+                    <script>nbproject/nbjdk.xml</script>
+                    <target>clean</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="tree">
+                        <label>Web Pages</label>
+                        <location>.</location>
+                    </source-folder>
+                    <source-folder style="tree">
+                        <label>WEB-INF Content</label>
+                        <location>.</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>amserver/source</label>
+                        <location>amserver/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>amserver/test/source</label>
+                        <location>amserver/test/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>federation/library/source</label>
+                        <location>federation/library/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>federation/openfm/source</label>
+                        <location>federation/openfm/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>shared/source</label>
+                        <location>shared/source</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>federation/openfm/unittest/source</label>
+                        <location>federation/openfm/unittest/source</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="clean"/>
+                    <action>
+                        <label>server-nightly</label>
+                        <target>server-nightly</target>
+                    </action>
+                    <action>
+                        <label>server-war</label>
+                        <target>server-war</target>
+                    </action>
+                    <action>
+                        <label>server-tools</label>
+                        <target>server-tools</target>
+                    </action>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+            <compilation-unit>
+                <package-root>amserver/source</package-root>
+                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/authapi.jar:extlib/click-nodeps-2.3.0.jar:extlib/esapiport.jar:extlib/imq.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/j2ee.jar:extlib/jaxrpc-impl.jar:extlib/jdmkrt.jar:extlib/je.jar:extlib/jms.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/jss4.jar:extlib/OpenDJ.jar:extlib/relaxngDatatype.jar:extlib/scn_stprs_util.jar:extlib/publicsuffix-1.0.1.jar:extlib/geoip-1.2.5.jar:extlib/opendj-ldap-sdk-3.0.0-M1.jar</classpath>
+                <built-to>amserver/built/classes</built-to>
+                <built-to>amserver/built/dist/amserver.jar</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>amserver/test/source</package-root>
+                <unit-tests/>
+                <classpath mode="compile">extlib/j2ee.jar:extlib/testng-5.9-jdk15.jar</classpath>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>federation/library/source</package-root>
+                <classpath mode="compile">extlib/esapiport.jar:extlib/j2ee.jar:extlib/jaxrpc-api.jar:extlib/jaxb-impl.jar:extlib/jaxb-libs.jar:extlib/jaxrpc-impl.jar:extlib/jersey-client-1.1.1-ea-SNAPSHOT.jar:extlib/jsr311-api-1.1.jar:extlib/webservices-rt.jar</classpath>
+                <built-to>federation/library/built/classes</built-to>
+                <built-to>federation/library/built/dist/openfedlib.jar</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>federation/openfm/source</package-root>
+                <classpath mode="compile">../resources/jato/jato.jar:../resources/lockhart/lib/cc.jar:amserver/built/classes:extlib/commons-collections-3.2.1.jar:extlib/esapiport.jar:extlib/icefaces-comps.jar:extlib/icefaces.jar:extlib/j2ee.jar:extlib/jdom.jar:extlib/json.jar:extlib/jsr311-api-1.1.jar:extlib/rome-1.0.jar:extlib/saaj-api.jar:extlib/scn_stprs_util.jar:extlib/webservices-rt.jar</classpath>
+                <built-to>federation/openfm/built/classes</built-to>
+                <built-to>federation/openfm/built/dist/opensso.jar</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>shared/source</package-root>
+                <classpath mode="compile">extlib/j2ee.jar:extlib/json.jar:extlib/jss4.jar</classpath>
+                <built-to>shared/built/dist/opensso-sharedlib.jar</built-to>
+                <built-to>shared/built/classes</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>federation/openfm/unittest/source</package-root>
+                <unit-tests/>
+                <classpath mode="compile">amserver/built/classes:extlib/jersey-client-1.1.1-ea-SNAPSHOT.jar:extlib/jersey-core-1.1.1-ea.jar:extlib/jsr311-api-1.1.jar:extlib/esapiport.jar:extlib/j2ee.jar:extlib/json.jar:extlib/testng-5.9-jdk15.jar</classpath>
+                <built-to>federation/openfm/unittest/built/classes</built-to>
+                <built-to>federation/openfm/unittest/built/dist/unittest.jar</built-to>
+                <source-level>1.6</source-level>
+            </compilation-unit>
+        </java-data>
+        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+            <module name="org-netbeans-modules-editor-indent">
+                <node name="text">
+                    <node name="x-java">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
+                        <node name="project"/>
+                    </node>
+                    <node name="xml">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
+                    </node>
+                    <node name="project"/>
+                    <node name="CodeStyle"/>
+                    <node name="x-ant+xml">
+                        <node name="CodeStyle">
+                            <node name="project"/>
+                        </node>
+                    </node>
+                </node>
+                <node name="CodeStyle">
+                    <node name="project"/>
+                </node>
+                <node name="project"/>
+                <node name="x-java"/>
+            </module>
+            <module name="org-netbeans-modules-html-editor-lib"/>
+            <module name="org-netbeans-modules-projectimport-eclipse-core"/>
+        </preferences>
+        <web-data xmlns="http://www.netbeans.org/ns/freeform-project-web/2">
+            <web-module>
+                <doc-root>.</doc-root>
+                <classpath/>
+                <context-path/>
+                <j2ee-spec-level>1.5</j2ee-spec-level>
+                <web-inf>.</web-inf>
+            </web-module>
+        </web-data>
+    </configuration>
+</project>

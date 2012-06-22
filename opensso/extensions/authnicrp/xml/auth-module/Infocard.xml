@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding="ISO-8859-1"?> 
+
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: Infocard.xml,v 1.6 2009/12/03 16:13:06 ppetitsm Exp $
+
+   Copyright 2008 Sun Microsystems Inc. All Rights Reserved
+   Portions Copyrighted 2008 Patrick Petit Consulting
+-->
+
+<!DOCTYPE ModuleProperties
+PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+<ModuleProperties moduleName="Infocard" version="1.0" >
+    <Callbacks length="2" order="1" timeout="120"
+    header="Or log in using your user ID and password" template="infocard.jsp">
+        <NameCallback>
+            <Prompt> User ID : </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false">
+            <Prompt> Password : </Prompt>
+        </PasswordCallback>
+    </Callbacks>
+    <Callbacks length="3" order="2" timeout="120" image="/opensso/images/openssoex.gif"
+               header="Here you can link your Information Card with an existing user account or create a new one.&lt;BR&gt;
+                       Please enter a user ID and password and click 'Confirm', or click 'New Account'" >
+        <NameCallback isRequired="true">
+            <Prompt> UserID : </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" >
+            <Prompt> Password : </Prompt>
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Confirm </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> New Account </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Cancel </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="4" order="3" timeout="300" image="/opensso/images/openssoex.gif"
+            header="You are about to create a new user account using the claims of your Information Card.&lt;BR&gt;
+                    Please choose a user ID and password or click 'cancel' to abort.&lt;BR&gt;
+                    After you create your account, you will be able to login using your Information Card" >
+        <NameCallback isRequired="true" attribute="uid" >
+            <Prompt> UserID: </Prompt>
+        </NameCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
+            <Prompt> Password: </Prompt>
+        </PasswordCallback>
+        <PasswordCallback echoPassword="false" isRequired="true" >
+            <Prompt> Confirm Password: </Prompt>
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Register </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Cancel </Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value> Reset </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="2" order="4" timeout="120" image="/opensso/images/openssoex.gif"
+    header="Self Registration" >
+        <ChoiceCallback attribute="uid" >
+            <Prompt>A user already exists with&lt;BR&gt;the user name you entered.&lt;BR&gt;Please choose
+one&lt;BR&gt;of the following user names,&lt;BR&gt;or create your own:
+            </Prompt>
+            <ChoiceValues>
+                <ChoiceValue>
+                    <Value>Create My Own</Value>
+                </ChoiceValue>
+            </ChoiceValues>
+        </ChoiceCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Submit </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="0" order="5" timeout="120" template="noUserName.jsp" />
+    <Callbacks length="0" order="6" timeout="120" template="noPassword.jsp" />
+    <Callbacks length="0" order="7" timeout="120" template="noConfirmation.jsp" />
+    <Callbacks length="0" order="8" timeout="120" template="invalidPassword.jsp" />
+    <Callbacks length="0" order="9" timeout="120" template="passwordMismatch.jsp" />
+    <Callbacks length="0" order="10" timeout="120" template="userExists.jsp" />
+    <Callbacks length="0" order="11" timeout="120" template="userPasswordSame.jsp" />
+    <Callbacks length="0" order="12" timeout="120" template="userPasswordSame.jsp" />
+    <Callbacks length="0" order="13" timeout="120" template="infocardException.jsp" />
+    <Callbacks length="1" order="14" timeout="120" error="true"
+               header="Information Card processing error!&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value> Dummy </Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+</ModuleProperties>

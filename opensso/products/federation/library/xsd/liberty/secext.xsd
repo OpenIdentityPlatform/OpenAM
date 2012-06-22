@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: secext.xsd,v 1.2 2008/06/25 05:48:42 qcheng Exp $
+
+-->
+
+
+<xsd:schema targetNamespace="http://schemas.xmlsoap.org/ws/2003/06/secext" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsu="http://schemas.xmlsoap.org/ws/2003/06/utility" xmlns:wsse="http://schemas.xmlsoap.org/ws/2003/06/secext" xmlns="http://schemas.xmlsoap.org/ws/2003/06/secext" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all" version="0.2">
+	<xsd:import namespace="http://schemas.xmlsoap.org/ws/2003/06/utility" schemaLocation="utility.xsd"/>
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="AttributedString">
+		<xsd:annotation>
+			<xsd:documentation>This type represents an element with arbitrary attributes.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute ref="wsu:Id"/>
+				<xsd:anyAttribute namespace="##other" processContents="lax"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="PasswordString">
+		<xsd:annotation>
+			<xsd:documentation>This type is used for password elements per Section 4.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="wsse:AttributedString">
+				<xsd:attribute name="Type" type="xsd:QName"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="EncodedString">
+		<xsd:annotation>
+			<xsd:documentation>This type is used for elements containing stringified binary data.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="wsse:AttributedString">
+				<xsd:attribute name="EncodingType" type="xsd:QName"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="UsernameTokenType">
+		<xsd:annotation>
+			<xsd:documentation>This type represents a username token per Section 4.1</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Username" type="wsse:AttributedString"/>
+			<xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute ref="wsu:Id"/>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:complexType name="BinarySecurityTokenType">
+		<xsd:annotation>
+			<xsd:documentation>A security token that is encoded in binary</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="wsse:EncodedString">
+				<xsd:attribute name="ValueType" type="xsd:QName"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="KeyIdentifierType">
+		<xsd:annotation>
+			<xsd:documentation>A security token key identifier</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="wsse:EncodedString">
+				<xsd:attribute name="ValueType" type="xsd:QName"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="tUsage">
+		<xsd:annotation>
+			<xsd:documentation>Typedef to allow a list of usages (as QNames).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:list itemType="xsd:QName"/>
+	</xsd:simpleType>
+	<xsd:attribute name="Usage" type="tUsage">
+		<xsd:annotation>
+			<xsd:documentation>This global attribute is used to indicate the usage of a referenced or indicated token within the containing context</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+	<xsd:complexType name="ReferenceType">
+		<xsd:annotation>
+			<xsd:documentation>This type represents a reference to an external security token.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="URI" type="xsd:anyURI"/>
+		<xsd:attribute name="ValueType" type="xsd:QName"/>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:complexType name="EmbeddedType">
+		<xsd:annotation>
+			<xsd:documentation>This type represents a reference to an embedded security token.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:any processContents="lax"/>
+		</xsd:choice>
+		<xsd:attribute name="ValueType" type="xsd:QName"/>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:complexType name="SecurityTokenReferenceType">
+		<xsd:annotation>
+			<xsd:documentation>This type is used reference a security token.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:any processContents="lax"/>
+		</xsd:choice>
+		<xsd:attribute ref="wsu:Id"/>
+		<xsd:attribute ref="wsse:Usage"/>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:complexType name="SecurityHeaderType">
+		<xsd:annotation>
+			<xsd:documentation>This complexType defines header block to use for security-relevant data directed at a specific SOAP actor.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>The use of "any" is to allow extensibility and different forms of security data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:any>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:element name="UsernameToken" type="wsse:UsernameTokenType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines the wsse:UsernameToken element per Section 4.1.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BinarySecurityToken" type="wsse:BinarySecurityTokenType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines the wsse:BinarySecurityToken element per Section 4.2.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Reference" type="wsse:ReferenceType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines a security token reference</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Embedded" type="wsse:EmbeddedType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines a security token embedded reference</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="KeyIdentifier" type="wsse:KeyIdentifierType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines a key identifier reference</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="SecurityTokenReference" type="wsse:SecurityTokenReferenceType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines the wsse:SecurityTokenReference per Section 4.3.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Security" type="wsse:SecurityHeaderType">
+		<xsd:annotation>
+			<xsd:documentation>This element defines the wsse:Security SOAP header element per Section 4.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Password" type="wsse:PasswordString"/>
+	<xsd:element name="Nonce" type="wsse:EncodedString"/>
+	<xsd:simpleType name="PasswordTypeEnum">
+		<xsd:restriction base="xsd:QName">
+			<xsd:enumeration value="wsse:PasswordText"/>
+			<xsd:enumeration value="wsse:PasswordDigest"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ValueTypeEnum">
+		<xsd:restriction base="xsd:QName">
+			<xsd:enumeration value="wsse:X509v3"/>
+			<xsd:enumeration value="wsse:Kerberosv5TGT"/>
+			<xsd:enumeration value="wsse:Kerberosv5ST"/>
+			<xsd:enumeration value="wsse:PKCS7"/>
+			<xsd:enumeration value="wsse:PKIPath"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EncodingTypeEnum">
+		<xsd:restriction base="xsd:QName">
+			<xsd:enumeration value="wsse:Base64Binary"/>
+			<xsd:enumeration value="wsse:HexBinary"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FaultcodeEnum">
+		<xsd:restriction base="xsd:QName">
+			<xsd:enumeration value="wsse:UnsupportedSecurityToken"/>
+			<xsd:enumeration value="wsse:UnsupportedAlgorithm"/>
+			<xsd:enumeration value="wsse:InvalidSecurity"/>
+			<xsd:enumeration value="wsse:InvalidSecurityToken"/>
+			<xsd:enumeration value="wsse:FailedAuthentication"/>
+			<xsd:enumeration value="wsse:FailedCheck"/>
+			<xsd:enumeration value="wsse:SecurityTokenUnavailable"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

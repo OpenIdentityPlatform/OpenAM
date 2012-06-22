@@ -1,0 +1,11 @@
+dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.601 NAME 'ic-ppid' DESC 'Information Card Personal Private Identifier' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'authnicrp module of OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.602 NAME 'ic-data' DESC 'Information Card data' SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 X-ORIGIN 'authnicrp module of OpenSSO' )
+-
+add: objectClasses
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.600 NAME 'infocard' DESC 'Holds Information Card attributes' SUP top AUXILIARY MAY ( ic-ppid $ ic-data ) X-ORIGIN 'authnicrp module of OpenSSO' )
+-
+
+

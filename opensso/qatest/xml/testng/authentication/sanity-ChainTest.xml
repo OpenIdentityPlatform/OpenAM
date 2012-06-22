@@ -1,0 +1,62 @@
+
+    <test name="SanityChainTestRequired">
+        <parameter name="testChainName" value="chain8"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestRequisite">
+        <parameter name="testChainName" value="chain9"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestOptional">
+        <parameter name="testChainName" value="chain11"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestOneUsernamePassword">
+        <parameter name="testChainName" value="chain10"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="SanityChainTestSufficient">
+        <parameter name="testChainName" value="chain12"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>

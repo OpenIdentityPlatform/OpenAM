@@ -1,0 +1,192 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build_agent.xml,v 1.18 2009/11/04 22:13:29 leiming Exp $
+
+-->
+
+<!--
+Portions Copyrighted 2010]-2012 ForgeRock Inc
+-->
+
+<project name="open-source-web-agents" default="usage">
+                
+    <description>Open Web Single Sign-On Web Agents</description>
+    <property name="webagents.install.dir" 
+              location="${webagents.basedir}/install"/>
+    <property name="webagents.am.src.dir" 
+              location="${webagents.basedir}/am/source"/>
+    <property name="webagents.apache.src.dir" 
+              location="${webagents.basedir}/agents/source/apache"/>
+    <property name="webagents.sjsws.src.dir" 
+              location="${webagents.basedir}/agents/source/sjsws"/>
+    <property name="webagents.proxy40.src.dir"
+              location="${webagents.basedir}/agents/source/proxy40"/>
+    <property name="webagents.apache22.src.dir" 
+              location="${webagents.basedir}/agents/source/apache22"/>
+    <property name="webagents.apache24.src.dir" 
+                  location="${webagents.basedir}/agents/source/apache24"/>
+    <property name="webagents.iis6.src.dir"
+              location="${webagents.basedir}/agents/source/iis6"/>
+    <property name="webagents.iis7.src.dir"
+              location="${webagents.basedir}/agents/source/iis7"/>
+    <property name="webagents.domino.src.dir"
+              location="${webagents.basedir}/agents/source/domino"/>
+
+    <!-- top level directory structure -->
+    <property name="webagents.container.extlib.dir" 
+              location="${webagents.basedir}/extlib"/>
+   
+    <!-- container agent directory structure -->
+    <property name="webagents.container.built.dir" 
+              location="${webagents.built.dir}/${containername}"/>   
+    <property name="webagents.container.classes.dir" 
+              location="${webagents.container.built.dir}/classes"/>   
+    <property name="webagents.container.lib.dir" 
+              location="${webagents.container.built.dir}/lib"/> 
+    <property name="webagents.container.archive.dir" 
+              location="${webagents.container.built.dir}/archive"/>   
+    <property name="webagents.container.scratch.dir" 
+              location="${webagents.container.built.dir}/scratch"/>   
+    <property name="container.web_agents.dir" 
+              location="${webagents.container.scratch.dir}/web_agents"/>   
+    <property name="container.web_agent.dir" 
+              location="${container.web_agents.dir}/${containername}_agent"/>   
+    <property name="container.web_agent.bin.dir" 
+              location="${container.web_agent.dir}/bin"/>   
+    <property name="container.web_agent.config.dir" 
+              location="${container.web_agent.dir}/config"/>   
+    <property name="container.web_agent.data.dir" 
+              location="${container.web_agent.dir}/data"/>   
+    <property name="container.web_agent.etc.dir" 
+              location="${container.web_agent.dir}/etc"/>   
+    <property name="container.web_agent.lib.dir" 
+              location="${container.web_agent.dir}/lib"/>   
+    <property name="container.web_agent.locale.dir" 
+              location="${container.web_agent.dir}/locale"/>   
+    <property name="container.web_agent.logs.dir" 
+              location="${container.web_agent.dir}/installer-logs"/>   
+
+    <!-- build class path for container -->
+    <path id="build.class.path">
+        <pathelement location="${webagents.container.classes.dir}"/>
+        <fileset dir="${webagents.container.extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <pathelement location="../installtools/built/classes"/>
+    </path>
+
+    <target name="preparebuild">
+        <mkdir dir="${webagents.built.dir}"/>
+        <mkdir dir="${webagents.container.built.dir}"/>
+        <mkdir dir="${webagents.container.classes.dir}"/>
+        <mkdir dir="${webagents.container.lib.dir}"/>
+        <mkdir dir="${webagents.container.archive.dir}"/>
+        <mkdir dir="${webagents.container.scratch.dir}"/>
+        <mkdir dir="${container.web_agents.dir}"/>
+        <mkdir dir="${container.web_agent.dir}"/>
+        <mkdir dir="${container.web_agent.bin.dir}"/>
+        <mkdir dir="${container.web_agent.config.dir}"/>
+        <mkdir dir="${container.web_agent.data.dir}"/>
+        <mkdir dir="${container.web_agent.etc.dir}"/>
+        <mkdir dir="${container.web_agent.lib.dir}"/>
+        <mkdir dir="${container.web_agent.locale.dir}"/>
+        <mkdir dir="${container.web_agent.logs.dir}"/>
+    </target>
+
+    <target name="scratch">
+        <!-- Copy license file -->
+        <copy todir="${container.web_agent.dir}">
+            <fileset dir="${webagents.basedir}/legal">
+                <include name="license.txt"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy README file -->
+        <copy todir="${container.web_agent.dir}">
+            <fileset dir="${webagents.basedir}">
+                <include name="README"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy OpenSSOAgentBootstrap.template file -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.basedir}/conf">
+                <include name="OpenSSOAgentBootstrap.template"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy OpenSSOAgentConfiguration.template file -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.basedir}/conf">
+                <include name="OpenSSOAgentConfiguration.template"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy OpenSSOAgentMigration.template file -->
+        <copy todir="${container.web_agent.config.dir}">
+            <fileset dir="${webagents.basedir}/conf">
+                <include name="OpenSSOAgentMigration.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Copy RELEASE_NOTES file -->
+        <available file="${webagents.basedir}/.copyReleaseNotes" property="copy.release.notes"/>
+        <antcall target="copyreleasenotes"/>
+
+    </target>
+
+    <target name="copyreleasenotes" if="copy.release.notes">
+        <!-- Copy RELEASE_NOTES file -->
+        <copy todir="${container.web_agent.dir}">
+            <fileset dir="${webagents.basedir}">
+                <include name="RELEASE_NOTES"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="${container.web_agent.bin.dir}"/>
+        <delete dir="${container.web_agent.config.dir}"/>
+        <delete dir="${container.web_agent.data.dir}"/>
+        <delete dir="${container.web_agent.etc.dir}"/>
+        <delete dir="${container.web_agent.lib.dir}"/>
+        <delete dir="${container.web_agent.locale.dir}"/>
+        <delete dir="${container.web_agent.logs.dir}"/>
+        <delete dir="${container.web_agent.sampleapp.dir}"/>
+        <delete dir="${container.web_agent.dir}"/>
+        <delete dir="${container.web_agents.dir}"/>
+        <delete dir="${webagents.container.scratch.dir}"/>
+        <delete dir="${webagents.container.archive.dir}"/>
+        <delete dir="${webagents.container.lib.dir}"/>
+        <delete dir="${webagents.container.classes.dir}"/>
+        <delete dir="${webagents.container.built.dir}"/>
+    </target>
+
+    <target name="all" depends="preparebuild, scratch">
+        <echo message="Dispatch to container specific directory"/>
+        <ant antfile="${webagents.install.dir}/build.xml" inheritRefs="true"/>
+    </target>
+
+</project>

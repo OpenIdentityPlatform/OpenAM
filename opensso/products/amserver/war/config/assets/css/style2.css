@@ -1,0 +1,538 @@
+/* ============================
+   Main template styles
+   ============================ */
+html{
+	overflow:auto;
+}
+body{
+	font-family:Arial, Helvetica, sans-serif;
+}
+#doc3 {
+    margin: auto;
+}
+
+#hd {	
+	background: #5382a1;
+    padding: 1.25em 0 0.625em 0.625em;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+}
+
+#hd h1 {
+	background:url(../images/javalogo.gif)  no-repeat right;
+    color: #ffffff;
+    font-size: 123.1%;
+    margin: 0;
+	margin-right:1.25em;
+	height:2.45em;
+    padding: 0;
+	font-weight:bold;
+}
+
+#bd {
+    padding: 0 2em 1em 2em;
+}
+
+#ft {
+    background-color: #5382a1;
+	color:#FFFFFF;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 0.625em 0 0.625em 0;
+	position: fixed;
+  	bottom: 0;
+	width:100%;
+}
+
+#ft p {
+    margin: 0;
+    text-align: center;
+}
+
+/* ================================
+   Site-wide styles
+   ================================ */
+a:link {
+    color: #5382a1;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a:visited {
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a:hover, a:active {
+    text-decoration: underline;
+}
+
+.panel {
+}
+
+.panel .body {
+    padding: 1em;
+    border: 1px solid #5382a1;
+    border-bottom: none;
+}
+
+.panel h1 {
+    background-color: #5382a1;
+    color: white;
+    border: 1px solid #5382a1;
+    border-top: none;
+    font-size: 100%;
+    font-weight: bold;
+    padding: 0 1em 0.2em 1em;
+    margin: 0;
+}
+
+/*.panel h2 {
+    color: #ff9933;
+    font-size: 123.1%;
+    font-weight: normal;
+    margin: 0.3em 0;
+}*/
+
+.panel ul,ol {
+    margin-left: 1.5em;
+}
+
+/* Rounded Corners div styling */
+.xtop, .xbottom {display:block; background:transparent;}
+.xt1, .xt2, .xt3, .xt4, .xb1, .xb2, .xb3, .xb4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #5382a1; border-right:1px solid #5382a1;}
+.xt1, .xt2, .xt3, .xt4 {background:#5382a1;}
+.xt1, .xb4 {margin:0 4px; border: 0;}
+.xt2, .xb3 {margin:0 3px;}
+.xt3, .xb2 {margin:0 2px;}
+.xt4, .xb1 {height:2px; margin:0 1px;}
+.xb4 {background:#5382a1;}
+
+.balloonIcon {
+    width: 14px;
+    height: 12px;
+    padding-left: 0.3em;
+    padding-bottom: 0.5em;
+}
+
+/*  Form CSS */
+/* Most of this was acquired & adapted from http://www.sitepoint.com/article/fancy-form-design-css/ */
+fieldset {
+    position: relative;
+    float: left;
+    clear: both;
+    width: 100%;
+    margin: 0 0 1.5em 0;
+    padding: 0;
+    border-style: none;
+}
+legend {
+    margin-left: 1em;
+    color: #000000;
+    font-weight: bold;
+}
+fieldset ol {
+    margin: 0;
+    list-style: none;
+}
+fieldset li {
+    list-style: none;
+    float: left;
+    clear: left;
+    width: 100%;  
+    padding-bottom: 1em;
+}
+fieldset.submit {
+    float: none;
+    width: auto;
+    border: none;
+}
+label {
+    position: relative;
+    float: left;
+    text-align: right;
+    margin-right: 1em;
+}
+
+label em img {
+    vertical-align: top;
+}
+
+select {
+    border: 1px solid #5382a1;
+}
+
+
+/*********************************
+Common Tasks
+
+************************************/
+
+.createpanel{
+	width:600px;
+	background-color:#cce0f5;
+	text-align:left;
+}
+
+.createpanel .firsttitle{
+	margin-left:0.625em;
+	margin-right:0.625em;
+	background-color:white;
+}
+
+
+.createpanel .titleorangre{
+	font-size:1em;
+	text-align:left;
+	font-weight:bold;
+	color: #ec9c2b; 
+	margin-left:5px;
+	margin-right:5px;
+	padding-top:0.625em;
+}
+
+.createpanel .littletitle{
+	margin-left:5px;
+	margin-right:5px;
+	text-align:left;
+	font-size:0.625em;
+	padding-bottom:0.625em;
+}
+
+.createpanel .middletitle{
+	width:330px;
+	color: #ec9c2b;
+	font-size:0.8em;
+	text-align:left;
+	float:left;
+	/*margin-left:0.625em;*/
+}
+
+.createpanel .bodywhitetop{
+	margin-left:0.625em;
+	margin-right:0.625em;
+	background-color:white;
+
+}
+
+.createpanel .bodywhite{
+	margin-top:5px;
+	margin-left:0.625em;
+	margin-right:0.625em;
+	background-color:white;
+	padding:0.625em;
+	text-align:left;
+}
+
+.createpanel .subbody{
+	padding:0.625em;
+	line-height:25px;
+	text-align:right;
+}
+.createpanel .smalltitle{
+	font-size:smaller;
+	color: #ec9c2b;
+}
+
+.createpanel .divlabelfirst{
+	width:140px;
+	float:left;
+	text-align:right;
+}
+
+.createpanel .divlabelfirst165{
+	width:170px;
+	float:left;
+	text-align:right;
+}
+
+.createpanel .divinput{
+	width:160px;
+	float:left;
+	text-align:left;
+}
+
+.createpanel .divinput1
+{
+	float:left;
+	text-align:left;
+}
+
+.createpanel .divinput2
+{	
+	margin-left:0.625em;
+	text-align:left;
+}
+.bodySpace{		
+	padding:0.625em;
+}
+/*******************************************************
+						TABs
+********************************************************/
+.colunmsheader{
+	background:#EBEBEB;				
+}
+.insideColunm{
+	width:50%;
+	float:left;
+	color:#5382a1;
+}
+.colunms{
+	width:49.2%;
+	height:300px;
+	float:left;
+	border-right:2px solid #5382a1;
+	background:#FFFFFF;
+}
+.large{
+	height:320px;
+}
+.tab{
+	width:280px;
+	float:left;
+}
+/*
+Generic*/
+h1 {
+    color: #ff9933;
+    font-size: 1.75em;
+    font-weight: normal;
+    margin: 1em 0;
+    padding: 0 0 0 0;
+}
+
+h2{
+	color: #ff9933;
+    font-size: 1.125em;    
+    margin: 0.3em 0;
+}
+.OrangeSmall{
+	color:#ec9c2b;
+	font-size:15px;	
+	text-align:left;
+}
+.OrangeVerySmall{
+	color:#ec9c2b;
+	font-size:11px;	
+	text-align:left;
+}
+
+em {
+    color: red;
+}
+
+
+/*All Button*/
+button{
+	background:url(../images/wizard/buttonbg.png);
+	font-size:10px;
+	font-weight:bold;
+}
+button:disabled{
+	
+}
+
+.blue{
+	color:#60a2e1;
+	font-size:15px;	
+}
+.blueSmall{
+	color:#60a2e1;
+	font-size:12px;		
+}
+.pointer{
+	cursor:pointer;
+}
+.black{
+	font-size:15px;	
+}
+/***********************************************************
+					   Click Styles
+***********************************************************/
+a.error {
+	color: red;
+}
+a:visited.error {
+	color: red;
+}
+input.disabled {
+	background: lightgray;
+}
+input.error {
+	background: #FFFF80;
+}
+
+select.error {
+	background: #FFFF80;
+}
+span.disabled {
+	color: #808080;
+}
+span.error {
+	color: red;
+}
+span.required {
+	color: red;
+}
+textarea.error {
+	background: #FFFF80;
+}
+table.form {
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+table.fields {
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+	white-space: nowrap;
+}
+table.errors {
+	border-width: 0px;
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+}
+table.buttons {
+	border-width: 0px;
+	padding: 0px;
+	margin-top: 0.5em;
+	vertical-align: baseline;
+	white-space: pre;
+}
+label {
+  white-space: nowrap;
+}
+form table {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+form tr {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+form td {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+input.inputs{
+	border-color:#A9A9A9;
+	border:1px solid;
+	height:14px;
+	font-size:0.625em;
+}
+input.inputsBlue{
+	border-color:#5382a1;
+	border:1px solid;
+	height:14px;
+	font-size:0.625em;	
+}
+
+#allfields{
+	text-align:right;
+	padding-right:0.625em;	
+}
+
+/*************************************************************
+					Tool tip
+**************************************************************/
+
+#ajax_tooltipObj{
+	z-index:1000000;
+	text-align:left;
+}
+#ajax_tooltipObj div{
+	position:relative;
+}
+
+/* If you don't want the arrow - Just set the width of this div to 1 or something like that and drop the background selectors from the CSS below */
+
+#ajax_tooltipObj .ajax_tooltip_arrow{	/* Left div for the small arrow */
+	background-image:url('../images/arrow.gif');
+	width:40px;
+	position:absolute;
+	left:0px;
+	top:0px;
+	background-repeat:no-repeat;
+	background-position:center left;
+	z-index:1000005;
+	height:190px;
+}
+
+#ajax_tooltipObj .ajax_tooltip_content{
+	border:4px solid #5382a1;	/* Border width */
+	left:28px;	/* Same as border thickness */
+	top:0px;
+	position:absolute;
+	width:320px;	/* Width of tooltip content */
+	height:190px;	/* Height of tooltip content */
+	background-color:#FFF;	/* Background color */
+	padding:5px;	/* Space between border and content */
+	font-size:0.8em;	/* Font size of content */
+	overflow:hidden;	/* Hide overflow content */
+	z-index:1000001;
+}
+
+/***********************************************************
+					   Div Generic
+***********************************************************/
+div.width_160{
+	width:160px;
+	float: left;
+	padding:5px;
+}
+
+div.borderPopUpGray{
+	background:#FFFFFF;
+	border-top:1px solid #999999;		
+	border-left:1px solid #999999;		
+	border-right:1px solid #999999;		
+	border-bottom:1px solid #999999;	
+	padding:0.625em;
+}
+
+/*Gray Boxes */
+.headerBox{
+	background-color: #5382a1;
+	color: white;
+	border: 1px solid #5382a1;
+	border-top: none;
+	font-size: 100%;
+	font-weight: bold;
+	padding: 0 1em 0.2em 1em;
+	margin: 0;
+}
+.bodyBox{
+	background-color: #e5e9ed;
+	padding:10px;
+	padding: 1em;
+	border: 1px solid #5382a1;
+	border-bottom: none;
+}
+/*Corners bottom*/
+.xbGray1, .xbGray2, .xbGray3, .xbGray4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #5382a1; border-right:1px solid #5382a1;}
+.xbGray4 {margin:0 4px; border: 0;}
+.xbGray3 {margin:0 3px;}
+.xbGray2 {margin:0 2px;}
+.xbGray1 {height:2px; margin:0 1px;}
+.xbGray4 {background:#5382a1;}
+.xbGray1, .xbGray2, .xbGray3{background:#e5e9ed;}
+/*.xb1, .xb2, .xb3{background:#e5e9ed;}*/
+
+.header{
+	background: url(../images/wizard/background1.png) repeat-x;
+	color:#FFFFFF;
+	font-size:1.0em;
+	font-weight:bold;
+	line-height:2;
+	padding:0pt 10px;
+	height:28px;
+	text-align:center;
+}

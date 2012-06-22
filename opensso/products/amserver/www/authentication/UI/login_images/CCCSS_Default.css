@@ -1,0 +1,138 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: CCCSS_Default.css,v 1.2 2008/06/25 05:44:32 qcheng Exp $
+ *
+ */
+
+
+
+
+/* GENERAL STYLES */
+a:link { text-decoration: underline; color:#669; }
+a:active { text-decoration: none; }
+a:visited { text-decoration: none; color:#669; }
+a:hover { text-decoration: none; }
+BODY, TH, TD, P, DIV, SPAN, INPUT, SELECT, TEXTAREA, FORM, B, STRONG, I, U, H1, H2, H3, UL, LI, option { font-family: verdana, geneva, helvetica,
+arial, sans-serif;}
+
+/* Regular Button - Enabled */
+.button-frame-enabled { background-color: #000; }
+.button-content-enabled { background-color: #CCC; }
+.button-link-enabled-text { color: #000; margin: 1px 0px; font-weight: bold; }
+a.button-link:link, a.button-link:visited { color: #000; background-color: #CCC; text-decoration: none; }
+a.button-link:active { color: #000; background-color: #999; text-decoration: none;}
+
+/* Regular Button - Disabled */
+.button-frame-disabled { background-color: #999; }
+.button-content-disabled { background-color: #CCC; }
+.button-link-disabled-text { color: #999; margin: 1px 0px; font-weight: bold;  }
+
+/* Mini Button - Enabled */
+.mini-button-frame-enabled { background-color: #000; }
+.mini-button-content-enabled { background-color: #CCC; }
+.mini-button-link-enabled-text { color: #000; font-size: .9em; margin: 1px 0px; font-weight: bold; }
+a.mini-button-link:link, a.mini-button-link:visited { color: #000; background-color: #CCC; text-decoration: none;}
+a.mini-button-link:active { color: #000; background-color: #999; text-decoration: none;}
+
+/* Mini Button - Disabled */
+.mini-button-frame-disabled { background-color: #999; }
+.mini-button-content-disabled { background-color: #CCC; }
+.mini-button-link-disabled-text { color: #999; font-size: .9em; margin: 1px 0px; font-weight: bold;  }
+
+/* Default Button - Enabled */
+.default-button-frame-enabled { background-color: #666; }
+.default-button-content-enabled { background-color: #CCC; }
+.default-button-link-enabled-text   { color: #000; margin: 1px 0px; font-weight: bold; }
+a.default-button-link:link, a.default-button-link:visited { color: #000; background-color: #CCC; text-decoration: none;}
+a.default-button-link:active { color: #000; background-color: #999; text-decoration: none;}
+
+/* Default Button - Disabled */
+.default-button-frame-disabled { background-color: #999; }
+.default-button-content-disabled { background-color: #CCC; }
+.default-button-link-disabled-text { color: #999; margin: 1px 0px; font-weight: bold;  }
+
+/* MASTHEAD STYLES  */
+.masthead-background { background-color: #666699; }
+a.masthead-link-text:visited, a.masthead-link-text:link, a.masthead-link-text:active { color: #FFFFFF; text-decoration: none; background-color: #000000; }
+a.masthead-link-text:hover { color: #FFFFFF; text-decoration: underline; background-color: #000000; }
+.masthead-link-divider { color: #FF9933; }
+.masthead-text { color: #FFFFFF; font-family: Verdana, Geneva, Helvetica, Arial, sans-serif }
+
+/* BREADCRUMB STYLES */
+.breadcrumb-table {background-color: #CCCCCC; }
+.breadcrumb-text { color: #000000; font-weight: bold; margin: 5px 0px 5px 0px; }
+a.breadcrumb-link-text:visited, a.breadcrumb-link-text:link, a.breadcrumb-link-text:active { color: #000000; font-weight: bold; text-decoration: underline; }
+
+/* DATA TABLE STYLES */
+.table-title-text { color: #000000; font-weight: bold; margin: 0px 5px 5px 0px;  }
+.table-header-text { color: #FFFFFF; font-weight: bold; margin: 0px 5px 1px 15px; }
+.table-label-text { margin: 3px 5px 3px 15px; color: #000000; }
+.table-normal-text { color: #000000;  margin: 3px 5px 3px 15px; }
+.table-back-table { background-color: #9999CC; margin: 3px 5px 3px 5px; }
+.table-front-table { background-color: #FFFFFF; }
+.table-header-row { background-color: #9999CC;  }
+.table-line-row { background-color: #CCCCCC; }
+.table-caption-text { color: #000000; font-weight: bold; margin: 0px 5px 5px 0px; }
+.table-sorting-row { background-color: #CCCCFF; margin: 0px 5px 1px 15px; }
+
+/* TAB STYLES */
+.tab-frame-forward { background-color: #000; }
+.tab-content-forward { background-color: #FFF; }
+.tab-link-forward-text { color: #000; margin: 0px; font-weight: bold; text-decoration: none; }
+.tab-frame-back { background-color: #666; }
+.tab-content-back { background-color: #CCC; }
+a.tab-link:link, a.tab-link:visited { color: #000; font-weight: bold; text-decoration: none; }
+a.tab-link:active { color: #000; font-weight: bold; background-color: #999; text-decoration: none; }
+
+/* WIZARD STYLES */
+.wizard-title-text { color: #FFF; margin: 5px; font-weight: bold;}
+.wizard-steps-body { background-color: #FFF; color: black; }
+.wizard-contents-body { background-color: #FFF; color: black; }
+.wizard-navigation-body { background-color: #FFF; color: black; }
+
+.wizard-steps-title-text { color: #000; font-weight: bold; }
+.wizard-steps-divider { background-color: #000 }
+.wizard-step-text { color: #000; }
+.wizard-step-current-text { color: #000; font-weight: bold; }
+a.wizard-step-link:link { color: #669; text-decoration: underline; }
+a.wizard-step-link:visited { color: #669; text-decoration: underline; }
+
+.wizard-content-title-text { color: #000; font-weight: bold; margin: 3px 5px; }
+.wizard-content-title-row { background-color: #CCC; }
+.wizard-content-instr-text { color: #000; }
+.wizard-content-label-text { color: #000; }
+
+/* LINE STYLES */
+.dark-line-color  { color: #000000; background-color: #FFFFFF; }
+
+/* JUMP-TO STYLES */
+.jumpto-text { color: #000000; }
+
+/* PROPERTY CATEGORY STYLES */
+.major-category-text { font-weight: bold }
+.category-text { font-weight: bold }
+.property-categories {background-color: #CCCCFF; }
+.property-categories-text { color: #000000; font-weight: bold; margin: 5px 0px 5px 0px; }
+a.top-link-text:visited, a.top-link-text:link, a.top-link-text:active  { color: #666699; font-weight: bold; text-decoration: underline; font-size: .8em; }

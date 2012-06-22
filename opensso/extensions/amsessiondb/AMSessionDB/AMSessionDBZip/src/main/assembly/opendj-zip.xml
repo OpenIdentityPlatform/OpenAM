@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright 2011 ForgeRock AS. All rights reserved.
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>dj</id>
+    <baseDirectory>/</baseDirectory>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src/main/resources/opendj</directory>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/opendj-zip/OpenDJ-${opendj.stable.version}</directory>
+            <includes>
+                <include>instance.loc</include>
+                <include>bat/</include>
+                <include>bat/backup.bat</include>
+                <include>bat/base64.bat</include>
+                <include>bat/control-panel.bat</include>
+                <include>bat/dbtest.bat</include>
+                <include>bat/dsconfig.bat</include>
+                <include>bat/dsframework.bat</include>
+                <include>bat/dsjavaproperties.bat</include>
+                <include>bat/dsreplication.bat</include>
+                <include>bat/encode-password.bat</include>
+                <include>bat/export-ldif.bat</include>
+                <include>bat/import-ldif.bat</include>
+                <include>bat/ldapcompare.bat</include>
+                <include>bat/ldapdelete.bat</include>
+                <include>bat/ldapmodify.bat</include>
+                <include>bat/ldappasswordmodify.bat</include>
+                <include>bat/ldapsearch.bat</include>
+                <include>bat/ldif-diff.bat</include>
+                <include>bat/ldifmodify.bat</include>
+                <include>bat/ldifsearch.bat</include>
+                <include>bat/list-backends.bat</include>
+                <include>bat/make-ldif.bat</include>
+                <include>bat/manage-account.bat</include>
+                <include>bat/manage-tasks.bat</include>
+                <include>bat/rebuild-index.bat</include>
+                <include>bat/restore.bat</include>
+                <include>bat/start-ds.bat</include>
+                <include>bat/status.bat</include>
+                <include>bat/stop-ds.bat</include>
+                <include>bat/verify-index.bat</include>
+                <include>bin/</include>
+                <include>bin/backup</include>
+                <include>bin/base64</include>
+                <include>bin/control-panel</include>
+                <include>bin/ControlPanel.app</include>
+                <include>bin/create-rc-script</include>
+                <include>bin/dbtest</include>
+                <include>bin/dsconfig</include>
+                <include>bin/dsframework</include>
+                <include>bin/dsjavaproperties</include>
+                <include>bin/dsreplication</include>
+                <include>bin/encode-password</include>
+                <include>bin/export-ldif</include>
+                <include>bin/import-ldif</include>
+                <include>bin/ldapcompare</include>
+                <include>bin/ldapdelete</include>
+                <include>bin/ldapmodify</include>
+                <include>bin/ldappasswordmodify</include>
+                <include>bin/ldapsearch</include>
+                <include>bin/ldif-diff</include>
+                <include>bin/ldifmodify</include>
+                <include>bin/ldifsearch</include>
+                <include>bin/list-backends</include>
+                <include>bin/make-ldif</include>
+                <include>bin/manage-account</include>
+                <include>bin/manage-tasks</include>
+                <include>bin/rebuild-index</include>
+                <include>bin/restore</include>
+                <include>bin/start-ds</include>
+                <include>bin/status</include>
+                <include>bin/stop-ds</include>
+                <include>bin/verify-index</include>
+                <include>changelogDb/</include>
+                <include>classes/</include>
+                <include>config/</include>
+                <include>config/admin-backend.ldif</include>
+                <include>config/buildinfo</include>
+                <include>config/config.ldif</include>
+                <include>config/java.properties</include>
+                <include>config/servicetag</include>
+                <include>config/tools.properties</include>
+                <include>config/wordlist.txt</include>
+                <include>config/messages/</include>
+                <include>config/messages/account-disabled.template</include>
+                <include>config/messages/account-enabled.template</include>
+                <include>config/messages/account-expired.template</include>
+                <include>config/messages/account-idle-locked.template</include>
+                <include>config/messages/account-permanently-locked.template</include>
+                <include>config/messages/account-reset-locked.template</include>
+                <include>config/messages/account-temporarily-locked.template</include>
+                <include>config/messages/account-unlocked.template</include>
+                <include>config/messages/password-changed.template</include>
+                <include>config/messages/password-expired.template</include>
+                <include>config/messages/password-expiring.template</include>
+                <include>config/messages/password-reset.template</include>
+                <include>config/schema/</include>
+                <include>config/schema/00-core.ldif</include>
+                <include>config/schema/01-pwpolicy.ldif</include>
+                <include>config/schema/02-config.ldif</include>
+                <include>config/schema/03-changelog.ldif</include>
+                <include>config/schema/03-rfc2713.ldif</include>
+                <include>config/schema/03-rfc2714.ldif</include>
+                <include>config/schema/03-rfc2739.ldif</include>
+                <include>config/schema/03-rfc2926.ldif</include>
+                <include>config/schema/03-rfc3112.ldif</include>
+                <include>config/schema/03-rfc3712.ldif</include>
+                <include>config/schema/03-uddiv3.ldif</include>
+                <include>config/schema/04-rfc2307bis.ldif</include>
+                <include>config/schema/05-rfc4876.ldif</include>
+                <include>config/schema/05-solaris.ldif</include>
+                <include>config/schema/06-compat.ldif</include>
+                <include>config/servicetag/</include>
+                <include>config/servicetag/opends.uuids.properties</include>
+                <include>config/upgrade/</include>
+                <include>config/upgrade/config.ldif.*</include>
+                <include>config/upgrade/schema.ldif.*</include>
+                <include>db/</include>
+                <include>import-tmp/</include>
+                <include>ldif/</include>
+                <include>ldif/openam_suffix.ldif.template</include>
+                <include>legal-notices/</include>
+                <include>legal-notices/BinariesLicense.txt</include>
+                <include>legal-notices/OpenDS.LICENSE</include>
+                <include>legal-notices/THIRDPARTYREADME.txt</include>
+                <include>lib/</include>
+                <include>lib/_client-script.bat</include>
+                <include>lib/_client-script.sh</include>
+                <include>lib/_mixed-script.bat</include>
+                <include>lib/_mixed-script.sh</include>
+                <include>lib/_script-util.bat</include>
+                <include>lib/_script-util.sh</include>
+                <include>lib/_server-script.bat</include>
+                <include>lib/_server-script.sh</include>
+                <include>lib/setcp.bat</include>
+                <include>locks/</include>
+                <include>logs/</include>
+            </includes>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

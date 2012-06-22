@@ -1,0 +1,193 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: PolicyLogMessageIDs.xml,v 1.5 2008/08/19 19:10:54 veiming Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="POLICY">
+    <logmessage name="POLICY_EVALUATION" id="1"
+	loglevel="LL_INFO"
+	description="Evaluating policy succeeded">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	    <item>service type name</item>
+	    <item>resource name</item>
+	    <item>action names</item>
+	    <item>policy decision</item>
+	</datainfo>
+	<triggers>
+	    <item>Evaluating policy.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="PROTECTED_RESOURCES" id="2"
+	loglevel="LL_INFO"
+	description="Getting protected policy resources succeeded">
+	<datainfo>
+	    <item>principal name</item>
+	    <item>resource name</item>
+	    <item>protecting policies</item>
+	</datainfo>
+	<triggers>
+	    <item>Getting protected policy resources.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="POLICY_CREATE_SUCCESS" id="3"
+	loglevel="LL_INFO"
+	description="Creating policy in a realm succeeded">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Creating policy in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="POLICY_MODIFY_SUCCESS" id="4"
+	loglevel="LL_INFO"
+	description="Modifying policy in a realm succeeded">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Modifying policy in a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="POLICY_REMOVE_SUCCESS" id="5"
+	loglevel="LL_INFO"
+	description="Removing policy from a realm succeeded">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Removing policy from a realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="POLICY_ALREADY_EXISTS_IN_REALM" id="6"
+	loglevel="LL_INFO"
+	description="Policy already exists in the realm">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Creating policy in the realm.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_ADD_POLICY" id="7"
+	loglevel="LL_INFO"
+	description="Creating policy in a realm failed">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Creating policy in a realm.</item>
+	</triggers>
+	<actions>
+            <item>Check if the user has privilege to create a policy in the realm.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="UNABLE_TO_REPLACE_POLICY" id="8"
+	loglevel="LL_INFO"
+	description="Replacing policy in a realm failed">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Replacing policy in a realm.</item>
+	</triggers>
+	<actions>
+            <item>Check if the user has privilege to replace a policy in the realm.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="DID_NOT_REPLACE_POLICY" id="81"
+	loglevel="LL_INFO"
+	description="Did not replace policy - A diifferent policy with the new name already exists in the realm">
+	<datainfo>
+	    <item>new policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Replacing policy in a realm</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="UNABLE_TO_REMOVE_POLICY" id="9"
+	loglevel="LL_INFO"
+	description="Removing policy from a realm failed">
+	<datainfo>
+	    <item>policy name</item>
+	    <item>realm name</item>
+	</datainfo>
+	<triggers>
+	    <item>Removing policy from a realm.</item>
+	</triggers>
+	<actions>
+            <item>Check if the user has privilege to remove a policy from the realm.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="PROXIED_POLICY_EVALUATION" id="10"
+	loglevel="LL_INFO"
+	description="Computing policy decision by an administrator succeeded">
+	<datainfo>
+	    <item>admin name</item>
+	    <item>principal name</item>
+	    <item>resource name</item>
+	    <item>policy decision</item>
+	</datainfo>
+	<triggers>
+	    <item>Computing policy decision by an administrator.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="PROXIED_POLICY_EVALUATION_IGNORING_SUBJECTS" id="11"
+	loglevel="LL_INFO"
+	description="Computing policy decision by an administrator ignoring subjects succeeded">
+	<datainfo>
+	    <item>admin name</item>
+	    <item>resource name</item>
+	    <item>policy decision</item>
+	</datainfo>
+	<triggers>
+	    <item>Computing policy decision by an administrator ignoring subjects.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+</logmessages>

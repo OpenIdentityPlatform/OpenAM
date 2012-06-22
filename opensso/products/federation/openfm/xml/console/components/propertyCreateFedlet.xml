@@ -1,0 +1,145 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyCreateFedlet.xml,v 1.4 2009/08/14 18:33:23 asyhuang Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="question" defaultValue="blank.header">
+    <property required="true">
+        <label name="lblRealm" defaultValue="create.fedlet.label.realm" labelFor="tfRealm" />
+        <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <attribute name="onClick" value="realmSelect(this);" />
+            <attribute name="onChange" value="realmSelect(this);" />
+        </cc>
+        <cc name="infoRealm" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateFedlet.infoRealm', infoRealm);" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblCOT" defaultValue="create.fedlet.label.cot" labelFor="choiceCOT" />
+        <cc name="choiceCOT" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">            
+            <attribute name="onClick" value="cotSelect(this);" />
+            <attribute name="onChange" value="cotSelect(this);" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblIDP" defaultValue="create.fedlet.label.idp" labelFor="choiceIDP" />
+        <cc name="choiceIDP" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+    </property>
+    </section>
+    <section name="question" defaultValue="create.fedlet.section.setup">
+    <property required="true">
+        <label name="lblEntityId" defaultValue="create.fedlet.label.entity.id" labelFor="tfEntityId" />
+        <cc name="tfEntityId" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="75" />
+        </cc>
+        <cc name="infoEntityId" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateFedlet.infoEntityId', infoEntityId);" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblAssertConsumer" defaultValue="create.fedlet.label.assert.consumer" labelFor="tfAssertConsumer" />
+        <cc name="tfAssertConsumer" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="75" />
+        </cc>
+        <cc name="infoAssertConsumer" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateFedlet.infoAssertConsumer', infoAssertConsumer);" />
+        </cc>
+    </property>
+    </section>
+    <section name="attrmapping" defaultValue="configure.provider.section.attributesmapping">
+        <property span="true">
+            <cc name="txtMapAttrDesc" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="create.fedlet.attribute.mapping.desc" />
+            </cc>
+            <cc name="tblattrmapping"
+                tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+                <attribute name="title" value="configure.provider.attributesmapping.title" />
+                <attribute name="empty" value="configure.provider.attributesmapping.title.empty" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="selectionType" value="multiple" />
+                <attribute name="selectionJavascript" value="toggleTblButtonState('CreateFedlet', 'CreateFedlet.tblattrmapping', 'tblButton', 'CreateFedlet.deleteAttrMappingBtn', this)"/>
+                <attribute name="showAdvancedSortingIcon" value="false" />
+                <attribute name="showLowerActions" value="false" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="showPaginationIcon" value="false" />
+                <attribute name="showSelectionIcons" value="false" />
+                <attribute name="showSelectionSortIcon" value="false" />
+                <attribute name="showSortingRow" value="false" />
+            </cc>
+        </property>
+        <property span="true">
+            <cc name="tfAttrMappingAssertion" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="localizeDisplayFieldValue" value="false" />
+                <attribute name="size" value="50" />
+            </cc>
+            <cc name="tfAttrMappingName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="localizeDisplayFieldValue" value="false" />
+                <attribute name="size" value="50" />
+            </cc>
+            <cc name="btnAddAttrMapping"
+                tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+                <attribute name="OnClick" value="addAttrMapping(); return false;" />
+                <attribute name="defaultValue" value="configure.provider.attributesmapping.add.button" />
+            </cc>
+            <cc name="menuUserAttributes" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <attribute name="onChange" value="userAttrSelect(this);" />
+            </cc>
+            <cc name="infoMenuUserAttributes" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+                <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+                <attribute name="title" value="click.to.see.info" />
+                <attribute name="alt" value="click.to.see.info" />
+                <attribute name="border" value="0" />
+                <attribute name="height" value="18" />
+                <attribute name="width" value="18" />
+                <attribute name="onClick" value="showHelp('CreateFedlet.infoMenuUserAttributes', infoMenuUserAttributes);" />
+            </cc>
+        </property>
+    </section>
+
+</propertysheet>

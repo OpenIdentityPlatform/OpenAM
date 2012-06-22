@@ -1,0 +1,1063 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   http://forgerock.org/license/CDDLv1.0.html
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at http://forgerock.org/license/CDDLv1.0.html
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+<ServicesConfiguration>
+    <Service name="sunAMAuthAdaptiveService" version="1.0">
+        <Schema serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthAdaptiveService"
+			i18nFileName="amAuthAdaptive" revisionNumber="1"
+			i18nKey="iplanet-am-auth-adaptive-service-description">
+            <Organization>
+                <AttributeSchema name="openam-auth-adaptive-auth-level"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a500">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-auth-threshold"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a502">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-failure-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a503">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-failure-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a505">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-failure-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a506">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a507">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-range"
+                cosQualifier="default"
+                type="list"
+                syntax="string"
+                i18nKey="a508">
+                    <DefaultValues>
+                        <Value>10.0.0.0/24</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a509">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a510">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a511">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ip-adaptive-history-count"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a512">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-attribute"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a513">
+                    <DefaultValues>
+                        <Value>iphistory</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a514">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a515">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a516">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a517">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a518">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a519">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a520">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a521">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a522">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a534">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a535">
+                    <DefaultValues>
+                        <Value>Device</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a536">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a537">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a538">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a523">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-cookie-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a524">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a525">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a526">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a527">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a528">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a529">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a530">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a531">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a532">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a533">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a539">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-database"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a540">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-values"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a541">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a542">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a543">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="openam-auth-adaptive-req-header-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a544">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a545">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a546">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a547">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a548">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                
+                <SubSchema name="serverconfig" inheritance="multiple">
+                <AttributeSchema name="openam-auth-adaptive-auth-level"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a500">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-auth-threshold"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a502">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-failure-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a503">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-failure-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a505">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-failure-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a506">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a507">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-range"
+                cosQualifier="default"
+                type="list"
+                syntax="string"
+                i18nKey="a508">
+                    <DefaultValues>
+                        <Value>10.0.0.0/24</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a509">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-range-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a510">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a511">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ip-adaptive-history-count"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a512">
+                    <DefaultValues>
+                        <Value>5</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-attribute"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a513">
+                    <DefaultValues>
+                        <Value>iphistory</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a514">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a515">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-ip-history-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a516">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a517">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a518">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a519">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a520">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a521">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-known-cookie-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a522">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a534">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a535">
+                    <DefaultValues>
+                        <Value>Device</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a536">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a537">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-device-cookie-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a538">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a523">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-cookie-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a524">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a525">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-save"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a526">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a527">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-time-since-last-login-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a528">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a529">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a530">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a531">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a532">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-risk-attribute-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a533">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a539">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-database"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a540">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-values"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a541">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a542">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-geo-location-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a543">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+				<AttributeSchema name="openam-auth-adaptive-req-header-check"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a544">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-name"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a545">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-value"
+                cosQualifier="default"
+                type="single"
+                syntax="string"
+                i18nKey="a546">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-score"
+                cosQualifier="default"
+                type="single"
+                syntax="number"
+                i18nKey="a547">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-adaptive-req-header-invert"
+                cosQualifier="default"
+                type="single"
+                syntax="boolean"
+                i18nKey="a548">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+

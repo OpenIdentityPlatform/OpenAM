@@ -1,0 +1,29 @@
+/* CSS Document */
+.widthTab{
+	width:300px;
+}
+select{
+	width:200px;
+}
+.bodySpace{
+	padding:10px;
+}
+.bodySpace2{
+	padding:3px;
+}
+.links{
+	width:200px;
+	text-align:right;
+}
+#option10{
+	background-color:#FFFFFF;
+	text-align:left;
+	border:1px solid #999999;
+}
+p{
+	height:20px;
+}
+#names{
+	float:left;
+	text-align:right;
+}

@@ -1,0 +1,93 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyPMConditionTime_Readonly.xml,v 1.2 2008/06/25 05:45:12 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header" >
+    <property>
+	<label name="lblName" defaultValue="policy.condition.attribute.label.name" labelFor="tfConditionName" />
+	<cc name="tfConditionName" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="conditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+	<cc name="tfConditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+	<cc name="tfRealmName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+    </section>
+
+    <section name="sectionDate" defaultValue="policy.condition.section.date">
+    <property>
+	<label name="lblStartDate" defaultValue="policy.condition.attribute.label.startdate" labelFor="StartDate" />
+    <cc name="StartDate" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblEndDate" defaultValue="policy.condition.attribute.label.enddate" labelFor="EndDate" />
+    <cc name="EndDate" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    </section>
+
+    <section name="sectionTime" defaultValue="policy.condition.section.time">
+    <property>
+	<label name="lblStartTime" defaultValue="policy.condition.attribute.label.starttime" labelFor="StartHour" />
+	<cc name="StartHour" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="colon" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+	    <attribute name="defaultValue" value=":" />
+	</cc>
+	<cc name="StartMinute" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="StartSession" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblEndTime" defaultValue="policy.condition.attribute.label.endtime" labelFor="EndHour" />
+	<cc name="EndHour" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="colon" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+	    <attribute name="defaultValue" value=":" />
+	</cc>
+	<cc name="EndMinute" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="EndSession" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    </section>
+
+    <section name="sectionTime" defaultValue="policy.condition.section.day">
+    <property>
+	<label name="lblStartDay" defaultValue="policy.condition.attribute.label.startday" labelFor="StartDay" />
+	<cc name="StartDay" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblEndDay" defaultValue="policy.condition.attribute.label.endday" labelFor="EndDay" />
+	<cc name="EndDay" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    </section>
+
+    <section name="sectionTime" defaultValue="policy.condition.section.timezone">
+    <property span="true">
+	<cc name="radioTimeZone" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="StandardTimeZone" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="CustomTimeZone" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+
+    </section>
+</propertysheet>

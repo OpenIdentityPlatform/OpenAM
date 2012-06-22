@@ -1,0 +1,168 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build_agent.xml,v 1.13 2009/07/09 17:04:18 veiming Exp $
+
+-->
+
+<!--
+   Portions Copyrighted [2010-2011] [ForgeRock AS]
+-->
+
+<project name="open-source-j2ee-agents" default="usage">
+                
+    <description>Open Web Single Sign-On J2EE Agents</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- top level directory structure -->
+    <property name="j2eeagents.extlib.dir" location="${j2eeagents.basedir}/extlib"/>
+    <property name="j2eeagents.container.extlib.dir" location="${j2eeagents.extlib.dir}/${containername}/${containerversion}"/>
+   
+    <!-- container agent directory structure -->
+    <property name="j2eeagents.container.built.dir" location="${j2eeagents.built.dir}/${containername}_${containerversion}"/>   
+    <property name="j2eeagents.container.classes.dir" location="${j2eeagents.container.built.dir}/classes"/>   
+    <property name="j2eeagents.container.lib.dir" location="${j2eeagents.container.built.dir}/lib"/> 
+    <property name="j2eeagents.container.archive.dir" location="${j2eeagents.container.built.dir}/archive"/>   
+    <property name="j2eeagents.container.scratch.dir" location="${j2eeagents.container.built.dir}/scratch"/>   
+    <property name="container.j2ee_agents.dir" location="${j2eeagents.container.scratch.dir}/j2ee_agents"/>   
+    <property name="container.j2ee_agent.dir" location="${container.j2ee_agents.dir}/${containername}_${containerversion}_agent"/>   
+    <property name="container.j2ee_agent.bin.dir" location="${container.j2ee_agent.dir}/bin"/>   
+    <property name="container.j2ee_agent.config.dir" location="${container.j2ee_agent.dir}/config"/>   
+    <property name="container.j2ee_agent.data.dir" location="${container.j2ee_agent.dir}/data"/>   
+    <property name="container.j2ee_agent.etc.dir" location="${container.j2ee_agent.dir}/etc"/>      
+    <property name="container.j2ee_agent.lib.dir" location="${container.j2ee_agent.dir}/lib"/>   
+    <property name="container.j2ee_agent.locale.dir" location="${container.j2ee_agent.dir}/locale"/>   
+    <property name="container.j2ee_agent.logs.dir" location="${container.j2ee_agent.dir}/installer-logs"/>   
+    <property name="container.j2ee_agent.sampleapp.dir" location="${container.j2ee_agent.dir}/sampleapp"/>   
+
+
+    <!-- build class path for container -->
+    <path id="build.class.path">
+        <pathelement location="${j2eeagents.container.classes.dir}"/>
+        <fileset dir="${j2eeagents.extlib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${j2eeagents.container.extlib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="build" depends="preparebuild">
+        <javac destdir="${j2eeagents.container.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${j2eeagents.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${j2eeagents.built.dir}"/>
+        <mkdir dir="${j2eeagents.container.built.dir}"/>
+        <mkdir dir="${j2eeagents.container.classes.dir}"/>
+        <mkdir dir="${j2eeagents.container.lib.dir}"/>
+        <mkdir dir="${j2eeagents.container.archive.dir}"/>
+        <mkdir dir="${j2eeagents.container.scratch.dir}"/>
+        <mkdir dir="${container.j2ee_agents.dir}"/>
+        <mkdir dir="${container.j2ee_agent.dir}"/>
+        <mkdir dir="${container.j2ee_agent.bin.dir}"/>
+        <mkdir dir="${container.j2ee_agent.config.dir}"/>
+        <mkdir dir="${container.j2ee_agent.data.dir}"/>
+        <mkdir dir="${container.j2ee_agent.etc.dir}"/>
+        <mkdir dir="${container.j2ee_agent.lib.dir}"/>
+        <mkdir dir="${container.j2ee_agent.locale.dir}"/>
+        <mkdir dir="${container.j2ee_agent.logs.dir}"/>
+        <mkdir dir="${container.j2ee_agent.sampleapp.dir}"/>
+        <loadfile property="revision.number" srcFile="${j2eeagents.src.dir}/.svn/entries" failonerror="false">
+            <filterchain>
+                <headfilter lines="1" skip="3"/>
+                    <deletecharacters chars="\n"/>
+            </filterchain>
+        </loadfile>
+        <copy todir="${j2eeagents.src.dir}/org/forgerock/openam/util"
+            filtering="true" overwrite="true">
+            <fileset dir="${j2eeagents.src.dir}/org/forgerock/openam/util">
+                <include name="Version.java.template"/>
+            </fileset>
+            <mapper type="glob" from="*.template" to="*" />
+            <filterset>
+                <filter token="BUILD_DATE" value="${nightly.date}" />
+                <filter token="BUILD_REVISION" value="${revision.number}" />
+                <filter token="BUILD_MACHINE" value="${j2eeagent.build.machine}" />
+                <filter token="BUILD_VERSION" value="${j2eeagents.version}" />
+            </filterset>
+        </copy>
+    </target>
+
+    <target name="scratch">
+        <copy todir="${container.j2ee_agent.dir}">
+            <fileset dir="${j2eeagents.basedir}/agentsdk/legal">
+                <include name="license.txt"/>
+                <include name="README.TXT"/>
+		<include name="LICENSE_apache_commons_io.txt" />
+            </fileset>
+        </copy>
+        <copy todir="${container.j2ee_agent.bin.dir}">
+            <fileset dir="${j2eeagents.basedir}/agentsdk/scripts">
+                <include name="agentadmin"/>
+                <include name="agentadmin.bat"/>
+            </fileset>
+        </copy>
+        <copy todir="${container.j2ee_agent.locale.dir}">
+            <fileset dir="${j2eeagents.basedir}/agentsdk/resources">
+                <include name="**/*.txt"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean">
+        <delete dir="${container.j2ee_agent.bin.dir}"/>
+        <delete dir="${container.j2ee_agent.config.dir}"/>
+        <delete dir="${container.j2ee_agent.data.dir}"/>
+        <delete dir="${container.j2ee_agent.etc.dir}"/>
+        <delete dir="${container.j2ee_agent.lib.dir}"/>
+        <delete dir="${container.j2ee_agent.locale.dir}"/>
+        <delete dir="${container.j2ee_agent.logs.dir}"/>
+        <delete dir="${container.j2ee_agent.sampleapp.dir}"/>
+        <delete dir="${container.j2ee_agent.dir}"/>
+        <delete dir="${container.j2ee_agents.dir}"/>
+        <delete dir="${j2eeagents.container.scratch.dir}"/>
+        <delete dir="${j2eeagents.container.archive.dir}"/>
+        <delete dir="${j2eeagents.container.lib.dir}"/>
+        <delete dir="${j2eeagents.container.classes.dir}"/>
+        <delete dir="${j2eeagents.container.built.dir}"/>
+    </target>
+
+    <target name="all" depends="build, scratch">
+        <echo message="Dispatch to container specific directory"/>
+        <ant antfile="${j2eeagents.basedir}/${containername}/build.xml" inheritRefs="true"/>
+    </target>
+
+</project>

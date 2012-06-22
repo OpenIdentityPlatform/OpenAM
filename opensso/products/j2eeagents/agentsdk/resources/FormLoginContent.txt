@@ -1,0 +1,14 @@
+<html>
+   <head>
+      <title>Security Check</title>
+   </head>
+
+   <body onLoad="document.security_check_form.submit()">
+      <form name="security_check_form" action="j_security_check" method="POST">
+         <input type="hidden" value="am.filter.j_username" name="j_username"/>
+         <input type="hidden" value="am.filter.j_password" name="j_password"/>
+      </form>
+   </body>
+</html>
+
+

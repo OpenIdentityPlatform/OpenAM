@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: lib-arch-protocols-schema.xsd,v 1.2 2008/06/25 05:48:41 qcheng Exp $
+
+-->
+
+
+<xs:schema targetNamespace="urn:liberty:iff:2003-08"
+    xmlns="urn:liberty:iff:2003-08"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ac="urn:liberty:ac:2003-08"
+    xmlns:md="urn:liberty:metadata:2003-08"
+    xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+    xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol"
+    xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+    elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+    <xs:import namespace="urn:oasis:names:tc:SAML:1.0:assertion"
+        schemaLocation="cs-sstc-schema-assertion-01.xsd"/>
+    <xs:import namespace="urn:oasis:names:tc:SAML:1.0:protocol"
+        schemaLocation="cs-sstc-schema-protocol-01.xsd"/>
+    <xs:import namespace="http://www.w3.org/2001/04/xmlenc#"
+        schemaLocation="xenc-schema.xsd"/>
+    <xs:import namespace="urn:liberty:ac:2003-08" schemaLocation="lib-arch-authentication-context.xsd"/>
+    <xs:import namespace="urn:liberty:metadata:2003-08" schemaLocation="lib-arch-metadata.xsd"/>
+
+    <xs:include schemaLocation="lib-arch-iff-utility.xsd"/>
+
+    <xs:annotation>
+        <xs:documentation>
+The source code in this XSD file was excerpted verbatim from:
+
+Liberty ID-FF Protocols &amp; Schema Specification
+Version 1.2
+12th November 2003
+
+Copyright (c) 2003 Liberty Alliance participants, see
+http://www.projectliberty.org/specs/idff_copyrights.html
+
+</xs:documentation>
+    </xs:annotation>
+    <xs:element name="ProviderID" type="md:entityIDType"/>
+    <xs:element name="AffiliationID" type="md:entityIDType"/>
+
+    <xs:element name="AuthnRequest" type="AuthnRequestType"/>
+    <xs:complexType name="AuthnRequestType">
+        <xs:complexContent>
+            <xs:extension base="samlp:RequestAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="AffiliationID" minOccurs="0"/>
+                    <xs:element ref="NameIDPolicy" minOccurs="0"/>
+                    <xs:element name="ForceAuthn" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="IsPassive" type="xs:boolean" minOccurs="0"/>
+                    <xs:element ref="ProtocolProfile" minOccurs="0"/>
+                    <xs:element name="AssertionConsumerServiceID" type="xs:string" minOccurs="0"/>
+                    <xs:element ref="RequestAuthnContext" minOccurs="0"/>
+                    <xs:element ref="RelayState" minOccurs="0"/>
+                    <xs:element ref="Scoping" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute ref="consent" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="NameIDPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="onetime"/>
+            <xs:enumeration value="federated"/>
+            <xs:enumeration value="any"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="NameIDPolicy" type="NameIDPolicyType"/>
+    <xs:simpleType name="AuthnContextComparisonType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="exact"/>
+            <xs:enumeration value="minimum"/>
+            <xs:enumeration value="better"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="ScopingType">
+        <xs:sequence>
+            <xs:element name="ProxyCount" type="xs:nonNegativeInteger" minOccurs="0"/>
+            <xs:element ref="IDPList" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="Scoping" type="ScopingType"/>
+    <xs:element name="RelayState" type="xs:string"/>
+    <xs:element name="ProtocolProfile" type="xs:anyURI"/>
+    <xs:element name="RequestAuthnContext">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice>
+                    <xs:element name="AuthnContextClassRef" type="xs:anyURI" maxOccurs="unbounded"/>
+                    <xs:element name="AuthnContextStatementRef" type="xs:anyURI" maxOccurs="unbounded"/>
+                </xs:choice>
+                <xs:element name="AuthnContextComparison" type="AuthnContextComparisonType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="AuthnResponse" type="AuthnResponseType"/>
+    <xs:complexType name="AuthnResponseType">
+        <xs:complexContent>
+            <xs:extension base="samlp:ResponseType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="RelayState" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute ref="consent" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Assertion" type="AssertionType"/>
+    <xs:complexType name="AssertionType">
+        <xs:complexContent>
+            <xs:extension base="saml:AssertionType">
+                <xs:attribute name="InResponseTo" type="xs:NCName" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="SubjectType">
+        <xs:complexContent>
+            <xs:extension base="saml:SubjectType">
+                <xs:sequence>
+                    <xs:element ref="IDPProvidedNameIdentifier"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Subject" type="SubjectType" substitutionGroup="saml:Subject"/>
+    <xs:element name="EncryptableNameIdentifier" type="EncryptableNameIdentifierType"
+        substitutionGroup="saml:NameIdentifier"/>
+    <xs:complexType name="EncryptableNameIdentifierType">
+        <xs:simpleContent>
+            <xs:extension base="saml:NameIdentifierType">
+                <xs:attribute name="IssueInstant" type="xs:dateTime"/>
+                <xs:attribute name="Nonce" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:element name="EncryptedNameIdentifier" type="EncryptedNameIdentifierType"/>
+    <xs:complexType name="EncryptedNameIdentifierType">
+        <xs:sequence>
+                <xs:element ref="xenc:EncryptedData"/>
+                <xs:element ref="xenc:EncryptedKey" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="AuthenticationStatement" type="AuthenticationStatementType" substitutionGroup="saml:Statement"/>
+    <xs:complexType name="AuthenticationStatementType">
+        <xs:complexContent>
+            <xs:extension base="saml:AuthenticationStatementType">
+                <xs:sequence>
+                <xs:element ref="AuthnContext" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="ReauthenticateOnOrAfter" type="xs:dateTime" use="optional"/>
+                <xs:attribute name="SessionIndex" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="AuthnContext">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="AuthnContextClassRef" type="xs:anyURI" minOccurs="0"/>
+                <xs:choice>
+                    <xs:element ref="ac:AuthenticationContextStatement"/>
+                    <xs:element name="AuthnContextStatementRef" type="xs:anyURI"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="AuthnRequestEnvelope" type="AuthnRequestEnvelopeType"/>
+    <xs:complexType name="AuthnRequestEnvelopeType">
+        <xs:complexContent>
+            <xs:extension base="RequestEnvelopeType">
+                <xs:sequence>
+                    <xs:element ref="AuthnRequest"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element name="ProviderName" type="xs:string" minOccurs="0"/>
+                    <xs:element name="AssertionConsumerServiceURL" type="xs:anyURI"/>
+                    <xs:element ref="IDPList" minOccurs="0"/>
+                    <xs:element name="IsPassive" type="xs:boolean" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="RequestEnvelopeType">
+        <xs:sequence>
+            <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="IDPList" type="IDPListType"/>
+    <xs:complexType name="IDPListType">
+        <xs:sequence>
+            <xs:element ref="IDPEntries"/>
+            <xs:element ref="GetComplete" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="IDPEntry">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ProviderID"/>
+                <xs:element name="ProviderName" type="xs:string" minOccurs="0"/>
+                <xs:element name="Loc" type="xs:anyURI"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="IDPEntries">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="IDPEntry" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetComplete" type="xs:anyURI"/>
+    <xs:element name="AuthnResponseEnvelope" type="AuthnResponseEnvelopeType"/>
+    <xs:complexType name="AuthnResponseEnvelopeType">
+        <xs:complexContent>
+            <xs:extension base="ResponseEnvelopeType">
+                <xs:sequence>
+                    <xs:element ref="AuthnResponse"/>
+                    <xs:element name="AssertionConsumerServiceURL" type="xs:anyURI"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ResponseEnvelopeType">
+        <xs:sequence>
+            <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="RegisterNameIdentifierRequest" type="RegisterNameIdentifierRequestType"/>
+    <xs:complexType name="RegisterNameIdentifierRequestType">
+        <xs:complexContent>
+            <xs:extension base="samlp:RequestAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="IDPProvidedNameIdentifier"/>
+                    <xs:element ref="SPProvidedNameIdentifier"/>
+                    <xs:element ref="OldProvidedNameIdentifier"/>
+                    <xs:element ref="RelayState" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="IDPProvidedNameIdentifier" type="saml:NameIdentifierType"/>
+    <xs:element name="SPProvidedNameIdentifier" type="saml:NameIdentifierType"/>
+    <xs:element name="OldProvidedNameIdentifier" type="saml:NameIdentifierType"/>
+    <xs:element name="RegisterNameIdentifierResponse" type="StatusResponseType"/>
+    <xs:complexType name="StatusResponseType">
+        <xs:complexContent>
+            <xs:extension base="samlp:ResponseAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="samlp:Status"/>
+                    <xs:element ref="RelayState" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="FederationTerminationNotification" type="FederationTerminationNotificationType"/>
+    <xs:complexType name="FederationTerminationNotificationType">
+        <xs:complexContent>
+            <xs:extension base="samlp:RequestAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="saml:NameIdentifier"/>
+                </xs:sequence>
+                <xs:attribute ref="consent" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="LogoutRequest" type="LogoutRequestType"/>
+    <xs:complexType name="LogoutRequestType">
+        <xs:complexContent>
+            <xs:extension base="samlp:RequestAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="saml:NameIdentifier"/>
+                    <xs:element name="SessionIndex" type="xs:string" minOccurs="0"/>
+                    <xs:element ref="RelayState" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute ref="consent" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="LogoutResponse" type="StatusResponseType"/>
+    <xs:element name="NameIdentifierMappingRequest" type="NameIdentifierMappingRequestType"/>
+    <xs:complexType name="NameIdentifierMappingRequestType">
+        <xs:complexContent>
+            <xs:extension base="samlp:RequestAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="saml:NameIdentifier"/>
+                    <xs:element name="TargetNamespace" type="md:entityIDType"/>
+                </xs:sequence>
+                <xs:attribute ref="consent" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="NameIdentifierMappingResponse" type="NameIdentifierMappingResponseType"/>
+    <xs:complexType name="NameIdentifierMappingResponseType">
+        <xs:complexContent>
+            <xs:extension base="samlp:ResponseAbstractType">
+                <xs:sequence>
+                    <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="ProviderID"/>
+                    <xs:element ref="samlp:Status"/>
+                    <xs:element ref="saml:NameIdentifier" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
