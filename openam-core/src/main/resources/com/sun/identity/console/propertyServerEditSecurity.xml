@@ -1,0 +1,291 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyServerEditSecurity.xml,v 1.5 2008/06/25 05:45:15 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="secEncryption" defaultValue="amconfig.header.encryption" >
+    <property>
+	<label name="lblcscam-encryption-pwd"
+            defaultValue="amconfig.am.encryption.pwd"
+            labelFor="cscam-encryption-pwd" />
+	<cc name="cscam-encryption-pwd"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="40" />
+        </cc>
+        <fieldhelp name="helpcscam-encryption-pwd"
+            defaultValue="amconfig.help.am.encryption.pwd" />
+    </property>
+    <property>
+	<label name="lblcsccom-iplanet-am-service-secret"
+            defaultValue="amconfig.com.iplanet.am.service.secret"
+            labelFor="csccom-iplanet-am-service-secret" />
+	<cc name="csccom-iplanet-am-service-secret"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="40" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-service-secret"
+            defaultValue="amconfig.help.com.iplanet.am.service.secret" />
+    </property>
+    <property>
+	<label name="lblcsccom-iplanet-security-encryptor"
+            defaultValue="amconfig.com.iplanet.security.encryptor"
+            labelFor="csccom-iplanet-security-encryptor" />
+	<cc name="csccom-iplanet-security-encryptor"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="75" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-security-encryptor"
+            defaultValue="amconfig.help.com.iplanet.security.encryptor" />
+    </property>
+    <property>
+	<label name="lblcsccom-iplanet-security-SecureRandomFactoryImpl"
+            defaultValue="amconfig.com.iplanet.security.SecureRandomFactoryImpl"
+            labelFor="csccom-iplanet-security-SecureRandomFactoryImpl" />
+	<cc name="csccom-iplanet-security-SecureRandomFactoryImpl"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="75" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-security-SecureRandomFactoryImpl"
+            defaultValue="amconfig.help.com.iplanet.security.SecureRandomFactoryImpl" />
+    </property>
+    </section>
+
+    <section name="secValidation" defaultValue="amconfig.header.validation" >
+    <property>
+	<label name="lblcsccom-iplanet-services-comm-server-pllrequest-maxContentLength"
+            defaultValue="amconfig.com.iplanet.services.comm.server.pllrequest.maxContentLength"
+            labelFor="csccom-iplanet-services-comm-server-pllrequest-maxContentLength" />
+	<cc name="csccom-iplanet-services-comm-server-pllrequest-maxContentLength"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="10" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-services-comm-server-pllrequest-maxContentLength"
+            defaultValue="amconfig.help.com.iplanet.services.comm.server.pllrequest.maxContentLength" />
+    </property>
+    <property>
+	<label name="lblcsccom-iplanet-am-clientIPCheckEnabled"
+            defaultValue="amconfig.com.iplanet.am.clientIPCheckEnabled"
+            labelFor="csccom-iplanet-am-clientIPCheckEnabled" />
+	<cc name="csccom-iplanet-am-clientIPCheckEnabled"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-clientIPCheckEnabled"
+            defaultValue="amconfig.help.com.iplanet.am.clientIPCheckEnabled" />
+    </property>
+    </section>
+
+    <section name="secCookie" defaultValue="amconfig.header.cookie" >
+    <property>
+	<label name="lblcsccom-iplanet-am-cookie-name"
+            defaultValue="amconfig.com.iplanet.am.cookie.name"
+            labelFor="csccom-iplanet-am-cookie-name" />
+	<cc name="csccom-iplanet-am-cookie-name"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-cookie-name"
+            defaultValue="amconfig.help.com.iplanet.am.cookie.name" />
+    </property>
+    <property>
+	<label name="lblcsccom-iplanet-am-cookie-secure"
+            defaultValue="amconfig.com.iplanet.am.cookie.secure"
+            labelFor="csccom-iplanet-am-cookie-secure" />
+	<cc name="csccom-iplanet-am-cookie-secure"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-cookie-secure"
+            defaultValue="amconfig.help.com.iplanet.am.cookie.secure" />
+    </property>
+    <property>
+	<label name="lblcsccom-iplanet-am-cookie-encode"
+            defaultValue="amconfig.com.iplanet.am.cookie.encode"
+            labelFor="csccom-iplanet-am-cookie-encode" />
+	<cc name="csccom-iplanet-am-cookie-encode"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+        <fieldhelp name="helpcsccom-iplanet-am-cookie-encode"
+            defaultValue="amconfig.help.com.iplanet.am.cookie.encode" />
+    </property>
+    </section>
+
+    <section name="secSecurityKey" defaultValue="amconfig.header.securitykey" >
+    <property>
+	<label name="lblcsccom-sun-identity-saml-xmlsig-keystore"
+            defaultValue="amconfig.com.sun.identity.saml.xmlsig.keystore"
+            labelFor="csccom-sun-identity-saml-xmlsig-keystore" />
+	<cc name="csccom-sun-identity-saml-xmlsig-keystore"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="75" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-saml-xmlsig-keystore"
+            defaultValue="amconfig.help.com.sun.identity.saml.xmlsig.keystore" />
+    </property>
+    <property>
+	<label name="lblcsccom-sun-identity-saml-xmlsig-storepass"
+            defaultValue="amconfig.com.sun.identity.saml.xmlsig.storepass"
+            labelFor="csccom-sun-identity-saml-xmlsig-storepass" />
+	<cc name="csccom-sun-identity-saml-xmlsig-storepass"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="75" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-saml-xmlsig-storepass"
+            defaultValue="amconfig.help.com.sun.identity.saml.xmlsig.storepass" />
+    </property>
+    <property>
+	<label name="lblcsccom-sun-identity-saml-xmlsig-keypass"
+            defaultValue="amconfig.com.sun.identity.saml.xmlsig.keypass"
+            labelFor="csccom-sun-identity-saml-xmlsig-keypass" />
+	<cc name="csccom-sun-identity-saml-xmlsig-keypass"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="75" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-saml-xmlsig-keypass"
+            defaultValue="amconfig.help.com.sun.identity.saml.xmlsig.keypass" />
+    </property>
+    <property>
+	<label name="lblcsccom.sun.identity.saml.xmlsig.certalias"
+            defaultValue="amconfig.com.sun.identity.saml.xmlsig.certalias"
+            labelFor="csccom.sun.identity.saml.xmlsig.certalias" />
+	<cc name="csccom.sun.identity.saml.xmlsig.certalias"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-saml-zmlsig-certalias" 
+            defaultValue="amconfig.help.com.sun.identity.saml.xmlsig.certalias" />
+    </property>
+    </section>
+    <section name="secCRLCache" defaultValue="amconfig.header.crlcache" >
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.host"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.host"
+            labelFor="csccom.sun.identity.crl.cache.directory.host" />
+        <cc name="csccom.sun.identity.crl.cache.directory.host"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.port"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.port"
+            labelFor="csccom.sun.identity.crl.cache.directory.port" />
+        <cc name="csccom.sun.identity.crl.cache.directory.port"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="10" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.ssl"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.ssl"
+            labelFor="csccom.sun.identity.crl.cache.directory.ssl" />
+        <cc name="csccom.sun.identity.crl.cache.directory.ssl"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.user"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.user"
+            labelFor="csccom.sun.identity.crl.cache.directory.user" />
+        <cc name="csccom.sun.identity.crl.cache.directory.user"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.password"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.password"
+            labelFor="csccom.sun.identity.crl.cache.directory.password" />
+        <cc name="csccom.sun.identity.crl.cache.directory.password"
+            tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.searchlocs"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.searchlocs"
+            labelFor="csccom.sun.identity.crl.cache.directory.searchlocs" />
+        <cc name="csccom.sun.identity.crl.cache.directory.searchlocs"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.crl.cache.directory.searchattr"
+            defaultValue="amconfig.com.sun.identity.crl.cache.directory.searchattr"
+            labelFor="csccom.sun.identity.crl.cache.directory.searchattr" />
+        <cc name="csccom.sun.identity.crl.cache.directory.searchattr"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+        <fieldhelp name="helpcsccom-sun-identity-crl-cache-directory-searchattr" 
+            defaultValue="amconfig.help.com.sun.identity.crl.cache.directory.searchattr" />
+    </property>
+    </section>
+    <section name="secOCSPCheck" defaultValue="amconfig.header.ocsp.check" >
+    <property>
+        <label name="lblcsccom.sun.identity.authentication.ocspCheck"
+            defaultValue="amconfig.com.sun.identity.authentication.ocspCheck"
+            labelFor="csccom.sun.identity.authentication.ocspCheck" />
+        <cc name="csccom.sun.identity.authentication.ocspCheck"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.authentication.ocsp.responder.url"
+            defaultValue="amconfig.com.sun.identity.authentication.ocsp.responder.url"
+            labelFor="csccom.sun.identity.authentication.ocsp.responder.url" />
+        <cc name="csccom.sun.identity.authentication.ocsp.responder.url"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblcsccom.sun.identity.authentication.ocsp.responder.nickname"
+            defaultValue="amconfig.com.sun.identity.authentication.ocsp.responder.nickname"
+            labelFor="csccom.sun.identity.authentication.ocsp.responder.nickname" />
+        <cc name="csccom.sun.identity.authentication.ocsp.responder.nickname"
+            tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="size" value="50" />
+        </cc>
+    </property>
+    </section>
+    <section name="secFIPS" defaultValue="amconfig.header.fips" >
+    <property>
+        <label name="lblcsccom.sun.identity.security.fipsmode"
+            defaultValue="amconfig.com.sun.identity.security.fipsmode"
+            labelFor="csccom.sun.identity.security.fipsmode" />
+        <cc name="csccom.sun.identity.security.fipsmode"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            <attribute name="label" value="amconfig.choice.yes" />
+        </cc>
+    </property>
+    </section>
+</propertysheet>
