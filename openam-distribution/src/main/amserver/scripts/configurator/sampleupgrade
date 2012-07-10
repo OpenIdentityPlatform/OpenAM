@@ -1,0 +1,10 @@
+##############################################################################
+###
+### SERVER_URL is the URL of the web container on which OpenAM Server is
+### deployed.
+###
+### DEPLOYMENT_URI is the OpenAM Server deployment URI.
+###
+#############################################################################
+SERVER_URL=http://server1.example.com:8080
+DEPLOYMENT_URI=/opensso

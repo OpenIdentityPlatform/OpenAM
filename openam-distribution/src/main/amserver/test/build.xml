@@ -1,0 +1,150 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.14 2009/07/09 17:04:16 veiming Exp $
+
+-->
+
+<project name="opensso" default="all">
+    <description>Open Web Single Sign-On - test</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.unittest.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="test.package.dir" location="${amserver.built.dir}/test/package"/>
+    <property name="test.classes.dir" location="${amserver.built.dir}/test/classes"/>
+
+    <target name="build" depends="preparebuild">
+        <javac destdir="${test.classes.dir}"
+        source="${target.jdk.set}" target="${target.jdk.set}"
+               debug="on" debuglevel="lines,vars,source">
+            <compilerarg value="-Xlint:unchecked"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <src path="${amserver.unittest.dir}/source"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+
+        <java classname="com.sun.identity.cli.tools.CLIDefinitionGenerator">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${test.classes.dir}"/>
+            </classpath>
+            <arg value="${test.classes.dir}"/>
+            <arg value="com.sun.identity.cli.definition.MockCLI"/>
+        </java>
+
+    </target>
+
+    <target name="all" depends="build">
+        <delete dir="${test.package.dir}" />
+        <mkdir dir="${test.package.dir}/mock" />
+        <mkdir dir="${test.package.dir}/classes" />
+        <mkdir dir="${test.package.dir}/test/classes" />
+        <mkdir dir="${test.package.dir}/lib" />
+
+        <copy todir="${test.package.dir}/mock">
+            <fileset dir="${amserver.unittest.dir}/mock" />
+        </copy>
+
+
+        <copy todir="${test.package.dir}/classes">
+            <fileset dir="${sharedlib.classes.dir}" />
+            <fileset dir="${amserver.classes.dir}" />
+        </copy>
+
+        <copy todir="${test.package.dir}/classes" 
+            file="${amserver.base.dir}/resources/config/bootstrapConfig.properties" />
+
+        <copy todir="${test.package.dir}/classes" flatten="true">
+            <fileset dir="${amserver.res.i18n.dir}" />
+        </copy>
+
+        <concat destfile="${test.package.dir}/classes/amSDK.properties">
+             <fileset dir="${test.package.dir}/classes">
+                <include name="Services.properties"/>
+                <include name="DSConfig.properties"/>
+                <include name="ums.properties"/>
+                <include name="sso.properties"/>
+                <include name="SMS.properties"/>
+                <include name="authentication_util.properties"/>
+             </fileset>
+        </concat>
+
+        <copy todir="${test.package.dir}/test/classes">
+            <fileset dir="${test.classes.dir}" />
+        </copy>
+
+        <copy todir="${test.package.dir}/lib">
+            <fileset dir="${extlib.dir}">
+                <exclude name="console.jar" />
+            </fileset>
+        </copy>
+
+        <copy todir="${test.package.dir}">
+            <fileset dir="${amserver.unittest.dir}/xml/ant">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+        <copy file="${amserver.unittest.dir}/README"
+            tofile="${test.package.dir}/README" />
+
+        <copy todir="${test.package.dir}/testng">
+            <fileset dir="${amserver.unittest.dir}/xml/testng" />
+        </copy>
+
+        <copy todir="${test.package.dir}/template">
+            <fileset dir="${amserver.unittest.dir}/www/template" />
+            <fileset dir="${amserver.unittest.dir}/www/css" />
+        </copy>
+
+        <zip destfile="${amserver.dist.dir}/opensso-server-test.zip"
+            basedir="${test.package.dir}" />
+        <checksum file="${amserver.dist.dir}/opensso-server-test.zip" algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${test.package.dir}"/>
+        <mkdir dir="${amserver.dist.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${test.classes.dir}"/>
+        <delete dir="${test.package.dir}"/>
+        <delete file="${amserver.dist.dir}/opensso-server-test.zip"/>
+    </target>
+</project>
