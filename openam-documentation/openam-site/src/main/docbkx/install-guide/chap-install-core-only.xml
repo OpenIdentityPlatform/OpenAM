@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-core-only'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing OpenAM Core Only</title>
+ 
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>No console</secondary>
+ </indexterm>
+ <para>You can deploy OpenAM core services without including the console if
+ you install the console elsewhere, or if you plan to perform all
+ configuration using <command>ssoadm</command> for example.</para>
+ 
+ <procedure xml:id="create-headless-file">
+  <title>To Create the Core Services <filename>.war</filename> File</title>
+  
+  <step>
+   <para>Unpack the <filename>opensso.war</filename> file into a temporary
+   directory.</para>
+   <screen>$ mkdir -p /tmp/headless ; cd /tmp/headless
+$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
+  </step>
+  <step>
+   <para>Create the <filename>headless.war</filename> file.</para>
+   <screen>$ cd ~/Downloads/opensso/deployable-war
+$ sh createwar.sh -s /tmp/headless --type noconsole -w headless.war</screen>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="deploy-headless-on-tomcat">
+  <title>To Deploy the Core Services On Tomcat</title>
+  
+  <step>
+   <para>Put the <filename>headless.war</filename> you created in the Tomcat
+   <filename>webapps/</filename> directory.</para>
+   <screen>$ mv headless.war /path/to/tomcat/webapps/</screen>
+  </step>
+  <step>
+   <para>Browse to the console application, for example
+   <literal>http://host.example.com:8080/headless/</literal>, and configure
+   OpenAM core services as if you were deploying with a full version.</para>
+  </step>
+  <step>
+   <para>Restrict permissions to the
+   <filename>$HOME/headless</filename> configuration directory, where
+   $HOME corresponds to the user who runs the web container.</para>
+  </step>
+ </procedure>
+</chapter>

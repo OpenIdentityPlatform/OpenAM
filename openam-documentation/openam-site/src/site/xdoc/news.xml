@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<document
+ xmlns="http://maven.apache.org/XDOC/2.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+ <properties>
+  <title>OpenAM News</title>
+  <author email="openam-dev@forgerock.org">ForgeRock AS</author>
+ </properties>
+ <body>
+  <section name="New Releases">
+   <p>April 16, 2012. OpenAM 10.0.0 is now available from the <a
+   href="http://forgerock.org/openam.html">download page</a>. This major release
+   of OpenAM brings many new features, enhancement, and fixes. The final <a
+   href="http://docs.forgerock.org/en/openam/10.0.0/release-notes/index.html"
+   >Release Notes</a> are posted on docs.forgerock.org. Also read the <a
+   href="http://lists.forgerock.org/pipermail/openam/2012-April/005904.html"
+   >release announcement</a>.</p>
+
+   <p>February 7, 2012. OpenAM 10.0.0 Early Access is ready. Read the <a
+   href="http://lists.forgerock.org/pipermail/openam/2012-February/004970.html"
+   >release announcement</a> from the OpenAM users mail archive.</p>
+
+   <p>December 7, 2011. OpenAM 9.5.4 is out. Get the release from the OpenAM
+   <a href="http://forgerock.org/openam.html">download page</a>.
+   <a href="https://wikis.forgerock.org/confluence/display/openam/OpenAM+9.5.4+Release+Notes"
+   >Release Notes</a> are posted on the Wiki. Also see the <a
+   href="http://lists.forgerock.org/pipermail/openam/2011-December/004157.html"
+   >release announcement</a>.</p>
+
+   <p>August 1, 2011. OpenAM 9.5.3 has been released. Get it from the OpenAM
+   <a href="http://forgerock.org/openam.html">download page</a>.</p>
+
+   <p>July 31, 2011. OpenAM Web Policy Agents version 3.0.4 are available.
+   Find them under Download Stable Web Policy Agents 3.0.4 on the <a
+   href="http://forgerock.org/openam.html">download page</a>.</p>
+
+   <p>March 3, 2011. OpenAM 9.5.2 is out! Come get 9.5.2 from the <a
+   href="http://forgerock.org/openam.html">download page</a>.</p>
+  </section>
+ </body>
+</document>

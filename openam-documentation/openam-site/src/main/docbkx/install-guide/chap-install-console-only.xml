@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-console-only'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing OpenAM Console Only</title>
+ 
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Console only</secondary>
+ </indexterm>
+ <para>You can deploy OpenAM administration console alone, configuring the
+ console-only application to point to an instance of OpenAM core services
+ elsewhere.</para>
+
+ <para>You must deploy the console-only application in the same cookie domain,
+ such as <literal>.example.com</literal>, as OpenAM core services.</para>
+
+ <procedure xml:id="create-console-only-file">
+  <title>To Create the Console <filename>.war</filename> File</title>
+  
+  <step>
+   <para>Unpack the <filename>opensso.war</filename> file into a temporary
+   directory.</para>
+   <screen>$ mkdir -p /tmp/console ; cd /tmp/console
+$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
+  </step>
+  <step>
+   <para>Create the <filename>console.war</filename> file.</para>
+   <screen>$ cd ~/Downloads/opensso/deployable-war
+$ sh createwar.sh --staging /tmp/console --type console --warfile console.war</screen>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="deploy-console-only-on-tomcat">
+  <title>To Deploy the Console On Tomcat</title>
+  
+  <step>
+   <para>Put the <filename>console.war</filename> you created in the Tomcat
+   <filename>webapps/</filename> directory.</para>
+   <screen>$ mv console.war /path/to/tomcat/webapps/</screen>
+  </step>
+  <step>
+   <para>Browse to the console application, for example
+   <literal>http://host.example.com:8080/console</literal>, and configure
+   the console to access an OpenAM instance using the following hints.</para>
+   <variablelist>
+    <varlistentry>
+     <term>Server Protocol</term>
+     <listitem>
+      <para><literal>http</literal>, <literal>https</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server Host</term>
+     <listitem>
+      <para>FQDN for OpenAM, such as
+      <literal>openam.example.com</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server Port</term>
+     <listitem>
+      <para>Port on which OpenAM listens for connections, such as 80, 443, or
+      8080</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Server Deployment URI</term>
+     <listitem>
+      <para>Absolute path on the host web container where OpenAM is deployed
+      such as <literal>/openam</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Password Encryption Key</term>
+     <listitem>
+      <para>Key for decrypting passwords stored in the Service Management
+      System configuration on the <literal>am.encryption.pwd</literal>
+      property.</para>
+      <para>If the OpenAM instance already has a console, then go to the
+      Configuration &gt; Servers and Sites &gt; <replaceable>Server
+      Name</replaceable> &gt; Security to view the encryption key.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application User Name</term>
+     <listitem>
+      <para>OpenAM administrator, <literal>amadmin</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application User Password</term>
+     <listitem>
+      <para>Password for the OpenAM administrator.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Administration Console Protocol</term>
+     <listitem>
+      <para><literal>http</literal>, <literal>https</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Administration Console Host</term>
+     <listitem>
+      <para>FQDN for the console, such as
+      <literal>console.example.com</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Administration Console Port</term>
+     <listitem>
+      <para>Port on which the console listens for connections, such as 80,
+      443, or 8080</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Administration Console Deployment URI</term>
+     <listitem>
+      <para>Absolute path on the host web container where the console is
+      deployed such as <literal>/console</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Administration Console Debug Directory</term>
+     <listitem>
+      <para>The console logs to flat files in this directory.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </step>
+  <step>
+   <para>Restrict permissions to the
+   <filename>$HOME/AMConfig.properties</filename> configuration file, where
+   $HOME corresponds to the user who runs the web container where the console
+   is deployed.</para>
+  </step>
+ </procedure>
+</chapter>

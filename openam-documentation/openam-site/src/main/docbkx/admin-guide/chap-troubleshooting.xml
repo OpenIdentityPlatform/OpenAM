@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-troubleshooting'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Troubleshooting</title>
+ <indexterm><primary>Troubleshooting</primary></indexterm>
+ <para>This chapter covers how to get debugging information and troubleshoot
+ issues in OpenAM deployments.</para>
+ 
+ <qandaset xml:id="solutions-to-common-issues" defaultlabel="qanda">
+  <title>Solutions to Common Issues</title>
+  
+  <para>This section offers solutions to common problems when working with
+  OpenAM.</para>
+  
+  <qandadiv xml:id="troubleshooting-openam-installation">
+   <title>OpenAM Installation</title>
+   <qandaentry xml:id="cannot-write-to-config-directory">
+    <question>
+     <para>OpenAM configuration could not write to the configuration directory.
+     Where must I change permissions, and what permissions are required?</para>
+    </question>
+    <answer>
+     <para>If the user running the web container has a $HOME directory, then
+     the configuration directory is stored there, and you probably do not have
+     this problem. If you do not know the user running the web container, use
+     the <command>ps</command> command to check. In the following example, the
+     user is <literal>mark</literal>, the web container
+     <literal>tomcat</literal>.</para>
+     <screen>$ ps -ef | grep tomcat
+mark      1739     1  0 14:47...</screen>
+     <para>For a container installed from native packages with a dedicated
+     user, $HOME may not be where you think it is. Look at the user's entry in
+     <filename>/etc/passwd</filename> to locate the home directory.
+     The user running the web container where you install OpenAM must
+     be able to read from and write in this directory.</para>
+     <para>If you cannot change the permissions to the user's home directory,
+     you can, as a workaround, unpack <filename>opensso.war</filename>, set the
+     <literal>configuration.dir</literal> property in the
+     <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
+     with appropriate permissions, and repack <filename>opensso.war</filename>
+     with the adjusted file before deploying that.</para>
+     <screen>$ cd ~/Downloads/opensso/deployable-war/
+$ mkdir unpacked ; cd unpacked
+$ jar xf ../opensso.war
+$ vi WEB-INF/classes/bootstrap.properties 
+$ grep ^config WEB-INF/classes/bootstrap.properties 
+configuration.dir=/my/readwrite/config/dir
+$ jar cf ../openam.war *</screen>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="deploy-failed-lack-of-memory">
+    <question>
+     <para>Deployment failed due to lack of memory. What do I do?</para>
+    </question>
+    <answer>
+     <para>OpenAM requires at least a maximum heap size of 1024 MB, with a 256
+     MB maximum permanent generation heap size. For the Sun JVM, ensure the
+     container starts with <literal>-Xmx1024m -XX:MaxPermSize=256m</literal>
+     for these settings.</para>
+     <para>If you do not know the settings used when the web container was
+     started, use the <command>ps</command> command to check. In the following
+     example, the web container is <literal>tomcat</literal>.</para>
+     <screen>$ ps -ef | grep tomcat | grep Xm
+... -Xmx1024m -XX:MaxPermSize=256m ...</screen>
+     <para>Make sure you have at least 2 GB of RAM on the system where you
+     run OpenAM to avoid running out of memory.</para>
+
+     <para>If you make it through deployment and seem to be running out of
+     memory later, you can confirm memory errors in OpenAM by searching the
+     <filename><replaceable>config-dir</replaceable>/openam/debug/*</filename>
+     files for <literal>java.lang.OutOfMemoryError</literal>.</para>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="deploy-failed-invalid-hostname">
+    <question>
+     <para>Deployment failed due to invalid hostname configuration. What do
+     I do?</para>
+    </question>
+    <answer>
+     <para>OpenAM requires that you use a fully qualified domain name (FQDN)
+     that the host can resolve.</para>
+     <screen>$ ping openam-ter.example.com
+PING openam-ter (192.168.56.2) 56(84) bytes of data.
+64 bytes from openam (192.168.56.2): icmp_seq=1 ttl=64 time=0.025 ms
+64 bytes from openam (192.168.56.2): icmp_seq=2 ttl=64 time=0.032 ms
+64 bytes from openam (192.168.56.2): icmp_seq=3 ttl=64 time=0.030 ms</screen>
+     <para>For a test deployment (at home, on a laptop), you can use fake FQDNs
+     in <filename>/etc/hosts</filename> (<filename
+     >%SystemRoot%\system32\drivers\etc\hosts</filename> on Windows), depending
+     on how your network is configured.</para>
+     <screen>$ cat /etc/hosts | grep openam
+192.168.56.2 openam openam.example.com
+192.168.56.3 openam-bis openam-bis.example.com
+192.168.56.5 openam-ter openam-ter.example.com</screen>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="who-deleted-my-config">
+    <question>
+     <para>I configured OpenAM, and now am seeing the configuration screen
+     again. Who deleted my configuration?</para>
+    </question>
+    <answer>
+     <para>OpenAM uses a file in <filename>$HOME/.openssocfg/</filename> to
+     bootstrap and find its configuration. The file is named after the path
+     to OpenAM and contains the path to the configuration. The following
+     example shows what the file looks like for OpenAM deployed in Apache
+     Tomcat under <filename>/path/to/tomcat/webapps/openam</filename>, and
+     running as user <literal>amuser</literal> with <literal>$HOME</literal>
+     <filename>/home/amuser</filename>.</para>
+     <screen>$ cat .openssocfg/AMConfig_path_to_tomcat_webapps_openam_ 
+/home/amuser/openam</screen>
+     <para>If OpenAM cannot find its configuration, then it displays the
+     configuration screen.</para>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+  
+  <qandadiv xml:id="troubleshooting-openam-administration">
+   <title>OpenAM Administration</title>
+   <qandaentry xml:id="cannot-use-ssoadm-jsp">
+    <question>
+     <para>I cannot use the browser-based equivalent of
+     <command>ssoadm</command>,
+     <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>. Why
+     not?</para>
+    </question>
+    <answer>
+     <para>For security reasons, <literal>ssoadm.jsp</literal> is not activated
+     by default. To activate it, browse to Configuration &gt; Servers and Sites
+     &gt; Servers &gt; <replaceable>ServerName</replaceable> &gt; Advanced,
+     and then add a property named <literal>ssoadm.disabled</literal> with
+     value <literal>false</literal>.</para>
+    </answer>
+   </qandaentry>
+   <qandaentry xml:id="opendj-missing-schema">
+    <question>
+     <para>I added OpenDJ as a data store, and now I cannot add a user. OpenAM
+     gives me the following error.</para>
+     <literallayout>ERROR: LDAPv3Repo.create failed. errorCode=65 Entry
+     uid=test,ou=people,dc=example,dc=com violates the Directory Server
+     schema configuration because it includes attribute inetUserStatus which
+     is not allowed by any of the objectclasses defined in that
+     entry</literallayout>
+    </question>
+    <answer>
+     <para>When you set up a New Data Store to use OpenDJ as an identity
+     repository under Access Control &gt; <replaceable>Realm Name</replaceable>
+     &gt; Data Stores &gt; New..., you need to check the Load schema when
+     finished box if you want OpenAM to add the schema to OpenDJ. The box is
+     not selected by default.</para>
+     <para>The full version of OpenAM includes directory server schema in the
+     <filename>~/Downloads/opensso/ldif/</filename> directory. To add the schema
+     to OpenDJ afterwards, you can try the following command.</para>
+     <screen>$ /path/to/OpenDJ/bin/ldapmodify
+ --port 1389
+ --bindDN "cn=Directory Manager"
+ --bindPassword password
+ --filename ~/Downloads/opensso/ldif/fam_sds_schema.ldif
+Processing MODIFY request for CN=schema
+MODIFY operation successful for DN CN=schema</screen>
+    </answer>
+   </qandaentry>
+  </qandadiv>
+ </qandaset>
+</chapter>

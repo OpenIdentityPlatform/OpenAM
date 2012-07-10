@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-issues'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
+
+ <para>OpenAM issues are tracked at <link
+ xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
+ >https://bugster.forgerock.org/jira/browse/OPENAM</link>. This chapter
+ covers the status of key issues and limitations at release
+ <?eval ${serverDocTargetVersion}?>.</para>
+
+ <note>
+  <para>This release contains fixes that resolve security issues within OpenAM.
+  Older versions of OpenAM contain these security issues. It is recommended
+  that you upgrade to this release to resolve these security issues. ForgeRock
+  customers can contact support for details on the security issues.</para>
+ </note>
+
+ <section xml:id="fixes">
+  <title>Fixes</title>
+
+  <para>The following issues were fixed in release
+  <?eval ${serverDocTargetVersion}?>.</para>
+  
+  <itemizedlist>
+  <!-- This list does not include some fixes for typos, doc issues, removed
+  functionality, and issues raised on new features during testing. -->
+<listitem><para>TODO</para></listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="limitations">
+  <title>Limitations</title>
+  
+  <para>ForgeRock supports the stable software releases that you can download
+  from ForgeRock, not nightly builds or pre-release software. ForgeRock
+  OpenAM downloads do not include OpenAM extensions. Therefore, ForgeRock does
+  not support OpenAM extensions. If you have a special request for capabilities
+  not currently in a software release, contact ForgeRock at <link
+  xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
+  
+  <para>Do not run different versions of OpenAM together in the same OpenAM
+  site.</para>
+
+  <para>Not all features of OpenAM work with IPv6.</para>
+
+  <para>The Database Repository type of data store is experimental and not
+  supported for production use.</para>
+
+  <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
+  <para>By default OpenAM does not enforce session quotas when running in Site
+  mode without session failover. To work around this behavior, set the server
+  configuration property
+  <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
+  You can set this property in OpenAM console under Configuration &gt; Servers
+  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+ </section>
+ 
+ <section xml:id="known-issues">
+  <title>Known Issues</title>
+
+  <para>The following important known issues remained open at the time
+  release <?eval ${serverDocTargetVersion}?> became available.</para>
+
+  <itemizedlist>
+<listitem><para>TODO</para></listitem>
+  </itemizedlist>
+ </section>
+</chapter>
