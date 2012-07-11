@@ -138,12 +138,19 @@
     </build>
 
     <dependencies>
-    <dependency>
-        <groupId>org.forgerock</groupId>
-        <artifactId>openam-shared</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
-        <!-- This Version -->
-    </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-shared</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-rest</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
+        </dependency>
 
         <dependency>
             <groupId>org.json</groupId>
