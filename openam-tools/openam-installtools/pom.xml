@@ -32,15 +32,15 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam-tools</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OPenAM Istall Tools</name>
+    <name>OpenAM Install Tools</name>
     <description>OpenAM Install Tool Components
     </description>
     <artifactId>openam-installtools</artifactId>
-    <version>10.1-XPRESS-SNAPSHOT</version>
+    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

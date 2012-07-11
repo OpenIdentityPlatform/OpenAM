@@ -32,7 +32,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -40,7 +40,7 @@
     <description>OpenAM Server Component
     </description>
     <artifactId>openam-server</artifactId>
-    <version>10.1-XPRESS-SNAPSHOT</version>
+    <version>10.1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -64,12 +64,12 @@
 
                                 <property name="openam.version" value="${project.version}"/>
 
+                                <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP"/>
+
                                 <property name="build.class.path" refid="maven.compile.classpath"/>
                                 <property name="project.basedir" value="./"/>
 
                                 <property name="server.resources" value="${project.basedir}/src/main/resources"/>
-
-                                <property name="openam.target" value="${project.build.directory}/openam"/>
 
                                 <property name="amserver.target.resources.dir"
                                           value="${project.build.directory}/classes"/>
@@ -92,7 +92,7 @@
 
                                 <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
                                     <target name="openam-server-prepare-war"/>
-                               </ant>
+                                </ant>
                             </target>
                         </configuration>
                         <goals>
@@ -153,7 +153,7 @@
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${basedir}/src/main/webapp/META-INF</directory>
+                            <directory>${project.basedir}/src/main/webapp/META-INF</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>
@@ -161,13 +161,86 @@
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                            <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
                             <includes>
-                                <include>web.xml</include>
+                                <include>**/**</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
                             <filtering>true</filtering>
                         </webResource>
+                        <webResource>
+                            <directory>
+                                ${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml
+                            </directory>
+                            <includes>
+                                <include>*.xsl</include>
+                                <include>*.xml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>web.xml</exclude>
+                            </excludes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>
+                                ${project.basedir}/../openam-core/src/main/resources/xml/console
+                            </directory>
+                            <includes>
+                                <include>amAccessControl.xml</include>
+                                <include>amConsoleConfig.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
+                            <includes>
+                                <include>*.wsdl</include>
+                                <include>*.xsd</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml
+                            </directory>
+                            <includes>
+                                <include>*.wsdl</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-schema/openam-jaxrpc-schema/target/classes/jaxrpc
+                            </directory>
+                            <includes>
+                                <include>IdentityManagementServices.wsdl</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
+                            </directory>
+                            <includes>
+                                <include>sun-jaxws.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <!-- This pickup the remaining moved elements build from the "openam-server-prepare-war"
+                                 step from a Temp Area -->
+                            <directory>${project.build.directory}/openam_TEMP
+                            </directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath></targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+
                     </webResources>
                 </configuration>
 
@@ -224,37 +297,37 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-installtools</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-federation-library</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>OpenFM</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-dtd-schema</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

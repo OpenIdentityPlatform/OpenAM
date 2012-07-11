@@ -31,20 +31,37 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
     <name>OpenAM Session High-Availability</name>
-    <description>OpenAM Session High-Availability FailOver Component
+    <description>OpenAM Session High-Availability Component
     </description>
     <artifactId>openam-session-ha</artifactId>
-    <version>10.1-XPRESS-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.com</url>
     </organization>
+
+
+    <!-- Sub-Parent Project Projects -->
+    <properties>
+        <!-- Java Properties -->
+        <openam.session.ha.java.source.version>1.6</openam.session.ha.java.source.version>
+        <openam.session.ha.java.target.version>1.6</openam.session.ha.java.target.version>
+    </properties>
+
+    <modules>
+        <module>openam-session-ha-locale</module>
+        <module>openam-session-ha-common</module>
+        <module>openam-session-ha-core</module>
+        <module>openam-session-ha-ldap</module>
+        <module>openam-session-ha-mq</module>
+        <module>openam-session-ha-client</module>
+    </modules>
 
     <!-- Build -->
     <build>
@@ -54,10 +71,9 @@
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${openam.session.ha.java.source.version}</source>
+                    <target>${openam.session.ha.java.target.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -72,50 +88,12 @@
                     </systemPropertyVariables>
                     <excludes>
                         <exclude>**/IT_*</exclude>
-                   </excludes>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                        <manifestEntries>
-                            <Specification-Title>OpenAM Session High-Availability FailOver Component</Specification-Title>
-                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Session High-Availability FailOver Component</Implementation-Title>
-                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Built-By>${user.name}</Built-By>
-                            <Build-Jdk>${java.version}</Build-Jdk>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Version>${project.version}</Version>
-                            <Create-On>${maven.build.timestamp}</Create-On>
-                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
-                            <!-- TODO Add License to Manifest -->
-                            <License></License>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
+                    </excludes>
                 </configuration>
             </plugin>
 
         </plugins>
-    
+
         <resources>
             <resource>
                 <filtering>false</filtering>
@@ -146,50 +124,5 @@
         </testResources>
     </build>
 
-    
-    <dependencies>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1-XPRESS-SNAPSHOT</version>
-        </dependency>
-
-        <!-- Session Repository Module Dependencies-->
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.jackson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.simple</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.crypto</artifactId>
-        </dependency>
-
-        <!-- Transport Layer Dependencies -->
-
-
-
-
-    </dependencies>
-    
 </project>
