@@ -6,7 +6,7 @@
 //
 
 
-package org.w3._2001.xmlschema.x;
+package org.w3._2001.xmlschema;
 
 
 /**

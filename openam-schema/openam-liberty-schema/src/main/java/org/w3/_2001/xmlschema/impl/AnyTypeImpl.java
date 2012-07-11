@@ -6,7 +6,7 @@
 //
 
 
-package org.w3._2001.xmlschema.x.impl;
+package org.w3._2001.xmlschema.impl;
 
 public class AnyTypeImpl implements org.w3._2001.xmlschema.AnyType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
