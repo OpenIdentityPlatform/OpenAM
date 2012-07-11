@@ -82,22 +82,31 @@
         <!-- **************************************************************** -->
         <maven.build.timestamp.format>yyyy-MMM-dd HH:mm:ss</maven.build.timestamp.format>
         <!-- **************************************************************** -->
+
         <!-- Java Properties -->
+
         <java.source.version>1.5</java.source.version>
         <!-- Backed off from 1.6 -->
+
         <java.target.version>1.5</java.target.version>
         <!-- Backed off from 1.6 -->
+
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
+
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
         <javadoc.excludePackageNames>java.*:javax.*:com.*:org.*:net.*:edu.*</javadoc.excludePackageNames>
+
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <!-- Product Properties File Inclusion during Build -->
         <openam.properties>openam.properties</openam.properties>
+
         <!-- Version Properties -->
         <restlet.version>2.0.14</restlet.version>
+
     </properties>
 
     <!-- OpenAM Child Modules -->
@@ -126,6 +135,9 @@
 
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
+
+        <!-- OpenAM Authentication Modules -->
+        <module>openam-authentication</module>
 
         <!-- OpenAM OAuth Token Service -->
         <module>openam-oauth</module>
@@ -383,8 +395,8 @@
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</developerConnection>
+        <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_merge/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_merge/</developerConnection>
     </scm>
 
     <!-- Dependency Management -->
@@ -1464,6 +1476,7 @@
                     <version>2.4</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>i18n-maven-plugin</artifactId>
                     <version>1.3.0-SNAPSHOT</version>
                 </plugin>
