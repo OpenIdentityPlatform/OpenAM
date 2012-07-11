@@ -1,0 +1,2844 @@
+--
+-- MIB for OpenSSO server
+-- Copyright (c) 2009, Sun Microsystems, All Rights Reserved.
+--
+
+--
+-- Portions Copyrighted 2011 ForgeRock AS
+--
+
+SUN-OPENSSO-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, NOTIFICATION-TYPE, enterprises,
+    Integer32
+        FROM SNMPv2-SMI
+    NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--
+-- The registered Sun branch at IANA.
+-- 
+    sun OBJECT IDENTIFIER ::= {enterprises 42}
+
+--
+-- allocated through SMPO
+--
+    jes OBJECT IDENTIFIER ::= {sun 2 230}
+    sso OBJECT IDENTIFIER ::= {jes 3}
+
+    ssoMIB MODULE-IDENTITY
+       LAST-UPDATED "200904141212Z"
+       ORGANIZATION "OpenSSO Project, Sun Microsystems"
+       CONTACT-INFO
+               "Users EMail: users@opensso.dev.java.net
+		See also: https://opensso.dev.java.net"
+
+       DESCRIPTION
+               "The MIB module defines objects for OpenSSO."
+       ::= { sso 1 }
+
+--
+-- Object Identifiers
+-- not sure about ssoObjects and ssoNotifications yet...
+--
+    ssoObjects        OBJECT IDENTIFIER ::= { ssoMIB 1 1 }
+    ssoStatistics     OBJECT IDENTIFIER ::= { ssoMIB 1 2 }
+    ssoNotifications  OBJECT IDENTIFIER ::= { ssoMIB 2 }
+    ssoConformance    OBJECT IDENTIFIER ::= { ssoMIB 3 }
+
+--
+-- SSO server Instance Statistics
+-- 
+
+ssoServerInstance OBJECT IDENTIFIER ::= { ssoStatistics 1 }
+
+ssoServerId OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ServerID of this server"
+    ::= { ssoServerInstance 1 }
+
+ssoServerHostname OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Hostname of this server"
+    ::= { ssoServerInstance 2 }
+
+ssoServerPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Port number of this server"
+    ::= { ssoServerInstance 3 }
+
+ssoServerMemberOfSite OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SiteID of which this server is a member"
+    ::= { ssoServerInstance 4 }
+
+
+ssoServerStartDate OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Date this server was started"
+    ::= { ssoServerInstance 5 }
+
+ssoServerConfigStoreType OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Type of config store : remote | embedded"
+    ::= { ssoServerInstance 6 }
+
+ssoServerSFOStatus OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session failover status : on | off"
+    ::= { ssoServerInstance 7 }
+
+--
+-- SSO server Topology (Site+Server  config and status)
+-- 
+
+ssoServerTopology OBJECT IDENTIFIER ::= { ssoServerInstance 8 }
+
+ssoServerServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Server topology : all servers known to this server & their state"
+    ::= { ssoServerTopology 1 } 
+
+ssoServerServerEntry  OBJECT-TYPE
+    SYNTAX      SsoServerServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Server Entry"
+    INDEX   { serverId }
+    ::= { ssoServerServerTable 1 }
+
+SsoServerServerEntry ::= SEQUENCE {
+        serverId         Integer32,
+        serverProtocol   SnmpAdminString,
+        serverHostName   SnmpAdminString,
+        serverPort       Integer32,
+        serverStatus     Integer32
+    }
+
+serverId OBJECT-TYPE
+    SYNTAX        Integer32 (1..2147483647)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "ServerID - unique ID for the server"
+    ::= { ssoServerServerEntry 1 }
+
+serverProtocol OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Server Protocol "
+    ::= { ssoServerServerEntry 2 }
+
+serverHostName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Server HostName "
+    ::= { ssoServerServerEntry 3 }
+
+serverPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Server Port "
+    ::= { ssoServerServerEntry 4 }
+
+serverStatus OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Server State as seen by this server : 0 = Down, 1 = Up, 2 = NotAccessible"
+    ::= { ssoServerServerEntry 5 }
+
+
+ssoServerSitesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Server topology : sites and servers"
+    ::= { ssoServerTopology 2 } 
+
+ssoServerSitesEntry  OBJECT-TYPE
+    SYNTAX      SsoServerSitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Site Entry"
+    INDEX   { siteId }
+    ::= { ssoServerSitesTable 1 }
+
+SsoServerSitesEntry ::= SEQUENCE {
+        siteId     Integer32,
+        siteName   SnmpAdminString,
+        siteState  Integer32
+    }
+
+siteId OBJECT-TYPE
+    SYNTAX        Integer32 (1..2147483647)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Site ID"
+    ::= { ssoServerSitesEntry 1 }
+
+siteName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Site name"
+    ::= { ssoServerSitesEntry 2 }
+
+siteState OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Site State as seen by this server : 0 = Down, 1 = Up"
+    ::= { ssoServerSitesEntry 3 }
+
+ssoServerSiteMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSiteMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Server topology : Site to server mapping"
+    ::= { ssoServerTopology 3 } 
+
+ssoServerSiteMapEntry  OBJECT-TYPE
+    SYNTAX      SsoServerSiteMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Server Entry"
+    INDEX   { siteMapIndex }
+    ::= { ssoServerSiteMapTable 1 }
+
+SsoServerSiteMapEntry ::= SEQUENCE {
+        siteMapIndex  Integer32,
+        siteMapId     Integer32,
+        mapId         SnmpAdminString,
+	mapSiteName      SnmpAdminString,
+	mapServerURL     SnmpAdminString
+    }
+
+siteMapIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Site Map index into table"
+    ::= { ssoServerSiteMapEntry 1 }
+
+siteMapId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Site ID to which this server maps"
+    ::= { ssoServerSiteMapEntry 2 }
+
+mapId OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ServerID of this server"
+    ::= { ssoServerSiteMapEntry 3 }
+
+mapSiteName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Site name to which this server maps"
+    ::= { ssoServerSiteMapEntry 4 }
+
+mapServerURL OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "URL for this server"
+    ::= { ssoServerSiteMapEntry 5 }
+
+--
+-- Realms table
+--
+
+ssoServerRealmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerRealmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "OpenSSO Server Realms"
+    ::= { ssoServerInstance 9 }
+
+--
+-- Realm Entry
+--
+ssoServerRealmEntry OBJECT-TYPE
+    SYNTAX      SsoServerRealmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "OpenSSO Server Realm"
+    INDEX   { ssoServerRealmIndex }
+    ::= { ssoServerRealmTable 1 }
+
+SsoServerRealmEntry ::= SEQUENCE {
+        ssoServerRealmIndex     Integer32,
+        ssoServerRealmName	SnmpAdminString
+    }
+
+ssoServerRealmIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Realm index into table"
+    ::= { ssoServerRealmEntry 1 }
+
+ssoServerRealmName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "OpenSSO Server Realm name"
+    ::= { ssoServerRealmEntry 2 }
+
+
+--
+-- SSO server Authentication Service
+-- 
+
+ssoServerAuthSvc OBJECT IDENTIFIER ::= { ssoServerInstance 10 }
+
+authenticationSuccessCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of successful authentications"
+    DEFVAL        { 0 }
+    ::= { ssoServerAuthSvc 1 }
+
+authenticationFailureCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of unsuccessful authentications"
+    DEFVAL        { 0 }
+    ::= { ssoServerAuthSvc 2 }
+
+authenticationSuccessRate OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current Auth success rate / second based on a fixed preconfigured window."
+    DEFVAL        { 0 }
+    ::= { ssoServerAuthSvc 3 }
+
+authenticationFailureRate OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current Auth failure rate / second based on a fixed preconfigured window."
+    DEFVAL        { 0 }
+    ::= { ssoServerAuthSvc 4 }
+--
+-- Authentication Modules Table 
+--
+ssoServerAuthModulesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerAuthModulesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Authentication modules"
+    ::= { ssoServerAuthSvc 5 } 
+
+--
+-- Authentication modules entry
+--    
+ssoServerAuthModulesEntry OBJECT-TYPE
+    SYNTAX      SsoServerAuthModulesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Authentication module"
+    INDEX   { ssoServerRealmIndex, authModuleIndex }
+    ::= { ssoServerAuthModulesTable 1 }
+
+SsoServerAuthModulesEntry ::= SEQUENCE {
+        authModuleIndex        Integer32,
+        authModuleName         SnmpAdminString,
+        authModuleType         SnmpAdminString,
+        authModuleSuccessCount Counter64,
+        authModuleFailureCount Counter64
+    }
+
+authModuleIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Realm index into table"
+    ::= { ssoServerAuthModulesEntry 1 }
+
+authModuleName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Auth module name."
+    ::= { ssoServerAuthModulesEntry 2 }
+
+authModuleType OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Auth module type."
+    ::= { ssoServerAuthModulesEntry 3 }
+
+authModuleSuccessCount  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Successful authentication count"
+    ::= { ssoServerAuthModulesEntry 4 }
+
+authModuleFailureCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Authentication failure count"
+    ::= { ssoServerAuthModulesEntry 5 }
+
+--
+-- SSO server Session Service
+-- 
+
+ssoServerSessSvc OBJECT IDENTIFIER ::= { ssoServerInstance 11 }
+
+sessionActiveCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current number of sessions on this server"
+    DEFVAL { 0 }
+    ::= { ssoServerSessSvc 1 }
+
+sessionCreatedCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Sessions created since server startup."
+    DEFVAL        { 0 }
+    ::= { ssoServerSessSvc 2 }
+
+sessionValidationsCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of session validations"
+    DEFVAL        { 0 }
+    ::= { ssoServerSessSvc 3 }
+
+sessionNotifCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session notifications emitted by this server"
+    DEFVAL        { 0 }
+    ::= { ssoServerSessSvc 4 }
+
+sessionNotifListnrCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of registered session notification listeners"
+    DEFVAL        { 0 }
+    ::= { ssoServerSessSvc 5 }
+
+sessionAveSessSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session size metrics - for approximate memory usage"
+    DEFVAL        { 0 }
+    ::= { ssoServerSessSvc 6 }
+
+sessionSFOBroker OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Session Failover : comma-separated broker connection string with status : eg : <broker>|on,<broker>|off. (TODO:change to table)?"
+    DEFVAL        { "N/A" }
+    ::= { ssoServerSessSvc 7 }
+
+
+--
+-- SSO server Logging Service
+-- 
+
+ssoServerLoggingSvc OBJECT IDENTIFIER ::= { ssoServerInstance 12 }
+
+loggingType OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Logging to flat files or database"
+    ::= { ssoServerLoggingSvc 1 }
+
+loggingLocation OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Flat file logging location or DB logging URL"
+    ::= { ssoServerLoggingSvc 2 }
+
+loggingMaxLogSize OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Maximum flat file log size in bytes"
+    ::= { ssoServerLoggingSvc 3 }
+
+loggingNumHistFiles OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of flat file history files"
+    ::= { ssoServerLoggingSvc 4 }
+
+loggingSecure OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure logging status : off | on"
+    ::= { ssoServerLoggingSvc 5 }
+
+loggingTimeBuffering OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Time buffering status : off | on"
+    ::= { ssoServerLoggingSvc 6 }
+
+loggingBufferTime OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Buffer time in seconds"
+    ::= { ssoServerLoggingSvc 7 }
+
+loggingBufferSize OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Buffer size in number of records"
+    ::= { ssoServerLoggingSvc 8 }
+
+loggingLoggers OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of logger instances"
+    ::= { ssoServerLoggingSvc 9 }
+
+loggingRecsRejected OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of LogRecords log requests the Logging service has rejected for failing authorization"
+    ::= { ssoServerLoggingSvc 10 }
+
+--
+-- Logging Handlers Table 
+--
+ssoServerLoggingHdlrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerLoggingHdlrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logging handlers"
+    ::= { ssoServerLoggingSvc 11 } 
+
+--
+-- Logging handler entry
+--    
+ssoServerLoggingHdlrEntry OBJECT-TYPE
+    SYNTAX      SsoServerLoggingHdlrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Logging handler"
+    INDEX   { loggingHdlrIndex }
+    ::= { ssoServerLoggingHdlrTable 1 }
+
+SsoServerLoggingHdlrEntry ::= SEQUENCE {
+        loggingHdlrIndex      Integer32,
+        loggingHdlrName       SnmpAdminString,
+        loggingHdlrRqtCt      Counter64,
+        loggingHdlrSuccessCt  Counter64,
+        loggingHdlrFailureCt  Counter64,
+        loggingHdlrDroppedCt  Counter64,
+        loggingHdlrConnRqts   Counter64,
+        loggingHdlrConnMade   Counter64,
+        loggingHdlrConnFailed Counter64
+    }
+    
+loggingHdlrIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Logging handler index"
+    ::= { ssoServerLoggingHdlrEntry 1 }
+
+loggingHdlrName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Logging handler name"
+    ::= { ssoServerLoggingHdlrEntry 2 }
+
+loggingHdlrRqtCt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of log records requested logged"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 3 }
+
+loggingHdlrSuccessCt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of log records successfully logged"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 4 }
+
+loggingHdlrFailureCt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of log records unsuccessfully logged"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 5 }
+
+loggingHdlrDroppedCt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of log records dropped"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 6 }
+
+loggingHdlrConnRqts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Database handler connection requests"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 7 }
+
+loggingHdlrConnMade OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Database handler successful connections"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 8 }
+
+loggingHdlrConnFailed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Database handler connection failures"
+    DEFVAL        { 0 }
+    ::= { ssoServerLoggingHdlrEntry 9 }
+
+--
+-- SSO server Policy Service
+-- 
+
+ssoServerPolicySvc OBJECT IDENTIFIER ::= { ssoServerInstance 13 }
+
+policyStatus OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Policy service operational status : dormant | operational"
+    DEFVAL        { "dormant" }
+    ::= { ssoServerPolicySvc 1 }
+
+policyEvalsIn OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of policy evaluations in"
+    DEFVAL        { 0 }
+    ::= { ssoServerPolicySvc 2 }
+
+policyEvalsOut OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of policy evaluations out"
+    DEFVAL        { 0 }
+    ::= { ssoServerPolicySvc 3 }
+
+--
+-- SSO server Service Management Service
+-- 
+
+ssoServerSvcMgmtSvc OBJECT IDENTIFIER ::= { ssoServerInstance 14 }
+
+svcMgmtStatus OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service management service operational status : dormant | operational"
+    ::= { ssoServerSvcMgmtSvc 1 }
+
+svcMgmtRepositoryType OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service Management repository type"
+    ::= { ssoServerSvcMgmtSvc 2 }
+
+svcMgmtRepositoryHostPort OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Host:Port for Service Management Repository"
+    ::= { ssoServerSvcMgmtSvc 3 }
+
+svcMgmtRepositoryBindDN OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bind DN for Service Management Repository"
+    ::= { ssoServerSvcMgmtSvc 4 }
+
+svcMgmtRepositoryOrgDN OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Organization DN for Service Management Repository"
+    ::= { ssoServerSvcMgmtSvc 5 }
+
+
+svcMgmtRepositorySSL OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SSL to repository : off | on"
+    ::= { ssoServerSvcMgmtSvc 6 }
+
+--
+-- SSO server Identity Repository Service
+-- 
+
+ssoServerIdRepoSvc OBJECT IDENTIFIER ::= { ssoServerInstance 15 }
+
+idRepoGetRqts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of get requests"
+    DEFVAL        { 0 }
+    ::= { ssoServerIdRepoSvc 1 }
+
+idRepoCacheEntries OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cache entries"
+    DEFVAL        { 0 }
+    ::= { ssoServerIdRepoSvc 2 }
+
+idRepoCacheHits OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cache hits"
+    DEFVAL        { 0 }
+    ::= { ssoServerIdRepoSvc 3 }
+
+idRepoSearchRqts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of search requests"
+    DEFVAL        { 0 }
+    ::= { ssoServerIdRepoSvc 4 }
+
+idRepoSearchCacheHits OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of search cache hits"
+    DEFVAL        { 0 }
+    ::= { ssoServerIdRepoSvc 5 }
+
+
+--
+-- SSO server SAML1 Service
+-- 
+
+ssoServerSAML1Svc OBJECT IDENTIFIER ::= { ssoServerInstance 16 }
+
+--
+-- SAML1 Cache Table; assertion and artifact caches
+--
+ssoServerSAML1CacheTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSAML1CacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SAML1 Caches"
+    ::= { ssoServerSAML1Svc 1 } 
+
+--
+-- SAML1 Cache entry
+--    
+ssoServerSAML1CacheEntry OBJECT-TYPE
+    SYNTAX      SsoServerSAML1CacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SAML1 Assertion Cache"
+    INDEX   { sAML1CacheIndex }
+    ::= { ssoServerSAML1CacheTable 1 }
+
+SsoServerSAML1CacheEntry ::= SEQUENCE {
+        sAML1CacheIndex   Integer32,
+        sAML1CacheName    SnmpAdminString,
+        sAML1CacheReads   Counter64,
+        sAML1CacheWrites  Counter64,
+        sAML1CacheHits    Counter64,
+        sAML1CacheMisses  Counter64
+    }
+
+sAML1CacheIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Cache index into table"
+    ::= { ssoServerSAML1CacheEntry 1 }
+
+sAML1CacheName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SAML1 Cache name"
+    ::= { ssoServerSAML1CacheEntry 2 }
+
+sAML1CacheReads  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 Cache reads"
+    ::= { ssoServerSAML1CacheEntry 3 }
+
+sAML1CacheWrites  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 Cache writes"
+    ::= { ssoServerSAML1CacheEntry 4 }
+
+sAML1CacheHits  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 Cache hits"
+    ::= { ssoServerSAML1CacheEntry 5 }
+
+sAML1CacheMisses  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 Cache misses"
+    ::= { ssoServerSAML1CacheEntry 6 }
+
+--
+--  SAML1 endpoints (SOAPReceiver, POSTProfile, SAMLAware/ArtifactProfile)
+--
+ssoServerSAML1EndPointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSAML1EndPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SAML1 EndPoints"
+    ::= { ssoServerSAML1Svc 2 } 
+
+--
+-- SAML1 EndPoint entry
+--    
+ssoServerSAML1EndPointEntry OBJECT-TYPE
+    SYNTAX      SsoServerSAML1EndPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SAML1 EndPoint"
+    INDEX   { sAML1EndPointIndex }
+    ::= { ssoServerSAML1EndPointTable 1 }
+
+SsoServerSAML1EndPointEntry ::= SEQUENCE {
+        sAML1EndPointIndex       Integer32,
+        sAML1EndPointName        SnmpAdminString,
+	sAML1EndPointStatus	 SnmpAdminString,
+        sAML1EndPointRqtIn       Counter64,
+        sAML1EndPointRqtOut      Counter64,
+        sAML1EndPointRqtFailed   Counter64,
+        sAML1EndPointRqtAborted  Counter64
+    }
+
+sAML1EndPointIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Realm index into table"
+    ::= { ssoServerSAML1EndPointEntry 1 }
+
+sAML1EndPointName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SAML1 EndPoint name"
+    ::= { ssoServerSAML1EndPointEntry 2 }
+
+sAML1EndPointStatus OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SAML1 EndPoint operational status : dormant | operational"
+    ::= { ssoServerSAML1EndPointEntry 3 }
+
+sAML1EndPointRqtIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 EndPoint Requests In"
+    ::= { ssoServerSAML1EndPointEntry 4 }
+
+sAML1EndPointRqtOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 EndPoint Requests Out"
+    ::= { ssoServerSAML1EndPointEntry 5 }
+
+sAML1EndPointRqtFailed  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 EndPoint Requests Failed"
+    ::= { ssoServerSAML1EndPointEntry 6 }
+
+sAML1EndPointRqtAborted  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of SAML1 EndPoint Requests Aborted"
+    ::= { ssoServerSAML1EndPointEntry 7 }
+
+
+--
+--  SAML1 Trusted Partners
+--
+ssoServerSAML1TrustPrtnrsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSAML1TrustPrtnrsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SAML1 Trusted Partners"
+    ::= { ssoServerSAML1Svc 3 } 
+
+--
+-- SAML1 Trusted Partner entry
+--    
+ssoServerSAML1TrustPrtnrsEntry OBJECT-TYPE
+    SYNTAX      SsoServerSAML1TrustPrtnrsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SAML1 Trusted Partner"
+    INDEX   { sAML1TrustPrtnrIndex }
+    ::= { ssoServerSAML1TrustPrtnrsTable 1 }
+
+SsoServerSAML1TrustPrtnrsEntry ::= SEQUENCE {
+        sAML1TrustPrtnrIndex       Integer32,
+        sAML1TrustPrtnrName        SnmpAdminString
+    }
+
+sAML1TrustPrtnrIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Trusted Partner index into table"
+    ::= { ssoServerSAML1TrustPrtnrsEntry 1 }
+
+sAML1TrustPrtnrName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SAML1 Trusted Partner name"
+    ::= { ssoServerSAML1TrustPrtnrsEntry 2 }
+
+
+--
+-- SSO server SAML2 Service
+-- 
+
+ssoServerSAML2Svc OBJECT IDENTIFIER ::= { ssoServerInstance 17 }
+
+sAML2Status OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SAML2 service operational status : dormant | operational"
+    DEFVAL        { "dormant" }
+    ::= { ssoServerSAML2Svc 1 }
+
+sAML2IDPSessionCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of IDP Sessions"
+    DEFVAL        { 0 }
+    ::= { ssoServerSAML2Svc 2 }
+
+sAML2FedSessionCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of Federation Sessions"
+    DEFVAL        { 0 }
+    ::= { ssoServerSAML2Svc 3 }
+--
+-- Hosted and Remote IDP counts in this realm
+--
+sAML2HostedIDPCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of This Realm's Hosted IDPs"
+    DEFVAL        { 0 }
+    ::= { ssoServerSAML2Svc 4 }
+
+sAML2RemoteIDPCount OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of This Realm's Remote IDPs"
+    DEFVAL        { 0 }
+    ::= { ssoServerSAML2Svc 5 }
+
+--
+-- SAML2 IDP Table
+--
+ssoServerSAML2IDPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSAML2IDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SAML2 Hosted Identity Providers"
+    ::= { ssoServerSAML2Svc 6 }
+
+--
+-- SAML2 IDP Entry
+--
+ssoServerSAML2IDPEntry OBJECT-TYPE
+    SYNTAX      SsoServerSAML2IDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SAML2 IDP"
+    INDEX   { ssoServerRealmIndex, sAML2IDPIndex }
+    ::= { ssoServerSAML2IDPTable 1 }
+SsoServerSAML2IDPEntry ::= SEQUENCE {
+	sAML2IDPIndex              Integer32,
+        sAML2IDPName	            SnmpAdminString,
+        sAML2IDPRqtsRcvd           Counter64,
+        sAML2IDPInvalRqtsRcvd      Counter64,
+        sAML2IDPAssertionsIssued   Counter64,
+        sAML2IDPArtifactsIssued    Counter64,
+        sAML2IDPAssertionsInCache  Counter64,
+        sAML2IDPArtifactsInCache   Counter64
+    }
+
+sAML2IDPIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "IDP index into table"
+    ::= { ssoServerSAML2IDPEntry 1 }
+
+sAML2IDPName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SAML2 IDP name"
+    ::= { ssoServerSAML2IDPEntry 2 }
+
+sAML2IDPRqtsRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Requests received for this IDP"
+    ::= { ssoServerSAML2IDPEntry 3 }
+
+sAML2IDPInvalRqtsRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Invalid requests received for this IDP"
+    ::= { ssoServerSAML2IDPEntry 4 }
+
+sAML2IDPAssertionsIssued OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Assertions issued by this IDP"
+    ::= { ssoServerSAML2IDPEntry 5 }
+
+sAML2IDPArtifactsIssued OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Artifacts issued by this IDP"
+    ::= { ssoServerSAML2IDPEntry 6 }
+
+sAML2IDPAssertionsInCache OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Assertions in this IDP's cache"
+    ::= { ssoServerSAML2IDPEntry 7 }
+
+sAML2IDPArtifactsInCache OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Artifacts in this IDP's cache"
+    ::= { ssoServerSAML2IDPEntry 8 }
+
+--
+-- Hosted Service Providers by this realm
+-- SAML2 SP Table
+--
+ssoServerSAML2SPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerSAML2SPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SAML2 Hosted Service Providers"
+    ::= { ssoServerSAML2Svc 7 }
+
+--
+-- SAML2 SP Entry
+--
+ssoServerSAML2SPEntry OBJECT-TYPE
+    SYNTAX      SsoServerSAML2SPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SAML2 SP"
+    INDEX   { ssoServerRealmIndex, sAML2SPIndex }
+    ::= { ssoServerSAML2SPTable 1 }
+
+SsoServerSAML2SPEntry ::= SEQUENCE {
+	sAML2SPIndex                 Integer32,
+        sAML2SPName	              SnmpAdminString,
+        sAML2SPRqtsSent              Counter64,
+        sAML2SPValidAssertionsRcvd   Counter64,
+        sAML2SPInvalidArtifactsRcvd  Counter64
+    }
+
+sAML2SPIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "SP index into table"
+    ::= { ssoServerSAML2SPEntry 1 }
+
+sAML2SPName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SAML2 SP name"
+    ::= { ssoServerSAML2SPEntry 2 }
+
+sAML2SPRqtsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Requests sent by this SP"
+    ::= { ssoServerSAML2SPEntry 3 }
+
+sAML2SPValidAssertionsRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Valid Assertions received by this SP"
+    ::= { ssoServerSAML2SPEntry 4 }
+
+sAML2SPInvalidArtifactsRcvd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Invalid Assertions received by this SP"
+    ::= { ssoServerSAML2SPEntry 5 }
+
+
+--
+-- Federation COT Table
+--
+ssoServerFedCOTs OBJECT IDENTIFIER ::= { ssoServerInstance 18 }
+
+--
+-- Federation COT Entry
+--
+ssoServerFedCOTsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerFedCOTsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Federation COT Table"
+    ::= { ssoServerFedCOTs 1 }
+
+ssoServerFedCOTsEntry OBJECT-TYPE
+    SYNTAX      SsoServerFedCOTsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Federation COTs"
+    INDEX   { ssoServerRealmIndex, fedCOTIndex }
+    ::= { ssoServerFedCOTsTable 1 }
+
+SsoServerFedCOTsEntry ::= SEQUENCE {
+	fedCOTIndex  Integer32,
+        fedCOTName	SnmpAdminString
+    }
+
+fedCOTIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "COT index into table"
+    ::= { ssoServerFedCOTsEntry 1 }
+
+fedCOTName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Federation COT name"
+    ::= { ssoServerFedCOTsEntry 2 }
+
+--
+-- Federation COT Members Table
+--
+ssoServerFedCOTMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerFedCOTMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Federation Circle of Trust Members"
+    ::= { ssoServerFedCOTs 2 }
+
+--
+-- Federation COT Member Entry
+--
+ssoServerFedCOTMemberEntry OBJECT-TYPE
+    SYNTAX      SsoServerFedCOTMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Federation COT Members"
+    INDEX   { ssoServerRealmIndex, fedCOTIndex, fedCOTMemberIndex }
+    ::= { ssoServerFedCOTMemberTable 1 }
+
+SsoServerFedCOTMemberEntry ::= SEQUENCE {
+        fedCOTMemberIndex  Integer32,
+        fedCOTMemberName   SnmpAdminString,
+        fedCOTMemberType   SnmpAdminString
+    }
+
+fedCOTMemberIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "COT index into table"
+    ::= { ssoServerFedCOTMemberEntry 1 }
+
+fedCOTMemberName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "COT member name"
+    ::= { ssoServerFedCOTMemberEntry 2 }
+
+fedCOTMemberType OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "COT member type"
+    ::= { ssoServerFedCOTMemberEntry 3 }
+
+--
+-- Federation Entities Table
+--
+ssoServerFedEntities OBJECT IDENTIFIER ::= { ssoServerInstance 19 }
+
+--
+-- Federation Entities Entry
+--
+ssoServerFedEntitiesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerFedEntitiesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Federation Entities Table"
+    ::= { ssoServerFedEntities 1 }
+
+ssoServerFedEntitiesEntry OBJECT-TYPE
+    SYNTAX      SsoServerFedEntitiesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Federation Entities"
+    INDEX   { ssoServerRealmIndex, fedEntityIndex }
+    ::= { ssoServerFedEntitiesTable 1 }
+
+SsoServerFedEntitiesEntry ::= SEQUENCE {
+	fedEntityIndex  Integer32,
+        fedEntityName	SnmpAdminString,
+        fedEntityProto	SnmpAdminString,
+        fedEntityLoc	SnmpAdminString,
+	fedEntityType   SnmpAdminString
+    }
+
+fedEntityIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entity index into table"
+    ::= { ssoServerFedEntitiesEntry 1 }
+
+fedEntityName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Federation Entity name"
+    ::= { ssoServerFedEntitiesEntry 2 }
+
+fedEntityProto OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Federation Entity protocol"
+    ::= { ssoServerFedEntitiesEntry 3 }
+
+fedEntityLoc OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Federation Entity Location"
+    ::= { ssoServerFedEntitiesEntry 4 }
+
+fedEntityType OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Federation Entity Type"
+    ::= { ssoServerFedEntitiesEntry 5 }
+
+--
+-- SSO server ID-FF Service
+-- 
+
+ssoServerIDFFSvc OBJECT IDENTIFIER ::= { ssoServerInstance 20 }
+
+iDFFStatus OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ID-FF service operational status : dormant | operational"
+    DEFVAL        { "dormant" }
+    ::= { ssoServerIDFFSvc 1 }
+
+iDFFAssertions OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of assertions for all ID-FF providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 2 }
+
+iDFFArtifacts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of artifacts for all ID-FF providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 3 }
+
+iDFFUserIDSessionList OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of entries in UserID Session List Map for all ID-FF Providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 4 }
+
+iDFFIdAuthnRqt OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of entries in ID Authentication Request Map for all ID-FF Providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 5 }
+
+iDFFIdLocalSessToken OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of entries in ID Local Session Token Map for all ID-FF Providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 6 }
+
+iDFFIdDestn OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of entries in ID Destination Map for all ID-FF Providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 7 }
+
+iDFFRelayState OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of entries in Relay State Map for all ID-FF Providers"
+    DEFVAL        { 0 }
+    ::= { ssoServerIDFFSvc 8 }
+
+
+--
+-- SSO server Policy Agents and Agent Groups
+-- 
+ssoServerPolicyAgents OBJECT IDENTIFIER ::= { ssoServerInstance 21 }
+
+--
+-- realm can have web agent, web group, j2ee agent, j2ee group,
+-- and 2.2 policy agents
+-- this is for web agent agents
+--
+ssoServerPolicyWebAgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerPolicyWebAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Policy Agent Web Agents"
+    ::= { ssoServerPolicyAgents 1 }
+
+--
+-- Policy Agents Web Agent Agent entry
+--
+ssoServerPolicyWebAgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerPolicyWebAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Agents Web Agent Agent"
+    INDEX   { ssoServerRealmIndex,
+	      policyWebAgentIndex }
+    ::= { ssoServerPolicyWebAgentTable 1 }
+
+SsoServerPolicyWebAgentEntry ::= SEQUENCE {
+        policyWebAgentIndex      Integer32,
+        policyWebAgentName       SnmpAdminString,
+	policyWebAgentServerURL  SnmpAdminString,
+	policyWebAgentAgentURL   SnmpAdminString,
+	policyWebAgentGroup      SnmpAdminString
+    }
+
+policyWebAgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Agent index into table"
+    ::= { ssoServerPolicyWebAgentEntry 1 }
+
+policyWebAgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Agent Name"
+    ::= { ssoServerPolicyWebAgentEntry 2 }
+
+policyWebAgentServerURL OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Agent Server URL"
+    ::= { ssoServerPolicyWebAgentEntry 3 }
+
+policyWebAgentAgentURL OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Agent Agent URL"
+    ::= { ssoServerPolicyWebAgentEntry 4 }
+
+policyWebAgentGroup OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Agent Group"
+    ::= { ssoServerPolicyWebAgentEntry 5 }
+
+--
+-- Policy Agent Web Agent Group Table
+--
+ssoServerPolicyWebGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerPolicyWebGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Policy Agent Web Agent Groups"
+    ::= { ssoServerPolicyAgents 2 }
+
+--
+-- Policy Agents Web Agent Group entry
+--
+ssoServerPolicyWebGroupEntry OBJECT-TYPE
+    SYNTAX      SsoServerPolicyWebGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Agents Web Agent Group"
+    INDEX   { ssoServerRealmIndex,
+	      policyWebGroupIndex }
+    ::= { ssoServerPolicyWebGroupTable 1 }
+
+SsoServerPolicyWebGroupEntry ::= SEQUENCE {
+        policyWebGroupIndex      Integer32,
+        policyWebGroupName       SnmpAdminString,
+	policyWebGroupServerURL  SnmpAdminString
+    }
+
+policyWebGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Group index into table"
+    ::= { ssoServerPolicyWebGroupEntry 1 }
+
+policyWebGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Group Name"
+    ::= { ssoServerPolicyWebGroupEntry 2 }
+
+policyWebGroupServerURL OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy Web Agent Group Server URL"
+    ::= { ssoServerPolicyWebGroupEntry 3 }
+
+--
+-- Policy Agent J2EE Agents
+--
+ssoServerPolicyJ2EEAgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerPolicyJ2EEAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Policy Agent J2EE Agents"
+    ::= { ssoServerPolicyAgents 3 }
+
+--
+-- Policy Agents J2EE Agent entry
+--
+ssoServerPolicyJ2EEAgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerPolicyJ2EEAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Agents J2EE Agent Agent"
+    INDEX   { ssoServerRealmIndex,
+	      policyJ2EEAgentIndex }
+    ::= { ssoServerPolicyJ2EEAgentTable 1 }
+
+SsoServerPolicyJ2EEAgentEntry ::= SEQUENCE {
+        policyJ2EEAgentIndex      Integer32,
+        policyJ2EEAgentName       SnmpAdminString,
+	policyJ2EEAgentServerURL  SnmpAdminString,
+	policyJ2EEAgentAgentURL   SnmpAdminString,
+	policyJ2EEAgentGroup      SnmpAdminString
+    }
+
+policyJ2EEAgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Agent index into table"
+    ::= { ssoServerPolicyJ2EEAgentEntry 1 }
+
+policyJ2EEAgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Agent Name"
+    ::= { ssoServerPolicyJ2EEAgentEntry 2 }
+
+policyJ2EEAgentServerURL OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Agent Server URL"
+    ::= { ssoServerPolicyJ2EEAgentEntry 3 }
+
+policyJ2EEAgentAgentURL OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Agent Agent URL"
+    ::= { ssoServerPolicyJ2EEAgentEntry 4 }
+
+policyJ2EEAgentGroup OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Agent Group"
+    ::= { ssoServerPolicyJ2EEAgentEntry 5 }
+
+--
+-- Policy Agent J2EE Agent Group Table
+--
+ssoServerPolicyJ2EEGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerPolicyJ2EEGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Policy Agent J2EE Agent Groups"
+    ::= { ssoServerPolicyAgents 4 }
+
+--
+-- Policy Agents J2EE Agent Group entry
+--
+ssoServerPolicyJ2EEGroupEntry OBJECT-TYPE
+    SYNTAX      SsoServerPolicyJ2EEGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Agents J2EE Agent Group"
+    INDEX   { ssoServerRealmIndex,
+	      policyJ2EEGroupIndex }
+    ::= { ssoServerPolicyJ2EEGroupTable 1 }
+
+SsoServerPolicyJ2EEGroupEntry ::= SEQUENCE {
+        policyJ2EEGroupIndex      Integer32,
+        policyJ2EEGroupName       SnmpAdminString,
+	policyJ2EEGroupServerURL  SnmpAdminString
+    }
+
+policyJ2EEGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "Policy J2EE Agent Group index into table"
+    ::= { ssoServerPolicyJ2EEGroupEntry 1 }
+
+policyJ2EEGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Group Name"
+    ::= { ssoServerPolicyJ2EEGroupEntry 2 }
+
+policyJ2EEGroupServerURL OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy J2EE Agent Group Server URL"
+    ::= { ssoServerPolicyJ2EEGroupEntry 3 }
+
+--
+-- realm can have web, j2ee, 2.2 policy agents
+-- this is for 2.2 policy agents
+--
+ssoServerPolicy22AgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerPolicy22AgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "J2EE Policy Agent"
+    ::= { ssoServerPolicyAgents 5 }
+
+--
+-- Policy Agent 2.2 Agent Entry
+--
+ssoServerPolicy22AgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerPolicy22AgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy Agent 2.2 Agent"
+
+    INDEX   { ssoServerRealmIndex, policy22AgentIndex }
+    ::= { ssoServerPolicy22AgentTable 1 }
+
+SsoServerPolicy22AgentEntry ::= SEQUENCE {
+	policy22AgentIndex  Integer32,
+        policy22AgentName   SnmpAdminString
+    }
+
+policy22AgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Policy 2.2 Agent index into table"
+    ::= { ssoServerPolicy22AgentEntry 1 }
+
+policy22AgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Policy 2.2 Agent name"
+    ::= { ssoServerPolicy22AgentEntry 2 }
+
+--
+-- Web Security Service Agents and Agent Groups
+--
+ssoServerWSSAgents OBJECT IDENTIFIER  ::= { ssoServerInstance 22 }
+
+--
+-- realm can also have WSC, STS, WSP, and Discovery agents
+-- this is for WSC agents
+--
+ssoServerWSSAgentsWSCAgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsWSCAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WSC Agents"
+    ::= { ssoServerWSSAgents 1 }
+
+--
+-- Web Security Services WSC Agent Entry
+--
+ssoServerWSSAgentsWSCAgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsWSCAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services WSC Agent"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsWSCAgentIndex }
+    ::= { ssoServerWSSAgentsWSCAgentTable 1 }
+
+SsoServerWSSAgentsWSCAgentEntry ::= SEQUENCE {
+	wssAgentsWSCAgentIndex  Integer32,
+        wssAgentsWSCAgentName   SnmpAdminString,
+        wssAgentsWSCAgentProxy   SnmpAdminString,
+        wssAgentsWSCAgentSvcEndPoint   SnmpAdminString
+    }
+
+wssAgentsWSCAgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent index into table"
+    ::= { ssoServerWSSAgentsWSCAgentEntry 1 }
+
+wssAgentsWSCAgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent name"
+    ::= { ssoServerWSSAgentsWSCAgentEntry 2 }
+
+wssAgentsWSCAgentProxy OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent Security Proxy End Point"
+    ::= { ssoServerWSSAgentsWSCAgentEntry 3 }
+
+wssAgentsWSCAgentSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent Service End Point"
+    ::= { ssoServerWSSAgentsWSCAgentEntry 4 }
+
+--
+-- this is for WSC agent groups
+--
+ssoServerWSSAgentsWSCAgtGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsWSCAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WSC Agent Groups"
+    ::= { ssoServerWSSAgents 2 }
+
+--
+-- Web Security Services WSC Agent Group Entry
+--
+ssoServerWSSAgentsWSCAgtGrpEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsWSCAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services WSC Agent Group"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsWSCAgtGrpIndex }
+    ::= { ssoServerWSSAgentsWSCAgtGrpTable 1 }
+
+SsoServerWSSAgentsWSCAgtGrpEntry ::= SEQUENCE {
+	wssAgentsWSCAgtGrpIndex  Integer32,
+        wssAgentsWSCAgtGrpName   SnmpAdminString,
+        wssAgentsWSCAgtGrpProxy   SnmpAdminString,
+        wssAgentsWSCAgtGrpSvcEndPoint   SnmpAdminString
+    }
+
+wssAgentsWSCAgtGrpIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent Group index into table"
+    ::= { ssoServerWSSAgentsWSCAgtGrpEntry 1 }
+
+wssAgentsWSCAgtGrpName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent Group name"
+    ::= { ssoServerWSSAgentsWSCAgtGrpEntry 2 }
+
+wssAgentsWSCAgtGrpProxy OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent Group Security Proxy End Point"
+    ::= { ssoServerWSSAgentsWSCAgtGrpEntry 3 }
+
+wssAgentsWSCAgtGrpSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSC Agent Group Service End Point"
+    ::= { ssoServerWSSAgentsWSCAgtGrpEntry 4 }
+
+
+--
+-- realm can also have WSC, STS, WSP, and Discovery agents
+-- these fall under Web Security Services, rather than
+-- policy
+-- this is for WSP agents
+--
+ssoServerWSSAgentsWSPAgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsWSPAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WSP Agent"
+    ::= { ssoServerWSSAgents 3 }
+
+--
+-- Web Security Services WSP Agent Entry
+--
+ssoServerWSSAgentsWSPAgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsWSPAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services WSP Agent"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsWSPAgentIndex }
+    ::= { ssoServerWSSAgentsWSPAgentTable 1 }
+
+SsoServerWSSAgentsWSPAgentEntry ::= SEQUENCE {
+	wssAgentsWSPAgentIndex  Integer32,
+        wssAgentsWSPAgentName   SnmpAdminString,
+        wssAgentsWSPAgentProxy   SnmpAdminString,
+        wssAgentsWSPAgentSvcEndPoint   SnmpAdminString
+    }
+
+wssAgentsWSPAgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent index into table"
+    ::= { ssoServerWSSAgentsWSPAgentEntry 1 }
+
+wssAgentsWSPAgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent name"
+    ::= { ssoServerWSSAgentsWSPAgentEntry 2 }
+
+wssAgentsWSPAgentProxy OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent Security Proxy End Point"
+    ::= { ssoServerWSSAgentsWSPAgentEntry 3 }
+
+wssAgentsWSPAgentSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent Service End Point"
+    ::= { ssoServerWSSAgentsWSPAgentEntry 4 }
+
+--
+-- this is for WSP agent groups
+--
+ssoServerWSSAgentsWSPAgtGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsWSPAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WSP Agent Groups"
+    ::= { ssoServerWSSAgents 4 }
+
+--
+-- Web Security Services WSP Agent Group Entry
+--
+ssoServerWSSAgentsWSPAgtGrpEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsWSPAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services WSP Agent Group"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsWSPAgtGrpIndex }
+    ::= { ssoServerWSSAgentsWSPAgtGrpTable 1 }
+
+SsoServerWSSAgentsWSPAgtGrpEntry ::= SEQUENCE {
+	wssAgentsWSPAgtGrpIndex  Integer32,
+        wssAgentsWSPAgtGrpName   SnmpAdminString,
+        wssAgentsWSPAgtGrpProxy   SnmpAdminString,
+        wssAgentsWSPAgtGrpSvcEndPoint   SnmpAdminString
+    }
+
+wssAgentsWSPAgtGrpIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent Group index into table"
+    ::= { ssoServerWSSAgentsWSPAgtGrpEntry 1 }
+
+wssAgentsWSPAgtGrpName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent Group name"
+    ::= { ssoServerWSSAgentsWSPAgtGrpEntry 2 }
+
+wssAgentsWSPAgtGrpProxy OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent Group Security Proxy End Point"
+    ::= { ssoServerWSSAgentsWSPAgtGrpEntry 3 }
+
+wssAgentsWSPAgtGrpSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service WSP Agent Group Service End Point"
+    ::= { ssoServerWSSAgentsWSPAgtGrpEntry 4 }
+
+--
+-- realm can also have WSC, STS, WSP, and Discovery agents
+-- these fall under Web Security Services, rather than
+-- policy
+-- this is for STS agents
+--
+ssoServerWSSAgentsSTSAgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsSTSAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "STS Agent"
+    ::= { ssoServerWSSAgents 5 }
+
+--
+-- Web Security Services STS Agent Entry
+--
+ssoServerWSSAgentsSTSAgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsSTSAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services STS Agent"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsSTSAgentIndex }
+    ::= { ssoServerWSSAgentsSTSAgentTable 1 }
+
+SsoServerWSSAgentsSTSAgentEntry ::= SEQUENCE {
+	wssAgentsSTSAgentIndex  Integer32,
+        wssAgentsSTSAgentName   SnmpAdminString,
+        wssAgentsSTSAgentSvcTokenEndPoint   SnmpAdminString,
+        wssAgentsSTSAgentSvcMEXEndPoint   SnmpAdminString
+    }
+
+wssAgentsSTSAgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent index into table"
+    ::= { ssoServerWSSAgentsSTSAgentEntry 1 }
+
+wssAgentsSTSAgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent name"
+    ::= { ssoServerWSSAgentsSTSAgentEntry 2 }
+
+wssAgentsSTSAgentSvcTokenEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent Token Service End Point"
+    ::= { ssoServerWSSAgentsSTSAgentEntry 3 }
+
+wssAgentsSTSAgentSvcMEXEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent Token Service MEX End Point"
+    ::= { ssoServerWSSAgentsSTSAgentEntry 4 }
+
+--
+-- this is for STS agent groups
+--
+ssoServerWSSAgentsSTSAgtGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsSTSAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "STS Agent Groups"
+    ::= { ssoServerWSSAgents 6 }
+
+--
+-- Web Security Services STS Agent Group Entry
+--
+ssoServerWSSAgentsSTSAgtGrpEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsSTSAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services STS Agent Group"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsSTSAgtGrpIndex }
+    ::= { ssoServerWSSAgentsSTSAgtGrpTable 1 }
+
+SsoServerWSSAgentsSTSAgtGrpEntry ::= SEQUENCE {
+	wssAgentsSTSAgtGrpIndex  Integer32,
+        wssAgentsSTSAgtGrpName   SnmpAdminString,
+        wssAgentsSTSAgtGrpSvcEndPoint   SnmpAdminString,
+        wssAgentsSTSAgtGrpSvcMEXEndPoint   SnmpAdminString
+    }
+
+wssAgentsSTSAgtGrpIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent Group index into table"
+    ::= { ssoServerWSSAgentsSTSAgtGrpEntry 1 }
+
+wssAgentsSTSAgtGrpName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent Group name"
+    ::= { ssoServerWSSAgentsSTSAgtGrpEntry 2 }
+
+wssAgentsSTSAgtGrpSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent Group Security Proxy End Point"
+    ::= { ssoServerWSSAgentsSTSAgtGrpEntry 3 }
+
+wssAgentsSTSAgtGrpSvcMEXEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service STS Agent Group Service End Point"
+    ::= { ssoServerWSSAgentsSTSAgtGrpEntry 4 }
+
+--
+-- realm can also have WSC, STS, WSP, and Discovery agents
+-- these fall under Web Security Services, rather than policy
+-- this is for Discovery agents
+--
+ssoServerWSSAgentsDSCAgentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsDSCAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Discovery Agent"
+    ::= { ssoServerWSSAgents 7 }
+
+--
+-- Web Security Services Discovery Agent Entry
+--
+ssoServerWSSAgentsDSCAgentEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsDSCAgentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services Discovery Agent"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsDSCAgentIndex }
+    ::= { ssoServerWSSAgentsDSCAgentTable 1 }
+
+SsoServerWSSAgentsDSCAgentEntry ::= SEQUENCE {
+	wssAgentsDSCAgentIndex  Integer32,
+        wssAgentsDSCAgentName   SnmpAdminString,
+        wssAgentsDSCAgentSvcEndPoint   SnmpAdminString,
+        wssAgentsDSCAgentWebSvcEndPoint   SnmpAdminString
+    }
+
+wssAgentsDSCAgentIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent index into table"
+    ::= { ssoServerWSSAgentsDSCAgentEntry 1 }
+
+wssAgentsDSCAgentName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent name"
+    ::= { ssoServerWSSAgentsDSCAgentEntry 2 }
+
+wssAgentsDSCAgentSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent Service End Point"
+    ::= { ssoServerWSSAgentsDSCAgentEntry 3 }
+
+wssAgentsDSCAgentWebSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent Auth Web Service End Point"
+    ::= { ssoServerWSSAgentsDSCAgentEntry 4 }
+
+--
+-- this is for Discovery agent groups
+--
+ssoServerWSSAgentsDSCAgtGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SsoServerWSSAgentsDSCAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Discovery Agent Groups"
+    ::= { ssoServerWSSAgents 8 }
+
+--
+-- Web Security Services Discovery Agent Group Entry
+--
+ssoServerWSSAgentsDSCAgtGrpEntry OBJECT-TYPE
+    SYNTAX      SsoServerWSSAgentsDSCAgtGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Services Discovery Agent Group"
+
+    INDEX   { ssoServerRealmIndex, wssAgentsDSCAgtGrpIndex }
+    ::= { ssoServerWSSAgentsDSCAgtGrpTable 1 }
+
+SsoServerWSSAgentsDSCAgtGrpEntry ::= SEQUENCE {
+	wssAgentsDSCAgtGrpIndex  Integer32,
+        wssAgentsDSCAgtGrpName   SnmpAdminString,
+        wssAgentsDSCAgtGrpSvcEndPoint   SnmpAdminString,
+        wssAgentsDSCAgtGrpWebSvcEndPoint   SnmpAdminString
+    }
+
+wssAgentsDSCAgtGrpIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent Group index into table"
+    ::= { ssoServerWSSAgentsDSCAgtGrpEntry 1 }
+
+wssAgentsDSCAgtGrpName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent Group name"
+    ::= { ssoServerWSSAgentsDSCAgtGrpEntry 2 }
+
+wssAgentsDSCAgtGrpSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent Group Service End Point"
+    ::= { ssoServerWSSAgentsDSCAgtGrpEntry 3 }
+
+wssAgentsDSCAgtGrpWebSvcEndPoint OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Web Security Service Discovery Agent Group Web Service End Point"
+    ::= { ssoServerWSSAgentsDSCAgtGrpEntry 4 }
+
+--
+--  SSO server Entitlements Service
+--
+ssoServerEntitlementSvc OBJECT IDENTIFIER ::= { ssoServerInstance 23 }
+
+numPolicies OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	"Total number of policies"
+    DEFVAL        { 0 }
+    ::= { ssoServerEntitlementSvc 1 }
+
+numReferrals OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	"Total number of referrals"
+    DEFVAL        { 0 }
+    ::= { ssoServerEntitlementSvc 2 }
+
+numCachedPolicies OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	"Total number of cached policies"
+    DEFVAL        { 0 }
+    ::= { ssoServerEntitlementSvc 3 }
+
+numCachedReferrals OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	"Total number of cached policies"
+    DEFVAL        { 0 }
+    ::= { ssoServerEntitlementSvc 4 }
+
+--
+--  SSO Entitlement Execution time and events table
+--
+ssoServerEntitlementExecStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SsoServerEntitlementExecStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS	current
+    DESCRIPTION
+	     "Cumulative Execution Time And Events Table"
+    ::= { ssoServerEntitlementSvc 5 }
+
+ssoServerEntitlementExecStatsEntry OBJECT-TYPE
+    SYNTAX	SsoServerEntitlementExecStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	      "Entitlements Execution Time and Events"
+    INDEX    { entitlementNetworkMonitorIndex }
+    ::= { ssoServerEntitlementExecStatsTable 1 }
+
+SsoServerEntitlementExecStatsEntry ::= SEQUENCE {
+        entitlementNetworkMonitorIndex	Integer32,
+	entitlementNetworkMonitorName	SnmpAdminString,
+	entitlementMonitorTotalTime	Counter64,
+	entitlementMonitorThruPut	Counter64
+    }
+
+entitlementNetworkMonitorIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "Entitlement Execution Stat Index"
+    ::= { ssoServerEntitlementExecStatsEntry 1 }
+
+entitlementNetworkMonitorName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	    "Entitlement Item Name"
+    ::= { ssoServerEntitlementExecStatsEntry 2 }
+
+entitlementMonitorTotalTime  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	    "Total Response Time"
+    ::= { ssoServerEntitlementExecStatsEntry 3 }
+
+
+entitlementMonitorThruPut  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	    "Throughput"
+    ::= { ssoServerEntitlementExecStatsEntry 4 }
+
+--
+--  SSO Entitlement Policy Statistics table
+--
+ssoServerEntitlementPolicyStatsTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SsoServerEntitlementPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS	current
+    DESCRIPTION
+	     "Policy Statistics Table"
+    ::= { ssoServerEntitlementSvc 6 }
+
+ssoServerEntitlementPolicyStatsEntry OBJECT-TYPE
+    SYNTAX	SsoServerEntitlementPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	      "Entitlements Policy Statistics Per Realm"
+    INDEX    { ssoServerRealmIndex, entitlementPolicyStatsIndex }
+    ::= { ssoServerEntitlementPolicyStatsTable 1 }
+
+SsoServerEntitlementPolicyStatsEntry ::= SEQUENCE {
+        entitlementPolicyStatsIndex	Integer32,
+	entitlementPolicyStatsRealmName	SnmpAdminString,
+	entitlementPolicyCaches		Integer32,
+	entitlementReferralCaches	Integer32
+    }
+
+entitlementPolicyStatsIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "Entitlement Policy Stat Index"
+    ::= { ssoServerEntitlementPolicyStatsEntry 1 }
+
+entitlementPolicyStatsRealmName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	    "Entitlement Policy Realm Name"
+    ::= { ssoServerEntitlementPolicyStatsEntry 2 }
+
+entitlementPolicyCaches  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	    "Number of Cached Policies"
+    ::= { ssoServerEntitlementPolicyStatsEntry 3 }
+
+entitlementReferralCaches  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	    "Number of Cached Referrals"
+    ::= { ssoServerEntitlementPolicyStatsEntry 4 }
+
+--
+-- LDAP Connectionpool monitoring values
+--
+ssoServerConnPoolSvc OBJECT IDENTIFIER ::= { ssoServerInstance 24 }
+
+connRequestWaitTimeHighWaterMark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "High watermark for request wait time"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 1 }
+
+connRequestWaitTimeLowWaterMark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Low watermark for request wait time"
+    DEFVAL        { 9223372036854775807 }
+    ::= { ssoServerConnPoolSvc 2 }
+
+connRequestWaitTimeCurrent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current request wait time"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 3 }
+
+numConnUsedHighWaterMark OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum number of concurrent connections in use"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 4 }
+
+numConnUsedLowWaterMark OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Minimum number of concurrent connections in use"
+    DEFVAL        { 2147483647 }
+    ::= { ssoServerConnPoolSvc 5 }
+
+numConnUsedCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current number of connections in use"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 6 }
+
+numConnReleased OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of connections returned to the pool"
+    DEFVAL        { 0 }
+    ::= { ssoServerConnPoolSvc 7 }
+
+--
+-- SSO Conformance
+--
+
+    ssoCompliances         OBJECT IDENTIFIER ::= { ssoConformance 1 }
+    ssoObjectGroups        OBJECT IDENTIFIER ::= { ssoConformance 2 }
+    ssoNotificationGroups  OBJECT IDENTIFIER ::= { ssoConformance 3 }
+
+-- compliance statements
+
+    ssoBasicCompliance MODULE-COMPLIANCE
+	STATUS  current
+	DESCRIPTION
+	      "The compliance statement for SNMPv2 entities which
+              implement this MIB."
+	MODULE  -- this module
+	    MANDATORY-GROUPS { ssoStatisticsGroup }
+	-- optional/conditional groups
+	GROUP ssoNotificationGroup
+	DESCRIPTION
+	        "This group is present only if the agent provides
+		notification functionality."
+    ::= { ssoCompliances 2 }
+
+-- units of conformance
+
+    ssoStatisticsGroup OBJECT-GROUP
+        OBJECTS {
+	    ssoServerId,
+	    ssoServerHostname,
+	    ssoServerPort,
+	    ssoServerMemberOfSite,
+	    ssoServerStartDate,
+	    ssoServerConfigStoreType,
+	    ssoServerSFOStatus,
+	    serverProtocol,
+	    serverHostName,
+	    serverPort,
+	    serverStatus,
+	    siteName,
+	    siteState,
+	    mapSiteName,
+	    mapServerURL,
+	    mapId,
+	    ssoServerRealmName,
+	    authenticationSuccessCount,
+	    authenticationFailureCount,
+	    authenticationSuccessRate,
+	    authenticationFailureRate,
+	    authModuleName,
+	    authModuleSuccessCount,
+	    authModuleFailureCount,
+	    authModuleType,
+	    sessionActiveCount,
+	    sessionCreatedCount,
+	    sessionValidationsCount,
+	    sessionNotifCount,
+	    sessionNotifListnrCount,
+	    sessionAveSessSize,
+	    sessionSFOBroker,
+	    loggingType,
+	    loggingLocation,
+	    loggingMaxLogSize,
+	    loggingNumHistFiles,
+	    loggingSecure,
+	    loggingTimeBuffering,
+	    loggingBufferTime,
+	    loggingBufferSize,
+	    loggingLoggers,
+	    loggingRecsRejected,
+	    loggingHdlrName,
+	    loggingHdlrRqtCt,
+	    loggingHdlrSuccessCt,
+	    loggingHdlrFailureCt,
+	    loggingHdlrDroppedCt,
+	    loggingHdlrConnRqts,
+	    loggingHdlrConnMade,
+	    loggingHdlrConnFailed,
+	    policyStatus,
+	    policyEvalsIn,
+	    policyEvalsOut,
+	    svcMgmtStatus,
+	    svcMgmtRepositoryType,
+	    svcMgmtRepositoryHostPort,
+	    svcMgmtRepositoryBindDN,
+	    svcMgmtRepositoryOrgDN,
+	    svcMgmtRepositorySSL,
+	    idRepoGetRqts,
+	    idRepoCacheEntries,
+	    idRepoCacheHits,
+	    idRepoSearchRqts,
+	    idRepoSearchCacheHits,
+	    sAML1CacheName,
+	    sAML1CacheReads,
+	    sAML1CacheWrites,
+	    sAML1CacheHits,
+	    sAML1CacheMisses,
+	    sAML1EndPointName,
+	    sAML1EndPointStatus,
+	    sAML1EndPointRqtIn,
+	    sAML1EndPointRqtOut,
+	    sAML1EndPointRqtFailed,
+	    sAML1EndPointRqtAborted,
+	    sAML1TrustPrtnrName,
+	    sAML2Status,
+	    sAML2IDPSessionCount,
+	    sAML2FedSessionCount,
+	    sAML2HostedIDPCount,
+	    sAML2RemoteIDPCount,
+	    sAML2IDPName,
+	    sAML2IDPRqtsRcvd,
+	    sAML2IDPInvalRqtsRcvd,
+	    sAML2IDPAssertionsIssued,
+	    sAML2IDPArtifactsIssued,
+	    sAML2IDPAssertionsInCache,
+	    sAML2IDPArtifactsInCache,
+	    sAML2SPName,
+	    sAML2SPRqtsSent,
+	    sAML2SPValidAssertionsRcvd,
+	    sAML2SPInvalidArtifactsRcvd,
+	    fedCOTName,
+	    fedCOTMemberName,
+	    fedCOTMemberType,
+	    fedEntityName,
+	    fedEntityProto,
+	    fedEntityType,
+	    fedEntityLoc,
+	    iDFFStatus,
+	    iDFFAssertions,
+	    iDFFArtifacts,
+	    iDFFUserIDSessionList,
+	    iDFFIdAuthnRqt,
+	    iDFFIdLocalSessToken,
+	    iDFFIdDestn,
+	    iDFFRelayState,
+	    policyWebAgentName,
+	    policyWebAgentServerURL,
+	    policyWebAgentAgentURL,
+	    policyWebAgentGroup,
+	    policyWebGroupName,
+	    policyWebGroupServerURL,
+	    policyJ2EEAgentName,
+	    policyJ2EEAgentServerURL,
+	    policyJ2EEAgentAgentURL,
+	    policyJ2EEAgentGroup,
+	    policyJ2EEGroupName,
+	    policyJ2EEGroupServerURL,
+	    policy22AgentName,
+            wssAgentsWSCAgentName,
+            wssAgentsWSCAgentProxy,
+            wssAgentsWSCAgentSvcEndPoint,
+            wssAgentsWSCAgtGrpName,
+            wssAgentsWSCAgtGrpProxy,
+            wssAgentsWSCAgtGrpSvcEndPoint,
+            wssAgentsWSPAgentName,
+            wssAgentsWSPAgentProxy,
+            wssAgentsWSPAgentSvcEndPoint,
+            wssAgentsWSPAgtGrpName,
+            wssAgentsWSPAgtGrpProxy,
+            wssAgentsWSPAgtGrpSvcEndPoint,
+            wssAgentsSTSAgentName,
+            wssAgentsSTSAgentSvcTokenEndPoint,
+            wssAgentsSTSAgentSvcMEXEndPoint,
+            wssAgentsSTSAgtGrpName,
+            wssAgentsSTSAgtGrpSvcEndPoint,
+            wssAgentsSTSAgtGrpSvcMEXEndPoint,
+            wssAgentsDSCAgentName,
+            wssAgentsDSCAgentSvcEndPoint,
+            wssAgentsDSCAgentWebSvcEndPoint,
+            wssAgentsDSCAgtGrpName,
+            wssAgentsDSCAgtGrpSvcEndPoint,
+            wssAgentsDSCAgtGrpWebSvcEndPoint,
+	    numPolicies,
+	    numReferrals,
+	    numCachedPolicies,
+	    numCachedReferrals,
+	    entitlementNetworkMonitorName,
+	    entitlementMonitorTotalTime,
+	    entitlementMonitorThruPut,
+	    entitlementPolicyStatsRealmName,
+	    entitlementPolicyCaches,
+	    entitlementReferralCaches,
+            connRequestWaitTimeHighWaterMark,
+            connRequestWaitTimeLowWaterMark,
+            connRequestWaitTimeCurrent,
+            numConnUsedHighWaterMark,
+            numConnUsedLowWaterMark,
+            numConnUsedCurrent,
+            numConnReleased
+        }
+    STATUS  current
+    DESCRIPTION
+	     "A collection of statistics about the OpenSSO Server."
+    ::= { ssoObjectGroups 1 }
+
+
+    ssoNotificationGroup  NOTIFICATION-GROUP
+	NOTIFICATIONS {
+	    ssoServerTrapServerDown,
+	    ssoServerTrapServerStart
+	}
+	STATUS  current
+	DESCRIPTION
+	    "The list of State Change Notifications that an agent should
+	     emit."
+    ::= { ssoNotificationGroups 1 }
+
+
+-- 
+--
+-- Traps.
+--
+ssoServerTraps    OBJECT IDENTIFIER ::= { ssoServerInstance 0 }
+
+ssoServerTrapServerDown   NOTIFICATION-TYPE
+    OBJECTS   { ssoServerId, ssoServerHostname, ssoServerPort } 
+    STATUS    current
+    DESCRIPTION "This trap is generated whenever the agent detects a
+             peer SSO server to be (potentially) down."
+    ::= { ssoServerTraps 7001 }
+                
+ssoServerTrapServerStart  NOTIFICATION-TYPE
+    OBJECTS   { ssoServerId, ssoServerHostname, ssoServerPort } 
+    STATUS    current
+    DESCRIPTION "This trap is generated whenever the agent detects the
+             a peer SSO server to have (re)started."
+    ::= { ssoServerTraps 7002 }
+
+END
