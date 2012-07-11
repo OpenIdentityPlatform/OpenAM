@@ -12,7 +12,7 @@ public class AnyTypeImpl implements org.w3._2001.xmlschema.AnyType, com.sun.xml.
 {
 
     protected com.sun.xml.bind.util.ListImpl _Content;
-    public final static Class version = (org.w3._2001.xmlschema.x.JAXBVersion.class);
+    public final static Class version = (org.w3._2001.xmlschema.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
     private final static Class PRIMARY_INTERFACE_CLASS() {
