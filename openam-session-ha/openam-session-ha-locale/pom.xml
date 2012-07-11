@@ -30,16 +30,16 @@
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock</groupId>
-        <artifactId>openam-authentication</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
+        <artifactId>openam-session-ha</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Auth Adaptive</name>
-    <description>OpenAM Authentication Adaptive
+    <name>OpenAM Session High-Availability Locale Constants</name>
+    <description>OpenAM Session High-Availability Locale Constants
     </description>
-    <artifactId>openam-auth-adaptive</artifactId>
-    <version>10.1-XPRESS-SNAPSHOT</version>
+    <artifactId>openam-session-ha-locale</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -51,31 +51,45 @@
         <plugins>
 
             <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>i18n-maven-plugin</artifactId>
+                <version>1.3.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-messages</goal>
+                        </goals>
+                        <configuration>
+                            <messageFiles>
+                                <messageFile>org/forgerock/openam/session/ha/i18n/amsessionstore.properties</messageFile>
+                            </messageFiles>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
-            <!-- Surefire Tests -->
+            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                   </excludes>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/annotations</source>
+                                <source>${project.build.directory}/generated-sources/messages</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -87,10 +101,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Auth Adaptive</Specification-Title>
+                            <Specification-Title>OpenAM Session High-Availability Locale Constants Component</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Auth Adaptive</Implementation-Title>
+                            <Implementation-Title>OpenAM Session High-Availability Locale Constants Component</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -103,6 +117,14 @@
                             <License></License>
                         </manifestEntries>
                     </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
 
@@ -127,26 +149,18 @@
                 </includes>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
+
     </build>
+
     <dependencies>
-    <dependency>
-        <groupId>org.forgerock</groupId>
-        <artifactId>openam-shared</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-        <groupId>org.forgerock</groupId>
-        <artifactId>openam-core</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
-    </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>i18n-core</artifactId>
+            <version>1.3.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
+    
 </project>

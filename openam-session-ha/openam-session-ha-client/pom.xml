@@ -30,17 +30,17 @@
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock</groupId>
-        <artifactId>openam-authentication</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
+        <artifactId>openam-session-ha</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Auth Adaptive</name>
-    <description>OpenAM Authentication Adaptive
+    <name>OpenAM Session High-Availability Client</name>
+    <description>OpenAM Session High-Availability Component
     </description>
-    <artifactId>openam-auth-adaptive</artifactId>
-    <version>10.1-XPRESS-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <artifactId>openam-session-ha-client</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <organization>
         <name>ForgeRock</name>
         <url>http://www.forgerock.com</url>
@@ -50,32 +50,6 @@
     <build>
         <plugins>
 
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <!-- Surefire Tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                   </excludes>
-                </configuration>
-            </plugin>
-            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -87,10 +61,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Auth Adaptive</Specification-Title>
+                            <Specification-Title>OpenAM Session High-Availability Client Component</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Auth Adaptive</Implementation-Title>
+                            <Implementation-Title>OpenAM Session High-Availability Client Component</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -107,46 +81,61 @@
             </plugin>
 
         </plugins>
-    
-        <resources>
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>version_information.txt</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version_information.txt</include>
-                </includes>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
+
     </build>
+
+    
     <dependencies>
-    <dependency>
-        <groupId>org.forgerock</groupId>
-        <artifactId>openam-shared</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-        <groupId>org.forgerock</groupId>
-        <artifactId>openam-core</artifactId>
-        <version>10.1-XPRESS-SNAPSHOT</version>
-    </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-locale</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-common</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Session Repository Module Dependencies-->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.simple</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.crypto</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.httpclient</artifactId>
+        </dependency>
+
+
+
+
     </dependencies>
+    
 </project>

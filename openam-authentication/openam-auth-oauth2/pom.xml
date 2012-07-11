@@ -35,10 +35,10 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Auth LDAP</name>
-    <description>OpenAM Authentication LDAP
+    <name>OpenAM Auth OAUTH2</name>
+    <description>OpenAM Authentication OAUTH2
     </description>
-    <artifactId>openam-auth-ldap</artifactId>
+    <artifactId>openam-auth-oauth2</artifactId>
     <version>10.1-XPRESS-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
@@ -87,10 +87,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Auth LDAP</Specification-Title>
+                            <Specification-Title>OpenAM Auth OAUTH2</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Auth LDAP</Implementation-Title>
+                            <Implementation-Title>OpenAM Auth OAUTH2</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
