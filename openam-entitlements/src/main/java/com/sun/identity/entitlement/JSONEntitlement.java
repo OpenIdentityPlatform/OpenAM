@@ -27,7 +27,7 @@
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.rest.DecisionResource;
+// import com.sun.identity.rest.DecisionResource;
 import com.sun.identity.shared.JSONUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +39,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONEntitlement {
+    public static final String JSON_DECISION_ARRAY_KEY = "results";
     private String resourceName;
     private Map<String, Set<String>> advices;
     private Map<String, Set<String>> attributes;
