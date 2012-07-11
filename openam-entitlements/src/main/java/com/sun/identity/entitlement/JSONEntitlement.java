@@ -123,7 +123,7 @@ public class JSONEntitlement {
 
         List<JSONEntitlement> results = new ArrayList<JSONEntitlement>();
         JSONArray array = jo.getJSONArray(
-            DecisionResource.JSON_DECISION_ARRAY_KEY);
+            JSON_DECISION_ARRAY_KEY);
         for (int i = 0; i < array.length(); i++) {
             results.add(new JSONEntitlement(array.getJSONObject(i)));
         }
