@@ -117,7 +117,7 @@ public class JSONEntitlement {
 
     public static List<JSONEntitlement> getEntitlements(JSONObject jo)
         throws JSONException {
-        if (!jo.has(DecisionResource.JSON_DECISION_ARRAY_KEY)) {
+        if (!jo.has(JSON_DECISION_ARRAY_KEY)) {
             return Collections.EMPTY_LIST;
         }
 
