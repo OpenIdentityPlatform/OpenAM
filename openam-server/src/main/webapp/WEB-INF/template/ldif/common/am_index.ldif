@@ -1,0 +1,76 @@
+dn: cn=nsroledn,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: nsroledn
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
+dn: cn=memberof,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: memberof
+nsIndexType: eq
+nsIndexType: pres
+
+dn: cn=iplanet-am-static-group-dn,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: iplanet-am-static-group-dn
+nsIndexType: eq
+
+dn: cn=iplanet-am-modifiable-by,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: iplanet-am-modifiable-by
+nsIndexType: eq
+
+dn: cn=@ORG_NAMING_ATTR@,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: @ORG_NAMING_ATTR@
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
+dn: cn=ou,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: ou
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
+dn: cn=sunPreferredDomain,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: sunPreferredDomain
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
+dn: cn=associatedDomain,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: associatedDomain
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
+dn: cn=sunOrganizationAlias,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: sunOrganizationAlias
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
