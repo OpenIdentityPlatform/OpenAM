@@ -54,18 +54,9 @@ import com.sun.identity.test.common.TestBase;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
-
-import javax.security.auth.callback.*;
 
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.AfterTest;

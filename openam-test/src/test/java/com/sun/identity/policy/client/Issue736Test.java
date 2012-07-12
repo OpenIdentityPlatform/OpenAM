@@ -39,8 +39,6 @@ import com.sun.identity.policy.TokenUtils;
 
 import com.sun.identity.policy.interfaces.Condition;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 
