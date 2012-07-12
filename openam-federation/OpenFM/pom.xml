@@ -114,6 +114,7 @@
             <artifactId>openam-test</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <scope>test</scope>
+            <classifier>tests</classifier>
         </dependency>
 
 

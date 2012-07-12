@@ -36,7 +36,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OPenAM Identity Services Schema</name>
+    <name>OpenAM Identity Services Schema</name>
     <description>OpenAM Identity Services Schema Components
     </description>
     <artifactId>openam-idsvcs-schema</artifactId>
