@@ -51,6 +51,7 @@
     <modules>
         <module>openam-auth-ad</module>
         <module>openam-auth-anonymous</module>
+        <module>openam-auth-adaptive</module>
         <module>openam-auth-application</module>
         <module>openam-auth-cert</module>
         <module>openam-auth-datastore</module>
@@ -61,6 +62,8 @@
         <module>openam-auth-membership</module>
         <module>openam-auth-msisdn</module>
         <module>openam-auth-nt</module>
+        <module>openam-auth-oath</module>
+        <module>openam-auth-oath2</module>
         <module>openam-auth-radius</module>
         <module>openam-auth-safeword</module>
         <module>openam-auth-securid</module>
