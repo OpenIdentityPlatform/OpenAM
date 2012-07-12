@@ -12,20 +12,20 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
 {
 
     protected com.sun.identity.liberty.ws.meta.jaxb.ExtensionType _Extension;
-    protected String _ValidUntil;
+    protected java.lang.String _ValidUntil;
     protected com.sun.identity.liberty.ws.meta.jaxb.ContactType _ContactPerson;
     protected com.sun.xml.bind.util.ListImpl _SPDescriptor;
     protected com.sun.identity.liberty.ws.meta.jaxb.OrganizationType _Organization;
-    protected String _ProviderID;
-    protected String _Id;
-    protected String _CacheDuration;
+    protected java.lang.String _ProviderID;
+    protected java.lang.String _Id;
+    protected java.lang.String _CacheDuration;
     protected com.sun.xml.bind.util.ListImpl _IDPDescriptor;
     protected com.sun.identity.liberty.ws.meta.jaxb.AffiliationDescriptorType _AffiliationDescriptor;
     protected com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureType _Signature;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorType.class);
     }
 
@@ -37,11 +37,11 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
         _Extension = value;
     }
 
-    public String getValidUntil() {
+    public java.lang.String getValidUntil() {
         return _ValidUntil;
     }
 
-    public void setValidUntil(String value) {
+    public void setValidUntil(java.lang.String value) {
         _ValidUntil = value;
     }
 
@@ -72,27 +72,27 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
         _Organization = value;
     }
 
-    public String getProviderID() {
+    public java.lang.String getProviderID() {
         return _ProviderID;
     }
 
-    public void setProviderID(String value) {
+    public void setProviderID(java.lang.String value) {
         _ProviderID = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
-    public String getCacheDuration() {
+    public java.lang.String getCacheDuration() {
         return _CacheDuration;
     }
 
-    public void setCacheDuration(String value) {
+    public void setCacheDuration(java.lang.String value) {
         _CacheDuration = value;
     }
 
@@ -232,8 +232,8 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
         if (_CacheDuration!= null) {
             context.startAttribute("", "cacheDuration");
             try {
-                context.text(((String) _CacheDuration), "CacheDuration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _CacheDuration), "CacheDuration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -241,24 +241,24 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         context.startAttribute("", "providerID");
         try {
-            context.text(((String) _ProviderID), "ProviderID");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _ProviderID), "ProviderID");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_ValidUntil!= null) {
             context.startAttribute("", "validUntil");
             try {
-                context.text(((String) _ValidUntil), "ValidUntil");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _ValidUntil), "ValidUntil");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -326,11 +326,11 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorType.class);
     }
 
@@ -454,11 +454,11 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.EntityDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -468,7 +468,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  0 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -498,7 +498,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  3 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -570,7 +570,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  6 :
                         attIdx = context.getAttribute("", "providerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -632,7 +632,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -721,47 +721,47 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _CacheDuration = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ProviderID = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ValidUntil = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -771,7 +771,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  0 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -808,7 +808,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  3 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -850,7 +850,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  6 :
                         attIdx = context.getAttribute("", "providerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -885,7 +885,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -947,7 +947,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1054,7 +1054,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1064,7 +1064,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  0 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -1094,7 +1094,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  3 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -1141,7 +1141,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  6 :
                         attIdx = context.getAttribute("", "providerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -1188,7 +1188,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -1215,7 +1215,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1226,7 +1226,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                         case  0 :
                             attIdx = context.getAttribute("", "cacheDuration");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -1256,7 +1256,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                         case  3 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -1303,7 +1303,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                         case  6 :
                             attIdx = context.getAttribute("", "providerID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText3(v);
                                 continue outer;
@@ -1338,7 +1338,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                         case  9 :
                             attIdx = context.getAttribute("", "validUntil");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText4(v);
                                 continue outer;
@@ -1364,7 +1364,7 @@ public class EntityDescriptorTypeImpl implements com.sun.identity.liberty.ws.met
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

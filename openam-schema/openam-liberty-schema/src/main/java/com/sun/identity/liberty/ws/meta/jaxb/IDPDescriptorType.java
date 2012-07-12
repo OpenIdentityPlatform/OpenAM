@@ -38,58 +38,58 @@ public interface IDPDescriptorType
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSingleSignOnServiceURL();
+    java.lang.String getSingleSignOnServiceURL();
 
     /**
      * Sets the value of the singleSignOnServiceURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSingleSignOnServiceURL(String value);
+    void setSingleSignOnServiceURL(java.lang.String value);
 
     /**
      * Gets the value of the SingleSignOnProtocolProfile property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the SingleSignOnProtocolProfile property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getSingleSignOnProtocolProfile().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getSingleSignOnProtocolProfile();
 
     /**
      * Gets the value of the authnServiceURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAuthnServiceURL();
+    java.lang.String getAuthnServiceURL();
 
     /**
      * Sets the value of the authnServiceURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAuthnServiceURL(String value);
+    void setAuthnServiceURL(java.lang.String value);
 
 }

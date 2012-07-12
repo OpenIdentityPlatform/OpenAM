@@ -15,13 +15,13 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
     protected boolean has_MustUnderstand;
     protected boolean _MustUnderstand;
     protected com.sun.xml.bind.util.ListImpl _Credential;
-    protected String _Actor;
-    protected String _Id;
-    protected String _Endpoint;
-    public final static Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb11.impl.JAXBVersion.class);
+    protected java.lang.String _Actor;
+    protected java.lang.String _Id;
+    protected java.lang.String _Endpoint;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb11.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.soapbinding.jaxb11.ServiceInstanceUpdateType.class);
     }
 
@@ -56,27 +56,27 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         return _getCredential();
     }
 
-    public String getActor() {
+    public java.lang.String getActor() {
         return _Actor;
     }
 
-    public void setActor(String value) {
+    public void setActor(java.lang.String value) {
         _Actor = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
-    public String getEndpoint() {
+    public java.lang.String getEndpoint() {
         return _Endpoint;
     }
 
-    public void setEndpoint(String value) {
+    public void setEndpoint(java.lang.String value) {
         _Endpoint = value;
     }
 
@@ -96,20 +96,20 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             int idx_0 = idx1;
             try {
                 idx_0 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_1 = idx1;
             try {
                 idx_1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _SecurityMechID.get(idx1 ++)), "SecurityMechID");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SecurityMechID.get(idx1 ++)), "SecurityMechID");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -130,8 +130,8 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _Endpoint), "Endpoint");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Endpoint), "Endpoint");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -148,8 +148,8 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -157,8 +157,8 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         if (_Actor!= null) {
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
             try {
-                context.text(((String) _Actor), "Actor");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Actor), "Actor");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -167,7 +167,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _MustUnderstand)), "MustUnderstand");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -175,7 +175,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         while (idx1 != len1) {
             try {
                 idx1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -200,7 +200,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         while (idx1 != len1) {
             try {
                 idx1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -209,11 +209,11 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.soapbinding.jaxb11.ServiceInstanceUpdateType.class);
     }
 
@@ -293,20 +293,20 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
     public static class CredentialTypeImpl implements com.sun.identity.liberty.ws.soapbinding.jaxb11.ServiceInstanceUpdateType.CredentialType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
     {
 
-        protected Object _Any;
+        protected java.lang.Object _Any;
         protected java.util.Calendar _NotOnOrAfter;
-        public final static Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb11.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb11.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.liberty.ws.soapbinding.jaxb11.ServiceInstanceUpdateType.CredentialType.class);
         }
 
-        public Object getAny() {
+        public java.lang.Object getAny() {
             return _Any;
         }
 
-        public void setAny(Object value) {
+        public void setAny(java.lang.Object value) {
             _Any = value;
         }
 
@@ -335,7 +335,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                 context.startAttribute("", "notOnOrAfter");
                 try {
                     context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _NotOnOrAfter), null), "NotOnOrAfter");
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
                 context.endAttribute();
@@ -347,7 +347,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.liberty.ws.soapbinding.jaxb11.ServiceInstanceUpdateType.CredentialType.class);
         }
 
@@ -410,11 +410,11 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.liberty.ws.soapbinding.jaxb11.impl.ServiceInstanceUpdateTypeImpl.CredentialTypeImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -427,7 +427,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                         case  0 :
                             attIdx = context.getAttribute("", "notOnOrAfter");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -436,7 +436,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                             continue outer;
                         case  3 :
                             if (true) {
-                                Object co = spawnWildcard(4, ___uri, ___local, ___qname, __atts);
+                                java.lang.Object co = spawnWildcard(4, ___uri, ___local, ___qname, __atts);
                                 if (co!= null) {
                                     _Any = co;
                                 }
@@ -449,17 +449,17 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _NotOnOrAfter = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -472,7 +472,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                         case  0 :
                             attIdx = context.getAttribute("", "notOnOrAfter");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -485,7 +485,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -508,7 +508,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -527,7 +527,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                         case  0 :
                             attIdx = context.getAttribute("", "notOnOrAfter");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -540,7 +540,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -558,7 +558,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                             case  0 :
                                 attIdx = context.getAttribute("", "notOnOrAfter");
                                 if (attIdx >= 0) {
-                                    final String v = context.eatAttribute(attIdx);
+                                    final java.lang.String v = context.eatAttribute(attIdx);
                                     state = 3;
                                     eatText1(v);
                                     continue outer;
@@ -566,7 +566,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                                 state = 3;
                                 continue outer;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
@@ -591,11 +591,11 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.soapbinding.jaxb11.impl.ServiceInstanceUpdateTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -617,7 +617,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -627,7 +627,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -674,7 +674,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  6 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -687,38 +687,38 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Actor = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MustUnderstand = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_MustUnderstand = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -736,7 +736,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -753,7 +753,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -789,7 +789,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  6 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -802,7 +802,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -854,7 +854,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -872,7 +872,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -888,7 +888,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -916,7 +916,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                     case  6 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -935,7 +935,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -954,7 +954,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -968,7 +968,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                         case  3 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -1006,7 +1006,7 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                         case  6 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText3(v);
                                 continue outer;
@@ -1014,29 +1014,29 @@ public class ServiceInstanceUpdateTypeImpl implements com.sun.identity.liberty.w
                             state = 9;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getSecurityMechID().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Endpoint = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

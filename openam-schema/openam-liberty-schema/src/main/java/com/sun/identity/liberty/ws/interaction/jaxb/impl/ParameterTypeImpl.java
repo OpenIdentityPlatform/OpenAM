@@ -11,28 +11,28 @@ package com.sun.identity.liberty.ws.interaction.jaxb.impl;
 public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interaction.jaxb.ParameterType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected String _Name;
-    protected String _Value;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Name;
+    protected java.lang.String _Value;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.ParameterType.class);
     }
 
-    public String getName() {
+    public java.lang.String getName() {
         return _Name;
     }
 
-    public void setName(String value) {
+    public void setName(java.lang.String value) {
         _Name = value;
     }
 
-    public String getValue() {
+    public java.lang.String getValue() {
         return _Value;
     }
 
-    public void setValue(String value) {
+    public void setValue(java.lang.String value) {
         _Value = value;
     }
 
@@ -50,15 +50,15 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
     {
         context.startAttribute("", "name");
         try {
-            context.text(context.onID(this, ((String) _Name)), "Name");
-        } catch (Exception e) {
+            context.text(context.onID(this, ((java.lang.String) _Name)), "Name");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         context.startAttribute("", "value");
         try {
-            context.text(((String) _Value), "Value");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Value), "Value");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -69,11 +69,11 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
     {
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Name);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Name);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.ParameterType.class);
     }
 
@@ -131,11 +131,11 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.ParameterTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -145,7 +145,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                     case  3 :
                         attIdx = context.getAttribute("", "value");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -154,7 +154,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -169,27 +169,27 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Value = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Name = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -199,7 +199,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                     case  3 :
                         attIdx = context.getAttribute("", "value");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -208,7 +208,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -223,7 +223,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -251,7 +251,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -261,7 +261,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                     case  3 :
                         attIdx = context.getAttribute("", "value");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -270,7 +270,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -297,7 +297,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -312,7 +312,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                         case  3 :
                             attIdx = context.getAttribute("", "value");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -321,7 +321,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                         case  0 :
                             attIdx = context.getAttribute("", "name");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -335,7 +335,7 @@ public class ParameterTypeImpl implements com.sun.identity.liberty.ws.interactio
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

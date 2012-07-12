@@ -11,37 +11,37 @@ package com.sun.identity.liberty.ws.interaction.jaxb.impl;
 public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jaxb.HelpType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected String _Link;
-    protected String _Label;
-    protected String _MoreLink;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Link;
+    protected java.lang.String _Label;
+    protected java.lang.String _MoreLink;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.HelpType.class);
     }
 
-    public String getLink() {
+    public java.lang.String getLink() {
         return _Link;
     }
 
-    public void setLink(String value) {
+    public void setLink(java.lang.String value) {
         _Link = value;
     }
 
-    public String getLabel() {
+    public java.lang.String getLabel() {
         return _Label;
     }
 
-    public void setLabel(String value) {
+    public void setLabel(java.lang.String value) {
         _Label = value;
     }
 
-    public String getMoreLink() {
+    public java.lang.String getMoreLink() {
         return _MoreLink;
     }
 
-    public void setMoreLink(String value) {
+    public void setMoreLink(java.lang.String value) {
         _MoreLink = value;
     }
 
@@ -60,8 +60,8 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
         if (_Label!= null) {
             context.startAttribute("", "label");
             try {
-                context.text(((String) _Label), "Label");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Label), "Label");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -69,8 +69,8 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
         if (_Link!= null) {
             context.startAttribute("", "link");
             try {
-                context.text(((String) _Link), "Link");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Link), "Link");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -78,8 +78,8 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
         if (_MoreLink!= null) {
             context.startAttribute("", "moreLink");
             try {
-                context.text(((String) _MoreLink), "MoreLink");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _MoreLink), "MoreLink");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -91,7 +91,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.HelpType.class);
     }
 
@@ -151,11 +151,11 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.HelpTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -165,7 +165,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  3 :
                         attIdx = context.getAttribute("", "link");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -178,7 +178,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  0 :
                         attIdx = context.getAttribute("", "label");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -188,7 +188,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  6 :
                         attIdx = context.getAttribute("", "moreLink");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -201,37 +201,37 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Link = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Label = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MoreLink = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -241,7 +241,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  3 :
                         attIdx = context.getAttribute("", "link");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -254,7 +254,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  0 :
                         attIdx = context.getAttribute("", "label");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -264,7 +264,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  6 :
                         attIdx = context.getAttribute("", "moreLink");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -277,7 +277,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -314,7 +314,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -330,7 +330,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  3 :
                         attIdx = context.getAttribute("", "link");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -355,7 +355,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  0 :
                         attIdx = context.getAttribute("", "label");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -365,7 +365,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                     case  6 :
                         attIdx = context.getAttribute("", "moreLink");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -378,7 +378,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -397,7 +397,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                         case  3 :
                             attIdx = context.getAttribute("", "link");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -414,7 +414,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                         case  0 :
                             attIdx = context.getAttribute("", "label");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -424,7 +424,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                         case  6 :
                             attIdx = context.getAttribute("", "moreLink");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText3(v);
                                 continue outer;
@@ -432,7 +432,7 @@ public class HelpTypeImpl implements com.sun.identity.liberty.ws.interaction.jax
                             state = 9;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

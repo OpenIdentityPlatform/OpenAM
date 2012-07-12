@@ -65,22 +65,22 @@ public interface EntityDescriptorType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getValidUntil();
+    java.lang.String getValidUntil();
 
     /**
      * Sets the value of the validUntil property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setValidUntil(String value);
+    void setValidUntil(java.lang.String value);
 
     /**
      * Gets the value of the contactPerson property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ContactType}
@@ -89,7 +89,7 @@ public interface EntityDescriptorType {
 
     /**
      * Sets the value of the contactPerson property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ContactType}
@@ -98,31 +98,31 @@ public interface EntityDescriptorType {
 
     /**
      * Gets the value of the SPDescriptor property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the SPDescriptor property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getSPDescriptor().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType}
      * {@link com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorElement}
-     *
+     * 
      */
     java.util.List getSPDescriptor();
 
     /**
      * Gets the value of the organization property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.OrganizationType}
@@ -131,7 +131,7 @@ public interface EntityDescriptorType {
 
     /**
      * Sets the value of the organization property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.OrganizationType}
@@ -140,57 +140,57 @@ public interface EntityDescriptorType {
 
     /**
      * Gets the value of the providerID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getProviderID();
+    java.lang.String getProviderID();
 
     /**
      * Sets the value of the providerID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setProviderID(String value);
+    void setProviderID(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the cacheDuration property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCacheDuration();
+    java.lang.String getCacheDuration();
 
     /**
      * Sets the value of the cacheDuration property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCacheDuration(String value);
+    void setCacheDuration(java.lang.String value);
 
     /**
      * Gets the value of the IDPDescriptor property.

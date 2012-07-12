@@ -11,19 +11,19 @@ package com.sun.identity.liberty.ws.interaction.jaxb.impl;
 public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.interaction.jaxb.RedirectRequestType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected String _RedirectURL;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _RedirectURL;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.RedirectRequestType.class);
     }
 
-    public String getRedirectURL() {
+    public java.lang.String getRedirectURL() {
         return _RedirectURL;
     }
 
-    public void setRedirectURL(String value) {
+    public void setRedirectURL(java.lang.String value) {
         _RedirectURL = value;
     }
 
@@ -41,8 +41,8 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
     {
         context.startAttribute("", "redirectURL");
         try {
-            context.text(((String) _RedirectURL), "RedirectURL");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _RedirectURL), "RedirectURL");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -53,7 +53,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.RedirectRequestType.class);
     }
 
@@ -104,11 +104,11 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.RedirectRequestTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -121,7 +121,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
                     case  0 :
                         attIdx = context.getAttribute("", "redirectURL");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -133,17 +133,17 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _RedirectURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -156,7 +156,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
                     case  0 :
                         attIdx = context.getAttribute("", "redirectURL");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -168,7 +168,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -190,7 +190,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -209,7 +209,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
                     case  0 :
                         attIdx = context.getAttribute("", "redirectURL");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -221,7 +221,7 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -239,14 +239,14 @@ public class RedirectRequestTypeImpl implements com.sun.identity.liberty.ws.inte
                         case  0 :
                             attIdx = context.getAttribute("", "redirectURL");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

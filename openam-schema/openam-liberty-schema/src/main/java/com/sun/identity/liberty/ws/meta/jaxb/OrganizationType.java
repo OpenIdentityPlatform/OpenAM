@@ -44,7 +44,7 @@ public interface OrganizationType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement}
@@ -54,43 +54,43 @@ public interface OrganizationType {
 
     /**
      * Gets the value of the OrganizationDisplayName property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the OrganizationDisplayName property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getOrganizationDisplayName().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.OrganizationDisplayNameType}
-     *
+     * 
      */
     java.util.List getOrganizationDisplayName();
 
     /**
      * Gets the value of the OrganizationURL property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the OrganizationURL property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getOrganizationURL().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.LocalizedURIType}

@@ -12,10 +12,10 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
 {
 
     protected com.sun.xml.bind.util.ListImpl _Any;
-    public final static Class version = (com.sun.identity.liberty.ws.paos.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.paos.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.paos.jaxb.ExtensionType.class);
     }
 
@@ -64,7 +64,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.paos.jaxb.ExtensionType.class);
     }
 
@@ -112,11 +112,11 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.paos.jaxb.impl.ExtensionTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -125,7 +125,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
                 switch (state) {
                     case  1 :
                         if (!(("" == ___uri)||("urn:liberty:paos:2003-08" == ___uri))) {
-                            Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -135,7 +135,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
                         return ;
                     case  0 :
                         if (!(("" == ___uri)||("urn:liberty:paos:2003-08" == ___uri))) {
-                            Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -148,7 +148,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -164,7 +164,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -180,7 +180,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -196,7 +196,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -208,7 +208,7 @@ public class ExtensionTypeImpl implements com.sun.identity.liberty.ws.paos.jaxb.
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

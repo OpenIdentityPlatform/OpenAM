@@ -107,54 +107,54 @@ public interface SelectType
          * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getValue();
+        java.lang.String getValue();
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setValue(String value);
+        void setValue(java.lang.String value);
 
         /**
          * Gets the value of the hint property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getHint();
+        java.lang.String getHint();
 
         /**
          * Sets the value of the hint property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setHint(String value);
+        void setHint(java.lang.String value);
 
         /**
          * Gets the value of the label property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getLabel();
+        java.lang.String getLabel();
 
         /**
          * Sets the value of the label property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setLabel(String value);
+        void setLabel(java.lang.String value);
 
     }
 

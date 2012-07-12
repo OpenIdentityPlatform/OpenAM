@@ -44,7 +44,7 @@ public interface VATType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -54,7 +54,7 @@ public interface VATType {
 
     /**
      * Gets the value of the modificationTime property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -63,7 +63,7 @@ public interface VATType {
 
     /**
      * Sets the value of the modificationTime property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -72,7 +72,7 @@ public interface VATType {
 
     /**
      * Gets the value of the idType property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTURI}
@@ -82,7 +82,7 @@ public interface VATType {
 
     /**
      * Sets the value of the idType property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTURI}
@@ -92,25 +92,25 @@ public interface VATType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the idValue property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.IDValueElement}
@@ -120,7 +120,7 @@ public interface VATType {
 
     /**
      * Sets the value of the idValue property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.IDValueElement}

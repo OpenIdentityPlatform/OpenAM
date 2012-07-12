@@ -34,65 +34,65 @@ public interface ProcessingContextType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getValue();
+    java.lang.String getValue();
 
     /**
      * Sets the value of the value property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setValue(String value);
+    void setValue(java.lang.String value);
 
     /**
      * Gets the value of the mustUnderstand property.
-     *
+     * 
      */
     boolean isMustUnderstand();
 
     /**
      * Sets the value of the mustUnderstand property.
-     *
+     * 
      */
     void setMustUnderstand(boolean value);
 
     /**
      * Gets the value of the actor property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

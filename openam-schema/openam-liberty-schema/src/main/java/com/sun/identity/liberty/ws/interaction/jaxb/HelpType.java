@@ -34,53 +34,53 @@ public interface HelpType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getLink();
+    java.lang.String getLink();
 
     /**
      * Sets the value of the link property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setLink(String value);
+    void setLink(java.lang.String value);
 
     /**
      * Gets the value of the label property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getLabel();
+    java.lang.String getLabel();
 
     /**
      * Sets the value of the label property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setLabel(String value);
+    void setLabel(java.lang.String value);
 
     /**
      * Gets the value of the moreLink property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getMoreLink();
+    java.lang.String getMoreLink();
 
     /**
      * Sets the value of the moreLink property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setMoreLink(String value);
+    void setMoreLink(java.lang.String value);
 
 }

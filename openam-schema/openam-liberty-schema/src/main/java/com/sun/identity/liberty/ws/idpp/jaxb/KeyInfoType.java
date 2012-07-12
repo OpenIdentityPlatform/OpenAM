@@ -37,22 +37,22 @@ public interface KeyInfoType
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getACC();
+    java.lang.String getACC();
 
     /**
      * Sets the value of the acc property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setACC(String value);
+    void setACC(java.lang.String value);
 
     /**
      * Gets the value of the modificationTime property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -61,7 +61,7 @@ public interface KeyInfoType
 
     /**
      * Sets the value of the modificationTime property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -70,21 +70,21 @@ public interface KeyInfoType
 
     /**
      * Gets the value of the modifier property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getModifier();
+    java.lang.String getModifier();
 
     /**
      * Sets the value of the modifier property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setModifier(String value);
+    void setModifier(java.lang.String value);
 
     /**
      * Gets the value of the accTime property.

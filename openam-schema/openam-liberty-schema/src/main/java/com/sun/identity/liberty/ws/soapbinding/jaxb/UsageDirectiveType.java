@@ -38,88 +38,88 @@ public interface UsageDirectiveType {
      * 
      * @return
      *     possible object is
-     *     {@link Object}
+     *     {@link java.lang.Object}
      */
-    Object getRef();
+    java.lang.Object getRef();
 
     /**
      * Sets the value of the ref property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link Object}
+     *     {@link java.lang.Object}
      */
-    void setRef(Object value);
+    void setRef(java.lang.Object value);
 
     /**
      * Gets the value of the Any property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Any property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAny().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
-     *
+     * {@link java.lang.Object}
+     * 
      */
     java.util.List getAny();
 
     /**
      * Gets the value of the mustUnderstand property.
-     *
+     * 
      */
     boolean isMustUnderstand();
 
     /**
      * Sets the value of the mustUnderstand property.
-     *
+     * 
      */
     void setMustUnderstand(boolean value);
 
     /**
      * Gets the value of the actor property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

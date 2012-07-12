@@ -36,83 +36,83 @@ public interface ProviderType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAffiliationID();
+    java.lang.String getAffiliationID();
 
     /**
      * Sets the value of the affiliationID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAffiliationID(String value);
+    void setAffiliationID(java.lang.String value);
 
     /**
      * Gets the value of the mustUnderstand property.
-     *
+     * 
      */
     boolean isMustUnderstand();
 
     /**
      * Sets the value of the mustUnderstand property.
-     *
+     * 
      */
     void setMustUnderstand(boolean value);
 
     /**
      * Gets the value of the actor property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the providerID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getProviderID();
+    java.lang.String getProviderID();
 
     /**
      * Sets the value of the providerID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setProviderID(String value);
+    void setProviderID(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

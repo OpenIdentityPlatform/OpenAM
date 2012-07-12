@@ -16,10 +16,10 @@ public class SPDescriptorTypeImpl
     protected boolean has_AuthnRequestsSigned;
     protected boolean _AuthnRequestsSigned;
     protected com.sun.xml.bind.util.ListImpl _AssertionConsumerServiceURL;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.class);
     }
 
@@ -72,7 +72,7 @@ public class SPDescriptorTypeImpl
         context.endAttributes();
         try {
             context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _AuthnRequestsSigned)), "AuthnRequestsSigned");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -106,7 +106,7 @@ public class SPDescriptorTypeImpl
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.class);
     }
 
@@ -261,22 +261,22 @@ public class SPDescriptorTypeImpl
     public static class AssertionConsumerServiceURLTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
     {
 
-        protected String _Value;
+        protected java.lang.String _Value;
         protected boolean has_IsDefault;
         protected boolean _IsDefault;
-        protected String _Id;
-        public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+        protected java.lang.String _Id;
+        public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType.class);
         }
 
-        public String getValue() {
+        public java.lang.String getValue() {
             return _Value;
         }
 
-        public void setValue(String value) {
+        public void setValue(java.lang.String value) {
             _Value = value;
         }
 
@@ -293,11 +293,11 @@ public class SPDescriptorTypeImpl
             has_IsDefault = true;
         }
 
-        public String getId() {
+        public java.lang.String getId() {
             return _Id;
         }
 
-        public void setId(String value) {
+        public void setId(java.lang.String value) {
             _Id = value;
         }
 
@@ -309,8 +309,8 @@ public class SPDescriptorTypeImpl
             throws org.xml.sax.SAXException
         {
             try {
-                context.text(((String) _Value), "Value");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Value), "Value");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -320,8 +320,8 @@ public class SPDescriptorTypeImpl
         {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -329,7 +329,7 @@ public class SPDescriptorTypeImpl
                 context.startAttribute("", "isDefault");
                 try {
                     context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _IsDefault)), "IsDefault");
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
                 context.endAttribute();
@@ -341,11 +341,11 @@ public class SPDescriptorTypeImpl
         {
         }
 
-        public String ____jaxb____getId() {
-            return ((String) _Id);
+        public java.lang.String ____jaxb____getId() {
+            return ((java.lang.String) _Id);
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType.class);
         }
 
@@ -407,11 +407,11 @@ public class SPDescriptorTypeImpl
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.liberty.ws.meta.jaxb.impl.SPDescriptorTypeImpl.AssertionConsumerServiceURLTypeImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -424,7 +424,7 @@ public class SPDescriptorTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "isDefault");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -434,7 +434,7 @@ public class SPDescriptorTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -446,28 +446,28 @@ public class SPDescriptorTypeImpl
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _IsDefault = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                     has_IsDefault = true;
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
 
-            private void eatText2(final String value)
+            private void eatText2(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -480,7 +480,7 @@ public class SPDescriptorTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "isDefault");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -490,7 +490,7 @@ public class SPDescriptorTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -502,7 +502,7 @@ public class SPDescriptorTypeImpl
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -531,7 +531,7 @@ public class SPDescriptorTypeImpl
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -550,7 +550,7 @@ public class SPDescriptorTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "isDefault");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -566,7 +566,7 @@ public class SPDescriptorTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -578,7 +578,7 @@ public class SPDescriptorTypeImpl
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -600,7 +600,7 @@ public class SPDescriptorTypeImpl
                             case  3 :
                                 attIdx = context.getAttribute("", "isDefault");
                                 if (attIdx >= 0) {
-                                    final String v = context.eatAttribute(attIdx);
+                                    final java.lang.String v = context.eatAttribute(attIdx);
                                     state = 6;
                                     eatText1(v);
                                     continue outer;
@@ -610,7 +610,7 @@ public class SPDescriptorTypeImpl
                             case  0 :
                                 attIdx = context.getAttribute("", "id");
                                 if (attIdx >= 0) {
-                                    final String v = context.eatAttribute(attIdx);
+                                    final java.lang.String v = context.eatAttribute(attIdx);
                                     state = 3;
                                     eatText2(v);
                                     continue outer;
@@ -621,19 +621,19 @@ public class SPDescriptorTypeImpl
                                 eatText2(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText3(final String value)
+            private void eatText3(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
@@ -656,11 +656,11 @@ public class SPDescriptorTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.SPDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -723,7 +723,7 @@ public class SPDescriptorTypeImpl
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -781,7 +781,7 @@ public class SPDescriptorTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -817,7 +817,7 @@ public class SPDescriptorTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -861,7 +861,7 @@ public class SPDescriptorTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -905,20 +905,20 @@ public class SPDescriptorTypeImpl
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AuthnRequestsSigned = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_AuthnRequestsSigned = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

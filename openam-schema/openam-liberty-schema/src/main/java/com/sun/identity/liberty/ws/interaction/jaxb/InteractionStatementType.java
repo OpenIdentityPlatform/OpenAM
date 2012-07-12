@@ -62,7 +62,7 @@ public interface InteractionStatementType {
 
     /**
      * Sets the value of the inquiry property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.interaction.jaxb.InquiryType}

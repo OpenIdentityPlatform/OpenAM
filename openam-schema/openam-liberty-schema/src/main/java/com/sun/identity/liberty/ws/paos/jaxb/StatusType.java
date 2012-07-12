@@ -45,7 +45,7 @@ public interface StatusType {
 
     /**
      * Sets the value of the status property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.paos.jaxb.StatusType}
@@ -55,39 +55,39 @@ public interface StatusType {
 
     /**
      * Gets the value of the ref property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getRef();
+    java.lang.String getRef();
 
     /**
      * Sets the value of the ref property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setRef(String value);
+    void setRef(java.lang.String value);
 
     /**
      * Gets the value of the comment property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getComment();
+    java.lang.String getComment();
 
     /**
      * Sets the value of the comment property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setComment(String value);
+    void setComment(java.lang.String value);
 
     /**
      * Gets the value of the code property.

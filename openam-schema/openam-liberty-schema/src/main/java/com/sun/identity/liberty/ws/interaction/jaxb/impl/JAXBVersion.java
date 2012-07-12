@@ -10,6 +10,6 @@ package com.sun.identity.liberty.ws.interaction.jaxb.impl;
 
 public class JAXBVersion {
 
-    public final static String version = "1.0.6";
+    public final static java.lang.String version = "1.0.6";
 
 }

@@ -84,36 +84,36 @@ public interface QueryResponseType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionType}
-     *
+     * 
      */
     java.util.List getExtension();
 
     /**
      * Gets the value of the Data property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Data property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getData().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.QueryResponseType.DataType}
-     *
+     * 
      */
     java.util.List getData();
 
     /**
      * Gets the value of the status property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.StatusElement}
@@ -123,7 +123,7 @@ public interface QueryResponseType {
 
     /**
      * Sets the value of the status property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.StatusElement}
@@ -133,39 +133,39 @@ public interface QueryResponseType {
 
     /**
      * Gets the value of the itemIDRef property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getItemIDRef();
+    java.lang.String getItemIDRef();
 
     /**
      * Sets the value of the itemIDRef property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setItemIDRef(String value);
+    void setItemIDRef(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 
     /**
@@ -185,69 +185,69 @@ public interface QueryResponseType {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
+     * 
      */
     public interface DataType {
 
 
         /**
          * Gets the value of the Any property.
-         *
+         * 
          * <p>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the Any property.
-         *
+         * 
          * <p>
          * For example, to add a new item, do as follows:
          * <pre>
          *    getAny().add(newItem);
          * </pre>
-         *
-         *
+         * 
+         * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link Object}
-         *
+         * {@link java.lang.Object}
+         * 
          */
         java.util.List getAny();
 
         /**
          * Gets the value of the itemIDRef property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getItemIDRef();
+        java.lang.String getItemIDRef();
 
         /**
          * Sets the value of the itemIDRef property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setItemIDRef(String value);
+        void setItemIDRef(java.lang.String value);
 
         /**
          * Gets the value of the id property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getId();
+        java.lang.String getId();
 
         /**
          * Sets the value of the id property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setId(String value);
+        void setId(java.lang.String value);
 
     }
 

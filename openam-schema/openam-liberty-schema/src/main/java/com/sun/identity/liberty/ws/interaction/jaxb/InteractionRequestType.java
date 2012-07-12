@@ -111,32 +111,32 @@ public interface InteractionRequestType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getLanguage();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the encryptedResourceID property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.interaction.jaxb.EncryptedResourceIDElement}
@@ -146,7 +146,7 @@ public interface InteractionRequestType {
 
     /**
      * Sets the value of the encryptedResourceID property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.interaction.jaxb.EncryptedResourceIDElement}
@@ -156,38 +156,38 @@ public interface InteractionRequestType {
 
     /**
      * Gets the value of the signed property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSigned();
+    java.lang.String getSigned();
 
     /**
      * Sets the value of the signed property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSigned(String value);
+    void setSigned(java.lang.String value);
 
     /**
      * Gets the value of the Inquiry property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Inquiry property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getInquiry().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.interaction.jaxb.InquiryType}

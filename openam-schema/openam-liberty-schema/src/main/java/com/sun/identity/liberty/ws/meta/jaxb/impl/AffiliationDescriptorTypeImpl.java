@@ -13,17 +13,17 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
 
     protected com.sun.xml.bind.util.ListImpl _KeyDescriptor;
     protected com.sun.identity.liberty.ws.meta.jaxb.ExtensionType _Extension;
-    protected String _AffiliationID;
+    protected java.lang.String _AffiliationID;
     protected java.util.Calendar _ValidUntil;
     protected com.sun.xml.bind.util.ListImpl _AffiliateMember;
-    protected String _Id;
-    protected String _CacheDuration;
-    protected String _AffiliationOwnerID;
+    protected java.lang.String _Id;
+    protected java.lang.String _CacheDuration;
+    protected java.lang.String _AffiliationOwnerID;
     protected com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureType _Signature;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.AffiliationDescriptorType.class);
     }
 
@@ -46,11 +46,11 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         _Extension = value;
     }
 
-    public String getAffiliationID() {
+    public java.lang.String getAffiliationID() {
         return _AffiliationID;
     }
 
-    public void setAffiliationID(String value) {
+    public void setAffiliationID(java.lang.String value) {
         _AffiliationID = value;
     }
 
@@ -73,27 +73,27 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         return _getAffiliateMember();
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
-    public String getCacheDuration() {
+    public java.lang.String getCacheDuration() {
         return _CacheDuration;
     }
 
-    public void setCacheDuration(String value) {
+    public void setCacheDuration(java.lang.String value) {
         _CacheDuration = value;
     }
 
-    public String getAffiliationOwnerID() {
+    public java.lang.String getAffiliationOwnerID() {
         return _AffiliationOwnerID;
     }
 
-    public void setAffiliationOwnerID(String value) {
+    public void setAffiliationOwnerID(java.lang.String value) {
         _AffiliationOwnerID = value;
     }
 
@@ -121,20 +121,20 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             int idx_0 = idx5;
             try {
                 idx_0 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_1 = idx5;
             try {
                 idx_1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _AffiliateMember.get(idx5 ++)), "AffiliateMember");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _AffiliateMember.get(idx5 ++)), "AffiliateMember");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -191,23 +191,23 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         final int len5 = ((_AffiliateMember == null)? 0 :_AffiliateMember.size());
         context.startAttribute("", "affiliationID");
         try {
-            context.text(((String) _AffiliationID), "AffiliationID");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _AffiliationID), "AffiliationID");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         context.startAttribute("", "affiliationOwnerID");
         try {
-            context.text(((String) _AffiliationOwnerID), "AffiliationOwnerID");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _AffiliationOwnerID), "AffiliationOwnerID");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_CacheDuration!= null) {
             context.startAttribute("", "cacheDuration");
             try {
-                context.text(((String) _CacheDuration), "CacheDuration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _CacheDuration), "CacheDuration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -215,8 +215,8 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -225,7 +225,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("", "validUntil");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _ValidUntil), null), "ValidUntil");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -233,7 +233,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         while (idx5 != len5) {
             try {
                 idx5 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -266,7 +266,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         while (idx5 != len5) {
             try {
                 idx5 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -289,11 +289,11 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.AffiliationDescriptorType.class);
     }
 
@@ -402,11 +402,11 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.AffiliationDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -424,7 +424,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  12 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -437,7 +437,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("", "affiliationOwnerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -446,7 +446,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "affiliationID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -461,7 +461,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  6 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -558,7 +558,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  9 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText5(v);
                             continue outer;
@@ -583,57 +583,57 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ValidUntil = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AffiliationOwnerID = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AffiliationID = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _CacheDuration = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -653,7 +653,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  12 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -673,7 +673,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("", "affiliationOwnerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -682,7 +682,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "affiliationID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -691,7 +691,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  6 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -738,7 +738,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  9 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText5(v);
                             continue outer;
@@ -754,7 +754,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -828,7 +828,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -841,7 +841,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  12 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -854,7 +854,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("", "affiliationOwnerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -863,7 +863,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "affiliationID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -872,7 +872,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  6 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -935,7 +935,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                     case  9 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText5(v);
                             continue outer;
@@ -951,7 +951,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -969,7 +969,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                         case  12 :
                             attIdx = context.getAttribute("", "validUntil");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 15;
                                 eatText1(v);
                                 continue outer;
@@ -982,7 +982,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                         case  3 :
                             attIdx = context.getAttribute("", "affiliationOwnerID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -991,7 +991,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                         case  0 :
                             attIdx = context.getAttribute("", "affiliationID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText3(v);
                                 continue outer;
@@ -1000,7 +1000,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                         case  6 :
                             attIdx = context.getAttribute("", "cacheDuration");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText4(v);
                                 continue outer;
@@ -1041,7 +1041,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                         case  9 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText5(v);
                                 continue outer;
@@ -1064,19 +1064,19 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.liberty.w
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText6(final String value)
+        private void eatText6(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getAffiliateMember().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

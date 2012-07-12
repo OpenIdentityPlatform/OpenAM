@@ -13,30 +13,30 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
 
     protected com.sun.xml.bind.util.ListImpl _RegisterNameIdentifierProtocolProfile;
     protected com.sun.xml.bind.util.ListImpl _NameIdentifierMappingProtocolProfile;
-    protected String _RegisterNameIdentifierServiceReturnURL;
+    protected java.lang.String _RegisterNameIdentifierServiceReturnURL;
     protected com.sun.xml.bind.util.ListImpl _ProtocolSupportEnumeration;
     protected com.sun.xml.bind.util.ListImpl _ContactPerson;
     protected com.sun.xml.bind.util.ListImpl _AdditionalMetaLocation;
     protected com.sun.identity.liberty.ws.meta.jaxb.OrganizationType _Organization;
     protected com.sun.xml.bind.util.ListImpl _NameIdentifierMappingEncryptionProfile;
-    protected String _SingleLogoutServiceURL;
+    protected java.lang.String _SingleLogoutServiceURL;
     protected com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureType _Signature;
-    protected String _SingleLogoutServiceReturnURL;
+    protected java.lang.String _SingleLogoutServiceReturnURL;
     protected com.sun.xml.bind.util.ListImpl _FederationTerminationNotificationProtocolProfile;
     protected com.sun.identity.liberty.ws.meta.jaxb.ExtensionType _Extension;
     protected com.sun.xml.bind.util.ListImpl _KeyDescriptor;
-    protected String _RegisterNameIdentifierServiceURL;
-    protected String _FederationTerminationServiceURL;
+    protected java.lang.String _RegisterNameIdentifierServiceURL;
+    protected java.lang.String _FederationTerminationServiceURL;
     protected java.util.Calendar _ValidUntil;
-    protected String _FederationTerminationServiceReturnURL;
-    protected String _CacheDuration;
-    protected String _Id;
-    protected String _SoapEndpoint;
+    protected java.lang.String _FederationTerminationServiceReturnURL;
+    protected java.lang.String _CacheDuration;
+    protected java.lang.String _Id;
+    protected java.lang.String _SoapEndpoint;
     protected com.sun.xml.bind.util.ListImpl _SingleLogoutProtocolProfile;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType.class);
     }
 
@@ -62,11 +62,11 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         return _getNameIdentifierMappingProtocolProfile();
     }
 
-    public String getRegisterNameIdentifierServiceReturnURL() {
+    public java.lang.String getRegisterNameIdentifierServiceReturnURL() {
         return _RegisterNameIdentifierServiceReturnURL;
     }
 
-    public void setRegisterNameIdentifierServiceReturnURL(String value) {
+    public void setRegisterNameIdentifierServiceReturnURL(java.lang.String value) {
         _RegisterNameIdentifierServiceReturnURL = value;
     }
 
@@ -122,11 +122,11 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         return _getNameIdentifierMappingEncryptionProfile();
     }
 
-    public String getSingleLogoutServiceURL() {
+    public java.lang.String getSingleLogoutServiceURL() {
         return _SingleLogoutServiceURL;
     }
 
-    public void setSingleLogoutServiceURL(String value) {
+    public void setSingleLogoutServiceURL(java.lang.String value) {
         _SingleLogoutServiceURL = value;
     }
 
@@ -138,11 +138,11 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         _Signature = value;
     }
 
-    public String getSingleLogoutServiceReturnURL() {
+    public java.lang.String getSingleLogoutServiceReturnURL() {
         return _SingleLogoutServiceReturnURL;
     }
 
-    public void setSingleLogoutServiceReturnURL(String value) {
+    public void setSingleLogoutServiceReturnURL(java.lang.String value) {
         _SingleLogoutServiceReturnURL = value;
     }
 
@@ -176,19 +176,19 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         return _getKeyDescriptor();
     }
 
-    public String getRegisterNameIdentifierServiceURL() {
+    public java.lang.String getRegisterNameIdentifierServiceURL() {
         return _RegisterNameIdentifierServiceURL;
     }
 
-    public void setRegisterNameIdentifierServiceURL(String value) {
+    public void setRegisterNameIdentifierServiceURL(java.lang.String value) {
         _RegisterNameIdentifierServiceURL = value;
     }
 
-    public String getFederationTerminationServiceURL() {
+    public java.lang.String getFederationTerminationServiceURL() {
         return _FederationTerminationServiceURL;
     }
 
-    public void setFederationTerminationServiceURL(String value) {
+    public void setFederationTerminationServiceURL(java.lang.String value) {
         _FederationTerminationServiceURL = value;
     }
 
@@ -200,35 +200,35 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         _ValidUntil = value;
     }
 
-    public String getFederationTerminationServiceReturnURL() {
+    public java.lang.String getFederationTerminationServiceReturnURL() {
         return _FederationTerminationServiceReturnURL;
     }
 
-    public void setFederationTerminationServiceReturnURL(String value) {
+    public void setFederationTerminationServiceReturnURL(java.lang.String value) {
         _FederationTerminationServiceReturnURL = value;
     }
 
-    public String getCacheDuration() {
+    public java.lang.String getCacheDuration() {
         return _CacheDuration;
     }
 
-    public void setCacheDuration(String value) {
+    public void setCacheDuration(java.lang.String value) {
         _CacheDuration = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
-    public String getSoapEndpoint() {
+    public java.lang.String getSoapEndpoint() {
         return _SoapEndpoint;
     }
 
-    public void setSoapEndpoint(String value) {
+    public void setSoapEndpoint(java.lang.String value) {
         _SoapEndpoint = value;
     }
 
@@ -288,8 +288,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _SoapEndpoint), "SoapEndpoint");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SoapEndpoint), "SoapEndpoint");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -299,8 +299,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _SingleLogoutServiceURL), "SingleLogoutServiceURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SingleLogoutServiceURL), "SingleLogoutServiceURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -310,8 +310,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _SingleLogoutServiceReturnURL), "SingleLogoutServiceReturnURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SingleLogoutServiceReturnURL), "SingleLogoutServiceReturnURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -321,8 +321,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _FederationTerminationServiceURL), "FederationTerminationServiceURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _FederationTerminationServiceURL), "FederationTerminationServiceURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -332,8 +332,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _FederationTerminationServiceReturnURL), "FederationTerminationServiceReturnURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _FederationTerminationServiceReturnURL), "FederationTerminationServiceReturnURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -343,20 +343,20 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             int idx_12 = idx12;
             try {
                 idx_12 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_13 = idx12;
             try {
                 idx_13 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _FederationTerminationNotificationProtocolProfile.get(idx12 ++)), "FederationTerminationNotificationProtocolProfile");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _FederationTerminationNotificationProtocolProfile.get(idx12 ++)), "FederationTerminationNotificationProtocolProfile");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -366,20 +366,20 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             int idx_14 = idx22;
             try {
                 idx_14 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_15 = idx22;
             try {
                 idx_15 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _SingleLogoutProtocolProfile.get(idx22 ++)), "SingleLogoutProtocolProfile");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SingleLogoutProtocolProfile.get(idx22 ++)), "SingleLogoutProtocolProfile");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -389,20 +389,20 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             int idx_16 = idx1;
             try {
                 idx_16 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_17 = idx1;
             try {
                 idx_17 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _RegisterNameIdentifierProtocolProfile.get(idx1 ++)), "RegisterNameIdentifierProtocolProfile");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _RegisterNameIdentifierProtocolProfile.get(idx1 ++)), "RegisterNameIdentifierProtocolProfile");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -412,8 +412,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _RegisterNameIdentifierServiceURL), "RegisterNameIdentifierServiceURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _RegisterNameIdentifierServiceURL), "RegisterNameIdentifierServiceURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -423,8 +423,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _RegisterNameIdentifierServiceReturnURL), "RegisterNameIdentifierServiceReturnURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _RegisterNameIdentifierServiceReturnURL), "RegisterNameIdentifierServiceReturnURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -445,20 +445,20 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             int idx_24 = idx8;
             try {
                 idx_24 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_25 = idx8;
             try {
                 idx_25 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _NameIdentifierMappingEncryptionProfile.get(idx8 ++)), "NameIdentifierMappingEncryptionProfile");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _NameIdentifierMappingEncryptionProfile.get(idx8 ++)), "NameIdentifierMappingEncryptionProfile");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -546,8 +546,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         if (_CacheDuration!= null) {
             context.startAttribute("", "cacheDuration");
             try {
-                context.text(((String) _CacheDuration), "CacheDuration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _CacheDuration), "CacheDuration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -555,8 +555,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -564,8 +564,8 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         context.startAttribute("", "protocolSupportEnumeration");
         while (idx4 != len4) {
             try {
-                context.text(((String) _ProtocolSupportEnumeration.get(idx4 ++)), "ProtocolSupportEnumeration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _ProtocolSupportEnumeration.get(idx4 ++)), "ProtocolSupportEnumeration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -574,7 +574,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             context.startAttribute("", "validUntil");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _ValidUntil), null), "ValidUntil");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -589,21 +589,21 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         while (idx12 != len12) {
             try {
                 idx12 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
         while (idx22 != len22) {
             try {
                 idx22 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
         while (idx1 != len1) {
             try {
                 idx1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -613,7 +613,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         while (idx8 != len8) {
             try {
                 idx8 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -659,7 +659,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         while (idx4 != len4) {
             try {
                 idx4 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -673,21 +673,21 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         while (idx12 != len12) {
             try {
                 idx12 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
         while (idx22 != len22) {
             try {
                 idx22 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
         while (idx1 != len1) {
             try {
                 idx1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -697,7 +697,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         while (idx8 != len8) {
             try {
                 idx8 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -719,11 +719,11 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType.class);
     }
 
@@ -881,11 +881,11 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.ProviderDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1066,7 +1066,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  0 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -1157,7 +1157,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  3 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -1211,7 +1211,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText3(v);
                             continue outer;
@@ -1224,37 +1224,37 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _CacheDuration = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ValidUntil = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1402,7 +1402,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  0 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -1475,7 +1475,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  3 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -1516,7 +1516,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText3(v);
                             continue outer;
@@ -1529,7 +1529,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1657,7 +1657,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1720,7 +1720,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  0 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -1778,7 +1778,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  3 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -1811,7 +1811,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText3(v);
                             continue outer;
@@ -1830,7 +1830,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1928,7 +1928,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                         case  0 :
                             attIdx = context.getAttribute("", "cacheDuration");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -1993,7 +1993,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                         case  3 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -2028,7 +2028,7 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                         case  9 :
                             attIdx = context.getAttribute("", "validUntil");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText3(v);
                                 continue outer;
@@ -2040,129 +2040,129 @@ public class ProviderDescriptorTypeImpl implements com.sun.identity.liberty.ws.m
                             eatText3(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getNameIdentifierMappingEncryptionProfile().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getFederationTerminationNotificationProtocolProfile().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText6(final String value)
+        private void eatText6(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getSingleLogoutProtocolProfile().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText7(final String value)
+        private void eatText7(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _FederationTerminationServiceURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText8(final String value)
+        private void eatText8(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _RegisterNameIdentifierServiceURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText9(final String value)
+        private void eatText9(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _RegisterNameIdentifierServiceReturnURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText10(final String value)
+        private void eatText10(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SingleLogoutServiceReturnURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText11(final String value)
+        private void eatText11(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _FederationTerminationServiceReturnURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText12(final String value)
+        private void eatText12(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SingleLogoutServiceURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText13(final String value)
+        private void eatText13(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SoapEndpoint = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText14(final String value)
+        private void eatText14(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getRegisterNameIdentifierProtocolProfile().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText15(final String value)
+        private void eatText15(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getProtocolSupportEnumeration().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

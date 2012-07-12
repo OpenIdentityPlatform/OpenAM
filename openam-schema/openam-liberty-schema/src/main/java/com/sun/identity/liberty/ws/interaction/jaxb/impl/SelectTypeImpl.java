@@ -16,10 +16,10 @@ public class SelectTypeImpl
     protected com.sun.xml.bind.util.ListImpl _Item;
     protected boolean has_Multiple;
     protected boolean _Multiple;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.SelectType.class);
     }
 
@@ -79,7 +79,7 @@ public class SelectTypeImpl
             context.startAttribute("", "multiple");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _Multiple)), "Multiple");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -101,7 +101,7 @@ public class SelectTypeImpl
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.SelectType.class);
     }
 
@@ -188,37 +188,37 @@ public class SelectTypeImpl
     public static class ItemTypeImpl implements com.sun.identity.liberty.ws.interaction.jaxb.SelectType.ItemType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
     {
 
-        protected String _Value;
-        protected String _Hint;
-        protected String _Label;
-        public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+        protected java.lang.String _Value;
+        protected java.lang.String _Hint;
+        protected java.lang.String _Label;
+        public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.liberty.ws.interaction.jaxb.SelectType.ItemType.class);
         }
 
-        public String getValue() {
+        public java.lang.String getValue() {
             return _Value;
         }
 
-        public void setValue(String value) {
+        public void setValue(java.lang.String value) {
             _Value = value;
         }
 
-        public String getHint() {
+        public java.lang.String getHint() {
             return _Hint;
         }
 
-        public void setHint(String value) {
+        public void setHint(java.lang.String value) {
             _Hint = value;
         }
 
-        public String getLabel() {
+        public java.lang.String getLabel() {
             return _Label;
         }
 
-        public void setLabel(String value) {
+        public void setLabel(java.lang.String value) {
             _Label = value;
         }
 
@@ -234,8 +234,8 @@ public class SelectTypeImpl
                 context.endNamespaceDecls();
                 context.endAttributes();
                 try {
-                    context.text(((String) _Hint), "Hint");
-                } catch (Exception e) {
+                    context.text(((java.lang.String) _Hint), "Hint");
+                } catch (java.lang.Exception e) {
                     com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
                 context.endElement();
@@ -248,16 +248,16 @@ public class SelectTypeImpl
             if (_Label!= null) {
                 context.startAttribute("", "label");
                 try {
-                    context.text(((String) _Label), "Label");
-                } catch (Exception e) {
+                    context.text(((java.lang.String) _Label), "Label");
+                } catch (java.lang.Exception e) {
                     com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
                 context.endAttribute();
             }
             context.startAttribute("", "value");
             try {
-                context.text(((String) _Value), "Value");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Value), "Value");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -268,7 +268,7 @@ public class SelectTypeImpl
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.liberty.ws.interaction.jaxb.SelectType.ItemType.class);
         }
 
@@ -335,11 +335,11 @@ public class SelectTypeImpl
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.liberty.ws.interaction.jaxb.impl.SelectTypeImpl.ItemTypeImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -349,7 +349,7 @@ public class SelectTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "value");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -361,7 +361,7 @@ public class SelectTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "label");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -382,27 +382,27 @@ public class SelectTypeImpl
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
 
-            private void eatText2(final String value)
+            private void eatText2(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Label = value;
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -412,7 +412,7 @@ public class SelectTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "value");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -431,7 +431,7 @@ public class SelectTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "label");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -447,7 +447,7 @@ public class SelectTypeImpl
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -479,7 +479,7 @@ public class SelectTypeImpl
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -495,7 +495,7 @@ public class SelectTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "value");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -507,7 +507,7 @@ public class SelectTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "label");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -529,7 +529,7 @@ public class SelectTypeImpl
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -540,7 +540,7 @@ public class SelectTypeImpl
                             case  3 :
                                 attIdx = context.getAttribute("", "value");
                                 if (attIdx >= 0) {
-                                    final String v = context.eatAttribute(attIdx);
+                                    final java.lang.String v = context.eatAttribute(attIdx);
                                     state = 6;
                                     eatText1(v);
                                     continue outer;
@@ -564,7 +564,7 @@ public class SelectTypeImpl
                             case  0 :
                                 attIdx = context.getAttribute("", "label");
                                 if (attIdx >= 0) {
-                                    final String v = context.eatAttribute(attIdx);
+                                    final java.lang.String v = context.eatAttribute(attIdx);
                                     state = 3;
                                     eatText2(v);
                                     continue outer;
@@ -575,19 +575,19 @@ public class SelectTypeImpl
                                 state = 9;
                                 continue outer;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText3(final String value)
+            private void eatText3(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Hint = value;
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
@@ -610,11 +610,11 @@ public class SelectTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.SelectTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -661,7 +661,7 @@ public class SelectTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "multiple");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -674,18 +674,18 @@ public class SelectTypeImpl
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Multiple = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_Multiple = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -727,7 +727,7 @@ public class SelectTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "multiple");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -740,7 +740,7 @@ public class SelectTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -779,7 +779,7 @@ public class SelectTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -820,7 +820,7 @@ public class SelectTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "multiple");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -833,7 +833,7 @@ public class SelectTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -873,7 +873,7 @@ public class SelectTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "multiple");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -881,7 +881,7 @@ public class SelectTypeImpl
                             state = 3;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

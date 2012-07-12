@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(148, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.federation.jaxb.entityconfig.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.federation.jaxb.entityconfig.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (com.sun.identity.liberty.ws.idpp.jaxb.ObjectFactory.class));
-    public final static Class version = (com.sun.identity.liberty.ws.idpp.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.idpp.jaxb.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((com.sun.identity.liberty.ws.idpp.jaxb.GreetMeSoundElement.class), "com.sun.identity.liberty.ws.idpp.jaxb.impl.GreetMeSoundElementImpl");
@@ -226,7 +226,7 @@ public class ObjectFactory
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sun.identity.liberty.ws.idpp.jaxb
-     *
+     * 
      */
     public ObjectFactory() {
         super(grammarInfo);
@@ -234,7 +234,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of the specified Java content interface.
-     *
+     * 
      * @param javaContentInterface
      *     the Class object of the javacontent interface to instantiate
      * @return
@@ -242,7 +242,7 @@ public class ObjectFactory
      * @throws JAXBException
      *     if an error occurs
      */
-    public Object newInstance(Class javaContentInterface)
+    public java.lang.Object newInstance(java.lang.Class javaContentInterface)
         throws javax.xml.bind.JAXBException
     {
         return super.newInstance(javaContentInterface);
@@ -253,7 +253,7 @@ public class ObjectFactory
      * used to get provider specific properties.
      * Attempting to get an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @return
@@ -261,7 +261,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error retrieving the given property or value
      */
-    public Object getProperty(String name)
+    public java.lang.Object getProperty(java.lang.String name)
         throws javax.xml.bind.PropertyException
     {
         return super.getProperty(name);
@@ -272,7 +272,7 @@ public class ObjectFactory
      * used to set provider specific properties.
      * Attempting to set an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @param value
@@ -280,7 +280,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error processing the given property or value
      */
-    public void setProperty(String name, Object value)
+    public void setProperty(java.lang.String name, java.lang.Object value)
         throws javax.xml.bind.PropertyException
     {
         super.setProperty(name, value);
@@ -288,7 +288,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of GreetMeSoundElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -300,7 +300,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of IDValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -312,7 +312,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of FNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -324,7 +324,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of VATElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -336,7 +336,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -348,7 +348,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryResponseTypeDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -360,7 +360,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ResponseType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -372,7 +372,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LInformalNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -384,7 +384,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmploymentIdentityElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -396,7 +396,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgTechnologyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -408,7 +408,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSTDate
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -420,7 +420,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AddressCardElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -432,7 +432,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AltCNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -444,7 +444,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LOElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -456,7 +456,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgProviderElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -468,7 +468,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LEmergencyContactElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -480,7 +480,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DOBElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -492,7 +492,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSTURI
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -504,7 +504,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LSNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -516,7 +516,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PostalAddressElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -528,7 +528,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyInfoType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -540,7 +540,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LJobTitleElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -552,7 +552,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DisplayLanguageElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -564,7 +564,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StatusElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -576,7 +576,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ModifyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -588,7 +588,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -600,7 +600,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LPostalAddressElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -612,7 +612,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AltIDType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -624,7 +624,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -636,7 +636,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DemographicsElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -648,7 +648,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignKeyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -660,7 +660,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgContactType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -672,7 +672,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AddressType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -684,7 +684,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ModifyTypeModificationTypeNewDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -696,7 +696,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ModifyTypeModificationType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -708,7 +708,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of FacadeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -720,7 +720,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LNickElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -732,7 +732,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PPElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -744,7 +744,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AltIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -756,7 +756,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LegalNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -768,7 +768,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of JobTitleElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -780,7 +780,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InformalNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -792,7 +792,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PPType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -804,7 +804,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -816,7 +816,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LanguageElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -828,7 +828,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PersonalTitleElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -840,7 +840,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmergencyContactElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -852,7 +852,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of GenderElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -864,7 +864,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ModifyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -876,7 +876,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LFNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -888,7 +888,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ModifyResponseElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -900,7 +900,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AddressElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -912,7 +912,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ExtensionType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -924,7 +924,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgAccountElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -936,7 +936,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CommonNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -948,7 +948,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -960,7 +960,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryResponseType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -972,7 +972,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TimeZoneElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -984,7 +984,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSTMonthDay
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -996,7 +996,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LLegalNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1008,7 +1008,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LCommentElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1020,7 +1020,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of NamePronouncedElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1032,7 +1032,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PostalCodeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1044,7 +1044,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LPersonalTitleElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1056,7 +1056,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ExtensionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1068,7 +1068,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of IDTypeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1080,7 +1080,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of NickElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1092,7 +1092,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AddrTypeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1104,7 +1104,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmptyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1116,7 +1116,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1128,7 +1128,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LLElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1140,7 +1140,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of BirthdayElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1152,7 +1152,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AnalyzedNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1164,7 +1164,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LAltCNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1176,7 +1176,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptKeyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1188,7 +1188,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LStElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1200,7 +1200,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of GreetSoundElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1212,7 +1212,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryResponseElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1224,7 +1224,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LegalIdentityType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1236,7 +1236,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MugShotElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1248,7 +1248,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of FacadeType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1260,7 +1260,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MaritalStatusElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1272,7 +1272,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CommonNameType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1284,7 +1284,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ResourceIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1296,7 +1296,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1308,7 +1308,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LMNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1320,7 +1320,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgContactElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1332,7 +1332,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgTechnologyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1344,7 +1344,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AltLOElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1356,7 +1356,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryTypeQueryItemType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1368,7 +1368,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSTInteger
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1380,7 +1380,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StatusType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1392,7 +1392,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AltOElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1404,7 +1404,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1416,7 +1416,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSTLocalizedString
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1428,7 +1428,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of VATType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1440,7 +1440,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MsgTypeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1452,7 +1452,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmploymentIdentityType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1464,7 +1464,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of WebSiteElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1476,7 +1476,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedResourceIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1488,7 +1488,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSTString
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1500,7 +1500,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1512,7 +1512,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DemographicsType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1524,7 +1524,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AddressCardType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1536,7 +1536,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LegalIdentityElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1548,7 +1548,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LCNElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1560,7 +1560,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AnalyzedNameType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */

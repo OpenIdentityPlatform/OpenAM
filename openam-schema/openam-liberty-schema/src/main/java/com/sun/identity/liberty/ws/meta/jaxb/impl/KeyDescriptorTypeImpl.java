@@ -13,13 +13,13 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
 
     protected com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyInfoType _KeyInfo;
     protected com.sun.identity.liberty.ws.meta.jaxb.ExtensionType _Extension;
-    protected String _EncryptionMethod;
+    protected java.lang.String _EncryptionMethod;
     protected java.math.BigInteger _KeySize;
-    protected String _Use;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Use;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorType.class);
     }
 
@@ -39,11 +39,11 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
         _Extension = value;
     }
 
-    public String getEncryptionMethod() {
+    public java.lang.String getEncryptionMethod() {
         return _EncryptionMethod;
     }
 
-    public void setEncryptionMethod(String value) {
+    public void setEncryptionMethod(java.lang.String value) {
         _EncryptionMethod = value;
     }
 
@@ -55,11 +55,11 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
         _KeySize = value;
     }
 
-    public String getUse() {
+    public java.lang.String getUse() {
         return _Use;
     }
 
-    public void setUse(String value) {
+    public void setUse(java.lang.String value) {
         _Use = value;
     }
 
@@ -75,8 +75,8 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _EncryptionMethod), "EncryptionMethod");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _EncryptionMethod), "EncryptionMethod");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -87,7 +87,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             context.endAttributes();
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printInteger(((java.math.BigInteger) _KeySize)), "KeySize");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -126,8 +126,8 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
         if (_Use!= null) {
             context.startAttribute("", "use");
             try {
-                context.text(((String) _Use), "Use");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Use), "Use");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -159,7 +159,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorType.class);
     }
 
@@ -261,11 +261,11 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.KeyDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -306,7 +306,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
                     case  0 :
                         attIdx = context.getAttribute("", "use");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -378,17 +378,17 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Use = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -424,7 +424,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
                     case  0 :
                         attIdx = context.getAttribute("", "use");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -463,7 +463,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -505,7 +505,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -527,7 +527,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
                     case  0 :
                         attIdx = context.getAttribute("", "use");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -558,7 +558,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -593,7 +593,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
                         case  0 :
                             attIdx = context.getAttribute("", "use");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -613,29 +613,29 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.liberty.ws.meta.j
                             _KeyInfo = ((com.sun.identity.liberty.ws.common.jaxb.xmlsig.impl.KeyInfoTypeImpl) spawnChildFromText((com.sun.identity.liberty.ws.common.jaxb.xmlsig.impl.KeyInfoTypeImpl.class), 15, value));
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _KeySize = javax.xml.bind.DatatypeConverter.parseInteger(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _EncryptionMethod = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

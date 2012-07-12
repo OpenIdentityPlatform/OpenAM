@@ -32,17 +32,17 @@ public interface RedirectRequestType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getRedirectURL();
+    java.lang.String getRedirectURL();
 
     /**
      * Sets the value of the redirectURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setRedirectURL(String value);
+    void setRedirectURL(java.lang.String value);
 
 }

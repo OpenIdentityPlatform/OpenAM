@@ -57,13 +57,13 @@ public interface AffiliationDescriptorType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorElement}
      * {@link com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorType}
-     *
+     * 
      */
     java.util.List getKeyDescriptor();
 
     /**
      * Gets the value of the extension property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement}
@@ -73,7 +73,7 @@ public interface AffiliationDescriptorType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement}
@@ -83,25 +83,25 @@ public interface AffiliationDescriptorType {
 
     /**
      * Gets the value of the affiliationID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAffiliationID();
+    java.lang.String getAffiliationID();
 
     /**
      * Sets the value of the affiliationID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAffiliationID(String value);
+    void setAffiliationID(java.lang.String value);
 
     /**
      * Gets the value of the validUntil property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -110,7 +110,7 @@ public interface AffiliationDescriptorType {
 
     /**
      * Sets the value of the validUntil property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -119,80 +119,80 @@ public interface AffiliationDescriptorType {
 
     /**
      * Gets the value of the AffiliateMember property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AffiliateMember property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAffiliateMember().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getAffiliateMember();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the cacheDuration property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCacheDuration();
+    java.lang.String getCacheDuration();
 
     /**
      * Sets the value of the cacheDuration property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCacheDuration(String value);
+    void setCacheDuration(java.lang.String value);
 
     /**
      * Gets the value of the affiliationOwnerID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAffiliationOwnerID();
+    java.lang.String getAffiliationOwnerID();
 
     /**
      * Sets the value of the affiliationOwnerID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAffiliationOwnerID(String value);
+    void setAffiliationOwnerID(java.lang.String value);
 
     /**
      * Gets the value of the signature property.

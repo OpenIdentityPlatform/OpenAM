@@ -16,15 +16,15 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
     protected boolean has_Redirect;
     protected boolean _Redirect;
     protected java.math.BigInteger _MaxInteractTime;
-    protected String _Actor;
+    protected java.lang.String _Actor;
     protected javax.xml.namespace.QName _Interact;
     protected com.sun.identity.liberty.ws.disco.jaxb.ResourceOfferingType _InteractionService;
     protected com.sun.xml.bind.util.ListImpl _Language;
-    protected String _Id;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Id;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.UserInteractionHeaderType.class);
     }
 
@@ -58,11 +58,11 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
         _MaxInteractTime = value;
     }
 
-    public String getActor() {
+    public java.lang.String getActor() {
         return _Actor;
     }
 
-    public void setActor(String value) {
+    public void setActor(java.lang.String value) {
         _Actor = value;
     }
 
@@ -97,11 +97,11 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
         return _getLanguage();
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -133,8 +133,8 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -143,7 +143,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("", "interact");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printQName(((javax.xml.namespace.QName) _Interact), context.getNamespaceContext()), "Interact");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -152,8 +152,8 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("", "language");
             while (idx7 != len7) {
                 try {
-                    context.text(((String) _Language.get(idx7 ++)), "Language");
-                } catch (Exception e) {
+                    context.text(((java.lang.String) _Language.get(idx7 ++)), "Language");
+                } catch (java.lang.Exception e) {
                     com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
             }
@@ -163,7 +163,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("", "maxInteractTime");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printInteger(((java.math.BigInteger) _MaxInteractTime)), "MaxInteractTime");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -172,7 +172,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("", "redirect");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _Redirect)), "Redirect");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -180,8 +180,8 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
         if (_Actor!= null) {
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
             try {
-                context.text(((String) _Actor), "Actor");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Actor), "Actor");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -190,7 +190,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _MustUnderstand)), "MustUnderstand");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -205,7 +205,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
         if (_Interact!= null) {
             try {
                 context.getNamespaceContext().declareNamespace(((javax.xml.namespace.QName) _Interact).getNamespaceURI(), ((javax.xml.namespace.QName) _Interact).getPrefix(), false);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -213,7 +213,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             while (idx7 != len7) {
                 try {
                     idx7 += 1;
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
             }
@@ -226,11 +226,11 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.UserInteractionHeaderType.class);
     }
 
@@ -335,11 +335,11 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.UserInteractionHeaderTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -349,7 +349,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  12 :
                         attIdx = context.getAttribute("", "redirect");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -359,7 +359,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  9 :
                         attIdx = context.getAttribute("", "maxInteractTime");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -369,7 +369,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("", "interact");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -415,7 +415,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  15 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 18;
                             eatText4(v);
                             continue outer;
@@ -437,7 +437,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -447,7 +447,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  18 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 21;
                             eatText6(v);
                             continue outer;
@@ -460,69 +460,69 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Redirect = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_Redirect = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MaxInteractTime = javax.xml.bind.DatatypeConverter.parseInteger(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Interact = javax.xml.bind.DatatypeConverter.parseQName(com.sun.xml.bind.WhiteSpaceProcessor.collapse(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value)), context);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Actor = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText6(final String value)
+        private void eatText6(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MustUnderstand = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_MustUnderstand = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -532,7 +532,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  12 :
                         attIdx = context.getAttribute("", "redirect");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -542,7 +542,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  9 :
                         attIdx = context.getAttribute("", "maxInteractTime");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -552,7 +552,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("", "interact");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -573,7 +573,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  15 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 18;
                             eatText4(v);
                             continue outer;
@@ -602,7 +602,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -612,7 +612,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  18 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 21;
                             eatText6(v);
                             continue outer;
@@ -625,7 +625,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -699,7 +699,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -715,7 +715,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  12 :
                         attIdx = context.getAttribute("", "redirect");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -737,7 +737,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  9 :
                         attIdx = context.getAttribute("", "maxInteractTime");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -747,7 +747,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  3 :
                         attIdx = context.getAttribute("", "interact");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -774,7 +774,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  15 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 18;
                             eatText4(v);
                             continue outer;
@@ -808,7 +808,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -824,7 +824,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                     case  18 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 21;
                             eatText6(v);
                             continue outer;
@@ -837,7 +837,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -860,7 +860,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                         case  12 :
                             attIdx = context.getAttribute("", "redirect");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 15;
                                 eatText1(v);
                                 continue outer;
@@ -874,7 +874,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                         case  9 :
                             attIdx = context.getAttribute("", "maxInteractTime");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText2(v);
                                 continue outer;
@@ -888,7 +888,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                         case  3 :
                             attIdx = context.getAttribute("", "interact");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
@@ -913,7 +913,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                         case  15 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 18;
                                 eatText4(v);
                                 continue outer;
@@ -939,7 +939,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText5(v);
                                 continue outer;
@@ -953,7 +953,7 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                         case  18 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 21;
                                 eatText6(v);
                                 continue outer;
@@ -961,19 +961,19 @@ public class UserInteractionHeaderTypeImpl implements com.sun.identity.liberty.w
                             state = 21;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText7(final String value)
+        private void eatText7(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getLanguage().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

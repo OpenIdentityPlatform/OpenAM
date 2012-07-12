@@ -52,69 +52,69 @@ public interface QueryType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getItemID();
+    java.lang.String getItemID();
 
     /**
      * Sets the value of the itemID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setItemID(String value);
+    void setItemID(java.lang.String value);
 
     /**
      * Gets the value of the Extension property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Extension property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getExtension().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionType}
-     *
+     * 
      */
     java.util.List getExtension();
 
     /**
      * Gets the value of the QueryItem property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the QueryItem property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getQueryItem().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.QueryType.QueryItemType}
-     *
+     * 
      */
     java.util.List getQueryItem();
 
     /**
      * Gets the value of the resourceID property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.disco.jaxb.ResourceIDType}
@@ -124,7 +124,7 @@ public interface QueryType {
 
     /**
      * Sets the value of the resourceID property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.disco.jaxb.ResourceIDType}
@@ -134,25 +134,25 @@ public interface QueryType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the encryptedResourceID property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.disco.jaxb.EncryptedResourceIDType}
@@ -162,7 +162,7 @@ public interface QueryType {
 
     /**
      * Sets the value of the encryptedResourceID property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.disco.jaxb.EncryptedResourceIDType}
@@ -190,62 +190,62 @@ public interface QueryType {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
+     * 
      */
     public interface QueryItemType {
 
 
         /**
          * Gets the value of the itemID property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getItemID();
+        java.lang.String getItemID();
 
         /**
          * Sets the value of the itemID property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setItemID(String value);
+        void setItemID(java.lang.String value);
 
         /**
          * Gets the value of the select property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getSelect();
+        java.lang.String getSelect();
 
         /**
          * Sets the value of the select property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setSelect(String value);
+        void setSelect(java.lang.String value);
 
         /**
          * Gets the value of the includeCommonAttributes property.
-         *
+         * 
          */
         boolean isIncludeCommonAttributes();
 
         /**
          * Sets the value of the includeCommonAttributes property.
-         *
+         * 
          */
         void setIncludeCommonAttributes(boolean value);
 
         /**
          * Gets the value of the changedSince property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link java.util.Calendar}
@@ -254,7 +254,7 @@ public interface QueryType {
 
         /**
          * Sets the value of the changedSince property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link java.util.Calendar}
@@ -263,21 +263,21 @@ public interface QueryType {
 
         /**
          * Gets the value of the id property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getId();
+        java.lang.String getId();
 
         /**
          * Sets the value of the id property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setId(String value);
+        void setId(java.lang.String value);
 
     }
 

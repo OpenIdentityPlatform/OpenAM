@@ -11,23 +11,23 @@ package com.sun.identity.liberty.ws.interaction.jaxb.impl;
 public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.interaction.jaxb.InquiryElementType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected String _Name;
+    protected java.lang.String _Name;
     protected com.sun.identity.liberty.ws.interaction.jaxb.HelpType _Help;
-    protected String _Value;
-    protected String _Hint;
-    protected String _Label;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Value;
+    protected java.lang.String _Hint;
+    protected java.lang.String _Label;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.InquiryElementType.class);
     }
 
-    public String getName() {
+    public java.lang.String getName() {
         return _Name;
     }
 
-    public void setName(String value) {
+    public void setName(java.lang.String value) {
         _Name = value;
     }
 
@@ -39,27 +39,27 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
         _Help = value;
     }
 
-    public String getValue() {
+    public java.lang.String getValue() {
         return _Value;
     }
 
-    public void setValue(String value) {
+    public void setValue(java.lang.String value) {
         _Value = value;
     }
 
-    public String getHint() {
+    public java.lang.String getHint() {
         return _Hint;
     }
 
-    public void setHint(String value) {
+    public void setHint(java.lang.String value) {
         _Hint = value;
     }
 
-    public String getLabel() {
+    public java.lang.String getLabel() {
         return _Label;
     }
 
-    public void setLabel(String value) {
+    public void setLabel(java.lang.String value) {
         _Label = value;
     }
 
@@ -88,8 +88,8 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _Hint), "Hint");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Hint), "Hint");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -99,8 +99,8 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _Label), "Label");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Label), "Label");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -110,8 +110,8 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _Value), "Value");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Value), "Value");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -123,8 +123,8 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
     {
         context.startAttribute("", "name");
         try {
-            context.text(context.onID(this, ((String) _Name)), "Name");
-        } catch (Exception e) {
+            context.text(context.onID(this, ((java.lang.String) _Name)), "Name");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -145,11 +145,11 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Name);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Name);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.InquiryElementType.class);
     }
 
@@ -234,11 +234,11 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.InquiryElementTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -296,7 +296,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -320,17 +320,17 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Name = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -401,7 +401,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -416,7 +416,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -465,7 +465,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -514,7 +514,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -529,7 +529,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -589,7 +589,7 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
                         case  0 :
                             attIdx = context.getAttribute("", "name");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -599,39 +599,39 @@ public class InquiryElementTypeImpl implements com.sun.identity.liberty.ws.inter
                             state = 6;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Label = com.sun.xml.bind.WhiteSpaceProcessor.replace(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Hint = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Value = com.sun.xml.bind.WhiteSpaceProcessor.replace(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

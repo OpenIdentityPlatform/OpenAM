@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(40, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.federation.jaxb.entityconfig.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.federation.jaxb.entityconfig.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (com.sun.identity.liberty.ws.interaction.jaxb.ObjectFactory.class));
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((com.sun.identity.liberty.ws.interaction.jaxb.InteractionRequestType.class), "com.sun.identity.liberty.ws.interaction.jaxb.impl.InteractionRequestTypeImpl");
@@ -79,7 +79,7 @@ public class ObjectFactory
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sun.identity.liberty.ws.interaction.jaxb
-     *
+     * 
      */
     public ObjectFactory() {
         super(grammarInfo);
@@ -87,7 +87,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of the specified Java content interface.
-     *
+     * 
      * @param javaContentInterface
      *     the Class object of the javacontent interface to instantiate
      * @return
@@ -95,7 +95,7 @@ public class ObjectFactory
      * @throws JAXBException
      *     if an error occurs
      */
-    public Object newInstance(Class javaContentInterface)
+    public java.lang.Object newInstance(java.lang.Class javaContentInterface)
         throws javax.xml.bind.JAXBException
     {
         return super.newInstance(javaContentInterface);
@@ -106,7 +106,7 @@ public class ObjectFactory
      * used to get provider specific properties.
      * Attempting to get an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @return
@@ -114,7 +114,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error retrieving the given property or value
      */
-    public Object getProperty(String name)
+    public java.lang.Object getProperty(java.lang.String name)
         throws javax.xml.bind.PropertyException
     {
         return super.getProperty(name);
@@ -125,7 +125,7 @@ public class ObjectFactory
      * used to set provider specific properties.
      * Attempting to set an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @param value
@@ -133,7 +133,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error processing the given property or value
      */
-    public void setProperty(String name, Object value)
+    public void setProperty(java.lang.String name, java.lang.Object value)
         throws javax.xml.bind.PropertyException
     {
         super.setProperty(name, value);
@@ -141,7 +141,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InteractionRequestType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -153,7 +153,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedResourceIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -165,7 +165,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InquiryTypeConfirm
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -177,7 +177,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of HintElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -189,11 +189,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of HintElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.liberty.ws.interaction.jaxb.HintElement createHintElement(String value)
+    public com.sun.identity.liberty.ws.interaction.jaxb.HintElement createHintElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.liberty.ws.interaction.jaxb.impl.HintElementImpl(value);
@@ -201,7 +201,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SelectType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -213,7 +213,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InquiryElementType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -225,7 +225,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InquiryElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -237,7 +237,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ParameterType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -249,7 +249,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InquiryType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -261,7 +261,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ExtensionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -273,7 +273,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SelectTypeItemType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -285,7 +285,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TextType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -297,7 +297,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InteractionResponseElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -309,7 +309,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of HelpElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -321,7 +321,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TextElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -333,7 +333,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StatusElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -345,7 +345,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InteractionStatementType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -357,7 +357,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InteractionRequestElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -369,7 +369,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ResourceIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -381,7 +381,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ExtensionType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -393,7 +393,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of UserInteractionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -405,7 +405,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of UserInteractionHeaderType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -417,7 +417,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmptyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -429,7 +429,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of InteractionResponseType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -441,7 +441,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RedirectRequestElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -453,7 +453,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RedirectRequestType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -465,7 +465,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of HelpType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -477,7 +477,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SelectElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -489,7 +489,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StatusType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */

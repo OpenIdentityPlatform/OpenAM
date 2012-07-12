@@ -12,17 +12,17 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
 {
 
     protected com.sun.identity.liberty.ws.meta.jaxb.ExtensionType _Extension;
-    protected String _SurName;
-    protected String _GivenName;
+    protected java.lang.String _SurName;
+    protected java.lang.String _GivenName;
     protected com.sun.xml.bind.util.ListImpl _TelephoneNumber;
     protected com.sun.xml.bind.util.ListImpl _EmailAddress;
-    protected String _LibertyPrincipalIdentifier;
-    protected String _Company;
-    protected String _ContactType;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _LibertyPrincipalIdentifier;
+    protected java.lang.String _Company;
+    protected java.lang.String _ContactType;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.ContactType.class);
     }
 
@@ -34,19 +34,19 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
         _Extension = value;
     }
 
-    public String getSurName() {
+    public java.lang.String getSurName() {
         return _SurName;
     }
 
-    public void setSurName(String value) {
+    public void setSurName(java.lang.String value) {
         _SurName = value;
     }
 
-    public String getGivenName() {
+    public java.lang.String getGivenName() {
         return _GivenName;
     }
 
-    public void setGivenName(String value) {
+    public void setGivenName(java.lang.String value) {
         _GivenName = value;
     }
 
@@ -72,27 +72,27 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
         return _getEmailAddress();
     }
 
-    public String getLibertyPrincipalIdentifier() {
+    public java.lang.String getLibertyPrincipalIdentifier() {
         return _LibertyPrincipalIdentifier;
     }
 
-    public void setLibertyPrincipalIdentifier(String value) {
+    public void setLibertyPrincipalIdentifier(java.lang.String value) {
         _LibertyPrincipalIdentifier = value;
     }
 
-    public String getCompany() {
+    public java.lang.String getCompany() {
         return _Company;
     }
 
-    public void setCompany(String value) {
+    public void setCompany(java.lang.String value) {
         _Company = value;
     }
 
-    public String getContactType() {
+    public java.lang.String getContactType() {
         return _ContactType;
     }
 
-    public void setContactType(String value) {
+    public void setContactType(java.lang.String value) {
         _ContactType = value;
     }
 
@@ -112,8 +112,8 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _Company), "Company");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Company), "Company");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -123,8 +123,8 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _GivenName), "GivenName");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _GivenName), "GivenName");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -134,8 +134,8 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _SurName), "SurName");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SurName), "SurName");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -145,20 +145,20 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             int idx_6 = idx5;
             try {
                 idx_6 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_7 = idx5;
             try {
                 idx_7 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _EmailAddress.get(idx5 ++)), "EmailAddress");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _EmailAddress.get(idx5 ++)), "EmailAddress");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -168,20 +168,20 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             int idx_8 = idx4;
             try {
                 idx_8 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_9 = idx4;
             try {
                 idx_9 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _TelephoneNumber.get(idx4 ++)), "TelephoneNumber");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _TelephoneNumber.get(idx4 ++)), "TelephoneNumber");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -210,16 +210,16 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
         final int len5 = ((_EmailAddress == null)? 0 :_EmailAddress.size());
         context.startAttribute("", "contactType");
         try {
-            context.text(((String) _ContactType), "ContactType");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _ContactType), "ContactType");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_LibertyPrincipalIdentifier!= null) {
             context.startAttribute("", "libertyPrincipalIdentifier");
             try {
-                context.text(((String) _LibertyPrincipalIdentifier), "LibertyPrincipalIdentifier");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _LibertyPrincipalIdentifier), "LibertyPrincipalIdentifier");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -227,14 +227,14 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
         while (idx5 != len5) {
             try {
                 idx5 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
         while (idx4 != len4) {
             try {
                 idx4 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -255,14 +255,14 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
         while (idx5 != len5) {
             try {
                 idx5 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
         while (idx4 != len4) {
             try {
                 idx4 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -273,7 +273,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.ContactType.class);
     }
 
@@ -371,11 +371,11 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.ContactTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -385,7 +385,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                     case  0 :
                         attIdx = context.getAttribute("", "contactType");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -402,7 +402,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                     case  3 :
                         attIdx = context.getAttribute("", "libertyPrincipalIdentifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -478,27 +478,27 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ContactType = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _LibertyPrincipalIdentifier = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -508,7 +508,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                     case  0 :
                         attIdx = context.getAttribute("", "contactType");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -527,7 +527,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                     case  3 :
                         attIdx = context.getAttribute("", "libertyPrincipalIdentifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -593,7 +593,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -640,7 +640,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -650,7 +650,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                     case  0 :
                         attIdx = context.getAttribute("", "contactType");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -674,7 +674,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                     case  3 :
                         attIdx = context.getAttribute("", "libertyPrincipalIdentifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -705,7 +705,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -716,7 +716,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                         case  0 :
                             attIdx = context.getAttribute("", "contactType");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -740,7 +740,7 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                         case  3 :
                             attIdx = context.getAttribute("", "libertyPrincipalIdentifier");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -782,59 +782,59 @@ public class ContactTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Co
                             state = 22;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getEmailAddress().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Company = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getTelephoneNumber().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText6(final String value)
+        private void eatText6(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SurName = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText7(final String value)
+        private void eatText7(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _GivenName = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

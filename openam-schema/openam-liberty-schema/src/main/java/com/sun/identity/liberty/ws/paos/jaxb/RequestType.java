@@ -48,71 +48,71 @@ public interface RequestType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getService();
+    java.lang.String getService();
 
     /**
      * Sets the value of the service property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setService(String value);
+    void setService(java.lang.String value);
 
     /**
      * Gets the value of the actor property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the messageID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getMessageID();
+    java.lang.String getMessageID();
 
     /**
      * Sets the value of the messageID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setMessageID(String value);
+    void setMessageID(java.lang.String value);
 
     /**
      * Gets the value of the responseConsumerURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getResponseConsumerURL();
+    java.lang.String getResponseConsumerURL();
 
     /**
      * Sets the value of the responseConsumerURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setResponseConsumerURL(String value);
+    void setResponseConsumerURL(java.lang.String value);
 
 }

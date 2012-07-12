@@ -61,135 +61,135 @@ public interface ContactType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSurName();
+    java.lang.String getSurName();
 
     /**
      * Sets the value of the surName property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSurName(String value);
+    void setSurName(java.lang.String value);
 
     /**
      * Gets the value of the givenName property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getGivenName();
+    java.lang.String getGivenName();
 
     /**
      * Sets the value of the givenName property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setGivenName(String value);
+    void setGivenName(java.lang.String value);
 
     /**
      * Gets the value of the TelephoneNumber property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the TelephoneNumber property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getTelephoneNumber().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getTelephoneNumber();
 
     /**
      * Gets the value of the EmailAddress property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the EmailAddress property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getEmailAddress().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getEmailAddress();
 
     /**
      * Gets the value of the libertyPrincipalIdentifier property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getLibertyPrincipalIdentifier();
+    java.lang.String getLibertyPrincipalIdentifier();
 
     /**
      * Sets the value of the libertyPrincipalIdentifier property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setLibertyPrincipalIdentifier(String value);
+    void setLibertyPrincipalIdentifier(java.lang.String value);
 
     /**
      * Gets the value of the company property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCompany();
+    java.lang.String getCompany();
 
     /**
      * Sets the value of the company property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCompany(String value);
+    void setCompany(java.lang.String value);
 
     /**
      * Gets the value of the contactType property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getContactType();
+    java.lang.String getContactType();
 
     /**
      * Sets the value of the contactType property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setContactType(String value);
+    void setContactType(java.lang.String value);
 
 }

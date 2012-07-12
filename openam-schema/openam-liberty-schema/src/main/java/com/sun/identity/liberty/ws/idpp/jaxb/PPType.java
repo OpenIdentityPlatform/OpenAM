@@ -55,7 +55,7 @@ public interface PPType {
 
     /**
      * Sets the value of the commonName property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.CommonNameType}
@@ -65,31 +65,31 @@ public interface PPType {
 
     /**
      * Gets the value of the AddressCard property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AddressCard property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAddressCard().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.AddressCardElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.AddressCardType}
-     *
+     * 
      */
     java.util.List getAddressCard();
 
     /**
      * Gets the value of the modificationTime property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -98,7 +98,7 @@ public interface PPType {
 
     /**
      * Sets the value of the modificationTime property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -107,31 +107,31 @@ public interface PPType {
 
     /**
      * Gets the value of the MsgContact property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the MsgContact property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getMsgContact().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgContactElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgContactType}
-     *
+     * 
      */
     java.util.List getMsgContact();
 
     /**
      * Gets the value of the legalIdentity property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.LegalIdentityElement}
@@ -141,7 +141,7 @@ public interface PPType {
 
     /**
      * Sets the value of the legalIdentity property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.LegalIdentityElement}
@@ -151,7 +151,7 @@ public interface PPType {
 
     /**
      * Gets the value of the informalName property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -161,7 +161,7 @@ public interface PPType {
 
     /**
      * Sets the value of the informalName property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -171,7 +171,7 @@ public interface PPType {
 
     /**
      * Gets the value of the emergencyContact property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -181,7 +181,7 @@ public interface PPType {
 
     /**
      * Sets the value of the emergencyContact property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -191,7 +191,7 @@ public interface PPType {
 
     /**
      * Gets the value of the demographics property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DemographicsType}
@@ -201,7 +201,7 @@ public interface PPType {
 
     /**
      * Sets the value of the demographics property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DemographicsType}
@@ -211,7 +211,7 @@ public interface PPType {
 
     /**
      * Gets the value of the extension property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -221,7 +221,7 @@ public interface PPType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -231,7 +231,7 @@ public interface PPType {
 
     /**
      * Gets the value of the signKey property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.SignKeyElement}
@@ -241,7 +241,7 @@ public interface PPType {
 
     /**
      * Sets the value of the signKey property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.SignKeyElement}
@@ -251,73 +251,73 @@ public interface PPType {
 
     /**
      * Gets the value of the LEmergencyContact property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the LEmergencyContact property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getLEmergencyContact().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.LEmergencyContactElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTLocalizedString}
-     *
+     * 
      */
     java.util.List getLEmergencyContact();
 
     /**
      * Gets the value of the LInformalName property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the LInformalName property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getLInformalName().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.LInformalNameElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTLocalizedString}
-     *
+     * 
      */
     java.util.List getLInformalName();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the employmentIdentity property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.EmploymentIdentityType}
@@ -327,7 +327,7 @@ public interface PPType {
 
     /**
      * Sets the value of the employmentIdentity property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.EmploymentIdentityType}
@@ -337,7 +337,7 @@ public interface PPType {
 
     /**
      * Gets the value of the facade property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.FacadeElement}
@@ -347,7 +347,7 @@ public interface PPType {
 
     /**
      * Sets the value of the facade property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.FacadeElement}
@@ -357,7 +357,7 @@ public interface PPType {
 
     /**
      * Gets the value of the encryptKey property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.KeyInfoType}
@@ -367,7 +367,7 @@ public interface PPType {
 
     /**
      * Sets the value of the encryptKey property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.KeyInfoType}

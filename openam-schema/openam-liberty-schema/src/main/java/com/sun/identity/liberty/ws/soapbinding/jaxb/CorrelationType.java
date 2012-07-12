@@ -49,72 +49,72 @@ public interface CorrelationType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the messageID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getMessageID();
+    java.lang.String getMessageID();
 
     /**
      * Sets the value of the messageID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setMessageID(String value);
+    void setMessageID(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the refToMessageID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getRefToMessageID();
+    java.lang.String getRefToMessageID();
 
     /**
      * Sets the value of the refToMessageID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setRefToMessageID(String value);
+    void setRefToMessageID(java.lang.String value);
 
     /**
      * Gets the value of the timestamp property.

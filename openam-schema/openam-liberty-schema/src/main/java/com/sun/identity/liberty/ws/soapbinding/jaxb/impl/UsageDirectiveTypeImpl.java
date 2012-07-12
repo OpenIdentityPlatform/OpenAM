@@ -11,24 +11,24 @@ package com.sun.identity.liberty.ws.soapbinding.jaxb.impl;
 public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapbinding.jaxb.UsageDirectiveType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected Object _Ref;
+    protected java.lang.Object _Ref;
     protected com.sun.xml.bind.util.ListImpl _Any;
     protected boolean has_MustUnderstand;
     protected boolean _MustUnderstand;
-    protected String _Actor;
-    protected String _Id;
-    public final static Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Actor;
+    protected java.lang.String _Id;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.soapbinding.jaxb.UsageDirectiveType.class);
     }
 
-    public Object getRef() {
+    public java.lang.Object getRef() {
         return _Ref;
     }
 
-    public void setRef(Object value) {
+    public void setRef(java.lang.Object value) {
         _Ref = value;
     }
 
@@ -52,19 +52,19 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
         has_MustUnderstand = true;
     }
 
-    public String getActor() {
+    public java.lang.String getActor() {
         return _Actor;
     }
 
-    public void setActor(String value) {
+    public void setActor(java.lang.String value) {
         _Actor = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -90,24 +90,24 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         context.startAttribute("", "ref");
         try {
-            context.text(context.onIDREF(((com.sun.xml.bind.marshaller.IdentifiableObject)((Object) _Ref))), "Ref");
-        } catch (Exception e) {
+            context.text(context.onIDREF(((com.sun.xml.bind.marshaller.IdentifiableObject)((java.lang.Object) _Ref))), "Ref");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_Actor!= null) {
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
             try {
-                context.text(((String) _Actor), "Actor");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Actor), "Actor");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -116,7 +116,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _MustUnderstand)), "MustUnderstand");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -142,11 +142,11 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.soapbinding.jaxb.UsageDirectiveType.class);
     }
 
@@ -233,11 +233,11 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.soapbinding.jaxb.impl.UsageDirectiveTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -247,7 +247,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  3 :
                         attIdx = context.getAttribute("", "ref");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -255,7 +255,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                         break;
                     case  12 :
                         if (!(("" == ___uri)||("urn:liberty:sb:2003-08" == ___uri))) {
-                            Object co = spawnWildcard(13, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(13, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -265,7 +265,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  9 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -275,7 +275,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -284,7 +284,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                         continue outer;
                     case  13 :
                         if (!(("" == ___uri)||("urn:liberty:sb:2003-08" == ___uri))) {
-                            Object co = spawnWildcard(13, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(13, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -295,7 +295,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  6 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -308,56 +308,56 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
-                context.addPatcher(new Runnable() {
+                context.addPatcher(new java.lang.Runnable() {
 
 
                     public void run() {
-                        _Ref = ((Object) context.getObjectFromId(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value)));
+                        _Ref = ((java.lang.Object) context.getObjectFromId(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value)));
                     }
 
                 }
                 );
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MustUnderstand = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_MustUnderstand = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Actor = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -367,7 +367,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  3 :
                         attIdx = context.getAttribute("", "ref");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -376,7 +376,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  9 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -386,7 +386,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -399,7 +399,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  6 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -412,7 +412,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -455,7 +455,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -465,7 +465,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  3 :
                         attIdx = context.getAttribute("", "ref");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -480,7 +480,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  9 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -508,7 +508,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -521,7 +521,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                     case  6 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -534,7 +534,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -545,7 +545,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                         case  3 :
                             attIdx = context.getAttribute("", "ref");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -558,7 +558,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                         case  9 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText2(v);
                                 continue outer;
@@ -576,7 +576,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText3(v);
                                 continue outer;
@@ -593,7 +593,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                         case  6 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText4(v);
                                 continue outer;
@@ -601,7 +601,7 @@ public class UsageDirectiveTypeImpl implements com.sun.identity.liberty.ws.soapb
                             state = 9;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

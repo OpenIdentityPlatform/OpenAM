@@ -13,21 +13,21 @@ public class IDPDescriptorTypeImpl
     implements com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected String _SingleSignOnServiceURL;
+    protected java.lang.String _SingleSignOnServiceURL;
     protected com.sun.xml.bind.util.ListImpl _SingleSignOnProtocolProfile;
-    protected String _AuthnServiceURL;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _AuthnServiceURL;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType.class);
     }
 
-    public String getSingleSignOnServiceURL() {
+    public java.lang.String getSingleSignOnServiceURL() {
         return _SingleSignOnServiceURL;
     }
 
-    public void setSingleSignOnServiceURL(String value) {
+    public void setSingleSignOnServiceURL(java.lang.String value) {
         _SingleSignOnServiceURL = value;
     }
 
@@ -42,11 +42,11 @@ public class IDPDescriptorTypeImpl
         return _getSingleSignOnProtocolProfile();
     }
 
-    public String getAuthnServiceURL() {
+    public java.lang.String getAuthnServiceURL() {
         return _AuthnServiceURL;
     }
 
-    public void setAuthnServiceURL(String value) {
+    public void setAuthnServiceURL(java.lang.String value) {
         _AuthnServiceURL = value;
     }
 
@@ -64,8 +64,8 @@ public class IDPDescriptorTypeImpl
         context.endNamespaceDecls();
         context.endAttributes();
         try {
-            context.text(((String) _SingleSignOnServiceURL), "SingleSignOnServiceURL");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _SingleSignOnServiceURL), "SingleSignOnServiceURL");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -74,20 +74,20 @@ public class IDPDescriptorTypeImpl
             int idx_2 = idx2;
             try {
                 idx_2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_3 = idx2;
             try {
                 idx_3 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _SingleSignOnProtocolProfile.get(idx2 ++)), "SingleSignOnProtocolProfile");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SingleSignOnProtocolProfile.get(idx2 ++)), "SingleSignOnProtocolProfile");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -97,8 +97,8 @@ public class IDPDescriptorTypeImpl
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _AuthnServiceURL), "AuthnServiceURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _AuthnServiceURL), "AuthnServiceURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -114,7 +114,7 @@ public class IDPDescriptorTypeImpl
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -129,13 +129,13 @@ public class IDPDescriptorTypeImpl
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType.class);
     }
 
@@ -299,11 +299,11 @@ public class IDPDescriptorTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.IDPDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -366,7 +366,7 @@ public class IDPDescriptorTypeImpl
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -426,7 +426,7 @@ public class IDPDescriptorTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -459,7 +459,7 @@ public class IDPDescriptorTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -498,7 +498,7 @@ public class IDPDescriptorTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -545,39 +545,39 @@ public class IDPDescriptorTypeImpl
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SingleSignOnServiceURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AuthnServiceURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getSingleSignOnProtocolProfile().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

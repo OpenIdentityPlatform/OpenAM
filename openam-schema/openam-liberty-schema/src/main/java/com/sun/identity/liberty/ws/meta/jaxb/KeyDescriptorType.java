@@ -65,7 +65,7 @@ public interface KeyDescriptorType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement}
@@ -75,25 +75,25 @@ public interface KeyDescriptorType {
 
     /**
      * Gets the value of the encryptionMethod property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getEncryptionMethod();
+    java.lang.String getEncryptionMethod();
 
     /**
      * Sets the value of the encryptionMethod property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setEncryptionMethod(String value);
+    void setEncryptionMethod(java.lang.String value);
 
     /**
      * Gets the value of the keySize property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.math.BigInteger}
@@ -102,7 +102,7 @@ public interface KeyDescriptorType {
 
     /**
      * Sets the value of the keySize property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.math.BigInteger}
@@ -111,20 +111,20 @@ public interface KeyDescriptorType {
 
     /**
      * Gets the value of the use property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getUse();
+    java.lang.String getUse();
 
     /**
      * Sets the value of the use property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setUse(String value);
+    void setUse(java.lang.String value);
 
 }

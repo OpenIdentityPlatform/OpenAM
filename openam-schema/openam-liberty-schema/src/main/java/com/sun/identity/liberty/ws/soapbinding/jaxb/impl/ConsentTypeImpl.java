@@ -13,14 +13,14 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
 
     protected boolean has_MustUnderstand;
     protected boolean _MustUnderstand;
-    protected String _Actor;
-    protected String _Uri;
-    protected String _Id;
+    protected java.lang.String _Actor;
+    protected java.lang.String _Uri;
+    protected java.lang.String _Id;
     protected java.util.Calendar _Timestamp;
-    public final static Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.soapbinding.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.soapbinding.jaxb.ConsentType.class);
     }
 
@@ -33,27 +33,27 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
         has_MustUnderstand = true;
     }
 
-    public String getActor() {
+    public java.lang.String getActor() {
         return _Actor;
     }
 
-    public void setActor(String value) {
+    public void setActor(java.lang.String value) {
         _Actor = value;
     }
 
-    public String getUri() {
+    public java.lang.String getUri() {
         return _Uri;
     }
 
-    public void setUri(String value) {
+    public void setUri(java.lang.String value) {
         _Uri = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -80,8 +80,8 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -90,23 +90,23 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             context.startAttribute("", "timestamp");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _Timestamp), null), "Timestamp");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         context.startAttribute("", "uri");
         try {
-            context.text(((String) _Uri), "Uri");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Uri), "Uri");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_Actor!= null) {
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
             try {
-                context.text(((String) _Actor), "Actor");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Actor), "Actor");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -115,7 +115,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             context.startAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _MustUnderstand)), "MustUnderstand");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -133,11 +133,11 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.soapbinding.jaxb.ConsentType.class);
     }
 
@@ -213,11 +213,11 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.soapbinding.jaxb.impl.ConsentTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -227,7 +227,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  3 :
                         attIdx = context.getAttribute("", "timestamp");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -237,7 +237,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  6 :
                         attIdx = context.getAttribute("", "uri");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -246,7 +246,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  12 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText3(v);
                             continue outer;
@@ -256,7 +256,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  9 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -269,7 +269,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -282,58 +282,58 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Timestamp = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Uri = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MustUnderstand = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_MustUnderstand = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Actor = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -343,7 +343,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  3 :
                         attIdx = context.getAttribute("", "timestamp");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -353,7 +353,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  6 :
                         attIdx = context.getAttribute("", "uri");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -362,7 +362,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  12 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText3(v);
                             continue outer;
@@ -372,7 +372,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  9 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -385,7 +385,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -398,7 +398,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -448,7 +448,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -464,7 +464,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  3 :
                         attIdx = context.getAttribute("", "timestamp");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -474,7 +474,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  6 :
                         attIdx = context.getAttribute("", "uri");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -501,7 +501,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  12 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText3(v);
                             continue outer;
@@ -511,7 +511,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  9 :
                         attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -524,7 +524,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -543,7 +543,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -554,7 +554,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                         case  3 :
                             attIdx = context.getAttribute("", "timestamp");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -564,7 +564,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                         case  6 :
                             attIdx = context.getAttribute("", "uri");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText2(v);
                                 continue outer;
@@ -577,7 +577,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                         case  12 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "mustUnderstand");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 15;
                                 eatText3(v);
                                 continue outer;
@@ -587,7 +587,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                         case  9 :
                             attIdx = context.getAttribute("http://schemas.xmlsoap.org/soap/envelope/", "actor");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText4(v);
                                 continue outer;
@@ -604,7 +604,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText5(v);
                                 continue outer;
@@ -624,7 +624,7 @@ public class ConsentTypeImpl implements com.sun.identity.liberty.ws.soapbinding.
                             eatText1(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

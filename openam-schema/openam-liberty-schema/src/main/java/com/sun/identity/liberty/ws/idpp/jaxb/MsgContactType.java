@@ -59,13 +59,13 @@ public interface MsgContactType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTURI}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgMethodElement}
-     *
+     * 
      */
     java.util.List getMsgMethod();
 
     /**
      * Gets the value of the extension property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -75,7 +75,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -85,7 +85,7 @@ public interface MsgContactType {
 
     /**
      * Gets the value of the msgAccount property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -95,7 +95,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the msgAccount property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -105,7 +105,7 @@ public interface MsgContactType {
 
     /**
      * Gets the value of the msgProvider property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -115,7 +115,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the msgProvider property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -125,7 +125,7 @@ public interface MsgContactType {
 
     /**
      * Gets the value of the modificationTime property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -134,7 +134,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the modificationTime property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -143,31 +143,31 @@ public interface MsgContactType {
 
     /**
      * Gets the value of the LNick property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the LNick property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getLNick().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.LNickElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTLocalizedString}
-     *
+     * 
      */
     java.util.List getLNick();
 
     /**
      * Gets the value of the msgSubaccount property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgSubaccountElement}
@@ -177,7 +177,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the msgSubaccount property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgSubaccountElement}
@@ -187,73 +187,73 @@ public interface MsgContactType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the MsgTechnology property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the MsgTechnology property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getMsgTechnology().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgTechnologyElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgTechnologyType}
-     *
+     * 
      */
     java.util.List getMsgTechnology();
 
     /**
      * Gets the value of the MsgType property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the MsgType property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getMsgType().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.MsgTypeElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTURI}
-     *
+     * 
      */
     java.util.List getMsgType();
 
     /**
      * Gets the value of the lComment property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -263,7 +263,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the lComment property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -273,7 +273,7 @@ public interface MsgContactType {
 
     /**
      * Gets the value of the nick property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.NickElement}
@@ -283,7 +283,7 @@ public interface MsgContactType {
 
     /**
      * Sets the value of the nick property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.NickElement}

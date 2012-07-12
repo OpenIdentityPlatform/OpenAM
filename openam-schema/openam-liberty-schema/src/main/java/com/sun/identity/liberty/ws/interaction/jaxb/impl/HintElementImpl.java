@@ -11,34 +11,34 @@ package com.sun.identity.liberty.ws.interaction.jaxb.impl;
 public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.jaxb.HintElement, com.sun.xml.bind.RIElement, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
 {
 
-    protected String _Value;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Value;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
     public HintElementImpl() {
     }
 
-    public HintElementImpl(String value) {
+    public HintElementImpl(java.lang.String value) {
         _Value = value;
     }
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.HintElement.class);
     }
 
-    public String ____jaxb_ri____getNamespaceURI() {
+    public java.lang.String ____jaxb_ri____getNamespaceURI() {
         return "urn:liberty:is:2003-08";
     }
 
-    public String ____jaxb_ri____getLocalName() {
+    public java.lang.String ____jaxb_ri____getLocalName() {
         return "Hint";
     }
 
-    public String getValue() {
+    public java.lang.String getValue() {
         return _Value;
     }
 
-    public void setValue(String value) {
+    public void setValue(java.lang.String value) {
         _Value = value;
     }
 
@@ -53,8 +53,8 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
         context.endNamespaceDecls();
         context.endAttributes();
         try {
-            context.text(((String) _Value), "Value");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Value), "Value");
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -70,7 +70,7 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.HintElement.class);
     }
 
@@ -132,11 +132,11 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.HintElementImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -159,7 +159,7 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -182,7 +182,7 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -198,7 +198,7 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -214,7 +214,7 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -230,19 +230,19 @@ public class HintElementImpl implements com.sun.identity.liberty.ws.interaction.
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Value = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

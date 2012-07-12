@@ -68,124 +68,124 @@ public interface ProviderDescriptorType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getRegisterNameIdentifierProtocolProfile();
 
     /**
      * Gets the value of the NameIdentifierMappingProtocolProfile property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the NameIdentifierMappingProtocolProfile property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getNameIdentifierMappingProtocolProfile().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.common.jaxb.assertion.AuthorityBindingType}
-     *
+     * 
      */
     java.util.List getNameIdentifierMappingProtocolProfile();
 
     /**
      * Gets the value of the registerNameIdentifierServiceReturnURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getRegisterNameIdentifierServiceReturnURL();
+    java.lang.String getRegisterNameIdentifierServiceReturnURL();
 
     /**
      * Sets the value of the registerNameIdentifierServiceReturnURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setRegisterNameIdentifierServiceReturnURL(String value);
+    void setRegisterNameIdentifierServiceReturnURL(java.lang.String value);
 
     /**
      * Gets the value of the ProtocolSupportEnumeration property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the ProtocolSupportEnumeration property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getProtocolSupportEnumeration().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getProtocolSupportEnumeration();
 
     /**
      * Gets the value of the ContactPerson property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the ContactPerson property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getContactPerson().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.ContactType}
-     *
+     * 
      */
     java.util.List getContactPerson();
 
     /**
      * Gets the value of the AdditionalMetaLocation property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AdditionalMetaLocation property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAdditionalMetaLocation().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.AdditionalMetadataLocationType}
-     *
+     * 
      */
     java.util.List getAdditionalMetaLocation();
 
     /**
      * Gets the value of the organization property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.OrganizationType}
@@ -194,7 +194,7 @@ public interface ProviderDescriptorType {
 
     /**
      * Sets the value of the organization property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.OrganizationType}
@@ -203,48 +203,48 @@ public interface ProviderDescriptorType {
 
     /**
      * Gets the value of the NameIdentifierMappingEncryptionProfile property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the NameIdentifierMappingEncryptionProfile property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getNameIdentifierMappingEncryptionProfile().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getNameIdentifierMappingEncryptionProfile();
 
     /**
      * Gets the value of the singleLogoutServiceURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSingleLogoutServiceURL();
+    java.lang.String getSingleLogoutServiceURL();
 
     /**
      * Sets the value of the singleLogoutServiceURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSingleLogoutServiceURL(String value);
+    void setSingleLogoutServiceURL(java.lang.String value);
 
     /**
      * Gets the value of the signature property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureElement}
@@ -254,7 +254,7 @@ public interface ProviderDescriptorType {
 
     /**
      * Sets the value of the signature property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureElement}
@@ -264,48 +264,48 @@ public interface ProviderDescriptorType {
 
     /**
      * Gets the value of the singleLogoutServiceReturnURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSingleLogoutServiceReturnURL();
+    java.lang.String getSingleLogoutServiceReturnURL();
 
     /**
      * Sets the value of the singleLogoutServiceReturnURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSingleLogoutServiceReturnURL(String value);
+    void setSingleLogoutServiceReturnURL(java.lang.String value);
 
     /**
      * Gets the value of the FederationTerminationNotificationProtocolProfile property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the FederationTerminationNotificationProtocolProfile property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getFederationTerminationNotificationProtocolProfile().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getFederationTerminationNotificationProtocolProfile();
 
     /**
      * Gets the value of the extension property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement}
@@ -315,7 +315,7 @@ public interface ProviderDescriptorType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement}
@@ -325,67 +325,67 @@ public interface ProviderDescriptorType {
 
     /**
      * Gets the value of the KeyDescriptor property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the KeyDescriptor property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getKeyDescriptor().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorElement}
      * {@link com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorType}
-     *
+     * 
      */
     java.util.List getKeyDescriptor();
 
     /**
      * Gets the value of the registerNameIdentifierServiceURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getRegisterNameIdentifierServiceURL();
+    java.lang.String getRegisterNameIdentifierServiceURL();
 
     /**
      * Sets the value of the registerNameIdentifierServiceURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setRegisterNameIdentifierServiceURL(String value);
+    void setRegisterNameIdentifierServiceURL(java.lang.String value);
 
     /**
      * Gets the value of the federationTerminationServiceURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getFederationTerminationServiceURL();
+    java.lang.String getFederationTerminationServiceURL();
 
     /**
      * Sets the value of the federationTerminationServiceURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setFederationTerminationServiceURL(String value);
+    void setFederationTerminationServiceURL(java.lang.String value);
 
     /**
      * Gets the value of the validUntil property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -394,7 +394,7 @@ public interface ProviderDescriptorType {
 
     /**
      * Sets the value of the validUntil property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -403,95 +403,95 @@ public interface ProviderDescriptorType {
 
     /**
      * Gets the value of the federationTerminationServiceReturnURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getFederationTerminationServiceReturnURL();
+    java.lang.String getFederationTerminationServiceReturnURL();
 
     /**
      * Sets the value of the federationTerminationServiceReturnURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setFederationTerminationServiceReturnURL(String value);
+    void setFederationTerminationServiceReturnURL(java.lang.String value);
 
     /**
      * Gets the value of the cacheDuration property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCacheDuration();
+    java.lang.String getCacheDuration();
 
     /**
      * Sets the value of the cacheDuration property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCacheDuration(String value);
+    void setCacheDuration(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the soapEndpoint property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSoapEndpoint();
+    java.lang.String getSoapEndpoint();
 
     /**
      * Sets the value of the soapEndpoint property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSoapEndpoint(String value);
+    void setSoapEndpoint(java.lang.String value);
 
     /**
      * Gets the value of the SingleLogoutProtocolProfile property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the SingleLogoutProtocolProfile property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getSingleLogoutProtocolProfile().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
+     * {@link java.lang.String}
      * 
      */
     java.util.List getSingleLogoutProtocolProfile();

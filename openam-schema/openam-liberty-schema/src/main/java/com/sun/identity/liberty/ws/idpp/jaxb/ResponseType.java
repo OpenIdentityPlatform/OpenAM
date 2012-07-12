@@ -71,13 +71,13 @@ public interface ResponseType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionType}
-     *
+     * 
      */
     java.util.List getExtension();
 
     /**
      * Gets the value of the status property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.StatusElement}
@@ -87,7 +87,7 @@ public interface ResponseType {
 
     /**
      * Sets the value of the status property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.StatusElement}
@@ -97,38 +97,38 @@ public interface ResponseType {
 
     /**
      * Gets the value of the itemIDRef property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getItemIDRef();
+    java.lang.String getItemIDRef();
 
     /**
      * Sets the value of the itemIDRef property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setItemIDRef(String value);
+    void setItemIDRef(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

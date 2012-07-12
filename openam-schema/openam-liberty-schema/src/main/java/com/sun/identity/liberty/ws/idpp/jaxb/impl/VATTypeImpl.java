@@ -14,12 +14,12 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
     protected com.sun.identity.liberty.ws.idpp.jaxb.ExtensionType _Extension;
     protected java.util.Calendar _ModificationTime;
     protected com.sun.identity.liberty.ws.idpp.jaxb.DSTURI _IDType;
-    protected String _Id;
+    protected java.lang.String _Id;
     protected com.sun.identity.liberty.ws.idpp.jaxb.DSTString _IDValue;
-    public final static Class version = (com.sun.identity.liberty.ws.idpp.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.idpp.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.idpp.jaxb.VATType.class);
     }
 
@@ -47,11 +47,11 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
         _IDType = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -115,8 +115,8 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
         if (_Id!= null) {
             context.startAttribute("urn:liberty:id-sis-pp:2003-08", "id");
             try {
-                context.text(((String) _Id), "Id");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Id), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -125,7 +125,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
             context.startAttribute("urn:liberty:id-sis-pp:2003-08", "modificationTime");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _ModificationTime), null), "ModificationTime");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -169,7 +169,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.idpp.jaxb.VATType.class);
     }
 
@@ -262,11 +262,11 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.idpp.jaxb.impl.VATTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -326,7 +326,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                     case  0 :
                         attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -351,7 +351,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                     case  3 :
                         attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "modificationTime");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -407,27 +407,27 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ModificationTime = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -479,7 +479,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                     case  0 :
                         attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -509,7 +509,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                     case  3 :
                         attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "modificationTime");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -554,7 +554,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -634,7 +634,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -685,7 +685,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                     case  0 :
                         attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -707,7 +707,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                     case  3 :
                         attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "modificationTime");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -752,7 +752,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -799,7 +799,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                         case  0 :
                             attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -823,7 +823,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                         case  3 :
                             attIdx = context.getAttribute("urn:liberty:id-sis-pp:2003-08", "modificationTime");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -864,7 +864,7 @@ public class VATTypeImpl implements com.sun.identity.liberty.ws.idpp.jaxb.VATTyp
                             _IDValue = ((com.sun.identity.liberty.ws.idpp.jaxb.impl.DSTStringImpl) spawnChildFromText((com.sun.identity.liberty.ws.idpp.jaxb.impl.DSTStringImpl.class), 15, value));
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

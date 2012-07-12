@@ -13,12 +13,12 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
 
     protected com.sun.xml.bind.util.ListImpl _SelectOrConfirmOrText;
     protected com.sun.identity.liberty.ws.interaction.jaxb.HelpType _Help;
-    protected String _Id;
-    protected String _Title;
-    public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+    protected java.lang.String _Id;
+    protected java.lang.String _Title;
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.InquiryType.class);
     }
 
@@ -41,19 +41,19 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
         _Help = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
-    public String getTitle() {
+    public java.lang.String getTitle() {
         return _Title;
     }
 
-    public void setTitle(String value) {
+    public void setTitle(java.lang.String value) {
         _Title = value;
     }
 
@@ -94,8 +94,8 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
         if (_Id!= null) {
             context.startAttribute("", "id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -103,8 +103,8 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
         if (_Title!= null) {
             context.startAttribute("", "title");
             try {
-                context.text(((String) _Title), "Title");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Title), "Title");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -138,11 +138,11 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.interaction.jaxb.InquiryType.class);
     }
 
@@ -219,18 +219,18 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
         implements com.sun.identity.liberty.ws.interaction.jaxb.InquiryType.Confirm, com.sun.xml.bind.RIElement, com.sun.xml.bind.JAXBObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.UnmarshallableObject, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.XMLSerializable, com.sun.identity.federation.jaxb.entityconfig.impl.runtime.ValidatableObject
     {
 
-        public final static Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.liberty.ws.interaction.jaxb.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.liberty.ws.interaction.jaxb.InquiryType.Confirm.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "urn:liberty:is:2003-08";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "Confirm";
         }
 
@@ -260,7 +260,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.liberty.ws.interaction.jaxb.InquiryType.Confirm.class);
         }
 
@@ -346,11 +346,11 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.liberty.ws.interaction.jaxb.impl.InquiryTypeImpl.ConfirmImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -381,7 +381,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -412,7 +412,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -434,7 +434,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -458,7 +458,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -478,7 +478,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                                 revertToParentFromText(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
@@ -503,11 +503,11 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.interaction.jaxb.impl.InquiryTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -568,7 +568,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -590,7 +590,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                     case  3 :
                         attIdx = context.getAttribute("", "title");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -603,27 +603,27 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Title = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -667,7 +667,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -680,7 +680,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                     case  3 :
                         attIdx = context.getAttribute("", "title");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -693,7 +693,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -744,7 +744,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -793,7 +793,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                     case  0 :
                         attIdx = context.getAttribute("", "id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -806,7 +806,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                     case  3 :
                         attIdx = context.getAttribute("", "title");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -819,7 +819,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -865,7 +865,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                         case  0 :
                             attIdx = context.getAttribute("", "id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -878,7 +878,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                         case  3 :
                             attIdx = context.getAttribute("", "title");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -886,7 +886,7 @@ public class InquiryTypeImpl implements com.sun.identity.liberty.ws.interaction.
                             state = 6;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

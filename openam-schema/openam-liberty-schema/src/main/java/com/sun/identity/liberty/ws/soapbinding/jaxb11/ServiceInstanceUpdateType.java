@@ -63,99 +63,99 @@ public interface ServiceInstanceUpdateType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getSecurityMechID();
 
     /**
      * Gets the value of the mustUnderstand property.
-     *
+     * 
      */
     boolean isMustUnderstand();
 
     /**
      * Sets the value of the mustUnderstand property.
-     *
+     * 
      */
     void setMustUnderstand(boolean value);
 
     /**
      * Gets the value of the Credential property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Credential property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getCredential().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.soapbinding.jaxb11.ServiceInstanceUpdateType.CredentialType}
-     *
+     * 
      */
     java.util.List getCredential();
 
     /**
      * Gets the value of the actor property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the endpoint property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getEndpoint();
+    java.lang.String getEndpoint();
 
     /**
      * Sets the value of the endpoint property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setEndpoint(String value);
+    void setEndpoint(java.lang.String value);
 
 
     /**
@@ -174,28 +174,28 @@ public interface ServiceInstanceUpdateType {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
+     * 
      */
     public interface CredentialType {
 
 
         /**
          * Gets the value of the any property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link Object}
+         *     {@link java.lang.Object}
          */
-        Object getAny();
+        java.lang.Object getAny();
 
         /**
          * Sets the value of the any property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link Object}
+         *     {@link java.lang.Object}
          */
-        void setAny(Object value);
+        void setAny(java.lang.Object value);
 
         /**
          * Gets the value of the notOnOrAfter property.

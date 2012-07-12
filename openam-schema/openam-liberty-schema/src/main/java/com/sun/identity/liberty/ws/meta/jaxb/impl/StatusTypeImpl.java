@@ -12,13 +12,13 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
 {
 
     protected com.sun.identity.liberty.ws.meta.jaxb.StatusType _Status;
-    protected String _Ref;
-    protected String _Comment;
+    protected java.lang.String _Ref;
+    protected java.lang.String _Comment;
     protected javax.xml.namespace.QName _Code;
-    public final static Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.liberty.ws.meta.jaxb.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.liberty.ws.meta.jaxb.StatusType.class);
     }
 
@@ -30,19 +30,19 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
         _Status = value;
     }
 
-    public String getRef() {
+    public java.lang.String getRef() {
         return _Ref;
     }
 
-    public void setRef(String value) {
+    public void setRef(java.lang.String value) {
         _Ref = value;
     }
 
-    public String getComment() {
+    public java.lang.String getComment() {
         return _Comment;
     }
 
-    public void setComment(String value) {
+    public void setComment(java.lang.String value) {
         _Comment = value;
     }
 
@@ -82,15 +82,15 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
         context.startAttribute("", "code");
         try {
             context.text(javax.xml.bind.DatatypeConverter.printQName(((javax.xml.namespace.QName) _Code), context.getNamespaceContext()), "Code");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_Comment!= null) {
             context.startAttribute("", "comment");
             try {
-                context.text(((String) _Comment), "Comment");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Comment), "Comment");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -98,8 +98,8 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
         if (_Ref!= null) {
             context.startAttribute("", "ref");
             try {
-                context.text(((String) _Ref), "Ref");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Ref), "Ref");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -116,7 +116,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
     {
         try {
             context.getNamespaceContext().declareNamespace(((javax.xml.namespace.QName) _Code).getNamespaceURI(), ((javax.xml.namespace.QName) _Code).getPrefix(), false);
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.federation.jaxb.entityconfig.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         if (_Status!= null) {
@@ -126,7 +126,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.liberty.ws.meta.jaxb.StatusType.class);
     }
 
@@ -203,11 +203,11 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.liberty.ws.meta.jaxb.impl.StatusTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -225,7 +225,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  0 :
                         attIdx = context.getAttribute("", "code");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -234,7 +234,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  6 :
                         attIdx = context.getAttribute("", "ref");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -247,7 +247,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  3 :
                         attIdx = context.getAttribute("", "comment");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -272,37 +272,37 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Code = javax.xml.bind.DatatypeConverter.parseQName(com.sun.xml.bind.WhiteSpaceProcessor.collapse(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value)), context);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Ref = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Comment = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -320,7 +320,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  0 :
                         attIdx = context.getAttribute("", "code");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -336,7 +336,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  6 :
                         attIdx = context.getAttribute("", "ref");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -349,7 +349,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  3 :
                         attIdx = context.getAttribute("", "comment");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -365,7 +365,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -410,7 +410,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -434,7 +434,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  0 :
                         attIdx = context.getAttribute("", "code");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -449,7 +449,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  6 :
                         attIdx = context.getAttribute("", "ref");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -462,7 +462,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                     case  3 :
                         attIdx = context.getAttribute("", "comment");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -484,7 +484,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -503,7 +503,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                         case  0 :
                             attIdx = context.getAttribute("", "code");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -524,7 +524,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                         case  6 :
                             attIdx = context.getAttribute("", "ref");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText2(v);
                                 continue outer;
@@ -537,7 +537,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                         case  3 :
                             attIdx = context.getAttribute("", "comment");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
@@ -548,7 +548,7 @@ public class StatusTypeImpl implements com.sun.identity.liberty.ws.meta.jaxb.Sta
                             state = 12;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

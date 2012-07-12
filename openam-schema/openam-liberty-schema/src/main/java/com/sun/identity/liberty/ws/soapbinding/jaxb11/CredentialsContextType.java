@@ -51,44 +51,44 @@ public interface CredentialsContextType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getSecurityMechID();
 
     /**
      * Gets the value of the mustUnderstand property.
-     *
+     * 
      */
     boolean isMustUnderstand();
 
     /**
      * Sets the value of the mustUnderstand property.
-     *
+     * 
      */
     void setMustUnderstand(boolean value);
 
     /**
      * Gets the value of the actor property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the requestAuthnContext property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.common.jaxb.ps.RequestAuthnContextType}
@@ -98,7 +98,7 @@ public interface CredentialsContextType {
 
     /**
      * Sets the value of the requestAuthnContext property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.common.jaxb.ps.RequestAuthnContextType}
@@ -108,20 +108,20 @@ public interface CredentialsContextType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

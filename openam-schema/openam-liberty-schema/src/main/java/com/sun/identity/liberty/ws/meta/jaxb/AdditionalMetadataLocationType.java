@@ -32,35 +32,35 @@ public interface AdditionalMetadataLocationType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getValue();
+    java.lang.String getValue();
 
     /**
      * Sets the value of the value property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setValue(String value);
+    void setValue(java.lang.String value);
 
     /**
      * Gets the value of the namespace property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getNamespace();
+    java.lang.String getNamespace();
 
     /**
      * Sets the value of the namespace property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setNamespace(String value);
+    void setNamespace(java.lang.String value);
 
 }

@@ -36,18 +36,18 @@ public interface TextType
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getFormat();
+    java.lang.String getFormat();
 
     /**
      * Sets the value of the format property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setFormat(String value);
+    void setFormat(java.lang.String value);
 
     /**
      * Gets the value of the maxChars property.

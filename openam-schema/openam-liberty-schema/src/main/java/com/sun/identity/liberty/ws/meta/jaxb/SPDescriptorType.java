@@ -43,36 +43,36 @@ public interface SPDescriptorType
 
     /**
      * Gets the value of the authnRequestsSigned property.
-     *
+     * 
      */
     boolean isAuthnRequestsSigned();
 
     /**
      * Sets the value of the authnRequestsSigned property.
-     *
+     * 
      */
     void setAuthnRequestsSigned(boolean value);
 
     /**
      * Gets the value of the AssertionConsumerServiceURL property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AssertionConsumerServiceURL property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAssertionConsumerServiceURL().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType}
-     *
+     * 
      */
     java.util.List getAssertionConsumerServiceURL();
 
@@ -91,58 +91,58 @@ public interface SPDescriptorType
      *   &lt;/simpleContent>
      * &lt;/complexType>
      * </pre>
-     *
+     * 
      */
     public interface AssertionConsumerServiceURLType {
 
 
         /**
          * Gets the value of the value property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getValue();
+        java.lang.String getValue();
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setValue(String value);
+        void setValue(java.lang.String value);
 
         /**
          * Gets the value of the isDefault property.
-         *
+         * 
          */
         boolean isIsDefault();
 
         /**
          * Sets the value of the isDefault property.
-         *
+         * 
          */
         void setIsDefault(boolean value);
 
         /**
          * Gets the value of the id property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getId();
+        java.lang.String getId();
 
         /**
          * Sets the value of the id property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setId(String value);
+        void setId(java.lang.String value);
 
     }
 

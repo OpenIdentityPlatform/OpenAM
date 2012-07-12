@@ -58,13 +58,13 @@ public interface LegalIdentityType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.LLegalNameElement}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTLocalizedString}
-     *
+     * 
      */
     java.util.List getLLegalName();
 
     /**
      * Gets the value of the extension property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -74,7 +74,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the extension property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement}
@@ -84,7 +84,7 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the legalName property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -94,7 +94,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the legalName property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTString}
@@ -104,7 +104,7 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the dob property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTDate}
@@ -114,7 +114,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the dob property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.DSTDate}
@@ -124,7 +124,7 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the modificationTime property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -133,7 +133,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the modificationTime property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -142,7 +142,7 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the gender property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.GenderElement}
@@ -152,7 +152,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the gender property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.GenderElement}
@@ -162,31 +162,31 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the AltID property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AltID property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAltID().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.AltIDType}
      * {@link com.sun.identity.liberty.ws.idpp.jaxb.AltIDElement}
-     *
+     * 
      */
     java.util.List getAltID();
 
     /**
      * Gets the value of the maritalStatus property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.MaritalStatusElement}
@@ -196,7 +196,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the maritalStatus property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.MaritalStatusElement}
@@ -206,7 +206,7 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the vat property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.VATElement}
@@ -216,7 +216,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the vat property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.VATElement}
@@ -226,7 +226,7 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the analyzedName property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.AnalyzedNameType}
@@ -236,7 +236,7 @@ public interface LegalIdentityType {
 
     /**
      * Sets the value of the analyzedName property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.idpp.jaxb.AnalyzedNameType}
@@ -246,20 +246,20 @@ public interface LegalIdentityType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

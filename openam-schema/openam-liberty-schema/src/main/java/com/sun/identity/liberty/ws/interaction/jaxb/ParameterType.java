@@ -33,35 +33,35 @@ public interface ParameterType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getName();
+    java.lang.String getName();
 
     /**
      * Sets the value of the name property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setName(String value);
+    void setName(java.lang.String value);
 
     /**
      * Gets the value of the value property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getValue();
+    java.lang.String getValue();
 
     /**
      * Sets the value of the value property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setValue(String value);
+    void setValue(java.lang.String value);
 
 }

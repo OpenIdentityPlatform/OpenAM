@@ -83,22 +83,22 @@ public interface UserInteractionHeaderType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getActor();
+    java.lang.String getActor();
 
     /**
      * Sets the value of the actor property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setActor(String value);
+    void setActor(java.lang.String value);
 
     /**
      * Gets the value of the interact property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link javax.xml.namespace.QName}
@@ -107,7 +107,7 @@ public interface UserInteractionHeaderType {
 
     /**
      * Sets the value of the interact property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link javax.xml.namespace.QName}
@@ -116,7 +116,7 @@ public interface UserInteractionHeaderType {
 
     /**
      * Gets the value of the interactionService property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.liberty.ws.disco.jaxb.ResourceOfferingType}
@@ -125,7 +125,7 @@ public interface UserInteractionHeaderType {
 
     /**
      * Sets the value of the interactionService property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.liberty.ws.disco.jaxb.ResourceOfferingType}
@@ -134,43 +134,43 @@ public interface UserInteractionHeaderType {
 
     /**
      * Gets the value of the Language property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Language property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getLanguage().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getLanguage();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }
