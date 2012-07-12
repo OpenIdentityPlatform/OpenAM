@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(16, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.federation.jaxb.entityconfig.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.federation.jaxb.entityconfig.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (ObjectFactory.class));
-    public final static Class version = (org.w3._2001.xmlschema.x.JAXBVersion.class);
+    public final static Class version = (org.w3._2001.xmlschema.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((AnyType.class), "org.w3._2001.xmlschema.impl.AnyTypeImpl");
@@ -107,7 +107,7 @@ public class ObjectFactory
     public AnyType createAnyType()
         throws javax.xml.bind.JAXBException
     {
-        return new org.w3._2001.xmlschema.x.AnyTypeImpl();
+        return new org.w3._2001.xmlschema.impl.AnyTypeImpl();
     }
 
 }

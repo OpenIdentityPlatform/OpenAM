@@ -29,6 +29,6 @@
 -->
 
 <configuration xmlns="http://java.sun.com/xml/ns/jax-rpc/ri/config">
-    <wsdl location="IdentityServices.wsdl" 
+    <wsdl location="target/classes/IdentityServices.wsdl" 
         packageName="com.sun.identity.idsvcs" />
 </configuration>
