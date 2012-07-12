@@ -39,60 +39,60 @@ public interface AuthzDecisionStatementType
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getResource();
+    java.lang.String getResource();
 
     /**
      * Sets the value of the resource property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setResource(String value);
+    void setResource(java.lang.String value);
 
     /**
      * Gets the value of the Action property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Action property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAction().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.assertion.ActionElement}
      * {@link com.sun.identity.saml2.jaxb.assertion.ActionType}
-     *
+     * 
      */
     java.util.List getAction();
 
     /**
      * Gets the value of the decision property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getDecision();
+    java.lang.String getDecision();
 
     /**
      * Sets the value of the decision property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setDecision(String value);
+    void setDecision(java.lang.String value);
 
     /**
      * Gets the value of the evidence property.

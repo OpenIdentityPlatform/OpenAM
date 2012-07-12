@@ -11,20 +11,20 @@ package com.sun.identity.saml2.jaxb.xmlsig.impl;
 public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.CanonicalizationMethodType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Algorithm;
+    protected java.lang.String _Algorithm;
     protected com.sun.xml.bind.util.ListImpl _Content;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.CanonicalizationMethodType.class);
     }
 
-    public String getAlgorithm() {
+    public java.lang.String getAlgorithm() {
         return _Algorithm;
     }
 
-    public void setAlgorithm(String value) {
+    public void setAlgorithm(java.lang.String value) {
         _Algorithm = value;
     }
 
@@ -50,15 +50,15 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
         final int len2 = ((_Content == null)? 0 :_Content.size());
         while (idx2 != len2) {
             {
-                Object o = _Content.get(idx2);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx2);
+                if (o instanceof java.lang.String) {
                     try {
-                        context.text(((String) _Content.get(idx2 ++)), "Content");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _Content.get(idx2 ++)), "Content");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx2 ++)), "Content");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -75,22 +75,22 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
         final int len2 = ((_Content == null)? 0 :_Content.size());
         context.startAttribute("", "Algorithm");
         try {
-            context.text(((String) _Algorithm), "Algorithm");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Algorithm), "Algorithm");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         while (idx2 != len2) {
             {
-                Object o = _Content.get(idx2);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx2);
+                if (o instanceof java.lang.String) {
                     try {
                         idx2 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx2 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -107,15 +107,15 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
         final int len2 = ((_Content == null)? 0 :_Content.size());
         while (idx2 != len2) {
             {
-                Object o = _Content.get(idx2);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx2);
+                if (o instanceof java.lang.String) {
                     try {
                         idx2 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx2 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -125,7 +125,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.CanonicalizationMethodType.class);
     }
 
@@ -190,11 +190,11 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.CanonicalizationMethodTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -203,7 +203,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
                 switch (state) {
                     case  3 :
                         if (true) {
-                            Object co = spawnWildcard(3, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(3, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getContent().add(co);
                             }
@@ -214,7 +214,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
                     case  0 :
                         attIdx = context.getAttribute("", "Algorithm");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -226,17 +226,17 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Algorithm = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -249,7 +249,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
                     case  0 :
                         attIdx = context.getAttribute("", "Algorithm");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -261,7 +261,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -283,7 +283,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -296,7 +296,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
                     case  0 :
                         attIdx = context.getAttribute("", "Algorithm");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -314,7 +314,7 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -333,26 +333,26 @@ public class CanonicalizationMethodTypeImpl implements com.sun.identity.saml2.ja
                         case  0 :
                             attIdx = context.getAttribute("", "Algorithm");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getContent().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

@@ -12,15 +12,15 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
 {
 
     protected java.util.Calendar _NotBefore;
-    protected String _Address;
+    protected java.lang.String _Address;
     protected java.util.Calendar _NotOnOrAfter;
-    protected String _InResponseTo;
+    protected java.lang.String _InResponseTo;
     protected com.sun.xml.bind.util.ListImpl _Content;
-    protected String _Recipient;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    protected java.lang.String _Recipient;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.SubjectConfirmationDataType.class);
     }
 
@@ -32,11 +32,11 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         _NotBefore = value;
     }
 
-    public String getAddress() {
+    public java.lang.String getAddress() {
         return _Address;
     }
 
-    public void setAddress(String value) {
+    public void setAddress(java.lang.String value) {
         _Address = value;
     }
 
@@ -48,11 +48,11 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         _NotOnOrAfter = value;
     }
 
-    public String getInResponseTo() {
+    public java.lang.String getInResponseTo() {
         return _InResponseTo;
     }
 
-    public void setInResponseTo(String value) {
+    public void setInResponseTo(java.lang.String value) {
         _InResponseTo = value;
     }
 
@@ -67,11 +67,11 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         return _getContent();
     }
 
-    public String getRecipient() {
+    public java.lang.String getRecipient() {
         return _Recipient;
     }
 
-    public void setRecipient(String value) {
+    public void setRecipient(java.lang.String value) {
         _Recipient = value;
     }
 
@@ -86,15 +86,15 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         final int len5 = ((_Content == null)? 0 :_Content.size());
         while (idx5 != len5) {
             {
-                Object o = _Content.get(idx5);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx5);
+                if (o instanceof java.lang.String) {
                     try {
-                        context.text(((String) _Content.get(idx5 ++)), "Content");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _Content.get(idx5 ++)), "Content");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx5 ++)), "Content");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -112,8 +112,8 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         if (_Address!= null) {
             context.startAttribute("", "Address");
             try {
-                context.text(((String) _Address), "Address");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Address), "Address");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -121,8 +121,8 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         if (_InResponseTo!= null) {
             context.startAttribute("", "InResponseTo");
             try {
-                context.text(((String) _InResponseTo), "InResponseTo");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _InResponseTo), "InResponseTo");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -131,7 +131,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             context.startAttribute("", "NotBefore");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _NotBefore), null), "NotBefore");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -140,7 +140,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             context.startAttribute("", "NotOnOrAfter");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _NotOnOrAfter), null), "NotOnOrAfter");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -148,23 +148,23 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         if (_Recipient!= null) {
             context.startAttribute("", "Recipient");
             try {
-                context.text(((String) _Recipient), "Recipient");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Recipient), "Recipient");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         while (idx5 != len5) {
             {
-                Object o = _Content.get(idx5);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx5);
+                if (o instanceof java.lang.String) {
                     try {
                         idx5 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx5 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -181,15 +181,15 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         final int len5 = ((_Content == null)? 0 :_Content.size());
         while (idx5 != len5) {
             {
-                Object o = _Content.get(idx5);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx5);
+                if (o instanceof java.lang.String) {
                     try {
                         idx5 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx5 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -199,7 +199,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.SubjectConfirmationDataType.class);
     }
 
@@ -278,11 +278,11 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.SubjectConfirmationDataTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -292,7 +292,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  12 :
                         attIdx = context.getAttribute("", "Recipient");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -301,7 +301,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                         continue outer;
                     case  15 :
                         if (true) {
-                            Object co = spawnWildcard(15, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(15, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getContent().add(co);
                             }
@@ -312,7 +312,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  9 :
                         attIdx = context.getAttribute("", "NotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -322,7 +322,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  6 :
                         attIdx = context.getAttribute("", "NotBefore");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -332,7 +332,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  3 :
                         attIdx = context.getAttribute("", "InResponseTo");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText4(v);
                             continue outer;
@@ -342,7 +342,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  0 :
                         attIdx = context.getAttribute("", "Address");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -355,57 +355,57 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Recipient = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NotOnOrAfter = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NotBefore = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _InResponseTo = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Address = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -415,7 +415,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  12 :
                         attIdx = context.getAttribute("", "Recipient");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -428,7 +428,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  9 :
                         attIdx = context.getAttribute("", "NotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -438,7 +438,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  6 :
                         attIdx = context.getAttribute("", "NotBefore");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -448,7 +448,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  3 :
                         attIdx = context.getAttribute("", "InResponseTo");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText4(v);
                             continue outer;
@@ -458,7 +458,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  0 :
                         attIdx = context.getAttribute("", "Address");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -471,7 +471,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -522,7 +522,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -532,7 +532,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  12 :
                         attIdx = context.getAttribute("", "Recipient");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 15;
                             eatText1(v);
                             continue outer;
@@ -557,7 +557,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  9 :
                         attIdx = context.getAttribute("", "NotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText2(v);
                             continue outer;
@@ -573,7 +573,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  6 :
                         attIdx = context.getAttribute("", "NotBefore");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -583,7 +583,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  3 :
                         attIdx = context.getAttribute("", "InResponseTo");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText4(v);
                             continue outer;
@@ -593,7 +593,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                     case  0 :
                         attIdx = context.getAttribute("", "Address");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText5(v);
                             continue outer;
@@ -618,7 +618,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -629,7 +629,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                         case  12 :
                             attIdx = context.getAttribute("", "Recipient");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 15;
                                 eatText1(v);
                                 continue outer;
@@ -643,7 +643,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                         case  9 :
                             attIdx = context.getAttribute("", "NotOnOrAfter");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText2(v);
                                 continue outer;
@@ -661,7 +661,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                         case  6 :
                             attIdx = context.getAttribute("", "NotBefore");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText3(v);
                                 continue outer;
@@ -671,7 +671,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                         case  3 :
                             attIdx = context.getAttribute("", "InResponseTo");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText4(v);
                                 continue outer;
@@ -681,7 +681,7 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                         case  0 :
                             attIdx = context.getAttribute("", "Address");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText5(v);
                                 continue outer;
@@ -701,19 +701,19 @@ public class SubjectConfirmationDataTypeImpl implements com.sun.identity.saml2.j
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText6(final String value)
+        private void eatText6(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getContent().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

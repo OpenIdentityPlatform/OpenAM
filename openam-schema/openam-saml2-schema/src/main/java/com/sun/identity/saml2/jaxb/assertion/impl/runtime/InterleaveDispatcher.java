@@ -7,14 +7,16 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.JAXBAssertionError;
-import com.sun.xml.bind.unmarshaller.Tracer;
+import java.util.Iterator;
+
+import javax.xml.bind.ValidationEvent;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.ValidationEvent;
-import java.util.Iterator;
+import com.sun.xml.bind.JAXBAssertionError;
+import com.sun.xml.bind.unmarshaller.Tracer;
 
 /**
  * Splits the unmarshalling events to bracnhes to support

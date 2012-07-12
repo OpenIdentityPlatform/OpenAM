@@ -19,5 +19,5 @@ public interface UnmarshallableObject
     /**
      * Creates an unmarshaller that will unmarshall this object.
      */
-    UnmarshallingEventHandler createUnmarshaller(UnmarshallingContext context);
+    UnmarshallingEventHandler createUnmarshaller( UnmarshallingContext context );
 }

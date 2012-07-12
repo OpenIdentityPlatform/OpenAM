@@ -11,28 +11,28 @@ package com.sun.identity.saml2.jaxb.assertion.impl;
 public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.assertion.SubjectLocalityType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Address;
-    protected String _DNSName;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    protected java.lang.String _Address;
+    protected java.lang.String _DNSName;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.SubjectLocalityType.class);
     }
 
-    public String getAddress() {
+    public java.lang.String getAddress() {
         return _Address;
     }
 
-    public void setAddress(String value) {
+    public void setAddress(java.lang.String value) {
         _Address = value;
     }
 
-    public String getDNSName() {
+    public java.lang.String getDNSName() {
         return _DNSName;
     }
 
-    public void setDNSName(String value) {
+    public void setDNSName(java.lang.String value) {
         _DNSName = value;
     }
 
@@ -51,8 +51,8 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
         if (_Address!= null) {
             context.startAttribute("", "Address");
             try {
-                context.text(((String) _Address), "Address");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Address), "Address");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -60,8 +60,8 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
         if (_DNSName!= null) {
             context.startAttribute("", "DNSName");
             try {
-                context.text(((String) _DNSName), "DNSName");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _DNSName), "DNSName");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -73,7 +73,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.SubjectLocalityType.class);
     }
 
@@ -129,11 +129,11 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.SubjectLocalityTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -143,7 +143,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                     case  3 :
                         attIdx = context.getAttribute("", "DNSName");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -156,7 +156,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                     case  0 :
                         attIdx = context.getAttribute("", "Address");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -169,27 +169,27 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _DNSName = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Address = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -199,7 +199,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                     case  3 :
                         attIdx = context.getAttribute("", "DNSName");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -212,7 +212,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                     case  0 :
                         attIdx = context.getAttribute("", "Address");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -225,7 +225,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -255,7 +255,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -265,7 +265,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                     case  3 :
                         attIdx = context.getAttribute("", "DNSName");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -284,7 +284,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                     case  0 :
                         attIdx = context.getAttribute("", "Address");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -303,7 +303,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -314,7 +314,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                         case  3 :
                             attIdx = context.getAttribute("", "DNSName");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -335,7 +335,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                         case  0 :
                             attIdx = context.getAttribute("", "Address");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -343,7 +343,7 @@ public class SubjectLocalityTypeImpl implements com.sun.identity.saml2.jaxb.asse
                             state = 3;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

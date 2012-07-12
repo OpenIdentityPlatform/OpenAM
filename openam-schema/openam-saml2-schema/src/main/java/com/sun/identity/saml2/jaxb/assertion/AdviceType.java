@@ -52,7 +52,7 @@ public interface AdviceType {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.assertion.AssertionElement}
-     * {@link Object}
+     * {@link java.lang.Object}
      * {@link com.sun.identity.saml2.jaxb.assertion.AssertionURIRefElement}
      * {@link com.sun.identity.saml2.jaxb.assertion.EncryptedAssertionElement}
      * {@link com.sun.identity.saml2.jaxb.assertion.AssertionIDRefElement}

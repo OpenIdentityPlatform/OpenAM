@@ -18,10 +18,10 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
     protected byte[] _Y;
     protected byte[] _PgenCounter;
     protected byte[] _J;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.DSAKeyValueType.class);
     }
 
@@ -94,7 +94,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _P)), "P");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -103,7 +103,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Q)), "Q");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -114,7 +114,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _G)), "G");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -124,7 +124,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
         context.endAttributes();
         try {
             context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Y)), "Y");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -134,7 +134,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _J)), "J");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -145,7 +145,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Seed)), "Seed");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -154,7 +154,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _PgenCounter)), "PgenCounter");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -171,7 +171,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.DSAKeyValueType.class);
     }
 
@@ -248,11 +248,11 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.DSAKeyValueTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -321,7 +321,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -398,7 +398,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -426,7 +426,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -454,7 +454,7 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -506,79 +506,79 @@ public class DSAKeyValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.D
                             state = 21;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Seed = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Y = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Q = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _J = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _PgenCounter = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText6(final String value)
+        private void eatText6(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _P = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText7(final String value)
+        private void eatText7(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _G = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

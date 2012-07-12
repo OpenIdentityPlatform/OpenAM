@@ -9,5 +9,5 @@ package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
 public interface PrefixCallback
 {
-    void onPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException;
+    void onPrefixMapping( String prefix, String uri ) throws org.xml.sax.SAXException;
 }

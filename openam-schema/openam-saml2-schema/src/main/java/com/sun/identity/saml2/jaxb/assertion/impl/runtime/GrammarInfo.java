@@ -33,7 +33,7 @@ public interface GrammarInfo
      *      null if the given name pair is not recognized.
      */
     UnmarshallingEventHandler createUnmarshaller(
-            String namespaceUri, String localName, UnmarshallingContext context);
+        String namespaceUri, String localName, UnmarshallingContext context );
     
     /**
      * Creates an instance for the root element.
@@ -62,7 +62,7 @@ public interface GrammarInfo
      *      The string needs to be interned by the caller
      *      for a performance reason.
      */
-    boolean recognize(String nsUri, String localName);
+    boolean recognize( String nsUri, String localName );
 
     /**
      * Gets the default implementation for the given public content
@@ -74,7 +74,7 @@ public interface GrammarInfo
      * @return null
      *      If the interface is not found.
      */
-    Class getDefaultImplementation(Class javaContentInterface);
+    Class getDefaultImplementation( Class javaContentInterface );
 
     /**
      * Gets the MSV AGM which can be used to validate XML during
@@ -83,7 +83,7 @@ public interface GrammarInfo
     com.sun.msv.grammar.Grammar getGrammar() throws JAXBException;
 
     
-    XMLSerializable castToXMLSerializable(Object o);
+    XMLSerializable castToXMLSerializable( Object o );
     
     
     ValidatableObject castToValidatableObject(Object o);

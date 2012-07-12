@@ -42,7 +42,7 @@ public interface CipherDataType {
 
     /**
      * Sets the value of the cipherReference property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.CipherReferenceType}

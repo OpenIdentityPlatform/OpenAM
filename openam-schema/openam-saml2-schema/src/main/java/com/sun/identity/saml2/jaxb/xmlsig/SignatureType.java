@@ -45,7 +45,7 @@ public interface SignatureType {
 
     /**
      * Sets the value of the keyInfo property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.KeyInfoElement}
@@ -55,7 +55,7 @@ public interface SignatureType {
 
     /**
      * Gets the value of the signatureValue property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.SignatureValueType}
@@ -65,7 +65,7 @@ public interface SignatureType {
 
     /**
      * Sets the value of the signatureValue property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.SignatureValueType}
@@ -75,7 +75,7 @@ public interface SignatureType {
 
     /**
      * Gets the value of the signedInfo property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.SignedInfoType}
@@ -85,7 +85,7 @@ public interface SignatureType {
 
     /**
      * Sets the value of the signedInfo property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.SignedInfoType}
@@ -95,21 +95,21 @@ public interface SignatureType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the Object property.

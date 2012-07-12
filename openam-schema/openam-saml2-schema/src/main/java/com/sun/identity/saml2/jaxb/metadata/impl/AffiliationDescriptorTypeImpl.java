@@ -15,14 +15,14 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
     protected com.sun.xml.bind.util.ListImpl _KeyDescriptor;
     protected java.util.Calendar _ValidUntil;
     protected com.sun.xml.bind.util.ListImpl _AffiliateMember;
-    protected String _ID;
-    protected String _CacheDuration;
-    protected String _AffiliationOwnerID;
+    protected java.lang.String _ID;
+    protected java.lang.String _CacheDuration;
+    protected java.lang.String _AffiliationOwnerID;
     protected com.sun.identity.saml2.jaxb.xmlsig.SignatureType _Signature;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType.class);
     }
 
@@ -64,27 +64,27 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
         return _getAffiliateMember();
     }
 
-    public String getID() {
+    public java.lang.String getID() {
         return _ID;
     }
 
-    public void setID(String value) {
+    public void setID(java.lang.String value) {
         _ID = value;
     }
 
-    public String getCacheDuration() {
+    public java.lang.String getCacheDuration() {
         return _CacheDuration;
     }
 
-    public void setCacheDuration(String value) {
+    public void setCacheDuration(java.lang.String value) {
         _CacheDuration = value;
     }
 
-    public String getAffiliationOwnerID() {
+    public java.lang.String getAffiliationOwnerID() {
         return _AffiliationOwnerID;
     }
 
-    public void setAffiliationOwnerID(String value) {
+    public void setAffiliationOwnerID(java.lang.String value) {
         _AffiliationOwnerID = value;
     }
 
@@ -138,20 +138,20 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             int idx_4 = idx4;
             try {
                 idx_4 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_5 = idx4;
             try {
                 idx_5 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _AffiliateMember.get(idx4 ++)), "AffiliateMember");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _AffiliateMember.get(idx4 ++)), "AffiliateMember");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -183,24 +183,24 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
         if (_ID!= null) {
             context.startAttribute("", "ID");
             try {
-                context.text(context.onID(this, ((String) _ID)), "ID");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _ID)), "ID");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         context.startAttribute("", "affiliationOwnerID");
         try {
-            context.text(((String) _AffiliationOwnerID), "AffiliationOwnerID");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _AffiliationOwnerID), "AffiliationOwnerID");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_CacheDuration!= null) {
             context.startAttribute("", "cacheDuration");
             try {
-                context.text(((String) _CacheDuration), "CacheDuration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _CacheDuration), "CacheDuration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -209,7 +209,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             context.startAttribute("", "validUntil");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _ValidUntil), null), "ValidUntil");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -227,7 +227,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
         while (idx4 != len4) {
             try {
                 idx4 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -260,7 +260,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
         while (idx4 != len4) {
             try {
                 idx4 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -273,11 +273,11 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _ID);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _ID);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType.class);
     }
 
@@ -384,11 +384,11 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadata.impl.AffiliationDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -398,7 +398,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText1(v);
                             continue outer;
@@ -420,7 +420,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  6 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -481,7 +481,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  3 :
                         attIdx = context.getAttribute("", "affiliationOwnerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -497,7 +497,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText4(v);
                             continue outer;
@@ -538,47 +538,47 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ValidUntil = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _CacheDuration = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AffiliationOwnerID = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ID = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -588,7 +588,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText1(v);
                             continue outer;
@@ -615,7 +615,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  6 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -646,7 +646,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  3 :
                         attIdx = context.getAttribute("", "affiliationOwnerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -662,7 +662,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText4(v);
                             continue outer;
@@ -686,7 +686,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -750,7 +750,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -760,7 +760,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  9 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText1(v);
                             continue outer;
@@ -773,7 +773,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  6 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -809,7 +809,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  3 :
                         attIdx = context.getAttribute("", "affiliationOwnerID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -830,7 +830,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText4(v);
                             continue outer;
@@ -854,7 +854,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -865,7 +865,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                         case  9 :
                             attIdx = context.getAttribute("", "validUntil");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText1(v);
                                 continue outer;
@@ -878,7 +878,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                         case  6 :
                             attIdx = context.getAttribute("", "cacheDuration");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText2(v);
                                 continue outer;
@@ -918,7 +918,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                         case  3 :
                             attIdx = context.getAttribute("", "affiliationOwnerID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
@@ -927,7 +927,7 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                         case  0 :
                             attIdx = context.getAttribute("", "ID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText4(v);
                                 continue outer;
@@ -950,19 +950,19 @@ public class AffiliationDescriptorTypeImpl implements com.sun.identity.saml2.jax
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getAffiliateMember().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

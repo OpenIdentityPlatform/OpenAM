@@ -38,39 +38,39 @@ public interface AgreementMethodType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAlgorithm();
+    java.lang.String getAlgorithm();
 
     /**
      * Sets the value of the algorithm property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAlgorithm(String value);
+    void setAlgorithm(java.lang.String value);
 
     /**
      * Gets the value of the Content property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Content property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getContent().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
-     * {@link String}
+     * {@link java.lang.Object}
+     * {@link java.lang.String}
      * {@link com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.RecipientKeyInfo}
      * {@link com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.OriginatorKeyInfo}
      * {@link com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.KANonce}

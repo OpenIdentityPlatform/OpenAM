@@ -7,6 +7,20 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.helpers.NotIdentifiableEventImpl;
+import javax.xml.bind.helpers.ValidationEventLocatorImpl;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
 import com.sun.xml.bind.JAXBAssertionError;
 import com.sun.xml.bind.JAXBObject;
 import com.sun.xml.bind.marshaller.IdentifiableObject;
@@ -14,18 +28,6 @@ import com.sun.xml.bind.marshaller.Messages;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import com.sun.xml.bind.serializer.AbortSerializationException;
 import com.sun.xml.bind.serializer.Util;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.helpers.NotIdentifiableEventImpl;
-import javax.xml.bind.helpers.ValidationEventLocatorImpl;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * XMLSerializer that produces SAX2 events.
@@ -449,7 +451,7 @@ public class SAXMarshaller implements XMLSerializer
     }
     
     /**
-     * Default {@link com.sun.xml.bind.marshaller.NamespacePrefixMapper} implementation used when
+     * Default {@link NamespacePrefixMapper} implementation used when
      * it is not specified by the user.
      */
     private static NamespacePrefixMapper defaultNamespacePrefixMapper = new NamespacePrefixMapper() {

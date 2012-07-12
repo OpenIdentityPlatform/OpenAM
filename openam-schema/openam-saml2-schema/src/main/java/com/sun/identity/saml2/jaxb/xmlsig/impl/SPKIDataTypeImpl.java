@@ -12,10 +12,10 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
 {
 
     protected com.sun.xml.bind.util.ListImpl _SPKISexpAndAny;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.SPKIDataType.class);
     }
 
@@ -41,11 +41,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
         final int len1 = ((_SPKISexpAndAny == null)? 0 :_SPKISexpAndAny.size());
         while (idx1 != len1) {
             {
-                Object o = _SPKISexpAndAny.get(idx1);
+                java.lang.Object o = _SPKISexpAndAny.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsBody(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "SPKISexpAndAny", o);
@@ -54,11 +54,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
             for (int _0 = 1; ((_0 > 0)&&(idx1 != len1)); _0 --) {
                 {
-                    Object o = _SPKISexpAndAny.get(idx1);
+                    java.lang.Object o = _SPKISexpAndAny.get(idx1);
                     if (o instanceof com.sun.xml.bind.JAXBObject) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                     } else {
-                        if (o instanceof Object) {
+                        if (o instanceof java.lang.Object) {
                             context.childAsBody(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                         } else {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "SPKISexpAndAny", o);
@@ -76,11 +76,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
         final int len1 = ((_SPKISexpAndAny == null)? 0 :_SPKISexpAndAny.size());
         while (idx1 != len1) {
             {
-                Object o = _SPKISexpAndAny.get(idx1);
+                java.lang.Object o = _SPKISexpAndAny.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsAttributes(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "SPKISexpAndAny", o);
@@ -89,11 +89,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
             for (int _0 = 1; ((_0 > 0)&&(idx1 != len1)); _0 --) {
                 {
-                    Object o = _SPKISexpAndAny.get(idx1);
+                    java.lang.Object o = _SPKISexpAndAny.get(idx1);
                     if (o instanceof com.sun.xml.bind.JAXBObject) {
                         context.childAsAttributes(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                     } else {
-                        if (o instanceof Object) {
+                        if (o instanceof java.lang.Object) {
                             idx1 += 1;
                         } else {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "SPKISexpAndAny", o);
@@ -111,11 +111,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
         final int len1 = ((_SPKISexpAndAny == null)? 0 :_SPKISexpAndAny.size());
         while (idx1 != len1) {
             {
-                Object o = _SPKISexpAndAny.get(idx1);
+                java.lang.Object o = _SPKISexpAndAny.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsURIs(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "SPKISexpAndAny", o);
@@ -124,11 +124,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
             for (int _0 = 1; ((_0 > 0)&&(idx1 != len1)); _0 --) {
                 {
-                    Object o = _SPKISexpAndAny.get(idx1);
+                    java.lang.Object o = _SPKISexpAndAny.get(idx1);
                     if (o instanceof com.sun.xml.bind.JAXBObject) {
                         context.childAsURIs(((com.sun.xml.bind.JAXBObject) _SPKISexpAndAny.get(idx1 ++)), "SPKISexpAndAny");
                     } else {
-                        if (o instanceof Object) {
+                        if (o instanceof java.lang.Object) {
                             idx1 += 1;
                         } else {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "SPKISexpAndAny", o);
@@ -139,7 +139,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.SPKIDataType.class);
     }
 
@@ -185,7 +185,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
     {
 
         protected byte[] _Value;
-        public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
         public SPKISexpImpl() {
@@ -195,15 +195,15 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             _Value = value;
         }
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.saml2.jaxb.xmlsig.SPKIDataType.SPKISexp.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "http://www.w3.org/2000/09/xmldsig#";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "SPKISexp";
         }
 
@@ -227,7 +227,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Value)), "Value");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -243,7 +243,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.saml2.jaxb.xmlsig.SPKIDataType.SPKISexp.class);
         }
 
@@ -305,11 +305,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.saml2.jaxb.xmlsig.impl.SPKIDataTypeImpl.SPKISexpImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -332,7 +332,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -355,7 +355,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -371,7 +371,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -387,7 +387,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -403,19 +403,19 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                                 eatText1(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
@@ -438,11 +438,11 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.SPKIDataTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -451,7 +451,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                 switch (state) {
                     case  1 :
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(2, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(2, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getSPKISexpAndAny().add(co);
                             }
@@ -478,7 +478,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -497,7 +497,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -516,7 +516,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -535,7 +535,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -550,7 +550,7 @@ public class SPKIDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.SPKI
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

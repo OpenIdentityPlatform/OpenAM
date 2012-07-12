@@ -50,26 +50,26 @@ public interface ManifestType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.xmlsig.ReferenceType}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.ReferenceElement}
-     *
+     * 
      */
     java.util.List getReference();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
 }

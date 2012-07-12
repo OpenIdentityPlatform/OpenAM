@@ -47,8 +47,8 @@ public interface AnyType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
-     * {@link String}
+     * {@link java.lang.Object}
+     * {@link java.lang.String}
      * 
      */
     java.util.List getContent();

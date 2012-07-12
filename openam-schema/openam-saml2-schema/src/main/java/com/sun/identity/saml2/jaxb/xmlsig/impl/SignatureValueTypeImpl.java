@@ -12,11 +12,11 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
 {
 
     protected byte[] _Value;
-    protected String _Id;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    protected java.lang.String _Id;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.SignatureValueType.class);
     }
 
@@ -28,11 +28,11 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
         _Value = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -45,7 +45,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
     {
         try {
             context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Value)), "Value");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
     }
@@ -56,8 +56,8 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
         if (_Id!= null) {
             context.startAttribute("", "Id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -69,11 +69,11 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
     {
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.SignatureValueType.class);
     }
 
@@ -133,11 +133,11 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.SignatureValueTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -150,7 +150,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -163,17 +163,17 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -186,7 +186,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -199,7 +199,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -222,7 +222,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -235,7 +235,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -254,7 +254,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -268,7 +268,7 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
                         case  0 :
                             attIdx = context.getAttribute("", "Id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -284,19 +284,19 @@ public class SignatureValueTypeImpl implements com.sun.identity.saml2.jaxb.xmlsi
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Value = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

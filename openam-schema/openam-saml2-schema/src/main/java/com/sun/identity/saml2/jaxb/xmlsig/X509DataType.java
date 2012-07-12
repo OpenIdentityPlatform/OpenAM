@@ -57,10 +57,10 @@ public interface X509DataType {
      * {@link com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SubjectName}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509IssuerSerial}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate}
-     * {@link Object}
+     * {@link java.lang.Object}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509CRL}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SKI}
-     *
+     * 
      */
     java.util.List getX509IssuerSerialOrX509SKIOrX509SubjectName();
 
@@ -72,7 +72,7 @@ public interface X509DataType {
      * <pre>
      * &lt;element name="X509CRL" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
      * </pre>
-     *
+     * 
      */
     public interface X509CRL
         extends javax.xml.bind.Element
@@ -81,7 +81,7 @@ public interface X509DataType {
 
         /**
          * Gets the value of the value property.
-         *
+         * 
          * @return
          *     possible object is
          *     byte[]
@@ -90,7 +90,7 @@ public interface X509DataType {
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     byte[]
@@ -107,7 +107,7 @@ public interface X509DataType {
      * <pre>
      * &lt;element name="X509Certificate" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
      * </pre>
-     *
+     * 
      */
     public interface X509Certificate
         extends javax.xml.bind.Element
@@ -116,7 +116,7 @@ public interface X509DataType {
 
         /**
          * Gets the value of the value property.
-         *
+         * 
          * @return
          *     possible object is
          *     byte[]
@@ -125,7 +125,7 @@ public interface X509DataType {
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     byte[]
@@ -142,7 +142,7 @@ public interface X509DataType {
      * <pre>
      * &lt;element name="X509IssuerSerial" type="{http://www.w3.org/2000/09/xmldsig#}X509IssuerSerialType"/>
      * </pre>
-     *
+     * 
      */
     public interface X509IssuerSerial
         extends javax.xml.bind.Element, com.sun.identity.saml2.jaxb.xmlsig.X509IssuerSerialType
@@ -159,7 +159,7 @@ public interface X509DataType {
      * <pre>
      * &lt;element name="X509SKI" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
      * </pre>
-     *
+     * 
      */
     public interface X509SKI
         extends javax.xml.bind.Element
@@ -168,7 +168,7 @@ public interface X509DataType {
 
         /**
          * Gets the value of the value property.
-         *
+         * 
          * @return
          *     possible object is
          *     byte[]
@@ -177,7 +177,7 @@ public interface X509DataType {
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     byte[]
@@ -194,7 +194,7 @@ public interface X509DataType {
      * <pre>
      * &lt;element name="X509SubjectName" type="{http://www.w3.org/2001/XMLSchema}string"/>
      * </pre>
-     *
+     * 
      */
     public interface X509SubjectName
         extends javax.xml.bind.Element
@@ -203,21 +203,21 @@ public interface X509DataType {
 
         /**
          * Gets the value of the value property.
-         *
+         * 
          * @return
          *     possible object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        String getValue();
+        java.lang.String getValue();
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
-         *     {@link String}
+         *     {@link java.lang.String}
          */
-        void setValue(String value);
+        void setValue(java.lang.String value);
 
     }
 

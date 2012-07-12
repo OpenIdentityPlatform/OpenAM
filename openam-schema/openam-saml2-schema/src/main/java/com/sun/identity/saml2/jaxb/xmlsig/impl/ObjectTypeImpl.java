@@ -11,38 +11,38 @@ package com.sun.identity.saml2.jaxb.xmlsig.impl;
 public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.ObjectType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Encoding;
-    protected String _MimeType;
-    protected String _Id;
+    protected java.lang.String _Encoding;
+    protected java.lang.String _MimeType;
+    protected java.lang.String _Id;
     protected com.sun.xml.bind.util.ListImpl _Content;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.ObjectType.class);
     }
 
-    public String getEncoding() {
+    public java.lang.String getEncoding() {
         return _Encoding;
     }
 
-    public void setEncoding(String value) {
+    public void setEncoding(java.lang.String value) {
         _Encoding = value;
     }
 
-    public String getMimeType() {
+    public java.lang.String getMimeType() {
         return _MimeType;
     }
 
-    public void setMimeType(String value) {
+    public void setMimeType(java.lang.String value) {
         _MimeType = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -68,15 +68,15 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
         final int len4 = ((_Content == null)? 0 :_Content.size());
         while (idx4 != len4) {
             {
-                Object o = _Content.get(idx4);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx4);
+                if (o instanceof java.lang.String) {
                     try {
-                        context.text(((String) _Content.get(idx4 ++)), "Content");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _Content.get(idx4 ++)), "Content");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx4 ++)), "Content");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -94,8 +94,8 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
         if (_Encoding!= null) {
             context.startAttribute("", "Encoding");
             try {
-                context.text(((String) _Encoding), "Encoding");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Encoding), "Encoding");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -103,8 +103,8 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
         if (_Id!= null) {
             context.startAttribute("", "Id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -112,23 +112,23 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
         if (_MimeType!= null) {
             context.startAttribute("", "MimeType");
             try {
-                context.text(((String) _MimeType), "MimeType");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _MimeType), "MimeType");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         while (idx4 != len4) {
             {
-                Object o = _Content.get(idx4);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx4);
+                if (o instanceof java.lang.String) {
                     try {
                         idx4 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx4 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -145,15 +145,15 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
         final int len4 = ((_Content == null)? 0 :_Content.size());
         while (idx4 != len4) {
             {
-                Object o = _Content.get(idx4);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx4);
+                if (o instanceof java.lang.String) {
                     try {
                         idx4 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx4 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -163,11 +163,11 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.ObjectType.class);
     }
 
@@ -241,11 +241,11 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.ObjectTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -255,7 +255,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  6 :
                         attIdx = context.getAttribute("", "MimeType");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -265,7 +265,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  3 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -274,7 +274,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                         continue outer;
                     case  9 :
                         if (true) {
-                            Object co = spawnWildcard(9, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(9, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getContent().add(co);
                             }
@@ -285,7 +285,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  0 :
                         attIdx = context.getAttribute("", "Encoding");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -298,37 +298,37 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MimeType = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Encoding = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -338,7 +338,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  6 :
                         attIdx = context.getAttribute("", "MimeType");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -348,7 +348,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  3 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -361,7 +361,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  0 :
                         attIdx = context.getAttribute("", "Encoding");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -374,7 +374,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -411,7 +411,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -421,7 +421,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  6 :
                         attIdx = context.getAttribute("", "MimeType");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -437,7 +437,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  3 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -462,7 +462,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                     case  0 :
                         attIdx = context.getAttribute("", "Encoding");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -475,7 +475,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -486,7 +486,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                         case  6 :
                             attIdx = context.getAttribute("", "MimeType");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText1(v);
                                 continue outer;
@@ -504,7 +504,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                         case  3 :
                             attIdx = context.getAttribute("", "Id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -522,7 +522,7 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                         case  0 :
                             attIdx = context.getAttribute("", "Encoding");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText3(v);
                                 continue outer;
@@ -530,19 +530,19 @@ public class ObjectTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Object
                             state = 3;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getContent().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

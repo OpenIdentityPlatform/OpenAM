@@ -15,10 +15,10 @@ public class ProxyRestrictionTypeImpl
 
     protected java.math.BigInteger _Count;
     protected com.sun.xml.bind.util.ListImpl _Audience;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.ProxyRestrictionType.class);
     }
 
@@ -56,20 +56,20 @@ public class ProxyRestrictionTypeImpl
             int idx_0 = idx2;
             try {
                 idx_0 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_1 = idx2;
             try {
                 idx_1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _Audience.get(idx2 ++)), "Audience");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Audience.get(idx2 ++)), "Audience");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -85,7 +85,7 @@ public class ProxyRestrictionTypeImpl
             context.startAttribute("", "Count");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printInteger(((java.math.BigInteger) _Count)), "Count");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -94,7 +94,7 @@ public class ProxyRestrictionTypeImpl
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -109,13 +109,13 @@ public class ProxyRestrictionTypeImpl
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.ProxyRestrictionType.class);
     }
 
@@ -198,11 +198,11 @@ public class ProxyRestrictionTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.ProxyRestrictionTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -220,7 +220,7 @@ public class ProxyRestrictionTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Count");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -244,17 +244,17 @@ public class ProxyRestrictionTypeImpl
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Count = javax.xml.bind.DatatypeConverter.parseInteger(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -267,7 +267,7 @@ public class ProxyRestrictionTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Count");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -293,7 +293,7 @@ public class ProxyRestrictionTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -322,7 +322,7 @@ public class ProxyRestrictionTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -341,7 +341,7 @@ public class ProxyRestrictionTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Count");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -360,7 +360,7 @@ public class ProxyRestrictionTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -374,7 +374,7 @@ public class ProxyRestrictionTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "Count");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -396,19 +396,19 @@ public class ProxyRestrictionTypeImpl
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getAudience().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

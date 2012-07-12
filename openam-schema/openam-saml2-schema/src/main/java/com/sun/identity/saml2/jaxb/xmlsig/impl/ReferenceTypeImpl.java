@@ -14,13 +14,13 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
     protected com.sun.identity.saml2.jaxb.xmlsig.TransformsType _Transforms;
     protected byte[] _DigestValue;
     protected com.sun.identity.saml2.jaxb.xmlsig.DigestMethodType _DigestMethod;
-    protected String _Type;
-    protected String _Id;
-    protected String _URI;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    protected java.lang.String _Type;
+    protected java.lang.String _Id;
+    protected java.lang.String _URI;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.ReferenceType.class);
     }
 
@@ -48,27 +48,27 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
         _DigestMethod = value;
     }
 
-    public String getType() {
+    public java.lang.String getType() {
         return _Type;
     }
 
-    public void setType(String value) {
+    public void setType(java.lang.String value) {
         _Type = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
-    public String getURI() {
+    public java.lang.String getURI() {
         return _URI;
     }
 
-    public void setURI(String value) {
+    public void setURI(java.lang.String value) {
         _URI = value;
     }
 
@@ -108,7 +108,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
         context.endAttributes();
         try {
             context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _DigestValue)), "DigestValue");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -120,8 +120,8 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
         if (_Id!= null) {
             context.startAttribute("", "Id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -129,8 +129,8 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
         if (_Type!= null) {
             context.startAttribute("", "Type");
             try {
-                context.text(((String) _Type), "Type");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Type), "Type");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -138,8 +138,8 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
         if (_URI!= null) {
             context.startAttribute("", "URI");
             try {
-                context.text(((String) _URI), "URI");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _URI), "URI");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -167,11 +167,11 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.ReferenceType.class);
     }
 
@@ -263,11 +263,11 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.ReferenceTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -317,7 +317,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  6 :
                         attIdx = context.getAttribute("", "URI");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -327,7 +327,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  3 :
                         attIdx = context.getAttribute("", "Type");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -337,7 +337,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -361,37 +361,37 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _URI = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Type = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -429,7 +429,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  6 :
                         attIdx = context.getAttribute("", "URI");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -439,7 +439,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  3 :
                         attIdx = context.getAttribute("", "Type");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -456,7 +456,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -469,7 +469,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -515,7 +515,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -551,7 +551,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  6 :
                         attIdx = context.getAttribute("", "URI");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -561,7 +561,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  3 :
                         attIdx = context.getAttribute("", "Type");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -571,7 +571,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -590,7 +590,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -631,7 +631,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                         case  6 :
                             attIdx = context.getAttribute("", "URI");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText1(v);
                                 continue outer;
@@ -641,7 +641,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                         case  3 :
                             attIdx = context.getAttribute("", "Type");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -651,7 +651,7 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                         case  0 :
                             attIdx = context.getAttribute("", "Id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText3(v);
                                 continue outer;
@@ -659,19 +659,19 @@ public class ReferenceTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.Ref
                             state = 3;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _DigestValue = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

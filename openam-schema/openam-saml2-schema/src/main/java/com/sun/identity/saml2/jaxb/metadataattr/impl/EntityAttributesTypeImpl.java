@@ -12,10 +12,10 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
 {
 
     protected com.sun.xml.bind.util.ListImpl _AttributeOrAssertion;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadataattr.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadataattr.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType.class);
     }
 
@@ -64,7 +64,7 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType.class);
     }
 
@@ -116,11 +116,11 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadataattr.impl.EntityAttributesTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -154,7 +154,7 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -170,7 +170,7 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -186,7 +186,7 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -202,7 +202,7 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -214,7 +214,7 @@ public class EntityAttributesTypeImpl implements com.sun.identity.saml2.jaxb.met
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

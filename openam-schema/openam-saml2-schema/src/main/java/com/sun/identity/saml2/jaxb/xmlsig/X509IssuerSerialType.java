@@ -53,17 +53,17 @@ public interface X509IssuerSerialType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getX509IssuerName();
+    java.lang.String getX509IssuerName();
 
     /**
      * Sets the value of the x509IssuerName property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setX509IssuerName(String value);
+    void setX509IssuerName(java.lang.String value);
 
 }

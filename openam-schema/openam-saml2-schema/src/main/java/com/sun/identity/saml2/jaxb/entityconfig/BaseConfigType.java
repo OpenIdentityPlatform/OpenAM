@@ -50,26 +50,26 @@ public interface BaseConfigType {
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.entityconfig.AttributeType}
      * {@link com.sun.identity.saml2.jaxb.entityconfig.AttributeElement}
-     *
+     * 
      */
     java.util.List getAttribute();
 
     /**
      * Gets the value of the metaAlias property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getMetaAlias();
+    java.lang.String getMetaAlias();
 
     /**
      * Sets the value of the metaAlias property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setMetaAlias(String value);
+    void setMetaAlias(java.lang.String value);
 
 }

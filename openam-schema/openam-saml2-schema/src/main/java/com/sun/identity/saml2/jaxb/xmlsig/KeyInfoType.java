@@ -42,43 +42,43 @@ public interface KeyInfoType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the Content property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Content property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getContent().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
+     * {@link java.lang.Object}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.X509DataElement}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.KeyValueElement}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.RetrievalMethodElement}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.KeyNameElement}
-     * {@link String}
+     * {@link java.lang.String}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.SPKIDataElement}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.PGPDataElement}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.MgmtDataElement}

@@ -14,10 +14,10 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
     protected com.sun.xml.bind.util.ListImpl _Any;
     protected byte[] _PGPKeyPacket;
     protected byte[] _PGPKeyID;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.PGPDataType.class);
     }
 
@@ -63,7 +63,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _PGPKeyID)), "PGPKeyID");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -73,7 +73,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
                 context.endAttributes();
                 try {
                     context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _PGPKeyPacket)), "PGPKeyPacket");
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
                 context.endElement();
@@ -88,7 +88,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
                 context.endAttributes();
                 try {
                     context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _PGPKeyPacket)), "PGPKeyPacket");
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                 }
                 context.endElement();
@@ -135,7 +135,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.PGPDataType.class);
     }
 
@@ -213,11 +213,11 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.PGPDataTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -234,7 +234,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
                         continue outer;
                     case  6 :
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -244,7 +244,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
                         continue outer;
                     case  10 :
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -254,14 +254,14 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
                         continue outer;
                     case  7 :
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
                             return ;
                         }
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(7, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -287,7 +287,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -333,7 +333,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -358,7 +358,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -383,7 +383,7 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -416,39 +416,39 @@ public class PGPDataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.PGPDa
                             eatText3(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _PGPKeyID = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _PGPKeyPacket = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _PGPKeyPacket = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

@@ -33,35 +33,35 @@ public interface SubjectLocalityType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAddress();
+    java.lang.String getAddress();
 
     /**
      * Sets the value of the address property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAddress(String value);
+    void setAddress(java.lang.String value);
 
     /**
      * Gets the value of the dnsName property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getDNSName();
+    java.lang.String getDNSName();
 
     /**
      * Sets the value of the dnsName property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setDNSName(String value);
+    void setDNSName(java.lang.String value);
 
 }

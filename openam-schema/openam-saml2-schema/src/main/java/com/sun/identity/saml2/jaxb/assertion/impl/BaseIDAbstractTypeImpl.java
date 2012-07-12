@@ -11,28 +11,28 @@ package com.sun.identity.saml2.jaxb.assertion.impl;
 public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.assertion.BaseIDAbstractType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _NameQualifier;
-    protected String _SPNameQualifier;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    protected java.lang.String _NameQualifier;
+    protected java.lang.String _SPNameQualifier;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.BaseIDAbstractType.class);
     }
 
-    public String getNameQualifier() {
+    public java.lang.String getNameQualifier() {
         return _NameQualifier;
     }
 
-    public void setNameQualifier(String value) {
+    public void setNameQualifier(java.lang.String value) {
         _NameQualifier = value;
     }
 
-    public String getSPNameQualifier() {
+    public java.lang.String getSPNameQualifier() {
         return _SPNameQualifier;
     }
 
-    public void setSPNameQualifier(String value) {
+    public void setSPNameQualifier(java.lang.String value) {
         _SPNameQualifier = value;
     }
 
@@ -51,8 +51,8 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
         if (_NameQualifier!= null) {
             context.startAttribute("", "NameQualifier");
             try {
-                context.text(((String) _NameQualifier), "NameQualifier");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _NameQualifier), "NameQualifier");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -60,8 +60,8 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
         if (_SPNameQualifier!= null) {
             context.startAttribute("", "SPNameQualifier");
             try {
-                context.text(((String) _SPNameQualifier), "SPNameQualifier");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SPNameQualifier), "SPNameQualifier");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -73,7 +73,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.BaseIDAbstractType.class);
     }
 
@@ -129,11 +129,11 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.BaseIDAbstractTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -146,7 +146,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                     case  0 :
                         attIdx = context.getAttribute("", "NameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -156,7 +156,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                     case  3 :
                         attIdx = context.getAttribute("", "SPNameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -169,27 +169,27 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NameQualifier = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SPNameQualifier = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -202,7 +202,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                     case  0 :
                         attIdx = context.getAttribute("", "NameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -212,7 +212,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                     case  3 :
                         attIdx = context.getAttribute("", "SPNameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -225,7 +225,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -255,7 +255,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -274,7 +274,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                     case  0 :
                         attIdx = context.getAttribute("", "NameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -290,7 +290,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                     case  3 :
                         attIdx = context.getAttribute("", "SPNameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -303,7 +303,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -321,7 +321,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                         case  0 :
                             attIdx = context.getAttribute("", "NameQualifier");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -331,7 +331,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                         case  3 :
                             attIdx = context.getAttribute("", "SPNameQualifier");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -343,7 +343,7 @@ public class BaseIDAbstractTypeImpl implements com.sun.identity.saml2.jaxb.asser
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

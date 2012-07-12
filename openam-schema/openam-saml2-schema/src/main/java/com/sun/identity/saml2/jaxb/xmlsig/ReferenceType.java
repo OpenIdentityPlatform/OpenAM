@@ -46,7 +46,7 @@ public interface ReferenceType {
 
     /**
      * Sets the value of the transforms property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.TransformsType}
@@ -56,7 +56,7 @@ public interface ReferenceType {
 
     /**
      * Gets the value of the digestValue property.
-     *
+     * 
      * @return
      *     possible object is
      *     byte[]
@@ -65,7 +65,7 @@ public interface ReferenceType {
 
     /**
      * Sets the value of the digestValue property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     byte[]
@@ -74,7 +74,7 @@ public interface ReferenceType {
 
     /**
      * Gets the value of the digestMethod property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.DigestMethodType}
@@ -84,7 +84,7 @@ public interface ReferenceType {
 
     /**
      * Sets the value of the digestMethod property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlsig.DigestMethodType}
@@ -94,56 +94,56 @@ public interface ReferenceType {
 
     /**
      * Gets the value of the type property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getType();
+    java.lang.String getType();
 
     /**
      * Sets the value of the type property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setType(String value);
+    void setType(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the uri property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getURI();
+    java.lang.String getURI();
 
     /**
      * Sets the value of the uri property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setURI(String value);
+    void setURI(java.lang.String value);
 
 }

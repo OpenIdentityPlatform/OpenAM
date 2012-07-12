@@ -50,8 +50,8 @@ public interface KeyValueType {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.xmlsig.RSAKeyValueElement}
-     * {@link String}
-     * {@link Object}
+     * {@link java.lang.String}
+     * {@link java.lang.Object}
      * {@link com.sun.identity.saml2.jaxb.xmlsig.DSAKeyValueElement}
      * 
      */

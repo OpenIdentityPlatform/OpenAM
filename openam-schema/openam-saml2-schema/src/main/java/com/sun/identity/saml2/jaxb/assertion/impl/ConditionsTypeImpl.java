@@ -14,10 +14,10 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
     protected java.util.Calendar _NotBefore;
     protected com.sun.xml.bind.util.ListImpl _ConditionOrAudienceRestrictionOrOneTimeUse;
     protected java.util.Calendar _NotOnOrAfter;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.ConditionsType.class);
     }
 
@@ -71,7 +71,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             context.startAttribute("", "NotBefore");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _NotBefore), null), "NotBefore");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -80,7 +80,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             context.startAttribute("", "NotOnOrAfter");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _NotOnOrAfter), null), "NotOnOrAfter");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -100,7 +100,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.ConditionsType.class);
     }
 
@@ -175,11 +175,11 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.ConditionsTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -189,7 +189,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                     case  0 :
                         attIdx = context.getAttribute("", "NotBefore");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -199,7 +199,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                     case  3 :
                         attIdx = context.getAttribute("", "NotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -250,27 +250,27 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NotBefore = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NotOnOrAfter = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -280,7 +280,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                     case  0 :
                         attIdx = context.getAttribute("", "NotBefore");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -290,7 +290,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                     case  3 :
                         attIdx = context.getAttribute("", "NotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -309,7 +309,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -342,7 +342,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -352,7 +352,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                     case  0 :
                         attIdx = context.getAttribute("", "NotBefore");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -362,7 +362,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                     case  3 :
                         attIdx = context.getAttribute("", "NotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -393,7 +393,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -408,7 +408,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                         case  0 :
                             attIdx = context.getAttribute("", "NotBefore");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -418,7 +418,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                         case  3 :
                             attIdx = context.getAttribute("", "NotOnOrAfter");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -436,7 +436,7 @@ public class ConditionsTypeImpl implements com.sun.identity.saml2.jaxb.assertion
                             eatText1(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

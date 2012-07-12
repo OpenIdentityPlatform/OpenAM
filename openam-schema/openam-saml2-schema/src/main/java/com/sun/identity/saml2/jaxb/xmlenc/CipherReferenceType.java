@@ -41,7 +41,7 @@ public interface CipherReferenceType {
 
     /**
      * Sets the value of the transforms property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.TransformsType}
@@ -50,20 +50,20 @@ public interface CipherReferenceType {
 
     /**
      * Gets the value of the uri property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getURI();
+    java.lang.String getURI();
 
     /**
      * Sets the value of the uri property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setURI(String value);
+    void setURI(java.lang.String value);
 
 }

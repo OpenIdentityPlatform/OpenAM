@@ -7,15 +7,16 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.Messages;
-import com.sun.xml.bind.serializer.AbortSerializationException;
-import com.sun.xml.bind.util.ValidationEventLocatorExImpl;
-import org.xml.sax.SAXException;
-
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.helpers.PrintConversionEventImpl;
 import javax.xml.bind.helpers.ValidationEventImpl;
 import javax.xml.bind.helpers.ValidationEventLocatorImpl;
+
+import org.xml.sax.SAXException;
+
+import com.sun.xml.bind.Messages;
+import com.sun.xml.bind.serializer.AbortSerializationException;
+import com.sun.xml.bind.util.ValidationEventLocatorExImpl;
 
 /**
  * 
@@ -64,7 +65,7 @@ public class Util {
     }
     
     private static String getUserFriendlyTypeName( Object o ) {
-        if( o instanceof ValidatableObject)
+        if( o instanceof ValidatableObject )
             return ((ValidatableObject)o).getPrimaryInterface().getName();
         else
             return o.getClass().getName();

@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(73, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (com.sun.identity.saml2.jaxb.xmlsig.ObjectFactory.class));
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((com.sun.identity.saml2.jaxb.xmlsig.SPKIDataElement.class), "com.sun.identity.saml2.jaxb.xmlsig.impl.SPKIDataElementImpl");
@@ -115,7 +115,7 @@ public class ObjectFactory
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sun.identity.saml2.jaxb.xmlsig
-     *
+     * 
      */
     public ObjectFactory() {
         super(grammarInfo);
@@ -123,7 +123,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of the specified Java content interface.
-     *
+     * 
      * @param javaContentInterface
      *     the Class object of the javacontent interface to instantiate
      * @return
@@ -131,7 +131,7 @@ public class ObjectFactory
      * @throws JAXBException
      *     if an error occurs
      */
-    public Object newInstance(Class javaContentInterface)
+    public java.lang.Object newInstance(java.lang.Class javaContentInterface)
         throws javax.xml.bind.JAXBException
     {
         return super.newInstance(javaContentInterface);
@@ -142,7 +142,7 @@ public class ObjectFactory
      * used to get provider specific properties.
      * Attempting to get an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @return
@@ -150,7 +150,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error retrieving the given property or value
      */
-    public Object getProperty(String name)
+    public java.lang.Object getProperty(java.lang.String name)
         throws javax.xml.bind.PropertyException
     {
         return super.getProperty(name);
@@ -161,7 +161,7 @@ public class ObjectFactory
      * used to set provider specific properties.
      * Attempting to set an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @param value
@@ -169,7 +169,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error processing the given property or value
      */
-    public void setProperty(String name, Object value)
+    public void setProperty(java.lang.String name, java.lang.Object value)
         throws javax.xml.bind.PropertyException
     {
         super.setProperty(name, value);
@@ -177,7 +177,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SPKIDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -189,7 +189,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -201,7 +201,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ManifestElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -213,7 +213,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509IssuerSerial
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -225,7 +225,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CanonicalizationMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -237,7 +237,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignedInfoType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -249,7 +249,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DigestMethodType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -261,7 +261,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureMethodTypeHMACOutputLength
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -273,7 +273,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureMethodTypeHMACOutputLength
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -285,7 +285,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509SubjectName
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -297,11 +297,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509SubjectName
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SubjectName createX509DataTypeX509SubjectName(String value)
+    public com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SubjectName createX509DataTypeX509SubjectName(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.X509SubjectNameImpl(value);
@@ -309,7 +309,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -321,11 +321,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.xmlsig.KeyNameElement createKeyNameElement(String value)
+    public com.sun.identity.saml2.jaxb.xmlsig.KeyNameElement createKeyNameElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.xmlsig.impl.KeyNameElementImpl(value);
@@ -333,7 +333,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyInfoElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -345,7 +345,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RetrievalMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -357,7 +357,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignaturePropertyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -369,7 +369,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -381,7 +381,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignedInfoElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -393,7 +393,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of MgmtDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -405,11 +405,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of MgmtDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.xmlsig.MgmtDataElement createMgmtDataElement(String value)
+    public com.sun.identity.saml2.jaxb.xmlsig.MgmtDataElement createMgmtDataElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.xmlsig.impl.MgmtDataElementImpl(value);
@@ -417,7 +417,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PGPDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -429,7 +429,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformTypeXPath
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -441,11 +441,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformTypeXPath
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.xmlsig.TransformType.XPath createTransformTypeXPath(String value)
+    public com.sun.identity.saml2.jaxb.xmlsig.TransformType.XPath createTransformTypeXPath(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.xmlsig.impl.TransformTypeImpl.XPathImpl(value);
@@ -453,7 +453,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -465,7 +465,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509CRL
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -477,7 +477,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509CRL
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -489,7 +489,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509IssuerSerialType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -501,7 +501,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyInfoType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -513,7 +513,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignaturePropertyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -525,7 +525,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -537,7 +537,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureMethodType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -549,7 +549,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -561,7 +561,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyValueType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -573,7 +573,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PGPDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -585,7 +585,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DigestValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -597,7 +597,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DigestValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -609,7 +609,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RetrievalMethodType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -621,7 +621,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ObjectElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -633,7 +633,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ObjectType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -645,7 +645,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509SKI
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -657,7 +657,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509SKI
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -669,7 +669,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DigestMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -681,7 +681,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformsType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -693,7 +693,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RSAKeyValueType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -705,7 +705,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SPKIDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -717,7 +717,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SPKIDataTypeSPKISexp
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -729,7 +729,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SPKIDataTypeSPKISexp
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -741,7 +741,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -753,7 +753,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509Certificate
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -765,7 +765,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of X509DataTypeX509Certificate
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -777,7 +777,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -789,7 +789,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ManifestType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -801,7 +801,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignaturePropertiesType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -813,7 +813,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RSAKeyValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -825,7 +825,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignaturePropertiesElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -837,7 +837,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -849,7 +849,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -861,7 +861,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -873,7 +873,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -885,7 +885,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SignatureValueType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -897,7 +897,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSAKeyValueType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -909,7 +909,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of DSAKeyValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -921,7 +921,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformsElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */

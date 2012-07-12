@@ -36,56 +36,56 @@ public interface SPSSODescriptorType
 
     /**
      * Gets the value of the authnRequestsSigned property.
-     *
+     * 
      */
     boolean isAuthnRequestsSigned();
 
     /**
      * Sets the value of the authnRequestsSigned property.
-     *
+     * 
      */
     void setAuthnRequestsSigned(boolean value);
 
     /**
      * Gets the value of the AssertionConsumerService property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AssertionConsumerService property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAssertionConsumerService().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement}
      * {@link com.sun.identity.saml2.jaxb.metadata.IndexedEndpointType}
-     *
+     * 
      */
     java.util.List getAssertionConsumerService();
 
     /**
      * Gets the value of the AttributeConsumingService property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AttributeConsumingService property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAttributeConsumingService().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.AttributeConsumingServiceType}

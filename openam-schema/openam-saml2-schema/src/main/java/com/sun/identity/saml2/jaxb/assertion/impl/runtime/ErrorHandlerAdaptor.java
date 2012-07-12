@@ -7,17 +7,18 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.validator.Locator;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventLocator;
 import javax.xml.bind.helpers.ValidationEventImpl;
 
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import com.sun.xml.bind.validator.Locator;
+
 /**
- * Receives errors through {@link org.xml.sax.ErrorHandler} and reports to the
+ * Receives errors through {@link ErrorHandler} and reports to the
  * {@link SAXUnmarshallerHandler}.
  * 
  * @author

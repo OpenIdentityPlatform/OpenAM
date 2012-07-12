@@ -11,20 +11,20 @@ package com.sun.identity.saml2.jaxb.entityconfig.impl;
 public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconfig.AttributeType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Name;
+    protected java.lang.String _Name;
     protected com.sun.xml.bind.util.ListImpl _Value;
-    public final static Class version = (com.sun.identity.saml2.jaxb.entityconfig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.entityconfig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.entityconfig.AttributeType.class);
     }
 
-    public String getName() {
+    public java.lang.String getName() {
         return _Name;
     }
 
-    public void setName(String value) {
+    public void setName(java.lang.String value) {
         _Name = value;
     }
 
@@ -53,20 +53,20 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
             int idx_0 = idx2;
             try {
                 idx_0 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_1 = idx2;
             try {
                 idx_1 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _Value.get(idx2 ++)), "Value");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Value.get(idx2 ++)), "Value");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -80,15 +80,15 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
         final int len2 = ((_Value == null)? 0 :_Value.size());
         context.startAttribute("", "name");
         try {
-            context.text(((String) _Name), "Name");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Name), "Name");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -102,13 +102,13 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.entityconfig.AttributeType.class);
     }
 
@@ -174,11 +174,11 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.entityconfig.impl.AttributeTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -204,7 +204,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -216,17 +216,17 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Name = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -242,7 +242,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -261,7 +261,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -286,7 +286,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -302,7 +302,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
                     case  0 :
                         attIdx = context.getAttribute("", "name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -320,7 +320,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -341,7 +341,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
                         case  0 :
                             attIdx = context.getAttribute("", "name");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -352,19 +352,19 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.entityconf
                             eatText2(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getValue().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

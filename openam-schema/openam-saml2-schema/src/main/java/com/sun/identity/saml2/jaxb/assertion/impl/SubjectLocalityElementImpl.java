@@ -13,18 +13,18 @@ public class SubjectLocalityElementImpl
     implements com.sun.identity.saml2.jaxb.assertion.SubjectLocalityElement, com.sun.xml.bind.RIElement, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.SubjectLocalityElement.class);
     }
 
-    public String ____jaxb_ri____getNamespaceURI() {
+    public java.lang.String ____jaxb_ri____getNamespaceURI() {
         return "urn:oasis:names:tc:SAML:2.0:assertion";
     }
 
-    public String ____jaxb_ri____getLocalName() {
+    public java.lang.String ____jaxb_ri____getLocalName() {
         return "SubjectLocality";
     }
 
@@ -54,7 +54,7 @@ public class SubjectLocalityElementImpl
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.SubjectLocalityElement.class);
     }
 
@@ -119,11 +119,11 @@ public class SubjectLocalityElementImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.SubjectLocalityElementImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -161,7 +161,7 @@ public class SubjectLocalityElementImpl
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -199,7 +199,7 @@ public class SubjectLocalityElementImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -226,7 +226,7 @@ public class SubjectLocalityElementImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -257,7 +257,7 @@ public class SubjectLocalityElementImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -284,7 +284,7 @@ public class SubjectLocalityElementImpl
                             spawnHandlerFromText((((com.sun.identity.saml2.jaxb.assertion.impl.SubjectLocalityTypeImpl)com.sun.identity.saml2.jaxb.assertion.impl.SubjectLocalityElementImpl.this).new Unmarshaller(context)), 2, value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

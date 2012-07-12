@@ -12,13 +12,13 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
 {
 
     protected com.sun.xml.bind.util.ListImpl _Any;
-    protected String _ResponseLocation;
-    protected String _Location;
-    protected String _Binding;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    protected java.lang.String _ResponseLocation;
+    protected java.lang.String _Location;
+    protected java.lang.String _Binding;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadata.EndpointType.class);
     }
 
@@ -33,27 +33,27 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
         return _getAny();
     }
 
-    public String getResponseLocation() {
+    public java.lang.String getResponseLocation() {
         return _ResponseLocation;
     }
 
-    public void setResponseLocation(String value) {
+    public void setResponseLocation(java.lang.String value) {
         _ResponseLocation = value;
     }
 
-    public String getLocation() {
+    public java.lang.String getLocation() {
         return _Location;
     }
 
-    public void setLocation(String value) {
+    public void setLocation(java.lang.String value) {
         _Location = value;
     }
 
-    public String getBinding() {
+    public java.lang.String getBinding() {
         return _Binding;
     }
 
-    public void setBinding(String value) {
+    public void setBinding(java.lang.String value) {
         _Binding = value;
     }
 
@@ -78,23 +78,23 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
         final int len1 = ((_Any == null)? 0 :_Any.size());
         context.startAttribute("", "Binding");
         try {
-            context.text(((String) _Binding), "Binding");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Binding), "Binding");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         context.startAttribute("", "Location");
         try {
-            context.text(((String) _Location), "Location");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Location), "Location");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_ResponseLocation!= null) {
             context.startAttribute("", "ResponseLocation");
             try {
-                context.text(((String) _ResponseLocation), "ResponseLocation");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _ResponseLocation), "ResponseLocation");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -114,7 +114,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadata.EndpointType.class);
     }
 
@@ -184,11 +184,11 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadata.impl.EndpointTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -197,7 +197,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                 switch (state) {
                     case  9 :
                         if (!(("" == ___uri)||("urn:oasis:names:tc:SAML:2.0:metadata" == ___uri))) {
-                            Object co = spawnWildcard(10, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(10, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -208,7 +208,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  6 :
                         attIdx = context.getAttribute("", "ResponseLocation");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -217,7 +217,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                         continue outer;
                     case  10 :
                         if (!(("" == ___uri)||("urn:oasis:names:tc:SAML:2.0:metadata" == ___uri))) {
-                            Object co = spawnWildcard(10, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(10, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAny().add(co);
                             }
@@ -228,7 +228,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  0 :
                         attIdx = context.getAttribute("", "Binding");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -237,7 +237,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  3 :
                         attIdx = context.getAttribute("", "Location");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -249,37 +249,37 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ResponseLocation = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Binding = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Location = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -292,7 +292,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  6 :
                         attIdx = context.getAttribute("", "ResponseLocation");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -305,7 +305,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  0 :
                         attIdx = context.getAttribute("", "Binding");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -314,7 +314,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  3 :
                         attIdx = context.getAttribute("", "Location");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -326,7 +326,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -364,7 +364,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -383,7 +383,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  6 :
                         attIdx = context.getAttribute("", "ResponseLocation");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -396,7 +396,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  0 :
                         attIdx = context.getAttribute("", "Binding");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -417,7 +417,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                     case  3 :
                         attIdx = context.getAttribute("", "Location");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -429,7 +429,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -447,7 +447,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                         case  6 :
                             attIdx = context.getAttribute("", "ResponseLocation");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText1(v);
                                 continue outer;
@@ -460,7 +460,7 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                         case  0 :
                             attIdx = context.getAttribute("", "Binding");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -477,14 +477,14 @@ public class EndpointTypeImpl implements com.sun.identity.saml2.jaxb.metadata.En
                         case  3 :
                             attIdx = context.getAttribute("", "Location");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

@@ -7,18 +7,19 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.msv.grammar.Grammar;
-import com.sun.msv.verifier.Verifier;
-import com.sun.msv.verifier.VerifierFilter;
-import com.sun.msv.verifier.regexp.REDocumentDeclaration;
-import com.sun.xml.bind.validator.Locator;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.ValidationEvent;
+
 import org.iso_relax.verifier.impl.ForkContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.ValidationEvent;
+import com.sun.msv.grammar.Grammar;
+import com.sun.msv.verifier.Verifier;
+import com.sun.msv.verifier.VerifierFilter;
+import com.sun.msv.verifier.regexp.REDocumentDeclaration;
+import com.sun.xml.bind.validator.Locator;
 
 /**
  * Filter implementation of SAXUnmarshallerHandler.
@@ -41,7 +42,7 @@ public class ValidatingUnmarshaller extends ForkContentHandler
     /**
      * Creates a new instance of ValidatingUnmarshaller.
      */
-    public static ValidatingUnmarshaller create( Grammar grammar,
+    public static ValidatingUnmarshaller create( Grammar grammar, 
                             SAXUnmarshallerHandler _core,
                             Locator locator ) {
         

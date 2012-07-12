@@ -11,28 +11,28 @@ package com.sun.identity.saml2.jaxb.metadata.impl;
 public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadata.LocalizedURIType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Lang;
-    protected String _Value;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    protected java.lang.String _Lang;
+    protected java.lang.String _Value;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadata.LocalizedURIType.class);
     }
 
-    public String getLang() {
+    public java.lang.String getLang() {
         return _Lang;
     }
 
-    public void setLang(String value) {
+    public void setLang(java.lang.String value) {
         _Lang = value;
     }
 
-    public String getValue() {
+    public java.lang.String getValue() {
         return _Value;
     }
 
-    public void setValue(String value) {
+    public void setValue(java.lang.String value) {
         _Value = value;
     }
 
@@ -44,8 +44,8 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
         throws org.xml.sax.SAXException
     {
         try {
-            context.text(((String) _Value), "Value");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Value), "Value");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
     }
@@ -55,8 +55,8 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
     {
         context.startAttribute("http://www.w3.org/XML/1998/namespace", "lang");
         try {
-            context.text(((String) _Lang), "Lang");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Lang), "Lang");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -68,7 +68,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
         context.getNamespaceContext().declareNamespace("http://www.w3.org/XML/1998/namespace", null, true);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadata.LocalizedURIType.class);
     }
 
@@ -125,11 +125,11 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadata.impl.LocalizedURITypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -142,7 +142,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
                     case  0 :
                         attIdx = context.getAttribute("http://www.w3.org/XML/1998/namespace", "lang");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -154,17 +154,17 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Lang = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -177,7 +177,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
                     case  0 :
                         attIdx = context.getAttribute("http://www.w3.org/XML/1998/namespace", "lang");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -189,7 +189,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -211,7 +211,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -230,7 +230,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
                     case  0 :
                         attIdx = context.getAttribute("http://www.w3.org/XML/1998/namespace", "lang");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -242,7 +242,7 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -264,26 +264,26 @@ public class LocalizedURITypeImpl implements com.sun.identity.saml2.jaxb.metadat
                         case  0 :
                             attIdx = context.getAttribute("http://www.w3.org/XML/1998/namespace", "lang");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Value = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

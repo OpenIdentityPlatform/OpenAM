@@ -7,13 +7,14 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.unmarshaller.Tracer;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.namespace.NamespaceContext;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.ValidationEvent;
-import javax.xml.namespace.NamespaceContext;
+import com.sun.xml.bind.unmarshaller.Tracer;
 
 /**
  * Methods exposed by the unmarshalling coordinator object
@@ -47,7 +48,7 @@ public interface UnmarshallingContext extends NamespaceContext
      *      the leaveChild event will be fired to the parent handler
      *      with this memento.
      */
-    void pushContentHandler(UnmarshallingEventHandler handler, int memento);
+    void pushContentHandler( UnmarshallingEventHandler handler, int memento );
     
     /**
      * Pops a content handler from the stack and registers
@@ -95,7 +96,7 @@ public interface UnmarshallingContext extends NamespaceContext
      *      false if the context doesn't need to fire text events
      *      for texts inside this element. True otherwise. 
      */
-    void pushAttributes(Attributes atts, boolean collectText);
+    void pushAttributes( Attributes atts, boolean collectText );
     
     /**
      * Discards the previously stored attribute set.
@@ -112,7 +113,7 @@ public interface UnmarshallingContext extends NamespaceContext
      * @return
      *      -1 if not found.
      */
-    int getAttribute(String uri, String name);
+    int getAttribute( String uri, String name );
     
     /**
      * Gets all the unconsumed attributes.
@@ -125,12 +126,12 @@ public interface UnmarshallingContext extends NamespaceContext
      * Fires an attribute event for the specified attribute,
      * and marks the attribute as "used".
      */
-    void consumeAttribute(int idx) throws SAXException;
+    void consumeAttribute( int idx ) throws SAXException;
     
     /**
      * Marks the attribute as "used" and return the value of the attribute.
      */
-    String eatAttribute(int idx) throws SAXException;
+    String eatAttribute( int idx ) throws SAXException;
     
     /**
      * Adds a job that will be executed at the last of the unmarshalling.
@@ -140,7 +141,7 @@ public interface UnmarshallingContext extends NamespaceContext
      * @param   job
      *      The run method of this object is called.
      */
-    void addPatcher(Runnable job);
+    void addPatcher( Runnable job );
     // the patcher can throw JAXBException?
     
     /**
@@ -152,7 +153,7 @@ public interface UnmarshallingContext extends NamespaceContext
      *      This is a hack, but this makes it easier for ID
      *      transducer to do its job.
      */
-    String addToIdTable(String id);
+    String addToIdTable( String id );
     //
     // throwing an exception is one way. Overwriting the previous one
     // is another way. The latter allows us to process invalid documents,
@@ -171,7 +172,7 @@ public interface UnmarshallingContext extends NamespaceContext
      *      If there is no object associated with the given id,
      *      this method returns null.
      */
-    Object getObjectFromId(String id);
+    Object getObjectFromId( String id );
     // if we don't find ID.
     
     
@@ -190,7 +191,7 @@ public interface UnmarshallingContext extends NamespaceContext
      * 
      * The thrown exception will be catched by the unmarshaller.
      */
-    void handleEvent(ValidationEvent event, boolean canRecover) throws SAXException;
+    void handleEvent( ValidationEvent event, boolean canRecover ) throws SAXException;
     
     
 //
@@ -202,10 +203,10 @@ public interface UnmarshallingContext extends NamespaceContext
 // we can adopt this interface into the ValidationContext interface.
 //
 // see the ValidationContextAdaptor class.
-    String resolveNamespacePrefix(String prefix);
+    String resolveNamespacePrefix( String prefix );
     String getBaseUri();
-    boolean isUnparsedEntity(String entityName);
-    boolean isNotation(String notationName);
+    boolean isUnparsedEntity( String entityName );
+    boolean isNotation( String notationName );
     
     
     

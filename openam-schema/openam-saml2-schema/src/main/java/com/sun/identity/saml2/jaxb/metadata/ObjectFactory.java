@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(93, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (com.sun.identity.saml2.jaxb.metadata.ObjectFactory.class));
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((com.sun.identity.saml2.jaxb.metadata.EmailAddressElement.class), "com.sun.identity.saml2.jaxb.metadata.impl.EmailAddressElementImpl");
@@ -150,7 +150,7 @@ public class ObjectFactory
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sun.identity.saml2.jaxb.metadata
-     *
+     * 
      */
     public ObjectFactory() {
         super(grammarInfo);
@@ -158,7 +158,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of the specified Java content interface.
-     *
+     * 
      * @param javaContentInterface
      *     the Class object of the javacontent interface to instantiate
      * @return
@@ -166,7 +166,7 @@ public class ObjectFactory
      * @throws JAXBException
      *     if an error occurs
      */
-    public Object newInstance(Class javaContentInterface)
+    public java.lang.Object newInstance(java.lang.Class javaContentInterface)
         throws javax.xml.bind.JAXBException
     {
         return super.newInstance(javaContentInterface);
@@ -177,7 +177,7 @@ public class ObjectFactory
      * used to get provider specific properties.
      * Attempting to get an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @return
@@ -185,7 +185,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error retrieving the given property or value
      */
-    public Object getProperty(String name)
+    public java.lang.Object getProperty(java.lang.String name)
         throws javax.xml.bind.PropertyException
     {
         return super.getProperty(name);
@@ -196,7 +196,7 @@ public class ObjectFactory
      * used to set provider specific properties.
      * Attempting to set an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @param value
@@ -204,7 +204,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error processing the given property or value
      */
-    public void setProperty(String name, Object value)
+    public void setProperty(java.lang.String name, java.lang.Object value)
         throws javax.xml.bind.PropertyException
     {
         super.setProperty(name, value);
@@ -212,7 +212,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmailAddressElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -224,11 +224,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of EmailAddressElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.EmailAddressElement createEmailAddressElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.EmailAddressElement createEmailAddressElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.EmailAddressElementImpl(value);
@@ -236,7 +236,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -248,7 +248,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OrganizationElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -260,7 +260,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RoleDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -272,7 +272,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EntitiesDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -284,7 +284,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionIDRequestServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -296,7 +296,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AdditionalMetadataLocationType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -308,7 +308,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SSODescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -320,7 +320,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ArtifactResolutionServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -332,7 +332,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EntitiesDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -344,7 +344,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of XACMLPDPDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -356,7 +356,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of XACMLAuthzDecisionQueryDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -368,7 +368,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ExtensionsElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -380,7 +380,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeAuthorityDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -392,7 +392,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthzServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -404,7 +404,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of GivenNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -416,11 +416,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of GivenNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.GivenNameElement createGivenNameElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.GivenNameElement createGivenNameElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.GivenNameElementImpl(value);
@@ -428,7 +428,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RoleDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -440,7 +440,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnAuthorityDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -452,7 +452,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LocalizedURIType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -464,7 +464,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OrganizationDisplayNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -476,7 +476,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TelephoneNumberElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -488,11 +488,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of TelephoneNumberElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.TelephoneNumberElement createTelephoneNumberElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.TelephoneNumberElement createTelephoneNumberElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.TelephoneNumberElementImpl(value);
@@ -500,7 +500,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PDPDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -512,7 +512,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OrganizationType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -524,7 +524,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -536,7 +536,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of XACMLPDPDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -548,7 +548,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AffiliationDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -560,7 +560,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EntityDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -572,7 +572,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -584,7 +584,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of XACMLAuthzDecisionQueryDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -596,7 +596,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionConsumerServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -608,7 +608,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of IDPSSODescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -620,7 +620,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -632,7 +632,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnQueryServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -644,7 +644,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RequestedAttributeType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -656,7 +656,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeAuthorityDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -668,7 +668,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of XACMLAuthzServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -680,7 +680,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnAuthorityDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -692,7 +692,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OrganizationURLElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -704,7 +704,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeConsumingServiceType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -716,7 +716,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SurNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -728,11 +728,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of SurNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.SurNameElement createSurNameElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.SurNameElement createSurNameElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.SurNameElementImpl(value);
@@ -740,7 +740,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AdditionalMetadataLocationElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -752,7 +752,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of NameIDFormatElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -764,11 +764,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of NameIDFormatElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.NameIDFormatElement createNameIDFormatElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.NameIDFormatElement createNameIDFormatElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.NameIDFormatElementImpl(value);
@@ -776,7 +776,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EndpointType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -788,7 +788,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of NameIDMappingServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -800,7 +800,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SPSSODescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -812,7 +812,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ExtensionsType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -824,7 +824,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OrganizationNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -836,7 +836,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ManageNameIDServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -848,7 +848,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ServiceDescriptionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -860,7 +860,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ServiceNameElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -872,7 +872,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ContactPersonElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -884,7 +884,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SPSSODescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -896,7 +896,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CompanyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -908,11 +908,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of CompanyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.CompanyElement createCompanyElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.CompanyElement createCompanyElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.CompanyElementImpl(value);
@@ -920,7 +920,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of QueryDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -932,7 +932,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ContactType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -944,7 +944,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of IDPSSODescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -956,7 +956,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of RequestedAttributeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -968,7 +968,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SingleLogoutServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -980,7 +980,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeConsumingServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -992,7 +992,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SingleSignOnServiceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1004,7 +1004,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of LocalizedNameType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1016,7 +1016,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1028,7 +1028,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeProfileElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1040,11 +1040,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeProfileElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.AttributeProfileElement createAttributeProfileElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.AttributeProfileElement createAttributeProfileElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.AttributeProfileElementImpl(value);
@@ -1052,7 +1052,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of PDPDescriptorElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1064,7 +1064,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EntityDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1076,7 +1076,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AffiliationDescriptorType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1088,7 +1088,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AffiliateMemberElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -1100,11 +1100,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AffiliateMemberElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.metadata.AffiliateMemberElement createAffiliateMemberElement(String value)
+    public com.sun.identity.saml2.jaxb.metadata.AffiliateMemberElement createAffiliateMemberElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.metadata.impl.AffiliateMemberElementImpl(value);
@@ -1112,7 +1112,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of IndexedEndpointType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */

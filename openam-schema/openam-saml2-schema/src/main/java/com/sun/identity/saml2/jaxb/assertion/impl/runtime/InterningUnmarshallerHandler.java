@@ -7,11 +7,12 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.unmarshaller.InterningXMLReader;
-import org.xml.sax.SAXException;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.ValidationEvent;
+
+import org.xml.sax.SAXException;
+
+import com.sun.xml.bind.unmarshaller.InterningXMLReader;
 
 /**
  * Filter {@link SAXUnmarshallerHandler} that interns all the Strings

@@ -11,29 +11,29 @@ package com.sun.identity.saml2.jaxb.xmlenc.impl;
 public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertyType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Target;
-    protected String _Id;
+    protected java.lang.String _Target;
+    protected java.lang.String _Id;
     protected com.sun.xml.bind.util.ListImpl _Content;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlenc.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlenc.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertyType.class);
     }
 
-    public String getTarget() {
+    public java.lang.String getTarget() {
         return _Target;
     }
 
-    public void setTarget(String value) {
+    public void setTarget(java.lang.String value) {
         _Target = value;
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -59,15 +59,15 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
         final int len3 = ((_Content == null)? 0 :_Content.size());
         while (idx3 != len3) {
             {
-                Object o = _Content.get(idx3);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx3);
+                if (o instanceof java.lang.String) {
                     try {
-                        context.text(((String) _Content.get(idx3 ++)), "Content");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _Content.get(idx3 ++)), "Content");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx3 ++)), "Content");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -85,8 +85,8 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
         if (_Id!= null) {
             context.startAttribute("", "Id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -94,23 +94,23 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
         if (_Target!= null) {
             context.startAttribute("", "Target");
             try {
-                context.text(((String) _Target), "Target");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Target), "Target");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         while (idx3 != len3) {
             {
-                Object o = _Content.get(idx3);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx3);
+                if (o instanceof java.lang.String) {
                     try {
                         idx3 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx3 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -127,15 +127,15 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
         final int len3 = ((_Content == null)? 0 :_Content.size());
         while (idx3 != len3) {
             {
-                Object o = _Content.get(idx3);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx3);
+                if (o instanceof java.lang.String) {
                     try {
                         idx3 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx3 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -145,11 +145,11 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertyType.class);
     }
 
@@ -223,11 +223,11 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlenc.impl.EncryptionPropertyTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -237,7 +237,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -247,7 +247,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                     case  3 :
                         attIdx = context.getAttribute("", "Target");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -256,7 +256,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                         continue outer;
                     case  6 :
                         if (!(("" == ___uri)||("http://www.w3.org/2001/04/xmlenc#" == ___uri))) {
-                            Object co = spawnWildcard(6, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(6, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getContent().add(co);
                             }
@@ -270,27 +270,27 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Target = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -300,7 +300,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -310,7 +310,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                     case  3 :
                         attIdx = context.getAttribute("", "Target");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -326,7 +326,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -356,7 +356,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -372,7 +372,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -388,7 +388,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                     case  3 :
                         attIdx = context.getAttribute("", "Target");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -404,7 +404,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -419,7 +419,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                         case  0 :
                             attIdx = context.getAttribute("", "Id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -433,7 +433,7 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                         case  3 :
                             attIdx = context.getAttribute("", "Target");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -445,19 +445,19 @@ public class EncryptionPropertyTypeImpl implements com.sun.identity.saml2.jaxb.x
                             eatText3(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getContent().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

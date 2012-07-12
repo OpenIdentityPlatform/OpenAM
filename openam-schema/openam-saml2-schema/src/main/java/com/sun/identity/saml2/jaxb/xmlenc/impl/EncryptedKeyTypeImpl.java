@@ -14,12 +14,12 @@ public class EncryptedKeyTypeImpl
 {
 
     protected com.sun.identity.saml2.jaxb.xmlenc.ReferenceListType _ReferenceList;
-    protected String _CarriedKeyName;
-    protected String _Recipient;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlenc.impl.JAXBVersion.class);
+    protected java.lang.String _CarriedKeyName;
+    protected java.lang.String _Recipient;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlenc.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlenc.EncryptedKeyType.class);
     }
 
@@ -31,19 +31,19 @@ public class EncryptedKeyTypeImpl
         _ReferenceList = value;
     }
 
-    public String getCarriedKeyName() {
+    public java.lang.String getCarriedKeyName() {
         return _CarriedKeyName;
     }
 
-    public void setCarriedKeyName(String value) {
+    public void setCarriedKeyName(java.lang.String value) {
         _CarriedKeyName = value;
     }
 
-    public String getRecipient() {
+    public java.lang.String getRecipient() {
         return _Recipient;
     }
 
-    public void setRecipient(String value) {
+    public void setRecipient(java.lang.String value) {
         _Recipient = value;
     }
 
@@ -73,8 +73,8 @@ public class EncryptedKeyTypeImpl
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _CarriedKeyName), "CarriedKeyName");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _CarriedKeyName), "CarriedKeyName");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -87,8 +87,8 @@ public class EncryptedKeyTypeImpl
         if (_Recipient!= null) {
             context.startAttribute("", "Recipient");
             try {
-                context.text(((String) _Recipient), "Recipient");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Recipient), "Recipient");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -112,7 +112,7 @@ public class EncryptedKeyTypeImpl
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlenc.EncryptedKeyType.class);
     }
 
@@ -222,11 +222,11 @@ public class EncryptedKeyTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlenc.impl.EncryptedKeyTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -248,7 +248,7 @@ public class EncryptedKeyTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Recipient");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -328,17 +328,17 @@ public class EncryptedKeyTypeImpl
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Recipient = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -358,7 +358,7 @@ public class EncryptedKeyTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Recipient");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -410,7 +410,7 @@ public class EncryptedKeyTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -457,7 +457,7 @@ public class EncryptedKeyTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -470,7 +470,7 @@ public class EncryptedKeyTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Recipient");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -521,7 +521,7 @@ public class EncryptedKeyTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -535,7 +535,7 @@ public class EncryptedKeyTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "Recipient");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -583,19 +583,19 @@ public class EncryptedKeyTypeImpl
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _CarriedKeyName = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

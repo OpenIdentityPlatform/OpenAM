@@ -7,10 +7,7 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.JAXBAssertionError;
-import com.sun.xml.bind.unmarshaller.Messages;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import java.util.StringTokenizer;
 
 import javax.xml.bind.Element;
 import javax.xml.bind.ParseConversionEvent;
@@ -18,16 +15,21 @@ import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.helpers.ParseConversionEventImpl;
 import javax.xml.bind.helpers.ValidationEventImpl;
 import javax.xml.bind.helpers.ValidationEventLocatorImpl;
-import java.util.StringTokenizer;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+import com.sun.xml.bind.JAXBAssertionError;
+import com.sun.xml.bind.unmarshaller.Messages;
 
 /**
  * Convenient default implementation of
  * {@link UnmarshallingEventHandler}
  * to minimize code generation.
- *
+ * 
  * <p>
  * For historical reasons, sometimes this type is used where
- * {@link UnmarshallingEventHandler} should be used.
+ * {@link UnmarshallingEventHandler} should be used.   
  * 
  * Once an exception is in the form of UnmarshalException, we consider
  * it to be already reported to the client app.

@@ -7,14 +7,15 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.GrammarImpl;
-import com.sun.xml.bind.Messages;
-import com.sun.xml.bind.ProxyGroup;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+
+import com.sun.xml.bind.GrammarImpl;
+import com.sun.xml.bind.Messages;
+import com.sun.xml.bind.ProxyGroup;
 
 /**
  * This class is a facade to a collection of GrammarInfo objects.  It
@@ -123,7 +124,7 @@ class GrammarInfoFacade implements GrammarInfo {
      * This static method is used to setup the GrammarInfoFacade.  It 
      * is invoked by the DefaultJAXBContextImpl constructor
      */
-    static GrammarInfo createGrammarInfoFacade( String contextPath,
+    static GrammarInfo createGrammarInfoFacade( String contextPath, 
                                                 ClassLoader classLoader ) 
         throws JAXBException {
             
@@ -181,7 +182,7 @@ class GrammarInfoFacade implements GrammarInfo {
             // if there's only one path, no need to use a facade.
             return (GrammarInfo)gis.get(0);
         
-        return new GrammarInfoFacade(
+        return new GrammarInfoFacade( 
             (GrammarInfo[])(gis.toArray( new GrammarInfo[ gis.size() ] ) ) );
     }
     
@@ -259,7 +260,7 @@ class GrammarInfoFacade implements GrammarInfo {
 
     
     /**
-     * @see com.sun.tools.xjc.runtime.GrammarInfo#castToXMLSerializable(Object)
+     * @see com.sun.tools.xjc.runtime.GrammarInfo#castToXMLSerializable(java.lang.Object)
      */
     public XMLSerializable castToXMLSerializable(Object o) {
         XMLSerializable result = null;
@@ -273,7 +274,7 @@ class GrammarInfoFacade implements GrammarInfo {
     }
 
     /**
-     * @see com.sun.tools.xjc.runtime.GrammarInfo#castToValidatableObject(Object)
+     * @see com.sun.tools.xjc.runtime.GrammarInfo#castToValidatableObject(java.lang.Object)
      */
     public ValidatableObject castToValidatableObject(Object o) {
         ValidatableObject result = null;

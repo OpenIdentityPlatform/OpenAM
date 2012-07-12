@@ -7,10 +7,10 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import org.xml.sax.SAXException;
-
 import javax.xml.bind.UnmarshallerHandler;
 import javax.xml.bind.ValidationEvent;
+
+import org.xml.sax.SAXException;
 
 /**
  * Unified event handler that processes
@@ -35,5 +35,5 @@ public interface SAXUnmarshallerHandler extends UnmarshallerHandler {
      * 
      * The thrown exception will be catched by the unmarshaller.
      */
-    void handleEvent(ValidationEvent event, boolean canRecover) throws SAXException;
+    void handleEvent( ValidationEvent event, boolean canRecover ) throws SAXException;
 }

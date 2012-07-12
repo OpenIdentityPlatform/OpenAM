@@ -12,10 +12,10 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
 {
 
     protected com.sun.xml.bind.util.ListImpl _Content;
-    public final static Class version = (com.sun.identity.saml2.jaxb.schema.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.schema.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.schema.AnyType.class);
     }
 
@@ -41,15 +41,15 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
         final int len1 = ((_Content == null)? 0 :_Content.size());
         while (idx1 != len1) {
             {
-                Object o = _Content.get(idx1);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx1);
+                if (o instanceof java.lang.String) {
                     try {
-                        context.text(((String) _Content.get(idx1 ++)), "Content");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _Content.get(idx1 ++)), "Content");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx1 ++)), "Content");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -66,15 +66,15 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
         final int len1 = ((_Content == null)? 0 :_Content.size());
         while (idx1 != len1) {
             {
-                Object o = _Content.get(idx1);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx1);
+                if (o instanceof java.lang.String) {
                     try {
                         idx1 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -91,15 +91,15 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
         final int len1 = ((_Content == null)? 0 :_Content.size());
         while (idx1 != len1) {
             {
-                Object o = _Content.get(idx1);
-                if (o instanceof String) {
+                java.lang.Object o = _Content.get(idx1);
+                if (o instanceof java.lang.String) {
                     try {
                         idx1 += 1;
-                    } catch (Exception e) {
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -109,7 +109,7 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.schema.AnyType.class);
     }
 
@@ -158,11 +158,11 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.schema.impl.AnyTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -171,7 +171,7 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
                 switch (state) {
                     case  0 :
                         if (true) {
-                            Object co = spawnWildcard(0, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(0, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getContent().add(co);
                             }
@@ -185,7 +185,7 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -201,7 +201,7 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -217,7 +217,7 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -233,7 +233,7 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -246,19 +246,19 @@ public class AnyTypeImpl implements com.sun.identity.saml2.jaxb.schema.AnyType, 
                             eatText1(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getContent().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

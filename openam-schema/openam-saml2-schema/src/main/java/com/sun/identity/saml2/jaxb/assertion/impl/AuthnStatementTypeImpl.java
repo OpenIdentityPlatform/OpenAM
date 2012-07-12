@@ -17,11 +17,11 @@ public class AuthnStatementTypeImpl
     protected java.util.Calendar _AuthnInstant;
     protected com.sun.identity.saml2.jaxb.assertion.SubjectLocalityType _SubjectLocality;
     protected java.util.Calendar _SessionNotOnOrAfter;
-    protected String _SessionIndex;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    protected java.lang.String _SessionIndex;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.AuthnStatementType.class);
     }
 
@@ -57,11 +57,11 @@ public class AuthnStatementTypeImpl
         _SessionNotOnOrAfter = value;
     }
 
-    public String getSessionIndex() {
+    public java.lang.String getSessionIndex() {
         return _SessionIndex;
     }
 
-    public void setSessionIndex(String value) {
+    public void setSessionIndex(java.lang.String value) {
         _SessionIndex = value;
     }
 
@@ -105,15 +105,15 @@ public class AuthnStatementTypeImpl
         context.startAttribute("", "AuthnInstant");
         try {
             context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _AuthnInstant), null), "AuthnInstant");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_SessionIndex!= null) {
             context.startAttribute("", "SessionIndex");
             try {
-                context.text(((String) _SessionIndex), "SessionIndex");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SessionIndex), "SessionIndex");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -122,7 +122,7 @@ public class AuthnStatementTypeImpl
             context.startAttribute("", "SessionNotOnOrAfter");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _SessionNotOnOrAfter), null), "SessionNotOnOrAfter");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -152,7 +152,7 @@ public class AuthnStatementTypeImpl
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.AuthnStatementType.class);
     }
 
@@ -237,11 +237,11 @@ public class AuthnStatementTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.AuthnStatementTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -251,7 +251,7 @@ public class AuthnStatementTypeImpl
                     case  6 :
                         attIdx = context.getAttribute("", "SessionNotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -279,7 +279,7 @@ public class AuthnStatementTypeImpl
                     case  3 :
                         attIdx = context.getAttribute("", "SessionIndex");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -315,7 +315,7 @@ public class AuthnStatementTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "AuthnInstant");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -345,37 +345,37 @@ public class AuthnStatementTypeImpl
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SessionNotOnOrAfter = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SessionIndex = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AuthnInstant = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -385,7 +385,7 @@ public class AuthnStatementTypeImpl
                     case  6 :
                         attIdx = context.getAttribute("", "SessionNotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -395,7 +395,7 @@ public class AuthnStatementTypeImpl
                     case  3 :
                         attIdx = context.getAttribute("", "SessionIndex");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -425,7 +425,7 @@ public class AuthnStatementTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "AuthnInstant");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -455,7 +455,7 @@ public class AuthnStatementTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -508,7 +508,7 @@ public class AuthnStatementTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -518,7 +518,7 @@ public class AuthnStatementTypeImpl
                     case  6 :
                         attIdx = context.getAttribute("", "SessionNotOnOrAfter");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -528,7 +528,7 @@ public class AuthnStatementTypeImpl
                     case  3 :
                         attIdx = context.getAttribute("", "SessionIndex");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -556,7 +556,7 @@ public class AuthnStatementTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "AuthnInstant");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText3(v);
                             continue outer;
@@ -592,7 +592,7 @@ public class AuthnStatementTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -603,7 +603,7 @@ public class AuthnStatementTypeImpl
                         case  6 :
                             attIdx = context.getAttribute("", "SessionNotOnOrAfter");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText1(v);
                                 continue outer;
@@ -613,7 +613,7 @@ public class AuthnStatementTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "SessionIndex");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -633,7 +633,7 @@ public class AuthnStatementTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "AuthnInstant");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText3(v);
                                 continue outer;
@@ -666,7 +666,7 @@ public class AuthnStatementTypeImpl
                             spawnHandlerFromText((((com.sun.identity.saml2.jaxb.assertion.impl.StatementAbstractTypeImpl)com.sun.identity.saml2.jaxb.assertion.impl.AuthnStatementTypeImpl.this).new Unmarshaller(context)), 10, value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

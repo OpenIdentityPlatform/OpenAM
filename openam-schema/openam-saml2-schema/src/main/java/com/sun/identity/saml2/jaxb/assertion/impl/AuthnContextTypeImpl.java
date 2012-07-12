@@ -11,22 +11,22 @@ package com.sun.identity.saml2.jaxb.assertion.impl;
 public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.assertion.AuthnContextType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _AuthnContextDeclRef;
+    protected java.lang.String _AuthnContextDeclRef;
     protected com.sun.xml.bind.util.ListImpl _AuthenticatingAuthority;
-    protected String _AuthnContextClassRef;
+    protected java.lang.String _AuthnContextClassRef;
     protected com.sun.identity.saml2.jaxb.schema.AnyType _AuthnContextDecl;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.AuthnContextType.class);
     }
 
-    public String getAuthnContextDeclRef() {
+    public java.lang.String getAuthnContextDeclRef() {
         return _AuthnContextDeclRef;
     }
 
-    public void setAuthnContextDeclRef(String value) {
+    public void setAuthnContextDeclRef(java.lang.String value) {
         _AuthnContextDeclRef = value;
     }
 
@@ -41,11 +41,11 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
         return _getAuthenticatingAuthority();
     }
 
-    public String getAuthnContextClassRef() {
+    public java.lang.String getAuthnContextClassRef() {
         return _AuthnContextClassRef;
     }
 
-    public void setAuthnContextClassRef(String value) {
+    public void setAuthnContextClassRef(java.lang.String value) {
         _AuthnContextClassRef = value;
     }
 
@@ -71,8 +71,8 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _AuthnContextClassRef), "AuthnContextClassRef");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _AuthnContextClassRef), "AuthnContextClassRef");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -94,8 +94,8 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
                     context.endNamespaceDecls();
                     context.endAttributes();
                     try {
-                        context.text(((String) _AuthnContextDeclRef), "AuthnContextDeclRef");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _AuthnContextDeclRef), "AuthnContextDeclRef");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                     context.endElement();
@@ -120,8 +120,8 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
                     context.endNamespaceDecls();
                     context.endAttributes();
                     try {
-                        context.text(((String) _AuthnContextDeclRef), "AuthnContextDeclRef");
-                    } catch (Exception e) {
+                        context.text(((java.lang.String) _AuthnContextDeclRef), "AuthnContextDeclRef");
+                    } catch (java.lang.Exception e) {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                     }
                     context.endElement();
@@ -133,20 +133,20 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             int idx_10 = idx2;
             try {
                 idx_10 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_11 = idx2;
             try {
                 idx_11 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _AuthenticatingAuthority.get(idx2 ++)), "AuthenticatingAuthority");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _AuthenticatingAuthority.get(idx2 ++)), "AuthenticatingAuthority");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -174,7 +174,7 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -201,13 +201,13 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
         while (idx2 != len2) {
             try {
                 idx2 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.AuthnContextType.class);
     }
 
@@ -290,11 +290,11 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.AuthnContextTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -375,7 +375,7 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -445,7 +445,7 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -473,7 +473,7 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -501,7 +501,7 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -541,49 +541,49 @@ public class AuthnContextTypeImpl implements com.sun.identity.saml2.jaxb.asserti
                             eatText4(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getAuthenticatingAuthority().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AuthnContextClassRef = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AuthnContextDeclRef = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _AuthnContextDeclRef = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

@@ -50,7 +50,7 @@ public interface RoleDescriptorType {
 
     /**
      * Sets the value of the extensions property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.metadata.ExtensionsType}
@@ -60,49 +60,49 @@ public interface RoleDescriptorType {
 
     /**
      * Gets the value of the KeyDescriptor property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the KeyDescriptor property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getKeyDescriptor().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement}
      * {@link com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType}
-     *
+     * 
      */
     java.util.List getKeyDescriptor();
 
     /**
      * Gets the value of the errorURL property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getErrorURL();
+    java.lang.String getErrorURL();
 
     /**
      * Sets the value of the errorURL property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setErrorURL(String value);
+    void setErrorURL(java.lang.String value);
 
     /**
      * Gets the value of the validUntil property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -111,7 +111,7 @@ public interface RoleDescriptorType {
 
     /**
      * Sets the value of the validUntil property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -120,72 +120,72 @@ public interface RoleDescriptorType {
 
     /**
      * Gets the value of the ProtocolSupportEnumeration property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the ProtocolSupportEnumeration property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getProtocolSupportEnumeration().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getProtocolSupportEnumeration();
 
     /**
      * Gets the value of the ContactPerson property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the ContactPerson property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getContactPerson().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.ContactType}
      * {@link com.sun.identity.saml2.jaxb.metadata.ContactPersonElement}
-     *
+     * 
      */
     java.util.List getContactPerson();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getID();
+    java.lang.String getID();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setID(String value);
+    void setID(java.lang.String value);
 
     /**
      * Gets the value of the organization property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.metadata.OrganizationType}
@@ -195,7 +195,7 @@ public interface RoleDescriptorType {
 
     /**
      * Sets the value of the organization property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.metadata.OrganizationType}
@@ -205,21 +205,21 @@ public interface RoleDescriptorType {
 
     /**
      * Gets the value of the cacheDuration property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCacheDuration();
+    java.lang.String getCacheDuration();
 
     /**
      * Sets the value of the cacheDuration property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCacheDuration(String value);
+    void setCacheDuration(java.lang.String value);
 
     /**
      * Gets the value of the signature property.

@@ -13,11 +13,11 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
 
     protected com.sun.identity.saml2.jaxb.xmlsig.KeyInfoType _KeyInfo;
     protected com.sun.xml.bind.util.ListImpl _EncryptionMethod;
-    protected String _Use;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    protected java.lang.String _Use;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType.class);
     }
 
@@ -40,11 +40,11 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
         return _getEncryptionMethod();
     }
 
-    public String getUse() {
+    public java.lang.String getUse() {
         return _Use;
     }
 
-    public void setUse(String value) {
+    public void setUse(java.lang.String value) {
         _Use = value;
     }
 
@@ -93,8 +93,8 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
         if (_Use!= null) {
             context.startAttribute("", "use");
             try {
-                context.text(((String) _Use), "Use");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Use), "Use");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -128,7 +128,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType.class);
     }
 
@@ -217,11 +217,11 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadata.impl.KeyDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -292,7 +292,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
                     case  0 :
                         attIdx = context.getAttribute("", "use");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -328,17 +328,17 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Use = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -375,7 +375,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
                     case  0 :
                         attIdx = context.getAttribute("", "use");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -398,7 +398,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -437,7 +437,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -473,7 +473,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
                     case  0 :
                         attIdx = context.getAttribute("", "use");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -489,7 +489,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -524,7 +524,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
                         case  0 :
                             attIdx = context.getAttribute("", "use");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -535,7 +535,7 @@ public class KeyDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metada
                             state = 7;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

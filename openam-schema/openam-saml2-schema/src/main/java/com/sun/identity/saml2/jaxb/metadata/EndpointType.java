@@ -50,63 +50,63 @@ public interface EndpointType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
-     *
+     * {@link java.lang.Object}
+     * 
      */
     java.util.List getAny();
 
     /**
      * Gets the value of the responseLocation property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getResponseLocation();
+    java.lang.String getResponseLocation();
 
     /**
      * Sets the value of the responseLocation property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setResponseLocation(String value);
+    void setResponseLocation(java.lang.String value);
 
     /**
      * Gets the value of the location property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getLocation();
+    java.lang.String getLocation();
 
     /**
      * Sets the value of the location property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setLocation(String value);
+    void setLocation(java.lang.String value);
 
     /**
      * Gets the value of the binding property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getBinding();
+    java.lang.String getBinding();
 
     /**
      * Sets the value of the binding property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setBinding(String value);
+    void setBinding(java.lang.String value);
 
 }

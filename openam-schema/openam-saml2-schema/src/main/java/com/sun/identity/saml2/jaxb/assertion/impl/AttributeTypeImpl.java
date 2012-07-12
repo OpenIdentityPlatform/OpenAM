@@ -11,38 +11,38 @@ package com.sun.identity.saml2.jaxb.assertion.impl;
 public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.AttributeType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Name;
-    protected String _NameFormat;
-    protected String _FriendlyName;
+    protected java.lang.String _Name;
+    protected java.lang.String _NameFormat;
+    protected java.lang.String _FriendlyName;
     protected com.sun.xml.bind.util.ListImpl _AttributeValue;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.AttributeType.class);
     }
 
-    public String getName() {
+    public java.lang.String getName() {
         return _Name;
     }
 
-    public void setName(String value) {
+    public void setName(java.lang.String value) {
         _Name = value;
     }
 
-    public String getNameFormat() {
+    public java.lang.String getNameFormat() {
         return _NameFormat;
     }
 
-    public void setNameFormat(String value) {
+    public void setNameFormat(java.lang.String value) {
         _NameFormat = value;
     }
 
-    public String getFriendlyName() {
+    public java.lang.String getFriendlyName() {
         return _FriendlyName;
     }
 
-    public void setFriendlyName(String value) {
+    public void setFriendlyName(java.lang.String value) {
         _FriendlyName = value;
     }
 
@@ -77,7 +77,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         context.getNamespaceContext().declareNamespace("http://www.w3.org/2001/XMLSchema-instance", null, true);
                         try {
                             idx_0 += 1;
-                        } catch (Exception e) {
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                     } else {
@@ -93,7 +93,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         context.startAttribute("http://www.w3.org/2001/XMLSchema-instance", "nil");
                         try {
                             context.text("true", "AttributeValue");
-                        } catch (Exception e) {
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                         context.endAttribute();
@@ -128,24 +128,24 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
         if (_FriendlyName!= null) {
             context.startAttribute("", "FriendlyName");
             try {
-                context.text(((String) _FriendlyName), "FriendlyName");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _FriendlyName), "FriendlyName");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         context.startAttribute("", "Name");
         try {
-            context.text(((String) _Name), "Name");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Name), "Name");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         if (_NameFormat!= null) {
             context.startAttribute("", "NameFormat");
             try {
-                context.text(((String) _NameFormat), "NameFormat");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _NameFormat), "NameFormat");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -158,7 +158,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     if (_AttributeValue.get(idx4) == null) {
                         try {
                             idx4 += 1;
-                        } catch (Exception e) {
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                     } else {
@@ -188,7 +188,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     if (_AttributeValue.get(idx4) == null) {
                         try {
                             idx4 += 1;
-                        } catch (Exception e) {
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                     } else {
@@ -205,7 +205,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.AttributeType.class);
     }
 
@@ -286,11 +286,11 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.AttributeTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -300,7 +300,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  3 :
                         attIdx = context.getAttribute("", "Name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -309,7 +309,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  0 :
                         attIdx = context.getAttribute("", "FriendlyName");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -319,7 +319,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  6 :
                         attIdx = context.getAttribute("", "NameFormat");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -353,7 +353,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  10 :
                         attIdx = context.getAttribute("http://www.w3.org/2001/XMLSchema-instance", "nil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 11;
                             eatText4(v);
                             continue outer;
@@ -370,47 +370,47 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Name = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _FriendlyName = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NameFormat = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getAttributeValue().add(null);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -420,7 +420,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  3 :
                         attIdx = context.getAttribute("", "Name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -429,7 +429,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  0 :
                         attIdx = context.getAttribute("", "FriendlyName");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -446,7 +446,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  6 :
                         attIdx = context.getAttribute("", "NameFormat");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -462,7 +462,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  10 :
                         attIdx = context.getAttribute("http://www.w3.org/2001/XMLSchema-instance", "nil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 11;
                             eatText4(v);
                             continue outer;
@@ -475,7 +475,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -521,7 +521,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -531,7 +531,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  3 :
                         attIdx = context.getAttribute("", "Name");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -546,7 +546,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  0 :
                         attIdx = context.getAttribute("", "FriendlyName");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -556,7 +556,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  6 :
                         attIdx = context.getAttribute("", "NameFormat");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -590,7 +590,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  10 :
                         attIdx = context.getAttribute("http://www.w3.org/2001/XMLSchema-instance", "nil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 11;
                             eatText4(v);
                             continue outer;
@@ -603,7 +603,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -614,7 +614,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  3 :
                             attIdx = context.getAttribute("", "Name");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -623,7 +623,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  0 :
                             attIdx = context.getAttribute("", "FriendlyName");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -637,7 +637,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  6 :
                             attIdx = context.getAttribute("", "NameFormat");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText3(v);
                                 continue outer;
@@ -661,7 +661,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  10 :
                             attIdx = context.getAttribute("http://www.w3.org/2001/XMLSchema-instance", "nil");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 11;
                                 eatText4(v);
                                 continue outer;
@@ -673,7 +673,7 @@ public class AttributeTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                             eatText1(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

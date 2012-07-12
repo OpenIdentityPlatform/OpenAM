@@ -48,27 +48,27 @@ public interface ReferenceType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
-     *
+     * {@link java.lang.Object}
+     * 
      */
     java.util.List getAny();
 
     /**
      * Gets the value of the uri property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getURI();
+    java.lang.String getURI();
 
     /**
      * Sets the value of the uri property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setURI(String value);
+    void setURI(java.lang.String value);
 
 }

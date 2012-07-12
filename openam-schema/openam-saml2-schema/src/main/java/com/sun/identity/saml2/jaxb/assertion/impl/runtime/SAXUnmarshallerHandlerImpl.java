@@ -7,22 +7,28 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.JAXBAssertionError;
-import com.sun.xml.bind.unmarshaller.Messages;
-import com.sun.xml.bind.unmarshaller.Tracer;
-import com.sun.xml.bind.util.AttributesImpl;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.LocatorImpl;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
-import java.util.*;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.LocatorImpl;
+
+import com.sun.xml.bind.JAXBAssertionError;
+import com.sun.xml.bind.unmarshaller.Messages;
+import com.sun.xml.bind.unmarshaller.Tracer;
+import com.sun.xml.bind.util.AttributesImpl;
 
 /**
  * Implementation of {@link UnmarshallerHandler}.

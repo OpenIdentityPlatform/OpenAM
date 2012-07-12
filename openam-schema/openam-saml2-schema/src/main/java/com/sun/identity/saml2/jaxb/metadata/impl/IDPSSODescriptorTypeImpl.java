@@ -20,10 +20,10 @@ public class IDPSSODescriptorTypeImpl
     protected com.sun.xml.bind.util.ListImpl _SingleSignOnService;
     protected com.sun.xml.bind.util.ListImpl _AssertionIDRequestService;
     protected com.sun.xml.bind.util.ListImpl _Attribute;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorType.class);
     }
 
@@ -159,20 +159,20 @@ public class IDPSSODescriptorTypeImpl
             int idx_6 = idx3;
             try {
                 idx_6 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endNamespaceDecls();
             int idx_7 = idx3;
             try {
                 idx_7 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttributes();
             try {
-                context.text(((String) _AttributeProfile.get(idx3 ++)), "AttributeProfile");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _AttributeProfile.get(idx3 ++)), "AttributeProfile");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -211,7 +211,7 @@ public class IDPSSODescriptorTypeImpl
             context.startAttribute("", "WantAuthnRequestsSigned");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _WantAuthnRequestsSigned)), "WantAuthnRequestsSigned");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -241,7 +241,7 @@ public class IDPSSODescriptorTypeImpl
         while (idx3 != len3) {
             try {
                 idx3 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -292,7 +292,7 @@ public class IDPSSODescriptorTypeImpl
         while (idx3 != len3) {
             try {
                 idx3 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -305,7 +305,7 @@ public class IDPSSODescriptorTypeImpl
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorType.class);
     }
 
@@ -477,11 +477,11 @@ public class IDPSSODescriptorTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadata.impl.IDPSSODescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -654,7 +654,7 @@ public class IDPSSODescriptorTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "WantAuthnRequestsSigned");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -667,18 +667,18 @@ public class IDPSSODescriptorTypeImpl
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _WantAuthnRequestsSigned = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_WantAuthnRequestsSigned = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -802,7 +802,7 @@ public class IDPSSODescriptorTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "WantAuthnRequestsSigned");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -815,7 +815,7 @@ public class IDPSSODescriptorTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -896,7 +896,7 @@ public class IDPSSODescriptorTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -991,7 +991,7 @@ public class IDPSSODescriptorTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "WantAuthnRequestsSigned");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -1004,7 +1004,7 @@ public class IDPSSODescriptorTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1102,7 +1102,7 @@ public class IDPSSODescriptorTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "WantAuthnRequestsSigned");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -1110,19 +1110,19 @@ public class IDPSSODescriptorTypeImpl
                             state = 3;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getAttributeProfile().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

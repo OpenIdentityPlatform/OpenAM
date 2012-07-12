@@ -55,8 +55,8 @@ public interface PGPDataType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object}
-     * {@link Object}
+     * {@link java.lang.Object}
+     * {@link java.lang.Object}
      * 
      */
     java.util.List getAny();

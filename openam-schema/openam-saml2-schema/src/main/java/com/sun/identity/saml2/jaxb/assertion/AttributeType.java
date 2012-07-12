@@ -37,71 +37,71 @@ public interface AttributeType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getName();
+    java.lang.String getName();
 
     /**
      * Sets the value of the name property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setName(String value);
+    void setName(java.lang.String value);
 
     /**
      * Gets the value of the nameFormat property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getNameFormat();
+    java.lang.String getNameFormat();
 
     /**
      * Sets the value of the nameFormat property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setNameFormat(String value);
+    void setNameFormat(java.lang.String value);
 
     /**
      * Gets the value of the friendlyName property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getFriendlyName();
+    java.lang.String getFriendlyName();
 
     /**
      * Sets the value of the friendlyName property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setFriendlyName(String value);
+    void setFriendlyName(java.lang.String value);
 
     /**
      * Gets the value of the AttributeValue property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AttributeValue property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAttributeValue().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.schema.AnyType}

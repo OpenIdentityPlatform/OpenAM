@@ -11,20 +11,20 @@ package com.sun.identity.saml2.jaxb.xmlsig.impl;
 public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyInfoType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.xml.bind.marshaller.IdentifiableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Id;
+    protected java.lang.String _Id;
     protected com.sun.xml.bind.util.ListImpl _Content;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.KeyInfoType.class);
     }
 
-    public String getId() {
+    public java.lang.String getId() {
         return _Id;
     }
 
-    public void setId(String value) {
+    public void setId(java.lang.String value) {
         _Id = value;
     }
 
@@ -50,18 +50,18 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
         final int len2 = ((_Content == null)? 0 :_Content.size());
         while (idx2 != len2) {
             {
-                Object o = _Content.get(idx2);
+                java.lang.Object o = _Content.get(idx2);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx2 ++)), "Content");
                 } else {
-                    if (o instanceof String) {
+                    if (o instanceof java.lang.String) {
                         try {
-                            context.text(((String) _Content.get(idx2 ++)), "Content");
-                        } catch (Exception e) {
+                            context.text(((java.lang.String) _Content.get(idx2 ++)), "Content");
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                     } else {
-                        if (o instanceof Object) {
+                        if (o instanceof java.lang.Object) {
                             context.childAsBody(((com.sun.xml.bind.JAXBObject) _Content.get(idx2 ++)), "Content");
                         } else {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -80,26 +80,26 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
         if (_Id!= null) {
             context.startAttribute("", "Id");
             try {
-                context.text(context.onID(this, ((String) _Id)), "Id");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _Id)), "Id");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         while (idx2 != len2) {
             {
-                Object o = _Content.get(idx2);
+                java.lang.Object o = _Content.get(idx2);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsAttributes(((com.sun.xml.bind.JAXBObject) _Content.get(idx2 ++)), "Content");
                 } else {
-                    if (o instanceof String) {
+                    if (o instanceof java.lang.String) {
                         try {
                             idx2 += 1;
-                        } catch (Exception e) {
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                     } else {
-                        if (o instanceof Object) {
+                        if (o instanceof java.lang.Object) {
                             idx2 += 1;
                         } else {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -117,18 +117,18 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
         final int len2 = ((_Content == null)? 0 :_Content.size());
         while (idx2 != len2) {
             {
-                Object o = _Content.get(idx2);
+                java.lang.Object o = _Content.get(idx2);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsURIs(((com.sun.xml.bind.JAXBObject) _Content.get(idx2 ++)), "Content");
                 } else {
-                    if (o instanceof String) {
+                    if (o instanceof java.lang.String) {
                         try {
                             idx2 += 1;
-                        } catch (Exception e) {
+                        } catch (java.lang.Exception e) {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
                         }
                     } else {
-                        if (o instanceof Object) {
+                        if (o instanceof java.lang.Object) {
                             idx2 += 1;
                         } else {
                             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "Content", o);
@@ -139,11 +139,11 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _Id);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _Id);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.KeyInfoType.class);
     }
 
@@ -231,11 +231,11 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.KeyInfoTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -272,7 +272,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
                             return ;
                         }
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(3, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(3, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getContent().add(co);
                             }
@@ -283,7 +283,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -296,17 +296,17 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Id = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -319,7 +319,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -332,7 +332,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -355,7 +355,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -374,7 +374,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
                     case  0 :
                         attIdx = context.getAttribute("", "Id");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -387,7 +387,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -406,7 +406,7 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
                         case  0 :
                             attIdx = context.getAttribute("", "Id");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -414,19 +414,19 @@ public class KeyInfoTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.KeyIn
                             state = 3;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getContent().add(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

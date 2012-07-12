@@ -80,17 +80,17 @@ public interface KeyDescriptorType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getUse();
+    java.lang.String getUse();
 
     /**
      * Sets the value of the use property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setUse(String value);
+    void setUse(java.lang.String value);
 
 }

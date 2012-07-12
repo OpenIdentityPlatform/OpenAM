@@ -14,16 +14,16 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
     protected com.sun.identity.saml2.jaxb.assertion.ConditionsType _Conditions;
     protected com.sun.identity.saml2.jaxb.assertion.NameIDType _Issuer;
     protected com.sun.identity.saml2.jaxb.assertion.SubjectType _Subject;
-    protected String _ID;
+    protected java.lang.String _ID;
     protected com.sun.xml.bind.util.ListImpl _StatementOrAuthnStatementOrAuthzDecisionStatement;
     protected com.sun.identity.saml2.jaxb.assertion.AdviceType _Advice;
-    protected String _Version;
+    protected java.lang.String _Version;
     protected java.util.Calendar _IssueInstant;
     protected com.sun.identity.saml2.jaxb.xmlsig.SignatureType _Signature;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.AssertionType.class);
     }
 
@@ -51,11 +51,11 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
         _Subject = value;
     }
 
-    public String getID() {
+    public java.lang.String getID() {
         return _ID;
     }
 
-    public void setID(String value) {
+    public void setID(java.lang.String value) {
         _ID = value;
     }
 
@@ -78,11 +78,11 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
         _Advice = value;
     }
 
-    public String getVersion() {
+    public java.lang.String getVersion() {
         return _Version;
     }
 
-    public void setVersion(String value) {
+    public void setVersion(java.lang.String value) {
         _Version = value;
     }
 
@@ -186,22 +186,22 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
         final int len5 = ((_StatementOrAuthnStatementOrAuthzDecisionStatement == null)? 0 :_StatementOrAuthnStatementOrAuthzDecisionStatement.size());
         context.startAttribute("", "ID");
         try {
-            context.text(context.onID(this, ((String) _ID)), "ID");
-        } catch (Exception e) {
+            context.text(context.onID(this, ((java.lang.String) _ID)), "ID");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         context.startAttribute("", "IssueInstant");
         try {
             context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _IssueInstant), null), "IssueInstant");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         context.startAttribute("", "Version");
         try {
-            context.text(((String) _Version), "Version");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Version), "Version");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -266,11 +266,11 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _ID);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _ID);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.AssertionType.class);
     }
 
@@ -388,11 +388,11 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.AssertionTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -418,7 +418,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -601,7 +601,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  6 :
                         attIdx = context.getAttribute("", "Version");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -610,7 +610,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  3 :
                         attIdx = context.getAttribute("", "IssueInstant");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -659,37 +659,37 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ID = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Version = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _IssueInstant = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -707,7 +707,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -780,7 +780,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  6 :
                         attIdx = context.getAttribute("", "Version");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -789,7 +789,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  3 :
                         attIdx = context.getAttribute("", "IssueInstant");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -834,7 +834,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -921,7 +921,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -939,7 +939,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -1002,7 +1002,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  6 :
                         attIdx = context.getAttribute("", "Version");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText2(v);
                             continue outer;
@@ -1011,7 +1011,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                     case  3 :
                         attIdx = context.getAttribute("", "IssueInstant");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -1049,7 +1049,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1068,7 +1068,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  0 :
                             attIdx = context.getAttribute("", "ID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -1125,7 +1125,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  6 :
                             attIdx = context.getAttribute("", "Version");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText2(v);
                                 continue outer;
@@ -1134,7 +1134,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                         case  3 :
                             attIdx = context.getAttribute("", "IssueInstant");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
@@ -1168,7 +1168,7 @@ public class AssertionTypeImpl implements com.sun.identity.saml2.jaxb.assertion.
                             _Issuer = ((com.sun.identity.saml2.jaxb.assertion.impl.NameIDTypeImpl) spawnChildFromText((com.sun.identity.saml2.jaxb.assertion.impl.NameIDTypeImpl.class), 25, value));
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

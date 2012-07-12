@@ -7,12 +7,13 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
+import javax.xml.bind.ValidationEvent;
+
+import org.xml.sax.SAXException;
+
 import com.sun.xml.bind.JAXBObject;
 import com.sun.xml.bind.marshaller.IdentifiableObject;
 import com.sun.xml.bind.serializer.AbortSerializationException;
-import org.xml.sax.SAXException;
-
-import javax.xml.bind.ValidationEvent;
 
 /**
  * Receives XML serialization event
@@ -57,19 +58,19 @@ public interface XMLSerializer
 {
     /**
      * Errors detected by the XMLSerializable should be either thrown
-     * as {@link org.xml.sax.SAXException} or reported through this method.
+     * as {@link SAXException} or reported through this method.
      * 
      * The callee should report an error to the client application
      * and 
      */
-    void reportError(ValidationEvent e) throws AbortSerializationException;
+    void reportError( ValidationEvent e ) throws AbortSerializationException;
     
     /**
      * Starts marshalling of an element.
      * Calling this method will push the internal state into the
      * internal stack.
      */
-    void startElement(String uri, String local) throws SAXException;
+    void startElement( String uri, String local ) throws SAXException;
     
     /**
      * Switches to the mode to marshal attribute values.
@@ -128,7 +129,7 @@ public interface XMLSerializer
      * 
      * will generate <code>&lt;foo>abc def&lt;bar/>ghi&lt;/foo></code>.
      */
-    void text(String text, String fieldName) throws SAXException;
+    void text( String text, String fieldName ) throws SAXException;
     
     
     /**
@@ -145,7 +146,7 @@ public interface XMLSerializer
      * Note that the whole attribute marshalling must be happened
      * after the startElement method and before the endAttributes method.
      */
-    void startAttribute(String uri, String local) throws SAXException;
+    void startAttribute( String uri, String local ) throws SAXException;
 
     void endAttribute() throws SAXException;
     
@@ -172,7 +173,7 @@ public interface XMLSerializer
      *      so that the invocation of this method can be done transparently
      *      by a transducer.
      */
-    String onID(IdentifiableObject owner, String value) throws SAXException;
+    String onID( IdentifiableObject owner, String value ) throws SAXException;
     
     /**
      * Notifies the serializer that an IDREF value has just marshalled.
@@ -185,7 +186,7 @@ public interface XMLSerializer
      *      so that the invocation of this method can be done transparently
      *      by a transducer.
      */
-    String onIDREF(IdentifiableObject obj) throws SAXException;
+    String onIDREF( IdentifiableObject obj ) throws SAXException;
     
     
     // I suppose we don't want to use SAXException. -kk
@@ -205,7 +206,7 @@ public interface XMLSerializer
      *      Used as a part of the error message in case anything goes wrong
      *      with 'o'. 
      */
-    void childAsBody(JAXBObject o, String fieldName) throws SAXException;
+    void childAsBody( JAXBObject o, String fieldName ) throws SAXException;
     
     /**
      * This method is called when an JAXBObject object is found
@@ -217,7 +218,7 @@ public interface XMLSerializer
      *      Used as a part of the error message in case anything goes wrong
      *      with 'o'. 
      */
-    void childAsAttributes(JAXBObject o, String fieldName) throws SAXException;
+    void childAsAttributes( JAXBObject o, String fieldName ) throws SAXException;
     
     /**
      * This method is called when an JAXBObject object is found
@@ -228,5 +229,5 @@ public interface XMLSerializer
      *      Used as a part of the error message in case anything goes wrong
      *      with 'o'. 
      */
-    void childAsURIs(JAXBObject o, String fieldName) throws SAXException;
+    void childAsURIs( JAXBObject o, String fieldName ) throws SAXException;
 }

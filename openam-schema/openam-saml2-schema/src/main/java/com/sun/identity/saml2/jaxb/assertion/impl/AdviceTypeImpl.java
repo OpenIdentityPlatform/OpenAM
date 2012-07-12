@@ -12,10 +12,10 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
 {
 
     protected com.sun.xml.bind.util.ListImpl _AssertionIDRefOrAssertionURIRefOrAssertion;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.AdviceType.class);
     }
 
@@ -41,11 +41,11 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
         final int len1 = ((_AssertionIDRefOrAssertionURIRefOrAssertion == null)? 0 :_AssertionIDRefOrAssertionURIRefOrAssertion.size());
         while (idx1 != len1) {
             {
-                Object o = _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1);
+                java.lang.Object o = _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsBody(((com.sun.xml.bind.JAXBObject) _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1 ++)), "AssertionIDRefOrAssertionURIRefOrAssertion");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1 ++)), "AssertionIDRefOrAssertionURIRefOrAssertion");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "AssertionIDRefOrAssertionURIRefOrAssertion", o);
@@ -62,11 +62,11 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
         final int len1 = ((_AssertionIDRefOrAssertionURIRefOrAssertion == null)? 0 :_AssertionIDRefOrAssertionURIRefOrAssertion.size());
         while (idx1 != len1) {
             {
-                Object o = _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1);
+                java.lang.Object o = _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsAttributes(((com.sun.xml.bind.JAXBObject) _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1 ++)), "AssertionIDRefOrAssertionURIRefOrAssertion");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "AssertionIDRefOrAssertionURIRefOrAssertion", o);
@@ -83,11 +83,11 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
         final int len1 = ((_AssertionIDRefOrAssertionURIRefOrAssertion == null)? 0 :_AssertionIDRefOrAssertionURIRefOrAssertion.size());
         while (idx1 != len1) {
             {
-                Object o = _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1);
+                java.lang.Object o = _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsURIs(((com.sun.xml.bind.JAXBObject) _AssertionIDRefOrAssertionURIRefOrAssertion.get(idx1 ++)), "AssertionIDRefOrAssertionURIRefOrAssertion");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "AssertionIDRefOrAssertionURIRefOrAssertion", o);
@@ -97,7 +97,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.AdviceType.class);
     }
 
@@ -161,11 +161,11 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.AdviceTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -190,7 +190,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
                             return ;
                         }
                         if (!(("" == ___uri)||("urn:oasis:names:tc:SAML:2.0:assertion" == ___uri))) {
-                            Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAssertionIDRefOrAssertionURIRefOrAssertion().add(co);
                             }
@@ -216,7 +216,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
                             return ;
                         }
                         if (!(("" == ___uri)||("urn:oasis:names:tc:SAML:2.0:assertion" == ___uri))) {
-                            Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getAssertionIDRefOrAssertionURIRefOrAssertion().add(co);
                             }
@@ -230,7 +230,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -249,7 +249,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -268,7 +268,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -287,7 +287,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -302,7 +302,7 @@ public class AdviceTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Adv
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

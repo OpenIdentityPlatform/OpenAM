@@ -35,9 +35,9 @@ public interface UnmarshallingEventHandler {
     // event handlers
     //
     void enterElement(String uri, String local, String qname, Attributes atts) throws SAXException;
-    void leaveElement(String uri, String local, String qname) throws SAXException;
+    void leaveElement(String uri, String local, String qname ) throws SAXException;
     void text(String s) throws SAXException;
-    void enterAttribute(String uri, String local, String qname) throws SAXException;
-    void leaveAttribute(String uri, String local, String qname) throws SAXException;
+    void enterAttribute(String uri, String local, String qname ) throws SAXException;
+    void leaveAttribute(String uri, String local, String qname ) throws SAXException;
     void leaveChild(int nextState) throws SAXException;
 }

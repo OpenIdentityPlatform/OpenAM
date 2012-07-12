@@ -12,11 +12,11 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
 {
 
     protected java.math.BigInteger _X509SerialNumber;
-    protected String _X509IssuerName;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    protected java.lang.String _X509IssuerName;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.X509IssuerSerialType.class);
     }
 
@@ -28,11 +28,11 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
         _X509SerialNumber = value;
     }
 
-    public String getX509IssuerName() {
+    public java.lang.String getX509IssuerName() {
         return _X509IssuerName;
     }
 
-    public void setX509IssuerName(String value) {
+    public void setX509IssuerName(java.lang.String value) {
         _X509IssuerName = value;
     }
 
@@ -47,8 +47,8 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
         context.endNamespaceDecls();
         context.endAttributes();
         try {
-            context.text(((String) _X509IssuerName), "X509IssuerName");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _X509IssuerName), "X509IssuerName");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -57,7 +57,7 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
         context.endAttributes();
         try {
             context.text(javax.xml.bind.DatatypeConverter.printInteger(((java.math.BigInteger) _X509SerialNumber)), "X509SerialNumber");
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endElement();
@@ -73,7 +73,7 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.X509IssuerSerialType.class);
     }
 
@@ -148,11 +148,11 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.X509IssuerSerialTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -182,7 +182,7 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -212,7 +212,7 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -228,7 +228,7 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -244,7 +244,7 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -264,29 +264,29 @@ public class X509IssuerSerialTypeImpl implements com.sun.identity.saml2.jaxb.xml
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _X509SerialNumber = javax.xml.bind.DatatypeConverter.parseInteger(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _X509IssuerName = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

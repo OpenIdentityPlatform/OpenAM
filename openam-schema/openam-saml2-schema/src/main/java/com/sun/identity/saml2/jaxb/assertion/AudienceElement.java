@@ -28,17 +28,17 @@ public interface AudienceElement
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getValue();
+    java.lang.String getValue();
 
     /**
      * Sets the value of the value property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setValue(String value);
+    void setValue(java.lang.String value);
 
 }

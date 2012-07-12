@@ -47,7 +47,7 @@ public interface SubjectConfirmationType {
 
     /**
      * Sets the value of the subjectConfirmationData property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.assertion.SubjectConfirmationDataElement}
@@ -57,7 +57,7 @@ public interface SubjectConfirmationType {
 
     /**
      * Gets the value of the encryptedID property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.assertion.EncryptedIDElement}
@@ -67,7 +67,7 @@ public interface SubjectConfirmationType {
 
     /**
      * Sets the value of the encryptedID property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.assertion.EncryptedIDElement}
@@ -77,21 +77,21 @@ public interface SubjectConfirmationType {
 
     /**
      * Gets the value of the method property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getMethod();
+    java.lang.String getMethod();
 
     /**
      * Sets the value of the method property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setMethod(String value);
+    void setMethod(java.lang.String value);
 
     /**
      * Gets the value of the baseID property.

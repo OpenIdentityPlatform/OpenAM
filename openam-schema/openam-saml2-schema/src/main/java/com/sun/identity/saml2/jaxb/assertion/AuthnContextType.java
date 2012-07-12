@@ -47,61 +47,61 @@ public interface AuthnContextType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
-     *     {@link String}
+     *     {@link java.lang.String}
+     *     {@link java.lang.String}
      */
-    String getAuthnContextDeclRef();
+    java.lang.String getAuthnContextDeclRef();
 
     /**
      * Sets the value of the authnContextDeclRef property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
-     *     {@link String}
+     *     {@link java.lang.String}
+     *     {@link java.lang.String}
      */
-    void setAuthnContextDeclRef(String value);
+    void setAuthnContextDeclRef(java.lang.String value);
 
     /**
      * Gets the value of the AuthenticatingAuthority property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AuthenticatingAuthority property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAuthenticatingAuthority().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getAuthenticatingAuthority();
 
     /**
      * Gets the value of the authnContextClassRef property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAuthnContextClassRef();
+    java.lang.String getAuthnContextClassRef();
 
     /**
      * Sets the value of the authnContextClassRef property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAuthnContextClassRef(String value);
+    void setAuthnContextClassRef(java.lang.String value);
 
     /**
      * Gets the value of the authnContextDecl property.

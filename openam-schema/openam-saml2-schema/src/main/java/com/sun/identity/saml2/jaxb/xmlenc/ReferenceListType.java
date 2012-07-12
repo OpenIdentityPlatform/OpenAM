@@ -79,7 +79,7 @@ public interface ReferenceListType {
      * <pre>
      * &lt;element name="KeyReference" type="{http://www.w3.org/2001/04/xmlenc#}ReferenceType"/>
      * </pre>
-     *
+     * 
      */
     public interface KeyReference
         extends javax.xml.bind.Element, com.sun.identity.saml2.jaxb.xmlenc.ReferenceType

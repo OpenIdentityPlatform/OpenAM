@@ -7,20 +7,22 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.ProxyGroup;
-import com.sun.xml.bind.serializer.AbortSerializationException;
-import com.sun.xml.bind.validator.Messages;
-import org.xml.sax.SAXException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.helpers.NotIdentifiableEventImpl;
 import javax.xml.bind.helpers.ValidationEventImpl;
 import javax.xml.bind.helpers.ValidationEventLocatorImpl;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+
+import org.xml.sax.SAXException;
+
+import com.sun.xml.bind.ProxyGroup;
+import com.sun.xml.bind.serializer.AbortSerializationException;
+import com.sun.xml.bind.validator.Messages;
 
 /**
  * Maintains information that needs to be stored across
@@ -70,7 +72,7 @@ class ValidationContext
     public void validate( ValidatableObject vo ) throws SAXException {
         if( validatedObjects.add(ProxyGroup.unwrap(vo)) ) {
             // setup a new validator for this object and validate it.
-            MSVValidator.validate(jaxbContext, this, vo);
+            MSVValidator.validate(jaxbContext,this,vo);
         } else {
             // this object has already been validated once.
             reportEvent( vo, Messages.format( Messages.CYCLE_DETECTED ) );

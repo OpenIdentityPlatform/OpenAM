@@ -12,10 +12,10 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
 {
 
     protected com.sun.xml.bind.util.ListImpl _X509IssuerSerialOrX509SKIOrX509SubjectName;
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.class);
     }
 
@@ -41,11 +41,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         final int len1 = ((_X509IssuerSerialOrX509SKIOrX509SubjectName == null)? 0 :_X509IssuerSerialOrX509SKIOrX509SubjectName.size());
         while (idx1 != len1) {
             {
-                Object o = _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1);
+                java.lang.Object o = _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsBody(((com.sun.xml.bind.JAXBObject) _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1 ++)), "X509IssuerSerialOrX509SKIOrX509SubjectName");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         context.childAsBody(((com.sun.xml.bind.JAXBObject) _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1 ++)), "X509IssuerSerialOrX509SKIOrX509SubjectName");
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "X509IssuerSerialOrX509SKIOrX509SubjectName", o);
@@ -62,11 +62,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         final int len1 = ((_X509IssuerSerialOrX509SKIOrX509SubjectName == null)? 0 :_X509IssuerSerialOrX509SKIOrX509SubjectName.size());
         while (idx1 != len1) {
             {
-                Object o = _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1);
+                java.lang.Object o = _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsAttributes(((com.sun.xml.bind.JAXBObject) _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1 ++)), "X509IssuerSerialOrX509SKIOrX509SubjectName");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "X509IssuerSerialOrX509SKIOrX509SubjectName", o);
@@ -83,11 +83,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         final int len1 = ((_X509IssuerSerialOrX509SKIOrX509SubjectName == null)? 0 :_X509IssuerSerialOrX509SKIOrX509SubjectName.size());
         while (idx1 != len1) {
             {
-                Object o = _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1);
+                java.lang.Object o = _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1);
                 if (o instanceof com.sun.xml.bind.JAXBObject) {
                     context.childAsURIs(((com.sun.xml.bind.JAXBObject) _X509IssuerSerialOrX509SKIOrX509SubjectName.get(idx1 ++)), "X509IssuerSerialOrX509SKIOrX509SubjectName");
                 } else {
-                    if (o instanceof Object) {
+                    if (o instanceof java.lang.Object) {
                         idx1 += 1;
                     } else {
                         com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handleTypeMismatchError(context, this, "X509IssuerSerialOrX509SKIOrX509SubjectName", o);
@@ -97,7 +97,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.class);
     }
 
@@ -162,11 +162,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -195,7 +195,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                             return ;
                         }
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getX509IssuerSerialOrX509SKIOrX509SubjectName().add(co);
                             }
@@ -224,7 +224,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                             return ;
                         }
                         if (!(("" == ___uri)||("http://www.w3.org/2000/09/xmldsig#" == ___uri))) {
-                            Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
+                            java.lang.Object co = spawnWildcard(1, ___uri, ___local, ___qname, __atts);
                             if (co!= null) {
                                 _getX509IssuerSerialOrX509SKIOrX509SubjectName().add(co);
                             }
@@ -238,7 +238,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -254,7 +254,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -270,7 +270,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -286,7 +286,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -298,7 +298,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                             revertToParentFromText(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
@@ -311,7 +311,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
     {
 
         protected byte[] _Value;
-        public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
         public X509CRLImpl() {
@@ -321,15 +321,15 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             _Value = value;
         }
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509CRL.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "http://www.w3.org/2000/09/xmldsig#";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "X509CRL";
         }
 
@@ -353,7 +353,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Value)), "Value");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -369,7 +369,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509CRL.class);
         }
 
@@ -431,11 +431,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.X509CRLImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -458,7 +458,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -481,7 +481,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -497,7 +497,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -513,7 +513,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -529,19 +529,19 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                                 revertToParentFromText(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
@@ -554,7 +554,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
     {
 
         protected byte[] _Value;
-        public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
         public X509CertificateImpl() {
@@ -564,15 +564,15 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             _Value = value;
         }
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "http://www.w3.org/2000/09/xmldsig#";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "X509Certificate";
         }
 
@@ -596,7 +596,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Value)), "Value");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -612,7 +612,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate.class);
         }
 
@@ -674,11 +674,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.X509CertificateImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -701,7 +701,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -724,7 +724,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -740,7 +740,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -756,7 +756,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -772,19 +772,19 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                                 eatText1(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
@@ -798,18 +798,18 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         implements com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509IssuerSerial, com.sun.xml.bind.RIElement, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
     {
 
-        public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509IssuerSerial.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "http://www.w3.org/2000/09/xmldsig#";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "X509IssuerSerial";
         }
 
@@ -839,7 +839,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509IssuerSerial.class);
         }
 
@@ -916,11 +916,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.X509IssuerSerialImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -949,7 +949,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -972,7 +972,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -988,7 +988,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1004,7 +1004,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1016,7 +1016,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                                 revertToParentFromText(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
@@ -1031,7 +1031,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
     {
 
         protected byte[] _Value;
-        public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+        public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
         public X509SKIImpl() {
@@ -1041,15 +1041,15 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             _Value = value;
         }
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SKI.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "http://www.w3.org/2000/09/xmldsig#";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "X509SKI";
         }
 
@@ -1073,7 +1073,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             context.endAttributes();
             try {
                 context.text(com.sun.msv.datatype.xsd.Base64BinaryType.save(((byte[]) _Value)), "Value");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -1089,7 +1089,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SKI.class);
         }
 
@@ -1151,11 +1151,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.X509SKIImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1178,7 +1178,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1201,7 +1201,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1217,7 +1217,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1233,7 +1233,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1249,19 +1249,19 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                                 eatText1(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = com.sun.msv.datatype.xsd.Base64BinaryType.load(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }
@@ -1273,34 +1273,34 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
     public static class X509SubjectNameImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SubjectName, com.sun.xml.bind.RIElement, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
     {
 
-        protected String _Value;
-        public final static Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
+        protected java.lang.String _Value;
+        public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlsig.impl.JAXBVersion.class);
         private static com.sun.msv.grammar.Grammar schemaFragment;
 
         public X509SubjectNameImpl() {
         }
 
-        public X509SubjectNameImpl(String value) {
+        public X509SubjectNameImpl(java.lang.String value) {
             _Value = value;
         }
 
-        private final static Class PRIMARY_INTERFACE_CLASS() {
+        private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SubjectName.class);
         }
 
-        public String ____jaxb_ri____getNamespaceURI() {
+        public java.lang.String ____jaxb_ri____getNamespaceURI() {
             return "http://www.w3.org/2000/09/xmldsig#";
         }
 
-        public String ____jaxb_ri____getLocalName() {
+        public java.lang.String ____jaxb_ri____getLocalName() {
             return "X509SubjectName";
         }
 
-        public String getValue() {
+        public java.lang.String getValue() {
             return _Value;
         }
 
-        public void setValue(String value) {
+        public void setValue(java.lang.String value) {
             _Value = value;
         }
 
@@ -1315,8 +1315,8 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
             context.endNamespaceDecls();
             context.endAttributes();
             try {
-                context.text(((String) _Value), "Value");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Value), "Value");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endElement();
@@ -1332,7 +1332,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
         {
         }
 
-        public Class getPrimaryInterface() {
+        public java.lang.Class getPrimaryInterface() {
             return (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509SubjectName.class);
         }
 
@@ -1395,11 +1395,11 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 state = startState;
             }
 
-            public Object owner() {
+            public java.lang.Object owner() {
                 return com.sun.identity.saml2.jaxb.xmlsig.impl.X509DataTypeImpl.X509SubjectNameImpl.this;
             }
 
-            public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+            public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1422,7 +1422,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveElement(String ___uri, String ___local, String ___qname)
+            public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1445,7 +1445,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void enterAttribute(String ___uri, String ___local, String ___qname)
+            public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1461,7 +1461,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void leaveAttribute(String ___uri, String ___local, String ___qname)
+            public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1477,7 +1477,7 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                 }
             }
 
-            public void handleText(final String value)
+            public void handleText(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 int attIdx;
@@ -1493,19 +1493,19 @@ public class X509DataTypeImpl implements com.sun.identity.saml2.jaxb.xmlsig.X509
                                 eatText1(value);
                                 return ;
                         }
-                    } catch (RuntimeException e) {
+                    } catch (java.lang.RuntimeException e) {
                         handleUnexpectedTextException(value, e);
                     }
                     break;
                 }
             }
 
-            private void eatText1(final String value)
+            private void eatText1(final java.lang.String value)
                 throws org.xml.sax.SAXException
             {
                 try {
                     _Value = value;
-                } catch (Exception e) {
+                } catch (java.lang.Exception e) {
                     handleParseConversionException(e);
                 }
             }

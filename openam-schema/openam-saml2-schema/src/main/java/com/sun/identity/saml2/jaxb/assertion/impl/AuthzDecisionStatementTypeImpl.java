@@ -13,22 +13,22 @@ public class AuthzDecisionStatementTypeImpl
     implements com.sun.identity.saml2.jaxb.assertion.AuthzDecisionStatementType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Resource;
+    protected java.lang.String _Resource;
     protected com.sun.xml.bind.util.ListImpl _Action;
-    protected String _Decision;
+    protected java.lang.String _Decision;
     protected com.sun.identity.saml2.jaxb.assertion.EvidenceType _Evidence;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.AuthzDecisionStatementType.class);
     }
 
-    public String getResource() {
+    public java.lang.String getResource() {
         return _Resource;
     }
 
-    public void setResource(String value) {
+    public void setResource(java.lang.String value) {
         _Resource = value;
     }
 
@@ -43,11 +43,11 @@ public class AuthzDecisionStatementTypeImpl
         return _getAction();
     }
 
-    public String getDecision() {
+    public java.lang.String getDecision() {
         return _Decision;
     }
 
-    public void setDecision(String value) {
+    public void setDecision(java.lang.String value) {
         _Decision = value;
     }
 
@@ -106,15 +106,15 @@ public class AuthzDecisionStatementTypeImpl
         final int len2 = ((_Action == null)? 0 :_Action.size());
         context.startAttribute("", "Decision");
         try {
-            context.text(((String) _Decision), "Decision");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Decision), "Decision");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
         context.startAttribute("", "Resource");
         try {
-            context.text(((String) _Resource), "Resource");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Resource), "Resource");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -153,7 +153,7 @@ public class AuthzDecisionStatementTypeImpl
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.AuthzDecisionStatementType.class);
     }
 
@@ -243,11 +243,11 @@ public class AuthzDecisionStatementTypeImpl
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.AuthzDecisionStatementTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -260,7 +260,7 @@ public class AuthzDecisionStatementTypeImpl
                     case  3 :
                         attIdx = context.getAttribute("", "Resource");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -311,7 +311,7 @@ public class AuthzDecisionStatementTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Decision");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -342,27 +342,27 @@ public class AuthzDecisionStatementTypeImpl
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Resource = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Decision = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -382,7 +382,7 @@ public class AuthzDecisionStatementTypeImpl
                     case  3 :
                         attIdx = context.getAttribute("", "Resource");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -404,7 +404,7 @@ public class AuthzDecisionStatementTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Decision");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -424,7 +424,7 @@ public class AuthzDecisionStatementTypeImpl
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -464,7 +464,7 @@ public class AuthzDecisionStatementTypeImpl
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -477,7 +477,7 @@ public class AuthzDecisionStatementTypeImpl
                     case  3 :
                         attIdx = context.getAttribute("", "Resource");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText1(v);
                             continue outer;
@@ -504,7 +504,7 @@ public class AuthzDecisionStatementTypeImpl
                     case  0 :
                         attIdx = context.getAttribute("", "Decision");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -524,7 +524,7 @@ public class AuthzDecisionStatementTypeImpl
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -546,7 +546,7 @@ public class AuthzDecisionStatementTypeImpl
                         case  3 :
                             attIdx = context.getAttribute("", "Resource");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText1(v);
                                 continue outer;
@@ -561,7 +561,7 @@ public class AuthzDecisionStatementTypeImpl
                         case  0 :
                             attIdx = context.getAttribute("", "Decision");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -576,7 +576,7 @@ public class AuthzDecisionStatementTypeImpl
                             }
                             break;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

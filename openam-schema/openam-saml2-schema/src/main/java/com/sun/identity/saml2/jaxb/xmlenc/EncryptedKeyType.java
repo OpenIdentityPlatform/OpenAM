@@ -35,7 +35,7 @@ public interface EncryptedKeyType
 
     /**
      * Gets the value of the referenceList property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.ReferenceListElement}
@@ -45,7 +45,7 @@ public interface EncryptedKeyType
 
     /**
      * Sets the value of the referenceList property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.ReferenceListElement}
@@ -55,38 +55,38 @@ public interface EncryptedKeyType
 
     /**
      * Gets the value of the carriedKeyName property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCarriedKeyName();
+    java.lang.String getCarriedKeyName();
 
     /**
      * Sets the value of the carriedKeyName property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCarriedKeyName(String value);
+    void setCarriedKeyName(java.lang.String value);
 
     /**
      * Gets the value of the recipient property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getRecipient();
+    java.lang.String getRecipient();
 
     /**
      * Sets the value of the recipient property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setRecipient(String value);
+    void setRecipient(java.lang.String value);
 
 }

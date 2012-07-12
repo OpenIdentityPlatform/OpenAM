@@ -34,89 +34,89 @@ public interface NameIDType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getValue();
+    java.lang.String getValue();
 
     /**
      * Sets the value of the value property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setValue(String value);
+    void setValue(java.lang.String value);
 
     /**
      * Gets the value of the format property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getFormat();
+    java.lang.String getFormat();
 
     /**
      * Sets the value of the format property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setFormat(String value);
+    void setFormat(java.lang.String value);
 
     /**
      * Gets the value of the nameQualifier property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getNameQualifier();
+    java.lang.String getNameQualifier();
 
     /**
      * Sets the value of the nameQualifier property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setNameQualifier(String value);
+    void setNameQualifier(java.lang.String value);
 
     /**
      * Gets the value of the spProvidedID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSPProvidedID();
+    java.lang.String getSPProvidedID();
 
     /**
      * Sets the value of the spProvidedID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSPProvidedID(String value);
+    void setSPProvidedID(java.lang.String value);
 
     /**
      * Gets the value of the spNameQualifier property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSPNameQualifier();
+    java.lang.String getSPNameQualifier();
 
     /**
      * Sets the value of the spNameQualifier property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSPNameQualifier(String value);
+    void setSPNameQualifier(java.lang.String value);
 
 }

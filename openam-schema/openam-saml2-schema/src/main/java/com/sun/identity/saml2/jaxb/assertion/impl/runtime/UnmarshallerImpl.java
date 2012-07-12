@@ -7,12 +7,14 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.DatatypeConverterImpl;
-import com.sun.xml.bind.unmarshaller.DOMScanner;
-import com.sun.xml.bind.unmarshaller.InterningXMLReader;
-import com.sun.xml.bind.validator.DOMLocator;
-import com.sun.xml.bind.validator.Locator;
-import com.sun.xml.bind.validator.SAXLocator;
+import java.io.IOException;
+
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshallerHandler;
+import javax.xml.bind.helpers.AbstractUnmarshallerImpl;
+import javax.xml.transform.sax.SAXSource;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,12 +23,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.UnmarshallerHandler;
-import javax.xml.bind.helpers.AbstractUnmarshallerImpl;
-import javax.xml.transform.sax.SAXSource;
-import java.io.IOException;
+import com.sun.xml.bind.DatatypeConverterImpl;
+import com.sun.xml.bind.unmarshaller.DOMScanner;
+import com.sun.xml.bind.unmarshaller.InterningXMLReader;
+import com.sun.xml.bind.validator.DOMLocator;
+import com.sun.xml.bind.validator.Locator;
+import com.sun.xml.bind.validator.SAXLocator;
 
 /**
  * Default Unmarshall implementation.
@@ -70,7 +72,7 @@ public class UnmarshallerImpl extends AbstractUnmarshallerImpl
         // we don't know the Locator to be used,
         // but SAXLocator would always be a good default,
         // as the source of SAX2 events can always set org.xml.sax.Locator.
-        return new InterningUnmarshallerHandler(
+        return new InterningUnmarshallerHandler( 
                 createUnmarshallerHandler(new SAXLocator()));
     }
     
@@ -102,7 +104,7 @@ public class UnmarshallerImpl extends AbstractUnmarshallerImpl
                 // if the validation is turned on, insert another
                 // component into the event pipe line.
                 unmarshaller = ValidatingUnmarshaller.create(
-                        context.getGrammar(), unmarshaller, locator);
+                    context.getGrammar(), unmarshaller, locator );
             }
         } catch( JAXBException e ) {
             // impossible since we've already made sure that a grammar is accessible.
@@ -157,7 +159,7 @@ public class UnmarshallerImpl extends AbstractUnmarshallerImpl
     public final Object unmarshal( Node node ) throws JAXBException {
         try {
             DOMScanner scanner = new DOMScanner();
-            UnmarshallerHandler handler = new InterningUnmarshallerHandler(
+            UnmarshallerHandler handler = new InterningUnmarshallerHandler( 
                 createUnmarshallerHandler(new DOMLocator(scanner)));
             
             if(node instanceof Element)

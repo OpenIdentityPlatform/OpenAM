@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(76, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (com.sun.identity.saml2.jaxb.assertion.ObjectFactory.class));
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((com.sun.identity.saml2.jaxb.assertion.SubjectConfirmationElement.class), "com.sun.identity.saml2.jaxb.assertion.impl.SubjectConfirmationElementImpl");
@@ -126,7 +126,7 @@ public class ObjectFactory
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sun.identity.saml2.jaxb.assertion
-     *
+     * 
      */
     public ObjectFactory() {
         super(grammarInfo);
@@ -134,7 +134,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of the specified Java content interface.
-     *
+     * 
      * @param javaContentInterface
      *     the Class object of the javacontent interface to instantiate
      * @return
@@ -142,7 +142,7 @@ public class ObjectFactory
      * @throws JAXBException
      *     if an error occurs
      */
-    public Object newInstance(Class javaContentInterface)
+    public java.lang.Object newInstance(java.lang.Class javaContentInterface)
         throws javax.xml.bind.JAXBException
     {
         return super.newInstance(javaContentInterface);
@@ -153,7 +153,7 @@ public class ObjectFactory
      * used to get provider specific properties.
      * Attempting to get an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @return
@@ -161,7 +161,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error retrieving the given property or value
      */
-    public Object getProperty(String name)
+    public java.lang.Object getProperty(java.lang.String name)
         throws javax.xml.bind.PropertyException
     {
         return super.getProperty(name);
@@ -172,7 +172,7 @@ public class ObjectFactory
      * used to set provider specific properties.
      * Attempting to set an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @param value
@@ -180,7 +180,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error processing the given property or value
      */
-    public void setProperty(String name, Object value)
+    public void setProperty(java.lang.String name, java.lang.Object value)
         throws javax.xml.bind.PropertyException
     {
         super.setProperty(name, value);
@@ -188,7 +188,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectConfirmationElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -200,7 +200,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of BaseIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -212,7 +212,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionURIRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -224,11 +224,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionURIRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.assertion.AssertionURIRefElement createAssertionURIRefElement(String value)
+    public com.sun.identity.saml2.jaxb.assertion.AssertionURIRefElement createAssertionURIRefElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.assertion.impl.AssertionURIRefElementImpl(value);
@@ -236,7 +236,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectLocalityType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -248,7 +248,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ActionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -260,7 +260,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AdviceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -272,7 +272,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -284,7 +284,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ConditionsElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -296,7 +296,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of NameIDType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -308,7 +308,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AudienceRestrictionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -320,7 +320,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectConfirmationDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -332,7 +332,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ConditionAbstractType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -344,7 +344,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectConfirmationDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -356,7 +356,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthzDecisionStatementType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -368,7 +368,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedAssertionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -380,7 +380,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StatementAbstractType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -392,7 +392,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeStatementElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -404,7 +404,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -416,7 +416,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of KeyInfoConfirmationDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -428,7 +428,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -440,7 +440,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ProxyRestrictionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -452,7 +452,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of NameIDElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -464,7 +464,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OneTimeUseType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -476,7 +476,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -488,7 +488,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ConditionsType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -500,7 +500,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of BaseIDAbstractType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -512,7 +512,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedAttributeElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -524,7 +524,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ConditionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -536,7 +536,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextDeclElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -548,7 +548,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EvidenceType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -560,7 +560,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -572,7 +572,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedElementType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -584,7 +584,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnStatementType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -596,7 +596,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectConfirmationType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -608,7 +608,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectLocalityElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -620,7 +620,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ProxyRestrictionType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -632,7 +632,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthzDecisionStatementElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -644,7 +644,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextClassRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -656,11 +656,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextClassRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.assertion.AuthnContextClassRefElement createAuthnContextClassRefElement(String value)
+    public com.sun.identity.saml2.jaxb.assertion.AuthnContextClassRefElement createAuthnContextClassRefElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.assertion.impl.AuthnContextClassRefElementImpl(value);
@@ -668,7 +668,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -680,7 +680,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AdviceType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -692,7 +692,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of SubjectElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -704,7 +704,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -716,7 +716,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of StatementElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -728,7 +728,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionIDRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -740,11 +740,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AssertionIDRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.assertion.AssertionIDRefElement createAssertionIDRefElement(String value)
+    public com.sun.identity.saml2.jaxb.assertion.AssertionIDRefElement createAssertionIDRefElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.assertion.impl.AssertionIDRefElementImpl(value);
@@ -752,7 +752,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -764,7 +764,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ActionType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -776,7 +776,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthenticatingAuthorityElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -788,11 +788,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthenticatingAuthorityElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.assertion.AuthenticatingAuthorityElement createAuthenticatingAuthorityElement(String value)
+    public com.sun.identity.saml2.jaxb.assertion.AuthenticatingAuthorityElement createAuthenticatingAuthorityElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.assertion.impl.AuthenticatingAuthorityElementImpl(value);
@@ -800,7 +800,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnStatementElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -812,7 +812,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeValueElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -824,7 +824,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EvidenceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -836,7 +836,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AudienceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -848,11 +848,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AudienceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.assertion.AudienceElement createAudienceElement(String value)
+    public com.sun.identity.saml2.jaxb.assertion.AudienceElement createAudienceElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.assertion.impl.AudienceElementImpl(value);
@@ -860,7 +860,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of OneTimeUseElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -872,7 +872,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of IssuerElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -884,7 +884,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AttributeStatementType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -896,7 +896,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AudienceRestrictionType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -908,7 +908,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextDeclRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -920,11 +920,11 @@ public class ObjectFactory
 
     /**
      * Create an instance of AuthnContextDeclRefElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
-    public com.sun.identity.saml2.jaxb.assertion.AuthnContextDeclRefElement createAuthnContextDeclRefElement(String value)
+    public com.sun.identity.saml2.jaxb.assertion.AuthnContextDeclRefElement createAuthnContextDeclRefElement(java.lang.String value)
         throws javax.xml.bind.JAXBException
     {
         return new com.sun.identity.saml2.jaxb.assertion.impl.AuthnContextDeclRefElementImpl(value);

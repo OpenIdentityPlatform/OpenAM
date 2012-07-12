@@ -10,6 +10,6 @@ package com.sun.identity.saml2.jaxb.metadataidpdiscovery.impl;
 
 public class JAXBVersion {
 
-    public final static String version = "1.0.6";
+    public final static java.lang.String version = "1.0.6";
 
 }

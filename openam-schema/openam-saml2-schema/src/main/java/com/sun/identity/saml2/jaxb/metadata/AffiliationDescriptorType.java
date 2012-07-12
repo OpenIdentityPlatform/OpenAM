@@ -48,7 +48,7 @@ public interface AffiliationDescriptorType {
 
     /**
      * Sets the value of the extensions property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.metadata.ExtensionsType}
@@ -58,31 +58,31 @@ public interface AffiliationDescriptorType {
 
     /**
      * Gets the value of the KeyDescriptor property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the KeyDescriptor property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getKeyDescriptor().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement}
      * {@link com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType}
-     *
+     * 
      */
     java.util.List getKeyDescriptor();
 
     /**
      * Gets the value of the validUntil property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -91,7 +91,7 @@ public interface AffiliationDescriptorType {
 
     /**
      * Sets the value of the validUntil property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -100,80 +100,80 @@ public interface AffiliationDescriptorType {
 
     /**
      * Gets the value of the AffiliateMember property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the AffiliateMember property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAffiliateMember().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
-     *
+     * {@link java.lang.String}
+     * 
      */
     java.util.List getAffiliateMember();
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getID();
+    java.lang.String getID();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setID(String value);
+    void setID(java.lang.String value);
 
     /**
      * Gets the value of the cacheDuration property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getCacheDuration();
+    java.lang.String getCacheDuration();
 
     /**
      * Sets the value of the cacheDuration property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setCacheDuration(String value);
+    void setCacheDuration(java.lang.String value);
 
     /**
      * Gets the value of the affiliationOwnerID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getAffiliationOwnerID();
+    java.lang.String getAffiliationOwnerID();
 
     /**
      * Sets the value of the affiliationOwnerID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setAffiliationOwnerID(String value);
+    void setAffiliationOwnerID(java.lang.String value);
 
     /**
      * Gets the value of the signature property.

@@ -67,7 +67,7 @@ public interface EncryptedType {
 
     /**
      * Sets the value of the encryptionMethod property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType}
@@ -76,79 +76,79 @@ public interface EncryptedType {
 
     /**
      * Gets the value of the encoding property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getEncoding();
+    java.lang.String getEncoding();
 
     /**
      * Sets the value of the encoding property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setEncoding(String value);
+    void setEncoding(java.lang.String value);
 
     /**
      * Gets the value of the type property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getType();
+    java.lang.String getType();
 
     /**
      * Sets the value of the type property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setType(String value);
+    void setType(java.lang.String value);
 
     /**
      * Gets the value of the mimeType property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getMimeType();
+    java.lang.String getMimeType();
 
     /**
      * Sets the value of the mimeType property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setMimeType(String value);
+    void setMimeType(java.lang.String value);
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getId();
+    java.lang.String getId();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setId(String value);
+    void setId(java.lang.String value);
 
     /**
      * Gets the value of the cipherData property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.CipherDataType}
@@ -158,7 +158,7 @@ public interface EncryptedType {
 
     /**
      * Sets the value of the cipherData property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.CipherDataType}
@@ -168,7 +168,7 @@ public interface EncryptedType {
 
     /**
      * Gets the value of the encryptionProperties property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertiesType}
@@ -178,7 +178,7 @@ public interface EncryptedType {
 
     /**
      * Sets the value of the encryptionProperties property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertiesType}

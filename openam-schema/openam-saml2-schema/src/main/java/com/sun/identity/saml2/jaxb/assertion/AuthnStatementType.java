@@ -85,7 +85,7 @@ public interface AuthnStatementType
 
     /**
      * Sets the value of the subjectLocality property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.assertion.SubjectLocalityElement}
@@ -95,7 +95,7 @@ public interface AuthnStatementType
 
     /**
      * Gets the value of the sessionNotOnOrAfter property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link java.util.Calendar}
@@ -104,7 +104,7 @@ public interface AuthnStatementType
 
     /**
      * Sets the value of the sessionNotOnOrAfter property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link java.util.Calendar}
@@ -113,20 +113,20 @@ public interface AuthnStatementType
 
     /**
      * Gets the value of the sessionIndex property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSessionIndex();
+    java.lang.String getSessionIndex();
 
     /**
      * Sets the value of the sessionIndex property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSessionIndex(String value);
+    void setSessionIndex(java.lang.String value);
 
 }

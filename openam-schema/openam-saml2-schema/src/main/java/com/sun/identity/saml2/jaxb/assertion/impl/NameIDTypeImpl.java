@@ -11,55 +11,55 @@ package com.sun.identity.saml2.jaxb.assertion.impl;
 public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.NameIDType, com.sun.xml.bind.JAXBObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.UnmarshallableObject, com.sun.identity.saml2.jaxb.assertion.impl.runtime.XMLSerializable, com.sun.identity.saml2.jaxb.assertion.impl.runtime.ValidatableObject
 {
 
-    protected String _Value;
-    protected String _Format;
-    protected String _NameQualifier;
-    protected String _SPProvidedID;
-    protected String _SPNameQualifier;
-    public final static Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
+    protected java.lang.String _Value;
+    protected java.lang.String _Format;
+    protected java.lang.String _NameQualifier;
+    protected java.lang.String _SPProvidedID;
+    protected java.lang.String _SPNameQualifier;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.assertion.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.assertion.NameIDType.class);
     }
 
-    public String getValue() {
+    public java.lang.String getValue() {
         return _Value;
     }
 
-    public void setValue(String value) {
+    public void setValue(java.lang.String value) {
         _Value = value;
     }
 
-    public String getFormat() {
+    public java.lang.String getFormat() {
         return _Format;
     }
 
-    public void setFormat(String value) {
+    public void setFormat(java.lang.String value) {
         _Format = value;
     }
 
-    public String getNameQualifier() {
+    public java.lang.String getNameQualifier() {
         return _NameQualifier;
     }
 
-    public void setNameQualifier(String value) {
+    public void setNameQualifier(java.lang.String value) {
         _NameQualifier = value;
     }
 
-    public String getSPProvidedID() {
+    public java.lang.String getSPProvidedID() {
         return _SPProvidedID;
     }
 
-    public void setSPProvidedID(String value) {
+    public void setSPProvidedID(java.lang.String value) {
         _SPProvidedID = value;
     }
 
-    public String getSPNameQualifier() {
+    public java.lang.String getSPNameQualifier() {
         return _SPNameQualifier;
     }
 
-    public void setSPNameQualifier(String value) {
+    public void setSPNameQualifier(java.lang.String value) {
         _SPNameQualifier = value;
     }
 
@@ -71,8 +71,8 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
         throws org.xml.sax.SAXException
     {
         try {
-            context.text(((String) _Value), "Value");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _Value), "Value");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
     }
@@ -83,8 +83,8 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
         if (_NameQualifier!= null) {
             context.startAttribute("", "NameQualifier");
             try {
-                context.text(((String) _NameQualifier), "NameQualifier");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _NameQualifier), "NameQualifier");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -92,8 +92,8 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
         if (_SPNameQualifier!= null) {
             context.startAttribute("", "SPNameQualifier");
             try {
-                context.text(((String) _SPNameQualifier), "SPNameQualifier");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SPNameQualifier), "SPNameQualifier");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -101,8 +101,8 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
         if (_Format!= null) {
             context.startAttribute("", "Format");
             try {
-                context.text(((String) _Format), "Format");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _Format), "Format");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -110,8 +110,8 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
         if (_SPProvidedID!= null) {
             context.startAttribute("", "SPProvidedID");
             try {
-                context.text(((String) _SPProvidedID), "SPProvidedID");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _SPProvidedID), "SPProvidedID");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -123,7 +123,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
     {
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.assertion.NameIDType.class);
     }
 
@@ -185,11 +185,11 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.assertion.impl.NameIDTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -199,7 +199,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  6 :
                         attIdx = context.getAttribute("", "Format");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -212,7 +212,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  0 :
                         attIdx = context.getAttribute("", "NameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -222,7 +222,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  3 :
                         attIdx = context.getAttribute("", "SPNameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -232,7 +232,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  9 :
                         attIdx = context.getAttribute("", "SPProvidedID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -245,47 +245,47 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Format = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _NameQualifier = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SPNameQualifier = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _SPProvidedID = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -295,7 +295,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  6 :
                         attIdx = context.getAttribute("", "Format");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -308,7 +308,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  0 :
                         attIdx = context.getAttribute("", "NameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -318,7 +318,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  3 :
                         attIdx = context.getAttribute("", "SPNameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -328,7 +328,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  9 :
                         attIdx = context.getAttribute("", "SPProvidedID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -341,7 +341,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -385,7 +385,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -401,7 +401,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  6 :
                         attIdx = context.getAttribute("", "Format");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText1(v);
                             continue outer;
@@ -432,7 +432,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  0 :
                         attIdx = context.getAttribute("", "NameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText2(v);
                             continue outer;
@@ -442,7 +442,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  3 :
                         attIdx = context.getAttribute("", "SPNameQualifier");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -452,7 +452,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                     case  9 :
                         attIdx = context.getAttribute("", "SPProvidedID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 12;
                             eatText4(v);
                             continue outer;
@@ -465,7 +465,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -480,7 +480,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                         case  6 :
                             attIdx = context.getAttribute("", "Format");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText1(v);
                                 continue outer;
@@ -501,7 +501,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                         case  0 :
                             attIdx = context.getAttribute("", "NameQualifier");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText2(v);
                                 continue outer;
@@ -515,7 +515,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                         case  3 :
                             attIdx = context.getAttribute("", "SPNameQualifier");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
@@ -525,7 +525,7 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                         case  9 :
                             attIdx = context.getAttribute("", "SPProvidedID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 12;
                                 eatText4(v);
                                 continue outer;
@@ -537,19 +537,19 @@ public class NameIDTypeImpl implements com.sun.identity.saml2.jaxb.assertion.Nam
                             eatText5(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Value = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }

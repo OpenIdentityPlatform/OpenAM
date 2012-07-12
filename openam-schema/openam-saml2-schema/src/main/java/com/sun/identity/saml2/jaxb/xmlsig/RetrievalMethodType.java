@@ -56,35 +56,35 @@ public interface RetrievalMethodType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getType();
+    java.lang.String getType();
 
     /**
      * Sets the value of the type property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setType(String value);
+    void setType(java.lang.String value);
 
     /**
      * Gets the value of the uri property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getURI();
+    java.lang.String getURI();
 
     /**
      * Sets the value of the uri property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setURI(String value);
+    void setURI(java.lang.String value);
 
 }

@@ -7,10 +7,16 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.DatatypeConverterImpl;
-import com.sun.xml.bind.Messages;
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Validator;
 
-import javax.xml.bind.*;
+import com.sun.xml.bind.Messages;
+import com.sun.xml.bind.DatatypeConverterImpl;
 
 /**
  * This class provides the default implementation of JAXBContext.  It
@@ -53,7 +59,7 @@ public class DefaultJAXBContextImpl extends JAXBContext {
         this.gi = gi;
     }
         
-    public GrammarInfo getGrammarInfo() {
+    public GrammarInfo getGrammarInfo() { 
         return gi;
     }
     
@@ -83,45 +89,45 @@ public class DefaultJAXBContextImpl extends JAXBContext {
      * java content-tree into XML data.
      *
      * @return a <CODE>Marshaller</CODE> object
-     * @throws javax.xml.bind.JAXBException if an error was encountered while creating the
+     * @throws JAXBException if an error was encountered while creating the
      *                      <code>Marshaller</code> object
      */
     public Marshaller createMarshaller() throws JAXBException {
             return new MarshallerImpl( this );
     }
-
+       
     /**
      * Create an <CODE>Unmarshaller</CODE> object that can be used to convert XML
      * data into a java content-tree.
      *
      * @return an <CODE>Unmarshaller</CODE> object
-     * @throws javax.xml.bind.JAXBException if an error was encountered while creating the
+     * @throws JAXBException if an error was encountered while creating the
      *                      <code>Unmarshaller</code> object
      */
     public Unmarshaller createUnmarshaller() throws JAXBException {
             return new UnmarshallerImpl( this, gi );
-    }
-
+    }    
+        
     /**
      * Create a <CODE>Validator</CODE> object that can be used to validate a
      * java content-tree.
      *
      * @return an <CODE>Unmarshaller</CODE> object
-     * @throws javax.xml.bind.JAXBException if an error was encountered while creating the
+     * @throws JAXBException if an error was encountered while creating the
      *                      <code>Validator</code> object
      */
     public Validator createValidator() throws JAXBException {
             return new ValidatorImpl( this );
     }
+    
 
-
-
+    
     /**
-     * Create an instance of the specified Java content interface.
+     * Create an instance of the specified Java content interface.  
      *
-     * @param javaContentInterface the Class object
+     * @param javaContentInterface the Class object 
      * @return an instance of the Java content interface
-     * @exception javax.xml.bind.JAXBException
+     * @exception JAXBException
      */
     public Object newInstance( Class javaContentInterface ) 
         throws JAXBException {

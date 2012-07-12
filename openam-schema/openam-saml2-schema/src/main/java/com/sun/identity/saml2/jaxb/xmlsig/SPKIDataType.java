@@ -49,7 +49,7 @@ public interface SPKIDataType {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.xmlsig.SPKIDataType.SPKISexp}
-     * {@link Object}
+     * {@link java.lang.Object}
      * 
      */
     java.util.List getSPKISexpAndAny();

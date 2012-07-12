@@ -36,71 +36,71 @@ public interface SSODescriptorType
 
     /**
      * Gets the value of the ManageNameIDService property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the ManageNameIDService property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getManageNameIDService().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.EndpointType}
      * {@link com.sun.identity.saml2.jaxb.metadata.ManageNameIDServiceElement}
-     *
+     * 
      */
     java.util.List getManageNameIDService();
 
     /**
      * Gets the value of the ArtifactResolutionService property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the ArtifactResolutionService property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getArtifactResolutionService().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.metadata.ArtifactResolutionServiceElement}
      * {@link com.sun.identity.saml2.jaxb.metadata.IndexedEndpointType}
-     *
+     * 
      */
     java.util.List getArtifactResolutionService();
 
     /**
      * Gets the value of the NameIDFormat property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the NameIDFormat property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getNameIDFormat().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String}
+     * {@link java.lang.String}
      * 
      */
     java.util.List getNameIDFormat();

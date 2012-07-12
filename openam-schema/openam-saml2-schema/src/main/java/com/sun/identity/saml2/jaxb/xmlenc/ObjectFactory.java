@@ -30,7 +30,7 @@ public class ObjectFactory
     private static java.util.HashMap defaultImplementations = new java.util.HashMap(37, 0.75F);
     private static java.util.HashMap rootTagMap = new java.util.HashMap();
     public final static com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfo grammarInfo = new com.sun.identity.saml2.jaxb.assertion.impl.runtime.GrammarInfoImpl(rootTagMap, defaultImplementations, (com.sun.identity.saml2.jaxb.xmlenc.ObjectFactory.class));
-    public final static Class version = (com.sun.identity.saml2.jaxb.xmlenc.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.xmlenc.impl.JAXBVersion.class);
 
     static {
         defaultImplementations.put((com.sun.identity.saml2.jaxb.xmlenc.ReferenceListType.KeyReference.class), "com.sun.identity.saml2.jaxb.xmlenc.impl.ReferenceListTypeImpl$KeyReferenceImpl");
@@ -72,7 +72,7 @@ public class ObjectFactory
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sun.identity.saml2.jaxb.xmlenc
-     *
+     * 
      */
     public ObjectFactory() {
         super(grammarInfo);
@@ -80,7 +80,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of the specified Java content interface.
-     *
+     * 
      * @param javaContentInterface
      *     the Class object of the javacontent interface to instantiate
      * @return
@@ -88,7 +88,7 @@ public class ObjectFactory
      * @throws JAXBException
      *     if an error occurs
      */
-    public Object newInstance(Class javaContentInterface)
+    public java.lang.Object newInstance(java.lang.Class javaContentInterface)
         throws javax.xml.bind.JAXBException
     {
         return super.newInstance(javaContentInterface);
@@ -99,7 +99,7 @@ public class ObjectFactory
      * used to get provider specific properties.
      * Attempting to get an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @return
@@ -107,7 +107,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error retrieving the given property or value
      */
-    public Object getProperty(String name)
+    public java.lang.Object getProperty(java.lang.String name)
         throws javax.xml.bind.PropertyException
     {
         return super.getProperty(name);
@@ -118,7 +118,7 @@ public class ObjectFactory
      * used to set provider specific properties.
      * Attempting to set an undefined property will result
      * in a PropertyException being thrown.
-     *
+     * 
      * @param name
      *     the name of the property to retrieve
      * @param value
@@ -126,7 +126,7 @@ public class ObjectFactory
      * @throws PropertyException
      *     when there is an error processing the given property or value
      */
-    public void setProperty(String name, Object value)
+    public void setProperty(java.lang.String name, java.lang.Object value)
         throws javax.xml.bind.PropertyException
     {
         super.setProperty(name, value);
@@ -134,7 +134,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceListTypeKeyReference
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -146,7 +146,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CipherReferenceType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -158,7 +158,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CipherDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -170,7 +170,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceListTypeDataReference
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -182,7 +182,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgreementMethodTypeKANonce
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -194,7 +194,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgreementMethodTypeKANonce
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -206,7 +206,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CipherDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -218,7 +218,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -230,7 +230,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionMethodTypeKeySize
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -242,7 +242,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionMethodTypeKeySize
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -254,7 +254,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceListType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -266,7 +266,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -278,7 +278,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionPropertiesElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -290,7 +290,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionMethodType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -302,7 +302,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedKeyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -314,7 +314,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of CipherReferenceElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -326,7 +326,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedKeyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -338,7 +338,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of TransformsType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -350,7 +350,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedDataType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -362,7 +362,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of ReferenceListElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -374,7 +374,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionMethodTypeOAEPparams
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -386,7 +386,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionMethodTypeOAEPparams
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -398,7 +398,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionPropertyType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -410,7 +410,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptedDataElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -422,7 +422,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionPropertiesType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -434,7 +434,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of EncryptionPropertyElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -446,7 +446,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgreementMethodElement
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -458,7 +458,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgreementMethodTypeRecipientKeyInfo
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -470,7 +470,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgreementMethodTypeOriginatorKeyInfo
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */
@@ -482,7 +482,7 @@ public class ObjectFactory
 
     /**
      * Create an instance of AgreementMethodType
-     *
+     * 
      * @throws JAXBException
      *     if an error occurs
      */

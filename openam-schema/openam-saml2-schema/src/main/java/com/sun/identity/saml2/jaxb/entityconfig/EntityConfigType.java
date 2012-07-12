@@ -70,7 +70,7 @@ public interface EntityConfigType {
 
     /**
      * Sets the value of the affiliationConfig property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link com.sun.identity.saml2.jaxb.entityconfig.AffiliationConfigElement}
@@ -80,62 +80,62 @@ public interface EntityConfigType {
 
     /**
      * Gets the value of the id property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getID();
+    java.lang.String getID();
 
     /**
      * Sets the value of the id property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setID(String value);
+    void setID(java.lang.String value);
 
     /**
      * Gets the value of the Attribute property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the Attribute property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAttribute().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.entityconfig.AttributeType}
      * {@link com.sun.identity.saml2.jaxb.entityconfig.AttributeElement}
-     *
+     * 
      */
     java.util.List getAttribute();
 
     /**
      * Gets the value of the IDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the IDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link com.sun.identity.saml2.jaxb.entityconfig.AttributeQueryConfigElement}
@@ -146,27 +146,27 @@ public interface EntityConfigType {
      * {@link com.sun.identity.saml2.jaxb.entityconfig.AttributeAuthorityConfigElement}
      * {@link com.sun.identity.saml2.jaxb.entityconfig.XACMLAuthzDecisionQueryConfigElement}
      * {@link com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement}
-     *
+     * 
      */
     java.util.List getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
 
     /**
      * Gets the value of the entityID property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getEntityID();
+    java.lang.String getEntityID();
 
     /**
      * Sets the value of the entityID property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setEntityID(String value);
+    void setEntityID(java.lang.String value);
 
     /**
      * Gets the value of the signature property.

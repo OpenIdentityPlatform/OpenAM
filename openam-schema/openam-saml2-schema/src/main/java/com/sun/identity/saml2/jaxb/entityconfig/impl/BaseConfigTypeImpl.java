@@ -12,11 +12,11 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
 {
 
     protected com.sun.xml.bind.util.ListImpl _Attribute;
-    protected String _MetaAlias;
-    public final static Class version = (com.sun.identity.saml2.jaxb.entityconfig.impl.JAXBVersion.class);
+    protected java.lang.String _MetaAlias;
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.entityconfig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType.class);
     }
 
@@ -31,11 +31,11 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
         return _getAttribute();
     }
 
-    public String getMetaAlias() {
+    public java.lang.String getMetaAlias() {
         return _MetaAlias;
     }
 
-    public void setMetaAlias(String value) {
+    public void setMetaAlias(java.lang.String value) {
         _MetaAlias = value;
     }
 
@@ -73,8 +73,8 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
         if (_MetaAlias!= null) {
             context.startAttribute("", "metaAlias");
             try {
-                context.text(((String) _MetaAlias), "MetaAlias");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _MetaAlias), "MetaAlias");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -102,7 +102,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
         }
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType.class);
     }
 
@@ -176,11 +176,11 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.entityconfig.impl.BaseConfigTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -202,7 +202,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
                     case  0 :
                         attIdx = context.getAttribute("", "metaAlias");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -235,17 +235,17 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _MetaAlias = value;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -258,7 +258,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
                     case  0 :
                         attIdx = context.getAttribute("", "metaAlias");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -289,7 +289,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -321,7 +321,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -334,7 +334,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
                     case  0 :
                         attIdx = context.getAttribute("", "metaAlias");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -364,7 +364,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -378,7 +378,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
                         case  0 :
                             attIdx = context.getAttribute("", "metaAlias");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -401,7 +401,7 @@ public class BaseConfigTypeImpl implements com.sun.identity.saml2.jaxb.entitycon
                             eatText1(value);
                             return ;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

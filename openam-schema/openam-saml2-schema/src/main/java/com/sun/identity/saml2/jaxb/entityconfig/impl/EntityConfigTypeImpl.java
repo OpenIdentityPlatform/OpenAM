@@ -14,15 +14,15 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
     protected boolean has_Hosted;
     protected boolean _Hosted;
     protected com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType _AffiliationConfig;
-    protected String _ID;
+    protected java.lang.String _ID;
     protected com.sun.xml.bind.util.ListImpl _Attribute;
     protected com.sun.xml.bind.util.ListImpl _IDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig;
-    protected String _EntityID;
+    protected java.lang.String _EntityID;
     protected com.sun.identity.saml2.jaxb.xmlsig.SignatureType _Signature;
-    public final static Class version = (com.sun.identity.saml2.jaxb.entityconfig.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.entityconfig.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.entityconfig.EntityConfigType.class);
     }
 
@@ -43,11 +43,11 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
         _AffiliationConfig = value;
     }
 
-    public String getID() {
+    public java.lang.String getID() {
         return _ID;
     }
 
-    public void setID(String value) {
+    public void setID(java.lang.String value) {
         _ID = value;
     }
 
@@ -73,11 +73,11 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
         return _getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
     }
 
-    public String getEntityID() {
+    public java.lang.String getEntityID() {
         return _EntityID;
     }
 
-    public void setEntityID(String value) {
+    public void setEntityID(java.lang.String value) {
         _EntityID = value;
     }
 
@@ -159,16 +159,16 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
         if (_ID!= null) {
             context.startAttribute("", "ID");
             try {
-                context.text(context.onID(this, ((String) _ID)), "ID");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _ID)), "ID");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
         }
         context.startAttribute("", "entityID");
         try {
-            context.text(((String) _EntityID), "EntityID");
-        } catch (Exception e) {
+            context.text(((java.lang.String) _EntityID), "EntityID");
+        } catch (java.lang.Exception e) {
             com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
         }
         context.endAttribute();
@@ -176,7 +176,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
             context.startAttribute("", "hosted");
             try {
                 context.text(javax.xml.bind.DatatypeConverter.printBoolean(((boolean) _Hosted)), "Hosted");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -238,11 +238,11 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _ID);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _ID);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.entityconfig.EntityConfigType.class);
     }
 
@@ -357,11 +357,11 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.entityconfig.impl.EntityConfigTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -495,7 +495,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -505,7 +505,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  3 :
                         attIdx = context.getAttribute("", "entityID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -514,7 +514,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  6 :
                         attIdx = context.getAttribute("", "hosted");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -555,38 +555,38 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ID = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _EntityID = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _Hosted = javax.xml.bind.DatatypeConverter.parseBoolean(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
                 has_Hosted = true;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -633,7 +633,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -650,7 +650,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  3 :
                         attIdx = context.getAttribute("", "entityID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -659,7 +659,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  6 :
                         attIdx = context.getAttribute("", "hosted");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -683,7 +683,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -744,7 +744,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -783,7 +783,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -799,7 +799,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  3 :
                         attIdx = context.getAttribute("", "entityID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText2(v);
                             continue outer;
@@ -808,7 +808,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                     case  6 :
                         attIdx = context.getAttribute("", "hosted");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText3(v);
                             continue outer;
@@ -838,7 +838,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -884,7 +884,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                         case  0 :
                             attIdx = context.getAttribute("", "ID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -894,7 +894,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                         case  3 :
                             attIdx = context.getAttribute("", "entityID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText2(v);
                                 continue outer;
@@ -903,7 +903,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                         case  6 :
                             attIdx = context.getAttribute("", "hosted");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText3(v);
                                 continue outer;
@@ -922,7 +922,7 @@ public class EntityConfigTypeImpl implements com.sun.identity.saml2.jaxb.entityc
                             state = 10;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;

@@ -13,7 +13,7 @@ import javax.xml.namespace.NamespaceContext;
  * Maintains namespace&lt;->prefix bindings.
  * 
  * <p>
- * This interface extends {@link javax.xml.namespace.NamespaceContext} and provides
+ * This interface extends {@link NamespaceContext} and provides
  * an additional functionality, which is necessary to declare
  * namespaced attributes on elements. The added method is for
  * self-consumption by the marshaller.
@@ -55,5 +55,5 @@ public interface NamespaceContext2 extends NamespaceContext
      *      returns the assigned prefix. If the namespace is bound to
      *      the default namespace, null is returned.
      */
-    String declareNamespace(String namespaceUri, String preferedPrefix, boolean requirePrefix);
+    String declareNamespace( String namespaceUri, String preferedPrefix, boolean requirePrefix );
 }

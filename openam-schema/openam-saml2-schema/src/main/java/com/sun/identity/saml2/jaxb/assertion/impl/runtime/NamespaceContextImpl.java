@@ -7,12 +7,19 @@
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.marshaller.NamespaceSupport;
-import org.xml.sax.SAXException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
-import java.util.*;
+
+import org.xml.sax.SAXException;
+
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import com.sun.xml.bind.marshaller.NamespaceSupport;
 
 /**
  * Implementation of the NamespaceContext2.

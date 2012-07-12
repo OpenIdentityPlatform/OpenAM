@@ -32,35 +32,35 @@ public interface BaseIDAbstractType {
      * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getNameQualifier();
+    java.lang.String getNameQualifier();
 
     /**
      * Sets the value of the nameQualifier property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setNameQualifier(String value);
+    void setNameQualifier(java.lang.String value);
 
     /**
      * Gets the value of the spNameQualifier property.
-     *
+     * 
      * @return
      *     possible object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    String getSPNameQualifier();
+    java.lang.String getSPNameQualifier();
 
     /**
      * Sets the value of the spNameQualifier property.
-     *
+     * 
      * @param value
      *     allowed object is
-     *     {@link String}
+     *     {@link java.lang.String}
      */
-    void setSPNameQualifier(String value);
+    void setSPNameQualifier(java.lang.String value);
 
 }

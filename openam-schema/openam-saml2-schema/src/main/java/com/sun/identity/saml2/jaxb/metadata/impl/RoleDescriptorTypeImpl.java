@@ -13,18 +13,18 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
 
     protected com.sun.identity.saml2.jaxb.metadata.ExtensionsType _Extensions;
     protected com.sun.xml.bind.util.ListImpl _KeyDescriptor;
-    protected String _ErrorURL;
+    protected java.lang.String _ErrorURL;
     protected java.util.Calendar _ValidUntil;
     protected com.sun.xml.bind.util.ListImpl _ProtocolSupportEnumeration;
     protected com.sun.xml.bind.util.ListImpl _ContactPerson;
-    protected String _ID;
+    protected java.lang.String _ID;
     protected com.sun.identity.saml2.jaxb.metadata.OrganizationType _Organization;
-    protected String _CacheDuration;
+    protected java.lang.String _CacheDuration;
     protected com.sun.identity.saml2.jaxb.xmlsig.SignatureType _Signature;
-    public final static Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
+    public final static java.lang.Class version = (com.sun.identity.saml2.jaxb.metadata.impl.JAXBVersion.class);
     private static com.sun.msv.grammar.Grammar schemaFragment;
 
-    private final static Class PRIMARY_INTERFACE_CLASS() {
+    private final static java.lang.Class PRIMARY_INTERFACE_CLASS() {
         return (com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType.class);
     }
 
@@ -47,11 +47,11 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         return _getKeyDescriptor();
     }
 
-    public String getErrorURL() {
+    public java.lang.String getErrorURL() {
         return _ErrorURL;
     }
 
-    public void setErrorURL(String value) {
+    public void setErrorURL(java.lang.String value) {
         _ErrorURL = value;
     }
 
@@ -85,11 +85,11 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         return _getContactPerson();
     }
 
-    public String getID() {
+    public java.lang.String getID() {
         return _ID;
     }
 
-    public void setID(String value) {
+    public void setID(java.lang.String value) {
         _ID = value;
     }
 
@@ -101,11 +101,11 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         _Organization = value;
     }
 
-    public String getCacheDuration() {
+    public java.lang.String getCacheDuration() {
         return _CacheDuration;
     }
 
-    public void setCacheDuration(String value) {
+    public void setCacheDuration(java.lang.String value) {
         _CacheDuration = value;
     }
 
@@ -213,8 +213,8 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         if (_ID!= null) {
             context.startAttribute("", "ID");
             try {
-                context.text(context.onID(this, ((String) _ID)), "ID");
-            } catch (Exception e) {
+                context.text(context.onID(this, ((java.lang.String) _ID)), "ID");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -222,8 +222,8 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         if (_CacheDuration!= null) {
             context.startAttribute("", "cacheDuration");
             try {
-                context.text(((String) _CacheDuration), "CacheDuration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _CacheDuration), "CacheDuration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -231,8 +231,8 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         if (_ErrorURL!= null) {
             context.startAttribute("", "errorURL");
             try {
-                context.text(((String) _ErrorURL), "ErrorURL");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _ErrorURL), "ErrorURL");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -240,8 +240,8 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         context.startAttribute("", "protocolSupportEnumeration");
         while (idx5 != len5) {
             try {
-                context.text(((String) _ProtocolSupportEnumeration.get(idx5 ++)), "ProtocolSupportEnumeration");
-            } catch (Exception e) {
+                context.text(((java.lang.String) _ProtocolSupportEnumeration.get(idx5 ++)), "ProtocolSupportEnumeration");
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -250,7 +250,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
             context.startAttribute("", "validUntil");
             try {
                 context.text(com.sun.msv.datatype.xsd.DateTimeType.theInstance.serializeJavaObject(((java.util.Calendar) _ValidUntil), null), "ValidUntil");
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
             context.endAttribute();
@@ -298,7 +298,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         while (idx5 != len5) {
             try {
                 idx5 += 1;
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 com.sun.identity.saml2.jaxb.assertion.impl.runtime.Util.handlePrintConversionException(this, e, context);
             }
         }
@@ -333,11 +333,11 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
         }
     }
 
-    public String ____jaxb____getId() {
-        return ((String) _ID);
+    public java.lang.String ____jaxb____getId() {
+        return ((java.lang.String) _ID);
     }
 
-    public Class getPrimaryInterface() {
+    public java.lang.Class getPrimaryInterface() {
         return (com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType.class);
     }
 
@@ -453,11 +453,11 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
             state = startState;
         }
 
-        public Object owner() {
+        public java.lang.Object owner() {
             return com.sun.identity.saml2.jaxb.metadata.impl.RoleDescriptorTypeImpl.this;
         }
 
-        public void enterElement(String ___uri, String ___local, String ___qname, org.xml.sax.Attributes __atts)
+        public void enterElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname, org.xml.sax.Attributes __atts)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -499,7 +499,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -509,7 +509,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  11 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 14;
                             eatText2(v);
                             continue outer;
@@ -519,7 +519,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  3 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -650,7 +650,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  6 :
                         attIdx = context.getAttribute("", "errorURL");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -663,47 +663,47 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
             }
         }
 
-        private void eatText1(final String value)
+        private void eatText1(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ID = context.addToIdTable(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText2(final String value)
+        private void eatText2(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ValidUntil = ((java.util.Calendar) com.sun.msv.datatype.xsd.DateTimeType.theInstance.createJavaObject(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value), null));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText3(final String value)
+        private void eatText3(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _CacheDuration = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        private void eatText4(final String value)
+        private void eatText4(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _ErrorURL = com.sun.xml.bind.WhiteSpaceProcessor.collapse(value);
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
 
-        public void leaveElement(String ___uri, String ___local, String ___qname)
+        public void leaveElement(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -741,7 +741,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -751,7 +751,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  11 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 14;
                             eatText2(v);
                             continue outer;
@@ -761,7 +761,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  3 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -828,7 +828,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  6 :
                         attIdx = context.getAttribute("", "errorURL");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -841,7 +841,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
             }
         }
 
-        public void enterAttribute(String ___uri, String ___local, String ___qname)
+        public void enterAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -924,7 +924,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
             }
         }
 
-        public void leaveAttribute(String ___uri, String ___local, String ___qname)
+        public void leaveAttribute(java.lang.String ___uri, java.lang.String ___local, java.lang.String ___qname)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -960,7 +960,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  0 :
                         attIdx = context.getAttribute("", "ID");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 3;
                             eatText1(v);
                             continue outer;
@@ -970,7 +970,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  11 :
                         attIdx = context.getAttribute("", "validUntil");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 14;
                             eatText2(v);
                             continue outer;
@@ -980,7 +980,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  3 :
                         attIdx = context.getAttribute("", "cacheDuration");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 6;
                             eatText3(v);
                             continue outer;
@@ -1044,7 +1044,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                     case  6 :
                         attIdx = context.getAttribute("", "errorURL");
                         if (attIdx >= 0) {
-                            final String v = context.eatAttribute(attIdx);
+                            final java.lang.String v = context.eatAttribute(attIdx);
                             state = 9;
                             eatText4(v);
                             continue outer;
@@ -1057,7 +1057,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
             }
         }
 
-        public void handleText(final String value)
+        public void handleText(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             int attIdx;
@@ -1082,7 +1082,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                         case  0 :
                             attIdx = context.getAttribute("", "ID");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 3;
                                 eatText1(v);
                                 continue outer;
@@ -1092,7 +1092,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                         case  11 :
                             attIdx = context.getAttribute("", "validUntil");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 14;
                                 eatText2(v);
                                 continue outer;
@@ -1102,7 +1102,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                         case  3 :
                             attIdx = context.getAttribute("", "cacheDuration");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 6;
                                 eatText3(v);
                                 continue outer;
@@ -1168,7 +1168,7 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                         case  6 :
                             attIdx = context.getAttribute("", "errorURL");
                             if (attIdx >= 0) {
-                                final String v = context.eatAttribute(attIdx);
+                                final java.lang.String v = context.eatAttribute(attIdx);
                                 state = 9;
                                 eatText4(v);
                                 continue outer;
@@ -1176,19 +1176,19 @@ public class RoleDescriptorTypeImpl implements com.sun.identity.saml2.jaxb.metad
                             state = 9;
                             continue outer;
                     }
-                } catch (RuntimeException e) {
+                } catch (java.lang.RuntimeException e) {
                     handleUnexpectedTextException(value, e);
                 }
                 break;
             }
         }
 
-        private void eatText5(final String value)
+        private void eatText5(final java.lang.String value)
             throws org.xml.sax.SAXException
         {
             try {
                 _getProtocolSupportEnumeration().add(com.sun.xml.bind.WhiteSpaceProcessor.collapse(value));
-            } catch (Exception e) {
+            } catch (java.lang.Exception e) {
                 handleParseConversionException(e);
             }
         }
