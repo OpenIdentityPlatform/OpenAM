@@ -228,17 +228,23 @@ public class EmbeddedOpenDS {
         }
 
         // copy OpenDJ jar file
+        // TODO Make this Dynamic, so we can eliminate versions on Jars.
         String[] opendsJarFiles = {
-            "OpenDJ.jar",
-            "je.jar",
-            "mail.jar"
+                "OpenDJ-2012-20-02.jar",                // Was OpenDJ.jar before Maven Support.
+                "sleepycat-je-2011-04-07.jar",          // Was je.jar before Maven Support.
+                "mail-1.4.5.jar"                        // Was mail.jar before Maven Support.
+        };
+        String[] NewOpendsJarFiles = {              //  We use this table to rename the files
+                "OpenDJ-2012-20-02.jar",               // Since OpenDJ seems to need je.jar by name
+                "je.jar",
+                "mail-1.4.5.jar"
         };
 
         for (int i = 0 ; i < opendsJarFiles.length; i++) {
             String jarFileName = "/WEB-INF/lib/" + opendsJarFiles[i];
             ReadableByteChannel inChannel =
                     Channels.newChannel(AMSetupServlet.getResourceAsStream(servletCtx, jarFileName));
-            FileChannel outChannel = new FileOutputStream(odsRoot + "/lib/" + opendsJarFiles[i]).getChannel();
+            FileChannel outChannel = new FileOutputStream(odsRoot + "/lib/" + NewOpendsJarFiles[i]).getChannel();
 
             try {
                 channelCopy(inChannel, outChannel);
@@ -1476,7 +1482,7 @@ public class EmbeddedOpenDS {
 
         if (configLdif.exists() && configLdif.isDirectory()) {
             String[] configFile = configLdif.list(new FilenameFilter() {
-                @Override
+                //@Override -- Not Allowed Here.
                 public boolean accept(File dir, String name) {
                     return name.startsWith(OPENDS_CONFIG_LDIF);
                 }
