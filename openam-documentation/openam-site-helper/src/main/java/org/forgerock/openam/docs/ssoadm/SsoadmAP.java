@@ -88,7 +88,7 @@ public class SsoadmAP extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations,
-            RoundEnvironment roundEnv) {
+                           RoundEnvironment roundEnv) {
         // Push Macro content into macros for use evaluating SubCommandInfos.
         for (Element e : roundEnv.getElementsAnnotatedWith(Macro.class)) {
             String name = e.getSimpleName().toString().replaceAll("_", "-");
@@ -120,12 +120,19 @@ public class SsoadmAP extends AbstractProcessor {
                     name, description, mandatory, optional));
         }
         if (roundEnv.processingOver()) {
-            StringBuilder content = readFile("src/main/docbkx/reference/man-ssoadm-1.header");
+            String cwd = null;
+            try {
+                cwd = new java.io.File( "." ).getCanonicalPath();
+            } catch (java.io.IOException e) {
+                // NoOp
+            }
+
+            StringBuilder content = readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.header");
             for (String subCommand : subcommands) {
                 content.append(subCommand);
             }
-            content.append(readFile("src/main/docbkx/reference/man-ssoadm-1.footer"));
-            writeFile("site-helper/target/generated-resources/man-ssoadm-1.xml", content.toString());
+            content.append(readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.footer"));
+            writeFile("openam-documentation/openam-site-helper/target/generated-resources/man-ssoadm-1.xml", content.toString());
         }
         return true;
     }
