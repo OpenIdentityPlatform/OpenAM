@@ -1,0 +1,97 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2PEPHosted.xml,v 1.4 2008/10/24 00:11:21 asyhuang Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="">       
+        <property>
+            <label name="lblProtocolSupportEnum" defaultValue="samlv2.entityDescriptor.provider.attribute.label.protocolSupportEnum" labelFor="txtProtocolSupportEnum" />
+            <cc name="txtProtocolSupportEnum" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag"></cc>
+             <fieldhelp name="helpProtocolSupportEnum" defaultValue="samlv2.entityDescriptor.pep.provider.attribute.help.protocolSupportEnum" />           
+        </property>                          
+        <property>
+            <label name="lblSigningKeyAlias" defaultValue="samlv2.entityDescriptor.provider.attribute.label.Signing.KeyAlias" labelFor="tfSigningKeyAlias" />
+            <cc name="signingCertAlias" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpSigningKeyAlias" defaultValue="samlv2.entityDescriptor.provider.attribute.help.Signing.KeyAlias" />
+        </property>                
+        <property>
+            <label name="lblEncryptionKeyAlias" defaultValue="samlv2.entityDescriptor.provider.attribute.label.Encryption.KeyAlias" labelFor="tfEncryptionKeyAlias" />
+            <cc name="encryptionCertAlias" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpEncryptionKeyAlias" defaultValue="samlv2.entityDescriptor.provider.attribute.help.Encryption.KeyAlias" />
+        </property>                                                  
+        <property>            
+            <label name="lblBasicAuth" defaultValue="samlv2.entityDescriptor.provider.attribute.label.basicAuth" labelFor="basicAuth" />          
+        </property>
+        <property>
+            <fieldhelp name="helpBasicAuth" defaultValue="samlv2.entityDescriptor.provider.attribute.help.basicAuth" />
+        </property>
+        <property>     
+            <ccgroup> 
+                <property>
+                    <label name="lblBasicAuthOn" defaultValue="label.Enable" labelFor="basicAuthOn" />
+                    <cc name="basicAuthOn" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag"></cc> 
+                </property>         
+                <property>
+                    <label name="lblBasicAuthUser" defaultValue="samlv2.entityDescriptor.provider.attribute.label.basicAuthUser" labelFor="basicAuthUser" />
+                    <cc name="basicAuthUser" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>                             
+                <property>
+                    <label name="lblBasicAuthPassword" defaultValue="samlv2.entityDescriptor.provider.attribute.label.basicAuthPassword" labelFor="basicAuthPassword" />
+                    <cc name="basicAuthPassword" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>    
+            </ccgroup>
+        </property>            
+        <property>
+            <label name="lblWantXACMLAuthzDecisionResponseSigned" defaultValue="samlv2.entityDescriptor.provider.attribute.label.wantXACMLAuthzDecisionResponseSigned" labelFor="wantXACMLAuthzDecisionResponseSigned" />
+            <cc name="wantXACMLAuthzDecisionResponseSigned" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="label.Signed" />
+            </cc>       
+              <fieldhelp name="helpWantXACMLAuthzDecisionResponseSigned" defaultValue="samlv2.entityDescriptor.provider.attribute.help.wantXACMLAuthzDecisionResponseSigned" />
+        </property>                   
+        <property>
+            <label name="lblWantAssertionEncrypted" defaultValue="samlv2.entityDescriptor.provider.attribute.label.wantAssertionEncrypted" labelFor="wantAssertionEncrypted" />
+            <cc name="wantAssertionEncrypted" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="label.Yes" />
+            </cc>
+            <fieldhelp name="helpWantAssertionEncrypted" defaultValue="samlv2.entityDescriptor.provider.attribute.help.wantAssertionEncrypted" />
+        </property>                  
+    </section>
+</propertysheet>

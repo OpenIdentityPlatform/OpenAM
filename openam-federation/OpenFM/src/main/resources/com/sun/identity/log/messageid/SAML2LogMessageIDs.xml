@@ -1,0 +1,2216 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: SAML2LogMessageIDs.xml,v 1.9 2010/01/23 00:06:23 exu Exp $
+
+-->
+
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="SAML2">
+    <logmessage name="INVALID_SP" id="1"
+        loglevel="LL_INFO"
+        description="Invalid Service Provider Identifier">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid Service Provider,cannot process request</item>
+        </triggers>
+        <actions>
+            <item>Check the Service Provider Name. </item> 
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_IDP" id="2"
+        loglevel="LL_INFO"
+        description="Invalid Identity Provider Identifier">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid Identity Provider,cannot process request</item>
+        </triggers>
+        <actions>
+            <item>Check the Identity Provider Name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="SP_METADATA_ERROR" id="3"
+        loglevel="LL_INFO"
+        description="Unable to retreive Service Provider Metadata.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot retrieve Service Provider Metadata</item>
+        </triggers>
+        <actions>
+            <item>Check the Data Store is accessible .</item> 
+            <item>Check the Realm name.</item> 
+            <item>Check the Service Provider Entity Identifier.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="IDP_METADATA_ERROR" id="4"
+        loglevel="LL_INFO"
+        description="Unable to retrieve Identity Provider Metadata.">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot retreive Identity Provider Metadata</item>
+        </triggers>
+        <actions>
+            <item>Check the Data Store is accessible .</item> 
+            <item>Check the Realm name.</item> 
+            <item>Check the Identity Provider Entity Identifier.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="SSO_NOT_FOUND" id="5"
+        loglevel="LL_INFO"
+        description="Unable to retrieve SingleSignOnService URL.">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Error retreiving SingleSignOnService URL.</item>
+        </triggers>
+        <actions>
+            <item>Check the Data Store is accessible .</item> 
+            <item>Check the Realm name.</item> 
+            <item>Check the Identity Provider Entity Identifier.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="REDIRECT_TO_SP" id="6"
+        loglevel="LL_INFO"
+        description="Redirecting to SingleSignOnService"> 
+        <datainfo>
+            <item>SingleSignOnService URL</item>
+        </datainfo>
+        <triggers>
+            <item>Sending Authentication Request by redirecting to Single SignOn Service URL.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+
+    <logmessage name="RESPONSE_NOT_FOUND_FROM_CACHE" id="7"
+        loglevel="LL_INFO"
+        description="Unable to retrieve Response using Response ID after local login.">
+        <datainfo>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Response doesn't exist in the SP cache.</item>
+        </triggers>
+        <actions>
+            <item>Check the SP cache clean up interval configuration.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_ARTIFACT" id="8"
+        loglevel="LL_INFO"
+        description="Unable to retrieve Artifact from HTTP Request.">
+        <datainfo/>
+        <triggers>
+            <item>SAMLart is missing from HTTP Request</item>
+        </triggers>
+        <actions>
+            <item>Check with sender.</item> 
+            <item>Check web container server log.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="RECEIVED_ARTIFACT" id="9"
+        loglevel="LL_INFO"
+        description="Received Artifact from HTTP Request.">
+        <datainfo>
+            <item>Artifact value</item>
+        </datainfo>
+        <triggers>
+            <item>Received Artifact from HTTP Request in the process of Single Sign On using Artifact Profile.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="IDP_NOT_FOUND" id="10"
+        loglevel="LL_INFO"
+        description="Unable to find Identity Provider Entity ID based on the SourceID in Artifact.">
+        <datainfo>
+            <item>Artifact value</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>No matching Identity Provider Entity ID found in meta data configuration.</item>
+        </triggers>
+        <actions>
+            <item>Check if Identity Provider's meta data is loaded.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="IDP_META_NOT_FOUND" id="11"
+        loglevel="LL_INFO"
+        description="Unable to load Identity Provider's meta data.">
+        <datainfo>
+            <item>Realm or organization name</item>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to load Identity Provider's meta data.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider Entity ID.</item>
+            <item>Check Realm or organization name.</item>
+            <item>Check if the identity provider's meta is loaded.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ARTIFACT_RESOLUTION_URL_NOT_FOUND" id="12"
+        loglevel="LL_INFO"
+        description="Unable to find Identity Provider's Artifact resolution service URL.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Artifact resolution service URL is not defined in Identity Provider's metadata.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider's meta data.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANNOT_CREATE_ARTIFACT_RESOLVE" id="13"
+        loglevel="LL_INFO"
+        description="Unable to create ArtifactResolve.">
+        <datainfo>
+            <item>Hosted Service Provider Entity ID</item>
+            <item>Artifact value</item>
+        </datainfo>
+        <triggers>
+            <item>Error when creating ArtifactResolve instance.</item>
+        </triggers>
+        <actions>
+            <item>Check implementation of ArtifactResolve.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANNOT_GET_SOAP_RESPONSE" id="14"
+        loglevel="LL_INFO"
+        description="Unable to obtain response from SOAP communication with Identity Provider's artifact resolution service.">
+        <datainfo>
+            <item>Hosted Service Provider Entity ID</item>
+            <item>Identity Provider's Artifact Resolution Service URL</item>
+        </datainfo>
+        <triggers>
+            <item>Error in SOAP communication.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider's Artifact Resolution Service URL.</item>
+            <item>Check SOAP message authentication requirements for Identity Provider's Artifact Resolution Service.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_RESPONSE_FROM_ARTIFACT" id="15"
+        loglevel="LL_INFO"
+        description="Obtained response using artifact profile.">
+        <datainfo>
+            <item>Hosted Service Provider Entity ID</item>
+            <item>Remote Identity Provider Entity ID</item>
+            <item>Artifact value</item>
+            <item>Response xml String if the log level was set to LL_FINE at run time</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On using Artifact Profile.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SOAP_ERROR" id="16"
+        loglevel="LL_INFO"
+        description="Unable to obtain Artifact Response due to SOAP error.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Error in SOAP communication.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration for Identity Provider</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SOAP_FAULT" id="17"
+        loglevel="LL_INFO"
+        description="Received SOAP Fault instead of Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Error in Identity Provider's Artifact Resolution.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider</item>
+            <item>Check debug file for detailed fault info.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="TOO_MANY_ARTIFACT_RESPONSE" id="18"
+        loglevel="LL_INFO"
+        description="Received too many Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Identity Provider sent more than one Artifact Response in SOAPMessage.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_ARTIFACT_RESPONSE" id="19"
+        loglevel="LL_INFO"
+        description="Unable to instantiate Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Error while instantiating Artifact Response.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider</item>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_ARTIFACT_RESPONSE" id="20"
+        loglevel="LL_INFO"
+        description="Unable to obtain Artifact Response from SOAP message.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>No ArtifactResponse is included in SOAPMessage.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ARTIFACT_RESPONSE_INVALID_SIGNATURE" id="21"
+        loglevel="LL_INFO"
+        description="Unable to verify signature on Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Error while trying to verify signature on ArtifactResponse.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration for Identity Provider</item>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ARTIFACT_RESPONSE_INVALID_INRESPONSETO" id="22"
+        loglevel="LL_INFO"
+        description="Invalid InResponseTo attribute in Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>InResponseTo attribute in Artifact Response is missing or doesn't match with Artifact Resolve ID.</item>
+        </triggers>
+        <actions>
+            <item>Check with Identity Provider</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ARTIFACT_RESPONSE_INVALID_ISSUER" id="23"
+        loglevel="LL_INFO"
+        description="Invalid Issuer in Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Issuer in Artifact Response is missing or doesn't match with Identity Provider Entity ID.</item>
+        </triggers>
+        <actions>
+            <item>Check with Identity Provider</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ARTIFACT_RESPONSE_INVALID_STATUS_CODE" id="24"
+        loglevel="LL_INFO"
+        description="Invalid status code in Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+            <item>Status code if the log level was set to LL_FINE at runtime</item>
+        </datainfo>
+        <triggers>
+            <item>Status in Artifact Response is missing or status code is not Success.</item>
+        </triggers>
+        <actions>
+            <item>Check with Identity Provider</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_RESPONSE_ARTIFACT" id="25"
+        loglevel="LL_INFO"
+        description="Unable to instantiate Respones from Artifact Response.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Error occurred while instantiating Response.</item>
+        </triggers>
+        <actions>
+            <item>Check debug file for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_SAML_RESPONSE_FROM_POST" id="26"
+        loglevel="LL_INFO"
+        description="SAML Response is missing from http post.">
+        <datainfo/>
+        <triggers>
+            <item>Parameter SAMLResponse is missing from http POST.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_RESPONSE_POST" id="27"
+        loglevel="LL_INFO"
+        description="Unable to instantiate Response from POST.">
+        <datainfo/>
+        <triggers>
+            <item>Error occurred while instantiating Response.</item>
+        </triggers>
+        <actions>
+            <item>Check debug file for more info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANNOT_DECODE_RESPONSE" id="28"
+        loglevel="LL_INFO"
+        description="Unable to decode Response.">
+        <datainfo/>
+        <triggers>
+            <item>Error occurred while decoding Response.</item>
+        </triggers>
+        <actions>
+            <item>Check debug file for more info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_RESPONSE_FROM_POST" id="29"
+        loglevel="LL_INFO"
+        description="Obtained response using POST profile.">
+        <datainfo>
+            <item>Response xml String if the log level was set to LL_FINE at runtime</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On using POST Profile.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="FED_INFO_WRITTEN" id="30"
+        loglevel="LL_INFO"
+        description="Written federation info.">
+        <datainfo>
+            <item>Username</item>
+            <item>NameIDInfo value string if the log level was set to LL_FINE at runtime</item>
+        </datainfo>
+        <triggers>
+            <item>Federation is done.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="REDIRECT_TO_IDP" id="31"
+        loglevel="LL_INFO"
+        description="Redirect request to IDP.">
+        <datainfo>
+            <item>redirection url</item>
+        </datainfo>
+        <triggers>
+            <item>Single logout.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="NO_ACS_URL" id="32"
+        loglevel="LL_INFO"
+        description="Unable to find Assertion Consumer Service URL.">
+        <datainfo>
+            <item>meta alias</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="NO_RETURN_BINDING" id="33"
+        loglevel="LL_INFO"
+        description="Unable to find return binding.">
+        <datainfo>
+            <item>meta alias</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="POST_TO_TARGET_FAILED" id="34"
+        loglevel="LL_INFO"
+        description="Unable to post the response to target.">
+        <datainfo>
+            <item>Assertion Consumer Service URL</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On with POST binding.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_CREATE_ARTIFACT" id="35"
+        loglevel="LL_INFO"
+        description="Unable to create an artifact.">
+        <datainfo>
+            <item>IDP entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On with Artifact binding.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="RECEIVED_AUTHN_REQUEST" id="36"
+        loglevel="LL_INFO"
+        description="Received AuthnRequest.">
+        <datainfo>
+            <item>SP entity ID</item>
+            <item>IDP meta alias</item>
+            <item>authnRequest xml string</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="POST_RESPONSE" id="37"
+        loglevel="LL_INFO"
+        description="Post response to SP.">
+        <datainfo>
+            <item>SP entity ID</item>
+            <item>IDP meta alias</item>
+            <item>response xml string</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On with POST binding.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SEND_ARTIFACT" id="38"
+        loglevel="LL_INFO"
+        description="Send an artifact to SP.">
+        <datainfo>
+            <item>IDP entity ID</item>
+            <item>IDP realm</item>
+            <item>redirect URL</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On with Artifact binding.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_SOAP_MESSAGE" id="39"
+        loglevel="LL_INFO"
+        description="Encounter invalid SOAP message in IDP.">
+        <datainfo>
+            <item>IDP entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On with Artifact binding.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ARTIFACT_RESPONSE" id="40"
+        loglevel="LL_INFO"
+        description="The artifact response being sent to SP.">
+        <datainfo>
+            <item>IDP entity ID</item>
+            <item>artifact string</item>
+            <item>artifact response</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On with Artifact binding.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="GOT_ENTITY_DESCRIPTOR" id="41"
+        loglevel="LL_FINE"
+        description="Entity descriptor obtained.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_REALM_GET_ENTITY_DESCRIPTOR" id="42"
+        loglevel="LL_INFO"
+        description="Invaid realm while getting entity descriptor.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_INVALID_ENTITY_DESCRIPTOR" id="43"
+        loglevel="LL_INFO"
+        description="Obtained invalid entity descriptor.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Delete invalid entity descriptor and import it again.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ENTITY_DESCRIPTOR" id="44"
+        loglevel="LL_INFO"
+        description="Configuration error while getting entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_ID_SET_ENTITY_DESCRIPTOR" id="45"
+        loglevel="LL_INFO"
+        description="No entity ID while setting entity descriptor.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Set entity ID in entity descriptor.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_SET_ENTITY_DESCRIPTOR" id="46"
+        loglevel="LL_INFO"
+        description="Invaid realm while setting entity descriptor.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_DESCRIPTOR_SET_ENTITY_DESCRIPTOR" id="47"
+        loglevel="LL_INFO"
+        description="Entity descriptor doesn't exist while setting entity descriptor.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Create entity descriptor before set.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="SET_ENTITY_DESCRIPTOR" id="48"
+        loglevel="LL_INFO"
+        description="Entity descriptor was set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_SET_ENTITY_DESCRIPTOR" id="49"
+        loglevel="LL_INFO"
+        description="Configuration error while setting entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_INVALID_ENTITY_DESCRIPTOR" id="50"
+        loglevel="LL_INFO"
+        description="Invalid entity descriptor to set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check entity descriptor if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_ID_CREATE_ENTITY_DESCRIPTOR" id="51"
+        loglevel="LL_INFO"
+        description="No entity ID while creating entity descriptor.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Set entity ID in entity descriptor.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_CREATE_ENTITY_DESCRIPTOR" id="52"
+        loglevel="LL_INFO"
+        description="Invaid realm while creating entity descriptor.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_DESCRIPTOR_EXISTS" id="53"
+        loglevel="LL_INFO"
+        description="Entity descriptor exists while creating entity descriptor.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Delete existing entity descriptor first.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_DESCRIPTOR_CREATED" id="54"
+        loglevel="LL_INFO"
+        description="Entity descriptor was created.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_CREATE_ENTITY_DESCRIPTOR" id="55"
+        loglevel="LL_INFO"
+        description="Configuration error while creating entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CREATE_INVALID_ENTITY_DESCRIPTOR" id="56"
+        loglevel="LL_INFO"
+        description="Invalid entity descriptor to create.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check entity descriptor if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_DELETE_ENTITY_DESCRIPTOR" id="57"
+        loglevel="LL_INFO"
+        description="Invaid realm while deleting entity descriptor.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_DESCRIPTOR_DELETE_ENTITY_DESCRIPTOR" id="58"
+        loglevel="LL_INFO"
+        description="Entity descriptor doesn't exist while deleting entity descriptor.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ENTITY_DESCRIPTOR_DELETED" id="59"
+        loglevel="LL_INFO"
+        description="Entity descriptor was deleted.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_DELETE_ENTITY_DESCRIPTOR" id="60"
+        loglevel="LL_INFO"
+        description="Configuration error while deleting entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ENTITY_CONFIG" id="61"
+        loglevel="LL_FINE"
+        description="Entity config obtained.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_REALM_GET_ENTITY_CONFIG" id="62"
+        loglevel="LL_INFO"
+        description="Invaid realm while getting entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_INVALID_ENTITY_CONFIG" id="63"
+        loglevel="LL_INFO"
+        description="Obtained invalid entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions>
+            <item>Delete invalid entity config and import it again.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ENTITY_CONFIG" id="64"
+        loglevel="LL_INFO"
+        description="Configuration error while getting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_ID_SET_ENTITY_CONFIG" id="65"
+        loglevel="LL_INFO"
+        description="No entity ID while setting entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Set entity ID in entity config.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_SET_ENTITY_CONFIG" id="66"
+        loglevel="LL_INFO"
+        description="Invaid realm while setting entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_DESCRIPTOR_SET_ENTITY_CONFIG" id="67"
+        loglevel="LL_INFO"
+        description="Entity config doesn't exist while setting entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Create entity descriptor before set entity config.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="SET_ENTITY_CONFIG" id="68"
+        loglevel="LL_INFO"
+        description="Entity config was set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_SET_ENTITY_CONFIG" id="69"
+        loglevel="LL_INFO"
+        description="Configuration error while setting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_INVALID_ENTITY_CONFIG" id="70"
+        loglevel="LL_INFO"
+        description="Invalid entity config to set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check entity config if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_ID_CREATE_ENTITY_CONFIG" id="71"
+        loglevel="LL_INFO"
+        description="No entity ID while creating entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Set entity ID in entity config.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_CREATE_ENTITY_CONFIG" id="72"
+        loglevel="LL_INFO"
+        description="Invaid realm while creating entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_DESCRIPTOR_CREATE_ENTITY_CONFIG" id="73"
+        loglevel="LL_INFO"
+        description="Entity config doesn't exist while creating entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Create entity descriptor before create entity config.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_EXISTS" id="74"
+        loglevel="LL_INFO"
+        description="Entity config exists while creating entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Delete existing entity config first.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_CREATED" id="75"
+        loglevel="LL_INFO"
+        description="Entity config was created.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_CREATE_ENTITY_CONFIG" id="76"
+        loglevel="LL_INFO"
+        description="Configuration error while creating entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CREATE_INVALID_ENTITY_CONFIG" id="77"
+        loglevel="LL_INFO"
+        description="Invalid entity config to create.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check entity config if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_DELETE_ENTITY_CONFIG" id="78"
+        loglevel="LL_INFO"
+        description="Invaid realm while deleting entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_CONFIG_DELETE_ENTITY_CONFIG" id="79"
+        loglevel="LL_INFO"
+        description="Entity config doesn't exist while deleting entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_DELETED" id="80"
+        loglevel="LL_INFO"
+        description="Entity config was deleted.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_DELETE_ENTITY_CONFIG" id="81"
+        loglevel="LL_INFO"
+        description="Configuration error while deleting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_GET_ALL_HOSTED_ENTITIES" id="82"
+        loglevel="LL_INFO"
+        description="Invaid realm while getting all hosted entities.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all hosted entities.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_HOSTED_ENTITIES" id="83"
+        loglevel="LL_INFO"
+        description="Configuration error while getting all hosted entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all hosted entities.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ALL_HOSTED_ENTITIES" id="84"
+        loglevel="LL_FINE"
+        description="Obtained all hosted entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all hosted entities.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_REALM_GET_ALL_REMOTE_ENTITIES" id="85"
+        loglevel="LL_INFO"
+        description="Invaid realm while getting all remote entities.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all remote entities.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_REMOTE_ENTITIES" id="86"
+        loglevel="LL_INFO"
+        description="Configuration error while getting all remote entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all remote entities.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ALL_REMOTE_ENTITIES" id="87"
+        loglevel="LL_FINE"
+        description="Obtained all remote entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all remote entities.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_INRESPONSETO_RESPONSE" id="88"
+        loglevel="LL_INFO"
+        description="InResponseTo attribute in Response is invalid.">
+        <datainfo>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service Provider received a Response for Single Sign On.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_ISSUER_RESPONSE" id="89"
+        loglevel="LL_INFO"
+        description="Issuer in Response is invalid.">
+        <datainfo>
+            <item>Hosted Entity ID</item>
+            <item>Name of Realm or organization</item>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Issuer in Response is not configured or not trusted by the hosted provider</item>
+        </triggers>
+        <actions>
+            <item>Check configuration.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="WRONG_STATUS_CODE" id="90"
+        loglevel="LL_INFO"
+        description="Status code in Response was not Success.">
+        <datainfo>
+            <item>Response ID</item>
+            <item>Status code (if log level is set to LL_FINE)</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider received a Response with wrong Status code. Most likely an error occurred at Identity Provider.</item>
+        </triggers>
+        <actions>
+            <item>Check the status code. Contact Identity Provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ASSERTION_NOT_ENCRYPTED" id="91"
+        loglevel="LL_INFO"
+        description="Assertion in Response was not encrypted.">
+        <datainfo>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider requested the assertion in Response to be encrypted, but it received a Response with unencrypted assertion(s).</item>
+        </triggers>
+        <actions>
+            <item>Check configuration. Notify Identity Provider regarding the requirement.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_ASSERTION" id="92"
+        loglevel="LL_INFO"
+        description="Response had no Assertion.">
+        <datainfo>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider received a Response for Single Sign On, but the response contained no Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check error code of the Response. Notify Identity Provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_ISSUER_ASSERTION" id="93"
+        loglevel="LL_INFO"
+        description="Issuer in Assertion is not valid.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Issuer in Assertion for single sign on was not configured at service provider, or not trusted by the service provider.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISMATCH_ISSUER_ASSERTION" id="94"
+        loglevel="LL_INFO"
+        description="Issuer in Assertion didn't match the Issuer in Response or other Assertions in the Response.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider received Response which had mismatch Issuer inside the Assertion it contained.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_SIGNATURE_ASSERTION" id="95"
+        loglevel="LL_INFO"
+        description="Assertion is not signed or signature is not valid.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider requested the Assertion to be signed but the assertion received was not; or the signature on the Assertion received was not valid.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration; check debug for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_SUBJECT_COMFIRMATION_DATA" id="96"
+        loglevel="LL_INFO"
+        description="SubjectConfirmationData had no Subject.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider received an Assertion whose SubjectConfirmationData had no Subject.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Contact Identity Provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_RECIPIENT" id="97"
+        loglevel="LL_INFO"
+        description="SubjectConfirmationData had no Recipient.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider received an Assertion whose SubjectConfirmationData had no Recipient.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Contact Identity Provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="WRONG_RECIPIENT" id="98"
+        loglevel="LL_INFO"
+        description="Service Provider is not the intended recipient.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider received an Assertion. But the provider is not the intended recipient of the Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Check meta data. Contact Identity Provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_TIME_SUBJECT_CONFIRMATION_DATA" id="99"
+        loglevel="LL_INFO"
+        description="Time in SubjectConfirmationData of the Assertion is invalid.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>The assertion service provider received had expired timewise.</item>
+        </triggers>
+        <actions>
+            <item>Synchronize the time between service provider and identity provider. Increase the time skew attribute for the service provider in its entity config.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONTAINED_NOT_BEFORE" id="100"
+        loglevel="LL_INFO"
+        description="SubjectConfirmationData of the Assertion had NotBefore.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>The assertion service provider received had NotBefore.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Contact identity provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="WRONG_INRESPONSETO_ASSERTION" id="101"
+        loglevel="LL_INFO"
+        description="Assertion contained wrong InResponseTo attribute.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>InResponseTo in Assertion is different from the one in Response. Or Assertion didn't contain InResponseTo, but Response did.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Contact identity provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_CONDITIONS" id="102"
+        loglevel="LL_INFO"
+        description="Assertion contained no Conditions.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Conditions is missing from the Single Sign On Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Contact identity provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_AUDIENCE_RESTRICTION" id="103"
+        loglevel="LL_INFO"
+        description="Assertion contained no AudienceRestriction.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>AudienceRestriction is missing from the Single Sign On Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Contact identity provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="WRONG_AUDIENCE" id="104"
+        loglevel="LL_INFO"
+        description="Assertion contained wrong Audience.">
+        <datainfo>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>This service provider was not the intended audience of the single sign on assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check debug for the Assertion received. Check meta data. Contact identity provider if needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="FOUND_AUTHN_ASSERTION" id="105"
+        loglevel="LL_INFO"
+        description="Found authentication assertion in the Response.">
+        <datainfo>
+            <item>Assertion ID</item>
+            <item>Subject if the log level was set to LL_FINE</item>
+            <item>SesionIndex if any</item>
+        </datainfo>
+        <triggers>
+            <item>Both the Response and Assertion(s) inside the Response are valid.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_SSOTOKEN" id="106"
+        loglevel="LL_INFO"
+        description="Invalid SSOToken found in Request.">
+        <datainfo>
+            <item>SSOToken value</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate Single Logout without SSOToken.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="MISSING_ENTITY" id="107"
+        loglevel="LL_INFO"
+        description="No entity ID is specified in Request.">
+        <datainfo>
+            <item>EntityID value</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate Request without EntityID.</item>
+        </triggers>
+        <actions>
+            <item>Specify EntityID parameter in request URL.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_META_ALIAS" id="108"
+        loglevel="LL_INFO"
+        description="No metaAlias is specified in Request.">
+        <datainfo>
+            <item>MetaAlias value</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate Request without metaAlias.</item>
+        </triggers>
+        <actions>
+            <item>Specify metaAlias parameter in request URL.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="REDIRECT_TO_AUTH" id="109"
+        loglevel="LL_INFO"
+        description="Redirect request to authentication page.">
+        <datainfo>
+            <item>URL to Authentication page</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate Request without SSOToken.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_DECODE_REQUEST" id="110"
+        loglevel="LL_INFO"
+        description="Can not decode URL encoded Query parameter.">
+        <datainfo>
+            <item>URL encoded Query parameter</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate to decode incorrectly URL encoded Query parameter.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_MNI_RESPONSE" id="111"
+        loglevel="LL_INFO"
+        description="Can not instantiate MNI Response with input xml.">
+        <datainfo>
+            <item>Input XML string for MNI Response</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate parse MNI Response with incorrect XML string.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_MNI_REQUEST" id="112"
+        loglevel="LL_INFO"
+        description="Can not instantiate MNI Request with input XML.">
+        <datainfo>
+            <item>Input XML string for MNI Request</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate parse MNI Request with incorrect XML string.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_SLO_RESPONSE" id="113"
+        loglevel="LL_INFO"
+        description="Can not instantiate SLO Response with input XML.">
+        <datainfo>
+            <item>Input XML string for SLO Response</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate parse SLO Response with incorrect XML string.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_SLO_REQUEST" id="114"
+        loglevel="LL_INFO"
+        description="Can not instantiate SLO Request with input XML.">
+        <datainfo>
+            <item>Input XML string for SLO Request</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate parse SLO Request with incorrect XML string.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="MNI_REQUEST_INVALID_SIGNATURE" id="115"
+        loglevel="LL_INFO"
+        description="Can not varify signature in MNI Request.">
+        <datainfo>
+            <item>MNI Request with signature</item>
+        </datainfo>
+        <triggers>
+            <item>Sinature in MNI Request is incorrect.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="MNI_RESPONSE_INVALID_SIGNATURE" id="116"
+        loglevel="LL_INFO"
+        description="Can not valify signature in MNI Response.">
+        <datainfo>
+            <item>MNI Response with signature</item>
+        </datainfo>
+        <triggers>
+            <item>Sinature in MNI Response is incorrect.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SLO_REQUEST_INVALID_SIGNATURE" id="117"
+        loglevel="LL_INFO"
+        description="Can not valify signature in SLO Request.">
+        <datainfo>
+            <item>SLO Request with signature</item>
+        </datainfo>
+        <triggers>
+            <item>Sinature in SLO Request is incorrect.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SLO_RESPONSE_INVALID_SIGNATURE" id="118"
+        loglevel="LL_INFO"
+        description="Can not valify signature in SLO Response.">
+        <datainfo>
+            <item>SLO Response with signature</item>
+        </datainfo>
+        <triggers>
+            <item>Sinature in SLO Response is incorrect.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="NAMEID_INVALID_ENCRYPTION" id="119"
+        loglevel="LL_INFO"
+        description="Can not decrypt EncryptedID.">
+        <datainfo>
+            <item>Exception message</item>
+        </datainfo>
+        <triggers>
+            <item>Decrypt the incorrectly encrypted EncryptedID.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_MNI_RESPONSE" id="120"
+        loglevel="LL_INFO"
+        description="MNI Response has error status.">
+        <datainfo>
+            <item>Status message</item>
+        </datainfo>
+        <triggers>
+            <item>Requested MNI Request caused problem.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_SLO_RESPONSE" id="121"
+        loglevel="LL_INFO"
+        description="SLO Response has error status.">
+        <datainfo>
+            <item>Status message</item>
+        </datainfo>
+        <triggers>
+            <item>Requested SLO Request caused problem.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="MISSING_ENTITY_ROLE" id="122"
+        loglevel="LL_INFO"
+        description="Entity Role is not specified in the request.">
+        <datainfo>
+            <item>Entity Role value</item>
+        </datainfo>
+        <triggers>
+            <item>Initiate request without Role value.</item>
+        </triggers>
+        <actions>
+            <item>Specify Entity Role parameter in the request.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_ISSUER_REQUEST" id="123"
+        loglevel="LL_INFO"
+        description="Issuer in Request is invalid.">
+        <datainfo>
+            <item>Hosted Entity ID</item>
+            <item>Name of Realm or organization</item>
+            <item>Request ID</item>
+        </datainfo>
+        <triggers>
+            <item>Issuer in Request is not configured or not trusted by the hosted provider</item>
+        </triggers>
+        <actions>
+            <item>Check configuration.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_GET_ALL_ENTITIES" id="124"
+        loglevel="LL_INFO"
+        description="Invaid realm while getting all entities.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all entities.</item>
+        </triggers>
+        <actions>
+            <item>Check the Realm name.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_ENTITIES" id="125"
+        loglevel="LL_INFO"
+        description="Configuration error while getting all entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all entities.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ALL_ENTITIES" id="126"
+        loglevel="LL_FINE"
+        description="Obtained all entities.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all entities.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="INVALID_PEP_ID" id="127"
+         loglevel="LL_INFO"
+         description="Invalid Policy Enforcement Point (PEP) Identifier.">
+        <datainfo>
+            <item>PEP Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot retrieve PEP Metadata</item>
+        </triggers>
+        <actions>
+            <item>Provide valid PEP Identifier and retry.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_PDP_ID" id="128"
+         loglevel="LL_INFO"
+         description="Invalid Policy Decision Point (PDP) Identifier.">
+        <datainfo>
+            <item>PDP Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot retrieve PDP Metadata</item>
+        </triggers>
+        <actions>
+            <item>Provide valid PDP Identifier and retry.</item>
+        </actions>
+    </logmessage>
+     <logmessage name="NULL_PDP_SIGN_CERT_ALIAS" id="129"
+        loglevel="LL_INFO"
+        description="Certificate Alias is null, cannot sign the message. ">
+        <datainfo>
+            <item>The realm from which the metadata was retreived.</item>
+            <item>Entity Identifier for the Policy Decision Point.</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot sign the message.</item>
+        </triggers>
+        <actions>
+            <item>
+                Check the entity's metadata to verify the certificate
+                alias is correct.
+            </item>
+        </actions>
+    </logmessage>
+    <logmessage name="NULL_PEP_SIGN_CERT_ALIAS" id="130"
+        loglevel="LL_INFO"
+        description="Certificate Alias is null,cannot retreive the 
+                    certificate."
+     >
+        <datainfo>
+            <item>The realm from which the metadata was retreived.</item>
+            <item>Entity Identifier for the Policy Enforcement Point.</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot validate the signature in the request message.</item>
+        </triggers>
+        <actions>
+            <item>
+                Check the entity's metadata to verify the certificate
+                alias is correct.
+            </item>
+        </actions>
+    </logmessage>
+     <logmessage name="INVALID_SIGNATURE_QUERY" id="131"
+        loglevel="LL_INFO"
+        description="Invalid Signature in Query Request. ">
+        <datainfo>
+            <item>The realm from which the metadata was retreived.</item>
+            <item>Entity Identifier for the Policy Decision Point.</item>
+            <item>Cert Alias used to retrieve certificate from keystore.</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot process the request, server will send back error
+                to the Requester.
+            </item>
+        </triggers>
+        <actions>
+            <item>
+                Check the entity's metadata to verify the certificate
+                alias is correct.
+            </item>
+            <item>
+                Check the certificate in the keystore for its existance 
+                and validity.
+            </item>
+        </actions>
+    </logmessage>
+     <logmessage name="INVALID_ISSUER_IN_PEP_REQUEST" id="132"
+        loglevel="LL_INFO"
+        description="Issuer in Request is invalid.">
+        <datainfo>
+            <item>Name of Realm or organization</item>
+            <item>Identity of the Issuer</item>
+            <item>Hosted Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Issuer in Request is not configured or not trusted by the 
+                  hosted provider therefore Query will fail.</item>
+        </triggers>
+        <actions>
+            <item>Check the hosted entity configuration attribute cotlist to 
+                  make sure the issuer identifier is in the list.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="PEP_METADATA_ERROR" id="133"
+        loglevel="LL_INFO"
+        description="Unable to retreive Policy Enforcement Point (PEP) Metadata.">
+        <datainfo>
+            <item>PEP Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot retrieve PEP Provider Metadata</item>
+        </triggers>
+        <actions>
+            <item>Check the Data Store is accessible .</item> 
+            <item>Check the PEP Provider Entity Identifier.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="PDP_METADATA_ERROR" id="134"
+        loglevel="LL_INFO"
+        description="Unable to retrieve Policy Decision Point (PDP) Metadata.">
+        <datainfo>
+            <item>PDP Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot retreive PDP Provider Metadata</item>
+        </triggers>
+        <actions>
+            <item>Check the Data Store is accessible .</item> 
+            <item>Check the PDP Provider Entity Identifier.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ASSERTION_FROM_PDP_NOT_ENCRYPTED" id="135"
+        loglevel="LL_INFO"
+        description="Assertion in Response not encrypted.">
+        <datainfo>
+            <item>Identity of the Issuer</item>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Policy Enforcement Point (PEP) Provider requested the 
+                  assertion in Response to be encrypted, but it received a 
+                  Response with unencrypted assertion(s).</item>
+        </triggers>
+        <actions>
+            <item>Check PEP metadata published to the PDP. Notify 
+                  Policy Decision Point (PDP) Provider regarding the 
+                  requirement.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_ASSERTION_IN_PDP_RESPONSE" id="136"
+        loglevel="LL_INFO"
+        description="Response has no Assertion.">
+        <datainfo>
+            <item>Identity of Issuer</item>
+            <item>Response ID</item>
+        </datainfo>
+        <triggers>
+            <item>Policy Enforcement Point (PEP) Provider received a Response 
+                  with no Assertion.</item>
+        </triggers>
+        <actions>
+            <item>Check error code of the Response. Notify 
+                Policy Decision Point (PDP) Provider to check for errors or 
+                possible misconfiguration.</item>
+        </actions>
+    </logmessage>
+        <logmessage name="INVALID_ISSUER_IN_ASSERTION_FROM_PDP" id="137"
+        loglevel="LL_INFO"
+        description="Issuer in Assertion is not valid.">
+        <datainfo>
+            <item>Assertion Issuer</item>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Issuer in Assertion  was not configured 
+                  at Policy Enforcement Point (PEP) provider, 
+                  or not trusted by the PEP provider.</item>
+        </triggers>
+        <actions>
+            <item>Check the configuration.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISMATCH_ISSUER_IN_ASSERTION_FROM_PDP" id="138"
+        loglevel="LL_INFO"
+        description="Issuer in Assertion doesn't match the Issuer in Response.">
+        <datainfo>
+            <item>Issuer Identifier in the Resposnse</item>
+            <item>Issuer Identity in the Assertion</item>
+        </datainfo>
+        <triggers>
+            <item>Error condition, Response will not be accepted.</item>
+        </triggers>
+        <actions>
+            <item>Check the Policy Decision Point instance  
+                  to debug the cause of the problem.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_SIGNATURE_ASSERTION_FROM_PDP" id="139"
+        loglevel="LL_INFO"
+        description="Assertion is not signed or signature is not valid.">
+        <datainfo>
+            <item>Issuer Identity in the Assertion</item>
+            <item>Assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Policy Enforcement Point (PEP) provider requested the Assertion to be signed but the assertion received was not; or the signature on the Assertion received was not valid.</item>
+        </triggers>
+        <actions>
+            <item>Check PEP metadata configuration.</item>
+            <item>Check debug for more detailed error message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="REQUEST_MESSAGE" id="140"
+                loglevel="LL_FINE"
+                description="Request message from Query Requester">
+        <datainfo>
+            <item>policy decision point entity descriptor</item>
+            <item>SAMLv2 Query Request Message</item>
+        </datainfo>
+        <triggers>
+            <item>SAMLv2 SOAP Query</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    
+    <logmessage name="VALID_SIGNATURE_QUERY" id="141"
+        loglevel="LL_INFO"
+        description="Valid Signature in Query Request. ">
+        <datainfo>
+            <item>The realm from which the metadata was retreived.</item>
+            <item>Entity Identifier for the Policy Decision Point.</item>
+            <item>Cert Alias used to retrieve certificate from keystore.</item>
+        </datainfo>
+        <triggers>
+            <item>The Request will be processed.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCESS_FED_SSO" id="142"
+        loglevel="LL_INFO"
+        description="Successful federation/Single Sign On.">
+        <datainfo>
+            <item>user id</item>
+            <item>NameID value</item>
+        </datainfo>
+        <triggers>
+            <item>Successful federation/Single Sign On.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SAE_IDP_SUCCESS" id="143"
+        loglevel="LL_INFO"
+        description="SAE_IDP succeeded.">
+        <datainfo>
+            <item>SAE attributes</item>
+        </datainfo>
+        <triggers>
+            <item>SAE_IDP succeeded.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SAE_IDP_ERROR" id="144"
+        loglevel="LL_INFO"
+        description="SAE_IDP failed.">
+        <datainfo>
+            <item>Error message</item>
+            <item>SAE attributes</item>
+        </datainfo>
+        <triggers>
+            <item>SAE_IDP failed.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SAE_IDP_ERROR_NODATA" id="145"
+        loglevel="LL_INFO"
+        description="SAE_IDP invoked without attributes.">
+        <datainfo>
+            <item>Error message</item>
+        </datainfo>
+        <triggers>
+            <item>SAE_IDP invoked without attributes.</item>
+        </triggers>
+        <actions>
+            <item>Add SAE attributes to request.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SAE_IDP_AUTH" id="146"
+        loglevel="LL_INFO"
+        description="SAE_IDP delegated to Auth.">
+        <datainfo>
+            <item>SAE attributes</item>
+        </datainfo>
+        <triggers>
+            <item>SAE_IDP invoked but no user session.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SAE_SP_SUCCESS" id="147"
+        loglevel="LL_INFO"
+        description="SAE_SP succeeded.">
+        <datainfo>
+            <item>SAE attributes</item>
+        </datainfo>
+        <triggers>
+            <item>SAE_SP succeeded.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SAE_SP_ERROR" id="148"
+        loglevel="LL_INFO"
+        description="SAE_SP failed.">
+        <datainfo>
+            <item>Error message</item>
+        </datainfo>
+        <triggers>
+            <item>SAE_SP failed.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SEND_ECP_RESPONSE" id="149"
+        loglevel="LL_INFO"
+        description="Send a response to ECP.">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+            <item>Realm or organization name</item>
+            <item>Assertion Consumer Service URL</item>
+            <item>SOAP message string if the log level was set to LL_FINE at run time</item>
+        </datainfo>
+        <triggers>
+            <item>Received AuthnRequest.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SEND_ECP_RESPONSE_FAILED" id="150"
+        loglevel="LL_INFO"
+        description="Unable to send a response to ECP.">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+            <item>Realm or organization name</item>
+            <item>Assertion Consumer Service URL</item>
+        </datainfo>
+        <triggers>
+            <item>Send a response to ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_SOAP_MESSAGE_ECP" id="151"
+        loglevel="LL_INFO"
+        description="Unable to instantiate a SOAP message sent from ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Received a response from ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="RECEIVE_SOAP_FAULT_ECP" id="152"
+        loglevel="LL_INFO"
+        description="Received a SOAP fault from ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Received a response from ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CANNOT_INSTANTIATE_SOAP_MESSAGE_ECP" id="153"
+        loglevel="LL_INFO"
+        description="Unable to instantiate a SAML Response sent from ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Received a response from ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ECP_ASSERTION_NOT_SIGNED" id="154"
+        loglevel="LL_INFO"
+        description="Assertion received from ECP is not signed.">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Received a response from ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ECP_ASSERTION_INVALID_SIGNATURE" id="155"
+        loglevel="LL_INFO"
+        description="Assertion received from ECP has invalid signature.">
+        <datainfo>
+            <item>Identity Provider Entity Identifier</item>
+        </datainfo>
+        <triggers>
+            <item>Assertion signature verification.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="RECEIVED_AUTHN_REQUEST_ECP" id="156"
+        loglevel="LL_INFO"
+        description="Received AuthnRequest from ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+            <item>IDP meta alias</item>
+            <item>authnRequest xml string</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="RECEIVED_HTTP_REQUEST_ECP" id="157"
+        loglevel="LL_INFO"
+        description="Received HTTP request from ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>ECP accessed SP Resource.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SEND_ECP_PAOS_REQUEST" id="158"
+        loglevel="LL_INFO"
+        description="Send a PAOS request to ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+            <item>Realm or organization name</item>
+            <item>SOAP message string if the log level was set to LL_FINE at run time</item>
+        </datainfo>
+        <triggers>
+            <item>Received HTTP request from ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SEND_ECP_PAOS_REQUEST_FAILED" id="159"
+        loglevel="LL_INFO"
+        description="Unable to send a PAOS request to ECP.">
+        <datainfo>
+            <item>Service Provider Entity Identifier</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Send a PAOS request to ECP.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="SUCCESS_FED_TERMINATION" id="160"
+        loglevel="LL_INFO"
+        description="Federation termination succeeded.">
+        <datainfo>
+            <item>user id</item>
+        </datainfo>
+        <triggers>
+            <item>Federation termination succeeded.</item>
+        </triggers>
+        <actions/>
+    </logmessage>    
+    <logmessage name="SUCCESS_NEW_NAMEID" id="161"
+        loglevel="LL_INFO"
+        description="New name identifier succeeded.">
+        <datainfo>
+            <item>user id</item>
+        </datainfo>
+        <triggers>
+            <item>New name identifier succeeded.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="UNKNOWN_PRINCIPAL" id="162"
+        loglevel="LL_INFO"
+        description="Unknown princial in manage name ID request.">
+        <datainfo>
+            <item>Manage Name ID request XML</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to find old name id in the management name id request.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="UNABLE_TO_TERMINATE" id="163"
+        loglevel="LL_INFO"
+        description="Unable to terminate federation.">
+        <datainfo>
+            <item>user id</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to terminate federation.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="POST_RESPONSE_INVALID_SIGNATURE" id="164"
+        loglevel="LL_INFO"
+        description="Unable to verify signature in Single Sign-On Response using POST binding.">
+        <datainfo>
+            <item>Identity Provider Entity ID</item>
+        </datainfo>
+        <triggers>
+            <item>Error while trying to verify signature in Response.</item>
+        </triggers>
+        <actions>
+            <item>Check Identity Provider metadata</item>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="BINDING_NOT_SUPPORTED" id="165"
+        loglevel="LL_INFO"
+        description="Binding is not supported.">
+        <datainfo>
+            <item>Provider Entity ID</item>
+            <item>Name of binding that is not supported</item>
+        </datainfo>
+        <triggers>
+            <item>Hosted provider received data from unsupported binding endpoint.</item>
+        </triggers>
+        <actions>
+            <item>Check Provider metadata</item>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SP_SSO_FAILED" id="166"
+        loglevel="LL_INFO"
+        description="Single Sign-On Failed at Service Provider.">
+        <datainfo>
+            <item>Hosted Service Provider Entity ID</item>
+            <item>Error message</item>
+            <item>Response received from IDP if the log level was set to LL_FINE at run time</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On failed</item>
+        </triggers>
+        <actions>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_REALM_FOR_SESSION" id="167"
+        loglevel="LL_INFO"
+        description="Invalid realm for the user trying to get an assertion from the IdP.">
+        <datainfo>
+            <item>Realm of the authenticated user</item>
+            <item>Realm where the IdP is defined</item>
+            <item>Entity Id of the SP</item>
+            <item>IP Address of the requester</item>
+            <item>SAML2 Authentication Request</item>
+        </datainfo>
+        <triggers>
+            <item>Single Sign On failed</item>
+        </triggers>
+        <actions>
+            <item>Check debug file for detailed info</item>
+        </actions>
+    </logmessage>
+</logmessages>
