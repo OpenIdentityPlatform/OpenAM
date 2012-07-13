@@ -1,0 +1,362 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.56 2009/11/21 00:36:40 huacui Exp $
+
+-->
+<!--
+   "Portions Copyrighted 2010-2011 ForgeRock AS"
+-->
+
+<project name="top" default="usage">
+                
+    <description>Open Web Single Sign-On</description>
+    <import file="../../../products.xml" />
+    <import file="amserver/amserver.xml" />
+    <import file="federation/library/library.xml" />
+    <import file="federation/openfm/openfm.xml" />
+    <import file="installtools/installtools.xml" />
+    <import file="j2eeagents/j2eeagents.xml" />
+
+    <loadfile property="build.number.set" srcFile="${products.basedir}/.svn/entries" failonerror="false">
+    	<filterchain>
+        	<headfilter lines="1" skip="3"/>
+                    <deletecharacters chars="\n"/>
+        </filterchain>
+    </loadfile>
+
+    <echo message="OpenAM Build Number: ${build.number.set}"/>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+        
+    <delete file="${products.basedir}/federation/openfm/source/com/sun/identity/federation/cli/stubs/FederationManagerCLI.java" />
+    <delete file="${products.basedir}/amserver/test/source/com/sun/identity/cli/stubs/MockCLI.java" />
+    <delete file="${products.basedir}/amserver/source/com/sun/identity/cli/stubs/AccessManagerCLI.java" />
+
+    <target name="nightly">
+        <property name="build.nightly" value="true"/>
+        <delete dir="${prd.nightly.dist.dir}" />
+        <antcall target="server-nightly" />
+        <antcall target="agents-nightly" />
+    </target>
+
+    <target name="server-nightly" depends="checkjar,create-version">
+        <mkdir dir="${prd.nightly.dist.dir}" />
+        <antcall target="amserver-nightly" />
+        <antcall target="fedlibrary-nightly" />
+        <antcall target="oauth-nightly" />
+        <antcall target="openfm-nightly" />
+        <antcall target="remove-amserver-bits" />
+        <antcall target="create-manifest" />
+        <antcall target="create-checksum" />
+        <antcall target="create-srczip" />
+    </target>
+
+    <target name="server-tools" depends="create-version">
+        <mkdir dir="${prd.nightly.dist.dir}" />
+        <ant antfile="${amserver.base.dir}/build.xml" inheritRefs="true"
+            target="tools" />
+        <ant antfile="${fedlibrary.base.dir}/build.xml" inheritRefs="true"
+            target="build" />
+        <copy todir="${fm.base.dir}/extlib">
+            <fileset file="${amserver.dist.dir}/amserver.jar" />
+            <fileset file="${sharedlib.dist.dir}/opensso-sharedlib.jar" />
+            <fileset file="${amserver.dist.dir}/amAdminTools.zip" />
+            <fileset file="${amserver.dist.dir}/amSessionTools.zip" />
+            <fileset file="${amserver.dist.dir}/amConfiguratorTools.zip" />
+            <fileset file="${amserver.dist.dir}/ssoDiagnosticTools.zip" />
+        </copy>
+        <!-- fake a copy to pass check-openfm-jars.xml -->
+        <copy file="${amserver.dist.dir}/amserver.jar" 
+            tofile="${fm.base.dir}/extlib/console.jar" />
+        <ant antfile="${fm.base.dir}/build.xml" inheritRefs="true"
+            target="tools" />
+        <delete file="${fm.base.dir}/extlib/console.jar" />
+    </target>
+
+    <target name="server-war" depends="create-version">
+        <mkdir dir="${prd.nightly.dist.dir}" />
+        <ant antfile="${amserver.base.dir}/build.xml" inheritRefs="true"
+            target="sample-war" />
+        <ant antfile="${fedlibrary.base.dir}/build.xml" inheritRefs="true"
+            target="build" />
+        <ant antfile="${oauth.base.dir}/build.xml" inheritRefs="true"
+            target="all" />
+        <copy todir="${fm.base.dir}/extlib">
+            <fileset file="${amserver.dist.dir}/console.jar" />
+            <fileset file="${amserver.dist.dir}/amserver.jar" />
+            <fileset file="${amserver.dist.dir}/opensso_server_samples.war" />
+            <fileset file="${sharedlib.dist.dir}/opensso-sharedlib.jar" />
+            <fileset file="${oauth.dist.dir}/oauthservice.jar" />
+        </copy>
+
+        <!-- fake a copy to pass check-openfm-jars.xml -->
+        <ant antfile="${fm.base.dir}/build.xml" inheritRefs="true"
+            target="war" />
+    </target>
+
+    <target name="remove-amserver-bits">
+        <delete dir="${amserver.dist.dir}" />
+    </target>
+
+    <target name="agents-nightly">
+        <mkdir dir="${prd.nightly.dist.dir}" />
+        <ant antfile="${installtools.base.dir}/build.xml" inheritRefs="true" />
+        <antcall target="j2ee-agents-nightly" />
+    </target>
+
+    <target name="amserver-nightly">
+        <ant antfile="${amserver.base.dir}/build.xml" inheritRefs="true"
+            target="nightly" />
+        <mkdir dir="${prd.nightly.dist.dir}/amserver" />
+        <copy todir="${prd.nightly.dist.dir}/amserver">
+            <fileset dir="${amserver.dist.dir}"/>
+        </copy>
+
+    </target>
+    
+    <target name="fedlibrary-nightly">
+        <ant antfile="${fedlibrary.base.dir}/build.xml" inheritRefs="true"
+            target="nightly" />
+        <mkdir dir="${prd.nightly.dist.dir}/fedlibrary" />
+        <copy todir="${prd.nightly.dist.dir}/fedlibrary">
+            <fileset dir="${fedlibrary.dist.dir}"/>
+        </copy>
+   </target>
+        
+    <target name="oauth-nightly">
+        <ant antfile="${oauth.base.dir}/build.xml" inheritRefs="true"
+            target="all" />
+   </target>
+        
+    <target name="openfm-nightly">
+        <copy file="${amserver.dist.dir}/amAdminTools.zip"
+            todir="${openfm.extlib.dir}"  />
+        <copy file="${amserver.dist.dir}/amSessionTools.zip"
+            todir="${openfm.extlib.dir}"  />            
+        <copy file="${amserver.dist.dir}/amConfiguratorTools.zip"
+            todir="${openfm.extlib.dir}"  />            
+        <copy file="${amserver.dist.dir}/ssoDiagnosticTools.zip"
+            todir="${openfm.extlib.dir}"  />            
+        <copy file="${amserver.tools.dir}/ssomanifest.jar"
+            todir="${prd.nightly.dist.dir}/openfm"  />
+        <copy file="${amserver.tools.dir}/ssopatch.jar"
+            todir="${prd.nightly.dist.dir}/openfm"  />            
+        <copy file="${amserver.tools.dir}/amserver.jar"
+            todir="${openfm.extlib.dir}"  />
+        <copy file="${amserver.dist.dir}/console.jar"
+            todir="${openfm.extlib.dir}"  />
+        <copy file="${amserver.dist.dir}/amclientsdk.jar"
+            todir="${openfm.extlib.dir}"  />
+        <copy file="${amserver.dist.dir}/opensso-amserver.war"
+            todir="${openfm.extlib.dir}"  />
+        <copy file="${oauth.dist.dir}/oauthservice.jar"
+            todir="${openfm.extlib.dir}"  />
+            
+        <ant antfile="${fm.base.dir}/build.xml" inheritRefs="true"
+            target="nightly" />
+        <mkdir dir="${prd.nightly.dist.dir}/openfm" />
+        <copy todir="${prd.nightly.dist.dir}/openfm">
+            <fileset dir="${fm.dist.dir}"/>
+        </copy>
+    </target>
+    
+    <target name="j2ee-agents-nightly">
+        <mkdir dir="${prd.nightly.dist.dir}/j2eeagents" />
+        <ant antfile="${j2eeagents.basedir}/build.xml" inheritRefs="true" target="prenightly" />
+        <ant antfile="${j2eeagents.basedir}/build.xml" inheritRefs="true" target="nightly" />
+        <ant antfile="${j2eeagents.basedir}/build.xml" inheritRefs="true" target="postnightly" />
+
+    </target>
+
+    <target name="create-checksum" depends="set-zipname">         
+        <checksum file="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="create-srczip" depends="set-zipname">
+        <mkdir dir="${prd.nightly.dist.dir}" />
+        <zip destfile="${prd.nightly.dist.dir}/openam_src_${time.stamp}.zip" basedir="${products.basedir}/.." includes="products/**,resources/**" excludes="**/built,**/built/**,**/extlib,**/extlib/**,products/webagents,products/webagents/**,**/tracker.properties" />
+        <checksum file="${prd.nightly.dist.dir}/openam_src_${time.stamp}.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="create-manifest" depends="set-zipname, create-version"> 
+        <unzip src="${prd.nightly.dist.dir}/openfm/opensso.zip"
+            dest="${prd.nightly.dist.dir}/opensso" />
+
+        <java jar="${prd.nightly.dist.dir}/openfm/ssomanifest.jar"
+            fork="true">            
+            <classpath>             
+                 <pathelement path="amserver/built/classes" />
+            </classpath>
+            <jvmarg value="-jar" />
+            <jvmarg value="-Dfile.header.path=${prd.nightly.dist.dir}/version" />
+            <jvmarg value="-Dfile.src.path=${prd.nightly.dist.dir}/opensso/opensso/deployable-war/opensso.war" />
+            <jvmarg value="-Dfile.dest.path=${prd.nightly.dist.dir}/manifest/META-INF/OpenSSO.manifest" />
+        </java>        
+        
+        <jar destfile="${prd.nightly.dist.dir}/opensso/opensso/deployable-war/opensso.war" update="true">
+            <zipfileset dir="${prd.nightly.dist.dir}/manifest" />
+        </jar>              
+       <copy file="${prd.nightly.dist.dir}/opensso/opensso/deployable-war/opensso.war"
+           todir="${prd.nightly.dist.dir}/openfm"/>
+       <zip destfile="${prd.nightly.dist.dir}/openfm/openam_${zipname.set}.zip"
+            whenempty="create">
+            <zipfileset dir="${prd.nightly.dist.dir}/opensso">
+            </zipfileset>                 
+	</zip>        
+        <filter token="ZIPNAME" value="${zipname.set}" />
+        <filter token="BUILD_DATE" value="${time.stamp}" />
+
+        <copy file="./products/openam_link.js.template"
+            tofile="${prd.nightly.dist.dir}/openfm/openam_link.js" filtering="true"/>
+        <copy file="./products/build_date.js.template"
+            tofile="${prd.nightly.dist.dir}/openfm/build_date.js" filtering="true"/>
+
+        
+        <delete file="${prd.nightly.dist.dir}/openfm/opensso.zip" />
+    </target>
+    
+    <target name="set-zipname" >
+        <tstamp>
+            <format property="time.stamp" pattern="yyyyMMdd"/>
+        </tstamp> 
+        <property name="zipname.set" value="nightly_${time.stamp}"/>            
+    </target>
+    
+    <target name="create-version"> 
+        <tstamp>
+            <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />
+        </tstamp>       
+        <property name="version.set" value="${opensso.version}"/>    
+            
+        <filter token="DATESTAMP" value="${war.time.stamp}"/>        
+        <filter token="VERSION" value="${version.set}" />
+        <copy file="${amserver.base.dir}/version.template"
+            tofile="${prd.nightly.dist.dir}/version"
+            filtering="true"/>      
+    </target>
+
+    <target name="clean">
+        <delete dir="${prd.nightly.dir}" />
+        <ant antfile="${amserver.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${fedlibrary.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${oauth.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${fm.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${fm.base.dir}/build.xml" inheritRefs="true"
+            target="extlib-clean" />
+        <ant antfile="${installtools.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${j2eeagents.basedir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${sharedlib.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+        <ant antfile="${wssagents.base.dir}/build.xml" inheritRefs="true"
+            target="clean" />
+    </target>
+
+    <target name="build-diff">
+        <mkdir dir="${sharedlib.classes.dir}" />
+        <javac destdir="${sharedlib.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}">
+            <src path="${products.basedir}/shared/source"/>
+            <include name="com/sun/identity/tools/diffs/*.java"/>
+        </javac>
+    </target>
+
+    <target name="logdoc">
+        <delete dir="${prd.classes.dir}" />
+        <delete dir="${prd.log.html.dir}" />
+        <mkdir dir="${prd.classes.dir}" />
+        <mkdir dir="${prd.log.html.dir}" />
+        <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+            destdir="${prd.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="on" debuglevel="lines,vars,source">
+            <src path="${amserver.src.dir}"/>
+            <include name="com/sun/identity/tools/logdoc/*.java"/>
+        </javac>
+        <java classname="com.sun.identity/tools/logdoc/LogMessagesFormatter"
+            fork="true">
+            <classpath>
+                 <pathelement path="${prd.classes.dir}" />
+            </classpath>
+            <jvmarg value="-Dopensso.log.html.dir=${prd.log.html.dir}" />
+            <arg value="${amserver.base.dir}/xml/log" />
+            <arg value="${openfm.dir}/xml/log" />
+        </java>
+    </target>
+
+    <target name="cvsdiff" depends="build-diff">
+        <delete dir="${diff.dir}" />
+        <mkdir dir="${diff.dir}" />
+        <cvs command="-q diff -cw" output="${diff.dir}/.diffs"/>
+        <java classname="com.sun.identity.tools.diffs.Diffs">
+            <classpath>
+                <pathelement path="${sharedlib.classes.dir}"/>
+            </classpath>
+            <arg value="${diff.dir}/.diffs"/>
+        </java>
+        <cvs command="-q stat" output="${diff.dir}/.stat"/>
+        <java classname="com.sun.identity.tools.diffs.Stat">
+            <classpath>
+                <pathelement path="${sharedlib.classes.dir}"/>
+            </classpath>
+            <arg value="${diff.dir}/.stat"/>
+        </java>
+    </target>
+
+    <target name="checkjar">
+        <ant antfile="${products.basedir}/build-checkjars.xml" />
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" clean        : cleans generated files for all products"/>
+        <echo message=" cvsdiff      : generates diffs under diffs subdirectory"/>
+        <echo message=" nightly      : performs nightly builds for all products"/>
+        <echo message=" server-war   : builds server war file"/>
+        <echo message=" server-tools : builds server tools zip file"/>
+        <echo message=" server-nightly: performs nightly builds for server products"/>
+        <echo message=" agents-nightly: performs nightly builds for agents products"/>
+        <echo message=" usage        : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+
+</project>
