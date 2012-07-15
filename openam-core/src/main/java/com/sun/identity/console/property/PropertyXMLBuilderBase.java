@@ -1130,7 +1130,9 @@ public abstract class PropertyXMLBuilderBase
     }
 
     private static void getDefaultEncoding() {
-	platformDefaultEncoding = java.nio.charset.Charset.defaultCharset().toString();
+        platformDefaultEncoding = "UTF-8";
+        // The JVM Should specify "file.encoding=utf-8" for proper encoding.
+        // java.nio.charset.Charset.defaultCharset().toString();
     }
 
     public static String getXMLDefinitionHeader() {
