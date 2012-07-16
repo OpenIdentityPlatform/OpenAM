@@ -180,7 +180,7 @@
                                 <exclude>web.xml</exclude>
                             </excludes>
                             <targetPath>WEB-INF/classes</targetPath>
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>
@@ -191,7 +191,7 @@
                                 <include>amConsoleConfig.xml</include>
                             </includes>
                             <targetPath>WEB-INF/classes</targetPath>
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
@@ -200,7 +200,7 @@
                                 <include>*.xsd</include>
                             </includes>
                             <targetPath>WEB-INF/wsdl</targetPath>
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml
@@ -209,7 +209,7 @@
                                 <include>*.wsdl</include>
                             </includes>
                             <targetPath>WEB-INF/wsdl</targetPath>
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>${project.basedir}/../openam-schema/openam-jaxrpc-schema/target/classes/jaxrpc
@@ -227,10 +227,11 @@
                                 <include>sun-jaxws.xml</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
-                            <!-- This pickup the remaining moved elements build from the "openam-server-prepare-war"
+                            <!-- This pickup the remaining moved elements build from the
+                                 "openam-server-prepare-war"
                                  step from a Temp Area -->
                             <directory>${project.build.directory}/openam_TEMP
                             </directory>
@@ -238,7 +239,7 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath></targetPath>
-                            <filtering>true</filtering>
+                            <filtering>false</filtering>
                         </webResource>
 
                     </webResources>
