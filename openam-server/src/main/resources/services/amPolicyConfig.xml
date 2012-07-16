@@ -327,16 +327,18 @@
                     syntax="string"
                     i18nKey="a122">
                     <ChoiceValues>
+                        <ChoiceValue i18nKey="a144">WebServicesClients</ChoiceValue>
                         <ChoiceValue i18nKey="a129">Organization</ChoiceValue>
                         <ChoiceValue i18nKey="a130">IdentityServerRoles</ChoiceValue>
                         <ChoiceValue i18nKey="a131">LDAPGroups</ChoiceValue>
                         <ChoiceValue i18nKey="a132">LDAPRoles</ChoiceValue>
                         <ChoiceValue i18nKey="a133">LDAPUsers</ChoiceValue>
-			<ChoiceValue i18nKey="a143">AuthenticatedUsers</ChoiceValue>
+			            <ChoiceValue i18nKey="a143">AuthenticatedUsers</ChoiceValue>
                         <ChoiceValue i18nKey="a145">AMIdentitySubject</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-			<Value>AuthenticatedUsers</Value>
+                        <Value>WebServicesClients</Value>
+			            <Value>AuthenticatedUsers</Value>
                         <Value>AMIdentitySubject</Value>
                     </DefaultValues>
                 </AttributeSchema>
