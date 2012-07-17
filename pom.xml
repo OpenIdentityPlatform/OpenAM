@@ -148,6 +148,9 @@
         <!-- OpenAM Server -->
         <module>openam-server</module>
 
+        <!-- OpenAM Standalone Container Environment -->
+        <module>openam-environment</module>
+
         <!-- Tools Artifacts -->
         <module>openam-tools</module>
 
