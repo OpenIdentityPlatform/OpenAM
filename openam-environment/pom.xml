@@ -142,7 +142,7 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-server</artifactId>
+            <artifactId>openam-clientsdk</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 		
