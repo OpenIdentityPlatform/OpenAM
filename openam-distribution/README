@@ -1,0 +1,43 @@
+OpenAM
+
+
+
+
+The openam-distribution Module will create the necessary packaging kit
+for installation of the OpenAM product and suite of tools.
+
+The Kit Structure:
+
+-rw-r--r--   1 jaschenk  staff   22462965 Jul 16 11:52 AssertionGenerator.zip
+-rw-r--r--   1 jaschenk  staff   13087407 Jul 16 11:52 Fedlet-unconfigured.zip
+-rw-r--r--   1 jaschenk  staff         28 Jul 16 11:54 build_date.js
+-rw-r--r--   1 jaschenk  staff    1947847 Jul 16 11:52 console.jar
+-rw-r--r--   1 jaschenk  staff       3462 Jul 16 11:52 index.html
+-rw-r--r--   1 jaschenk  staff        583 Jul 16 11:54 openam_link.js
+-rw-r--r--   1 jaschenk  staff  359977975 Jul 16 11:54 openam_nightly_20120716.zip
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:54 openam_nightly_20120716.zip.sha
+-rw-r--r--   1 jaschenk  staff   33959628 Jul 16 11:52 opensso-client-jdk15.war
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:52 opensso-client-jdk15.war.sha
+-rw-r--r--   1 jaschenk  staff   63622205 Jul 16 11:52 opensso-client.zip
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:52 opensso-client.zip.sha
+-rw-r--r--   1 jaschenk  staff   69341188 Jul 16 11:47 opensso-embedded.war
+-rw-r--r--   1 jaschenk  staff    2342144 Jul 16 11:52 opensso-public-javadocs.jar
+-rw-r--r--   1 jaschenk  staff     715627 Jul 16 11:52 opensso.jar
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:52 opensso.jar.sha
+-rw-r--r--   1 jaschenk  staff   71361653 Jul 16 11:53 opensso.war
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:52 opensso.war.sha
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:53 opensso.zip.sha
+-rw-r--r--   1 jaschenk  staff    9956673 Jul 16 11:53 openssoclientsdk.jar
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:53 openssoclientsdk.jar.sha
+-rw-r--r--   1 jaschenk  staff   51447640 Jul 16 11:53 ssoAdminTools.zip
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:53 ssoAdminTools.zip.sha
+-rw-r--r--   1 jaschenk  staff   22470067 Jul 16 11:53 ssoExternalTools.zip
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:53 ssoExternalTools.zip.sha
+-rw-r--r--   1 jaschenk  staff   74498634 Jul 16 11:53 ssoSessionTools.zip
+-rw-r--r--   1 jaschenk  staff         41 Jul 16 11:53 ssoSessionTools.zip.sha
+-rw-r--r--   1 jaschenk  staff      12272 Jul 16 11:38 ssomanifest.jar
+-rw-r--r--   1 jaschenk  staff      11096 Jul 16 11:38 ssopatch.jar
+
+
+
+OpenAM Development Team

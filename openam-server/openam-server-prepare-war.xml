@@ -376,37 +376,6 @@
             </fileset>
         </copy>
 
-
-        <!--
-
-        <replaceregexp flags="s"
-                       file="${openam.temp.target}/WEB-INF/classes/amPolicyConfig.xml"
-                       match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
-                       replace="\1&#10;&lt;ChoiceValue i18nKey=&quot;a144&quot;&gt;WebServicesClients&lt;/ChoiceValue&gt;"/>
-
-        <replaceregexp flags="s"
-                       file="${openam.temp.target}/WEB-INF/classes/amPolicyConfig.xml"
-                       match="(iplanet-am-policy-selected-subjects.+?&lt;DefaultValues&gt;)"
-                       replace="\1&#10;&lt;Value&gt;WebServicesClients&lt;/Value&gt;"/>
-
-        <replaceregexp flags="s"
-                       file="${openam.temp.target}/WEB-INF/classes/amPolicy.xml"
-                       match="(&lt;PluginSchema.+?)(&lt;/Service&gt;)"
-                       replace="\1&#10;&lt;PluginSchema name=&quot;WebServicesClients&quot; interfaceName=&quot;Subject&quot; className=&quot;com.sun.identity.policy.plugins.WebServicesClients&quot; i18nFileName=&quot;amPolicy&quot; i18nKey=&quot;SunIdentityServer-subject-WebServicesClients-name&quot; /&gt;&#10;\2"/>
-
-        <replaceregexp flags="s"
-                       file="${openam.temp.target}/WEB-INF/classes/amPolicy.properties"
-                       match="(.+)"
-                       replace="\1&#10;SunIdentityServer-subject-WebServicesClients-name=Web Services Clients&#10;webservicesclients_subject_invalid_user_names=Invalid Web Services Clients for this subject.&#10;"/>
-
-        <replaceregexp flags="s"
-                       file="${openam.temp.target}/WEB-INF/classes/amPolicyConfig.properties"
-                       match="(.+)"
-                       replace="\1&#10;a144=Web Services Clients&#10;"/>
-
-        -->
-
-
         <!--
         remove duplicate entries in FederationConfig.properties against
         AMConfig.properties
