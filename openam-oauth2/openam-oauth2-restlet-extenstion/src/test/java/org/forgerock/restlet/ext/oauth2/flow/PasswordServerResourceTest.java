@@ -24,6 +24,7 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
@@ -36,10 +37,7 @@ import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Reference;
+import org.restlet.data.*;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
@@ -84,5 +82,109 @@ public class PasswordServerResourceTest extends AbstractFlowTest {
         assertNotNull(auth2Proxy);
         BearerToken token = auth2Proxy.flowPassword();
         assertNotNull(token);
+    }
+    /*
+    The client MUST use the HTTP "POST" method when making access token
+    requests.
+     */
+    @Test
+    public void testGETRequest() throws Exception {
+        Reference reference = new Reference("riap://component/test/oauth2/access_token");
+        Request request = new Request(Method.GET, reference);
+        Response response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2.Params.USERNAME, "admin");
+        parameters.add(OAuth2.Params.PASSWORD, "admin");
+        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        request.setEntity(parameters.getWebRepresentation());
+
+        // handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+    }
+    /*
+    Parameters sent without a value MUST be treated as if they were
+    omitted from the request.
+     */
+    @Test
+    public void testEmptyParameterInRequest() throws Exception {
+        Reference reference = new Reference("riap://component/test/oauth2/access_token");
+        Request request = new Request(Method.POST, reference);
+        Response response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+        //blank username
+        parameters.add(OAuth2.Params.USERNAME, "");
+        parameters.add(OAuth2.Params.PASSWORD, "admin");
+        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        request.setEntity(parameters.getWebRepresentation());
+
+        // handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
+    }
+
+    /*
+    The authorization server MUST ignore
+    unrecognized request parameters.
+     */
+    @Test
+    public void testIgnoreUnrecognizedParametersInRequest() throws Exception {
+        Reference reference = new Reference("riap://component/test/oauth2/access_token");
+        Request request = new Request(Method.POST, reference);
+        Response response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+        parameters.add(OAuth2.Params.USERNAME, "admin");
+        parameters.add(OAuth2.Params.PASSWORD, "admin");
+        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        //add unrecognized parameter
+        parameters.add("Unrecognized_Param", "Value");
+        request.setEntity(parameters.getWebRepresentation());
+
+        // handle
+        getClient().handle(request, response);
+        assertTrue(MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType()));
+        JacksonRepresentation<Map> representation =
+                new JacksonRepresentation<Map>(response.getEntity(), Map.class);
+
+        // assert
+        assertThat(representation.getObject()).includes(
+                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
+                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+            @Override
+            public boolean matches(Map<?, ?> value) {
+                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+            }
+        });
+    }
+
+    /*
+    Request and response parameters
+    MUST NOT be included more than once.
+     */
+    @Test
+    public void testMultipleSameParametersInRequest() throws Exception {
+        Reference reference = new Reference("riap://component/test/oauth2/access_token");
+        Request request = new Request(Method.POST, reference);
+        Response response = new Response(request);
+
+        Form parameters = new Form();
+        parameters.add(OAuth2.Params.GRANT_TYPE, OAuth2.TokeEndpoint.PASSWORD);
+        //add more usernames (uses the first param)
+        parameters.add(OAuth2.Params.USERNAME, "");
+        parameters.add(OAuth2.Params.USERNAME, "admin");
+        parameters.add(OAuth2.Params.USERNAME, "admin1");
+        parameters.add(OAuth2.Params.PASSWORD, "admin");
+        parameters.add(OAuth2.Params.SCOPE, "read write delete");
+        request.setEntity(parameters.getWebRepresentation());
+
+        // handle
+        getClient().handle(request, response);
+        assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
     }
 }
