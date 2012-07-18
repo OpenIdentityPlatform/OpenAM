@@ -46,6 +46,17 @@
         <url>http://www.forgerock.com</url>
     </organization>
 
+    <properties>
+
+        <!-- Embedded Tomcat Version -->
+        <embedded.tomcat.version>7.0.29</embedded.tomcat.version>
+
+        <!-- Main Boostrap Class -->
+        <main.bootstrap.classname>org.forgerock.openam.engine.commons.boot.BootServiceInstance</main.bootstrap.classname>
+
+
+    </properties>
+
     <!-- Build -->
     <build>
         <plugins>
@@ -146,7 +157,30 @@
             <version>10.1.0-SNAPSHOT</version>
             <type>war</type>
         </dependency>
-		
+
+        <!-- Embedded Tomcat -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>${embedded.tomcat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${embedded.tomcat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper</artifactId>
+            <version>${embedded.tomcat.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+
     </dependencies>
     
 </project>
