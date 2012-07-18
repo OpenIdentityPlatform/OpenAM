@@ -36,9 +36,9 @@
 
     <!-- Component Definition -->
     <name>OpenAM Environment</name>
-    <description>OpenAM Environment - Standalone Instance
+    <description>OpenAM Server Engine - Standalone Instance - Experimental
     </description>
-    <artifactId>openam-environment</artifactId>
+    <artifactId>openam-server-engine</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
@@ -86,10 +86,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Environment - Standalone Instance</Specification-Title>
+                            <Specification-Title>OpenAM Server Engine - Standalone Instance</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Environment - Standalone Instance</Implementation-Title>
+                            <Implementation-Title>OpenAM Server Engine - Standalone Instance</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -142,8 +142,9 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-clientsdk</artifactId>
+            <artifactId>openam-server</artifactId>
             <version>10.1.0-SNAPSHOT</version>
+            <type>war</type>
         </dependency>
 		
     </dependencies>
