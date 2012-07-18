@@ -1352,7 +1352,7 @@ public class AMLoginContext {
         String clientType
     ) throws AuthException {
         String moduleName = null;
-        java.util.Locale loc = com.iplanet.am.util.Locale.getLocale(
+        java.util.Locale loc = com.sun.identity.shared.locale.Locale.getLocale(
         loginState.getLocale());
         CompositeAdvices compositeAdvice = new CompositeAdvices(indexName,orgDN,
         clientType,loc);

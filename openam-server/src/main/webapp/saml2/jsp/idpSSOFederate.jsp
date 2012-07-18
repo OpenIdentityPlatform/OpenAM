@@ -30,7 +30,9 @@
 
 
 
-<%@ page import="com.iplanet.am.util.Debug" %>
+<!-- %@ page import="com.iplanet.am.util.Debug" % -->
+<%@ page import="com.sun.identity.shared.debug.Debug" %>
+
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>

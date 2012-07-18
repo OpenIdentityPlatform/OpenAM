@@ -122,7 +122,7 @@ public class LogoutViewBean extends AuthViewBeanBase {
                 populateL10NFileAttrs(intSess);
                 String localeStr =  intSess.getProperty(ISAuthConstants.LOCALE);
                 // I18N get resource bundle
-                locale = com.iplanet.am.util.Locale.getLocale(localeStr);
+                locale = com.sun.identity.shared.locale.Locale.getLocale(localeStr);
                 fallbackLocale = locale;
             } else {
                 ISLocaleContext localeContext = new ISLocaleContext();
@@ -130,7 +130,7 @@ public class LogoutViewBean extends AuthViewBeanBase {
                 locale = localeContext.getLocale();
                 if (locale == null) {
                     String localeStr = AuthD.getAuth().getPlatformLocale();
-                    locale = com.iplanet.am.util.Locale.getLocale(localeStr);
+                    locale = com.sun.identity.shared.locale.Locale.getLocale(localeStr);
                 }
             }
                 

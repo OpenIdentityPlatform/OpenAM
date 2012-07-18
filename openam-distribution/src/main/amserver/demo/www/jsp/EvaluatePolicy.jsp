@@ -27,7 +27,8 @@
 -->
 <%@ page import="com.iplanet.sso.SSOToken"%>
 <%@ page import="com.iplanet.am.util.SystemProperties"%>
-<%@ page import="com.iplanet.am.util.Debug"%>
+<%@ page import="import com.sun.identity.shared.debug.Debug"%>
+<!  --%@ page import="com.iplanet.am.util.Debug"% -->
 <%@ page import="com.sun.identity.common.Constants"%>
 <%@ page import="com.iplanet.sso.SSOTokenManager"%>
 <%@ page import="com.iplanet.sso.SSOException"%>

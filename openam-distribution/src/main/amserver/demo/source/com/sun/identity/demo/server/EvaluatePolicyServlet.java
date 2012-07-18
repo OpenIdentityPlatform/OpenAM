@@ -39,7 +39,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.iplanet.am.util.Debug;
+import com.sun.identity.shared.debug.Debug;
+//import com.iplanet.am.util.Debug;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.XMLUtils;
 import com.iplanet.sso.SSOToken;

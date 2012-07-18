@@ -28,7 +28,9 @@
 
 package com.sun.identity.authentication.spi;
 
-import com.iplanet.am.util.Debug;
+// import com.iplanet.am.util.Debug;
+import com.sun.identity.shared.debug.Debug;
+
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;

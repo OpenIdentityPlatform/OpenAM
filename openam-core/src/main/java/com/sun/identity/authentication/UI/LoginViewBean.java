@@ -32,7 +32,8 @@
 
 package com.sun.identity.authentication.UI;
 
-import com.iplanet.am.util.AMURLEncDec;
+//import com.iplanet.am.util.AMURLEncDec;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.SessionID;
@@ -614,11 +615,11 @@ public class LoginViewBean extends AuthViewBeanBase {
                         if(redirect_url.indexOf("?") == -1){
                             redirect_url = redirect_url + "?" + 
                             appendCookie.getName() + "=" + 
-                            AMURLEncDec.encode(appendCookie.getValue()); 
+                            URLEncDec.encode(appendCookie.getValue());
                         }else{
                             redirect_url = redirect_url + "&" + 
                             appendCookie.getName() + "=" + 
-                            AMURLEncDec.encode(appendCookie.getValue()); 
+                            URLEncDec.encode(appendCookie.getValue());
                         }
                         if(loginDebug.messageEnabled()){
                             loginDebug.message("LoginViewBean.forwardTo():" +

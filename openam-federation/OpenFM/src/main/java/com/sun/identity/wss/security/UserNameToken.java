@@ -38,7 +38,8 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.DateUtils;
-import com.iplanet.am.util.Locale;
+//import com.iplanet.am.util.Locale;
+import com.sun.identity.shared.locale.Locale;
 import com.iplanet.am.util.SecureRandomManager;
 
 import org.w3c.dom.Element;

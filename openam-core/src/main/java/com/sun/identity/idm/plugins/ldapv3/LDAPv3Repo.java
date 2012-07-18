@@ -84,7 +84,8 @@ import com.sun.identity.shared.ldap.LDAPSearchRequest;
 
 import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.am.util.AMURLEncDec;
+//import com.iplanet.am.util.AMURLEncDec;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
@@ -2658,7 +2659,7 @@ public class LDAPv3Repo extends IdRepo {
                     String memberUrl = (String) enumVals.nextElement();
                     try {
                         LDAPUrl ldapUrl = new LDAPUrl(
-                                AMURLEncDec.encodeLDAPUrl(memberUrl));
+                                URLEncDec.encodeLDAPUrl(memberUrl));
                         Set dynMembers = findDynamicGroupMembersByUrl(ldapUrl);
                         resultSet.addAll(dynMembers);
                     } catch (java.net.MalformedURLException e) {

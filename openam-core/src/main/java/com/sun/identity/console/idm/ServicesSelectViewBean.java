@@ -28,7 +28,7 @@
 
 package com.sun.identity.console.idm;
 
-import com.iplanet.am.util.Locale;
+import com.sun.identity.shared.locale.Locale;
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;

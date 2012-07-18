@@ -26,9 +26,9 @@
  */
 package com.sun.identity.password.ui.model;
 
-import com.iplanet.am.util.AMResourceBundleCache;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 
 /**
  * Utility to cache resource bundle object. It leverage on

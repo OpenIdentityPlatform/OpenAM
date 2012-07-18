@@ -30,7 +30,8 @@ package com.sun.identity.wss.provider;
 
 import java.util.ResourceBundle;
 
-import com.iplanet.am.util.Locale;
+//import com.iplanet.am.util.Locale;
+import com.sun.identity.shared.locale.Locale;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wss.security.WSSUtils;

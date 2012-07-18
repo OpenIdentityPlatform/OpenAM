@@ -139,7 +139,7 @@ public class AuthContext extends Object implements java.io.Serializable {
     // Debug & I18N class
     protected static Debug authDebug = Debug.getInstance(amAuthContext);
     protected static ResourceBundle bundle =
-        com.iplanet.am.util.Locale.getInstallResourceBundle(amAuthContext);
+            com.sun.identity.shared.locale.Locale.getInstallResourceBundle(amAuthContext);
     
     Status loginStatus = Status.IN_PROGRESS;
     String organizationName = "";

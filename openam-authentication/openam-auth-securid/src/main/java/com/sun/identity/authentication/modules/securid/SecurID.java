@@ -74,7 +74,7 @@ public class SecurID extends AMLoginModule {
     static ResourceBundle bundle = null;
     private static String bundleName = "amAuthSecurID";
     private static Debug debug = null;
-    private static com.iplanet.am.util.Locale locale = null;
+    private static com.sun.identity.shared.locale.Locale locale = null;
 
     // this is per user auth session, but really per module instance
     private AuthSessionFactory api = null;

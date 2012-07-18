@@ -73,7 +73,8 @@ import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.sun.identity.session.util.SessionUtils;
 
 import com.iplanet.am.util.AMClientDetector;
-import com.iplanet.am.util.AMURLEncDec;
+//import com.iplanet.am.util.AMURLEncDec;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -1753,8 +1754,8 @@ public class AuthClientUtils {
                     	       value = getBase64DecodedValue(value);
                     	   }
                        } 
-                       queryString = queryString + AMURLEncDec.encode(parameter)
-                       + "=" + AMURLEncDec.encode(
+                       queryString = queryString + URLEncDec.encode(parameter)
+                       + "=" + URLEncDec.encode(
                        getCharDecodedField(value, encoding, utilDebug));
                     }
                 }
@@ -1794,7 +1795,7 @@ public class AuthClientUtils {
          int index = adviceString.indexOf("=");
          String value = adviceString.substring(index+1);
          sb.append(COMPOSITE_ADVICE).append("=");
-         sb.append(AMURLEncDec.encode(value));
+         sb.append(URLEncDec.encode(value));
          return sb.toString();
      }
      
@@ -1819,9 +1820,9 @@ public class AuthClientUtils {
                      value = 
                     	 getCharDecodedField(value, encoding, utilDebug);
                   }
-                  sb.append(AMURLEncDec.encode(parameter));
+                  sb.append(URLEncDec.encode(parameter));
                   sb.append("=");
-                  sb.append(AMURLEncDec.encode(value));
+                  sb.append(URLEncDec.encode(value));
                   if(st.hasMoreTokens()){
                       sb.append("&");
                   }

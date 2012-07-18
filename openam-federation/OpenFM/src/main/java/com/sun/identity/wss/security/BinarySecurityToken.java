@@ -41,7 +41,8 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtilsCommon;
-import com.iplanet.am.util.Locale;
+//import com.iplanet.am.util.Locale;
+import com.sun.identity.shared.locale.Locale;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;

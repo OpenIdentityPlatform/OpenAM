@@ -33,6 +33,7 @@ package com.iplanet.am.util;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLHandler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

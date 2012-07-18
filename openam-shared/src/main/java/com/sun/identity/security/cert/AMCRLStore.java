@@ -65,7 +65,8 @@ import sun.security.x509.DistributionPoint;
 
 import com.iplanet.security.x509.IssuingDistributionPointExtension;
 import com.iplanet.security.x509.X500Name;
-import com.iplanet.am.util.AMURLEncDec;
+//import com.iplanet.am.util.AMURLEncDec;
+import com.sun.identity.shared.encode.URLEncDec;
 
 import com.sun.identity.common.HttpURLConnectionManager;
 
@@ -604,8 +605,7 @@ public class AMCRLStore extends AMCertStore {
                     if (st2.countTokens() == 2) {
                         String param = st2.nextToken();
                         String value = st2.nextToken();
-                        params.append(AMURLEncDec.encode(param) + "=" + 
-                                      AMURLEncDec.encode(value));
+                        params.append(URLEncDec.encode(param) + "=" + URLEncDec.encode(value));
                     } else {
                         continue;
                     }

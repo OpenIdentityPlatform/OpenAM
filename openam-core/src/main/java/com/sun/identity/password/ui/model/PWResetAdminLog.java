@@ -75,7 +75,7 @@ public class PWResetAdminLog
         }
         String lstr = SystemProperties.get(Constants.AM_LOCALE);
 
-        locale = com.iplanet.am.util.Locale.getLocale(lstr);
+        locale = com.sun.identity.shared.locale.Locale.getLocale(lstr);
         rb = PWResetResBundleCacher.getBundle(PWResetModel.DEFAULT_RB, locale);
 
         if (rb == null) {

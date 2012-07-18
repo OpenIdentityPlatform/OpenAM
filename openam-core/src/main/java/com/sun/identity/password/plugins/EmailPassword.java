@@ -84,7 +84,7 @@ public class EmailPassword implements NotifyPassword {
 		userLocale = locale;
 	    } else {
 		String localeStr = localeSet.iterator().next().toString();
-		userLocale = com.iplanet.am.util.Locale.getLocale (localeStr);
+		userLocale = com.sun.identity.shared.locale.Locale.getLocale (localeStr);
 	    }
             
             rb = PWResetResBundleCacher.getBundle(bundleName, userLocale);
