@@ -43,6 +43,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.restlet.ext.freemarker.TemplateRepresentation;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.testng.annotations.Test;
 
 /**
@@ -413,7 +414,6 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         // handle
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.CLIENT_ERROR_UNAUTHORIZED);
-        response.getStatus().getReasonPhrase().toString().equalsIgnoreCase("unsupported_response_type");
     }
 
     /* TODO:
@@ -506,7 +506,19 @@ public class AuthorizationCodeServerResourceTest extends AbstractFlowTest {
         request.setEntity(parameters.getWebRepresentation());
         getClient().handle(request, response);
         assertEquals(response.getStatus(), Status.SUCCESS_ACCEPTED);
-        /*TODO: add check for access token*/
+        assertTrue(MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType()));
+        JacksonRepresentation<Map> representation =
+                new JacksonRepresentation<Map>(response.getEntity(), Map.class);
+
+        // assert
+        assertThat(representation.getObject()).includes(
+                MapAssert.entry(OAuth2.Params.TOKEN_TYPE, OAuth2.Bearer.BEARER),
+                MapAssert.entry(OAuth2.Params.EXPIRES_IN, 3600)).is(new Condition<Map<?, ?>>() {
+            @Override
+            public boolean matches(Map<?, ?> value) {
+                return value.containsKey(OAuth2.Params.ACCESS_TOKEN);
+            }
+        });
     }
 
     /*
