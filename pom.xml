@@ -149,7 +149,7 @@
         <module>openam-server</module>
 
         <!-- OpenAM Standalone Container Environment -->
-        <module>openam-environment</module>
+        <module>openam-server-engine</module>
 
         <!-- Tools Artifacts -->
         <module>openam-tools</module>
@@ -177,6 +177,7 @@
             <organizationUrl>http://www.forgerock.com</organizationUrl>
             <roles>
                 <role>VP Community</role>
+                <role>Support Staff</role>
             </roles>
         </developer>
 
@@ -189,6 +190,7 @@
             <organizationUrl>http://www.forgerock.com</organizationUrl>
             <roles>
                 <role>VP Engineering</role>
+                <role>Support Staff</role>
             </roles>
         </developer>
 
@@ -202,6 +204,7 @@
             <roles>
                 <role>Build Master</role>
                 <role>Senior Software Development Engineer</role>
+                <role>Support Staff</role>
             </roles>
         </developer>
 
@@ -213,6 +216,7 @@
             <organization>ForgeRock US</organization>
             <organizationUrl>http://www.forgerock.com</organizationUrl>
             <roles>
+                <role>Support Staff</role>
                 <role>Software Engineer</role>
             </roles>
         </developer>
