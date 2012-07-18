@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Environment</name>
+    <name>OpenAM Server Engine</name>
     <description>OpenAM Server Engine - Standalone Instance - Experimental
     </description>
     <artifactId>openam-server-engine</artifactId>
