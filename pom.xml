@@ -105,7 +105,7 @@
         <openam.properties>openam.properties</openam.properties>
 
         <!-- Version Properties -->
-        <restlet.version>2.0.14</restlet.version>
+        <restlet.version>2.1-RC4</restlet.version>
 
     </properties>
 
@@ -144,6 +144,9 @@
 
         <!-- OpenAM OAuth Token Service -->
         <module>openam-oauth</module>
+        
+		<!-- OpenAM OAuth2 Token Service -->
+        <module>openam-oauth2</module>
 
         <!-- OpenAM Server -->
         <module>openam-server</module>
@@ -1034,6 +1037,31 @@
             <dependency>
                 <groupId>org.restlet.jse</groupId>
                 <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.servlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.freemarker</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.ssl</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
