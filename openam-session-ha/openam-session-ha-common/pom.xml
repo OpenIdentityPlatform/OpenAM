@@ -127,7 +127,10 @@
             <artifactId>org.restlet.ext.httpclient</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>i18n-core</artifactId>
+        </dependency>
 
 
     </dependencies>

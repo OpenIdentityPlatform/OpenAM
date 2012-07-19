@@ -149,6 +149,12 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>j2ee</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
