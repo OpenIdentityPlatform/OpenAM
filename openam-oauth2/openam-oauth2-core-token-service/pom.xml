@@ -54,10 +54,7 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>org.forgerock.restlet.ext.openam</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
