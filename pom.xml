@@ -144,8 +144,8 @@
 
         <!-- OpenAM OAuth Token Service -->
         <module>openam-oauth</module>
-        
-		<!-- OpenAM OAuth2 Token Service -->
+
+        <!-- OpenAM OAuth2 Token Service -->
         <module>openam-oauth2</module>
 
         <!-- OpenAM Server -->
@@ -1214,8 +1214,22 @@
                     <systemPropertyVariables>
                         <system_config>${openam.properties}</system_config>
                     </systemPropertyVariables>
+                    <testNGArtifactName>none:none</testNGArtifactName>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <junitArtifactName>none:none</junitArtifactName>
+                            <testNGArtifactName>org.testng:testng</testNGArtifactName>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -127,15 +127,6 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
         </dependency>
-        <!-- Commons -->
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.json.resource</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-patch</artifactId>
-        </dependency>
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.easytesting</groupId>
