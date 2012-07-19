@@ -117,7 +117,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-openam-extenstion</artifactId>
+            <artifactId>openam-oauth2-openam-extension</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

@@ -39,8 +39,8 @@
     <name>OpenAM OAuth2</name>
 
     <modules>
-        <module>openam-oauth2-restlet-extenstion</module>
-        <module>openam-oauth2-openam-extenstion</module>
+        <module>openam-oauth2-restlet-extension</module>
+        <module>openam-oauth2-openam-extension</module>
         <module>openam-oauth2-core-token-service</module>
         <module>openam-oauth2-main</module>
         <module>openam-oauth2-demo</module>
