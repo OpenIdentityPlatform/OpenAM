@@ -30,6 +30,8 @@
  */
 package com.sun.identity.idsvcs;
 
+import com.iplanet.am.util.Token;
+
 import java.util.List;
 import java.rmi.Remote;
 import java.rmi.RemoteException;

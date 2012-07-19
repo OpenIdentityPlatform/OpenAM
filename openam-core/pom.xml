@@ -148,14 +148,9 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-dtd-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
+
             <!-- This Version -->
         </dependency>
         <dependency>
@@ -167,24 +162,6 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-saml2-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-wsfederation-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-liberty-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
