@@ -148,6 +148,12 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
+            <artifactId>openam-dtd-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <!-- This Version -->
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->

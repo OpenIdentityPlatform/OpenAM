@@ -28,6 +28,8 @@
 
 package com.sun.identity.idsvcs;
 
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -70,7 +72,7 @@ public class IdentityServicesFactory {
      * Return an instance of a factory that provider.
      */
     public static IdentityServicesFactory getInstance(String provider) {
-        final Class TEST = com.sun.identity.idsvcs.IdentityServicesImpl.class;
+        final Class TEST = IdentityServicesImpl.class;
         IdentityServicesFactory ret = (IdentityServicesFactory)
             cache.get(provider);
         // attempt to determine if the provider is okay..
