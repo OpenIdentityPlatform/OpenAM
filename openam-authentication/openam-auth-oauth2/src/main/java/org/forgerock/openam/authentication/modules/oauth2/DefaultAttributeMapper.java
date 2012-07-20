@@ -39,10 +39,13 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+
+import  org.forgerock.openam.authentication.modules.AttributeMapper;
+
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
-public class DefaultAttributeMapper implements AttributeMapper {
+public class DefaultAttributeMapper implements org.forgerock.openam.authentication.modules.AttributeMapper {
 
     public DefaultAttributeMapper() {
     }
@@ -53,7 +56,7 @@ public class DefaultAttributeMapper implements AttributeMapper {
             throws AuthLoginException {
 
         OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " +
-                        attributeMapConfiguration);
+                attributeMapConfiguration);
         JSONObject json;
         try {
             json = new JSONObject((String) svcProfileResponse);
