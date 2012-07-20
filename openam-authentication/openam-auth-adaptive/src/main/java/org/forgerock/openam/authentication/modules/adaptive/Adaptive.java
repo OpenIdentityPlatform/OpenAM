@@ -309,11 +309,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     @Override
     public Principal getPrincipal() {
         if (userUUID != null) {
-            userPrincipal = new AdaptivePrincipal(userUUID);
+            userPrincipal = new org.forgerock.openam.authentication.modules.adaptive.AdaptivePrincipal(userUUID);
             return userPrincipal;
         }
         if (userName != null) {
-            userPrincipal = new AdaptivePrincipal(userName);
+            userPrincipal = new org.forgerock.openam.authentication.modules.adaptive.AdaptivePrincipal(userName);
             return userPrincipal;
         } else {
             return null;
