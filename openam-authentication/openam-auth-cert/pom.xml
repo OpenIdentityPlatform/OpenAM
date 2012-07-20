@@ -155,6 +155,10 @@
             <groupId>external</groupId>
             <artifactId>j2ee</artifactId>
         </dependency>
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>jss4</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
