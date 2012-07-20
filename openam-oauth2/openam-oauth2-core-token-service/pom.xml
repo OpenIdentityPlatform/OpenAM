@@ -40,43 +40,58 @@
 
 
     <dependencies>
-
         <!-- Commons -->
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.json.resource</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-patch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.restlet.ext.openam</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.json.resource</artifactId>
+            <version>${commons.json-resource.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.restlet.ext.openam</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-patch</artifactId>
+            <version>${commons.json-patch.version}</version>
+        </dependency>
+
         <!-- OpenAM -->
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-rest</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-common</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-session-ha-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -168,59 +183,4 @@
             </build>
         </profile>
     </profiles>
-
-    <dependencies>
-        <!-- OpenAM -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-rest</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-idsvcs-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-common</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <!-- Commons -->
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.json.resource</artifactId>
-            <version>${commons.json-resource.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.restlet.ext.openam</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-patch</artifactId>
-            <version>${commons.json-patch.version}</version>
-        </dependency>
-
-    </dependencies>
-
 </project>
