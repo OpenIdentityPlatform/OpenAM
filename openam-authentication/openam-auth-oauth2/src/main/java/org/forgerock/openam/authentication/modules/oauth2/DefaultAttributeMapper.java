@@ -27,25 +27,21 @@
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
-import java.util.Iterator;
+
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.sun.identity.shared.debug.Debug;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
-import  org.forgerock.openam.authentication.modules.AttributeMapper;
-
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
-public class DefaultAttributeMapper implements org.forgerock.openam.authentication.modules.AttributeMapper {
+public class DefaultAttributeMapper implements AttributeMapper {
 
     public DefaultAttributeMapper() {
     }
