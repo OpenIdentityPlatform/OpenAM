@@ -61,7 +61,7 @@ import javax.xml.bind.DatatypeConverter;
  * 
  * @author jasonl
  */
-public class                                    OATH extends AMLoginModule {
+public class OATH extends AMLoginModule {
     
     //debug log name
     protected Debug debug = null;
