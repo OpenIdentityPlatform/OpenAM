@@ -38,7 +38,7 @@
     <packaging>jar</packaging>
 
     <name>OpenAM OAuth2 Restlet Extensions</name>
-
+    
     <dependencies>
         <!-- OpenAM -->
         <dependency>
@@ -87,7 +87,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.3.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -96,7 +95,6 @@
             <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
     <build>
         <pluginManagement>
