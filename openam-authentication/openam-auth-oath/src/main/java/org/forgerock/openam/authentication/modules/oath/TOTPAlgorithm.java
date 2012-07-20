@@ -37,10 +37,10 @@ public class TOTPAlgorithm {
     * HMAC computes a Hashed Message Authentication Code with the
     * crypto hash algorithm as a parameter.
     *
-    * @param crypto: the crypto algorithm (HmacSHA1, HmacSHA256,
+    * @param crypto the crypto algorithm (HmacSHA1, HmacSHA256,
     *                             HmacSHA512)
-    * @param keyBytes: the bytes to use for the HMAC key
-    * @param text: the message or text to be authenticated
+    * @param keyBytes the bytes to use for the HMAC key
+    * @param text the message or text to be authenticated
     */
     private static byte[] hmac_sha(String crypto, byte[] keyBytes, byte[] text){
         try {
@@ -57,9 +57,9 @@ public class TOTPAlgorithm {
     /**
       * This method converts a HEX string to Byte[]
       *
-      * @param hex: the HEX string
+      * @param hex the HEX string
       *
-      * @return: a byte array
+      * @return a byte array
       */
 
     private static byte[] hexStr2Bytes(String hex){
@@ -82,11 +82,11 @@ public class TOTPAlgorithm {
       * This method generates a TOTP value for the given
       * set of parameters.
       *
-      * @param key: the shared secret, HEX encoded
-      * @param time: a value that reflects a time
-      * @param returnDigits: number of digits to return
+      * @param key the shared secret, HEX encoded
+      * @param time a value that reflects a time
+      * @param returnDigits number of digits to return
       *
-      * @return: a numeric String in base 10 that includes
+      * @return a numeric String in base 10 that includes
       *              {@link truncationDigits} digits
       */
 
@@ -101,11 +101,11 @@ public class TOTPAlgorithm {
       * This method generates a TOTP value for the given
       * set of parameters.
       *
-      * @param key: the shared secret, HEX encoded
-      * @param time: a value that reflects a time
-      * @param returnDigits: number of digits to return
+      * @param key the shared secret, HEX encoded
+      * @param time a value that reflects a time
+      * @param returnDigits number of digits to return
       *
-      * @return: a numeric String in base 10 that includes
+      * @return a numeric String in base 10 that includes
       *              {@link truncationDigits} digits
       */
 
@@ -119,11 +119,11 @@ public class TOTPAlgorithm {
       * This method generates a TOTP value for the given
       * set of parameters.
       *
-      * @param key: the shared secret, HEX encoded
-      * @param time: a value that reflects a time
-      * @param returnDigits: number of digits to return
+      * @param key the shared secret, HEX encoded
+      * @param time a value that reflects a time
+      * @param returnDigits number of digits to return
       *
-      * @return: a numeric String in base 10 that includes
+      * @return a numeric String in base 10 that includes
       *              {@link truncationDigits} digits
       */
 
@@ -138,12 +138,12 @@ public class TOTPAlgorithm {
       * This method generates a TOTP value for the given
       * set of parameters.
       *
-      * @param key: the shared secret, HEX encoded
-      * @param time: a value that reflects a time
-      * @param returnDigits: number of digits to return
-      * @param crypto: the crypto function to use
+      * @param key the shared secret, HEX encoded
+      * @param time a value that reflects a time
+      * @param returnDigits number of digits to return
+      * @param crypto the crypto function to use
       *
-      * @return: a numeric String in base 10 that includes
+      * @return a numeric String in base 10 that includes
       *              {@link truncationDigits} digits
       */
 
