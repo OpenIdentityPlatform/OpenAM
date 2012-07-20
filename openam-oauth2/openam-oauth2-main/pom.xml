@@ -104,6 +104,14 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-coretoken</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
@@ -126,6 +134,10 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>j2ee</artifactId>
         </dependency>
         <!-- Test Dependencies -->
         <dependency>
