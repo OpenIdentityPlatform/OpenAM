@@ -46,7 +46,7 @@ public class DefaultAttributeMapper implements AttributeMapper {
     public DefaultAttributeMapper() {
     }
 
-    @Override
+    //@Override
     public Map<String, Set<String>> getAttributes(Set<String> attributeMapConfiguration, 
                    String svcProfileResponse) 
             throws AuthLoginException {
