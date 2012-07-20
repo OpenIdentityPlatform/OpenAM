@@ -872,7 +872,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.5.2</version>
+                <version>6.3.1</version>
                 <scope>test</scope>
             </dependency>
 
@@ -1214,7 +1214,7 @@
                     <systemPropertyVariables>
                         <system_config>${openam.properties}</system_config>
                     </systemPropertyVariables>
-                    <testNGArtifactName>none:none</testNGArtifactName>
+                    <testNGArtifactName>org.testng:testng</testNGArtifactName>
                 </configuration>
                 <executions>
                     <execution>
