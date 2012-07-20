@@ -38,7 +38,7 @@
     <packaging>jar</packaging>
 
     <name>OpenAM OAuth2 Restlet Extensions</name>
-    
+
     <dependencies>
         <!-- OpenAM -->
         <dependency>
