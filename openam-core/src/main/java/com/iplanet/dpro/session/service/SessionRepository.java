@@ -34,13 +34,13 @@ import com.iplanet.am.util.SystemProperties;
  * <code>SessionRepository</code> represents the session
  * repository , default repository 
  * is <code>JMQSessionRepository</code>
- * @see com.iplanet.dpro.session.JMQSessionRepository
+ * @see org.forgerock.openam.session.ha.JMQSessionRepository
  */
 
 public class SessionRepository {
 
-    private static final String DEFAULT_REPOSITORY_CLASS = 
-        "com.iplanet.dpro.session.JMQSessionRepository";
+    private static final String DEFAULT_REPOSITORY_CLASS =
+            "org.forgerock.openam.session.ha.JMQSessionRepository";
 
     private static final String REPOSITORY_CLASS_PROPERTY = 
         "com.sun.am.session.SessionRepositoryImpl";

@@ -29,8 +29,10 @@
 /**
  * Portions Copyrighted 2011-2012 ForgeRock AS
  */
-package com.iplanet.dpro.session;
+package org.forgerock.openam.session.ha.mq;
 
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.iplanet.am.util.SystemProperties;
@@ -53,6 +55,7 @@ import com.sun.identity.shared.Constants;
  * is used in session failover mode to store/recover serialized
  * state of InternalSession object
  */
+@Deprecated
 public class JMQSessionRepository extends GeneralTaskRunnable implements
     AMSessionRepository {
 
