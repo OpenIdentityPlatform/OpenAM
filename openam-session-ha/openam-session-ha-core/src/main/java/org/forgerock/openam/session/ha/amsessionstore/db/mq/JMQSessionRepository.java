@@ -29,7 +29,7 @@
 /**
  * Portions Copyrighted 2011-2012 ForgeRock AS
  */
-package org.forgerock.openam.session.ha.mq;
+package org.forgerock.openam.session.ha.amsessionstore.db.mq;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;

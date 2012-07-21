@@ -58,8 +58,6 @@
         <module>openam-session-ha-locale</module>
         <module>openam-session-ha-common</module>
         <module>openam-session-ha-core</module>
-        <module>openam-session-ha-ldap</module>
-        <module>openam-session-ha-mq</module>
         <module>openam-session-ha-client</module>
     </modules>
 

@@ -42,7 +42,7 @@ import com.iplanet.dpro.session.SessionID;
   * such as <code>JDBCSessionRepository</code>,
   I <code> JMQSessionRepository</code> implements this interface.
   *
-  * @see org.forgerock.openam.session.ha.mq.JMQSessionRepository
+  * @see org.forgerock.openam.session.ha.amsessionstore.db.mq.JMQSessionRepository
   */ 
 public interface AMSessionRepository {
 
