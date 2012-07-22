@@ -104,7 +104,6 @@
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Session Repository Module Dependencies-->
