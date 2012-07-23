@@ -166,6 +166,9 @@
         <!-- Final Packaging Distribution Kit -->
         <module>openam-distribution</module>
 
+        <!-- OSGi Bundle -->
+        <!-- <module>openam-bundle</module>  Not Ready Yet. -->
+
     </modules>
 
     <!-- Developers -->
