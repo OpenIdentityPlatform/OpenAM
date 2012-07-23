@@ -29,11 +29,9 @@
 package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 
-import com.sun.identity.common.TaskRunnable;
 import com.iplanet.dpro.session.SessionException;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
@@ -45,7 +43,6 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;

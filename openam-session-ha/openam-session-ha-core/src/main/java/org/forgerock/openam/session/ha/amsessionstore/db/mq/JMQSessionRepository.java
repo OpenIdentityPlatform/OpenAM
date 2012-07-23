@@ -55,7 +55,6 @@ import com.sun.identity.shared.Constants;
  * is used in session failover mode to store/recover serialized
  * state of InternalSession object
  */
-@Deprecated
 public class JMQSessionRepository extends GeneralTaskRunnable implements
     AMSessionRepository {
 

@@ -61,10 +61,8 @@ import com.sun.identity.ha.jmqdb.ConnectionFactoryProvider;
 import com.sun.identity.ha.jmqdb.ConnectionFactoryProviderFactory;
 
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
 import com.sleepycat.je.Transaction;
 import com.sleepycat.persist.EntityCursor;
-import com.sleepycat.persist.EntityStore;
 
 import com.sun.messaging.ConnectionConfiguration;
 import com.sun.messaging.ConnectionFactory;

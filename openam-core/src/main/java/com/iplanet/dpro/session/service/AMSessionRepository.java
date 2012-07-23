@@ -40,10 +40,10 @@ import com.iplanet.dpro.session.SessionID;
   * <code>retrive</code> , <code>save</code> , <code>delete</code> the session
   * from the session repository.Any </code>Session<code> repository mechanisms
   * such as <code>JDBCSessionRepository</code>,
-  I <code> JMQSessionRepository</code> implements this interface.
+  * <code> JMQSessionRepository</code> implements this interface.
   *
-  * @see org.forgerock.openam.session.ha.amsessionstore.db.mq.JMQSessionRepository
-  */ 
+  * @see <code>JMQSessionRepository</code>
+  */
 public interface AMSessionRepository {
 
     /**
