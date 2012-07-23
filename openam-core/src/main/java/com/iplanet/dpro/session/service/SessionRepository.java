@@ -34,7 +34,7 @@ import com.iplanet.am.util.SystemProperties;
  * <code>SessionRepository</code> represents the session
  * repository , default repository 
  * is <code>JMQSessionRepository</code>
- * @see org.forgerock.openam.session.ha.amsessionstore.db.mq.JMQSessionRepository
+ * @see <code>JMQSessionRepository</code>
  */
 
 public class SessionRepository {

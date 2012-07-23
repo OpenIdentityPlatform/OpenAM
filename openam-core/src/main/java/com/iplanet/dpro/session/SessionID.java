@@ -472,7 +472,7 @@ public class SessionID implements Serializable {
      * @param tail tail part of session ID (currently used to carry associated
      *        HTTP session ID)
      * @return encoded session id string.
-     * @throws SessionException.
+     * @throws SessionException
      */
     public static String makeSessionID(String encryptedID, Map extensions,
             String tail) throws SessionException {
