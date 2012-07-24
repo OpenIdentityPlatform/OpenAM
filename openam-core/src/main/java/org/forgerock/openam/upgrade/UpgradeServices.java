@@ -60,6 +60,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -561,7 +562,7 @@ public class UpgradeServices {
         return doc;
     }
     
-    protected String getResourceContent(String resName) 
+    protected String getResourceContent(String resName)
     throws IOException {
         if ( (resName == null) || (resName.length() <= 0) )
             { return null; }
@@ -570,8 +571,15 @@ public class UpgradeServices {
         String content = null;
 
         try {
-            rawReader = new BufferedReader(new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(resName)));
+
+            URL resourceURL = getClass().getClassLoader().getResource((resName.startsWith("/")?resName:"classpath:"+resName));
+            if (resourceURL == null)
+            {
+                debug.error("Unable to obtain Resource Content: "+resName+", Resource Not Available!");
+                return null;
+            }
+
+            rawReader = new BufferedReader(new InputStreamReader(resourceURL.openStream()));
             StringBuilder buff = new StringBuilder();
             String line = null;
 
@@ -584,8 +592,7 @@ public class UpgradeServices {
             content = buff.toString();
 
         } catch (RuntimeException rte) {
-            debug.error("Unable to obtain resource file: " + resName);
-            debug.error("Exception Encountered: ", rte);
+            debug.error("Unable to obtain resource file: " + resName + ", Exception Encountered.", rte);
         } finally {
             if (rawReader != null) {
                 rawReader.close();
