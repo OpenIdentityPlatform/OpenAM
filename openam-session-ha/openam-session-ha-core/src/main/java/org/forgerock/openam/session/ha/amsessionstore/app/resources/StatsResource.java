@@ -23,24 +23,17 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.app.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJConfig;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.ReplicationConfig;
-import org.forgerock.openam.session.ha.amsessionstore.app.resources.ReplicationResource;
+import java.util.Set;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
 /**
  *
  * @author steve
  */
-public class ReplicationResourceImpl extends ServerResource implements ReplicationResource {
+public interface StatsResource {
+    public final static String URI = "/stats";
     @Get
-    @Override
-    public ReplicationConfig getConfig() {
-        ReplicationConfig config = new ReplicationConfig(OpenDJConfig.getOpenDJSetupMap());
-
-        return config;
-    }   
+    public Set stats() throws Exception;
 }

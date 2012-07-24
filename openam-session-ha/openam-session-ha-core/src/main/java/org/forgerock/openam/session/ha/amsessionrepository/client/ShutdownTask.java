@@ -26,7 +26,7 @@
 package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import org.forgerock.openam.session.model.AMRecord;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.ShutdownResource;
+import org.forgerock.openam.session.ha.amsessionstore.app.resources.ShutdownResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;

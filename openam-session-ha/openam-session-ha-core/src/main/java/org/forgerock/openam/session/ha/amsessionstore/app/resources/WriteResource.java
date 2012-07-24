@@ -23,24 +23,18 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.app.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJConfig;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.ReplicationConfig;
-import org.forgerock.openam.session.ha.amsessionstore.app.resources.ReplicationResource;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
+import org.forgerock.openam.session.model.AMRecord;
+import org.restlet.resource.Put;
 
 /**
  *
  * @author steve
  */
-public class ReplicationResourceImpl extends ServerResource implements ReplicationResource {
-    @Get
-    @Override
-    public ReplicationConfig getConfig() {
-        ReplicationConfig config = new ReplicationConfig(OpenDJConfig.getOpenDJSetupMap());
+public interface WriteResource {
+    public final static String URI = "/write";
 
-        return config;
-    }   
+    @Put
+    public void write(AMRecord record) throws Exception;
 }

@@ -26,8 +26,8 @@ package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.StatsResource;
+import org.forgerock.openam.session.ha.amsessionstore.store.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.app.resources.StatsResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;

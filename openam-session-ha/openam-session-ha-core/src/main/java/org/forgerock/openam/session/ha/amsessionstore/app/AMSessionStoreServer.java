@@ -36,7 +36,7 @@ import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.common.config.SystemProperties;
 import org.forgerock.openam.session.model.DBStatistics;
-import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.store.PersistentStoreFactory;
 import org.restlet.Component;
 import org.restlet.Server;
 import org.restlet.data.Protocol;

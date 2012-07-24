@@ -23,24 +23,19 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.app.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.resources;
 
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJConfig;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.ReplicationConfig;
-import org.forgerock.openam.session.ha.amsessionstore.app.resources.ReplicationResource;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
+import org.restlet.resource.Delete;
 
 /**
  *
  * @author steve
  */
-public class ReplicationResourceImpl extends ServerResource implements ReplicationResource {
-    @Get
-    @Override
-    public ReplicationConfig getConfig() {
-        ReplicationConfig config = new ReplicationConfig(OpenDJConfig.getOpenDJSetupMap());
-
-        return config;
-    }   
+public interface DeleteResource {
+    public static final String URI = "/delete";
+    public static final String PKEY_PARAM = "pkey";
+    public static final String PKEY = "/{" + PKEY_PARAM + "}";
+    
+    @Delete
+    public void remove();
 }

@@ -29,7 +29,7 @@ import org.forgerock.openam.session.model.FAMRecord;
 import java.util.HashMap;
 import java.util.Map;
 import org.forgerock.openam.session.model.AMRecord;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.GetRecordCountResource;
+import org.forgerock.openam.session.ha.amsessionstore.app.resources.GetRecordCountResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.resource.ClientResource;

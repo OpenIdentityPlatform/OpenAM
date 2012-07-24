@@ -268,15 +268,15 @@
                                      syntax="string"
                                      i18nKey="">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="In-Memory">org.forgerock.openam.session.ha.amsessionstore.db.memory.MemoryPersistentStore
+                            <ChoiceValue i18nKey="In-Memory">org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore
                             </ChoiceValue>
-                            <ChoiceValue i18nKey="OpenDJ">org.forgerock.openam.session.ha.amsessionstore.db.opendj.OpenDJPersistentStore
+                            <ChoiceValue i18nKey="OpenDJ">org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore
                             </ChoiceValue>
-                            <ChoiceValue i18nKey="JMS-MQ">org.forgerock.openam.session.ha.amsessionstore.db.mq.JMQSessionRepository
+                            <ChoiceValue i18nKey="JMS-MQ">org.forgerock.openam.session.ha.amsessionstore.store.mq.JMQSessionRepository
                             </ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>org.forgerock.openam.session.ha.amsessionstore.db.memory.MemoryPersistentStore</Value>
+                            <Value>org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
