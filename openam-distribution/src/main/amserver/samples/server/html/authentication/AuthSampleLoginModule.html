@@ -31,7 +31,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>OpenSSO</title>
+<title>OpenAM</title>
 
 <link rel="stylesheet" type="text/css" href="../../com_sun_web_ui/css/css_ns6up.css" />
 <link rel="shortcut icon" href="../../com_sun_web_ui/images/favicon/favicon.ico" type="image/x-icon"></link>
@@ -60,7 +60,7 @@
 <tr>
 <td>
 <p></p>
-<h2>OpenSSO Server - Authentication Samples</h2>
+<h2>OpenAM Server - Authentication Samples</h2>
 <p>
 <hr noshade="yes" size="1">
 <h3>1. Sample Login Module</h3>
@@ -140,7 +140,7 @@
     implement <code>init()</code>, <code>process()</code>,
     <code>getPrincipal()</code> methods. <code>AMLoginModule</code> is an
     abstract class which implements JAAS <code>LoginModule</code>, it provides
-    methods to access OpenSSO services and the module
+    methods to access OpenAM services and the module
     XML configuration. Refer javadocs for complete list of methods. 
     <pre>
     public void init(Subject subject,Map sharedState, Map options);
@@ -214,7 +214,7 @@
     pages in the Module properties XML file have been sent and the module
     has not thrown an exception. The method retrieves the authenticated
     token string that the authenticated user will be known by in the
-    OpenSSO environment. 
+    OpenAM environment.
     </p>
 <p>
     
@@ -230,7 +230,7 @@
     </p>
 <p>
 <ol>
-<li>Login to OpenSSO Console as amadmin. [<a target="console" href="../../UI/Login">here</a>]</li>
+<li>Login to OpenAM Console as amadmin. [<a target="console" href="../../UI/Login">here</a>]</li>
 <li>Click on "Configuration" tab.</li>
 <li>Select "Core" under the Authentication table.</li>
 <li>Add <code>com.sun.identity.samples.authentication.spi.providers.LoginModuleSample</code> to "Pluggable Auth Modules Classes" attribute.</li>

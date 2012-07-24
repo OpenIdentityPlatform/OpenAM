@@ -29,7 +29,7 @@
 
 <html>
 <head>
-<title>Configure OpenSSO Client SDK</title>
+<title>Configure OpenAM Client SDK</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="stylesheet" type="text/css" href="com_sun_web_ui/css/css_ns6up.css" />
 
@@ -160,11 +160,11 @@ java.util.Properties"
     if (!configured) {
 %>
 
-<h3>Configuring OpenSSO Client SDK</h3>
+<h3>Configuring OpenAM Client SDK</h3>
 
 <form action="Configurator.jsp" method="POST" 
     name="clientsampleconfigurator">
-    Please provide the OpenSSO Server Information. This is the server this Client SDK (including samples) will interact with. 
+    Please provide the OpenAM Server Information. This is the server this Client SDK (including samples) will interact with.
     <p>&nbsp;</p>    
 
     <table border=0 cellpadding=5 cellspacing=0>

@@ -90,7 +90,7 @@ Samples Main Page</a> </p>
       <h3>Introduction</h3>
       <p style="margin-bottom: 0in;">This sample demonstrates the usage
 of Security Token Service (STS) Client API for obtaining security
-tokens from a Security Token Service hosted on OpenSSO
+tokens from a Security Token Service hosted on OpenAM
 server. STS client API makes WS-Trust request to STS service in order
 to get Security Token from STS service. The communication between STS
 client and STS service is secured using Authentication token of STS
@@ -101,20 +101,20 @@ and issues SAML 1.1 or SAML 2.0 token.</p>
       <p style="margin-bottom: 0in;">STS service :</p>
       <ol>
         <li>
-          <p style="margin-bottom: 0in;">Deploy OpenSSO war</p>
+          <p style="margin-bottom: 0in;">Deploy OpenAM war</p>
         </li>
         <li>
-          <p style="margin-bottom: 0in;">Configure OpenSSO web
+          <p style="margin-bottom: 0in;">Configure OpenAM web
 application</p>
         </li>
       </ol>
       <p style="margin-bottom: 0in;">STS client :</p>
       <ol>
         <li>
-          <p style="margin-bottom: 0in;">This OpenSSO client web application</p>
+          <p style="margin-bottom: 0in;">This OpenAM client web application</p>
         </li>
         <li>
-          <p style="margin-bottom: 0in;">This page → &lt;OpenSSO client web
+          <p style="margin-bottom: 0in;">This page → &lt;OpenAM client web
 application
 protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/index.html</p>
         </li>
@@ -124,18 +124,18 @@ protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/index.html</p>
 included in this STS client sample.</p>
       <ol>
         <li>
-          <p style="margin-bottom: 0in;">&lt;OpenSSO client web application
+          <p style="margin-bottom: 0in;">&lt;OpenAM client web application
 protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/sts-client-user.jsp</p>
           <p style="margin-bottom: 0in;">Accessing this page will
 redirect to
-authentication service of OpenSSO server. </p>
+authentication service of OpenAM server. </p>
           <p style="margin-bottom: 0in;">Login with any existing
-OpenSSO user. </p>
+OpenAM user. </p>
           <p style="margin-bottom: 0in;">After successful user
 authentication and valid user's SSOToken, the page will redirect back
 to sts-client-user.jsp.</p>
           <p style="margin-bottom: 0in;">sts-client-user.jsp will
-display SAML assertion obtained from OpenSSO Security Token Service, in
+display SAML assertion obtained from OpenAM Security Token Service, in
 exchange of end user's SSOToken.</p>
           <p style="margin-bottom: 0in;"><b>Description :</b></p>
           <p style="margin-bottom: 0in;">There are two parties involved
@@ -156,11 +156,11 @@ would be the authenticated End user and its identity (name id) would be
 the End user's user identity.</p>
         </li>
         <li>
-          <p style="margin-bottom: 0in;">&lt;OpenSSO client web application
+          <p style="margin-bottom: 0in;">&lt;OpenAM client web application
 protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/sts-client-wsc.jsp
           </p>
-          <p style="margin-bottom: 0in;">Login to OpenSSO
-Administration console &lt;OpenSSO web application
+          <p style="margin-bottom: 0in;">Login to OpenAM
+Administration console &lt;OpenAM web application
 protocol://host:port&gt;/&lt;opensso deploy uri&gt; as “amadmin” user
 and its password.</p>
           <p style="margin-bottom: 0in;">Go to Access Control → Default
@@ -170,14 +170,14 @@ Agents → Web Service Client → click “wsc” agent profile</p>
 “STSSecurity”, STS Configuration as “SecurityTokenService” and Web
 Service End Point as “default”.</p>
           <p style="margin-bottom: 0in;">Save changes and Logout of
-OpenSSO Administration console.</p>
-          <p style="margin-bottom: 0in;">Access &lt;OpenSSO client web
+OpenAM Administration console.</p>
+          <p style="margin-bottom: 0in;">Access &lt;OpenAM client web
 application
 protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/sts-client-wsc.jsp</p>
           <p style="margin-bottom: 0in;">Enter web service client name
 as
 "wsc" and click "GetToken".<br>
-If successful, this will display SAML Assertion obtained from OpenSSO
+If successful, this will display SAML Assertion obtained from OpenAM
 Security Token Service, in exchange of WSC's token.</p>
           <p style="margin-bottom: 0in;"><b>Description :</b></p>
           <p style="margin-bottom: 0in;">There are four parties
@@ -207,8 +207,8 @@ certificate subject DN of the STS client's X509 certificate.</p>
 dictate SAML 1.1 or SAML 2.0 token ?<br>
       <br>
       </p>
-      <div style="margin-left: 40px;">Login to OpenSSO Administration
-console &lt;OpenSSO web application
+      <div style="margin-left: 40px;">Login to OpenAM Administration
+console &lt;OpenAM web application
 protocol://host:port&gt;/&lt;opensso deploy uri&gt; as “amadmin” user
 and its password.<br>
 Go to Access Control → Default realm → Agents →
@@ -226,7 +226,7 @@ own identity (sample 2 - sts-client-wsc.jsp) <br>
 - “SAML-SenderVouches” if the token is to be retrieved for end user's
 identity (sample 1 - sts-client-user.jsp)<br>
       <br>
-Save changes and Logout of OpenSSO Administration console.<br>
+Save changes and Logout of OpenAM Administration console.<br>
       <br>
 If both, SAML 2.0 and SAML 1.1 security mechanisms are selected, then
 SAML 2.0 takes the precedence.<br>
@@ -234,8 +234,8 @@ SAML 2.0 takes the precedence.<br>
       <p style="margin-bottom: 0in;">2) How to create agent profiles
 for WSC, STS client and WSP (if not created out of box) ?</p>
       <ol start="2">
-        <p style="margin-bottom: 0in;">Login to OpenSSO Administration
-console &lt;OpenSSO web application
+        <p style="margin-bottom: 0in;">Login to OpenAM Administration
+console &lt;OpenAM web application
 protocol://host:port&gt;/&lt;opensso deploy uri&gt; as “amadmin” user
 and its password.</p>
         <p style="margin-bottom: 0in;">Go to Access Control → Default
@@ -271,7 +271,7 @@ true (checked).<br>
 Save changes.<br>
       </div>
       <ol start="2">
-        <p>Logout of OpenSSO Administration console.<br>
+        <p>Logout of OpenAM Administration console.<br>
         </p>
         <p><br>
         </p>

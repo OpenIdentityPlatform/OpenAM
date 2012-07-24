@@ -67,7 +67,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
 <!--
     <p><hr>
     <form name="FAMConsole" action="/opensso/console" method="GET">
-        Click <a href="/opensso/console">here</a> to view OpenSSO Console
+        Click <a href="/opensso/console">here</a> to view OpenAM Console
         <p><input type="submit" value="FAMConsole"/>
     </form>
 -->

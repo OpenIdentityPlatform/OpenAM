@@ -118,7 +118,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
                 if (name.equals(openssoCookieName)) {
                     try {
                         if (OAuthServiceUtils.isTokenValid(value)) {
-                        // get the UUID of the user based on the OpenSSO session cookie
+                        // get the UUID of the user based on the OpenAM session cookie
                             uid = getUid(value);
                         }
                     } catch (OAuthServiceException oe) {
@@ -130,7 +130,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
             }
         }
         if (uid == null) {
-            // session is not valid so redirect the user to OpenSSO login page
+            // session is not valid so redirect the user to OpenAM login page
             String loginURL = 
                 OAuthProperties.get(PathDefs.OPENSSO_SERVER_URL) +
                 OAuthProperties.get(PathDefs.OPENSSO_SERVER_LOGIN_URI);

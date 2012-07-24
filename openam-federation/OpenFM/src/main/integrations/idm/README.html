@@ -18,7 +18,7 @@
 <P ALIGN=CENTER STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><FONT SIZE=4 STYLE="font-size: 16pt">(
-Integration between OpenSSO and Sun Identity Manager )</FONT></FONT></P>
+Integration between OpenAM and Sun Identity Manager )</FONT></FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
@@ -27,7 +27,7 @@ Integration between OpenSSO and Sun Identity Manager )</FONT></FONT></P>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">The
 files in this directory, are intended as samples, to enable some of
-the usecases in the context of integration between OpenSSO and Sun
+the usecases in the context of integration between OpenAM and Sun
 Identity Manager. The samples are part of the opensso.zip
 distribution.</FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
@@ -48,9 +48,9 @@ Password-Reset&quot; Behavior</B></U></FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
 a user's password is close to expiry, the Directory Server will send
 a warning, at the time configured in the password policy. When this
-event occurs, the user will be redirected by OpenSSO, to IDM, where
+event occurs, the user will be redirected by OpenAM, to IDM, where
 he can change his password, the next time the user attempts to login
-to OpenSSO.</FONT></P>
+to OpenAM.</FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">If
@@ -101,7 +101,7 @@ system.</FONT></P>
 <P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">The user
 will be allowed to provide the minimum details required of him, so
 that an account can be created for him on IDM. This account will get
-automatically provisioned into OpenSSO. </FONT>
+automatically provisioned into OpenAM. </FONT>
 </P>
 <P ALIGN=JUSTIFY><FONT FACE="Andale Sans UI, sans-serif">Such a
 user-account, would be the most basic account with the least
@@ -115,7 +115,7 @@ Configuring First-Time User Login Behavior</B></U></FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
-a user is logging into the protected application, through OpenSSO,
+a user is logging into the protected application, through OpenAM,
 for the first time, after being provisioned, he should be requested
 to set his challenge/response answers. These answers could later be
 used to verify his identity, when he wants to reset a forgotten
@@ -126,12 +126,12 @@ password. </FONT>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><U><B>(5)
-Configuring Single-Logout (SLO) Between IDM And OpenSSO</B></U></FONT></P>
+Configuring Single-Logout (SLO) Between IDM And OpenAM</B></U></FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif">When
 the user logs out from the IDM app, he should automatically logged
-out from OpenSSO as well.</FONT></P>
+out from OpenAM as well.</FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
@@ -178,9 +178,9 @@ account could have been locked, due to the following reasons:</FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><FONT FACE="Andale Sans UI, sans-serif"><B>For
-a detailed description about how to configure OpenSSO and Sun
+a detailed description about how to configure OpenAM and Sun
 Identity Manager, for the above usecases, and how to use the sample
-files included here, please refer to the <A HREF="http://docs.sun.com/app/docs/doc/820-4729/ggsmu">OpenSSO
+files included here, please refer to the <A HREF="http://docs.sun.com/app/docs/doc/820-4729/ggsmu">OpenAM
 Integration Guide.</A></B></FONT></P>
 <P ALIGN=JUSTIFY STYLE="margin-bottom: 0in"><BR>
 </P>

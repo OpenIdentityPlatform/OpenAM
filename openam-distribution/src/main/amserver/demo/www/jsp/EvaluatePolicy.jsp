@@ -35,7 +35,7 @@
 
 <html>
     <head>
-        <title>OpenSSO Demo | Policy Evaluation</title>
+        <title>OpenAM Demo | Policy Evaluation</title>
     </head>
     <%
     String serverUrl = SystemProperties.get(Constants.AM_SERVER_PROTOCOL)		+ "://" + SystemProperties.get(Constants.AM_SERVER_HOST)

@@ -89,7 +89,7 @@
 %>
 <html>
 <head>
-<title>OpenSSO (Realm Selection)</title>
+<title>OpenAM (Realm Selection)</title>
 <link rel="stylesheet" href="<%= contextPath %>/css/styles.css" type="text/css" />
 <script language="JavaScript" src="<%= contextPath %>/js/browserVersion.js"></script>
 <script language="JavaScript" src="<%= contextPath %>/js/auth.js"></script>
@@ -134,7 +134,7 @@
           <tr>
             <td width="260"><img src="<%= contextPath %>/images/dot.gif" width="260" height="245" alt="" /></td>
             <td width="415" bgcolor="#ffffff" valign="top"><img name="Login.productLogo" 
-            src="<%= contextPath %>/images/PrimaryProductName.png" alt="OpenSSO" 
+            src="<%= contextPath %>/images/PrimaryProductName.png" alt="OpenAM"
             border="0" />
 
         <form name="realm_form" action="<%=request.getRequestURI()%>" 

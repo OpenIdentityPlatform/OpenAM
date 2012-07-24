@@ -51,14 +51,14 @@
               filtering="true"/>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/opendj"/>
-        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
+        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="true">
             <fileset dir="${project.basedir}/binary">
                 <include name="opendj.zip"/>
             </fileset>
         </copy>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
-        <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="false">
+        <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">
             <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml">
                 <include name="serverconfig.xml"/>
             </fileset>
@@ -103,21 +103,21 @@
         </copy>
 
         <mkdir dir="${openam.temp.target}/config/federation/default_en"/>
-        <copy todir="${openam.temp.target}/config/federation/default_en" filtering="false">
+        <copy todir="${openam.temp.target}/config/federation/default_en" filtering="true">
             <fileset dir="${project.basedir}/src/main/webapp/config/federation/default">
                 <include name="**/**"/>
             </fileset>
         </copy>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/classes"/>
-        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="false">
+        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="true">
             <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
                 <include name="FederationManagerCLI.properties"/>
             </fileset>
             <globmapper from="*.properties" to="*_en.properties"/>
         </copy>
 
-        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="false">
+        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="true">
             <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
                 <include name="FederationManagerCLI.properties"/>
             </fileset>
@@ -322,7 +322,7 @@
         </copy>
 
         <!-- Align the Config Definitions for WAR Inclusion. -->
-        <copy todir="${project.build.directory}/classes" overwrite="false">
+        <copy todir="${project.build.directory}/classes" overwrite="true" filtering="true">
             <fileset dir="${server.resources}/config">
                 <include name="*.htm"/>
                 <include name="*.properties"/>
@@ -350,21 +350,21 @@
 
 
         <!-- Remaining Bits -->
-        <copy todir="${openam.temp.target}/config" overwrite="false">
+        <copy todir="${openam.temp.target}/config" overwrite="true" filtering="true">
             <fileset dir="${server.resources}/config">
                 <include name="*.htm"/>
             </fileset>
         </copy>
 
         <mkdir dir="${openam.temp.target}/js"/>
-        <copy todir="${openam.temp.target}/js" overwrite="false">
+        <copy todir="${openam.temp.target}/js" overwrite="true">
             <fileset dir="src/main/webapp/com_sun_web_ui/js">
                 <include name="browserVersion.js"/>
             </fileset>
         </copy>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/classes/META-INF/services"/>
-        <copy todir="${openam.temp.target}/WEB-INF/classes/META-INF/services" overwrite="false">
+        <copy todir="${openam.temp.target}/WEB-INF/classes/META-INF/services" overwrite="true">
             <fileset dir="src/main/webapp/META-INF/services">
                 <include name="com.sun.xml.ws.api.security.trust.STSAttributeProvider"/>
                 <include name="com.sun.xml.ws.api.security.trust.STSAuthorizationProvider"/>

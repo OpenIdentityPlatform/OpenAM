@@ -54,13 +54,13 @@ public void jspInit()
 <br><b>Secure Attributes Exchange IDP APP SAMPLE</b><br>
 <% 
     request.setCharacterEncoding("UTF-8");
-    // Crypto type to be used with local <OpenSSO>-IDP
+    // Crypto type to be used with local <OpenAM>-IDP
     String cryptotype     = SecureAttrs.SAE_CRYPTO_TYPE_SYM;
-    // For SYM: Shared secret with local <OpenSSO>-IDP
+    // For SYM: Shared secret with local <OpenAM>-IDP
     // For ASYM: Private Key Alias for IDP-APP's signing cert
     String secret     = "secret12";
-    // For SYM: Shared secret with local <OpenSSO>-IDP. Same value as secret.
-    // For ASYM: Public Key Alias for  <OpenSSO>-IDP.
+    // For SYM: Shared secret with local <OpenAM>-IDP. Same value as secret.
+    // For ASYM: Public Key Alias for  <OpenAM>-IDP.
     String encSecret = secret;
     String encryptionAlg = "DES";
     String encryptionStrength = "56";
@@ -74,7 +74,7 @@ public void jspInit()
     // registered application in one of the hosted IDP extended metadata.
     String idpAppName = request.getRequestURL().toString();
 
-    // <OpenSSO>-IDP hosted SAE url that will act like the gateway.
+    // <OpenAM>-IDP hosted SAE url that will act like the gateway.
     String  saeServiceURL="http://sa.idp.com:8080/sa/idpsaehandler/metaAlias/idp";
 
     // String representing authenticated user.
@@ -98,18 +98,18 @@ public void jspInit()
 This sample represents an IDP-App wishing to securely invoke a remote SP-App and pass it some secure attributes (mail and branch).
 <br>
 <br>
-IDP-App -sae---> IDP-&lt;OpenSSO> --samlv2---> SP-&lt;OpenSSO> --sae--> SP-App 
+IDP-App -sae---> IDP-&lt;OpenAM> --samlv2---> SP-&lt;OpenAM> --sae--> SP-App
 <br>
 <br>
 <b>Prerequisites :</b>
 <br>
 IDP=Identity Provider  SP=Service Provider
 <br>
-i) Trust key (shared secret for symmetric crypto  or privatekey for asymmetric signing; shared secret for symmetric crypto data encryption or publickey for asymmetric data encryption) & this application provisioned on IDP-&lt;OpenSSO> in one of the hosted extended metadata - you will enter the same appname and secret here.
+i) Trust key (shared secret for symmetric crypto  or privatekey for asymmetric signing; shared secret for symmetric crypto data encryption or publickey for asymmetric data encryption) & this application provisioned on IDP-&lt;OpenAM> in one of the hosted extended metadata - you will enter the same appname and secret here.
 <br>
-ii) SP_App and corresponding shared secret or key-pair provisioned on SP-&lt;OpenSSO> and destination SP-App. You will enter SP-App here.
+ii) SP_App and corresponding shared secret or key-pair provisioned on SP-&lt;OpenAM> and destination SP-App. You will enter SP-App here.
 <br>
-iii) "auto-federation" and corresponding attributes setup (branch and mail) on both SP-&lt;OpenSSO> and IDP-&lt;OpenSSO> ends.
+iii) "auto-federation" and corresponding attributes setup (branch and mail) on both SP-&lt;OpenAM> and IDP-&lt;OpenAM> ends.
 <br>
 iv) SP-App is already deployed and ready to accept requests.
 <br>

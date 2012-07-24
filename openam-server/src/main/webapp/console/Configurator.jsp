@@ -31,7 +31,7 @@
 
 <html>
 <head>
-<title>Configure OpenSSO Administration Console WAR</title>
+<title>Configure OpenAM Administration Console WAR</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="stylesheet" type="text/css" href="com_sun_web_ui/css/css_ns6up.css" />
 
@@ -213,11 +213,11 @@ org.owasp.esapi.ESAPI"
     if (!configured) {
 %>
 
-<h3>Configuring OpenSSO Administration Console WAR</h3>
+<h3>Configuring OpenAM Administration Console WAR</h3>
 
 <form action="Configurator.jsp" method="POST" 
     name="consoleconfigurator">
-    Please provide the OpenSSO Server Information. This is the server instance this remote administration console will be managing. 
+    Please provide the OpenAM Server Information. This is the server instance this remote administration console will be managing.
     <p>&nbsp;</p>    
 
     <table border=0 cellpadding=5 cellspacing=0>

@@ -44,7 +44,7 @@
     <table class="MstTblBot" title="" border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
         <td class="MstTdTtl" width="99%">
-        <div class="MstDivTtl"><img name="AMConfig.configurator.ProdName" src="console/images/PrimaryProductName.png" alt="OpenSSO" border="0" /></div>
+        <div class="MstDivTtl"><img name="AMConfig.configurator.ProdName" src="console/images/PrimaryProductName.png" alt="OpenAM" border="0" /></div>
         </td>
         <td class="MstTdLogo" width="1%"><img name="AMConfig.configurator.BrandLogo" src="com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td>
         </tr>

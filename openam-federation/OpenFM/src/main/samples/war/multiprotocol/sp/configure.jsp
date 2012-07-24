@@ -189,7 +189,7 @@
 
     <tr>
     <td colspan="2">Please provide the remote Identity Provider (must also be an
-        OpenSSO instance) information:</td>
+        OpenAM instance) information:</td>
     </tr>
     <tr>
     <td valign="center" width="25%">Federation Protocol:</td>

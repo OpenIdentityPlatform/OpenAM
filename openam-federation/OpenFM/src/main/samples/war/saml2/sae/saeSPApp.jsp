@@ -57,11 +57,11 @@ public void jspInit()
     request.setCharacterEncoding("UTF-8");
     try {
         String cryptotype = SecureAttrs.SAE_CRYPTO_TYPE_SYM;
-        // Symmetric : Shared secret between this SP-App and OpenSSO-SP
-        // Asymmetric : pub key alias of OpenSSO-SP 
+        // Symmetric : Shared secret between this SP-App and OpenAM-SP
+        // Asymmetric : pub key alias of OpenAM-SP
         String secret = "secret12";
         // Symmetric : Shared secret for encryption between this SP-App and
-        //     OpenSSO-SP. Same value as shared secret for signing.
+        //     OpenAM-SP. Same value as shared secret for signing.
         // Asymmetric : private key alias of SP-App
         String encSecret = secret;
 

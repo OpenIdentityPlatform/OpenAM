@@ -6,22 +6,22 @@
   <title>CA Siteminder Integration</title>
 </head>
 <body>
-<h1><small><span style="font-weight: bold;">OpenSSO
+<h1><small><span style="font-weight: bold;">OpenAM
 Integration with CA Siteminder</span></small><br>
 </h1>
 =====================================================================<br>
 <br>
-This README explains the OpenSSO Server SSO
+This README explains the OpenAM Server SSO
 Integration with Computer Associates (CA) SiteMinder. The README must
-be read in the context of OpenSSO Integration Document
+be read in the context of OpenAM Integration Document
 where the use cases, possible integrations and configurations are
 described in detail.<br>
 <br>
 This README explains the custom codes for e.g. Authentication
 Modules,&nbsp; compilation instructions and the configuration of the
-auth modules for OpenSSO context. The OpenSSO custom
+auth modules for OpenAM context. The OpenAM custom
 authentication enables the SSO integration between legacy Siteminder
-(SM) access server and OpenSSO especially when the
+(SM) access server and OpenAM especially when the
 deployment contains SM for protecting existing applications.<br>
 <br>
 1. Pre-requisites :<br>
@@ -32,8 +32,8 @@ the&nbsp; integration souce code, configuration files and ofcourse this
 README file along with regular opensso.war<br>
 2. Siteminder server 6.0 SP4 or higer version&nbsp; - The siteminder
 server must be installed and configured. For more details, check
-siteminder documentation. For OpenSSO <br>
-&nbsp;&nbsp;&nbsp; related configuration, check the OpenSSO
+siteminder documentation. For OpenAM <br>
+&nbsp;&nbsp;&nbsp; related configuration, check the OpenAM
 integration
 document. There are no trial versions available for Siteminder
 libraries or for other siteminder components. This <br>
@@ -42,7 +42,7 @@ on Siteminder components and knows how to get them.<br>
 3. Siteminder SDK 6.0 SP4 or higher version&nbsp; - The siteminder SDK
 must be installed and configured. The SDK is required to compile and
 build Federated<br>
-&nbsp;&nbsp;&nbsp; OpenSSO Authentication Modules for
+&nbsp;&nbsp;&nbsp; OpenAM Authentication Modules for
 Siteminder. <br>
 4. Siteminder Agent installed and configured.<br>
 <br>
@@ -52,7 +52,7 @@ Siteminder. <br>
 <br>
 The opensso/integrations directory contains source and configurations
 to compile and build the custom authentication modules and other plugins.&nbsp;
-Check the OpenSSO integration document for your use case and
+Check the OpenAM integration document for your use case and
 configure accordingly. This document provides instructions on how to
 configure authentication modules<br>
 <br>
@@ -66,7 +66,7 @@ build.xml - This file is a build script for building <br>
 config - This directory contains auth module configuration files.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 SMAuthService.xml&nbsp;&nbsp;&nbsp; -&nbsp; This is siteminder auth
-module configuration file that must be imported into OpenSSO<br>
+module configuration file that must be imported into OpenAM<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 SMAuthModule.xml&nbsp;&nbsp; -&nbsp; This file is used for auth module
 call backs and for Siteminder auth module they are empty. However, the
@@ -82,7 +82,7 @@ libraries. They are:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; smjavaagentapi.jar,
 SmJavaApi.jar (Siteminder jar files)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; openfedlib.jar,
-amserver.jar, opensso-sharedlib.jar (OpenSSO jar files)<br>
+amserver.jar, opensso-sharedlib.jar (OpenAM jar files)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; servlet .jar file (If
 it's Glassfish, it is javaee.jar)<br>
 <br>
@@ -94,7 +94,7 @@ com/sun/identity/authentication/siteminder/SMAuthModule.java <br>
 com/sun/identity/authentication/siteminder/SMPrincipal.java<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The above java source
 files are the custom authentication module classes that would be
-plugged into OpenSSO for generating OpenSSO Session by<br>
+plugged into OpenAM for generating OpenAM Session by<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; using Siteminder session.<br>
 <br>
 &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; com
@@ -102,21 +102,21 @@ plugged into OpenSSO for generating OpenSSO Session by<br>
 -&nbsp; This class provides codes for Siteminder AuthScheme Plugin
 class for generating<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Siteminder
-session using OpenSSO session.<br>
+session using OpenAM session.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 com/sun/identity/saml2/plugins/SMAdapter.java&nbsp; - This class is a
 SAML2 Plugin Adapter for SAML service providers to do the remote
 authentication to<br>
-&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; Siteminder using OpenSSO
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; Siteminder using OpenAM
 Session.
-Essentially these java files are used for usecase2 in OpenSSO
+Essentially these java files are used for usecase2 in OpenAM
 integration document.<br>
 <br>
 &nbsp;&nbsp;&nbsp; <br>
 3: How to build:<br>
 ===========<br>
 <br>
-1.&nbsp; Make sure all the siteminder libraries and OpenSSO libraries
+1.&nbsp; Make sure all the siteminder libraries and OpenAM libraries
 present in lib directory as mentioned above.<br>
 <br>
 2.&nbsp; Use&nbsp; "ant" script to build the source files. A compatible
@@ -129,7 +129,7 @@ under<br>
 $openssozipdir/integrations/siteminder/dist directory. <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
 <br>
-4. OpenSSO Installation and Configuration with Siteminder AuthModule:<br>
+4. OpenAM Installation and Configuration with Siteminder AuthModule:<br>
 =================================================<br>
 <br>
 1. Create a temporary directory&nbsp; for e.g. /export/tmp and unwar
@@ -156,7 +156,7 @@ $WAR_DIR/config/auth/default_en<br>
 <br>
 6. Re-war opensso.war using jar cvf opensso.war from $WAR_DIR<br>
 <br>
-7. Deploy opensso.war onto OpenSSO web container. The deployment is self
+7. Deploy opensso.war onto OpenAM web container. The deployment is self
 explanatory. Please check the web container documentation for war<br>
 deployment.<br>
 <br>
@@ -165,11 +165,11 @@ deployment.<br>
 http://&lt;host&gt;:&lt;port&gt;/opensso<br>
 <br>
 9. Accessing deployed application redirects to opensso configurator.
-Choose custom configuration. By default OpenSSO uses embedded directory<br>
+Choose custom configuration. By default OpenAM uses embedded directory<br>
 server for configuration, however, you could choose to use existing or
 a new directory server instance for configuration. <br>
 <br>
-Note: The OpenSSO can be configured to use various
+Note: The OpenAM can be configured to use various
 user repository for validating the user existance, however, you could
 also choose to ignore profile. <br>
 <br>
@@ -183,12 +183,12 @@ user login and verify your administrator credentials. <br>
 Now we have to load the Siteminder authentication module service
 into&nbsp; Open SSO and configure for the SSO integration. The auth
 module service<br>
-is loaded from a OpenSSO command line utility called as "ssoadm". For OpenSSO,
+is loaded from a OpenAM command line utility called as "ssoadm". For OpenAM,
 the ssoadm utitily is exposed in both console mode and browser based<br>
-interfaces. Here we will use use browser based ssoadm for OpenSSO
+interfaces. Here we will use use browser based ssoadm for OpenAM
 configuration changes.<br>
 <br>
-1. Login into OpenSSO using amadmin<br>
+1. Login into OpenAM using amadmin<br>
 <br>
 2. Now access the following URL<br>
 http://&lt;host&gt;:&lt;port&gt;/opensso/ssoadm.jsp<br>
@@ -198,7 +198,7 @@ http://&lt;host&gt;:&lt;port&gt;/opensso/ssoadm.jsp<br>
 4. Copy and paste the xml file from
 $openssozipdir/integrations/siteminder/config/SMAuthService.xml and
 Submit<br>
-This will load the auth module service into OpenSSO configuration.<br>
+This will load the auth module service into OpenAM configuration.<br>
 <br>
 5. Register the auth module into the authentication core framework. <br>
 <br>
@@ -226,10 +226,10 @@ Policy Server IP Address: IP Address of Site minder policy server<br>
 Trusted host name: Agent/SDK host name<br>
 HTTPHeaders: If you have configured SMPolicyServer/SMAgent to send
 HTTPHeaders to the applications, enter the same<br>
-HTTP Header names here so that they could be uploaded to the OpenSSO
+HTTP Header names here so that they could be uploaded to the OpenAM
 session. Also, the same could be sent to SAML Assertion<br>
 by using SAML Attribute configuration mapper. For details on SAML
-Attribute mapping, check the OpenSSO&nbsp; integration documentation.<br>
+Attribute mapping, check the OpenAM&nbsp; integration documentation.<br>
 <br>
 Configure as appropriate and save the configuration. <br>
 <br>
@@ -252,7 +252,7 @@ for siteminder SDK installation.<br>
 1. Set the LD_LIBRARY_PATH for loading siteminder SDK libraries.They
 are located under $SM_SDK_INSTALL/sdk/bin <br>
 <br>
-2. Restart the OpenSSO web container with LD_LIBRARY_PATH set and make
+2. Restart the OpenAM web container with LD_LIBRARY_PATH set and make
 sure that container is loaded with these site minder SDK shared libs.<br>
 <br>
 3. Now access the siteminder protected application and login with
@@ -261,30 +261,30 @@ of siteminder policy and authentication schemes are outside scope of
 this documentation and please check siteminder documentation for more <br>
 information. <br>
 <br>
-4. After successful authentication at siteminder server, access the OpenSSO
+4. After successful authentication at siteminder server, access the OpenAM
 auth module url as follows:<br>
 <br>
 http://&lt;host&gt;:&lt;port&gt;/opensso/UI/Login?module=SMAuth<br>
 <br>
-This should provide a valid OpenSSO session.<br>
+This should provide a valid OpenAM session.<br>
 <br>
-Note: Assumption here is that siteminder and OpenSSO are in the same
+Note: Assumption here is that siteminder and OpenAM are in the same
 physical domain. <br>
 <br>
-By default OpenSSO authentication framework looks for user profile
+By default OpenAM authentication framework looks for user profile
 existance in it's known data repositories. However, you could use
 ignoreProfile<br>
 option if your integration does not require a user to be searched from
-siteminder's user repository. Check the OpenSSO documentation for more info<br>
+siteminder's user repository. Check the OpenAM documentation for more info<br>
 about ignoreProfile option.<br>
 <br>
 7. Installation of FAMAuthScheme into Siteminder:<br>
 ==================================<br>
 <br>
 This section is for a use case where the siteminder session needs to be
-generated upon validating OpenSSO session. The FAMAuthScheme class<br>
+generated upon validating OpenAM session. The FAMAuthScheme class<br>
 implements Siteminder java SPI to configure a custom authentication
 module. The integration dcoumentation guide describes in detail how to<br>
-configure the custom OpenSSO Authentication Scheme in Siteminder.<br>
+configure the custom OpenAM Authentication Scheme in Siteminder.<br>
 </body>
 </html>

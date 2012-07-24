@@ -260,7 +260,7 @@
 <form action="configure.jsp" method="GET">
     This sample will create and load metadata for a hosted Identity Provider and a remote Service Provider, it will also setup circle of trust for the two providers.
     <p>&nbsp;</p>    
-    Please provide the remote Service Provider (must also be an OpenSSO instance) information: <p>
+    Please provide the remote Service Provider (must also be an OpenAM instance) information: <p>
 
     <table border=0 cellpadding=5 cellspacing=0>
 

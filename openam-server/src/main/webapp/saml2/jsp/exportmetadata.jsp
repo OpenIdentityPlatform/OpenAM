@@ -25,7 +25,7 @@
    $Id: exportmetadata.jsp,v 1.8 2009/12/23 23:13:23 exu Exp $
 
 
-   NOTE : remove this JSP from the OpenSSO WAR if you don't want to 
+   NOTE : remove this JSP from the OpenAM WAR if you don't want to
      publically expose your hosted metadata, but some of the SAML2 metadata
      workflows will not work anymore 
 --%><%@ page 

@@ -216,7 +216,7 @@ java.util.Properties"
 <h3>Configuring DistAuth Application</h3>
 
 <form action="distAuthConfigurator.jsp" method="POST">
-    Please provide the OpenSSO Server Information.
+    Please provide the OpenAM Server Information.
     <p>&nbsp;</p>    
 
     <table border=0 cellpadding=5 cellspacing=0>
