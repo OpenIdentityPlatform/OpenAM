@@ -348,6 +348,12 @@ public class UpgradeServices {
             // This string 'content' is to avoid plain text password
             // in the files copied to the config/xml directory.
             String content = strXML;
+            if ( (strXML == null) || (strXML.length() <= 0) )
+            {
+                String errorMessage = "Unable to load services file: " + serviceFileName;
+                debug.error(errorMessage);
+                throw new UpgradeException(errorMessage);
+            }
             
             if (tagswap) {
                 content = StringUtils.strReplaceAll(content,
@@ -557,6 +563,9 @@ public class UpgradeServices {
     
     protected String getResourceContent(String resName) 
     throws IOException {
+        if ( (resName == null) || (resName.length() <= 0) )
+            { return null; }
+
         BufferedReader rawReader = null;
         String content = null;
 
@@ -573,6 +582,10 @@ public class UpgradeServices {
             rawReader.close();
             rawReader = null;
             content = buff.toString();
+
+        } catch (RuntimeException rte) {
+            debug.error("Unable to obtain resource file: " + resName);
+            debug.error("Exception Encountered: ", rte);
         } finally {
             if (rawReader != null) {
                 rawReader.close();
