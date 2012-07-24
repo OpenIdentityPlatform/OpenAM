@@ -98,11 +98,6 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock</groupId>
-                <artifactId>openam-session-ha-common</artifactId>
-                <version>10.1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock</groupId>
                 <artifactId>openam-session-ha-core</artifactId>
                 <version>10.1.0-SNAPSHOT</version>
             </dependency>
