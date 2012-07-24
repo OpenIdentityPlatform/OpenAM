@@ -22,25 +22,21 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
-package org.forgerock.openam.session.ha.amsessionstore.impl;
-
-import org.forgerock.openam.session.ha.amsessionstore.db.opendj.OpenDJConfig;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.ReplicationConfig;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReplicationResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.ConfigResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.config.Config;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- *
+ * This implementation outputs the configuration of the amsessiondb server
+ * 
  * @author steve
  */
-public class ReplicationResourceImpl extends ServerResource implements ReplicationResource {
+public class ConfigResourceImpl extends ServerResource implements ConfigResource {
     @Get
-    @Override
-    public ReplicationConfig getConfig() {
-        ReplicationConfig config = new ReplicationConfig(OpenDJConfig.getOpenDJSetupMap());
-
-        return config;
-    }   
+    public Config getConfig() {
+        return Config.getInstance();
+    }
 }

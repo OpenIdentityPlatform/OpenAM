@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore;
+package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.config.SystemProperties;

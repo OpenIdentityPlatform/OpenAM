@@ -23,50 +23,60 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
 import org.forgerock.i18n.LocalizableMessage;
-import java.util.Set;
 import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import com.iplanet.dpro.session.exceptions.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReadWithSecKeyResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteResource;
+import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
-import org.restlet.resource.Get;
+import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
- * Implements the read with sec key resource functionality
+ * Implements the delete resource functionality
  * 
  * @author steve
  */
-public class ReadWithSecKeyResourceImpl extends ServerResource implements ReadWithSecKeyResource {
-    @Get
+public class DeleteResourceImpl extends ServerResource implements DeleteResource {
+    @Delete
     @Override
-    public Set<String> readWithSecKey() {
-        String id = (String) getRequest().getAttributes().get(ReadWithSecKeyResource.UUID_PARAM);
-        Set<String> records = null;
+    public void remove() {
+        String id = (String) getRequest().getAttributes().get(DeleteResource.PKEY_PARAM);
+        long startTime = 0;
+        
+        if (Statistics.isEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
         
         try {
-            records = PersistentStoreFactory.getPersistentStore().readWithSecKey(id);
+            PersistentStoreFactory.getPersistentStore().delete(id);
         } catch (StoreException sex) {
-            final LocalizableMessage message = DB_R_SEC_KEY.get(sex.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(sex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         } catch (NotFoundException nfe) {
-            final LocalizableMessage message = DB_R_SEC_KEY.get(nfe.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(nfe.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
         } catch (Exception ex) {
-            final LocalizableMessage message = DB_R_SEC_KEY.get(ex.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(ex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
         
-        return records;
+        if (Statistics.isEnabled()) {
+            Statistics.getInstance().incrementTotalDeletes();
+            
+            if (startTime != 0) {
+                Statistics.getInstance().updateDeleteTime(System.currentTimeMillis() - startTime);          
+            }
+        }
     }
 }

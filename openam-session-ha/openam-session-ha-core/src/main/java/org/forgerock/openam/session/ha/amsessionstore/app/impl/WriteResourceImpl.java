@@ -23,36 +23,51 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteByDateResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.WriteResource;
+import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
-import org.restlet.resource.Delete;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
- * Implements the delete by date resource.
+ * Implements the write resource functionality
  * 
  * @author steve
  */
-public class DeleteByDateResourceImpl extends ServerResource implements DeleteByDateResource {
-    @Delete
+public class WriteResourceImpl extends ServerResource implements WriteResource {
+    @Put
     @Override
-    public void remove() {
-        long expDate = Long.parseLong((String) getRequest().getAttributes().get(DeleteByDateResource.DATE_PARAM));
+    public void write(AMRecord record) 
+    throws Exception {
+        long startTime = 0;
+        
+        if (Statistics.isEnabled()) {
+            startTime = System.currentTimeMillis();
+        }
         
         try {
-            PersistentStoreFactory.getPersistentStore().deleteExpired(expDate);
+            PersistentStoreFactory.getPersistentStore().write(record);
         } catch (Exception ex) {
-            final LocalizableMessage message = DB_R_DEL_EXP.get(ex.getMessage());
+            final LocalizableMessage message = DB_R_WRITE.get(ex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
+        }
+        
+        if (Statistics.isEnabled()) {
+            Statistics.getInstance().incrementTotalWrites();
+            
+            if (startTime != 0) {
+                Statistics.getInstance().updateWriteTime(System.currentTimeMillis() - startTime);
+            }
         }
     }
 }

@@ -22,65 +22,51 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore.impl;
 
-/**
- * Implements the read resource functionality
- * 
- * @author steve
- */
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
 import org.forgerock.i18n.LocalizableMessage;
+import java.util.Set;
 import java.util.logging.Level;
-import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import com.iplanet.dpro.session.exceptions.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReadResource;
-import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReadWithSecKeyResource;
 import org.restlet.data.Status;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
-public class ReadResourceImpl extends ServerResource implements ReadResource {
+/**
+ * Implements the read with sec key resource functionality
+ * 
+ * @author steve
+ */
+public class ReadWithSecKeyResourceImpl extends ServerResource implements ReadWithSecKeyResource {
     @Get
     @Override
-    public AMRecord read() {
-        String id = (String) getRequest().getAttributes().get(ReadResource.PKEY_PARAM);
-        AMRecord record = null;
-        long startTime = 0;
-        
-        if (Statistics.isEnabled()) {
-            startTime = System.currentTimeMillis();
-        }
+    public Set<String> readWithSecKey() {
+        String id = (String) getRequest().getAttributes().get(ReadWithSecKeyResource.UUID_PARAM);
+        Set<String> records = null;
         
         try {
-            record = (AMRecord) PersistentStoreFactory.getPersistentStore().read(id);
+            records = PersistentStoreFactory.getPersistentStore().readWithSecKey(id);
         } catch (StoreException sex) {
-            final LocalizableMessage message = DB_R_READ.get(sex.getMessage());
+            final LocalizableMessage message = DB_R_SEC_KEY.get(sex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, sex.getMessage());
         } catch (NotFoundException nfe) {
-            final LocalizableMessage message = DB_R_READ.get(nfe.getMessage());
+            final LocalizableMessage message = DB_R_SEC_KEY.get(nfe.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
         } catch (Exception ex) {
-            final LocalizableMessage message = DB_R_READ.get(ex.getMessage());
+            final LocalizableMessage message = DB_R_SEC_KEY.get(ex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
         
-        if (Statistics.isEnabled()) {
-            Statistics.getInstance().incrementTotalReads();
-            
-            if (startTime != 0) {
-                Statistics.getInstance().updateReadTime(System.currentTimeMillis() - startTime);    
-            }
-        }
-        
-        return record;
+        return records;
     }
 }

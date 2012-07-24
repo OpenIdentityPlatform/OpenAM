@@ -22,21 +22,30 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.ConfigResource;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.Config;
+import java.util.HashSet;
+import java.util.Set;
+import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.StatsResource;
+import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- * This implementation outputs the configuration of the amsessiondb server
+ * Implements the statistics functionality
  * 
  * @author steve
  */
-public class ConfigResourceImpl extends ServerResource implements ConfigResource {
+public class StatsResourceImpl extends ServerResource implements StatsResource {
     @Get
-    public Config getConfig() {
-        return Config.getInstance();
+    @Override
+    public Set stats()
+    throws Exception {
+        Set<Object> results = new HashSet<Object>();
+        results.add(Statistics.getInstance());
+        results.add(PersistentStoreFactory.getPersistentStore().getDBStatistics());
+        
+        return results;
     }
 }

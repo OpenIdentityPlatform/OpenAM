@@ -23,32 +23,32 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
+import org.restlet.resource.Get;
 import org.forgerock.i18n.LocalizableMessage;
+import java.util.Map;
 import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
-import com.iplanet.dpro.session.exceptions.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import com.iplanet.dpro.session.exceptions.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteResource;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.GetRecordCountResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
-import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
- * Implements the delete resource functionality
+ * Implements the get record count functionality
  * 
  * @author steve
  */
-public class DeleteResourceImpl extends ServerResource implements DeleteResource {
-    @Delete
+public class GetRecordCountResourceImpl extends ServerResource implements GetRecordCountResource {
+    @Get
     @Override
-    public void remove() {
-        String id = (String) getRequest().getAttributes().get(DeleteResource.PKEY_PARAM);
+    public Map<String, Long> getRecordCount() {
+        String uuid = (String) getRequest().getAttributes().get("uuid");
+        Map<String, Long> sessions = null;
         long startTime = 0;
         
         if (Statistics.isEnabled()) {
@@ -56,27 +56,21 @@ public class DeleteResourceImpl extends ServerResource implements DeleteResource
         }
         
         try {
-            PersistentStoreFactory.getPersistentStore().delete(id);
-        } catch (StoreException sex) {
-            final LocalizableMessage message = DB_R_DEL_EXP.get(sex.getMessage());
-            Log.logger.log(Level.WARNING, message.toString());
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
-        } catch (NotFoundException nfe) {
-            final LocalizableMessage message = DB_R_DEL_EXP.get(nfe.getMessage());
-            Log.logger.log(Level.WARNING, message.toString());
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, message.toString());
+            sessions = PersistentStoreFactory.getPersistentStore().getRecordCount(uuid);
         } catch (Exception ex) {
-            final LocalizableMessage message = DB_R_DEL_EXP.get(ex.getMessage());
+            final LocalizableMessage message = DB_R_GRC.get(ex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
         
         if (Statistics.isEnabled()) {
-            Statistics.getInstance().incrementTotalDeletes();
+            Statistics.getInstance().incrementTotalReadRecordCount();
             
             if (startTime != 0) {
-                Statistics.getInstance().updateDeleteTime(System.currentTimeMillis() - startTime);          
+                Statistics.getInstance().updateReadRecordCountTime(System.currentTimeMillis() - startTime);   
             }
         }
+        
+        return sessions;
     }
 }

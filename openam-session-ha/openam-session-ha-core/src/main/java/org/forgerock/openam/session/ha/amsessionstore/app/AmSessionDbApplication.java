@@ -22,20 +22,19 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore;
+package org.forgerock.openam.session.ha.amsessionstore.app;
 
-import org.forgerock.openam.session.ha.amsessionstore.impl.ConfigResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.DeleteByDateResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.DeleteResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.GetRecordCountResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.ReadResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.ReadWithSecKeyResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.ReplicationResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.ShutdownResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.StatsResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.WriteResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.ConfigResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.DeleteByDateResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.DeleteResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.GetRecordCountResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.ReadResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.ReadWithSecKeyResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.ReplicationResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.ShutdownResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.StatsResourceImpl;
+import org.forgerock.openam.session.ha.amsessionstore.app.impl.WriteResourceImpl;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.ConfigResource;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.DBDumpResource;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteByDateResource;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteResource;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.GetRecordCountResource;

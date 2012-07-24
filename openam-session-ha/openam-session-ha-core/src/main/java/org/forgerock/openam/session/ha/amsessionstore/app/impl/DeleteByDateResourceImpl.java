@@ -23,54 +23,36 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.impl;
+package org.forgerock.openam.session.ha.amsessionstore.app.impl;
 
-import org.restlet.resource.Get;
 import org.forgerock.i18n.LocalizableMessage;
-import java.util.Map;
 import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.common.resources.GetRecordCountResource;
-import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
+import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteByDateResource;
 import org.restlet.data.Status;
+import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
- * Implements the get record count functionality
+ * Implements the delete by date resource.
  * 
  * @author steve
  */
-public class GetRecordCountResourceImpl extends ServerResource implements GetRecordCountResource {
-    @Get
+public class DeleteByDateResourceImpl extends ServerResource implements DeleteByDateResource {
+    @Delete
     @Override
-    public Map<String, Long> getRecordCount() {
-        String uuid = (String) getRequest().getAttributes().get("uuid");
-        Map<String, Long> sessions = null;
-        long startTime = 0;
-        
-        if (Statistics.isEnabled()) {
-            startTime = System.currentTimeMillis();
-        }
+    public void remove() {
+        long expDate = Long.parseLong((String) getRequest().getAttributes().get(DeleteByDateResource.DATE_PARAM));
         
         try {
-            sessions = PersistentStoreFactory.getPersistentStore().getRecordCount(uuid);
+            PersistentStoreFactory.getPersistentStore().deleteExpired(expDate);
         } catch (Exception ex) {
-            final LocalizableMessage message = DB_R_GRC.get(ex.getMessage());
+            final LocalizableMessage message = DB_R_DEL_EXP.get(ex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, message.toString());
         }
-        
-        if (Statistics.isEnabled()) {
-            Statistics.getInstance().incrementTotalReadRecordCount();
-            
-            if (startTime != 0) {
-                Statistics.getInstance().updateReadRecordCountTime(System.currentTimeMillis() - startTime);   
-            }
-        }
-        
-        return sessions;
     }
 }

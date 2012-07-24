@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore;
+package org.forgerock.openam.session.ha.amsessionstore.app;
 
 import org.forgerock.i18n.LocalizableMessage;
 import java.io.BufferedReader;
