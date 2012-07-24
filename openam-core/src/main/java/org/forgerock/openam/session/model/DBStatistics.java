@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.db;
+package org.forgerock.openam.session.model;
 
 /**
  * This singleton class is used to keep statistics about the running db.

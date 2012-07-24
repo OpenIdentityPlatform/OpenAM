@@ -30,13 +30,15 @@
  * Portions Copyrighted [2010] [ForgeRock AS]
  */
 
-package com.sun.identity.ha;
+package org.forgerock.openam.session.model;
+
+import org.forgerock.openam.session.model.AMRootEntity;
 
 import java.util.HashMap;
 /**
  * FAMRecord stores all the data that the user would store in the database.
  */
-public class FAMRecord 
+public class FAMRecord extends AMRootEntity
 {
     /** Represents JMS message read Operation */
     static public final String READ = "READ";

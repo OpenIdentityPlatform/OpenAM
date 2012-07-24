@@ -34,7 +34,7 @@ import java.util.logging.Level;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.common.config.ReplicationConfig;
-import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReplicationResource;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;

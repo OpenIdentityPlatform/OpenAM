@@ -32,11 +32,11 @@ package org.forgerock.openam.session.ha.amsessionstore.impl;
 
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
-import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
+import com.iplanet.dpro.session.exceptions.NotFoundException;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
-import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.ReadResource;
 import org.forgerock.openam.session.ha.amsessionstore.shared.Statistics;
 import org.restlet.data.Status;
@@ -58,7 +58,7 @@ public class ReadResourceImpl extends ServerResource implements ReadResource {
         }
         
         try {
-            record = PersistentStoreFactory.getPersistentStore().read(id);
+            record = (AMRecord) PersistentStoreFactory.getPersistentStore().read(id);
         } catch (StoreException sex) {
             final LocalizableMessage message = DB_R_READ.get(sex.getMessage());
             Log.logger.log(Level.WARNING, message.toString());

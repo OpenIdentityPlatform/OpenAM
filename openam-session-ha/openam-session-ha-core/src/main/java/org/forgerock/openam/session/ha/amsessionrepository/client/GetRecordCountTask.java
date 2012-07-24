@@ -25,10 +25,10 @@
 
 package org.forgerock.openam.session.ha.amsessionrepository.client;
 
-import com.sun.identity.ha.FAMRecord;
+import org.forgerock.openam.session.model.FAMRecord;
 import java.util.HashMap;
 import java.util.Map;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.GetRecordCountResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;

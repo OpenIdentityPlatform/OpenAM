@@ -29,7 +29,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.exceptions.UnauthorizedException;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.ConfigResource;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteByDateResource;

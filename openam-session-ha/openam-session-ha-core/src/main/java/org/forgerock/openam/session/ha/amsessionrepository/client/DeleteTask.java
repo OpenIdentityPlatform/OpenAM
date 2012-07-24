@@ -25,7 +25,7 @@
 
 package org.forgerock.openam.session.ha.amsessionrepository.client;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.DeleteResource;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;

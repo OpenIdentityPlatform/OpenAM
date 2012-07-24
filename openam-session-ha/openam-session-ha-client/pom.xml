@@ -94,7 +94,7 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-common</artifactId>
+            <artifactId>openam-session-ha-core</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 

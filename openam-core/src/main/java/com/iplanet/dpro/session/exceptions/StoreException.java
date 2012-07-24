@@ -23,20 +23,40 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.common.resources;
-
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
-import org.restlet.resource.Get;
+package com.iplanet.dpro.session.exceptions;
 
 /**
- *
+ * Encapsulates a problem in the store
+ * 
  * @author steve
  */
-public interface ReadResource {
-    public static final String URI = "/read";
-    public static final String PKEY_PARAM = "pkey";
-    public static final String PKEY = "/{" + PKEY_PARAM + "}";
+public class StoreException extends Exception {
+    private static final long serialVersionUID = 42L;
+
+    /**
+     * Constructs a new exception with {@code null} as its detail message.
+     */
+    public StoreException() {
+    }
     
-    @Get
-    public AMRecord read();
+    /**
+     * Constructs a new exception with the specified detail message.
+     */
+    public StoreException(String message) {
+        super(message);
+    }
+    
+    /**
+     * Constructs a new exception with the specified cause.
+     */
+    public StoreException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     */
+    public StoreException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

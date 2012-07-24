@@ -23,40 +23,18 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.db;
+package org.forgerock.openam.session.ha.amsessionstore.common.resources;
+
+import org.forgerock.openam.session.model.AMRecord;
+import org.restlet.resource.Put;
 
 /**
- * Encapsulates a user not found exception
- * 
+ *
  * @author steve
  */
-public class NotFoundException extends Exception {
-    private static final long serialVersionUID = 42L;
+public interface WriteResource {
+    public final static String URI = "/write";
 
-    /**
-     * Constructs a new exception with {@code null} as its detail message.
-     */
-    public NotFoundException() {
-    }
-    
-    /**
-     * Constructs a new exception with the specified detail message.
-     */
-    public NotFoundException(String message) {
-        super(message);
-    }
-    
-    /**
-     * Constructs a new exception with the specified cause.
-     */
-    public NotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Constructs a new exception with the specified detail message and cause.
-     */
-    public NotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    @Put
+    public void write(AMRecord record) throws Exception;
 }

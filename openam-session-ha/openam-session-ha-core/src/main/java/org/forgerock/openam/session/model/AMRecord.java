@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.common.model;
+package org.forgerock.openam.session.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import java.util.Vector;
  * @author peter.major
  * @author steve
  */
-public class AMRecord implements Serializable {
+public class AMRecord extends AMRootEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     
     /** Represents JMS message read Operation */

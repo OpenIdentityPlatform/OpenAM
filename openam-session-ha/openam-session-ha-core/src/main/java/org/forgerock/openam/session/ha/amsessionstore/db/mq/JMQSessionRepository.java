@@ -33,6 +33,8 @@ package org.forgerock.openam.session.ha.amsessionstore.db.mq;
 
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.exceptions.NotFoundException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.iplanet.am.util.SystemProperties;
@@ -44,8 +46,12 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.jms.IllegalStateException;
-import com.sun.identity.ha.FAMRecord;
+
+import org.forgerock.openam.session.model.AMRootEntity;
+import org.forgerock.openam.session.model.DBStatistics;
+import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.ha.FAMPersisterManager;
 import com.sun.identity.shared.Constants;
@@ -277,7 +283,7 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
 
     /**
      * Deletes all expired Sessions from the repository
-     * @exception When Unable to delete the expired sessions
+     * @exception Exception thrown when Unable to delete the expired sessions
      */
     public void deleteExpired() throws Exception {
         if (!isDatabaseUp) {
@@ -307,7 +313,7 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
    /**
     * Saves<code> InternalSession</code> into the <code>SessionRepository</code>
     * @param is InternalSession
-    * @exception when cannot save the internal session
+    * @exception Exception thrown when cannot save the internal session
     */
    public void save(InternalSession is) throws Exception {
         if (!isDatabaseUp) {
@@ -476,4 +482,44 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
 
     }
 
+    @Override
+    public DBStatistics getDBStatistics() {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public void delete(String id) throws StoreException, NotFoundException {
+        // TODO
+    }
+
+    @Override
+    public void deleteExpired(long expDate) throws StoreException {
+        // TODO
+    }
+
+    @Override
+    public void write(AMRootEntity amRootEntity) throws StoreException {
+        // TODO
+    }
+
+    @Override
+    public AMRootEntity read(String id) throws StoreException, NotFoundException {
+        return null;  // TODO
+    }
+
+    @Override
+    public Set<String> readWithSecKey(String id) throws StoreException, NotFoundException {
+        return null;  // TODO
+    }
+
+    @Override
+    public void shutdown() {
+        // TODO
+    }
+
+    @Override
+    public Map<String, Long> getRecordCount(String id) throws StoreException {
+        return null;  // TODO
+    }
 }

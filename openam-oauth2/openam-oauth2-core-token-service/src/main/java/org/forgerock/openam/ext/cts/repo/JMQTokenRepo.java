@@ -21,7 +21,7 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.ha.FAMPersisterManager;
-import com.sun.identity.ha.FAMRecord;
+import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;

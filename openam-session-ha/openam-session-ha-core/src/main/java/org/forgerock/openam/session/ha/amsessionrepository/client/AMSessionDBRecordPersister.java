@@ -26,7 +26,7 @@
 package org.forgerock.openam.session.ha.amsessionrepository.client;
 
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.ha.FAMRecord;
+import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.ha.FAMRecordUtils;
 import com.sun.identity.shared.debug.Debug;
@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.Protocol;

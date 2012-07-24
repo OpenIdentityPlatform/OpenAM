@@ -26,6 +26,8 @@
 package org.forgerock.openam.session.ha.amsessionstore.db;
 
 import java.util.logging.Level;
+
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
@@ -47,7 +49,7 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  * @author steve
  */
 public class PersistentStoreFactory {
-    private static PersistentStore persistentStore = null; 
+    private static AMSessionRepository persistentStore = null;
     private static String persistentStoreImpl = null; 
     private static final String DEFAULT_PERSISTER_VALUE = 
         "org.forgerock.openam.session.ha.amsessionstore.db.memory.MemoryPersistentStore";
@@ -74,11 +76,11 @@ public class PersistentStoreFactory {
      * @return The persistent store instance
      * @throws Exception 
      */
-    public synchronized static PersistentStore getPersistentStore() 
+    public synchronized static AMSessionRepository getPersistentStore()
     throws Exception {
         if (persistentStore == null) {
             try {
-                persistentStore = (PersistentStore) Class.forName(
+                persistentStore = (AMSessionRepository) Class.forName(
                 persistentStoreImpl).newInstance(); 
                 Log.logger.log(Level.FINE, DB_PER_CREATE.get().toString());
             } catch (Exception ex) {

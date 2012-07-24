@@ -30,7 +30,7 @@
  * Portions Copyrighted 2011 ForgeRock AS
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.common.model;
+package org.forgerock.openam.session.model;
 
 /**
  * String wrapper that returns a case insensitive hash code useful for case

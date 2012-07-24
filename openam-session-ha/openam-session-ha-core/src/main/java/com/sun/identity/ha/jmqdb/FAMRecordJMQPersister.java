@@ -50,7 +50,7 @@ import javax.jms.TopicSession;
 import javax.jms.TopicSubscriber;
 import java.util.Iterator;
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.ha.FAMRecord;
+import org.forgerock.openam.session.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.ha.FAMRecordUtils;
 import com.sun.identity.shared.Constants;

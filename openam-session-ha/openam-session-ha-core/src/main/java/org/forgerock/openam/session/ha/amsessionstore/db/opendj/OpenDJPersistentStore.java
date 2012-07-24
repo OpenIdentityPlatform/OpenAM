@@ -26,6 +26,12 @@
 package org.forgerock.openam.session.ha.amsessionstore.db.opendj;
 
 import java.util.Iterator;
+
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.AMSessionRepository;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.sun.identity.common.GeneralTaskRunnable;
+import org.forgerock.openam.session.model.AMRootEntity;
 import org.opends.server.types.AttributeValue;
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.ArrayList;
@@ -37,13 +43,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
-import org.forgerock.openam.session.ha.amsessionstore.db.DBStatistics;
-import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStore;
-import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import org.forgerock.openam.session.model.DBStatistics;
+import com.iplanet.dpro.session.exceptions.NotFoundException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
 import org.opends.server.core.ModifyOperation;
@@ -65,7 +70,8 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  *
  * @author steve
  */
-public class OpenDJPersistentStore implements PersistentStore, Runnable {
+public class OpenDJPersistentStore extends GeneralTaskRunnable implements
+        AMSessionRepository {
     private boolean shutdown = false;
     private Thread storeThread;
     private int sleepInterval = 60 * 1000;
@@ -158,14 +164,31 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
             }   
         }
     }
+
+
+    public boolean addElement(Object obj) {
+        return false;
+    }
+
+    public boolean removeElement(Object obj) {
+        return false;
+    }
+
+    public boolean isEmpty() {
+        return true;
+    }
+
+
+
+
     
     @Override
-    public void write(AMRecord record) 
+    public void write(AMRootEntity record)
     throws StoreException {
         boolean found = false;
         StringBuilder baseDN = new StringBuilder();
         baseDN.append(Constants.AMRECORD_NAMING_ATTR).append(Constants.EQUALS);
-        baseDN.append(record.getPrimaryKey()).append(Constants.COMMA);
+        baseDN.append(((AMRecord)record).getPrimaryKey()).append(Constants.COMMA);
         baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(OpenDJConfig.getSessionDBSuffix());
         
         try {
@@ -193,9 +216,9 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         }
         
         if (found) {
-            update(record);
+            update((AMRecord)record);
         } else {
-            store(record);
+            store((AMRecord)record);
         }
     }
    
@@ -593,5 +616,35 @@ public class OpenDJPersistentStore implements PersistentStore, Runnable {
         }
         
         return recordCount;
+    }
+
+    @Override
+    public InternalSession retrieve(SessionID sid) throws Exception {
+        return null;  // TODO
+    }
+
+    @Override
+    public void save(InternalSession is) throws Exception {
+        // TODO
+    }
+
+    @Override
+    public void delete(SessionID sid) throws Exception {
+        // TODO
+    }
+
+    @Override
+    public void deleteExpired() throws Exception {
+        // TODO
+    }
+
+    @Override
+    public Map getSessionsByUUID(String uuid) throws Exception {
+        return null;  // TODO
+    }
+
+    @Override
+    public long getRunPeriod() {
+        return 0;  // TODO
     }
 }

@@ -27,7 +27,7 @@ package org.forgerock.openam.session.ha.amsessionstore.impl;
 
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.logging.Level;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStoreFactory;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.WriteResource;

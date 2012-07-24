@@ -28,7 +28,7 @@ package org.forgerock.openam.session.ha.amsessionrepository.client;
 import com.sun.identity.ha.FAMRecordUtils;
 import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.Callable;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.resources.ConfigResource;
 
 import org.restlet.Client;

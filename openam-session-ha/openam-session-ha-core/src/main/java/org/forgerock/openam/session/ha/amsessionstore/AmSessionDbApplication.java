@@ -25,7 +25,6 @@
 package org.forgerock.openam.session.ha.amsessionstore;
 
 import org.forgerock.openam.session.ha.amsessionstore.impl.ConfigResourceImpl;
-import org.forgerock.openam.session.ha.amsessionstore.impl.DBDumpResourceImpl;
 import org.forgerock.openam.session.ha.amsessionstore.impl.DeleteByDateResourceImpl;
 import org.forgerock.openam.session.ha.amsessionstore.impl.DeleteResourceImpl;
 import org.forgerock.openam.session.ha.amsessionstore.impl.GetRecordCountResourceImpl;
@@ -75,8 +74,7 @@ public class AmSessionDbApplication extends Application {
         router.attach(StatsResource.URI, StatsResourceImpl.class);
         router.attach(ConfigResource.URI, ConfigResourceImpl.class);
         router.attach(ReplicationResource.URI, ReplicationResourceImpl.class);
-        // TODO remove as this is debugging code
-        router.attach(DBDumpResource.URI, DBDumpResourceImpl.class);
+
 
         return router;
     }

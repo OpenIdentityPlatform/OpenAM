@@ -25,18 +25,22 @@
 
 package org.forgerock.openam.session.ha.amsessionstore.db.memory;
 
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.AMSessionRepository;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.sun.identity.common.GeneralTaskRunnable;
 import org.forgerock.i18n.LocalizableMessage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import org.forgerock.openam.session.ha.amsessionstore.common.model.AMRecord;
+import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
-import org.forgerock.openam.session.ha.amsessionstore.db.DBStatistics;
-import org.forgerock.openam.session.ha.amsessionstore.db.NotFoundException;
-import org.forgerock.openam.session.ha.amsessionstore.db.PersistentStore;
-import org.forgerock.openam.session.ha.amsessionstore.db.StoreException;
+import org.forgerock.openam.session.model.AMRootEntity;
+import org.forgerock.openam.session.model.DBStatistics;
+import com.iplanet.dpro.session.exceptions.NotFoundException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
@@ -44,7 +48,8 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  * 
  * @author steve
  */
-public class MemoryPersistentStore implements PersistentStore, Runnable {
+public class MemoryPersistentStore extends GeneralTaskRunnable implements
+        AMSessionRepository {
     private Map<String, AMRecord> store = null;
     private volatile boolean shutdown = false;
     private Thread storeThread;
@@ -84,9 +89,9 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
     }
     
     @Override
-    public void write(AMRecord record) 
+    public void write(AMRootEntity record)
     throws StoreException {
-        store.put(record.getPrimaryKey(), record);
+        store.put(((AMRecord)record).getPrimaryKey(), (AMRecord)record);
     }
 
     @Override
@@ -165,5 +170,51 @@ public class MemoryPersistentStore implements PersistentStore, Runnable {
     protected void internalShutdown() {
         shutdown = true;
     }
+
+    @Override
+    public InternalSession retrieve(SessionID sid) throws Exception {
+        return null;  // TODO
+    }
+
+    @Override
+    public void save(InternalSession is) throws Exception {
+        // TODO
+    }
+
+    @Override
+    public void delete(SessionID sid) throws Exception {
+        // TODO
+    }
+
+    @Override
+    public void deleteExpired() throws Exception {
+        // TODO
+    }
+
+    @Override
+    public Map getSessionsByUUID(String uuid) throws Exception {
+        return null;  // TODO
+    }
+
+    @Override
+    public boolean addElement(Object key) {
+        return false;  // TODO
+    }
+
+    @Override
+    public boolean removeElement(Object key) {
+        return false;  // TODO
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;  // TODO
+    }
+
+    @Override
+    public long getRunPeriod() {
+        return 0;  // TODO
+    }
+
 
 }

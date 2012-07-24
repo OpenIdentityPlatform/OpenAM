@@ -32,6 +32,8 @@
 
 package com.sun.identity.ha;
 
+import org.forgerock.openam.session.model.FAMRecord;
+
 /**
  * FAMRecordPersister is an interface. It sends FAMRecord and processes
  * return message, also reformats the message to FAMRecord.

@@ -32,23 +32,30 @@
 package com.iplanet.dpro.session.service;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.exceptions.NotFoundException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 
- /**
-  * The <code>AMSessionRepository</code> interface provides methods to
-  * <code>retrive</code> , <code>save</code> , <code>delete</code> the session
-  * from the session repository.Any </code>Session<code> repository mechanisms
-  * such as <code>JDBCSessionRepository</code>,
-  * <code> JMQSessionRepository</code> implements this interface.
-  *
-  * @see <code>JMQSessionRepository</code>
-  */
+import org.forgerock.openam.session.model.AMRootEntity;
+import org.forgerock.openam.session.model.DBStatistics;
+
+/**
+ * The <code>AMSessionRepository</code> interface provides methods to
+ * <code>retrive</code> , <code>save</code> , <code>delete</code> the session
+ * from the session repository.Any </code>Session<code> repository mechanisms
+ * such as <code>JDBCSessionRepository</code>,
+ * <code> JMQSessionRepository</code> implements this interface.
+ *
+ * @see <code>JMQSessionRepository</code>
+ * @see <code></code>
+ */
 public interface AMSessionRepository {
 
     /**
      * Retrieves session state from the repository.
-     * 
+     *
      * @param sid session ID
      * @return <code>InternalSession</code> object retrieved from the repository
      * @throws Exception if anything goes wrong
@@ -61,7 +68,7 @@ public interface AMSessionRepository {
      * updates repository record instead while checking that versions in the
      * InternalSession and in the record match In case of version mismatch or
      * missing record IllegalArgumentException will be thrown
-     * 
+     *
      * @param is reference to <code>InternalSession</code> object being saved.
      * @throws Exception if anything goes wrong.
      */
@@ -69,29 +76,109 @@ public interface AMSessionRepository {
 
     /**
      * Deletes session record from the repository.
-     * 
+     *
      * @param sid session ID.
      * @throws Exception if anything goes wrong.
      */
     public void delete(SessionID sid) throws Exception;
 
     /**
-     * Deletes the expired session records , this is mainly used by the 
+     * Deletes the expired session records , this is mainly used by the
      * background clean up thread to cleanup the expired session records from
      * the <code>Sessionrepository</code>
-     * 
-     * @throws Exception when unable to deleted the session record from the 
-     * repository
+     *
+     * @throws Exception when unable to deleted the session record from the
+     *                   repository
      */
     public void deleteExpired() throws Exception;
 
     /**
+     * Deletes a record from the store.
+     *
+     * @param id The id of the record to delete from the store
+     * @throws StoreException
+     * @throws NotFoundException
+     */
+    public void delete(String id) throws StoreException, NotFoundException;
+
+    /**
+     * Delete all records in the store
+     * that have an expiry date older than the one specified.
+     *
+     * @param expDate The expDate in seconds
+     * @throws StoreException
+     */
+    public void deleteExpired(long expDate) throws StoreException;
+
+
+    /**
      * Returns the expiration information of all sessions belonging to a user.
      * The returned value will be a Map (sid->expiration_time).
-     * 
+     *
      * @param uuid User's universal unique ID.
      * @throws Exception if there is any problem with accessing the session
-     *         repository.
+     *                   repository.
      */
     public Map getSessionsByUUID(String uuid) throws Exception;
+
+    /**
+     * Merge of additional methods from PersistentStore Class for new session-ha.
+     */
+
+
+    /**
+     * Takes an AMRecord and writes this to the store
+     *
+     * @param amRootEntity The record object to store
+     * @throws StoreException
+     */
+    public void write(AMRootEntity amRootEntity) throws StoreException;
+
+    /**
+     * Reads a record from the store with the specified id
+     *
+     * @param id The primary key of the record to find
+     * @return AMRootEntity The AMRecord if found
+     * @throws StoreException
+     * @throws NotFoundException
+     */
+    public AMRootEntity read(String id) throws StoreException, NotFoundException;
+
+    /**
+     * Reads a record with the secondary key from the underlying store. The
+     * return value is a <code><Set>String</code>. Each string represents the
+     * token id of the matching session found.
+     *
+     * @param id The secondary key on which to search the store
+     * @return A Set of Strings of the matching records, if any.
+     * @throws StoreException
+     * @throws NotFoundException
+     */
+    public Set<String> readWithSecKey(String id) throws StoreException, NotFoundException;
+
+
+    /**
+     * Shut down the store
+     */
+    public void shutdown();
+
+    /**
+     * Returns the count of the records found in the store with a given matching
+     * id.
+     * <p/>
+     * The return value is <code>Map<String, Long></code> where the key is the
+     * token.id of the users session and the long is the expiry time of the session.
+     *
+     * @param id
+     * @return
+     * @throws StoreException
+     */
+    public Map<String, Long> getRecordCount(String id) throws StoreException;
+
+    /**
+     * Returns the current set of store statistics.
+     *
+     * @return DBStatistics
+     */
+    public DBStatistics getDBStatistics();
 }
