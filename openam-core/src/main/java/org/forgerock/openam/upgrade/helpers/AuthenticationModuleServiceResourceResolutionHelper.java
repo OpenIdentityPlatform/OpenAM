@@ -56,11 +56,53 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
         /** amAuthAD.xml **/
         resourceNeighborClassNames.put("amAuthAD.xml","com.sun.identity.authentication.modules.ad.AD");
 
+        /** amAuthAdaptive.xml **/
+        resourceNeighborClassNames.put("amAuthAdaptive.xml","org.forgerock.openam.authentication.modules.adaptive.Adaptive");
+
+        /** amAuthAnonymous.xml **/
+        resourceNeighborClassNames.put("amAuthAnonymous.xml","com.sun.identity.authentication.modules.anonymous.Anonymous");
+
+        /** amAuthCert.xml **/
+        resourceNeighborClassNames.put("amAuthCert.xml","com.sun.identity.authentication.modules.cert.Cert");
+
+        /** amAuthDataStore.xml **/
+        resourceNeighborClassNames.put("amAuthDataStore.xml","com.sun.identity.authentication.modules.datastore.DataStore");
+
+        /** amAuthHOTP.xml **/
+        resourceNeighborClassNames.put("amAuthHOTP.xml","com.sun.identity.authentication.modules.hotp.HOTP");
+
         /** amAuthHTTPBasic.xml **/
         resourceNeighborClassNames.put("amAuthHTTPBasic.xml","com.sun.identity.authentication.modules.httpbasic.HTTPBasic");
 
+        /** amAuthJDBC.xml **/
+        resourceNeighborClassNames.put("amAuthJDBC.xml","com.sun.identity.authentication.modules.jdbc.JDBC");
 
+        /** amAuthLDAP.xml **/
+        resourceNeighborClassNames.put("amAuthLDAP.xml","com.sun.identity.authentication.modules.ldap.LDAP");
 
+        /** amAuthMembership.xml **/
+        resourceNeighborClassNames.put("amAuthMembership.xml","com.sun.identity.authentication.modules.membership.Membership");
+
+        /** amAuthMSISDN.xml **/
+        resourceNeighborClassNames.put("amAuthMSISDN.xml","com.sun.identity.authentication.modules.msisdn.MSISDN");
+
+        /** amAuthNT.xml **/
+        resourceNeighborClassNames.put("amAuthNT.xml","com.sun.identity.authentication.modules.nt.NT");
+
+        /** amAuthOATH.xml **/
+        resourceNeighborClassNames.put("amAuthOATH.xml","org.forgerock.openam.authentication.modules.oath.OATH");
+
+        /** amAuthOAuth.xml **/
+        resourceNeighborClassNames.put("amAuthOAuth.xml","org.forgerock.openam.authentication.modules.oauth2.OAuth");
+
+        /** amAuthRadius.xml **/
+        resourceNeighborClassNames.put("amAuthRadius.xml","com.sun.identity.authentication.modules.radius.RADIUS");
+
+        /** amAuthSecurID.xml **/
+        resourceNeighborClassNames.put("amAuthSecurID.xml","com.sun.identity.authentication.modules.securid.SecurID");
+
+        /** amAuthWindowsDesktopSSO.xml **/
+        resourceNeighborClassNames.put("amAuthWindowsDesktopSSO.xml","com.sun.identity.authentication.modules.windowsdesktopsso.WindowsDesktopSSO");
 
     };
 
@@ -75,9 +117,5 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
             { return null; }
           return resourceNeighborClassNames.get(resourceName);
     }
-
-
-
-
 
 }
