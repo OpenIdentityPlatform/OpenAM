@@ -240,6 +240,31 @@
             </roles>
         </developer>
 
+        <developer>
+            <id>jonathan.scudder</id>
+            <name>Jonathan Scudder</name>
+            <email>jonathan.scudder@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock UK - Oslo</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>OpenAM Chief Architect</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>peter.major</id>
+            <name>Peter Major</name>
+            <email>peter.major@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock - HUNGARY</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>Software Engineer</role>
+            </roles>
+        </developer>
+
+
         <!-- TODO Add remaining OpenAM Team -->
 
     </developers>

@@ -615,27 +615,37 @@ public class UpgradeServices {
         {
             resourceURL =
                     getClass().getClassLoader().getResource(resName);
-            debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "+
+            debug.message("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "+
                     ((resourceURL==null)?"Not Found":"Found")+" using "+resName+".");
         }
         if (resourceURL == null)
         {
             resourceURL =
                     getClass().getClassLoader().getResource("/"+resName);
-            debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
+            debug.message("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
                     +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+".");
         }
+        // *****************************************
+        // After two Attempts we still have not
+        // found our Resource, attempt to use our
+        // helper class to obtain the resource.
+
+
+
         if ( (resourceURL == null) && (resName.equals("amAuthHTTPBasic.xml")) )
         {
             Class<?> neighboorClass = getNeighborClassForResource("com.sun.identity.authentication.modules.httpbasic.HTTPBasic");
             if (neighboorClass != null)
             {
-            resourceURL =
-                    neighboorClass.getClassLoader().getResource("/"+resName);
+                resourceURL =
+                    neighboorClass.getClassLoader().getResource("com/sun/identity/authentication/modules/httpbasic/"+resName);
             }
             debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
                     +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+" with a neighbor class.");
         }
+
+
+
         return resourceURL;
     }
 
