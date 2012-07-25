@@ -73,6 +73,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.forgerock.openam.upgrade.helpers.AuthenticationModuleServiceResourceResolutionHelper;
 import org.w3c.dom.Document;
 
 /**
@@ -615,52 +617,50 @@ public class UpgradeServices {
         {
             resourceURL =
                     getClass().getClassLoader().getResource(resName);
-            debug.message("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "+
-                    ((resourceURL==null)?"Not Found":"Found")+" using "+resName+".");
+            debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was " +
+                    ((resourceURL == null) ? "Not Found" : "Found") + " using " + resName + ".");
         }
         if (resourceURL == null)
         {
             resourceURL =
                     getClass().getClassLoader().getResource("/"+resName);
-            debug.message("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
-                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+".");
+            debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was "
+                    + ((resourceURL == null) ? "Not Found" : "Found") + " using /" + resName + ".");
         }
         // *****************************************
         // After two Attempts we still have not
         // found our Resource, attempt to use our
         // helper class to obtain the resource.
-
-
-
-        if ( (resourceURL == null) && (resName.equals("amAuthHTTPBasic.xml")) )
+        if (resourceURL == null)
         {
-            Class<?> neighboorClass = getNeighborClassForResource("com.sun.identity.authentication.modules.httpbasic.HTTPBasic");
-            if (neighboorClass != null)
+            Class<?> neighborClass = null;
+            String neighborClassName = AuthenticationModuleServiceResourceResolutionHelper.getNeighborClassName(resName);
+            if (neighborClassName != null)
+                {  neighborClass = getNeighborClassForResource(neighborClassName);  }
+            if (neighborClass != null)
             {
                 resourceURL =
-                    neighboorClass.getClassLoader().getResource("com/sun/identity/authentication/modules/httpbasic/"+resName);
+                    neighborClass.getClassLoader().getResource(neighborClass.getPackage().getName().replace(".","/")+"/"+resName);
             }
             debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
-                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+" with a neighbor class.");
+                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+" with a neighbor class: "+neighborClassName+".");
         }
-
-
-
         return resourceURL;
     }
 
+    /**
+     * Helper Method of Obtain the specified Class.
+     * @param className
+     * @return Class<?> of Found Class Instance
+     */
     private Class<?> getNeighborClassForResource(String className) {
       Class<?> clazz = null;
       try {
         clazz =
             getClass().getClassLoader().loadClass(className);
-
-
       } catch(ClassNotFoundException cne) {
-                debug.error("Unable ");
-
+                debug.error("Unable to obtain Class: " + className);
       }
-
       return clazz;
 
     }
