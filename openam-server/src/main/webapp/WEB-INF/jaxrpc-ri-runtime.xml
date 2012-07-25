@@ -80,4 +80,50 @@
             service='LibertyManagerService'
             port='LibertyManagerIFPort'
             urlpattern='/jaxrpc/LibertyManagerIF'/>
+
+    <endpoint
+            name='AssertionManagerIF'
+            interface='com.sun.identity.saml.AssertionManagerIF'
+            implementation='com.sun.identity.saml.AssertionManagerImpl'
+            tie='com.sun.identity.saml.AssertionManagerIF_Tie'
+            model=''
+            wsdl=''
+            service='AssertionManagerService'
+            port='AssertionManagerIFPort'
+            urlpattern='/AssertionManagerServlet/AssertionManagerIF'/>
+
+    <endpoint
+            name='FSAssertionManagerIF'
+            interface='com.sun.identity.federation.services.FSAssertionManagerIF'
+            implementation='com.sun.identity.federation.services.FSAssertionManagerImpl'
+            tie='com.sun.identity.federation.services.FSAssertionManagerIF_Tie'
+            model=''
+            wsdl=''
+            service='FSAssertionManagerService'
+            port='FSAssertionManagerIFPort'
+            urlpattern='/FSAssertionManagerServlet/FSAssertionManagerIF'/>
+
+    <endpoint
+            name='SecurityTokenManagerIF'
+            interface='com.sun.identity.liberty.ws.security.SecurityTokenManagerIF'
+            implementation='com.sun.identity.liberty.ws.security.SecurityTokenManagerImpl'
+            tie='com.sun.identity.liberty.ws.security.SecurityTokenManagerIF_Tie'
+            model=''
+            wsdl=''
+            service='SecurityTokenManagerService'
+            port='SecurityTokenManagerIFPort'
+            urlpattern='/SecurityTokenManagerServlet/SecurityTokenManagerIF'/>
+
+    <endpoint
+            name='LibertyManagerIF'
+            interface='com.sun.liberty.jaxrpc.LibertyManagerIF'
+            implementation='com.sun.liberty.jaxrpc.LibertyManagerImpl'
+            tie='com.sun.liberty.jaxrpc.LibertyManagerIF_Tie'
+            model=''
+            wsdl=''
+            service='LibertyManagerService'
+            port='LibertyManagerIFPort'
+            urlpattern='/jaxrpc/LibertyManagerIF'/>
+
+
 </endpoints>

@@ -569,10 +569,10 @@ public class UpgradeServices {
 
         BufferedReader rawReader = null;
         String content = null;
+        URL resourceURL = null;
 
         try {
-
-            URL resourceURL = getClass().getClassLoader().getResource((resName.startsWith("/")?resName:"classpath:"+resName));
+            resourceURL = getResourceURL(resName);
             if (resourceURL == null)
             {
                 debug.error("Unable to obtain Resource Content: "+resName+", Resource Not Available!");
@@ -592,7 +592,8 @@ public class UpgradeServices {
             content = buff.toString();
 
         } catch (RuntimeException rte) {
-            debug.error("Unable to obtain resource file: " + resName + ", Exception Encountered.", rte);
+            debug.error("Resource URL: " +
+                    ((resourceURL==null)?"is null":resourceURL.toString()+" is not accessible") + ", Exception Encountered.", rte);
         } finally {
             if (rawReader != null) {
                 rawReader.close();
@@ -601,7 +602,60 @@ public class UpgradeServices {
         
         return content;
     }
-    
+
+    /**
+     * Attempt to resolve the Resource Names URL for pulling Content.
+     * @param resName Resource Name
+     * @return URL of Resource or null if Not Found.
+     */
+    private URL getResourceURL(String resName) {
+        URL resourceURL = null;
+        if ( (resName.startsWith("/")) ||
+                (resName.contains(":")) )
+        {
+            resourceURL =
+                    getClass().getClassLoader().getResource(resName);
+            debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "+
+                    ((resourceURL==null)?"Not Found":"Found")+" using "+resName+".");
+        }
+        if (resourceURL == null)
+        {
+            resourceURL =
+                    getClass().getClassLoader().getResource("/"+resName);
+            debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
+                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+".");
+        }
+        if ( (resourceURL == null) && (resName.equals("amAuthHTTPBasic.xml")) )
+        {
+            Class<?> neighboorClass = getNeighborClassForResource("com.sun.identity.authentication.modules.httpbasic.HTTPBasic");
+            if (neighboorClass != null)
+            {
+            resourceURL =
+                    neighboorClass.getClassLoader().getResource("/"+resName);
+            }
+            debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
+                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+" with a neighbor class.");
+        }
+        return resourceURL;
+    }
+
+    private Class<?> getNeighborClassForResource(String className) {
+      Class<?> clazz = null;
+      try {
+        clazz =
+            getClass().getClassLoader().loadClass(className);
+
+
+      } catch(ClassNotFoundException cne) {
+                debug.error("Unable ");
+
+      }
+
+      return clazz;
+
+    }
+
+
     private String generateBackupPassword() {
         PasswordGenerator passwordGenerator = new RandomPasswordGenerator();
         String password = null;

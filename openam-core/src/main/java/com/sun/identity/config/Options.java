@@ -76,7 +76,7 @@ public class Options extends TemplatedPage {
     }
 
     /**
-     * @return If <tt>true</tt>, the options.htm page will be cusotmized for a new installation, otherwise it will be
+     * @return boolean If <tt>true</tt>, the options.htm page will be cusotmized for a new installation, otherwise it will be
      * customized for an upgrade.
      */
     public boolean isNewInstall() {

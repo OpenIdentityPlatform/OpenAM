@@ -2647,7 +2647,7 @@ public class AMSetupServlet extends HttpServlet {
 
     /**
      * Gets <code>ServerGroup</code> for SMS for specified server
-     * @param servername
+     * @param sname servername of groupo to find.
      * @returns <code>ServerGroup</code> instance
      */
     private static ServerGroup getSMSServerGroup(String sname) 
@@ -2660,7 +2660,7 @@ public class AMSetupServlet extends HttpServlet {
     }
     /**
      * Gets clear password of SMS datastore
-     * @param <code>ServerGroup</code> instance representing SMS 
+     * @param ssg <code>ServerGroup</code> instance representing SMS
      * or Configuration datastore.
      * @returns clear password
      */
@@ -2675,7 +2675,7 @@ public class AMSetupServlet extends HttpServlet {
     }
     /**
      * Gets port number of SMS datastore
-     * @param <code>ServerGroup</code> instance representing SMS 
+     * @param ssg <code>ServerGroup</code> instance representing SMS
      * or Configuration datastore.
      * @returns port
      */
