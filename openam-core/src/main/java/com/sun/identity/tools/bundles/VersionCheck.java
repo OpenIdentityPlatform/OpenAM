@@ -46,6 +46,8 @@ public class VersionCheck implements SetupConstants {
             "openam.mismatch.message.to.debuglog";
     private final static String IGNORE_VERSION_CHECK =
             "openam.ignore.version.check";
+    private final static String SNAPSHOT =
+            "SNAPSHOT";
     private final static Debug debug = Debug.getInstance("amCLI");
     
     /**
@@ -83,7 +85,18 @@ public class VersionCheck implements SetupConstants {
                 SystemProperties.get(MISMATCH_MSG_TO_DEBUGLOG, "true"))
                 && Boolean.valueOf(
                       SystemProperties.get(IGNORE_VERSION_CHECK, "true"));
-
+        // Check to see if we need to determine what level of check
+        // for determining if our Version Number has changed.
+        System.out.println("Configured Version: "+configVersion+
+                           "Expected Version: "+amExpectedVersion+ ".");
+        if ( (configVersion.contains(SNAPSHOT)) && (amExpectedVersion.contains(SNAPSHOT)) )
+        {
+            if (getSimpleVersionNumber(configVersion).equalsIgnoreCase(getSimpleVersionNumber(amExpectedVersion)))
+            {
+                System.out.println("Development SNAPSHOT Version Detected, no Upgrade Assumed.");
+                return 0;
+            }
+        }
         // checking case like this, server version is 
         // OpenSSO Express Build 6a(2008-December-9 02:22) but
         // ssoadm version is (2008-December-10 01:19)
@@ -164,4 +177,13 @@ public class VersionCheck implements SetupConstants {
         }
         return true;
     }
+
+
+    private static String getSimpleVersionNumber(final String versionString) {
+        if ( (versionString == null) || (versionString.length() <=0) )
+            { return ""; }
+        String[] versionContents = versionString.split(" ");
+        return versionContents[0];
+    }
+
 }
