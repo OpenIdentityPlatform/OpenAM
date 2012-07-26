@@ -41,7 +41,7 @@ import java.util.Map;
  *    resource directory.
  */
 public class AuthenticationModuleServiceResourceResolutionHelper {
-    protected static Debug debug = Debug.getInstance("amResolver");
+    protected static Debug debug = Debug.getInstance("Configuration");
 
     private static Map<String, String> resourceNeighborClassNames = new HashMap<String, String>();
 
@@ -135,9 +135,8 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
      */
     public static String getResourceContent(Class<?> aClass, String resName)
             throws IOException {
-        if ( (resName == null) || (resName.length() <= 0) )
-        { return null; }
-
+        if ( (resName == null) || (resName.length() <= 0) || (aClass == null))
+            { return null; }
         BufferedReader rawReader = null;
         String content = null;
         URL resourceURL = null;
@@ -180,22 +179,18 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
      * @return URL of Resource or null if Not Found.
      */
     private static URL getResourceURL(Class<?> aClass, String resName) {
+        if ( (resName == null) || (resName.length() <= 0) || (aClass == null))
+            { return null; }
 
-        // TODO Improve
 
-        URL resourceURL = null;
-        if ( (resName.startsWith("/")) ||
-                (resName.contains(":")) )
-        {
-            resourceURL =
-                    aClass.getClass().getClassLoader().getResource(resName);
+        URL resourceURL =
+                    aClass.getClassLoader().getResource(resName);
             debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was " +
                     ((resourceURL == null) ? "Not Found" : "Found") + " using " + resName + ".");
-        }
         if (resourceURL == null)
         {
             resourceURL =
-                    aClass.getClass().getClassLoader().getResource("/"+resName);
+                    aClass.getClassLoader().getResource("/"+resName);
             debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was "
                     + ((resourceURL == null) ? "Not Found" : "Found") + " using /" + resName + ".");
         }
@@ -229,7 +224,7 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
         Class<?> clazz = null;
         try {
             clazz =
-                    aClass.getClass().getClassLoader().loadClass(className);
+                    aClass.getClassLoader().loadClass(className);
         } catch(ClassNotFoundException cne) {
             debug.error("Unable to obtain Class: " + className);
         }
