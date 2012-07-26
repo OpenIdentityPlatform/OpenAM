@@ -24,6 +24,12 @@
  */
 package org.forgerock.openam.upgrade.helpers;
 
+import com.sun.identity.shared.debug.Debug;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +41,7 @@ import java.util.Map;
  *    resource directory.
  */
 public class AuthenticationModuleServiceResourceResolutionHelper {
+    protected static Debug debug = Debug.getInstance("amResolver");
 
     private static Map<String, String> resourceNeighborClassNames = new HashMap<String, String>();
 
@@ -117,5 +124,119 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
             { return null; }
           return resourceNeighborClassNames.get(resourceName);
     }
+
+    /**
+     * Get Resource Content
+     *
+     * @param aClass -- Calling Instantiated Class to obtain Resource.
+     * @param resName -- Resource Name to be Obtained.
+     * @return String Contents of Resource
+     * @throws IOException
+     */
+    public static String getResourceContent(Class<?> aClass, String resName)
+            throws IOException {
+        if ( (resName == null) || (resName.length() <= 0) )
+        { return null; }
+
+        BufferedReader rawReader = null;
+        String content = null;
+        URL resourceURL = null;
+
+        try {
+            resourceURL = getResourceURL(aClass, resName);
+            if (resourceURL == null)
+            {
+                debug.error("Unable to obtain Resource Content: "+resName+", Resource Not Available!");
+                return null;
+            }
+
+            rawReader = new BufferedReader(new InputStreamReader(resourceURL.openStream()));
+            StringBuilder buff = new StringBuilder();
+            String line = null;
+
+            while ((line = rawReader.readLine()) != null) {
+                buff.append(line).append("\n");
+            }
+
+            rawReader.close();
+            rawReader = null;
+            content = buff.toString();
+
+        } catch (RuntimeException rte) {
+            debug.error("Resource URL: " +
+                    ((resourceURL==null)?"is null":resourceURL.toString()+" is not accessible") + ", Exception Encountered.", rte);
+        } finally {
+            if (rawReader != null) {
+                rawReader.close();
+            }
+        }
+
+        return content;
+    }
+
+    /**
+     * Attempt to resolve the Resource Names URL for pulling Content.
+     * @param resName Resource Name
+     * @return URL of Resource or null if Not Found.
+     */
+    private static URL getResourceURL(Class<?> aClass, String resName) {
+
+        // TODO Improve
+
+        URL resourceURL = null;
+        if ( (resName.startsWith("/")) ||
+                (resName.contains(":")) )
+        {
+            resourceURL =
+                    aClass.getClass().getClassLoader().getResource(resName);
+            debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was " +
+                    ((resourceURL == null) ? "Not Found" : "Found") + " using " + resName + ".");
+        }
+        if (resourceURL == null)
+        {
+            resourceURL =
+                    aClass.getClass().getClassLoader().getResource("/"+resName);
+            debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was "
+                    + ((resourceURL == null) ? "Not Found" : "Found") + " using /" + resName + ".");
+        }
+        // *****************************************
+        // After two Attempts we still have not
+        // found our Resource, attempt to use our
+        // helper class to obtain the resource.
+        if (resourceURL == null)
+        {
+            Class<?> neighborClass = null;
+            String neighborClassName = AuthenticationModuleServiceResourceResolutionHelper.getNeighborClassName(resName);
+            if (neighborClassName != null)
+            {  neighborClass = getNeighborClassForResource(aClass, neighborClassName);  }
+            if (neighborClass != null)
+            {
+                resourceURL =
+                        neighborClass.getClassLoader().getResource(neighborClass.getPackage().getName().replace(".","/")+"/"+resName);
+            }
+            debug.message("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
+                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+" with a neighbor class: "+neighborClassName+".");
+        }
+        return resourceURL;
+    }
+
+    /**
+     * Helper Method of Obtain the specified Class.
+     * @param className
+     * @return Class<?> of Found Class Instance
+     */
+    private static Class<?> getNeighborClassForResource(Class<?> aClass, String className) {
+        Class<?> clazz = null;
+        try {
+            clazz =
+                    aClass.getClass().getClassLoader().loadClass(className);
+        } catch(ClassNotFoundException cne) {
+            debug.error("Unable to obtain Class: " + className);
+        }
+        return clazz;
+
+    }
+
+
 
 }

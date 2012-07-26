@@ -37,6 +37,8 @@ import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.openam.upgrade.helpers.AuthenticationModuleServiceResourceResolutionHelper;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -96,10 +98,11 @@ public class RegisterServices {
 
             Object[] params = {serviceFileName};
             SetupProgress.reportStart("emb.registerservice", params);
-            String strXML = getResourceContent(serviceFileName);
+            String strXML =
+                AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(),serviceFileName);
             // This string 'content' is to avoid plain text password
             // in the files copied to the config/xml directory.
-            String content = strXML;
+            String content = (strXML == null)?"":strXML;
             if (tagswap) {
                 content = StringUtils.strReplaceAll(content,
                     "@UM_DS_DIRMGRPASSWD@", "********");
@@ -128,7 +131,8 @@ public class RegisterServices {
     private void addSubConfigForEmbeddedDS(SSOToken adminSSOToken)
         throws SSOException, SMSException, IOException {
         Map data = ServicesDefaultValues.getDefaultValues();
-        String xml = getResourceContent(umEmbeddedDS);
+        String xml =
+              AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(),umEmbeddedDS);
 
         xml = StringUtils.strReplaceAll(xml, "@UM_CONFIG_ROOT_SUFFIX@",
             XMLUtils.escapeSpecialCharacters(
@@ -165,34 +169,8 @@ public class RegisterServices {
             }
         }
     }
-    
-    private String getResourceContent(String resName) 
-        throws IOException {
-        BufferedReader rawReader = null;
-        
-        String content = null;
 
-        try {
-            rawReader = new BufferedReader(new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(resName)));
-            StringBuilder buff = new StringBuilder();
-            String line = null;
 
-            while ((line = rawReader.readLine()) != null) {
-                buff.append(line).append("\n");
-            }
-
-            rawReader.close();
-            rawReader = null;
-            content = buff.toString();
-        } finally {
-            if (rawReader != null) {
-                rawReader.close();
-            }
-        }
-        return content;
-    }
-    
     private String manipulateServiceXML(String serviceFileName, String strXML){
         if (serviceFileName.equals("idRepoService.xml")) {
             strXML = StringUtils.strReplaceAll(strXML, IDREPO_SUB_CONFIG_MARKER,

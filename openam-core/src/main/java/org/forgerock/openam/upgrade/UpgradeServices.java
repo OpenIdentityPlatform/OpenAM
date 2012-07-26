@@ -342,7 +342,8 @@ public class UpgradeServices {
             String strXML = null;
             
             try {
-                strXML = getResourceContent(serviceFileName);
+                strXML =
+                AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(),serviceFileName);
             } catch (IOException ioe) {
                 debug.error("unable to load services file: " + serviceFileName, ioe);
                 throw new UpgradeException(ioe);
@@ -564,106 +565,6 @@ public class UpgradeServices {
         return doc;
     }
     
-    protected String getResourceContent(String resName)
-    throws IOException {
-        if ( (resName == null) || (resName.length() <= 0) )
-            { return null; }
-
-        BufferedReader rawReader = null;
-        String content = null;
-        URL resourceURL = null;
-
-        try {
-            resourceURL = getResourceURL(resName);
-            if (resourceURL == null)
-            {
-                debug.error("Unable to obtain Resource Content: "+resName+", Resource Not Available!");
-                return null;
-            }
-
-            rawReader = new BufferedReader(new InputStreamReader(resourceURL.openStream()));
-            StringBuilder buff = new StringBuilder();
-            String line = null;
-
-            while ((line = rawReader.readLine()) != null) {
-                buff.append(line).append("\n");
-            }
-
-            rawReader.close();
-            rawReader = null;
-            content = buff.toString();
-
-        } catch (RuntimeException rte) {
-            debug.error("Resource URL: " +
-                    ((resourceURL==null)?"is null":resourceURL.toString()+" is not accessible") + ", Exception Encountered.", rte);
-        } finally {
-            if (rawReader != null) {
-                rawReader.close();
-            }
-        }
-        
-        return content;
-    }
-
-    /**
-     * Attempt to resolve the Resource Names URL for pulling Content.
-     * @param resName Resource Name
-     * @return URL of Resource or null if Not Found.
-     */
-    private URL getResourceURL(String resName) {
-        URL resourceURL = null;
-        if ( (resName.startsWith("/")) ||
-                (resName.contains(":")) )
-        {
-            resourceURL =
-                    getClass().getClassLoader().getResource(resName);
-            debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was " +
-                    ((resourceURL == null) ? "Not Found" : "Found") + " using " + resName + ".");
-        }
-        if (resourceURL == null)
-        {
-            resourceURL =
-                    getClass().getClassLoader().getResource("/"+resName);
-            debug.message("ResourceURL " + ((resourceURL == null) ? "is null and" : resourceURL.toExternalForm()) + " was "
-                    + ((resourceURL == null) ? "Not Found" : "Found") + " using /" + resName + ".");
-        }
-        // *****************************************
-        // After two Attempts we still have not
-        // found our Resource, attempt to use our
-        // helper class to obtain the resource.
-        if (resourceURL == null)
-        {
-            Class<?> neighborClass = null;
-            String neighborClassName = AuthenticationModuleServiceResourceResolutionHelper.getNeighborClassName(resName);
-            if (neighborClassName != null)
-                {  neighborClass = getNeighborClassForResource(neighborClassName);  }
-            if (neighborClass != null)
-            {
-                resourceURL =
-                    neighborClass.getClassLoader().getResource(neighborClass.getPackage().getName().replace(".","/")+"/"+resName);
-            }
-            debug.error("ResourceURL "+((resourceURL==null)?"is null and":resourceURL.toExternalForm())+" was "
-                    +((resourceURL==null)?"Not Found":"Found")+" using /"+resName+" with a neighbor class: "+neighborClassName+".");
-        }
-        return resourceURL;
-    }
-
-    /**
-     * Helper Method of Obtain the specified Class.
-     * @param className
-     * @return Class<?> of Found Class Instance
-     */
-    private Class<?> getNeighborClassForResource(String className) {
-      Class<?> clazz = null;
-      try {
-        clazz =
-            getClass().getClassLoader().loadClass(className);
-      } catch(ClassNotFoundException cne) {
-                debug.error("Unable to obtain Class: " + className);
-      }
-      return clazz;
-
-    }
 
 
     private String generateBackupPassword() {
