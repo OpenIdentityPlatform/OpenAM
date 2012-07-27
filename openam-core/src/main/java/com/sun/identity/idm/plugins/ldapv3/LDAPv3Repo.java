@@ -676,8 +676,8 @@ public class LDAPv3Repo extends IdRepo {
         if (ldapServerName == null) {
             getLDAPServerName(configParams);
         }
-        // ldapServerName is list of server names seperated by sapce for
-        // failover purposes. LDAPConnection will automatcially handle failover.
+        // ldapServerName is list of server names separated by space for
+        // failover purposes. LDAPConnection will automatically handle failover.
 
         // port will not be used since ldapserver is in the following format:
         // nameOfLDAPhost:portNumber.
@@ -779,7 +779,7 @@ public class LDAPv3Repo extends IdRepo {
                     ldc.setConnectTimeout(3);
                 }
 
-                ldc.connect(ldapServerHost, ldapServerPort, authid, authpw);
+                ldc.connect(ldapHost, ldapServerPort, authid, authpw);
                 connOptions.put("referrals", Boolean.valueOf(referrals));
 
                 // Construct the pool by cloning the successful connection
@@ -788,7 +788,7 @@ public class LDAPv3Repo extends IdRepo {
                 if (shutdownMan.acquireValidLock()) {
                     try {
                         connPool = new LDAPConnectionPool("LDAPv3Repo", minPoolSize,
-                            maxPoolSize, ldapServerName, ldapPort,
+                            maxPoolSize, ldapHost, ldapPort,
                             ldc.getAuthenticationDN(),
                                 ldc.getAuthenticationPassword(),
                                 ldc, connOptions);
@@ -814,7 +814,7 @@ public class LDAPv3Repo extends IdRepo {
                 int resultCode = lex.getLDAPResultCode();
                 ldapConnError = Integer.toString(resultCode);
                 debug.error("LDAPv3Repo: initConnectionPool ConnectionPool failed: " +
-                            resultCode + "; to server " + ldapServerHost + ":" + ldapServerPort);
+                            resultCode + "; to server " + ldapHost + ":" + ldapServerPort,lex);
                 connPool = null;
 
                 try {

@@ -31,12 +31,8 @@
  */
 package com.sun.identity.common;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.*;
+
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -48,9 +44,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchConstraints;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Class to maintain a pool of individual connections to the
@@ -770,9 +763,14 @@ public class LDAPConnectionPool {
             }
         }
         String hpName = hostArrList.get(0);
-        StringTokenizer stn = new StringTokenizer(hpName,":");
-        this.host = stn.nextToken();
-        this.port = Integer.valueOf(stn.nextToken()).intValue();
+        String[] hpNameParts = hpName.split(":");
+        this.host = (hpNameParts.length > 0)?hpNameParts[0]:"";
+        this.port = ((hpNameParts.length > 1)&&(hpNameParts[1].matches("([0-9]+?)+")))?
+                Integer.valueOf(hpNameParts[1]).intValue() : 389;
+        if (debug.messageEnabled()) {
+            debug.message("LDAPConnectionPool:createHostList():" +
+                    "parsed host name: "+ this.host + ", port: "+this.port);
+        }
     }
 
     /**
