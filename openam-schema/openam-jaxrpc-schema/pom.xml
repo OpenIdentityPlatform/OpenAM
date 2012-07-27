@@ -96,11 +96,6 @@
                     </dependency>
                     <dependency>
                         <groupId>org.forgerock</groupId>
-                        <artifactId>openam-federation-library</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.forgerock</groupId>
                         <artifactId>openam-core</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                     </dependency>
@@ -205,6 +200,12 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>webservices-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-federation-library</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
