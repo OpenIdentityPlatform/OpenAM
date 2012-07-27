@@ -51,7 +51,7 @@
               filtering="true"/>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/opendj"/>
-        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="true">
+        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
             <fileset dir="${project.basedir}/binary">
                 <include name="opendj.zip"/>
             </fileset>
