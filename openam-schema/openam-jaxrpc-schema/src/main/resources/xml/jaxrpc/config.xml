@@ -40,5 +40,15 @@
             servantName="com.iplanet.am.sdk.remote.DirectoryManagerImpl" />
         <interface name="com.sun.identity.entity.EntityObjectIF"
             servantName="com.sun.identity.entity.EntityObjectImpl" />
+
+		<!-- From Federation jaxrpc-ri-runtime file -->
+		<interface name="com.sun.identity.saml.AssertionManagerIF"
+			servantName="com.sun.identity.saml.AssertionManagerImpl" />
+		<interface name="com.sun.identity.federation.services.FSAssertionManagerIF"
+			servantName="com.sun.identity.federation.services.FSAssertionManagerImpl" />
+		<interface name="com.sun.identity.liberty.ws.security.SecurityTokenManagerIF"
+			servantName="com.sun.identity.liberty.ws.security.SecurityTokenManagerImpl" />
+		<interface name="com.sun.liberty.jaxrpc.LibertyManagerIF"
+			servantName="com.sun.liberty.jaxrpc.LibertyManagerImpl" />
     </service>
 </configuration>
