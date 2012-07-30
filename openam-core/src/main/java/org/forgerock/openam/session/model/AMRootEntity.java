@@ -13,7 +13,7 @@ import java.io.Serializable;
  *
  */
 public abstract class AMRootEntity implements Serializable {
-    private static final long serialVersionUID = 100100L;
+    private static final long serialVersionUID = 1010L;
 
 
 
