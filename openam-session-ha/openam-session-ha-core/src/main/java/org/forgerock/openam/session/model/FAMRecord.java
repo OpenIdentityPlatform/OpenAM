@@ -38,36 +38,12 @@ import java.util.HashMap;
 /**
  * FAMRecord stores all the data that the user would store in the database.
  */
-public class FAMRecord extends AMRootEntity
-{
-    /** Represents JMS message read Operation */
-    static public final String READ = "READ";
+public class FAMRecord extends AMRootEntity {
+    private static final long serialVersionUID = 101L;   //  10.1
 
-    /** Represents JMS write Operation */
-    static public final String WRITE = "WRITE";
-
-    /** Represents delete Operation */
-    static public final String DELETE = "DELETE";
-
-    /** Represents delete Date Operation */
-    static public final String DELETEBYDATE = "DELETEBYDATE";
-
-    /** Represents shut down Operation */
-    static public final String SHUTDOWN = "SHUTDOWN";
-
-    /** Represents the record count such as data record count*/
-    static public final String GET_RECORD_COUNT = "GET_RECORD_COUNT";
-
-    /** Represents JMS message read Operation with secondary key */
-    static public final String READ_WITH_SEC_KEY = "READ_WITH_SEC_KEY";
-
-    String service = null;
-    String operation = null; 
-    String primaryKey = null;
-    long expDate = 0;
-    String secondaryKey = null;
-    int state = 0;
-    String auxdata = null;
+    /**
+     * FAMRecord Specifics
+     */
     byte[] data = null;    
     HashMap extraStringAttrs = null;
     HashMap extraByteAttrs = null; 
@@ -86,13 +62,13 @@ public class FAMRecord extends AMRootEntity
      */
     public FAMRecord ( String svc, String op, String pKey, long eDate,
         String secKey, int st, String ax, byte[] blob) {
-        service = svc; 
-        operation = op; 
-        primaryKey = pKey; 
-        expDate = eDate;
-        secondaryKey = secKey; 
-        state = st; 
-        auxdata = ax; 
+        this.setService(svc);
+        this.setOperation(op);
+        this.setPrimaryKey(pKey);
+        this.setExpDate(eDate);
+        this.setSecondaryKey(secKey);
+        this.setState(st);
+        this.setAuxData(ax);
         data = blob; 
     }
     
@@ -117,37 +93,9 @@ public class FAMRecord extends AMRootEntity
     public void setBlob(byte[] blob) {
         data = blob; 
     }
-    
-    public String getService(){
-        return service;
-    }
-    
-    public String getPrimaryKey() {
-        return primaryKey;
-    }
-    
-    public long getExpDate() {
-        return expDate;
-    }
-
-    public String getSecondarykey() {
-        return secondaryKey;
-    }
-
-    public String getAuxData() {
-        return auxdata;
-    }
-
-    public int getState() {
-        return state;
-    }
 
     public byte[] getBlob() {
         return data;
-    } 
-    
-    public String getOperation() {
-        return operation; 
     }
     
     public String getString(String key) {
@@ -169,13 +117,7 @@ public class FAMRecord extends AMRootEntity
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("Service: ").append(service).append("\n");
-        buffer.append("OP: ").append(operation).append("\n");
-        buffer.append("PK: ").append(primaryKey).append("\n");
-        buffer.append("SK: ").append(secondaryKey).append("\n");
-        buffer.append("Expr Date: ").append(expDate).append("\n");
-        buffer.append("State: ").append(state).append("\n");
-        buffer.append("Aux Data: ").append(auxdata).append("\n");
+        buffer.append(super.toString());
         buffer.append("Data: ").append(new String(data)).append("\n");
         buffer.append("Extra String Attrs: ").append(extraStringAttrs).append("\n");
         buffer.append("Extra Byte Attrs: ").append(extraByteAttrs).append("\n");

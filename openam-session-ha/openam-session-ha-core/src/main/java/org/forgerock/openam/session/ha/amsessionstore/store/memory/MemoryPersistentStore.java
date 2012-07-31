@@ -151,7 +151,7 @@ public class MemoryPersistentStore extends GeneralTaskRunnable implements
         
         for (Map.Entry<String, AMRecord> entry : store.entrySet()) {
             if (entry.getValue().getSecondaryKey().equals(id)) {
-                sessions.put(entry.getValue().getAuxdata(), 
+                sessions.put(entry.getValue().getAuxData(),
                         Long.valueOf(entry.getValue().getExpDate()));
             }
         }

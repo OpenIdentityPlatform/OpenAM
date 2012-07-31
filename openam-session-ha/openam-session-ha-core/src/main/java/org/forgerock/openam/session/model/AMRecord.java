@@ -34,37 +34,12 @@ import java.util.Vector;
  * @author peter.major
  * @author steve
  */
-public class AMRecord extends AMRootEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    /** Represents JMS message read Operation */
-    static public final String READ = "READ";
+public class AMRecord extends AMRootEntity {
+    private static final long serialVersionUID = 101L;   //  10.1
 
-    /** Represents JMS write Operation */
-    static public final String WRITE = "WRITE";
-
-    /** Represents delete Operation */
-    static public final String DELETE = "DELETE";
-
-    /** Represents delete Date Operation */
-    static public final String DELETEBYDATE = "DELETEBYDATE";
-
-    /** Represents shut down Operation */
-    static public final String SHUTDOWN = "SHUTDOWN";
-
-    /** Represents the record count such as data record count*/
-    static public final String GET_RECORD_COUNT = "GET_RECORD_COUNT";
-
-    /** Represents JMS message read Operation with secondary key */
-    static public final String READ_WITH_SEC_KEY = "READ_WITH_SEC_KEY";
-    
-    private String service = null;
-    private String operation = null; 
-    private String primaryKey = null;
-    private long expDate = 0;
-    private String secondaryKey = null;
-    private int state = 0;
-    private String auxdata = null;
+    /**
+     * AMRecord Specifics
+     */
     @SuppressWarnings("UseOfObsoleteCollectionType")
     private Vector<String> records = null;
     
@@ -89,13 +64,13 @@ public class AMRecord extends AMRootEntity implements Serializable {
      */
     public AMRecord(String svc, String op, String pKey, long eDate,
         String secKey, int st, String ax, String blob) {
-        service = svc; 
-        operation = op; 
-        primaryKey = pKey; 
-        expDate = eDate;
-        secondaryKey = secKey; 
-        state = st; 
-        auxdata = ax; 
+        this.setService(svc);
+        this.setOperation(op);
+        this.setPrimaryKey(pKey);
+        this.setExpDate(eDate);
+        this.setSecondaryKey(secKey);
+        this.setState(st);
+        this.setAuxData(ax);
         data = blob; 
     }
     
@@ -141,61 +116,7 @@ public class AMRecord extends AMRootEntity implements Serializable {
         return data;
     }
     
-    public String getService(){
-        return service;
-    }
-    
-    public void setService(String service){
-        this.service = service;
-    }
-    
-    public String getPrimaryKey() {
-        return primaryKey;
-    }
-    
-    public void setPrimaryKey(String primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-    
-    public long getExpDate() {
-        return expDate;
-    }
-    
-    public void setExpDate(long expDate) {
-        this.expDate = expDate;
-    }
 
-    public String getSecondaryKey() {
-        return secondaryKey;
-    }
-    
-    public void setSecondaryKey(String secondaryKey) {
-        this.secondaryKey = secondaryKey;
-    }
-
-    public String getAuxdata() {
-        return auxdata;
-    }
-    
-    public void setAuxdata(String auxdata) {
-        this.auxdata = auxdata;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-     
-    public String getOperation() {
-        return operation; 
-    }
-    
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
     
     public String getString(String key) {
       return extraStringAttrs.get(key);
@@ -218,13 +139,7 @@ public class AMRecord extends AMRootEntity implements Serializable {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("Service: ").append(service).append("\n");
-        buffer.append("OP: ").append(operation).append("\n");
-        buffer.append("PK: ").append(primaryKey).append("\n");
-        buffer.append("SK: ").append(secondaryKey).append("\n");
-        buffer.append("Expr Date: ").append(expDate).append("\n");
-        buffer.append("State: ").append(state).append("\n");
-        buffer.append("Aux Data: ").append(auxdata).append("\n");
+        buffer.append(super.toString());
         
         if (data != null) {
             buffer.append("Data: ").append(data).append("\n");

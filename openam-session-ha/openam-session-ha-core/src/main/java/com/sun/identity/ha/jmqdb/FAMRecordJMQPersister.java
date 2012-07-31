@@ -294,7 +294,7 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
            msg.writeLong(expirationTime);
        }
        // Write Secondary Key such as UUID
-       String tmp = famRecord.getSecondarykey(); 
+       String tmp = famRecord.getSecondaryKey();
        if (tmp != null && (!tmp.equals(""))) {
            msg.writeLong(tmp.length());
            msg.writeBytes(tmp.getBytes());

@@ -166,7 +166,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
 
             // Write Secondary Key such as UUID
-            String sKey = famRecord.getSecondarykey(); 
+            String sKey = famRecord.getSecondaryKey();
 
             if (sKey != null && !sKey.isEmpty()) {
                 record.setSecondaryKey(sKey);
@@ -175,7 +175,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             // Write AuxData such as Master ID 
             String auxData = famRecord.getAuxData();
             if (auxData != null && !auxData.isEmpty()) {
-                record.setAuxdata(auxData);
+                record.setAuxData(auxData);
             }
 
             int state = famRecord.getState(); 
@@ -255,7 +255,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
             
             String pKey = famRecord.getPrimaryKey();
-            String sKey = famRecord.getSecondarykey();
+            String sKey = famRecord.getSecondaryKey();
             Callable<AMRecord> getRecordCountTask = 
                     new GetRecordCountTask(client, resourceURL, userName, password, pKey, sKey);
             FutureTask<AMRecord> result = new FutureTask<AMRecord>(getRecordCountTask);
@@ -278,7 +278,7 @@ public class AMSessionDBRecordPersister implements FAMRecordPersister {
             }
             
             String pKey = famRecord.getPrimaryKey();
-            String sKey = famRecord.getSecondarykey();
+            String sKey = famRecord.getSecondaryKey();
             Callable<AMRecord> readWithSecKeyTask = 
                     new ReadWithSecKeyTask(client, resourceURL, userName, password, pKey, sKey);
             FutureTask<AMRecord> result = new FutureTask<AMRecord>(readWithSecKeyTask);

@@ -112,7 +112,7 @@ public class AMRecordDataEntry {
         if (attributeValues.get(AUX_DATA) != null) {
             Set<String> values = attributeValues.get(AUX_DATA);
             for (String value : values) {
-                record.setAuxdata(value);
+                record.setAuxData(value);
             }
         }
         
@@ -210,8 +210,8 @@ public class AMRecordDataEntry {
         this.attributeValues = new HashMap<String, Set<String>>();
         Set<String> set = new HashSet<String>();
         
-        if (record.getAuxdata() != null) {
-            set.add(record.getAuxdata());
+        if (record.getAuxData() != null) {
+            set.add(record.getAuxData());
             attributeValues.put(AUX_DATA, set);
         }
         
