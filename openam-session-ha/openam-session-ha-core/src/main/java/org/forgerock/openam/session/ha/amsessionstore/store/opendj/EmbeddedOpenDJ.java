@@ -255,7 +255,7 @@ public class EmbeddedOpenDJ {
         
         // copy schema files
         String[] opendjSchemaFiles = {
-            "98-amsessiondb.ldif"
+            "amsessiondb.ldif"
         };
 
         for (int i = 0 ; i < opendjSchemaFiles.length; i++) {
