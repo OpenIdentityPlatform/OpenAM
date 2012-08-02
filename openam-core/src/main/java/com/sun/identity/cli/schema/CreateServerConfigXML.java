@@ -52,8 +52,10 @@ import java.util.List;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;
+import org.forgerock.openam.common.OpenAMCommonConstants;
 
-public class CreateServerConfigXML extends AuthenticatedCommand {
+public class CreateServerConfigXML extends AuthenticatedCommand implements OpenAMCommonConstants {
+
     static final String DS_HOST = "dshost";
     static final String DS_PORT = "dsport";
     static final String DS_ADMIN = "dsadmin";
@@ -105,7 +107,7 @@ public class CreateServerConfigXML extends AuthenticatedCommand {
                 dsPasswordFile);
         }
         if ((basedn == null) || (basedn.length() == 0)) {
-            basedn = "dc=opensso,dc=java,dc=net";
+            basedn = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
         }
         dsPassword = (String)AccessController.doPrivileged(
             new EncodeAction(dsPassword));

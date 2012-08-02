@@ -2111,7 +2111,7 @@
 ./js/admincli.js
 ./js/auth.js
 ./js/browserVersion.js
-./js/opensso.js
+./js/openam.js
 ./js/jquery.js
 ./js/jquery-ui.js
 ./login_images/CCCSS_Default.css

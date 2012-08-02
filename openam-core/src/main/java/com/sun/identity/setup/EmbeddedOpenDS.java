@@ -77,6 +77,7 @@ import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPModification;
 import java.io.FilenameFilter;
 
+import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.opends.messages.Message;
 import org.opends.server.core.DirectoryServer;
 import org.opends.server.extensions.ConfigFileHandler;
@@ -468,7 +469,7 @@ public class EmbeddedOpenDS {
      /**
       * Runs the OpenDS setup command like this:
       * $ ./setup --cli --adminConnectorPort 4444
-      * --baseDN dc=opensso,dc=java,dc=net --rootUserDN "cn=directory manager"
+      * --baseDN dc=openam,dc=java,dc=net --rootUserDN "cn=directory manager"
       * --doNotStart --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx
       * --jmxPort 1689 --no-prompt
       *
@@ -481,7 +482,7 @@ public class EmbeddedOpenDS {
             "--adminConnectorPort",         // 1
             "4444",                         // 2
             "--baseDN",                     // 3
-            "dc=opensso,dc=java,dc=net",    // 4
+            OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX,    // 4
             "--rootUserDN",                 // 5
             "cn=Directory Manager",         // 6
             "--ldapPort",                   // 7
@@ -739,7 +740,7 @@ public class EmbeddedOpenDS {
             "initialize",                 // 0
             "--no-prompt",                // 1
             "--baseDN",                   // 2
-            "dc=opensso,dc=java,dc=net",  // 3
+            OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX,  // 3
             "--adminUID",                 // 4
             "admin",                      // 5
             "--adminPassword",            // 6

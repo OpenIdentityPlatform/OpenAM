@@ -73,7 +73,7 @@
 %>
 
 <link rel="stylesheet" type="text/css" href="<%= deployuri %>/com_sun_web_ui/css/css_ns6up.css" />
-<link rel="stylesheet" type="text/css" href="<%= deployuri %>/console/css/opensso.css" />
+<link rel="stylesheet" type="text/css" href="<%= deployuri %>/console/css/openam.css" />
 
 <script language="JavaScript">
 </script>

@@ -16,6 +16,7 @@
             var configStoreNameValid = false;
             var configStoreHostValid = false;
             var configStoreBaseDNValid = false;
+            var configStoreSessionDNValid = false;
             var configStoreLoginIdValid = false;
 
             var usingCustomUserStore = false;
@@ -185,6 +186,7 @@
             function isCustomConfigStoreValid() {
                 return configStoreHostValid &&
                        configStoreBaseDNValid &&
+                       configStoreSessionDNValid &&
                        configStoreLoginIdValid;
             }
 

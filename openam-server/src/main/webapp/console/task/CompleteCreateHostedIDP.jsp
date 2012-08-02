@@ -41,7 +41,7 @@
 
 <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2008" fireDisplayEvents="true">
 
-<link rel="stylesheet" type="text/css" href="../console/css/opensso.css" />
+<link rel="stylesheet" type="text/css" href="../console/css/openam.css" />
 <script language="javascript" src="../console/js/am.js"></script>
 
 <cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>

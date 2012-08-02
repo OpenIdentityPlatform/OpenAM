@@ -41,7 +41,7 @@
 
 <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2009" fireDisplayEvents="true">
 
-<link rel="stylesheet" type="text/css" href="../console/css/opensso.css" />
+<link rel="stylesheet" type="text/css" href="../console/css/openam.css" />
 
 <script language="javascript">
     function confirmLogout() {

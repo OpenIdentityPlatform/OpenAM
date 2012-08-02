@@ -45,6 +45,7 @@ public interface SessionAttributeNames {
     String CONFIG_STORE_LOGIN_ID = "configStoreLoginId";
     String CONFIG_STORE_ROOT_SUFFIX = "rootSuffix";
     String CONFIG_STORE_PWD = "configStorePassword";
+    String CONFIG_STORE_SESSION_ROOT_SUFFIX = "sessionRootSuffix";
 
     String CONFIG_VAR_DATA_STORE = "DATA_STORE";
     String DS_EMB_REPL_FLAG = "DS_EMB_REPL_FLAG";

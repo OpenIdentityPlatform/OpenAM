@@ -49,6 +49,7 @@ import org.apache.click.Context;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.common.OpenAMCommonConstants;
 
 /**
  * Step 3 is for selecting the embedded or external configuration store 
@@ -62,7 +63,11 @@ public class Step3 extends LDAPStoreWizardPage {
         new ActionLink("validateSMHost", this, "validateSMHost");
     public ActionLink validateRootSuffixLink = 
         new ActionLink("validateRootSuffix", this, "validateRootSuffix");
-    public ActionLink setReplicationLink = 
+    public ActionLink validateSessionRootSuffixLink =
+            new ActionLink("validateSessionRootSuffix", this, "validateSessionRootSuffix");
+    public ActionLink setSessionStoreType =
+            new ActionLink("setSessionStoreType", this, "setSessionStoreType");
+    public ActionLink setReplicationLink =
         new ActionLink("setReplication", this, "setReplication");
     public ActionLink validateHostNameLink = 
         new ActionLink("validateHostName", this, "validateHostName");
@@ -89,6 +94,12 @@ public class Step3 extends LDAPStoreWizardPage {
     public void onInit() {
         String val = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         addModel("rootSuffix", val);
+
+        val = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootSuffix);
+        addModel("sessionRootSuffix", val);
+
+        val = getAttribute("sessionStoreType", Wizard.defaultSessionStoreType);
+        addModel("sessionStoreType", val);
 
         val = getAttribute("encryptionKey", AMSetupServlet.getRandomString());
         addModel("encryptionKey", val);
@@ -198,6 +209,22 @@ public class Step3 extends LDAPStoreWizardPage {
         }
         setPath(null);
         return false;    
+    }
+
+    public boolean validateSessionRootSuffix() {
+        String sessionRootSuffix = toString("sessionRootSuffix");
+
+        if ((sessionRootSuffix == null) || (sessionRootSuffix.trim().length() == 0)) {
+            writeToResponse(getLocalizedString("missing.required.field"));
+        } else if (!DN.isDN(sessionRootSuffix)) {
+            writeToResponse(getLocalizedString("invalid.dn"));
+        } else {
+            writeToResponse("true");
+            getContext().setSessionAttribute(
+                    SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX, sessionRootSuffix);
+        }
+        setPath(null);
+        return false;
     }
     
     
@@ -584,6 +611,10 @@ public class Step3 extends LDAPStoreWizardPage {
         String tmp = (String)data.get(BootstrapData.DS_BASE_DN);
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX, tmp);
+
+        tmp = (String)data.get(BootstrapData.DS_BASE_DN);
+        getContext().setSessionAttribute(
+                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX, tmp);
         
         tmp = (String)data.get(BootstrapData.DS_MGR);
         getContext().setSessionAttribute(
@@ -622,6 +653,8 @@ public class Step3 extends LDAPStoreWizardPage {
             SessionAttributeNames.CONFIG_STORE_LOGIN_ID);
         String rootSuffix = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX);
+        String sessionRootSuffix = (String)ctx.getSessionAttribute(
+                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX);
         String bindPwd = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_PWD);
 
@@ -629,7 +662,10 @@ public class Step3 extends LDAPStoreWizardPage {
             bindDN = "cn=Directory Manager";
         }
         if (rootSuffix == null) {
-            rootSuffix = "dc=opensso,dc=java,dc=net";
+            rootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
+        }
+        if (sessionRootSuffix == null) {
+            sessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX;
         }
         
         LDAPConnection ld = null;

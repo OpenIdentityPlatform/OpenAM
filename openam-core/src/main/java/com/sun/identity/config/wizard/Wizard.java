@@ -43,8 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.click.control.ActionLink;
+import org.forgerock.openam.common.OpenAMCommonConstants;
 
-public class Wizard extends AjaxPage {
+public class Wizard extends AjaxPage implements OpenAMCommonConstants {
 
     public int startingTab = 1;
 
@@ -61,7 +62,10 @@ public class Wizard extends AjaxPage {
     
     public static String defaultUserName = "cn=Directory Manager";
     public static String defaultPassword = "";
-    public static String defaultRootSuffix = "dc=opensso,dc=java,dc=net";
+    public static String defaultRootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
+    public static String defaultSessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX;
+    public static String defaultSessionStoreType = "InMemory";
+
     public String defaultPort = Integer.toString(
         AMSetupServlet.getUnusedPort(hostName, 50389, 1000));
     public String defaultAdminPort = Integer.toString(
@@ -165,6 +169,12 @@ public class Wizard extends AjaxPage {
 
         tmp = getAttribute("rootSuffix", defaultRootSuffix);
         request.addParameter(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, tmp);
+
+        tmp = getAttribute("sessionRootSuffix", defaultSessionRootSuffix);
+        request.addParameter(SetupConstants.CONFIG_VAR_SESSION_ROOT_SUFFIX, tmp);
+
+        tmp = getAttribute("sessionStoreType", defaultSessionStoreType);
+        request.addParameter(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, tmp);
        
         if (!isEmbedded) {
             tmp = getAttribute("configStoreHost", hostName);

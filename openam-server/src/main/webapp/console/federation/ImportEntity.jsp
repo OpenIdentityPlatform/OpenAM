@@ -39,7 +39,7 @@
 
 <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2007" fireDisplayEvents="true" onLoad="onload()">
 
-<link rel="stylesheet" type="text/css" href="../console/css/opensso.css" />
+<link rel="stylesheet" type="text/css" href="../console/css/openam.css" />
 <script language="javascript" src="../console/js/am.js"></script>
 <script language="javascript" src="../com_sun_web_ui/js/dynamic.js"></script>
 <cc:form name="ImportEntity" method="post" >

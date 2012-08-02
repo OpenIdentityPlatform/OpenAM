@@ -9,6 +9,9 @@
     function configStoreBaseDNValidated( response ) {
         storeBaseDNValidated('$type', response );
     }
+    function configStoreSessionDNValidated( response ) {
+        storeSessionDNValidated('$type', response );
+    }
     function configStoreLoginIdValidated( response ) {
         storeLoginIdValidated( '$type', response );
     }
@@ -119,6 +122,16 @@
 	field = "rootSuffix";
         var callUrl = "$context$path?actionLink=validateRootSuffix&ie7fix=" +
             ie7fix + "&rootSuffix=" +  escape($(field).value);
+        setTimeout("enableNextButton()", 500);
+        AjaxUtils.call(callUrl, fieldValidated);
+    }
+
+    function validateSessionRootSuffix() {
+        $('nextTabButton').disabled = true;
+        ie7fix++;
+        field = "sessionRootSuffix";
+        var callUrl = "$context$path?actionLink=validateSessionRootSuffix&ie7fix=" +
+                ie7fix + "&sessionRootSuffix=" +  escape($(field).value);
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, fieldValidated);
     }
@@ -286,7 +299,7 @@
         } else {
             document.getElementById("configStoreSSL").disabled = false;
             document.getElementById("configStoreHost").disabled = false;
-	    remoteDSHost = document.getElementById("configStoreHost").value;
+	        remoteDSHost = document.getElementById("configStoreHost").value;
             document.getElementById("configStoreHost").value = remoteDSHost;
             document.getElementById("adminport").style.display = "none";
             document.getElementById("jmxport").style.display = "none";
@@ -329,11 +342,14 @@
                 !isFieldOK('configStoreAdminPort') ||
                 !isFieldOK('configStoreJmxPort') ||
                 !isEncryptionKeyOk() ||
-                !isFieldOK('rootSuffix');
+                !isFieldOK('rootSuffix') ||
+                !isFieldOK('sessionRootSuffix') ||
+                !isFieldOK('sessionStoreType');
         } else {
             var allFieldsValid = isFieldOK('configStoreHost') &&
                 isFieldOK('configStorePort') && isEncryptionKeyOk() &&
-                isFieldOK('rootSuffix') && isFieldOK('configStoreLoginId') &&
+                isFieldOK('rootSuffix') && isFieldOK('sessionRootSuffix') && isFieldOK('sessionStoreType') &&
+                isFieldOK('configStoreLoginId') &&
                 isFieldOK('configStorePassword') &&
                 (document.getElementById('configStorePassword').value != '');
             if (allFieldsValid) {
@@ -366,6 +382,24 @@
     function isFieldOK(field) {
         var x = $(field + 'Status').innerHTML; 
         return (x == '') || (x.indexOf('ok.jpg') != -1);
+    }
+
+    function setSessionStoreTypeNone() {
+        setSessionStoreType(document.getElementById("sessionStoreTypeNone").value);
+    }
+
+    function setSessionStoreTypeInMemory() {
+        setSessionStoreType(document.getElementById("sessionStoreTypeInMemory").value);
+    }
+
+    function setSessionStoreTypeOpenDJ() {
+        setSessionStoreType(document.getElementById("sessionStoreTypeOpenDJ").value);
+    }
+    function setSessionStoreTypeJMSMQ() {
+        setSessionStoreType(document.getElementById("sessionStoreTypeJMSMQ").value);
+    }
+    function setSessionStoreTypeWAN() {
+        setSessionStoreType(document.getElementById("sessionStoreTypeWAN").value);
     }
 
     YAHOO.util.Event.onDOMReady(initConfig);
@@ -496,7 +530,29 @@
                             <span id="rootSuffixStatus"></span>                       
                         </td>
                     </tr>
-
+                    <tr>
+                        <td><label for="sessionRootSuffix"><em>*&nbsp;</em>
+                            $page.getLocalizedString("session.root.suffix.label")</label></td>
+                        <td>
+                        <td>
+                            <input id="sessionRootSuffix" name="sessionRootSuffix"
+                                   type="text" class="text" style="width:200px"
+                                   value="$sessionRootSuffix"
+                                   onkeyup="APP.callDelayed(this, validateSessionRootSuffix)"
+                                   onchange="APP.callDelayed(this, validateSessionRootSuffix)"/>
+                            <span id="sessionRootSuffixStatus"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="sessionStoreType"><em>*&nbsp;</em>$page.getLocalizedString("session.store.type.label")</label></td>
+                        <td>
+                              <input type="radio" id="sessionStoreTypeNone" name="sessionStoreTypeNone" style="margin-left:1em" value="None" $selectNone onclick="setSessionStoreTypeNone();"/>&nbsp;$page.getLocalizedString("session.store.type.none")&nbsp;
+                              <input type="radio" id="sessionStoreTypeInMemory" name="sessionStoreTypeInMemory" style="margin-left:1em" value="InMemory" $selectInMemory onclick="setSessionStoreTypeInMemory();"/>&nbsp;$page.getLocalizedString("session.store.type.inmemory")&nbsp;
+                              <input type="radio" id="sessionStoreTypeOpenDJ" name="sessionStoreTypeOpenDJ" style="margin-left:2em" value="OpenDJ" $selectOpenDJ onclick="setSessionStoreTypeOpenDJ();"/>&nbsp;$page.getLocalizedString("session.store.type.opendj")&nbsp;
+                              <input type="radio" id="sessionStoreTypeJMSMQ" name="sessionStoreTypeJMSMQ" style="margin-left:1em" value="JMSMQ" $selectJMSMQ onclick="setSessionStoreTypeJMSMQ();"/>&nbsp;$page.getLocalizedString("session.store.type.jmsmq")&nbsp;
+                              <input type="radio" id="sessionStoreTypeWAN" name="sessionStoreTypeWAN" style="margin-left:1em" value="WAN" $selectWAN onclick="setSessionStoreTypeWAN();"/>&nbsp;$page.getLocalizedString("session.store.type.wan")
+                        </td>
+                    </tr>
                     <tr id="login">
                         <td><label for="configStoreLoginId"><em>*&nbsp;</em>
                             $page.getLocalizedString("login.id.label")</label></td>

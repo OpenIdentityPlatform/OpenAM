@@ -439,6 +439,22 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
         return (baseDN);
     }
 
+    /**
+     * Returns the session root suffix (i.e., base DN) for the SMS objects. All
+     * SMSEntries will end with this root suffix.
+     */
+    public String getSessionRootSuffix() {
+        if (baseDN == null) {
+            try {
+                baseDN = (String) client.send(client.encodeMessage(
+                        "getSessionRootSuffix", null), null, null);
+            } catch (Exception re) {
+                debug.error("SMSJAXRPCObject:getSessionRootSuffix:Exception:", re);
+            }
+        }
+        return (baseDN);
+    }
+
 
     /**
      * Returns the root suffix (i.e., base DN) for the UMS objects.

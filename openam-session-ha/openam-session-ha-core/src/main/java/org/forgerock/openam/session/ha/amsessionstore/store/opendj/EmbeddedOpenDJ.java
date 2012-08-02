@@ -52,6 +52,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
@@ -360,7 +362,7 @@ public class EmbeddedOpenDJ {
      *  Utility function to preload data in the embedded instance.
      *  Must be called when the directory instance is shutdown.
      *
-     *  @param odsRoot Local directory where <code>OpenDS</code> is installed.
+     *  @param odjRoot Local directory where <code>OpenDS</code> is installed.
      *  @param ldif Full path of the ldif file to be loaded.
      *
      */
@@ -426,7 +428,7 @@ public class EmbeddedOpenDJ {
      /**
       * Runs the OpenDJ setup command like this:
       * $ ./setup --cli --adminConnectorPort 4444
-      * --baseDN dc=opensso,dc=java,dc=net --rootUserDN "cn=directory manager"
+      * --baseDN ou=session,dc=openam,dc=java,dc=net --rootUserDN "cn=directory manager"
       * --doNotStart --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx
       * --jmxPort 1689 --no-prompt
       *
@@ -439,7 +441,7 @@ public class EmbeddedOpenDJ {
             "--adminConnectorPort",         // 1
             "5444",                         // 2
             "--baseDN",                     // 3
-            "o=amsessiondb",                // 4
+            OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX,                // 4
             "--rootUserDN",                 // 5
             "cn=Directory Manager",         // 6
             "--ldapPort",                   // 7
@@ -667,8 +669,8 @@ public class EmbeddedOpenDJ {
       *    --baseDN "dc=amsessiondb,dc=com"
       *
       *
-      *  @param map Map of configuration properties 
-      *  @return status : 0 == success, !0 == failure
+      *  @param localMap Map of configuration properties
+      *  @return int status : 0 == success, !0 == failure
       */
     public static int setupReplicationEnable(Map<String, String> localMap, Map<String, String> remoteMap) {
         String[] enableCmd= {

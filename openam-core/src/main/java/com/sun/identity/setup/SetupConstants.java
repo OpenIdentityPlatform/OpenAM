@@ -423,6 +423,16 @@ public interface SetupConstants {
      * Configuration Variable for root suffix.
      */
     String CONFIG_VAR_ROOT_SUFFIX = "ROOT_SUFFIX";
+
+    /**
+     * Configuration Variable for Session root suffix.
+     */
+    String CONFIG_VAR_SESSION_ROOT_SUFFIX = "SESSION_ROOT_SUFFIX";
+
+    /**
+     * Configuration Variable for Session Store Type.
+     */
+    String CONFIG_VAR_SESSION_STORE_TYPE = "SESSION_STORE_TYPE";
     
     /**
      * Configuration Variable for bootstarp file base directory.

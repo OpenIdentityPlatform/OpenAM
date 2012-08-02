@@ -1511,7 +1511,7 @@
 ./console/css/css_master.css
 ./console/css/help.css
 ./console/css/index.html
-./console/css/opensso.css
+./console/css/openam.css
 ./console/delegation/Delegation.jsp
 ./console/delegation/DelegationProperties.jsp
 ./console/delegation/index.html

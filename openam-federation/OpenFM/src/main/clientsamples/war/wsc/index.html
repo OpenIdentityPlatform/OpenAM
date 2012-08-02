@@ -91,11 +91,11 @@
 <h3>Setup</h3>
 
 In the following instructions we use unix path seperator '/'. For windows enviroment please change '/' to '\'.<br><br>
-1. Deploy OpenAM server WAR (opensso.war) on machine A,
+1. Deploy OpenAM server WAR (openam.war) on machine A,
    and configure the IDFF sample to run as IDP. This instance will also act as
    DS and ID-SIS-PP role in the sample scenario.
 <br>
-2. Deploy OpenAM server WAR (opensso.war) on machine B,
+2. Deploy OpenAM server WAR (openam.war) on machine B,
    and configure the IDFF sample to run as SP. 
 <br>
 3. Create a user on IDP and a user on SP. Federate and signle sign on the users.
@@ -106,7 +106,7 @@ In the following instructions we use unix path seperator '/'. For windows enviro
 <br>
 5. Click <a class="named" href="../Configurator.jsp">here</a> to configure Client SDK. If you have done it, skip to next step. Enter SP information and save.
 <br>
-6. If you changed your SP cookie name, you need to set property "com.iplanet.am.cookie.name" value to the new cookie name in "&lt;your_home_dir&gt;/OpenSSOClient/&lt;normalized_web_app_path&gt;AMConfig.properties" file, where "&lt;your_home_dir&gt;" is the home directory of the web container running user, "&lt;normalized_web_app_path&gt;" is a path string (e.g. "_opt_tomcat_webapps_opensso_") by replacing the file separator (e.g. "/") with "_" in the absolute file path (e.g. "/opt/tomcat/webapps/opensso/") the web application is deployed.
+6. If you changed your SP cookie name, you need to set property "com.iplanet.am.cookie.name" value to the new cookie name in "&lt;your_home_dir&gt;/OpenSSOClient/&lt;normalized_web_app_path&gt;AMConfig.properties" file, where "&lt;your_home_dir&gt;" is the home directory of the web container running user, "&lt;normalized_web_app_path&gt;" is a path string (e.g. "_opt_tomcat_webapps_openam_") by replacing the file separator (e.g. "/") with "_" in the absolute file path (e.g. "/opt/tomcat/webapps/openam/") the web application is deployed.
 <br>
 7. Click <a class="named" href="configure.jsp">here</a> to configure.
 <br>

@@ -361,7 +361,7 @@ public class AuthenticatedSharedAgentsCondition implements Condition,
          * This check is for the resource name like this is constructed 
          * from the delegation service while getting the permission
          * requestedResourcename:
-         * [sms://dc=opensso,dc=java,dc=net/sunIdentityRepositoryService
+         * [sms://dc=openam,dc=java,dc=net/sunIdentityRepositoryService
          * /1.0/application/agentonly/http://quasar.red.iplanet.com:7001/
          * StockService/StockService]
          */

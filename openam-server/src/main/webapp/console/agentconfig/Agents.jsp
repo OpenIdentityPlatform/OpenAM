@@ -40,7 +40,7 @@
 
 <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2004" fireDisplayEvents="true">
 
-<link rel="stylesheet" type="text/css" href="../console/css/opensso.css" />
+<link rel="stylesheet" type="text/css" href="../console/css/openam.css" />
 
 <script language="javascript" src="../console/js/am.js"></script>
 <script language="javascript">
