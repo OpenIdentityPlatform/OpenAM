@@ -25,11 +25,13 @@
    $Id: IdentitySubject.jsp,v 1.2 2008/06/25 05:44:42 qcheng Exp $
 
 --%>
-
-
-
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <%@ page info="IdentitySubject" language="java" %>
+<%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <jato:useViewBean
     className="com.sun.identity.console.policy.IdentitySubjectViewBean" >

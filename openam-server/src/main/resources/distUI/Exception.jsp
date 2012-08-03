@@ -22,18 +22,20 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
-   $Id: Exception.jsp,v 1.5 2008/08/15 01:05:30 veiming Exp $
+   $Id: Exception.jsp,v 1.5 2008/08/15 01:05:27 veiming Exp $
                                                                                 
 --%>
 <%--
    Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <%@page info="AuthException" language="java"%>
+    <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
     <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
-    <jato:useViewBean className="com.sun.identity.authentication.distUI.AuthExceptionViewBean">
+    <jato:useViewBean className="com.sun.identity.authentication.UI.AuthExceptionViewBean">
         <%@ page contentType="text/html" %>
         <head>
             <title>Authentication Exception</title>

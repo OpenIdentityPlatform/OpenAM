@@ -25,11 +25,13 @@
    $Id: PMDefaultSessionCondition.jsp,v 1.3 2008/06/25 05:44:43 qcheng Exp $
 
 --%>
-
-
-
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <%@ page info="PMLDAPRoleSubject" language="java" %>
+<%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <jato:useViewBean
     className="com.sun.identity.console.policy.PMDefaultSessionConditionViewBean" >
