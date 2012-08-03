@@ -437,7 +437,7 @@ public interface SetupConstants {
     /**
      * Configuration Variable for bootstarp file base directory.
      */
-    String CONFIG_VAR_BOOTSTRAP_BASE_DIR = ".openssocfg";
+    String CONFIG_VAR_BOOTSTRAP_BASE_DIR = ".openamcfg";
 
     /**
      * Configuration Variable for bootstarp file base prefix.

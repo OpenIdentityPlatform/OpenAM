@@ -66,6 +66,10 @@ public class Step7 extends AjaxPage {
             getLocalizedString("no.label"));
         tmp = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         add("rootSuffix", tmp);
+        tmp = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootSuffix);
+        add("sessionRootSuffix", tmp);
+        tmp = getAttribute("sessionStoreType", Wizard.defaultSessionStoreType);
+        add("sessionStoreType", tmp);
         tmp = getAttribute("configStorePort", getAvailablePort(50389));
         add("configStorePort", tmp);
         tmp = getAttribute("configStoreAdminPort", getAvailablePort(4444));

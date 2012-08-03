@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2012] [ForgeRock AS]
  */
 
 package com.sun.identity.config.wizard;
@@ -226,7 +226,21 @@ public class Step3 extends LDAPStoreWizardPage {
         setPath(null);
         return false;
     }
-    
+
+    public boolean setSessionStoreType() {
+        String sessionStoreType = toString("sessionStoreType");
+        writeToResponse("true"); // Accept whatever has been specified...
+        if ((sessionStoreType == null) || (sessionStoreType.trim().length() == 0)) {
+            getContext().setSessionAttribute(
+                    SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                        OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE);
+        } else {
+            getContext().setSessionAttribute(
+                    SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, sessionStoreType);
+        }
+        setPath(null);
+        return false;
+    }
     
     public boolean validateLocalPort() {
         String port = toString("port");
@@ -602,10 +616,10 @@ public class Step3 extends LDAPStoreWizardPage {
     }
     
     /*
-     * the following value have been pulled from an existing OpenSSO
+     * the following value have been pulled from an existing OpenAM
      * server which was configured to use an external DS. We need to set the DS 
-     * values in the request so they can be used to configure the exisiting
-     * OpenSSO server.
+     * values in the request so they can be used to configure the existing
+     * OpenAM server.
      */
     private void setupDSParams(Map data) {             
         String tmp = (String)data.get(BootstrapData.DS_BASE_DN);
@@ -615,6 +629,10 @@ public class Step3 extends LDAPStoreWizardPage {
         tmp = (String)data.get(BootstrapData.DS_BASE_DN);
         getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX, tmp);
+
+        tmp = (String)data.get(OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE);
+        getContext().setSessionAttribute(
+                SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, tmp);
         
         tmp = (String)data.get(BootstrapData.DS_MGR);
         getContext().setSessionAttribute(
@@ -653,6 +671,8 @@ public class Step3 extends LDAPStoreWizardPage {
             SessionAttributeNames.CONFIG_STORE_LOGIN_ID);
         String rootSuffix = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX);
+        String sessionStoreType = (String)ctx.getSessionAttribute(
+                SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE);
         String sessionRootSuffix = (String)ctx.getSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX);
         String bindPwd = (String)ctx.getSessionAttribute(
@@ -666,6 +686,9 @@ public class Step3 extends LDAPStoreWizardPage {
         }
         if (sessionRootSuffix == null) {
             sessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX;
+        }
+        if (sessionStoreType == null) {
+            sessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE;
         }
         
         LDAPConnection ld = null;

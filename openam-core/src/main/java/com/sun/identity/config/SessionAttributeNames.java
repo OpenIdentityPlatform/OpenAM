@@ -28,45 +28,46 @@
 package com.sun.identity.config;
 
 public interface SessionAttributeNames {
-    String CONFIG_VAR_ADMIN_PWD = "ADMIN_PWD";
-    String CONFIG_VAR_AMLDAPUSERPASSWD = "AMLDAPUSERPASSWD";
-    String CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM = "AMLDAPUSERPASSWD_CONFIRM";
+    static final String CONFIG_VAR_ADMIN_PWD = "ADMIN_PWD";
+    static final String CONFIG_VAR_AMLDAPUSERPASSWD = "AMLDAPUSERPASSWD";
+    static final String CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM = "AMLDAPUSERPASSWD_CONFIRM";
 
-    String ENCRYPTION_KEY = "encryptionKey";
-    String ENCLDAPUSERPASSWD = "ENCLDAPUSERPASSWD";
-    String SERVER_URL = "serverURL";
-    String COOKIE_DOMAIN = "cookieDomain";
-    String PLATFORM_LOCALE = "platformLocale";
-    String CONFIG_DIR = "configDirectory";
+    static final  String ENCRYPTION_KEY = "encryptionKey";
+    static final  String ENCLDAPUSERPASSWD = "ENCLDAPUSERPASSWD";
+    static final  String SERVER_URL = "serverURL";
+    static final  String COOKIE_DOMAIN = "cookieDomain";
+    static final  String PLATFORM_LOCALE = "platformLocale";
+    static final  String CONFIG_DIR = "configDirectory";
 
-    String CONFIG_STORE_SSL = "configStoreSSL";
-    String CONFIG_STORE_HOST = "configStoreHost";
-    String CONFIG_STORE_PORT = "configStorePort";
-    String CONFIG_STORE_LOGIN_ID = "configStoreLoginId";
-    String CONFIG_STORE_ROOT_SUFFIX = "rootSuffix";
-    String CONFIG_STORE_PWD = "configStorePassword";
-    String CONFIG_STORE_SESSION_ROOT_SUFFIX = "sessionRootSuffix";
+    static final  String CONFIG_STORE_SSL = "configStoreSSL";
+    static final  String CONFIG_STORE_HOST = "configStoreHost";
+    static final  String CONFIG_STORE_PORT = "configStorePort";
+    static final  String CONFIG_STORE_LOGIN_ID = "configStoreLoginId";
+    static final  String CONFIG_STORE_ROOT_SUFFIX = "rootSuffix";
+    static final  String CONFIG_STORE_PWD = "configStorePassword";
+    static final  String CONFIG_STORE_SESSION_STORE_TYPE = "sessionStoreType";
+    static final  String CONFIG_STORE_SESSION_ROOT_SUFFIX = "sessionRootSuffix";
 
-    String CONFIG_VAR_DATA_STORE = "DATA_STORE";
-    String DS_EMB_REPL_FLAG = "DS_EMB_REPL_FLAG";
-    String EXISTING_HOST = "existingHost";
-    String EXISTING_STORE_HOST = "existingStoreHost";
-    String EXISTING_PORT = "existingPort";
-    String EXISTING_STORE_PORT = "existingStorePort";
-    String LOCAL_REPL_PORT = "localRepPort";
-    String EXISTING_REPL_PORT = "existingRepPort";
-    String EXISTING_SERVER_ID = "existingserverid";
+    static final  String CONFIG_VAR_DATA_STORE = "DATA_STORE";
+    static final  String DS_EMB_REPL_FLAG = "DS_EMB_REPL_FLAG";
+    static final  String EXISTING_HOST = "existingHost";
+    static final  String EXISTING_STORE_HOST = "existingStoreHost";
+    static final  String EXISTING_PORT = "existingPort";
+    static final  String EXISTING_STORE_PORT = "existingStorePort";
+    static final  String LOCAL_REPL_PORT = "localRepPort";
+    static final  String EXISTING_REPL_PORT = "existingRepPort";
+    static final  String EXISTING_SERVER_ID = "existingserverid";
 
-    String EXT_DATA_STORE = "EXT_DATA_STORE";
-    String USER_STORE_SSL = "userStoreSSL";
-    String USER_STORE_HOST = "userStoreHostName";
-    String USER_STORE_DOMAINNAME = "userStoreDomainName";
-    String USER_STORE_PORT = "userStorePort";
-    String USER_STORE_ROOT_SUFFIX = "userStoreRootSuffix";
-    String USER_STORE_LOGIN_ID = "userStoreLoginID";
-    String USER_STORE_LOGIN_PWD = "userStoreLoginPassword";
-    String USER_STORE_TYPE = "userStoreType";
+    static final  String EXT_DATA_STORE = "EXT_DATA_STORE";
+    static final  String USER_STORE_SSL = "userStoreSSL";
+    static final  String USER_STORE_HOST = "userStoreHostName";
+    static final  String USER_STORE_DOMAINNAME = "userStoreDomainName";
+    static final  String USER_STORE_PORT = "userStorePort";
+    static final  String USER_STORE_ROOT_SUFFIX = "userStoreRootSuffix";
+    static final  String USER_STORE_LOGIN_ID = "userStoreLoginID";
+    static final  String USER_STORE_LOGIN_PWD = "userStoreLoginPassword";
+    static final  String USER_STORE_TYPE = "userStoreType";
 
-    String LB_SITE_NAME = "wizardLoadBalancerSiteName";
-    String LB_PRIMARY_URL = "wizardLoadBalancerURL";
+    static final  String LB_SITE_NAME = "wizardLoadBalancerSiteName";
+    static final  String LB_PRIMARY_URL = "wizardLoadBalancerURL";
 }

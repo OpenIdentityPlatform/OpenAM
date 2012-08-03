@@ -740,7 +740,7 @@ public class EmbeddedOpenDS {
             "initialize",                 // 0
             "--no-prompt",                // 1
             "--baseDN",                   // 2
-            OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX,  // 3
+            OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX,  // 3 Placeholder
             "--adminUID",                 // 4
             "admin",                      // 5
             "--adminPassword",            // 6

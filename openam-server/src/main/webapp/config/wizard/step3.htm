@@ -119,11 +119,22 @@
     function validateRootSuffix() {
         $('nextTabButton').disabled = true;
         ie7fix++;
-	field = "rootSuffix";
+	    field = "rootSuffix";
         var callUrl = "$context$path?actionLink=validateRootSuffix&ie7fix=" +
             ie7fix + "&rootSuffix=" +  escape($(field).value);
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, fieldValidated);
+    }
+
+    function setSessionStoreType() {
+        $('nextTabButton').disabled = true;
+        field = "sessionStoreType";
+        var call = "$context$path?actionLink=setSessionStoreType";
+        var sessionStoreTypeVal = "&sessionStoreType=" + escape($(field).value);
+        ie7fix++;
+        call = call + "&ie7fix=" + ie7fix;
+        setTimeout("enableNextButton()", 500);
+        AjaxUtils.call(call+sessionStoreTypeVal, fieldValidated);
     }
 
     function validateSessionRootSuffix() {
@@ -384,24 +395,6 @@
         return (x == '') || (x.indexOf('ok.jpg') != -1);
     }
 
-    function setSessionStoreTypeNone() {
-        setSessionStoreType(document.getElementById("sessionStoreTypeNone").value);
-    }
-
-    function setSessionStoreTypeInMemory() {
-        setSessionStoreType(document.getElementById("sessionStoreTypeInMemory").value);
-    }
-
-    function setSessionStoreTypeOpenDJ() {
-        setSessionStoreType(document.getElementById("sessionStoreTypeOpenDJ").value);
-    }
-    function setSessionStoreTypeJMSMQ() {
-        setSessionStoreType(document.getElementById("sessionStoreTypeJMSMQ").value);
-    }
-    function setSessionStoreTypeWAN() {
-        setSessionStoreType(document.getElementById("sessionStoreTypeWAN").value);
-    }
-
     YAHOO.util.Event.onDOMReady(initConfig);
 </script>
 
@@ -429,7 +422,7 @@
         <div class="headerBox">
             $page.getLocalizedString("step3.sub.title")
         </div>
-        <div class="bodyBox" style="height:290px;">	
+        <div class="bodyBox" style="height:340px;">
              <span>  
              <!-- New Instances -->
              <div id="newInstanceOptions">            
@@ -452,7 +445,7 @@
                 </table>
             
                 <!-- Embedded Store -->
-                <table class="temp">                    
+                <table class="temp">
                     <tr id="ssl">
                         <td><label for="configStoreSSL"><em>*&nbsp;</em>
                             $page.getLocalizedString("ssl.label")</label></td>
@@ -475,7 +468,7 @@
                         </td>
                     </tr>  
                     <tr>
-			<td><label for="configStorePort"><em>*&nbsp;</em>
+			            <td><label for="configStorePort"><em>*&nbsp;</em>
                             $page.getLocalizedString("port.label")</label></td>
                         <td>
                             <input id="configStorePort" name="configStorePort" 
@@ -486,7 +479,7 @@
                             <span id="configStorePortStatus"></span></td>
                     </tr>
                     <tr id="adminport">
-			<td><label for="configStoreAdminPort"><em>*&nbsp;</em>
+			            <td><label for="configStoreAdminPort"><em>*&nbsp;</em>
                             $page.getLocalizedString("admin.port.label")</label></td>
                         <td>
                             <input id="configStoreAdminPort" name="configStoreAdminPort"
@@ -497,7 +490,7 @@
                             <span id="configStoreAdminPortStatus"></span></td>
                     </tr>
                     <tr id="jmxport">
-			<td><label for="configStoreJmxPort"><em>*&nbsp;</em>
+			            <td><label for="configStoreJmxPort"><em>*&nbsp;</em>
                             $page.getLocalizedString("jmx.port.label")</label></td>
                         <td>
                             <input id="configStoreJmxPort" name="configStoreJmxPort"
@@ -531,26 +524,31 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="sessionRootSuffix"><em>*&nbsp;</em>
+                        <td><label for="sessionStoreType"><em>&nbsp;&nbsp;</em>
+                            $page.getLocalizedString("session.store.type.label")</label></td>
+                        <td>
+                            <select name="sessionStoreType" id="sessionStoreType" size="1"
+                                    onkeyup="APP.callDelayed(this, setSessionStoreType)"
+                                    onchange="APP.callDelayed(this, setSessionStoreType)">
+                                <option value="NONE">$page.getLocalizedString("session.store.type.none")</option>
+                                <option value="InMemory">$page.getLocalizedString("session.store.type.inmemory")</option>
+                                <option value="OpenDJ">$page.getLocalizedString("session.store.type.opendj")</option>
+                                <option value="JMSMQ">$page.getLocalizedString("session.store.type.jmsmq")</option>
+                                <option value="WAN">$page.getLocalizedString("session.store.type.wan")</option>
+                            </select>
+                            <span id="sessionStoreTypeStatus"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="sessionRootSuffix"><em>&nbsp;&nbsp;</em>
                             $page.getLocalizedString("session.root.suffix.label")</label></td>
                         <td>
-                        <td>
                             <input id="sessionRootSuffix" name="sessionRootSuffix"
-                                   type="text" class="text" style="width:200px"
+                                   type="text" class="text" style="width:240px"
                                    value="$sessionRootSuffix"
                                    onkeyup="APP.callDelayed(this, validateSessionRootSuffix)"
                                    onchange="APP.callDelayed(this, validateSessionRootSuffix)"/>
                             <span id="sessionRootSuffixStatus"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="sessionStoreType"><em>*&nbsp;</em>$page.getLocalizedString("session.store.type.label")</label></td>
-                        <td>
-                              <input type="radio" id="sessionStoreTypeNone" name="sessionStoreTypeNone" style="margin-left:1em" value="None" $selectNone onclick="setSessionStoreTypeNone();"/>&nbsp;$page.getLocalizedString("session.store.type.none")&nbsp;
-                              <input type="radio" id="sessionStoreTypeInMemory" name="sessionStoreTypeInMemory" style="margin-left:1em" value="InMemory" $selectInMemory onclick="setSessionStoreTypeInMemory();"/>&nbsp;$page.getLocalizedString("session.store.type.inmemory")&nbsp;
-                              <input type="radio" id="sessionStoreTypeOpenDJ" name="sessionStoreTypeOpenDJ" style="margin-left:2em" value="OpenDJ" $selectOpenDJ onclick="setSessionStoreTypeOpenDJ();"/>&nbsp;$page.getLocalizedString("session.store.type.opendj")&nbsp;
-                              <input type="radio" id="sessionStoreTypeJMSMQ" name="sessionStoreTypeJMSMQ" style="margin-left:1em" value="JMSMQ" $selectJMSMQ onclick="setSessionStoreTypeJMSMQ();"/>&nbsp;$page.getLocalizedString("session.store.type.jmsmq")&nbsp;
-                              <input type="radio" id="sessionStoreTypeWAN" name="sessionStoreTypeWAN" style="margin-left:1em" value="WAN" $selectWAN onclick="setSessionStoreTypeWAN();"/>&nbsp;$page.getLocalizedString("session.store.type.wan")
                         </td>
                     </tr>
                     <tr id="login">
@@ -709,7 +707,8 @@
                                    onchange="APP.callDelayed(this, validatePort)"/>
                             <span id="existingStorePortStatus"></span>
                         </td>
-                    </tr>                
+                    </tr>
+
                 </table>     
             </div>                
             </span>

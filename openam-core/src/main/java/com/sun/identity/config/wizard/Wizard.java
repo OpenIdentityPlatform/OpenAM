@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -64,7 +64,7 @@ public class Wizard extends AjaxPage implements OpenAMCommonConstants {
     public static String defaultPassword = "";
     public static String defaultRootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
     public static String defaultSessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX;
-    public static String defaultSessionStoreType = "InMemory";
+    public static String defaultSessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE;
 
     public String defaultPort = Integer.toString(
         AMSetupServlet.getUnusedPort(hostName, 50389, 1000));

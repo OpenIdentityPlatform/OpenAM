@@ -42,7 +42,7 @@ public interface OpenAMCommonConstants {
 
          static final String DEFAULT_SESSION_ROOT_SUFFIX = "ou=session,dc=openam,dc=java,dc=net";
 
-
+         static final String DEFAULT_SESSION_STORE_TYPE = "None";
 
 
 }
