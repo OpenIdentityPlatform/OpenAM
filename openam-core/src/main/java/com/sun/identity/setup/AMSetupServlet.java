@@ -1990,6 +1990,7 @@ public class AMSetupServlet extends HttpServlet {
     ) throws IOException {
         // Get OpenSSO web application base location.
         URL url = servletCtx.getResource("/WEB-INF/lib/opensso.jar");
+        // TODO: Needs to be Fixed...
         String webAppLocation = (url.toString()).substring(5);
         int index = webAppLocation.indexOf("WEB-INF");
         webAppLocation = webAppLocation.substring(0, index-1);

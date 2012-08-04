@@ -28,6 +28,26 @@
     *
     -->
 
+    <!-- Build Notes:
+
+         To Build all of OpenAM use the following Maven Command:
+         cd to openam top directory.
+         mvn clean install
+
+         To Build only a specify Module: (This will pull existing modules whichever is newest local or remote).
+         mvn clean install -pl <module Name>
+
+         To Build only specific Module and Dependencies
+         mvn clean install -pl <module Name> -am
+
+         Skipping Tests add:
+         -DskipTests=true
+
+         Running only a test or list of tests:
+         -DfailIfNoTests=false -Dtest=org.forgerock.restlet.ext.openam.OpenAMParametersTest
+
+    -->
+
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock</groupId>
@@ -108,6 +128,35 @@
         <restlet.version>2.1-RC4</restlet.version>
 
     </properties>
+
+    <!-- Profiles -->
+    <profiles>
+        <!-- Place Default Profiles here to override and determine Environment. -->
+
+        <profile>
+            <id>default-profile</id>
+            <!-- This profile gets activated for WINDOWS and LINUX Systems -->
+            <activation>
+                <file>
+                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>${java.target.version}</version>
+                    <scope>system</scope>
+                    <optional>true</optional>
+                    <systemPath>${toolsjar}</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
 
     <!-- OpenAM Child Modules -->
     <modules>
@@ -273,35 +322,6 @@
     <contributors>
         <!-- TODO Add OpenAM Additional Contributors -->
     </contributors>
-
-    <!-- Profiles -->
-    <profiles>
-        <!-- Place Default Profiles here to override and determine Environment. -->
-
-        <profile>
-            <id>default-profile</id>
-            <!-- This profile gets activated for WINDOWS and LINUX Systems -->
-            <activation>
-                <file>
-                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>${java.target.version}</version>
-                    <scope>system</scope>
-                    <optional>true</optional>
-                    <systemPath>${toolsjar}</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-
-    </profiles>
 
     <!-- Maven Repositories -->
     <repositories>

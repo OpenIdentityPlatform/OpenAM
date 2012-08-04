@@ -165,8 +165,19 @@
                             <includes>
                                 <include>**/**</include>
                             </includes>
+                            <excludes>
+                                <exclude>**/*.jks</exclude>
+                            </excludes>
                             <targetPath>WEB-INF</targetPath>
                             <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
+                            <includes>
+                                <include>**/*.jks</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>

@@ -165,18 +165,35 @@ public class FAMClassLoader {
 
     /**
      * The list of jar files to be loaded by FAMClassLoader.
+     *
+     * TODO -- Revisit to fix.
      */
     public static String[] jars = new String[]{
-        "webservices-api.jar",
-        "webservices-rt.jar",
-        "webservices-tools.jar",
-        "webservices-extra-api.jar",
-        "webservices-extra.jar",
-        "opensso.jar",
-        "openssowssproviders.jar",
-        "xalan.jar",
-        "xercesImpl.jar",
-        "openfedlib.jar"
+        "webservices-api-2009-14-01.jar",       // "webservices-api.jar",
+        "webservices-rt-2009-29-07.jar",        // "webservices-rt.jar",
+        "webservices-tools-2.1-b16.jar",        // "webservices-tools.jar",
+        "webservices-extra-api-2003-09-04.jar", // "webservices-extra-api.jar",
+        "webservices-extra-2008-03-12.jar",     // "webservices-extra.jar",
+                                                // "opensso.jar",
+        "openam-shared-10.1.0-SNAPSHOT.jar",
+        "openam-core-10.1.0-SNAPSHOT.jar",
+        "openam-coretoken-10.1.0-SNAPSHOT.jar",
+        "openam-dtd-schema-10.1.0-SNAPSHOT.jar",
+        "openam-entitlements-10.1.0-SNAPSHOT.jar",
+        "openam-idsvcs-schema-10.1.0-SNAPSHOT.jar",
+        "openam-jaxrpc-schema-10.1.0-SNAPSHOT.jar",
+        "openam-liberty-schema-10.1.0-SNAPSHOT.jar",
+        "openam-mib-schema-10.1.0-SNAPSHOT.jar",
+        "openam-rest-10.1.0-SNAPSHOT.jar",
+        "openam-saml2-schema-10.1.0-SNAPSHOT.jar",
+        "openam-wsfederation-schema-10.1.0-SNAPSHOT.jar",
+        "openam-xacml3-schema-10.1.0-SNAPSHOT.jar",
+                                                // "openssowssproviders.jar",
+        "xalan-2.7.1.jar",                      // "xalan.jar",
+        "xercesImpl-2.10.0.jar",                // "xercesImpl.jar",
+                                                // "openfedlib.jar"
+        "openam-federation-library-10.1.0-SNAPSHOT.jar",
+        "OpenFM-10.1.0-SNAPSHOT.jar"
     };
 
     /**
