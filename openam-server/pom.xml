@@ -139,6 +139,17 @@
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
                     </archive>
+                    <nonFilteredFileExtensions>
+                        <!-- default value contains jpg,jpeg,gif,bmp,png -->
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
                     <webResources>
                         <webResource>
                             <directory>${basedir}/src/main/webapp</directory>
@@ -165,19 +176,8 @@
                             <includes>
                                 <include>**/**</include>
                             </includes>
-                            <excludes>
-                                <exclude>**/*.jks</exclude>
-                            </excludes>
                             <targetPath>WEB-INF</targetPath>
                             <filtering>true</filtering>
-                        </webResource>
-                        <webResource>
-                            <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
-                            <includes>
-                                <include>**/*.jks</include>
-                            </includes>
-                            <targetPath>WEB-INF</targetPath>
-                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>
@@ -481,7 +481,7 @@
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
-		<!-- Oauth2 dependencies -->
+        <!-- Oauth2 dependencies -->
 
         <dependency>
             <groupId>org.forgerock</groupId>
