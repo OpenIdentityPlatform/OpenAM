@@ -217,7 +217,7 @@ public class HOTP extends AMLoginModule {
                     sentHOTPCode = sendHOTPCode();
                     substituteHeader(START_STATE, bundle.getString("send.success"));
                 } catch (AuthLoginException ale) {
-                    substituteHeader(START_STATE, bundle.getString("send.fail"));
+                    substituteHeader(START_STATE, bundle.getString("send.failure"));
                 }
             }
             return START_STATE;
