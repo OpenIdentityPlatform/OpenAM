@@ -241,6 +241,11 @@ public class CreateFedlet
             
             try {
                 String fileName = (String) i.next();
+                if ( (fileName == null) || (fileName.isEmpty()) )
+                    { continue; } // skip
+                File jarFile = new File(fileName);
+                if ( (!jarFile.exists()) || (!jarFile.canRead()) )
+                    { continue; } // skip
                 Set pkgNames = (Set) jarExtracts.get(fileName);
                 InputStream is = servletCtx.getResourceAsStream(fileName);
                 jis = new JarInputStream(is);
