@@ -28,8 +28,6 @@
 
 package com.sun.identity.idsvcs;
 
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-
 import java.util.Map;
 import java.util.HashMap;
 
