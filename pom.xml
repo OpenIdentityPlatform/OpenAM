@@ -179,6 +179,9 @@
         <!-- OpenAM Common Test Suite -->
         <module>openam-test</module>
 
+        <!-- OpenAM Schema -->
+        <module>openam-schema</module>
+
         <!-- OpenAM Session High-Availability FailOver Module -->
         <module>openam-session-ha</module>
 
