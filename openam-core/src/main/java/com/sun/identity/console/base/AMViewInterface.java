@@ -51,11 +51,6 @@ public interface AMViewInterface
     int TAB_SERVICE_POLICY = 45;
 
     /**
-     * Tab index for Session Management.
-     */
-    int TAB_SESSION = 5;
-
-    /**
      * Tab index for Web Services Management.
      */
     int TAB_WEBSERVICES = 3;
@@ -69,6 +64,15 @@ public interface AMViewInterface
      * Tab index for Web Services - Discovery Service.
      */
     int TAB_WEBSERVICES_DISCOVERY_SERVICE = 32;
+
+    /**
+     * Tab index for Session Management.
+     */
+    int TAB_SESSIONS = 5;
+    int TAB_SESSIONS_CURRENT = 51;
+    int TAB_SESSIONS_HA_CONFIGURATION = 52;
+    int TAB_SESSIONS_HA_STATISTICS = 53;
+
 
     /**
      * Static Text Field Child Prefix.

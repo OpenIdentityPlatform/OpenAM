@@ -87,9 +87,7 @@
 </table>
 
 <%-- PAGE CONTENT --------------------------------------------------------- --%>
-<cc:pagetitle name="pgtitle" bundleID="amConsole" pageTitleText="page.title.currentSessions" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="false" showPageButtonsBottom="false" />
-
-<cc:spacer name="spacer" height="10" newline="true" />
+<cc:pagetitle name="pgtitle" bundleID="amConsole" pageTitleText="page.title.currentSessions" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
 
 <table border="0" cellpadding="0" cellspacing="0">
     <tr>

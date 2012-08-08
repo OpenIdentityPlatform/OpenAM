@@ -431,4 +431,17 @@ public class AMTabEntry {
         }
         return values;
     }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getTooltip() {
+        return tooltip;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
 }

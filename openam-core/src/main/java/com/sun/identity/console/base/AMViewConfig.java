@@ -156,6 +156,32 @@ public class AMViewConfig {
         return tabModel;
     }
 
+
+    public CCTabsModel addSessionTabs(CCTabsModel tabModel, AMModel model) {
+        if (tabModel == null) {
+            tabModel = new CCTabsModel();
+        }
+        CCNavNode sessionNode = (CCNavNode) tabModel.getNodeById(
+                AMAdminConstants.SESSIONS_NODE_ID);
+
+        if (sessionNode != null) {
+            if ( (tabs == null) || (tabs.isEmpty()) ||
+                 (sessionNode.getChildren() == null) ||
+                 (sessionNode.getChildren().size() >= 3)) {
+                return tabModel;
+            }
+            AMTabEntry entries[] = new AMTabEntry[3];
+            entries[0] = (AMTabEntry) sessionNode.getChildren().get(0);
+            entries[1] = (AMTabEntry) sessionNode.getChildren().get(1);
+            entries[2] = (AMTabEntry) sessionNode.getChildren().get(2);
+            for (AMTabEntry entry : entries) {
+                sessionNode.addChild(new CCNavNode(entry.getID(), entry.getLabel(),
+                        entry.getTooltip(), entry.getStatus()));
+            }
+        }
+        return tabModel;
+    }
+
     public boolean addEntityTabs(
         CCTabsModel tabModel,
         String realmName,
@@ -328,7 +354,7 @@ public class AMViewConfig {
 
         return (ordered == null) ? Collections.EMPTY_LIST : ordered;
     }
-    
+
     private List matchIdentityType(Set basket, String wildcard, AMModel model) {
         Set matched = new HashSet();
         for (Iterator i = basket.iterator(); i.hasNext(); ) {
