@@ -173,9 +173,6 @@
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
 
-        <!-- OpenAM Schema Modules -->
-        <module>openam-schema</module>
-
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
@@ -187,9 +184,6 @@
 
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
-
-        <!-- OpenAM Authentication Modules -->
-        <module>openam-authentication</module>
 
         <!-- OpenAM OAuth Token Service -->
         <module>openam-oauth</module>
