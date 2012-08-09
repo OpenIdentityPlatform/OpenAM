@@ -241,6 +241,7 @@
                             <targetPath>WEB-INF/wsdl</targetPath>
                             <filtering>false</filtering>
                         </webResource>
+                        <!-- The below prevents us from removing openam-schema from main build. -->
                         <webResource>
                             <directory>${project.basedir}/../openam-schema/openam-jaxrpc-schema/target/classes/jaxrpc
                             </directory>

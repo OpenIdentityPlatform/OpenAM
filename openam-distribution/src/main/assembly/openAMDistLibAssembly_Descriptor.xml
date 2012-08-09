@@ -2,18 +2,19 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-    <id>openam-distribution-assembly</id>
+    <id>openam-distribution-library</id>
     <formats>
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <dependencySets>
-        <dependencySet>
-            <outputDirectory>/lib</outputDirectory>
+    <fileSets>
+        <fileSet>
+            <outputDirectory></outputDirectory>
+            <directory>${project.basedir}/target/distribution/openam-distribution-lib</directory>
             <includes>
-                <include>org.forgerock:openam-server</include>
+                <include>**/**</include>
             </includes>
-        </dependencySet>
-    </dependencySets>
+        </fileSet>
+    </fileSets>
 </assembly>
 
