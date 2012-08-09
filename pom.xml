@@ -179,9 +179,6 @@
         <!-- OpenAM Common Test Suite -->
         <module>openam-test</module>
 
-        <!-- OpenAM Schema -->
-        <module>openam-schema</module>
-
         <!-- OpenAM Session High-Availability FailOver Module -->
         <module>openam-session-ha</module>
 
@@ -211,9 +208,6 @@
 
         <!-- Final Packaging Distribution Kit -->
         <module>openam-distribution</module>
-
-        <!-- OSGi Bundle -->
-        <!-- <module>openam-bundle</module>  Not Ready Yet. -->
 
     </modules>
 

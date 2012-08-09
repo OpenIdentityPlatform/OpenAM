@@ -19,7 +19,7 @@
                 <include>org.forgerock:openam-dtd-schema</include>
                 <include>org.forgerock:openam-jaxrpc-schema</include>
                 <include>org.forgerock:openam-idsvcs-schema</include>
-                <include>external:OpenDJ:2012-20-02</include>
+                <include>external:OpenDJ</include>
                 <include>external:j2ee</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>com.sun.xml.rpc:jaxrpc-impl</include>
