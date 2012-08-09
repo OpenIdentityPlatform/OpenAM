@@ -175,15 +175,18 @@ public class FAMClassLoader {
         "webservices-extra-api-2003-09-04.jar", // "webservices-extra-api.jar",
         "webservices-extra-2008-03-12.jar",     // "webservices-extra.jar",
                                                 // "opensso.jar",
+
+            //  Add xml-serializer.jar   (I used the latest  2-7-1)
+            //  3) Add xml-apis.jar
+
+            // Xerces-J-bin.2.11.0
+
         "openam-shared-10.1.0-SNAPSHOT.jar",
-        "openam-core-10.1.0-SNAPSHOT.jar",
-        "openam-coretoken-10.1.0-SNAPSHOT.jar",
         "openam-dtd-schema-10.1.0-SNAPSHOT.jar",
         "openam-entitlements-10.1.0-SNAPSHOT.jar",
         "openam-idsvcs-schema-10.1.0-SNAPSHOT.jar",
         "openam-jaxrpc-schema-10.1.0-SNAPSHOT.jar",
         "openam-liberty-schema-10.1.0-SNAPSHOT.jar",
-        "openam-mib-schema-10.1.0-SNAPSHOT.jar",
         "openam-rest-10.1.0-SNAPSHOT.jar",
         "openam-saml2-schema-10.1.0-SNAPSHOT.jar",
         "openam-wsfederation-schema-10.1.0-SNAPSHOT.jar",
@@ -191,8 +194,10 @@ public class FAMClassLoader {
                                                 // "openssowssproviders.jar",
         "xalan-2.7.1.jar",                      // "xalan.jar",
         "xercesImpl-2.10.0.jar",                // "xercesImpl.jar",
-                                                // "openfedlib.jar"
-        "openam-federation-library-10.1.0-SNAPSHOT.jar",
+        "xml-apis-1.4.01.jar",
+        "xml-resolver-1.2.jar",
+
+        "openam-federation-library-10.1.0-SNAPSHOT.jar", // "openfedlib.jar"
         "OpenFM-10.1.0-SNAPSHOT.jar"
     };
 
