@@ -50,7 +50,7 @@
         </fileSet>
         <fileSet>
             <outputDirectory></outputDirectory>
-            <directory>src/main/amserver/scripts/tools</directory>
+            <directory>${project.basedir}/../src/main/amserver/scripts/tools</directory>
             <includes>
                 <include>README.setup</include>
                 <include>setup</include>

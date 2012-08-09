@@ -539,14 +539,6 @@
         -->
 
 
-        <!-- add federation server samples to the WAR -->
-        <!--mkdir dir="${openam.temp.target}/samples" />
-        <copy todir="${openam.temp.target}/samples">
-            <fileset dir="${openfm.samples.dir}/war"
-                 excludes="**/CVS" />
-        </copy-->
-
-
     </target>
 
 </project>
