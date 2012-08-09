@@ -83,6 +83,22 @@ if [ "$5" = "-p" -o "$5" = "--path" ] ; then
   path_AMConfig="$6"
 fi
 
+CLASSPATH=""
+#CLASSPATH="lib/amadm_setup.jar"
+CLASSPATH="${CLASSPATH}:lib/OpenDJ-2012-20-02.jar"
+CLASSPATH="${CLASSPATH}:lib/json-20090211.jar"
+CLASSPATH="${CLASSPATH}:lib/xalan-2.7.1.jar"
+CLASSPATH="${CLASSPATH}:lib/xercesImpl-2.10.0.jar"
+CLASSPATH="${CLASSPATH}:lib/xml-apis-1.4.01.jar"
+CLASSPATH="${CLASSPATH}:lib/xmlsec-1.3.0.jar"
+CLASSPATH="${CLASSPATH}:lib/openam-core-10.1.0-SNAPSHOT.jar"
+CLASSPATH="${CLASSPATH}:lib/openam-shared-10.1.0-SNAPSHOT.jar"
+CLASSPATH="${CLASSPATH}:lib/openam-dtd-schema-10.1.0-SNAPSHOT.jar"
+CLASSPATH="${CLASSPATH}:lib/openam-rest-10.1.0-SNAPSHOT.jar"
+CLASSPATH="${CLASSPATH}:resources"
 
-
-${JAVA_HOME}/bin/java -D"load.config=yes" -D"help.print=${help_print}" -D"path.AMConfig=${path_AMConfig}" -D"path.debug=${path_debug}" -D"path.log=${path_log}" -cp "lib/amserver.jar:lib/amadm_setup.jar:lib/opensso-sharedlib.jar:lib/OpenDJ.jar:resources" com.sun.identity.tools.bundles.Main
+${JAVA_HOME}/bin/java -D"load.config=yes" -D"help.print=${help_print}" \
+                      -D"path.AMConfig=${path_AMConfig}" -D"path.debug=${path_debug}" \
+                      -D"path.log=${path_log}"
+                      -cp "${CLASSPATH}" \
+                      com.sun.identity.tools.bundles.Main

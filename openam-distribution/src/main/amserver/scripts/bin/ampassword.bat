@@ -38,9 +38,24 @@ shift
 goto WHILE
 :WEND
 
-set TOOLS_CLASSPATH="@CONFIG_DIR@";%TOOLS_HOME%/lib/amadm_setup.jar;%TOOLS_HOME%/lib/OpenDJ.jar;%TOOLS_HOME%/lib/j2ee.jar;%TOOLS_HOME%/lib/webservices-api.jar;%TOOLS_HOME%/lib/webservices-rt.jar;%TOOLS_HOME%/lib/webservices-tools.jar;%TOOLS_HOME%/lib/jaxrpc-spi.jar;%TOOLS_HOME%/lib/mail.jar;%TOOLS_HOME%/lib/amserver.jar;%TOOLS_HOME%/lib/opensso-sharedlib.jar;%TOOLS_HOME%/resources;%TOOLS_HOME%/config
+set CLASSPATH="@CONFIG_DIR@"
+: set CLASSPATH="%CLASSPATH%;lib/amadm_setup.jar"
+set CLASSPATH="%CLASSPATH%;lib/OpenDJ-2012-20-02.jar"
+set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
+set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-api-2009-14-01.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-rt-2009-29-07.jar"
+set CLASSPATH="%CLASSPATH%;lib/wwebservices-tools-2.1-b16.jar"
+set CLASSPATH="%CLASSPATH%;lib/json-20090211.jar"
+set CLASSPATH="%CLASSPATH%;lib/xalan-2.7.1.jar"
+set CLASSPATH="%CLASSPATH%;lib/xercesImpl-2.10.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/xml-apis-1.4.01.jar"
+set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-core-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-shared-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-rest-10.1.0-SNAPSHOT.jar"
 
-
-"@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %TOOLS_CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" com.iplanet.services.ldap.ServerConfigMgr %PARAMS%
+"@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" com.iplanet.services.ldap.ServerConfigMgr %PARAMS%
 endlocal
 :END

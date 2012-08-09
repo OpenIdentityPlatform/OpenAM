@@ -87,7 +87,27 @@ IF "%5" == "--debug" SET path_debug=%~6
 IF "%5" == "-p" SET path_AMConfig=%~6
 IF "%5" == "--path" SET path_AMConfig=%~6
 
-"%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/OpenDJ.jar;resources" com.sun.identity.tools.bundles.Main
+
+: lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/OpenDJ.jar;resources
+set CLASSPATH="@CONFIG_DIR@"
+: set CLASSPATH="%CLASSPATH%;lib/amadm_setup.jar"
+set CLASSPATH="%CLASSPATH%;lib/OpenDJ-2012-20-02.jar"
+set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
+set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-api-2009-14-01.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-rt-2009-29-07.jar"
+set CLASSPATH="%CLASSPATH%;lib/wwebservices-tools-2.1-b16.jar"
+set CLASSPATH="%CLASSPATH%;lib/json-20090211.jar"
+set CLASSPATH="%CLASSPATH%;lib/xalan-2.7.1.jar"
+set CLASSPATH="%CLASSPATH%;lib/xercesImpl-2.10.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/xml-apis-1.4.01.jar"
+set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-core-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-shared-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-rest-10.1.0-SNAPSHOT.jar"
+
+"%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main
 ENDLOCAL
 
 :exit

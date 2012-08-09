@@ -7,6 +7,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
+    <!-- Library Dependency -->
     <dependencySets>
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
@@ -37,12 +38,23 @@
             </includes>
         </dependencySet>
     </dependencySets>
+
+    <!-- File Groupings -->
     <fileSets>
         <fileSet>
             <outputDirectory></outputDirectory>
             <directory>${project.basedir}/../license</directory>
             <includes>
                 <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory></outputDirectory>
+            <directory>src/main/amserver/scripts/tools</directory>
+            <includes>
+                <include>README.setup</include>
+                <include>setup</include>
+                <include>setup.bat</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -244,5 +256,43 @@
             </includes>
         </fileSet>
     </fileSets>
+
+    <!-- Single Files -->
+    <files>
+        <file>
+            <source>${project.basedir}/../openam-federation/OpenFM/src/main/scripts/bin/ssoadm</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>ssoadm.template</destName>
+        </file>
+        <file>
+            <source>${project.basedir}/../openam-federation/OpenFM/src/main/scripts/bin/ssoadm.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>ssoadm.bat.template</destName>
+        </file>
+
+        <file>
+            <source>src/main/amserver/scripts/bin/ampassword</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>ampassword.template</destName>
+        </file>
+        <file>
+            <source>src/main/amserver/scripts/bin/ampassword.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>ampassword.bat.template</destName>
+        </file>
+
+        <file>
+            <source>src/main/amserver/scripts/log/amverifyarchive</source>
+            <outputDirectory>template/unix/bin</outputDirectory>
+            <destName>amverifyarchive.template</destName>
+        </file>
+        <file>
+            <source>src/main/amserver/scripts/log/amverifyarchive.bat</source>
+            <outputDirectory>template/windows/bin</outputDirectory>
+            <destName>amverifyarchive.bat.template</destName>
+        </file>
+
+    </files>
+
 </assembly>
 
