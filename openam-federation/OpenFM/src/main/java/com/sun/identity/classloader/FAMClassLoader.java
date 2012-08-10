@@ -169,19 +169,16 @@ public class FAMClassLoader {
      * TODO -- Revisit to fix.
      */
     public static String[] jars = new String[]{
-        "webservices-api-2009-14-01.jar",       // "webservices-api.jar",
-        "webservices-rt-2009-29-07.jar",        // "webservices-rt.jar",
-        "webservices-tools-2.1-b16.jar",        // "webservices-tools.jar",
-        "webservices-extra-api-2003-09-04.jar", // "webservices-extra-api.jar",
-        "webservices-extra-2008-03-12.jar",     // "webservices-extra.jar",
-                                                // "opensso.jar",
-
-            //  Add xml-serializer.jar   (I used the latest  2-7-1)
-            //  3) Add xml-apis.jar
-
-            // Xerces-J-bin.2.11.0
-
-        "openam-shared-10.1.0-SNAPSHOT.jar",
+        "webservices-api-2009-14-01.jar",               // "webservices-api.jar",
+        "webservices-rt-2009-29-07.jar",                // "webservices-rt.jar",
+        "webservices-tools-2.1-b16.jar",                // "webservices-tools.jar",
+        "webservices-extra-api-2003-09-04.jar",         // "webservices-extra-api.jar",
+        "webservices-extra-2008-03-12.jar",             // "webservices-extra.jar",
+        "xercesImpl-2.11.0.jar",                        // "xercesImpl.jar",
+        "xml-apis-2.11.0.jar",
+        "xml-resolver-2.11.0.jar",
+        "xml-serializer-2.11.0.jar",
+        "openam-shared-10.1.0-SNAPSHOT.jar",            // "opensso.jar",
         "openam-dtd-schema-10.1.0-SNAPSHOT.jar",
         "openam-entitlements-10.1.0-SNAPSHOT.jar",
         "openam-idsvcs-schema-10.1.0-SNAPSHOT.jar",
@@ -191,12 +188,7 @@ public class FAMClassLoader {
         "openam-saml2-schema-10.1.0-SNAPSHOT.jar",
         "openam-wsfederation-schema-10.1.0-SNAPSHOT.jar",
         "openam-xacml3-schema-10.1.0-SNAPSHOT.jar",
-                                                // "openssowssproviders.jar",
-        "xalan-2.7.1.jar",                      // "xalan.jar",
-        "xercesImpl-2.10.0.jar",                // "xercesImpl.jar",
-        "xml-apis-1.4.01.jar",
-        "xml-resolver-1.2.jar",
-
+        "xalan-2.7.1.jar",                               // "xalan.jar",
         "openam-federation-library-10.1.0-SNAPSHOT.jar", // "openfedlib.jar"
         "OpenFM-10.1.0-SNAPSHOT.jar"
     };

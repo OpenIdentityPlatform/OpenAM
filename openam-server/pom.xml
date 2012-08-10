@@ -563,19 +563,22 @@
         </dependency>
 
         <!-- XML -->
+        <!-- Xerces-J Required for fedlet -->
         <dependency>
-            <groupId>xml-apis</groupId>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
             <artifactId>xml-apis</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>xml-resolver</groupId>
+            <groupId>xerces-J</groupId>
             <artifactId>xml-resolver</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
         </dependency>
 
     </dependencies>
