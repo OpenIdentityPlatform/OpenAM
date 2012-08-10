@@ -165,8 +165,8 @@
              permissions="iPlanetAMSessionService"
              accesslevel="globalconfig"/>
 
-        <tab id="52" viewbean="com.sun.identity.console.session.SMProfileViewBean"
-             url="../session/SMProfile"
+        <tab id="52" viewbean="com.sun.identity.console.session.SessionHAPropertiesViewBean"
+             url="../session/SessionHAProperties"
              label="tab.session.configuration.label"
              tooltip="tab.session.configuration.tooltip"
              status="tab.session.configuration.status"

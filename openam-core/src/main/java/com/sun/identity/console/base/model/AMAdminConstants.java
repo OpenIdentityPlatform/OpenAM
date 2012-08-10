@@ -409,4 +409,10 @@ public interface AMAdminConstants {
      */
     String AGENT_REPOSITORY_LOCATION_ATTR =
             "com.sun.identity.agents.config.repository.location";
+
+    /**
+     *  View Display Phase.
+     */
+    String DISPLAY_HA_SESSION_PHASE = "displaySessionHAProperties";
+
 }

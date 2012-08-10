@@ -91,4 +91,38 @@ public interface SMProfileModel
      */
     public Map getServerNames();
 
+    /**
+     * Returns realm profile property XML.
+     *
+     * @param realmName Name of Realm.
+     * @param viewbeanClassName Class name of View Bean
+     * @throws AMConsoleException if there are no attributes to display.
+     * @return realm profile property XML.
+     */
+    String getRealmProfilePropertyXML(
+            String realmName,
+            String viewbeanClassName
+    ) throws AMConsoleException;
+
+    /**
+     * Returns attribute values. Map of attribute name to set of values.
+     *
+     * @param name Name of Realm.
+     * @return attribute values.
+     */
+    Map getAttributeValues(String name)
+            throws AMConsoleException;
+
+    /**
+     * Set attribute values.
+     *
+     * @param name Name of Realm.
+     * @param attributeValues Map of attribute values to set of values.
+     * @throws AMConsoleException if attribute values cannot be updated.
+     */
+    void setAttributeValues(String name, Map attributeValues)
+            throws AMConsoleException;
+
+
+
 }

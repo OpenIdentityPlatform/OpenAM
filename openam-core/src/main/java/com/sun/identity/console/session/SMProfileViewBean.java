@@ -101,13 +101,13 @@ public class SMProfileViewBean
     private static final String LOGOUT_URL = "logoutUrl";
     private static final String SERVER_NAME = "SERVER_NAME";
 
-    private CCActionTableModel tblModel = null;
+    protected CCActionTableModel tblModel = null;
     private CCPageTitleModel ptModel;
     protected int curPage = 0;
     private boolean validSession = true;
 
     /**
-     * Creates a session view bean.
+     * Creates a default named session view bean.
      */
     public SMProfileViewBean() {
         super("SMProfile");
@@ -116,6 +116,19 @@ public class SMProfileViewBean
         ptModel = new CCPageTitleModel(
             getClass().getClassLoader().getResourceAsStream(
                 "com/sun/identity/console/simplePageTitle.xml"));
+        registerChildren();
+    }
+
+    /**
+     * Creates a session view bean by name.
+     */
+    public SMProfileViewBean(String name) {
+        super(name);
+        setDefaultDisplayURL(DEFAULT_DISPLAY_URL);
+        createTableModel();
+        ptModel = new CCPageTitleModel(
+                getClass().getClassLoader().getResourceAsStream(
+                        "com/sun/identity/console/simplePageTitle.xml"));
         registerChildren();
     }
 
@@ -158,7 +171,7 @@ public class SMProfileViewBean
         } else if (name.equals(CHILD_SERVER_NAME_HREF)) {
             view = new CCHref(this, name, null);
         } else {
-            view = super.createChild(name);
+                 view = super.createChild(name);
         }
 
         return view;

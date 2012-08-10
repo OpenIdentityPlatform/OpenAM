@@ -42,4 +42,6 @@ public abstract class SMViewBeanBase
     public SMViewBeanBase(String name) {
         super(name);
     }
+
+
 }

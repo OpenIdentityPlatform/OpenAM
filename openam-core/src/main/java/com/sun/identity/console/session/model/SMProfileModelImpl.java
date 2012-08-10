@@ -36,14 +36,26 @@ import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
+import com.sun.identity.console.delegation.model.DelegationConfig;
+import com.sun.identity.console.property.MultiServicesPropertyXMLBuilder;
+import com.sun.identity.console.property.PropertyTemplate;
+import com.sun.identity.console.property.PropertyXMLBuilderBase;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchema;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,6 +74,9 @@ import javax.servlet.http.HttpServletRequest;
 public class SMProfileModelImpl extends AMModelBase
     implements SMProfileModel
 {
+    private static SSOToken adminSSOToken =
+            (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+
     private final static String SERVER_LIST = 
         "iplanet-am-platform-server-list";
 
@@ -92,6 +107,66 @@ public class SMProfileModelImpl extends AMModelBase
         serverName = value;
     }
 
+    /**
+     * Returns sub realm creation property XML.
+     *
+     * @throws AMConsoleException if there are no attributes to display.
+     * @return sub realm creation property XML.
+     */
+    public String getCreateRealmPropertyXML()
+            throws AMConsoleException {
+        StringBuffer buff = new StringBuffer(2000);
+        buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
+                .append(PropertyTemplate.START_TAG);
+        getPropertyXML(buff, false);
+        buff.append(PropertyTemplate.END_TAG);
+        return buff.toString();
+    }
+
+    /**
+     * Returns realm profile property XML.
+     *
+     * @param realmName Name of Realm.
+     * @param viewbeanClassName Class name of View Bean
+     * @throws AMConsoleException if there are no attributes to display.
+     * @return realm profile property XML.
+     */
+    public String getRealmProfilePropertyXML(
+            String realmName,
+            String viewbeanClassName
+    ) throws AMConsoleException {
+        DelegationConfig dConfig = DelegationConfig.getInstance();
+        boolean canModify = dConfig.hasPermission(realmName, null,
+                AMAdminConstants.PERMISSION_MODIFY, this, viewbeanClassName);
+        StringBuffer buff = new StringBuffer(2000);
+        buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
+                .append(PropertyTemplate.START_TAG);
+        getPropertyXML(buff, !canModify);
+        buff.append(PropertyTemplate.END_TAG);
+        return buff.toString();
+    }
+
+    private void getPropertyXML(StringBuffer buff, boolean readonly)
+            throws AMConsoleException
+    {
+        try {
+            OrganizationConfigManager orgMgr = new OrganizationConfigManager(
+                    adminSSOToken, "/");
+            Set serviceSchemas =  orgMgr.getServiceSchemas();
+
+            for (Iterator iter = serviceSchemas.iterator(); iter.hasNext(); ) {
+                MultiServicesPropertyXMLBuilder xmlBuilder =
+                        new MultiServicesPropertyXMLBuilder(
+                                (ServiceSchema)iter.next(), this);
+                xmlBuilder.setAllAttributeReadOnly(readonly);
+                buff.append(xmlBuilder.getXML(false));
+            }
+        } catch (SSOException e) {
+            debug.error("RMRealmModelImpl.getPropertyXML", e);
+        } catch (SMSException e) {
+            debug.error("RMRealmModelImpl.getPropertyXML", e);
+        }
+    }
 
     /**
      * Initializes sessions list.
@@ -391,5 +466,116 @@ public class SMProfileModelImpl extends AMModelBase
             }
         }
         return map;
+    }
+
+    /**
+     * Returns attribute values. Map of attribute name to set of values.
+     *
+     * @param name Name of Realm.
+     * @return attribute values.
+     * @throws AMConsoleException if attribute values cannot be obtained.
+     */
+    public Map getAttributeValues(String name)
+            throws AMConsoleException
+    {
+        String[] param = {name};
+        logEvent("ATTEMPT_GET_ATTR_VALUES_OF_REALM", param);
+
+        try {
+            Map map = new HashMap();
+            OrganizationConfigManager orgMgr = new OrganizationConfigManager(
+                    getUserSSOToken(), name);
+            Set serviceSchemas = orgMgr.getServiceSchemas();
+
+            for (Iterator iter = serviceSchemas.iterator(); iter.hasNext();) {
+                ServiceSchema ss = (ServiceSchema)iter.next();
+                String serviceName = ss.getServiceName();
+                Map values = orgMgr.getAttributes(serviceName);
+                Set attributeSchemas = ss.getAttributeSchemas();
+
+                for (Iterator i = attributeSchemas.iterator(); i.hasNext(); ) {
+                    AttributeSchema as = (AttributeSchema)i.next();
+                    String i18nKey = as.getI18NKey();
+
+                    if ((i18nKey != null) && (i18nKey.trim().length() > 0)) {
+                        String attrName = as.getName();
+                        Set val = (Set)values.get(attrName);
+                        if (val == null) {
+                            val = Collections.EMPTY_SET;
+                        }
+                        map.put(serviceName + "_" + attrName, val);
+                    }
+                }
+            }
+            logEvent("SUCCEED_GET_ATTR_VALUES_OF_REALM", param);
+
+            return map;
+        } catch (SMSException e) {
+            String strError = getErrorString(e);
+            String[] paramsEx = {name, strError};
+            logEvent("SMS_EXCEPTION_GET_ATTR_VALUES_OF_REALM", paramsEx);
+            throw new AMConsoleException(strError);
+        }
+    }
+
+    /**
+     * Set attribute values.
+     *
+     * @param name Name of Realm.
+     * @param attributeValues Map of attribute name to set of values.
+     * @throws AMConsoleException if attribute values cannot be updated.
+     */
+    public void setAttributeValues(String name, Map attributeValues)
+            throws AMConsoleException {
+        try {
+            String[] param = {name};
+            logEvent("ATTEMPT_SET_ATTR_VALUES_OF_REALM", param);
+            OrganizationConfigManager orgMgr = new OrganizationConfigManager(
+                    getUserSSOToken(), name);
+            Map map = mapAttributeValuesToServiceName(attributeValues);
+
+            for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
+                String serviceName = (String)iter.next();
+                orgMgr.setAttributes(serviceName, (Map)map.get(serviceName));
+            }
+            logEvent("SUCCEED_SET_ATTR_VALUES_OF_REALM", param);
+        } catch (SMSException e) {
+            String strError = getErrorString(e);
+            String[] paramsEx = {name, strError};
+            logEvent("SMS_EXCEPTION_SET_ATTR_VALUES_OF_REALM", paramsEx);
+            throw new AMConsoleException(strError);
+        }
+    }
+
+    private Map mapAttributeValuesToServiceName(Map attributeValues) {
+        Map mapServices = null;
+
+        if ((attributeValues != null) && !attributeValues.isEmpty()) {
+            mapServices = new HashMap();
+
+            for (Iterator i = attributeValues.keySet().iterator();
+                 i.hasNext();
+                    ) {
+                String attrName = (String)i.next();
+                int idx = attrName.indexOf('_');
+                if (idx != -1) {
+                    String serviceName = attrName.substring(0, idx);
+                    String attributeName = attrName.substring(idx+1);
+
+                    Map map = (Map)mapServices.get(serviceName);
+                    if (map == null) {
+                        map = new HashMap();
+                        mapServices.put(serviceName, map);
+                    }
+                    map.put(attributeName, attributeValues.get(attrName));
+                } else {
+                    debug.error(
+                            "RMRealmModelImpl.mapAttributeValuesToServiceName: " +
+                                    "unknown attribute, " + attrName);
+                }
+            }
+        }
+
+        return (mapServices == null) ? Collections.EMPTY_MAP : mapServices;
     }
 }
