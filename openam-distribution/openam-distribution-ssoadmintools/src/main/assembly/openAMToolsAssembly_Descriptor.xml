@@ -32,7 +32,7 @@
                 <include>external:webservices-rt</include>
                 <include>com.sun.tools.ws:webservices-tools</include>
                 <include>xalan:xalan</include>
-                <include>xerces:xercesImpl</include>
+                <include>xerces-J:xercesImpl</include>
                 <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
                 <!-- amadm_setup.jar -->
             </includes>
