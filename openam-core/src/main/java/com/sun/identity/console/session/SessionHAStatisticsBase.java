@@ -22,7 +22,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SessionHAPropertiesBase.java,v 1.3 2008/06/25 05:43:11 qcheng Exp $
  *
  */
 
@@ -36,14 +35,14 @@ import com.sun.web.ui.model.CCPageTitleModel;
 
 import java.text.MessageFormat;
 
-public abstract class SessionHAPropertiesBase
+public abstract class SessionHAStatisticsBase
     extends SMProfileViewBean
 {
-    public SessionHAPropertiesBase(String name) {
+    public SessionHAStatisticsBase(String name) {
         super(name);
     }
 
-    protected static final String SESSION_HA_PROPERTIES = "SessionHAProperties";
+    protected static final String SESSION_HA_STATISTICS = "SessionHAStatistics";
 
     public CCPageTitleModel ptModel;
 

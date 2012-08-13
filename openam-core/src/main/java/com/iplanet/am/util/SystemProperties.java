@@ -143,6 +143,7 @@ public class SystemProperties {
         mapTagswap.put("%SERVER_HOST%", Constants.AM_SERVER_HOST);
         mapTagswap.put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL);
         mapTagswap.put("%BASE_DIR%", CONFIG_PATH);
+
         
         try {
             // Initialize properties

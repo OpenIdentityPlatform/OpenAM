@@ -5908,6 +5908,79 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    
+
+    <!-- 13074 - 13079 are reserved for modify session HA related properties profile -->
+    <logmessage name="ATTEMPT_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13074"
+                loglevel="LL_INFO"
+                description="Attempt to read session HA properties">
+        <datainfo>
+            <item>name of attribute</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in session profile page.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEED_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13075"
+                loglevel="LL_INFO"
+                description="Read Access of session HA properties succeeded.">
+        <datainfo>
+            <item>name of attribute</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in session profile page.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13076"
+                loglevel="LL_SEVERE"
+                description="Read Access of session HA properties failed.">
+        <datainfo>
+            <item>name of attribute</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to modify session HA properties due to service management SDK exception.</item>
+        </triggers>
+        <actions>
+            <item>Look under service management log for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ATTEMPT_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13077"
+                loglevel="LL_INFO"
+                description="Attempt to modify session HA properties">
+        <datainfo>
+            <item>name of attribute</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in session profile page.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEED_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13078"
+                loglevel="LL_INFO"
+                description="Modification of session HA properties succeeded.">
+        <datainfo>
+            <item>name of attribute</item>
+        </datainfo>
+        <triggers>
+            <item>Click on Save button in session profile page.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SMS_EXCEPTION_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13079"
+                loglevel="LL_SEVERE"
+                description="Modification of session HA properties failed.">
+        <datainfo>
+            <item>name of attribute</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to modify session HA properties due to service management SDK exception.</item>
+        </triggers>
+        <actions>
+            <item>Look under service management log for more information.</item>
+        </actions>
+    </logmessage>
+
 </logmessages>

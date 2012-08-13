@@ -36,20 +36,16 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
 import com.sun.identity.console.base.AMConsoleConfig;
 import com.sun.identity.console.base.AMViewConfig;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.components.view.html.SerializedField;
-import com.sun.identity.console.idm.model.EntitiesModel;
 import com.sun.identity.console.realm.HasEntitiesTabs;
 import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
-import com.sun.identity.idm.IdSearchResults;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
-import com.sun.web.ui.model.CCTabsModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
 import com.sun.web.ui.view.html.CCDropDownMenu;
@@ -226,18 +222,16 @@ public class SMProfileViewBean
                 populateTableModel(Collections.EMPTY_LIST);
             }
             setPageSessionAttribute(SERVER_NAME, value);
-
-            addSessionsTab(model);
-            tabModel.setSelectedNode(1);
+            // Set our Sub-Tabs
+            addSessionsTab(model,1);
         }
     }
 
-    private void addSessionsTab(SMProfileModel model) {
-        String curRealm = (String)getPageSessionAttribute(
-                AMAdminConstants.CURRENT_REALM);
+    protected void addSessionsTab(SMProfileModel model, int selectedNode) {
         AMViewConfig config = AMViewConfig.getInstance();
         config.addSessionTabs(tabModel, model);
         registerChild(TAB_COMMON, CCTabs.class);
+        tabModel.setSelectedNode(selectedNode);
     }
 
     /**

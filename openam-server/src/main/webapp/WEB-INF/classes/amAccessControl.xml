@@ -329,6 +329,7 @@
     <neednodealwith classname="com.sun.identity.console.service.G11NCharsetAliasAddViewBean" />
     <neednodealwith classname="com.sun.identity.console.session.SMProfileViewBean" />
     <neednodealwith classname="com.sun.identity.console.session.SessionHAPropertiesViewBean" />
+    <neednodealwith classname="com.sun.identity.console.session.SessionHAStatisticsViewBean" />
     <neednodealwith classname="com.sun.identity.console.delegation.DelegationViewBean" />
     <neednodealwith classname="com.sun.identity.console.delegation.DelegationPropertiesViewBean" />
     <neednodealwith classname="com.sun.identity.console.user.UMUserPasswordResetOptionsViewBean" />

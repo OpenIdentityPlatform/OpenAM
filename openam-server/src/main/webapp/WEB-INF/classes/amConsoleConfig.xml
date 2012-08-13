@@ -157,6 +157,7 @@
              status="tab.session.status"
              permissions="iPlanetAMSessionService"
              accesslevel="globalconfig">
+
         <tab id="51" viewbean="com.sun.identity.console.session.SMProfileViewBean"
              url="../session/SMProfile"
              label="tab.session.current.label"
@@ -173,8 +174,8 @@
              permissions="iPlanetAMSessionService"
              accesslevel="globalconfig"/>
 
-        <tab id="53" viewbean="com.sun.identity.console.session.SMProfileViewBean"
-             url="../session/SMProfile"
+        <tab id="53" viewbean="com.sun.identity.console.session.SessionHAStatisticsViewBean"
+             url="../session/SessionHAStatistics"
              label="tab.session.statistics.label"
              tooltip="tab.session.statistics.tooltip"
              status="tab.session.statistics.status"

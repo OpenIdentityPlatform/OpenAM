@@ -53,6 +53,9 @@ import org.forgerock.openam.session.model.DBStatistics;
  */
 public interface AMSessionRepository {
 
+    public static final String REPOSITORY_CLASS_PROPERTY =
+            "com.sun.am.session.SessionRepositoryImpl";
+
     /**
      * Retrieves session state from the repository.
      *

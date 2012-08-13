@@ -39,17 +39,14 @@ import com.iplanet.am.util.SystemProperties;
 
 public class SessionRepository {
 
-    private static final String DEFAULT_REPOSITORY_CLASS =
+    private static final String LEGACY_REPOSITORY_CLASS =
             "org.forgerock.openam.session.ha.amsessionstore.db.mq.JMQSessionRepository";
 
     private static final String  MEMORY_REPOSITORY_CLASS =
             "org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore";
 
-    private static final String REPOSITORY_CLASS_PROPERTY = 
-        "com.sun.am.session.SessionRepositoryImpl";
-
     private static final String REPOSITORY_CLASS = SystemProperties.get(
-            REPOSITORY_CLASS_PROPERTY, MEMORY_REPOSITORY_CLASS);
+            AMSessionRepository.REPOSITORY_CLASS_PROPERTY, MEMORY_REPOSITORY_CLASS);
 
     private static AMSessionRepository sessionRepository = null;
 

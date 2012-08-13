@@ -164,7 +164,7 @@ public class Bootstrap {
     /**
      * Returns System Property with an URL.
      *
-     * @param bootstrapInfo an URL that contains information on how to
+     * @param bootstrapData an URL that contains information on how to
      *        fetch the server configuration properties.
      * @param reinit <code>true</code> to re initialize the system.
      * @throws Exception if properties cannot be loaded.

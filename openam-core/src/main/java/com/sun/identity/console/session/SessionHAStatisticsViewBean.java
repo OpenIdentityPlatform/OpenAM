@@ -22,7 +22,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SessionHAPropertiesViewBean.java,v 1.2 2008/06/25 05:43:12 qcheng Exp $
  *
  */
 
@@ -34,7 +33,12 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-
+import com.sun.identity.console.base.AMPropertySheet;
+import com.sun.identity.console.base.model.AMConsoleException;
+import com.sun.identity.console.base.model.AMModel;
+import com.sun.identity.console.base.model.AMPropertySheetModel;
+import com.sun.identity.console.session.model.SMProfileModel;
+import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
@@ -42,18 +46,11 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-import com.sun.identity.console.base.AMPropertySheet;
-import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMPropertySheetModel;
-import com.sun.identity.console.session.model.SMProfileModel;
-import com.sun.identity.console.session.model.SMProfileModelImpl;
-
-public class SessionHAPropertiesViewBean
-        extends SessionHAPropertiesBase {
+public class SessionHAStatisticsViewBean
+        extends SessionHAStatisticsBase {
 
     public static final String DEFAULT_DISPLAY_URL =
-            "/console/session/SessionHAProperties.jsp";
+            "/console/session/SessionHAStatistics.jsp";
 
     protected AMPropertySheetModel psModel;
 
@@ -63,14 +60,14 @@ public class SessionHAPropertiesViewBean
     /**
      * Creates a authentication domains view bean.
      */
-    public SessionHAPropertiesViewBean() {
-        super(SESSION_HA_PROPERTIES);
+    public SessionHAStatisticsViewBean() {
+        super(SESSION_HA_STATISTICS);
         setDefaultDisplayURL(DEFAULT_DISPLAY_URL);
     }
 
     protected void initialize() {
         if (!initialized) {
-            String sessionAttribute = (String) getPageSessionAttribute(SESSION_HA_PROPERTIES);
+            String sessionAttribute = (String) getPageSessionAttribute(SESSION_HA_STATISTICS);
             if (sessionAttribute != null) {
                 initialized = true;
                 createPropertyModel(sessionAttribute);
@@ -83,7 +80,7 @@ public class SessionHAPropertiesViewBean
     }
 
     protected void registerChildren() {
-        registerChild(SESSION_HA_PROPERTIES, AMPropertySheet.class);
+        registerChild(SESSION_HA_STATISTICS, AMPropertySheet.class);
         if (psModel != null) {
             psModel.registerChildren(this);
         }
@@ -95,14 +92,14 @@ public class SessionHAPropertiesViewBean
     protected View createChild(String name) {
         View view = null;
         if (psModel == null) {
-            createPropertyModel(SESSION_HA_PROPERTIES);
+            createPropertyModel(SESSION_HA_STATISTICS);
         }
         if (ptModel == null) {
             createPageTitleModel();
         }
         if (name.equals(PAGETITLE)) {
             view = new CCPageTitle(this, ptModel, name);
-        } else if (name.equals(SESSION_HA_PROPERTIES)) {
+        } else if (name.equals(SESSION_HA_STATISTICS)) {
             view = new AMPropertySheet(this, psModel, name);
         } else if ((psModel != null) && psModel.isChildSupported(name)) {
             view = psModel.createChild(this, name, getModel());
@@ -120,30 +117,33 @@ public class SessionHAPropertiesViewBean
         super.beginDisplay(event);
         SMProfileModel model = (SMProfileModel) getModel();
         if (model != null) {
-            String sessionAttribute = (String) getPageSessionAttribute(SESSION_HA_PROPERTIES);
+            String sessionAttribute = (String) getPageSessionAttribute(SESSION_HA_STATISTICS);
             AMPropertySheet ps =
-                    (AMPropertySheet) getChild(SESSION_HA_PROPERTIES);
+                    (AMPropertySheet) getChild(SESSION_HA_STATISTICS);
             psModel.clear();
-            //try {
+            try {
+                ps.setAttributeValues(
+                        model.getAttributeValues(sessionAttribute), model);
+               // ps.setDisplayFieldValue("db_status", "Unknown");
+               // ps.setDisplayFieldValue("ACTIVE_SESSIONS", "-1");
+               // ps.setDisplayFieldValue("REPLICATED_SESSIONS", "-1");
+               // ps.setDisplayFieldValue("READS", "-1");
+               // ps.setDisplayFieldValue("WRITES", "-1");
 
-                //ps.setAttributeValues(
-                //        model.getAttributeValues(sessionAttribute), model);
-
-            //} catch (AMConsoleException a) {
-            //    setInlineAlertMessage(CCAlert.TYPE_ERROR,
-            //            "message.error", "no.properties");
-            //}
+            } catch (AMConsoleException a) {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR,
+                        "message.error", "no.properties");
+            }
             // Set our Sub-Tabs and current position, relative to one.
-            addSessionsTab(model, 2);
+            addSessionsTab(model, 3);
         }
     }
 
     private void createPageTitleModel() {
         ptModel = new CCPageTitleModel(
                 getClass().getClassLoader().getResourceAsStream(
-                        "com/sun/identity/console/twoBtnsPageTitle.xml"));
-        ptModel.setValue("button1", "button.save");
-        ptModel.setValue("button2", "button.reset");
+                        "com/sun/identity/console/oneBtnPageTitle.xml"));
+        ptModel.setValue("button1", "button.refresh");
     }
 
     protected AMModel getModelInternal() {
@@ -152,14 +152,13 @@ public class SessionHAPropertiesViewBean
         return new SMProfileModelImpl(req, getPageSessionAttributes());
     }
 
-    protected void createPropertyModel(String modelName) {
+    private void createPropertyModel(String modelName) {
         SMProfileModel model = (SMProfileModel) getModel();
         try {
             psModel = new AMPropertySheetModel(
                     model.getSessionProfilePropertyXML(modelName,
                             getClass().getName()));
             psModel.clear();
-
         } catch (AMConsoleException e) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
                     e.getMessage() + ", File Not Found for ModelName:[" + modelName + "].");
@@ -173,22 +172,7 @@ public class SessionHAPropertiesViewBean
      */
     public void handleButton1Request(RequestInvocationEvent event)
             throws ModelControlException {
-        SMProfileModel model = (SMProfileModel) getModel();
-        String name =
-                (String) getPageSessionAttribute(SESSION_HA_PROPERTIES);
 
-        //AMPropertySheet ps = (AMPropertySheet) getChild(SESSION_HA_PROPERTIES);
-
-        //try {
-            //Map orig = model.getAttributeValues(name);
-            //Map values = ps.getAttributeValues(orig, true, true, model);
-            //model.setAttributeValues(name, values);
-            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
-                    "message.updated");
-        //} catch (AMConsoleException e) {
-        //    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-        //            e.getMessage());
-        //}
         forwardTo();
     }
 

@@ -108,35 +108,19 @@ public class SMProfileModelImpl extends AMModelBase
     }
 
     /**
-     * Returns sub realm creation property XML.
+     * Returns session profile property XML.
      *
-     * @throws AMConsoleException if there are no attributes to display.
-     * @return sub realm creation property XML.
-     */
-    public String getCreateRealmPropertyXML()
-            throws AMConsoleException {
-        StringBuffer buff = new StringBuffer(2000);
-        buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
-                .append(PropertyTemplate.START_TAG);
-        getPropertyXML(buff, false);
-        buff.append(PropertyTemplate.END_TAG);
-        return buff.toString();
-    }
-
-    /**
-     * Returns realm profile property XML.
-     *
-     * @param realmName Name of Realm.
+     * @param profileName Name of Profile to be Obtained.
      * @param viewbeanClassName Class name of View Bean
      * @throws AMConsoleException if there are no attributes to display.
-     * @return realm profile property XML.
+     * @return String of profile XML.
      */
-    public String getRealmProfilePropertyXML(
-            String realmName,
+    public String getSessionProfilePropertyXML(
+            String profileName,
             String viewbeanClassName
     ) throws AMConsoleException {
         DelegationConfig dConfig = DelegationConfig.getInstance();
-        boolean canModify = dConfig.hasPermission(realmName, null,
+        boolean canModify = dConfig.hasPermission(profileName, null,
                 AMAdminConstants.PERMISSION_MODIFY, this, viewbeanClassName);
         StringBuffer buff = new StringBuffer(2000);
         buff.append(PropertyXMLBuilderBase.getXMLDefinitionHeader())
@@ -162,9 +146,9 @@ public class SMProfileModelImpl extends AMModelBase
                 buff.append(xmlBuilder.getXML(false));
             }
         } catch (SSOException e) {
-            debug.error("RMRealmModelImpl.getPropertyXML", e);
+            debug.error("SMProfileModelImpl.getPropertyXML", e);
         } catch (SMSException e) {
-            debug.error("RMRealmModelImpl.getPropertyXML", e);
+            debug.error("SMProfileModelImpl.getPropertyXML", e);
         }
     }
 
@@ -471,7 +455,7 @@ public class SMProfileModelImpl extends AMModelBase
     /**
      * Returns attribute values. Map of attribute name to set of values.
      *
-     * @param name Name of Realm.
+     * @param name Name of Attribute.
      * @return attribute values.
      * @throws AMConsoleException if attribute values cannot be obtained.
      */
@@ -479,7 +463,7 @@ public class SMProfileModelImpl extends AMModelBase
             throws AMConsoleException
     {
         String[] param = {name};
-        logEvent("ATTEMPT_GET_ATTR_VALUES_OF_REALM", param);
+        logEvent("ATTEMPT_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES", param);
 
         try {
             Map map = new HashMap();
@@ -507,13 +491,13 @@ public class SMProfileModelImpl extends AMModelBase
                     }
                 }
             }
-            logEvent("SUCCEED_GET_ATTR_VALUES_OF_REALM", param);
+            logEvent("SUCCEED_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES", param);
 
             return map;
         } catch (SMSException e) {
             String strError = getErrorString(e);
             String[] paramsEx = {name, strError};
-            logEvent("SMS_EXCEPTION_GET_ATTR_VALUES_OF_REALM", paramsEx);
+            logEvent("SMS_EXCEPTION_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES", paramsEx);
             throw new AMConsoleException(strError);
         }
     }
@@ -521,7 +505,7 @@ public class SMProfileModelImpl extends AMModelBase
     /**
      * Set attribute values.
      *
-     * @param name Name of Realm.
+     * @param name Name of Attribute.
      * @param attributeValues Map of attribute name to set of values.
      * @throws AMConsoleException if attribute values cannot be updated.
      */
@@ -529,7 +513,7 @@ public class SMProfileModelImpl extends AMModelBase
             throws AMConsoleException {
         try {
             String[] param = {name};
-            logEvent("ATTEMPT_SET_ATTR_VALUES_OF_REALM", param);
+            logEvent("ATTEMPT_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES", param);
             OrganizationConfigManager orgMgr = new OrganizationConfigManager(
                     getUserSSOToken(), name);
             Map map = mapAttributeValuesToServiceName(attributeValues);
@@ -538,11 +522,11 @@ public class SMProfileModelImpl extends AMModelBase
                 String serviceName = (String)iter.next();
                 orgMgr.setAttributes(serviceName, (Map)map.get(serviceName));
             }
-            logEvent("SUCCEED_SET_ATTR_VALUES_OF_REALM", param);
+            logEvent("SUCCEED_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES", param);
         } catch (SMSException e) {
             String strError = getErrorString(e);
             String[] paramsEx = {name, strError};
-            logEvent("SMS_EXCEPTION_SET_ATTR_VALUES_OF_REALM", paramsEx);
+            logEvent("SMS_EXCEPTION_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES", paramsEx);
             throw new AMConsoleException(strError);
         }
     }
@@ -570,7 +554,7 @@ public class SMProfileModelImpl extends AMModelBase
                     map.put(attributeName, attributeValues.get(attrName));
                 } else {
                     debug.error(
-                            "RMRealmModelImpl.mapAttributeValuesToServiceName: " +
+                            "SMProfileModelImpl.mapAttributeValuesToServiceName: " +
                                     "unknown attribute, " + attrName);
                 }
             }

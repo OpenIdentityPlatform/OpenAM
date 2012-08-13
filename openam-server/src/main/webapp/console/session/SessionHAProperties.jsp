@@ -22,8 +22,6 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
-   $Id: RealmProperties.jsp,v 1.3 2008/06/25 05:44:48 qcheng Exp $
-
 --%>
 
 
@@ -69,15 +67,6 @@
     </tr>
 </table>
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr>
-	<td>
-	    <cc:breadcrumbs name="parentagepath" bundleID="amConsole" />
-	    <div class="BcmWhtDiv"><cc:text name="txtRoot" bundleID="amConsole" /></div>
-	</td>
-    </tr>
-</table>
-
 <%-- PAGE CONTENT --%>
 <cc:pagetitle 
     name="pgtitle" 
@@ -89,9 +78,7 @@
     showPageButtonsTop="true" 
     showPageButtonsBottom="false" />
 
-<cc:spacer name="spacer" height="10" newline="true" />
-
-<cc:propertysheet name="sessionHAProperties" bundleID="amConsole" />
+<cc:propertysheet name="SessionHAProperties" bundleID="amConsole" />
 </cc:form>
 
 </cc:header>
