@@ -87,22 +87,22 @@
             <th>Current Runtime Value</th>
         </thead>
         <tr>
-            <td>iplanet-am-session-sfo-enabled</td>
-            <td>Indicates if Session High Availability is enabled or not,</td>
+            <td align="right"><b>iplanet-am-session-sfo-enabled</b></td>
+            <td>Indicates if Session High Availability is enabled or not.</td>
             <td>***</td>
         </tr>
         <tr>
-            <td>org.forgerock.openam.session.ha.amsessionrepository.type</td>
+            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.type</b></td>
             <td>Specifies the Type of Session High Availability to Enable.</td>
             <td>***</td>
         </tr>
         <tr>
-            <td>com.sun.am.session.SessionRepositoryImpl</td>
-            <td>Specifies which Implementation Class determined by Session Repository Type.</td>
+            <td align="right"><b>com.sun.am.session.SessionRepositoryImpl</td>
+            <td>Specifies which Implementation Class determined by Session Repository Type.</b></td>
             <td>***</td>
         </tr>
         <tr>
-            <td>org.forgerock.openam.session.ha.amsessionrepository.rootdn</td>
+            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.rootdn</b></td>
             <td>Specifies AM Session Repository Root DN</td>
             <td>ou=amsessiondb</td>
         </tr>

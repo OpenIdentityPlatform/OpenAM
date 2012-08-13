@@ -131,7 +131,7 @@
         <tr>
             <td bgcolor='#EEE8CD' colspan='2'>
                 <h3>OpenAM Session DB Status</h3>
-                *****
+                <b>Ok</b>
             </td>
         </tr>
 
