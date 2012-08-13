@@ -63,8 +63,8 @@ public class Wizard extends AjaxPage implements OpenAMCommonConstants {
     public static String defaultUserName = "cn=Directory Manager";
     public static String defaultPassword = "";
     public static String defaultRootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
-    public static String defaultSessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX;
-    public static String defaultSessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE;
+    public static String defaultSessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_HA_ROOT_DN;
+    public static String defaultSessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE;
 
     public String defaultPort = Integer.toString(
         AMSetupServlet.getUnusedPort(hostName, 50389, 1000));
@@ -171,7 +171,7 @@ public class Wizard extends AjaxPage implements OpenAMCommonConstants {
         request.addParameter(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, tmp);
 
         tmp = getAttribute("sessionRootSuffix", defaultSessionRootSuffix);
-        request.addParameter(SetupConstants.CONFIG_VAR_SESSION_ROOT_SUFFIX, tmp);
+        request.addParameter(SetupConstants.CONFIG_VAR_SESSION_ROOT_DN, tmp);
 
         tmp = getAttribute("sessionStoreType", defaultSessionStoreType);
         request.addParameter(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, tmp);

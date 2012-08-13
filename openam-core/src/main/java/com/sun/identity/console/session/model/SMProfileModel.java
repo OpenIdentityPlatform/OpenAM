@@ -91,34 +91,4 @@ public interface SMProfileModel
      */
     public Map getServerNames();
 
-    /**
-     * Returns attribute values. Map of attribute name to set of values.
-     *
-     * @param name Name of Attribute.
-     * @return attribute values.
-     */
-    Map getAttributeValues(String name)
-            throws AMConsoleException;
-
-    /**
-     * Set attribute values.
-     *
-     * @param name Name of Attribute.
-     * @param attributeValues Map of attribute values to set of values.
-     * @throws AMConsoleException if attribute values cannot be updated.
-     */
-    void setAttributeValues(String name, Map attributeValues)
-            throws AMConsoleException;
-
-    /**
-     * Returns session profile property XML.
-     *
-     * @param profileName Name of Profile to be Obtained.
-     * @param viewbeanClassName Class name of View Bean
-     * @throws AMConsoleException if there are no attributes to display.
-     * @return String of session profile property XML.
-     */
-     String getSessionProfilePropertyXML(String profileName, String viewbeanClassName)
-             throws AMConsoleException;
-
 }

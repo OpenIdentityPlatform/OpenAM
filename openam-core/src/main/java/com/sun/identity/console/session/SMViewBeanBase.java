@@ -34,6 +34,9 @@ import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 public abstract class SMViewBeanBase
     extends AMPrimaryMastHeadViewBean 
 {
+
+    protected static final String PAGETITLE = "pgtitle";
+
     /**
      * Creates a session view bean base.
      *

@@ -40,9 +40,12 @@ public interface OpenAMCommonConstants {
 
          static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=java,dc=net";
 
-         static final String DEFAULT_SESSION_ROOT_SUFFIX = "ou=amsessiondb,dc=openam,dc=java,dc=net";
+         static final String DEFAULT_SESSION_HA_ROOT_DN = "ou=amsessiondb";
 
-         static final String DEFAULT_SESSION_STORE_TYPE = "None";
+         static final String DEFAULT_SESSION_HA_STORE_TYPE = "None";
+
+
+
 
 
 }

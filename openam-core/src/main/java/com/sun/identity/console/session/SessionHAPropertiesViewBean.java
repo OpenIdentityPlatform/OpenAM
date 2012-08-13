@@ -28,26 +28,14 @@
 
 package com.sun.identity.console.session;
 
-import com.iplanet.jato.RequestContext;
-import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
-import com.iplanet.jato.view.event.RequestInvocationEvent;
 
 import com.sun.web.ui.model.CCPageTitleModel;
-import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-
-import com.sun.identity.console.base.AMPropertySheet;
-import com.sun.identity.console.base.model.AMConsoleException;
-import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.session.model.SMProfileModel;
-import com.sun.identity.console.session.model.SMProfileModelImpl;
 
 public class SessionHAPropertiesViewBean
         extends SessionHAPropertiesBase {
@@ -55,9 +43,6 @@ public class SessionHAPropertiesViewBean
     public static final String DEFAULT_DISPLAY_URL =
             "/console/session/SessionHAProperties.jsp";
 
-    protected AMPropertySheetModel psModel;
-
-    private static final String PAGETITLE = "pgtitle";
     private boolean initialized;
 
     /**
@@ -73,7 +58,6 @@ public class SessionHAPropertiesViewBean
             String sessionAttribute = (String) getPageSessionAttribute(SESSION_HA_PROPERTIES);
             if (sessionAttribute != null) {
                 initialized = true;
-                createPropertyModel(sessionAttribute);
                 createPageTitleModel();
                 registerChildren();
                 super.initialize();
@@ -83,10 +67,6 @@ public class SessionHAPropertiesViewBean
     }
 
     protected void registerChildren() {
-        registerChild(SESSION_HA_PROPERTIES, AMPropertySheet.class);
-        if (psModel != null) {
-            psModel.registerChildren(this);
-        }
         if (ptModel != null) {
             ptModel.registerChildren(this);
         }
@@ -94,18 +74,11 @@ public class SessionHAPropertiesViewBean
 
     protected View createChild(String name) {
         View view = null;
-        if (psModel == null) {
-            createPropertyModel(SESSION_HA_PROPERTIES);
-        }
         if (ptModel == null) {
             createPageTitleModel();
         }
         if (name.equals(PAGETITLE)) {
             view = new CCPageTitle(this, ptModel, name);
-        } else if (name.equals(SESSION_HA_PROPERTIES)) {
-            view = new AMPropertySheet(this, psModel, name);
-        } else if ((psModel != null) && psModel.isChildSupported(name)) {
-            view = psModel.createChild(this, name, getModel());
         } else if ((ptModel != null) && ptModel.isChildSupported(name)) {
             view = ptModel.createChild(this, name);
         } else {
@@ -120,19 +93,9 @@ public class SessionHAPropertiesViewBean
         super.beginDisplay(event);
         SMProfileModel model = (SMProfileModel) getModel();
         if (model != null) {
-            String sessionAttribute = (String) getPageSessionAttribute(SESSION_HA_PROPERTIES);
-            AMPropertySheet ps =
-                    (AMPropertySheet) getChild(SESSION_HA_PROPERTIES);
-            psModel.clear();
-            //try {
 
-                //ps.setAttributeValues(
-                //        model.getAttributeValues(sessionAttribute), model);
+            // TODO
 
-            //} catch (AMConsoleException a) {
-            //    setInlineAlertMessage(CCAlert.TYPE_ERROR,
-            //            "message.error", "no.properties");
-            //}
             // Set our Sub-Tabs and current position, relative to one.
             addSessionsTab(model, 2);
         }
@@ -141,64 +104,8 @@ public class SessionHAPropertiesViewBean
     private void createPageTitleModel() {
         ptModel = new CCPageTitleModel(
                 getClass().getClassLoader().getResourceAsStream(
-                        "com/sun/identity/console/twoBtnsPageTitle.xml"));
-        ptModel.setValue("button1", "button.save");
-        ptModel.setValue("button2", "button.reset");
+                        "com/sun/identity/console/simplePageTitle.xml"));
     }
 
-    protected AMModel getModelInternal() {
-        RequestContext rc = RequestManager.getRequestContext();
-        HttpServletRequest req = rc.getRequest();
-        return new SMProfileModelImpl(req, getPageSessionAttributes());
-    }
-
-    protected void createPropertyModel(String modelName) {
-        SMProfileModel model = (SMProfileModel) getModel();
-        try {
-            psModel = new AMPropertySheetModel(
-                    model.getSessionProfilePropertyXML(modelName,
-                            getClass().getName()));
-            psModel.clear();
-
-        } catch (AMConsoleException e) {
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                    e.getMessage() + ", File Not Found for ModelName:[" + modelName + "].");
-        }
-    }
-
-    /**
-     * Handles save button request.
-     *
-     * @param event Request invocation event
-     */
-    public void handleButton1Request(RequestInvocationEvent event)
-            throws ModelControlException {
-        SMProfileModel model = (SMProfileModel) getModel();
-        String name =
-                (String) getPageSessionAttribute(SESSION_HA_PROPERTIES);
-
-        //AMPropertySheet ps = (AMPropertySheet) getChild(SESSION_HA_PROPERTIES);
-
-        //try {
-            //Map orig = model.getAttributeValues(name);
-            //Map values = ps.getAttributeValues(orig, true, true, model);
-            //model.setAttributeValues(name, values);
-            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
-                    "message.updated");
-        //} catch (AMConsoleException e) {
-        //    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-        //            e.getMessage());
-        //}
-        forwardTo();
-    }
-
-    /**
-     * Handles reset request.
-     *
-     * @param event Request invocation event
-     */
-    public void handleButton2Request(RequestInvocationEvent event) {
-        forwardTo();
-    }
 
 }

@@ -50,7 +50,6 @@ public abstract class SessionHAStatisticsBase
      * forward on to home session view page.
      */
     protected void forwardToSessionView(RequestInvocationEvent event) {
-
         // and now forward on to the session page...
         SMProfileViewBean vb = (SMProfileViewBean)getViewBean(
                 SMProfileViewBean.class);
@@ -58,17 +57,4 @@ public abstract class SessionHAStatisticsBase
         vb.forwardTo(getRequestContext());
     }
 
-    /**
-     * Handles "back to" page request.
-     *
-     * @param event Request invocation event
-     */
-    public void handleButton3Request(RequestInvocationEvent event) {
-        backTrail();
-        forwardToSessionView(event);
-    }
-
-    protected String getBackButtonLabel() {
-        return getBackButtonLabel("page.title.back.sessionha");
-    }
 }                                                                     

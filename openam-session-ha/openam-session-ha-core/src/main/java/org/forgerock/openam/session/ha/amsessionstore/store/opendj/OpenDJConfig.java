@@ -46,7 +46,7 @@ public class OpenDJConfig {
     private static Map<String, String> openDJSetupMap; 
     
     private final static String DEFAULT_OPENDJ_ROOT = "../opendj"; 
-    private final static String DEFAULT_SUFFIX = "dc=amsessiondb,dc=com";
+    private final static String DEFAULT_SUFFIX = "ou=amsessiondb";
     private final static String DEFAULT_OPENDJ_ADMIN_PORT = "4444";
     private final static String DEFAULT_OPENDJ_LDAP_PORT =" 60389";
     private final static String DEFAULT_OPENDJ_JMX_PORT = "2689";

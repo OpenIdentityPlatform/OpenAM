@@ -441,7 +441,7 @@ public class EmbeddedOpenDJ {
             "--adminConnectorPort",         // 1
             "5444",                         // 2
             "--baseDN",                     // 3
-            OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX,                // 4
+            OpenAMCommonConstants.DEFAULT_SESSION_HA_ROOT_DN,                // 4
             "--rootUserDN",                 // 5
             "cn=Directory Manager",         // 6
             "--ldapPort",                   // 7

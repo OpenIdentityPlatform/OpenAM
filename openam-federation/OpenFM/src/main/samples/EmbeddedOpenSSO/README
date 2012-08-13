@@ -93,7 +93,7 @@ Deployed
      DIRECTORY_SERVER=localhost
      DIRECTORY_PORT=50389
      ROOT_SUFFIX=dc=openam,dc=java,dc=net
-     SESSION_ROOT_PREFIX=ou=session,dc=openam,dc=java,dc=net
+     SESSION_ROOT_DN=ou=amsessiondb
      SESSION_STORE_TYPE=None
      DS_DIRMGRDN=cn=Directory Manager
      DS_DIRMGRPASSWD=11111111

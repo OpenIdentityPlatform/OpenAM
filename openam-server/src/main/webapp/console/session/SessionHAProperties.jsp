@@ -78,7 +78,37 @@
     showPageButtonsTop="true" 
     showPageButtonsBottom="false" />
 
-<cc:propertysheet name="SessionHAProperties" bundleID="amConsole" />
+    <!-- TODO Make Dynamic -->
+
+    <table>
+        <thead>
+            <th>Session HA Property Name</th>
+            <th>Property Description</th>
+            <th>Current Runtime Value</th>
+        </thead>
+        <tr>
+            <td>iplanet-am-session-sfo-enabled</td>
+            <td>Indicates if Session High Availability is enabled or not,</td>
+            <td>***</td>
+        </tr>
+        <tr>
+            <td>org.forgerock.openam.session.ha.amsessionrepository.type</td>
+            <td>Specifies the Type of Session High Availability to Enable.</td>
+            <td>***</td>
+        </tr>
+        <tr>
+            <td>com.sun.am.session.SessionRepositoryImpl</td>
+            <td>Specifies which Implementation Class determined by Session Repository Type.</td>
+            <td>***</td>
+        </tr>
+        <tr>
+            <td>org.forgerock.openam.session.ha.amsessionrepository.rootdn</td>
+            <td>Specifies AM Session Repository Root DN</td>
+            <td>ou=amsessiondb</td>
+        </tr>
+    </table>
+    iplanet-am-session-sfo-enabled
+
 </cc:form>
 
 </cc:header>

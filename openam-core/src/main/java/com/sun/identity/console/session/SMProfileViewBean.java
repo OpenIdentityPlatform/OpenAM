@@ -68,6 +68,7 @@ public class SMProfileViewBean
     extends SMViewBeanBase
     implements HasEntitiesTabs
 {
+
     public static final String DEFAULT_DISPLAY_URL =
         "/console/session/SMProfile.jsp";
 
@@ -91,7 +92,6 @@ public class SMProfileViewBean
     private static final String TBL_DATA_MAX_IDLE_TIME = "tblDataMaxIdleTime";
     private static final String TBL_DATA_SESSION_ID = "sessionId";
 
-    private static final String PAGETITLE = "pgtitle";
     public static final String CHILD_SERVER_NAME_HREF = "serverNameHref";
     public static final String CHILD_SERVER_NAME_MENU = "serverNameMenu";
     private static final String LOGOUT_URL = "logoutUrl";

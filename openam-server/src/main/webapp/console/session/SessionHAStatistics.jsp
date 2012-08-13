@@ -127,9 +127,13 @@
     showPageButtonsTop="true" 
     showPageButtonsBottom="false" />
 
-<cc:propertysheet name="SessionHAStatistics" bundleID="amConsole" />
-
     <table>
+        <tr>
+            <td bgcolor='#EEE8CD' colspan='2'>
+                <h3>OpenAM Session DB Status</h3>
+                *****
+            </td>
+        </tr>
 
         <tr>
             <td valign="center">
@@ -140,12 +144,6 @@
             </td>
         </tr>
 
-        <tr>
-            <td bgcolor='#EEE8CD' colspan='2'>
-                <h3>OpenAM Session DB Status</h3>
-                    Ok
-            </td>
-        </tr>
     </table>
 
 

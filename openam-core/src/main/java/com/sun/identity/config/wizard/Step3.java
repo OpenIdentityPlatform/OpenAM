@@ -221,7 +221,7 @@ public class Step3 extends LDAPStoreWizardPage {
         } else {
             writeToResponse("true");
             getContext().setSessionAttribute(
-                    SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX, sessionRootSuffix);
+                    SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, sessionRootSuffix);
         }
         setPath(null);
         return false;
@@ -233,7 +233,7 @@ public class Step3 extends LDAPStoreWizardPage {
         if ((sessionStoreType == null) || (sessionStoreType.trim().length() == 0)) {
             getContext().setSessionAttribute(
                     SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
-                        OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE);
+                        OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE);
         } else {
             getContext().setSessionAttribute(
                     SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, sessionStoreType);
@@ -628,9 +628,9 @@ public class Step3 extends LDAPStoreWizardPage {
 
         tmp = (String)data.get(BootstrapData.DS_BASE_DN);
         getContext().setSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX, tmp);
+                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, "ou=amsessiondb,"+tmp);
 
-        tmp = (String)data.get(OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE);
+        tmp = (String)data.get(OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE);
         getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, tmp);
         
@@ -673,8 +673,8 @@ public class Step3 extends LDAPStoreWizardPage {
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX);
         String sessionStoreType = (String)ctx.getSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE);
-        String sessionRootSuffix = (String)ctx.getSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_SUFFIX);
+        String sessionRootDN = (String)ctx.getSessionAttribute(
+                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN);
         String bindPwd = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_PWD);
 
@@ -684,11 +684,11 @@ public class Step3 extends LDAPStoreWizardPage {
         if (rootSuffix == null) {
             rootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
         }
-        if (sessionRootSuffix == null) {
-            sessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_ROOT_SUFFIX;
+        if (sessionRootDN == null) {
+            sessionRootDN = OpenAMCommonConstants.DEFAULT_SESSION_HA_ROOT_DN;
         }
         if (sessionStoreType == null) {
-            sessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_STORE_TYPE;
+            sessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE;
         }
         
         LDAPConnection ld = null;
