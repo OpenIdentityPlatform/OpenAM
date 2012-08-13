@@ -102,13 +102,16 @@ public class OAuth2FlowFinder extends Finder {
         }
     }
 
-    public AbstractFlow create(Class<? extends AbstractFlow> targetClass, Request request,
-            Response response) {
+    //public AbstractFlow create(Class<? extends AbstractFlow> targetClass, Request request,
+    //       Response response) {
+      public ServerResource create(Class<? extends ServerResource> targetClass, Request request,
+                Response response) {
         AbstractFlow result = null;
         if (targetClass != null) {
             try {
                 // Invoke the default constructor
-                result = targetClass.newInstance();
+                // result = targetClass.newInstance();
+                result = (AbstractFlow) targetClass.newInstance();
                 result.setEndpointType(endpointType);
             } catch (Exception e) {
                 getLogger().log(Level.WARNING,

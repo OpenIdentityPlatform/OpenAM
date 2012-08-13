@@ -78,36 +78,33 @@
     showPageButtonsTop="true" 
     showPageButtonsBottom="false" />
 
-    <!-- TODO Make Dynamic -->
-
     <table>
         <thead>
             <th>Session HA Property Name</th>
-            <th>Property Description</th>
             <th>Current Runtime Value</th>
         </thead>
         <tr>
-            <td align="right"><b>iplanet-am-session-sfo-enabled</b></td>
-            <td>Indicates if Session High Availability is enabled or not.</td>
-            <td>***</td>
+            <td align="right"><b>iplanet-am-session-sfo-enabled</b>
+            <br/>Indicates if Session High Availability is enabled or not.</td>
+            <td>false</td>
         </tr>
         <tr>
-            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.type</b></td>
-            <td>Specifies the Type of Session High Availability to Enable.</td>
-            <td>***</td>
+            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.type</b>
+            <br/>Specifies the Type of Session High Availability to Enable.</td>
+            <td>*********************</td>
         </tr>
         <tr>
-            <td align="right"><b>com.sun.am.session.SessionRepositoryImpl</td>
-            <td>Specifies which Implementation Class determined by Session Repository Type.</b></td>
-            <td>***</td>
+            <td align="right"><b>com.sun.am.session.SessionRepositoryImpl</b>
+            <br/>Specifies which Implementation Class determined by Session Repository Type.</td>
+            <td>*********************</td>
         </tr>
         <tr>
-            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.rootdn</b></td>
-            <td>Specifies AM Session Repository Root DN</td>
+            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.rootdn</b>
+            <br/>Specifies AM Session Repository Root DN</td>
             <td>ou=amsessiondb</td>
         </tr>
     </table>
-    iplanet-am-session-sfo-enabled
+
 
 </cc:form>
 

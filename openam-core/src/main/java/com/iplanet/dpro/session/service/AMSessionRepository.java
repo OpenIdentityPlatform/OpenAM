@@ -56,6 +56,15 @@ public interface AMSessionRepository {
     public static final String REPOSITORY_CLASS_PROPERTY =
             "com.sun.am.session.SessionRepositoryImpl";
 
+    public static final String IS_SFO_ENABLED =
+                "iplanet-am-session-sfo-enabled";
+
+    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN =
+            "org.forgerock.openam.session.ha.amsessionrepository.rootdn";
+
+    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
+            "org.forgerock.openam.session.ha.amsessionrepository.type";
+
     /**
      * Retrieves session state from the repository.
      *

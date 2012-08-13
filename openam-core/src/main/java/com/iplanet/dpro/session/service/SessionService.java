@@ -124,7 +124,6 @@ import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -222,10 +221,7 @@ public class SessionService {
     private static final String TOP_LEVEL_ADMIN_ROLE = 
         "Top-level Admin Role";
 
-    private static final String IS_SFO_ENABLED = 
-        "iplanet-am-session-sfo-enabled";
-    
-    private static final String SESSION_STORE_USERNAME = 
+    private static final String SESSION_STORE_USERNAME =
         "iplanet-am-session-store-username";
 
     private static final String SESSION_STORE_PASSWORD = 
@@ -2172,7 +2168,7 @@ public class SessionService {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                         CollectionHelper.getMapAttr(
-                        sessionAttrs, IS_SFO_ENABLED, "false")
+                        sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
                         ).booleanValue();
                 
                 if(sfoEnabled) {
@@ -3124,7 +3120,7 @@ public class SessionService {
      * 
      * @param owner
      *            server instance URL
-     * @param sid
+     * @param masterSid
      *            SessionID
      * @param restriction
      *            restriction
@@ -3211,8 +3207,8 @@ public class SessionService {
      * This method is used to update the HttpSession when InternalSession
      * property changes.
      * 
-     * @param sid
-     *            SessionID
+     * @param session
+     *            Session Object
      */
     void saveForFailover(InternalSession session) {
 

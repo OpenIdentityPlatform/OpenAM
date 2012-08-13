@@ -263,11 +263,12 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="iplanet-am-session-sfo-persistent-store"
+                    <AttributeSchema name="org.forgerock.openam.session.ha.amsessionrepository.type"
                                      type="single_choice"
                                      syntax="string"
                                      i18nKey="">
                         <ChoiceValues>
+                            <ChoiceValue i18nKey="None"/>
                             <ChoiceValue i18nKey="In-Memory">org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore
                             </ChoiceValue>
                             <ChoiceValue i18nKey="OpenDJ">org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore
@@ -277,6 +278,14 @@
                         </ChoiceValues>
                         <DefaultValues>
                             <Value>org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="org.forgerock.openam.session.ha.amsessionrepository.rootdn"
+                                     type="single"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>ou=amsessiondb</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
