@@ -84,7 +84,7 @@ if [ "$5" = "-p" -o "$5" = "--path" ] ; then
 fi
 
 CLASSPATH=""
-CLASSPATH="lib/openam-amamdsetup-10.1.0-SNAPSHOT.jar"
+CLASSPATH="lib/openam-distribution-amadmsetup-10.1.0-SNAPSHOT.jar"
 CLASSPATH="${CLASSPATH}:lib/OpenDJ-2012-20-02.jar"
 CLASSPATH="${CLASSPATH}:lib/json-20090211.jar"
 CLASSPATH="${CLASSPATH}:lib/xalan-2.7.1.jar"
