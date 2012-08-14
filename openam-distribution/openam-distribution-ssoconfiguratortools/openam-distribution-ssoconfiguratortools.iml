@@ -3,13 +3,12 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
-    <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="openam-installtools" />
+    <orderEntry type="module" module-name="openam-distribution-amadmsetup" />
     <orderEntry type="module" module-name="openam-core" />
     <orderEntry type="module" module-name="openam-shared" />
     <orderEntry type="library" name="Maven: external:j2ee:2007-18-10" level="project" />
@@ -126,6 +125,7 @@
     <orderEntry type="library" name="Maven: external:webservices-extra:2008-03-12" level="project" />
     <orderEntry type="library" name="Maven: external:webservices-extra-api:2003-09-04" level="project" />
     <orderEntry type="library" name="Maven: external:webservices-rt:2009-29-07" level="project" />
+    <orderEntry type="module" module-name="openam-installtools" />
     <orderEntry type="module" module-name="openam-federation-library" />
     <orderEntry type="library" name="Maven: org.forgerock:openam-saml2-schema:10.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.forgerock:openam-wsfederation-schema:10.1.0-SNAPSHOT" level="project" />

@@ -9,7 +9,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="openam-distribution-amadmsetup" />
     <orderEntry type="module" module-name="openam-core" />
     <orderEntry type="module" module-name="openam-shared" />
     <orderEntry type="library" name="Maven: external:j2ee:2007-18-10" level="project" />
@@ -126,69 +125,6 @@
     <orderEntry type="library" name="Maven: external:webservices-extra:2008-03-12" level="project" />
     <orderEntry type="library" name="Maven: external:webservices-extra-api:2003-09-04" level="project" />
     <orderEntry type="library" name="Maven: external:webservices-rt:2009-29-07" level="project" />
-    <orderEntry type="module" module-name="openam-installtools" />
-    <orderEntry type="module" module-name="openam-federation-library" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-saml2-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-wsfederation-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-liberty-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="module" module-name="OpenFM" />
-    <orderEntry type="module" module-name="openam-session-ha-core" />
-    <orderEntry type="module" module-name="openam-session-ha-locale" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:i18n-core:1.3.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: commons-net:commons-net:3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.jackson:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.simple:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.simpleframework:simple:4.1.21" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.ssl:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.jsslutils:jsslutils:1.0.5" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.crypto:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.httpclient:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.1.1" level="project" />
-    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.james:apache-mime4j:0.6" level="project" />
-    <orderEntry type="module" module-name="openam-oauth" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-dtd-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-jaxrpc-schema:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-ad:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-ldap:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-anonymous:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-adaptive:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-application:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-cert:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-datastore:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-hotp:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-httpbasic:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-jdbc:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-membership:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-msisdn:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-nt:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-oath:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-oauth2:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-radius:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-safeword:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-securid:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock:openam-auth-windowsdesktopsso:10.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="module" module-name="openam-oauth2-restlet-extension" />
-    <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.osgi:org.osgi.core:4.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet.ext.jackson:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet.ext.freemarker:2.1-RC4" level="project" />
-    <orderEntry type="module" module-name="openam-oauth2-openam-extension" />
-    <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet.ext.servlet:2.1-RC4" level="project" />
-    <orderEntry type="module" module-name="openam-oauth2-core-token-service" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:org.forgerock.json.resource:1.2.2" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:json-fluent:1.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:org.forgerock.util:1.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:org.forgerock.restlet.ext.openam:1.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:org.forgerock.restlet.ext.oauth2:1.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:json-patch:1.0.0" level="project" />
-    <orderEntry type="module" module-name="openam-oauth2-main" />
-    <orderEntry type="library" name="Maven: org.freemarker:freemarker:2.3.19" level="project" />
   </component>
 </module>
 
