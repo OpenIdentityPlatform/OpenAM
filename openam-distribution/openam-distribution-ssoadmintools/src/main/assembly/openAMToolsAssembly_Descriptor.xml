@@ -81,6 +81,13 @@
         </fileSet>
         <fileSet>
             <outputDirectory>resources</outputDirectory>
+            <directory>${pom.build.outputDirectory}/locale/en_US</directory>
+            <includes>
+                <include>*.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
             <directory>${project.basedir}/../../openam-server/src/main/resources/locale/de_DE</directory>
             <includes>
                 <include>*.properties</include>

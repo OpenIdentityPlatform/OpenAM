@@ -51,6 +51,36 @@
     <build>
         <plugins>
 
+            <!-- Pre-Packaging step for Zip Elements. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>zip-pre-packaging</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                    <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                        <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                            <include name="*.properties"/>
+                                            <exclude name="Services.properties"/>
+                                            <exclude name="ums.properties"/>
+                                            <exclude name="sso.properties"/>
+                                            <exclude name="SMS.properties"/>
+                                            <exclude name="authentication_util.properties"/>
+                                        </fileset>
+                                        <globmapper from="*.properties" to="*_en.properties"/>
+                                    </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
