@@ -99,6 +99,6 @@ CLASSPATH="${CLASSPATH}:resources"
 
 ${JAVA_HOME}/bin/java -D"load.config=yes" -D"help.print=${help_print}" \
                       -D"path.AMConfig=${path_AMConfig}" -D"path.debug=${path_debug}" \
-                      -D"path.log=${path_log}"
+                      -D"path.log=${path_log}" \
                       -cp "${CLASSPATH}" \
                       com.sun.identity.tools.bundles.Main
