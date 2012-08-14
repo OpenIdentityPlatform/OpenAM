@@ -47,9 +47,38 @@
         <url>http://www.forgerock.com</url>
     </organization>
 
+
     <!-- Build -->
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock</groupId>
+                                    <artifactId>openam-core</artifactId>
+                                    <version>10.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+                                    <includes>org/forgerock/openam/setup/OpenAMUpgrade**</includes>
+                                </artifactItem>
+                            </artifactItems>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!-- Pre-Packaging step for Zip Elements. -->
             <plugin>
@@ -61,73 +90,68 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties"/>
-                                </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties"/>
-                                </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
+                                        <include name="amadmtoolssetup.properties"/>
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en_US.properties"/>
-                                </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
+                                        <include name="amadmtoolssetup.properties"/>
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en_US.properties"/>
                                 </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                        <include name="amadmtoolssetup.properties"/>
                                     </fileset>
-                                    <globmapper from="*.properties" to="*_en_US.properties"/>
                                 </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/de_DE">
+                                        <include name="amadmtoolssetup_de.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/es_ES">
+                                        <include name="amadmtoolssetup_es.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/fr_FR">
+                                        <include name="amadmtoolssetup_fr.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/ja_JP">
+                                        <include name="amadmtoolssetup_ja.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/ko_KR">
+                                        <include name="amadmtoolssetup_ko.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/zh_CN">
+                                        <include name="amadmtoolssetup_zh.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/zh_TW">
+                                        <include name="amadmtoolssetup_zh_TW.properties"/>
+                                    </fileset>
+                                </copy>
+
                             </target>
                         </configuration>
                         <goals>
@@ -142,13 +166,13 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>admintools-assembly</id>
+                        <id>openam-amadmsetup</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-ssoConfiguratorTools-${project.version}</finalName>
+                            <finalName>openam-distribution-configurator-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
@@ -168,183 +192,8 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-distribution-amadmsetup</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-installtools</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-federation-library</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>OpenFM</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-dtd-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-jaxrpc-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-saml2-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-rest</artifactId>
-        </dependency>
-
-        <!-- Include all Authentication Modules -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-ad</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-anonymous</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-adaptive</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-application</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-cert</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-datastore</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-hotp</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-httpbasic</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-ldap</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-membership</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-msisdn</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-nt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-oath</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-oauth2</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-radius</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-safeword</artifactId>
-        </dependency>
-
-        <dependency>
-            <artifactId>openam-auth-securid</artifactId>
-            <groupId>org.forgerock</groupId>
-        </dependency>
-
-        <dependency>
-            <artifactId>openam-auth-windowsdesktopsso</artifactId>
-            <groupId>org.forgerock</groupId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <!-- Oauth2 dependencies -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-restlet-extension</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-openam-extension</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-core-token-service</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-main</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
         </dependency>
 
     </dependencies>
 </project>
-

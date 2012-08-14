@@ -175,7 +175,7 @@
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
-                                <descriptor>src/main/assembly/openAMConfiguratorAssembly_Descriptor.xml</descriptor>
+                                <descriptor>src/main/assembly/openAMToolsAssembly_Descriptor.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
