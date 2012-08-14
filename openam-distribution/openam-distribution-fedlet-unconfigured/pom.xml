@@ -36,10 +36,10 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Distribution ssoAdminTools</name>
-    <description>OpenAM Distribution SSO Admin Tools Kit.
+    <name>OpenAM Distribution Fedlet UnConfigured</name>
+    <description>OpenAM Distribution Fedlet UnConfigured.
     </description>
-    <artifactId>openam-distribution-ssoadmintools</artifactId>
+    <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
@@ -152,7 +152,7 @@
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
-                                <descriptor>src/main/assembly/openAMToolsAssembly_Descriptor.xml</descriptor>
+                                <descriptor>src/main/assembly/openAMFedletAssembly_Descriptor.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>

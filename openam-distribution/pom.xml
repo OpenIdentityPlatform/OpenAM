@@ -48,10 +48,12 @@
     </organization>
 
 
-    <!-- Distribution Modules to produce all Artifacts -->
+    <!-- Distribution Modules to produce all Ancillary Artifacts -->
     <modules>
         <module>openam-distribution-library</module>
+        <module>openam-distribution-fedlet-unconfigured</module>
         <module>openam-distribution-ssoadmintools</module>
+        <module>openam-distribution-ssoconfiguratortools</module>
     </modules>
 
     <dependencyManagement>
