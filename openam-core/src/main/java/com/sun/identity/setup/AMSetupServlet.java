@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.setup;
@@ -1314,12 +1314,15 @@ public class AMSetupServlet extends HttpServlet {
         if (servletCtx != null) {
             String path = getNormalizedRealPath(servletCtx);
             if (path != null) {
-                return System.getProperty("user.home") + "/" +
-                    SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_DIR + "/" +
-                    SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_PREFIX + path;
+                String home = System.getProperty("user.home");
+                File newPath = new File(home + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_DIR);
+                File oldPath = new File(home + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_LEGACY_BASE_DIR);
+
+                return (oldPath.exists() && !newPath.exists() ? oldPath.getPath() : newPath.getPath())
+                        + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_PREFIX + path;
             } else {
                 throw new ConfiguratorException(
-                    "Cannot read the bootstrap path");
+                        "Cannot read the bootstrap path");
             }
         } else {
             return null;
@@ -1335,9 +1338,7 @@ public class AMSetupServlet extends HttpServlet {
         if (servletCtx != null) {
             String path = getNormalizedRealPath(servletCtx);
             if (path != null) {
-                String bootstrap = System.getProperty("user.home") + "/" +
-                    SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_DIR + "/" +
-                    SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_PREFIX + path;
+                String bootstrap = getBootstrapLocator();
                 File test = new File(bootstrap);
                 if (!test.exists()) {
                     return null;

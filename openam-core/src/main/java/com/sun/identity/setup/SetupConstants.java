@@ -433,7 +433,8 @@ public interface SetupConstants {
      * Configuration Variable for Session Store Type.
      */
     String CONFIG_VAR_SESSION_STORE_TYPE = "SESSION_STORE_TYPE";
-    
+
+    String CONFIG_VAR_BOOTSTRAP_LEGACY_BASE_DIR = ".openssocfg";
     /**
      * Configuration Variable for bootstarp file base directory.
      */
