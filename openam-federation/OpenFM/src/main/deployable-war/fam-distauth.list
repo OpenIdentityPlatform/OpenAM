@@ -37,7 +37,7 @@
 ./WEB-INF/classes/amClientDetection_zh_TW.properties
 ./WEB-INF/classes/debugfiles.properties
 ./WEB-INF/classes/BasicClientTypesManager.properties
-./WEB-INF/lib/jato.jar
+./WEB-INF/lib/jato-2005-05-04.jar
 ./WEB-INF/auth.tld
 ./WEB-INF/jato.tld
 ./css/css_ie5win.css
