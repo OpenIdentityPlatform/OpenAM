@@ -67,8 +67,12 @@ import org.opends.server.types.SearchScope;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
+ *  Provide Implementation of AMSessionRepository using the internal
+ *  Configuration Directory as our Store.  Having a replicated Directory
+ *  will provide the underlying SFO/HA for OpenAM Session Data.
  *
  * @author steve
+ *
  */
 public class OpenDJPersistentStore extends GeneralTaskRunnable implements
         AMSessionRepository {
@@ -86,11 +90,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements
     private final static String ALL_ATTRS = "(" + NUM_SUB_ORD_ATTR + "=*)";
     private static LinkedHashSet<String> returnAttrs;
     private static LinkedHashSet<String> numSubOrgAttrs;
-    
+
+    // Initialize Singleton Service Implementation
     static {
         initialize();
     }
-    
+
+    // Initialize Service
     private static void initialize() {
         returnAttrs = new LinkedHashSet<String>();
         returnAttrs.add("dn");
