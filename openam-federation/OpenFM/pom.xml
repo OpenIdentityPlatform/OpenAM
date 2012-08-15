@@ -49,7 +49,64 @@
     <!-- Build -->
     <build>
         <plugins>
-            
+            <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-antrun-plugin</artifactId>
+	      <executions>
+		<execution>
+		  <id>zip-pre-packaging</id>
+		  <phase>compile</phase>
+		  <configuration>
+		    <target>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/">
+			  <include name="deployablewar.properties"/>
+			  </fileset>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/">
+			  <include name="deployablewar.properties"/>
+			  </fileset>
+			<globmapper from="*.properties" to="*_en_US.properties"/>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/de_DE">
+			  <include name="deployablewar_de.properties"/>
+			  </fileset>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/es_ES">
+			  <include name="deployablewar_es.properties"/>
+			  </fileset>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/fr_FR">
+			  <include name="deployablewar_fr.properties"/>
+			  </fileset>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/ja_JP">
+			  <include name="deployablewar_ja.properties"/>
+			  </fileset>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/ko_KR">
+			  <include name="deployablewar_ko.properties"/>
+			  </fileset>
+			</copy>
+		      <copy todir="${project.build.directory}/classes" filtering="false">
+			<fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/zh_TW">
+			  <include name="deployablewar_zh_TW.properties"/>
+			  </fileset>
+			</copy>
+		      </target>
+		    </configuration>
+		  <goals>
+		    <goal>run</goal>
+		    </goals>
+		  </execution>
+		</executions>
+	    </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
