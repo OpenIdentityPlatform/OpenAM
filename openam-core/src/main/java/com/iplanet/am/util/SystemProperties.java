@@ -31,6 +31,7 @@
  */
 package com.iplanet.am.util;
 
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.security.AdminTokenAction;
@@ -137,13 +138,15 @@ public class SystemProperties {
      * anything else starts.
      */
     static {
-        mapTagswap.put("%SERVER_PORT%", Constants.AM_SERVER_PORT);
-        mapTagswap.put("%SERVER_URI%", 
-            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-        mapTagswap.put("%SERVER_HOST%", Constants.AM_SERVER_HOST);
+        mapTagswap.put("%SERVER_PORT%",  Constants.AM_SERVER_PORT);
+        mapTagswap.put("%SERVER_URI%",   Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+        mapTagswap.put("%SERVER_HOST%",  Constants.AM_SERVER_HOST);
         mapTagswap.put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL);
         mapTagswap.put("%BASE_DIR%", CONFIG_PATH);
-
+        mapTagswap.put("%SESSION_ROOT_DN%",
+                AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN);
+        mapTagswap.put("%SESSION_STORE_TYPE%",
+                AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
         
         try {
             // Initialize properties

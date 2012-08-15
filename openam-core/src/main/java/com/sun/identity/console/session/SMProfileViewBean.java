@@ -28,6 +28,7 @@
 
 package com.sun.identity.console.session;
 
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
@@ -44,7 +45,9 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.web.ui.model.CCActionTableModel;
+import com.sun.web.ui.model.CCNavNodeInterface;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
@@ -224,14 +227,41 @@ public class SMProfileViewBean
             setPageSessionAttribute(SERVER_NAME, value);
             // Set our Sub-Tabs
             addSessionsTab(model,1);
+            // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
+            if ( (!SystemPropertiesManager.get(AMSessionRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) ||
+                 (!SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
+            {
+                removeSessionsTab();
+            }
         }
     }
 
+    // Assign the Session SubTabs
     protected void addSessionsTab(SMProfileModel model, int selectedNode) {
         AMViewConfig config = AMViewConfig.getInstance();
         config.addSessionTabs(tabModel, model);
         registerChild(TAB_COMMON, CCTabs.class);
         tabModel.setSelectedNode(selectedNode);
+    }
+
+    // Remove all Session Tabs, since HA not available, disable associated Tabs.
+    protected void removeSessionsTab() {
+        if (tabModel != null) {
+            tabModel.clear();
+            // removeSessionsTab(551); Current Sessions, Leave!
+            removeSessionsTab(552);
+            removeSessionsTab(553);
+        }
+    }
+
+    private void removeSessionsTab(int tabNodeId) {
+            CCNavNodeInterface tabNode = tabModel.getNodeById(tabNodeId);
+            if (tabNode != null)
+            {
+                tabNode.setVisible(false);
+                tabNode.setAcceptsChildren(false);
+                tabNode.getParent().removeChild(tabNode);
+            }
     }
 
     /**

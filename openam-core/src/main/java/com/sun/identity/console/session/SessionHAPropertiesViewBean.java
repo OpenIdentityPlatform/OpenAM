@@ -28,11 +28,16 @@
 
 package com.sun.identity.console.session;
 
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 
+import com.iplanet.jato.view.html.TextField;
+import com.iplanet.jato.view.html.StaticTextField;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.web.ui.model.CCPageTitleModel;
+import com.sun.web.ui.view.html.CCStaticTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 
 import com.sun.identity.console.session.model.SMProfileModel;
@@ -70,6 +75,16 @@ public class SessionHAPropertiesViewBean
         if (ptModel != null) {
             ptModel.registerChildren(this);
         }
+        // Labels
+        registerChild(AMSessionRepository.IS_SFO_ENABLED+".LABEL",TextField.class);
+        registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE+".LABEL",TextField.class);
+        registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN+".LABEL",TextField.class);
+        registerChild(AMSessionRepository.REPOSITORY_CLASS_PROPERTY+".LABEL",TextField.class);
+        // Read-Only Fields
+        registerChild(AMSessionRepository.IS_SFO_ENABLED,StaticTextField.class);
+        registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE,StaticTextField.class);
+        registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,StaticTextField.class);
+        registerChild(AMSessionRepository.REPOSITORY_CLASS_PROPERTY,StaticTextField.class);
     }
 
     protected View createChild(String name) {
@@ -79,7 +94,41 @@ public class SessionHAPropertiesViewBean
         }
         if (name.equals(PAGETITLE)) {
             view = new CCPageTitle(this, ptModel, name);
-        } else if ((ptModel != null) && ptModel.isChildSupported(name)) {
+        }
+        else if (name.equals(AMSessionRepository.IS_SFO_ENABLED+".LABEL")) {
+            view = new CCStaticTextField(this,name,AMSessionRepository.IS_SFO_ENABLED);
+        }
+        else if (name.equals(AMSessionRepository.IS_SFO_ENABLED)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(AMSessionRepository.IS_SFO_ENABLED, "false"));
+        }
+
+        else if (name.equals(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE+".LABEL")) {
+            view = new CCStaticTextField(this,name,AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
+        }
+        else if (name.equals(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE,
+                    "None"));
+        }
+
+        else if (name.equals(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN+".LABEL")) {
+            view = new CCStaticTextField(this,name,AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN);
+        }
+        else if (name.equals(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,
+                    ""));
+        }
+
+        else if (name.equals(AMSessionRepository.REPOSITORY_CLASS_PROPERTY+".LABEL")) {
+            view = new CCStaticTextField(this,name,AMSessionRepository.REPOSITORY_CLASS_PROPERTY);
+        }
+        else if (name.equals(AMSessionRepository.REPOSITORY_CLASS_PROPERTY)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(AMSessionRepository.REPOSITORY_CLASS_PROPERTY, ""));
+        }
+        else if ((ptModel != null) && ptModel.isChildSupported(name)) {
             view = ptModel.createChild(this, name);
         } else {
             view = super.createChild(name);
@@ -93,9 +142,6 @@ public class SessionHAPropertiesViewBean
         super.beginDisplay(event);
         SMProfileModel model = (SMProfileModel) getModel();
         if (model != null) {
-
-            // TODO
-
             // Set our Sub-Tabs and current position, relative to one.
             addSessionsTab(model, 2);
         }

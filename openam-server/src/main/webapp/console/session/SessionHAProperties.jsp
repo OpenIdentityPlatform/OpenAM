@@ -1,28 +1,27 @@
-<%--
-   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
-   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
-   The contents of this file are subject to the terms
-   of the Common Development and Distribution License
-   (the License). You may not use this file except in
-   compliance with the License.
-
-   You can obtain a copy of the License at
-   https://opensso.dev.java.net/public/CDDLv1.0.html or
-   opensso/legal/CDDLv1.0.txt
-   See the License for the specific language governing
-   permission and limitations under the License.
-
-   When distributing Covered Code, include this CDDL
-   Header Notice in each file and include the License file
-   at opensso/legal/CDDLv1.0.txt.
-   If applicable, add the following below the CDDL Header,
-   with the fields enclosed by brackets [] replaced by
-   your own identifying information:
-   "Portions Copyrighted [year] [name of copyright owner]"
-
---%>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
 
 
 
@@ -84,24 +83,46 @@
             <th>Current Runtime Value</th>
         </thead>
         <tr>
-            <td align="right"><b>iplanet-am-session-sfo-enabled</b>
-            <br/>Indicates if Session High Availability is enabled or not.</td>
-            <td>false</td>
+            <td align="right">
+                <cc:textfield name="iplanet-am-session-sfo-enabled.LABEL" readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="iplanet-am-session-sfo-enabled"
+                              readOnly="true" defaultValue="false" size="64"
+                              title="iplanet-am-session-sfo-enabled"  />
+            </td>
         </tr>
         <tr>
-            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.type</b>
-            <br/>Specifies the Type of Session High Availability to Enable.</td>
-            <td>*********************</td>
+            <td align="right">
+                <cc:textfield name="org.forgerock.openam.session.ha.amsessionrepository.type.LABEL"
+                              readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="org.forgerock.openam.session.ha.amsessionrepository.type"
+                              readOnly="true" size="64"
+                              title="org.forgerock.openam.session.ha.amsessionrepository.type" />
+            </td>
         </tr>
         <tr>
-            <td align="right"><b>com.sun.am.session.SessionRepositoryImpl</b>
-            <br/>Specifies which Implementation Class determined by Session Repository Type.</td>
-            <td>*********************</td>
+            <td align="right">
+                <cc:textfield name="com.sun.am.session.SessionRepositoryImpl.LABEL" readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="com.sun.am.session.SessionRepositoryImpl"
+                              readOnly="true" size="64"
+                              title="com.sun.am.session.SessionRepositoryImpl" />
+            </td>
         </tr>
         <tr>
-            <td align="right"><b>org.forgerock.openam.session.ha.amsessionrepository.rootdn</b>
-            <br/>Specifies AM Session Repository Root DN</td>
-            <td>ou=amsessiondb</td>
+            <td align="right">
+                <cc:textfield name="org.forgerock.openam.session.ha.amsessionrepository.rootdn.LABEL"
+                              readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="org.forgerock.openam.session.ha.amsessionrepository.rootdn"
+                              readOnly="true" size="64"
+                              title="org.forgerock.openam.session.ha.amsessionrepository.rootdn" />
+            </td>
         </tr>
     </table>
 

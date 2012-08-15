@@ -1,33 +1,27 @@
-<%--
-   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
-   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
-   The contents of this file are subject to the terms
-   of the Common Development and Distribution License
-   (the License). You may not use this file except in
-   compliance with the License.
-
-   You can obtain a copy of the License at
-   https://opensso.dev.java.net/public/CDDLv1.0.html or
-   opensso/legal/CDDLv1.0.txt
-   See the License for the specific language governing
-   permission and limitations under the License.
-
-   When distributing Covered Code, include this CDDL
-   Header Notice in each file and include the License file
-   at opensso/legal/CDDLv1.0.txt.
-   If applicable, add the following below the CDDL Header,
-   with the fields enclosed by brackets [] replaced by
-   your own identifying information:
-   "Portions Copyrighted [year] [name of copyright owner]"
-
-   $Id: RealmProperties.jsp,v 1.3 2008/06/25 05:44:48 qcheng Exp $
-
---%>
-
-
-
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
 
 <%@ page info="SessionHAStatistics" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
@@ -45,7 +39,24 @@
     copyrightYear="2012"
     fireDisplayEvents="true">
 
-<script language="javascript" src="../console/js/am.js"></script>
+        <style type="text/css">
+            #watermark {
+                color: #d0d0d0;
+                font-size: 200pt;
+                -webkit-transform: rotate(-45deg);
+                -moz-transform: rotate(-45deg);
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                z-index: -1;
+                left: -100px;
+                top: -200px;
+            }
+        </style>
+
+
+        <script language="javascript" src="../console/js/am.js"></script>
 
         <script language="javascript" src="/openam/js/Bluff-0.3.6.2/js-class.js" type="text/javascript"></script>
         <script language="javascript" src="/openam/js/Bluff-0.3.6.2/bluff-min.js" type="text/javascript"></script>
@@ -126,6 +137,11 @@
     pageTitleHelpMessage="" 
     showPageButtonsTop="true" 
     showPageButtonsBottom="false" />
+
+    <div id="watermark">
+        <p>WIP - Mockup</p>
+    </div>
+
 
     <table>
         <tr>
