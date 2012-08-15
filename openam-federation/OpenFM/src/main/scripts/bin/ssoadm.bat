@@ -39,7 +39,7 @@ set ORIG_CLASSPATH=%CLASSPATH%
 
 set CLASSPATH="@CONFIG_DIR@"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources"
-: set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/amadm_setup.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-distribution-amadmsetup-10.1.0-SNAPSHOT.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/OpenDJ-2012-20-02.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/mail-1.4.5.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/j2ee-2007-18-10.jar"
@@ -93,6 +93,7 @@ set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-session-ha-core-10.1.0-SNAPSH
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-session-ha-locale-10.1.0-SNAPSHOT.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-wsfederation-schema-10.1.0-SNAPSHOT.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-xacml3-schema-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/OpenFM-10.1.0-SNAPSHOT.jar"
 
 IF DEFINED ORIG_CLASSPATH (
 	set CLASSPATH=%ORIG_CLASSPATH%;%CLASSPATH%

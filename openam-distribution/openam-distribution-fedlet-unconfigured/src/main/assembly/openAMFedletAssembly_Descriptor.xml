@@ -275,7 +275,7 @@
 
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${pom.build.outputDirectory}/locale/en_US</directory>
+            <directory>${project.build.directory}/locale/en_US</directory>
             <includes>
                 <include>*.properties</include>
             </includes>

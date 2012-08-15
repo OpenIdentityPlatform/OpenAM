@@ -35,7 +35,6 @@
                 <include>xalan:xalan</include>
                 <include>xerces-J:xercesImpl</include>
                 <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
-                <!-- amadm_setup.jar -->
             </includes>
         </dependencySet>
     </dependencySets>
@@ -66,6 +65,7 @@
                 <include>sunds_config_schema.ldif</include>
             </includes>
         </fileSet>
+
         <fileSet>
             <outputDirectory>resources</outputDirectory>
             <directory>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF</directory>
@@ -101,187 +101,14 @@
                 <include>*.properties</include>
             </includes>
         </fileSet>
+        <!-- Pick up Files from our AntRun -->
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale</directory>
+            <directory>${project.build.directory}/resources</directory>
             <includes>
                 <include>*.properties</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/de_DE</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/es_ES</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/fr_FR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/ja_JP</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/ko_KR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/zh_CN</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/locale/zh_TW</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/de_DE</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/es_ES</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/fr_FR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/ja_JP</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/ko_KR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/zh_CN</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/federation-locale/zh_TW</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/de_DE</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/es_ES</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/fr_FR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/ja_JP</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/ko_KR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/zh_CN</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/openfm-locale/zh_TW</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>resources</outputDirectory>
-            <directory>${pom.build.outputDirectory}/locale/en_US</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
         <fileSet>
             <outputDirectory>template/unix/bin</outputDirectory>
             <includes>

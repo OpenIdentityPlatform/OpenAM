@@ -61,7 +61,7 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>
@@ -72,7 +72,7 @@
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>
@@ -83,7 +83,7 @@
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>
@@ -95,7 +95,7 @@
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>
@@ -106,7 +106,7 @@
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en_US.properties"/>
                                 </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>
@@ -117,7 +117,7 @@
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en_US.properties"/>
                                 </copy>
-                                <copy todir="${pom.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>

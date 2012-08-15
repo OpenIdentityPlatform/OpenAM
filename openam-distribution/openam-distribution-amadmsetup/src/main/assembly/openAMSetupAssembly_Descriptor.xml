@@ -11,7 +11,7 @@
     <fileSets>
         <fileSet>
             <outputDirectory></outputDirectory>
-            <directory>${project.build.directory}/unpacked</directory>
+            <directory>${project.build.directory}/classes</directory>
         </fileSet>
     </fileSets>
 

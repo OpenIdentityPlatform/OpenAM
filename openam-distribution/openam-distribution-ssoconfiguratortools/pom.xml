@@ -101,13 +101,6 @@
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
                                         <include name="amadmtoolssetup.properties"/>
                                     </fileset>
-                                    <globmapper from="*.properties" to="*_en_US.properties"/>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
-                                        <include name="amadmtoolssetup.properties"/>
-                                    </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
