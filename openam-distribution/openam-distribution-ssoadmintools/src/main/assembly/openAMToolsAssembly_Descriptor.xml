@@ -14,6 +14,7 @@
             <includes>
                 <include>org.forgerock:openam-shared</include>
                 <include>org.forgerock:openam-core</include>
+                <include>org.forgerock:openam-entitlements</include>
                 <include>org.forgerock:openam-federation-library</include>
                 <include>org.forgerock:OpenFM</include>
                 <include>org.forgerock:openam-dtd-schema</include>

@@ -228,8 +228,9 @@ public class SMProfileViewBean
             // Set our Sub-Tabs
             addSessionsTab(model,1);
             // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
-            if ( (!SystemPropertiesManager.get(AMSessionRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) ||
-                 (!SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
+            // Both the SFO is Enabled and Repository Type has been Specified for view of HA Tabs.
+            if ( (!SystemPropertiesManager.get(AMSessionRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
+                 (SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
             {
                 removeSessionsTab();
             }
