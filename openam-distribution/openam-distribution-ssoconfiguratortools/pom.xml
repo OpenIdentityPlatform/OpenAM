@@ -57,7 +57,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
+                        <id>unpack_1</id>
                         <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -70,7 +70,28 @@
                                     <version>10.1.0-SNAPSHOT</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/unpacked_1</outputDirectory>
+                                    <includes>com/sun/identity/setup/OpenSSOConfigurator**</includes>
+                                </artifactItem>
+                            </artifactItems>
+
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack_2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock</groupId>
+                                    <artifactId>openam-core</artifactId>
+                                    <version>10.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/unpacked_2</outputDirectory>
                                     <includes>org/forgerock/openam/setup/OpenAMUpgrade**</includes>
                                 </artifactItem>
                             </artifactItems>
@@ -90,58 +111,92 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <!-- OpenSSOConfiguration Properties -->
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
-                                        <include name="amadmtoolssetup.properties"/>
+                                        <include name="OpenSSOConfigurator.properties"/>
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
-                                        <include name="amadmtoolssetup.properties"/>
+                                        <include name="OpenSSOConfigurator.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/de_DE">
-                                        <include name="amadmtoolssetup_de.properties"/>
+                                        <include name="OpenSSOConfigurator_de.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/es_ES">
-                                        <include name="amadmtoolssetup_es.properties"/>
+                                        <include name="OpenSSOConfigurator_es.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/fr_FR">
-                                        <include name="amadmtoolssetup_fr.properties"/>
+                                        <include name="OpenSSOConfigurator_fr.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/ja_JP">
-                                        <include name="amadmtoolssetup_ja.properties"/>
+                                        <include name="OpenSSOConfigurator_ja.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/ko_KR">
-                                        <include name="amadmtoolssetup_ko.properties"/>
+                                        <include name="OpenSSOConfigurator_ko.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/zh_CN">
-                                        <include name="amadmtoolssetup_zh.properties"/>
+                                        <include name="OpenSSOConfigurator_zh.properties"/>
                                     </fileset>
                                 </copy>
 
-                                <copy todir="${project.build.directory}/unpacked/com/sun/identity/tools/bundles" filtering="false">
+                                <copy todir="${project.build.directory}/unpacked_1" filtering="false">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/zh_TW">
-                                        <include name="amadmtoolssetup_zh_TW.properties"/>
+                                        <include name="OpenSSOConfigurator_zh_TW.properties"/>
+                                    </fileset>
+                                </copy>
+
+
+                                <!-- OpenSSOConfiguration Properties-->
+                                <copy todir="${project.build.directory}/unpacked_2" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                        <include name="OpenAMUpgrade.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked_2" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                        <include name="OpenAMUpgrade.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked_2" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/de_DE">
+                                        <include name="OpenAMUpgrade_de.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked_2" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/es_ES">
+                                        <include name="OpenAMUpgrade_es.properties"/>
+                                    </fileset>
+                                </copy>
+
+                                <copy todir="${project.build.directory}/unpacked_2" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/fr_FR">
+                                        <include name="OpenAMUpgrade_fr.properties"/>
                                     </fileset>
                                 </copy>
 
@@ -159,7 +214,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>openam-amadmsetup</id>
+                        <id>openam-configurator</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -170,6 +225,36 @@
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
                                 <descriptor>src/main/assembly/openAMConfiguratorAssembly_Descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>openam-upgrade</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>openam-distribution-upgrade-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <descriptors>
+                                <descriptor>src/main/assembly/openAMUpgradeAssembly_Descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>openam-ssoconfiguratortools</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>openam-distribution-ssoconfiguratortools-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <descriptors>
+                                <descriptor>src/main/assembly/openAMToolsAssembly_Descriptor.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
