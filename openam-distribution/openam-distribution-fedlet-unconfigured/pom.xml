@@ -61,7 +61,7 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
                                         <include name="*.properties"/>
                                         <exclude name="Services.properties"/>
@@ -93,40 +93,6 @@
                                         <exclude name="authentication_util.properties"/>
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
-                                </copy>
-
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en_US.properties"/>
-                                </copy>
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en_US.properties"/>
-                                </copy>
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale">
-                                        <include name="*.properties"/>
-                                        <exclude name="Services.properties"/>
-                                        <exclude name="ums.properties"/>
-                                        <exclude name="sso.properties"/>
-                                        <exclude name="SMS.properties"/>
-                                        <exclude name="authentication_util.properties"/>
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en_US.properties"/>
                                 </copy>
                             </target>
                         </configuration>
@@ -142,17 +108,32 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>admintools-assembly</id>
+                        <id>fedlet-assembly_1</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-ssoAdminTools-${project.version}</finalName>
+                            <finalName>openam-distribution-fedlet-unconfigured-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
-                                <descriptor>src/main/assembly/openAMFedletAssembly_Descriptor.xml</descriptor>
+                                <descriptor>src/main/assembly/openAMFedlet_WAR_Assembly_Descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fedlet-assembly_2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>openam-distribution-fedlet-unconfigured-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <descriptors>
+                                <descriptor>src/main/assembly/openAMFedlet_ZIP_Assembly_Descriptor.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
@@ -165,17 +146,6 @@
 
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-distribution-amadmsetup</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-installtools</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
@@ -194,11 +164,6 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
             <artifactId>openam-dtd-schema</artifactId>
         </dependency>
 
@@ -213,136 +178,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-rest</artifactId>
-        </dependency>
-
-        <!-- Include all Authentication Modules -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-ad</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-anonymous</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-adaptive</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-application</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-cert</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-datastore</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-hotp</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-httpbasic</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-ldap</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-membership</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-msisdn</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-nt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-oath</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-oauth2</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-radius</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-auth-safeword</artifactId>
-        </dependency>
-
-        <dependency>
-            <artifactId>openam-auth-securid</artifactId>
-            <groupId>org.forgerock</groupId>
-        </dependency>
-
-        <dependency>
-            <artifactId>openam-auth-windowsdesktopsso</artifactId>
-            <groupId>org.forgerock</groupId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <!-- Oauth2 dependencies -->
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-restlet-extension</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-openam-extension</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-core-token-service</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-oauth2-main</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
         </dependency>
 
     </dependencies>

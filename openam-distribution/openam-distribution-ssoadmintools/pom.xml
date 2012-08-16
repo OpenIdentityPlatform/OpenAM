@@ -163,6 +163,13 @@
                                     </fileset>
                                 </copy>
 
+                                <!-- Set our Version Information for the Package -->
+                                <copy todir="${project.build.directory}/resources" overwrite="true" filtering="true" flatten="yes">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/config">
+                                        <include name="serviceDefaultValues.properties"/>
+                                    </fileset>
+                                </copy>
+
                             </target>
                         </configuration>
                         <goals>
