@@ -58,6 +58,7 @@
                 <include>setup</include>
                 <include>setup.bat</include>
             </includes>
+            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
             <outputDirectory>classes</outputDirectory>
