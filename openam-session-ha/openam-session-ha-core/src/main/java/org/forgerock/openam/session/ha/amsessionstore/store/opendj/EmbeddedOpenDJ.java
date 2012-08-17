@@ -57,6 +57,7 @@ import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
+import org.forgerock.openam.session.ha.amsessionstore.store.opendj.setup.SetupProgress;
 import org.opends.messages.Message;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
