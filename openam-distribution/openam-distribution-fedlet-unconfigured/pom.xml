@@ -149,17 +149,12 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
+            <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-federation-library</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>OpenFM</artifactId>
         </dependency>
 
         <dependency>
@@ -178,8 +173,93 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-mib-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-liberty-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-wsfederation-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-rest</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>external</groupId>
             <artifactId>esapiport</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.relaxng</groupId>
+            <artifactId>relaxngDatatype</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-extra-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.tools.ws</groupId>
+            <artifactId>webservices-tools</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.java.dev.msv.datatype.xsd</groupId>
+            <artifactId>xsdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
         </dependency>
 
     </dependencies>
