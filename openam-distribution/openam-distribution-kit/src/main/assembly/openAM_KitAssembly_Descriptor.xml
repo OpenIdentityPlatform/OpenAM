@@ -36,7 +36,7 @@
     <!-- Library Dependency -->
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory></outputDirectory>
             <!-- Include fully packaged Modules -->
             <includes>
                 <include>org.forgerock:openam-server:war</include>
