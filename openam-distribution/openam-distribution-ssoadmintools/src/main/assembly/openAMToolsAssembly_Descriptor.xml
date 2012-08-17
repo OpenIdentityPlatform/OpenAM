@@ -20,6 +20,9 @@
                 <include>org.forgerock:openam-dtd-schema</include>
                 <include>org.forgerock:openam-jaxrpc-schema</include>
                 <include>org.forgerock:openam-idsvcs-schema</include>
+                <include>org.forgerock:openam-liberty-schema</include>
+                <include>org.forgerock:openam-saml2-schema</include>
+                <include>org.forgerock:openam-wsfederation-schema</include>
                 <include>org.forgerock:openam-distribution-amadmsetup</include>
                 <include>external:OpenDJ</include>
                 <include>external:j2ee</include>
