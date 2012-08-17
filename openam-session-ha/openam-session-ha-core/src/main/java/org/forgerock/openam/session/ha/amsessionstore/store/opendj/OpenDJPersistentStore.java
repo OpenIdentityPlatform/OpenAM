@@ -68,7 +68,9 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  *  Provide Implementation of AMSessionRepository using the internal
- *  Configuration Directory as our Store.  Having a replicated Directory
+ *  Configuration Directory as OpenAM's Session and Token Store.
+ *
+ *  Having a replicated Directory
  *  will provide the underlying SFO/HA for OpenAM Session Data.
  *
  * @author steve

@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.store.opendj.setup;
+package org.forgerock.openam.session.ha.amsessionstore.store.opendj;
 
 import java.io.IOException;
 import java.io.OutputStream;

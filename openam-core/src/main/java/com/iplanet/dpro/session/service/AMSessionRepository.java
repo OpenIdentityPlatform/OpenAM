@@ -49,7 +49,7 @@ import org.forgerock.openam.session.model.DBStatistics;
  * <code> JMQSessionRepository</code> implements this interface.
  *
  * @see <code>JMQSessionRepository</code>
- * @see <code></code>
+ * @see <code>OpenDJPersistentStore</code>
  */
 public interface AMSessionRepository {
 
