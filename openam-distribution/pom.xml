@@ -55,6 +55,7 @@
         <module>openam-distribution-fedlet-unconfigured</module>
         <module>openam-distribution-ssoadmintools</module>
         <module>openam-distribution-ssoconfiguratortools</module>
+        <module>openam-distribution-kit</module>
     </modules>
 
     <dependencyManagement>
