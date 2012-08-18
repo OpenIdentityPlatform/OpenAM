@@ -16,7 +16,6 @@
                 <include>org.forgerock:openam-federation-library</include>
                 <include>org.forgerock:openam-dtd-schema</include>
                 <include>org.forgerock:openam-jaxrpc-schema</include>
-                <include>org.forgerock:openam-idsvcs-schema</include>
                 <include>org.forgerock:openam-saml2-schema</include>
                 <include>org.forgerock:openam-liberty-schema</include>
                 <include>org.forgerock:openam-mib-schema</include>
@@ -25,16 +24,17 @@
                 <include>org.forgerock:openam-rest</include>
                 <include>external:esapiport</include>
                 <include>javax.mail:mail</include>
-                <include>com.github.relaxng:relaxngDatatype</include>
+                <include>relaxngDatatype:relaxngDatatype</include>
                 <include>external:webservices-api</include>
+                <include>external:webservices-extra</include>
                 <include>external:webservices-extra-api</include>
+                <include>external:webservices-rt</include>
                 <include>com.sun.tools.ws:webservices-tools</include>
                 <include>xalan:xalan</include>
                 <include>xerces-J:xercesImpl</include>
                 <include>xerces-J:xml-apis</include>
                 <include>xerces-J:xml-resolver</include>
                 <include>xerces-J:xml-serializer</include>
-                <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
                 <include>xml-security:xmlsec</include>
             </includes>
         </dependencySet>

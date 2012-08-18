@@ -449,7 +449,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.relaxng</groupId>
+            <groupId>relaxngDatatype</groupId>
             <artifactId>relaxngDatatype</artifactId>
         </dependency>
 

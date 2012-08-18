@@ -908,10 +908,9 @@
             <!-- TODO publicsuffix -->
 
             <dependency>
-                <groupId>com.github.relaxng</groupId>
+                <groupId>relaxngDatatype</groupId>
                 <artifactId>relaxngDatatype</artifactId>
-                <version>2011.1</version>
-                <!-- Originally ? -->
+                <version>20020414</version>
             </dependency>
 
             <dependency>

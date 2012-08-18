@@ -184,11 +184,6 @@
 
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-idsvcs-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock</groupId>
             <artifactId>openam-wsfederation-schema</artifactId>
         </dependency>
 
@@ -208,7 +203,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.relaxng</groupId>
+            <groupId>relaxngDatatype</groupId>
             <artifactId>relaxngDatatype</artifactId>
         </dependency>
 
@@ -219,7 +214,17 @@
 
         <dependency>
             <groupId>external</groupId>
+            <artifactId>webservices-extra</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
             <artifactId>webservices-extra-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-rt</artifactId>
         </dependency>
 
         <dependency>
