@@ -32,7 +32,7 @@
                 <include>org.json:json</include>
                 <include>external:jsr173_api</include>
                 <include>javax.mail:mail</include>
-                <include>com.github.relaxng:relaxngDatatype</include>
+                <include>relaxngDatatype:relaxngDatatype</include>
                 <include>external:webservices-api</include>
                 <include>external:webservices-rt</include>
                 <include>com.sun.tools.ws:webservices-tools</include>
