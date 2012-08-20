@@ -61,6 +61,15 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
+
+                                <tstamp>
+                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK"/>
+                                </tstamp>
+                                <property name="version.set" value="${project.version}"/>
+
+                                <filter token="DATESTAMP" value="${war.time.stamp}"/>
+                                <filter token="VERSION" value="${version.set}"/>
+
                                 <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
                                         <include name="*.properties"/>

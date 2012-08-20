@@ -36,8 +36,8 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Distribution Kit</name>
-    <description>OpenAM Final Module Distribution Kit.
+    <name>OpenAM Distribution Packaging</name>
+    <description>OpenAM Final Module Distribution Package.
     </description>
     <artifactId>openam-distribution</artifactId>
     <version>10.1.0-SNAPSHOT</version>
