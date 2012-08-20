@@ -87,9 +87,6 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
      */
     private static long gracePeriod = 5 * 60; /* 5 mins in secs */
 
-    private static final String CLEANUP_GRACE_PERIOD = 
-        "com.sun.identity.session.repository.cleanupGracePeriod";
-
     private static final String BRIEF_DB_ERROR_MSG = 
         "Session failover service is not functional due to DB unavailability.";
 

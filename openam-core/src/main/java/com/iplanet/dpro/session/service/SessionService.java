@@ -1173,23 +1173,23 @@ public class SessionService {
     /**
      * Add a listener to a Internal Session.
      * 
-     * @param session
+     * @param session - InternalSession Object
      * @param url
      * @param sid
      *            sid to be used with notification (master or restricted)
      */
-    private void addInternalSessionListener(InternalSession sess, String url,
+    private void addInternalSessionListener(InternalSession session, String url,
             SessionID sid) {
 
-        if (sess != null) {
-            if (!sid.equals(sess.getID())
-                    && sess.getRestrictionForToken(sid) == null) {
+        if (session != null) {
+            if (!sid.equals(session.getID())
+                    && session.getRestrictionForToken(sid) == null) {
                 throw new IllegalArgumentException("Session id mismatch");
             }
 
-            Map urls = sess.getSessionEventURLs();
+            Map urls = session.getSessionEventURLs();
             urls.put(url, sid);
-            sess.updateForFailover();
+            session.updateForFailover();
         }
     }
 
@@ -3183,10 +3183,8 @@ public class SessionService {
 
     /**
      * This method is the "server side" of the getRestrictedTokenIdRemotely()
-     * 
-     * @param owner
-     *            server instance URL
-     * @param sid
+     *
+     * @param masterSid
      *            SessionID
      * @param restriction
      *            restriction

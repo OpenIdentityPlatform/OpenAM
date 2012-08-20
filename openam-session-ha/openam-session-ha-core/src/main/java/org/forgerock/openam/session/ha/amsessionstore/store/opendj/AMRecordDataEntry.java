@@ -41,6 +41,7 @@ import org.forgerock.openam.session.model.AMRecord;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
+import org.forgerock.openam.session.model.AMRootEntity;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
@@ -53,7 +54,7 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 public class AMRecordDataEntry {
     private String dn;
     private Map<String, Set<String>> attributeValues;
-    private AMRecord record;
+    private AMRootEntity record;
     
     public final static String AUX_DATA = "auxData";
     public final static String DATA = "data";
@@ -119,7 +120,7 @@ public class AMRecordDataEntry {
         if (attributeValues.get(DATA) != null) {
             Set<String> values = attributeValues.get(DATA);
             for (String value : values) {
-                record.setData(value);
+                ((AMRecord)record).setData(value);
             }
         }
         
@@ -181,8 +182,8 @@ public class AMRecordDataEntry {
                     key = value.substring(0, value.indexOf('='));
                     v = value.substring(value.indexOf('=') + 1);
                 }
-                
-                record.setExtraByteAttrs(key, v);
+
+                ((AMRecord)record).setExtraByteAttrs(key, v);
             }
         }
         
@@ -198,13 +199,13 @@ public class AMRecordDataEntry {
                     key = value.substring(0, value.indexOf('='));
                     v = value.substring(value.indexOf('=') + 1);
                 }
-                
-                record.setExtraStringAttrs(key, v);
+
+                ((AMRecord)record).setExtraStringAttrs(key, v);
             }
         }
     }
     
-    public AMRecordDataEntry(AMRecord record) 
+    public AMRecordDataEntry(AMRootEntity record)
     throws StoreException {
         this.record = record;
         this.attributeValues = new HashMap<String, Set<String>>();
@@ -214,13 +215,16 @@ public class AMRecordDataEntry {
             set.add(record.getAuxData());
             attributeValues.put(AUX_DATA, set);
         }
-        
-        if (record.getData() != null) {
-            set = new HashSet<String>();
-            set.add(record.getData());
-            attributeValues.put(DATA, set);
+
+        if (record instanceof AMRecord)
+        {
+            if (((AMRecord)record).getData() != null) {
+                set = new HashSet<String>();
+                set.add(((AMRecord)record).getData());
+                attributeValues.put(DATA, set);
+            }
         }
-        
+
         if (record.getPrimaryKey() != null) {
             set = new HashSet<String>();
             set.add(record.getPrimaryKey());
@@ -253,12 +257,15 @@ public class AMRecordDataEntry {
         set.add(Integer.toString(record.getState()));
         attributeValues.put(STATE, set);
 
-        attributeValues.put(EXTRA_BYTE_ATTR, formatMultiValuedAttr(EXTRA_BYTE_ATTR, record.getExtraByteAttributes()));
-        attributeValues.put(EXTRA_STRING_ATTR, formatMultiValuedAttr(EXTRA_STRING_ATTR, record.getExtraStringAttributes()));
+        if (record instanceof AMRecord)
+        {
+            attributeValues.put(EXTRA_BYTE_ATTR, formatMultiValuedAttr(EXTRA_BYTE_ATTR, ((AMRecord)record).getExtraByteAttributes()));
+            attributeValues.put(EXTRA_STRING_ATTR, formatMultiValuedAttr(EXTRA_STRING_ATTR, ((AMRecord)record).getExtraStringAttributes()));
+        }
     }
     
     public AMRecord getAMRecord() {
-        return record;
+        return (AMRecord)record;
     }
     
     private Set<String> formatMultiValuedAttr(String attr, Map<String, String> values) {

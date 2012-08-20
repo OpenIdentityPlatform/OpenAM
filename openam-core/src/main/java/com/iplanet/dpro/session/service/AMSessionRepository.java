@@ -38,6 +38,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.exceptions.NotFoundException;
 import com.iplanet.dpro.session.exceptions.StoreException;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.model.AMRootEntity;
 import org.forgerock.openam.session.model.DBStatistics;
 
@@ -53,6 +54,8 @@ import org.forgerock.openam.session.model.DBStatistics;
  */
 public interface AMSessionRepository {
 
+    public final static String DEBUG_NAME = "amSessionRepository";
+
     public static final String REPOSITORY_CLASS_PROPERTY =
             "com.sun.am.session.SessionRepositoryImpl";
 
@@ -64,6 +67,9 @@ public interface AMSessionRepository {
 
     public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
             "org.forgerock.openam.session.ha.amsessionrepository.type";
+
+    public static final String CLEANUP_GRACE_PERIOD =
+            "com.sun.identity.session.repository.cleanupGracePeriod";
 
     /**
      * Retrieves session state from the repository.
