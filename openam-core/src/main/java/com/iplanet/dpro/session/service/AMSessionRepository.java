@@ -54,21 +54,21 @@ import org.forgerock.openam.session.model.DBStatistics;
  */
 public interface AMSessionRepository {
 
-    public final static String DEBUG_NAME = "amSessionRepository";
+    static final String DEBUG_NAME = "amSessionRepository";
 
-    public static final String REPOSITORY_CLASS_PROPERTY =
+    static final String REPOSITORY_CLASS_PROPERTY =
             "com.sun.am.session.SessionRepositoryImpl";
 
-    public static final String IS_SFO_ENABLED =
+    static final String IS_SFO_ENABLED =
                 "iplanet-am-session-sfo-enabled";
 
-    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN =
+    static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN =
             "org.forgerock.openam.session.ha.amsessionrepository.rootdn";
 
-    public static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
+    static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
             "org.forgerock.openam.session.ha.amsessionrepository.type";
 
-    public static final String CLEANUP_GRACE_PERIOD =
+    static final String CLEANUP_GRACE_PERIOD =
             "com.sun.identity.session.repository.cleanupGracePeriod";
 
     /**

@@ -40,7 +40,7 @@ public interface Constants extends com.sun.identity.shared.Constants {
 
     static final String URI = "amsessiondb.uri";
 
-    static final String LOCAL = "local";
+    /**
     
     static final String OPENDJ_ROOT = "amsessiondb.opendj.root";
     
@@ -53,10 +53,7 @@ public interface Constants extends com.sun.identity.shared.Constants {
     static final String OPENDJ_SUFFIX = "amsessiondb.opendj.suffix";
     
     static final String OPENDJ_REPL_PORT = "amsessiondb.opendj.repl.port";
-    
-    static final String OPENDJ_SUFFIX_TAG = "AMSESSIONDB_BASEDN";
-    
-    static final String OPENDJ_RDN_TAG = "AMSESSIONDB_RDN";
+
 
 
     static final String OPENDJ_DS_MGR_DN = "amsessiondb.opendj.ds_mgr_dn";
@@ -77,7 +74,7 @@ public interface Constants extends com.sun.identity.shared.Constants {
     
     static final String HOST_URI = "amsessiondb.host.uri";
 
-
+    **/
 
     
     static final String BASE_DN = "ou=famrecords";
@@ -97,11 +94,6 @@ public interface Constants extends com.sun.identity.shared.Constants {
     public final static String FR_AMSESSIONDB = "frAmSessionDb";
     
     public final static String FAMRECORD_FILTER = "(objectclass=*)";
-    
-    static final String COMMA = ",";
-    
-    static final String EQUALS = "=";
-
 
 
 

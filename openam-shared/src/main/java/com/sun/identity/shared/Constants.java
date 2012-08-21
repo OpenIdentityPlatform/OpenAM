@@ -1080,7 +1080,12 @@ public interface Constants {
     /**
      * Constant for file separator
      */
-    public static String FILE_SEPARATOR = "/";
+    static final String FILE_SEPARATOR = "/";
+
+    /**
+     * Constant for string "local".
+     */
+    static final String LOCAL = "local";
 
     /**
      * Property string for sm and um notification thread pool size
@@ -1179,7 +1184,20 @@ public interface Constants {
      */
     static final String USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE =
             "openam.session.useLocalSessionsInMultiServerMode";
-    String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=java,dc=net";
-    String DEFAULT_SESSION_HA_ROOT_DN = "ou=amsessiondb";
-    String DEFAULT_SESSION_HA_STORE_TYPE = "None";
+
+    /**
+     * Default Root Context
+     */
+    static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=java,dc=net";
+
+    /**
+     * Default Session SFO/HA Root DN
+     */
+    static final String DEFAULT_SESSION_HA_ROOT_DN = "ou=amsessiondb";
+
+    /**
+     * Default Session SFO/HA Store Type.
+     */
+    static final String DEFAULT_SESSION_HA_STORE_TYPE = "None";
+
 }
