@@ -33,9 +33,10 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.iplanet.am.util.SystemProperties;
 import org.forgerock.i18n.LocalizableMessage;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.SystemProperties;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**

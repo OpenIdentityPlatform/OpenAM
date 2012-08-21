@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
+import org.forgerock.openam.session.model.AMRecordDataEntry;
 import org.forgerock.openam.session.model.CaseInsensitiveHashMap;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;

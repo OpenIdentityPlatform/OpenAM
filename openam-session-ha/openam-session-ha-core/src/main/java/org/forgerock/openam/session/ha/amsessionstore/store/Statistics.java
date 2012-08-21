@@ -28,8 +28,8 @@
  */
 package org.forgerock.openam.session.ha.amsessionstore.store;
 
+import com.iplanet.am.util.SystemProperties;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
-import org.forgerock.openam.session.ha.amsessionstore.common.config.SystemProperties;
 import java.io.Serializable;
 
 /**

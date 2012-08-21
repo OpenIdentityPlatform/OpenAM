@@ -56,7 +56,7 @@ import java.util.zip.ZipFile;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.AMSessionDBOpenDJServer;
+import org.forgerock.openam.session.model.AMSessionDBOpenDJServer;
 import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJConfig;
 import org.opends.messages.Message;
 import org.opends.server.core.AddOperation;

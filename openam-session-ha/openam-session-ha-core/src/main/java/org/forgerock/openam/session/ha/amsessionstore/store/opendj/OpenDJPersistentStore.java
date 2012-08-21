@@ -39,7 +39,6 @@ import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.ha.FAMPersisterManager;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.model.*;
@@ -76,9 +75,6 @@ import org.opends.server.types.RawModification;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
-
-import javax.jms.*;
-import javax.jms.IllegalStateException;
 
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 

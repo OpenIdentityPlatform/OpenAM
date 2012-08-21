@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.store.opendj;
+package org.forgerock.openam.session.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

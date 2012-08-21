@@ -23,11 +23,12 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.store.opendj;
+package org.forgerock.openam.session.model;
 
 import java.io.Serializable;
 
 /**
+ * OpenAM Session DB OpenDJ Server POJO
  *
  * @author steve
  */

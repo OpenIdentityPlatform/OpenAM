@@ -350,6 +350,22 @@ public class SystemProperties {
 
         return (value.equalsIgnoreCase(TRUE) ? true : false);
     }
+
+    /**
+     * Returns the property value as a boolean
+     *
+     * @param key
+     * @param defaultValue value if key is not found.
+     * @return
+     */
+    public static boolean getAsBoolean(String key, boolean defaultValue) {
+        String value = get(key);
+
+        if (value == null)
+            { return defaultValue; }
+
+        return (value.equalsIgnoreCase(TRUE) ? true : false);
+    }
     
     /**
      * Returns all the properties defined and their values.

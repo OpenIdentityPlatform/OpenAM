@@ -35,27 +35,11 @@ package org.forgerock.openam.session.ha.amsessionstore.common;
  */
 public interface Constants extends com.sun.identity.shared.Constants {
 
-    static final String PROPERTIES_FILE = "amsessiondb.properties";
-    
-    static final String PERSISTER_KEY = 
-        "amsessiondb.amrecordpersister"; 
-    
     static final String STATS_ENABLED = 
         "amsessiondb.enabled";
 
-
-    static final String PORT = "amsessiondb.port";
-    
-    static final String SHUTDOWN_PORT = "amsessiondb.shutdown.port";
-    
-    static final String SHUTDOWN_ADDR = "amsessiondb.shutdown.addr";
-    
     static final String URI = "amsessiondb.uri";
-    
-    static final String MIN_THREADS = "amsessiondb.min.threads";
-    
-    static final String MAX_THREADS = "amsessiondb.max.threads";
-    
+
     static final String LOCAL = "local";
     
     static final String OPENDJ_ROOT = "amsessiondb.opendj.root";
@@ -74,14 +58,10 @@ public interface Constants extends com.sun.identity.shared.Constants {
     
     static final String OPENDJ_RDN_TAG = "AMSESSIONDB_RDN";
 
-    
-    static final String OPENDJ_DATASTORE = "opendj";
-    
+
     static final String OPENDJ_DS_MGR_DN = "amsessiondb.opendj.ds_mgr_dn";
     
     static final String OPENDJ_DS_MGR_PASSWD = "amsessiondb.opendj.ds_mgr_passwd";
-    
-    static final String USERNAME = "amsessiondb.auth.username";
     
     static final String PASSWORD = "amsessiondb.auth.password";
     
