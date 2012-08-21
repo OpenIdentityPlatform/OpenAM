@@ -27,77 +27,86 @@ package org.forgerock.openam.session.ha.amsessionstore.common;
 
 /**
  *
+ * Specific Constants for use within the OpenDJPersistentStore as our
+ * Session Store.
+ *
  * @author peter.major
  * @author steve
  */
-public final class Constants {
-    public static final String PROPERTIES_FILE = "amsessiondb.properties";
+public interface Constants extends com.sun.identity.shared.Constants {
+
+    static final String PROPERTIES_FILE = "amsessiondb.properties";
     
-    public static final String PERSISTER_KEY = 
+    static final String PERSISTER_KEY = 
         "amsessiondb.amrecordpersister"; 
     
-    public static final String STATS_ENABLED = 
+    static final String STATS_ENABLED = 
         "amsessiondb.enabled";
-    
-    public static final String PORT = "amsessiondb.port";
-    
-    public static final String SHUTDOWN_PORT = "amsessiondb.shutdown.port";
-    
-    public static final String SHUTDOWN_ADDR = "amsessiondb.shutdown.addr";
-    
-    public static final String URI = "amsessiondb.uri";
-    
-    public static final String MIN_THREADS = "amsessiondb.min.threads";
-    
-    public static final String MAX_THREADS = "amsessiondb.max.threads";
-    
-    public static final String LOCAL = "local";
-    
-    public static final String OPENDJ_ROOT = "amsessiondb.opendj.root";
-    
-    public static final String OPENDJ_ADMIN_PORT = "amsessiondb.opendj.admin.port";
-            
-    public static final String OPENDJ_LDAP_PORT = "amsessiondb.opendj.ldap.port";
-    
-    public static final String OPENDJ_JMX_PORT = "amsessiondb.opendj.jmx.port";
 
-    public static final String OPENDJ_SUFFIX = "amsessiondb.opendj.suffix";
+
+    static final String PORT = "amsessiondb.port";
     
-    public static final String OPENDJ_REPL_PORT = "amsessiondb.opendj.repl.port";
+    static final String SHUTDOWN_PORT = "amsessiondb.shutdown.port";
     
-    public static final String OPENDJ_SUFFIX_TAG = "AMSESSIONDB_BASEDN";
+    static final String SHUTDOWN_ADDR = "amsessiondb.shutdown.addr";
     
-    public static final String OPENDJ_RDN_TAG = "AMSESSIONDB_RDN";
+    static final String URI = "amsessiondb.uri";
     
-    public static final String OPENDJ_DATASTORE = "opendj";
+    static final String MIN_THREADS = "amsessiondb.min.threads";
     
-    public static final String OPENDJ_DS_MGR_DN = "amsessiondb.opendj.ds_mgr_dn";
+    static final String MAX_THREADS = "amsessiondb.max.threads";
     
-    public static final String OPENDJ_DS_MGR_PASSWD = "amsessiondb.opendj.ds_mgr_passwd";
+    static final String LOCAL = "local";
     
-    public static final String USERNAME = "amsessiondb.auth.username";
+    static final String OPENDJ_ROOT = "amsessiondb.opendj.root";
     
-    public static final String PASSWORD = "amsessiondb.auth.password";
+    static final String OPENDJ_ADMIN_PORT = "amsessiondb.opendj.admin.port";
+            
+    static final String OPENDJ_LDAP_PORT = "amsessiondb.opendj.ldap.port";
     
-    public static final String EXISTING_SERVER_URL = "amsessiondb.exising.server.url";
+    static final String OPENDJ_JMX_PORT = "amsessiondb.opendj.jmx.port";
+
+    static final String OPENDJ_SUFFIX = "amsessiondb.opendj.suffix";
     
-    public static final String HOST_URL = "amsessiondb.host.url";
+    static final String OPENDJ_REPL_PORT = "amsessiondb.opendj.repl.port";
     
-    public static final String HOST_PROTOCOL = "amsessiondb.host.protocol";
+    static final String OPENDJ_SUFFIX_TAG = "AMSESSIONDB_BASEDN";
     
-    public static final String HOST_FQDN = "amsessiondb.host.fqdn";
+    static final String OPENDJ_RDN_TAG = "AMSESSIONDB_RDN";
+
     
-    public static final String HOST_PORT = "amsessiondb.host.port";
+    static final String OPENDJ_DATASTORE = "opendj";
     
-    public static final String HOST_URI = "amsessiondb.host.uri";
+    static final String OPENDJ_DS_MGR_DN = "amsessiondb.opendj.ds_mgr_dn";
     
-    public static final String BASE_DN = "ou=famrecords";
+    static final String OPENDJ_DS_MGR_PASSWD = "amsessiondb.opendj.ds_mgr_passwd";
     
-    public static final String HOSTS_BASE_DN = "ou=amsessiondb";
+    static final String USERNAME = "amsessiondb.auth.username";
     
-    public static final String HOST_NAMING_ATTR = "cn";
+    static final String PASSWORD = "amsessiondb.auth.password";
     
-    public static final String AMRECORD_NAMING_ATTR = "pKey";
+    static final String EXISTING_SERVER_URL = "amsessiondb.exising.server.url";
+    
+    static final String HOST_URL = "amsessiondb.host.url";
+    
+    static final String HOST_PROTOCOL = "amsessiondb.host.protocol";
+    
+    static final String HOST_FQDN = "amsessiondb.host.fqdn";
+    
+    static final String HOST_PORT = "amsessiondb.host.port";
+    
+    static final String HOST_URI = "amsessiondb.host.uri";
+
+
+
+    
+    static final String BASE_DN = "ou=famrecords";
+    
+    static final String HOSTS_BASE_DN = "ou=amsessiondb";
+    
+    static final String HOST_NAMING_ATTR = "cn";
+    
+    static final String AMRECORD_NAMING_ATTR = "pKey";
     
     public final static String TOP = "top";
         
@@ -109,14 +118,18 @@ public final class Constants {
     
     public final static String FAMRECORD_FILTER = "(objectclass=*)";
     
-    public static final String COMMA = ",";
+    static final String COMMA = ",";
     
-    public static final String EQUALS = "=";
-    
+    static final String EQUALS = "=";
+
+
+
+
     // exit codes
-    public static final int EXIT_INVALID_URL = 1;
+    static final int EXIT_INVALID_URL = 1;
     
-    public static final int EXIT_INSTALL_FAILED = 2;
+    static final int EXIT_INSTALL_FAILED = 2;
     
-    public static final int EXIT_REMOVE_FAILED = 3;
+    static final int EXIT_REMOVE_FAILED = 3;
+
 }

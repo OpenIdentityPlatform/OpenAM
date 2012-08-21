@@ -44,12 +44,13 @@ import java.util.Map;
 import java.net.InetAddress;
 import java.io.IOException;
 import java.net.UnknownHostException;
+
+import com.sun.identity.shared.Constants;
 import org.apache.click.control.ActionLink;
 import org.apache.click.Context;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.util.DN;
-import org.forgerock.openam.common.OpenAMCommonConstants;
 
 /**
  * Step 3 is for selecting the embedded or external configuration store 
@@ -233,7 +234,7 @@ public class Step3 extends LDAPStoreWizardPage {
         if ((sessionStoreType == null) || (sessionStoreType.trim().length() == 0)) {
             getContext().setSessionAttribute(
                     SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
-                        OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE);
+                        Constants.DEFAULT_SESSION_HA_STORE_TYPE);
         } else {
             getContext().setSessionAttribute(
                     SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, sessionStoreType);
@@ -630,7 +631,7 @@ public class Step3 extends LDAPStoreWizardPage {
         getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, "ou=amsessiondb,"+tmp);
 
-        tmp = (String)data.get(OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE);
+        tmp = (String)data.get(Constants.DEFAULT_SESSION_HA_STORE_TYPE);
         getContext().setSessionAttribute(
                 SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, tmp);
         
@@ -682,13 +683,13 @@ public class Step3 extends LDAPStoreWizardPage {
             bindDN = "cn=Directory Manager";
         }
         if (rootSuffix == null) {
-            rootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
+            rootSuffix = Constants.DEFAULT_ROOT_SUFFIX;
         }
         if (sessionRootDN == null) {
-            sessionRootDN = OpenAMCommonConstants.DEFAULT_SESSION_HA_ROOT_DN;
+            sessionRootDN = Constants.DEFAULT_SESSION_HA_ROOT_DN;
         }
         if (sessionStoreType == null) {
-            sessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE;
+            sessionStoreType = Constants.DEFAULT_SESSION_HA_STORE_TYPE;
         }
         
         LDAPConnection ld = null;

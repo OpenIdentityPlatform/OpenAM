@@ -42,10 +42,11 @@ import com.sun.identity.setup.SetupConstants;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.click.control.ActionLink;
-import org.forgerock.openam.common.OpenAMCommonConstants;
 
-public class Wizard extends AjaxPage implements OpenAMCommonConstants {
+import com.sun.identity.shared.Constants;
+import org.apache.click.control.ActionLink;
+
+public class Wizard extends AjaxPage implements Constants {
 
     public int startingTab = 1;
 
@@ -62,9 +63,9 @@ public class Wizard extends AjaxPage implements OpenAMCommonConstants {
     
     public static String defaultUserName = "cn=Directory Manager";
     public static String defaultPassword = "";
-    public static String defaultRootSuffix = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
-    public static String defaultSessionRootSuffix = OpenAMCommonConstants.DEFAULT_SESSION_HA_ROOT_DN;
-    public static String defaultSessionStoreType = OpenAMCommonConstants.DEFAULT_SESSION_HA_STORE_TYPE;
+    public static String defaultRootSuffix = DEFAULT_ROOT_SUFFIX;
+    public static String defaultSessionRootSuffix = DEFAULT_SESSION_HA_ROOT_DN;
+    public static String defaultSessionStoreType = DEFAULT_SESSION_HA_STORE_TYPE;
 
     public String defaultPort = Integer.toString(
         AMSetupServlet.getUnusedPort(hostName, 50389, 1000));

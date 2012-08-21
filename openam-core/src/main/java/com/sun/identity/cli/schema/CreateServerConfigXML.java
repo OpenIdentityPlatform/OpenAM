@@ -49,12 +49,13 @@ import java.io.InputStreamReader;
 import java.security.AccessController;
 import java.util.Iterator;
 import java.util.List;
+
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;
-import org.forgerock.openam.common.OpenAMCommonConstants;
 
-public class CreateServerConfigXML extends AuthenticatedCommand implements OpenAMCommonConstants {
+public class CreateServerConfigXML extends AuthenticatedCommand implements Constants {
 
     static final String DS_HOST = "dshost";
     static final String DS_PORT = "dsport";
@@ -107,7 +108,7 @@ public class CreateServerConfigXML extends AuthenticatedCommand implements OpenA
                 dsPasswordFile);
         }
         if ((basedn == null) || (basedn.length() == 0)) {
-            basedn = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
+            basedn = DEFAULT_ROOT_SUFFIX;
         }
         dsPassword = (String)AccessController.doPrivileged(
             new EncodeAction(dsPassword));

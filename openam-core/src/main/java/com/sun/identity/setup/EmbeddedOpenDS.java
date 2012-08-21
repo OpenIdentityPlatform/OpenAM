@@ -36,6 +36,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.ShutdownPriority;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 import java.io.BufferedInputStream;
@@ -77,7 +78,6 @@ import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPModification;
 import java.io.FilenameFilter;
 
-import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.opends.messages.Message;
 import org.opends.server.core.DirectoryServer;
 import org.opends.server.extensions.ConfigFileHandler;
@@ -482,7 +482,7 @@ public class EmbeddedOpenDS {
             "--adminConnectorPort",         // 1
             "4444",                         // 2
             "--baseDN",                     // 3
-            OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX,    // 4
+            Constants.DEFAULT_ROOT_SUFFIX,    // 4
             "--rootUserDN",                 // 5
             "cn=Directory Manager",         // 6
             "--ldapPort",                   // 7
@@ -740,7 +740,7 @@ public class EmbeddedOpenDS {
             "initialize",                 // 0
             "--no-prompt",                // 1
             "--baseDN",                   // 2
-            OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX,  // 3 Placeholder
+            Constants.DEFAULT_ROOT_SUFFIX,  // 3 Placeholder
             "--adminUID",                 // 4
             "admin",                      // 5
             "--adminPassword",            // 6

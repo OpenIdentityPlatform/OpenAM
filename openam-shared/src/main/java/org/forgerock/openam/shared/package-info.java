@@ -26,4 +26,4 @@
  * Portions Copyrighted [2010] [ForgeRock AS]
  *
  */
-package org.forgerock.openam.common;
+package org.forgerock.openam.shared;

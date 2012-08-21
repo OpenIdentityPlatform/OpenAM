@@ -78,6 +78,7 @@ public class Config {
         locale = System.getProperty(LOCALE);
         classpath = System.getProperty(CLASSPATH);
         jvmSpecVendor = System.getProperty(JVM_SPEC_VENDOR);
+
         dbImpl = SystemProperties.get(Constants.PROPERTIES_FILE, "");
     }
     

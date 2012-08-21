@@ -48,13 +48,13 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.ServiceManager;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.testng.annotations.Test;
 
 /**
@@ -65,7 +65,7 @@ public class PrivilegeUtilsTest {
 
     @Test
     public void testPrivilegeToPolicy() throws Exception {
-        String BASE_DN = OpenAMCommonConstants.DEFAULT_ROOT_SUFFIX;
+        String BASE_DN = Constants.DEFAULT_ROOT_SUFFIX;
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("GET", Boolean.TRUE);
         actionValues.put("POST", Boolean.TRUE);

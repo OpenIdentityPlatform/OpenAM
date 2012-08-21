@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
@@ -441,7 +440,7 @@ public class EmbeddedOpenDJ {
             "--adminConnectorPort",         // 1
             "5444",                         // 2
             "--baseDN",                     // 3
-            OpenAMCommonConstants.DEFAULT_SESSION_HA_ROOT_DN,                // 4
+            com.sun.identity.shared.Constants.DEFAULT_SESSION_HA_ROOT_DN,                // 4
             "--rootUserDN",                 // 5
             "cn=Directory Manager",         // 6
             "--ldapPort",                   // 7
