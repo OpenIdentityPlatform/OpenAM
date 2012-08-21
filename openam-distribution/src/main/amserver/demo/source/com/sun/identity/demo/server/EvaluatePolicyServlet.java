@@ -46,7 +46,7 @@ import com.iplanet.am.util.XMLUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.PolicyDecision;
 

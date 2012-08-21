@@ -66,7 +66,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 
 import com.sun.identity.security.AdminTokenAction;
 

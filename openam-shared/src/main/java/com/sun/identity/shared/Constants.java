@@ -59,11 +59,11 @@ public interface Constants {
     String AM_STATS_INTERVAL = "com.iplanet.am.stats.interval";
 
     /**
-     *  property string representing set of invalid strings in a goto or target
-     *  query parameter for a CDC Servlet
+     * property string representing set of invalid strings in a goto or target
+     * query parameter for a CDC Servlet
      */
     public static final String INVALID_GOTO_STRINGS =
-    "com.iplanet.services.cdc.invalidGotoStrings";
+            "com.iplanet.services.cdc.invalidGotoStrings";
 
     /**
      * Property string for state of <code>Stats</code> service.
@@ -156,15 +156,24 @@ public interface Constants {
     String AM_COOKIE_NAME = "com.iplanet.am.cookie.name";
 
     /**
-     * Property that determines whether to c66 encode session id 
+     *  property string for time to live of AM cookie, in minutes.
+     * If authentication was initiated with query parameter,
+     * <code>PERSIST_AM_COOKIE</code>=true, maxAge of AM session
+     * cookie is set to this value converted to seconds
+     */
+    public static final String AM_COOKIE_TIME_TO_LIVE
+            = "com.iplanet.am.cookie.timeToLive";
+
+    /**
+     * Property that determines whether to c66 encode session id
      * to convert to cookie string. Value would be read as boolean.
      * Any value other than "true", case ignored, would be treated
      * as <code>false</code>. c66 encoding is opensso specific
      * url safe char66 encoding
      *
-     * @see com.iplanet.dpro.session.SessionID#c66EncodeCookie()
-     * @see com.iplanet.dpro.session.SessionID#c66EncodeSidString(java.lang.String)
-     * @see com.iplanet.dpro.session.SessionID#c66DecodeCookieString(java.lang.String)
+     * @see <code>com.iplanet.dpro.session.SessionID#c66EncodeCookie()</code>
+     * @see <code>com.iplanet.dpro.session.SessionID#c66EncodeSidString(java.lang.String)</code>
+     * @see <code>com.iplanet.dpro.session.SessionID#c66DecodeCookieString(java.lang.String)</code>
      */
     String C66_ENCODE_AM_COOKIE = "com.iplanet.am.cookie.c66Encode";
 
@@ -222,13 +231,13 @@ public interface Constants {
      * Property string for SAML XML signature key store file.
      */
     String SAML_XMLSIG_KEYSTORE =
-        "com.sun.identity.saml.xmlsig.keystore";
+            "com.sun.identity.saml.xmlsig.keystore";
 
     /**
      * Property string for SAML XML signature key store password file.
      */
-    String SAML_XMLSIG_STORE_PASS = 
-        "com.sun.identity.saml.xmlsig.storepass";
+    String SAML_XMLSIG_STORE_PASS =
+            "com.sun.identity.saml.xmlsig.storepass";
 
     /**
      * Property string for SAML XML signature key password file.
@@ -243,16 +252,16 @@ public interface Constants {
     /**
      * Property string for authentication super user.
      */
-    String AUTHENTICATION_SUPER_USER = 
-        "com.sun.identity.authentication.super.user";
+    String AUTHENTICATION_SUPER_USER =
+            "com.sun.identity.authentication.super.user";
 
     String CONSOLE_PRIVILEGED_USERS =
             "console.privileged.users";
     /**
      * Property string for authentication super user.
      */
-    String AUTHENTICATION_SPECIAL_USERS = 
-        "com.sun.identity.authentication.special.users";
+    String AUTHENTICATION_SPECIAL_USERS =
+            "com.sun.identity.authentication.special.users";
 
     /**
      * Property string for installation directory
@@ -274,44 +283,44 @@ public interface Constants {
      * Property string for service deployment descriptor
      */
     String AM_SERVICES_DEPLOYMENT_DESCRIPTOR =
-        "com.iplanet.am.services.deploymentDescriptor";
+            "com.iplanet.am.services.deploymentDescriptor";
 
     /**
      * Property string for console deployment descriptor
      */
     String AM_CONSOLE_DEPLOYMENT_DESCRIPTOR =
-        "com.iplanet.am.console.deploymentDescriptor";
+            "com.iplanet.am.console.deploymentDescriptor";
 
     /**
      * property string which contains the name of HTTP session tracking cookie
      */
-    String AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME = 
-        "com.iplanet.am.session.failover.httpSessionTrackingCookieName";
+    String AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME =
+            "com.iplanet.am.session.failover.httpSessionTrackingCookieName";
 
     /**
      * property string to choose whether local or remote saving method is used
      */
-    String AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD = 
-        "com.iplanet.am.session.failover.useRemoteSaveMethod";
+    String AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD =
+            "com.iplanet.am.session.failover.useRemoteSaveMethod";
 
     /**
      * property string to choose whether we rely on app server load balancer to
      * do the request routing or use our own
      */
-    String AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING = 
-        "com.iplanet.am.session.failover.useInternalRequestRouting";
+    String AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING =
+            "com.iplanet.am.session.failover.useInternalRequestRouting";
 
     /**
      * Property string for failover cluster state check timeout
      */
-    String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT = 
-        "com.iplanet.am.session.failover.cluster.stateCheck.timeout";
+    String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT =
+            "com.iplanet.am.session.failover.cluster.stateCheck.timeout";
 
     /**
      * Property string for failover cluster state check period
      */
-    String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD = 
-        "com.iplanet.am.session.failover.cluster.stateCheck.period";
+    String AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD =
+            "com.iplanet.am.session.failover.cluster.stateCheck.period";
 
     /**
      * Property string for max number of sessions
@@ -341,13 +350,13 @@ public interface Constants {
     /**
      * Property string for CDSSO cookie domain.
      */
-    String SERVICES_CDSSO_COOKIE_DOMAIN = 
-        "com.iplanet.services.cdsso.cookiedomain";
+    String SERVICES_CDSSO_COOKIE_DOMAIN =
+            "com.iplanet.services.cdsso.cookiedomain";
 
     /**
      * Property string for maximum content-length accepted in HttpRequest.
      */
-    String SERVICES_COMM_SERVER_PLLREQUEST_MAX_CONTENT_LENGTH = 
+    String SERVICES_COMM_SERVER_PLLREQUEST_MAX_CONTENT_LENGTH =
             "com.iplanet.services.comm.server.pllrequest.maxContentLength";
 
     /**
@@ -363,14 +372,14 @@ public interface Constants {
     /**
      * Property string for federation service cookie.
      */
-    String FEDERATION_FED_COOKIE_NAME = 
-        "com.sun.identity.federation.fedCookieName";
+    String FEDERATION_FED_COOKIE_NAME =
+            "com.sun.identity.federation.fedCookieName";
 
     /**
      * Property string for session notification thread pool size.
      */
-    String NOTIFICATION_THREADPOOL_SIZE = 
-        "com.iplanet.am.notification.threadpool.size";
+    String NOTIFICATION_THREADPOOL_SIZE =
+            "com.iplanet.am.notification.threadpool.size";
 
     /**
      * Property string for name of the webcontainer.
@@ -380,8 +389,8 @@ public interface Constants {
     /**
      * Property string for session notification thread pool queue size.
      */
-    String NOTIFICATION_THREADPOOL_THRESHOLD = 
-        "com.iplanet.am.notification.threadpool.threshold";
+    String NOTIFICATION_THREADPOOL_THRESHOLD =
+            "com.iplanet.am.notification.threadpool.threshold";
 
     /**
      * Property string for fully qualified host name map.
@@ -417,49 +426,49 @@ public interface Constants {
      * Property string for determining if cookie needs to be written in the URL
      * as a path info.
      */
-    String REWRITE_AS_PATH = 
-        "com.sun.identity.cookieRewritingInPath";
+    String REWRITE_AS_PATH =
+            "com.sun.identity.cookieRewritingInPath";
 
     /**
      * Property string for determining if session cookie needs to be appended
      * in the URL
      */
-    String APPEND_SESS_COOKIE_IN_URL = 
-        "com.sun.identity.appendSessionCookieInURL";
+    String APPEND_SESS_COOKIE_IN_URL =
+            "com.sun.identity.appendSessionCookieInURL";
 
     /**
      * Property string for Application session max-caching-time.
      */
-    String APPLICATION_SESSION_MAX_CACHING_TIME = 
-        "com.sun.identity.session.application.maxCacheTime";
+    String APPLICATION_SESSION_MAX_CACHING_TIME =
+            "com.sun.identity.session.application.maxCacheTime";
 
     /**
      * Property string to enable Session/Cookie hijacking mode in Access
      * Manager.
      */
     String IS_ENABLE_UNIQUE_COOKIE =
-        "com.sun.identity.enableUniqueSSOTokenCookie";
+            "com.sun.identity.enableUniqueSSOTokenCookie";
 
     /**
      * Property string for 'HostUrl' Cookie name in Session/Cookie hijacking
      * mode.
      */
-    String AUTH_UNIQUE_COOKIE_NAME = 
-        "com.sun.identity.authentication.uniqueCookieName";
+    String AUTH_UNIQUE_COOKIE_NAME =
+            "com.sun.identity.authentication.uniqueCookieName";
 
     /**
      * Property string for unique Cookie domain in Session/Cookie hijacking
      * mode.
      */
     String AUTH_UNIQUE_COOKIE_DOMAIN =
-        "com.sun.identity.authentication.uniqueCookieDomain";
+            "com.sun.identity.authentication.uniqueCookieDomain";
 
     /**
      * Property string for checking if remote method
      * <code>AddListenerOnAllSessions</code> is enabled.
      */
     String ENABLE_ADD_LISTENER_ON_ALL_SESSIONS =
-        "com.sun.am.session.enableAddListenerOnAllSessions";
+            "com.sun.am.session.enableAddListenerOnAllSessions";
 
     /**
      * Property string for list of IP address of remote clients which are
@@ -472,8 +481,8 @@ public interface Constants {
      * Property string to Identify the Http Header which returns the Client IP
      * address when running in loadbalancer configuration.
      */
-    String HTTP_CLIENT_IP_HEADER = 
-        "com.sun.identity.session.httpClientIPHeader";
+    String HTTP_CLIENT_IP_HEADER =
+            "com.sun.identity.session.httpClientIPHeader";
 
     /**
      * Property string to ensure more stringent (security-wise) check If enabled
@@ -491,21 +500,21 @@ public interface Constants {
      * Property string to determine if authentication enforces using seperate
      * JAAS thread or not.
      */
-    String ENFORCE_JAAS_THREAD = 
-        "com.sun.identity.authentication.usingJaasThread";
+    String ENFORCE_JAAS_THREAD =
+            "com.sun.identity.authentication.usingJaasThread";
 
     /**
      * Property string to list all the Session properties that should be
      * protected.
      */
-    String PROTECTED_PROPERTIES_LIST = 
-        "com.iplanet.am.session.protectedPropertiesList";
+    String PROTECTED_PROPERTIES_LIST =
+            "com.iplanet.am.session.protectedPropertiesList";
 
     /**
      * Property string to set max idle timeout for agent sessions
      */
     String AGENT_SESSION_IDLE_TIME =
-        "com.iplanet.am.session.agentSessionIdleTime";
+            "com.iplanet.am.session.agentSessionIdleTime";
 
     /**
      * Property for Login URL.
@@ -516,11 +525,11 @@ public interface Constants {
      * Property for checking the cookie support / cookie enabled in the browser
      */
     public static final String AM_COOKIE_CHECK =
-        "com.sun.identity.am.cookie.check";
+            "com.sun.identity.am.cookie.check";
 
     /**
      * System property name that is a list of package name prefixes is used to
-     * resolve protocol names into actual handler class names. 
+     * resolve protocol names into actual handler class names.
      */
     String PROTOCOL_HANDLER = "opensso.protocol.handler.pkgs";
 
@@ -558,14 +567,14 @@ public interface Constants {
     /**
      * Global schema property name in Session Service.
      */
-    String PROPERTY_CHANGE_NOTIFICATION = 
-        "iplanet-am-session-property-change-notification";
+    String PROPERTY_CHANGE_NOTIFICATION =
+            "iplanet-am-session-property-change-notification";
 
     /**
      * Global schema property name in Session Service.
      */
     String NOTIFICATION_PROPERTY_LIST =
-        "iplanet-am-session-notification-property-list";
+            "iplanet-am-session-notification-property-list";
 
     String TIMEOUT_HANDLER_LIST =
             "openam-session-timeout-handler-list";
@@ -579,26 +588,26 @@ public interface Constants {
      * Property string for session polling thread pool size.
      */
     String POLLING_THREADPOOL_SIZE =
-        "com.sun.identity.session.polling.threadpool.size";
+            "com.sun.identity.session.polling.threadpool.size";
 
     /**
      * Property string for session polling thread pool queue size.
      */
-    String POLLING_THREADPOOL_THRESHOLD = 
-        "com.sun.identity.session.polling.threadpool.threshold";
+    String POLLING_THREADPOOL_THRESHOLD =
+            "com.sun.identity.session.polling.threadpool.threshold";
 
     /**
      * Property for enabling or disabling encryption for Session Repository.
      */
-    String SESSION_REPOSITORY_ENCRYPTION = 
-        "com.sun.identity.session.repository.enableEncryption";
+    String SESSION_REPOSITORY_ENCRYPTION =
+            "com.sun.identity.session.repository.enableEncryption";
 
     /**
      * Property string for determining whether or not appplication sessions
      * should be returned via the getValidSessions() call.
      */
-    String SESSION_RETURN_APP_SESSION = 
-        "com.sun.identity.session.returnAppSession";
+    String SESSION_RETURN_APP_SESSION =
+            "com.sun.identity.session.returnAppSession";
 
     /**
      * HTTP Form Parameter name used by PEP for posting policy advices to
@@ -617,9 +626,10 @@ public interface Constants {
      */
     String AUTH_SCHEME_CONDITION_ADVICE = "AuthSchemeConditionAdvice";
 
-    /** Key that is used to identify the advice messages from
+    /**
+     * Key that is used to identify the advice messages from
      * <code>AuthLevelCondition</code>.
-     */   
+     */
     String AUTH_LEVEL_CONDITION_ADVICE = "AuthLevelConditionAdvice";
 
     /**
@@ -664,18 +674,13 @@ public interface Constants {
      * will not be reaped.
      */
     String LDAP_CONN_IDLE_TIME_IN_SECS =
-        "com.sun.am.ldap.connnection.idle.seconds";
+            "com.sun.am.ldap.connnection.idle.seconds";
 
     /**
-     *  Property string for Fallback Monitoring thread polling interval
+     * Property string for Fallback Monitoring thread polling interval
      */
     String LDAP_FALLBACK_SLEEP_TIME_IN_MINS =
-        "com.sun.am.ldap.fallback.sleep.minutes";
-
-    /**
-     * Constant for file separator.
-     */
-    String FILE_SEPARATOR = "/";
+            "com.sun.am.ldap.fallback.sleep.minutes";
 
     /**
      * Install Time System property key.
@@ -688,13 +693,13 @@ public interface Constants {
      * succeed.
      */
     String FORWARD_PARAM = "forwardrequest";
-                                                                                
+
     /**
-     * Value is for <code>FORWARD_PARAM</code> to indicate that the 
+     * Value is for <code>FORWARD_PARAM</code> to indicate that the
      * authentication component should forward request.
      */
     String FORWARD_YES_VALUE = "yes";
-    
+
     /**
      * Attribute name for the load balancer cookie in the
      * Naming Response.
@@ -721,30 +726,30 @@ public interface Constants {
      * Property string for URL Checker Target URL
      */
     String URLCHECKER_INVALIDATE_INTERVAL =
-        "com.sun.identity.urlchecker.invalidate.interval";
+            "com.sun.identity.urlchecker.invalidate.interval";
 
     /**
      * Property string for URL Checker Sleep Interval
      */
     String URLCHECKER_SLEEP_INTERVAL =
-        "com.sun.identity.urlchecker.sleep.interval";
+            "com.sun.identity.urlchecker.sleep.interval";
 
     /**
-     *  Property string for URL Checker Retry Interval
+     * Property string for URL Checker Retry Interval
      */
-    public static final String URLCHECKER_RETRY_INTERVAL = 
-                  "com.sun.identity.urlchecker.retry.interval";
+    public static final String URLCHECKER_RETRY_INTERVAL =
+            "com.sun.identity.urlchecker.retry.interval";
     /**
-     *  Property string for URL Checker Retry Limit
+     * Property string for URL Checker Retry Limit
      */
-    public static final String URLCHECKER_RETRY_LIMIT = 
-                  "com.sun.identity.urlchecker.retry.limit";
+    public static final String URLCHECKER_RETRY_LIMIT =
+            "com.sun.identity.urlchecker.retry.limit";
 
     /**
      * Property string for Site Status Check Class name
      */
     String SITE_STATUS_CHECK_CLASS =
-        "com.sun.identity.sitemonitor.SiteStatusCheck.class";
+            "com.sun.identity.sitemonitor.SiteStatusCheck.class";
 
     /**
      * Property string for Site Status Check timeout
@@ -758,7 +763,7 @@ public interface Constants {
      * its considered protected.
      */
     String AM_PROTECTED_PROPERTY_PREFIX =
-        "am.protected";
+            "am.protected";
 
     /**
      * Property string to determine whether to set auth cookies to all
@@ -806,48 +811,48 @@ public interface Constants {
      * Platform service name.
      */
     String SVC_NAME_PLATFORM = "iPlanetAMPlatformService";
-    
+
     /**
      * LDAP server host name for saml2 crl cache
      */
     String CRL_CACHE_DIR_HOST =
-        "com.sun.identity.crl.cache.directory.host";
+            "com.sun.identity.crl.cache.directory.host";
 
     /**
      * LDAP server port number for saml2 crl cache
      */
     String CRL_CACHE_DIR_PORT =
-        "com.sun.identity.crl.cache.directory.port";
+            "com.sun.identity.crl.cache.directory.port";
 
     /**
      * LDAP server ssl config for saml2 crl cache
      */
     String CRL_CACHE_DIR_SSL_ENABLED =
-        "com.sun.identity.crl.cache.directory.ssl";
+            "com.sun.identity.crl.cache.directory.ssl";
 
     /**
      * LDAP Server bind user name for saml2 crl cache
      */
     String CRL_CACHE_DIR_USER =
-        "com.sun.identity.crl.cache.directory.user";
+            "com.sun.identity.crl.cache.directory.user";
 
     /**
      * LDAP Server bind password for saml2 crl cache
      */
     String CRL_CACHE_DIR_PASSWD =
-        "com.sun.identity.crl.cache.directory.password";
+            "com.sun.identity.crl.cache.directory.password";
 
     /**
      * LDAP Server search base dn for saml2 crl cache
      */
     String CRL_CACHE_DIR_SEARCH_LOC =
-        "com.sun.identity.crl.cache.directory.searchlocs";
+            "com.sun.identity.crl.cache.directory.searchlocs";
 
     /**
      * LDAP attribute name for searching crl entry
      */
     String CRL_CACHE_DIR_SEARCH_ATTR =
-        "com.sun.identity.crl.cache.directory.searchattr";        
+            "com.sun.identity.crl.cache.directory.searchattr";
 
     /**
      * Naming service name.
@@ -855,10 +860,10 @@ public interface Constants {
     String SVC_NAME_NAMING = "iPlanetAMNamingService";
 
     /**
-     * Certificate Alias name for SSL Client Auth 
+     * Certificate Alias name for SSL Client Auth
      */
     String CLIENT_CERTIFICATE_ALIAS =
-        "com.sun.identity.security.keyStore.clientAlias";        
+            "com.sun.identity.security.keyStore.clientAlias";
 
     /**
      * User service name.
@@ -876,22 +881,22 @@ public interface Constants {
     String SVC_NAME_SAML = "iPlanetAMSAMLService";
 
     /**
-     * Certificate Alias name for SSL Client Auth 
+     * Certificate Alias name for SSL Client Auth
      */
     String URL_CONNECTION_USE_CACHE =
-        "com.sun.identity.urlconnection.useCache";        
-        
+            "com.sun.identity.urlconnection.useCache";
+
     /**
      * Property string for distauth deployment descriptor
      */
     String AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR =
-        "com.iplanet.am.distauth.deploymentDescriptor";        
-       
+            "com.iplanet.am.distauth.deploymentDescriptor";
+
     /**
      * Property string for cdc servlet login url
      */
     String CDCSERVLET_LOGIN_URL =
-        "com.sun.identity.cdcservlet.loginurl";        
+            "com.sun.identity.cdcservlet.loginurl";
 
     /**
      * Property name for data encryption key
@@ -902,14 +907,14 @@ public interface Constants {
      * Property string for load balancer cookie value.
      */
     String PROPERTY_NAME_LB_COOKIE_VALUE =
-        "com.iplanet.am.lbcookie.value";
+            "com.iplanet.am.lbcookie.value";
 
     /**
      * Key name for serverid-cookievalue list in naming table.
      */
     String SERVERID_LBCOOKIEVALUE_LIST =
-        "iplanet-am-platform-lb-cookie-value-list";
-        
+            "iplanet-am-platform-lb-cookie-value-list";
+
     /**
      * Configuration Variable for distauth bootstrap file base directory.
      */
@@ -919,90 +924,90 @@ public interface Constants {
      * Configuration Variable for distauth bootstrap file name.
      */
     String CONFIG_VAR_DISTAUTH_BOOTSTRAP_FILENAME = "AMDistAuthConfig.properties";
-    
+
     /**
      * property string for enabling SMS datastore notification
      */
     public static final String SMS_ENABLE_DB_NOTIFICATION =
-        "com.sun.identity.sm.enableDataStoreNotification";
+            "com.sun.identity.sm.enableDataStoreNotification";
 
     /**
      * property string for controlling SMS, AMSDK & IdRepo cache
      */
     static String SDK_GLOBAL_CACHE_PROPERTY =
-        "com.iplanet.am.sdk.caching.enabled";
+            "com.iplanet.am.sdk.caching.enabled";
 
     /**
      * property string for controlling SMS cache.
      * Active only if "com.iplanet.am.sdk.caching.enabled" is "false"
      */
     static String SMS_CACHE_PROPERTY = "com.sun.identity.sm.cache.enabled";
-    
+
     /**
      * property string to enable SMS cache expiry time.
      */
     static String SMS_CACHE_TTL_ENABLE = "com.sun.identity.sm.cache.ttl.enable";
-    
+
     /**
      * property string for controlling SMS cache expiry time, in minutes.
      * The default values is 30 minutes. After the expiry time the next access
      * to the object will fetched from the backend datastore.
      */
     static String SMS_CACHE_TTL = "com.sun.identity.sm.cache.ttl";
-    
+
     /**
      * property string to manage the persistent connection to directory
      */
     static final String EVENT_LISTENER_DISABLE_LIST =
-        "com.sun.am.event.connection.disable.list";
-    
-    /**
-     *  property string to cache past event changes in minutes
-     */
-    static final String EVENT_LISTENER_REMOTE_CLIENT_BACKLOG_CACHE =
-        "com.sun.am.event.notification.expire.time";
-                
-    /**
-     * Global schema property name in Session Service.
-     * constant used for session trimming when purge delay > 0 
-     */
-    static final String ENABLE_TRIM_SESSION = 
-        "iplanet-am-session-enable-session-trimming";        
+            "com.sun.am.event.connection.disable.list";
 
     /**
-      * property string to the size of SystemTimerPool
-      */
+     * property string to cache past event changes in minutes
+     */
+    static final String EVENT_LISTENER_REMOTE_CLIENT_BACKLOG_CACHE =
+            "com.sun.am.event.notification.expire.time";
+
+    /**
+     * Global schema property name in Session Service.
+     * constant used for session trimming when purge delay > 0
+     */
+    static final String ENABLE_TRIM_SESSION =
+            "iplanet-am-session-enable-session-trimming";
+
+    /**
+     * property string to the size of SystemTimerPool
+     */
     public static final String SYSTEM_TIMERPOOL_SIZE =
-        "com.sun.identity.common.systemtimerpool.size";
+            "com.sun.identity.common.systemtimerpool.size";
 
     /**
      * property string for Distributed Authentication cluster
      */
-    public static final String DISTAUTH_CLUSTER = 
-        "com.sun.identity.distauth.cluster";
+    public static final String DISTAUTH_CLUSTER =
+            "com.sun.identity.distauth.cluster";
 
     /**
      * property string for Krb5LoginModule class name
      */
-    public static final String KRB5_LOGINMODULE = 
-     "com.sun.identity.authentication.module.WindowsDesktopSSO.Krb5LoginModule";
-    public static final String DEFAULT_KRB5_LOGINMODULE = 
-        "com.sun.security.auth.module.Krb5LoginModule";
+    public static final String KRB5_LOGINMODULE =
+            "com.sun.identity.authentication.module.WindowsDesktopSSO.Krb5LoginModule";
+    public static final String DEFAULT_KRB5_LOGINMODULE =
+            "com.sun.security.auth.module.Krb5LoginModule";
     public static final String KRB5_CREDENTIAL_TYPE =
-        "com.sun.identity.authentication.module.WindowsDesktopSSO.credsType";
+            "com.sun.identity.authentication.module.WindowsDesktopSSO.credsType";
 
     /**
      * property to control whether remote auth includes request/response
      */
     public static final String REMOTEAUTH_INCLUDE_REQRES =
-        "openam.remoteauth.include.reqres";
+            "openam.remoteauth.include.reqres";
 
     /**
      * property to control if the OpenAM session cookie should be made
      * persistent
      */
     public static final String PERSIST_AM_COOKIE =
-        "openam.session.persist_am_cookie";
+            "openam.session.persist_am_cookie";
 
     /**
      * property to control if the OpenAM server will persist the OpenAM
@@ -1010,31 +1015,31 @@ public interface Constants {
      * <code>PersistAMCookie</code>.
      */
     public static final String ALLOW_PERSIST_AM_COOKIE =
-        "openam.session.allow_persist_am_cookie";
+            "openam.session.allow_persist_am_cookie";
 
     /**
      * Server configuration property for the OpenDS admin port
      */
     public static final String DS_ADMIN_PORT =
-        "org.forgerock.embedded.dsadminport";
+            "org.forgerock.embedded.dsadminport";
 
     /**
      * OpenDS Replication Port
      */
     public static final String EMBED_REPL_PORT =
-        "com.sun.embedded.replicationport";
+            "com.sun.embedded.replicationport";
 
     /**
      * OpenDS Replication Port
      */
     public static final String EMBED_SYNC_SERVERS =
-        "com.sun.embedded.sync.servers";
+            "com.sun.embedded.sync.servers";
 
     /**
      * Configuration property to enable the site monitor in the naming service
      */
     public static final String SITEMONITOR_DISABLED =
-        "openam.naming.sitemonitor.disabled";
+            "openam.naming.sitemonitor.disabled";
 
     /**
      * EQUALS sign
@@ -1050,7 +1055,7 @@ public interface Constants {
      * colon sign
      */
     public static final String COLON = ":";
-    
+
     /**
      * colon sign
      */
@@ -1070,36 +1075,54 @@ public interface Constants {
      * empty string
      */
     public static final String EMPTY = "";
-     
+
+    /**
+     * Constant for file separator
+     */
+    public static String FILE_SEPARATOR = "/";
+
+    /**
+     * Property string for sm and um notification thread pool size
+     */
+    public static String SM_THREADPOOL_SIZE =
+            "com.sun.identity.sm.notification.threadpool.size";
+
+    /**
+     * Key to indicate if the customer is performing auths via mutiple tabs
+     * of the same browser.
+     */
+    public static final String MULTIPLE_TABS_USED =
+            "com.sun.identity.authentication.multiple.tabs.used";
+
     /**
      * empty string
      */
     public static final String DELIMITER_PREF_LEFT =
-        "openam.entitlement.delimiter.precedence.left";
+            "openam.entitlement.delimiter.precedence.left";
 
     public static final String USE_OLD_LOG_FORMAT =
-        "openam.logging.use.old.log.format";
+            "openam.logging.use.old.log.format";
 
     public static final String SESSION_UPGRADER_IMPL =
-        "openam.auth.session_property_upgrader";
+            "openam.auth.session_property_upgrader";
 
     public static final String DEFAULT_SESSION_UPGRADER_IMPL =
-        "org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader";
+            "org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader";
 
     /**
      * Property for dist auth cookie name.
      */
     public static final String AM_DIST_AUTH_COOKIE_NAME =
-        "openam.auth.distAuthCookieName";
+            "openam.auth.distAuthCookieName";
 
     public static final String DESTROY_SESSION_AFTER_UPGRADE =
-        "openam.auth.destroy_session_after_upgrade";
-    
+            "openam.auth.destroy_session_after_upgrade";
+
     public static final String AUTH_RATE_MONITORING_INTERVAL =
-        "openam.auth.rate_monitoring_interval";
+            "openam.auth.rate_monitoring_interval";
 
     public static final String CASE_SENSITIVE_UUID =
-        "openam.session.case.sensitive.uuid";
+            "openam.session.case.sensitive.uuid";
 
     public static final String RETAINED_HTTP_HEADERS_LIST =
             "openam.retained.http.headers";
@@ -1121,14 +1144,14 @@ public interface Constants {
 
     public static final String AM_DISTAUTH_LB_COOKIE_VALUE =
             "openam.auth.distauth.lb_cookie_value";
-    
+
     public static final String AM_DISTAUTH_SITES =
             "openam.auth.distauth.sites";
-    
+
     /**
      * Key name for site ID list in naming table.
      */
-    public static final String SITE_NAMES_LIST = 
+    public static final String SITE_NAMES_LIST =
             "openam-am-platform-site-names-list";
 
     public static final String RUNTIME_SHUTDOWN_HOOK_ENABLED =
@@ -1137,22 +1160,22 @@ public interface Constants {
      * Property string for client IP address header.
      */
     public static final String CLIENT_IP_ADDR_HEADER =
-        "com.sun.identity.authentication.client.ipAddressHeader";
-    
-    public static final String VERSION_DATE_FORMAT = 
-        "yyyy-MMMM-dd HH:mm";
-    
+            "com.sun.identity.authentication.client.ipAddressHeader";
+
+    public static final String VERSION_DATE_FORMAT =
+            "yyyy-MMMM-dd HH:mm";
+
     /**
      * Switch to allow for a generic Authentication Exception rather than
      * the more specific InvalidPassword Exception from the SOAP and REST API
      */
     public static final String GENERIC_SOAP_REST_AUTHENTICATION_EXCEPTION =
             "openam.auth.soap.rest.generic.authentication.exception";
-    
+
     /**
      * Switch to allow using local sessions to track session counts when running
      * in SessionCount.MULTI_SERVER_MODE.
      */
     public static final String USE_LOCAL_SESSIONS_IN_MULTI_SERVER_MODE =
-        "openam.session.useLocalSessionsInMultiServerMode";
+            "openam.session.useLocalSessionsInMultiServerMode";
 }

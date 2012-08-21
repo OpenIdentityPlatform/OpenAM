@@ -94,4 +94,21 @@ public class AMSessionDBOpenDJServer implements Serializable {
     public void setReplPort(String replPort) {
         this.replPort = replPort;
     }
+
+
+    public enum AmSessionDbAttr {
+        ADMIN_PORT("adminPort"), LDAP_PORT("ldapPort"), JMX_PORT("jmxPort"), REPL_PORT("replPort");
+
+        private final String text;
+
+        private AmSessionDbAttr(String text) {
+            this.text = text;
+        }
+
+        @Override public String toString() {
+            return text;
+        }
+    }
+
+
 }

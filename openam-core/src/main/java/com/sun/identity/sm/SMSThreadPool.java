@@ -28,7 +28,7 @@
 
 package com.sun.identity.sm;
 
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.debug.Debug;

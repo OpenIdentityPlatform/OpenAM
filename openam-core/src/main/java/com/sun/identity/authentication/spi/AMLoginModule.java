@@ -2054,7 +2054,7 @@ public abstract class AMLoginModule implements LoginModule {
                 debug.message("Validating username...");
                 Map envMap = new HashMap(2);
                 envMap.put(
-                 com.sun.identity.common.Constants.ORGANIZATION_NAME,
+                 com.sun.identity.shared.Constants.ORGANIZATION_NAME,
                  getRequestOrg());
                 plugin.validateUserID(userName, envMap);
             } else if (regEx != null && (regEx.length() != 0)) {

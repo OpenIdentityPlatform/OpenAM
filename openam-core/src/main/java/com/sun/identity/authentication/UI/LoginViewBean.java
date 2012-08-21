@@ -2233,7 +2233,7 @@ public class LoginViewBean extends AuthViewBeanBase {
    public void enableCookieTimeToLive() {
        int cookieTimeToLive = 0;
        String cookieTimeToLiveString = SystemProperties.get(
-            com.sun.identity.common.Constants.AM_COOKIE_TIME_TO_LIVE);
+            com.sun.identity.shared.Constants.AM_COOKIE_TIME_TO_LIVE);
      if ((cookieTimeToLiveString != null)
                && (cookieTimeToLiveString.length() != 0)) {
            try {

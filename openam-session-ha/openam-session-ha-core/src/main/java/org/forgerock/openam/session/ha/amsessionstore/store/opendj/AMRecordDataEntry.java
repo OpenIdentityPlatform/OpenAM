@@ -42,6 +42,7 @@ import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import org.forgerock.openam.session.model.AMRootEntity;
+import org.forgerock.openam.session.model.FAMRecord;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
@@ -221,6 +222,14 @@ public class AMRecordDataEntry {
             if (((AMRecord)record).getData() != null) {
                 set = new HashSet<String>();
                 set.add(((AMRecord)record).getData());
+                attributeValues.put(DATA, set);
+            }
+        } else if (record instanceof FAMRecord)
+        {
+            if (((FAMRecord)record).getBlob() != null) {
+                // TODO -- This needs to be addressed!!!!!!
+                set = new HashSet<String>();
+                set.add(((FAMRecord)record).getBlob().toString());
                 attributeValues.put(DATA, set);
             }
         }

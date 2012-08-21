@@ -80,7 +80,7 @@ public class AMUserPasswordValidationPlugin extends AMUserPasswordValidation
         SSOToken token = (SSOToken) AccessController
                 .doPrivileged(AdminTokenAction.getInstance());
         String orgDN = (String) envParams
-                .get(com.sun.identity.common.Constants.ORGANIZATION_NAME);
+                .get(com.sun.identity.shared.Constants.ORGANIZATION_NAME);
         String regEx = getOrgUserInvalidChars(orgDN, token);
         if (userID == null || userID.length() == 0) {
             debug.error("AMUserPasswordValidationPlugin."

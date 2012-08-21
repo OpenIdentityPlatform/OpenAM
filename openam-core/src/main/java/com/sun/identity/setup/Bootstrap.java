@@ -43,7 +43,7 @@ import com.sun.identity.authentication.internal.AuthContext;
 import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.authentication.internal.server.SMSAuthModule;
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.common.DebugPropertiesObserver;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.shared.debug.Debug;

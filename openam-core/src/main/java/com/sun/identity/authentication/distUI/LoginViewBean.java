@@ -1894,8 +1894,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         cookie = null;
     }
     
-    /** Clear cookie and destroy session
-     *  @param ac AuthContext for this request
+    /**
+     * Clear cookie and destroy session
      */
     private void clearCookieAndDestroySession() {
         // clear cookie, destroy orignal invalid session
@@ -2114,7 +2114,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
    public void enableCookieTimeToLive() {
        String cookieTimeToLiveString = SystemProperties.get(
-            com.sun.identity.common.Constants.AM_COOKIE_TIME_TO_LIVE);
+            com.sun.identity.shared.Constants.AM_COOKIE_TIME_TO_LIVE);
        if ((cookieTimeToLiveString != null)
                && (cookieTimeToLiveString.length() != 0)) {
            try {

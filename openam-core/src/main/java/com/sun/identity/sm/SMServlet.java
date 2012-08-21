@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 
 /**
  * The <code>SMServlet</code> provides`simple http interface to obtain service

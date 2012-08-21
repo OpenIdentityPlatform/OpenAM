@@ -28,6 +28,7 @@
 
 package com.sun.identity.common;
 
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.search.FileLookup;
 import com.sun.identity.shared.search.FileLookupException;

@@ -23,7 +23,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.store.opendj;
+package org.forgerock.openam.session.ha.amsessionstore.store.opendj.setup;
 
 import org.forgerock.i18n.LocalizableMessage;
 import java.io.BufferedInputStream;
@@ -57,7 +57,8 @@ import org.forgerock.openam.common.OpenAMCommonConstants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.setup.SetupProgress;
+import org.forgerock.openam.session.ha.amsessionstore.store.opendj.AMSessionDBOpenDJServer;
+import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJConfig;
 import org.opends.messages.Message;
 import org.opends.server.core.AddOperation;
 import org.opends.server.core.DeleteOperation;
@@ -154,8 +155,7 @@ public class EmbeddedOpenDJ {
      * <li>invokes <code>EmbeddedUtils</code> to start the embedded server.
      * </ul>
      *
-     *  @param map Map of properties collected by the configurator.
-     *  @param servletCtx Servlet Context to read deployed war contents.
+     *  @param odjRoot Directory Root.
      *  @throws Exception on encountering errors.
      */
     public static void setup(String odjRoot)
@@ -514,7 +514,7 @@ public class EmbeddedOpenDJ {
         }
     }
     
-    public static Set<AMSessionDBOpenDJServer> getServers() 
+    public static Set<AMSessionDBOpenDJServer> getServers()
     throws StoreException {
         InternalClientConnection icConn = InternalClientConnection.getRootConnection();
         Set<AMSessionDBOpenDJServer> serverList = new HashSet<AMSessionDBOpenDJServer>();
@@ -611,13 +611,13 @@ public class EmbeddedOpenDJ {
     
     private static String getAttrName(String key) {
         if (key.equals(Constants.OPENDJ_ADMIN_PORT)) {
-            return OpenDJConfig.AmSessionDbAttr.ADMIN_PORT.toString();
+            return AMSessionDBOpenDJServer.AmSessionDbAttr.ADMIN_PORT.toString();
         } else if (key.equals(Constants.OPENDJ_LDAP_PORT)) {
-            return OpenDJConfig.AmSessionDbAttr.LDAP_PORT.toString();
+            return AMSessionDBOpenDJServer.AmSessionDbAttr.LDAP_PORT.toString();
         } else if (key.equals(Constants.OPENDJ_JMX_PORT)) {
-            return OpenDJConfig.AmSessionDbAttr.JMX_PORT.toString();
+            return AMSessionDBOpenDJServer.AmSessionDbAttr.JMX_PORT.toString();
         } else if (key.equals(Constants.OPENDJ_REPL_PORT)) {
-            return OpenDJConfig.AmSessionDbAttr.REPL_PORT.toString();
+            return AMSessionDBOpenDJServer.AmSessionDbAttr.REPL_PORT.toString();
         } else {
             final LocalizableMessage message = DB_INV_MAP.get(key);
             Log.logger.log(Level.WARNING, message.toString());
@@ -751,7 +751,7 @@ public class EmbeddedOpenDJ {
      *    --baseDN "dc=amsessiondb,dc=com" -X -n
      *
      *
-     *  @param map Map of configuration properties 
+     *  @param localMap Map of configuration properties
      *  @return status : 0 == success, !0 == failure
      */
     public static int replicationDisable(Map<String, String> localMap) {
@@ -805,7 +805,8 @@ public class EmbeddedOpenDJ {
       *     --hostDestination host2 --portDestination 2389
       *     --trustAll
       *
-      *  @param map Map of configuration properties 
+      *  @param localMap Map of configuration properties
+      *  @param remoteMap Map of configuration properties
       *  @return status : 0 == success, !0 == failure
       */
     public static int setupReplicationInitialize(Map<String, String> localMap, Map<String, String> remoteMap) {
@@ -854,7 +855,7 @@ public class EmbeddedOpenDJ {
     /**
      *  Starts the embedded <code>OpenDJ</code> instance.
      *
-     *  @param odsRoot File system directory where <code>OpenDJ</code> 
+     *  @param odjRoot File system directory where <code>OpenDJ</code>
      *                 is installed.
      *
      *  @throws Exception upon encountering errors.

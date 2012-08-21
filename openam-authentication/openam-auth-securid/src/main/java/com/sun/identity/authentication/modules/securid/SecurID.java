@@ -48,7 +48,7 @@ import com.iplanet.am.util.Misc;
 import com.sun.identity.authentication.spi.*;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.Constants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 
