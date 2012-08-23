@@ -154,9 +154,8 @@ public class WebtopNaming {
     }
 
     public static void initialize() {
-        serverMode = Boolean.valueOf(
-                System.getProperty(Constants.SERVER_MODE, SystemProperties.get(
-                        Constants.SERVER_MODE, "false"))).booleanValue();
+        serverMode = Boolean.valueOf(SystemProperties.get(
+                        Constants.SERVER_MODE, "false")).booleanValue();
         sitemonitorDisabled = Boolean.valueOf(SystemProperties.get(
                 Constants.SITEMONITOR_DISABLED,"false")).booleanValue();
         
@@ -566,6 +565,10 @@ public class WebtopNaming {
      * key.
      */
     private static String getValueFromTable(Hashtable table, String key) {
+        if (table == null)
+            { return null; }
+        if ( (key == null) || (key.isEmpty()) )
+            { return null; }
         if (table.contains(key)) {
             return (String) table.get(key);
         }
@@ -750,7 +753,7 @@ public class WebtopNaming {
             if (namingTable != null) {
                 server = getValueFromTable(namingTable, serverID);
             }
-            if (server == null) {
+            if ( (namingTable != null) && (server == null) ) {
                 getNamingProfile(true);
                 server = getValueFromTable(namingTable, serverID);
             }

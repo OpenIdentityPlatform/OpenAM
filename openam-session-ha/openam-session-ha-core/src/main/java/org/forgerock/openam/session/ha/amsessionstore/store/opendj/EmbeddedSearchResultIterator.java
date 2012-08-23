@@ -103,7 +103,7 @@ public class EmbeddedSearchResultIterator {
         // not supported.
     }
 
-    static Map<String, Set<String>> convertLDAPAttributeSetToMap(List<Attribute> attributes) {
+    public static Map<String, Set<String>> convertLDAPAttributeSetToMap(List<Attribute> attributes) {
         Map answer = null;
         
         if ((attributes != null) && (!attributes.isEmpty())) {

@@ -273,6 +273,10 @@
                             </ChoiceValue>
                             <ChoiceValue i18nKey="OpenDJ">org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore
                             </ChoiceValue>
+                            <ChoiceValue i18nKey="OpenESM">org.forgerock.openam.session.ha.amsessionstore.store.openesm.OpenESMPersistentStore
+                            </ChoiceValue>
+                            <ChoiceValue i18nKey="Plug-In">org.forgerock.openam.session.ha.amsessionstore.store.plugin.PluginSessionRepository
+                            </ChoiceValue>
                             <ChoiceValue i18nKey="JMS-MQ">org.forgerock.openam.session.ha.amsessionstore.store.mq.JMQSessionRepository
                             </ChoiceValue>
                         </ChoiceValues>
