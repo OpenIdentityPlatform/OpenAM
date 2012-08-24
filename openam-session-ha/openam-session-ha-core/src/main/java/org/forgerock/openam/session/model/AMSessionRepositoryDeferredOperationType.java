@@ -1,16 +1,18 @@
 package org.forgerock.openam.session.model;
 
 /**
- * Type of AMSession Repository Deferred Operation to be performed.
+ * Type of AM Session Repository Deferred Operation to be performed.
  *
  * @author  jeff.schenk@forgerock.com
  */
 public enum AMSessionRepositoryDeferredOperationType {
 
+    READ(0),
     WRITE(1),
     UPDATE(2),
     STORE(3),
-    DELETE(4);
+    DELETE(4),
+    STATUS(5);
 
     private final int index;
 

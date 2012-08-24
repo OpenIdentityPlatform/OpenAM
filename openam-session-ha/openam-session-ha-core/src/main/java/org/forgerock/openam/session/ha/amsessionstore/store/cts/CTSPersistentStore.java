@@ -27,7 +27,7 @@
  *
  */
 
-package org.forgerock.openam.session.ha.amsessionstore.store.openesm;
+package org.forgerock.openam.session.ha.amsessionstore.store.cts;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.exceptions.NotFoundException;
@@ -41,8 +41,8 @@ import java.util.*;
 
 
 /**
- * Provide Implementation of AMSessionRepository using the External
- * Enterprise Session Manager to handle the persistence for the
+ * Provide Implementation of AMSessionRepository using the CTS or
+ * Core Token Service to handle the persistence for the
  *
  * This allows for the Session Management and Replication Aspects to be
  * in a secondary instance.
@@ -50,7 +50,7 @@ import java.util.*;
  * @author steve
  * @author jeff.schenk@forgerock.com
  */
-public class OpenESMPersistentStore extends GeneralTaskRunnable implements AMSessionRepository {
+public class CTSPersistentStore extends GeneralTaskRunnable implements AMSessionRepository {
 
 
     // TODO -- Class is a placeholder for a possible OpenESM. (Enterprise Session Manager)

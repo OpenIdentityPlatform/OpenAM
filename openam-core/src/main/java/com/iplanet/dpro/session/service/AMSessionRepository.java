@@ -44,10 +44,8 @@ import org.forgerock.openam.session.model.DBStatistics;
 
 /**
  * The <code>AMSessionRepository</code> interface provides methods to
- * <code>retrive</code> , <code>save</code> , <code>delete</code> the session
- * from the session repository.  Any </code>Session<code> repository mechanisms
- * such as <code>JDBCSessionRepository</code>,
- * <code> JMQSessionRepository</code> implements this interface.
+ * <code>retrieve</code> , <code>save</code> , <code>delete</code> the session
+ * from the session repository.
  *
  * @see <code>JMQSessionRepository</code>
  * @see <code>OpenDJPersistentStore</code>

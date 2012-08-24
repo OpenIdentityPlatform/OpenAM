@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/classes" />
-    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <output url="file://$MODULE_DIR$/../../target/classes" />
+    <output-test url="file://$MODULE_DIR$/../../target/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/target" />
@@ -132,24 +132,6 @@
     <orderEntry type="library" name="Maven: org.forgerock:openam-liberty-schema:10.1.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="OpenFM" />
     <orderEntry type="module" module-name="openam-session-ha-core" />
-    <orderEntry type="module" module-name="openam-session-ha-locale" />
-    <orderEntry type="library" name="Maven: org.forgerock.commons:i18n-core:1.3.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: commons-net:commons-net:3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.jackson:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.simple:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.simpleframework:simple:4.1.21" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.ssl:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.jsslutils:jsslutils:1.0.5" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.crypto:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet.ext.httpclient:2.1-RC4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.1.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.1.1" level="project" />
-    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.james:apache-mime4j:0.6" level="project" />
     <orderEntry type="module" module-name="openam-oauth" />
     <orderEntry type="library" name="Maven: org.forgerock:openam-dtd-schema:10.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.forgerock:openam-jaxrpc-schema:10.1.0-SNAPSHOT" level="project" />
@@ -176,8 +158,11 @@
     <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet:2.1-RC4" level="project" />
     <orderEntry type="library" name="Maven: org.osgi:org.osgi.core:4.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet.ext.jackson:2.1-RC4" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.7" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.7" level="project" />
     <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet.ext.freemarker:2.1-RC4" level="project" />
     <orderEntry type="module" module-name="openam-oauth2-openam-extension" />
+    <orderEntry type="library" name="Maven: org.restlet.jse:org.restlet:2.1-RC4" level="project" />
     <orderEntry type="library" name="Maven: org.restlet.osgi:org.restlet.ext.servlet:2.1-RC4" level="project" />
     <orderEntry type="module" module-name="openam-oauth2-core-token-service" />
     <orderEntry type="library" name="Maven: org.forgerock.commons:org.forgerock.json.resource:1.2.2" level="project" />

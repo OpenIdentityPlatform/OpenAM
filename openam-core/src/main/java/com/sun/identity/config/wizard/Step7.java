@@ -66,10 +66,34 @@ public class Step7 extends AjaxPage {
             getLocalizedString("no.label"));
         tmp = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         add("rootSuffix", tmp);
-        tmp = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootSuffix);
+        tmp = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootDN);
         add("sessionRootSuffix", tmp);
-        tmp = getAttribute("sessionStoreType", Wizard.defaultSessionStoreType);
-        add("sessionStoreType", tmp);
+
+        // Provide Localized Setting for Session Failover Type.
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, Wizard.defaultSessionStoreType);
+        if (tmp.equals("NONE")) {
+            add("sessionStoreType",
+                    getLocalizedString("session.store.type.none"));
+        } else if (tmp.equals("InMemory")) {
+            add("sessionStoreType", getLocalizedString(
+                    "session.store.type.inmemory"));
+        } else if (tmp.equals("OpenDJ")) {
+            add("sessionStoreType", getLocalizedString(
+                    "session.store.type.opendj"));
+        } else if (tmp.equals("CTS")) {
+            add("sessionStoreType", getLocalizedString(
+                    "session.store.type.cts"));
+        } else if (tmp.equals("PlugIn")) {
+            add("sessionStoreType",
+                    getLocalizedString("session.store.type.plugin"));
+        } else if (tmp.equals("JMSMQ")) {
+            add("sessionStoreType",
+                    getLocalizedString("session.store.type.jmsmq"));
+        } else {
+            add("sessionStoreType",tmp);
+        }
+
+        // Provide Port Settings
         tmp = getAttribute("configStorePort", getAvailablePort(50389));
         add("configStorePort", tmp);
         tmp = getAttribute("configStoreAdminPort", getAvailablePort(4444));
@@ -79,6 +103,7 @@ public class Step7 extends AjaxPage {
         tmp = getAttribute("configStoreLoginId", Wizard.defaultUserName);
         add("configStoreLoginId", tmp);
 
+        // Provide User Store Properties.
         tmp = getAttribute(SetupConstants.DS_EMB_REPL_FLAG, "");
         if (!tmp.equals(SetupConstants.DS_EMP_REPL_FLAG_VAL)) {
             // User Config Store Properties

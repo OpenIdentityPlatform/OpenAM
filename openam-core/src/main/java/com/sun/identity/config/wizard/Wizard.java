@@ -64,7 +64,7 @@ public class Wizard extends AjaxPage implements Constants {
     public static String defaultUserName = "cn=Directory Manager";
     public static String defaultPassword = "";
     public static String defaultRootSuffix = DEFAULT_ROOT_SUFFIX;
-    public static String defaultSessionRootSuffix = DEFAULT_SESSION_HA_ROOT_DN;
+    public static String defaultSessionRootDN = DEFAULT_SESSION_HA_ROOT_DN;
     public static String defaultSessionStoreType = DEFAULT_SESSION_HA_STORE_TYPE;
 
     public String defaultPort = Integer.toString(
@@ -171,10 +171,10 @@ public class Wizard extends AjaxPage implements Constants {
         tmp = getAttribute("rootSuffix", defaultRootSuffix);
         request.addParameter(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, tmp);
 
-        tmp = getAttribute("sessionRootSuffix", defaultSessionRootSuffix);
+        tmp = getAttribute(SetupConstants.CONFIG_VAR_SESSION_ROOT_DN, defaultSessionRootDN);
         request.addParameter(SetupConstants.CONFIG_VAR_SESSION_ROOT_DN, tmp);
 
-        tmp = getAttribute("sessionStoreType", defaultSessionStoreType);
+        tmp = getAttribute(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, defaultSessionStoreType);
         request.addParameter(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, tmp);
        
         if (!isEmbedded) {

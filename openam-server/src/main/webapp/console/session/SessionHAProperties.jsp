@@ -124,6 +124,9 @@
                               title="org.forgerock.openam.session.ha.amsessionrepository.rootdn" />
             </td>
         </tr>
+
+        <!-- TODO Show Additional Properties -->
+
     </table>
 
 

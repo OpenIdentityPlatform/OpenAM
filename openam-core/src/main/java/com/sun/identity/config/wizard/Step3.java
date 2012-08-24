@@ -96,11 +96,14 @@ public class Step3 extends LDAPStoreWizardPage {
         String val = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         addModel("rootSuffix", val);
 
-        val = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootSuffix);
+        val = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootDN);
         addModel("sessionRootSuffix", val);
 
-        val = getAttribute("sessionStoreType", Wizard.defaultSessionStoreType);
-        addModel("sessionStoreType", val);
+        val = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, Wizard.defaultSessionStoreType);
+        addModel(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, val);
+
+        val = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, Wizard.defaultSessionRootDN);
+        addModel(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, val);
 
         val = getAttribute("encryptionKey", AMSetupServlet.getRandomString());
         addModel("encryptionKey", val);
@@ -229,7 +232,7 @@ public class Step3 extends LDAPStoreWizardPage {
     }
 
     public boolean setSessionStoreType() {
-        String sessionStoreType = toString("sessionStoreType");
+        String sessionStoreType = toString(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE);
         writeToResponse("true"); // Accept whatever has been specified...
         if ((sessionStoreType == null) || (sessionStoreType.trim().length() == 0)) {
             getContext().setSessionAttribute(

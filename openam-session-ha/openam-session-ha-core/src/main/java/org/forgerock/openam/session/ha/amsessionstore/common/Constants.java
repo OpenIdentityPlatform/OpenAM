@@ -39,43 +39,6 @@ public interface Constants extends com.sun.identity.shared.Constants {
         "amsessiondb.enabled";
 
     static final String URI = "amsessiondb.uri";
-
-    /**
-    
-    static final String OPENDJ_ROOT = "amsessiondb.opendj.root";
-    
-    static final String OPENDJ_ADMIN_PORT = "amsessiondb.opendj.admin.port";
-            
-    static final String OPENDJ_LDAP_PORT = "amsessiondb.opendj.ldap.port";
-    
-    static final String OPENDJ_JMX_PORT = "amsessiondb.opendj.jmx.port";
-
-    static final String OPENDJ_SUFFIX = "amsessiondb.opendj.suffix";
-    
-    static final String OPENDJ_REPL_PORT = "amsessiondb.opendj.repl.port";
-
-
-
-    static final String OPENDJ_DS_MGR_DN = "amsessiondb.opendj.ds_mgr_dn";
-    
-    static final String OPENDJ_DS_MGR_PASSWD = "amsessiondb.opendj.ds_mgr_passwd";
-    
-    static final String PASSWORD = "amsessiondb.auth.password";
-    
-    static final String EXISTING_SERVER_URL = "amsessiondb.exising.server.url";
-    
-    static final String HOST_URL = "amsessiondb.host.url";
-    
-    static final String HOST_PROTOCOL = "amsessiondb.host.protocol";
-    
-    static final String HOST_FQDN = "amsessiondb.host.fqdn";
-    
-    static final String HOST_PORT = "amsessiondb.host.port";
-    
-    static final String HOST_URI = "amsessiondb.host.uri";
-
-    **/
-
     
     static final String BASE_DN = "ou=famrecords";
     
@@ -85,23 +48,15 @@ public interface Constants extends com.sun.identity.shared.Constants {
     
     static final String AMRECORD_NAMING_ATTR = "pKey";
     
-    public final static String TOP = "top";
-        
-    public final static String FR_FAMRECORD = "frFamRecord";
-    
-    public final static String OBJECTCLASS = "objectClass";
-    
-    public final static String FR_AMSESSIONDB = "frAmSessionDb";
-    
-    public final static String FAMRECORD_FILTER = "(objectclass=*)";
+    static final String TOP = "top";
 
+    static final String FR_FAMRECORD = "frFamRecord";
 
+    static final String OBJECTCLASS = "objectClass";
 
-    // exit codes
-    static final int EXIT_INVALID_URL = 1;
-    
-    static final int EXIT_INSTALL_FAILED = 2;
-    
-    static final int EXIT_REMOVE_FAILED = 3;
+    static final String FR_AMSESSIONDB = "frAmSessionDb";
+
+    static final String FAMRECORD_FILTER = "(objectclass=*)";
+
 
 }

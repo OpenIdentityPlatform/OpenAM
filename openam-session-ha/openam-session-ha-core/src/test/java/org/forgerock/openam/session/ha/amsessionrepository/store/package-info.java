@@ -26,4 +26,4 @@
  * Portions Copyrighted [2010] [ForgeRock AS]
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore.store.openesm;
+package org.forgerock.openam.session.ha.amsessionrepository.store;

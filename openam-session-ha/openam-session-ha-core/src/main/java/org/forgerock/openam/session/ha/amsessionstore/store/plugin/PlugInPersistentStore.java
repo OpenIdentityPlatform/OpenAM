@@ -71,7 +71,7 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  * @author steve
  * @author jeff.schenk@forgerock.com
  */
-public class PlugInPersistentStore extends GeneralTaskRunnable implements AMSessionRepository {
+public abstract class PlugInPersistentStore extends GeneralTaskRunnable implements AMSessionRepository {
 
 
     // TODO -- Class is a placeholder for a possible OpenESM. (Enterprise Session Manager)
