@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -119,21 +119,14 @@ public class SsoadmAP extends AbstractProcessor {
             subcommands.add(SubCommandXML.parseSubCommandInfo(
                     name, description, mandatory, optional));
         }
-        if (roundEnv.processingOver()) {
-            String cwd = null;
-            try {
-                cwd = new java.io.File( "." ).getCanonicalPath();
-            } catch (java.io.IOException e) {
-                // NoOp
-            }
 
-            StringBuilder content = readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.header");
-            for (String subCommand : subcommands) {
-                content.append(subCommand);
-            }
-            content.append(readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.footer"));
-            writeFile("openam-documentation/openam-site-helper/target/generated-resources/man-ssoadm-1.xml", content.toString());
+        StringBuilder content = readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.header");
+        for (String subCommand : subcommands) {
+            content.append(subCommand);
         }
+        content.append(readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.footer"));
+        writeFile("openam-documentation/openam-site-helper/target/generated-resources/man-ssoadm-1.xml", content.toString());
+
         return true;
     }
 
@@ -144,7 +137,7 @@ public class SsoadmAP extends AbstractProcessor {
             br = new BufferedReader(new FileReader(path));
             String line;
             while ((line = br.readLine()) != null) {
-                sb.append(line);
+                sb.append(line).append('\n');
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();

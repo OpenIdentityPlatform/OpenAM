@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock Inc
   !    
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -128,6 +128,13 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xml-maven-plugin</artifactId>
                 <version>1.0</version>
@@ -140,7 +147,7 @@
                         <configuration>
                             <transformationSets>
                                 <transformationSet>
-                                    <dir>../</dir>
+                                    <dir>../..</dir>
                                     <includes>
                                         <include>
                                             openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/AuthenticationLogMessageIDs.xml
@@ -191,7 +198,7 @@
 
                                         <!--  <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>  THIS FILE DOES NOT EXIST -->
                                     </includes>
-                                    <stylesheet>src/main/xslt/logs.xsl</stylesheet>
+                                    <stylesheet>${basedir}/src/main/xslt/logs.xsl</stylesheet>
                                     <outputProperties>
                                         <outputProperty>
                                             <name>omit-xml-declaration</name>
@@ -230,7 +237,7 @@
                             <target>
                                 <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
                                     <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header"/>
-                                    <fileset dir="${basedir}/src/main/xslt"
+                                    <fileset dir="${project.build.directory}/generated-resources/xml/xslt"
                                              includes="**/*.xml">
 
                                     </fileset>
@@ -248,7 +255,7 @@
                             <target>
                                 <mkdir dir="${site-out}/doc/public-api"/>
                                 <unjar
-                                        src="../openam-federation/OpenFM/target/OpenFM*javadoc.jar"
+                                        src="../../openam-federation/OpenFM/target/OpenFM-${project.version}-javadoc.jar"
                                         dest="${site-out}/doc/public-api"/>
                             </target>
                         </configuration>
