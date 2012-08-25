@@ -74,143 +74,6 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 public abstract class PlugInPersistentStore extends GeneralTaskRunnable implements AMSessionRepository {
 
 
-    // TODO -- Class is a placeholder for a possible OpenESM. (Enterprise Session Manager)
-
-
-    /**
-     * Retrieves session state from the repository.
-     *
-     * @param sid session ID
-     * @return <code>InternalSession</code> object retrieved from the repository
-     * @throws Exception if anything goes wrong
-     */
-    @Override
-    public InternalSession retrieve(SessionID sid) throws Exception {
-        return null;  // TODO -- Implement
-    }
-
-    /**
-     * Saves session state to the repository If it is a new session (version ==
-     * 0) it inserts new record(s) to the repository. For an existing session it
-     * updates repository record instead while checking that versions in the
-     * InternalSession and in the record match In case of version mismatch or
-     * missing record IllegalArgumentException will be thrown
-     *
-     * @param is reference to <code>InternalSession</code> object being saved.
-     * @throws Exception if anything goes wrong.
-     */
-    @Override
-    public void save(InternalSession is) throws Exception {
-        // TODO -- Implement
-    }
-
-    /**
-     * Deletes session record from the repository.
-     *
-     * @param sid session ID.
-     * @throws Exception if anything goes wrong.
-     */
-    @Override
-    public void delete(SessionID sid) throws Exception {
-        // TODO -- Implement
-    }
-
-    /**
-     * Deletes the expired session records , this is mainly used by the
-     * background clean up thread to cleanup the expired session records from
-     * the <code>Sessionrepository</code>
-     *
-     * @throws Exception when unable to deleted the session record from the
-     *                   repository
-     */
-    @Override
-    public void deleteExpired() throws Exception {
-        // TODO -- Implement
-    }
-
-    /**
-     * Deletes a record from the store.
-     *
-     * @param id The id of the record to delete from the store
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
-     *
-     * @throws com.iplanet.dpro.session.exceptions.NotFoundException
-     *
-     */
-    @Override
-    public void delete(String id) throws StoreException, NotFoundException {
-        // TODO -- Implement
-    }
-
-    /**
-     * Delete all records in the store
-     * that have an expiry date older than the one specified.
-     *
-     * @param expDate The expDate in seconds
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
-     *
-     */
-    @Override
-    public void deleteExpired(long expDate) throws StoreException {
-        // TODO -- Implement
-    }
-
-    /**
-     * Returns the expiration information of all sessions belonging to a user.
-     * The returned value will be a Map (sid->expiration_time).
-     *
-     * @param uuid User's universal unique ID.
-     * @throws Exception if there is any problem with accessing the session
-     *                   repository.
-     */
-    @Override
-    public Map getSessionsByUUID(String uuid) throws Exception {
-        return null;  // TODO -- Implement
-    }
-
-    /**
-     * Takes an AMRecord and writes this to the store
-     *
-     * @param amRootEntity The record object to store
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
-     *
-     */
-    @Override
-    public void write(AMRootEntity amRootEntity) throws StoreException {
-        // TODO -- Implement
-    }
-
-    /**
-     * Reads a record from the store with the specified id
-     *
-     * @param id The primary key of the record to find
-     * @return AMRootEntity The AMRecord if found
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
-     *
-     * @throws com.iplanet.dpro.session.exceptions.NotFoundException
-     *
-     */
-    @Override
-    public AMRootEntity read(String id) throws StoreException, NotFoundException {
-        return null;  // TODO -- Implement
-    }
-
-    /**
-     * Reads a record with the secondary key from the underlying store. The
-     * return value is a <code><Set>String</code>. Each string represents the
-     * token id of the matching session found.
-     *
-     * @param id The secondary key on which to search the store
-     * @return A Set of Strings of the matching records, if any.
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
-     *
-     * @throws com.iplanet.dpro.session.exceptions.NotFoundException
-     *
-     */
-    @Override
-    public Set<String> readWithSecKey(String id) throws StoreException, NotFoundException {
-        return null;  // TODO -- Implement
-    }
 
     /**
      * Shut down the store
@@ -221,30 +84,13 @@ public abstract class PlugInPersistentStore extends GeneralTaskRunnable implemen
     }
 
     /**
-     * Returns the count of the records found in the store with a given matching
-     * id.
-     * <p/>
-     * The return value is <code>Map<String, Long></code> where the key is the
-     * token.id of the users session and the long is the expiry time of the session.
-     *
-     * @param id
-     * @return
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
-     *
-     */
-    @Override
-    public Map<String, Long> getRecordCount(String id) throws StoreException {
-        return null;  // TODO -- Implement
-    }
-
-    /**
      * Returns the current set of store statistics.
      *
      * @return DBStatistics
      */
     @Override
     public DBStatistics getDBStatistics() {
-        return null;  // TODO -- Implement
+        return null;
     }
 
     /**
@@ -255,7 +101,7 @@ public abstract class PlugInPersistentStore extends GeneralTaskRunnable implemen
      */
     @Override
     public boolean addElement(Object key) {
-        return false;  // TODO -- Implement
+        return false;
     }
 
     /**
@@ -266,7 +112,7 @@ public abstract class PlugInPersistentStore extends GeneralTaskRunnable implemen
      */
     @Override
     public boolean removeElement(Object key) {
-        return false;  // TODO -- Implement
+        return false;
     }
 
     /**
@@ -276,7 +122,7 @@ public abstract class PlugInPersistentStore extends GeneralTaskRunnable implemen
      */
     @Override
     public boolean isEmpty() {
-        return false;  // TODO -- Implement
+        return false;
     }
 
     /**
@@ -286,7 +132,7 @@ public abstract class PlugInPersistentStore extends GeneralTaskRunnable implemen
      */
     @Override
     public long getRunPeriod() {
-        return 0;  // TODO -- Implement
+        return 0;
     }
 
     /**
@@ -302,7 +148,6 @@ public abstract class PlugInPersistentStore extends GeneralTaskRunnable implemen
      */
     @Override
     public void run() {
-        // TODO -- Implement
     }
 
 

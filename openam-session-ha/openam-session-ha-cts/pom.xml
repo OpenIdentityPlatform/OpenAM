@@ -6,7 +6,7 @@
     <!--
     * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
     *
-    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    * Copyright (c) 2012 ForgeRock AS. All Rights Reserved
     *
     * The contents of this file are subject to the terms
     * of the Common Development and Distribution License
@@ -36,8 +36,8 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Core Token Service High-Availability</name>
-    <description>OpenAM Core Token Service High-Availability Component
+    <name>OpenAM Session High-Availability CTS</name>
+    <description>OpenAM Session High-Availability CTS Component
     </description>
     <artifactId>openam-session-ha-cts</artifactId>
     <version>10.1.0-SNAPSHOT</version>
@@ -62,10 +62,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Core Token Service High-Availability Component</Specification-Title>
+                            <Specification-Title>OpenAM Session High-Availability CTS Component</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Core Token Service High-Availability Component</Implementation-Title>
+                            <Implementation-Title>OpenAM Session High-Availability CTS Component</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}
                             </Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>

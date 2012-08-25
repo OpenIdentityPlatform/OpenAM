@@ -42,7 +42,8 @@ import java.util.*;
 
 /**
  * Provide Implementation of AMSessionRepository using the CTS or
- * Core Token Service to handle the persistence for the
+ * Core Token Service to handle the persistence for Session/Token
+ * and other persistent resources.
  *
  * This allows for the Session Management and Replication Aspects to be
  * in a secondary instance.
