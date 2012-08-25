@@ -42,11 +42,11 @@ public class SessionRepository {
     private static final String LEGACY_REPOSITORY_CLASS =
             "org.forgerock.openam.session.ha.amsessionstore.db.mq.JMQSessionRepository";
 
-    private static final String  MEMORY_REPOSITORY_CLASS =
-            "org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore";
+    private static final String  OPENDJ_REPOSITORY_CLASS =
+            "org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore";
 
     private static final String REPOSITORY_CLASS = SystemProperties.get(
-            AMSessionRepository.REPOSITORY_CLASS_PROPERTY, MEMORY_REPOSITORY_CLASS);
+            AMSessionRepository.REPOSITORY_CLASS_PROPERTY, OPENDJ_REPOSITORY_CLASS);
 
     private static AMSessionRepository sessionRepository = null;
 

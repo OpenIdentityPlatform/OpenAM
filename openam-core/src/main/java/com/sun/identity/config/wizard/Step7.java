@@ -66,17 +66,14 @@ public class Step7 extends AjaxPage {
             getLocalizedString("no.label"));
         tmp = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         add("rootSuffix", tmp);
-        tmp = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootDN);
-        add("sessionRootSuffix", tmp);
+        tmp = getAttribute("sessionRootDN", Wizard.defaultSessionRootDN);
+        add("sessionRootDN", tmp);
 
         // Provide Localized Setting for Session Failover Type.
         tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, Wizard.defaultSessionStoreType);
         if (tmp.equals("NONE")) {
             add("sessionStoreType",
                     getLocalizedString("session.store.type.none"));
-        } else if (tmp.equalsIgnoreCase("InMemory")) {
-            add("sessionStoreType", getLocalizedString(
-                    "session.store.type.inmemory"));
         } else if (tmp.equalsIgnoreCase("OpenDJ")) {
             add("sessionStoreType", getLocalizedString(
                     "session.store.type.opendj"));

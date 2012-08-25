@@ -65,7 +65,7 @@ public class AMSessionRepositoryTypeTest {
     public void testGetAMSessionRepositoryTypes() throws Exception {
         Map<String,String> types = AMSessionRepositoryType.getAMSessionRepositoryTypes();
         assertNotNull(types, "Expected non-null Collection of AMSessionRepositoryType(s), very Bad!");
-        assertEquals(types.size(), 6, "Wrong number of AmSessionRepositoryTypeS");
+        assertEquals(types.size(), 5, "Wrong number of AmSessionRepositoryTypeS");
         for(Map.Entry<String,String> entry : types.entrySet())
         {
             System.out.println("key:["+entry.getKey()+"], Value:["+entry.getValue()+"]");
@@ -84,11 +84,11 @@ public class AMSessionRepositoryTypeTest {
         assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.OPENDJ.displayType()),
                 AMSessionRepositoryType.OPENDJ.textDefinition());
 
-        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.OPENESM.type()),
-                AMSessionRepositoryType.OPENESM.textDefinition());
+        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.CTS.type()),
+                AMSessionRepositoryType.CTS.textDefinition());
 
-        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.OPENESM.displayType()),
-                AMSessionRepositoryType.OPENESM.textDefinition());
+        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.CTS.displayType()),
+                AMSessionRepositoryType.CTS.textDefinition());
 
     }
 
@@ -100,7 +100,7 @@ public class AMSessionRepositoryTypeTest {
 
         assertEquals(AMSessionRepositoryType.OPENDJ.amSessionRepositoryImplementationClass(),
                 OpenDJPersistentStore.class);
-        assertEquals(AMSessionRepositoryType.OPENESM.amSessionRepositoryImplementationClass(),
+        assertEquals(AMSessionRepositoryType.CTS.amSessionRepositoryImplementationClass(),
                 CTSPersistentStore.class);
         assertEquals(AMSessionRepositoryType.PLUGIN.amSessionRepositoryImplementationClass(),
                 PlugInPersistentStore.class);

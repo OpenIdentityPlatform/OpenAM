@@ -64,8 +64,8 @@ public class Step3 extends LDAPStoreWizardPage {
         new ActionLink("validateSMHost", this, "validateSMHost");
     public ActionLink validateRootSuffixLink = 
         new ActionLink("validateRootSuffix", this, "validateRootSuffix");
-    public ActionLink validateSessionRootSuffixLink =
-            new ActionLink("validateSessionRootSuffix", this, "validateSessionRootSuffix");
+    public ActionLink validateSessionRootDNLink =
+            new ActionLink("validateSessionRootDN", this, "validateSessionRootDN");
     public ActionLink setSessionStoreType =
             new ActionLink("setSessionStoreType", this, "setSessionStoreType");
     public ActionLink setReplicationLink =
@@ -96,8 +96,8 @@ public class Step3 extends LDAPStoreWizardPage {
         String val = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         addModel("rootSuffix", val);
 
-        val = getAttribute("sessionRootSuffix", Wizard.defaultSessionRootDN);
-        addModel("sessionRootSuffix", val);
+        val = getAttribute("sessionRootDN", Wizard.defaultSessionRootDN);
+        addModel("sessionRootDN", val);
 
         val = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, Wizard.defaultSessionStoreType);
         addModel(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, val);
@@ -215,17 +215,17 @@ public class Step3 extends LDAPStoreWizardPage {
         return false;    
     }
 
-    public boolean validateSessionRootSuffix() {
-        String sessionRootSuffix = toString("sessionRootSuffix");
+    public boolean validateSessionRootDN() {
+        String sessionRootDN = toString("sessionRootDN");
 
-        if ((sessionRootSuffix == null) || (sessionRootSuffix.trim().length() == 0)) {
+        if ((sessionRootDN == null) || (sessionRootDN.trim().length() == 0)) {
             writeToResponse(getLocalizedString("missing.required.field"));
-        } else if (!DN.isDN(sessionRootSuffix)) {
+        } else if (!DN.isDN(sessionRootDN)) {
             writeToResponse(getLocalizedString("invalid.dn"));
         } else {
             writeToResponse("true");
             getContext().setSessionAttribute(
-                    SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, sessionRootSuffix);
+                    SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, sessionRootDN);
         }
         setPath(null);
         return false;

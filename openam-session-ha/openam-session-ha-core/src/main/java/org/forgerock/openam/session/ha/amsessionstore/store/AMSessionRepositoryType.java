@@ -45,19 +45,16 @@ public enum AMSessionRepositoryType {
      */
     NONE(0, 0, "none", "None", "No Session Failover or High Availability", "session.store.type.none", null),
 
-    INMEMORY(1, 1, "inmemory", "In-Memory", "In Memory", "session.store.type.inmemory",
-            org.forgerock.openam.session.ha.amsessionstore.store.memory.MemoryPersistentStore.class),
-
-    OPENDJ(2, 2, "opendj", "OpenDJ", "OpenAM Configuration Directory", "session.store.type.opendj",
+    OPENDJ(1, 1, "opendj", "OpenDJ", "OpenAM Configuration Directory", "session.store.type.opendj",
             org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore.class),
 
-    OPENESM(3, 3, "cts", "CTS", "OpenAM Core Token Service", "session.store.type.cts",
+    CTS(2, 2, "cts", "CTS", "OpenAM Core Token Service", "session.store.type.cts",
             org.forgerock.openam.session.ha.amsessionstore.store.cts.CTSPersistentStore.class),
 
-    PLUGIN(4, 4, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
+    PLUGIN(3, 3, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
             org.forgerock.openam.session.ha.amsessionstore.store.plugin.PlugInPersistentStore.class),
 
-    JMSMQ(5, 5, "jmsmq", "JMS-MQ", "JMS MQ (Deprecated)", "session.store.type.jmsmq",
+    JMSMQ(4, 4, "jmsmq", "JMS-MQ", "JMS MQ (Deprecated)", "session.store.type.jmsmq",
             org.forgerock.openam.session.ha.amsessionstore.store.mq.JMQSessionRepository.class);
 
     /**
