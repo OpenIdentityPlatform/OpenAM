@@ -105,7 +105,8 @@
         </tr>
         <tr>
             <td align="right">
-                <cc:textfield name="com.sun.am.session.SessionRepositoryImpl.LABEL" readOnly="true" size="64" />
+                <cc:textfield name="com.sun.am.session.SessionRepositoryImpl.LABEL"
+                              readOnly="true" size="64" />
             </td>
             <td align="right">
                 <cc:textfield name="com.sun.am.session.SessionRepositoryImpl"
@@ -122,6 +123,51 @@
                 <cc:textfield name="org.forgerock.openam.session.ha.amsessionrepository.rootdn"
                               readOnly="true" size="64"
                               title="org.forgerock.openam.session.ha.amsessionrepository.rootdn" />
+            </td>
+        </tr>
+
+        <tr>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.useRemoteSaveMethod.LABEL"
+                              readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.useRemoteSaveMethod"
+                              readOnly="true" size="64"
+                              title="com.iplanet.am.session.failover.useRemoteSaveMethod" />
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.useInternalRequestRouting.LABEL"
+                              readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.useInternalRequestRouting"
+                              readOnly="true" size="64"
+                              title="com.iplanet.am.session.failover.useInternalRequestRouting" />
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.cluster.stateCheck.timeout.LABEL"
+                              readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.cluster.stateCheck.timeout"
+                              readOnly="true" size="64"
+                              title="com.iplanet.am.session.failover.cluster.stateCheck.timeout" />
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.cluster.stateCheck.period.LABEL"
+                              readOnly="true" size="64" />
+            </td>
+            <td align="right">
+                <cc:textfield name="com.iplanet.am.session.failover.cluster.stateCheck.period"
+                              readOnly="true" size="64"
+                              title="com.iplanet.am.session.failover.cluster.stateCheck.period" />
             </td>
         </tr>
 

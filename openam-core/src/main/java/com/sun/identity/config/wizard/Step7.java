@@ -70,24 +70,25 @@ public class Step7 extends AjaxPage {
         add("sessionRootDN", tmp);
 
         // Provide Localized Setting for Session Failover Type.
-        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, Wizard.defaultSessionStoreType);
-        if (tmp.equals("NONE")) {
-            add("sessionStoreType",
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                Wizard.defaultSessionStoreType);
+        if (tmp.equalsIgnoreCase("None")) {
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
                     getLocalizedString("session.store.type.none"));
         } else if (tmp.equalsIgnoreCase("OpenDJ")) {
-            add("sessionStoreType", getLocalizedString(
-                    "session.store.type.opendj"));
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                    getLocalizedString("session.store.type.opendj"));
         } else if (tmp.equalsIgnoreCase("CTS")) {
-            add("sessionStoreType", getLocalizedString(
-                    "session.store.type.cts"));
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
+                    getLocalizedString("session.store.type.cts"));
         } else if (tmp.equalsIgnoreCase("PlugIn")) {
-            add("sessionStoreType",
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
                     getLocalizedString("session.store.type.plugin"));
         } else if (tmp.equalsIgnoreCase("JMSMQ")) {
-            add("sessionStoreType",
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
                     getLocalizedString("session.store.type.jmsmq"));
         } else {
-            add("sessionStoreType",tmp);
+            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,tmp);
         }
 
         // Provide Port Settings

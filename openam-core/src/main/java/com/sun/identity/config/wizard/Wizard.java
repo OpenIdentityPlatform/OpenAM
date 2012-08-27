@@ -171,10 +171,10 @@ public class Wizard extends AjaxPage implements Constants {
         tmp = getAttribute("rootSuffix", defaultRootSuffix);
         request.addParameter(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, tmp);
 
-        tmp = getAttribute(SetupConstants.CONFIG_VAR_SESSION_ROOT_DN, defaultSessionRootDN);
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, defaultSessionRootDN);
         request.addParameter(SetupConstants.CONFIG_VAR_SESSION_ROOT_DN, tmp);
 
-        tmp = getAttribute(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, defaultSessionStoreType);
+        tmp = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, defaultSessionStoreType);
         request.addParameter(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE, tmp);
        
         if (!isEmbedded) {

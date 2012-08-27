@@ -29,37 +29,9 @@
 
 package org.forgerock.openam.session.ha.amsessionstore.store.plugin;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.exceptions.NotFoundException;
-import com.iplanet.dpro.session.exceptions.StoreException;
 import com.iplanet.dpro.session.service.AMSessionRepository;
-import com.iplanet.dpro.session.service.InternalSession;
-import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.i18n.LocalizableMessage;
-import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
-import org.forgerock.openam.session.ha.amsessionstore.common.Log;
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.EmbeddedSearchResultIterator;
 import org.forgerock.openam.session.model.*;
-import org.opends.server.core.AddOperation;
-import org.opends.server.core.DeleteOperation;
-import org.opends.server.core.ModifyOperation;
-import org.opends.server.protocols.internal.InternalClientConnection;
-import org.opends.server.protocols.internal.InternalSearchOperation;
-import org.opends.server.protocols.ldap.LDAPModification;
-import org.opends.server.types.*;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-
-import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  * Provide easy Plug-In Implementation of AMSessionRepository using a custom

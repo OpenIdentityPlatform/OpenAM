@@ -40,6 +40,7 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.session.util.SessionUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.model.*;
@@ -57,7 +58,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
-import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.NotFoundException;
 import com.iplanet.dpro.session.exceptions.StoreException;
@@ -87,6 +87,7 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  * will provide the underlying SFO/HA for OpenAM Session Data.
  *
  * @author steve
+ * @author jeff.schenk@forgerock.com
  */
 public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSessionRepository {
 
@@ -147,10 +148,71 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             = new ConcurrentLinkedQueue<AMSessionRepositoryDeferredOperation>();
 
     /**
+     * Time period between two successive runs of repository cleanup thread
+     * which checks and removes expired records
+     */
+
+    private static long cleanUpPeriod = 5 * 60 * 1000; // 5 min in milliseconds
+
+    private static long cleanUpValue = 0;
+
+    public static final String CLEANUP_RUN_PERIOD =
+            "com.sun.identity.session.repository.cleanupRunPeriod";
+
+    /**
+     * Time period between two successive runs of DBHealthChecker thread which
+     * checks for Database availability.
+     */
+    private static long healthCheckPeriod = 1 * 60 * 1000;
+
+    public static final String HEALTH_CHECK_RUN_PERIOD =
+            "com.sun.identity.session.repository.healthCheckRunPeriod";
+
+    /**
+     * This period is actual one that is used by the thread. The value is set to
+     * the smallest value of cleanUPPeriod and healthCheckPeriod.
+     */
+    private static long runPeriod = 1 * 60 * 1000; // 1 min in milliseconds
+
+    /**
+     * Initialize all Timing Periods.
+     */
+    static {
+        try {
+            gracePeriod = Integer.parseInt(SystemProperties.get(
+                    CLEANUP_GRACE_PERIOD, String.valueOf(gracePeriod)));
+        } catch (Exception e) {
+            debug.error("Invalid value for " + CLEANUP_GRACE_PERIOD
+                    + ", using default");
+        }
+
+        try {
+            cleanUpPeriod = Integer.parseInt(SystemProperties.get(
+                    CLEANUP_RUN_PERIOD, String.valueOf(cleanUpPeriod)));
+        } catch (Exception e) {
+            debug.error("Invalid value for " + CLEANUP_RUN_PERIOD
+                    + ", using default");
+        }
+
+        try {
+            healthCheckPeriod = Integer
+                    .parseInt(SystemProperties.get(HEALTH_CHECK_RUN_PERIOD,
+                            String.valueOf(healthCheckPeriod)));
+        } catch (Exception e) {
+            debug.error("Invalid value for " + HEALTH_CHECK_RUN_PERIOD
+                    + ", using default");
+        }
+
+        runPeriod = (cleanUpPeriod <= healthCheckPeriod) ? cleanUpPeriod
+                : healthCheckPeriod;
+        cleanUpValue = cleanUpPeriod;
+    }
+
+
+    /**
      * Initialize Singleton Service Implementation
      */
     static {
-        debug = Debug.getInstance(DEBUG_NAME);
         initialize();
     }
 
@@ -159,7 +221,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
      */
     private static void initialize() {
         // Initialize this Service
-        debug.message("Initializing OpenAM Session Repository using Implementation Class: " +
+        debug.message("Initializing Configuration for the OpenAM Session Repository using Implementation Class: " +
                 OpenDJPersistentStore.class.getClass().getSimpleName());
 
         // Create and Initialize all Necessary Attribute Linked Sets.
@@ -187,7 +249,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         serverAttrs.add("replPort");
 
         // Finish Initialization
-        debug.message("Successful Initialization of OpenAM Session Repository using Implementation Class: " +
+        debug.message("Successful Configuration Initialization for the OpenAM Session Repository using Implementation Class: " +
                 OpenDJPersistentStore.class.getClass().getSimpleName());
     }
 
@@ -207,22 +269,30 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             }
         });
 
+        // Obtain our Directory Connection.
+        // This needs to come from a connection pool.
+        try {
+            icConn = InternalClientConnection.getRootConnection();
+            InternalSearchOperation results =
+                    icConn.processSearch("dc=internal,dc=openam,dc=java,dc=net", SearchScope.BASE_OBJECT, "*");
+           debug.warning("Search for base container yielded Result Code: "+results.getResultCode().toString()+"]");
+
+
+
+
+        } catch (DirectoryException directoryException) {
+            debug.warning("Unable to obtain the Internal Root Container for Session Persistence!",
+                    directoryException);
+            // TODO -- Abort further setup.
+        }
+
+
+        // Start our AM Repository Store Thread.
         storeThread = new Thread(this);
         storeThread.setName(ID);
         storeThread.start();
-        initializeOpenDJ();
-        icConn = InternalClientConnection.getRootConnection();
-        Log.logger.log(Level.FINE, DB_DJ_STR_OK.get().toString());
-    }
 
-    private void initializeOpenDJ()
-            throws StoreException {
-        try {
-            //EmbeddedOpenDJ.startServer(OpenDJConfig.getOdjRoot());
-        } catch (Exception ex) {
-            Log.logger.log(Level.SEVERE, DB_DJ_NO_START.get().toString(), ex);
-            throw new StoreException(DB_DJ_NO_START.get().toString(), ex);
-        }
+        Log.logger.log(Level.FINE, DB_DJ_STR_OK.get().toString());
     }
 
     /**
@@ -285,13 +355,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                         "session size=" + blob.length + " bytes");
             }
 
-            FAMRecord famRec = new FAMRecord (
+            FAMRecord famRec = new FAMRecord(
                     SESSION, FAMRecord.WRITE, key, expirationTime, uuid,
                     is.getState(), sid.toString(), blob);
 
             writeImmediate(famRec);
 
-           } catch (Exception e) {
+        } catch (Exception e) {
             debug.error("OpenDJPersistenceStore.save(): failed "
                     + "to save Session", e);
         }
@@ -306,7 +376,6 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
      */
     @Override
     public void write(AMRootEntity amRootEntity) throws StoreException {
-        //amSessionRepositoryEventConcurrentLinkedQueue.
         writeImmediate(amRootEntity);
     }
 
@@ -448,12 +517,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
     }
 
     public void deleteExpired() throws Exception {
-        // TODO -- Use a Default Expiration Period.
+        // TODO -- Delete all Expired Sessions.
     }
 
     public void deleteExpired(long expDate)
             throws StoreException {
         try {
+            debug.error("** Polling for any Expired Sessions....");
             StringBuilder baseDN = new StringBuilder();
             StringBuilder filter = new StringBuilder();
             filter.append(EXPDATE_FILTER_PRE).append(expDate).append(EXPDATE_FILTER_POST);
@@ -463,7 +533,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, filter.toString(), returnAttrs);
             ResultCode resultCode = iso.getResultCode();
-
+            debug.error("** Poll Result Code: "+resultCode.toString() );
             if (resultCode == ResultCode.SUCCESS) {
                 LinkedList<SearchResultEntry> searchResult = iso.getSearchEntries();
 
@@ -490,21 +560,28 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                 }
             } else if (resultCode == ResultCode.NO_SUCH_OBJECT) {
                 final LocalizableMessage message = DB_ENT_NOT_P.get(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
+                debug.error(message.toString());
                 Log.logger.log(Level.FINE, message.toString());
             } else {
                 final LocalizableMessage message = DB_ENT_ACC_FAIL.get(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN), resultCode.toString());
+                debug.error(message.toString());
+
                 Log.logger.log(Level.WARNING, message.toString());
                 throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
             final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
+            debug.error(message.toString());
             Log.logger.log(Level.WARNING, message.toString(), dex);
             throw new StoreException(message.toString(), dex);
         } catch (Exception ex) {
             if (!shutdown) {
+                debug.error(DB_ENT_EXP_FAIL.get().toString(), ex);
                 Log.logger.log(Level.WARNING, DB_ENT_EXP_FAIL.get().toString(), ex);
             } else {
+                debug.error(DB_ENT_EXP_FAIL.get().toString(), ex);
                 Log.logger.log(Level.FINEST, DB_ENT_EXP_FAIL.get().toString(), ex);
+
             }
         }
     }
@@ -535,7 +612,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             baseDN.append(Constants.COMMA).append(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, Constants.FAMRECORD_FILTER , returnAttrs);
+                    0, 0, false, Constants.FAMRECORD_FILTER, returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {
@@ -798,10 +875,10 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         try {
             String key = SessionUtils.getEncryptedStorageKey(sid);
 
-            FAMRecord famRecord = (FAMRecord)this.read(key);
+            FAMRecord famRecord = (FAMRecord) this.read(key);
 
             InternalSession is = null;
-            if(famRecord != null) {
+            if (famRecord != null) {
                 byte[] blob = famRecord.getBlob();
                 is = (InternalSession) SessionUtils.decode(blob);
             }
@@ -834,13 +911,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         InternalClientConnection icConn = InternalClientConnection.getRootConnection();
         Set<AMSessionDBOpenDJServer> serverList = new HashSet<AMSessionDBOpenDJServer>();
         StringBuilder baseDn = new StringBuilder();
-        baseDn.append(Constants.HOSTS_BASE_DN);
+        baseDn.append(com.sun.identity.shared.Constants.DEFAULT_SESSION_HA_ROOT_DN);
         baseDn.append(Constants.COMMA).append(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
 
         try {
             InternalSearchOperation iso = icConn.processSearch(baseDn.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
-                    0, 0, false, "objectclass=*" , serverAttrs);
+                    0, 0, false, "objectclass=*", serverAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             if (resultCode == ResultCode.SUCCESS) {
@@ -882,7 +959,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                 throw new StoreException(message.toString());
             }
         } catch (DirectoryException dex) {
-            Object[] error = { baseDn };
+            Object[] error = {baseDn};
             final LocalizableMessage message = DB_ENT_ACC_FAIL2.get(baseDn);
             Log.logger.log(Level.WARNING, message.toString());
             throw new StoreException(message.toString(), dex);
@@ -909,21 +986,21 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
      * Process any and all deferred AM Session Repository Operations.
      */
     private synchronized void processDeferredAMSessionRepositoryOperations() {
-        debug.error("Begin Processing Deferred AMSession Repository Operations.");
+        debug.message("Begin Processing Deferred AMSession Repository Operations.");
         int count = 0;
         ConcurrentLinkedQueue<AMSessionRepositoryDeferredOperation>
                 tobeRemoved
                 = new ConcurrentLinkedQueue<AMSessionRepositoryDeferredOperation>();
         for (AMSessionRepositoryDeferredOperation amSessionRepositoryDeferredOperation :
                 amSessionRepositoryDeferredOperationConcurrentLinkedQueue) {
-           count++;
+            count++;
             // TODO -- Build out Implementation to invoke Session Repository Events.
 
-           // Place Entry to Collection to be removed from Queue.
-           tobeRemoved.add(amSessionRepositoryDeferredOperation);
+            // Place Entry to Collection to be removed from Queue.
+            tobeRemoved.add(amSessionRepositoryDeferredOperation);
         }
-        debug.error("End of Processing Deferred AMSession Repository Operations.");
-        debug.error("Performed " + count + " Deferred Operations.");
+        debug.message("End of Processing Deferred AMSession Repository Operations.");
+        debug.message("Performed " + count + " Deferred Operations.");
         amSessionRepositoryDeferredOperationConcurrentLinkedQueue.removeAll(tobeRemoved);
     }
 

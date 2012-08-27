@@ -1191,13 +1191,40 @@ public interface Constants {
     static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=java,dc=net";
 
     /**
+     * Internal Root Context
+     */
+    static final String DEFAULT_INTERNAL_CONTAINER = "dc=internal";
+
+    /**
      * Default Session SFO/HA Root DN
      */
-    static final String DEFAULT_SESSION_HA_ROOT_DN = "ou=amsessiondb";
+    static final String DEFAULT_SESSION_HA_ROOT_DN = DEFAULT_INTERNAL_CONTAINER+","+DEFAULT_ROOT_SUFFIX;
 
     /**
      * Default Session SFO/HA Store Type.
      */
     static final String DEFAULT_SESSION_HA_STORE_TYPE = "None";
+
+    /**
+     * Additional AMSessionDB Constants
+     */
+    static final String STATS_ENABLED =
+            "amsessiondb.enabled";
+
+    static final String URI = "amsessiondb.uri";
+
+    static final String BASE_DN = "ou=famrecords";
+
+    static final String AMRECORD_NAMING_ATTR = "pKey";
+
+    static final String TOP = "top";
+
+    static final String FR_FAMRECORD = "frFamRecord";
+
+    static final String OBJECTCLASS = "objectClass";
+
+    static final String FR_AMSESSIONDB = "frAmSessionDb";
+
+    static final String FAMRECORD_FILTER = "(objectclass=*)";
 
 }

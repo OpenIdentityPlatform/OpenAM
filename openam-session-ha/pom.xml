@@ -58,7 +58,6 @@
     <modules>
         <module>openam-session-ha-locale</module>
         <module>openam-session-ha-core</module>
-        <module>openam-session-ha-cts</module>
     </modules>
 
     <!-- Build -->

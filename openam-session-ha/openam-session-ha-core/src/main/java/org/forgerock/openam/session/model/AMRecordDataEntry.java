@@ -36,13 +36,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Level;
+
+import com.sun.identity.shared.Constants;
 import org.forgerock.i18n.LocalizableMessage;
-import org.forgerock.openam.session.model.AMRecord;
-import org.forgerock.openam.session.ha.amsessionstore.common.Constants;
 import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
-import org.forgerock.openam.session.model.AMRootEntity;
-import org.forgerock.openam.session.model.FAMRecord;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;

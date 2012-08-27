@@ -1,0 +1,13 @@
+dn: dc=internal,dc=openam,dc=java,dc=net
+objectClass: domain
+objectClass: top
+dc: internal
+
+dn: ou=famrecords,dc=internal,dc=openam,dc=java,dc=net
+ou: famrecords
+objectClass: organizationalUnit
+
+dn: ou=amsessiondb,dc=internal,dc=openam,dc=java,dc=net
+ou: amsessiondb
+objectClass: organizationalUnit
+

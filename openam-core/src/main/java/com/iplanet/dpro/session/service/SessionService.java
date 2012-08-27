@@ -80,6 +80,7 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
@@ -139,6 +140,8 @@ public class SessionService {
     static private ThreadPool threadPool = null;
 
     static SSOTokenManager ssoManager = null;
+
+    private static AMSessionRepository amSessionRepository = null;
 
     public static Debug sessionDebug = null;
 
@@ -281,6 +284,7 @@ public class SessionService {
         int poolSize = DEFAULT_POOL_SIZE;
         int threshold = DEFAULT_THRESHOLD;
 
+        // Notification Thread Pool Size
         String size = SystemProperties.get(
             Constants.NOTIFICATION_THREADPOOL_SIZE);
         if (size != null) {
@@ -293,6 +297,7 @@ public class SessionService {
             }
         }
 
+        // Notification Thread Pool Threshold
         String thres = SystemProperties.get(
             Constants.NOTIFICATION_THREADPOOL_THRESHOLD);
         if (thres != null) {
@@ -305,6 +310,21 @@ public class SessionService {
             }
         }
 
+        // *******************************************************************
+        // Bootstrap AMSessionRepository Implementation if one was specified.
+        if (!SystemPropertiesManager.get(
+                AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE,"none").equalsIgnoreCase("none"))
+        {
+            if (amSessionRepository == null)
+            {
+                // Instantiate our Session Repository Implementation.
+                amSessionRepository = getRepository();
+                sessionDebug.message("amSessionRepository Implementation: "+
+                    ((amSessionRepository == null) ? "" : amSessionRepository.getClass().getSimpleName()));
+            }
+        }
+
+        // Establish Shutdown Manager.
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
         if (shutdownMan.acquireValidLock()) {
             try {
@@ -2050,14 +2070,20 @@ public class SessionService {
      * 
      * @return reference to session repository
      */
-    protected AMSessionRepository getRepository() {
+    protected static AMSessionRepository getRepository() {
 
-        if (!getUseInternalRequestRouting()) {
-            return null;
-        }
+        // TODO -- Fix
+        //if (!getUseInternalRequestRouting()) {
+        //    sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
+        //    return null;
+        //}
+
         if (sessionRepository == null) {
             try {
                 sessionRepository = SessionRepository.getInstance();
+                String message =
+                        "Obtained Session Repository Implementation: "+sessionRepository.getClass().getSimpleName();
+                sessionDebug.message(message);
             } catch (Exception e) {
                 sessionDebug
                         .error("Failed to initialize session repository", e);

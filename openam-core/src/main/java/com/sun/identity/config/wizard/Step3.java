@@ -216,7 +216,7 @@ public class Step3 extends LDAPStoreWizardPage {
     }
 
     public boolean validateSessionRootDN() {
-        String sessionRootDN = toString("sessionRootDN");
+        String sessionRootDN = toString(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN);
 
         if ((sessionRootDN == null) || (sessionRootDN.trim().length() == 0)) {
             writeToResponse(getLocalizedString("missing.required.field"));
@@ -630,9 +630,9 @@ public class Step3 extends LDAPStoreWizardPage {
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX, tmp);
 
-        tmp = (String)data.get(BootstrapData.DS_BASE_DN);
+        tmp = (String)data.get(Constants.DEFAULT_SESSION_HA_ROOT_DN);
         getContext().setSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, "ou=amsessiondb,"+tmp);
+                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, tmp);
 
         tmp = (String)data.get(Constants.DEFAULT_SESSION_HA_STORE_TYPE);
         getContext().setSessionAttribute(

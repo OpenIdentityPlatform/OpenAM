@@ -48,13 +48,10 @@ public enum AMSessionRepositoryType {
     OPENDJ(1, 1, "opendj", "OpenDJ", "OpenAM Configuration Directory", "session.store.type.opendj",
             org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore.class),
 
-    CTS(2, 2, "cts", "CTS", "OpenAM Core Token Service", "session.store.type.cts",
-            org.forgerock.openam.session.ha.amsessionstore.store.cts.CTSPersistentStore.class),
-
-    PLUGIN(3, 3, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
+    PLUGIN(2, 2, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
             org.forgerock.openam.session.ha.amsessionstore.store.plugin.PlugInPersistentStore.class),
 
-    JMSMQ(4, 4, "jmsmq", "JMS-MQ", "JMS MQ (Deprecated)", "session.store.type.jmsmq",
+    JMSMQ(3, 3, "jmsmq", "JMS-MQ", "JMS MQ (Deprecated)", "session.store.type.jmsmq",
             org.forgerock.openam.session.ha.amsessionstore.store.mq.JMQSessionRepository.class);
 
     /**

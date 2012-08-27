@@ -1305,6 +1305,7 @@
                     <systemPropertyVariables>
                         <system_config>${openam.properties}</system_config>
                     </systemPropertyVariables>
+                    <junitArtifactName>none:none</junitArtifactName>
                     <testNGArtifactName>org.testng:testng</testNGArtifactName>
                 </configuration>
                 <executions>
@@ -1313,14 +1314,9 @@
                         <goals>
                             <goal>test</goal>
                         </goals>
-                        <configuration>
-                            <junitArtifactName>none:none</junitArtifactName>
-                            <testNGArtifactName>org.testng:testng</testNGArtifactName>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

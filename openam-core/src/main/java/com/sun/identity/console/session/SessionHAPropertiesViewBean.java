@@ -35,6 +35,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 
 import com.iplanet.jato.view.html.TextField;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.html.CCStaticTextField;
@@ -80,11 +81,21 @@ public class SessionHAPropertiesViewBean
         registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE+".LABEL",TextField.class);
         registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN+".LABEL",TextField.class);
         registerChild(AMSessionRepository.REPOSITORY_CLASS_PROPERTY+".LABEL",TextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD+".LABEL",TextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING+".LABEL",TextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT+".LABEL",TextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD+".LABEL",TextField.class);
+
         // Read-Only Fields
         registerChild(AMSessionRepository.IS_SFO_ENABLED,StaticTextField.class);
         registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE,StaticTextField.class);
         registerChild(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,StaticTextField.class);
         registerChild(AMSessionRepository.REPOSITORY_CLASS_PROPERTY,StaticTextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD,StaticTextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING,StaticTextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT,StaticTextField.class);
+        registerChild(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD,StaticTextField.class);
+
     }
 
     protected View createChild(String name) {
@@ -128,6 +139,39 @@ public class SessionHAPropertiesViewBean
             view = new CCStaticTextField(
                     this,name,SystemPropertiesManager.get(AMSessionRepository.REPOSITORY_CLASS_PROPERTY, ""));
         }
+
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD+".LABEL")) {
+            view = new CCStaticTextField(this,name,Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD);
+        }
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD, ""));
+        }
+
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING+".LABEL")) {
+            view = new CCStaticTextField(this,name,Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING);
+        }
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING, ""));
+        }
+
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT+".LABEL")) {
+            view = new CCStaticTextField(this,name,Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT);
+        }
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT, ""));
+        }
+
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD+".LABEL")) {
+            view = new CCStaticTextField(this,name,Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD);
+        }
+        else if (name.equals(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD)) {
+            view = new CCStaticTextField(
+                    this,name,SystemPropertiesManager.get(Constants.AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD, ""));
+        }
+
         else if ((ptModel != null) && ptModel.isChildSupported(name)) {
             view = ptModel.createChild(this, name);
         } else {

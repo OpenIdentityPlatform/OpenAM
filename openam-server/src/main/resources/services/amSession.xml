@@ -287,7 +287,7 @@
                                      type="single"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>ou=amsessiondb</Value>
+                            <Value>dc=internal,dc=openam,dc=java,dc=net</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
