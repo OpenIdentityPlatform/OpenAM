@@ -318,9 +318,10 @@ public class SessionService {
             if (amSessionRepository == null)
             {
                 // Instantiate our Session Repository Implementation.
+                // Allows Static Elements to Initialize.
                 amSessionRepository = getRepository();
                 sessionDebug.message("amSessionRepository Implementation: "+
-                    ((amSessionRepository == null) ? "" : amSessionRepository.getClass().getSimpleName()));
+                    ((amSessionRepository == null) ? "None" : amSessionRepository.getClass().getSimpleName()));
             }
         }
 

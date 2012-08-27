@@ -245,9 +245,11 @@ public class SessionRequestHandler implements RequestHandler {
                             if (siteID != null) {
                                 String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
                                 String localServerID = sessionService.getLocalServerID();
-                                
-                                if (primaryID.equals(localServerID)) {
-                                    throw new SessionException("invalid session id");
+                                if ( (primaryID != null) && (localServerID != null) )
+                                {
+                                    if (primaryID.equals(localServerID)) {
+                                        throw new SessionException("invalid session id");
+                                    }
                                 }
                             }
                         } else {

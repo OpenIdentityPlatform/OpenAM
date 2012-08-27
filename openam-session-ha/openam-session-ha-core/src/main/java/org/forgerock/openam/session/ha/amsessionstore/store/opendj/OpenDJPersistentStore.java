@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.Iterator;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -275,7 +276,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             icConn = InternalClientConnection.getRootConnection();
             InternalSearchOperation results =
                     icConn.processSearch("dc=internal,dc=openam,dc=java,dc=net", SearchScope.BASE_OBJECT, "*");
-           debug.warning("Search for base container yielded Result Code: "+results.getResultCode().toString()+"]");
+           debug.warning("Search for base container yielded Result Code: " + results.getResultCode().toString() + "]");
 
 
 
@@ -890,20 +891,30 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             return is;
 
         } catch (Exception e) {
-            debug.message("OpenDJPersistentStore.retrieve(): failed retrieving "
+            debug.error("OpenDJPersistentStore.retrieve(): failed retrieving "
                     + "session", e);
             return null;
         }
     }
 
     @Override
-    public Map getSessionsByUUID(String uuid) throws Exception {
-        return null;  // TODO
+    public Map getSessionsByUUID(String uuid) throws SessionException {
+        HashMap sessions = null;
+
+        try {
+            FAMRecord famRecord = (FAMRecord) this.read(uuid);
+            if (famRecord != null) {
+                sessions = famRecord.getExtraStringAttributes();
+            }
+            return sessions;
+        } catch (Exception e) {
+            throw new SessionException(e);
+        }
     }
 
     @Override
     public long getRunPeriod() {
-        return 0;  // TODO
+        return runPeriod;
     }
 
     public static Set<AMSessionDBOpenDJServer> getServers()
