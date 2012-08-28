@@ -39,17 +39,7 @@ import com.sun.identity.common.ShutdownPriority;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -76,7 +66,6 @@ import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPEntry;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPModification;
-import java.io.FilenameFilter;
 
 import org.opends.messages.Message;
 import org.opends.server.core.DirectoryServer;
@@ -105,6 +94,13 @@ public class EmbeddedOpenDS {
     private static final String OPENDS_UPGRADE_DIR = "/config/upgrade/";
     private static final String OPENDS_CONFIG_LDIF = "config.ldif";
     private static boolean serverStarted = false;
+
+    /**
+     * List of Schema to be copied and applied during installation.
+     */
+    private static final String[] additionalSchemaToBeApplied = {
+            "webapps/openam/WEB-INF/template/ldif/sfha/98-amsessiondb.ldif"
+    };
 
     /**
      * Returns <code>true</code> if the server has already been started.
@@ -221,12 +217,12 @@ public class EmbeddedOpenDS {
                         //No handling requried
                     }
                 }
-            }
+            } // End of Inner Finally.
 
             if (file.getName().endsWith("sh") || file.getName().startsWith("bin")) {
                 f.setExecutable(true);
             }
-        }
+        } // End of File Elements from Zip for OpenDJ.
 
         // copy OpenDJ jar file
         // TODO Make this Dynamic, so we can eliminate versions on Jars.
@@ -235,7 +231,7 @@ public class EmbeddedOpenDS {
                 "sleepycat-je-2011-04-07.jar",          // Was je.jar before Maven Support.
                 "mail-1.4.5.jar"                        // Was mail.jar before Maven Support.
         };
-        String[] NewOpendsJarFiles = {              //  We use this table to rename the files
+        String[] NewOpendsJarFiles = {                 // We use this table to rename the files
                 "OpenDJ-2012-20-02.jar",               // Since OpenDJ seems to need je.jar by name
                 "je.jar",
                 "mail-1.4.5.jar"
@@ -350,6 +346,51 @@ public class EmbeddedOpenDS {
                 }
             }
         }
+
+        // ****************************************************
+        // Copy in additional Schemata Definitions.
+        String targetDirectory =  odsRoot+"/config/schema/";
+        for(String additionalSchemaSourceFileName : additionalSchemaToBeApplied)
+        {
+            File additionalSchemaSourceFile = new File(additionalSchemaSourceFileName);
+            if (!additionalSchemaSourceFile.canRead())
+                {
+                    Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to Read Schema File:["
+                            +additionalSchemaSourceFile.getAbsolutePath()+"], Ignoring!");
+                    continue;
+                }
+            // Copy over the File.
+            ReadableByteChannel inChannel =
+                    new FileInputStream(additionalSchemaSourceFile).getChannel();
+            FileChannel outChannel = new FileOutputStream(targetDirectory + additionalSchemaSourceFile.getName()).getChannel();
+
+            try {
+                channelCopy(inChannel, outChannel);
+            } catch (IOException ioe) {
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                        "EmbeddedOpenDS.setup(): Error copying schema file: "+additionalSchemaSourceFile.toString(), ioe);
+                throw ioe;
+            } finally {
+                if (inChannel != null) {
+                    try {
+                        inChannel.close();
+                    } catch (Exception ex) {
+                        //No handling requried
+                    }
+                }
+
+                if (outChannel != null) {
+                    try {
+                        outChannel.close();
+                    } catch (Exception ex) {
+                        //No handling requried
+                    }
+                }
+            }
+        } // End of For Each Loop.
+
+
+
 
         // remove zip
         File toDelete = new File(odsRoot + "/opendj.zip");
