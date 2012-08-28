@@ -894,19 +894,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
     public InternalSession retrieve(SessionID sid) throws Exception {
         try {
             String key = SessionUtils.getEncryptedStorageKey(sid);
-
-            FAMRecord famRecord = (FAMRecord) this.read(key);
-
+            AMRecord amRecord = (AMRecord) this.read(key);
             InternalSession is = null;
-            if (famRecord != null) {
-                byte[] blob = famRecord.getBlob();
+            if (amRecord != null) {
+                byte[] blob = amRecord.getData().getBytes();
                 is = (InternalSession) SessionUtils.decode(blob);
             }
-
-            /*
-             * ret.put(SESSIONID, message.getString(SESSIONID)); ret.put(DATA,
-             * message.getString(DATA));
-             */
+            // Return Internal Session.
             return is;
 
         } catch (Exception e) {
@@ -918,12 +912,11 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
 
     @Override
     public Map getSessionsByUUID(String uuid) throws SessionException {
-        HashMap sessions = null;
-
+        Map<String,String> sessions = null;
         try {
-            FAMRecord famRecord = (FAMRecord) this.read(uuid);
-            if (famRecord != null) {
-                sessions = famRecord.getExtraStringAttributes();
+            AMRecord amRecord = (AMRecord) this.read(uuid);
+            if (amRecord != null) {
+                sessions = amRecord.getExtraStringAttributes();
             }
             return sessions;
         } catch (Exception e) {
