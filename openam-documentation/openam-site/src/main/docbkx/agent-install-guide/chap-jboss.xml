@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-jboss'
@@ -359,6 +359,9 @@ fi</emphasis></programlisting>
  <section xml:id="uninstall-jboss-agent">
   <title>Removing JBoss Policy Agent Software</title>
   
+  <para>Shut down the JBoss server before you uninstall the
+    policy agent.</para>
+
   <para>To remove the J2EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the JBoss configuration directory
   location.</para>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-weblogic'
@@ -375,6 +375,9 @@ $ ./domain/mydomain/bin/startWebLogic.sh</screen>
  <section xml:id="uninstall-weblogic-agent">
   <title>Removing WebLogic Policy Agent Software</title>
   
+  <para>Shut down the WebLogic server before you uninstall the
+    policy agent.</para>
+
   <para>To remove the J2EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the WebLogic configuration directory
   location.</para>

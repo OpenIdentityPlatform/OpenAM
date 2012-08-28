@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-msiis-6'
@@ -32,9 +32,6 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing the Microsoft IIS 6 Policy Agent</title>
  <indexterm><primary>Microsoft IIS</primary></indexterm>
- <para>This chapter covers installation of the policy agent for Microsoft 
- Internet Information Services 6.</para>
- 
  <para>This chapter covers installation of the policy agent for Microsoft 
  Internet Information Services 6.</para>
  

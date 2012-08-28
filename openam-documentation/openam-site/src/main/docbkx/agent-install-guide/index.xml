@@ -45,6 +45,9 @@
      <firstname>Mark</firstname><surname>Craig</surname>
     </personname>
    </author>
+    <personname>
+     <firstname>Vanessa</firstname><surname>Richie</surname>
+    </personname>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>

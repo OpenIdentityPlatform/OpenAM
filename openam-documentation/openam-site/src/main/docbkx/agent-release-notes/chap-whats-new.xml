@@ -38,35 +38,65 @@
   <title>New in Web Policy Agents <?eval ${webAgentsDocTargetVersion}?></title>
 
   <itemizedlist>
+
    <listitem>
-    <para>TODO: For new, see JIRA for a complete list</para>
+    <para>The Java EE agent goto URL can now be modified (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
+    xlink:show="new">OPENAM-1299</link>).</para>
    </listitem>
    <listitem>
     <para>If you have already validated the URLs in your web policy agent
     configuration, you can disable URL validation during the bootstrap phase
     using the <literal>com.forgerock.agents.ext.url.validation.disable</literal>
-    property (OPENAM-1270).</para>
+    property (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
+   xlink:show="new">OPENAM-1270</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Policy agent now allows you to set the Login URL based on the incoming FQDN (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
+    xlink:show="new">OPENAM-1265</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Policy agent now allows you to configure the naming of the URL validation net-connect timeout (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1257"
+    xlink:show="new">OPENAM-1257</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agents now support IPv6 for notenforced IP addresses
-    (OPENAM-1256).</para>
+    (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1256"
+   xlink:show="new">OPENAM-1256</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Policy agents now support Apache HTTP Server 2.4 (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1195"
+    xlink:show="new">OPENAM-1195</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agents now let you preserve POST data when working with
-    URI-based load balancing (OPENAM-980).</para>
+    URI-based load balancing (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"
+   xlink:show="new">OPENAM-980</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agents can now conditionally redirect users based on the
-    incoming request URL (OPENAM-849).</para>
+    incoming request URL (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
+   xlink:show="new">OPENAM-849</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agents can now mark persistent cookies as HTTPOnly, to prevent
     scripts and third-party programs from accessing the cookies
-    (OPENAM-804).</para>
+    (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-804"
+   xlink:show="new">OPENAM-804</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agent file names now include the version number
-    (OPENAM-337).</para>
+    (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-337"
+   xlink:show="new">OPENAM-337</link>).</para>
    </listitem>
   </itemizedlist>
  </section>
@@ -77,11 +107,15 @@
   <itemizedlist>
    <listitem>
     <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
-    now parses as valid XML (OPENAM-674).</para>
+    now parses as valid XML (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
+   xlink:show="new">OPENAM-674</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agent file names now include the version number
-    (OPENAM-337).</para>
+    (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-337"
+   xlink:show="new">OPENAM-337</link>).</para>
    </listitem>
   </itemizedlist>
  </section>

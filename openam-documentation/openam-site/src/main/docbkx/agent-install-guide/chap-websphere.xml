@@ -345,6 +345,9 @@ Install log file location:
  <section xml:id="uninstall-websphere-agent">
   <title>Removing WebSphere Policy Agent Software</title>
   
+  <para>Shut down the WebSphere server before you uninstall the
+    policy agent.</para>
+
   <para>To remove the J2EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the WebSphere configuration directory
   location.</para>

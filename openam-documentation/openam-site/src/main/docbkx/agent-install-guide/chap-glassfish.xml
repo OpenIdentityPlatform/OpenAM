@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-glassfish'
@@ -348,6 +348,13 @@ Command start-domain executed successfully.</screen>
  
  <section xml:id="uninstall-glassfish-agent">
   <title>Removing GlassFish Policy Agent Software</title>
+
+  <para>Shut down the GlassFish domain before you uninstall the
+    policy agent.</para>
+
+  <screen>$ /path/to/glassfish/bin/asadmin stop-domain domain1
+    Waiting for the domain to stop ....
+    Command stop-domain executed successfully.</screen>
   
   <para>To remove the J2EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the GlassFish configuration directory

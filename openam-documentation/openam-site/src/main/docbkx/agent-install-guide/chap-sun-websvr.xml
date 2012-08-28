@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-sun-websvr'
@@ -301,7 +301,7 @@ Your client is not allowed to access the requested object.</literallayout>
  </section>
  
  <section xml:id="custom-sjsws-agent-installation">
-  <title>Custom Apache 2.2 Web Policy Agent Installation</title>
+  <title>Custom Sun Web Policy Agent Installation</title>
   
   <para>For alternative installations, use <command>agentadmin
   --custom-install</command>.</para>
@@ -315,7 +315,10 @@ Your client is not allowed to access the requested object.</literallayout>
  </section>
  
  <section xml:id="uninstall-sjsws-agent">
-  <title>Remove Apache 2.2 Web Policy Agent Software</title>
+  <title>Remove Sun Web Policy Agent Software</title>
+  
+  <para>Shut down the Sun Web Server before you uninstall the
+    policy agent.</para>
   
   <para>To remove the web policy agent, use <command>agentadmin
   --uninstall</command>.</para>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-apache-20'
@@ -337,10 +337,15 @@ Install log file location:
  <section xml:id="uninstall-apache20-agent">
   <title>Remove Apache 2.0 Web Policy Agent Software</title>
   
-  <para>To remove the web policy agent, use <command>agentadmin
+  <para>Shut down the Apache 2.0 server before you uninstall the
+    policy agent.</para>
+  
+  <screen>$ /path/to/apache20/bin/apachectl -k stop</screen>
+  
+  <para>To remove the web policy agent, use <command>./agentadmin
   --uninstall</command>.</para>
   
-  <screen>$ agentadmin --uninstall
+  <screen>$ ./agentadmin --uninstall
 ...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-apache-tomcat'
@@ -358,6 +358,11 @@ Build Machine: builds.forgerock.org
  
  <section xml:id="uninstall-tomcat-agent">
   <title>Remove Tomcat Policy Agent Software</title>
+  
+  <para>Shut down the Tomcat server before you uninstall the
+    policy agent.</para>
+  
+  <screen>$ /path/to/tomcat/bin/shutdown.sh</screen>
   
   <para>To remove the J2EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the Tomcat server configuration
