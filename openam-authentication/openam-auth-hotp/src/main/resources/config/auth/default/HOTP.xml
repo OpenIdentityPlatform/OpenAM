@@ -32,7 +32,8 @@
 
 
 <ModuleProperties moduleName="HOTP" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="This server uses OATH OTP authentication" >
+    <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
+    <Callbacks length="2" order="2" timeout="120" header="This server uses OATH OTP authentication" >
         <PasswordCallback echoPassword="false" >
             <Prompt> Enter OTP Code: </Prompt>
         </PasswordCallback>

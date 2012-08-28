@@ -32,7 +32,8 @@
 
 
 <ModuleProperties moduleName="HOTP" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="このサーバーでは OATH OTP 認証が使用されます" >
+    <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
+    <Callbacks length="2" order="2" timeout="120" header="このサーバーでは OATH OTP 認証が使用されます" >
         <PasswordCallback echoPassword="false" >
             <Prompt> OTP コードの入力: </Prompt>
         </PasswordCallback>

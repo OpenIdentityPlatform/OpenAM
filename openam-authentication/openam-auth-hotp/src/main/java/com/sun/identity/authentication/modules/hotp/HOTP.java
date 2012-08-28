@@ -288,13 +288,14 @@ public class HOTP extends AMLoginModule {
 
                     } else { // Send HOTP Code
                         try {
-                            sentHOTPCode = sendHOTPCode();                           
+                            sentHOTPCode = sendHOTPCode();
                             substituteHeader(START_STATE, bundle.getString("send.success"));
                         } catch (AuthLoginException ale) {
                             //it's already logged so we just handle the exception
                             substituteHeader(START_STATE, bundle.getString("send.failure"));
                         }
-                        return START_STATE;
+                        //repeat state 2
+                        return START_STATE-1;
                     }
                 } else {
                     setFailureID(userName);
