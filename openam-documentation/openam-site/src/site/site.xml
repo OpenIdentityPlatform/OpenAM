@@ -90,7 +90,7 @@
    <src>./images/openam-tagline-200x65.png</src>
    <alt>OpenAM</alt>
   </openproject>
-  <siteSearchFQDN>openam.forgerock.org</siteSearchFQDN>
+  <siteSearchFQDN>forgerock.org</siteSearchFQDN>
  </custom>
 
 </project>
