@@ -739,7 +739,11 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
      <term>MetaAlias</term>
      <listitem>
       <para>Used to locate the providers entity identifier, specified as
-      <literal>/<replaceable>realm</replaceable>/<replaceable>provider-name</replaceable></literal>.
+      <literal>/<replaceable>realm-name</replaceable>/<replaceable
+      >provider-name</replaceable></literal>, where neither
+      <replaceable>realm-name</replaceable> nor
+      <replaceable>provider-name</replaceable> can contain slash characters
+      (<literal>/</literal>).
       The extra leading <literal>/</literal> is omitted for the top-level
       realm.</para>
      </listitem>
@@ -1150,7 +1154,11 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
      <term>MetaAlias</term>
      <listitem>
       <para>Used to locate the providers entity identifier, specified as
-      <literal>/<replaceable>realm</replaceable>/<replaceable>provider-name</replaceable></literal>.
+      <literal>/<replaceable>realm-name</replaceable>/<replaceable
+      >provider-name</replaceable></literal>, where neither
+      <replaceable>realm-name</replaceable> nor
+      <replaceable>provider-name</replaceable> can contain slash characters
+      (<literal>/</literal>).
       The extra leading <literal>/</literal> is omitted for the top-level
       realm.</para>
      </listitem>
@@ -1375,5 +1383,550 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
     </listitem>
    </varlistentry>
   </variablelist>
+ </section>
+
+ <section xml:id="using-saml2-sso-slo">
+  <title>Using SAML 2.0 Single Sign-On &amp; Single Logout</title>
+
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>SAML 2.0 Single Sign-On (SSO)</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>SAML 2.0 Single Logout (SLO)</secondary>
+  </indexterm>
+
+  <para>OpenAM SAML 2.0 Federation provides JSPs where you can direct
+  users to do single sign-on (SSO) and single logout (SLO) across providers
+  in a circle of trust. OpenAM has two JSPs for SSO and two JSPs for
+  SLO, allowing you to initiate both processes either from the identity
+  provider side, or from the service provider side.</para>
+
+  <para>SSO lets users sign in once and remain authenticated as they access
+  services in the circle of trust.</para>
+
+  <para>SLO attempts to log a user out of all providers in the circle of
+  trust.</para>
+
+  <variablelist>
+   <para>The JSP pages are found under the context root where you deployed
+   OpenAM, in <filename>saml2/jsp/</filename>.</para>
+
+   <varlistentry>
+    <term><filename>spSSOInit.jsp</filename></term>
+    <listitem>
+     <para>Used to initiate SSO from the service provider side, so call this
+     on the service provider not the identity provider. This is also mapped
+     to the endpoint <literal>spssoinit</literal> under the
+     context root.</para>
+     <para>Examples:
+     <literal>http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp</literal>,
+     <literal>http://www.sp.com:8080/openam/spssoinit</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>idpSSOInit.jsp</filename></term>
+    <listitem>
+     <para>Used to initiate SSO from the identity provider side, so call this
+     on the identity provider not the service provider. This is also mapped to
+     the endpoint <literal>idpssoinit</literal> under the
+     context root.</para>
+     <para>Examples:
+     <literal>http://www.idp.com:8080/openam/saml2/jsp/idpSSOInit.jsp</literal>,
+     <literal>http://www.idp.com:8080/openam/idpssoinit</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>spSingleLogoutInit.jsp</filename></term>
+    <listitem>
+     <para>Used to initiate SLO from the service provider side, so call this
+     on the service provider not the identity provider.</para>
+     <para>Example:
+     <literal>http://www.sp.com:8080/sp/saml2/jsp/spSingleLogoutInit.jsp</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>idpSingleLogoutInit.jsp</filename></term>
+    <listitem>
+     <para>Used to initiate SLO from the identity provider side, so call this
+     on the identity provider not the service provider.</para>
+     <para>Example:
+     <literal>http://www.idp.com:8080/idp/saml2/jsp/idpSingleLogoutInit.jsp</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+   <para>When you invoke these JSPs, there are several parameters to
+   specify. Which parameters you can use depends on the JSP.</para>
+
+  <variablelist xml:id="idpssoinit-parameters">
+   <title><filename>idpSSOInit.jsp</filename> Parameters</title>
+  
+   <varlistentry>
+    <term><literal>metaAlias</literal></term>
+    <listitem>
+     <para>(Required) Use this parameter to specify the local alias for the
+     provider, such as <literal>metaAlias=/myRealm/idp</literal>. This
+     parameter takes the format
+     <literal>/<replaceable>realm-name</replaceable>/<replaceable
+     >provider-name</replaceable></literal> as described in <xref
+     linkend="idp-meta-alias"/>. You do not repeat the slash for
+     the top level realm, for example <literal>metaAlias=/idp</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>spEntityID</literal></term>
+    <listitem>
+     <para>(Required) Use this parameter to indicate the remote service
+     provider. Make sure you URL encode the value. For example, specify
+     <literal>spEntityID=http://www.sp.com:8080/openam</literal> as
+     <literal>spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>affiliationID</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a SAML affiliation
+     identifier.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>binding</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to indicate what binding to use for the
+     operation. For example, specify <literal>binding=HTTP-POST</literal> to
+     use HTTP POST binding with a self-submitting form. In addition to
+     <literal>binding=HTTP-POST</literal>, you can also use
+     <literal>binding=HTTP-Artifact</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>NameIDFormat</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a SAML Name Identifier
+     format identifier such as
+     <literal>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literal>, or
+     <literal>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayState</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify where to redirect the user
+     when the process is complete. Make sure you URL encode the value. For
+     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
+     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayStateAlias</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify the parameter to use as the
+     <literal>RelayState</literal>. For example, if your query string has
+     <literal>target=http%3A%2F%2Fopenam.forgerock.org&amp;RelayStateAlias=target</literal>,
+     this is like setting
+     <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="spssoinit-parameters">
+   <title><filename>spSSOInit.jsp</filename> Parameters</title>
+  
+   <varlistentry>
+    <term><literal>idpEntityID</literal></term>
+    <listitem>
+     <para>(Required) Use this parameter to indicate the remote identity
+     provider. Make sure you URL encode the value. For example, specify
+     <literal>idpEntityID=http://www.idp.com:8080/openam</literal> as
+     <literal>idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>metaAlias</literal></term>
+    <listitem>
+     <para>(Required) Use this parameter to specify the local alias for the
+     provider, such as <literal>metaAlias=/myRealm/sp</literal>. This parameter
+     takes the format <literal>/<replaceable>realm-name</replaceable>/<replaceable
+     >provider-name</replaceable></literal> as described in <xref
+     linkend="sp-meta-alias"/>. You do not repeat the slash for the
+     top level realm, <literal>metaAlias=/sp</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>affiliationID</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a SAML affiliation
+     identifier.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>AllowCreate</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to indicate whether the identity
+     provider can create a new identifier for the principal if none exists
+     (<literal>true</literal>) or not (<literal>false</literal>).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>AssertionConsumerServiceIndex</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify an integer that indicates
+     the location to which the Response message should be returned to the
+     requester.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>AuthComparison</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a comparison method to
+     evaluate the requested context classes or statements. OpenAM accepts the
+     following values: <literal>better</literal>, <literal>exact</literal>,
+     <literal>maximum</literal>, and <literal>minimum</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>AuthnContextClassRef</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify authentication context
+     class references. Separate multiple values with pipe characters
+     (<literal>|</literal>).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>AuthnContextDeclRef</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify authentication context
+     declaration references. Separate multiple values with pipe characters
+     (<literal>|</literal>).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>AuthLevel</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify the authentication level
+     of the authentication context that OpenAM should use to authenticate the
+     user.</para>
+    </listitem>
+   </varlistentry>
+
+<!-- Supported currently in OpenAM?
+   <varlistentry>
+    <term><literal>AttributeConsumingServiceIndex</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify information associated with
+     the requester, describing the SAML attributes the identity provider is
+     requested to supply in the Response message.</para>
+    </listitem>
+   </varlistentry>
+-->
+
+   <varlistentry>
+    <term><literal>binding</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to indicate what binding to use for the
+     operation. For example, specify <literal>binding=HTTP-POST</literal> to
+     use HTTP POST binding with a self-submitting form. In addition to
+     <literal>binding=HTTP-POST</literal>, you can also use
+     <literal>binding=HTTP-Artifact</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+<!-- Supported currently in OpenAM?
+   <varlistentry>
+    <term><literal>Consent</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URI that is a SAML Consent
+     Identifier.</para>
+    </listitem>
+   </varlistentry>
+-->
+
+   <varlistentry>
+    <term><literal>Destination</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URI Reference indicating
+     the address to which the request is sent.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>ForceAuthN</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to indicate whether the identity
+     provider should force authentication (<literal>true</literal>) or can
+     reuse existing security contexts (<literal>false</literal>).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>isPassive</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to indicate whether the identity
+     provider should authenticate passively (<literal>true</literal>) or not
+     (<literal>false</literal>).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>NameIDFormat</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a SAML Name Identifier
+     format identifier such as
+     <literal>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literal>,
+     or <literal>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayState</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify where to redirect the user
+     when the process is complete. Make sure you URL encode the value. For
+     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
+     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayStateAlias</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify the parameter to use as the
+     <literal>RelayState</literal>. For example, if your query string has
+     <literal>target=http%3A%2F%2Fopenam.forgerock.org&amp;RelayStateAlias=target</literal>,
+     this is like setting
+     <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>reqBinding</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to indicate what binding to use for the
+     authentication request. Valid values in include
+     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal>
+     (default) and
+     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>sunamcompositeadvice</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URL encoded XML blob that
+     specifies the authentication level advice. For example, the following XML
+     indicates a requested authentication level of 1. Notice the required
+     <literal>:</literal> before the 1.</para>
+     <programlisting language="xml">&lt;Advice&gt;
+ &lt;AttributeValuePair&gt;
+  &lt;Attribute name=&quot;AuthLevelConditionAdvice&quot;/&gt;
+  &lt;Value&gt;/:1&lt;/Value&gt;
+ &lt;/AttributeValuePair&gt;
+&lt;/Advice&gt;</programlisting>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="idpsloinit-parameters">
+   <title><filename>idpSingleLogoutInit.jsp</filename> Parameters</title>
+
+   <varlistentry>
+    <term><literal>binding</literal></term>
+    <listitem>
+     <para>(Required) Use this parameter to indicate what binding to use for the
+     operation. For example, specify <literal>binding=HTTP-POST</literal> to
+     use HTTP POST binding with a self-submitting form rather than the default
+     HTTP redirect binding. In addition to <literal>binding=HTTP-POST</literal>,
+     you can also use <literal>binding=HTTP-Artifact</literal>.</para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term><literal>Consent</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URI that is a SAML Consent
+     Identifier.</para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term><literal>Destination</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URI Reference indicating
+     the address to which the request is sent.</para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term><literal>Extension</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a list of Extensions as
+     string objects.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>goto</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify where to redirect the user
+     when the process is complete. <literal>RelayState</literal> takes
+     precedence over this parameter.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>logoutAll</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify that the identity provider
+     should send single logout requests to service providers without indicating
+     a session index.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayState</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify where to redirect the user
+     when the process is complete. Make sure you URL encode the value. For
+     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
+     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="spsloinit-parameters">
+   <title><filename>spSingleLogoutInit.jsp</filename> Parameters</title>
+  
+   <varlistentry>
+    <term><literal>binding</literal></term>
+    <listitem>
+     <para>(Required) Use this parameter to indicate what binding to use for the
+     operation. For example, specify <literal>binding=HTTP-POST</literal> to
+     use HTTP POST binding with a self-submitting form rather than the default
+     HTTP redirect binding. In addition to <literal>binding=HTTP-POST</literal>,
+     you can also use <literal>binding=HTTP-Artifact</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>idpEntityID</literal></term>
+    <listitem>
+     <para>(Required for Fedlets) Use this parameter to indicate the remote
+     identity provider. If the <literal>binding</literal> is not set, then
+     OpenAM uses this parameter to find the default binding. Make sure you URL
+     encode the value. For example, specify
+     <literal>idpEntityID=http://www.sp.com:8080/openam</literal> as
+     <literal>idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>NameIDValue</literal></term>
+    <listitem>
+     <para>(Required for Fedlets) Use this parameter to indicate the SAML Name
+     Identifier for the user.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>SessionIndex</literal></term>
+    <listitem>
+     <para>(Required for Fedlets) Use this parameter to indicate the
+     <literal>sessionIndex</literal> of the user session to terminate.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>Consent</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URI that is a SAML Consent
+     Identifier.</para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term><literal>Destination</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a URI Reference indicating
+     the address to which the request is sent.</para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term><literal>Extension</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify a list of Extensions as
+     string objects.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>goto</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify where to redirect the user
+     when the process is complete. <literal>RelayState</literal> takes
+     precedence over this parameter.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayState</literal></term>
+    <listitem>
+     <para>(Optional) Use this parameter to specify where to redirect the user
+     when the process is complete. Make sure you URL encode the value. For
+     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
+     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>spEntityID</literal></term>
+    <listitem>
+     <para>(Optional, for Fedlets) Use this parameter to indicate the Fedlet
+     entity ID. When missing, OpenAM uses the first entity ID in the
+     metadata.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <example xml:id="example-saml2-sso-slo"><?dbfo keep-together="auto"?>
+   <title>SSO &amp; SLO From the Service Provider</title>
+
+   <para>The following URL takes the user from the service provider side to
+   authenticate at the identity provider and then come back to the end user
+   profile page at the service provider after successful SSO. Lines are folded
+   to show you the query string parameters.</para>
+
+   <programlisting language="none"
+   >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?metaAlias=/sp
+&amp;idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+&amp;RelayState=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam%2Fidm%2FEndUser</programlisting>
+
+   <para>The following URL initiates SLO from the service provider side,
+   leaving the user at <literal>http://openam.forgerock.org</literal>.</para>
+
+   <programlisting language="none"
+   >http://www.sp.com:8080/sp/saml2/jsp/spSingleLogoutInit.jsp?metaAlias=/sp
+&amp;idpEntityID=http%3A%2F%2Fdesktop.example.com%3A8080%2Fopenam
+&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
+  </example>
  </section>
 </chapter>
