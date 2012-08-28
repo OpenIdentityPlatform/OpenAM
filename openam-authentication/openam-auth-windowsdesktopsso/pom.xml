@@ -148,8 +148,8 @@
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>j2ee</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
     </dependencies>
 

@@ -299,16 +299,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.el</groupId>
-            <artifactId>el-ri</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>external</groupId>
             <artifactId>esapiport</artifactId>
         </dependency>
@@ -414,6 +404,16 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
@@ -451,11 +451,6 @@
         <dependency>
             <groupId>relaxngDatatype</groupId>
             <artifactId>relaxngDatatype</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>rome</groupId>
-            <artifactId>rome</artifactId>
         </dependency>
 
         <dependency>
@@ -531,10 +526,6 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>i18n-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>j2ee</artifactId>
         </dependency>
         <dependency>
             <groupId>external</groupId>

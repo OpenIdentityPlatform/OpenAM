@@ -25,7 +25,6 @@
                 <include>org.forgerock:openam-wsfederation-schema</include>
                 <include>org.forgerock:openam-distribution-amadmsetup</include>
                 <include>external:OpenDJ</include>
-                <include>external:j2ee</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>com.sun.xml.rpc:jaxrpc-impl</include>
                 <include>com.sun.xml.rpc:jaxrpc-spi</include>
@@ -39,6 +38,13 @@
                 <include>xalan:xalan</include>
                 <include>xerces-J:xercesImpl</include>
                 <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <scope>provided</scope>
+            <includes>
+                <include>javax.servlet:servlet-api</include>
             </includes>
         </dependencySet>
     </dependencySets>

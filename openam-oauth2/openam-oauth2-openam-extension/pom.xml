@@ -105,6 +105,10 @@
             <artifactId>openam-session-ha-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>

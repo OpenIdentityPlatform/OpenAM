@@ -24,7 +24,9 @@
  *
  * $Id: ReferralPrivilegeManager.java,v 1.7 2010/01/20 17:01:35 veiming Exp $
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -36,7 +38,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.persistence.EntityExistsException;
 import javax.security.auth.Subject;
 
 /**
@@ -154,7 +155,7 @@ public final class ReferralPrivilegeManager {
      * Removes a referral privilege.
      *
      * @param name name of referral privilege to be removed.
-     * @throws EntityExistsException if referral privilege cannot be removed.
+     * @throws EntitlementException if referral privilege cannot be removed.
      */
     public void delete(String name) throws EntitlementException {
         ReferralPrivilege referral = getReferral(name);

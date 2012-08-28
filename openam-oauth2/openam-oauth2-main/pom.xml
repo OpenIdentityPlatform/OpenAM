@@ -131,8 +131,8 @@
             <artifactId>jsr311-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>j2ee</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
         <!-- Test Dependencies -->
         <dependency>

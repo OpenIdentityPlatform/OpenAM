@@ -366,6 +366,11 @@
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
         <!-- Oauth2 dependencies -->
         <dependency>
             <groupId>org.forgerock</groupId>

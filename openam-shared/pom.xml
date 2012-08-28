@@ -139,20 +139,20 @@
 
     
     <dependencies>
-    	<dependency>
-			<groupId>external</groupId>
-			<artifactId>j2ee</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
 		
-		<dependency>
-			<groupId>external</groupId>
-			<artifactId>jss4</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>jss4</artifactId>
+        </dependency>
 		
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+        </dependency>
 		
     </dependencies>
     

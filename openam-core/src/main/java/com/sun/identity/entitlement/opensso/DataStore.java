@@ -24,7 +24,9 @@
  *
  * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -61,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.persistence.EntityExistsException;
 import javax.security.auth.Subject;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -672,7 +673,7 @@ public class DataStore {
      * @param ascendingOrder <code>true</code> to have result sorted in
      * ascending order.
      * @return a set of privilege names that satifies a search filter.
-     * @throws EntityExistsException if search failed.
+     * @throws EntitlementException if search failed.
      */
     public Set<String> search(
         Subject adminSubject,
