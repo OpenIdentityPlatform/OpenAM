@@ -274,13 +274,10 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         // This needs to come from a connection pool.
         try {
             icConn = InternalClientConnection.getRootConnection();
+            // TODO -- Fix Make ths Dynamic.
             InternalSearchOperation results =
                     icConn.processSearch("dc=internal,dc=openam,dc=java,dc=net", SearchScope.BASE_OBJECT, "*");
-           debug.warning("Search for base container yielded Result Code: " + results.getResultCode().toString() + "]");
-
-
-
-
+            debug.message("Search for base container yielded Result Code: " + results.getResultCode().toString() + "]");
         } catch (DirectoryException directoryException) {
             debug.warning("Unable to obtain the Internal Root Container for Session Persistence!",
                     directoryException);
@@ -396,6 +393,9 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(
                 SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
 
+        // TODO -- Remove me after testing
+        debug.error("OpenDJPersistence.writeImmediate: BaseDN:[" + baseDN.toString() + "] Record:[" + record.toString() + "]");
+
         try {
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
@@ -441,6 +441,10 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
 
         if (resultCode == ResultCode.SUCCESS) {
             final LocalizableMessage message = DB_SVR_CREATE.get(dn);
+
+            // TODO -- Remove me after testing
+            debug.error("OpenDJPersistence.saveImmediate: [" + message + "]");
+
             Log.logger.log(Level.FINE, message.toString());
         } else if (resultCode == ResultCode.ENTRY_ALREADY_EXISTS) {
             final LocalizableMessage message = DB_SVR_CRE_FAIL.get(dn);
@@ -465,6 +469,10 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
 
         if (resultCode == ResultCode.SUCCESS) {
             final LocalizableMessage message = DB_SVR_MOD.get(dn);
+
+            // TODO -- Remove me after testing
+            debug.error("OpenDJPersistence.saveImmediate: [" + message + "]");
+
             Log.logger.log(Level.FINE, message.toString());
         } else {
             final LocalizableMessage message = DB_SVR_MOD_FAIL.get(dn, resultCode.toString());
@@ -502,6 +510,21 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         deleteImmediate(id);
     }
 
+    /**
+     * Deletes session record from the repository.
+     *
+     * @param sid session ID.
+     * @throws Exception if anything goes wrong.
+     */
+    @Override
+    public void delete(SessionID sid) throws Exception {
+        deleteImmediate(sid);
+    }
+
+    private void deleteImmediate(SessionID sid) throws Exception {
+        // TODO
+    }
+
     private void deleteImmediate(String id)
             throws StoreException, NotFoundException {
         StringBuilder dn = new StringBuilder();
@@ -534,7 +557,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, filter.toString(), returnAttrs);
             ResultCode resultCode = iso.getResultCode();
-            debug.error("** Poll Result Code: "+resultCode.toString() );
+            debug.error("** Poll Result Code: " + resultCode.toString());
             if (resultCode == ResultCode.SUCCESS) {
                 LinkedList<SearchResultEntry> searchResult = iso.getSearchEntries();
 
@@ -587,21 +610,6 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
-    /**
-     * Deletes session record from the repository.
-     *
-     * @param sid session ID.
-     * @throws Exception if anything goes wrong.
-     */
-    @Override
-    public void delete(SessionID sid) throws Exception {
-        deleteImmediate(sid);
-    }
-
-    private void deleteImmediate(SessionID sid) throws Exception {
-        // TODO
-    }
-
     @Override
     public AMRootEntity read(String id)
             throws NotFoundException, StoreException {
@@ -615,6 +623,12 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                     SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, Constants.FAMRECORD_FILTER, returnAttrs);
             ResultCode resultCode = iso.getResultCode();
+
+            // TODO -- Remove me after testing
+            debug.error("OpenDJPersistence.read: BaseDN:[" + baseDN.toString() +
+                    "], Filter:["+Constants.FAMRECORD_FILTER.toString()+
+                    "], Result:[" + resultCode.toString() + "]");
+
 
             if (resultCode == ResultCode.SUCCESS) {
                 LinkedList searchResult = iso.getSearchEntries();
@@ -661,6 +675,11 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, filter.toString(), returnAttrs);
             ResultCode resultCode = iso.getResultCode();
+
+            // TODO -- Remove me after testing
+            debug.error("OpenDJPersistence.readWithSecKey: BaseDN:[" + baseDN.toString()
+                    + "], Filter:["+filter.toString()+"], Result:[" + resultCode.toString() + "]");
+
 
             if (resultCode == ResultCode.SUCCESS) {
                 LinkedList<SearchResultEntry> searchResult = iso.getSearchEntries();

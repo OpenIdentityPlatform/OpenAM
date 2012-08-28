@@ -2073,11 +2073,10 @@ public class SessionService {
      */
     protected static AMSessionRepository getRepository() {
 
-        // TODO -- Fix
-        //if (!getUseInternalRequestRouting()) {
-        //    sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
-        //    return null;
-        //}
+        if (!getUseInternalRequestRouting()) {
+            sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
+            return null;
+        }
 
         if (sessionRepository == null) {
             try {
