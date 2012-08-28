@@ -394,7 +394,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                 SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
 
         // TODO -- Remove me after testing
-        debug.error("OpenDJPersistence.writeImmediate: BaseDN:[" + baseDN.toString() + "] Record:[" + record.toString() + "]");
+        debug.error("OpenDJPersistence.writeImmediate:\nBaseDN:[" + baseDN.toString() + "] " +
+                "\nService:[" + record.getService() + "],"+
+                "\n     Op:[" + record.getOperation() + "],"+
+                "\n     PK:[" + record.getPrimaryKey() + "],"+
+                "\n     SK:[" + record.getSecondaryKey() + "],"+
+                "\n  State:[" + record.getState() + "],"+
+                "\nExpTIme:[" + record.getExpDate() + "],");
 
         try {
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
