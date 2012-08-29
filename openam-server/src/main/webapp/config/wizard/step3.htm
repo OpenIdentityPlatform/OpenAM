@@ -523,6 +523,7 @@
                             <span id="rootSuffixStatus"></span>                       
                         </td>
                     </tr>
+                    <!-- TODO Refactor this Field, to a simple CheckBox/Radio Button for Yes or No. -->
                     <tr>
                         <td><label for="sessionStoreType"><em>&nbsp;&nbsp;</em>
                             $page.getLocalizedString("session.store.type.label")</label></td>
@@ -533,11 +534,11 @@
                                 <option value="NONE">$page.getLocalizedString("session.store.type.none")</option>
                                 <option value="OpenDJ">$page.getLocalizedString("session.store.type.opendj")</option>
                                 <option value="PlugIn">$page.getLocalizedString("session.store.type.plugin")</option>
-                                <option value="JMSMQ">$page.getLocalizedString("session.store.type.jmsmq")</option>
                             </select>
                             <span id="sessionStoreTypeStatus"></span>
                         </td>
                     </tr>
+                    <!-- TODO Pull this Field, as it will be Dynamically Generated -->
                     <tr>
                         <td><label for="sessionRootDN"><em>&nbsp;&nbsp;</em>
                             $page.getLocalizedString("session.root.dn.label")</label></td>

@@ -33,14 +33,10 @@ import com.iplanet.am.util.SystemProperties;
 /**
  * <code>SessionRepository</code> represents the session
  * repository , default repository 
- * is <code>JMQSessionRepository</code>
- * @see <code>JMQSessionRepository</code>
+ * is <code>OpenDJPersistentStore</code>.
  */
 
 public class SessionRepository {
-
-    private static final String LEGACY_REPOSITORY_CLASS =
-            "org.forgerock.openam.session.ha.amsessionstore.store.mq.JMQSessionRepository";
 
     private static final String  OPENDJ_REPOSITORY_CLASS =
             "org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore";

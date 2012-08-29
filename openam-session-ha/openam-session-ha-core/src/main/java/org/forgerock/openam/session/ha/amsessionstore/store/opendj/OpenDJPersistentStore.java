@@ -40,6 +40,7 @@ import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.ha.FAMPersisterManager;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -77,6 +78,8 @@ import org.opends.server.types.RawModification;
 import org.opends.server.types.ResultCode;
 import org.opends.server.types.SearchResultEntry;
 import org.opends.server.types.SearchScope;
+
+import javax.jms.*;
 
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
@@ -303,9 +306,8 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             try {
                 // Process any Deferred Operations
                 processDeferredAMSessionRepositoryOperations();
+                deleteExpired(System.currentTimeMillis() / 1000);
                 Thread.sleep(sleepInterval);
-                long curTime = System.currentTimeMillis() / 1000;
-                deleteExpired(curTime);
             } catch (InterruptedException ie) {
                 Log.logger.log(Level.WARNING, DB_THD_INT.get().toString(), ie);
             } catch (StoreException se) {
@@ -314,14 +316,27 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Service Method
+     * @param obj
+     * @return
+     */
     public boolean addElement(Object obj) {
         return false;
     }
-
+    /**
+     * Service Method
+     * @param obj
+     * @return
+     */
     public boolean removeElement(Object obj) {
         return false;
     }
 
+    /**
+     * Servie Method
+     * @return
+     */
     public boolean isEmpty() {
         return true;
     }
@@ -528,7 +543,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
     }
 
     private void deleteImmediate(SessionID sid) throws Exception {
-        // TODO
+            deleteImmediate(SessionUtils.getEncryptedStorageKey(sid));
     }
 
     private void deleteImmediate(String id)
@@ -546,10 +561,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    @Override
     public void deleteExpired() throws Exception {
-        // TODO -- Delete all Expired Sessions.
+        long date = System.currentTimeMillis() / 1000;
+        deleteExpired(date);
     }
 
+    @Override
     public void deleteExpired(long expDate)
             throws StoreException {
         try {
@@ -616,6 +634,14 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Read the Persisted Session Record from the Store.
+     *
+     * @param id The primary key of the record to find
+     * @return
+     * @throws NotFoundException
+     * @throws StoreException
+     */
     @Override
     public AMRootEntity read(String id)
             throws NotFoundException, StoreException {
@@ -625,14 +651,17 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             baseDN.append(Constants.AMRECORD_NAMING_ATTR).append(Constants.EQUALS);
             baseDN.append(id).append(Constants.COMMA).append(Constants.BASE_DN);
             baseDN.append(Constants.COMMA).append(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
+
+            // TODO -- Remove me after testing
+            debug.error("OpenDJPersistence.read: Attempting Read of BaseDN:[" + baseDN.toString()+"]");
+
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, Constants.FAMRECORD_FILTER, returnAttrs);
             ResultCode resultCode = iso.getResultCode();
 
             // TODO -- Remove me after testing
-            debug.error("OpenDJPersistence.read: BaseDN:[" + baseDN.toString() +
-                    "], Filter:["+Constants.FAMRECORD_FILTER.toString()+
+            debug.error("OpenDJPersistence.read: Attempting Read of BaseDN:[" + baseDN.toString()+
                     "], Result:[" + resultCode.toString() + "]");
 
 
@@ -669,6 +698,14 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Read with Security Key.
+     *
+     * @param id The secondary key on which to search the store
+     * @return
+     * @throws StoreException
+     * @throws NotFoundException
+     */
     @Override
     public Set<String> readWithSecKey(String id)
             throws StoreException, NotFoundException {
@@ -677,6 +714,11 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             StringBuilder filter = new StringBuilder();
             filter.append(SKEY_FILTER_PRE).append(id).append(SKEY_FILTER_POST);
             baseDN.append(Constants.BASE_DN).append(Constants.COMMA).append(SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN));
+
+
+            // TODO -- Remove me after testing
+            debug.error("OpenDJPersistence.readWithSecKey: Attempting Read of BaseDN:[" + baseDN.toString()+"]");
+
             InternalSearchOperation iso = icConn.processSearch(baseDN.toString(),
                     SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
                     0, 0, false, filter.toString(), returnAttrs);
@@ -684,7 +726,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
 
             // TODO -- Remove me after testing
             debug.error("OpenDJPersistence.readWithSecKey: BaseDN:[" + baseDN.toString()
-                    + "], Filter:["+filter.toString()+"], Result:[" + resultCode.toString() + "]");
+                    +"], Result:[" + resultCode.toString() + "]");
 
 
             if (resultCode == ResultCode.SUCCESS) {
@@ -731,6 +773,13 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Get Record Counts
+     *
+     * @param id
+     * @return
+     * @throws StoreException
+     */
     @Override
     public Map<String, Long> getRecordCount(String id)
             throws StoreException {
@@ -801,12 +850,18 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Perform Service Shutdown.
+     */
     @Override
     public void shutdown() {
         internalShutdown();
         Log.logger.log(Level.FINE, DB_AM_SHUT.get().toString());
     }
 
+    /**
+     * Internal Service Shutdown.
+     */
     protected void internalShutdown() {
         shutdown = true;
         Log.logger.log(Level.FINE, DB_AM_INT_SHUT.get().toString());
@@ -818,6 +873,11 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Get DB Statistics
+     *
+     * @return
+     */
     @Override
     public DBStatistics getDBStatistics() {
         DBStatistics stats = DBStatistics.getInstance();
@@ -833,6 +893,12 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         return stats;
     }
 
+    /**
+     * Helper method to obtain number of Subordinates.
+     *
+     * @return
+     * @throws StoreException
+     */
     protected int getNumSubordinates()
             throws StoreException {
         int recordCount = -1;
@@ -916,6 +982,12 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Obtain a Mao of Sessions.
+     * @param uuid User's universal unique ID.
+     * @return
+     * @throws SessionException
+     */
     @Override
     public Map getSessionsByUUID(String uuid) throws SessionException {
         Map<String,String> sessions = null;
@@ -930,11 +1002,22 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         }
     }
 
+    /**
+     * Return Service Run Period.
+     *
+     * @return long current run period.
+     */
     @Override
     public long getRunPeriod() {
         return runPeriod;
     }
 
+    /**
+     * Obtain a List of Configured Servers
+     *
+     * @return Set<AMSessionDBOpenDJServer>
+     * @throws StoreException
+     */
     public static Set<AMSessionDBOpenDJServer> getServers()
             throws StoreException {
         InternalClientConnection icConn = InternalClientConnection.getRootConnection();
@@ -997,6 +1080,11 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         return serverList;
     }
 
+    /**
+     * Private Helper Method to Obtain a DN from a Host URL.
+     * @param urlHost
+     * @return
+     */
     private static String getFQDN(String urlHost) {
         URL url = null;
 

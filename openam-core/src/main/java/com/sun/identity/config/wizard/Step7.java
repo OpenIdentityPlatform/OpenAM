@@ -78,15 +78,6 @@ public class Step7 extends AjaxPage {
         } else if (tmp.equalsIgnoreCase("OpenDJ")) {
             add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
                     getLocalizedString("session.store.type.opendj"));
-        } else if (tmp.equalsIgnoreCase("CTS")) {
-            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
-                    getLocalizedString("session.store.type.cts"));
-        } else if (tmp.equalsIgnoreCase("PlugIn")) {
-            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
-                    getLocalizedString("session.store.type.plugin"));
-        } else if (tmp.equalsIgnoreCase("JMSMQ")) {
-            add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
-                    getLocalizedString("session.store.type.jmsmq"));
         } else {
             add(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,tmp);
         }
