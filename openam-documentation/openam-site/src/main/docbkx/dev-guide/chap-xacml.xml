@@ -251,7 +251,7 @@ public class XACMLClientSample {
 
  <programlisting language="java">pdp.entityId=xacmlPdpEntity
 pep.entityId=xacmlPepEntity
-subject.id=id=demo,ou=user,dc=opensso,dc=java,dc=net
+subject.id=id=demo,ou=user,<?eval ${defaultRootSuffix}?>
 subject.id.datatype=urn:oasis:names:tc:xacml:1.0:data-type:x500Name
 subject.category=urn:oasis:names:tc:xacml:1.0:subject-category:access-subject
 resource.id=http://www.example.com:80/banner.html
@@ -372,7 +372,7 @@ resource.id:http://www.example.com:80/banner.html
 action.id.datatype:http://www.w3.org/2001/XMLSchema#string
 resource.id.datatype:http://www.w3.org/2001/XMLSchema#string
 action.id:GET
-subject.id:id=demo,ou=user,dc=opensso,dc=java,dc=net
+subject.id:id=demo,ou=user,<?eval ${defaultRootSuffix}?>
 ------------------------------------------------------------------------------:
 subject.id.datatype:urn:oasis:names:tc:xacml:1.0:data-type:x500Name
 pdp.entityId:xacmlPdpEntity
@@ -392,7 +392,7 @@ testProcessRequest():xacmlRequest:
  &quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot;&gt;
 &lt;Attribute AttributeId=&quot;urn:oasis:names:tc:xacml:1.0:subject:subject-id&quot;
  DataType=&quot;urn:oasis:names:tc:xacml:1.0:data-type:x500Name&quot; &gt;
-&lt;AttributeValue&gt;id=demo,ou=user,dc=opensso,dc=java,dc=net&lt;/AttributeValue&gt;
+&lt;AttributeValue&gt;id=demo,ou=user,<?eval ${defaultRootSuffix}?>&lt;/AttributeValue&gt;
 &lt;/Attribute&gt;
 &lt;/Subject&gt;
 &lt;xacml-context:Resource&gt;

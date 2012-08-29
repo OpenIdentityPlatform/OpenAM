@@ -237,7 +237,7 @@ Using CLASSPATH:
     always stop the application server before removing the configuration
     files. In case you're using external configuration store make sure you
     delete the entries under the configured OpenAM suffix (by default
-    dc=opensso,dc=java,dc=net).</para>
+    <?eval ${defaultRootSuffix}?>).</para>
    </note>
   </step>
   <step>

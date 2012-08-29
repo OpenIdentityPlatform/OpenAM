@@ -89,7 +89,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
    <para>If you used an external configuration store you must also remove
    the configuration manually from your external directory server. The default
    base DN for the OpenAM configuration is
-   <literal>dc=opensso,dc=java,dc=net</literal>.</para>
+   <literal><?eval ${defaultRootSuffix}?></literal>.</para>
   </step>
   <step>
    <para>Undeploy the OpenAM web application.</para>

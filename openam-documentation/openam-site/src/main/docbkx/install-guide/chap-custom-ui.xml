@@ -86,8 +86,8 @@
    <filename><replaceable>suffix</replaceable>[_<replaceable>locale</replaceable
    >]/html</filename>,
    where <replaceable>suffix</replaceable> is the value of the RDN of the
-   configuration suffix, such as <literal>opensso</literal> if you use the
-   default configuration suffix <literal>dc=opensso,dc=java,dc=net</literal>,
+   configuration suffix, such as <literal>openam</literal> if you use the
+   default configuration suffix <literal><?eval ${defaultRootSuffix}?></literal>,
    and the optional <replaceable>locale</replaceable> is, for example,
    <literal>jp</literal> for Japanese, or <literal>zh_CN</literal> for
    Simplified Chinese.</para>
@@ -177,7 +177,7 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
     <listitem>
      <para>When you set up the OpenAM to store its configuration in a directory
      server, you provide the distinguished name of the configuration suffix,
-     by default <literal>dc=opensso,dc=java,dc=net</literal>, therefore, the
+     by default <literal><?eval ${defaultRootSuffix}?></literal>, therefore, the
      relative distinguished name attribute value is <literal>opensso</literal>.
      If instead you set the configuration suffix to be
      <literal>o=openam</literal>, the RDN value is

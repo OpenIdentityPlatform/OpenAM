@@ -167,7 +167,7 @@ Enter SSOToken ID:
  <userinput>AQIC5wM2LY4Sfcxsdru55RwePLUIbY8xTjeHf3Xnw6hphOE.*AAJTSQACMDE.*</userinput>
 SSOToken host name: 192.168.56.1
 SSOToken Principal name:
- id=bjensen,ou=user,o=realm,ou=services,dc=opensso,dc=java,dc=net
+ id=bjensen,ou=user,o=realm,ou=services,<?eval ${defaultRootSuffix}?>
 Authentication type used: DataStore
 IPAddress of the host: 192.168.56.1
 SSO Token validation test Succeeded.

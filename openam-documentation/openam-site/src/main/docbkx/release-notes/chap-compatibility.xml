@@ -124,6 +124,14 @@
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Servers &gt;
     Advanced</citetitle></link>.</para>
    </listitem>
+   <!-- Fix for OPENAM-1578 -->
+   <listitem>
+    <para>In earlier versions the default root suffix DN for OpenAM
+    configuration and profile data was
+    <literal>dc=opensso,dc=java,dc=net</literal>.
+    The default root suffix is now
+    <literal><?eval ${defaultRootSuffix}?></literal>.</para>
+   </listitem>
   </itemizedlist>
  </section>
 
