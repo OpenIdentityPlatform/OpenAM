@@ -44,7 +44,7 @@
   organizations share identities and services without giving away their
   identity information, or the services they provide.</para>
   
-  <para>To bridge heterogenous systems, federation requires interoperability,
+  <para>To bridge heterogeneous systems, federation requires interoperability,
   and thus depends on standards for orchestrating interaction and exchanging
   information between providers. OpenAM federation relies on standards such as
   <link xlink:href="http://saml.xml.org/saml-specifications">Security Assertion
@@ -328,7 +328,19 @@
    service providers must discover which identity provider corresponds to a
    request. You can deploy the identity provider discovery service for this
    purpose as a separate web application.</para>
-   
+
+   <para>Browsers only send cookies for the originating domain. Therefore
+   when a browser accesses the service provider in the <literal>sp.com</literal>
+   domain, the service provider has no way of knowing whether the user has
+   perhaps already authenticated at <literal>this-idp.com</literal> or at
+   <literal>that-idp.com</literal>. The providers therefore host an identity
+   provider discovery service in a common domain, such as
+   <literal>disco.com</literal>, and use that service to discover where
+   the user logged in. The identity provider discover service essentially
+   writes and reads cookies from the common domain. The providers configure
+   their circle of trust to use the identity provider discovery service
+   as part of SAML 2.0 federation.</para>
+
    <para>Deploying the identity provider discovery service involves the
    following stages.</para>
    <orderedlist>
@@ -337,18 +349,17 @@
     </listitem>
     <listitem>
      <para>Deploy the .war file into your web application container.</para>
-     <para>How you deploy the discovery service .war file depends on your web
-     application container. The procedure in this section shows how to deploy
-     on Apache Tomcat.</para>
     </listitem>
     <listitem>
      <para>Configure the discovery service.</para>
     </listitem>
     <listitem>
-     <para>Add the discovery service to your circle of trust.</para>
+     <para>Add the identity provider discovery service endpoints for writing
+     cookies to and reading cookies from the common domain to the circle of
+     trust configurations for the providers.</para>
     </listitem>
     <listitem>
-     <para>Share metadata between the identity provider and the service
+     <para>Share metadata between identity providers and the service
      provider.</para>
     </listitem>
    </orderedlist>
@@ -362,13 +373,13 @@
     <step>
      <para>Unpack the <filename>opensso.war</filename> file into a temporary
      directory.</para>
-     <screen>$ mkdir /tmp/ipds; cd /tmp/ipds
+     <screen>$ mkdir /tmp/disco ; cd /tmp/disco
 $ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
     </step>
     <step>
-     <para>Create the <filename>ipds.war</filename> file.</para>
+     <para>Create the <filename>disco.war</filename> file.</para>
      <screen>$ cd ~/Downloads/opensso/deployable-war
-$ sh createwar.sh --staging /tmp/ipds --type idpdiscovery --warfile ipds.war
+$ sh createwar.sh --staging /tmp/disco --type idpdiscovery --warfile disco.war
 
 WAR file was created.</screen>
     </step>
@@ -376,18 +387,22 @@ WAR file was created.</screen>
    
    <procedure xml:id="deploy-idpdisco-on-tomcat">
     <title>To Deploy the Discovery Service on Tomcat</title>
-    
+
+    <para>How you deploy the discovery service .war file depends on your web
+    application container. The procedure in this section shows how to deploy
+    on Apache Tomcat.</para>
+
     <step>
-     <para>Put the <filename>ipds.war</filename> you created in the Tomcat
+     <para>Put the <filename>disco.war</filename> you created in the Tomcat
      <filename>webapps/</filename> directory.</para>
-     <screen>$ mv ipds.war /path/to/tomcat/webapps/</screen>
+     <screen>$ mv disco.war /path/to/tomcat/webapps/</screen>
     </step>
     <step>
      <para>Access the configuration screen through your browser.</para>
      <para>In this example, Apache Tomcat listens for HTTP requests on
-     <literal>openam.example.com:8080</literal>, and Tomcat has unpacked the
-     application under <literal>/ipds</literal>, so the URL is
-     <literal>http://openam.example.com:8080/ipds</literal>, which redirects to
+     <literal>idp.disco.com:8080</literal>, and Tomcat has unpacked the
+     application under <literal>/disco</literal>, so the URL is
+     <literal>http://idp.disco.com:8080/disco</literal>, which redirects to
      <filename>Configurator.jsp</filename>.</para>
     </step>
    </procedure>
@@ -397,10 +412,10 @@ WAR file was created.</screen>
     
     <step>
      <para>Configure the identity provider discovery service.</para>
-     <mediaobject xml:id="figure-ipds-complete-config">
+     <mediaobject xml:id="figure-idp-disco-config">
       <alt>Completed discovery service configuration screen</alt>
       <imageobject>
-       <imagedata fileref="images/ipds-complete-config.png" format="PNG" />
+       <imagedata fileref="images/idp-disco-config.png" format="PNG" />
       </imageobject>
       <textobject>
        <para>Configure the identity provider discovery service.</para>
@@ -420,6 +435,9 @@ WAR file was created.</screen>
         <para>Default is <literal>error</literal>. Other options include
         <literal>error</literal>, <literal>warning</literal>,
         <literal>message</literal>, and <literal>off</literal>.</para>
+
+        <para>Set this to <literal>message</literal> in order to see the
+        service working when you run your initial tests.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -433,8 +451,9 @@ WAR file was created.</screen>
       <varlistentry>
        <term>Cookie Domain</term>
        <listitem>
-        <para>The cookie domain depends on the cookie domain configured for
-        your circle of trust.</para>
+        <para>The cookie domain is the common cookie domain used in your circle
+        of trust for identity provider discovery, in this case
+        <literal>.disco.com</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -470,65 +489,150 @@ WAR file was created.</screen>
    </procedure>
    
    <procedure xml:id="add-idpdisco-to-circle-of-trust">
-    <title>To Add the Discovery Service to Your Circle of Trust</title>
+    <title>To Add the Discovery Service to Your Circles of Trust</title>
     
-    <para>The examples in this procedure expect you have a circle of trust
-    configured with at least a service provider and an identity provider.</para>
+    <para>Each provider has a circle of trust including itself. You configure
+    each of these circles of trust to use the identity provider discovery
+    service as described in the following steps.</para>
     
     <step>
-     <para>On the service provider console, login as OpenAM Administrator.</para>
+     <para>On the service provider console, login as OpenAM
+     Administrator.</para>
     </step>
     <step>
      <para>On the service provider console, under Federation &gt; Circle of
-     Trust Configuration, create a circle of trust, adding URLs for the
-     discovery service for the SAMLv2 writer and reader services.</para>
+     Trust Configuration &gt; <replaceable>Circle of Trust Name</replaceable>
+     add SAML2 Writer and Reader Service URLs for the identity provider
+     discovery service endpoints, and Save your work.</para>
+
      <para>In this example, the writer URL is
-     <literal>http://openam.example.com:8080/ipds/saml2writer</literal>, and the
+     <literal>http://idp.disco.com:8080/disco/saml2writer</literal>, and the
      reader URL is
-     <literal>http://openam.example.com:8080/ipds/saml2reader</literal>.</para>
+     <literal>http://idp.disco.com:8080/disco/saml2reader</literal>.</para>
     </step>
+
     <step>
-     <para>On the identity provider console, login as OpenAM Administrator.</para>
+     <para>On each identity provider console, login as OpenAM
+     Administrator.</para>
     </step>
     <step>
      <para>On the identity provider console, under Federation &gt; Circle of
-     Trust Configuration, create a circle of trust, adding URLs for the
-     discovery service for the SAMLv2 writer and reader services as for the
-     service provider.</para>
+     Trust Configuration &gt; <replaceable>Circle of Trust Name</replaceable>
+     also add SAML2 Writer and Reader Service URLs for the identity provider
+     discovery service endpoints, and Save your work.</para>
     </step>
    </procedure>
    
    <procedure xml:id="share-idpdisco-sp-metadata">
     <title>To Share Identity &amp; Service Provider Metadata</title>
-    
-    <step>
-     <para>Obtain metadata for both the identity provider and service
-     provider.</para>
-     <screen>$ ssh idp.example.com
-...
-$ ssoadm create-metadata-templ -y "http://idp.example.com:8080/openam"
- -u amadmin -f /tmp/pwd.txt -i /idp -m idp-standard.xml -x idp-extended.xml
 
-Hosted entity configuration was written to idp-extended.xml.
-Hosted entity descriptor was written to idp-standard.xml.
-$ ssh sp.example.com
-...
-$ ssoadm create-metadata-templ -y "http://sp.example.com:8080/openam"
- -u amadmin -f /tmp/pwd.txt -i /sp -m sp-standard.xml -x sp-extended.xml
+    <para>Before performing these steps, install the administration tools
+    for each provider as described in <link
+    xlink:href="install-guide#install-openam-admin-tools"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+    Administration Tools</citetitle></link>. The administration tools include
+    the <command>ssoadm</command> tool that you need to export metadata.</para>
 
-Hosted entity configuration was written to idp-extended.xml.
-Hosted entity descriptor was written to idp-standard.xml.</screen>
+    <step>
+     <para>On each identity provider console, register the service provider as
+     a remote service provider adding to the circle of trust you configured
+     to use the identity provider discovery service.</para>
+
+     <para>The URL to the service provider metadata is something like
+     <literal>http://www.sp.com:8080/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
+    </step>
+
+    <step>
+     <para>Obtain metadata for each identity provider.</para>
+
+     <screen>$ ssh www.this-idp.com
+$ cd /path/to/openam-tools/admin/openam/bin
+$ ./ssoadm create-metadata-templ -y "http://www.this-idp.com:8080/openam"
+ -u amadmin -f /tmp/pwd.txt -i /idp -m this-standard.xml -x this-extended.xml
+Hosted entity configuration was written to this-extended.xml.
+Hosted entity descriptor was written to this-standard.xml.
+
+$ ssh www.that-idp.com
+$ cd /path/to/openam-tools/admin/openam/bin
+$ ./ssoadm create-metadata-templ -y "http://www.that-idp.com:8080/openam"
+ -u amadmin -f /tmp/pwd.txt -i /idp -m that-standard.xml -x that-extended.xml
+
+Hosted entity configuration was written to that-extended.xml.
+Hosted entity descriptor was written to that-standard.xml.</screen>
     </step>
     <step>
-     <para>On the identity provider console, create a remote service provider
-     in the circle of trust using the service provider metadata.</para>
+     <para>For each identity provider extended metadata file, change the value
+     of the <literal>hosted</literal> attribute to <literal>0</literal>,
+     meaning the identity provider is remote.</para>
     </step>
     <step>
-     <para>Adjust the identity provider metadata.</para>
+     <para>On the service provider, add the identity providers to the circle of
+     trust using the identity provider metadata.</para>
+
+     <screen>$ ssh www.sp.com
+$ cd /path/to/openam-tools/admin/openam/bin
+$ ./ssoadm import-entity -t discocot -m ~/Downloads/this-standard.xml
+ -x ~/Downloads/this-extended.xml -u amadmin -f /tmp/pwd.txt
+
+Import file, /Users/mark/Downloads/this-standard.xml.
+Import file, /Users/mark/Downloads/this-extended.xml.
+$ ./ssoadm import-entity -t discocot -m ~/Downloads/that-standard.xml
+ -x ~/Downloads/that-extended.xml -u amadmin -f /tmp/pwd.txt
+
+Import file, /Users/mark/Downloads/that-standard.xml.
+Import file, /Users/mark/Downloads/that-extended.xml.</screen>
     </step>
+
     <step>
-     <para>On the service provider console, create a remote identity provider
-     in the circle of trust using the identity provider metadata.</para>
+     <para>Test your work by using the Federation Connectivity Test that
+     you start from the service provider console under Common Tasks &gt;
+     Test Federation Connectivity.</para>
+
+     <para>When the test is done, you can see messages from the
+     <literal>CookieWriterServlet</literal> in the
+     <filename>libIDPDiscovery</filename> log file where you set up
+     logging when you configured the identity provider discovery
+     service, such as <filename>/tmp/debug/libIDPDiscovery</filename>.
+     Output generated during a test follows, with some lines folded to fit
+     on the printed page.</para>
+
+     <screen>08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieUtils.init : idpDiscoveryOnlyWar=true
+08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet Initializing...
+08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Preferred Cookie Name is _saml_idp
+08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: URL Scheme is null, set to https.
+08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Preferred IDP Cookie Not found
+08/08/2012 11:43:38:342 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Cookie Type is PERSISTENT
+08/08/2012 11:43:38:342 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Cookie value is
+ aHR0cDovL3d3dy50aGF0LWlkcC5jb206ODA4MC9vcGVuYW0=
+08/08/2012 11:43:38:342 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Preferred Cookie Name _saml_idp
+08/08/2012 11:43:38:343 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Redirect to
+ http://www.that-idp.com:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
+ s28bc4db004f1365d78d07d69846c54a3c850fe801
+08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Preferred Cookie Name is _saml_idp
+08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieUtils:cookieValue=aHR0cDovL3d3dy50aGF0LWlkcC5jb206ODA4MC9vcGVuYW0=,
+ result=aHR0cDovL3d3dy50aGF0LWlkcC5jb206ODA4MC9vcGVuYW0=
+08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Cookie Type is PERSISTENT
+08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Cookie value is
+ aHR0cDovL3d3dy50aGF0LWlkcC5jb206ODA4MC9vcGVuYW0=
+08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Preferred Cookie Name _saml_idp
+08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+CookieWriterServlet.doGetPost: Redirect to
+ http://www.that-idp.com:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
+ s2ce9c465cf39c96f31e1dcf009cf9943695d82901</screen>
     </step>
    </procedure>
   </section>
