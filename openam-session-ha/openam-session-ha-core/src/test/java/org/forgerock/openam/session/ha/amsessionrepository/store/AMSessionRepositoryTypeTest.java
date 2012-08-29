@@ -64,7 +64,7 @@ public class AMSessionRepositoryTypeTest {
     public void testGetAMSessionRepositoryTypes() throws Exception {
         Map<String,String> types = AMSessionRepositoryType.getAMSessionRepositoryTypes();
         assertNotNull(types, "Expected non-null Collection of AMSessionRepositoryType(s), very Bad!");
-        assertEquals(types.size(), 4, "Wrong number of AmSessionRepositoryTypeS");
+        assertEquals(types.size(), 3, "Wrong number of AmSessionRepositoryTypeS");
         for(Map.Entry<String,String> entry : types.entrySet())
         {
             System.out.println("key:["+entry.getKey()+"], Value:["+entry.getValue()+"]");
