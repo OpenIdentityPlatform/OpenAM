@@ -54,9 +54,9 @@
   application.</para>
 
   <step>
-   <para>Unzip the <filename>Fedlet-unconfigured.zip</filename> file, and
-   copy the contents of the <filename>Fedlet-unconfigured\asp.net\</filename>
-   folder to a working directory.</para>
+   <para>Download the .NET Fedlet .zip from the <link xlink:show="new"
+   xlink:href="http://forgerock.org/openam.html">OpenAM download page</link>.
+   Unpack the contents of the .zip file into a working directory.</para>
    <variablelist>
     <varlistentry>
      <term><filename>bin\</filename></term>
