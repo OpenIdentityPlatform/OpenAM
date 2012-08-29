@@ -118,7 +118,7 @@ $ cp -r default_fr/* openam_fr/html</screen>
    >]/services/<replaceable>realm</replaceable>/html</filename>.</para>
    <para>The following example copies the files for a custom French locale and
    a realm named <literal>ventes</literal>.</para>
-   <screen>$ mkdir -p openam/html
+   <screen>$ mkdir -p openam/html/ventes/html
 $ cp -r default/* openam/services/ventes/html
 $ mkdir -p openam_fr/services/ventes/html
 $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
