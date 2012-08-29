@@ -1927,4 +1927,81 @@ Hosted entity descriptor was written to idp-standard.xml.</screen>
 &amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
   </example>
  </section>
+
+ <section xml:id="saml2-ecp-config">
+  <title>Configuring OpenAM For the ECP Profile</title>
+
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+
+  <para>The SAML 2.0 Enhanced Client or Proxy (ECP) profile is intended for use
+  when accessing services over devices like simple phones, medical devices, and
+  set-top boxes that lack the capabilities needed to use the more widely used
+  SAML 2.0 Web Browser SSO profile.</para>
+
+  <para>The ECP knows which identity provider to contact for the user, and is
+  able to use the reverse SOAP (PAOS) SAML 2.0 binding for the authentication
+  request and response. The PAOS binding uses HTTP and SOAP headers to pass
+  information about processing SOAP requests and responses, starting with a
+  PAOS HTTP header that the ECP sends in its initial request to the server.
+  The PAOS messages continue with a SOAP authentication request in the server's
+  HTTP response to the ECP's request for a resource, followed by a SOAP
+  response in an HTTP request from the ECP.</para>
+
+  <para>An enhanced client, such as a browser with a plugin or an extension,
+  can handle these communications on its own. An enhanced proxy is an HTTP
+  server such as a WAP gateway that can support the ECP profile on behalf of
+  client applications.</para>
+
+  <para>OpenAM supports the SAML 2.0 ECP profile on the server side for
+  identity providers and service providers. You must build the ECP.</para>
+
+  <para>By default an OpenAM identity provider uses the
+  <literal>com.sun.identity.saml2.plugins.DefaultIDPECPSessionMapper</literal>
+  class to find a user session for requests to the IDP from the ECP. The
+  default session mapper uses OpenAM cookies as it would for any other client
+  application. If for some reason you must change the mapping after writing
+  and installing your own session mapper, you can change the class under
+  Federation &gt; Entity Providers &gt; <replaceable>idp-name</replaceable>
+  &gt; IDP &gt; Advanced &gt; ECP Configuration.</para>
+
+  <para>By default an OpenAM service provider uses the
+  <literal>com.sun.identity.saml2.plugins.ECPIDPFinder</literal> class to
+  return identity providers from the list under Federation &gt; Entity
+  Providers &gt; <replaceable>sp-name</replaceable> &gt; SP &gt; Advanced
+  &gt; ECP Configuration &gt; Request IDP List. You must populate the list
+  with identity provider entity IDs.</para>
+
+  <variablelist>
+   <para>The endpoint for the ECP to contact on the OpenAM service provider is
+   <literal>/SPECP</literal> as in
+   <literal>http://www.sp.com:8080/openam/SPECP</literal>. The ECP provides
+   two query string parameters to identify the service provider and to specify
+   the URL of the resource to access.</para>
+
+   <varlistentry>
+    <term><literal>metaAlias</literal></term>
+    <listitem>
+     <para>This specifies the service provider, by default
+     <literal>metaAlias=/<replaceable>realm-name</replaceable>/sp</literal>,
+     as described in <xref linkend="sp-meta-alias" />.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RelayState</literal></term>
+    <listitem>
+     <para>This specifies the resource the client aims to access such as
+     <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>For example, the URL to access the service provider and finally
+  the resource at <literal>http://openam.forgerock.org/index.html</literal>
+  could be
+  <literal>http://www.sp.com:8080/openam/SPECP?metaAlias=/sp&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
+ </section>
 </chapter>
