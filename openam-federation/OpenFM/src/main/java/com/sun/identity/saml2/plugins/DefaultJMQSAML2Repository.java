@@ -234,7 +234,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
                 SAML2, FAMRecord.READ, samlKey, 0, null, 0, null, null);
            
             FAMRecord retRec = pSession.send(famRec);
-            byte[] blob = retRec.getBlob();  
+            byte[] blob = retRec.getSerializedInternalSessionBlob();
             Object retObj = SessionUtils.decode(blob);
             return retObj;
         } catch (IllegalStateException e) {
@@ -325,7 +325,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
 
     /**
      * Deletes expired SAML2 object from the repository
-     * @exception When Unable to delete the expired SAML2 object
+     * @exception Exception When Unable to delete the expired SAML2 object
      */
     public void deleteExpired()  {
         if (!isDatabaseUp) {

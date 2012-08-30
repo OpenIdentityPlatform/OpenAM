@@ -42,9 +42,7 @@ public class AMRecord extends AMRootEntity {
      */
     @SuppressWarnings("UseOfObsoleteCollectionType")
     private Vector<String> records = null;
-    
-    // byte[] encoded as Base64
-    private String data = null;    
+
     private Map<String, String> extraStringAttrs = null;
     // value is byte[] encoded as Base64
     private Map<String, String> extraByteAttrs = null; 
@@ -60,10 +58,10 @@ public class AMRecord extends AMRootEntity {
      * @param secKey Secondary Key 
      * @param st state 
      * @param ax Additional Data 
-     * @param blob Data Blob 
+     * @param stringBlob Data Blob
      */
     public AMRecord(String svc, String op, String pKey, long eDate,
-        String secKey, int st, String ax, String blob) {
+        String secKey, int st, String ax, String stringBlob) {
         this.setService(svc);
         this.setOperation(op);
         this.setPrimaryKey(pKey);
@@ -71,7 +69,7 @@ public class AMRecord extends AMRootEntity {
         this.setSecondaryKey(secKey);
         this.setState(st);
         this.setAuxData(ax);
-        data = blob; 
+        this.setData(stringBlob);
     }
     
     public AMRecord() {
@@ -108,16 +106,6 @@ public class AMRecord extends AMRootEntity {
        extraStringAttrs.put(key, value); 
     }
     
-    public void setData(String blob) {
-        data = blob; 
-    }
-    
-    public String getData() {
-        return data;
-    }
-    
-
-    
     public String getString(String key) {
       return extraStringAttrs.get(key);
     }
@@ -140,11 +128,7 @@ public class AMRecord extends AMRootEntity {
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append(super.toString());
-        
-        if (data != null) {
-            buffer.append("Data: ").append(data).append("\n");
-        }
-        
+
         buffer.append("Extra String Attrs: ").append(extraStringAttrs).append("\n");
         buffer.append("Extra Byte Attrs: ").append(extraByteAttrs).append("\n");
 

@@ -25,12 +25,24 @@
 
 package org.forgerock.openam.session.ha.amsessionstore.common;
 
-import java.util.logging.Logger;
+import java.util.logging.Level;
+
 
 /**
- *
  * @author steve
  */
 public class Log {
-    public final static Logger logger = Logger.getLogger("amsessiondb");
+    //public final static java.util.logging.Logger logger = Logger.getLogger("amsessiondb");
+
+    // Spoof Logging.
+    public final static class logger {
+        public final static void log(Level loggingLevel, String message) {
+            System.out.println(loggingLevel.getName() + ": " + message);
+        }
+        public final static void log(Level loggingLevel, String message, Exception e) {
+            System.out.println(loggingLevel.getName() + ": " + message);
+            System.out.println(loggingLevel.getName() + ": " + e.toString());
+        }
+    }
+
 }

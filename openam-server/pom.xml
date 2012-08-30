@@ -303,15 +303,12 @@
                             <directory>${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif
                             </directory>
                             <includes>
-                                <include>amsessiondb_default_container.ldif</include>
-                                <!-- <include>amsessiondb_container.ldif.template</include> -->
-                                <!-- This File gets moved into Place when installing OpenDJ. -->
+                                <!-- The xx-...ldif Files get moved into Place when installing OpenDJ. -->
                                 <include>98-amsessiondb.ldif</include>
                             </includes>
                             <targetPath>WEB-INF/template/ldif/sfha</targetPath>
                             <filtering>false</filtering>
                         </webResource>
-
                     </webResources>
                 </configuration>
 

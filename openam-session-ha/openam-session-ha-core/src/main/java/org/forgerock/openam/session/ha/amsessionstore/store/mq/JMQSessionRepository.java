@@ -223,7 +223,7 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
             FAMRecord retRec = pSession.send(famRec);
             InternalSession is = null;
             if(retRec != null) {
-            	byte[] blob = retRec.getBlob();       
+            	byte[] blob = retRec.getSerializedInternalSessionBlob();
             	is = (InternalSession) SessionUtils.decode(blob);
             }
 

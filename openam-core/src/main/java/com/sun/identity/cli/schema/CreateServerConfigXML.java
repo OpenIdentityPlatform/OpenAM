@@ -31,6 +31,7 @@
  */
 package com.sun.identity.cli.schema;
 
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AccessManagerConstants;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -51,6 +52,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;
@@ -191,6 +193,23 @@ public class CreateServerConfigXML extends AuthenticatedCommand implements Const
         xml = xml.replaceAll("@ENCADADMINPASSWD@", amadminPwds);
         xml = xml.replaceAll("@SM_CONFIG_BASEDN@", canRootSuffix);
         xml = xml.replaceAll("@ORG_BASE@", canRootSuffix);
+
+        // Set up our Session SFHA Container.
+        xml = xml.replaceAll("@AMSESSIONDB_BASEDN@",
+                SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,
+                        Constants.DEFAULT_SESSION_HA_ROOT_DN));
+        String rdn = SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,
+                Constants.DEFAULT_SESSION_HA_ROOT_DN);
+        int x = rdn.indexOf(Constants.EQUALS);
+        if (x>0)
+        {
+            int y = rdn.indexOf(Constants.COMMA);
+            if (y>0)
+            {
+                rdn = rdn.substring(x+1,y);
+                xml = xml.replaceAll("@AMSESSIONDB_RDN@", rdn);
+            }
+        }
         return xml;
     }
     

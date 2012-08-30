@@ -78,6 +78,10 @@ public abstract class AMRootEntity implements Serializable {
     private String secondaryKey = null;
     private int state = 0;
     private String auxData = null;
+    // byte[] encoded as Base64
+    private String data = null;
+    // Used During Serialization of InternalSession.
+    private byte[] serializedInternalSessionBlob = null;
 
 
     public String getService() {
@@ -136,6 +140,30 @@ public abstract class AMRootEntity implements Serializable {
         this.auxData = auxData;
     }
 
+    /**
+     *  Secured Internal Session Data
+     * @return byte[] Array of Serialized Data.
+     */
+    public byte[] getSerializedInternalSessionBlob() {
+        return serializedInternalSessionBlob;
+    }
+
+    public void setSerializedInternalSessionBlob(byte[] serializedInternalSessionBlob) {
+        this.serializedInternalSessionBlob = serializedInternalSessionBlob;
+    }
+
+    /**
+     * Base64 Encoded Data.
+     * @return
+     */
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
@@ -147,7 +175,14 @@ public abstract class AMRootEntity implements Serializable {
         buffer.append("Expr Date: ").append(expDate).append("\n");
         buffer.append("State: ").append(state).append("\n");
         buffer.append("Aux Data: ").append(auxData).append("\n");
-
+        if (this.getData() != null)
+        {
+            buffer.append("Data Byte Length: ").append(this.getData().length()).append("\n");
+        }
+        if (this.getSerializedInternalSessionBlob() == null)
+        {
+            buffer.append("IS Serialized Blob Byte Length: ").append(this.getSerializedInternalSessionBlob().length).append("\n");
+        }
         return buffer.toString();
     }
 

@@ -32,8 +32,6 @@
 
 package org.forgerock.openam.session.model;
 
-import org.forgerock.openam.session.model.AMRootEntity;
-
 import java.util.HashMap;
 /**
  * FAMRecord stores all the data that the user would store in the database.
@@ -44,7 +42,6 @@ public class FAMRecord extends AMRootEntity {
     /**
      * FAMRecord Specifics
      */
-    byte[] data = null;    
     HashMap extraStringAttrs = null;
     HashMap extraByteAttrs = null; 
       
@@ -58,10 +55,10 @@ public class FAMRecord extends AMRootEntity {
      * @param secKey Secondary Key 
      * @param st state 
      * @param ax Additional Data 
-     * @param blob Data Blob 
+     * @param serializedInternalSessionBlob  Binary Blob
      */
     public FAMRecord ( String svc, String op, String pKey, long eDate,
-        String secKey, int st, String ax, byte[] blob) {
+        String secKey, int st, String ax, byte[] serializedInternalSessionBlob) {
         this.setService(svc);
         this.setOperation(op);
         this.setPrimaryKey(pKey);
@@ -69,7 +66,7 @@ public class FAMRecord extends AMRootEntity {
         this.setSecondaryKey(secKey);
         this.setState(st);
         this.setAuxData(ax);
-        data = blob; 
+        this.setSerializedInternalSessionBlob(serializedInternalSessionBlob);
     }
     
     public void setString(String key, String val) {
@@ -88,14 +85,6 @@ public class FAMRecord extends AMRootEntity {
     
     public void setStringAttrs(HashMap map) {
         extraStringAttrs = map; 
-    }
-    
-    public void setBlob(byte[] blob) {
-        data = blob; 
-    }
-
-    public byte[] getBlob() {
-        return data;
     }
     
     public String getString(String key) {
@@ -118,7 +107,6 @@ public class FAMRecord extends AMRootEntity {
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append(super.toString());
-        buffer.append("Data: ").append(new String(data)).append("\n");
         buffer.append("Extra String Attrs: ").append(extraStringAttrs).append("\n");
         buffer.append("Extra Byte Attrs: ").append(extraByteAttrs).append("\n");
 

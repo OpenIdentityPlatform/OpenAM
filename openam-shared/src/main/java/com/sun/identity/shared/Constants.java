@@ -1203,7 +1203,7 @@ public interface Constants {
     /**
      * Default Session SFO/HA Store Type.
      */
-    static final String DEFAULT_SESSION_HA_STORE_TYPE = "None";
+    static final String DEFAULT_SESSION_HA_STORE_TYPE = "OpenDJ";
 
     /**
      * Additional AMSessionDB Constants

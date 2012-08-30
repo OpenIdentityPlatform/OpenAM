@@ -65,7 +65,7 @@ public class LDIFTemplates {
 	    templates.add("sunds/amsdk_plugin/amsdk_init_template.ldif");
 	    templates.add("sunds/amsdk_plugin/amsdk_sunone_schema2.ldif");
 	    templates.add("tivoli/tivoli_user_schema.ldif");
-        templates.add("sfha/amsessiondb_default_container.ldif");
+        templates.add("sfha/amsessiondb_container.ldif");
     }
 
     private LDIFTemplates() {

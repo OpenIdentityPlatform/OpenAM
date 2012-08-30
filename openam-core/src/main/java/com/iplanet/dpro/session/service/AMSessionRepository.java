@@ -47,7 +47,6 @@ import org.forgerock.openam.session.model.DBStatistics;
  * <code>retrieve</code> , <code>save</code> , <code>delete</code> the session
  * from the session repository.
  *
- * @see <code>JMQSessionRepository</code>
  * @see <code>OpenDJPersistentStore</code>
  */
 public interface AMSessionRepository {

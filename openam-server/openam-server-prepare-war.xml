@@ -57,6 +57,17 @@
             </fileset>
         </copy>
 
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
+        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/amsessiondb_container.ldif.template"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/amsessiondb_container.ldif"
+              filtering="false"/>
+
+        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
+            <fileset dir="${project.basedir}/binary">
+                <include name="opendj.zip"/>
+            </fileset>
+        </copy>
+
         <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
         <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">
             <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml">
@@ -376,167 +387,6 @@
             </fileset>
         </copy>
 
-        <!--
-        remove duplicate entries in FederationConfig.properties against
-        AMConfig.properties
-        -->
-        <!--
-        <java classname="com.sun.identity.setup.ConsolidateConfig"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="${openam.temp.target}/WEB-INF/classes/AMConfig.properties"/>
-            <arg value="${library.res.dir}/FederationPerServer.properties"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/AMConfig.properties"/>
-        </java>
-        <java classname="com.sun.identity.setup.ConsolidateConfig"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <classpath refid="build.class.path"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/serverdefaults.properties"/>
-            <arg value="${library.res.dir}/FederationConfig.properties"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/serverdefaults.properties"/>
-        </java>
-        -->
-
-        <!-- update amConsoleConfig with federation tabs -->
-        <!--
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <classpath refid="build.class.path"/>
-            <arg value="&lt;tab id=\&quot;2\&quot;.+?/tab&gt;"/>
-            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/amConsoleConfig.xml"/>
-            <arg value="&lt;tab id=\&quot;4\&quot;"/>
-        </java>
-        -->
-
-        <!-- entities profile tabs -->
-        <!--
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;profile id=\&quot;SAMLv2\&quot;&gt;.+?&lt;/profile&gt;"/>
-            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/amConsoleConfig.xml"/>
-            <arg value="&lt;/profiletabs&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;profile id=\&quot;wsfed\&quot;&gt;.+?&lt;/profile&gt;"/>
-            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/amConsoleConfig.xml"/>
-            <arg value="&lt;/profiletabs&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;profile id=\&quot;idff\&quot;&gt;.+?&lt;/profile&gt;"/>
-            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/amConsoleConfig.xml"/>
-            <arg value="&lt;/profiletabs&gt;"/>
-        </java>
-
-
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
-            <arg value="${library.xml.dir}/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;!- - servlet declaration - -&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
-            <arg value="${library.xml.dir}/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;!- - servlet mapping - -&gt;"/>
-        </java>
-        -->
-
-        <!-- update web.xml with fed servlet info -->
-        <!--
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;"/>
-            <arg value="${openfm.dir}/xml/console/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;! - - context param - -&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
-            <arg value="${openfm.dir}/xml/console/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;! - - servlet declaration - -&gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
-            <arg value="${openfm.dir}/xml/console/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;! - - servlet mapping - - &gt;"/>
-        </java>
-        -->
-
-        <!-- update web.xml with FAM STS info -->
-        <!--
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;listener&gt;.+?&lt;/listener&gt;"/>
-            <arg value="${openfm.dir}/xml/wss/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;! - - listener declaration - - &gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;"/>
-            <arg value="${openfm.dir}/xml/wss/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;! - - servlet declaration - - &gt;"/>
-        </java>
-        <java classname="com.sun.identity.setup.InsertContent"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;"/>
-            <arg value="${openfm.dir}/xml/wss/web.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/web.xml"/>
-            <arg value="&lt;!- - servlet mapping - -&gt;"/>
-        </java>
-
-        <java classname="com.sun.identity.setup.MergeProperties"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="configuratorPlugins"/>
-            <arg value="fmConfiguratorPlugins"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/configuratorPlugins.properties"/>
-        </java>
-
-        <java classname="com.sun.identity.setup.MergeProperties"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="serviceNames"/>
-            <arg value="fmServiceNames"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/serviceNames.properties"/>
-        </java>
-
-        <java classname="com.sun.identity.setup.MergeProperties"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="serviceDefaultValues"/>
-            <arg value="fmServiceDefaultValues"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/serviceDefaultValues.properties"/>
-        </java>
-
-        <java classname="com.sun.identity.setup.MergeProperties" fork="true">
-            <arg value="configuratorTagSwap"/>
-            <arg value="fmConfiguratorTagSwap"/>
-            <arg value="${openam.temp.target}/WEB-INF/classes/configuratorTagSwap.properties"/>
-        </java>
-
-        <java classname="com.sun.identity.setup.InsertContent" fork="true">
-            <arg value="&lt;endpoint.+?/&gt;"/>
-            <arg value="${library.xml.dir}/jaxrpc-ri-runtime.xml"/>
-            <arg value="${openam.temp.target}/WEB-INF/jaxrpc-ri-runtime.xml"/>
-            <arg value="&lt;/endpoints&gt;"/>
-        </java>
-        -->
-
-        <!--
-        <mkdir dir="${war.packageweb.dir}"/>
-        <move file="${openam.temp.target}/WEB-INF/web.xml" tofile="${war.packageweb.dir}/web.xml"/>
-        -->
 
 
     </target>

@@ -323,7 +323,7 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
        } 
        
        
-       byte[] blob = famRecord.getBlob(); 
+       byte[] blob = famRecord.getSerializedInternalSessionBlob();
        if (blob != null) {
            msg.writeLong(blob.length);
            msg.writeBytes(blob);

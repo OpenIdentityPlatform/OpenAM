@@ -236,9 +236,9 @@ public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
             if (null == retRec) {
                 throw new JsonResourceException(JsonResourceException.NOT_FOUND, "Object not found with id: " + primaryKey);
             }
-            byte[] blob = retRec.getBlob();
+            byte[] blob = retRec.getSerializedInternalSessionBlob();
             Object retObj = SessionUtils.decode(blob);
-            Map tokenObj = (Map) retObj; // TODO: check cast
+            Map tokenObj = (Map) retObj; // TODO: check cast  // Jeff: This is InternalSession or Binary Data !
 
             JsonValue retValue = new JsonValue(tokenObj);
             retValue.put("_id", primaryKey);
