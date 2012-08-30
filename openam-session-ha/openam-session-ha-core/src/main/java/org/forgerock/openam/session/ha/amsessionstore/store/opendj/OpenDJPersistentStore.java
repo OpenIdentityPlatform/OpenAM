@@ -278,9 +278,12 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         try {
             icConn = InternalClientConnection.getRootConnection();
             String sfhaDN = SystemPropertiesManager.get(SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN, Constants.DEFAULT_SESSION_HA_ROOT_DN);
-            InternalSearchOperation results =
-                    icConn.processSearch(  sfhaDN, SearchScope.BASE_OBJECT, "*");
-            Log.logger.log(Level.INFO, "Search for base container: "+sfhaDN+", yielded Result Code: " + results.getResultCode().toString() + "]");
+            LinkedHashSet<String> initialReturnAttrs = new LinkedHashSet<String>();
+            initialReturnAttrs.add("dn");
+            InternalSearchOperation iso = icConn.processSearch(sfhaDN,
+                    SearchScope.SINGLE_LEVEL, DereferencePolicy.NEVER_DEREF_ALIASES,
+                    0, 0, false, Constants.FAMRECORD_FILTER, initialReturnAttrs);
+            Log.logger.log(Level.INFO, "Search for base container: "+sfhaDN+", yielded Result Code: " + iso.getResultCode().toString() + "]");
             icConnAvailable = true;
         } catch (DirectoryException directoryException) {
             Log.logger.log(Level.INFO, "Unable to obtain the Internal Root Container for Session Persistence!",
