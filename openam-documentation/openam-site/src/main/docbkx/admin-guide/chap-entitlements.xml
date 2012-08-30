@@ -42,11 +42,10 @@
   <indexterm><primary>Policy</primary></indexterm>
   <para>OpenAM <firstterm>entitlements</firstterm> serve much the same purpose
   as OpenAM policies, defining who has access to what, under what conditions.
-  You can define entitlements through the OpenAM console, and OpenAM stores and
-  manages policies centrally using the standard eXtensible Access Control
-  Markup Language (XACML). You can access OpenAM entitlements and policy
-  decisions using the RESTful web interface, for even lighter weight policy
-  enforcement than with OpenAM policy agents.</para>
+  OpenAM stores and manages policies centrally using the standard eXtensible
+  Access Control Markup Language (XACML). You can access OpenAM entitlements
+  and policy decisions using the RESTful web interface, for even lighter weight
+  policy enforcement than with OpenAM policy agents.</para>
   
   <itemizedlist>
    <para>The OpenAM entitlements service uses XACML terminology to refer to
