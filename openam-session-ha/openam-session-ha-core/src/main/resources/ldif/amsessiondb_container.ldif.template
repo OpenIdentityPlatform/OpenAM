@@ -1,13 +1,13 @@
-dn: @AMSESSIONDB_BASEDN@
+dn: dc=internal,@SM_CONFIG_BASEDN@
 objectClass: domain
 objectClass: top
-dc: @AMSESSIONDB_RDN@
+dc: internal
 
-dn: ou=famrecords,@AMSESSIONDB_BASEDN@
+dn: ou=famrecords,dc=internal,@SM_CONFIG_BASEDN@
 ou: famrecords
 objectClass: organizationalUnit
 
-dn: ou=amsessiondb,@AMSESSIONDB_BASEDN@
+dn: ou=amsessiondb,dc=internal,@SM_CONFIG_BASEDN@
 ou: amsessiondb
 objectClass: organizationalUnit
 
