@@ -178,82 +178,6 @@
         <actionhandler name="button1,button2" />
     </viewbean>
 
-    <!-- DIRECTORY MANAGER -->
-    <viewbean classname="com.sun.identity.console.dm.OrganizationViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.OrganizationGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.OrganizationServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAddDynamic,tblButtonDelete,tblButtonAddStatic" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button2,button1" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupMembersViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserGroupsViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserRolesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.UserServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAddStatic,tblButtonAddDynamic,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button2,button1" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleMembersViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.RoleServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.ContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.ContainerGeneralViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.ContainerServicesViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.EditServiceViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="button1,button2" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.GroupContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.PeopleContainerViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
-    <viewbean classname="com.sun.identity.console.dm.AgentViewBean" view="sunAMRealmService" modify="sunAMRealmService">
-        <actionhandler name="tblButtonAdd,tblButtonDelete" />
-        <table name="tblSearch" />
-    </viewbean>
 
     <!-- SERVICE MANAGEMENT -->
     <viewbean classname="com.sun.identity.console.service.SCServiceProfileViewBean" view="null" modify="null">
@@ -337,17 +261,6 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMPostViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AuthenticatedViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.VersionViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewOrganizationViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewContainerViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewPeopleContainerViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewStaticGroupViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewUserViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewGroupContainerViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.SelectServicesViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewDynamicGroupViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.NewRoleViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.GroupContainerGeneralViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.dm.PeopleContainerGeneralViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingAddViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingEditViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.realm.RealmResourceOfferingViewBean" />
