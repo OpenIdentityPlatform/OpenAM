@@ -31,7 +31,6 @@
  */
 package com.sun.identity.console.base;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -44,14 +43,9 @@ import com.sun.identity.console.base.model.AMCommonNameGenerator;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
+import com.sun.identity.console.delegation.model.DelegationConfig;
 import com.sun.identity.console.idm.EndUserViewBean;
 import com.sun.identity.console.idm.EntitiesViewBean;
-import com.sun.identity.console.user.UMChangeUserPasswordViewBean;
-import com.sun.identity.console.user.UMUserPasswordResetOptionsViewBean;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
 import com.sun.web.ui.model.CCBreadCrumbsModel;
 import com.sun.web.ui.model.CCMastheadModel;
 import com.sun.web.ui.model.CCNavNodeInterface;
@@ -61,13 +55,12 @@ import com.sun.web.ui.view.masthead.CCPrimaryMasthead;
 import com.sun.web.ui.view.tabs.CCNodeEventHandlerInterface;
 import com.sun.web.ui.view.tabs.CCTabs;
 import java.io.Serializable;
-import java.security.AccessController;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.text.MessageFormat;
 import javax.servlet.http.HttpServletRequest;
 import org.owasp.esapi.ESAPI;
 
@@ -84,15 +77,7 @@ public abstract class AMPrimaryMastHeadViewBean
     protected static Set retainPageSessionsBtwTabs = new HashSet();
     private static final String BREAD_CRUMB = "breadCrumb";
     private static final String BREAD_CRUMB_HREF = "breadCrumbHref";
-    private static final List<String> UNPROTECTED_PAGES = Arrays.asList(
-            new String[]{
-                EndUserViewBean.class.getName(),
-                UMUserPasswordResetOptionsViewBean.class.getName(),
-                UMChangeUserPasswordViewBean.class.getName(),
-            });
-    private static final List<String> PRIVILEGED_USERS = Arrays.asList(
-            SystemProperties.get(Constants.CONSOLE_PRIVILEGED_USERS, "").toLowerCase().split("\\|"));
-    private static String superUUID;
+
 
     static {
         retainPageSessionsBtwTabs.add(PG_SESSION_TAB_ID);
@@ -100,12 +85,6 @@ public abstract class AMPrimaryMastHeadViewBean
         retainPageSessionsBtwTabs.add(AMAdminConstants.CURRENT_ORG);
         retainPageSessionsBtwTabs.add(AMAdminConstants.PREVIOUS_REALM);
         retainPageSessionsBtwTabs.add(EntitiesViewBean.PG_SESSION_ENTITY_TYPE);
-        superUUID = new AMIdentity(
-                AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER),
-                IdType.USER,
-                "/",
-                null).getUniversalId();
     }
 
     public static final String MH_COMMON = "mhCommon";
@@ -149,20 +128,14 @@ public abstract class AMPrimaryMastHeadViewBean
         }
         createTabModel();
 
-//        DelegationConfig dConfig = DelegationConfig.getInstance();
-        String userdn = getModel().getUserDN();
-
-        if (!UNPROTECTED_PAGES.contains(getClass().getName())) {
-            if (!PRIVILEGED_USERS.contains(userdn.toLowerCase())
-                    && !userdn.equalsIgnoreCase(superUUID)) {
-//                if (!dConfig.isUncontrolledViewBean(getClass().getName())) {
-//                if ((tabModel == null) || (tabModel.getNodeCount() == 0)) {
+        DelegationConfig dConfig = DelegationConfig.getInstance();
+        //check to see if class is in the noneeddealwith bean
+        if (!dConfig.isUncontrolledViewBean(getClass().getName())) {
+            if ((tabModel == null) || (tabModel.getNodeCount() == 0)) {
                 EndUserViewBean vb = (EndUserViewBean) getViewBean(EndUserViewBean.class);
                 vb.forwardTo(rc);
                 forwarded = true;
-//                }
-//                }
-            }
+           }
         }
         return forwarded;
     }

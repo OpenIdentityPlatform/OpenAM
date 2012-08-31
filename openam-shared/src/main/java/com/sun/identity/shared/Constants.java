@@ -256,8 +256,6 @@ public interface Constants {
     static final String AUTHENTICATION_SUPER_USER =
             "com.sun.identity.authentication.super.user";
 
-    static final String CONSOLE_PRIVILEGED_USERS =
-            "console.privileged.users";
     /**
      * Property string for authentication super user.
      */
