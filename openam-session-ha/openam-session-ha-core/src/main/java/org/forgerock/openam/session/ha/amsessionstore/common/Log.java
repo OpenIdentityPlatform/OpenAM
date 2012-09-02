@@ -25,23 +25,32 @@
 
 package org.forgerock.openam.session.ha.amsessionstore.common;
 
+import org.forgerock.openam.session.ha.amsessionstore.common.utils.TimeStamp;
+
 import java.util.logging.Level;
 
-
 /**
+ * Common Logging
+ *
+ *
  * @author steve
+ * @author jeff.schenk@forgerock.com
  */
 public class Log {
     //public final static java.util.logging.Logger logger = Logger.getLogger("amsessiondb");
 
-    // Spoof Logging.
+    // Spoof Logging during testing acceptance phase, until we figure out logging directions.
     public final static class logger {
         public final static void log(Level loggingLevel, String message) {
-            System.out.println(loggingLevel.getName() + ": " + message);
+            System.out.println(TimeStamp.getGenerationTimeStamp() + " "
+                    + loggingLevel.getName() + ": " + message);
         }
+
         public final static void log(Level loggingLevel, String message, Exception e) {
-            System.out.println(loggingLevel.getName() + ": " + message);
-            System.out.println(loggingLevel.getName() + ": " + e.toString());
+            System.out.println(TimeStamp.getGenerationTimeStamp() + " "
+                    + loggingLevel.getName() + ": " + message);
+            System.out.println(TimeStamp.getGenerationTimeStamp() + " "
+                    + loggingLevel.getName() + ": " + e.toString());
         }
     }
 

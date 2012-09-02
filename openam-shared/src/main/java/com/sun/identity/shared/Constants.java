@@ -1211,7 +1211,7 @@ public interface Constants {
 
     static final String URI = "amsessiondb.uri";
 
-    static final String BASE_DN = "ou=famrecords";
+    static final String OU_FAMRECORDS = "ou=famrecords";
 
     static final String AMRECORD_NAMING_ATTR = "pKey";
 

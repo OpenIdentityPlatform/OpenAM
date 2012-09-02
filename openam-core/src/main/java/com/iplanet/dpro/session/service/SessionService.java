@@ -312,17 +312,13 @@ public class SessionService {
 
         // *******************************************************************
         // Bootstrap AMSessionRepository Implementation if one was specified.
-        if (!SystemPropertiesManager.get(
-                AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE,"none").equalsIgnoreCase("none"))
+        if (amSessionRepository == null)
         {
-            if (amSessionRepository == null)
-            {
                 // Instantiate our Session Repository Implementation.
                 // Allows Static Elements to Initialize.
                 amSessionRepository = getRepository();
                 sessionDebug.message("amSessionRepository Implementation: "+
                     ((amSessionRepository == null) ? "None" : amSessionRepository.getClass().getSimpleName()));
-            }
         }
 
         // Establish Shutdown Manager.

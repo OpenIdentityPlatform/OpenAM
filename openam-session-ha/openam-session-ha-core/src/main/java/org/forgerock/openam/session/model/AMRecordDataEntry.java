@@ -266,6 +266,11 @@ public class AMRecordDataEntry {
             attributeValues.put(EXTRA_BYTE_ATTR, formatMultiValuedAttr(EXTRA_BYTE_ATTR, ((AMRecord) record).getExtraByteAttributes()));
             attributeValues.put(EXTRA_STRING_ATTR, formatMultiValuedAttr(EXTRA_STRING_ATTR, ((AMRecord) record).getExtraStringAttributes()));
         }
+
+        if (record instanceof FAMRecord) {
+            attributeValues.put(EXTRA_BYTE_ATTR, formatMultiValuedAttr(EXTRA_BYTE_ATTR, ((FAMRecord) record).getExtraByteAttributes()));
+            attributeValues.put(EXTRA_STRING_ATTR, formatMultiValuedAttr(EXTRA_STRING_ATTR, ((FAMRecord) record).getExtraStringAttributes()));
+        }
     }
 
     /**
