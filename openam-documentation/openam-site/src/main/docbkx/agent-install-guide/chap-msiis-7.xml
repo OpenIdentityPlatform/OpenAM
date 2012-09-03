@@ -301,7 +301,236 @@ Internet services successfully restarted</screen>
   
   <screen>C:\web_agents\iis7_agent\bin&gt;cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></screen>
  </section>
- 
+
+ <!-- OPENAM-1644: Document changes to IIS 7 PA support for Basic Auth and password replay -->
+ <section xml:id="iis7-enable-basic-auth">
+  <title>Enable IIS 7 Basic Authentication &amp; Password Replay Support</title>
+
+  <itemizedlist>
+   <para>The IIS 7 web policy agent now supports IIS 7 basic authentication and
+   password replay. You must use the appropriate software versions.</para>
+
+   <listitem>
+    <para>For Microsoft Office integration, you must use Microsoft Office 2007
+    SP2 or later.</para>
+   </listitem>
+   <listitem>
+    <para>For Microsoft SharePoint integration, you must use Microsoft
+    SharePoint Server 2007 SP2 or later.</para>
+   </listitem>
+  </itemizedlist>
+
+  <variablelist>
+   <para>You must also apply workarounds as described for the following
+   Microsoft issues.</para>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 841215</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/841215"
+     >http://support.microsoft.com/kb/841215</link></para>
+     <para>Description: Error message when you try to connect to a Windows
+     SharePoint document library: "System error 5 has occurred"</para>
+     <para>Summary: Enable Basic Authentication on the client computer.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 870853</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/870853"
+     >http://support.microsoft.com/kb/870853</link></para>
+     <para>Description: Office 2003 and 2007 Office documents open read-only
+     in Internet Explorer</para>
+     <para>Summary: Add registry keys as described in Microsoft's support
+     document.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 928692</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/928692"
+     >http://support.microsoft.com/kb/928692</link></para>
+     <para>Description: Error message when you open a Web site by using Basic
+     authentication in Expression Web on a computer that is running Windows
+     Vista: "The folder name is not valid"</para>
+     <para>Summary: Edit the registry as described in Microsoft's support
+     document.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 932118</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/932118"
+     >http://support.microsoft.com/kb/932118</link></para>
+     <para>Description: Persistent cookies are not shared between Internet
+     Explorer and Office applications</para>
+     <para>Summary: Add the web site the list of trusted sites.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 943280</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/943280"
+     >http://support.microsoft.com/kb/943280</link></para>
+     <para>Description: Prompt for Credentials When Accessing FQDN Sites From a
+     Windows Vista or Windows 7 Computer</para>
+     <para>Summary: Edit the registry as described in Microsoft's support
+     document.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 968851</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/968851"
+     >http://support.microsoft.com/kb/968851</link></para>
+     <para>Description: SharePoint Server 2007 Cumulative Update Server
+     Hotfix Package (MOSS server-package): April 30, 2009</para>
+     <para>Summary: Apply the fix from Microsoft if you use SharePoint.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Microsoft Support Issue: 2123563</term>
+    <listitem>
+     <para>Link: <link xlink:show="new"
+     xlink:href="http://support.microsoft.com/kb/2123563"
+     >http://support.microsoft.com/kb/2123563</link></para>
+     <para>Description: You cannot open Office file types directly from a
+     server that supports only Basic authentication over a non-SSL
+     connection</para>
+     <para>Summary: Enable SSL encryption on the web server.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <procedure xml:id="configure-ii7-basic-auth">
+   <title>To Configure IIS 7 Basic Authentication &amp; Password Replay Support</title>
+
+   <para>Follow these steps.</para>
+
+   <step>
+    <para>Generate and store an encryption key.</para>
+
+    <substeps>
+     <step>
+      <para>Generate the key using
+      <literal>com.sun.identity.common.DESGenKey</literal> using the .jars
+      where you deployed OpenAM, as in the following example.</para>
+      <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/lib
+$ java -cp openam-core-<?eval ${serverDocTargetVersion}?>.jar:openam-shared-<?eval ${serverDocTargetVersion}?>.jar
+ com.sun.identity.common.DESGenKey
+Key ==> sxVoaDRAN0o=</screen>
+     </step>
+
+     <step>
+      <para>Store the key in the agent configuration on the property in the
+      OpenAM console under Access Control &gt;
+      <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
+      <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
+      Server &gt; Replay Password Key (property name:
+      <literal>com.sun.identity.agents.config.replaypasswd.key</literal>),
+      and then Save your work.</para>
+     </step>
+
+     <step>
+      <para>Store the key in the server configuration in the OpenAM console
+      under Configuration &gt; Servers and Sites &gt;
+      <replaceable>server-name</replaceable> &gt; Advanced &gt; Add... to add
+      the property <literal>com.sun.am.replaypasswd.key</literal> with the
+      key you generated as the value, and then Save your work.</para>
+     </step>
+    </substeps>
+   </step>
+
+   <step>
+    <para>In the OpenAM console under Access Control &gt;
+      <replaceable>realm-name</replaceable> &gt; Authentication &gt; All Core
+      Settings... &gt; Authentication Post Processing Classes, add the class
+      <literal>com.sun.identity.authentication.spi.ReplayPasswd</literal>,
+      and then Save your work.</para>
+   </step>
+
+   <step>
+    <para>If you require Windows logon, or you need to use basic authentication
+    with SharePoint or OWA, then you must configure Active Directory as a
+    user date store, and you must configure the IIS 7 policy agent profile
+    User ID Parameter and User ID Parameter Type so that the policy agent
+    requests OpenAM to provide the appropriate account information from
+    Active Directory in its policy response.</para>
+
+    <para>Skip this step if you do not use SharePoint or OWA and no Windows
+    logon is required.</para>
+
+    <para>Make sure OpenAM data store is configured to use Active Directory as
+    the user data store.</para>
+
+    <para>In the OpenAM console under Access Control &gt;
+    <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
+    <replaceable>agent-name</replaceable> &gt; OpenAM Services &gt; Policy
+    Client Service, set User ID Parameter and User ID Parameter Type, and then
+    Save your work. For example if the real username for Windows domain logon
+    in Active Directory is stored on the <literal>samaccountname</literal>
+    attribute, then set the User ID Parameter to
+    <literal>samaccountname</literal>, and the User ID Parameter Type to
+    <literal>LDAP</literal>.</para>
+
+    <para>Setting the User ID Parameter Type to <literal>LDAP</literal> causes
+    the policy agent to request that OpenAM get the value of the User ID
+    Parameter attribute from the data store, in this case Active Directory.
+    Given that information, the policy agent can set the HTTP headers
+    <literal>remote_user</literal>, <literal>auth_user</literal>, or
+    <literal>logon_user</literal> and <literal>user_password</literal> with
+    Active Directory attribute values suitable for Windows logon, setting the
+    remote user, and so forth.</para>
+   </step>
+
+   <step>
+    <para>To set the encrypted password in the AUTH_PASSWORD header, in the
+    OpenAM console under Access Control &gt;
+    <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
+    Server, select Show Password in HTTP Header, and then Save your work.</para>
+   </step>
+
+   <step>
+    <para>To have the agent perform Windows logon (for user token
+    impersonation), in the OpenAM console under Access Control &gt;
+    <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
+    Server, select Logon and Impersonation, and then Save your work.</para>
+   </step>
+
+   <step>
+    <para>In the OpenAM console under Access Control &gt;
+    <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
+    Server, set Authentication Type to basic, and then Save your work.</para>
+   </step>
+
+   <step>
+    <para>To use the agent with SharePoint or Microsoft Office, configure
+    OpenAM to support the <literal>iPlanetDirectoryPro</literal> as a persistent
+    cookie.</para>
+
+    <para>In the OpenAM console under Access Control &gt;
+      <replaceable>realm-name</replaceable> &gt; Authentication &gt; All Core
+      Settings... &gt; Persistent Cookie Mode, select Enabled, and then Save
+      your work.</para>
+   </step>
+  </procedure>
+ </section>
+
  <section xml:id="uninstall-iis7-agent">
   <title>Remove IIS 7 Web Policy Agent Software</title>
   
