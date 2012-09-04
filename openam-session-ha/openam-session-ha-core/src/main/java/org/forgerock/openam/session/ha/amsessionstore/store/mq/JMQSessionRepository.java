@@ -64,6 +64,11 @@ import com.sun.identity.shared.Constants;
 public class JMQSessionRepository extends GeneralTaskRunnable implements
     AMSessionRepository {
 
+    /**
+     * Singleton Definition.
+     */
+    private static JMQSessionRepository instance;
+
     /* Operations */
     static public final String READ = "READ";
 
@@ -169,27 +174,39 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
     // Message queues
     // One REQUEST queue/topic is suffcient
     // Multiple RESPONSE queues/topics may be necessary
-    public FAMRecordPersister pSession = null;
+    public static FAMRecordPersister pSession = null;
 
-   /**
+    /**
+     * Provide Service Instance Access to our Singleton
+     *
+     * @return OpenDJPersistentStore Singleton Instance.
+     * @throws com.iplanet.dpro.session.exceptions.StoreException
+     *
+     */
+    public JMQSessionRepository getInstance() throws Exception {
+        initPersistSession();
+        SystemTimer.getTimer().schedule(this, new Date((
+                System.currentTimeMillis() / 1000) * 1000));
+        return instance;
+    }
+
+    /**
     *
     * Constructs new JMQSessionRepository
     * @exception Exception when cannot create a new Session repository
     *
     */
-   public JMQSessionRepository() throws Exception {
-        initPersistSession();
-        SystemTimer.getTimer().schedule(this, new Date((
-            System.currentTimeMillis() / 1000) * 1000));
-    }
+   private JMQSessionRepository() throws Exception {
+   }
 
     /**
      *
      * Initialize new persistant session
      */
    
-    private void initPersistSession() {
+    private synchronized static void initPersistSession() {
         try {
+            instance =  new JMQSessionRepository();
             pSession = FAMPersisterManager.getInstance().
                 getFAMRecordPersister(); 
             isDatabaseUp = true;

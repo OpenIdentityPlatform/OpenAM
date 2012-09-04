@@ -35,12 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.logging.Level;
 
+import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.codec.binary.Base64;
 import org.forgerock.i18n.LocalizableMessage;
-import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
@@ -53,10 +53,22 @@ import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
  * @author steve
  */
 public class AMRecordDataEntry {
+
+    /**
+     * Debug Logging
+     */
+    private static Debug debug = SessionService.sessionDebug;
+
+    /**
+     * AMRecordDataEntry Object Properties
+     */
     private String dn;
     private Map<String, Set<String>> attributeValues;
     private AMRootEntity record;
 
+    /**
+     * Static LDAP Construct definitions.
+     */
     public final static String AUX_DATA = "auxData";
     public final static String DATA = "data";
     public final static String SERIALIZED_INTERNAL_SESSION_BLOB = "serializedInternalSessionBlob";
@@ -123,6 +135,14 @@ public class AMRecordDataEntry {
             Set<String> values = attributeValues.get(DATA);
             for (String value : values) {
                 record.setData(value);
+            }
+        }
+
+        if (attributeValues.get(SERIALIZED_INTERNAL_SESSION_BLOB) != null) {
+            Set<String> values = attributeValues.get(SERIALIZED_INTERNAL_SESSION_BLOB);
+            for (String value : values) {
+                Base64 base64 = new Base64();
+                record.setSerializedInternalSessionBlob(base64.decode(value));
             }
         }
 
@@ -226,7 +246,8 @@ public class AMRecordDataEntry {
 
         if (record.getSerializedInternalSessionBlob() != null) {
             set = new HashSet<String>();
-            set.add(record.getSerializedInternalSessionBlob().toString());
+            Base64 base64 = new Base64();
+            set.add(base64.encodeAsString(record.getSerializedInternalSessionBlob()));
             attributeValues.put(SERIALIZED_INTERNAL_SESSION_BLOB, set);
         }
 
@@ -381,7 +402,7 @@ public class AMRecordDataEntry {
             expDate = formatter.parse(date);
         } catch (ParseException pe) {
             final LocalizableMessage message = DB_DJ_PARSE.get(date);
-            Log.logger.log(Level.SEVERE, message.toString());
+            debug.error(message.toString());
             throw new StoreException(message.toString());
         }
 

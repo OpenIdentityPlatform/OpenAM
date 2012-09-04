@@ -29,25 +29,21 @@
 
 package org.forgerock.openam.session.ha.amsessionrepository.store;
 
+import com.iplanet.dpro.session.service.SessionRepository;
 import org.junit.Ignore;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.util.Map;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-
+import static org.testng.Assert.*;
 
 /**
  * AMSessionRepositoryEncodingTest Tester.
  *
  * @author jeff.schenk@forgerock.com
  * @version 10.1
- * @since <pre>Aug 29, 2012</pre>
+ * @since <pre>Sep 3, 2012</pre>
  */
-public class AMSessionRepositoryEncodingTest {
+public class AMSessionRepositoryGetInstanceTest {
 
     @BeforeClass
     public void before() throws Exception {
@@ -58,7 +54,10 @@ public class AMSessionRepositoryEncodingTest {
     }
 
     @Ignore
-    public void testEncoding() throws Exception {
+    public void testGetInstance() throws Exception {
+
+              assertNotNull(SessionRepository.getInstance());
+
 
 
     }

@@ -87,7 +87,7 @@ public class TimeStamp {
         sb.append( formatDigit(current_calendar.get(Calendar.YEAR))+"-" );
         sb.append( formatDigit(current_calendar.get(Calendar.MONTH)+1)+"-" );
         sb.append( formatDigit(current_calendar.get(Calendar.DAY_OF_MONTH))+" " );
-        sb.append( formatDigit(current_calendar.get(Calendar.HOUR))+":" );
+        sb.append( formatDigit(current_calendar.get(Calendar.HOUR_OF_DAY))+":" );
         sb.append( formatDigit(current_calendar.get(Calendar.MINUTE))+":" );
         sb.append( formatDigit(current_calendar.get(Calendar.SECOND))+"." );
         sb.append( current_calendar.get(Calendar.MILLISECOND) );

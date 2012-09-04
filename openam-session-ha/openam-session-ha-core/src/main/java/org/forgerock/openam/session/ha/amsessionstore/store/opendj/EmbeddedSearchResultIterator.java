@@ -31,11 +31,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.model.AMRecordDataEntry;
 import org.forgerock.openam.session.model.CaseInsensitiveHashMap;
-import org.forgerock.openam.session.ha.amsessionstore.common.Log;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;
@@ -46,6 +46,15 @@ import org.opends.server.types.SearchResultEntry;
  * @author steve
  */
 public class EmbeddedSearchResultIterator {
+
+    /**
+     * Debug Logging
+     */
+    private static Debug debug = SessionService.sessionDebug;
+
+    /**
+     * Object Instance Properties
+     */
     private Iterator resultIter;
     private Set excludeDNs;
     private boolean hasExcludeDNs;
@@ -87,7 +96,7 @@ public class EmbeddedSearchResultIterator {
             current = (entry == null) ? null : new AMRecordDataEntry(dn,
                 convertLDAPAttributeSetToMap(entry.getAttributes()));
         } catch (StoreException se) {
-            Log.logger.log(Level.WARNING,"Unable to create AMRecordDataEntry ", se);
+            debug.error("Unable to create AMRecordDataEntry ", se);
         }
             
         return (current != null);

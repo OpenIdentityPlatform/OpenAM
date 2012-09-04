@@ -30,6 +30,8 @@ package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
 
+import java.lang.reflect.Method;
+
 /**
  * <code>SessionRepository</code> represents the session
  * repository , default repository 
@@ -47,14 +49,24 @@ public class SessionRepository {
     private static AMSessionRepository sessionRepository = null;
 
     /**
-     * @return the instance of AMSessionRepository
+     * Private, do not allow instantiation.
+     */
+    private SessionRepository() {
+    }
+
+    /**
+     * Common Get Instance method to obtain access to
+     * Service Methods.
+     *
+     * @return AMSessionRepository Singleton Instance.
      * @throws Exception
      */
     public static synchronized AMSessionRepository getInstance()
             throws Exception {
         if (sessionRepository == null) {
-            sessionRepository = (AMSessionRepository) Class.forName(
-                    REPOSITORY_CLASS).newInstance();
+            Class c = Class.forName(REPOSITORY_CLASS);
+            Method factoryMethod = c.getDeclaredMethod("getInstance");
+            sessionRepository  = (AMSessionRepository) factoryMethod.invoke(null, null);
         }
         return sessionRepository;
     }
