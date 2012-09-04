@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+*** GENERATED FROM project.xml - DO NOT EDIT  ***
+***         EDIT ../build.xml INSTEAD         ***
+
+For the purpose of easier reading the script
+is divided into following sections:
+
+  - initialization
+  - compilation
+  - jar
+  - execution
+  - debugging
+  - javadoc
+  - junit compilation
+  - junit execution
+  - junit debugging
+  - applet
+  - cleanup
+
+        -->
+<project xmlns:javafxproject1="http://www.netbeans.org/ns/javafx-project/1" xmlns:javafxproject2="http://www.netbeans.org/ns/javafx-project/2" xmlns:javafxproject3="http://www.netbeans.org/ns/javafx-project/3" basedir=".." default="default" name="C1DemoClient-impl">
+    <target depends="jar" description="Build whole project." name="default"/>
+    <!--
+                    ======================
+                    INITIALIZATION SECTION
+                    ======================
+    -->
+    <target name="-pre-init">
+        <!-- Empty placeholder for easier customization.-->
+        <!-- You can override this target in the ../build.xml file.-->
+    </target>
+    <target depends="-pre-init" name="-init-private">
+        <macrodef name="property" uri="http://www.netbeans.org/ns/javafx-project/1">
+            <attribute name="name"/>
+            <attribute name="value"/>
+            <sequential>
+                <property name="@{name}" value="${@{value}}"/>
+            </sequential>
+        </macrodef>
+        <property file="nbproject/private/config.properties"/>
+        <property file="nbproject/private/configs/${config}.properties"/>
+        <property file="nbproject/private/private.properties"/>
+    </target>
+    <target depends="-pre-init,-init-private" name="-init-user">
+        <property file="${user.properties.file}"/>
+    </target>
+    <target depends="-pre-init,-init-private,-init-user" name="-init-project">
+        <property file="nbproject/configs/${config}.properties"/>
+        <property file="nbproject/project.properties"/>
+    </target>
+    <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
+        <javafxproject1:property name="platform.fxhome" value="platforms.${platform.active}.fxhome"/>
+        <javafxproject1:property name="platform.javadoc.tmp" value="platforms.${platform.active}.javadoc"/>
+        <condition property="platform.javadoc" value="${platform.home}/bin/javadoc">
+            <equals arg1="${platform.javadoc.tmp}" arg2="$${platforms.${platform.active}.javadoc}"/>
+        </condition>
+        <property name="platform.javadoc" value="${platform.javadoc.tmp}"/>
+        <condition property="no.javadoc.preview">
+            <and>
+                <isset property="javadoc.preview"/>
+                <isfalse value="${javadoc.preview}"/>
+            </and>
+        </condition>
+        <property name="work.dir" value="${basedir}"/>
+        <condition property="no.deps">
+            <istrue value="${no.dependencies}"/>
+        </condition>
+        <condition else="" property="codebase.arg" value="-appCodebase ${codebase.url}">
+            <isset property="codebase.url"/>
+        </condition>
+        <property file="${user.properties.file}/../config/preferences/org/apache/tools/ant/module.properties" prefix="ant.module"/>
+        <condition else="" property="verbose.arg" value="-v">
+            <or>
+                <equals arg1="${ant.module.verbosity}" arg2="3"/>
+                <equals arg1="${ant.module.verbosity}" arg2="4"/>
+            </or>
+        </condition>
+        <condition else="" property="draggable.arg" value="-draggable">
+            <istrue value="${applet.draggable}"/>
+        </condition>
+        <condition else="" property="pack200.arg" value="-pack200">
+            <istrue value="${jnlp.packEnabled}"/>
+        </condition>
+        <condition else="" property="sign.arg" value="-sign">
+            <istrue value="${jnlp.signed}"/>
+        </condition>
+        <property name="javadoc.preview" value="true"/>
+        <property name="source.encoding" value="${file.encoding}"/>
+        <condition else="" property="binary.extension" value=".exe">
+            <os family="windows"/>
+        </condition>
+        <property name="javafx.profile" value="desktop"/>
+        <condition property="midp.execution.trigger">
+            <equals arg1="${javafx.profile}" arg2="mobile"/>
+        </condition>
+        <condition property="jnlp.execution.trigger">
+            <and>
+                <equals arg1="${javafx.profile}" arg2="desktop"/>
+                <equals arg1="${execution.target}" arg2="jnlp"/>
+            </and>
+        </condition>
+        <condition property="applet.execution.trigger">
+            <and>
+                <equals arg1="${javafx.profile}" arg2="desktop"/>
+                <equals arg1="${execution.target}" arg2="applet"/>
+                <isset property="netbeans.home"/>
+            </and>
+        </condition>
+        <condition property="standard.execution.trigger">
+            <not>
+                <or>
+                    <isset property="jnlp.execution.trigger"/>
+                    <isset property="applet.execution.trigger"/>
+                    <isset property="midp.execution.trigger"/>
+                </or>
+            </not>
+        </condition>
+        <property name="run.jvmargs" value=""/>
+        <available file="${platform.fxhome}/emulator/bin/emulator${binary.extension}" property="emulator.available"/>
+    </target>
+    <target name="-post-init">
+        <!-- Empty placeholder for easier customization.-->
+        <!-- You can override this target in the ../build.xml file.-->
+    </target>
+    <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init" name="-init-check">
+        <fail unless="build.dir">Must set build.dir</fail>
+        <fail unless="dist.dir">Must set dist.dir</fail>
+        <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
+    </target>
+    <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check" name="init"/>
+    <!--
+                    ===================
+                    COMPILATION SECTION
+                    ===================
+    -->
+    <target depends="init" name="deps-jar" unless="no.deps"/>
+    <target name="-pre-compile">
+        <!-- Empty placeholder for easier customization.-->
+        <!-- You can override this target in the ../build.xml file.-->
+    </target>
+    <target depends="init,deps-jar,-pre-compile" name="-do-compile">
+        <exec executable="${platform.fxhome}/bin/javafxpackager${binary.extension}" failonerror="true">
+            <arg value="-src"/>
+            <arg value="${src.dir}"/>
+            <arg value="-workdir"/>
+            <arg file="${build.dir}"/>
+            <arg value="-d"/>
+            <arg file="${dist.dir}"/>
+            <arg value="-appname"/>
+            <arg value="${application.title}"/>
+            <arg value="-appvendor"/>
+            <arg value="${application.vendor}"/>
+            <arg value="-appwidth"/>
+            <arg value="${applet.width}"/>
+            <arg value="-appheight"/>
+            <arg value="${applet.height}"/>
+            <arg value="-appclass"/>
+            <arg value="${main.class}"/>
+            <arg line="${codebase.arg}"/>
+            <arg value="-encoding"/>
+            <arg value="${source.encoding}"/>
+            <arg value="-p"/>
+            <arg value="${javafx.profile}"/>
+            <arg value="${verbose.arg}"/>
+            <arg value="${draggable.arg}"/>
+            <arg value="${pack200.arg}"/>
+            <arg value="${sign.arg}"/>
+            <arg value="-cp"/>
+            <arg path="${javac.classpath}"/>
+        </exec>
+    </target>
+    <target name="-post-compile">
+        <!-- Empty placeholder for easier customization.-->
+        <!-- You can override this target in the ../build.xml file.-->
+    </target>
+    <target depends="init,deps-jar,-pre-compile,-do-compile,-post-compile" description="Compile project." name="compile"/>
+    <!--
+                    ====================
+                    JAR BUILDING SECTION
+                    ====================
+    -->
+    <target depends="init,compile" description="Build." name="jar"/>
+    <!--
+                    =================
+                    EXECUTION SECTION
+                    =================
+    -->
+    <target depends="init,compile,jar" description="Run a main class." if="standard.execution.trigger" name="standard-run">
+        <property name="application.args" value=""/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}" jvmargs="${run.jvmargs}">
+            <arg line="${application.args}"/>
+        </java>
+    </target>
+    <target depends="jar" description="Start MIDP execution" if="midp.execution.trigger" name="midp-run">
+        <fail message="Current platform does not include mobile device emulator necessary for the execution." unless="emulator.available"/>
+        <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
+        <property name="mobile.device" value="DefaultFxPhone1"/>
+        <condition else="-Xdescriptor:" property="emulator.exec.arg" value="-Xjam:install=">
+            <istrue value="${jad.install}"/>
+        </condition>
+        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}" failonerror="true">
+            <arg value="${run.jvmargs}"/>
+            <arg value="${emulator.exec.arg}${jad.file}"/>
+            <arg value="-Xdevice:${mobile.device}"/>
+        </exec>
+    </target>
+    <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
+        <makeurl file="${dist.dir}/${application.title}.html" property="applet.local.url"/>
+        <condition else="${applet.local.url}" property="applet.url" value="${codebase.url}/${application.title}.html">
+            <isset property="codebase.url"/>
+        </condition>
+        <nbbrowse url="${applet.url}"/>
+    </target>
+    <target depends="jar" description="Start javaws execution" if="jnlp.execution.trigger" name="jws-run">
+        <condition else="${java.home}" property="javaws.home" value="/usr">
+            <os family="mac"/>
+        </condition>
+        <exec executable="${javaws.home}/bin/javaws" failonerror="true">
+            <env key="JAVAWS_VM_ARGS" value="${run.jvmargs}"/>
+            <arg file="${dist.dir}/${application.title}.jnlp"/>
+        </exec>
+    </target>
+    <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run" description="Run an application." name="run"/>
+    <!--
+                    =================
+                    DEBUGGING SECTION
+                    =================
+    -->
+    <target depends="init" if="netbeans.home" name="-debug-start-debugger">
+        <nbjavafxstart addressproperty="javafx.address" name="${application.title}" transport="dt_socket">
+            <classpath>
+                <path path="${javac.classpath}"/>
+            </classpath>
+            <sourcepath>
+                <path path="${src.dir}"/>
+            </sourcepath>
+        </nbjavafxstart>
+    </target>
+    <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
+        <nbjavafxstart addressproperty="javafx.address" name="${application.title}" stopclassname="${main.class}" transport="dt_socket">
+            <classpath>
+                <path path="${javac.classpath}"/>
+            </classpath>
+            <sourcepath>
+                <path path="${src.dir}"/>
+            </sourcepath>
+        </nbjavafxstart>
+    </target>
+    <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
+        <property name="application.args" value=""/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}">
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address}"/>
+            <jvmarg line="${run.jvmargs}"/>
+            <syspropertyset>
+                <propertyref prefix="run-sys-prop."/>
+                <mapper from="run-sys-prop.*" to="*" type="glob"/>
+            </syspropertyset>
+            <arg line="${application.args}"/>
+        </java>
+    </target>
+    <target if="midp.execution.trigger" name="-debug-midp-debuggee">
+        <fail message="Current platform does not include mobile device emulator necessary for the debugging." unless="emulator.available"/>
+        <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
+        <condition else="-Xdescriptor:" property="emulator.exec.arg" value="-Xjam:install=">
+            <istrue value="${jad.install}"/>
+        </condition>
+        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+            <arg value="${run.jvmargs}"/>
+            <arg value="${emulator.exec.arg}${jad.file}"/>
+            <arg value="-Xdebug"/>
+            <arg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address},server=n"/>
+        </exec>
+    </target>
+    <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
+        <condition else="${java.home}" property="javaws.home" value="/usr">
+            <os family="mac"/>
+        </condition>
+        <exec executable="${javaws.home}/bin/javaws">
+            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${javafx.address} ${run.jvmargs}"/>
+            <arg file="${dist.dir}/${application.title}.jnlp"/>
+        </exec>
+    </target>
+    <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
+    <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee" if="netbeans.home" name="debug-stepinto"/>
+    <!--
+                    ===============
+                    JAVADOC SECTION
+                    ===============
+    -->
+    <target depends="init" name="-javadoc-build">
+        <mkdir dir="${dist.javadoc.dir}"/>
+        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" executable="${platform.fxhome}/bin/javafxdoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true" version="${javadoc.version}">
+            <fileset dir="${src.dir}" includes="**/*.fx"/>
+        </javadoc>
+        <condition property="javadoc.available">
+            <and>
+                <isset property="netbeans.home"/>
+                <available file="${dist.javadoc.dir}/index.html"/>
+            </and>
+        </condition>
+    </target>
+    <target depends="init,-javadoc-build" if="javadoc.available" name="-javadoc-browse" unless="no.javadoc.preview">
+        <nbbrowse file="${dist.javadoc.dir}/index.html"/>
+    </target>
+    <target depends="init,-javadoc-build,-javadoc-browse" description="Build Javadoc." name="javadoc"/>
+    <!--
+                    ===============
+                    CLEANUP SECTION
+                    ===============
+    -->
+    <target depends="init" name="deps-clean" unless="no.deps"/>
+    <target depends="init" name="-do-clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+    <target name="-post-clean">
+        <!-- Empty placeholder for easier customization.-->
+        <!-- You can override this target in the ../build.xml file.-->
+    </target>
+    <target depends="init,deps-clean,-do-clean,-post-clean" description="Clean build products." name="clean"/>
+</project>

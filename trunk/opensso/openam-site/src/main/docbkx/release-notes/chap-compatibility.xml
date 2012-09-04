@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-compatibility'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Changes &amp; Deprecated Functionality</title>
+
+ <para>This chapter covers both major changes to existing functionality, and
+ also deprecated and removed functionality.</para>
+
+ <section xml:id="changes">
+  <title>Major Changes to Existing Functionality</title>
+
+  <itemizedlist>
+   <listitem>
+    <itemizedlist>
+     <para>The following web policy agents are compatible with OpenAM
+     <?eval ${serverDocTargetVersion}?>.</para>
+     <listitem>
+      <para>Apache 2.0</para>
+     </listitem>
+     <listitem>
+      <para>Apache 2.2</para>
+     </listitem>
+     <listitem>
+      <para>Microsoft IIS 6</para>
+     </listitem>
+     <listitem>
+      <para>Microsoft IIS 7</para>
+     </listitem>
+    </itemizedlist>
+    <itemizedlist>
+     <para>The following J2EE policy agents are compatible with OpenAM
+     <?eval ${serverDocTargetVersion}?>.</para>
+     <listitem>
+      <para>GlassFish v2 &amp; v3</para>
+     </listitem>
+     <listitem>
+      <para>JBoss v4.2 &amp; v5.x</para>
+     </listitem>
+     <listitem>
+      <para>Jetty v6.1 &amp; v7</para>
+     </listitem>
+     <listitem>
+      <para>Tomcat v6</para>
+     </listitem>
+     <listitem>
+      <para>WebSphere v6.1</para>
+     </listitem>
+     <listitem>
+      <para>WebLogic v10</para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+   <listitem>
+    <!-- Fix for OpenAM-413 -->
+    <para>Prior to OpenAM 9.5.2, trailing slashes (<literal>/</literal>) were
+    ignored when matching resource names in policy evaluation. Therefore,
+    <literal>/-*-</literal> matched <literal>/secret</literal>, but also
+    <literal>/secret/</literal>, short for
+    <literal>/secret/index.html</literal> on most web servers.</para>
+    <para>Now, <literal>/-*-</literal> matches <literal>/secret</literal>, but
+    not <literal>/secret/</literal>.</para>
+   </listitem>
+   <listitem>
+    <!-- Fix for OpenAM-694. -->
+    <para>Since OpenAM 9.5.3, application shutdown hooks are no longer
+    registered by default. This change only has an effect on standalone and
+    web applications that use the OpenAM Client SDK. The changes do not affect
+    OpenAM, distributed authentication services, or the Java EE policy
+    agents.</para>
+    <para>For Java EE applications, ensure the OpenAM client SDK
+    shuts down successfully by including the following context listener in
+    your application's <filename>web.xml</filename> file.</para>
+    <programlisting language="xml">&lt;listener&gt;
+ &lt;listener-class&gt;
+  com.sun.identity.common.ShutdownServletContextListener
+ &lt;/listener-class&gt;
+&lt;/listener&gt;</programlisting>
+    <para>For standalone applications, set the following JVM property.</para>
+    <literallayout class="monospaced"
+    >-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
+   </listitem>
+<!-- Fix for OpenAM-699
+   <listitem>
+    <para>RSA has marked the RSA Authentication API used in earlier versions of
+    OpenAM as End of Life. The current API version used in OpenAM is now 8.1.
+    As a result, OpenAM now supports RSA Authentication Manager versions 6.1.2
+    and 7.1.</para>
+   </listitem>
+ -->
+   <listitem>
+    <para>Privileged console access is now disabled by default. To enable
+    privileged console access for specific users, set the
+    <literal>console.privileged.users</literal> advanced property as described
+    in the <citetitle>OpenAM Reference</citetitle> section, <link
+    xlink:href="reference#servers-advanced-configuration"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Servers &gt;
+    Advanced</citetitle></link>.</para>
+   </listitem>
+   <!-- Fix for OPENAM-1578 -->
+   <listitem>
+    <para>In earlier versions the default root suffix DN for OpenAM
+    configuration and profile data was
+    <literal>dc=opensso,dc=java,dc=net</literal>.
+    The default root suffix is now
+    <literal><?eval ${defaultRootSuffix}?></literal>.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="deprecated">
+  <title>Deprecated Functionality</title>
+  
+  <para>The following functionality is deprecated in OpenAM
+  <?eval ${serverDocTargetVersion}?>.</para>
+  
+  <itemizedlist>
+   <listitem>
+    <para>The Netscape LDAP API is to be removed from OpenAM, with OpenAM
+    using the OpenDJ LDAP SDK instead. This affects all classes in
+    <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
+   </listitem>
+   <listitem>
+    <!-- Fix for OpenAM-837 -->
+    <para>Support for Liberty Identity Web Services Framework (ID-WSF) is
+    deprecated. The functionality is likely to be removed in a future
+    release.</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM currently uses Sun Java System Application Framework (JATO).
+    JATO is deprecated and is likely to be replaced in a future release.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="removed">
+  <title>Removed Functionality</title>
+  
+  <para>OpenAM <?eval ${serverDocTargetVersion}?> does not include the
+  <command>amtune</command> command.</para>
+
+  <!-- Fix for OpenAM-1020 -->
+  <para>OpenAM console only mode is no longer supported. Console only mode
+  is likely to be replaced with a different solution in a future
+  release.</para>
+
+  <para>The Test Beta Console has been removed. Its functionality is currently
+  available through the <command>ssoadm</command> command.</para>
+
+  <para>OpenAM no longer includes the SafeWord and Unix authentication
+  modules.</para>
+ </section>
+</chapter>

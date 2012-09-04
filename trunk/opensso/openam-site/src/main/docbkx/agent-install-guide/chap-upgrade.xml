@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-upgrade'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Upgrading</title>
+ <indexterm><primary>Upgrading</primary></indexterm>
+
+ <para>This chapter briefly describes the upgrade process for OpenAM
+ policy agents.</para>
+
+ <procedure xml:id="upgrade-same-major-version">
+  <title>To Upgrade Version 3 Agents</title>
+  
+  <para>Follow these steps to upgrade a version 3 policy agent to
+  a more recent version 3 release.</para>
+
+  <step>
+   <para>Backup the file system directory where the existing agent is
+   installed.</para>
+   <para>In other words when upgrading a web policy agent, backup the
+   <filename>web_agents/</filename> directory. For Java EE policy agents,
+   back up the <filename>j2ee_agents/</filename> directory.</para>
+  </step>
+  <step>
+   <para>Extract the .zip for the new release over the existing agent files,
+   replacing the current version with the new version.</para>
+  </step>
+  <step>
+   <para>When upgrading a Java EE agent, replace the deployed agent
+   application with the new version.</para>
+  </step>
+  <step>
+   <para>Restart the web server, web container, or policy agent.</para>
+   <para>At this point, new configuration parameters introduced since the
+   release of the earlier policy agent have not yet been set, and so the
+   policy agent uses the default values until you change the
+   configuration.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="revert-same-major-version">
+  <title>To Revert Version 3 Agents</title>
+
+  <step>
+   <para>Make sure your policy agent configuration does not set parameters
+   not supported by the earlier version.</para>
+  </step>
+  <step>
+   <para>When reverting a Java EE agent, stop the agent and affected
+   applications, and revert the agent to the earlier version.</para>
+  </step>
+  <step>
+   <para>Restore the file system directory for the agent with the earlier
+   version you backed up.</para>
+  </step>
+  <step>
+   <para>Restart the web server, web container, or policy agent.</para>
+  </step>
+ </procedure>
+
+<!-- TODO: Placeholder if we choose to describe upgrade from earlier versions.
+ <procedure xml:id="upgrade-earlier-major-version">
+  <title>To Upgrade Version 2 Agents</title>
+
+  <para>Follow these steps to upgrade a version 2 policy agent to
+  version 3.</para>
+
+  <step>
+   <para>TODO</para>
+  </step>
+ </procedure> -->
+</chapter>

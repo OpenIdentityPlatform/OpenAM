@@ -1,0 +1,84 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyFSSAMLTrustedPartnersReceiverArtifactProfile.xml,v 1.2 2008/06/25 05:45:11 qcheng Exp $
+
+-->
+
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header">
+    <property required="true">
+	<label name="lblSourceid" defaultValue="saml.profile.trustedPartners.sourceID.label" labelFor="sourceid" />
+	<cc name="sourceid" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+    </property>
+    <property required="true">
+	<label name="lblSoapUrl" defaultValue="saml.profile.trustedPartners.soapURL.label" labelFor="soapURL" />
+	<cc name="soapURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblAccountMapper" defaultValue="saml.profile.trustedPartners.accountMapper.label" labelFor="accountMapper" />
+	<cc name="accountMapper" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblAuthenticationType" defaultValue="saml.profile.trustedPartners.authenticationType.label" labelFor="authenticationType" />
+	<cc name="authenticationType" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option label="saml.profile.trustedPartners.authenticationType.option.none" value="NOAUTH" />
+	    <option label="saml.profile.trustedPartners.authenticationType.option.basic" value="BASICAUTH" />
+	    <option label="saml.profile.trustedPartners.authenticationType.option.ssl" value="SSL" />
+	    <option label="saml.profile.trustedPartners.authenticationType.option.sslWithBasic" value="SSLWITHBASICAUTH" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblUser" defaultValue="saml.profile.trustedPartners.user.label" labelFor="user" />
+	<cc name="user" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+    </property>
+    <property>
+	<label name="lblCertificate" defaultValue="saml.profile.trustedPartners.certificate.label" labelFor="certificate" />
+	<cc name="certificate" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+    </property>
+    </section>
+</propertysheet>

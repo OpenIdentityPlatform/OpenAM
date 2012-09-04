@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<project name="${project.name}"
+ xmlns="http://maven.apache.org/DECORATION/1.0.1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.1 http://maven.apache.org/xsd/decoration-1.0.1.xsd">
+
+ <skin>
+  <groupId>org.forgerock.commons</groupId>
+  <artifactId>forgerock-community-skin</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+ </skin>
+ <publishDate position="right" format="yyyy.MM.dd" />
+ <version position="right" />
+
+ <body>
+ 
+  <breadcrumbs>
+   <item name="Developer Community" href="http://www.forgerock.org" />
+   <item name="OpenAM" href="http://openam.forgerock.org" />
+  </breadcrumbs>
+ 
+  <menu name="OpenAM">
+   <item name="Welcome" href="index.html" />
+   <item name="News" href="news.html" />
+   <item name="Join" href="https://idp.forgerock.org/openam/UI/Login?service=register" />
+   <item name="Downloads" href="http://forgerock.org/openam.html" />
+   <item name="FAQ" href="faq.html" />
+   <item name="Mailing Lists" href="mail-lists.html" />
+   <item name="Support" href="http://forgerock.com/subscriptions.html" />
+   <item name="Partners" href="http://forgerock.com/partners.html" />
+   <item name="Wiki" href="https://wikis.forgerock.org/confluence/display/OPENAM/Home" />
+  </menu>
+  
+  <menu name="Released Documentation">
+   <item name="OpenAM 10.0.0" href="http://docs.forgerock.org/en/index.html?product=openam&amp;version=10.0.0"/>
+  </menu>
+
+  <menu name="OpenAM Docs (in progress)">
+   <item name="All Formats" href="docs.html"/>
+   <item name="Release Notes" href="./doc/release-notes/index.html" />
+   <item name="Installation Guide" href="./doc/install-guide/index.html" />
+   <item name="Admin Guide" href="./doc/admin-guide/index.html" />
+   <item name="Developer Guide" href="./doc/dev-guide/index.html" />
+   <item name="Reference" href="./doc/reference/index.html" />
+   <item name="Javadoc" href="./doc/public-api/index.html" />
+  </menu>
+
+  <menu name="Policy Agent Docs (in progress)">
+   <item name="All Formats" href="docs.html"/>
+   <item name="Release Notes" href="./doc/agent-release-notes/index.html" />
+   <item name="Install Guide" href="./doc/agent-install-guide/index.html" />
+  </menu>
+
+  <menu name="Project Information">
+   <item name="Issue Tracking" href="issue-tracking.html" />
+   <item name="Mailing Lists" href="mail-lists.html" />
+   <item name="License" href="license.html" />
+   <item name="Source Repository" href="source-repository.html" />
+  </menu>  
+ </body>
+ 
+ <custom>
+  <googleAnalytics>UA-23412190-7</googleAnalytics>
+  <openproject>
+   <href>http://openam.forgerock.org/</href>
+   <src>./images/openam-tagline-200x65.png</src>
+   <alt>OpenAM</alt>
+  </openproject>
+  <siteSearchFQDN>forgerock.org</siteSearchFQDN>
+ </custom>
+
+</project>

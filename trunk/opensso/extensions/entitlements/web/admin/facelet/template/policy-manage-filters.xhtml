@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policy-manage-filters.xhtml,v 1.9 2009/06/23 18:43:49 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ice:panelGroup
+        visible="#{o:size(policyManageBean.policyFilterHolders) == 0}"
+        styleClass="policy-filter-outer">
+        <o:box>
+            <ui:define name="body">
+                <ice:panelGrid
+                    style="padding-left: 5px"
+                    styleClass="policy-filter"
+                    columnClasses="policy-filter-lead,policy-filter-actions"
+                    columns="2">
+                    <ice:panelGroup>
+                        <ice:outputText
+                            value="#{resources['policy-manage-filters.addFilter']}"/>
+                    </ice:panelGroup>
+                    <ice:panelGroup
+                        styleClass="float-right">
+                        <ice:commandLink
+                            actionListener="#{policyManageHandler.addPolicyFilterListener}">
+                            <ice:graphicImage
+                                value="../image/add-16.png"/>
+                        </ice:commandLink>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+            </ui:define>
+        </o:box>
+    </ice:panelGroup>
+    <ice:panelSeries
+        var="policyFilterHolder"
+        value="#{policyManageBean.policyFilterHolders}">
+        <o:policyfilterholder
+            handler="#{policyManageHandler}"
+            policyFilterHolder="#{policyFilterHolder}"/>
+    </ice:panelSeries>
+</span>

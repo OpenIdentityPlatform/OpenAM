@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: lib-arch-interact-svc.xsd,v 1.2 2008/06/25 05:48:41 qcheng Exp $
+
+-->
+
+
+<xs:schema targetNamespace="urn:liberty:is:2003-08" xmlns="urn:liberty:is:2003-08" xmlns:is="urn:liberty:is:2003-08" xmlns:disco="urn:liberty:disco:2003-08" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0-09">
+    <xs:include schemaLocation="lib-arch-iwsf-utility.xsd"/>
+    <xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/" schemaLocation="soap.xsd"/>
+    <xs:import namespace="urn:liberty:disco:2003-08" schemaLocation="lib-arch-disco-svc.xsd"/>
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+    <xs:annotation>
+        <xs:documentation>
+The source code in this XSD file was excerpted verbatim from:
+
+Liberty ID-WSF Interaction Service Specification
+Version 1.0
+12th November 2003
+
+Copyright (c) 2003 Liberty Alliance participants, see
+http://www.projectliberty.org/specs/idwsf_copyrights.html
+
+        </xs:documentation>
+    </xs:annotation>
+    <xs:element name="UserInteraction" type="UserInteractionHeaderType"/>
+    <xs:complexType name="UserInteractionHeaderType">
+        <xs:sequence>
+            <xs:element name="InteractionService" type="disco:ResourceOfferingType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+        <xs:attribute name="interact" type="xs:QName" use="optional" default="is:interactIfNeeded"/>
+        <xs:attribute name="language" type="xs:NMTOKENS" use="optional"/>
+        <xs:attribute name="redirect" type="xs:boolean" use="optional" default="0"/>
+        <xs:attribute name="maxInteractTime" type="xs:integer" use="optional"/>
+        <xs:attribute ref="soap:actor" use="optional"/>
+        <xs:attribute ref="soap:mustUnderstand" use="optional"/>
+    </xs:complexType>
+    <xs:element name="RedirectRequest" type="RedirectRequestType"/>
+    <xs:complexType name="RedirectRequestType">
+        <xs:attribute name="redirectURL" type="xs:anyURI" use="required"/>
+    </xs:complexType>
+    <xs:element name="ResourceID" type="disco:ResourceIDType"/>
+    <xs:element name="EncryptedResourceID" type="disco:EncryptedResourceIDType"/>
+    <xs:group name="ResourceIDGroup">
+        <xs:choice>
+            <xs:element ref="ResourceID"/>
+            <xs:element ref="EncryptedResourceID"/>
+        </xs:choice>
+    </xs:group>
+    <xs:element name="InteractionRequest" type="InteractionRequestType"/>
+    <xs:complexType name="InteractionRequestType">
+        <xs:sequence>
+            <xs:group ref="ResourceIDGroup" minOccurs="0"/>
+            <xs:element ref="Inquiry" maxOccurs="unbounded"/>
+            <xs:element ref="ds:KeyInfo" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+        <xs:attribute name="language" type="xs:NMTOKENS" use="optional"/>
+        <xs:attribute name="maxInteractTime" type="xs:integer" use="optional"/>
+        <xs:attribute name="signed" type="xs:token" use="optional"/>
+    </xs:complexType>
+    <xs:element name="Inquiry" type="InquiryType"/>
+    <xs:complexType name="InquiryType">
+        <xs:sequence>
+            <xs:element ref="Help" minOccurs="0"/>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element ref="Select" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="Confirm" type="InquiryElementType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="Text" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional"/>
+        <xs:attribute name="title" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:element name="Help" type="HelpType"/>
+    <xs:complexType name="HelpType">
+        <xs:attribute name="label" type="xs:string" use="optional"/>
+        <xs:attribute name="link" type="xs:anyURI" use="optional"/>
+        <xs:attribute name="moreLink" type="xs:anyURI" use="optional"/>
+    </xs:complexType>
+    <xs:element name="Hint" type="xs:string"/>
+    <xs:element name="Select" type="SelectType"/>
+    <xs:complexType name="SelectType">
+        <xs:complexContent>
+            <xs:extension base="InquiryElementType">
+                <xs:sequence>
+                    <xs:element name="Item" minOccurs="2" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element ref="Hint" minOccurs="0"/>
+                            </xs:sequence>
+                            <xs:attribute name="label" type="xs:string" use="optional"/>
+                            <xs:attribute name="value" type="xs:NMTOKEN" use="required"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Text" type="TextType"/>
+    <xs:complexType name="TextType">
+        <xs:complexContent>
+            <xs:extension base="InquiryElementType">
+                <xs:attribute name="minChars" type="xs:integer" use="optional"/>
+                <xs:attribute name="maxChars" type="xs:integer" use="optional"/>
+                <xs:attribute name="format" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="InquiryElementType" abstract="true">
+        <xs:sequence>
+            <xs:element ref="Help" minOccurs="0"/>
+            <xs:element ref="Hint" minOccurs="0"/>
+            <xs:element name="Label" type="xs:normalizedString" minOccurs="0"/>
+            <xs:element name="Value" type="xs:normalizedString" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:ID" use="required"/>
+    </xs:complexType>
+    <xs:element name="InteractionResponse" type="InteractionResponseType"/>
+    <xs:complexType name="InteractionResponseType">
+        <xs:sequence>
+            <xs:element ref="Status"/>
+            <xs:choice>
+                <xs:element name="InteractionStatement" type="InteractionStatementType" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="Parameter" type="ParameterType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="InteractionStatementType">
+        <xs:sequence>
+            <xs:element ref="Inquiry"/>
+            <xs:element ref="ds:Signature"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ParameterType">
+        <xs:attribute name="name" type="xs:ID" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+</xs:schema>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !
+-->
+ <section xml:id="formatting-conventions"
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Formatting Conventions</title>
+
+ <para>Some items are formatted differently from other text, like
+ <filename>filenames</filename>, <command>commands</command>, and
+ <literal>literal values</literal>.</para>
+
+ <screen>$ echo Terminal sessions are formatted with lines folded for easier reading.
+ In HTML documents click the [-] image for a flat, copy-paste version. Click
+ the [+] image for an expanded, line-wrapped version. &gt; /dev/null</screen>
+
+ <para>In many cases, sections pertaining to UNIX, GNU/Linux, Mac OS X, BSD,
+ and so forth are marked (UNIX). Sections pertaining to Microsoft Windows
+ might be marked (Windows). To avoid repetition, however, file system
+ directory names are often given only in UNIX format as in
+ <filename>/path/to/OpenAM</filename>, even if the text applies to
+ <filename>C:\path\to\OpenAM</filename> as well.</para>
+
+ <para>Absolute path names usually begin with the placeholder
+ <filename>/path/to/</filename>, which might translate to
+ <filename>/opt/</filename>, <filename>C:\Program Files\</filename>, or
+ somewhere else on your system. Unless you install from native packages,
+ you create this location before you install.</para>
+
+ <programlisting language='java'>class Test
+{
+    public static void main(String [] args)
+    {
+        System.out.println("This is a program listing.");
+    }
+}</programlisting>
+</section>

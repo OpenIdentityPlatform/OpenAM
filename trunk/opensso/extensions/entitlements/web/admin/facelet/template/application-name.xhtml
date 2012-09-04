@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: application-name.xhtml,v 1.2 2009/08/04 18:50:47 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['application-name.sectionTitleName']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['application-name.sectionDescriptionName']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+            <ice:panelGrid
+                columns="2"
+                columnClasses="label-column,input-column">
+                <ice:panelGroup>
+                    <ice:outputLabel
+                        for="nameInput"
+                        value="#{resources['application-name.name']}"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:inputText
+                        id="nameInput"
+                        readonly="#{!applicationNameBean.nameEditable}"
+                        partialSubmit="false"
+                        value="#{applicationNameBean.viewApplication.name}"
+                        effect="#{applicationNameBean.nameInputEffect}"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:outputLabel
+                        for="descriptionInput"
+                        value="#{resources['application-name.description']}"/>
+                    <ice:panelGroup>
+                        <ice:outputLabel
+                            for="descriptionInput"
+                            value="#{resources['application-name.optional']}"/>
+                    </ice:panelGroup>
+                </ice:panelGroup>
+                <ice:inputTextarea
+                    id="descriptionInput"
+                    value="#{applicationNameBean.viewApplication.description}"
+                    styleClass="application-description"/>
+            </ice:panelGrid>
+        </ui:define>
+    </o:section>
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['application-name.sectionTitleApplicationType']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['application-name.sectionDescriptionApplicationType']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+            <ice:panelGrid
+                columns="2"
+                columnClasses="label-column,input-column">
+                <ice:panelGroup>
+                    <ice:outputLabel
+                        for="application-type-select"
+                        value="#{resources['application-name.applicationType']}"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:selectOneMenu
+                        id="application-type-select"
+                        value="#{applicationNameBean.viewApplicationTypeName}">
+                        <f:selectItems
+                            value="#{applicationNameBean.viewApplicationTypeNameItems}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+            </ice:panelGrid>
+        </ui:define>
+    </o:section>
+</span>

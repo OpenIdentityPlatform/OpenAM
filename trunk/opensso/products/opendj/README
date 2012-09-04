@@ -1,0 +1,21 @@
+Required steps for preparing OpenDJ (e.g. 2.4.5) server for OpenAM:
+
+1) Obtain the required version of OpenDJ ZIP):
+
+  http://maven.forgerock.org/repo/releases/org/forgerock/opendj/opendj-server/2.4.5/opendj-server-2.4.5.zip
+  Or alternatively from downloads page: http://download.forgerock.org/downloads/opendj/2.4.5/OpenDJ-2.4.5.zip
+
+2) Change directory to products/opendj
+3) Copy OpenDJ-2.4.5.zip into this directory and unzip it
+4) Ensure that the file opendj_inclusion_list references the correct version of the upgrade config/schema files. For example in 2.4.5 they should be:
+
+  config/upgrade/config.ldif.7743
+  config/upgrade/schema.ldif.7743
+
+5) Run "./create_opendj_zip.sh OpenDJ-2.4.5" which will filter some unneeded cruft out of the ZIP file and generate a new file called opendj.zip
+6) Copy the following files into products/extlib:
+
+  cp opendj.zip OpenDJ-2.4.5/lib/je.jar OpenDJ-2.4.5/lib/OpenDJ.jar ../extlib
+
+7) You may also need to copy OpenDJ-2.4.5/lib/mail.jar there as well, but I think there's already a more recent version included in extlib.
+

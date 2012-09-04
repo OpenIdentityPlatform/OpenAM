@@ -1,0 +1,213 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: wss_agent_configurator.xml,v 1.3 2009/12/03 18:57:52 mrudul_uchil Exp $
+
+-->
+
+<project name="Open WSS Agents Configurator" default="usage">
+    <description>Open Web Services Security Agents Configurator</description>
+
+    <dirname property="wss.basedir" file="${ant.file}"/>
+    <property file="${wss.basedir}/config/WSSAgentInputData.properties"/>
+
+    <!-- build class path -->
+    <path id="build.class.path">
+
+        <fileset dir="${wss.basedir}/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="config">
+        <echo message="Welcome to OpenSSO WSS Agent Configurator..."/>
+        <echo message="This will secure your non-secured web aplication (either non-secured WAR file or non-secured staging area)."/>
+        <echo message="Please make sure that you have enabled JAX-WS handlers configuration from your WSC / WSP application code."/>
+
+        <tstamp>
+            <format property="touch.time" pattern="yyyy-MMMM-d hh:mm"/>
+        </tstamp>
+        
+        <mkdir dir="${wss.basedir}/debug" />
+        <property name="wss.debugdir" value="${wss.basedir}/debug"/>
+        <property name="wss.keystoredir" value="${wss.basedir}/resources"/>
+
+        <input
+            message="Enter OpenSSO Server URL (e.g. http://torpedo.red.iplanet.com:8080/opensso) :"
+            addproperty="server.url"
+        />
+        
+        <input
+            message="Enter type of application (WSC/ WSP) :"
+            validargs="WSC,WSP"
+            addproperty="app.type"
+        />
+
+        <echo message="Now securing ${app.type} Application using OpenSSO WSS Agents..."/>
+
+        <input
+            message="Enter location of un-secured WAR file OR location of un-secured application's staging area :"
+            addproperty="unsecure.location"
+        />
+
+        <input
+            message="Enter the name of secured war file to be generated (e.g. mySecuredApp.war) :"
+            addproperty="secureapp.war"
+        />
+
+        <input
+            message="Enter the package structure of application class file (e.g. com/sun/stockquote) :"
+            addproperty="app.package"
+        />
+
+        <property name="amconfig.file" location="${wss.basedir}/config/AMConfig.properties.template"/>
+        <available file="${amconfig.file}" property="amconfig.file.template.exists"/>
+        <antcall target="amconfig-backup" />
+        <copy file="${wss.basedir}/config/AMConfig.properties"
+              tofile="${wss.basedir}/config/AMConfig.properties.template" />
+
+        <java classname="com.sun.identity.setup.SwapClientConfig" fork="true">
+                <classpath refid="build.class.path"/>
+                <arg value="${server.url}" />
+                <arg value="${wss.basedir}" />
+                <arg value="${app.user.name}" />
+                <arg value="${app.user.password}" />
+                <arg value="${wsc.providername}" />
+                <arg value="${wss.basedir}/config/AMConfig.properties.template"/>
+                <arg value="${wss.basedir}/config/AMConfig.properties"/>
+        </java>
+
+        <java classname="com.sun.identity.setup.ParseInputData" fork="true">
+                <classpath refid="build.class.path"/>
+                <arg value="${unsecure.location}" />
+                <arg value="${wss.basedir}/config/warDetails.txt"/>
+        </java>
+
+        <loadproperties srcFile="${wss.basedir}/config/warDetails.txt"/>
+        <delete file="${wss.basedir}/config/warDetails.txt" />
+
+        <condition property="do.wsc">
+            <equals arg1="WSC" arg2="${app.type}"/>
+        </condition>
+
+        <condition property="do.wsp">
+            <equals arg1="WSP" arg2="${app.type}"/>
+        </condition>
+
+        <condition property="do.staging">
+            <equals arg1="yes" arg2="${war.exist}"/>
+        </condition>
+
+        <property name="wss.war.packages.dir" value="${wss.basedir}/.war"/>
+        <antcall target="create-staging-area" />
+        
+        <mkdir dir="${wss.war.packages.dir}/WEB-INF/classes"/>
+        <copy todir="${wss.war.packages.dir}/WEB-INF/classes"
+              file="${wss.basedir}/config/AMConfig.properties"/>
+
+        <antcall target="copy-clientHandlers" />
+        <antcall target="copy-serverHandlers" />
+
+        <mkdir dir="${wss.war.packages.dir}/WEB-INF/lib" />
+        <copy todir="${wss.war.packages.dir}/WEB-INF/lib">
+            <fileset dir="${wss.basedir}/lib" includes="*.jar" />
+        </copy>
+
+        <antcall target="merge-webxml" />
+
+        <mkdir dir="${wss.basedir}/secured_war" />
+        <war destfile="${wss.basedir}/secured_war/${secureapp.war}" >
+            <manifest>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <zipfileset dir="${wss.war.packages.dir}" />
+        </war>
+
+        <echo message="Completed OpenSSO WSS Agent Configurator with debug directory created at ${wss.debugdir}"/>
+        <echo message="Completed Securing your application of type ${app.type} using OpenSSO WSS Agents with secured war file ${wss.basedir}/secured_war/${secureapp.war}" />
+        
+    </target>
+
+    <target name="create-staging-area" if="do.staging">
+        <mkdir dir="${wss.basedir}/.war" />
+
+        <unjar src="${unsecure.location}" dest="${wss.war.packages.dir}">
+        </unjar>
+    </target>
+
+    <target name="copy-clientHandlers" if="do.wsc">
+        <copy todir="${wss.war.packages.dir}/WEB-INF/classes/${app.package}"
+              file="${wss.basedir}/config/client_handlers.xml" overwrite="true"/>
+    </target>
+
+    <target name="copy-serverHandlers" if="do.wsp">
+        <copy todir="${wss.war.packages.dir}/WEB-INF/classes/${app.package}"
+              file="${wss.basedir}/config/server_handlers.xml" overwrite="true"/>
+    </target>
+
+    <target name="merge-webxml" if="do.wsc">
+        <property name="web.file" location="${wss.war.packages.dir}/WEB-INF/web.xml.backup"/>
+        <available file="${web.file}" property="web.file.exists"/>
+        <antcall target="web-xml-backup" />
+
+        <copy file="${wss.war.packages.dir}/WEB-INF/web.xml"
+              tofile="${wss.war.packages.dir}/WEB-INF/web.xml.backup"/>
+        <java classname="com.sun.identity.setup.InsertWebXMLContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;filter-mapping&gt;.+?&lt;/filter-mapping&gt;" />
+            <arg value="${wss.basedir}/config/web.xml" />
+            <arg value="${wss.war.packages.dir}/WEB-INF/web.xml" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertWebXMLContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;filter&gt;.+?&lt;/filter&gt;" />
+            <arg value="${wss.basedir}/config/web.xml" />
+            <arg value="${wss.war.packages.dir}/WEB-INF/web.xml" />
+        </java>
+        
+    </target>
+
+    <target name="web-xml-backup" if="web.file.exists">
+        <copy file="${wss.war.packages.dir}/WEB-INF/web.xml.backup"
+              tofile="${wss.war.packages.dir}/WEB-INF/web.xml" overwrite="true"/>
+    </target>
+
+    <target name="amconfig-backup" if="amconfig.file.template.exists">
+        <copy file="${wss.basedir}/config/AMConfig.properties.template"
+              tofile="${wss.basedir}/config/AMConfig.properties" overwrite="true"/>
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available:"/>
+        <echo message=" "/>
+        <echo message=" config     : Configures OpenSSO WSS Agents to secure WSC/WSP application"/>
+        <echo message=" usage      : Displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+</project>

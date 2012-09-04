@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.4 2009/07/09 17:04:16 veiming Exp $
+
+-->
+<project basedir="." default="compile">
+    <property name="root.dir" value="${basedir}"/>
+
+    <!-- Allow custom user properties, if any: -->
+    <property file="build.properties"/>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- Environment variables: -->
+    <property environment="env"/>
+
+    <property name="src.dir" value="${root.dir}/src" />
+    <property name="lib.dir" value="${root.dir}/WEB-INF/lib"/>
+    <property name="classes.dir" value="${root.dir}/WEB-INF/classes"/>
+
+    <!-- compile flags, can be overridden on the command line using the -D flag -->
+    <property name="compile.debug" value="true"/>
+    <property name="compile.deprecation" value="false"/>
+    <property name="compile.optimize" value="true"/>
+
+    <fileset id="runtime.libs" dir="${lib.dir}">
+        <include name="**/*.jar"/>
+    </fileset>
+
+    <fileset id="j2ee.libs" dir="${env.CATALINA_HOME}/common/lib">
+        <include name="**/*.jar"/>
+    </fileset>
+
+    <path id="compile.path">
+        <fileset refid="runtime.libs"/>
+        <fileset refid="j2ee.libs"/>
+    </path>
+
+    <target name="clean" description="Clean output dirs">
+        <delete dir="${classes.dir}/com"/>
+    </target>
+
+    <!-- ===================================================================
+         compile.src - default Java compile behavior for a submodule.  Not
+                       used at the root level, but listed here so it can be
+                       shared by all submodules (since they import this file).
+         =================================================================== -->
+    <target name="compile">
+        <javac
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            destdir="${classes.dir}"
+            debug="${compile.debug}"
+            deprecation="${compile.deprecation}"
+            optimize="${compile.optimize}"
+            classpathref="compile.path">
+            <src path="${src.dir}" />
+        </javac>
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.vm"/>
+            </fileset>
+        </copy>
+    </target>
+
+        <target name="deploy" depends="compile">
+        <copy todir="${env.CATALINA_HOME}/webapps/amgui"  overwrite="true">
+            <fileset dir="${root.dir}">
+                <exclude name="src/**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="deployView" >
+        <copy todir="${env.CATALINA_HOME}/webapps/amgui"  overwrite="true">
+            <fileset dir="${root.dir}">
+                <exclude name="src/**/*"/>
+                <exclude name="WEB-INF/**/*"/>
+            </fileset>
+        </copy>
+    </target>
+

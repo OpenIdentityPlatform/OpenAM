@@ -1,0 +1,505 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-war.xml,v 1.57 2010/01/20 17:58:48 huacui Exp $
+
+-->
+<!--
+   Portions Copyrighted 2011-2012 ForgeRock Inc
+-->
+
+<project name="openfed-war" default="all">
+                
+    <description>Open Federation - WAR creation</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <not><isset property="openfm.built.war.dir"/></not>
+        </condition>
+    </fail>
+
+    <import file="../../wssagents/wssagents.xml" />
+    <import file="../../oauth/oauth.xml" />
+    <property name="war.package.dir" location="${openfm.built.war.dir}/package"/>
+    <property name="war.webinf.classes.dir" location="${openfm.built.war.dir}/package/WEB-INF/classes"/>
+    <property name="war.packageweb.dir" location="${openfm.built.war.dir}/packageweb"/>
+
+    <target name="all">
+        <antcall target="war" inheritRefs="true"/>
+    </target>
+
+    <target name="war" depends="preparebuild">
+        <delete dir="${war.package.dir}" />
+        <unjar src="${openfm.extlib.dir}/opensso_server_samples.war" dest="${war.package.dir}" />
+        <delete dir="META-INF" />
+
+        <mkdir dir="${war.package.dir}/WEB-INF/template/openfm"/>
+        <mkdir dir="${war.package.dir}/WEB-INF/wsdl"/>
+        <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF"/>
+        <mkdir dir="${war.package.dir}/WEB-INF/classes/META-INF/services"/>
+        <mkdir dir="${war.package.dir}/WEB-INF/fedlet"/>
+        <mkdir dir="${war.package.dir}/WEB-INF/fedlet/AG"/>
+	<mkdir dir="${war.package.dir}/WEB-INF/fedlet/AG/conf"/>
+
+	<copy file="${library.dir}/fedlet/AG/index.jsp"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/index.jsp" />
+
+	<copy file="${library.dir}/fedlet/AG/conf/.keypass"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/conf/.keypass" />
+
+	<copy file="${library.dir}/fedlet/AG/conf/.storepass"
+           tofile="${war.package.dir}/WEB-INF/fedlet/AG/conf/.storepass" />
+
+	<copy file="${library.dir}/fedlet/AG/conf/idp-extended.xml"
+     tofile="${war.package.dir}/WEB-INF/fedlet/AG/conf/idp-extended.xml" />
+
+	<copy file="${library.dir}/fedlet/AG/conf/idp.xml"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/conf/idp.xml" />
+
+	<copy file="${library.dir}/fedlet/AG/conf/keystore.jks"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/conf/keystore.jks" />
+	
+	<copy file="${products.basedir}/extlib/xmlsec.jar"
+            tofile="${war.package.dir}/WEB-INF/lib/xmlsec.jar" />
+
+	<copy file="${library.dir}/built/classes/com/sun/identity/fedlet/ag/AssertionGen.class"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/AssertionGen.class" />
+
+	<copy file="${library.dir}/built/classes/com/sun/identity/fedlet/ag/UserData.class"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/UserData.class" />
+
+	<copy file="${library.dir}/built/classes/com/sun/identity/fedlet/ag/MetaDataParser.class"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/MetaDataParser.class" />
+
+	<copy file="${library.dir}/fedlet/AG/web.xml"
+            tofile="${war.package.dir}/WEB-INF/fedlet/AG/web.xml" />
+
+        <copy file="${library.dir}/fedlet/README"
+            tofile="${war.package.dir}/WEB-INF/fedlet/README" />
+
+        <copy file="${library.dir}/fedlet/fedletEncode.jsp"
+            tofile="${war.package.dir}/WEB-INF/fedlet/fedletEncode.jsp" />
+
+        <copy file="${library.dir}/fedlet/index.jsp"
+            tofile="${war.package.dir}/WEB-INF/fedlet/index.jsp" />
+
+        <copy file="${library.dir}/fedlet/index.html"
+            tofile="${war.package.dir}/WEB-INF/fedlet/index.html" />
+
+        <copy file="${library.dir}/fedlet/logout.jsp"
+            tofile="${war.package.dir}/WEB-INF/fedlet/logout.jsp" />
+
+        <copy file="${library.dir}/fedlet/header.jspf"
+            tofile="${war.package.dir}/WEB-INF/fedlet/header.jspf" />
+
+        <copy file="${library.dir}/fedlet/web.xml"
+            tofile="${war.package.dir}/WEB-INF/fedlet/web.xml" />
+
+        <copy file="${library.res.dir}/FederationConfig.properties"
+            tofile="${war.package.dir}/WEB-INF/fedlet/FederationConfig.properties" />
+
+        <copy todir="${war.package.dir}/WEB-INF/wsdl">
+            <fileset dir="${openfm.dir}/wsdl" includes="*" excludes="famsts-client.wsdl"/>
+        </copy>
+        
+        <copy todir="${war.package.dir}/WEB-INF">
+            <fileset dir="${openfm.dir}/xml/wss" includes="sun-jaxws.xml"/>
+        </copy>
+        
+        <copy todir="${war.package.dir}/WEB-INF/classes/META-INF/services">
+            <fileset dir="${openfm.dir}/resources/META-INF/services" includes="*" excludes="com.sun.xml.ws.assembler.ClientPipelineHook, com.sun.xml.ws.api.pipe.TransportPipeFactory"/>
+        </copy>
+        
+        <copy todir="${war.package.dir}/WEB-INF/template/openfm">
+            <fileset dir="${openfm.ldif.dir}" includes="*.ldif"/>
+        </copy>
+
+        <copy todir="${war.package.dir}/WEB-INF/lib">
+            <fileset dir="${extlib.dir}" includes="FastInfoset.jar, jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, jsr173_api.jar, mail.jar, relaxngDatatype.jar, webservices-rt.jar, xsdlib.jar" />
+        </copy>
+        
+        <copy todir="${war.package.dir}/WEB-INF/classes" flatten="true">
+            <fileset dir="${library.res.i18n.dir}" includes="**/*.properties" />
+            <fileset dir="${openfm.res.i18n.dir}" includes="**/*.properties" />
+        </copy>
+        
+        <copy todir="${war.package.dir}/WEB-INF/classes" flatten="true">
+            <fileset dir="${library.res.i18n.dir}" includes="*.properties" />
+            <fileset dir="${openfm.res.i18n.dir}" includes="*.properties" />
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+        
+        <copy todir="${war.package.dir}/WEB-INF/classes">
+            <fileset dir="${library.res.dir}" includes="*.properties" 
+                excludes="FederationConfig.properties,FederationPerServer.properties" />
+            <fileset dir="${openfm.res.dir}" includes="*.properties" />
+            <fileset dir="${library.xml.dir}" includes="*.xsl" />
+        </copy>
+        <copy todir="${war.package.dir}/WEB-INF/classes">
+            <fileset dir="${oauth.config.res.dir}" includes="*.properties" />
+        </copy>
+        <copy file="${fedlibrary.dist.dir}/idpdiscovery.jar"
+            tofile="${war.package.dir}/WEB-INF/lib/idpdiscovery.jar" />
+        <copy file="${fedlibrary.dist.dir}/openfedlib.jar"
+            tofile="${war.package.dir}/WEB-INF/lib/openfedlib.jar" />
+        <copy file="${fm.dist.dir}/console.jar"
+            tofile="${war.package.dir}/WEB-INF/lib/console.jar" />
+        <copy file="${fm.dist.dir}/opensso.jar"
+            tofile="${war.package.dir}/WEB-INF/lib/opensso.jar" />
+
+        <ant dir="${wssagents.basedir}" target="jars" />
+        <copy todir="${war.package.dir}/WEB-INF/lib"
+              file="${wssagents.dist.dir}/openssowssproviders.jar"/>
+              
+        <copy todir="${war.package.dir}/WEB-INF/lib"
+              file="${oauth.dist.dir}/oauthservice.jar"/>
+              
+        <copy todir="${war.package.dir}/config/auth/default">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_en">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+		<copy todir="${war.package.dir}/config/auth/default_ja">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_ko">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_zh">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_zh_CN">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_de">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_es">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/auth/default_fr">
+            <fileset dir="${openfm.authmodule.xml.dir}" includes="*.xml" />
+        </copy>
+
+        <copy file="${openfm.dir}/www/jsp/ssoadm.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validatorMain.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validatorStatus.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validateWait.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validator.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validatorFooter.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validatorRpt.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/validatorAuthFail.jsp" todir="${war.package.dir}" />
+        <copy file="${openfm.dir}/www/jsp/proxyidpfinder.jsp" todir="${war.package.dir}" />
+
+        <copy file="${library.dir}/www/config/federation/index.html" todir="${war.package.dir}/config/federation" />
+
+        <copy todir="${war.package.dir}/config/federation/default">
+            <fileset dir="${library.dir}/www/config/federation" 
+                includes="*.jsp,*.html" />
+        </copy>
+
+        <copy todir="${war.package.dir}/config/federation/default_en">
+            <fileset dir="${library.dir}/www/config/federation" 
+                includes="*.jsp,*.html" />
+        </copy>     
+                
+        <copy todir="${war.package.dir}/fed_images">
+            <fileset dir="${library.dir}/www/config/federation/fed_images"
+                includes="*" />
+        </copy>
+
+        <copy todir="${war.package.dir}/fed_css">
+            <fileset dir="${library.dir}/www/config/federation/fed_css"
+                includes="*" />
+        </copy>
+
+        <copy file="${library.dir}/www/config/saml2/index.html" todir="${war.package.dir}/saml2" />
+
+        <copy todir="${war.package.dir}/saml2/jsp">
+            <fileset dir="${library.dir}/www/config/saml2"
+                includes="*.jsp,*.html" />
+        </copy>
+
+        <copy file="${library.dir}/www/config/wsfederation/index.html" todir="${war.package.dir}/wsfederation" />
+
+        <copy todir="${war.package.dir}/wsfederation/jsp">
+            <fileset dir="${library.dir}/www/config/wsfederation"
+                includes="*.jsp,*.html" />
+        </copy>
+
+        <copy todir="${war.package.dir}/oauth">
+            <fileset dir="${oauth.www.dir}/jsp"
+                includes="*.jsp" />
+            <fileset dir="${oauth.www.dir}/jsp"
+                includes="index.html" />
+        </copy>
+
+        <copy todir="${war.package.dir}/console">
+            <fileset dir="${openfm.dir}/www/console" excludes="Configurator.jsp" />
+        </copy>
+
+        <copy overwrite="true" todir="${war.package.dir}">
+            <fileset file="${openfm.dir}/deployable-war/index.html"/>
+        </copy>
+        
+        <replaceregexp flags="s"
+            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
+            match="(iplanet-am-policy-selected-subjects.+?&lt;ChoiceValues&gt;)"
+            replace="\1&#10;&lt;ChoiceValue i18nKey=&quot;a144&quot;&gt;WebServicesClients&lt;/ChoiceValue&gt;"/>
+
+        <replaceregexp flags="s"
+            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.xml"
+            match="(iplanet-am-policy-selected-subjects.+?&lt;DefaultValues&gt;)"
+            replace="\1&#10;&lt;Value&gt;WebServicesClients&lt;/Value&gt;"/>
+
+        <replaceregexp flags="s"
+            file="${war.package.dir}/WEB-INF/classes/amPolicy.xml"
+            match="(&lt;PluginSchema.+?)(&lt;/Service&gt;)"
+            replace="\1&#10;&lt;PluginSchema name=&quot;WebServicesClients&quot; interfaceName=&quot;Subject&quot; className=&quot;com.sun.identity.policy.plugins.WebServicesClients&quot; i18nFileName=&quot;amPolicy&quot; i18nKey=&quot;SunIdentityServer-subject-WebServicesClients-name&quot; /&gt;&#10;\2" />
+
+        <replaceregexp flags="s"
+            file="${war.package.dir}/WEB-INF/classes/amPolicy.properties"
+            match="(.+)"
+            replace="\1&#10;SunIdentityServer-subject-WebServicesClients-name=Web Services Clients&#10;webservicesclients_subject_invalid_user_names=Invalid Web Services Clients for this subject.&#10;" />
+
+        <replaceregexp flags="s"
+            file="${war.package.dir}/WEB-INF/classes/amPolicyConfig.properties"
+            match="(.+)"
+            replace="\1&#10;a144=Web Services Clients&#10;" />
+
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${library.xml.dir}/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${library.xml.dir}/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;endpoint.+?/&gt;" />
+            <arg value="${library.xml.dir}/jaxrpc-ri-runtime.xml" />
+            <arg value="${war.package.dir}/WEB-INF/jaxrpc-ri-runtime.xml" />
+            <arg value="&lt;/endpoints&gt;" />
+        </java>
+
+	<!--
+            remove duplicate entries in FederationConfig.properties against
+            AMConfig.properties
+        -->
+        <java classname="com.sun.identity.setup.ConsolidateConfig" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="${war.package.dir}/WEB-INF/classes/AMConfig.properties" />
+            <arg value="${library.res.dir}/FederationPerServer.properties" />
+            <arg value="${war.package.dir}/WEB-INF/classes/AMConfig.properties" />
+        </java>
+        <java classname="com.sun.identity.setup.ConsolidateConfig" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="${war.package.dir}/WEB-INF/classes/serverdefaults.properties" />
+            <arg value="${library.res.dir}/FederationConfig.properties" />
+            <arg value="${war.package.dir}/WEB-INF/classes/serverdefaults.properties" />
+        </java>
+
+	<!-- update amConsoleConfig with federation tabs -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;tab id=\&quot;2\&quot;.+?/tab&gt;" />
+            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
+            <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
+            <arg value="&lt;tab id=\&quot;4\&quot;" />
+        </java>
+
+        <!-- entities profile tabs -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;profile id=\&quot;SAMLv2\&quot;&gt;.+?&lt;/profile&gt;" />
+            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
+            <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
+            <arg value="&lt;/profiletabs&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;profile id=\&quot;wsfed\&quot;&gt;.+?&lt;/profile&gt;" />
+            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
+            <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
+            <arg value="&lt;/profiletabs&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;profile id=\&quot;idff\&quot;&gt;.+?&lt;/profile&gt;" />
+            <arg value="${openfm.dir}/xml/console/fmConsoleConfiguration.xml" />
+            <arg value="${war.webinf.classes.dir}/amConsoleConfig.xml" />
+            <arg value="&lt;/profiletabs&gt;" />
+        </java>
+        
+        
+	<!-- update web.xml with fed servlet info -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;context-param&gt;.+?&lt;/context-param&gt;" />
+            <arg value="${openfm.dir}/xml/console/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- context param --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${openfm.dir}/xml/console/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/console/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+        
+	<!-- update web.xml with FAM STS info -->
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;listener&gt;.+?&lt;/listener&gt;" />
+            <arg value="${openfm.dir}/xml/wss/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- listener declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet&gt;.+?&lt;/servlet&gt;" />
+            <arg value="${openfm.dir}/xml/wss/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet declaration --&gt;" />
+        </java>
+        <java classname="com.sun.identity.setup.InsertContent" fork="true">
+            <classpath refid="build.class.path"/>
+            <arg value="&lt;servlet-mapping&gt;.+?&lt;/servlet-mapping&gt;" />
+            <arg value="${openfm.dir}/xml/wss/web.xml" />
+            <arg value="${war.package.dir}/WEB-INF/web.xml" />
+            <arg value="&lt;!-- servlet mapping --&gt;" />
+        </java>
+
+        <java classname="com.sun.identity.setup.MergeProperties" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${war.package.dir}/WEB-INF/classes"/>
+            </classpath>
+            <arg value="configuratorPlugins" />
+            <arg value="fmConfiguratorPlugins" />
+            <arg value="${war.package.dir}/WEB-INF/classes/configuratorPlugins.properties" />
+        </java>
+
+        <java classname="com.sun.identity.setup.MergeProperties" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${war.package.dir}/WEB-INF/classes"/>
+            </classpath>
+            <arg value="serviceNames" />
+            <arg value="fmServiceNames" />
+            <arg value="${war.package.dir}/WEB-INF/classes/serviceNames.properties" />
+        </java>
+
+        <java classname="com.sun.identity.setup.MergeProperties" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${war.package.dir}/WEB-INF/classes"/>
+                <pathelement path="${openfm.res.dir}"/>
+            </classpath>
+            <arg value="serviceDefaultValues" />
+            <arg value="fmServiceDefaultValues" />
+            <arg value="${war.package.dir}/WEB-INF/classes/serviceDefaultValues.properties" />
+        </java>
+
+        <java classname="com.sun.identity.setup.MergeProperties" fork="true">
+            <classpath refid="build.class.path"/>
+            <classpath>
+                <pathelement path="${war.package.dir}/WEB-INF/classes"/>
+            </classpath>
+            <arg value="configuratorTagSwap" />
+            <arg value="fmConfiguratorTagSwap" />
+            <arg value="${war.package.dir}/WEB-INF/classes/configuratorTagSwap.properties" />
+        </java>
+
+        <mkdir dir="${war.packageweb.dir}" />
+        <move file="${war.package.dir}/WEB-INF/web.xml" tofile="${war.packageweb.dir}/web.xml" />
+
+        <!-- add federation server samples to the WAR -->
+        <!--mkdir dir="${war.package.dir}/samples" />
+        <copy todir="${war.package.dir}/samples">
+            <fileset dir="${openfm.samples.dir}/war"
+                 excludes="**/CVS" />
+        </copy-->
+
+        <!-- Uncomment the following line to include the unittest files in the WAR -->
+        <!-- <antcall target="unittest" /> -->
+
+        <war destfile="${fm.dist.dir}/opensso.war" webxml="${war.packageweb.dir}/web.xml">
+            <manifest>
+                <attribute name="Version" value="${openfm.version}"/>
+                <attribute name="Create-On" value="${touch.time}"/>
+            </manifest>
+            <zipfileset dir="${war.package.dir}" />
+        </war>
+        <move file="${war.packageweb.dir}/web.xml" tofile="${war.package.dir}/WEB-INF/web.xml" />
+        <delete dir="${war.packageweb.dir}" />
+        <checksum file="${fm.dist.dir}/opensso.war" algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="unittest" unless="enterprise.authmodules.present">
+        <copy todir="${war.package.dir}/WEB-INF/lib">
+            <fileset file="${unittest.dist.dir}/unittest.jar" />
+        </copy>
+        <mkdir dir="${war.package.dir}/unittest" />
+        <copy todir="${war.package.dir}/unittest">
+            <fileset dir="${unittest.dir}/www/jsp" includes="**/*.jsp" />
+            <fileset dir="${unittest.dir}/www/images" includes="**/*.gif" />
+        </copy>
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${fm.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${war.package.dir}" />
+        <delete dir="${fm.dist.dir}" />
+    </target>
+
+</project>

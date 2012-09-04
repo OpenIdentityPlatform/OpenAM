@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE mbeans-descriptors PUBLIC "-//Apache Software Foundation//DTD Model MBeans Configuration File" "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
+  
+<!-- Descriptions of JMX MBeans for Catalina -->
+<mbeans-descriptors>
+    <mbean         
+	name="AmTomcatRealm" 
+	className="org.apache.catalina.mbeans.ClassNameMBean"
+	description="OpenSSO policy Agent implementation of Realm"
+	domain="Catalina" 
+	group="Realm" 
+	type="com.sun.identity.agents.tomcat.v6.AmTomcatRealm"> 
+	
+	<attribute   name="className" 
+	description="Fully qualified class name of the managed object"
+	type="java.lang.String"
+	writeable="false"/> 
+	
+	<attribute   name="debug" 
+	description="The debugging detail level for this component"
+	type="int"/> 
+    </mbean>
+</mbeans-descriptors>
+

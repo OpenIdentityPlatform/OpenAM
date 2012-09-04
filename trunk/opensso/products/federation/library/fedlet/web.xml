@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: web.xml,v 1.5 2010/01/07 00:22:19 exu Exp $
+
+-->
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
+
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>Fedlet Sample Application</display-name>
+    <distributable/>
+
+    <listener>
+        <listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
+    </listener>
+    <!-- Add one servlet entry like this per module -->
+    <servlet>
+        <servlet-name>fedletapplication</servlet-name>
+        <jsp-file>/fedletSampleApp.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>fedletSloInit</servlet-name>
+        <jsp-file>/saml2/jsp/spSingleLogoutInit.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>fedletSloSoap</servlet-name>
+        <servlet-class>com.sun.identity.saml2.servlet.SPSingleLogoutServiceSOAP</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>fedletlogout</servlet-name>
+        <jsp-file>/logout.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>fedletSloRedirect</servlet-name>
+        <jsp-file>/saml2/jsp/spSingleLogoutRedirect.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <servlet-name>fedletSloPOST</servlet-name>
+        <jsp-file>/saml2/jsp/spSingleLogoutPOST.jsp</jsp-file>
+    </servlet>
+
+    <!-- Add one servlet mapping entry like this per module -->
+    <servlet-mapping>
+        <servlet-name>fedletapplication</servlet-name>
+        <url-pattern>/fedletapplication</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>fedletSloInit</servlet-name>
+        <url-pattern>/fedletSloInit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>fedletSloSoap</servlet-name>
+        <url-pattern>/fedletSloSoap</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>fedletlogout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>fedletSloPOST</servlet-name>
+        <url-pattern>/fedletSloPOST</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>fedletSloRedirect</servlet-name>
+        <url-pattern>/fedletSloRedirect</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+         <welcome-file>index.jsp</welcome-file>
+         <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+</web-app>

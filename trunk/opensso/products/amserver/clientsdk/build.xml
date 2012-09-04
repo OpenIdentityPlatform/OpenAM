@@ -1,0 +1,103 @@
+<!--
+ includes="**/*.clas includes="**/*.classs   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.12 2009/09/21 18:33:44 dillidorai Exp $
+
+-->
+
+<project name="opensso-clientsdk" default="package-clientsdk">
+                
+    <description>Open Web Single Sign-On Client SDK</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** clientsdk may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.clientsdkbase.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <!-- properties for clientsdk -->
+    <property name="clientsdk.name" value="am_client_sdk"/>
+    <property name="clientsdk.version" value="${opensso.version}"/>
+    <tstamp>
+        <format property="pstamp" pattern="yyyy-MMMM-d hh:mm"/>
+    </tstamp>
+    <property name="clientsdk.stamp" 
+        value="${clientsdk.version}_${DSTAMP}${TSTAMP}_${build.number.set}"/>
+
+    <!-- clientsdk class path -->
+    <path id="build.class.path">
+        <path refid="build.class.path"/>
+    </path>
+
+    <target name="package-clientsdk" depends="preparebuild">
+        <echo message="Building clientSDK"/>
+
+        <jar destfile="${amserver.dist.dir}/.amclientsdk.jar">
+            <fileset dir="${amserver.classes.dir}">
+                <includesfile name="${amserver.clientsdkbase.dir}/ClientSDKClasses"/>
+            </fileset>
+            <fileset dir="${sharedlib.classes.dir}">
+                <includesfile name="${amserver.clientsdkbase.dir}/ClientSDKClasses"/>
+            </fileset>
+            <fileset dir="${amserver.built.res.dir}">
+                <includesfile name="${amserver.clientsdkbase.dir}/ClientSDKProperties"/>
+            </fileset>
+            <manifest>
+               <attribute name="Created-On" value="${pstamp}" />
+                <section name="com.sun.identity">
+                    <attribute name="Implementation-Title"
+                        value="OpenAM Client SDK"/>
+                    <attribute name="Implementation-Version"
+                        value="${clientsdk.stamp}"/>
+                    <attribute name="Implementation-Vendor"
+                        value="ForgeRock AS"/>
+                </section>
+            </manifest>
+        </jar>
+
+        <jar destfile="${amserver.dist.dir}/amclientsdk.jar"
+             filesetmanifest="merge">
+                <zipfileset src="${sharedlib.dist.dir}/opensso-sharedlib.jar" includes="com/sun/identity/shared/ldap/LDAPDN.class,com/sun/identity/shared/ldap/util/DN.class,com/sun/identity/shared/ldap/LDAPException.class,com/sun/identity/shared/ldap/util/RDN.class,com/sun/identity/shared/ldap/LDAPMessage.class,com/sun/identity/shared/ldap/LDAPSearchResult.class,com/sun/identity/shared/ldap/LDAPConstraints.class,com/sun/identity/shared/ldap/LDAPSearchConstraints.class"/>
+                <zipfileset src="${amserver.dist.dir}/.amclientsdk.jar"/>
+                <zipfileset src="${extlib.dir}/json.jar" includes="org/json/*.class"/>
+        </jar>
+
+        <delete file="${amserver.dist.dir}/.amclientsdk.jar" />
+        <checksum file="${amserver.dist.dir}/amclientsdk.jar"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${amserver.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete file="${amserver.dist.dir}/amclientsdk.jar"/>
+        <delete file="${amserver.dist.dir}/amclientsdk.jar.sha"/>
+    </target>
+   
+</project>

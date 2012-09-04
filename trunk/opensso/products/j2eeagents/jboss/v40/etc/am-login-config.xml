@@ -1,0 +1,21 @@
+<?xml version='1.0'?>
+<!DOCTYPE policy PUBLIC
+      "-//JBoss//DTD JBOSS Security Config 3.0//EN"
+      "http://www.jboss.org/j2ee/dtd/security_config.dtd">
+<policy>
+
+  <application-policy name = "AMRealm">
+    <authentication>
+      <login-module code = "com.sun.identity.agents.jboss.v40.AmJBossLoginModule"
+                    flag = "required">
+       <module-option name = "unauthenticatedIdentity">anonymous</module-option>
+      </login-module>
+
+      <login-module code = "org.jboss.security.ClientLoginModule" flag = "required">
+         <!-- Any existing security context will be restored on logout -->
+         <module-option name="restore-login-identity">true</module-option>
+      </login-module>
+    </authentication>
+  </application-policy>
+  
+</policy>

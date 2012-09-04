@@ -1,0 +1,96 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyFSEntityDescriptorsProfile_Readonly.xml,v 1.2 2008/06/25 05:45:10 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="common" defaultValue="entityDescriptor.section.title.commonAttributes" >
+    <property>
+	<label name="lblName" defaultValue="entityDescriptor.attribute.label.name" labelFor="tfName" />
+	<cc name="tfName" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblType" defaultValue="entityDescriptor.attribute.label.type" labelFor="txtType" />
+	<cc name="txtType" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblDescription" defaultValue="entityDescriptor.attribute.label.description" labelFor="tfDescription" />
+	<cc name="tfDescription" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    </section>
+
+    <section name="contactPerson" defaultValue="entityDescriptor.section.title.contactPersonAttributes" >
+    <property>
+	<label name="lblFirstName" defaultValue="entityDescriptor.attribute.label.contactPersonFirstName" labelFor="tfContactPersonGivenName" />
+	<cc name="tfContactPersonGivenName" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblLastName" defaultValue="entityDescriptor.attribute.label.contactPersonLastName" labelFor="tfContactPersonLastName" />
+	<cc name="tfContactPersonLastName" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblContactPersonType" defaultValue="entityDescriptor.attribute.label.contactPersonType" labelFor="singleChoiceContactPersonType" />
+	<cc name="singleChoiceContactPersonType" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblCompany" defaultValue="entityDescriptor.attribute.label.contactPersonCompany" labelFor="tfContactPersonCompany" />
+	<cc name="tfContactPersonCompany" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblPrincipalID" defaultValue="entityDescriptor.attribute.label.contactPersonPrincipalID" labelFor="tfContactPersonPrincipalID" />
+	<cc name="tfContactPersonPrincipalID" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblEmails" defaultValue="entityDescriptor.attribute.label.contactPersonEmails" labelFor="elistContactPersonEmails" />
+	<cc name="elistContactPersonEmails" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    <property>
+	<label name="lblPhones" defaultValue="entityDescriptor.attribute.label.contactPersonPhones" labelFor="elistContactPersonPhones" />
+	<cc name="elistContactPersonPhones" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+    </section>
+
+    <section name="organization" defaultValue="entityDescriptor.section.title.organizationAttributes" >
+    <property>
+	<label name="lblOrganizationNames" defaultValue="entityDescriptor.attribute.label.organizationNames" labelFor="elistOrgNames" />
+	<cc name="elistOrgNames" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<fieldhelp name="helpOrganizationNames" defaultValue="entityDescriptor.attribute.help.organizationNames" />
+    </property>
+    <property>
+	<label name="lblOrganizationDisplayNames" defaultValue="entityDescriptor.attribute.label.organizationDisplayNames" labelFor="elistOrgDisplayNames" />
+	<cc name="elistOrgDisplayNames" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<fieldhelp name="helpOrganizationDisplayNames" defaultValue="entityDescriptor.attribute.help.organizationDisplayNames" />
+    </property>
+    <property>
+	<label name="lblOrganizationURL" defaultValue="entityDescriptor.attribute.label.organizationURL" labelFor="elistOrgURLs" />
+	<cc name="elistOrgURLs" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<fieldhelp name="helpOrganizationURL" defaultValue="entityDescriptor.attribute.help.organizationURL" />
+    </property>
+    </section>
+
+</propertysheet>

@@ -1,0 +1,119 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.7 2009/06/26 21:37:15 robertis Exp $
+
+-->
+
+<project name="open-source-web-agents-install-iis6" default="build">
+                
+    <description>Open Web Single Sign-On IIS6 agent install</description>
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** IIS6 Agent may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="containername"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="webagents.install.iis6.dir" 
+        location="${webagents.install.dir}/${containername}"/>
+    <property name="webagents.install.iis6.scripts.dir" 
+        location="${webagents.install.iis6.dir}/scripts"/>
+    <property name="webagents.install.iis6.resource.dir" 
+        location="${webagents.install.iis6.dir}/resources"/>
+
+    <target name="build">
+
+        <!-- Copy version file -->
+        <copy todir="${webagents.container.classes.dir}">
+            <fileset dir="${webagents.install.dir}/${containername}">
+                <include name=".version"/>
+            </fileset>
+        </copy>
+        <concat destfile="${webagents.container.classes.dir}/.version" append="true">
+             <filelist dir="${webagents.base.dir}" files=".version"/>
+        </concat>
+
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${webagents.install.iis6.scripts.dir}">
+                    <include name="IIS6Admin.vbs"/>
+            </fileset>
+        </copy>
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${webagents.install.iis6.scripts.dir}">
+                    <include name="IIS6CreateConfig.vbs"/>
+            </fileset>
+        </copy>
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${webagents.install.iis6.resource.dir}">
+                    <include name="IIS6Resource.en"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${webagents.iis6.src.dir}">
+                    <include name="amiis6.dll"/>
+                    <include name="amiis6.pdb"/>
+            </fileset>
+        </copy>
+
+
+        <copy todir="${container.web_agent.bin.dir}">
+            <fileset dir="${container.web_agent.lib.dir}">
+                    <include name="**"/>
+            </fileset>
+        </copy>
+
+        <!-- delete unncessary files/directories, since these are not used -->
+        <delete dir="${container.web_agent.lib.dir}"/>
+        <delete dir="${container.web_agent.locale.dir}"/>
+        <delete dir="${container.web_agent.jce.dir}"/>
+        <delete dir="${container.web_agent.jsse.dir}"/>
+        <delete dir="${container.web_agent.etc.dir}"/>
+        <delete dir="${container.web_agent.data.dir}"/>
+        <delete dir="${container.web_agent.logs.dir}"/>
+        <delete file="${container.web_agent.config.dir}/OpenSSOInstallerConfig.properties"/>
+        <delete file="${container.web_agent.bin.dir}/agentadmin.bat"/>
+
+        <!-- Generate IIS6 agent install archive -->
+        <zip destfile="${webagents.dist.dir}/iis_v6_${build.os}${winnt.ext}_agent_${agentversion}.zip"
+             basedir="${webagents.container.scratch.dir}"
+        /> 
+        <checksum file="${webagents.dist.dir}/iis_v6_${build.os}${winnt.ext}_agent_${agentversion}.zip"
+            algorithm="SHA" fileext=".sha" />
+
+    </target>
+
+    <target name="copy-WINNT-library">
+        <copy todir="${container.web_agent.lib.dir}">
+            <fileset dir="${webagents.iis6.src.dir}">
+                    <include name="ames6.dll"/>
+            </fileset>
+        </copy>
+
+    </target>
+
+</project>
