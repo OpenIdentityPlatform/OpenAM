@@ -3069,7 +3069,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       Post Data Preservation entry cannot be found in the local cache because
       it has exceeded its POST entry TTL. Either the agent redirects to a
       URI in this list, or it shows an HTTP 403 Forbidden error.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.postdata.preservce.cache.noentry.url</literal></para>
+      <para>Property: <literal>com.sun.identity.agents.config.postdata.preserve.cache.noentry.url</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
