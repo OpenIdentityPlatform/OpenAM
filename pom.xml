@@ -174,11 +174,14 @@
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
 
+        <!-- OpenAM Forgerock REST - CORE Module -->
+        <module>openam-forgerock-rest</module>
+
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
         <!-- OpenAM Common Test Suite -->
-        <module>openam-test</module>
+        <!-- module>openam-test</module -->
 
         <!-- OpenAM Session High-Availability FailOver Module -->
         <module>openam-session-ha</module>
