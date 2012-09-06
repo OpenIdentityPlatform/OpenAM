@@ -11,14 +11,13 @@ README file for OpenAM
  compliance with the License.
 
  You can obtain a copy of the License at
- https://opensso.dev.java.net/public/CDDLv1.0.html or
- opensso/legal/CDDLv1.0.txt
+ http://forgerock.org/license/CDDLv1.0.html.
  See the License for the specific language governing
  permission and limitations under the License.
 
  When distributing Covered Code, include this CDDL
  Header Notice in each file and include the License file
- at opensso/legal/CDDLv1.0.txt.
+ at openam/legal/CDDLv1.0.txt.
 
  If applicable, add the following below the CDDL Header,
  with the fields enclosed by brackets [] replaced by
@@ -31,303 +30,114 @@ Portions Copyrighted 2010-2012 ForgeRock US
 
 %% Contents:
 
-    %% 1. Build requirements
+    %% 1. Maven build requirements and structure
+        %% 1.1 Build requirements
+        %% 2.2 Maven structure
 
     %% 2. Library dependencies
-        %% 2.1 Obtaining j2ee.jar and mail.jar
-        %% 2.2 Obtaining shared library jars: jaxb-api.jar, jaxb-impl.jar, 
-               jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, 
-               jaxrpc-api.jar, saaj-api.jar, saaj-impl.jar,
-               relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar, 
-               FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
-               webservices-rt.jar, webservices-tools.jar, 
-               webservices-extra.jar, webservices-extra-api.jar, OpenDJ.jar, 
-               je.jar, xercesImpl.jar, jss4.jar,
-               esapiport.jar, json.jar, asm-3.1.jar,
-               commons-logging-api-1.1.jar, rome-1.0.jar,jdom.jar,
-               commons-collections-3.2.1.jar, commons-fileupload-1.2.1.jar,
-               commons-beanutils-1.6.jar, backport-util-concurrent-2.2.jar,
-               icefaces.jar, icefaces-comps.jar, commons-logging-1.1.1.jar,
-               commons-digester-1.8.jar, icefaces-facelets.jar,
-               jersey-bundle-1.1.1-ea-SNAPSHOT.jar,
-               oauth-signature-1.1.5-ea-SNAPSHOT.jar,
-               oauth-server-1.1.5-ea-SNAPSHOT.jar,
-               oauth-client-1.1.5-ea-SNAPSHOT.jar
-        %% 2.3 Obtaining testng-5.9-jdk15.jar
-        %% 2.4 Obtaining fmsae.dll, fmsae64.dll and agent-csdk
-        %% 2.5 Obtaining Open Message Queue binaries, imq.jar and jms.jar
-        %% 2.6 Obtaining click-nodeps-2.3.0.jar.jar and click-extras-2.3.0.jar
-        %% 2.7 Obtaining ant-contrib-1.0b3.jar
-        %% 2.8 Obtaining commons-codec-1.4.jar
-        %% 2.9 Obtaining jsr311-api-1.1.jar
-        %% 2.10 Obtaining jstl.jar
-        %% 2.11 Obtaining jsf.jar, jsf-impl.jar
-        %% 2.12 Obtaining opendj.zip
-        %% 2.13 Obtaining log4j-1.2.8.jar
-        %% 2.14 Obtaining velocity-1.7.jar
-        %% 2.15 Obtaining commons-io 2.0.1
-        %% 2.16 Obtaining commons-lang 2.5
-        %% 2.17 Obtaining ognl 2.6.9
-        %% 2.18 Obtaining OpenDMK
+        %% 2.1 Maven resolved dependencies
+        %% 2.2 Obtaining fmsae.dll, fmsae64.dll and agent-csdk
 
     %% 3. Building the workspace
-        %% 3.1 clean target
-        %% 3.2 cvsdiff target
-        %% 3.3 nightly target
-        %% 3.4 server-war target
-        %% 3.5 server-tools target
-        %% 3.6 server-nightly target
-        %% 3.7 agents-nightly target
-        %% 3.8 usage target
 
-%% 1. Build requirements
+%% 1. Maven build requirements and structure
 
-The OpenSSO workspace uses Apache Ant as the build tool. The build scripts
-in this workspace use features not present in releases of Ant prior to 1.6.
-Thus, in order to build this workspace you must have Ant version 1.6.5 or above
-installed and available in your system path.
+Maven provides a simpler structure, making the development and build process
+easier to use and faster to run. New features are easier to isolate for
+reviews and migration. It is also a recommended method of implementing best
+business practices.
+
+%% 1.1  Build requirements
+
+The OpenAM workspace is based on a standard maven build and uses maven as the
+build framework.
 
 The sources in this workspace should be compiled using JDK 6.0. In order to allow
 this, you must ensure that JDK 6.0 is present in your system path and the
 JAVA_HOME environment variable is setup correctly pointing to its location. The
-target JDK is set to 1.5.
+target JDK is set to 1.6.
 
-Please see this URL for the latest instructions on how to compile OpenSSO:
+Please see this URL for the latest instructions on how to compile OpenAM:
 https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source
-The above URL provides a convenient ZIP file of all the needed dependencies below.
+
+%% 1.2  Maven structure
+
+The maven OpenAM artifactory includes three areas:
+
+     - community                                : extensions of the OpenAM product created within the community
+     - openam                                   : the core and supplementary components of OpenAM supported by ForgeRock
+     - opensso                                  : legacy components
+
+Maven builds the files in the following order:
+
+     - Openam                                   : contains basic build files, as well as license and legal information
+     - Openam Shared                            : contains shared information and utilities
+     - Openam Entitlements                      : contains Entitlement Services to fine-tune access management
+     - Openam Core Token                        : contains the components for session tokens
+     - Openam Rest                              : contains all components of the REST interface
+     - Openam Core                              : contains the core components of OpenAM
+     - Openam Server HA                         : contains the components for configuring high availability sessions
+     - Openam Session HA Locale Constants       : contains
+     - Openam Server HA Core                    : contains the components for interacting with tomcat
+     - Openam Federation                        : contains the components of Federation
+     - Openam Federation Library                : contains the Federation library
+     - Openam FM                                : contains
+     - Openam OAuth                             : contains the components for integrating OAuth
+     - Openam Tools                             : contains OpenAM tools
+     - Openam Install Tools                     : contains files for installing the OpenAM tools
+     - Openam Server                            : contains the components for configuring OpenAM
+     - Openam Server Engine                     : contains
+     - Openam Client SDK                        : contains the client SDK
+     - Openam Documentation                     : contains the OpenAM documentation
+     - Openam Site Helper                       : contains the OpenAM Online Help
+     - Openam Site Documentation                : contains the HTML versions of OpenAM documentation
+     - Openam Distribution Packaging            : contains the tools for working with OpenAM
+     - Openam Distribution ADM Setup            : contains
+     - Openam Distribution Library              : contains the third-party libraries
+     - Openam Distribution Fedlet UnConfigured  : contains the unconfigured informaiton for the Fedlet
+     - Openam Distribution ssoAdminTools        : contains just the components required for ssoAdminTools
+     - Openam Distribution ssoConfiguratorTools : contains just the components required for ssoConfiguratorTools
+     - Openam Distribution Kit                  : contains all of the components of OpenAm, including the core and tools
 
 %% 2. Library dependencies
 
-The OpenSSO sources depend upon a few third-party libraries that are not
-included as a part of the workspace and must be obtained directly from 
-the library vendor or distributor. Some of these libraries are available in 
-source distribution form and must be built locally before they can be used. 
-The libraries needed for compiling OpenSSO sources are:
+The standard version of maven automatically resolves most third-party libraries.
+Only the Secure Attribute Exchange API requires additional work to acquire the
+necessary files for the build process.
+
+%% 2.1 Maven resolved dependencies
+
+Third-party libraries are hosted on the ForgeRock depot repository at
+http://maven.forgerock.org/repo/maven-central, including the following library files:
 
    - Java EE 5 SDK: j2ee.jar, mail.jar
-   - SUN shared library jars: jaxb-api.jar, jaxb-impl.jar, 
-     jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, 
+   - SUN shared library jars: jaxb-api.jar, jaxb-impl.jar,
+     jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-impl.jar, jaxrpc-spi.jar,
      jaxrpc-api.jar, saaj-api.jar, saaj-impl.jar,
-     relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar, 
+     relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar,
      FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
      webservices-rt.jar, webservices-tools.jar, webservices-extra.jar,
      webservices-extra-api.jar, OpenDJ.jar, je.jar,
      xercesImpl.jar, jss4.jar
    - TestNG version 5.9 : testng-5.9-jdk15.jar
-   - Secure Attribute Exchange API: fmsae.dll and fmsae64.dll
-   - Open Message Queue: mq4_4-v2-AIX.zip,mq4_4-v2-Linux_X86.zip, 
-                         mq4_4-v2-SunOS_X86.zip,mq4_4-v2-SunOS.zip,
-                         mq4_4-v2-WINNT.zip,imq.jar and jms.jar
    - Apache Commons Codec: commons-codec-1.4.jar
    - OpenDS 2.3.x distribution ZIP file
 
-Once these libraries are available, they should be placed under the 
-"opensso/products/extlib" directory of your workspace. Any library placed 
-in this directory is automatically included in the classpath during the 
-compilation phase of the build process.
+%% 2.2 Obtaining fmsae.dll, fmsae64.dll and agent-cdsk
 
-The following subsections briefly describe how these libraries may be 
-obtained. (Please note as mentioned earlier all needed libraries are available
-in a single download by visiting this page:
-https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source).
-These instructions are provided for your convenience only and
-are not intended to replace or invalidate the procedures/guidelines set
-by the library vendor or distributor for obtaining those libraries. Before
-you follow these instructions, you must agree to abide by any terms and
-conditions set forth by the library vendor or distributor. In case any of
-these instructions are in contradiction to such terms or conditions, you 
-must disregard those instructions and instead follow the ones provided by
-the library vendor or distributor in accordance with their terms and 
-conditions.
+   - Secure Attribute Exchange API: fmsae.dll and fmsae64.dll
 
-%% 2.1 Obtaining j2ee.jar and mail.jar
-
-The j2ee.jar and mail.jar library can be obtained from Java EE 5 SDK.
-Follow these steps to obtain the J2EE SDK:
-
-2.1.1 Open the web page: http://java.sun.com/javaee/downloads/index.jsp
-2.1.2 Depending on your choice of platform, you may choose to download any
-      one of the three distribution types available under Java EE 5 SDK
-      Update 1.
-2.1.3 Extract or extract and install the downloaded file as necessary to
-      have the SDK available on your system.
-
-Once the J2EE SDK is installed, you can get the javaee.jar and mail.jar from 
-the lib directory of this SDK. You must rename javaee.jar to j2ee.jar when 
-copying it to the "opensso/products/extlib" directory of your workspace.
- 
-
-%% 2.2 Obtaining SUN shared library jars 
-Those libraries can be obtained by downloading opensso-sun-extlib.zip from
-http://download.java.net/general/opensso/extlib/latest/opensso-sun-extlib.zip
-
-Extract the zip, you can get all those shared library jars.
-
-
-%% 2.3 Obtaining testng-5.9-jdk15.jar
-
-Download testng-5.9.zip from http://testng.org/testng-5.9.zip; unzip it and 
-testng-5.9-jdk15.jar in the base directory.
-
-%% 2.4 Obtaining fmsae.dll, fmsae64.dll and agent-cdsk
-
-Download opensso.zip from 
-http://download.java.net/general/opensso/nightly/latest/opensso/opensso.zip
+Download openam.zip from http://forgerock.org/openam.html.
 Save the zip file locally, unzip it, then get fmsae.dll and fmsae64.dll  from 
 libraries/native/dll and copy it into the opensso/products/extlib directory
 in your workspace. Copy the agent-csdk subdirectory, and contents from 
 libraries/native to opensso/products/extlib.
 
-%% 2.5 Obtaining Open Message Queue binaries, imq.jar and jms.jar
-
-2.5.1 Open the web page: https://mq.dev.java.net/downloads.html
-2.5.2 Depending on your choice of platform, you may choose to download any
-      one of the available distribution types available under Open MQ 4.4 
-      Binary Downloads.
-       |----mq4_4-v2-Linux_X86.zip
-       |    (Open Message Queue binaries for x86 linux)
-       |
-       |----mq4_4-v2-SunOS_X86.zip
-       |    (Open Message Queue binaries for x86 Solaris)
-       |
-       |----mq4_4-v2-SunOS.zip
-       |    (Open Message Queue binaries for sparc Solaris)
-       |
-       |----mq4_4-v2-WINNT.zip
-       |    (Open Message Queue binaries for Windows)
-       |
-       |----mq4_4-v2-AIX.zip
-       |    (Open Message Queue binaries for AIX)
-  
-2.5.3 Extract the downloaded file as necessary to get the 
-      imq.jar and jms.jar under /imq/lib directory
-
-%% 2.6 Obtaining click-nodeps-2.3.0.jar.jar and click-extras-2.3.0.jar
-2.6.1 Visit http://click.apache.org/, navigate to the maven repository
-      http://repo1.maven.org/maven2/org/apache/click/
-2.6.2 Download click-nodeps-2.3.0.jar from click-nodeps/2.3.0/
-2.6.3 Download click-extras-2.3.0.jar from click-extras/2.3.0/
-2.6.4 copy click-nodeps-2.3.0.jar to
-      <your workspace>/opensso/products/extlib/
-2.6.5 copy click-extras-2.3.0.jar to
-      <your workspace>/opensso/products/extlib/
-
-%% 2.7 Obtaining ant-contrib-1.0b3.jar
-2.7.1 Visit http://sourceforge.net/project/showfiles.php?group_id=36177
-2.7.2 Under "Latest File Releases" , click on the link "Download".
-      You wil be brought to a page with list of ant-contrib binaries.
-2.7.3 Download ant-contrib-1.0b3-bin.zip 
-2.7.4 Unzip this zip file in a temporary directory.
-2.7.5 copy <temporary directory>/ant-contrib/ant-contrib-1.0b3.jar to
-      <your workspace>/opensso/products/extlib/ant-contrib-1.0b3.jar
-
-%% 2.8 Obtaining commons-codec-1.4.jar
-2.8.1 Visit http://commons.apache.org/downloads/download_codec.cgi
-2.8.2 Download one of the Binary selections (e.g., 1.4.tar.gz)
-2.8.3 Uncompress (and un-tar, in the case of 1.4.tar.gz) the file in
-       a temporary directory.
-2.8.4 Find the commons-codec-1.4.jar file and copy it to
-       <your workspace>/opensso/products/extlib/commons-codec-1.4.jar
-
-%% 2.9 Obtaining jsr311-api-1.1.jar
-2.9.1 Download from
-       http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar
-
-%% 2.10 Obtaining jstl.jar
-2.10.1 Download from
-       http://mirrors.ibiblio.org/pub/mirrors/maven2/jstl/jstl/1.1.2/jstl-1.1.2.jar
-
-%% 2.11 Obtaining jsf.jar, jsf-impl.jar
-2.11.1 Download 
-       https://javaserverfaces.dev.java.net/files/documents/1866/138058/mojarra-1.2_13-binary.zip
-2.11.2 Unzip it and the jars are in lib directory.
-
-%% 2.12 Obtaining opendj.zip
-2.12.1 Download the latest OpenDJ 2.4.x from
-	http://opendj.forgerock.org/
-2.12.2 Change to the opensso/products/opends directory
-2.12.3 Unzip the OpenDJ zip file
-2.12.4 Copy the OpenDJ.zip and je.jar files from the OpenDJ-2.4.x/lib directory into
-        products/extlib
-2.12.5 Run the create_opendj_zip.sh script (ensure the script has the execute permission set)
-    	./create_opendj_zip.sh OpenDJ-2.4.x
-2.12.6 Copy the opendj.zip into the products/extlib directory
-
-%% 2.13 Obtaining log4j-1.2.8.jar
-2.13.1 Download from
-       http://search.maven.org/remotecontent?filepath=log4j/log4j/1.2.8/log4j-1.2.8.jar
-
-%% 2.14 Obtaining velocity-1.7.jar
-2.14.1 Download from
-       http://velocity.apache.org/download.cgi
-
-%% 2.15 Obtaining commons-io 2.0.1
-2.15.1 Download from
-       http://commons.apache.org/io/download_io.cgi
-
-%% 2.16 Obtaining commons-lang 2.5
-2.16.1 Download from
-       http://commons.apache.org/lang/download_lang.cgi
-
-%% 2.17 Obtaining ognl 2.6.9
-2.17.1 Download from
-       http://repo.fusesource.com/nexus/content/groups/public/ognl/ognl/2.6.9/
-
-%% 2.18 Obtaining OpenDMK
-2.18.1 Download OpenDMK 1.0-b02 Full binary bundle from
-       http://opendmk.java.net/download/index.html
-2.18.2 Install OpenDMK by issuing the following command
-        java -jar opendmk-1.0-b02-bin-dual-01-Oct-2007_19-17-46.jar
-2.18.3 Copy jdmkrt.jar and jdmktk.jar from <install dir>/lib dierctory
-       to <workspace>/opensso/products/extlib
-
 %% 3. Building the workspace
 
-The workspace build system offers many build targets. You can view the
-available targets by issuing the ant command from the root of the
-workspace. The default target that is executed is the usage target which
-displays a brief description about the other targets. Currently the main
-targets available in the workspace are:
-   
-     - clean          : deletes the generated files
-     - cvsdiff        : generates diffs under diffs subdirectory
-     - nightly        : performs nightly builds for all products
-     - server-war     : builds the OpenAM WAR file
-     - server-tools   : builds the OpenAM admin tools
-     - server-nightly : performs nightly builds for server products
-     - agents-nightly : performs nightly builds for agents products
-     - usage          : displays this usage message
+The maven workspace build system has only one build target, which is
+available in the openam-server workspace.
 
-%% 3.1 clean target
-
-Removes build output directories and generated files.
-
-%% 3.2 cvsdiff target
-
-Generates diffs using the cvs command, which are suitable for creating a patch.
-Note that OpenAM uses Subversion, not CVS, for the source repository.
-
-%% 3.3 nightly target
-
-Runs server-nightly and agents-nightly targets.
-
-%% 3.4 server-war target
-
-Builds OpenAM, leaving the war files in amserver/built/dist/.
-
-%% 3.5 server-tools target
-
-Builds the OpenAM tools, leaving the zip files in amserver/built/dist/.
-
-%% 3.6 server-nightly target
-
-Builds and packages servers, tools, docs, and samples in built/dist/.
-
-%% 3.7 agents-nightly target
-
-Builds and packages Java EE policy agents in built/dist/.
-
-%% 3.8 usage target
-
-Displays the list of targets.
-
+The first maven build will likely take longer than all subsequent builds to
+accomodate the lengthy dependency artifact chain. Following a successful build,
+a .war file will reside in the openam-server/target directory.
