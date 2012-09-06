@@ -60,8 +60,9 @@
                 <executions>
                     <execution>
                         <id>generate-idsvcs-source</id>
-                        <phase>generate-sources</phase>
+                        <phase>compile</phase>
                         <configuration>
+                            <failOnError>true</failOnError>
                             <target name="idsvcs">
                                 <property name="build.class.path" refid="maven.compile.classpath"/>
 
@@ -69,7 +70,7 @@
                                       tofile="${project.build.directory}/classes/IdentityServices.wsdl"/>
 
                                 <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
-                                      classpath="${build.class.path}">
+                                      classpath="${build.class.path}" failonerror="true">
                                     <arg value="-g"/>
                                     <arg value="-gen:server"/>
                                     <arg value="-d"/>
@@ -88,12 +89,16 @@
                         <groupId>com.sun.xml.rpc</groupId>
                         <artifactId>jaxrpc-impl</artifactId>
                         <version>1.1.3_01</version>
-                        <!-- Originally ? -->
                     </dependency>
                     <dependency>
                         <groupId>javax.activation</groupId>
                         <artifactId>activation</artifactId>
                         <version>1.1.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.mail</groupId>
+                        <artifactId>mail</artifactId>
+                        <version>1.4.5</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -171,6 +176,11 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>webservices-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
         </dependency>
 
     </dependencies>
