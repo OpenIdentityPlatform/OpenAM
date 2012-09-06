@@ -193,7 +193,7 @@
         <module>openam-oauth</module>
 
         <!-- OpenAM OAuth2 Token Service -->
-        <module>openam-oauth2</module>
+        <!--<module>openam-oauth2</module>-->
 
         <!-- OpenAM Server -->
         <module>openam-server</module>

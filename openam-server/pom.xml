@@ -538,7 +538,7 @@
         </dependency>
 
         <!-- Oauth2 dependencies -->
-
+	<!--
         <dependency>
             <groupId>org.forgerock</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
@@ -568,7 +568,7 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.19</version>
         </dependency>
-
+	-->
         <!-- XML -->
         <!-- Xerces-J Required for fedlet -->
         <dependency>
