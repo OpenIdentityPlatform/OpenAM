@@ -150,7 +150,7 @@
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
+            <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
     </dependencies>

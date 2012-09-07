@@ -273,7 +273,7 @@
             </dependency>
 
             <!-- Oauth2 dependencies -->
-            <dependency>
+            <!--dependency>
                 <groupId>org.forgerock</groupId>
                 <artifactId>openam-oauth2-restlet-extension</artifactId>
                 <version>10.1.0-SNAPSHOT</version>
@@ -295,7 +295,7 @@
                 <groupId>org.forgerock</groupId>
                 <artifactId>openam-oauth2-main</artifactId>
                 <version>10.1.0-SNAPSHOT</version>
-            </dependency>
+            </dependency-->
 
             <dependency>
                 <groupId>org.freemarker</groupId>

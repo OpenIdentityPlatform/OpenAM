@@ -140,7 +140,7 @@
             <artifactId>OpenDJ</artifactId>
         </dependency>
         <dependency>
-            <groupId>external</groupId>
+            <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
 

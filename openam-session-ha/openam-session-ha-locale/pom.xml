@@ -153,12 +153,10 @@
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>i18n-core</artifactId>
         </dependency>
-
     </dependencies>
     
 </project>
