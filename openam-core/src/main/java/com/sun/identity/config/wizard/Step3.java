@@ -563,9 +563,10 @@ public class Step3 extends LDAPStoreWizardPage {
                     addObject(sb, "existingPort", existing);
 
                     // set the configuration store port
+                    String ds_existingStorePort = (String)data.get(BootstrapData.DS_PORT);
                     getContext().setSessionAttribute(
-                        SessionAttributeNames.EXISTING_STORE_PORT, existing);   
-                    addObject(sb, "existingStorePort", existing);
+                            SessionAttributeNames.EXISTING_STORE_PORT, ds_existingStorePort);
+                    addObject(sb, "existingStorePort", ds_existingStorePort);
                     
                     getContext().setSessionAttribute(
                         SessionAttributeNames.EXISTING_HOST, host);
