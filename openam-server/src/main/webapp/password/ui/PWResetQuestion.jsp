@@ -26,13 +26,14 @@
 
 --%>
 <%--
-   Portions Copyrighted 2011-2012 ForgeRock AS
+   Portions Copyrighted 2011-2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <%@include file="../ui/PWResetBase.jsp" %>
-    <%@page info="PWResetQuestion" language="java" %>
+    <%@page info="PWResetQuestion" language="java" pageEncoding="UTF-8" %>
     <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
     <jato:useViewBean className="com.sun.identity.password.ui.PWResetQuestionViewBean" fireChildDisplayEvents="true">
         <head>
@@ -104,7 +105,7 @@
                 </div>
                 <div class="footer alt-color">
                     <div class="grid_6 suffix_3">
-                        <p>Copyright &copy; 2012 ForgeRock AS, Philip Pedersens vei 1, 1366 Lysaker, Norway. All rights reserved. Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenAM/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
+                        <p>Copyright &copy; 2012 ForgeRock AS, Philip Pedersens vei 1, 1366 Lysaker, Norway. All rights reserved. Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
                     </div>
                 </div>
             </div>
