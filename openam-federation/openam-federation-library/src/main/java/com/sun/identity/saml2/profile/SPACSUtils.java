@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -66,7 +66,6 @@ import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Advice;
-import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.assertion.Assertion;
@@ -1179,10 +1178,12 @@ public class SPACSUtils {
             }
         }
 
+        boolean ignoreProfile = false;
         String existUserName = null;
         SessionProvider sessionProvider = null;
         try {
             sessionProvider = SessionManager.getProvider();
+            ignoreProfile = SAML2Utils.isIgnoreProfileSet(session);
         } catch (SessionException se) {
             // invoke SPAdapter for failure
             SAML2Exception se2 = new SAML2Exception(se);
@@ -1265,11 +1266,18 @@ public class SPACSUtils {
                 SAML2Utils.bundle.getString("noUserMapping"));
         }
 
+        // Even if the user profile is set to ignore, we must attempt to persist
+        // if the NameIDFormat is set to persistent.
+        if (ignoreProfile && SAML2Constants.PERSISTENT.equals(nameIDFormat)) {
+            ignoreProfile = false;
+            SAML2Utils.debug.warning(classMethod
+                + "ignoreProfile was true but NameIDFormat is Persistent => setting ignoreProfile to false");        }
+
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(
             nameId.getFormat());
         boolean spDoNotWriteFedInfo = isSPDoNotWriteFedInfo(realm, hostEntityId, metaManager) &&
                 SAML2Constants.UNSPECIFIED.equals(nameId.getFormat());
-        boolean writeFedInfo = ( (!isTransient && !spDoNotWriteFedInfo) &&
+        boolean writeFedInfo = ( (!ignoreProfile && !isTransient && !spDoNotWriteFedInfo) &&
                 (!SAML2Utils.isFedInfoExists(
                     userName, hostEntityId, remoteHostId, nameId)));
             // TODO: check if this few lines are needed

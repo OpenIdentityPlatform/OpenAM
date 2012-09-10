@@ -4778,4 +4778,37 @@ public class SAML2Utils extends SAML2SDKUtils {
 
         return cookie;
     }
-}
+
+    /**
+     * Return true if the User for this session has a profile set to Ignore
+     * @param session session object of the user
+     * @return true if the User for this session has a profile set to Ignore
+     */
+    public static boolean isIgnoreProfileSet(Object session) throws SessionException {
+
+        boolean result = false;
+        String classMethod = "SAML2Utils.isIgnoreProfileSet: ";
+
+        if (session != null) {
+            //ISAuthConstants.USER_PROFILE
+            String[] values = SessionManager.getProvider().getProperty(session, "UserProfile");
+            String profile = "";
+            if (values != null && values.length > 0) {
+                profile = values[0];
+                //ISAuthConstants.IGNORE
+                result = "Ignore".equals(profile);
+            }
+            if (debug.messageEnabled()) {
+                debug.message(classMethod
+                        + "User profile from session = "
+                        + profile + " ignoreProfile = " + result);
+            }
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message(classMethod + "User session was null");
+            }
+        }
+
+        return result;
+    }
+}             

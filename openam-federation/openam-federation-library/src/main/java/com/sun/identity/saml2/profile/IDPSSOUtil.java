@@ -27,7 +27,7 @@
  */
 
  /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -1333,12 +1333,14 @@ public class IDPSSOUtil {
         String classMethod = "IDPSSOUtil.getSubject: ";
         
         Subject subject = AssertionFactory.getInstance().createSubject();
+        boolean ignoreProfile = false;
         String userName = null;
         try {
             userName = sessionProvider.getPrincipalName(session);
+            ignoreProfile = SAML2Utils.isIgnoreProfileSet(session);
         } catch (SessionException se) {
             SAML2Utils.debug.error(classMethod +
-                "Unable to get principal name from the session.", se);
+                "There was a problem with the session.", se);
             throw new SAML2Exception(
                    SAML2Utils.bundle.getString("invalidSSOToken")); 
         }
@@ -1414,6 +1416,14 @@ public class IDPSSOUtil {
         nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso,
             idpsso);
             
+        // Even if the user profile is set to ignore, we must attempt to persist
+        // if the NameIDFormat is set to persistent.
+        if (ignoreProfile && SAML2Constants.PERSISTENT.equals(nameIDFormat)) {
+            ignoreProfile = false;
+            SAML2Utils.debug.warning(classMethod
+                + "ignoreProfile was true but NameIDFormat is Persistent => setting ignoreProfile to false");
+        }
+
         NameIDInfo nameIDInfo = null;
         NameID nameID = null;
         boolean isTransient = nameIDFormat.equals(
@@ -1429,8 +1439,10 @@ public class IDPSSOUtil {
                    SAML2Utils.bundle.getString("invalidSSOToken")); 
             }
 
-            nameIDInfo = AccountUtils.getAccountFederation(userID,
-                idpEntityID, remoteEntityID);
+            if (!ignoreProfile) {
+                nameIDInfo = AccountUtils.getAccountFederation(userID,
+                    idpEntityID, remoteEntityID);
+            }
 
             if (nameIDInfo != null) {
                 nameID = nameIDInfo.getNameID();
@@ -1466,7 +1478,7 @@ public class IDPSSOUtil {
             boolean spDoNotWriteFedInfoInIdP = isSPDoNotWriteFedInfoInIdP(realm,
                         remoteEntityID, metaManager) &&
                         SAML2Constants.UNSPECIFIED.equals(nameIDFormat);
-            boolean writeFedInfo = !isTransient && !spDoNotWriteFedInfoInIdP;
+            boolean writeFedInfo = !ignoreProfile && !isTransient && !spDoNotWriteFedInfoInIdP;
             SAML2Utils.debug.message(classMethod + " writeFedInfo = " + writeFedInfo);
 
             if (writeFedInfo && allowCreate) {
