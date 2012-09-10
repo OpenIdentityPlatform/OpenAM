@@ -26,7 +26,8 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.setup;
@@ -91,7 +92,6 @@ public class OpenSSOConfigurator {
             }
         }
 
-
         String serverURL = null;
         String deploymentURI = null;
         String userStoreType = null;
@@ -131,9 +131,9 @@ public class OpenSSOConfigurator {
                     }
                     if (key.equals(USERSTORE_TYPE)) {
                        userStoreType = val;
-                    } 
+                    }
                 }
-            }    
+            }
         }
 
         if (serverURL == null) {
@@ -162,9 +162,11 @@ public class OpenSSOConfigurator {
 
         DataOutputStream os = null;
         BufferedReader br = null;
+        boolean isException = false;
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(openssoURL + "/config/configurator");
-            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn = (HttpURLConnection)url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setUseCaches(false);
@@ -189,18 +191,17 @@ public class OpenSSOConfigurator {
                 }
             } else {
                 System.out.println(rb.getString("configFailed"));
-                if ((userStoreType != null) && 
+                if ((userStoreType != null) &&
                     (userStoreType.equals("LDAPv3ForADDC"))) {
                     System.out.println(rb.getString("cannot.connect.to.UM.datastore"));
                 }
             }
-            conn.disconnect();
         } catch (ProtocolException ex) {
             ex.printStackTrace();
-            System.exit(-1);
+            isException = true;
         } catch (IOException ex) {
             ex.printStackTrace();
-            System.exit(-1);
+            isException = true;
         } finally {
             if (os != null) {
                 try {
@@ -214,8 +215,23 @@ public class OpenSSOConfigurator {
                 } catch (IOException ex) {
                 }
             }
+            try {
+                // wait 5 seconds if ReadProgress thread does not finished.
+                t.join(5000);
+            } catch (InterruptedException e) {
+            }
+            if (conn != null) {
+                try {
+                    conn.disconnect();
+                } catch (Exception ex) {
+                }
+            }
         }
-        System.exit(0);
+        if (isException) {
+            System.exit(-1);
+        } else {
+            System.exit(0);
+        }
     }
 
     static class ReadProgress implements Runnable {
@@ -231,11 +247,11 @@ public class OpenSSOConfigurator {
             while (retry <= 1) {
                 retry++;
                 BufferedReader br = null;
+                HttpURLConnection conn = null;
                 try {
                     URL url = new URL(openssoURL +
                         "/setup/setSetupProgress?mode=text");
-                    HttpURLConnection conn =
-                        (HttpURLConnection)url.openConnection();
+                    conn = (HttpURLConnection)url.openConnection();
                     conn.setInstanceFollowRedirects(false);
                     conn.connect();
 
@@ -257,7 +273,6 @@ public class OpenSSOConfigurator {
                         System.out.println(conn.getResponseMessage());
                     }
 
-                    conn.disconnect();
                 } catch (ProtocolException ex) {
                     ex.printStackTrace();
                 } catch (IOException ex) {
@@ -267,6 +282,12 @@ public class OpenSSOConfigurator {
                         try {
                             br.close();
                         } catch (IOException ex) {
+                        }
+                    }
+                    if (conn != null) {
+                        try {
+                            conn.disconnect();
+                        } catch (Exception ex) {
                         }
                     }
                 }

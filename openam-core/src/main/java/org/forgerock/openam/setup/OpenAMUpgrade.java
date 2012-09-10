@@ -23,6 +23,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
+
 package org.forgerock.openam.setup;
 
 import java.io.BufferedReader;
@@ -30,11 +35,9 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -63,7 +66,7 @@ public class OpenAMUpgrade {
         String configFile = args[1];
         Properties config = new Properties();
         FileInputStream fis = null;
-        
+
         try {
             fis = new FileInputStream(configFile);
             config.load(fis);
@@ -88,12 +91,12 @@ public class OpenAMUpgrade {
 
             if (val != null) {
                 val = val.trim();
-                
+
                 if (val.length() > 0) {
                     if (key.equals(DEPLOYMENT_URI)) {
                         deploymentURI = val;
                     } else if (key.equals(SERVER_URL)) {
-                        serverURL = val; 
+                        serverURL = val;
                     }
                 }
             }
@@ -125,16 +128,17 @@ public class OpenAMUpgrade {
 
         DataOutputStream os = null;
         BufferedReader br = null;
-        
+        boolean isException = false;
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(openamURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setUseCaches(false);
             conn.connect();
 
             int responseCode = conn.getResponseCode();
-            
+
             if (responseCode == 200) {
                 br = new BufferedReader(new InputStreamReader(
                     conn.getInputStream()));
@@ -149,13 +153,12 @@ public class OpenAMUpgrade {
             } else {
                 System.out.println(rb.getString("upgradeFailed"));
             }
-            conn.disconnect();
         } catch (ProtocolException ex) {
             ex.printStackTrace();
-            System.exit(-1);
+            isException = true;
         } catch (IOException ex) {
             ex.printStackTrace();
-            System.exit(-1);
+            isException = true;
         } finally {
             if (os != null) {
                 try {
@@ -169,9 +172,23 @@ public class OpenAMUpgrade {
                 } catch (IOException ex) {
                 }
             }
+            try {
+                // wait 5 seconds if ReadProgress thread does not finished.
+                t.join(5000);
+            } catch (InterruptedException e) {
+            }
+            if (conn != null) {
+                try {
+                    conn.disconnect();
+                } catch (Exception ex) {
+                }
+            }
         }
-        
-        System.exit(0);
+        if (isException) {
+            System.exit(-1);
+        } else {
+            System.exit(0);
+        }
     }
 
     static class ReadProgress implements Runnable {
@@ -187,12 +204,11 @@ public class OpenAMUpgrade {
             while (retry <= 1) {
                 retry++;
                 BufferedReader br = null;
-                
+                HttpURLConnection conn = null;
                 try {
                     URL url = new URL(openamURL +
                         "/upgrade/setUpgradeProgress?mode=text");
-                    HttpURLConnection conn =
-                        (HttpURLConnection)url.openConnection();
+                    conn = (HttpURLConnection)url.openConnection();
                     conn.setInstanceFollowRedirects(false);
                     conn.connect();
 
@@ -214,7 +230,6 @@ public class OpenAMUpgrade {
                         System.out.println(conn.getResponseMessage());
                     }
 
-                    conn.disconnect();
                 } catch (ProtocolException ex) {
                     ex.printStackTrace();
                 } catch (IOException ex) {
@@ -226,9 +241,15 @@ public class OpenAMUpgrade {
                         } catch (IOException ex) {
                         }
                     }
+                    if (conn != null) {
+                        try {
+                            conn.disconnect();
+                        } catch (Exception ex) {
+                        }
+                    }
                 }
                 break;
             }
         }
-    }    
+    }
 }
