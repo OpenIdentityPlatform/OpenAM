@@ -202,7 +202,7 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
     /**
      * Gets the handler to the plugin object.
      *
-     * @param realm Realm name.
+     * @param orgDN Realm name.
      * @param attribute attribute name
      * @return handler to the plugin object
      */
@@ -375,8 +375,8 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
 	Locale userLocale = null;
 	if ( localeSet != null && !localeSet.isEmpty() ) {
 	    String localeStr = localeSet.iterator().next().toString();
-	    userLocale = (localeStr != null) ? 
-                   com.iplanet.am.util.Locale.getLocale (localeStr):null;
+	    userLocale = (localeStr != null) ?
+                com.sun.identity.shared.locale.Locale.getLocale (localeStr):null;
 	}
 	if (userLocale == null) {
 	    userLocale = localeContext.getLocale();
