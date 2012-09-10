@@ -24,6 +24,10 @@
     "Portions Copyrighted [year] [name of copyright owner]"
 
 -->
+<!--
+    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+-->
 
 <!DOCTYPE ServicesConfiguration
 PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -206,9 +210,6 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
                                  type="single" syntax="password" i18nKey="a140">
-                        <DefaultValues>
-                                <Value></Value>
-                        </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
                                  type="single" syntax="boolean" i18nKey="a142">
@@ -399,9 +400,6 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
                                  type="single" syntax="password" i18nKey="a140">
-                        <DefaultValues>
-                                <Value></Value>
-                        </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
                                  type="single" syntax="boolean" i18nKey="a142">
