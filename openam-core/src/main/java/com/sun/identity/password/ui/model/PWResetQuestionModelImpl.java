@@ -25,6 +25,10 @@
  * $Id: PWResetQuestionModelImpl.java,v 1.3 2009/11/18 20:52:18 qcheng Exp $
  *
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
 
 package com.sun.identity.password.ui.model;
 
@@ -371,8 +375,8 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
 	Locale userLocale = null;
 	if ( localeSet != null && !localeSet.isEmpty() ) {
 	    String localeStr = localeSet.iterator().next().toString();
-	    userLocale = (localeStr != null) ?
-                com.sun.identity.shared.locale.Locale.getLocale (localeStr):null;
+	    userLocale = (localeStr != null) ? 
+                   com.iplanet.am.util.Locale.getLocale (localeStr):null;
 	}
 	if (userLocale == null) {
 	    userLocale = localeContext.getLocale();
@@ -613,9 +617,7 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
         boolean active = false;
         try {
             AMIdentity user = IdUtils.getIdentity(getSSOToken(), uuid);
-            Set set = user.getAttribute(USER_SERVICE_ACTIVE_STATUS);
-            String userStatus = getFirstElement(set);
-            active = userStatus.equalsIgnoreCase(ACTIVE);
+            active = user.isActive();
         } catch (SSOException e) {
            debug.warning("PWResetQuestionModelImpl.isUserStatusActive", e);
            errorMsg = getErrorString(e);

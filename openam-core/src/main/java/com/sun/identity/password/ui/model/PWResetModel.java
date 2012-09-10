@@ -25,6 +25,10 @@
  * $Id: PWResetModel.java,v 1.5 2009/12/18 03:26:59 222713 Exp $
  *
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
 
 package com.sun.identity.password.ui.model;
 
@@ -52,11 +56,6 @@ public interface PWResetModel {
      * Name of user mail attribute
      */
     String USER_MAIL_ATTR = "mail";
-
-    /**
-     * Name of user service active/inactive attribute.
-     */
-    String USER_SERVICE_ACTIVE_STATUS = "inetuserstatus";
 
     /**
      * Name of user active status.

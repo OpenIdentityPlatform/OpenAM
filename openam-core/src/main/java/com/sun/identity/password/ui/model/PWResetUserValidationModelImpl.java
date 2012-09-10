@@ -25,6 +25,10 @@
  * $Id: PWResetUserValidationModelImpl.java,v 1.3 2010/01/28 08:17:10 bina Exp $
  *
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
 
 package com.sun.identity.password.ui.model;
 
@@ -327,14 +331,13 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
         boolean active = false;
         try {
             AMIdentity user= IdUtils.getIdentity(ssoToken, userId);
-            String userStatus = getUserAttributeValue(
-                user, USER_SERVICE_ACTIVE_STATUS);
+            boolean isUserActive = user.isActive();
             String loginStatus = getUserAttributeValue(
                 user,  USER_SERVICE_LOGIN_STATUS, ACTIVE);
             String lockout = getUserAttributeValue(
                 user, USER_SERVICE_NS_LOCKOUT, STRING_FALSE);
             
-            if (!userStatus.equalsIgnoreCase(ACTIVE) ||
+            if (!isUserActive ||
                 !loginStatus.equalsIgnoreCase(ACTIVE) ||
                 !lockout.equalsIgnoreCase(STRING_FALSE)) {
                 errorMsg = getLocalizedString("userNotActive.message");
