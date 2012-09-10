@@ -25,6 +25,10 @@
    $Id: id-sis-pp-query.jsp,v 1.3 2009/02/05 00:46:40 mrudulahg Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <%@page import="
 java.io.*,
@@ -107,7 +111,7 @@ com.sun.identity.shared.xml.XMLUtils"
 
             %>
             <form name="ppquery" method="POST">
-		<input type='hidden' name='resOffFN' value=<%=resOffFN %>
+		<input type='hidden' name='resOffFN' value='<%=resOffFN %>' />
             <table>
                 <tr>
                     <td>Authentication Mechanism</td>
