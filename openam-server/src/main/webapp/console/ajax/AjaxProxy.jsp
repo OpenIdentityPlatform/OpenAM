@@ -25,6 +25,11 @@
    $Id: AjaxProxy.jsp,v 1.7 2009/08/04 20:50:49 asyhuang Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
+
 <%@page import="com.iplanet.am.util.SystemProperties"%>
 <%@page import="com.iplanet.sso.SSOException"%>
 <%@page import="com.iplanet.sso.SSOToken"%>
@@ -40,7 +45,7 @@
 <%@page import="java.util.*" %>
 
 <%
-
+		response.setContentType("text/html; charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         String locale = request.getParameter("locale");
         Locale resLocale = null;
