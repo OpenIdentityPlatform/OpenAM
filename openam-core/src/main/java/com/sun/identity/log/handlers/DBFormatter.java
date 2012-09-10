@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.log.handlers;
 
@@ -59,6 +60,8 @@ public class DBFormatter extends Formatter {
 
     private String dateTimeFormat = null;
     private boolean isMySQL = false;
+    /** max length of literal for Oracle */
+    private static final int MAX_LITERAL_LENGTH = 4000;
     
     /**
      * Creates <code>DBFormatter</code> object
@@ -197,10 +200,34 @@ public class DBFormatter extends Formatter {
                 str1 = checkEscapes(tstr, "'", "''");
             }
             String str2 = str1;
-            // Oracle doesn't have a problem with backslash
             if (isMySQL) {
+                // MySQL has a problem with backslash
                 if (str1.indexOf("\\") != -1) {
                     str2 = checkEscapes(str1, "\\", "\\\\");
+                }
+            } else {
+                // Currently MySQL and Oracle are supported. If isMySQL is not true, we assume it is Oracle. 
+                // Split string data since Oracle only accept string literal less than 4000 bytes.
+                int splitLength = MAX_LITERAL_LENGTH / 4; // consider multi byte charactor set
+                 if (str1.length() >= splitLength){
+                    StringBuilder strBuilder = new StringBuilder();
+                    int beginIndex = 0;
+                    int endIndex = splitLength;
+                    if (str1.length() >= splitLength) {
+                        strBuilder.append("'");
+                        while (str1.length() > beginIndex) {
+                            if (endIndex > str1.length()) {
+                                endIndex = str1.length();
+                            }
+                            strBuilder.append(" || TO_CLOB('");
+                            strBuilder.append(str1.substring(beginIndex, endIndex));
+                            strBuilder.append("')");
+                            beginIndex = beginIndex + splitLength;
+                            endIndex = endIndex + splitLength;
+                        }
+                        strBuilder.append(" || '");
+                    }
+                    str2 = strBuilder.toString();
                 }
             }
             tstr = str2;
