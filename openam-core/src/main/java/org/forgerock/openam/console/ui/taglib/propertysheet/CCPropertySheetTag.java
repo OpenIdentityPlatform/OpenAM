@@ -22,6 +22,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+ 
+ /**
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
+
 package org.forgerock.openam.console.ui.taglib.propertysheet;
 
 import com.iplanet.am.util.SystemProperties;
@@ -103,10 +108,10 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             String helpUri = super.getMessage(uriKey);
             if (helpUri.equals(uriKey)) {
                 //There is no Help URL so only render the HelpText
-                return MessageFormat.format(HELP_TEMPLATE, uniqueID++, super.getMessage(key), helpTxt, "");
+                return MessageFormat.format(HELP_TEMPLATE, String.valueOf(uniqueID++), super.getMessage(key), helpTxt, "");
             } else {
                 //Let's render everything
-                return MessageFormat.format(HELP_TEMPLATE, uniqueID++, super.getMessage(key), helpTxt, MessageFormat.format(URL_TEMPLATE, helpUri));
+                return MessageFormat.format(HELP_TEMPLATE, String.valueOf(uniqueID++), super.getMessage(key), helpTxt, MessageFormat.format(URL_TEMPLATE, helpUri));
             }
         }
     }
