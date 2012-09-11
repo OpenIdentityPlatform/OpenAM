@@ -25,6 +25,10 @@
    $Id: configure.jsp,v 1.13 2008/08/21 18:03:32 qcheng Exp $
 
 --%>
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <html>
 <head>
@@ -255,7 +259,7 @@
 %>
     <tr>
     <td colspan="2" align="center">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>

@@ -26,7 +26,8 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 
 <html>
@@ -227,7 +228,7 @@ org.owasp.esapi.ESAPI"
 %>
     <tr>
     <td colspan="2" align="left">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>

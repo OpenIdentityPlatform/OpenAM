@@ -26,7 +26,8 @@
 
 --%>
 <%--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 
 <html>
@@ -166,7 +167,7 @@
 %>
     <tr>
     <td  align="center">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>

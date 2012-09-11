@@ -25,7 +25,10 @@
    $Id: configure.jsp,v 1.11 2009/02/05 00:46:38 mrudulahg Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <html>
 <head>
@@ -147,7 +150,7 @@ Client SDK is not configured. Please click <a class="named" href="../Configurato
 %>
     <tr>
     <td colspan="2" align="center">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>

@@ -25,7 +25,10 @@
    $Id: Configurator.jsp,v 1.4 2009/11/03 00:51:42 madan_ranganath Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
+--%>
 
 <html>
 <head>
@@ -151,7 +154,7 @@ java.util.Properties"
 %>
     <tr>
     <td colspan="2" align="left">
-    <b><font color="red"><%= errorMsg %></font>
+    <b><font color="red"><%= errorMsg %></font></b>
     <br><br>
     </td>
     </tr>
