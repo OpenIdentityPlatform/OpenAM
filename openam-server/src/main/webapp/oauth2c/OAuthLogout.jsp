@@ -1,18 +1,18 @@
 <%--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
-   Copyright � 2011 ForgeRock AS. All rights reserved.
-  
+
+   Copyright (c) 2011 ForgeRock Inc. All rights reserved.
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
    compliance with the License.
-                                                                                
+
    You can obtain a copy of the License at
    http://forgerock.org/license/CDDLv1.0.html 
    See the License for the specific language governing
    permission and limitations under the License.
-                                                                                
+
    When distributing Covered Code, include this CDDL
    Header Notice in each file and include the License file
    at http://forgerock.org/license/CDDLv1.0.html
@@ -20,15 +20,16 @@
    with the fields enclosed by brackets [] replaced by
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
-                                                              
+
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ page language="java"%>
+<%@ page language="java" pageEncoding="UTF-8" %>
 <%@ page import="org.owasp.esapi.*" %>
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
@@ -103,6 +104,11 @@
            doYouWantToLogout = doYouWantToLogout.replace("#IDP#", OAuth2IdP);
        }
    }
+   String copyrightNotice = null;
+   try{
+       copyrightNotice = ResourceBundle.getBundle("amAuthUI", locale).getString("copyright.notice");
+   } catch (MissingResourceException mr) {
+   }
     
   String loggedout = request.getParameter(PARAM_LOGGEDOUT);
   System.out.println("loggedout=" + loggedout);
@@ -110,7 +116,7 @@
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
         <!--[if IE 9]> <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
         <!--[if lte IE 7]> <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
@@ -184,10 +190,14 @@
             </div>
             <div class="footer alt-color">
                 <div class="grid_6 suffix_3">
-                    <p><auth:resBundle bundleName="amAuthUI" resourceKey="copyright.notice" /></p>
+                    <p>
+                        <% if (copyrightNotice != null){
+                               out.println(copyrightNotice);
+                            }
+                        %>
+                    </p>
                 </div>
             </div>
         </div>
     </body>
-</jato:useViewBean>
 </html>
