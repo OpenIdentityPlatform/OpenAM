@@ -127,7 +127,7 @@ public void jspInit() {
 </form>
 <p>
 <form method="GET" name="discomodify" action="discovery-modify.jsp" onSubmit="return checkForm();">
-IDP User DN (IDP user whose has single-sign-on. For example id=idpuser,ou=user,dc=openom,dc=java,dc=net):
+IDP User DN (IDP user whose has single-sign-on. For example id=idpuser,ou=user,dc=openom,dc=forgerock.dc=org):
 <input name="idpUserDN" type="text" size="50" value=""/>
 <br><br>
 <input type='hidden' name='providerID' value='<%= providerID %>'>

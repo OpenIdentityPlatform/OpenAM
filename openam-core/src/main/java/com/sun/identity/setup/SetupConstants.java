@@ -427,7 +427,7 @@ public interface SetupConstants {
     /**
      * Configuration Variable for Session root suffix.
      */
-    static final String CONFIG_VAR_SESSION_ROOT_DN = "SESSION_ROOT_DN";
+    static final String CONFIG_VAR_SESSION_ROOT_SUFFIX = "SESSION_ROOT_SUFFIX";
 
     /**
      * Configuration Variable for Session Store Type.

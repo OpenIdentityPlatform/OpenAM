@@ -578,7 +578,9 @@ public class ServicesDefaultValues {
                     key.equals(SetupConstants.SM_ROOT_SUFFIX_HAT) ||
                     key.equals(SetupConstants.NORMALIZED_RS) ||
                     key.equals(SetupConstants.NORMALIZED_ORG_BASE) ||
-                    key.equals(SetupConstants.SM_ROOT_SUFFIX_HAT)
+                    key.equals(SetupConstants.SM_ROOT_SUFFIX_HAT) ||
+                    key.equals(SetupConstants.CONFIG_VAR_SESSION_ROOT_SUFFIX) ||
+                    key.equals(SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE)
                 ) {
                     orig = orig.replaceAll("@" + key + "@", value);
                 } else {

@@ -43,12 +43,15 @@ public enum AMSessionRepositoryType {
     /**
      * Enumerator Values
      */
-    NONE(0, 0, "none", "None", "No Session Failover or High Availability", "session.store.type.none", null),
+    none(0, 0, "none", "None", "Session Failover High Availability Disabled", "session.store.type.none", null),
 
-    OPENDJ(1, 1, "opendj", "OpenDJ", "OpenAM Configuration Directory", "session.store.type.opendj",
+    embedded(1, 1, "embedded", "Embedded", "OpenAM Configuration Directory", "session.store.type.embedded",
             org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore.class),
 
-    PLUGIN(2, 2, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
+    external(2, 2, "external", "External", "OpenAM External OpenDJ Directory", "session.store.type.external",
+            org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore.class),
+
+    plugin(3, 3, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
             org.forgerock.openam.session.ha.amsessionstore.store.plugin.PlugInPersistentStore.class);
 
     /**

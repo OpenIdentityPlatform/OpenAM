@@ -80,7 +80,6 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
@@ -236,7 +235,7 @@ public class SessionService {
     private static final String JDBC_DRIVER_CLASS = 
         "iplanet-am-session-JDBC-driver-Impl-classname";
 
-    private static final String JDBC_URL = "iplanet-am-session-jdbc-url";
+    private static final String IPLANET_AM_SESSION_REPOSITORY_URL = "iplanet-am-session-repository-url";
 
     private static final String MIN_POOL_SIZE = 
         "iplanet-am-session-min-pool-size";
@@ -259,7 +258,7 @@ public class SessionService {
 
     static String jdbcDriverClass = null;
 
-    static String jdbcURL = null;
+    static String sessionRepositoryURL = null; // Can be Null, if using Internal Embedded OpenDJ Instance.
 
     static int minPoolSize = 8;
 
@@ -387,14 +386,6 @@ public class SessionService {
 
     public static String deploymentURI = SystemProperties
             .get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-
-    /*
-     * the following group of members is used only in session failover mode
-     */
-
-    private static boolean isSessionFailoverEnabled = false;
-
-    private static boolean isSiteEnabled = false;
     
     // used for session trimming    
     private static boolean isSessionTrimmingEnabled = false;            
@@ -425,15 +416,26 @@ public class SessionService {
 
     private URL thisSessionServiceURL;
 
+    // Must be True to permit Session Failover HA to be available.
     private static boolean useRemoteSaveMethod = Boolean.valueOf(
             SystemProperties
-                    .get(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD))
-            .booleanValue();
+                    .get(Constants.AM_SESSION_FAILOVER_USE_REMOTE_SAVE_METHOD,
+                    "true")).booleanValue();
 
+    // Must be True to permit Session Failover HA to be available.
     private static boolean useInternalRequestRouting = Boolean.valueOf(
             SystemProperties.get(
                     Constants.AM_SESSION_FAILOVER_USE_INTERNAL_REQUEST_ROUTING,
                     "true")).booleanValue();
+
+    // Must be True to permit Session Failover HA to be available.
+    private static boolean isSessionFailoverEnabled = Boolean.valueOf(
+            SystemProperties.get(
+                    AMSessionRepository.IS_SFO_ENABLED,
+                     "true")).booleanValue();
+
+    // Must be True to permit Session Failover HA to be available.
+    private static boolean isSiteEnabled = isSessionFailoverEnabled;    // Did Default to False.
 
     /**
      * The following InternalSession is for the Authentication Service to use
@@ -782,7 +784,7 @@ public class SessionService {
             }
         }        
 
-        if (isSessionFailoverEnabled() && isSessionStored) {
+        if (isSessionFailoverEnabled && isSessionStored) {
             if (getUseInternalRequestRouting()) {
                 try {
                     getRepository().delete(sid);
@@ -799,7 +801,7 @@ public class SessionService {
     }
 
     void deleteFromRepository(SessionID sid) {
-        if (isSessionFailoverEnabled()) {
+        if (isSessionFailoverEnabled) {
             try {
                 getRepository().delete(sid);
             } catch (Exception e) {
@@ -863,7 +865,7 @@ public class SessionService {
         if (isSessionPresent(sid)) {
             return true;
         } else {
-            if (isSessionFailoverEnabled()) {
+            if (isSessionFailoverEnabled) {
                 String hostServerID = getCurrentHostServer(sid);
                 if (isLocalServer(hostServerID)) {
                     if (recoverSession(sid) == null) {
@@ -1832,7 +1834,7 @@ public class SessionService {
             }
 
             /*
-             * In session failover mode we need to distinguiush between server
+             * In session failover mode we need to distinguish between server
              * instance own address and the cluster address We will use new set
              * of properties
              * 
@@ -1887,47 +1889,57 @@ public class SessionService {
                 thisSessionServiceURL = Session.getSessionServiceURL(
                         thisSessionServerProtocol, thisSessionServer,
                         thisSessionServerPortAsString, thisSessionURI);
+
                 if (isSessionFailoverEnabled) {
-
-                    int timeout = ClusterStateService.DEFAULT_TIMEOUT;
-                    try {
-                        timeout = Integer.parseInt(SystemProperties.get(
-                           Constants.
-                               AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT,
-                               String.valueOf(
-                                       ClusterStateService.DEFAULT_TIMEOUT)));
-                    } catch (Exception e) {
-                        sessionDebug.error("Invalid value for "+
-                             Constants.
-                                 AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT
-                                        + ", using default");
-                    }
-
-                    long period = ClusterStateService.DEFAULT_PERIOD;
-                    try {
-                        period = Integer.parseInt(SystemProperties.get(
-                                Constants.
-                                 AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD,
-                                 String.valueOf(
-                                         ClusterStateService.DEFAULT_PERIOD)));
-                    } catch (Exception e) {
-                        sessionDebug.error("Invalid value for "
-                                + Constants.
-                                AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD
-                                        + ", using default");
-                    }
-
-                    clusterStateService = new ClusterStateService(this,
-                            thisSessionServerID, timeout, period,
-                            clusterMemberMap);
-                    getRepository();
+                    initializationClusterService();
                 }
-            }
+            } // End of isSiteEnabled.
         } catch (Exception ex) {
             sessionDebug.error(
                     "SessionService.SessionService(): Initialization Failed",
                     ex);
         }
+    }
+
+    /**
+     * Initialization Helper Class.
+     *
+     * @throws Exception
+     */
+    private void initializationClusterService() throws Exception {
+        int timeout = ClusterStateService.DEFAULT_TIMEOUT;
+        try {
+            timeout = Integer.parseInt(SystemProperties.get(
+                    Constants.
+                            AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT,
+                    String.valueOf(
+                            ClusterStateService.DEFAULT_TIMEOUT)));
+        } catch (Exception e) {
+            sessionDebug.error("Invalid value for "+
+                    Constants.
+                            AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_TIMEOUT
+                    + ", using default");
+        }
+
+        long period = ClusterStateService.DEFAULT_PERIOD;
+        try {
+            period = Integer.parseInt(SystemProperties.get(
+                    Constants.
+                            AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD,
+                    String.valueOf(
+                            ClusterStateService.DEFAULT_PERIOD)));
+        } catch (Exception e) {
+            sessionDebug.error("Invalid value for "
+                    + Constants.
+                    AM_SESSION_FAILOVER_CLUSTER_STATE_CHECK_PERIOD
+                    + ", using default");
+        }
+        // Initialize Our Cluster State Service
+        clusterStateService = new ClusterStateService(this,
+                thisSessionServerID, timeout, period,
+                clusterMemberMap);
+        // Poke the Backend Session Repository to initialize.
+        getRepository();
     }
 
     /**
@@ -1944,7 +1956,7 @@ public class SessionService {
      * @throws SessionException
      */
     public String getCurrentHostServer(SessionID sid) throws SessionException {
-        if (!isSessionFailoverEnabled()) {
+        if (!isSessionFailoverEnabled) {
             return sid.getSessionServerID();
         } else {
             if (getUseInternalRequestRouting()) {
@@ -1983,6 +1995,18 @@ public class SessionService {
             return serverID;
         }
 
+        // Ensure we have a Cluster State Service Available.
+        if (clusterStateService == null)
+        {
+            try {
+                initializationClusterService();
+            } catch (Exception e) {
+                sessionDebug.error("Unable to Initialize the Cluster Service, please review Configuration settings.",e);
+                throw new SessionException(e);
+            }
+        }
+
+        // Check for Service Available.
         if (clusterStateService.isUp(primaryID)) {
             return primaryID;
         } else {
@@ -1996,6 +2020,8 @@ public class SessionService {
             for (int i = 0; i < selectionListSize; ++i) {
                 selectedServerId = clusterStateService.getServerSelection(perm
                         .itemAt(i));
+                if (selectedServerId == null)
+                    { continue; }
                 if (clusterStateService.isUp(selectedServerId)) {
                     break;
                 }
@@ -2096,7 +2122,7 @@ public class SessionService {
      * @return true if server is up, false otherwise
      */
     public boolean checkServerUp(String serverID) {
-        return clusterStateService.checkServerUp(serverID);
+      return ((serverID == null)||(serverID.isEmpty())) ? false : clusterStateService.checkServerUp(serverID);
     }
 
     private void postInit() {
@@ -2195,6 +2221,11 @@ public class SessionService {
                 
                 if(sfoEnabled) {
                     isSessionFailoverEnabled = true;
+
+                    useRemoteSaveMethod = true;
+
+                    useInternalRequestRouting = true;
+
                     sessionStoreUserName = CollectionHelper.getMapAttr(
                         sessionAttrs, SESSION_STORE_USERNAME, "amsvrusr");
                     sessionStorePassword = CollectionHelper.getMapAttr(
@@ -2207,8 +2238,8 @@ public class SessionService {
                         sessionAttrs, CONNECT_MAX_WAIT_TIME, "5000"));
                     jdbcDriverClass = CollectionHelper.getMapAttr(
                         sessionAttrs, JDBC_DRIVER_CLASS, "");
-                    jdbcURL = CollectionHelper.getMapAttr(
-                        sessionAttrs, JDBC_URL, "");
+                    sessionRepositoryURL = CollectionHelper.getMapAttr(
+                        sessionAttrs, IPLANET_AM_SESSION_REPOSITORY_URL, "");
                     minPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
                         sessionAttrs, MIN_POOL_SIZE, "8"));
                     maxPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
@@ -2220,7 +2251,7 @@ public class SessionService {
                             + getClusterServerList() + ": "
                             + "connectionMaxWaitTime=" + connectionMaxWaitTime
                             + " :" + "jdbcDriverClass=" + jdbcDriverClass
-                            + " : " + "jdcbURL=" + jdbcURL + " : "
+                            + " : " + "Session Repository URL=" + sessionRepositoryURL + " : "
                             + "minPoolSize=" + minPoolSize + " : "
                             + "maxPoolSize=" + maxPoolSize);
                     }
@@ -3579,10 +3610,10 @@ public class SessionService {
     }
 
     /**
-     * @return Returns the jdbcURL.
+     * @return Returns the sessionRepositoryURL.
      */
-    public static String getJdbcURL() {
-        return jdbcURL;
+    public static String getSessionRepositoryURL() {
+        return sessionRepositoryURL;
     }
 
     /**

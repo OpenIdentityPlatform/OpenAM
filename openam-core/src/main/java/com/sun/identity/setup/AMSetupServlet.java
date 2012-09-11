@@ -1006,7 +1006,7 @@ public class AMSetupServlet extends HttpServlet {
                       map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST)+
                       ":"+
                       map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT)+
-                     "|"+ serverID;
+                     "|"+ ((serverID==null)?"":serverID);
                     String orgName = (String) 
                             map.get(SetupConstants.SM_CONFIG_ROOT_SUFFIX);
                     updateEmbeddedIdRepo(orgName, "embedded", entry);
@@ -1015,7 +1015,8 @@ public class AMSetupServlet extends HttpServlet {
                         "EmbeddedDS : failed to setup serverid", ex);
                     throw ex;
                 }
-            } 
+            }
+
             SystemProperties.setServerInstanceName(serverInstanceName);
             LDIFTemplates.copy(basedir, servletCtx);
             ServiceXMLTemplates.copy(basedir + "/template/xml", 
@@ -1465,7 +1466,7 @@ public class AMSetupServlet extends HttpServlet {
     }
 
     /**
-     * Initialize AMConfig.propeties with host specific values
+     * Initialize AMConfig.properties with host specific values
      */
     private static Map initializeConfigProperties()
         throws SecurityException, IOException {

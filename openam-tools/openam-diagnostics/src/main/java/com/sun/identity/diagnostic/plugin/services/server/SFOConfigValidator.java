@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -95,7 +96,7 @@ public class SFOConfigValidator extends ServerConfigBase {
         HashMap clusterMemberMap = new HashMap();
         int connectionMaxWaitTime = 5000; // in milli-second
         String jdbcDriverClass = null;
-        String jdbcURL = null;
+        String sessionRepositoryURL = null;
         int minPoolSize = 8;
         int maxPoolSize = 32;
         int maxWaitTimeForConstraint = 6000; // in milli-second
@@ -116,7 +117,7 @@ public class SFOConfigValidator extends ServerConfigBase {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                     CollectionHelper.getMapAttr(
-                    sessionAttrs, IS_SFO_ENABLED, "false")
+                    sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
                     ).booleanValue();
                 if (sfoEnabled) {
                     isSessionFailoverEnabled = true;
@@ -130,15 +131,19 @@ public class SFOConfigValidator extends ServerConfigBase {
                         sessionAttrs, CONNECT_MAX_WAIT_TIME, "5000"));
                     jdbcDriverClass = CollectionHelper.getMapAttr(
                         sessionAttrs, JDBC_DRIVER_CLASS, "");
-                    jdbcURL = CollectionHelper.getMapAttr(
-                        sessionAttrs, JDBC_URL, "");
-                    validateClusterList(jdbcURL);
+                    sessionRepositoryURL = CollectionHelper.getMapAttr(
+                        sessionAttrs, IPLANET_AM_SESSION_REPOSITORY_URL, "");
+                    validateClusterList(sessionRepositoryURL);
                     minPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
                         sessionAttrs, MIN_POOL_SIZE, "8"));
                     maxPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
                         sessionAttrs, MAX_POOL_SIZE, "32"));
+
+
+
+
                     toolOutWriter.printMessage("sfo-cfg-prop-details");
-                    String[] params1 = {sessionStoreUserName, jdbcURL,
+                    String[] params1 = {sessionStoreUserName, sessionRepositoryURL,
                         Integer.toString(connectionMaxWaitTime),
                         Integer.toString(minPoolSize),
                         Integer.toString(maxPoolSize)};
@@ -159,23 +164,23 @@ public class SFOConfigValidator extends ServerConfigBase {
         }
     }
     
-    private void validateClusterList(String jdbcURL){
+    private void validateClusterList(String sessionRepositoryURL){
         boolean valid = true;
-        if ((jdbcURL != null) && jdbcURL.length() > 0 ) {
-            if (jdbcURL.indexOf(",") == -1) {
-                int idx1 =  jdbcURL.indexOf(":");
-                int idx2 =  jdbcURL.lastIndexOf(":");
+        if ((sessionRepositoryURL != null) && sessionRepositoryURL.length() > 0 ) {
+            if (sessionRepositoryURL.indexOf(",") == -1) {
+                int idx1 =  sessionRepositoryURL.indexOf(":");
+                int idx2 =  sessionRepositoryURL.lastIndexOf(":");
                 if (idx2 > idx1) {
                     toolOutWriter.printStatusMsg(false, "sfo-validate-jdbc-url");
                     toolOutWriter.printError("sfo-jdbc-url-invalid",
-                        new String[] {jdbcURL});
+                        new String[] {sessionRepositoryURL});
                     valid = false;
                 } else {
                     toolOutWriter.printMessage("sfo-jdbc-url-single");
                 }
             }
             if (valid) {
-                StringTokenizer st = new StringTokenizer(jdbcURL, ",");
+                StringTokenizer st = new StringTokenizer(sessionRepositoryURL, ",");
                 while (st.hasMoreTokens()) {
                     String str = st.nextToken();
                     if (str != null) {

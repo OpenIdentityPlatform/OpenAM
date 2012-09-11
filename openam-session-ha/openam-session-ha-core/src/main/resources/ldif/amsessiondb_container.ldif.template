@@ -1,13 +1,14 @@
-dn: dc=internal,@SM_CONFIG_BASEDN@
-objectClass: domain
+dn: o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organization
 objectClass: top
-dc: internal
+o: OpenAM-Session
+aci: (target="ldap:///o=openam-session,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
 
-dn: ou=famrecords,dc=internal,@SM_CONFIG_BASEDN@
+dn: ou=famrecords,o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
 ou: famrecords
 objectClass: organizationalUnit
 
-dn: ou=amsessiondb,dc=internal,@SM_CONFIG_BASEDN@
+dn: ou=amsessiondb,o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
 ou: amsessiondb
 objectClass: organizationalUnit
 

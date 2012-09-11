@@ -166,15 +166,7 @@
              permissions="iPlanetAMSessionService"
              accesslevel="globalconfig"/>
 
-        <tab id="52" viewbean="com.sun.identity.console.session.SessionHAPropertiesViewBean"
-             url="../session/SessionHAProperties"
-             label="tab.session.configuration.label"
-             tooltip="tab.session.configuration.tooltip"
-             status="tab.session.configuration.status"
-             permissions="iPlanetAMSessionService"
-             accesslevel="globalconfig"/>
-
-        <tab id="53" viewbean="com.sun.identity.console.session.SessionHAStatisticsViewBean"
+        <tab id="52" viewbean="com.sun.identity.console.session.SessionHAStatisticsViewBean"
              url="../session/SessionHAStatistics"
              label="tab.session.statistics.label"
              tooltip="tab.session.statistics.tooltip"

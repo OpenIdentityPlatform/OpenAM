@@ -78,11 +78,14 @@ public interface ServiceConstants extends Constants {
         "iplanet-am-session-store-cpl-max-wait-time";
     static final String JDBC_DRIVER_CLASS =
         "iplanet-am-session-JDBC-driver-Impl-classname";
-    static final String JDBC_URL = "iplanet-am-session-jdbc-url";
+    static final String IPLANET_AM_SESSION_REPOSITORY_URL =
+         "iplanet-am-session-repository-url";
     static final String MIN_POOL_SIZE =
         "iplanet-am-session-min-pool-size";
     static final String MAX_POOL_SIZE =
         "iplanet-am-session-max-pool-size";
+    static final String IS_SFO_ENABLED =
+            "iplanet-am-session-sfo-enabled";
 
     /**
      * General Server  related properties

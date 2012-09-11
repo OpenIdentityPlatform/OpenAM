@@ -32,12 +32,15 @@
 
 package com.sun.identity.config;
 
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
 import javax.servlet.http.HttpServletRequest;
+
+import com.sun.identity.shared.Constants;
 import org.apache.click.control.ActionLink;
 
 public class DefaultSummary extends AjaxPage {
@@ -116,7 +119,15 @@ public class DefaultSummary extends AjaxPage {
             SetupConstants.CONFIG_VAR_PLATFORM_LOCALE, 
             SetupConstants.DEFAULT_PLATFORM_LOCALE);
         request.addParameter("locale", configLocale.toString());
-                
+
+        request.addParameter(
+                SetupConstants.CONFIG_VAR_SESSION_ROOT_SUFFIX,
+                Constants.DEFAULT_SESSION_HA_ROOT_SUFFIX);
+
+        request.addParameter(
+                SetupConstants.CONFIG_VAR_SESSION_STORE_TYPE,
+                Constants.DEFAULT_SESSION_HA_STORE_TYPE);
+
         try {
             if (!AMSetupServlet.processRequest(request, response)) {
                 responseString = AMSetupServlet.getErrorMessage();

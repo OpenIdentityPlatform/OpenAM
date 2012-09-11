@@ -167,13 +167,12 @@ public class AMViewConfig {
         if (sessionNode != null) {
             if ( (tabs == null) || (tabs.isEmpty()) ||
                  (sessionNode.getChildren() == null) ||
-                 (sessionNode.getChildren().size() >= 3)) {
+                 (sessionNode.getChildren().size() >= 2)) {
                 return tabModel;
             }
-            AMTabEntry entries[] = new AMTabEntry[3];
+            AMTabEntry entries[] = new AMTabEntry[2];
             entries[0] = (AMTabEntry) sessionNode.getChildren().get(0);
             entries[1] = (AMTabEntry) sessionNode.getChildren().get(1);
-            entries[2] = (AMTabEntry) sessionNode.getChildren().get(2);
             for (AMTabEntry entry : entries) {
                 sessionNode.addChild(new CCNavNode(entry.getID(), entry.getLabel(),
                         entry.getTooltip(), entry.getStatus()));

@@ -198,7 +198,7 @@ public class FAMRecordJMQPersister implements FAMRecordPersister,
                 thisURI);
                    
         // Initialize all message queues/topics
-        serverList = SessionService.getJdbcURL();
+        serverList = SessionService.getSessionRepositoryURL();
         userName =   SessionService.getSessionStoreUserName();
         password =   SessionService.getSessionStorePassword();
         readTimeOut = SessionService.getConnectionMaxWaitTime();

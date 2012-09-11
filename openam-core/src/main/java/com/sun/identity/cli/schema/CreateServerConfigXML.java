@@ -192,24 +192,9 @@ public class CreateServerConfigXML extends AuthenticatedCommand implements Const
         xml = xml.replaceAll("@ENCADMINPASSWD@", dsPassword);
         xml = xml.replaceAll("@ENCADADMINPASSWD@", amadminPwds);
         xml = xml.replaceAll("@SM_CONFIG_BASEDN@", canRootSuffix);
+        xml = xml.replaceAll("@ROOT_SUFFIX@", canRootSuffix);
         xml = xml.replaceAll("@ORG_BASE@", canRootSuffix);
 
-        // Set up our Session SFHA Container.
-        xml = xml.replaceAll("@AMSESSIONDB_BASEDN@",
-                SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,
-                        Constants.DEFAULT_SESSION_HA_ROOT_DN));
-        String rdn = SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN,
-                Constants.DEFAULT_SESSION_HA_ROOT_DN);
-        int x = rdn.indexOf(Constants.EQUALS);
-        if (x>0)
-        {
-            int y = rdn.indexOf(Constants.COMMA);
-            if (y>0)
-            {
-                rdn = rdn.substring(x+1,y);
-                xml = xml.replaceAll("@AMSESSIONDB_RDN@", rdn);
-            }
-        }
         return xml;
     }
     

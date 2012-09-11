@@ -349,6 +349,7 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
             setPageSessionAttribute(AMServiceProfile.PG_SESSION_SUB_CONFIG_IDS,
                 subConfigNames);
         }
+
         subConfigNames.add(0, configName);
         addViewBeanClassToPageSession();
         unlockPageTrail();

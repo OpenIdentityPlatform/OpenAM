@@ -59,11 +59,14 @@ public interface AMSessionRepository {
     static final String IS_SFO_ENABLED =
                 "iplanet-am-session-sfo-enabled";
 
-    static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_DN =
-            "org.forgerock.openam.session.ha.amsessionrepository.rootdn";
+    static final String SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX =
+            "iplanet-am-config-root-suffix";
+
+    static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX =
+            "iplanet-am-session-sfo-store-root-suffix";
 
     static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
-            "org.forgerock.openam.session.ha.amsessionrepository.type";
+            "iplanet-am-session-sfo-store-type";
 
     static final String CLEANUP_GRACE_PERIOD =
             "com.sun.identity.session.repository.cleanupGracePeriod";

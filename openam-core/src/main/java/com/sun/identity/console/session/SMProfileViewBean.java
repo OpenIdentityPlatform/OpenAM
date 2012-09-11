@@ -251,7 +251,6 @@ public class SMProfileViewBean
             tabModel.clear();
             // removeSessionsTab(551); Current Sessions, Leave!
             removeSessionsTab(552);
-            removeSessionsTab(553);
         }
     }
 

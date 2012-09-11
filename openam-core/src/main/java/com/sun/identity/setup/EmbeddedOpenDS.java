@@ -83,11 +83,11 @@ import org.opends.server.tools.InstallDS;
 import org.opends.server.tools.dsreplication.ReplicationCliMain;
 
 /**
-  * This class encapsulates all <code>OpenDS</code>  dependencies.
-  * All the interfaces are invoked from <code>AMSetupServlet</code> class
-  * at different points : initial installation, normal startup and
-  * normal shutdown of the embedded <code>OpenDS</code> instance.
-  */
+ * This class encapsulates all <code>OpenDS</code>  dependencies.
+ * All the interfaces are invoked from <code>AMSetupServlet</code> class
+ * at different points : initial installation, normal startup and
+ * normal shutdown of the embedded <code>OpenDS</code> instance.
+ */
 public class EmbeddedOpenDS {
     private static final String OPENDS_1x_VER = "5097";
     private static final String OPENDS_230B2_VER = "6500";
@@ -119,15 +119,15 @@ public class EmbeddedOpenDS {
      * <li>invokes <code>EmbeddedUtils</code> to start the embedded server.
      * </ul>
      *
-     *  @param map Map of properties collected by the configurator.
-     *  @param servletCtx Servlet Context to read deployed war contents.
-     *  @throws Exception on encountering errors.
+     * @param map        Map of properties collected by the configurator.
+     * @param servletCtx Servlet Context to read deployed war contents.
+     * @throws Exception on encountering errors.
      */
     public static void setup(Map map, ServletContext servletCtx)
-        throws Exception {
+            throws Exception {
         // Determine Cipher to be used
         SetupProgress.reportStart("emb.installingemb.null", null);
-        String xform =  getSupportedTransformation();
+        String xform = getSupportedTransformation();
 
         if (xform == null) {
             SetupProgress.reportEnd("emb.noxform", null);
@@ -156,7 +156,7 @@ public class EmbeddedOpenDS {
             }
         } catch (IOException ioe) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
+                    "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
             throw ioe;
         } finally {
             if (bin != null) {
@@ -178,7 +178,7 @@ public class EmbeddedOpenDS {
 
         ZipFile opendsZip = new ZipFile(odsRoot + "/opendj.zip");
         Enumeration files = opendsZip.entries();
-
+        // Process the OpenDJ Archive File.
         while (files.hasMoreElements()) {
             ZipEntry file = (ZipEntry) files.nextElement();
             File f = new File(odsRoot + "/" + file.getName());
@@ -199,7 +199,7 @@ public class EmbeddedOpenDS {
                 }
             } catch (IOException ioe) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.setup(): Error loading ldifs", ioe);
+                        "EmbeddedOpenDS.setup(): Error loading ldifs", ioe);
                 throw ioe;
             } finally {
                 if (is != null) {
@@ -237,7 +237,7 @@ public class EmbeddedOpenDS {
                 "mail-1.4.5.jar"
         };
 
-        for (int i = 0 ; i < opendsJarFiles.length; i++) {
+        for (int i = 0; i < opendsJarFiles.length; i++) {
             String jarFileName = "/WEB-INF/lib/" + opendsJarFiles[i];
             ReadableByteChannel inChannel =
                     Channels.newChannel(AMSetupServlet.getResourceAsStream(servletCtx, jarFileName));
@@ -247,7 +247,7 @@ public class EmbeddedOpenDS {
                 channelCopy(inChannel, outChannel);
             } catch (IOException ioe) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
+                        "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
                 throw ioe;
             } finally {
                 if (inChannel != null) {
@@ -268,47 +268,12 @@ public class EmbeddedOpenDS {
             }
         }
 
-        /*
-        for (int i = 0 ; i < opendsJarFiles.length; i++) {
-            String jarFileName = "/WEB-INF/lib/" + opendsJarFiles[i];
-            BufferedInputStream jin = new BufferedInputStream(
-                AMSetupServlet.getResourceAsStream(servletCtx, jarFileName), 10000);
-            BufferedOutputStream jout = new BufferedOutputStream(
-                new FileOutputStream(odsRoot + "/lib/" + opendsJarFiles[i]), 10000);
-
-            try {
-                while (jin.available() > 0) {
-                    jout.write(jin.read());
-                }
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
-                throw ioe;
-            } finally {
-                if (jin != null) {
-                    try {
-                        jin.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-
-                if (jout != null) {
-                    try {
-                        jout.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-            }
-        }*/
-
         // create tag swapped files
         String[] tagSwapFiles = {
-            "ldif/openam_suffix.ldif.template"
+                "ldif/openam_suffix.ldif.template"
         };
 
-        for (int i = 0 ; i < tagSwapFiles.length; i++) {
+        for (int i = 0; i < tagSwapFiles.length; i++) {
             String fileIn = odsRoot + "/" + tagSwapFiles[i];
             FileReader fin = new FileReader(fileIn);
 
@@ -327,7 +292,7 @@ public class EmbeddedOpenDS {
                 fout.write(ServicesDefaultValues.tagSwap(inpStr));
             } catch (IOException e) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.setup(): Error tag swapping files", e);
+                        "EmbeddedOpenDS.setup(): Error tag swapping files", e);
                 throw e;
             } finally {
                 if (fin != null) {
@@ -349,48 +314,7 @@ public class EmbeddedOpenDS {
 
         // ****************************************************
         // Copy in additional Schemata Definitions.
-        String targetDirectory =  odsRoot+"/config/schema/";
-        for(String additionalSchemaSourceFileName : additionalSchemaToBeApplied)
-        {
-            File additionalSchemaSourceFile = new File(additionalSchemaSourceFileName);
-            if (!additionalSchemaSourceFile.canRead())
-                {
-                    Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to Read Schema File:["
-                            +additionalSchemaSourceFile.getAbsolutePath()+"], Ignoring!");
-                    continue;
-                }
-            // Copy over the File.
-            ReadableByteChannel inChannel =
-                    new FileInputStream(additionalSchemaSourceFile).getChannel();
-            FileChannel outChannel = new FileOutputStream(targetDirectory + additionalSchemaSourceFile.getName()).getChannel();
-
-            try {
-                channelCopy(inChannel, outChannel);
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "EmbeddedOpenDS.setup(): Error copying schema file: "+additionalSchemaSourceFile.toString(), ioe);
-                throw ioe;
-            } finally {
-                if (inChannel != null) {
-                    try {
-                        inChannel.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-
-                if (outChannel != null) {
-                    try {
-                        outChannel.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-            }
-        } // End of For Each Loop.
-
-
-
+        copyFiles(additionalSchemaToBeApplied, odsRoot + "/config/schema/");
 
         // remove zip
         File toDelete = new File(odsRoot + "/opendj.zip");
@@ -412,71 +336,133 @@ public class EmbeddedOpenDS {
         EmbeddedOpenDS.startServer(odsRoot);
 
         // Check: If adding a new server to a existing cluster
-
         if (!isMultiServer(map)) {
             // Default: single / first server.
             SetupProgress.reportStart("emb.creatingfamsuffix", null);
-            //EmbeddedOpenDS.shutdownServer("to load ldif");
             int ret = EmbeddedOpenDS.loadLDIF(map, odsRoot, odsRoot + "/ldif/openam_suffix.ldif");
 
             if (ret == 0) {
                 SetupProgress.reportEnd("emb.creatingfamsuffix.success", null);
             } else {
-                Object[] error = { Integer.toString(ret) };
+                Object[] error = {Integer.toString(ret)};
                 SetupProgress.reportEnd("emb.creatingfamsuffix.failure", error);
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.setupOpenDS. Error loading OpenAM suffix");
-            throw new ConfiguratorException(
-                    "emb.creatingfamsuffix.failure");
+                        "EmbeddedOpenDS.setupOpenDS. Error loading OpenAM suffix");
+                throw new ConfiguratorException(
+                        "emb.creatingfamsuffix.failure");
             }
+
             //EmbeddedOpenDS.startServer(odsRoot);
-        }
-    }
-
-    protected static void channelCopy(ReadableByteChannel from, WritableByteChannel to)
-    throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
-
-        while (from.read(buffer) != -1) {
-            buffer.flip();
-            to.write(buffer);
-            buffer.compact();
-        }
-
-        buffer.flip();
-
-        while (buffer.hasRemaining()) {
-            to.write(buffer);
-        }
+        } // End of single / first server check.
     }
 
     /**
-      * Preferred transforms
-      */
+     * Helper Method to Copy Files.
+     *
+     * @param sourceFiles
+     * @param targetDirectory
+     * @throws IOException
+     */
+    protected static void copyFiles(String[] sourceFiles, String targetDirectory) throws IOException {
+        if ((targetDirectory == null) || (!new File(targetDirectory).exists())) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Invalid Target Directory Destination: "
+                    + targetDirectory + ", Ignoring.");
+            return;
+        }
+        // ****************************************************
+        // Copy in additional Schemata Definitions.
+        for (String additionalSchemaSourceFileName : sourceFiles) {
+            File additionalSchemaSourceFile = new File(additionalSchemaSourceFileName);
+            if (!additionalSchemaSourceFile.canRead()) {
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to Read Schema File:["
+                        + additionalSchemaSourceFile.getAbsolutePath() + "], Ignoring!");
+                continue;
+            }
+            ReadableByteChannel inChannel = null;
+            FileChannel outChannel = null;
+            try {
+                // Copy over the File.
+                inChannel =
+                        new FileInputStream(additionalSchemaSourceFile).getChannel();
+                outChannel =
+                        new FileOutputStream(targetDirectory + additionalSchemaSourceFile.getName()).getChannel();
+                channelCopy(inChannel, outChannel);
+            } catch (IOException ioe) {
+                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
+                        "EmbeddedOpenDS.setup(): Error copying schema file: " + additionalSchemaSourceFile.toString(), ioe);
+                throw ioe;
+            }
+        } // End of For Each Loop.
+    }
+
+    /**
+     * Helper Method to Copy from one Byte Channel to another.
+     * @param from
+     * @param to
+     * @throws IOException
+     */
+    protected static void channelCopy(ReadableByteChannel from, WritableByteChannel to)
+            throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
+        try {
+            // Read
+            while (from.read(buffer) != -1) {
+                buffer.flip();
+                to.write(buffer);
+                buffer.compact();
+            }
+            // Flip the Buffer
+            buffer.flip();
+            // Write
+            while (buffer.hasRemaining()) {
+                to.write(buffer);
+            } // End of While Loop
+        } finally {
+            // Handle In Channel Closure
+            if (from != null) {
+                try {
+                    from.close();
+                } catch (Exception ex) {
+                    //No handling required
+                }
+            }
+            // Handle Out Channel Closure
+            if (to != null) {
+                try {
+                    to.close();
+                } catch (Exception ex) {
+                    //No handling required
+                }
+            }
+        } // End of Finally
+    }
+
+    /**
+     * Preferred transforms
+     */
     final static String[] preferredTransforms =
-    {
-         "RSA/ECB/OAEPWithSHA1AndMGF1Padding",      // Sun JCE
-         "RSA/ /OAEPPADDINGSHA-1",                  // IBMJCE
-         "RSA/ECB/OAEPWithSHA-1AndMGF-1Padding",    // BouncyCastle
-         "RSA/ECB/PKCS1Padding"                     // Fallback
-    };
-    final static String  OPENDS_TRANSFORMATION = "OPENDS_TRANSFORMATION";
+            {
+                    "RSA/ECB/OAEPWithSHA1AndMGF1Padding",      // Sun JCE
+                    "RSA/ /OAEPPADDINGSHA-1",                  // IBMJCE
+                    "RSA/ECB/OAEPWithSHA-1AndMGF-1Padding",    // BouncyCastle
+                    "RSA/ECB/PKCS1Padding"                     // Fallback
+            };
+    final static String OPENDS_TRANSFORMATION = "OPENDS_TRANSFORMATION";
 
     /**
      * Traverses <code>preferredTransforms</code> list in order to
      * find a Cipher supported by underlying JCE providers.`
+     *
      * @returns transformation available.
      */
     private static String getSupportedTransformation() {
-        for (int i = 0; i < preferredTransforms.length ; i++) {
+        for (int i = 0; i < preferredTransforms.length; i++) {
             try {
                 Cipher.getInstance(preferredTransforms[i]);
                 return preferredTransforms[i];
-             }
-             catch  ( NoSuchAlgorithmException ex) {
-             }
-             catch  ( NoSuchPaddingException ex) {
-             }
+            } catch (NoSuchAlgorithmException ex) {
+            } catch (NoSuchPaddingException ex) {
+            }
         }
         return null;
     }
@@ -488,7 +474,7 @@ public class EmbeddedOpenDS {
      * @throws Exception upon encountering errors.
      */
     public static void setupOpenDS(Map map)
-    throws Exception {
+            throws Exception {
         SetupProgress.reportStart("emb.setupopends", null);
 
         int ret = runOpenDSSetup(map);
@@ -496,49 +482,49 @@ public class EmbeddedOpenDS {
         if (ret == 0) {
             SetupProgress.reportEnd("emb.setupopends.success", null);
             Debug.getInstance(SetupConstants.DEBUG_NAME).message(
-                "EmbeddedOpenDS.setupOpenDS: OpenDS setup succeeded.");
+                    "EmbeddedOpenDS.setupOpenDS: OpenDS setup succeeded.");
         } else {
             Object[] params = {Integer.toString(ret)};
             SetupProgress.reportEnd("emb.setupopends.failed.param", params);
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "EmbeddedOpenDS.setupOpenDS. Error setting up OpenDS");
+                    "EmbeddedOpenDS.setupOpenDS. Error setting up OpenDS");
             throw new ConfiguratorException(
                     "configurator.embsetupopendsfailed");
         }
     }
 
-     /**
-      * Runs the OpenDS setup command like this:
-      * $ ./setup --cli --adminConnectorPort 4444
-      * --baseDN dc=openam,dc=java,dc=net --rootUserDN "cn=directory manager"
-      * --doNotStart --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx
-      * --jmxPort 1689 --no-prompt
-      *
-      *  @param map Map of properties collected by the configurator.
-      *  @return status : 0 == success, !0 == failure
-      */
+    /**
+     * Runs the OpenDS setup command like this:
+     * $ ./setup --cli --adminConnectorPort 4444
+     * --baseDN dc=openam,dc=forgerock,dc=org --rootUserDN "cn=directory manager"
+     * --doNotStart --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx
+     * --jmxPort 1689 --no-prompt
+     *
+     * @param map Map of properties collected by the configurator.
+     * @return status : 0 == success, !0 == failure
+     */
     public static int runOpenDSSetup(Map map) {
-        String[] setupCmd= {
-            "--cli",                        // 0
-            "--adminConnectorPort",         // 1
-            "4444",                         // 2
-            "--baseDN",                     // 3
-            Constants.DEFAULT_ROOT_SUFFIX,    // 4
-            "--rootUserDN",                 // 5
-            "cn=Directory Manager",         // 6
-            "--ldapPort",                   // 7
-            "50389",                        // 8
-            "--skipPortCheck",              // 9
-            "--rootUserPassword",           // 10
-            "xxxxxxx",                      // 11
-            "--jmxPort",                    // 12
-            "1689",                         // 13
-            "--no-prompt",                  // 14
-            "--configFile",                 // 15
-            "/path/to/config.ldif",         // 16
-            "--doNotStart",                 // 17
-            "--hostname",                   // 18
-            "hostname"                      // 19
+        String[] setupCmd = {
+                "--cli",                        // 0
+                "--adminConnectorPort",         // 1
+                "4444",                         // 2
+                "--baseDN",                     // 3
+                Constants.DEFAULT_ROOT_SUFFIX,    // 4
+                "--rootUserDN",                 // 5
+                "cn=Directory Manager",         // 6
+                "--ldapPort",                   // 7
+                "50389",                        // 8
+                "--skipPortCheck",              // 9
+                "--rootUserPassword",           // 10
+                "xxxxxxx",                      // 11
+                "--jmxPort",                    // 12
+                "1689",                         // 13
+                "--no-prompt",                  // 14
+                "--configFile",                 // 15
+                "/path/to/config.ldif",         // 16
+                "--doNotStart",                 // 17
+                "--hostname",                   // 18
+                "hostname"                      // 19
         };
 
         setupCmd[2] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
@@ -555,10 +541,10 @@ public class EmbeddedOpenDS {
         setupCmd[11] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
 
         int ret = InstallDS.mainCLI(
-            setupCmd, true,
-            SetupProgress.getOutputStream(),
-            SetupProgress.getOutputStream(),
-            null);
+                setupCmd, true,
+                SetupProgress.getOutputStream(),
+                SetupProgress.getOutputStream(),
+                null);
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -570,19 +556,18 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     *  Starts the embedded <code>OpenDS</code> instance.
+     * Starts the embedded <code>OpenDS</code> instance.
      *
-     *  @param odsRoot File system directory where <code>OpenDS</code>
-     *                 is installed.
-     *
-     *  @throws Exception upon encountering errors.
+     * @param odsRoot File system directory where <code>OpenDS</code>
+     *                is installed.
+     * @throws Exception upon encountering errors.
      */
     public static void startServer(String odsRoot) throws Exception {
         if (isStarted()) {
             return;
         }
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
-        debug.message("EmbeddedOpenDS.startServer("+odsRoot+")");
+        debug.message("EmbeddedOpenDS.startServer(" + odsRoot + ")");
 
         DirectoryEnvironmentConfig config = new DirectoryEnvironmentConfig();
         config.setServerRoot(new File(odsRoot));
@@ -617,9 +602,9 @@ public class EmbeddedOpenDS {
                             shutdownServer("Graceful Shutdown");
                         } catch (Exception ex) {
                             Debug debug = Debug.getInstance(
-                                SetupConstants.DEBUG_NAME);
+                                    SetupConstants.DEBUG_NAME);
                             debug.error("EmbeddedOpenDS:shutdown hook failed",
-                                ex);
+                                    ex);
                         }
                     }
                 }, ShutdownPriority.LOWEST);
@@ -631,19 +616,18 @@ public class EmbeddedOpenDS {
 
 
     /**
-     *  Gracefully shuts down the embedded opends instance.
+     * Gracefully shuts down the embedded opends instance.
      *
-     *  @param reason  string representing reasn why shutdown was called.
-     *
-     *  @throws Exception on encountering errors.
+     * @param reason string representing reasn why shutdown was called.
+     * @throws Exception on encountering errors.
      */
     public static void shutdownServer(String reason) throws Exception {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         if (isStarted()) {
             debug.message("EmbeddedOpenDS.shutdown server...");
             DirectoryServer.shutDown(
-                "com.sun.identity.setup.EmbeddedOpenDS",
-                Message.EMPTY);
+                    "com.sun.identity.setup.EmbeddedOpenDS",
+                    Message.EMPTY);
             int sleepcount = 0;
             while (DirectoryServer.isRunning() && (sleepcount < 60)) {
                 sleepcount++;
@@ -654,8 +638,7 @@ public class EmbeddedOpenDS {
         }
     }
 
-    public static void setupReplication(Map map) throws Exception
-    {
+    public static void setupReplication(Map map) throws Exception {
         // Setup replication
         SetupProgress.reportStart("emb.creatingreplica", null);
         int ret = setupReplicationEnable(map);
@@ -663,66 +646,64 @@ public class EmbeddedOpenDS {
             ret = setupReplicationInitialize(map);
             SetupProgress.reportEnd("emb.success", null);
             Debug.getInstance(SetupConstants.DEBUG_NAME).message(
-                "EmbeddedOpenDS.setupReplication: replication setup succeeded.");
+                    "EmbeddedOpenDS.setupReplication: replication setup succeeded.");
         } else {
             Object[] params = {Integer.toString(ret)};
             SetupProgress.reportEnd("emb.failed.param", params);
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "EmbeddedOpenDS.setupReplication. Error setting up replication");
+                    "EmbeddedOpenDS.setupReplication. Error setting up replication");
             throw new ConfiguratorException(
                     "configurator.embreplfailed");
         }
     }
 
     /**
-      * Setups replication between two opends sms and user stores.
-      * $ dsreplication enable
-      *    --no-prompt
-      *    --host1 host1 --port1 1389 --bindDN1 "cn=Directory Manager"
-      *    --bindPassword1 password --replicationPort1 8989
-      *    --host2 host2 --port2 2389 --bindDN2 "cn=Directory Manager"
-      *    --bindPassword2 password --replicationPort2 8990
-      *    --adminUID admin --adminPassword password
-      *    --baseDN "dc=example,dc=com"
-      *
-      *
-      *  @param map Map of properties collected by the configurator.
-      *  @return status : 0 == success, !0 == failure
-      */
-    public static int setupReplicationEnable(Map map)
-    {
-        String[] enableCmd= {
-            "enable",                // 0
-            "--no-prompt",           // 1
-            "--host1",               // 2
-            "host1val",              // 3
-            "--port1",               // 4
-            "port1ival",             // 5
-            "--bindDN1",             // 6
-            "cn=Directory Manager",  // 7
-            "--bindPassword1",       // 8
-            "xxxxxxxx",              // 9
-            "--replicationPort1",    // 10
-            "8989",                  // 11
-            "--host2",               // 12
-            "host2val",              // 13
-            "--port2",               // 14
-            "port2ival",             // 15
-            "--bindDN2",             // 16
-            "cn=Directory Manager",  // 17
-            "--bindPassword2",       // 18
-            "xxxxxxxx",              // 19
-            "--replicationPort2",    // 20
-            "8989",                  // 21
-            "--adminUID",            // 22
-            "admin",                 // 23
-            "--adminPassword",       // 24
-            "xxxxxxxx",              // 25
-            "--baseDN",              // 26
-            "dc=example,dc=com",     // 27
-            "--trustAll",            // 28
-            "--configFile",          // 29
-            "path/to/config.ldif"    // 30
+     * Setups replication between two opends sms and user stores.
+     * $ dsreplication enable
+     * --no-prompt
+     * --host1 host1 --port1 1389 --bindDN1 "cn=Directory Manager"
+     * --bindPassword1 password --replicationPort1 8989
+     * --host2 host2 --port2 2389 --bindDN2 "cn=Directory Manager"
+     * --bindPassword2 password --replicationPort2 8990
+     * --adminUID admin --adminPassword password
+     * --baseDN "dc=example,dc=com"
+     *
+     * @param map Map of properties collected by the configurator.
+     * @return status : 0 == success, !0 == failure
+     */
+    public static int setupReplicationEnable(Map map) {
+        String[] enableCmd = {
+                "enable",                // 0
+                "--no-prompt",           // 1
+                "--host1",               // 2
+                "host1val",              // 3
+                "--port1",               // 4
+                "port1ival",             // 5
+                "--bindDN1",             // 6
+                "cn=Directory Manager",  // 7
+                "--bindPassword1",       // 8
+                "xxxxxxxx",              // 9
+                "--replicationPort1",    // 10
+                "8989",                  // 11
+                "--host2",               // 12
+                "host2val",              // 13
+                "--port2",               // 14
+                "port2ival",             // 15
+                "--bindDN2",             // 16
+                "cn=Directory Manager",  // 17
+                "--bindPassword2",       // 18
+                "xxxxxxxx",              // 19
+                "--replicationPort2",    // 20
+                "8989",                  // 21
+                "--adminUID",            // 22
+                "admin",                 // 23
+                "--adminPassword",       // 24
+                "xxxxxxxx",              // 25
+                "--baseDN",              // 26
+                "dc=example,dc=com",     // 27
+                "--trustAll",            // 28
+                "--configFile",          // 29
+                "path/to/config.ldif"    // 30
         };
         enableCmd[3] = (String) map.get(SetupConstants.DS_EMB_REPL_HOST2);
         enableCmd[5] = (String) map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
@@ -730,7 +711,7 @@ public class EmbeddedOpenDS {
         enableCmd[13] = getOpenDJHostName(map);
         enableCmd[15] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
         enableCmd[21] = (String) map.get(SetupConstants.DS_EMB_REPL_REPLPORT1);
-        enableCmd[27] = (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
+        enableCmd[27] = (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
         enableCmd[30] = getOpenDJConfigFile(map);
 
         Object[] params = {concat(enableCmd)};
@@ -742,20 +723,20 @@ public class EmbeddedOpenDS {
 
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         if (debug.messageEnabled()) {
-            debug.message("EmbeddedOpenDS.setupReplicationEnable: "+
-                "Host 1 "+enableCmd[3]);
-            debug.message("EmbeddedOpenDS.setupReplicationEnable: "+
-                "Host 2 "+enableCmd[13]);
-            debug.message("EmbeddedOpenDS.setupReplicationEnable: "+
-                "Port 1 "+enableCmd[5]);
-            debug.message("EmbeddedOpenDS.setupReplicationEnable: "+
-                "Port 2 "+enableCmd[15]);
+            debug.message("EmbeddedOpenDS.setupReplicationEnable: " +
+                    "Host 1 " + enableCmd[3]);
+            debug.message("EmbeddedOpenDS.setupReplicationEnable: " +
+                    "Host 2 " + enableCmd[13]);
+            debug.message("EmbeddedOpenDS.setupReplicationEnable: " +
+                    "Port 1 " + enableCmd[5]);
+            debug.message("EmbeddedOpenDS.setupReplicationEnable: " +
+                    "Port 2 " + enableCmd[15]);
         }
         int ret = ReplicationCliMain.mainCLI(
-            enableCmd, false,
-            SetupProgress.getOutputStream(),
-            SetupProgress.getOutputStream(),
-            null);
+                enableCmd, false,
+                SetupProgress.getOutputStream(),
+                SetupProgress.getOutputStream(),
+                null);
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -764,55 +745,55 @@ public class EmbeddedOpenDS {
         }
         return ret;
     }
+
     /**
-      * Syncs replication data between two opends sms and user stores.
-      * $ dsreplication initialize
-      *     --baseDN "dc=example,dc=com" --adminUID admin --adminPassword pass
-      *     --hostSource host1 --portSource 1389
-      *     --hostDestination host2 --portDestination 2389
-      *     --trustAll
-      *
-      *  @param map Map of properties collected by the configurator.
-      *  @return status : 0 == success, !0 == failure
-      */
-    public static int setupReplicationInitialize(Map map)
-    {
-        String[] initializeCmd= {
-            "initialize",                 // 0
-            "--no-prompt",                // 1
-            "--baseDN",                   // 2
-            Constants.DEFAULT_ROOT_SUFFIX,  // 3 Placeholder
-            "--adminUID",                 // 4
-            "admin",                      // 5
-            "--adminPassword",            // 6
-            "xxxxxxxx",                   // 7
-            "--hostSource",               // 8
-            "localhost",                  // 9
-            "--portSource",               // 10
-            "50389",                      // 11
-            "--hostDestination",          // 12
-            "localhost",                  // 13
-            "--portDestination",          // 14
-            "51389",                      // 15
-            "--trustAll",                 // 16
-            "--configFile",               // 17
-            "path/to/config.ldif"         // 18
+     * Syncs replication data between two opends sms and user stores.
+     * $ dsreplication initialize
+     * --baseDN "dc=example,dc=com" --adminUID admin --adminPassword pass
+     * --hostSource host1 --portSource 1389
+     * --hostDestination host2 --portDestination 2389
+     * --trustAll
+     *
+     * @param map Map of properties collected by the configurator.
+     * @return status : 0 == success, !0 == failure
+     */
+    public static int setupReplicationInitialize(Map map) {
+        String[] initializeCmd = {
+                "initialize",                 // 0
+                "--no-prompt",                // 1
+                "--baseDN",                   // 2
+                Constants.DEFAULT_ROOT_SUFFIX,  // 3 Placeholder
+                "--adminUID",                 // 4
+                "admin",                      // 5
+                "--adminPassword",            // 6
+                "xxxxxxxx",                   // 7
+                "--hostSource",               // 8
+                "localhost",                  // 9
+                "--portSource",               // 10
+                "50389",                      // 11
+                "--hostDestination",          // 12
+                "localhost",                  // 13
+                "--portDestination",          // 14
+                "51389",                      // 15
+                "--trustAll",                 // 16
+                "--configFile",               // 17
+                "path/to/config.ldif"         // 18
         };
-        initializeCmd[3] = (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
-        initializeCmd[9] = (String)map.get(SetupConstants.DS_EMB_REPL_HOST2);
-        initializeCmd[11] = (String)map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
+        initializeCmd[3] = (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
+        initializeCmd[9] = (String) map.get(SetupConstants.DS_EMB_REPL_HOST2);
+        initializeCmd[11] = (String) map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
         initializeCmd[13] = getOpenDJHostName(map);
-        initializeCmd[15] = (String)map.get(
-            SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
+        initializeCmd[15] = (String) map.get(
+                SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
         initializeCmd[18] = getOpenDJConfigFile(map);
 
         Object[] params = {concat(initializeCmd)};
         SetupProgress.reportStart("emb.replcommand", params);
 
-        initializeCmd[7] =(String)map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
+        initializeCmd[7] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
         int ret = ReplicationCliMain.mainCLI(initializeCmd, false,
-            SetupProgress.getOutputStream(), SetupProgress.getOutputStream(),
-            null);
+                SetupProgress.getOutputStream(), SetupProgress.getOutputStream(),
+                null);
 
         if (ret == 0) {
             SetupProgress.reportEnd("emb.success", null);
@@ -825,98 +806,99 @@ public class EmbeddedOpenDS {
     /**
      * Returns Replication Status by invoking opends <code>dsreplication</code>
      * CLI
-     * @param port LDAP port number of embedded opends
+     *
+     * @param port   LDAP port number of embedded opends
      * @param passwd Directory Manager password
-     * @param oo Standard output
-     * @param err : Standard error
+     * @param oo     Standard output
+     * @param err    : Standard error
      * @return <code>dsreplication</code> CLI exit code.
      */
     public static int getReplicationStatus(String port, String passwd,
-                OutputStream oo, OutputStream err)
-    {
+                                           OutputStream oo, OutputStream err) {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
 
-        String[] statusCmd= {
-                              "status","--no-prompt",
-                              "-h",  "localhost",
-                              "-p",  port,
-                              "--adminUID", "admin",
-                              "--adminPassword",  passwd,
-                              "-s",
-                              "--configFile",
-                              baseDir + "/opends/config/config.ldif"
-                            };
+        String[] statusCmd = {
+                "status", "--no-prompt",
+                "-h", "localhost",
+                "-p", port,
+                "--adminUID", "admin",
+                "--adminPassword", passwd,
+                "-s",
+                "--configFile",
+                baseDir + "/opends/config/config.ldif"
+        };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(statusCmd).replaceAll(passwd, "****");
             debug.message("EmbeddedOpenDS:getReplicationStatus:exec dsreplication :"
-                             +dbgcmd);
+                    + dbgcmd);
         }
         int ret = ReplicationCliMain.mainCLI(statusCmd, false, oo, err, null);
         if (debug.messageEnabled()) {
             debug.message("EmbeddedOpenDS:getReplicationStatus:dsreplication ret:"
-                           +ret);
+                    + ret);
         }
         return ret;
     }
 
     /**
-      * @return true if multi server option is selected in the configurator.
-      */
-    public static boolean isMultiServer(Map map)
-    {
+     * @return true if multi server option is selected in the configurator.
+     */
+    public static boolean isMultiServer(Map map) {
         String replFlag = (String) map.get(SetupConstants.DS_EMB_REPL_FLAG);
         if (replFlag != null && replFlag.startsWith(
-              SetupConstants.DS_EMP_REPL_FLAG_VAL)) {
+                SetupConstants.DS_EMP_REPL_FLAG_VAL)) {
             return true;
         }
         return false;
     }
 
-    private static String concat(String[] args)
-    {
+    private static String concat(String[] args) {
         String ret = "";
         for (int i = 0; i < args.length; i++)
-           ret += args[i]+" ";
+            ret += args[i] + " ";
 
         return ret;
     }
 
     /**
-     *  Utility function to preload data in the embedded instance.
-     *  Must be called when the directory instance is shutdown.
+     * Utility function to preload data in the embedded instance.
+     * Must be called when the directory instance is shutdown.
      *
-     *  @param odsRoot Local directory where <code>OpenDS</code> is installed.
-     *  @param ldif Full path of the ldif file to be loaded.
-     *
+     * @param odsRoot Local directory where <code>OpenDS</code> is installed.
+     * @param ldif    Full path of the ldif file to be loaded.
      */
-    public static int loadLDIF(Map map, String odsRoot, String ldif)
-    {
+    public static int loadLDIF(Map map, String odsRoot, String ldif) {
         int ret = 0;
 
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
+        File ldifFile = new File(ldif);
+        if (!ldifFile.exists()) {
+            debug.error("LDIF File:" + ldifFile.getAbsolutePath() + " does not exist, unable to load!");
+            return -1;
+        }
         try {
             if (debug.messageEnabled()) {
                 debug.message("EmbeddedOpenDS:loadLDIF(" + ldif + ")");
             }
 
             String[] args1 =
-            {
-                "-C",                                               // 0
-                "org.opends.server.extensions.ConfigFileHandler",   // 1
-                "-f",                                               // 2
-                odsRoot + "/config/config.ldif",                    // 3
-                "-n",                                               // 4
-                "userRoot",                                         // 5
-                "-l",                                               // 6
-                ldif,                                               // 7
-                "-Q",                                               // 8
-                "--trustAll",                                       // 9
-                "-D",                                               // 10
-                "cn=Directory Manager",                             // 11
-                "-w",                                               // 12
-                "password"                                          // 13
-            };
+                    {
+                            "-C",                                               // 0
+                            "org.opends.server.extensions.ConfigFileHandler",   // 1
+                            "-f",                                               // 2
+                            odsRoot + "/config/config.ldif",                    // 3
+                            "-n",                                               // 4
+                            "userRoot",                                         // 5
+                            "-l",                                               // 6
+                            ldif,                                               // 7
+                            "-Q",                                               // 8
+                            "--trustAll",                                       // 9
+                            "-D",                                               // 10
+                            "cn=Directory Manager",                             // 11
+                            "-w",                                               // 12
+                            "password"                                          // 13
+                    };
             args1[11] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
             args1[13] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
             ret = org.opends.server.tools.ImportLDIF.mainImportLDIF(args1, false,
@@ -926,58 +908,58 @@ public class EmbeddedOpenDS {
                 debug.message("EmbeddedOpenDS:loadLDIF Success");
             }
         } catch (Exception ex) {
-              debug.error("EmbeddedOpenDS:loadLDIF:ex=", ex);
+            debug.error("EmbeddedOpenDS:loadLDIF:ex=", ex);
         }
 
         return ret;
     }
 
     /**
-      * Returns a one-way hash for passwd using SSHA512 scheme.
-      *
-      * @param p Clear password string
-      * @return hash value
-      */
-    public static String hash(String p)
-    {
+     * Returns a one-way hash for passwd using SSHA512 scheme.
+     *
+     * @param p Clear password string
+     * @return hash value
+     */
+    public static String hash(String p) {
         String str = null;
         try {
             byte[] bb = p.getBytes();
             str = SaltedSHA512PasswordStorageScheme.encodeOffline(bb);
         } catch (Exception ex) {
             Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
-            debug.error("EmbeddedOpenDS.hash failed : ex="+ex);
+            debug.error("EmbeddedOpenDS.hash failed : ex=" + ex);
         }
         return str;
     }
 
     /**
-     *  Get replication port
-     *  @param username
-     *  @param password
-     *  @param hostname
-     *  @param port
-     *  @return port number if replication is setup, null if not or on error.
+     * Get replication port
+     *
+     * @param username
+     * @param password
+     * @param hostname
+     * @param port
+     * @return port number if replication is setup, null if not or on error.
      */
     public static String getReplicationPort(
-        String username,
-        String password,
-        String hostname,
-        String port
+            String username,
+            String password,
+            String hostname,
+            String port
     ) {
         final String replDN =
-           "cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config";
-        final String[] attrs = { "ds-cfg-replication-port" };
+                "cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config";
+        final String[] attrs = {"ds-cfg-replication-port"};
         String replPort = null;
         LDAPConnection ld = null;
         try {
             // We'll use Directory Manager
             username = "cn=Directory Manager";
             LDAPConnection lc = getLDAPConnection(
-                hostname,
-                port,
-                username,
-                password
+                    hostname,
+                    port,
+                    username,
+                    password
             );
             if (lc != null) {
                 LDAPEntry le = lc.read(replDN, attrs);
@@ -986,14 +968,14 @@ public class EmbeddedOpenDS {
                     if (la != null) {
                         Enumeration en = la.getStringValues();
                         if (en != null && en.hasMoreElements()) {
-                             replPort = (String) en.nextElement();
+                            replPort = (String) en.nextElement();
                         }
                     }
                 }
             }
         } catch (Exception ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-            "EmbeddedOpenDS.getReplicationPort(). Error getting replication port:", ex);
+                    "EmbeddedOpenDS.getReplicationPort(). Error getting replication port:", ex);
 
         } finally {
             disconnectDServer(ld);
@@ -1003,31 +985,31 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     *  Get admin port of the OpenDS server
+     * Get admin port of the OpenDS server
      *
      * @param username The username of the directory admin
      * @param password The password of the directory admin
      * @param hostname The hostname of the directory server
-     * @param port The port of the directory server
+     * @param port     The port of the directory server
      * @return The admin port
      */
     public static String getAdminPort(
-        String username,
-        String password,
-        String hostname,
-        String port
+            String username,
+            String password,
+            String hostname,
+            String port
     ) {
         final String adminConnectorDN = "cn=Administration Connector,cn=config";
-        final String[] attrs = { "ds-cfg-listen-port" };
+        final String[] attrs = {"ds-cfg-listen-port"};
         String adminPort = null;
         LDAPConnection ld = null;
 
         try {
             LDAPConnection lc = getLDAPConnection(
-                hostname,
-                port,
-                username,
-                password
+                    hostname,
+                    port,
+                    username,
+                    password
             );
 
             if (lc != null) {
@@ -1040,14 +1022,14 @@ public class EmbeddedOpenDS {
                         Enumeration en = la.getStringValues();
 
                         if (en != null && en.hasMoreElements()) {
-                             adminPort = (String) en.nextElement();
+                            adminPort = (String) en.nextElement();
                         }
                     }
                 }
             }
         } catch (Exception ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "EmbeddedOpenDS.getAdminPort(). Error getting admin port:", ex);
+                    "EmbeddedOpenDS.getAdminPort(). Error getting admin port:", ex);
         } finally {
             disconnectDServer(ld);
         }
@@ -1059,24 +1041,23 @@ public class EmbeddedOpenDS {
      * Synchronizes replication server info with current list of opensso servers.
      */
     public static boolean syncReplicatedServers(
-                          Set currServerSet, String port, String passwd)
-    {
+            Set currServerSet, String port, String passwd) {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         debug.message("EmbeddedOPenDS:syncReplication:start processing.");
         String[] args = {
-            "-p", port,      // 1 : ds port num
-            "-h", "localhost",
-            "-D",  "cn=directory manager",
-            "-w", passwd,    // 7 : password
-            "list-replication-server",
-            "--provider-name", "Multimaster Synchronization",
-            "--property", "replication-server",
-            "--property", "replication-port","--no-prompt", "--trustAll"
+                "-p", port,      // 1 : ds port num
+                "-h", "localhost",
+                "-D", "cn=directory manager",
+                "-w", passwd,    // 7 : password
+                "list-replication-server",
+                "--provider-name", "Multimaster Synchronization",
+                "--property", "replication-server",
+                "--property", "replication-port", "--no-prompt", "--trustAll"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(args).replaceAll(passwd, "****");
             debug.message("EmbeddedOpenDS:syncReplication:exec dsconfig:"
-                             +dbgcmd);
+                    + dbgcmd);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteArrayOutputStream boe = new ByteArrayOutputStream();
@@ -1086,12 +1067,12 @@ public class EmbeddedOpenDS {
         if (stre.length() > 0 &&
                 !stre.contains("Unable to continue since there are no Replication Server currently")) {
             debug.error("EmbeddedOpenDS:syncReplication: stderr is not empty:"
-                           + stre);
+                    + stre);
             return false;
         } else {
             if (debug.messageEnabled()) {
                 debug.message("EmbeddedOpenDS:syncReplication: stderr is not empty:"
-                           + stre);
+                        + stre);
             }
         }
 
@@ -1102,16 +1083,16 @@ public class EmbeddedOpenDS {
             line = brd.readLine(); // 2nd line
             line = brd.readLine(); // 3rd line
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
+            debug.error("EmbeddedOpenDS:syncReplication:Failed:", ex);
         }
-        if (line == null)  {
-            debug.error("EmbeddedOpenDS:syncReplication:cmd failed"+str);
+        if (line == null) {
+            debug.error("EmbeddedOpenDS:syncReplication:cmd failed" + str);
             return false;
         }
         try {
-            int lastcolon= line.lastIndexOf(':');
-            int stcolon = line.indexOf(':', line.indexOf(':')+1);
-            String replservers = line.substring(stcolon+1, lastcolon);
+            int lastcolon = line.lastIndexOf(':');
+            int stcolon = line.indexOf(':', line.indexOf(':') + 1);
+            String replservers = line.substring(stcolon + 1, lastcolon);
 
             StringTokenizer stok = new StringTokenizer(replservers, ",");
             // Check if this server is part of server list
@@ -1135,17 +1116,17 @@ public class EmbeddedOpenDS {
                 String tok = stok.nextToken().trim();
                 if (!currServerSet.contains(tok)) {
                     cmdlist.add("--remove");
-                    cmdlist.add("replication-server:"+tok);
+                    cmdlist.add("replication-server:" + tok);
                     numremoved++;
                 }
             }
             if (numremoved > 0) {
                 String[] args1 =
-                    (String[]) cmdlist.toArray(new String[cmdlist.size()]);
+                        (String[]) cmdlist.toArray(new String[cmdlist.size()]);
                 if (debug.messageEnabled()) {
                     String dbgcmd1 = concat(args1).replaceAll(passwd, "****");
-                    debug.message("EmbeddedOpenDS:syncReplication:Execute:"+
-                             dbgcmd1);
+                    debug.message("EmbeddedOpenDS:syncReplication:Execute:" +
+                            dbgcmd1);
                 }
                 bos = new ByteArrayOutputStream();
                 boe = new ByteArrayOutputStream();
@@ -1153,43 +1134,43 @@ public class EmbeddedOpenDS {
                 str = bos.toString();
                 stre = boe.toString();
                 if (debug.messageEnabled()) {
-                    debug.message("EmbeddedOpenDS:syncReplication:Result:"+
-                         str);
+                    debug.message("EmbeddedOpenDS:syncReplication:Result:" +
+                            str);
                 }
                 if (stre.length() != 0) {
-                        debug.error("EmbeddedOpenDS:syncReplication:cmd stderr:"
-                                     +stre);
-                    }
+                    debug.error("EmbeddedOpenDS:syncReplication:cmd stderr:"
+                            + stre);
                 }
+            }
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
+            debug.error("EmbeddedOpenDS:syncReplication:Failed:", ex);
             return false;
         }
         return true;
     }
+
     /**
      * Synchronizes replication domain info with current list of opensso servers.
      */
     public static boolean syncReplicatedDomains(
-                          Set currServerSet, String port, String passwd)
-    {
+            Set currServerSet, String port, String passwd) {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         debug.message("EmbeddedOpenDS:syncReplication:Domains:started");
         String[] args = {
-            "-p", port,      // 1 : ds port num
-            "-h", "localhost",
-            "-D",  "cn=directory manager",
-            "-w", passwd,    // 7 : password
-            "list-replication-domains",
-            "--provider-name", "Multimaster Synchronization",
-            "--property", "replication-server",
-            "--no-prompt",
-            "--trustAll"
+                "-p", port,      // 1 : ds port num
+                "-h", "localhost",
+                "-D", "cn=directory manager",
+                "-w", passwd,    // 7 : password
+                "list-replication-domains",
+                "--provider-name", "Multimaster Synchronization",
+                "--property", "replication-server",
+                "--no-prompt",
+                "--trustAll"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(args).replaceAll(passwd, "****");
             debug.message("EmbeddedOpenDS:syncReplication:exec dsconfig:"
-                             +dbgcmd);
+                    + dbgcmd);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteArrayOutputStream boe = new ByteArrayOutputStream();
@@ -1197,7 +1178,7 @@ public class EmbeddedOpenDS {
         String str = bos.toString();
         String stre = boe.toString();
         if (stre.length() != 0) {
-            debug.error("EmbeddedOpenDS:syncReplication:stderr:"+stre);
+            debug.error("EmbeddedOpenDS:syncReplication:stderr:" + stre);
         }
         BufferedReader brd = new BufferedReader(new StringReader(str));
         String line = null;
@@ -1208,11 +1189,11 @@ public class EmbeddedOpenDS {
                 try {
                     int dcolon = line.indexOf(':');
                     String domainname = line.substring(0, dcolon).trim();
-                    int stcolon = line.indexOf(':', dcolon+1);
-                    String replservers = line.substring(stcolon+1);
+                    int stcolon = line.indexOf(':', dcolon + 1);
+                    String replservers = line.substring(stcolon + 1);
                     if (debug.messageEnabled()) {
-                        debug.message("EmbeddedOpenDS:syncRepl:domain="+
-                                      domainname+" replservers="+replservers);
+                        debug.message("EmbeddedOpenDS:syncRepl:domain=" +
+                                domainname + " replservers=" + replservers);
                     }
 
                     StringTokenizer stok = new StringTokenizer(replservers, ",");
@@ -1239,18 +1220,18 @@ public class EmbeddedOpenDS {
                         String tok = stok.nextToken().trim();
                         if (!currServerSet.contains(tok)) {
                             cmdlist.add("--remove");
-                            cmdlist.add("replication-server:"+tok);
+                            cmdlist.add("replication-server:" + tok);
                             numremoved++;
                         }
                     }
                     if (numremoved > 0) {
                         String[] args1 =
-                            (String[]) cmdlist.toArray(new String[cmdlist.size()]);
+                                (String[]) cmdlist.toArray(new String[cmdlist.size()]);
                         if (debug.messageEnabled()) {
                             String dbgcmd1 =
-                                concat(args1).replaceAll(passwd, "****");
-                            debug.message("EmbeddedOpenDS:syncReplication:Execute:"+
-                                     dbgcmd1);
+                                    concat(args1).replaceAll(passwd, "****");
+                            debug.message("EmbeddedOpenDS:syncReplication:Execute:" +
+                                    dbgcmd1);
                         }
                         bos = new ByteArrayOutputStream();
                         boe = new ByteArrayOutputStream();
@@ -1258,39 +1239,39 @@ public class EmbeddedOpenDS {
                         str = bos.toString();
                         stre = boe.toString();
                         if (stre.length() != 0) {
-                            debug.error("EmbeddedOpenDS:syncRepl:stderr="+stre);
+                            debug.error("EmbeddedOpenDS:syncRepl:stderr=" + stre);
                         }
                         if (debug.messageEnabled()) {
-                          debug.message("EmbeddedOpenDS:syncReplication:Result:"+
-                                 str);
+                            debug.message("EmbeddedOpenDS:syncReplication:Result:" +
+                                    str);
                         }
                     }
                 } catch (Exception ex) {
-                    debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
+                    debug.error("EmbeddedOpenDS:syncReplication:Failed:", ex);
                     return false;
                 }
             }
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS:syncReplication:Failed:",ex);
+            debug.error("EmbeddedOpenDS:syncReplication:Failed:", ex);
             return false;
         }
         return true;
     }
+
     /**
      * Synchronizes replication domain info with current list of opensso servers.
      */
     public static boolean syncReplicatedServerList(
-                          Set currServerSet, String port, String passwd)
-    {
+            Set currServerSet, String port, String passwd) {
         LDAPConnection lc = null;
         try {
             lc = getLDAPConnection(
-                "localhost",
-                port,
-                "cn=Directory Manager",
-                passwd
+                    "localhost",
+                    port,
+                    "cn=Directory Manager",
+                    passwd
             );
-            Set dsServers =  getServerSet(lc);
+            Set dsServers = getServerSet(lc);
 
             if (dsServers == null)
                 return false;
@@ -1307,16 +1288,18 @@ public class EmbeddedOpenDS {
         }
         return true;
     }
+
     /**
      * Helper method to return Ldap connection to a embedded opends
      * server.
+     *
      * @return Ldap connection
      */
     private static LDAPConnection getLDAPConnection(
-        String dsHostName,
-        String dsPort,
-        String dsManager,
-        String dsAdminPwd
+            String dsHostName,
+            String dsPort,
+            String dsManager,
+            String dsAdminPwd
     ) {
         LDAPConnection ld = null;
         try {
@@ -1326,7 +1309,7 @@ public class EmbeddedOpenDS {
             ld.connect(3, dsHostName, dsPortInt, dsManager, dsAdminPwd);
         } catch (LDAPException ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "EmbeddedOpenDS.setup(). Error getting LDAPConnection:", ex);
+                    "EmbeddedOpenDS.setup(). Error getting LDAPConnection:", ex);
         }
         return ld;
     }
@@ -1342,22 +1325,24 @@ public class EmbeddedOpenDS {
             }
         }
     }
+
     static final String replDN =
             "cn=all-servers,cn=Server Groups,cn=admin data";
+
     /**
-     *  Removes host:port from opends replication
+     * Removes host:port from opends replication
      */
     public static void delOpenDSServer(
-        LDAPConnection lc,
-        String delServer
+            LDAPConnection lc,
+            String delServer
     ) {
         String replServerDN =
-           "cn="+delServer+",cn=Servers,cn=admin data";
-        final String[] attrs = { "ds-cfg-key-id" };
+                "cn=" + delServer + ",cn=Servers,cn=admin data";
+        final String[] attrs = {"ds-cfg-key-id"};
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         if (lc == null) {
-            debug.error("EmbeddedOpenDS:syncOpenDSServer():"+
-                        "Could not connect to local opends instance."+replServerDN);
+            debug.error("EmbeddedOpenDS:syncOpenDSServer():" +
+                    "Could not connect to local opends instance." + replServerDN);
             return;
         }
         String trustKey = null;
@@ -1368,47 +1353,48 @@ public class EmbeddedOpenDS {
                 if (la != null) {
                     Enumeration en = la.getStringValues();
                     if (en != null && en.hasMoreElements()) {
-                         trustKey = (String) en.nextElement();
+                        trustKey = (String) en.nextElement();
                     }
                 }
-                String keyDN = "ds-cfg-key-id="+trustKey+
-                       ",cn=instance keys,cn=admin data";
+                String keyDN = "ds-cfg-key-id=" + trustKey +
+                        ",cn=instance keys,cn=admin data";
                 lc.delete(keyDN);
             } else {
-                debug.error("EmbeddedOpenDS:syncOpenDSServer():"+
-                            "Could not find trustkey for:"+replServerDN);
+                debug.error("EmbeddedOpenDS:syncOpenDSServer():" +
+                        "Could not find trustkey for:" + replServerDN);
             }
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
-                        " Error getting replication key:", ex);
+            debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
+                    " Error getting replication key:", ex);
 
         }
         try {
             lc.delete(replServerDN);
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
-                        " Error getting deleting server entrt:"+replServerDN, ex);
+            debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
+                    " Error getting deleting server entrt:" + replServerDN, ex);
 
         }
         try {
             LDAPAttribute attr = new LDAPAttribute(
-                                    "uniqueMember", "cn="+ delServer);
+                    "uniqueMember", "cn=" + delServer);
             LDAPModification mod = new LDAPModification(
-                                   LDAPModification.DELETE, attr);
+                    LDAPModification.DELETE, attr);
             lc.modify(replDN, mod);
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
-                        " Error getting removing :"+replDN, ex);
+            debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
+                    " Error getting removing :" + replDN, ex);
 
         }
     }
+
     /**
-     *  Gets list of replicated servers from local opends directory.
+     * Gets list of replicated servers from local opends directory.
      */
     public static Set getServerSet(
-        LDAPConnection lc
+            LDAPConnection lc
     ) {
-        final String[] attrs = { "uniqueMember" };
+        final String[] attrs = {"uniqueMember"};
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         try {
             if (lc != null) {
@@ -1419,23 +1405,23 @@ public class EmbeddedOpenDS {
                     if (la != null) {
                         Enumeration en = la.getStringValues();
                         while (en != null && en.hasMoreElements()) {
-                             String val=(String) en.nextElement();
-                             // strip "cn="
-                             hostSet.add(val.substring(3, val.length()));
+                            String val = (String) en.nextElement();
+                            // strip "cn="
+                            hostSet.add(val.substring(3, val.length()));
                         }
                     }
                     return hostSet;
                 } else {
-                    debug.error("EmbeddedOpenDS:syncOpenDSServer():"+
-                                "Could not find trustkey for:"+replDN);
+                    debug.error("EmbeddedOpenDS:syncOpenDSServer():" +
+                            "Could not find trustkey for:" + replDN);
                 }
             } else {
-                debug.error("EmbeddedOpenDS:syncOpenDSServer():"+
-                            "Could not connect to local opends instance.");
+                debug.error("EmbeddedOpenDS:syncOpenDSServer():" +
+                        "Could not connect to local opends instance.");
             }
         } catch (Exception ex) {
-            debug.error("EmbeddedOpenDS.syncOpenDSServer()."+
-                        " Error getting replication key:", ex);
+            debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
+                    " Error getting replication key:", ex);
 
         }
         return null;
@@ -1450,20 +1436,26 @@ public class EmbeddedOpenDS {
         shutdownServer("Rebuild index");
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         String[] args = {
-            "--configClass",
-            "org.opends.server.extensions.ConfigFileHandler",
-            "--configFile",
-            getOpenDJConfigFile(map),
-            "--baseDN",
-            (String)map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
-            "--index",
-            "sunxmlkeyvalue",
-            "--index",
-            "memberof",
-            "--index",
-            "iplanet-am-user-federation-info-key",
-            "--index",
-            "sun-fm-saml2-nameid-infokey"};
+                "--configClass",
+                "org.opends.server.extensions.ConfigFileHandler",
+                "--configFile",
+                getOpenDJConfigFile(map),
+                "--baseDN",
+                (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
+                "--index",
+                "sunxmlkeyvalue",
+                "--index",
+                "memberof",
+                "--index",
+                "iplanet-am-user-federation-info-key",
+                "--index",
+                "sun-fm-saml2-nameid-infokey",
+                "--index",
+                "pkey",
+                "--index",
+                "skey",
+                "--index",
+                "expirationDate"};
         OutputStream bos = new ByteArrayOutputStream();
         OutputStream boe = new ByteArrayOutputStream();
         TimeThread.start();
@@ -1473,25 +1465,25 @@ public class EmbeddedOpenDS {
         String errStr = boe.toString();
         if (errStr.length() != 0) {
             debug.error("EmbeddedOpenDS:rebuildIndex:stderr=" +
-                errStr);
+                    errStr);
         }
         if (debug.messageEnabled()) {
             String msg = "msg=Rebuild complete.";
             int idx = outStr.indexOf(msg);
             if (idx >= 0) {
-                debug.message("EmbeddedOpenDS:rebuildIndex: "+
-                    "Rebuild Status: "+ outStr.substring(idx));
+                debug.message("EmbeddedOpenDS:rebuildIndex: " +
+                        "Rebuild Status: " + outStr.substring(idx));
             }
             debug.message("EmbeddedOpenDS:rebuildIndex:Result:" +
-                outStr);
+                    outStr);
         }
         startServer(getOpenDJBaseDir(map));
         return ret;
     }
 
     /**
-      * @return true if installed OpenDS is version 1.0.2
-      */
+     * @return true if installed OpenDS is version 1.0.2
+     */
     public static boolean isOpenDSVer1Installed() {
         boolean openDSVer1x = false;
 
@@ -1503,8 +1495,8 @@ public class EmbeddedOpenDS {
     }
 
     /**
-      * @return true if installed OpenDS is version 2.3.0BACKPORT2
-      */
+     * @return true if installed OpenDS is version 2.3.0BACKPORT2
+     */
     public static boolean isOpenDSVer230Installed() {
         boolean openDSVer230b2 = false;
 
@@ -1558,7 +1550,7 @@ public class EmbeddedOpenDS {
     // Returns the installation directory for the embedded OpenDJ.
     private static String getOpenDJBaseDir(Map configProperties) {
         String basedir = (String) configProperties
-          .get(SetupConstants.CONFIG_VAR_BASE_DIR);
+                .get(SetupConstants.CONFIG_VAR_BASE_DIR);
         return basedir + "/" + SetupConstants.SMS_OPENDS_DATASTORE;
     }
 
@@ -1570,12 +1562,12 @@ public class EmbeddedOpenDS {
 
     // Returns the host name for the embedded OpenDJ.
     private static String getOpenDJHostName(Map configProperties) {
-      String dirHost = (String) configProperties
-          .get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST);
-      if (dirHost.equals("localhost")) {
-        dirHost = (String) configProperties
-            .get(SetupConstants.CONFIG_VAR_SERVER_HOST);
-}
-      return dirHost;
+        String dirHost = (String) configProperties
+                .get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST);
+        if (dirHost.equals("localhost")) {
+            dirHost = (String) configProperties
+                    .get(SetupConstants.CONFIG_VAR_SERVER_HOST);
+        }
+        return dirHost;
     }
 }

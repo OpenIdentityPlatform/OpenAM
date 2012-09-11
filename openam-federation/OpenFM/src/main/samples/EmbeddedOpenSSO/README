@@ -92,9 +92,7 @@ Deployed
      DIRECTORY_SSL=SIMPLE
      DIRECTORY_SERVER=localhost
      DIRECTORY_PORT=50389
-     ROOT_SUFFIX=dc=openam,dc=java,dc=net
-     SESSION_ROOT_DN=dc=internal,dc=openam,dc=java,dc=net
-     SESSION_STORE_TYPE=None
+     ROOT_SUFFIX=dc=openam,dc=forgerock.dc=org
      DS_DIRMGRDN=cn=Directory Manager
      DS_DIRMGRPASSWD=11111111
 

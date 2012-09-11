@@ -1,0 +1,19 @@
+dn: ds-cfg-attribute=pkey,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: pkey
+ds-cfg-index-type: equality
+ds-cfg-index-type: presence
+
+dn: ds-cfg-attribute=skey,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: skey
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=expirationDate,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: expirationDate
+ds-cfg-index-type: equality
+ds-cfg-index-type: presence

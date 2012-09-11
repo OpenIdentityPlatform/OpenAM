@@ -64,10 +64,6 @@ public class Step3 extends LDAPStoreWizardPage {
         new ActionLink("validateSMHost", this, "validateSMHost");
     public ActionLink validateRootSuffixLink = 
         new ActionLink("validateRootSuffix", this, "validateRootSuffix");
-    public ActionLink validateSessionRootDNLink =
-            new ActionLink("validateSessionRootDN", this, "validateSessionRootDN");
-    public ActionLink setSessionStoreType =
-            new ActionLink("setSessionStoreType", this, "setSessionStoreType");
     public ActionLink setReplicationLink =
         new ActionLink("setReplication", this, "setReplication");
     public ActionLink validateHostNameLink = 
@@ -95,15 +91,6 @@ public class Step3 extends LDAPStoreWizardPage {
     public void onInit() {
         String val = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         addModel("rootSuffix", val);
-
-        val = getAttribute("sessionRootDN", Wizard.defaultSessionRootDN);
-        addModel("sessionRootDN", val);
-
-        val = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, Wizard.defaultSessionStoreType);
-        addModel(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, val);
-
-        val = getAttribute(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, Wizard.defaultSessionRootDN);
-        addModel(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, val);
 
         val = getAttribute("encryptionKey", AMSetupServlet.getRandomString());
         addModel("encryptionKey", val);
@@ -201,11 +188,26 @@ public class Step3 extends LDAPStoreWizardPage {
 
     public boolean validateRootSuffix() {
         String rootsuffix = toString("rootSuffix");
-        
         if ((rootsuffix == null) || (rootsuffix.trim().length() == 0)) {
             writeToResponse(getLocalizedString("missing.required.field"));
+        }
+        // Determine if we have the minimal number of high order naming attributes.
+        String[] containers = rootsuffix.split(Constants.COMMA);
+        int namedDomainContainers = 0;
+        int namedOrganizationContainers = 0;
+        for(String container : containers)
+        {
+            if (container.startsWith(Constants.DEFAULT_ROOT_NAMING_ATTRIBUTE+Constants.EQUALS))
+                { namedDomainContainers++; }
+            else if (container.startsWith(Constants.ORGANIZATION_NAMING_ATTRIBUTE+Constants.EQUALS))
+                { namedOrganizationContainers++; }
+        }
+        if ((namedDomainContainers+namedOrganizationContainers) <= 1) {
+            writeToResponse(getLocalizedString("invalid.naming.suffix"));
         } else if (!DN.isDN(rootsuffix)) {
             writeToResponse(getLocalizedString("invalid.dn"));
+        } else if (!rootsuffix.startsWith(Constants.DEFAULT_ROOT_NAMING_ATTRIBUTE+Constants.EQUALS)) {
+                writeToResponse(getLocalizedString("invalid.naming.attribute"));
         } else {
             writeToResponse("true");
             getContext().setSessionAttribute(
@@ -213,37 +215,6 @@ public class Step3 extends LDAPStoreWizardPage {
         }
         setPath(null);
         return false;    
-    }
-
-    public boolean validateSessionRootDN() {
-        String sessionRootDN = toString(SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN);
-
-        if ((sessionRootDN == null) || (sessionRootDN.trim().length() == 0)) {
-            writeToResponse(getLocalizedString("missing.required.field"));
-        } else if (!DN.isDN(sessionRootDN)) {
-            writeToResponse(getLocalizedString("invalid.dn"));
-        } else {
-            writeToResponse("true");
-            getContext().setSessionAttribute(
-                    SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, sessionRootDN);
-        }
-        setPath(null);
-        return false;
-    }
-
-    public boolean setSessionStoreType() {
-        String sessionStoreType = toString(SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE);
-        writeToResponse("true"); // Accept whatever has been specified...
-        if ((sessionStoreType == null) || (sessionStoreType.trim().length() == 0)) {
-            getContext().setSessionAttribute(
-                    SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE,
-                        Constants.DEFAULT_SESSION_HA_STORE_TYPE);
-        } else {
-            getContext().setSessionAttribute(
-                    SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, sessionStoreType);
-        }
-        setPath(null);
-        return false;
     }
     
     public boolean validateLocalPort() {
@@ -440,8 +411,8 @@ public class Step3 extends LDAPStoreWizardPage {
    
    
     /*
-     * a call is made to the OpenSSO url entered in the browser. If
-     * the OpenSSO server
+     * a call is made to the OpenAM url entered in the browser. If
+     * the OpenAM server
      * exists a <code>Map</code> of data will be returned which contains the
      * information about the existing servers data store, including any 
      * replication ports if its embedded.
@@ -462,7 +433,7 @@ public class Step3 extends LDAPStoreWizardPage {
             addObject(sb, "message",
                 getLocalizedString("missing.required.field"));
         } else {
-            // try to retrieve the remote OpenSSO information
+            // try to retrieve the remote OpenAM information
             String admin = "amadmin";
             String password = (String)getContext().getSessionAttribute(
                 SessionAttributeNames.CONFIG_VAR_ADMIN_PWD);
@@ -472,7 +443,7 @@ public class Step3 extends LDAPStoreWizardPage {
                 Map data = AMSetupServlet.getRemoteServerInfo(
                     hostName, admin, password);
                 
-                // data returned from existing OpenSSO server
+                // data returned from existing OpenAM server
                 if (data != null && !data.isEmpty()) {                    
                     addObject(sb, "code", "100");
                     addObject(sb, "message", getLocalizedString("ok.string"));
@@ -631,14 +602,6 @@ public class Step3 extends LDAPStoreWizardPage {
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX, tmp);
 
-        tmp = (String)data.get(Constants.DEFAULT_SESSION_HA_ROOT_DN);
-        getContext().setSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN, tmp);
-
-        tmp = (String)data.get(Constants.DEFAULT_SESSION_HA_STORE_TYPE);
-        getContext().setSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE, tmp);
-        
         tmp = (String)data.get(BootstrapData.DS_MGR);
         getContext().setSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_LOGIN_ID, tmp);
@@ -676,10 +639,6 @@ public class Step3 extends LDAPStoreWizardPage {
             SessionAttributeNames.CONFIG_STORE_LOGIN_ID);
         String rootSuffix = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_ROOT_SUFFIX);
-        String sessionStoreType = (String)ctx.getSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_STORE_TYPE);
-        String sessionRootDN = (String)ctx.getSessionAttribute(
-                SessionAttributeNames.CONFIG_STORE_SESSION_ROOT_DN);
         String bindPwd = (String)ctx.getSessionAttribute(
             SessionAttributeNames.CONFIG_STORE_PWD);
 
@@ -689,13 +648,7 @@ public class Step3 extends LDAPStoreWizardPage {
         if (rootSuffix == null) {
             rootSuffix = Constants.DEFAULT_ROOT_SUFFIX;
         }
-        if (sessionRootDN == null) {
-            sessionRootDN = Constants.DEFAULT_SESSION_HA_ROOT_DN;
-        }
-        if (sessionStoreType == null) {
-            sessionStoreType = Constants.DEFAULT_SESSION_HA_STORE_TYPE;
-        }
-        
+
         LDAPConnection ld = null;
         try {
             ld = (ssl) ? new LDAPConnection(

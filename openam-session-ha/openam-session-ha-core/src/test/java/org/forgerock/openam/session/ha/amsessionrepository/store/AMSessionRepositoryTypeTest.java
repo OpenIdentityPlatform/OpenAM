@@ -64,7 +64,7 @@ public class AMSessionRepositoryTypeTest {
     public void testGetAMSessionRepositoryTypes() throws Exception {
         Map<String,String> types = AMSessionRepositoryType.getAMSessionRepositoryTypes();
         assertNotNull(types, "Expected non-null Collection of AMSessionRepositoryType(s), very Bad!");
-        assertEquals(types.size(), 3, "Wrong number of AmSessionRepositoryTypeS");
+        assertEquals(types.size(), 4, "Wrong number of AmSessionRepositoryTypeS");
         for(Map.Entry<String,String> entry : types.entrySet())
         {
             System.out.println("key:["+entry.getKey()+"], Value:["+entry.getValue()+"]");
@@ -77,11 +77,11 @@ public class AMSessionRepositoryTypeTest {
     @Test
     public void testGetAMSessionRepositoryTypeText() throws Exception {
 
-        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.OPENDJ.type()),
-                AMSessionRepositoryType.OPENDJ.textDefinition());
+        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.embedded.type()),
+                AMSessionRepositoryType.embedded.textDefinition());
 
-        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.OPENDJ.displayType()),
-                AMSessionRepositoryType.OPENDJ.textDefinition());
+        assertEquals(AMSessionRepositoryType.getAMSessionRepositoryTypeText(AMSessionRepositoryType.embedded.displayType()),
+                AMSessionRepositoryType.embedded.textDefinition());
 
     }
 
@@ -91,10 +91,13 @@ public class AMSessionRepositoryTypeTest {
     @Test
     public void testGetAMSessionRepositoryTypeImplementationClass() throws Exception {
 
-        assertEquals(AMSessionRepositoryType.OPENDJ.amSessionRepositoryImplementationClass(),
+        assertEquals(AMSessionRepositoryType.embedded.amSessionRepositoryImplementationClass(),
                 OpenDJPersistentStore.class);
 
-        assertEquals(AMSessionRepositoryType.PLUGIN.amSessionRepositoryImplementationClass(),
+        assertEquals(AMSessionRepositoryType.external.amSessionRepositoryImplementationClass(),
+                OpenDJPersistentStore.class);
+
+        assertEquals(AMSessionRepositoryType.plugin.amSessionRepositoryImplementationClass(),
                 PlugInPersistentStore.class);
     }
 

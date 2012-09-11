@@ -62,6 +62,11 @@
               tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/amsessiondb_container.ldif"
               filtering="false"/>
 
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
+        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/opendj_amsessiondb_index.ldif"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/opendj_amsessiondb_index.ldif"
+              filtering="false"/>
+
         <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
             <fileset dir="${project.basedir}/binary">
                 <include name="opendj.zip"/>

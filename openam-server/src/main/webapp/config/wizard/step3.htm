@@ -9,9 +9,6 @@
     function configStoreBaseDNValidated( response ) {
         storeBaseDNValidated('$type', response );
     }
-    function configStoreSessionDNValidated( response ) {
-        storeSessionDNValidated('$type', response );
-    }
     function configStoreLoginIdValidated( response ) {
         storeLoginIdValidated( '$type', response );
     }
@@ -122,27 +119,6 @@
 	    field = "rootSuffix";
         var callUrl = "$context$path?actionLink=validateRootSuffix&ie7fix=" +
             ie7fix + "&rootSuffix=" +  escape($(field).value);
-        setTimeout("enableNextButton()", 500);
-        AjaxUtils.call(callUrl, fieldValidated);
-    }
-
-    function setSessionStoreType() {
-        $('nextTabButton').disabled = true;
-        field = "sessionStoreType";
-        var call = "$context$path?actionLink=setSessionStoreType";
-        var sessionStoreTypeVal = "&sessionStoreType=" + escape($(field).value);
-        ie7fix++;
-        call = call + "&ie7fix=" + ie7fix;
-        setTimeout("enableNextButton()", 500);
-        AjaxUtils.call(call+sessionStoreTypeVal, fieldValidated);
-    }
-
-    function validateSessionRootDN() {
-        $('nextTabButton').disabled = true;
-        ie7fix++;
-        field = "sessionRootDN";
-        var callUrl = "$context$path?actionLink=validateSessionRootDN&ie7fix=" +
-                ie7fix + "&sessionRootDN=" +  escape($(field).value);
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, fieldValidated);
     }
@@ -521,34 +497,6 @@
                                    onkeyup="APP.callDelayed(this, validateRootSuffix)"
                                    onchange="APP.callDelayed(this, validateRootSuffix)"/>
                             <span id="rootSuffixStatus"></span>                       
-                        </td>
-                    </tr>
-                    <!-- TODO Refactor this Field, to a simple CheckBox/Radio Button for Yes or No. -->
-                    <tr>
-                        <td><label for="sessionStoreType"><em>&nbsp;&nbsp;</em>
-                            $page.getLocalizedString("session.store.type.label")</label></td>
-                        <td>
-                            <select name="sessionStoreType" id="sessionStoreType" size="1"
-                                    onkeyup="APP.callDelayed(this, setSessionStoreType)"
-                                    onchange="APP.callDelayed(this, setSessionStoreType)">
-                                <option value="NONE">$page.getLocalizedString("session.store.type.none")</option>
-                                <option value="OpenDJ">$page.getLocalizedString("session.store.type.opendj")</option>
-                                <option value="PlugIn">$page.getLocalizedString("session.store.type.plugin")</option>
-                            </select>
-                            <span id="sessionStoreTypeStatus"></span>
-                        </td>
-                    </tr>
-                    <!-- TODO Pull this Field, as it will be Dynamically Generated -->
-                    <tr>
-                        <td><label for="sessionRootDN"><em>&nbsp;&nbsp;</em>
-                            $page.getLocalizedString("session.root.dn.label")</label></td>
-                        <td>
-                            <input id="sessionRootDN" name="sessionRootDN"
-                                   type="text" class="text" style="width:240px"
-                                   value="$sessionRootDN"
-                                   onkeyup="APP.callDelayed(this, validateSessionRootDN)"
-                                   onchange="APP.callDelayed(this, validateSessionRootDN)"/>
-                            <span id="sessionRootDNStatus"></span>
                         </td>
                     </tr>
                     <tr id="login">

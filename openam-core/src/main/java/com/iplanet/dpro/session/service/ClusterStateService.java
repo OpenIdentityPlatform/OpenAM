@@ -152,7 +152,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      *            map if server id - > url for all cluster members
      * @throws Exception
      */
-    public ClusterStateService(SessionService ss, String localServerId,
+    protected ClusterStateService(SessionService ss, String localServerId,
             int timeout, long period, Map<String, String> members) throws Exception {
         this.ss = ss;
         this.localServerId = localServerId;
@@ -167,7 +167,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
             info.url = url;
             info.protocol = url.getProtocol();
             info.address = new InetSocketAddress(url.getHost(), url.getPort());
-            info.isUp = checkServerUp(info);
+            info.isUp = localServerId.equals(info.id) ? true : false;  // Fix for Deadlock.
             
             if (!info.isUp) {
                 downServers.add(info.id);
@@ -203,7 +203,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return true if server is up, false otherwise
      */
     boolean isUp(String serverId) {
-        return (servers.get(serverId)).isUp;
+        return ((serverId == null)||(serverId.isEmpty())||(servers==null)) ? false : (servers.get(serverId)).isUp;
     }
 
     /**
@@ -216,6 +216,8 @@ public class ClusterStateService extends GeneralTaskRunnable {
      */
 
     boolean checkServerUp(String serverId) {
+        if ((serverId == null)||(serverId.isEmpty())||(servers==null))
+            { return false; }
         ServerInfo info = servers.get(serverId);
         info.isUp = checkServerUp(info);
         return info.isUp;
@@ -227,7 +229,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return size of the server list
      */
     int getServerSelectionListSize() {
-        return serverSelectionList.length;
+        return (serverSelectionList==null) ? 0 : serverSelectionList.length;
     }
 
     /**
@@ -238,6 +240,8 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return server id
      */
     String getServerSelection(int index) {
+        if ( (serverSelectionList == null)||(serverSelectionList.length <= 0)||(index < 0) )
+            { return null; }
         return serverSelectionList[index].id;
     }
 
@@ -318,6 +322,8 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return true if server is up, false otherwise
      */
     private boolean checkServerUp(ServerInfo info) {
+        if (info == null)
+            { return false; }
         if (localServerId.equals(info.id)) {
             return true;
         }

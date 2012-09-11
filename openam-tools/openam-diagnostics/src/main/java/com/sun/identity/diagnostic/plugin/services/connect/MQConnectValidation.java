@@ -35,6 +35,7 @@ import java.util.StringTokenizer;
 import javax.jms.*;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -127,7 +128,7 @@ public class MQConnectValidation extends ServiceBase implements
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                     CollectionHelper.getMapAttr(
-                    sessionAttrs, IS_SFO_ENABLED, "false")
+                    sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
                     ).booleanValue();
                 if (sfoEnabled) {
                     isSessionFailoverEnabled = true;
@@ -150,8 +151,8 @@ public class MQConnectValidation extends ServiceBase implements
                         sessionAttrs, JDBC_DRIVER_CLASS, "");
                     mqParams.put(JDBC_DRIVER_CLASS, jdbcDriverClass);
                     jdbcURL = CollectionHelper.getMapAttr(
-                        sessionAttrs, JDBC_URL, "");
-                    mqParams.put(JDBC_URL, jdbcURL);
+                        sessionAttrs, IPLANET_AM_SESSION_REPOSITORY_URL, "");
+                    mqParams.put(IPLANET_AM_SESSION_REPOSITORY_URL, jdbcURL);
                     minPoolSize = Integer.parseInt(CollectionHelper.getMapAttr(
                         sessionAttrs, MIN_POOL_SIZE, "8"));
                     String minPoolSizeStr = CollectionHelper.getMapAttr(
@@ -244,12 +245,12 @@ public class MQConnectValidation extends ServiceBase implements
         boolean connected = false;
         
         String[] params =  {(String)mqMap.get(SESSION_STORE_USERNAME),
-        (String)mqMap.get(JDBC_URL)};
-        String[] param1 = {(String)mqMap.get(JDBC_URL)};
+        (String)mqMap.get(IPLANET_AM_SESSION_REPOSITORY_URL)};
+        String[] param1 = {(String)mqMap.get(IPLANET_AM_SESSION_REPOSITORY_URL)};
         String[] param2 = {(String)mqMap.get(SESSION_STORE_USERNAME)};
         toolOutWriter.printMessage("sfo-cfg-connect-test", params);
         try {
-            if (verifyJDBCURL((String)mqMap.get(JDBC_URL))) {
+            if (verifyJDBCURL((String)mqMap.get(IPLANET_AM_SESSION_REPOSITORY_URL))) {
                 TopicConnectionFactory tFactory =
                     new com.sun.messaging.TopicConnectionFactory();
                 sunSpecificConfig(tFactory, mqMap);
@@ -304,7 +305,7 @@ public class MQConnectValidation extends ServiceBase implements
             (com.sun.messaging.ConnectionFactory) tFactory;
         cf.setProperty(
             com.sun.messaging.ConnectionConfiguration.imqAddressList,
-            (String)mqMap.get(JDBC_URL));
+            (String)mqMap.get(IPLANET_AM_SESSION_REPOSITORY_URL));
         cf.setProperty(
             com.sun.messaging.ConnectionConfiguration.imqAddressListBehavior,
             "RANDOM");

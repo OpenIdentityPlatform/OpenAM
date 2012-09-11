@@ -37,7 +37,7 @@
     <parameter name="serviceName" value="iPlanetAMWebAgentService"/>
     <parameter name="resourceName" value="http://realm1.red.iplanet.com:80/banner.html"/>
     <parameter name="actionName" value="GET"/>
-    <parameter name="invocatorUuid" value="id=user1,ou=user,dc=openam,dc=java,dc=net"/>
+    <parameter name="invocatorUuid" value="id=user1,ou=user,dc=openam,dc=forgerock,dc=org"/>
 
     <!--
     <test name="policy1" parallel="false">

@@ -210,7 +210,10 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
                                  type="single" syntax="password" i18nKey="a140">
-                </AttributeSchema>
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+        </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
                                  type="single" syntax="boolean" i18nKey="a142">
 			<BooleanValues>
@@ -400,6 +403,9 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-password"
                                  type="single" syntax="password" i18nKey="a140">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-smtp-ssl_enabled"
                                  type="single" syntax="boolean" i18nKey="a142">
