@@ -27,7 +27,8 @@
  */
 
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.authentication.modules.jdbc;
 
@@ -313,6 +314,8 @@ public class JDBC extends AMLoginModule {
             throw new AuthLoginException(amAuthJDBC, "userNameTooLong", null);
         } 
         Connection database = null;
+        PreparedStatement thisStatement = null;
+        ResultSet results = null;
         try {
             if ( useJNDI ) {        
                 Context initctx = new InitialContext();
@@ -335,7 +338,7 @@ public class JDBC extends AMLoginModule {
             if (debug.messageEnabled()) {
                 debug.message("PreparedStatement to build: " + statement);
             }
-            PreparedStatement thisStatement = 
+            thisStatement = 
                 database.prepareStatement(statement);
             thisStatement.setString(1,userName);
             if (debug.messageEnabled()) {
@@ -343,7 +346,7 @@ public class JDBC extends AMLoginModule {
             }
             
             // execute the query
-            ResultSet results = thisStatement.executeQuery();
+            results = thisStatement.executeQuery();
             
             if (results == null) {
                 debug.message("returned null from executeQuery()");
@@ -382,6 +385,22 @@ public class JDBC extends AMLoginModule {
             }
             throw new AuthLoginException(e);
         } finally {
+            // close the resultset
+            if (results != null) {
+                  try {
+                    results.close();
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+            // close the statement
+            if (thisStatement != null) {
+                  try {
+                    thisStatement.close();
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
             // close the connection when done
             if (database != null) {
                   try {
