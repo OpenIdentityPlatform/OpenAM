@@ -73,6 +73,42 @@
                 </executions>
             </plugin>
 
+            <!-- Post-Packaging step for preparing Artifacts for Upload to Nightly Download Area -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>post-packaging</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+
+                                <property name="distribution.target.dir"
+                                          value="${project.build.directory}"/>
+
+                                <tstamp>
+                                    <format property="time.stamp" pattern="yyyyMMdd"/>
+                                </tstamp>
+                                <property name="zipname.set" value="nightly_${time.stamp}"/>
+
+                                <filter token="ZIPNAME" value="${zipname.set}" />
+                                <filter token="BUILD_DATE" value="${time.stamp}" />
+
+                                <copy file="../../src/main/jenkins/openam_link.js.template"
+                                      tofile="${distribution.target.dir}/openam_link.js" filtering="true"/>
+                                <copy file="../../src/main/jenkins/build_date.js.template"
+                                      tofile="${distribution.target.dir}/build_date.js" filtering="true"/>
+
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
     </build>

@@ -1,5 +1,0 @@
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam_@ZIPNAME@.zip\">Nightly Build</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam_@ZIPNAME@.zip.sha\">SHA</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam_@BUILD_DATE@.war\">WAR</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/ssoAdminTools_@BUILD_DATE@.zip\">TOOLS</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam_src_@BUILD_DATE@.zip\">SRC</a>]");
