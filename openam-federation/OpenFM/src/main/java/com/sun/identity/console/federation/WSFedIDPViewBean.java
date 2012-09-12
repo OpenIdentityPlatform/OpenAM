@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.federation;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -43,7 +46,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 public class WSFedIDPViewBean extends WSFedGeneralBase {
     public static final String DEFAULT_DISPLAY_URL =
@@ -97,14 +99,17 @@ public class WSFedIDPViewBean extends WSFedGeneralBase {
             Map idpExtValues =
                 ps.getAttributeValues(model.getIDPEXDataMap(), false, model);
             
-            // should retain the value of the displayname from General page
+            // should retain the value of the displayname and cotlist from General page
             Set entries = getExtendedValues().entrySet();
             Iterator iterator = entries.iterator();
              while (iterator.hasNext()) {
                 Map.Entry entry = (Map.Entry)iterator.next();
-                if (entry.getKey().equals("displayName")) {
+                if (entry.getKey().equals(WSFedPropertiesModel.TF_DISPNAME)) {
                     idpExtValues.put((String)entry.getKey(),
                         returnEmptySetIfValueIsNull((Set)entry.getValue()));
+                } else if (entry.getKey().equals(WSFedPropertiesModel.COT_LIST)) {
+                    idpExtValues.put((String)entry.getKey(),
+                            returnEmptySetIfValueIsNull((Set)entry.getValue()));
                 }
             } 
 

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.federation;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -35,11 +38,9 @@ import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.federation.model.WSFedPropertiesModel;
-import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 import com.sun.web.ui.view.alert.CCAlert;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -92,15 +93,18 @@ public class WSFedSPViewBean extends WSFedGeneralBase {
             Map spExtValues =
                 ps.getAttributeValues(model.getSPEXDataMap(), false, model);
             
-            // should retain the value of the displayname from General page
+            // should retain the value of the displayname and cotlist from General page
             Set entries = getExtendedValues().entrySet();
             Iterator iterator = entries.iterator();
              while (iterator.hasNext()) {
                 Map.Entry entry = (Map.Entry)iterator.next();
-                if (entry.getKey().equals("displayName")) {
-                    spExtValues.put((String)entry.getKey(),
-                        returnEmptySetIfValueIsNull((Set)entry.getValue()));
-                }
+                 if (entry.getKey().equals(WSFedPropertiesModel.TF_DISPNAME)) {
+                     spExtValues.put((String)entry.getKey(),
+                             returnEmptySetIfValueIsNull((Set)entry.getValue()));
+                 } else if (entry.getKey().equals(WSFedPropertiesModel.COT_LIST)) {
+                     spExtValues.put((String)entry.getKey(),
+                             returnEmptySetIfValueIsNull((Set)entry.getValue()));
+                 }
             } 
             
             //save the extended metadata values for the SP
