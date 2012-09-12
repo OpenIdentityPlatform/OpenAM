@@ -38,6 +38,24 @@
     <packaging>jar</packaging>
     <name>OpenAM Forgerock REST API</name>
 
+    <description>OpenAM Forgerock REST API</description>
+    <inceptionYear>2012</inceptionYear>
+    <developers>
+        <developer>
+            <id>allan.foster</id>
+            <name>Allan Foster</name>
+            <email>allan.foster@forgerock.com</email>
+            <url>http://www.forgerock.com/</url>
+            <organization>ForgeRock US</organization>
+            <organizationUrl>http://www.forgerock.com</organizationUrl>
+            <roles>
+                <role>VP Community</role>
+                <role>Support Staff</role>
+                <role>OpenAM Guru</role>
+            </roles>
+        </developer>
+    </developers>
+
     <properties>
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
