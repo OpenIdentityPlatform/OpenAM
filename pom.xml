@@ -160,6 +160,7 @@
     </profiles>
 
     <!-- OpenAM Child Modules -->
+    <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
 
         <!-- OpenAM Shared - Common Module -->
@@ -167,6 +168,12 @@
 
         <!-- OpenAM Entitlement Module -->
         <module>openam-entitlements</module>
+
+        <!-- OpenAM Authentication Modules -->
+        <module>openam-authentication</module>
+
+        <!-- OpenAM Schema Modules -->
+        <module>openam-schema</module>
 
         <!-- OpenAM CoreToken Module -->
         <module>openam-coretoken</module>
