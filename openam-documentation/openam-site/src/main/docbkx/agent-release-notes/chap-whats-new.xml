@@ -74,6 +74,12 @@
     xlink:show="new">OPENAM-1195</link>).</para>
    </listitem>
    <listitem>
+    <para>Web policy policy agents now let you enable and disable Cache-Control
+    headers for unauthenticated sessions (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1087"
+    xlink:show="new">OPENAM-1087</link>).</para>
+   </listitem>
+   <listitem>
     <para>Policy agents now let you preserve POST data when working with
     URI-based load balancing (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"

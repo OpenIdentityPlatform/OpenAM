@@ -43,6 +43,16 @@
   <filename>config/OpenSSOAgentBootstrap.properties</filename>.</para>
 
   <variablelist>
+
+  <varlistentry>
+   <term><literal>com.forgerock.agents.cache_control_header.enable</literal></term>
+   <listitem>
+    <para>Set this property to <literal>true</literal> to enable use of
+    Cache-Control headers that prevent proxies from caching resources accessed
+    by unauthenticated users. Default: <literal>false</literal>.</para>
+   </listitem>
+  </varlistentry>
+
    <varlistentry>
     <term><literal>com.forgerock.agents.ext.url.validation.disable</literal></term>
     <listitem>
