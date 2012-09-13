@@ -47,7 +47,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
-                        <aggregate>true</aggregate>
                         <links>
                             <link>http://docs.oracle.com/javase/6/docs/api</link>
                             <link>http://openam.forgerock.org/doc/public-api</link>

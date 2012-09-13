@@ -6,7 +6,7 @@
     <!--
     * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
     *
-    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
     *
     * The contents of this file are subject to the terms
     * of the Common Development and Distribution License
@@ -116,7 +116,6 @@
 
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
-        <javadoc.excludePackageNames>java.*:javax.*:com.*:org.*:net.*:edu.*</javadoc.excludePackageNames>
 
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1320,33 +1319,33 @@
                 <version>2.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <aggregate>true</aggregate>
-                    <show>public</show>
                     <charset>utf-8</charset>
                     <encoding>utf-8</encoding>
                     <source>${java.source.version}</source>
                     <additionalJOption>${javadoc.options}</additionalJOption>
-                    <outputDirectory>${project.build.directory}/site/apidocs
-                    </outputDirectory>
                     <detectLinks>true</detectLinks>
-                    <excludePackageNames>${javadoc.excludePackageNames}
-                    </excludePackageNames>
-                    <subpackages>org.forgerock:com.forgerock:com.iplanet.sso:com.sun.identity</subpackages>
-                    <name>OpenAM JavaDoc</name>
-                    <description>OpenAM Java Documentation.
-                    </description>
                     <bottom>
-                        <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]></bottom>
-                    <header file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.header"/>
-                    <footer file="../openam-documentation/src/main/docbkx/reference/log-messages-preface.footer"/>
+                        <![CDATA[Copyright &#169 2010-2012, <a href="http://www.forgerock.com">ForgeRock<a> All Rights Reserved.]]>
+                    </bottom>
                 </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadoc</id>
                         <phase>site</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>aggregate-jar</goal>
                         </goals>
+                        <configuration>
+                            <doctitle>OpenAM ${project.version} Public API JavaDoc</doctitle>
+                            <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
+                            <finalName>openam-${project.version}-public</finalName>
+                            <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
+                            <docletArtifact>
+                                <groupId>org.forgerock</groupId>
+                                <artifactId>openam-shared</artifactId>
+                                <version>10.1.0-SNAPSHOT</version>
+                            </docletArtifact>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
