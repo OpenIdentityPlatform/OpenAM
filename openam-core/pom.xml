@@ -429,11 +429,6 @@
         </dependency>
 
         <dependency>
-            <groupId>ognl</groupId>
-            <artifactId>ognl</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>relaxngDatatype</groupId>
             <artifactId>relaxngDatatype</artifactId>
         </dependency>
@@ -451,11 +446,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
         </dependency>
 
         <dependency>
