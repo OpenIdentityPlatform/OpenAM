@@ -151,9 +151,9 @@
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
     </dependency>
-    <dependency>
-        <groupId>external</groupId>
-        <artifactId>opendj-ldap-sdk</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.forgerock.opendj</groupId>
+            <artifactId>opendj-ldap-sdk</artifactId>
+        </dependency>
     </dependencies>
 </project>
