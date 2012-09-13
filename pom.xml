@@ -1320,6 +1320,7 @@
                 <version>2.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
+                    <aggregate>true</aggregate>
                     <show>public</show>
                     <charset>utf-8</charset>
                     <encoding>utf-8</encoding>
