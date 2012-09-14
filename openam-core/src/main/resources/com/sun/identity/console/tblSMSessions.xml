@@ -25,6 +25,10 @@
    $Id: tblSMSessions.xml,v 1.2 2008/06/25 05:45:20 qcheng Exp $
 
 -->
+<!--
+    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+-->
 
 <!DOCTYPE table SYSTEM "table.dtd">
 
@@ -47,7 +51,7 @@
 <column name="tblColIdleTime" sortname="tblDataIdleTime" rowheader="true">
     <cc name="tblDataIdleTime" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
 </column>
-<column name="tblColMaxIdleTime" sortname="tblDataIdleTime" rowheader="true">
+<column name="tblColMaxIdleTime" sortname="tblDataMaxIdleTime" rowheader="true">
     <cc name="tblDataMaxIdleTime" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
 </column>
 </table>
