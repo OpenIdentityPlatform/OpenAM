@@ -26,6 +26,11 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+-->
+
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
 <propertysheet>    
@@ -142,18 +147,18 @@
         <property>
             <label name="lblManageNameId" defaultValue="samlv2idp.attribute.label.managenameid" />
             <ccgroup> 
+                   <property>
+                   <label name="lblsingleChoiceMangeNameIDProfile" defaultValue="samlv2sp.attribute.label.httpartifactassertconsumerservicedefault" labelFor="singleChoiceMangeNameIDProfile" />
+                       <cc name="singleChoiceMangeNameIDProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+                       <option label="samlv2idp.attribute.label.none" value="none" />
+                       <option label="samlv2idp.attribute.label.httpredirectsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" />
+                       <option label="samlv2idp.attribute.label.postsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
+                       <option label="samlv2idp.attribute.label.soapsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" />
+                       </cc>
+                   </property>      
                 <property>
                     <label name="lblHttpRedirManageNameIDService" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidservice" />
                     <ccgroup>
-                        <property>
-                        <label name="lblsingleChoiceMangeNameIDProfile" defaultValue="samlv2sp.attribute.label.httpartifactassertconsumerservicedefault" labelFor="singleChoiceMangeNameIDProfile" />
-                            <cc name="singleChoiceMangeNameIDProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
-                            <option label="samlv2idp.attribute.label.none" value="none" />
-                            <option label="samlv2idp.attribute.label.httpredirectsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" />
-                            <option label="samlv2idp.attribute.label.postsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
-                            <option label="samlv2idp.attribute.label.soapsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" />
-                            </cc>
-                        </property>      
                         <property>
                             <label name="lblHttpRedirectManagerNameIDServiceLocation" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidservicelocation" 
                                    labelFor="mnihttpLocation" />
