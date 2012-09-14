@@ -26,6 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
+
 package com.sun.identity.console.federation;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -843,8 +848,6 @@ public  class FederationViewBean
         }
 
         if (vb != null) {
-            setPageSessionAttribute(getTrackingTabIDName(),
-               AMAdminConstants.PREVIOUS_TAB_ID);
             setPageSessionAttribute(EntityPropertiesBase.ENTITY_NAME, name);
             setPageSessionAttribute(EntityPropertiesBase.ENTITY_REALM, realm);
             setPageSessionAttribute(
