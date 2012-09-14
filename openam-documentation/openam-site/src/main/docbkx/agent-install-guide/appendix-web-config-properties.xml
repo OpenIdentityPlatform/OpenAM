@@ -268,16 +268,6 @@
      <para>Set this to the user name of the agent authenticator.</para>
     </listitem>
    </varlistentry>
-
-   <varlistentry>
-    <term><literal>com.sun.identity.cookie.httponly</literal></term>
-    <listitem>
-     <para>Set this property to <literal>true</literal> to mark
-     <literal>iPlanetDirectoryPro</literal> cookies as HTTPOnly, preventing
-     scripts and third-party programs from accessing the cookies.</para>
-    </listitem>
-   </varlistentry>
-
   </variablelist>
  </section>
 
@@ -1518,6 +1508,16 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Notification URL.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.cookie.httponly</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to mark
+     <literal>iPlanetDirectoryPro</literal> cookies as HTTPOnly, preventing
+     scripts and third-party programs from accessing the cookies.</para>
+    </listitem>
+   </varlistentry>
+
   </variablelist>
  </section>
 </appendix>
