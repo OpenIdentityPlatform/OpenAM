@@ -22,6 +22,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+ 
+/**
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
+
 div.helpPanel {
     background-color: #F4F6F7;
     border: 1px solid #AABCC8;
@@ -33,10 +38,12 @@ div.helpPanel {
     width: 500px;
     z-index:2;
 }
-div.helpPanel div { float: right; }
 div.helpPanel p {
     margin: 16px 18px;
     min-height: 60%;
+}
+div.closeBtn { 
+    float: right;
 }
 div.helpHeader {
     color:#666666;

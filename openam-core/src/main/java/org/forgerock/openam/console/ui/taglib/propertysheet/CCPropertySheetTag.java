@@ -65,7 +65,7 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             SystemProperties.get(Constants.AM_CONSOLE_DEPLOYMENT_DESCRIPTOR);
     private static final String HELP_TEMPLATE =
             "<div id=\"help{0}\" class=\"helpPanel\">"
-            + "<div><a href=\"#\" id=\"close{0}\" onclick=\"hideHelp({0}); event.cancelBubble = true;return false;\">"
+            + "<div class=\"closeBtn\"><a href=\"#\" id=\"close{0}\" onclick=\"hideHelp({0}); event.cancelBubble = true;return false;\">"
             + "<img alt=\"Close help\" src=\"" + CONTEXT_ROOT + "/console/images/tasks/close.gif\" border=\"0\" /></a></div>"
             + "<div class=\"helpHeader\">{2}</div>{3}</div>"
             + "<a href=\"#\" onclick=\"showHelp({0}); event.cancelBubble = true; return false;\" "
