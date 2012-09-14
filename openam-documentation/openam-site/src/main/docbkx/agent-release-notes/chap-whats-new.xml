@@ -80,10 +80,10 @@
     xlink:show="new">OPENAM-1087</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agents now let you preserve POST data when working with
+    <para>Web policy agents now let you preserve POST data when working with
     URI-based load balancing (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"
-   xlink:show="new">OPENAM-980</link>).</para>
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-980"
+    xlink:show="new">OPENAM-980</link>).</para>
    </listitem>
    <listitem>
     <para>Web policy agents can now conditionally redirect users based on the
