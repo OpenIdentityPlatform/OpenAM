@@ -281,6 +281,19 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>com.forgerock.agents.cdsso.disable.redirect.on_post</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to disable the HTTP
+     302 redirect after the LARES POST. By default, the policy agent does an
+     HTTP redirect after processing the LARES POST message. Default:
+     <literal>false</literal>.</para>
+     <para>This property applies only to Apache HTTPD 2.2 and 2.4, Lotus Domino,
+     and Varnish Cache policy agents. Other policy agents do not redirect
+     after processing the LARES POST message.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>com.forgerock.agents.conditional.login.url</literal></term>
     <listitem>
      <para>To conditionally redirect users based on the incoming request URL,

@@ -86,6 +86,12 @@
     xlink:show="new">OPENAM-980</link>).</para>
    </listitem>
    <listitem>
+    <para>Web policy agents now let you configure whether to do an HTTP 302
+    redirect after processing the LARES POST (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-936"
+    xlink:show="new">OPENAM-936</link>).</para>
+   </listitem>
+   <listitem>
     <para>Web policy agents can now conditionally redirect users based on the
     incoming request URL (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
