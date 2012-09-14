@@ -928,6 +928,9 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       ( <literal>|</literal> ), and then a comma-separated list of URLs to
       which to redirect incoming users.</para>
       <para>Property: <literal>com.forgerock.agents.conditional.login.url</literal></para>
+      <para>Example: <literal>com.forgerock.agents.conditional.login.url[0]=
+      login.example.com|http://openam1.example.com/openam/UI/Login,
+      http://openam2.example.com/openam/UI/Login</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>

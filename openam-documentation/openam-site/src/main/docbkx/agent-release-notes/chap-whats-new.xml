@@ -86,10 +86,10 @@
    xlink:show="new">OPENAM-980</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agents can now conditionally redirect users based on the
+    <para>Web policy agents can now conditionally redirect users based on the
     incoming request URL (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
-   xlink:show="new">OPENAM-849</link>).</para>
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
+    xlink:show="new">OPENAM-849</link>).</para>
    </listitem>
    <listitem>
     <para>Web policy agents can now mark persistent cookies as HTTPOnly, to

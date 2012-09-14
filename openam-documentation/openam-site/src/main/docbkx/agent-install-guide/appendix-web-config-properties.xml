@@ -293,10 +293,17 @@
    <varlistentry>
     <term><literal>com.forgerock.agents.conditional.login.url</literal></term>
     <listitem>
-     <para>This takes the incoming request URL to match, a comma, and then a
-      comma-separated list of URLs to which to redirect incoming users.</para>
+     <para>To conditionally redirect users based on the incoming request URL,
+     set this property. The values take the incoming request URL to match, a
+     <literal>|</literal> separator, and a comma-separated list of URLs to
+     which to redirect incoming users.</para>
+
+     <para>Example: <literal>com.forgerock.agents.conditional.login.url[0]=
+     login.example.com|http://openam1.example.com/openam/UI/Login,
+     http://openam2.example.com/openam/UI/Login</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term><literal>com.forgerock.agents.config.notenforced.ip.handler</literal></term>
     <listitem>
