@@ -24,6 +24,10 @@
  *
  * $Id: STSExportPolicyViewBean.java,v 1.1 2009/12/19 00:14:56 asyhuang Exp $
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -44,7 +48,6 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCStaticTextField;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import java.text.MessageFormat;
 import org.owasp.esapi.ESAPI;
 
 /**
@@ -167,6 +170,6 @@ public class STSExportPolicyViewBean extends AMPrimaryMastHeadViewBean {
     }
 
     protected String getBackButtonLabel() {
-        return getBackButtonLabel("button.back");
+        return getBackButtonLabel("breadcrumbs.webservices.security.token.service");
     }
 }
