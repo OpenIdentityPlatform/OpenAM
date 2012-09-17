@@ -76,9 +76,9 @@
 
     <!-- Source Control -->
     <scm>
-        <url>https://svn.forgerock.org/openam/branches/maven_branch_01</url>
-        <connection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/maven_branch_01/</developerConnection>
+        <url>https://svn.forgerock.org/openam/trunk/openam/</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
