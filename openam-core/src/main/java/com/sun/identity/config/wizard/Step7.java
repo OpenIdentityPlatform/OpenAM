@@ -108,9 +108,9 @@ public class Step7 extends AjaxPage {
 
                 tmp = (String) ctx.getSessionAttribute(
                     SessionAttributeNames.USER_STORE_TYPE);
-                if (tmp.equals("LDAPv3ForSUNDS")) {
+                if (tmp.equals("LDAPv3ForODSEE")) {
                     add("userStoreType", 
-                        getLocalizedString("sunds.ldap.schema"));
+                        getLocalizedString("odsee.ldap.schema"));
                 } else if (tmp.equals("LDAPv3ForAD")) {
                     add("userStoreType", getLocalizedString(
                         "activedirectory.ldap.schema"));

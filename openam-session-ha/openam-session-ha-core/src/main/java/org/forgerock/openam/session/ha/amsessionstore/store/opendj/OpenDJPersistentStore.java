@@ -44,7 +44,6 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.session.ha.amsessionstore.common.utils.TimeUtils;
 import org.forgerock.openam.session.model.*;
 import org.opends.server.types.AttributeValue;
 import org.forgerock.i18n.LocalizableMessage;
@@ -195,7 +194,8 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
     private static long runPeriod = 1 * 60 * 1000; // 1 min in milliseconds
 
     /**
-     * Initialize all Timing Periods.
+     * Static Initialization Stanza
+     * - Set all Timing Periods.
      */
     static {
         try {
@@ -258,7 +258,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         serverAttrs.add("ldapPort");
         serverAttrs.add("replPort");
 
-    }
+    } // End of Static Initialization Stanza.
 
     /**
      * Protected Singleton from being Instantiated.
@@ -371,7 +371,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                 // Process any Deferred Operations
                 processDeferredAMSessionRepositoryOperations();
                 // Delete any expired Sessions up to now.
-                deleteExpired(TimeUtils.nowInSeconds());
+                deleteExpired(nowInSeconds());
                 Thread.sleep(SLEEP_INTERVAL);
             } catch (InterruptedException ie) {
                 debug.warning(DB_THD_INT.get().toString(), ie);
@@ -402,7 +402,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
     }
 
     /**
-     * Servie Method
+     * Service Method
      *
      * @return
      */
@@ -432,7 +432,10 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
             SessionID sid = is.getID();
             String key = SessionUtils.getEncryptedStorageKey(sid);
             if (key == null)
-                { return; }
+            {   debug.error("OpenDJPersistenceStore.save(): Primary Encrypted Key "
+                    + "null, not persisting Session.");
+                return;
+            }
             byte[] serializedInternalSession = SessionUtils.encode(is);
             long expirationTime = is.getExpirationTime() + gracePeriod;
             String uuid = caseSensitiveUUID ? is.getUUID() : is.getUUID().toLowerCase();
@@ -665,7 +668,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
      */
     @Override
     public void deleteExpired() throws Exception {
-        deleteExpired(TimeUtils.nowInSeconds());
+        deleteExpired(nowInSeconds());
     }
 
     /**
@@ -681,7 +684,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
         try {
             if (debug.messageEnabled()) {
                 debug.message("OpenDJPersistence:deleteExpired Polling for any Expired Sessions older than: "
-                        + TimeUtils.getDate(expDate * 1000));
+                        + getDate(expDate * 1000));
             }
             // Initialize Filter.
             StringBuilder filter = new StringBuilder();
@@ -1204,7 +1207,7 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                         "\n     SK:[" + amRootEntity.getSecondaryKey() + "]," +
                         "\n  State:[" + amRootEntity.getState() + "]," +
                         "\nExpTime:[" + amRootEntity.getExpDate() + " = "
-                        + TimeUtils.getDate(amRootEntity.getExpDate() * 1000) + "]," +
+                        + getDate(amRootEntity.getExpDate() * 1000) + "]," +
                         "\n     IS:[" + (
                         (amRootEntity.getSerializedInternalSessionBlob() != null) ?
                                 amRootEntity.getSerializedInternalSessionBlob().length + " bytes]" : "null]") +
@@ -1215,6 +1218,24 @@ public class OpenDJPersistentStore extends GeneralTaskRunnable implements AMSess
                         (amRootEntity.getAuxData() != null) ?
                                 amRootEntity.getAuxData().length() + " bytes]" : "null].")
         );
+    }
+    /**
+    * Return current Time in Seconds.
+    * @return long Time in Seconds.
+    */
+    private static long nowInSeconds() {
+        return Calendar.getInstance().getTimeInMillis() / 1000;
+    }
+
+    /**
+     * Return specified Milliseconds in a Date Object.
+     * @param milliseconds
+     * @return Date
+     */
+    private static Date getDate(long milliseconds) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(milliseconds);
+        return cal.getTime();
     }
 
 }

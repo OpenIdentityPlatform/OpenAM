@@ -29,7 +29,7 @@
 
 package org.forgerock.openam.session.ha.amsessionrepository.store;
 
-import org.forgerock.openam.session.ha.amsessionstore.store.AMSessionRepositoryType;
+import org.forgerock.openam.shared.session.ha.amsessionstore.AMSessionRepositoryType;
 import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore;
 import org.forgerock.openam.session.ha.amsessionstore.store.plugin.PlugInPersistentStore;
 import org.testng.annotations.AfterClass;
@@ -91,14 +91,14 @@ public class AMSessionRepositoryTypeTest {
     @Test
     public void testGetAMSessionRepositoryTypeImplementationClass() throws Exception {
 
-        assertEquals(AMSessionRepositoryType.embedded.amSessionRepositoryImplementationClass(),
-                OpenDJPersistentStore.class);
+        assertEquals(AMSessionRepositoryType.embedded.amSessionRepositoryImplementationClassName(),
+                OpenDJPersistentStore.class.getName());
 
-        assertEquals(AMSessionRepositoryType.external.amSessionRepositoryImplementationClass(),
-                OpenDJPersistentStore.class);
+        assertEquals(AMSessionRepositoryType.external.amSessionRepositoryImplementationClassName(),
+                OpenDJPersistentStore.class.getName());
 
-        assertEquals(AMSessionRepositoryType.plugin.amSessionRepositoryImplementationClass(),
-                PlugInPersistentStore.class);
+        assertEquals(AMSessionRepositoryType.plugin.amSessionRepositoryImplementationClassName(),
+                PlugInPersistentStore.class.getName());
     }
 
 

@@ -136,11 +136,24 @@ import org.forgerock.openam.session.service.SessionTimeoutHandler;
 public class SessionService {
 
     private static String LOG_PROVIDER = "Session";
+
+    /**
+     * Session Service Thread Pool for Session
+     * Handler Tasks.
+     */
     static private ThreadPool threadPool = null;
 
-    static SSOTokenManager ssoManager = null;
+    /**
+     * Our Session Service Singleton Service Implementation
+     */
+    private static volatile SessionService sessionService = null;
 
-    private static AMSessionRepository amSessionRepository = null;
+    /**
+     * AM Session Repository for Session Persistence.
+     */
+    private static volatile AMSessionRepository amSessionRepository = null;
+
+    static SSOTokenManager ssoManager = null;
 
     public static Debug sessionDebug = null;
 
@@ -235,7 +248,8 @@ public class SessionService {
     private static final String JDBC_DRIVER_CLASS = 
         "iplanet-am-session-JDBC-driver-Impl-classname";
 
-    private static final String IPLANET_AM_SESSION_REPOSITORY_URL = "iplanet-am-session-repository-url";
+    private static final String IPLANET_AM_SESSION_REPOSITORY_URL =
+         "iplanet-am-session-repository-url";
 
     private static final String MIN_POOL_SIZE = 
         "iplanet-am-session-min-pool-size";
@@ -360,29 +374,27 @@ public class SessionService {
 
     public static final String SESSION_SERVICE = "session";
 
-    private SecureRandom secureRandom = null;
+    private static SecureRandom secureRandom = null;
 
-    private Hashtable sessionTable = null;
+    private static Hashtable sessionTable = null;
     
-    private Set remoteSessionSet = null;
+    private static Set remoteSessionSet = null;
 
-    private Hashtable sessionHandleTable = new Hashtable();
+    private static Hashtable sessionHandleTable = new Hashtable();
 
-    private Map restrictedTokenMap = Collections.synchronizedMap(new HashMap());
+    private static Map restrictedTokenMap = Collections.synchronizedMap(new HashMap());
 
-    private String sessionServer;
+    private static String sessionServer;
 
-    private String sessionServerPort;
+    private static String sessionServerPort;
 
-    private String sessionServerProtocol;
+    private static String sessionServerProtocol;
     
-    private String sessionServerURI;
+    private static String sessionServerURI;
 
-    private String sessionServerID;
+    private static String sessionServerID;
 
-    private Set secondaryServerIDs;
-
-    private static SessionService sessionService = null;
+    private static Set secondaryServerIDs;
 
     public static String deploymentURI = SystemProperties
             .get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
@@ -400,21 +412,21 @@ public class SessionService {
     private static String constraintHandler =
             SessionConstraint.DESTROY_OLDEST_SESSION_CLASS;
 
-    private String thisSessionServer;
+    private static String thisSessionServer;
 
-    private String thisSessionServerPortAsString;
+    private static String thisSessionServerPortAsString;
 
-    private int thisSessionServerPort;
+    private static int thisSessionServerPort;
     
-    private String thisSessionURI;
+    private static String thisSessionURI;
 
-    private String thisSessionServerProtocol;
+    private static String thisSessionServerProtocol;
 
-    private String thisSessionServerID;
+    private static String thisSessionServerID;
 
-    private String thisSessionServerURL;
+    private static String thisSessionServerURL;
 
-    private URL thisSessionServiceURL;
+    private static URL thisSessionServiceURL;
 
     // Must be True to permit Session Failover HA to be available.
     private static boolean useRemoteSaveMethod = Boolean.valueOf(
@@ -435,27 +447,25 @@ public class SessionService {
                      "true")).booleanValue();
 
     // Must be True to permit Session Failover HA to be available.
-    private static boolean isSiteEnabled = isSessionFailoverEnabled;    // Did Default to False.
+    private static boolean isSiteEnabled = false;  // If this is set to True and no Site is found, issues will arise
+    // Trying to resolve the serverID and will hang install and subsequent login attempts.
 
     /**
      * The following InternalSession is for the Authentication Service to use
      * Profile API to fetch user profile.
      */
-    private InternalSession authSession = null;
+    private static InternalSession authSession = null;
 
     /**
      * The URL Vector for ALL session events : SESSION_CREATION, IDLE_TIMEOUT,
      * MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY.
      */
-    private Vector sessionEventURLs = new Vector();
+    private static Vector sessionEventURLs = new Vector();
 
-    private URL sessionServiceID = null;
+    private static URL sessionServiceID = null;
 
-    private ClusterStateService clusterStateService = null;
+    private static ClusterStateService clusterStateService = null;
 
-    private static AMSessionRepository sessionRepository = null;
-
-    private static boolean initialized = false;
     
     /**
      * Returns Session Service. If a Session Service already exists then it
@@ -463,17 +473,15 @@ public class SessionService {
      * 
      */
     public static SessionService getSessionService() {
-        if (!initialized) {
+        if (sessionService == null) {
             if (SystemProperties.isServerMode()) {
                 synchronized (SessionService.class) {
                     if (sessionService == null) {
                         sessionService = new SessionService();
-                        initialized = true;
                     }
-                }
+                } // End of synchronized Block.
             }
         }
-
         return sessionService;
     }
 
@@ -728,13 +736,13 @@ public class SessionService {
             Map ext = new HashMap();
             ext.put(SessionID.SITE_ID, sessionServerID);
 
-            if (isSiteEnabled) {
-                ext.put(SessionID.PRIMARY_ID, thisSessionServerID);
-                if (isSessionFailoverEnabled) {
-                    ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom
-                            .nextInt()));
-                }
-            }
+            // AME-129 Required for Automatic Session Failover Persistence
+            if ( (isSiteEnabled)&&(thisSessionServerID != null)&&(!thisSessionServerID.isEmpty()) )
+                { ext.put(SessionID.PRIMARY_ID, thisSessionServerID); }
+
+            // AME-129, always set a Storage Key regardless of persisting or not.
+            // TODO -- Review if this Storage Key is unique across OpenAM Instances!
+            ext.put(SessionID.STORAGE_KEY, String.valueOf(secureRandom.nextInt()));
 
             String sessionID = SessionID.makeSessionID(encryptedID, ext,
                     httpSessionId);
@@ -1762,6 +1770,9 @@ public class SessionService {
         return adminToken;
     }
 
+    /**
+     * Private Singleton Session Service.
+     */
     private SessionService() {
         try {
             dsameAdminDN = (String) AccessController
@@ -1889,10 +1900,6 @@ public class SessionService {
                 thisSessionServiceURL = Session.getSessionServiceURL(
                         thisSessionServerProtocol, thisSessionServer,
                         thisSessionServerPortAsString, thisSessionURI);
-
-                if (isSessionFailoverEnabled) {
-                    initializationClusterService();
-                }
             } // End of isSiteEnabled.
         } catch (Exception ex) {
             sessionDebug.error(
@@ -1906,7 +1913,7 @@ public class SessionService {
      *
      * @throws Exception
      */
-    private void initializationClusterService() throws Exception {
+    private synchronized void initializationClusterService() throws Exception {
         int timeout = ClusterStateService.DEFAULT_TIMEOUT;
         try {
             timeout = Integer.parseInt(SystemProperties.get(
@@ -1935,15 +1942,26 @@ public class SessionService {
                     + ", using default");
         }
         // Initialize Our Cluster State Service
-        clusterStateService = new ClusterStateService(this,
+        if (clusterStateService == null)
+        {
+            clusterStateService = new ClusterStateService(this,
                 thisSessionServerID, timeout, period,
                 clusterMemberMap);
-        // Poke the Backend Session Repository to initialize.
-        getRepository();
+        }
+
+        // Show our State Server Info Map
+        sessionDebug.error(this.toString());
+
+        // Verify Functionality
+        if (!clusterStateService.isLocalServerId(thisSessionServerID))
+        {
+            sessionDebug.error("Initialized ClusterStateService, but it did not recognize this server correctly as our Local Server!");
+            // TODO We Should Fail Here, if this ever happens, this indicates a corrupted State Service.
+        }
     }
 
     /**
-     * THis is a key method for "internal request routing" mode It determines
+     * This is a key method for "internal request routing" mode It determines
      * the server id which is currently hosting session identified by sid. In
      * "internal request routing" mode, this method also has a side effect of
      * releasing a session which no longer "belongs locally" (e.g., due to
@@ -1961,6 +1979,8 @@ public class SessionService {
         } else {
             if (getUseInternalRequestRouting()) {
                 String serverID = locateCurrentHostServer(sid);
+                if (serverID == null)
+                    { return sid.getSessionServerID(); }
                 // if we happen to have local session replica
                 // get rid of it, as hosting server instance
                 // is not supposed to be local
@@ -1989,7 +2009,11 @@ public class SessionService {
             throws SessionException {
         String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
         String serverID = sid.getSessionServerID();
-
+        // if this is our local Server
+        if (serverID.equalsIgnoreCase(this.getLocalServerID()))
+        {
+            return serverID;
+        }
         // if session is from remote site
         if (!serverID.equals(sessionServerID)) {
             return serverID;
@@ -2100,18 +2124,18 @@ public class SessionService {
             return null;
         }
 
-        if (sessionRepository == null) {
+        if (amSessionRepository == null) {
             try {
-                sessionRepository = SessionRepository.getInstance();
+                amSessionRepository = SessionRepository.getInstance();
                 String message =
-                        "Obtained Session Repository Implementation: "+sessionRepository.getClass().getSimpleName();
+                        "Obtained Session Repository Implementation: "+amSessionRepository.getClass().getSimpleName();
                 sessionDebug.message(message);
             } catch (Exception e) {
                 sessionDebug
                         .error("Failed to initialize session repository", e);
             }
         }
-        return sessionRepository;
+        return amSessionRepository;
     }
 
     /**
@@ -2125,6 +2149,9 @@ public class SessionService {
       return ((serverID == null)||(serverID.isEmpty())) ? false : clusterStateService.checkServerUp(serverID);
     }
 
+    /**
+     * Post Initialization
+     */
     private void postInit() {
         try {
             ServiceSchemaManager ssm = new ServiceSchemaManager(
@@ -2216,21 +2243,32 @@ public class SessionService {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                         CollectionHelper.getMapAttr(
-                        sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
+                        sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "true")
                         ).booleanValue();
-                
+                // We Allow to default to Session Failover HA,
+                // even with a single server to enable session persistence.
                 if(sfoEnabled) {
+
                     isSessionFailoverEnabled = true;
 
                     useRemoteSaveMethod = true;
 
                     useInternalRequestRouting = true;
 
+                    // TODO: Check for Type of backend Store.
+
                     sessionStoreUserName = CollectionHelper.getMapAttr(
                         sessionAttrs, SESSION_STORE_USERNAME, "amsvrusr");
                     sessionStorePassword = CollectionHelper.getMapAttr(
                         sessionAttrs, SESSION_STORE_PASSWORD, "password");
-                    Set serverIDs = WebtopNaming.getSiteNodes(sessionServerID);
+
+                    Set<String> serverIDs = WebtopNaming.getSiteNodes(sessionServerID);
+                    if ( (serverIDs==null)||(serverIDs.isEmpty()) )
+                    {
+                        serverIDs = new HashSet<String>();
+                        serverIDs.add(this.getLocalServerID());
+                    }
+                    initializationClusterService();
                     initClusterMemberMap(serverIDs);
 
                     connectionMaxWaitTime = Integer.parseInt(
@@ -2272,7 +2310,7 @@ public class SessionService {
     }
 
     /**
-     * This method will execute all the globally setted session timeout handlers
+     * This method will execute all the globally set session timeout handlers
      * with the corresponding timeout event simultaniously.
      *
      * @param sessionId The timed out sessions ID

@@ -1021,8 +1021,8 @@ public class WebtopNaming {
      * @throws Exception if an error occurs when updating the
      *     nameing table     
      */
-    public static Set getSiteNodes(String serverid) throws Exception {
-        HashSet nodeset = new HashSet();
+    public static Set<String> getSiteNodes(String serverid) throws Exception {
+        HashSet<String> nodeset = new HashSet();
 
         if (namingTable == null) {
             getNamingProfile(false);

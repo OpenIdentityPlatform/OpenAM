@@ -41,37 +41,19 @@ import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
  */
 public final class IdentityDispatcher  {
 
-    private static IdentityDispatcher instance = null;
-    private RequestHandler handler = null;
-    private ConnectionFactory factory = null;
     private IdentityDispatcher() {
 
     }
 
-    public final static IdentityDispatcher  getInstance() {
-        if (instance == null)  instance = new  IdentityDispatcher();
-        return instance;
-    }
-
-    /**
-     * Build the initial dispatcher.
-     * This is a separate method so that we can modify the dispatching
-     * dynamically
-     * */
-
-    public ConnectionFactory buildConnectionFactory() throws ResourceException {
-        final UriTemplateRoutingStrategy routes = new UriTemplateRoutingStrategy();
-        routes.register("/users", new IdentityResource());
-        routes.register("/groups", new IdentityResource());
-        handler = new Router(routes);
-        factory = Connections.newInternalConnectionFactory(handler);
-        initSampleResources(factory);
-        return factory;
-    }
-
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
-            return getInstance().buildConnectionFactory();
+            final UriTemplateRoutingStrategy routes = new UriTemplateRoutingStrategy();
+            routes.register("/users", new IdentityResource());
+            routes.register("/groups", new IdentityResource());
+            final RequestHandler handler = new Router(routes);
+            final ConnectionFactory factory = Connections.newInternalConnectionFactory(handler);
+            initSampleResources(factory);
+            return factory;
         } catch (final Exception e) {
             throw new ServletException(e);
         }

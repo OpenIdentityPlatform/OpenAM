@@ -254,7 +254,7 @@
        Mode</para>
       </listitem>
       <listitem>
-       <para><literal>LDAPv3ForSUNDS</literal>: Sun Java System Directory
+       <para><literal>LDAPv3ForODSEE</literal>: Sun Java System Directory
        Server</para>
       </listitem>
       <listitem>

@@ -48,17 +48,17 @@ opendj (OpenDJ)
 	configuration store.
     opendj_remove_user_schema.ldif -- file used to remove user schema.
 
-sunds (Sun Directory Server)
+odsee (Oracle Directory Server Enterprise Edition)
 ============================
-    sunds_config_schema.ldif -- schema to be loaded to configuration 
+    odsee_config_schema.ldif -- schema to be loaded to configuration
 	store.
-    sunds_config_index.ldif -- attribute index to be loaded 
+    odsee_config_index.ldif -- attribute index to be loaded
 	to configuration store.
-    sunds_user_schema.ldif -- schema to be loaded to user store.
-    sunds_user_index.ldif -- attribute index to be loaded 
+    odsee_user_schema.ldif -- schema to be loaded to user store.
+    odsee_user_index.ldif -- attribute index to be loaded
 	to user store.
-    sunds_userinit.ldif -- file used for initialization.
-    sunds_plugin.ldif -- referential integrity plugin.
+    odsee_userinit.ldif -- file used for initialization.
+    odsee_plugin.ldif -- referential integrity plugin.
     amsdk_plugin
     ~~~~~~~~~~~~
         amsdk_init_template.ldif -- file for amsdk initialization.

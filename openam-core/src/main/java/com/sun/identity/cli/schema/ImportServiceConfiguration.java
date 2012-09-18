@@ -80,8 +80,8 @@ import java.io.FileReader;
  * Import service configuration data.
  */
 public class ImportServiceConfiguration extends AuthenticatedCommand {
-    private static final String DS_LDIF = "sunds_config_schema.ldif";
-    private static final String DS_IDX = "sunds_config_index.ldif";
+    private static final String DS_LDIF = "odsee_config_schema.ldif";
+    private static final String DS_IDX = "odsee_config_index.ldif";
 
     /**
      * Services a Commandline Request.
@@ -124,7 +124,7 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
                 DirectoryServerVendor.getInstance().query(ldConnection);
             if (!vendor.name.equals(DirectoryServerVendor.OPENDJ)
                     && !vendor.name.equals(DirectoryServerVendor.OPENDS)
-                    && !vendor.name.equals(DirectoryServerVendor.SUNDS)
+                    && !vendor.name.equals(DirectoryServerVendor.ODSEE)
                     ) {
                 throw new CLIException(getResourceString(
                         "import-service-configuration-unknown-ds"),
@@ -362,7 +362,7 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
 
         try {
             String vendorName = vendor.name;
-            if (vendorName.equals(DirectoryServerVendor.SUNDS)) {
+            if (vendorName.equals(DirectoryServerVendor.ODSEE)) {
                 ldif = new DataInputStream(
                     getClass().getClassLoader().getResourceAsStream(DS_LDIF));
                 index = new DataInputStream(

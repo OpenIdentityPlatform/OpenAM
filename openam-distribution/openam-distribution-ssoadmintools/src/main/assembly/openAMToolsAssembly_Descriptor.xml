@@ -72,10 +72,10 @@
         </fileSet>
         <fileSet>
             <outputDirectory>classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/template/ldif/sunds</directory>
+            <directory>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/template/ldif/odsee</directory>
             <includes>
-                <include>sunds_config_index.ldif</include>
-                <include>sunds_config_schema.ldif</include>
+                <include>odsee_config_index.ldif</include>
+                <include>odsee_config_schema.ldif</include>
             </includes>
         </fileSet>
 

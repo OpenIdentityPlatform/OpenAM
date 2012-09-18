@@ -102,13 +102,13 @@ class UserIdRepo {
         String type = 
             (String) userRepo.get(SetupConstants.USER_STORE_TYPE);
         if (type == null) {
-            type = SetupConstants.UM_LDAPv3ForSUNDS;
+            type = SetupConstants.UM_LDAPv3ForODSEE;
         }
 
         ResourceBundle rb = ResourceBundle.getBundle(
             SetupConstants.SCHEMA_PROPERTY_FILENAME);
         String configName = "";
-        String strFiles = rb.getString(SetupConstants.SUNDS_LDIF);
+        String strFiles = rb.getString(SetupConstants.ODSEE_LDIF);
         if (type.equals(SetupConstants.UM_LDAPv3ForOpenDS)) {
             strFiles = rb.getString(SetupConstants.OpenDS_LDIF);
             configName = "OpenDJ";
@@ -138,7 +138,7 @@ class UserIdRepo {
         SSOToken adminToken
     ) throws SMSException, SSOException, IOException {
         String xml = null;
-        if (type.equals(SetupConstants.UM_LDAPv3ForSUNDS)) {
+        if (type.equals(SetupConstants.UM_LDAPv3ForODSEE)) {
             xml = getResourceContent(umSunDSForAM);
         } else {
             xml = getResourceContent(umSunDSGeneric);

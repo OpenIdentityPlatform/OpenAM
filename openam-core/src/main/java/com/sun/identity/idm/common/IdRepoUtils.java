@@ -69,13 +69,13 @@ import com.sun.identity.sm.ServiceConfigManager;
  */
 public class IdRepoUtils {
 
-    private static final String LDAPv3ForSUNDS = "LDAPv3ForAMDS";
+    private static final String LDAPv3ForODSEE = "LDAPv3ForAMDS";
     private static final String LDAPv3ForOpenDS = "LDAPv3ForOpenDS";
     private static final String LDAPv3ForAD = "LDAPv3ForAD";
     private static final String LDAPv3ForADAM = "LDAPv3ForADAM";
     private static final String LDAPv3ForTivoli = "LDAPv3ForTivoli";
 
-    private static final String SUNDS_LDIF = "sundsSchema";
+    private static final String ODSEE_LDIF = "odseeSchema";
     private static final String OpenDS_LDIF = "opendsUserSchema";
     private static final String AD_LDIF = "adUserSchema";
     private static final String ADAM_LDIF = "adamUserSchema";
@@ -135,8 +135,8 @@ public class IdRepoUtils {
             SCHEMA_PROPERTY_FILENAME);
         String schemaFiles = null;
 
-        if (idRepoType.equals(LDAPv3ForSUNDS)) {
-            schemaFiles = rb.getString(SUNDS_LDIF);
+        if (idRepoType.equals(LDAPv3ForODSEE)) {
+            schemaFiles = rb.getString(ODSEE_LDIF);
         } else if (idRepoType.equals(LDAPv3ForOpenDS)) {
             schemaFiles = rb.getString(OpenDS_LDIF);
         } else if (idRepoType.equals(LDAPv3ForAD)) {

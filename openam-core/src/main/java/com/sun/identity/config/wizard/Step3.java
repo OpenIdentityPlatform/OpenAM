@@ -458,7 +458,7 @@ public class Step3 extends LDAPStoreWizardPage {
                         SessionAttributeNames.ENCLDAPUSERPASSWD,
                         (String)data.get("ENCLDAPUSERPASSWD"));
                     
-                    // true for embedded, false for sunds
+                    // true for embedded, false for ODSEE
                     String embedded = 
                         (String)data.get(BootstrapData.DS_ISEMBEDDED);
                     addObject(sb, "embedded", embedded);           

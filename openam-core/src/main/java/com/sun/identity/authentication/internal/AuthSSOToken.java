@@ -33,6 +33,7 @@
 package com.sun.identity.authentication.internal;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,7 +99,16 @@ public class AuthSSOToken implements SSOToken {
         random.nextBytes(keyRandom);
         String key = Base64.encode(keyRandom);
         try {
+            InetAddress.getLocalHost().getAddress();
             key += Base64.encode((InetAddress.getLocalHost()).getAddress());
+        } catch ( UnknownHostException unknownHostException) {
+            // This issue is due to Bug:  	MACOSX_PORT-564
+            // @see http://java.net/jira/browse/MACOSX_PORT-564
+            if (System.getProperty("os.name").toLowerCase().contains("mac"))
+            {
+                System.out.println("Unknown Host Exception Encountered, could be related to MACOSX_PORT-564,\n"
+                        +unknownHostException.getCause());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -121,7 +121,7 @@ public class Step4 extends AjaxPage {
             ctx.setSessionAttribute(SessionAttributeNames.EXT_DATA_STORE,
                 "true");
             ctx.setSessionAttribute(SessionAttributeNames.USER_STORE_TYPE,
-                "LDAPv3ForSUNDS");
+                "LDAPv3ForODSEE");
         }
 
         String smsType = getAttribute(SetupConstants.CONFIG_VAR_DATA_STORE,
@@ -162,48 +162,48 @@ public class Step4 extends AjaxPage {
             val);
         addModel("userStoreRootSuffix", val);
 
-        val = getAttribute(SetupConstants.USER_STORE_TYPE, "LDAPv3ForSUNDS");
+        val = getAttribute(SetupConstants.USER_STORE_TYPE, "LDAPv3ForODSEE");
         if (val.equals("LDAPv3ForAD")) {
             addModel("selectLDAPv3ad", "checked=\"checked\"");
             addModel("selectLDAPv3addc", "");
             addModel("selectLDAPv3adam", "");
-            addModel("selectLDAPv3sunds", "");
+            addModel("selectLDAPv3odsee", "");
             addModel("selectLDAPv3opends", "");
             addModel("selectLDAPv3tivoli", "");
         } else if (val.equals("LDAPv3ForADDC")) {
             addModel("selectLDAPv3addc", "checked=\"checked\"");
             addModel("selectLDAPv3ad", "");
             addModel("selectLDAPv3adam", "");
-            addModel("selectLDAPv3sunds", "");
+            addModel("selectLDAPv3odsee", "");
             addModel("selectLDAPv3opends", "");
             addModel("selectLDAPv3tivoli", "");
         } else if (val.equals("LDAPv3ForADAM")) {
             addModel("selectLDAPv3adam", "checked=\"checked\"");
             addModel("selectLDAPv3ad", "");
             addModel("selectLDAPv3addc", "");
-            addModel("selectLDAPv3sunds", "");
+            addModel("selectLDAPv3odsee", "");
             addModel("selectLDAPv3opends", "");
             addModel("selectLDAPv3tivoli", "");
-        } else if (val.equals("LDAPv3ForSUNDS")) {
-            addModel("selectLDAPv3sunds", "checked=\"checked\"");
+        } else if (val.equals("LDAPv3ForODSEE")) {
+            addModel("selectLDAPv3odsee", "checked=\"checked\"");
             addModel("selectLDAPv3ad", "");
             addModel("selectLDAPv3addc", "");
             addModel("selectLDAPv3adam", "");
-            addModel("selectLDAPv3opends", "");
+            addModel("selectLDAPv3odsee", "");
             addModel("selectLDAPv3tivoli", "");
         } else if (val.equals("LDAPv3ForOpenDS")) {
             addModel("selectLDAPv3opends", "checked=\"checked\"");
             addModel("selectLDAPv3ad", "");
             addModel("selectLDAPv3addc", "");
             addModel("selectLDAPv3adam", "");
-            addModel("selectLDAPv3sunds", "");
+            addModel("selectLDAPv3odsee", "");
             addModel("selectLDAPv3tivoli", "");
         } else {
             addModel("selectLDAPv3tivoli", "checked=\"checked\"");
             addModel("selectLDAPv3ad", "");
             addModel("selectLDAPv3addc", "");
             addModel("selectLDAPv3adam", "");
-            addModel("selectLDAPv3sunds", "");
+            addModel("selectLDAPv3odsee", "");
             addModel("selectLDAPv3opends", "");
         }
 

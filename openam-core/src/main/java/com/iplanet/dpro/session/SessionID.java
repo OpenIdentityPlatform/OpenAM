@@ -344,6 +344,7 @@ public class SessionID implements Serializable {
         if (isNull()) {
             throw new IllegalArgumentException("sid value is null or empty");
         }
+        String serverID = null;
         try {
             String sidString = encryptedString;
             // sidString would have * if it has been c66 encoded
@@ -385,14 +386,14 @@ public class SessionID implements Serializable {
                 extensions = extMap;
             }
 
-            String serverID = (String) extensions.get(SITE_ID);
+            serverID = (String) extensions.get(SITE_ID);
             if (serverID != null) {
                 setServerID(serverID);
             }
 
         } catch (Exception e) {
-            debug.error("Invalid sessionid format", e);
-            throw new IllegalArgumentException("Invalid sessionid format" + e);
+            debug.error("Invalid sessionid format:["+serverID+"]", e);
+            throw new IllegalArgumentException("Invalid sessionid format:["+serverID+"]" + e);
         }
         isParsed = true;
     }
@@ -417,9 +418,9 @@ public class SessionID implements Serializable {
                 idx = sessionServerURI.lastIndexOf('/');
             }
         } catch (Exception e) {
-            debug.error("Could not get server info from sessionid", e);
+            debug.error("Could not get server info from sessionid: "+id+"]", e);
             throw new IllegalArgumentException(
-                    "Invalid server id in session id " + e);
+                    "Invalid server id in session id:["+id+"]" + e);
         }
     }
 

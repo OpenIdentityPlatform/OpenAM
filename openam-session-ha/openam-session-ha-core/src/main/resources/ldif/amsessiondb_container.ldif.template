@@ -1,7 +1,7 @@
 dn: o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
 objectClass: organization
 objectClass: top
-o: OpenAM-Session
+o: openam-session
 aci: (target="ldap:///o=openam-session,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
 
 dn: ou=famrecords,o=openam-session,@SM_CONFIG_ROOT_SUFFIX@

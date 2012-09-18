@@ -22,7 +22,7 @@
 ##   your own identifying information:
 ##   "Portions Copyrighted [year] [name of copyright owner]"
 ##
-##   $Id: sunds_userinit.ldif,v 1.1 2009/06/03 19:14:25 goodearth Exp $
+##   $Id: odsee_userinit.ldif,v 1.1 2009/06/03 19:14:25 goodearth Exp $
 ##
 ##
 dn: ou=people,@userStoreRootSuffix@

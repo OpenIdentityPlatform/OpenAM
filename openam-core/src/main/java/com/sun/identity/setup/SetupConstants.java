@@ -156,7 +156,7 @@ public interface SetupConstants {
      * Property keys in <code>SCHEMA_PROPERTY_FILENAME</code> file.
      * Sun Directory Server Schema File for user management data.
      */
-    static final String SUNDS_LDIF = "sundsSchema";
+    static final String ODSEE_LDIF = "odseeSchema";
 
     /**
      * Property keys in <code>SCHEMA_PROPERTY_FILENAME</code> file.
@@ -190,7 +190,7 @@ public interface SetupConstants {
     /**
      * User Management datastore option - Sun DS.
      */
-    static final String UM_LDAPv3ForSUNDS = "LDAPv3ForSUNDS";
+    static final String UM_LDAPv3ForODSEE = "LDAPv3ForODSEE";
 
     /**
      * User Management datastore option - OpenDS.

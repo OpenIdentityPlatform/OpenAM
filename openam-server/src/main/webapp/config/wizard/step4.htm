@@ -207,8 +207,8 @@
         document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
 
-    function setSUNDS() {
-        setType(document.getElementById("ldapv3sunds").value);
+    function setODSEE() {
+        setType(document.getElementById("ldapv3odsee").value);
         document.getElementById("userStoreSettings").style.display = "";
         document.getElementById("activeDirectoryConfigSettings").style.display = "none";
     }
@@ -246,7 +246,7 @@
     <!-- when external config is selected -->
     function enableExternalConfig() {
         userStoreChoice = "external";
-        document.getElementById("ldapv3sunds").checked=true;
+        document.getElementById("ldapv3odsee").checked=true;
         document.getElementById("externalConfigSettings").style.display = "";
         document.getElementById("userStoreSettings").style.display = "";
         document.getElementById("activeDirectoryConfigSettings").style.display = "none";
@@ -302,7 +302,7 @@
                     <tr>
                         <td valign="top"><label for="userStoreType"><em>*&nbsp;</em>$page.getLocalizedString("store.type.label")</label></td>
                         <td>
-                            <input type="radio" id="ldapv3sunds" name="userStoreType" style="margin-left:1em" value="LDAPv3ForSUNDS" $selectLDAPv3sunds onclick="setSUNDS();"/>&nbsp;$page.getLocalizedString("sunds.ldap.schema")
+                            <input type="radio" id="ldapv3odsee" name="userStoreType" style="margin-left:1em" value="LDAPv3ForODSEE" $selectLDAPv3odsee onclick="setODSEE();"/>&nbsp;$page.getLocalizedString("odsee.ldap.schema")
                             <input type="radio" id="ldapv3opends" name="userStoreType" style="margin-left:2em" value="LDAPv3ForOpenDS" $selectLDAPv3opends onclick="setOpenDS();"/>&nbsp;$page.getLocalizedString("opends.ldap.schema")<br>
                             <input type="radio" id="ldapv3ad" name="userStoreType" style="margin-left:1em" value="LDAPv3ForAD" $selectLDAPv3ad onclick="setAD();"/>&nbsp;$page.getLocalizedString("activedirectory.ldap.schema")
                             <input type="radio" id="ldapv3adforDomainName" name="userStoreType" style="margin-left:1em" value="LDAPv3ForADDC" $selectLDAPv3addc onclick="setADforDomainName();"/>&nbsp;$page.getLocalizedString("activedirectoryfordomainname.ldap.schema")<br>

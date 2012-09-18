@@ -362,11 +362,11 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
         String configDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
         String templateDir = configDir + "/ldif";
         ldifs.add(templateDir +
-            "/sunds/amsdk_plugin/amsdk_sunone_schema2.ldif");
-        ldifs.add(templateDir + "/sunds/sunds_user_schema.ldif");
-        ldifs.add(templateDir + "/sunds/amsdk_plugin/amsdk_init_template.ldif");
-        ldifs.add(templateDir + "/sunds/sunds_user_index.ldif");
-        ldifs.add(templateDir + "/sunds/sunds_plugin.ldif");
+            "/odsee/amsdk_plugin/amsdk_sunone_schema2.ldif");
+        ldifs.add(templateDir + "/odsee/odsee_user_schema.ldif");
+        ldifs.add(templateDir + "/odsee/odsee_plugin/amsdk_init_template.ldif");
+        ldifs.add(templateDir + "/odsee/odsee_user_index.ldif");
+        ldifs.add(templateDir + "/odsee/odsee_plugin.ldif");
         return ldifs;
     }
 

@@ -136,7 +136,7 @@ public class DefaultSummary extends AjaxPage {
             responseString = e.getMessage();
             debug.error("DefaultSummary.createDefaultConfig()", e);
         }
-        writeToResponse(responseString);
+        writeToResponse( ((responseString!=null)?responseString:"") );
         setPath(null);
         return false;
     }

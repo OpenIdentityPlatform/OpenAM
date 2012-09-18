@@ -26,15 +26,14 @@
  * Portions Copyrighted [2010-2012] [ForgeRock AS]
  *
  */
-package org.forgerock.openam.session.ha.amsessionstore.store;
-
-import com.iplanet.dpro.session.service.AMSessionRepository;
+package org.forgerock.openam.shared.session.ha.amsessionstore;
 
 import java.util.*;
 
 
 /**
- * AM Session Repository Type
+ * AM Session Repository Type, provides Naming, Description and Implementation ClassName for
+ * the various Types of AMSessionRepository Types.
  *
  * @author jeff.schenk@forgerock.com
  */
@@ -46,13 +45,13 @@ public enum AMSessionRepositoryType {
     none(0, 0, "none", "None", "Session Failover High Availability Disabled", "session.store.type.none", null),
 
     embedded(1, 1, "embedded", "Embedded", "OpenAM Configuration Directory", "session.store.type.embedded",
-            org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore.class),
+            "org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore"),
 
     external(2, 2, "external", "External", "OpenAM External OpenDJ Directory", "session.store.type.external",
-            org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore.class),
+            "org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore"),
 
     plugin(3, 3, "plugin", "Plug-In", "External Plug-In", "session.store.type.plugin",
-            org.forgerock.openam.session.ha.amsessionstore.store.plugin.PlugInPersistentStore.class);
+            "org.forgerock.openam.session.ha.amsessionstore.store.plugin.PlugInPersistentStore");
 
     /**
      * Index
@@ -77,7 +76,7 @@ public enum AMSessionRepositoryType {
     /**
      * Associated AMSessionRepository Implementation Class.
      */
-    private final Class<? extends AMSessionRepository> amSessionRepositoryImplementationClass;
+    private final String amSessionRepositoryImplementationClassName;
 
     /**
      * Index Entry
@@ -90,8 +89,8 @@ public enum AMSessionRepositoryType {
      * Index Entry
      * @return int of Enum
      */
-    public Class<? extends AMSessionRepository> amSessionRepositoryImplementationClass() {
-        return this.amSessionRepositoryImplementationClass;
+    public String amSessionRepositoryImplementationClassName() {
+        return this.amSessionRepositoryImplementationClassName;
     }
     /**
      * Index Entry
@@ -123,14 +122,14 @@ public enum AMSessionRepositoryType {
      * @param textDefinition
      */
     private AMSessionRepositoryType(int index, int displayOrder, String type, String displayType, String textDefinition,
-                                    String i18nKeyName, Class<? extends AMSessionRepository> amSessionRepositoryImplementationClass) {
+                                    String i18nKeyName, String amSessionRepositoryImplementationClassName) {
         this.index = index;
         this.displayOrder = displayOrder;
         this.type = type;
         this.displayType = displayType;
         this.textDefinition = textDefinition;
 
-        this.amSessionRepositoryImplementationClass = amSessionRepositoryImplementationClass;
+        this.amSessionRepositoryImplementationClassName = amSessionRepositoryImplementationClassName;
     }
 
     /**
@@ -168,12 +167,12 @@ public enum AMSessionRepositoryType {
      * @param type
      * @return String
      */
-    public static Class<? extends AMSessionRepository> getAMSessionRepositoryTypeImplementationClass(String type) {
+    public static String getAMSessionRepositoryTypeImplementationClass(String type) {
         for (AMSessionRepositoryType amSessionRepositoryType : AMSessionRepositoryType.values()) {
             if (amSessionRepositoryType.type().equalsIgnoreCase(type)) {
-                return amSessionRepositoryType.amSessionRepositoryImplementationClass;
+                return amSessionRepositoryType.amSessionRepositoryImplementationClassName;
             }  else if (amSessionRepositoryType.displayType.equalsIgnoreCase(type)) {
-                return amSessionRepositoryType.amSessionRepositoryImplementationClass;
+                return amSessionRepositoryType.amSessionRepositoryImplementationClassName;
             }
         }
         return null;

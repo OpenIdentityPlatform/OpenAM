@@ -46,13 +46,14 @@ import com.sun.identity.shared.ldap.LDAPv2;
 public class DirectoryServerVendor {
     public static String OPENDS = "opends";
     public static String OPENDJ = "opendj";
-    public static String SUNDS = "sunds";
+    public static String ODSEE = "odsee";
 
     private static String VENDOR_OPENDJ = "OpenDJ ";
     private static String VENDOR_OPENDS = "OpenDS Directory Server ";
     private static String VENDOR_SUNDS_5 = "Sun-ONE-Directory/";
     private static String VENDOR_SUNDS_6 = "Sun-Java(tm)-System-Directory/";
     private static String VENDOR_SUNDS_7 = "Sun-Directory-Server/";
+    private static String VENDOR_ODSEE_11 = "Oracle Directory Server Enterprise Edition";
     private static DirectoryServerVendor instance = new DirectoryServerVendor();
     
     private String[] attrs = {
@@ -115,13 +116,16 @@ public class DirectoryServerVendor {
                 vendor = new Vendor(OPENDS, version);
             } else if (result.startsWith(VENDOR_SUNDS_5)) {
                 String version = result.substring(VENDOR_SUNDS_5.length());
-                vendor = new Vendor(SUNDS, version);
+                vendor = new Vendor(ODSEE, version);
             } else if (result.startsWith(VENDOR_SUNDS_6)) {
                 String version = result.substring(VENDOR_SUNDS_6.length());
-                vendor = new Vendor(SUNDS, version);
+                vendor = new Vendor(ODSEE, version);
             } else if (result.startsWith(VENDOR_SUNDS_7)) {
                 String version = result.substring(VENDOR_SUNDS_7.length());
-                vendor = new Vendor(SUNDS, version);
+                vendor = new Vendor(ODSEE, version);
+            }  else if (result.startsWith(VENDOR_ODSEE_11)) {
+                String version = result.substring(VENDOR_ODSEE_11.length());
+                vendor = new Vendor(ODSEE, version);
             }
         }
 
