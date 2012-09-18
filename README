@@ -3,26 +3,23 @@ README file for OpenAM
 ------------------------------------------------------------------------------
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
- Copyright (c) 2012 ForgeRock AS Inc. All Rights Reserved
+ Copyright (c) 2011-2012 ForgeRock AS Inc. All Rights Reserved
 
- The contents of this file are subject to the terms
- of the Common Development and Distribution License
- (the License). You may not use this file except in
- compliance with the License.
+ This work is licensed under the Creative Commons
+ Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+ To view a copy of this license, visit
+ http://creativecommons.org/licenses/by-nc-nd/3.0/
+ or send a letter to Creative Commons, 444 Castro Street,
+ Suite 900, Mountain View, California, 94041, USA.
 
- You can obtain a copy of the License at
- http://forgerock.org/license/CDDLv1.0.html.
- See the License for the specific language governing
- permission and limitations under the License.
+ You can also obtain a copy of the license at
+ src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+ See the License for the specific language governing permissions
+ and limitations under the License.
 
- When distributing Covered Code, include this CDDL
- Header Notice in each file and include the License file
- at openam/legal/CDDLv1.0.txt.
-
- If applicable, add the following below the CDDL Header,
- with the fields enclosed by brackets [] replaced by
- your own identifying information:
- "Portions Copyrighted [year] [name of copyright owner]"
+ If applicable, add the following below this CCPL HEADER, with the fields
+ enclosed by brackets "[]" replaced with your own identifying information:
+      Portions Copyright [yyyy] [name of copyright owner]
 
 ------------------------------------------------------------------------------
 Portions Copyrighted 2010-2012 ForgeRock US
@@ -35,8 +32,6 @@ Portions Copyrighted 2010-2012 ForgeRock US
         %% 2.2 Maven structure
 
     %% 2. Library dependencies
-        %% 2.1 Maven resolved dependencies
-        %% 2.2 Obtaining fmsae.dll, fmsae64.dll and agent-csdk
 
     %% 3. Building the workspace
 
@@ -49,95 +44,100 @@ business practices.
 
 %% 1.1  Build requirements
 
-The OpenAM workspace is based on a standard maven build and uses maven as the
+The OpenAM workspace is based on a standard Maven build and uses Maven as the
 build framework.
 
 The sources in this workspace should be compiled using JDK 6.0. In order to allow
 this, you must ensure that JDK 6.0 is present in your system path and the
 JAVA_HOME environment variable is setup correctly pointing to its location. The
-target JDK is set to 1.6.
+target JDK is set to 1.5, but the recommended compiler is 1.6 or higher.
 
 Please see this URL for the latest instructions on how to compile OpenAM:
 https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source
 
 %% 1.2  Maven structure
 
-The maven OpenAM artifactory includes three areas:
+The Maven OpenAM subfolders includes three areas:
 
      - community                                : extensions of the OpenAM product created within the community
      - openam                                   : the core and supplementary components of OpenAM supported by ForgeRock
-     - opensso                                  : legacy components
+     - opensso                                  : policy agents and legacy OpenAM components
 
 Maven builds the files in the following order:
 
-     - Openam                                   : contains basic build files, as well as license and legal information
-     - Openam Shared                            : contains shared information and utilities
-     - Openam Entitlements                      : contains Entitlement Services to fine-tune access management
-     - Openam Core Token                        : contains the components for session tokens
-     - Openam Rest                              : contains all components of the REST interface
+     - OpenAM                                   : contains basic build files, as well as license and legal information
+     - OpenAM Shared                            : contains shared information and utilities
+     - OpenAM Entitlements                      : contains Entitlement Services to fine-tune access management
+     - OpenAM Core Token                        : contains the components for session tokens
+     - OpenAM Rest                              : contains all components of the REST interface
+     - OpenAM Schemata                          : is the parent folder for all schemas
+     - OpenAM Identity Services Schema          : contains the Identity Services schema
+     - OpenAM MIB Schema                        : contains MIB schema
+     - OpenAM XACML3 Schema                     : contains XACML3 schema
      - Openam Core                              : contains the core components of OpenAM
-     - Openam Server HA                         : contains the components for configuring high availability sessions
-     - Openam Session HA Locale Constants       : contains
-     - Openam Server HA Core                    : contains the components for interacting with tomcat
+     - OpenAM Authentication                    : contains authentication modules
+     - OpenAM Auth LDAP                         : contains the LDAP authenticaiton module
+     - OpenAM Auth AD                           : contains the AD authenticaiton module
+     - OpenAM Auth Anonymous                    : contains the anonymous authenticaiton module
+     - OpenAM Auth Adaptive                     : contains the adaptive authenticaiton module
+     - OpenAM Auth Application                  : contains the authenticaiton application module
+     - OpenAM Auth Cert                         : contains the authenticaiton certification module
+     - OpenAM Auth Datastore                    : contains the authenticaiton datastore
+     - OpenAM Auth HOTP                         : contains the HOTP authenticaiton module
+     - OpenAM Auth HttpBasic                    : contains the basic HTTP authenticaiton module
+     - OpenAM Auth JDBC                         : contains the JDBC authenticaiton module
+     - OpenAM Auth Membership                   : contains the membership authenticaiton module
+     - OpenAM Auth MSISDN                       : contains the MSISDN authenticaiton module
+     - OpenAM Auth NT                           : contains the NT authenticaiton module
+     - OpenAM Auth OATH                         : contains the OATH authenticaiton module
+     - OpenAM Auth Radius                       : contains the radius authenticaiton module
+     - OpenAM Auth Safeword                     : contains the authenticaiton safeword module
+     - OpenAM Auth SecureID                     : contains the SecureID authenticaiton module
+     - OpenAM Auth WindowsDesktopSSO            : contains the WindowsDesktopSSO authenticaiton module
+     - OpenAM SAML2 Schema                      : contains the SAML2 schema
+     - OpenAM WS Federation Schema              : contains the WS Federation schema
+     - OpenAM Liberty Schema                    : contains the Liberty schema
      - Openam Federation                        : contains the components of Federation
      - Openam Federation Library                : contains the Federation library
-     - Openam FM                                : contains
+     - OpenAM JAXRPC Schema                     : contains the JACRPC schema
+     - OpenAM DTD Schema                        : contains the DTD schema
+     - Openam Server HA                         : contains the components for configuring high availability sessions
+     - Openam Session HA Locale Constants       : contains the local and international components
+     - Openam Server HA Core                    : contains the components for interacting with tomcat
+     - Openam FM                                : contains OpenFM and Fedlet components
      - Openam OAuth                             : contains the components for integrating OAuth
      - Openam Tools                             : contains OpenAM tools
      - Openam Install Tools                     : contains files for installing the OpenAM tools
-     - Openam Server                            : contains the components for configuring OpenAM
-     - Openam Server Engine                     : contains
+     - Openam Server                            : contains the war file
+     - Openam Server Engine                     : contains the experimental Tomcat container
      - Openam Client SDK                        : contains the client SDK
      - Openam Documentation                     : contains the OpenAM documentation
      - Openam Site Helper                       : contains the OpenAM Online Help
      - Openam Site Documentation                : contains the HTML versions of OpenAM documentation
      - Openam Distribution Packaging            : contains the tools for working with OpenAM
-     - Openam Distribution ADM Setup            : contains
+     - Openam Distribution ADM Setup            : contains admin tools
      - Openam Distribution Library              : contains the third-party libraries
-     - Openam Distribution Fedlet UnConfigured  : contains the unconfigured informaiton for the Fedlet
+     - Openam Distribution Fedlet UnConfigured  : contains the unconfigured information for the Fedlet
      - Openam Distribution ssoAdminTools        : contains just the components required for ssoAdminTools
      - Openam Distribution ssoConfiguratorTools : contains just the components required for ssoConfiguratorTools
-     - Openam Distribution Kit                  : contains all of the components of OpenAm, including the core and tools
+     - Openam Distribution Kit                  : contains the main OpenAM package
+
+    * The ssoSessionTools has been removed from the build. It will be returned to the build in a later release.
 
 %% 2. Library dependencies
 
-The standard version of maven automatically resolves most third-party libraries.
-Only the Secure Attribute Exchange API requires additional work to acquire the
-necessary files for the build process.
-
-%% 2.1 Maven resolved dependencies
-
-Third-party libraries are hosted on the ForgeRock depot repository at
-http://maven.forgerock.org/repo/maven-central, including the following library files:
-
-   - Java EE 5 SDK: j2ee.jar, mail.jar
-   - SUN shared library jars: jaxb-api.jar, jaxb-impl.jar,
-     jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-impl.jar, jaxrpc-spi.jar,
-     jaxrpc-api.jar, saaj-api.jar, saaj-impl.jar,
-     relaxngDatatype.jar, xmlsec.jar, xalan.jar, xsdlib.jar,
-     FastInfoset.jar, jsr173_api.jar, webservices-api.jar,
-     webservices-rt.jar, webservices-tools.jar, webservices-extra.jar,
-     webservices-extra-api.jar, OpenDJ.jar, je.jar,
-     xercesImpl.jar, jss4.jar
-   - TestNG version 5.9 : testng-5.9-jdk15.jar
-   - Apache Commons Codec: commons-codec-1.4.jar
-   - OpenDS 2.3.x distribution ZIP file
-
-%% 2.2 Obtaining fmsae.dll, fmsae64.dll and agent-cdsk
-
-   - Secure Attribute Exchange API: fmsae.dll and fmsae64.dll
-
-Download openam.zip from http://forgerock.org/openam.html.
-Save the zip file locally, unzip it, then get fmsae.dll and fmsae64.dll  from 
-libraries/native/dll and copy it into the opensso/products/extlib directory
-in your workspace. Copy the agent-csdk subdirectory, and contents from 
-libraries/native to opensso/products/extlib.
+The standard version of Maven automatically resolves the third-party libraries.Third-party
+libraries are hosted on the ForgeRock depot repository at
+http://maven.forgerock.org/repo/maven-central.
 
 %% 3. Building the workspace
 
-The maven workspace build system has only one build target, which is
+Authentication and schema are separate from the build components and
+should be finished or pulled from the Artifactory prior to starting the Maven build.
+
+The Maven workspace build system has only one build target, which is
 available in the openam-server workspace.
 
-The first maven build will likely take longer than all subsequent builds to
-accomodate the lengthy dependency artifact chain. Following a successful build,
+The first Maven build will likely take longer than all subsequent builds to
+accommodate the lengthy dependency artifact chain. Following a successful build,
 a .war file will reside in the openam-server/target directory.
