@@ -469,6 +469,11 @@
         </dependency>
 
         <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>xml-security</groupId>
             <artifactId>xmlsec</artifactId>
         </dependency>
