@@ -196,13 +196,13 @@ $ which java
    <title>To Create the Password File</title>
    
    <step>
-    <para>Protect the password file you create as appropriate for your
-    operating system.</para>
-    <screen>$ umask 366</screen>
-   </step>
-   <step>
     <para>Create a text file containing only the password.</para>
     <screen>$ echo password > /tmp/pwd.txt</screen>
+   </step>
+   <step>
+    <para>Protect the password file you create as appropriate for your
+    operating system.</para>
+    <screen>$ chmod 400 /tmp/pwd.txt</screen>
    </step>
   </procedure>
   
