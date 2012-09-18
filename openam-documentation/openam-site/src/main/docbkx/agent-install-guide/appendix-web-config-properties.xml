@@ -49,18 +49,94 @@
      <para>The bootstrap configuration property,
      <literal>com.forgerock.agents.ext.url.validation.disable</literal>, lets
      you turn off URL validation during the initial bootstrap phase when the
-     policy agent reads its configuration. When you disable URL validation
+     policy agent reads its configuration. When you fully disable URL validation
      the policy agent does not need to connect to OpenAM during the bootstrap
      phase.</para>
      <para>Before you disable URL validation, make sure that the URLs in the
      policy agent configuration are valid and correct. As the policy agent
      performs no further validation, if the URLs are not correct then the
      agent is likely to crash.</para>
-     <para>To disable URL validation, set the property as shown:</para>
+     <para>To fully disable URL validation, set the property as shown:</para>
      <literallayout class="monospaced"
-     >com.forgerock.agents.ext.url.validation.disable = 1</literallayout>
+     >com.forgerock.agents.ext.url.validation.disable = 2</literallayout>
+
+     <variablelist>
+      <para>This property can take the following values.</para>
+
+      <varlistentry>
+       <term>0</term>
+       <listitem>
+        <para>Fully validate naming URLs specified by using the
+        <literal>com.sun.identity.agents.config.naming.url</literal> property.
+        The web policy agent logs into and logs out of OpenAM to check that
+        a naming URL is valid.</para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>1</term>
+       <listitem>
+        <para>Check that naming URLs are valid by performing an HTTP GET, which
+        should receive an HTTP 200 response.</para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>2</term>
+       <listitem>
+        <para>Disable all naming URL validation.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+
+     <itemizedlist>
+      <para>When naming URL validation is enabled, then set the following
+      properties.</para>
+
+      <listitem>
+       <para><literal>com.forgerock.agents.ext.url.validation.poll.interval</literal></para>
+      </listitem>
+
+      <listitem>
+       <para><literal>com.forgerock.agents.ext.url.validation.scan.interval</literal></para>
+      </listitem>
+
+      <listitem>
+       <para><literal>com.sun.identity.agents.config.connect.timeout</literal></para>
+      </listitem>
+
+      <listitem>
+       <para><literal>com.sun.identity.agents.config.receive.timeout</literal></para>
+      </listitem>
+     </itemizedlist>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.ext.url.validation.poll.interval</literal></term>
+    <listitem>
+     <para>Set this property to the number of seconds to wait before contacting
+     OpenAM to check that naming URLs are valid. This property should be set to
+     a larger value than
+     <literal>com.forgerock.agents.ext.url.validation.scan.interval</literal>.
+     For example,
+     <literal>com.forgerock.agents.ext.url.validation.poll.interval = 10</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.ext.url.validation.scan.interval</literal></term>
+    <listitem>
+     <para>Set this property to the number of seconds to wait before rescanning
+     the list of valid naming URLs, and persisting the list to a temporary file.
+     This property should be set to a smaller value than
+     <literal>com.forgerock.agents.ext.url.validation.poll.interval</literal>.
+     For example,
+     <literal>com.forgerock.agents.ext.url.validation.scan.interval = 3</literal>.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.certdb.password</literal></term>
     <listitem>
@@ -88,8 +164,9 @@
     <term><literal>com.sun.identity.agents.config.connect.timeout</literal></term>
     <listitem>
      <para>Set this to the number of milliseconds to keep the socket connection
-     open before timing out. The default value is 0 which implies no
-     timeout.</para>
+     open before timing out. If you have the web policy agent perform naming
+     URL validation, then set this property to a reasonable value such as
+     2000 (2 seconds). The default value is 0 which implies no timeout.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -226,8 +303,10 @@
     <term><literal>com.sun.identity.agents.config.receive.timeout</literal></term>
     <listitem>
      <para>Set this to the number of milliseconds to wait for a response from
-     OpenAM before timing out and dropping the connection. The default value is
-     0 which implies no timeout.</para>
+     OpenAM before timing out and dropping the connection. If you have the web
+     policy agent perform naming URL validation, then set this property to a
+     reasonable value such as 2000 (2 seconds). The default value is 0 which
+     implies no timeout.</para>
     </listitem>
    </varlistentry>
    <varlistentry>

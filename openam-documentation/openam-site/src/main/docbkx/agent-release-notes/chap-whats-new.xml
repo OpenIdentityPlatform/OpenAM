@@ -58,6 +58,11 @@
     xlink:show="new">OPENAM-1265</link>).</para>
    </listitem>
    <listitem>
+    <para>Web policy agents now support failover across multiple naming URLs
+    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
+    xlink:show="new">OPENAM-1258</link>).</para>
+   </listitem>
+   <listitem>
     <para>Policy agent now allows you to configure the naming of the URL validation net-connect timeout (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1257"
     xlink:show="new">OPENAM-1257</link>).</para>
