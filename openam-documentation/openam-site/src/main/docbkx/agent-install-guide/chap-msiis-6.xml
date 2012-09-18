@@ -181,9 +181,7 @@ Default Web Site (1)
 Web Site Identifier :
 <userinput>1</userinput>
 ...
-Enter the URL where the OpenAM server is running. Please include the deployment
- URI also as shown in the example (Example: http://openam.example.com:58080/
- openam):
+Enter the URL where the OpenAM server is running...:
 <userinput>http://openam.example.com:8080/openam</userinput>
 
 Please enter the Agent Profile name :
@@ -214,8 +212,8 @@ Agent Configuration file created : config.txt
 Enter the Agent Resource File Name [IIS6Resource.en] :
 
 Creating the Agent Config Directory
-Creating the OpenSSOAgentBootstrap.properties and OpenSSOAgentConfiguration.prop
-erties File
+Creating the <?eval ${agentsBootstrapFile}?> and
+ <?eval ${agentsConfigurationFile}?> File
 Updating the Windows Product Registry
 Loading the IIS 6.0 Agent
 Completed Configuring the IIS 6.0 Agent</screen>
@@ -244,14 +242,14 @@ Internet services successfully restarted</screen>
     <filename>web_agents\iis6_agent\Identifier_1</filename>.</para>
     <variablelist>
      <varlistentry>
-      <term><filename>config\OpenSSOAgentBootstrap.properties</filename></term>
+      <term><filename>config\<?eval ${agentsBootstrapFile}?></filename></term>
       <listitem>
        <para>Used to bootstrap the web policy agent, allowing the agent to
        connect to OpenAM and download its configuration</para>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><filename>config\OpenSSOAgentConfiguration.properties</filename></term>
+      <term><filename>config\<?eval ${agentsConfigurationFile}?></filename></term>
       <listitem>
        <para>Only used if you configured the web policy agent to use local
        configuration</para>
@@ -275,7 +273,7 @@ Internet services successfully restarted</screen>
    </step>
    <step>
     <para>If your policy agent configuration is not in the top-level realm (/),
-       then you must edit config/OpenSSOAgentBootstrap.properties to indentify
+       then you must edit config\<?eval ${agentsBootstrapFile}?> to identify
        the sub-realm that has your policy agent configuration.
        Find com.sun.identity.agents.config.organization.name and change
        the / to the path to your policy agent profile. This allows the policy agent

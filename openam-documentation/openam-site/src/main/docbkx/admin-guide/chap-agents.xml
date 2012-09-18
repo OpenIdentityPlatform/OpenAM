@@ -236,7 +236,7 @@
 
    <para>This corresponds to the local Java properties configuration file
    that is set up when you install an agent, for example in
-   <filename>Agent_001/config/OpenSSOAgentConfiguration.properties</filename>.</para>
+   <filename>Agent_001/config/<?eval ${agentsConfigurationFile}?></filename>.</para>
   </tip>
   
   <para>After changing properties specified as "Hot swap: no" you must

@@ -46,11 +46,9 @@
   requires Java.</para>
   
   <screen>$ echo $JAVA_HOME
-/path/to/jdk1.6
-$ java -version
-java version "1.6.0_29"
-Java(TM) SE Runtime Environment (build 1.6.0_29-b11-402-11D50)
-Java HotSpot(TM) 64-Bit Server VM (build 20.4-b02-402, mixed mode)</screen>
+/path/to/java1.6
+$ which java
+/usr/bin/java</screen>
   
   <para>Download the Apache 2.2 policy agent for your platform from the
   <link xlink:href="http://forgerock.org/openam.html">download page</link>.
@@ -222,10 +220,10 @@ SUMMARY OF AGENT INSTALLATION
 Agent instance name: Agent_001
 Agent Bootstrap file location:
 /path/to/web_agents/apache22_agent/Agent_001/config/
- OpenSSOAgentBootstrap.properties
+ <?eval ${agentsBootstrapFile}?>
 Agent Configuration Tag file location
 /path/to/web_agents/apache22_agent/Agent_001/config/
- OpenSSOAgentConfiguration.properties
+ <?eval ${agentsConfigurationFile}?>
 Agent Audit directory location:
 /path/to/web_agents/apache22_agent/Agent_001/logs/audit
 Agent Debug directory location:
@@ -253,14 +251,14 @@ Install log file location:
     <filename>web_agents/apache22_agent/Agent_001/</filename>.</para>
     <variablelist>
      <varlistentry>
-      <term><filename>config/OpenSSOAgentBootstrap.properties</filename></term>
+      <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
       <listitem>
        <para>Used to bootstrap the web policy agent, allowing the agent to
        connect to OpenAM and download its configuration</para>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><filename>config/OpenSSOAgentConfiguration.properties</filename></term>
+      <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
       <listitem>
        <para>Only used if you configured the web policy agent to use local
        configuration</para>
@@ -284,7 +282,7 @@ Install log file location:
    </step>
    <step>
     <para>If your policy agent configuration is not in the top-level realm (/),
-       then you must edit config/OpenSSOAgentBootstrap.properties to indentify
+       then you must edit config/<?eval ${agentsBootstrapFile}?> to identify
        the sub-realm that has your policy agent configuration.
        Find com.sun.identity.agents.config.organization.name and change
        the / to the path to your policy agent profile. This allows the policy agent

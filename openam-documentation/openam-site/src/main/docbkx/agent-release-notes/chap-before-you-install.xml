@@ -38,6 +38,11 @@
  https://wikis.forgerock.org/confluence/display/openam/OpenAM+Policy+Agents+3.0.4+supported
  modulo changes in particular for test plans.</para>
 
+ <para>All agents except Microsoft IIS web agents require Java for installation.
+ ForgeRock has tested this release of OpenAM primarily with Oracle Java SE JDK,
+ and recommends the most recent release of Java 6 to ensure you have the latest
+ security fixes.</para>
+
  <para>Apache web agents require Apache Portable Runtime 1.3.x or later. You
  can check your installation by running <command>httpd -v</command>. On some
  systems, the packaged version of Apache HTTPD uses earlier versions of APR

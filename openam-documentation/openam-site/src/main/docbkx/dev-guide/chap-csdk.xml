@@ -132,7 +132,7 @@ $ cd ../samples</screen>
    <para>Try one of the samples you built to test your build.</para>
    <screen>$ LD_LIBRARY_PATH=../lib
  ./am_auth_test
- -f ../config/OpenSSOAgentBootstrap.properties
+ -f ../config/<?eval ${agentsBootstrapFile}?>
  -u demo
  -p changeit
  -o /

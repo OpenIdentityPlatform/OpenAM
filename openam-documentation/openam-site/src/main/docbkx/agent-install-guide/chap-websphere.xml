@@ -43,7 +43,12 @@
   
   <para>You must install a Java 6 runtime environment, and set the
   <literal>JAVA_HOME</literal> environment variable.</para>
-  
+
+  <screen>$ echo $JAVA_HOME
+/path/to/java1.6
+$ which java
+/usr/bin/java</screen>
+
   <para>Download the WebSphere policy agent from the
   <link xlink:href="http://forgerock.org/openam.html">download page</link>.
   Also verify the checksum of the file you download against the checksum
@@ -212,7 +217,7 @@ Instance Config Directory :
 
 Instance Server name : server1 
 WebSphere Install Root Directory : /path/to/WebSphere/AppServer 
-OpenSSO server URL : http://openam.example.com:8080/openam 
+<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam 
 Agent URL : http://www.example.com:9080/agentapp 
 Agent Profile name : WebSphere Agent 
 Agent Profile Password file name : /tmp/pwd.txt
@@ -223,10 +228,10 @@ SUMMARY OF AGENT INSTALLATION
 Agent instance name: Agent_001
 Agent Bootstrap file location:
 /path/to/j2ee_agents/websphere_v61_agent/Agent_001/config/
- OpenSSOAgentBootstrap.properties
+ <?eval ${agentsBootstrapFile}?>
 Agent Configuration file location
 /path/to/j2ee_agents/websphere_v61_agent/Agent_001/config/
- OpenSSOAgentConfiguration.properties
+ <?eval ${agentsConfigurationFile}?>
 Agent Audit directory location:
 /path/to/j2ee_agents/websphere_v61_agent/Agent_001/logs/audit
 Agent Debug directory location:
@@ -255,14 +260,14 @@ Install log file location:
     <filename>j2ee_agents/websphere_v61_agent/Agent_001/</filename>.</para>
     <variablelist>
      <varlistentry>
-      <term><filename>config/OpenSSOAgentBootstrap.properties</filename></term>
+      <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
       <listitem>
        <para>Used to bootstrap the J2EE policy agent, allowing the agent to
        connect to OpenAM and download its configuration</para>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><filename>config/OpenSSOAgentConfiguration.properties</filename></term>
+      <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
       <listitem>
        <para>Only used if you configured the J2EE policy agent to use local
        configuration</para>
@@ -286,7 +291,7 @@ Install log file location:
    </step>
    <step>
     <para>If your policy agent configuration is not in the top-level realm (/),
-       then you must edit config/OpenSSOAgentBootstrap.properties to indentify
+       then you must edit config/<?eval ${agentsBootstrapFile}?> to identify
        the sub-realm that has your policy agent configuration.
        Find com.sun.identity.agents.config.organization.name and change
        the / to the path to your policy agent profile. This allows the policy agent

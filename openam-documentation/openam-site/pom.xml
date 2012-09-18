@@ -111,6 +111,9 @@
         <agentsDocTargetVersion>3</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
+        <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
+        <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
+        <oldProjectName>OpenSSO</oldProjectName>
 
         <site-out>${project.build.outputDirectory}/site</site-out>
 

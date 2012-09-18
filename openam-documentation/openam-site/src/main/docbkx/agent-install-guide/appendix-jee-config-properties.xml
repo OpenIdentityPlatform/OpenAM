@@ -40,7 +40,7 @@
   <title>Bootstrap Configuration Properties</title>
 
   <para>These properties are set in
-  <filename>config/OpenSSOAgentBootstrap.properties</filename>.</para>
+  <filename>config/<?eval ${agentsBootstrapFile}?></filename>.</para>
 
   <variablelist>
    <varlistentry>
@@ -74,7 +74,7 @@
     <term><literal>com.iplanet.am.services.deploymentDescriptor</literal></term>
     <listitem>
      <para>Set this to the URI under which OpenAM is deployed, such as
-     <literal>/openam</literal>. Default is <literal>/opensso</literal>.</para>
+     <literal>/openam</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -141,7 +141,7 @@
   <title>Agent Configuration Properties</title>
 
   <para>These properties are set in
-  <filename>config/OpenSSOAgentConfiguration.properties</filename> if your
+  <filename>config/<?eval ${agentsConfigurationFile}?></filename> if your
   agent uses local configuration. If your agent uses centralized configuration,
   the properties are set in OpenAM.</para>
 
