@@ -14,5 +14,5 @@ mv openam-distribution/openam-distribution-ssoconfiguratortools/target/openam-di
    openam-distribution/openam-distribution-ssoconfiguratortools/target/openam-distribution-ssoconfiguratortools-${OPENAM_VERSION}_`date "+%Y%m%d"`.zip
 
 mv openam-distribution/openam-distribution-kit/target/openam-distribution-kit-${OPENAM_VERSION}.zip \
-   openam-distribution/openam-distribution-kit/target/openam-distribution-kit-${OPENAM_VERSION}_`date "+%Y%m%d"`.zip
+   openam-distribution/openam-distribution-kit/target/openam-distribution-kit-${OPENAM_VERSION}_nightly_`date "+%Y%m%d"`.zip
 
