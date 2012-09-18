@@ -53,7 +53,7 @@ JAVA_HOME environment variable is setup correctly pointing to its location. The
 target JDK is set to 1.5, but the recommended compiler is 1.6 or higher.
 
 Please see this URL for the latest instructions on how to compile OpenAM:
-https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source
+https://wikis.forgerock.org/confluence/display/openam/Build+OpenAM+from+Source.
 
 %% 1.2  Maven structure
 
@@ -131,12 +131,6 @@ libraries are hosted on the ForgeRock depot repository at
 http://maven.forgerock.org/repo/maven-central.
 
 %% 3. Building the workspace
-
-Authentication and schema are separate from the build components and
-should be finished or pulled from the Artifactory prior to starting the Maven build.
-
-The Maven workspace build system has only one build target, which is
-available in the openam-server workspace.
 
 The first Maven build will likely take longer than all subsequent builds to
 accommodate the lengthy dependency artifact chain. Following a successful build,
