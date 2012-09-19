@@ -94,7 +94,7 @@
 
                                 <filter token="ZIPNAME" value="${zipname.set}" />
                                 <filter token="BUILD_DATE" value="${time.stamp}" />
-                                <filter token="BUILD_VERSION" value="${version}" />
+                                <filter token="BUILD_VERSION" value="${project.version}" />
 
                                 <copy file="../../src/main/jenkins/openam_link.js.template"
                                       tofile="${distribution.target.dir}/openam_link.js" filtering="true"/>
