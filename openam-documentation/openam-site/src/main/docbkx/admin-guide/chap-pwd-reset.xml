@@ -81,15 +81,35 @@
    each realm inherit the global settings.</para>
 
    <step performance="optional">
-    <para>If you use LDAP as the user repository and want to be able to force
-    password changes on reset, set the default authentication type for the
-    realm to LDAP rather than the default (Data Store) to prevent
-    authentication from failing after user passwords are reset.</para>
+    <para>When OpenAM is configured with default settings, it uses the
+    <literal>ldapService</literal> authentication chain, which relies on the
+    <literal>DataStore</literal> authentication module. The
+    <literal>DataStore</literal> authentication module provides a generic
+    authentication mechanism for OpenAM data stores, and therefore cannot
+    handle specific data store settings, such as the directory server password
+    policy setting to force password changes on reset. When you use settings
+    the module cannot handle, then authentication can fail.</para>
 
-    <para>You can change the settings through the OpenAM console. Browse to
-    Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
-    Authentication &gt; Authentication Chaining &gt; ldapService, and then set
-    Instance to LDAP and Criteria to REQUIRED.</para>
+    <para>If you must configure the directory server to force password changes
+    on reset, then also configure a separate authentication chain for users.
+    The separate authentication chain must require the <literal>LDAP</literal>
+    authentication module rather than the <literal>DataStore</literal>
+    authentication module.</para>
+
+    <para>You can create and configure authentication chains, and assign them
+    in the OpenAM console under Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Authentication.</para>
+
+    <para>The OpenAM administrator, <literal>amadmin</literal>, uses the
+    <literal>DataStore</literal> authentication module. If you set Access
+    Control &gt; /(Top Level Realm) &gt; Authentication &gt;
+    Core &gt; Organization Authentication Configuration to use your
+    <literal>LDAP</literal> based authentication chain for users, let the
+    Administrator Authentication Configuration continue to use the
+    <literal>DataStore</literal> based authentication chain. To login to the
+    OpenAM console as <literal>amadmin</literal>, access the administrator
+    console service instead of the UI login service endpoint. For example:
+    <literal>http://openam.example.com:8080/openam/console</literal>.</para>
    </step>
    <step>
     <para>In the OpenAM console, browse to Configuration &gt; Global &gt;
