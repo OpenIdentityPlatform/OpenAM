@@ -56,7 +56,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM</name>
+    <name>OpenAM Project</name>
     <groupId>org.forgerock</groupId>
     <artifactId>openam</artifactId>
     <version>10.1.0-SNAPSHOT</version>
@@ -127,6 +127,8 @@
         <restlet.version>2.1-RC4</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
 
+        <!--  Project web site -->
+        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
     </properties>
 
     <!-- Profiles -->
@@ -496,6 +498,11 @@
             <name>maven.forgerock.org-snapshots</name>
             <url>http://maven.forgerock.org/repo/openam-snapshots</url>
         </snapshotRepository>
+        <site>
+            <id>forgerock.org</id>
+            <name>OpenAM Project</name>
+            <url>${siteDistributionURL}</url>
+        </site>
     </distributionManagement>
 
     <!-- Source Control -->

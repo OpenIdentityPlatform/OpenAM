@@ -117,7 +117,6 @@
 
         <site-out>${project.build.outputDirectory}/site</site-out>
 
-        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
         <products-basedir>${basedir}</products-basedir>
         <gaId>UA-23412190-7</gaId>
         <!--
@@ -130,13 +129,7 @@
         <softwareReleaseDate>${releaseDate}</softwareReleaseDate>
         <defaultRootSuffix>dc=openam,dc=java,dc=net</defaultRootSuffix>
     </properties>
-    <distributionManagement>
-        <site>
-            <id>forgerock.org</id>
-            <name>OpenAM</name>
-            <url>${siteDistributionURL}</url>
-        </site>
-    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -258,25 +251,6 @@
                             </target>
                         </configuration>
                     </execution>
-
-                    <execution>
-                        <id>unpack-javadoc</id>
-                        <phase>site</phase>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <target>
-                                <mkdir dir="${site-out}/doc/public-api"/>
-                                <unjar
-                                        src="../../target/openam-${project.version}-public-javadoc.jar"
-                                        dest="${site-out}/doc/public-api"/>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-
-
                 </executions>
             </plugin>
 

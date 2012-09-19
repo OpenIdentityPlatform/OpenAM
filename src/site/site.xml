@@ -23,7 +23,7 @@
   !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
-<project name="${project.name}"
+<project name="${project.name} Project"
  xmlns="http://maven.apache.org/DECORATION/1.0.1"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.1 http://maven.apache.org/xsd/decoration-1.0.1.xsd">
@@ -56,23 +56,23 @@
   </menu>
   
   <menu name="Released Documentation">
-   <item name="OpenAM 10.0.0" href="http://docs.forgerock.org/en/index.html?product=openam&amp;version=10.0.0"/>
+   <item name="OpenAM 10.0.0" href="http://docs.forgerock.org/en/openam/10.0.0"/>
   </menu>
 
   <menu name="OpenAM Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./doc/release-notes/index.html" />
-   <item name="Installation Guide" href="./doc/install-guide/index.html" />
-   <item name="Admin Guide" href="./doc/admin-guide/index.html" />
-   <item name="Developer Guide" href="./doc/dev-guide/index.html" />
-   <item name="Reference" href="./doc/reference/index.html" />
-   <item name="Javadoc" href="./doc/public-api/index.html" />
+   <item name="Release Notes" href="./openam-documentation/openam-site/doc/release-notes/index.html" />
+   <item name="Installation Guide" href="./openam-documentation/openam-site/doc/install-guide/index.html" />
+   <item name="Admin Guide" href="./openam-documentation/openam-site/doc/admin-guide/index.html" />
+   <item name="Developer Guide" href="./openam-documentation/openam-site/doc/dev-guide/index.html" />
+   <item name="Reference" href="./openam-documentation/openam-site/doc/reference/index.html" />
+   <item name="Javadoc" href="./apidocs/index.html" />
   </menu>
 
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./doc/agent-release-notes/index.html" />
-   <item name="Install Guide" href="./doc/agent-install-guide/index.html" />
+   <item name="Release Notes" href="./openam-documentation/openam-site/doc/agent-release-notes/index.html" />
+   <item name="Install Guide" href="./openam-documentation/openam-site/doc/agent-install-guide/index.html" />
   </menu>
 
   <menu name="Project Information">
