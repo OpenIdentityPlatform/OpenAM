@@ -74,7 +74,7 @@
    xlink:show="new">OPENAM-1256</link>).</para>
    </listitem>
    <listitem>
-    <para>A web policy agent is now available for Apache HTTP Server 2.4 (<link
+    <para>A web policy agent is now available for Apache HTTPD Server 2.4 (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1195"
     xlink:show="new">OPENAM-1195</link>).</para>
    </listitem>
@@ -127,6 +127,11 @@
     now parses as valid XML (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
    xlink:show="new">OPENAM-674</link>).</para>
+   </listitem>
+   <listitem>
+    <para>The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
+    xlink:show="new">OPENAM-1273</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agent file names now include the version number
