@@ -24,16 +24,6 @@
                 '<small>' + response.responseText + '</small>';
         }                
         field = "";
-    }  
-    
-   function validatePort() {
-        field = "configStorePort";
-        var callUrl = "$context$path?actionLink=validateLocalPort";
-        var param = "&port=" + $('configStorePort').value;
-        ie7fix++;
-        callUrl = callUrl + "&ie7fix=" + ie7fix;
-        setTimeout("enableNextButton()", 500);
-        AjaxUtils.call(callUrl+param, validateUserFields);
     }
 
     function validateAdminPort() {
@@ -92,12 +82,21 @@
         var call = "$context$path?actionLink=validateConfigStoreHost";
         var hostname = "&configStoreHost=" + $('configStoreHost').value;        
         $('nextTabButton').disabled = true;
-	field = "configStoreHost";
-        
+	    field = "configStoreHost";
         ie7fix++;
         call = call + "&ie7fix=" + ie7fix;
         AjaxUtils.call(call+hostname, validateSMHost);        
-    }        
+    }
+
+    function validateConfigStorePort() {
+        field = "configStorePort";
+        var callUrl = "$context$path?actionLink=validateLocalPort";
+        var param = "&port=" + $('configStorePort').value;
+        ie7fix++;
+        callUrl = callUrl + "&ie7fix=" + ie7fix;
+        setTimeout("enableNextButton()", 500);
+        AjaxUtils.call(callUrl+param, validateUserFields);
+    }
     
     function validateConfigStoreLoginId() {
         $('nextTabButton').disabled = true;
@@ -278,9 +277,15 @@
         document.getElementById("password").style.display = display;
         
         if (display == "none") {
-            document.getElementById("configStoreSSL").disabled = true;
-            document.getElementById("configStoreHost").disabled = true;
-            document.getElementById("configStoreHost").value = "localhost";
+            document.getElementById("configStoreSSL").disabled = false;
+            document.getElementById("configStoreHost").disabled = false;
+            if ( document.getElementById("configStoreHost").value == "" )
+            {
+              document.getElementById("configStoreHost").value = "localhost";
+            }
+            document.getElementById("configStoreHost").style.display = "";
+            document.getElementById("configStorePort").disabled = false;
+            document.getElementById("configStorePort").style.display = "";
             document.getElementById("adminport").style.display = "";
             document.getElementById("jmxport").style.display = "";
         } else {
@@ -288,6 +293,10 @@
             document.getElementById("configStoreHost").disabled = false;
 	        remoteDSHost = document.getElementById("configStoreHost").value;
             document.getElementById("configStoreHost").value = remoteDSHost;
+            document.getElementById("configStorePort").disabled = false;
+            document.getElementById("configStorePort").style.display = "";
+            remoteDSPort = document.getElementById("configStorePort").value;
+            document.getElementById("configStorePort").value = remoteDSPort;
             document.getElementById("adminport").style.display = "none";
             document.getElementById("jmxport").style.display = "none";
         }
@@ -329,13 +338,11 @@
                 !isFieldOK('configStoreAdminPort') ||
                 !isFieldOK('configStoreJmxPort') ||
                 !isEncryptionKeyOk() ||
-                !isFieldOK('rootSuffix') ||
-                !isFieldOK('sessionRootDN') ||
-                !isFieldOK('sessionStoreType');
+                !isFieldOK('rootSuffix');
         } else {
             var allFieldsValid = isFieldOK('configStoreHost') &&
                 isFieldOK('configStorePort') && isEncryptionKeyOk() &&
-                isFieldOK('rootSuffix') && isFieldOK('sessionRootDN') && isFieldOK('sessionStoreType') &&
+                isFieldOK('rootSuffix') &&
                 isFieldOK('configStoreLoginId') &&
                 isFieldOK('configStorePassword') &&
                 (document.getElementById('configStorePassword').value != '');
@@ -378,11 +385,9 @@
     <h1>$page.getLocalizedString("step3.title")<img class="pointer" 
         src="$context/assets/images/message.gif"/></h1>
     <p>$page.getLocalizedString("step3.description")</p> 
-    <input type="radio" id="existingNo" name="existingInstance" 
-        value="false" $selectFirstSetup onclick="disableExisting();"/>
+    <input type="radio" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" $selectFirstSetup />
         $page.getLocalizedString("create.new.instance")
-    <input type="radio" $selectExistingSetup id="existingYes" name="existingInstance" 
-        value="true" onclick="enableExisting();"/>
+    <input type="radio" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" $selectExistingSetup />
         $page.getLocalizedString("add.existing.instance")
        
     <!-- EMBEDDED STORE PROPERTIES -->
@@ -398,7 +403,7 @@
         <div class="headerBox">
             $page.getLocalizedString("step3.sub.title")
         </div>
-        <div class="bodyBox" style="height:340px;">
+        <div class="bodyBox" style="height:290px;">
              <span>  
              <!-- New Instances -->
              <div id="newInstanceOptions">            
@@ -427,15 +432,15 @@
                             $page.getLocalizedString("ssl.label")</label></td>
                         <td>
                             <input id="configStoreSSL" name="configStoreSSL" 
-                               type="checkbox" value="SSL" $selectConfigStoreSSL
-                               onClick="APP.callDelayed(this, validateConfigStoreSSL)"/></td>
+                               type="checkbox" value="SSL"
+                               onClick="APP.callDelayed(this, validateConfigStoreSSL)" $selectConfigStoreSSL /></td>
                     </tr>
                     <tr id="host">
                         <td><label for="configStoreHost"><em>*&nbsp;</em>
                             $page.getLocalizedString("host.name.label")</label></td>
                         <td>
                             <input id="configStoreHost" name="configStoreHost" 
-                               type="text" class="text" style="width:150px" 
+                               type="text" class="text" style="width:200px"
                                value="$configStoreHost"
                                onkeyup="APP.callDelayed(this, validateConfigStoreHost)"
                                onchange="APP.callDelayed(this, validateConfigStoreHost)"/>
@@ -450,8 +455,8 @@
                             <input id="configStorePort" name="configStorePort" 
                                    type="text" size="5" maxLength="5" 
                                    value="$configStorePort" 
-                                   onkeyup="APP.callDelayed(this, validatePort)"
-                                   onchange="APP.callDelayed(this, validatePort)"/>
+                                   onkeyup="APP.callDelayed(this, validateConfigStorePort)"
+                                   onchange="APP.callDelayed(this, validateConfigStorePort)"/>
                             <span id="configStorePortStatus"></span></td>
                     </tr>
                     <tr id="adminport">
@@ -499,6 +504,7 @@
                             <span id="rootSuffixStatus"></span>                       
                         </td>
                     </tr>
+
                     <tr id="login">
                         <td><label for="configStoreLoginId"><em>*&nbsp;</em>
                             $page.getLocalizedString("login.id.label")</label></td>
@@ -651,8 +657,8 @@
                             <input id="existingStorePort" name="existingStorePort"
                                    type="text" size="5" maxLength="5"
                                    value="$existingStorePort"
-                                   onkeyup="APP.callDelayed(this, validatePort)"
-                                   onchange="APP.callDelayed(this, validatePort)"/>
+                                   onkeyup="APP.callDelayed(this, validateConfigStorePort)"
+                                   onchange="APP.callDelayed(this, validateConfigStorePort)"/>
                             <span id="existingStorePortStatus"></span>
                         </td>
                     </tr>
