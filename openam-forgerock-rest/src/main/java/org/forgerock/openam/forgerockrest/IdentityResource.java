@@ -15,8 +15,13 @@
  */
 package org.forgerock.openam.forgerockrest;
 
+import java.lang.Exception;
+import java.lang.String;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -42,6 +47,20 @@ import org.forgerock.json.resource.exception.NotSupportedException;
 import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.CollectionResourceProvider;
 
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOTokenManager;
+import java.security.AccessController;
+
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.idsvcs.Token;
+
+import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.Attribute;
+
 /**
  * A simple {@code Map} based collection resource provider.
  */
@@ -58,11 +77,17 @@ public final class IdentityResource implements CollectionResourceProvider {
     private final Map<String, Resource> resources = new ConcurrentHashMap<String, Resource>();
     private final Object writeLock = new Object();
 
+    private final List<Attribute> iDSvcsAttrList = new ArrayList();
+
     /**
      * Creates a new empty backend.
      */
     public IdentityResource() {
         // No implementation required.
+    }
+    public IdentityResource(String userType) {
+        String[] vals = {userType} ;
+        iDSvcsAttrList.add(new Attribute("objecttype",vals)) ;
     }
 
     /**
@@ -187,9 +212,25 @@ public final class IdentityResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(final Context context, final QueryRequest request,
                                 final QueryResultHandler handler) {
-        for (final Resource resource : resources.values()) {
-            handler.handleResource(resource);
+
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                AdminTokenAction. getInstance());
+        Token ret = new Token();
+        ret.setId(adminToken.getTokenID().toString());
+        try {
+
+            IdentityServicesImpl id = new IdentityServicesImpl();
+            List<String> users = id.search( "*", iDSvcsAttrList, ret );
+
+            for (final String user : users) {
+                JsonValue val = new JsonValue(user);
+                Resource resource = new Resource("0","0",val)  ;
+                handler.handleResource(resource);
+            }
+        } catch (Exception ex)             {
+
         }
+
         handler.handleResult(new QueryResult());
     }
 
@@ -200,15 +241,33 @@ public final class IdentityResource implements CollectionResourceProvider {
     public void readInstance(final Context context, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
         final String id = request.getResourceId();
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                AdminTokenAction. getInstance());
+        Token admin = new Token();
+        admin.setId(adminToken.getTokenID().toString());
+
         try {
-            final Resource resource = resources.get(id);
-            if (resource == null) {
+            IdentityServicesImpl idsvc = new IdentityServicesImpl();
+            IdentityDetails dtls = idsvc.read(id, iDSvcsAttrList, admin);
+
+            if (dtls == null) {
                 throw new NotFoundException("The resource with ID '" + id
                         + " could not be read because it does not exist");
             }
+            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+            result.put("name", dtls.getName());
+            result.put("realm", dtls.getRealm());
+            Attribute[] attrs = dtls.getAttributes();
+
+            for (Attribute aix : attrs)  {
+                result.put(aix.getName(),aix.getValues()) ;
+            }
+            Resource resource = new Resource("0","0",result)  ;
+
             handler.handleResult(resource);
         } catch (final ResourceException e) {
             handler.handleError(e);
+        } catch (final Exception e) {
         }
     }
 
@@ -270,4 +329,5 @@ public final class IdentityResource implements CollectionResourceProvider {
                     + "' encountered while updating a resource");
         }
     }
+
 }

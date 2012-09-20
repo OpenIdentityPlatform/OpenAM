@@ -1132,18 +1132,25 @@
 	    </servlet-mapping>
 
     <servlet>
-    <servlet-name>FRRest</servlet-name>
+    <servlet-name>ForgeRockRest</servlet-name>
     <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
 
     <!-- Your application class name (Optional - For mode 3) -->
     <init-param>
         <param-name>connection-factory-class</param-name>
-        <param-value>org.forgerock.openam.forgerockrest.IdentityDispatcher</param-value>
+        <param-value>org.forgerock.openam.forgerockrest.RestDispatcher</param-value>
+    </init-param>
+    <init-param>
+        <param-name>rootContexts</param-name>
+        <param-value>
+            org.forgerock.openam.forgerockrest.RealmDispatcher,
+            org.forgerock.openam.forgerockrest.TestDispatcher
+        </param-value>
     </init-param>
     </servlet>
     <servlet-mapping>
-        <servlet-name>FRRest</servlet-name>
-        <url-pattern>/jsonresource/*</url-pattern>
+        <servlet-name>ForgeRockRest</servlet-name>
+        <url-pattern>/json/*</url-pattern>
     </servlet-mapping>
 
 

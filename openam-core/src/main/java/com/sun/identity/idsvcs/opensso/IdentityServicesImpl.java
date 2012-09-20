@@ -608,7 +608,7 @@ public class IdentityServicesImpl
 
     }
 
-    private List search(String filter, List attributes, Token admin)
+    public List search(String filter, List attributes, Token admin)
         throws TokenExpired, GeneralFailure, RemoteException
     {
         List rv = Collections.EMPTY_LIST;
@@ -963,7 +963,7 @@ public class IdentityServicesImpl
         return read(name, attrList, admin);
     }
 
-    private IdentityDetails read(String name, List attributes, Token admin)
+    public IdentityDetails read(String name, List attributes, Token admin)
         throws NeedMoreCredentials, ObjectNotFound, TokenExpired, 
         GeneralFailure, AccessDenied
     {

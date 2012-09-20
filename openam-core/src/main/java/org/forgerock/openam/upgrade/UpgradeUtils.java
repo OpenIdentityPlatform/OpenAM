@@ -278,6 +278,8 @@ public class UpgradeUtils {
         if (current == null || war == null) {
             return false;
         }
+        if (SystemProperties.get("org.forgerock.donotupgrade") != null) return false;
+
         SimpleDateFormat versionDateFormat = new SimpleDateFormat(Constants.VERSION_DATE_FORMAT, Locale.UK);
         Date currentVersionDate = null;
         Date warVersionDate = null;

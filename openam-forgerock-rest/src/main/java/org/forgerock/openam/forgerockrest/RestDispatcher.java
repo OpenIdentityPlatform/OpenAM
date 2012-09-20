@@ -17,10 +17,14 @@ package org.forgerock.openam.forgerockrest;
 
 import static org.forgerock.json.resource.Context.newRootContext;
 
+import java.lang.String;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletConfig;
+import java.lang.reflect.Method;
 
 
 import org.forgerock.json.fluent.JsonValue;
@@ -33,27 +37,69 @@ import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.RequestHandler;
 import org.forgerock.json.resource.provider.Router;
 import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
+import org.forgerock.json.resource.provider.SingletonResourceProvider;
 
 
 
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class IdentityDispatcher  {
+public final class RestDispatcher  {
 
-    private IdentityDispatcher() {
+    private static RestDispatcher instance = null;
+    private RequestHandler handler = null;
+    private ConnectionFactory factory = null;
+    private RestDispatcher() {
 
     }
 
-    public static ConnectionFactory getConnectionFactory() throws ServletException {
+    public final static RestDispatcher  getInstance() {
+        if (instance == null)  instance = new  RestDispatcher();
+        return instance;
+    }
+
+    private void callConfigClass(String className,UriTemplateRoutingStrategy routes) {
+            // Check for configured connection factory class first.
+        if (className != null) {
+            final ClassLoader cl = this.getClass().getClassLoader();
+            try {
+                final Class<?> cls = Class.forName(className, true, cl);
+                // Try method which accepts ServletConfig.
+                final Method factoryMethod = cls.getMethod("initDispatcher", UriTemplateRoutingStrategy.class);
+
+                factoryMethod.invoke(null, routes);
+                return ;
+            } catch (final Exception e) {
+            }
+        }
+
+    };
+    /**
+     * Build the initial dispatcher.
+     * This is a separate method so that we can modify the dispatching
+     * dynamically
+     * */
+
+    public ConnectionFactory buildConnectionFactory(ServletConfig config) throws ResourceException {
+        final UriTemplateRoutingStrategy routes = new UriTemplateRoutingStrategy();
+
+        String roots = config.getInitParameter("rootContexts");
+        routes.register("/test",new TestResource());                // Just a simply READ to make sure dispatching works
+        if (roots != null)  {
+            String[] initClasses = config.getInitParameter("rootContexts").split(","); // not really much to do
+
+            for (String ctx : initClasses)  {
+                callConfigClass(ctx.trim(),routes);
+            }
+        }
+        handler = new Router(routes);
+        factory = Connections.newInternalConnectionFactory(handler);
+        return factory;
+    }
+
+    public static ConnectionFactory getConnectionFactory(ServletConfig config) throws ServletException {
         try {
-            final UriTemplateRoutingStrategy routes = new UriTemplateRoutingStrategy();
-            routes.register("/users", new IdentityResource());
-            routes.register("/groups", new IdentityResource());
-            final RequestHandler handler = new Router(routes);
-            final ConnectionFactory factory = Connections.newInternalConnectionFactory(handler);
-            initSampleResources(factory);
-            return factory;
+            return getInstance().buildConnectionFactory(config);
         } catch (final Exception e) {
             throw new ServletException(e);
         }
