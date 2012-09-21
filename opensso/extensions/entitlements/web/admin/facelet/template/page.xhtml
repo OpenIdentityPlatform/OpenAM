@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: page.xhtml,v 1.14 2009/08/13 21:30:24 farble1670 Exp $
+
+-->
+
+<ice:outputHtml
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+        
+    <f:loadBundle basename="com.sun.identity.admin.Messages" var="resources"/>
+    <ice:outputHead>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>#{resources['page.title']}</title>
+        <ice:outputStyle href="/xmlhttp/css/rime/rime.css"/>
+        <ice:outputStyle href="/admin/css/admin.css"/>
+        <ice:outputStyle href="/admin/css/override.css"/>
+        <script type="text/javascript" src="../js/admin.js"></script>
+    </ice:outputHead>
+    <ice:outputBody>
+        <div id="page">
+            <ice:form 
+                id="form"
+                partialSubmit="true">
+                <o:messages/>
+                <ui:include
+                    src="/admin/facelet/template/next-popup.xhtml"/>
+                <div id="status">
+                    <ui:include src="status.xhtml"/>
+                </div>
+                <div id="header">
+                    <ui:include src="header.xhtml"/>
+                </div>
+                <div id="realm-select">
+                    <ui:include src="realm-select.xhtml"/>
+                </div>
+                <div id="menu-separator"></div>
+                <div id="menu">
+                    <ui:include src="menu.xhtml"/>
+                </div>
+                <ice:panelGroup styleClass="clear" />
+                <div id="panel">
+                    <ui:include src="panel.xhtml"/>
+                </div>
+                <div id="footer">
+                    <ui:include src="footer.xhtml"/>
+                </div>
+            </ice:form>
+        </div>
+    </ice:outputBody>
+</ice:outputHtml>

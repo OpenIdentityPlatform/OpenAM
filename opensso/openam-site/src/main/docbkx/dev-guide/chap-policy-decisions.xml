@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-policy-decisions'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Requesting Policy Decisions Using OpenAM Java SDK</title>
+ <indexterm>
+  <primary>Policy</primary>
+  <secondary>Java API</secondary>
+ </indexterm>
+ <para>This chapter shows how to request policy decision by using OpenAM Java
+ SDK. The chapter focuses on the sample client,
+ <filename>PolicyEvaluationSample.java</filename>, which demonstrates making a
+ request to OpenAM for a policy decision about access to a web resource.</para>
+
+ <para>OpenAM centralizes policy administration, policy evaluation, and policy
+ decision making so that your applications do not have to do so. In many
+ deployments, OpenAM policy agents and the Open Identity gateway can handle
+ policy enforcement independently from your application code.</para>
+
+ <para>If your application does need to request a policy decision from OpenAM,
+ then your application can retrieve a <literal>PolicyEvaluator</literal> from
+ a client-side <literal>PolicyEvaluatorFactory</literal>, and then call the
+ <literal>PolicyEvaluator</literal> <literal>getPolicyDecision()</literal>
+ method. For boolean decisions such as allow or deny, your application can also
+ call the <literal>isAllowed()</literal> method.</para>
+ 
+ <para>To make a policy decision, OpenAM needs an <literal>SSOToken</literal>,
+ the resource to access, the action the user wants to perform on the resource
+ such as HTTP <literal>GET</literal> or <literal>POST</literal>, and a
+ <literal>Map</literal> of environment settings you can use to specify
+ conditions and attributes in the session or can pass back as an empty
+ <literal>Map</literal> if your policy does not include conditions and
+ response attributes.</para>
+
+ <para>The <literal>PolicyEvaluationSample</literal> class takes as its
+ configuration the user credentials, service name, resource, and action that
+ you provide in a Java properties file. It then authenticates the user to get
+ an <literal>SSOToken</literal> using the <filename>TokenUtils.java</filename>
+ helper methods. At that point it has sufficient information to request a
+ policy decision.</para>
+
+ <para>The implementation of the sample client follows.</para>
+
+ <programlisting language="java">package samples.policy;
+
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+
+import com.sun.identity.policy.PolicyDecision;
+import com.sun.identity.policy.client.PolicyEvaluator;
+import com.sun.identity.policy.client.PolicyEvaluatorFactory;
+
+import samples.policy.TokenUtils;
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+public class PolicyEvaluationSample {
+
+
+    public PolicyEvaluationSample() {
+    }
+
+    public static void main(String[] args) throws Exception {
+        PolicyEvaluationSample clientSample = new PolicyEvaluationSample();
+        clientSample.runSample(args);
+        System.exit(0);
+    }
+
+    public void runSample(String[] args) throws Exception {
+        if (args.length == 0 || args.length &gt; 1) {
+            System.out.println("Missing argument:"
+                    + "properties file name not specified");
+        } else {
+            System.out.println("Using properties file:" + args[0]);
+            Properties sampleProperties = getProperties(args[0]);
+            SSOToken ssoToken = getSSOToken(
+                (String)sampleProperties.get("user.name"),
+                (String)sampleProperties.get("user.password")
+            );
+            getPolicyDecision(
+                ssoToken,
+                (String)sampleProperties.get("service.name"),
+                (String)sampleProperties.get("resource.name"),
+                (String)sampleProperties.get("action.name")
+            );
+        }
+    }
+
+    private SSOToken getSSOToken(
+            String userName, String password) throws Exception {
+        System.out.println("Entering getSSOToken():"
+                + "userName=" + userName + ","
+                + "password=" + password);
+        SSOToken ssoToken = TokenUtils.getSessionToken("/",
+                userName, password);
+        System.out.println("TokenID:" + ssoToken.getTokenID().toString());
+        System.out.println("returning from getSSOToken()");
+        return ssoToken;
+    }
+
+    private void getPolicyDecision(
+            SSOToken ssoToken,
+            String serviceName,
+            String resourceName,
+            String actionName)
+            throws Exception {
+
+        System.out.println("Entering getPolicyDecision():"
+                + "resourceName=" + resourceName + ","
+                + "serviceName=" + serviceName + ","
+                + "actionName=" + actionName);
+        PolicyEvaluator pe = PolicyEvaluatorFactory.getInstance().
+                    getPolicyEvaluator(serviceName);
+
+        Map env = new HashMap();
+        Set attrSet = new HashSet();
+        Set actions = new HashSet();
+        actions.add(actionName);
+        PolicyDecision pd = pe.getPolicyDecision(ssoToken, resourceName,
+                actions, env);
+        System.out.println("policyDecision:" + pd.toXML());
+
+        System.out.println("returning from getPolicyDecision()");
+    }
+
+    private Properties getProperties(String file)
+      throws MissingResourceException {
+        Properties properties = new Properties();
+        ResourceBundle bundle = ResourceBundle.getBundle(file);
+        Enumeration e = bundle.getKeys();
+        System.out.println("sample properties:");
+        while (e.hasMoreElements()) {
+            String key = (String) e.nextElement();
+            String value = bundle.getString(key);
+            properties.put(key, value);
+            System.out.println(key + ":" + value);
+        }
+        return properties;
+    }
+}</programlisting>
+
+ <para>Before you run the script that calls the sample, edit the properties
+ file, <filename>resources/policyEvaluationSample.properties</filename>, to
+ indicate the user credentials, resource to access, and HTTP method to
+ use. You can use a resource that might not exist for the purposes of this
+ example.</para>
+
+ <programlisting language="java">user.name=demo
+user.password=changeit
+service.name=iPlanetAMWebAgentService
+resource.name=http://www.example.com:80/banner.html
+action.name=GET</programlisting>
+
+ <para>Also, set up a policy in OpenAM that corresponds to the resource in
+ question. You can set up the policy in OpenAM console under Access Control
+ &gt; <replaceable>Realm Name</replaceable> &gt; Policies. Concerning the
+ <replaceable>Realm Name</replaceable>, notice that unless you change the code,
+ the sample uses the top-level realm, <literal>/</literal> to authenticate the
+ user.</para>
+
+ <para>With the properties configured and policy in place, get the decision
+ from OpenAM using the script,
+ <filename>scripts/run-policy-evaluation-sample.sh</filename>.</para>
+
+ <screen>$ scripts/run-policy-evaluation-sample.sh
+Using properties file:policyEvaluationSample
+sample properties:
+user.password:changeit
+service.name:iPlanetAMWebAgentService
+user.name:demo
+resource.name:http://www.example.com:80/banner.html
+action.name:GET
+------------------------------------------------------------------------------:
+Entering getSSOToken():userName=demo,password=changeit
+TokenID:AQIC5wM2LY4Sfcwu-JzDtYKCaxP-DxROXYd73zLlDt3fCh4.*AAJTSQACMDE.*
+returning from getSSOToken()
+Entering getPolicyDecision():
+ resourceName=http://www.example.com:80/banner.html,
+ serviceName=iPlanetAMWebAgentService,
+ actionName=GET
+policyDecision:&lt;PolicyDecision&gt;
+&lt;ResponseAttributes&gt;
+&lt;/ResponseAttributes&gt;
+&lt;ActionDecision timeToLive=&quot;9223372036854775807&quot;&gt;
+&lt;AttributeValuePair&gt;
+&lt;Attribute name=&quot;GET&quot;/&gt;
+&lt;Value&gt;allow&lt;/Value&gt;
+&lt;/AttributeValuePair&gt;
+&lt;Advices&gt;
+&lt;/Advices&gt;
+&lt;/ActionDecision&gt;
+&lt;/PolicyDecision&gt;
+
+returning from getPolicyDecision()</screen>
+
+ <para>As you see, the policy decision response is formatted here as an XML
+ document.<footnote><para>The <literal>PolicyDecision</literal> element is
+ defined in
+ <filename><replaceable>openam</replaceable>/WEB-INF/remoteInterface.dtd</filename>
+ where <replaceable>openam</replaceable> is the location where the OpenAM web
+ application is deployed.</para></footnote> Notice here the line showing that
+ OpenAM has allowed access to the resource.</para>
+
+ <literallayout class="monospaced">&lt;Value&gt;allow&lt;/Value&gt;</literallayout>
+</chapter>

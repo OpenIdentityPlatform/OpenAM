@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-standards'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Supported Standards</title>
+
+ <para>OpenAM implements the following RFCs, Internet-Drafts, and standards.</para>
+
+ <!-- Document [link], brief description -->
+ <variablelist>
+  <varlistentry xml:id="oauth-2">
+   <term><link xlink:href="http://oauth.net/2/">OAuth 2.0</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>OAuth</secondary>
+    </indexterm>
+    <para>Simple authorization for web applications, desktop applications,
+    mobile phones, and living room devices.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="rest">
+   <term><link
+   xlink:href="http://en.wikipedia.org/wiki/Representational_state_transfer"
+   >Representational State Transfer (REST)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>REST</secondary>
+    </indexterm>
+    <para>Style of software architecture for web-based, distributed
+    systems.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="saml-2">
+   <term><link xlink:href="http://saml.xml.org/">Security Assertion Markup
+   Language (SAML)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>SAML</secondary>
+    </indexterm>
+    <para>Standard, XML-based framework for creating and exchanging security
+    information between online partners. OpenAM supports multiple versions
+    of SAML including 2.0.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="liberty-id-ff">
+   <term><link
+   xlink:href="http://projectliberty.org/resource_center/specifications/liberty_alliance_id_ff_1_2_specifications/?f=resource_center/specifications/liberty_alliance_id_ff_1_2_specifications"
+   >Liberty Alliance Project Identity Federation Framework (Liberty
+   ID-FF)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>Liberty ID-FF</secondary>
+    </indexterm>
+    <para>Federation standard, whose concepts and capabilities contributed to
+    SAML 2.0.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="soap">
+   <term><link xlink:href="http://www.w3.org/TR/soap/">Simple Object Access
+   Protocol</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>SOAP</secondary>
+    </indexterm>
+    <para>Lightweight protocol intended for exchanging structured information
+    in a decentralized, distributed environment.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="wsdl">
+   <term><link xlink:href="http://www.w3.org/TR/wsdl">Web Services Description
+   Language (WSDL)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>WSDL</secondary>
+    </indexterm>
+    <para>XML format for describing network services as a set of endpoints
+    operating on messages containing either document-oriented or
+    procedure-oriented information.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="ws-federation">
+   <term><link
+   xlink:href="http://www.ibm.com/developerworks/library/specification/ws-fed/"
+   >Web Services Federation Language (WS-Federation)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>WS-Federation</secondary>
+    </indexterm>
+    <para>Identity federation standard, part of the Web Services Security
+    framework.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry xml:id="xacml">
+   <term><link xlink:href="http://wiki.oasis-open.org/xacml/">eXtensible Access
+   Control Markup Language (XACML)</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>XACML</secondary>
+    </indexterm>
+    <para>Declarative access control policy language implemented in XML, and
+    also a processing model, describing how to interpret policies.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</chapter>

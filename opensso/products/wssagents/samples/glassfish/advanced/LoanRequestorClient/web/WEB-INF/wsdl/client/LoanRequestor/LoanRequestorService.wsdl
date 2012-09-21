@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.5-hudson-218-. --><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://j2ee.netbeans.org/wsdl/LoanRequestor" xmlns:ns="http://xml.netbeans.org/schema/LoanRequestor" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="LoanRequestor" targetNamespace="http://j2ee.netbeans.org/wsdl/LoanRequestor">
+    <types>
+        <xsd:schema targetNamespace="http://j2ee.netbeans.org/wsdl/LoanRequestor">
+            <xsd:import namespace="http://xml.netbeans.org/schema/LoanRequestor" schemaLocation="LoanRequestorService.xsd" />
+        </xsd:schema>
+    </types>
+    <message name="LoanRequestorOperationRequest">
+        <part name="requestLoanMessage" element="ns:processApplicationElement" />
+    </message>
+    <message name="LoanRequestorOperationReply">
+        <part name="responseLoanMessage" element="ns:processApplicationResponseElement" />
+    </message>
+    <portType name="LoanRequestorPortType">
+        <operation name="LoanRequestorOperation">
+            <input name="input1" message="tns:LoanRequestorOperationRequest" />
+            <output name="output1" message="tns:LoanRequestorOperationReply" />
+        </operation>
+    </portType>
+    <binding name="LoanRequestorBinding" type="tns:LoanRequestorPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="LoanRequestorOperation">
+            <soap:operation />
+            <input name="input1">
+                <soap:body use="literal" />
+            </input>
+            <output name="output1">
+                <soap:body use="literal" />
+            </output>
+        </operation>
+    </binding>
+    <service name="LoanRequestorService">
+        <port name="LoanRequestorPort" binding="tns:LoanRequestorBinding">
+            <soap:address location="http://localhost:8080/LoanRequestor/LoanRequestorService" />
+        </port>
+    </service>
+</definitions>

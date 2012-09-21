@@ -1,0 +1,61 @@
+   <test name="AMSDK_Session_Tests1">
+       <parameter name="testName" value="amsdksessionattributetests.test1"/>
+        <groups>
+            <run>
+                <include name="ds_ds"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.AMSDKSessionAttributeTests"/>
+        </classes>
+    </test>
+   <test name="AMSDK_Session_Tests2">
+       <parameter name="testName" value="amsdksessionattributetests.test2"/>
+        <groups>
+            <run>
+                <include name="ds_ds"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.AMSDKSessionAttributeTests"/>
+        </classes>
+    </test>
+   <test name="AMSDK_Session_Tests3">
+       <parameter name="testName" value="amsdksessionattributetests.test3"/>
+        <groups>
+            <run>
+                <include name="ds_ds"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.AMSDKSessionAttributeTests"/>
+        </classes>
+    </test>
+   <test name="AMSDK_Session_Tests4">
+       <parameter name="testName" value="amsdksessionattributetests.test4"/>
+        <groups>
+            <run>
+                <include name="ds_ds"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.AMSDKSessionAttributeTests"/>
+        </classes>
+    </test>
+   <test name="AMSDK_Session_Tests5">
+       <parameter name="testName" value="amsdksessionattributetests.test5"/>
+        <groups>
+            <run>
+                <include name="ds_ds"/>
+            </run>
+        </groups>
+        <classes>
+            <class name=
+            "com.sun.identity.qatest.session.AMSDKSessionAttributeTests"/>
+        </classes>
+    </test>
+

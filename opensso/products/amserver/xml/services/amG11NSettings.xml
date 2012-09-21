@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: amG11NSettings.xml,v 1.2 2008/06/25 05:46:12 qcheng Exp $
+  
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetG11NSettings" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetG11NSettings"
+            i18nFileName="amG11NSettings"
+            i18nKey="sun-identity-g11n-settings-service-description"
+            propertiesViewBeanURL="../service/SMG11N"
+            >
+             <Global>
+                <AttributeSchema name="sun-identity-g11n-settings-locale-charset-mapping"
+                    type="list"
+                    syntax="string"
+                    uitype="name_value_list"
+                    i18nKey="a100">
+                <DefaultValues>
+                <Value>locale=en|charset=UTF-8;ISO-8859-1</Value>
+                <Value>locale=ja|charset=UTF-8;Shift_JIS;EUC-JP</Value>
+                <Value>locale=fr|charset=UTF-8;ISO-8859-15</Value>
+                <Value>locale=de|charset=UTF-8;ISO-8859-15</Value>
+                <Value>locale=es|charset=UTF-8;ISO-8859-15</Value>
+                <Value>locale=ko|charset=UTF-8;EUC-KR</Value>
+                <Value>locale=zh|charset=UTF-8;GB2312</Value>
+                <Value>locale=ar|charset=UTF-8;ISO-8859-6</Value>
+                <Value>locale=th|charset=UTF-8;TIS-620</Value>
+                <Value>locale=zh_TW|charset=UTF-8;BIG5</Value>
+                </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sun-identity-g11n-settings-charset-alias-mapping"
+                    type="list"
+                    syntax="string"
+                    uitype="name_value_list"
+                    i18nKey="a101">
+                    <DefaultValues>
+                <Value>mimeName=Shift_JIS|javaName=SJIS</Value>
+                <Value>mimeName=EUC-JP|javaName=EUC_JP</Value>
+                <Value>mimeName=EUC-KR|javaName=EUC_KR</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+
+            <Organization>
+                <AttributeSchema name="sun-identity-g11n-settings-common-name-format"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a102">
+                    <DefaultValues>
+                    <Value>zh={sn}{givenname}</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

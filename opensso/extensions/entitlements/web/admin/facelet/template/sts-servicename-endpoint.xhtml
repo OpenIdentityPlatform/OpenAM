@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sts-servicename-endpoint.xhtml,v 1.2 2009/08/03 22:25:31 ggennaro Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:section>
+        <ui:define name="section-title">
+            <ice:outputText
+                value="#{resources['sts-servicename-endpoint.section-title']}"/>
+        </ui:define>
+        <ui:define name="section-details">
+            <ice:outputText
+                value="#{resources['sts-servicename-endpoint.section-details']}"/>
+        </ui:define>
+        <ui:define name="section-body">
+
+            <ice:panelGrid columns="2" columnClasses="label-column,input-column">
+
+                <ice:outputLabel 
+                    for="serviceName"
+                    style="float: right;"
+                    effect="#{wizardBean.serviceNameMessageEffect}"
+                    value="#{resources['sts-servicename-endpoint.serviceNameLabel']}" />
+                <ice:inputText
+                    id="serviceName"
+                    effect="#{wizardBean.serviceNameInputEffect}"
+                    size="40"
+                    maxlength="255"
+                    value="#{wizardBean.serviceName}" />
+                <ice:outputLabel
+                    for="serviceEndPoint"
+                    style="float: right;"
+                    effect="#{wizardBean.serviceEndPointMessageEffect}"
+                    value="#{resources['sts-servicename-endpoint.serviceEndPointLabel']}" />
+                <ice:inputText
+                    id="serviceEndPoint"
+                    effect="#{wizardBean.serviceEndPointInputEffect}"
+                    size="70"
+                    maxlength="1024"
+                    value="#{wizardBean.serviceEndPoint}" />
+                <ice:outputLabel
+                    for="mexEndPoint"
+                    style="float: right;"
+                    effect="#{wizardBean.mexEndPointMessageEffect}"
+                    value="#{resources['sts-servicename-endpoint.mexEndPointLabel']}" />
+                <ice:inputText
+                    id="mexEndPoint"
+                    effect="#{wizardBean.mexEndPointInputEffect}"
+                    size="70"
+                    maxlength="1024"
+                    value="#{wizardBean.mexEndPoint}" />
+
+            </ice:panelGrid>
+
+        </ui:define>
+    </o:section>
+
+</span>

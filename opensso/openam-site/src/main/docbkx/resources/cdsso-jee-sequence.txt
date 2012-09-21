@@ -1,0 +1,96 @@
+@startuml cdsso-jee-sequence.png
+
+/'
+    CCPL HEADER START
+   
+    This work is licensed under the Creative Commons
+    Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+    To view a copy of this license, visit
+    http://creativecommons.org/licenses/by-nc-nd/3.0/
+    or send a letter to Creative Commons, 444 Castro Street,
+    Suite 900, Mountain View, California, 94041, USA.
+   
+    You can also obtain a copy of the license at
+    src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+    See the License for the specific language governing permissions
+    and limitations under the License.
+   
+    If applicable, add the following below this CCPL HEADER, with the fields
+    enclosed by brackets "[]" replaced with your own identifying information:
+         Portions Copyright [yyyy] [name of copyright owner]
+   
+    CCPL HEADER END
+   
+         Copyright 2012 ForgeRock AS
+
+    To generate a sequence diagram from this file, process
+    it with PlantUML, http://plantuml.sourceforge.net/sequence.html
+'/
+
+title Java EE Agent and CDSSO
+autonumber
+
+participant "Browser" as UA
+participant "Java EE App\n& Agent" as App
+box "OpenAM" #FAFAFA
+	participant "CDCServlet" as CDC
+	participant "Policy, Session Services" as NPS
+	participant "AuthN Service" as AuthN
+end box
+
+UA->App: Browse to protected resource.\nNo SSOToken for resource domain, yet.
+
+App->UA: Set an amFilterCDSSORequest cookie,\nand redirect...
+
+note right of UA
+	The amFilterCDSSORequest cookie holds
+	information consumed when processing
+	the form submitted in 15.
+end note
+
+UA->CDC: ...to CDCServlet.
+
+CDC->NPS: If browser presents SSOToken,\nrequest SSOToken validation.
+
+NPS->CDC: If SSOToken is valid,\nskip to 14. Otherwise...
+
+CDC->UA: Redirect...
+
+UA->AuthN: ...to OpenAM for authentication.
+
+AuthN->UA: Authentication page
+
+UA->AuthN: Submit credentials.
+
+AuthN->UA: Set valid SSOToken with OpenAM domain name,\nand redirect...
+
+UA->CDC: ...to CDCServlet.
+
+CDC->NPS: Request SSOToken validation
+
+NPS->CDC: SSOToken is valid.
+
+CDC->UA: Send self-submitting form with\nLiberty AuthN Response (LARES).
+
+UA->App: Form POSTs automatically to a\npolicy agent endpoint that\nconsumes the response.
+
+note right of UA
+	Policy agent extracts SSOToken from LARES,
+	Sets cookie domain to FQDN of resource,
+	Validates LARES attributes.
+end note
+
+App->UA: Redirect, with request to delete the\namFilterCDSSORequest cookie...
+
+UA->App: ...to protected resource.
+
+App->NPS: Request SSOToken validation
+
+NPS->App: Response for SSOToken validation
+
+App->NPS: Request policy decision
+
+NPS->App: Response for policy decision
+
+App->UA: Allow access & return resource,\nor deny access & return HTTP 403.
+@enduml

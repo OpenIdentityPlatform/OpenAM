@@ -1,0 +1,14 @@
+dn: @SM_CONFIG_BASEDN@
+objectClass: domain
+objectClass: top
+dc: @SM_CONFIG_BASEDN_RDNV@
+aci: (target="ldap:///@SM_CONFIG_BASEDN@")(targetattr = "*")(version 3.0; acl "OpenSSO-FAM Services anonymous access"; deny (all) userdn = "ldap:///anyone";)
+
+dn: ou=people,@SM_CONFIG_BASEDN@
+ou: People
+objectClass: organizationalUnit
+
+dn: ou=groups,@SM_CONFIG_BASEDN@
+ou: Groups
+objectClass: organizationalUnit
+

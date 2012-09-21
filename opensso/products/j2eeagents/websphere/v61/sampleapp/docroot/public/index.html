@@ -1,0 +1,346 @@
+<HTML lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+        <meta name="keywords" content="single sign on, sso, authentication, Sun Microsystems">
+        <meta name="description" content="Sun Microsystems, Inc., is delivering Sun software and enterprise solutions that enable companies to compete successfully in the Net Economy.">
+	<title>Simple Web Sample Application:  Simple Web Sample Application</title>
+</head>
+
+<body text="#000000" link="#594fbf" vlink="10% #594fbf" alink="#333366" bgcolor="#FFFFFF">
+
+<MAINCONTENT>
+
+<NAVIGATIONCONTENT>
+   <TABLE WIDTH="100%" BORDER="0" CELLSPACING="4">
+      <TR>
+         <td VALIGN="TOP">
+            <A HREF="http://www.sun.com/software">
+              <IMG SRC="../../../docs/images/SunONE.jpg" alt="Sun ONE logo" 
+                valign="BOTTOM"
+                height="40" width="120" border="0"></A>
+             &nbsp;&nbsp;&nbsp;&nbsp;
+         </td>
+     </TR>
+
+      <TR>
+         <TD VALIGN="TOP" ALIGN="RIGHT" BGCOLOR="#594fbf">
+            <FONT FACE="Helvetica, Arial, sans-serif" COLOR="#ffffff" SIZE="-1"><B>
+            Simple Web Sample Application</B></FONT>
+         </TD>
+      </TR>
+
+   </TABLE>
+   <BR>
+</NAVIGATIONCONTENT>
+
+<BOOKCONTENT>
+   <BLOCKQUOTE>
+<BR>
+<BR>
+
+      <A NAME="15913"> </A>
+<A NAME="Simple Web Sample Application"> </A>
+<FONT FACE="Helvetica, Arial, Sans-Serif" SIZE="+1" COLOR="#000000">
+<B>
+Simple Web Sample Application
+</B>
+</FONT>
+<BR>
+<BR>
+<BR>
+
+<A NAME="15115"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">This document describes how to utilize the Simple Web sample application in conjunction with Sun ONE Application Server version 7.
+</FONT>
+<P>
+
+<A NAME="15119"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">This sample application document contains the following sections:
+</FONT>
+<P>
+<ul>
+<A NAME="15123"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li></B>
+<A HREF="index.html#14805"  >Overview</A>
+</FONT>
+<P><A NAME="15153"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li></B>
+<A HREF="index.html#14862"  >Compiling and Assembling the Application</A>
+</FONT>
+<P><A NAME="15154"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li></B>
+<A HREF="index.html#19434"  >Deploying the Sample Application</A>
+</FONT>
+<P><A NAME="15158"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li></B>
+<A HREF="index.html#19746"  >Running the Sample Application</A>
+</FONT>
+<P><A NAME="15139"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li></B>
+<A HREF="index.html#15009"  >Troubleshooting</A>
+</FONT>
+<P></ul>
+
+<BR>
+<BR>
+
+<A NAME="14805"> </A>
+<A NAME="Overview"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Overview
+<HR SIZE="2" NOSHADE>
+</FONT>
+<BR>
+
+
+<A NAME="19897"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">The Simple Web sample application is a collection of simple servlets and JSPs that demonstrate the usage of the Servlet and the JSP specification.
+</FONT>
+<P>
+
+<A NAME="19899"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">Assembling this application and deploying it to the Sun ONE Application Server introduces you to the Sun ONE Application Server Admin Tool.
+</FONT>
+<P>
+
+<A NAME="19903"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">The following instructions describe how to manually deploy the application. You may want to experiment by modifying and redeploying the sample.
+</FONT>
+<P>
+
+<A NAME="19286"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">To better understand the sample application source code, you may refer to the related javadocs which can be accessed at <FONT FACE="courier, couriernew, monospaced size">&lt;install_root&gt;/samples/webapps/simple/javadocs/index.html</FONT> after it is generated.
+</FONT>
+<P>
+
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Setting up the environment
+</FONT>
+<BR>
+<BR>
+
+<A NAME="14833"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">In order to successfully deploy and run the Simple Web sample application, several resources need to be setup with the Application Server. These resources include Javamail and JNDI resources.
+</FONT>
+<P>
+</A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">The build scripts provided will automatically register all the above resources with Application Server.
+</FONT>
+<P>
+
+<BR>
+<BR>
+
+<A NAME="14862"> </A>
+<A NAME="Compiling and Assembling the Application"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Compiling and Assembling the Application
+<HR SIZE="2" NOSHADE>
+</FONT>
+<BR>
+
+
+<A NAME="14865"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">This section contains instructions to build and assemble the Simple Web sample application using a Command Line Interface (CLI).
+</FONT>
+<P>
+
+<A NAME="19962"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">To rebuild the entire application from scratch, follow these steps:
+</FONT>
+<P>
+<ol type="1">
+<A NAME="19415"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li value="1"></B>
+Compile and assemble the application. For ezample:
+</FONT>
+<P>  <dl>
+     <DT> <A NAME="19371"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+Execute the command <FONT FACE="courier, couriernew, monospaced size">asant</FONT> under <FONT FACE="courier, couriernew, monospaced size">&lt;install_root&gt;/samples/webapps/simple/src/</FONT>
+</FONT>
+<P>     <DT> <A NAME="19995"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+The default target <FONT FACE="courier, couriernew, monospaced size">core</FONT> will be executed to rebuild the WAR files.
+</FONT>
+<P>  </dl>
+<A NAME="14885"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li value="2"></B>
+Deploy the application.
+</FONT>
+<P>  <dl>
+     <DT> <A NAME="16257"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+After you have re-created the sample application from scratch, you may proceed to <A HREF="index.html#19434"  >Deploying the Sample Application</A>. <A HREF="index.html#14889"  >Step 3</A> is optional.
+</FONT>
+<P>  </dl>
+<A NAME="14889"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li value="3"></B>
+Clean the application project area (optional).
+</FONT>
+<P>  <dl>
+     <DT> <A NAME="19426"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+Execute the command <FONT FACE="courier, couriernew, monospaced size">asant clean</FONT> to remove the sample application assemble and build directories.
+</FONT>
+<P>     <DT> <A NAME="19432"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+Now you are ready to use this WAR file for deployment.
+</FONT>
+<P>  </dl>
+</ol>
+
+<BR>
+<BR>
+
+<A NAME="19434"> </A>
+<A NAME="Deploying the Sample Application"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Deploying the Sample Application
+<HR SIZE="2" NOSHADE>
+</FONT>
+<BR>
+
+</A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">To deploy the application, do the following:
+</FONT>
+<P>
+
+<A NAME="14904"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">Execute the command <FONT FACE="courier, couriernew, monospaced size">asant deploy</FONT> under <FONT FACE="courier, couriernew, monospaced size">&lt;install_root&gt;/samples/webapps/simple/src</FONT></FONT>
+<P>
+
+<A NAME="14905"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">This will deploy the <FONT FACE="courier, couriernew, monospaced size">webapps-simple.war</FONT> file located under <FONT FACE="courier, couriernew, monospaced size">&lt;install_root&gt;/samples/webapps/simple/
+<BR>
+<HR SIZE="1">
+<TABLE BORDER="0" CELLPADDING="5" WIDTH="75%">
+  <TR>
+    <TD VALIGN=TOP>
+<A NAME="17911"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>
+Note
+</B>
+</FONT>
+</TD>
+    <TD VALIGN=TOP>
+<A NAME="17915"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">You must run <FONT FACE="courier, couriernew, monospaced size">asant undeploy</FONT> before redeploying this sample. This will ensure that all modules are undeployed and the resources are disabled.  </FONT>
+<P>
+</TD>
+  </TR>
+</TABLE>
+
+<HR SIZE="1">
+<BR>
+</FONT>
+</FONT>
+
+<P>
+<P>
+<BR>
+
+<A NAME="19560"> </A>
+<A NAME="Verifying Deployment"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Verifying Deployment
+</FONT>
+<BR>
+<BR>
+
+
+
+<A NAME="14912"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">As an optional step, you can use the Sun ONE Application Server Administration Tool to verify that the application has been registered. Otherwise, proceed directly to <A HREF="index.html#19746"  >Running the Sample Application</A>.
+</FONT>
+<P>
+
+<A NAME="14915"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">To verify the registration of the application, do the following:
+</FONT>
+<P>
+<ol type="1">
+<A NAME="15737"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li value="1"></B>
+Execute the command <FONT FACE="courier, couriernew, monospaced size">asadmin list-components</FONT> to look at applications deployed with a server instance. For example:
+</FONT>
+<P>  <dl>
+     <DT> <A NAME="20328"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<FONT FACE="courier, couriernew, monospaced size">asadmin list-components --user &lt;username&gt; --password &lt;password&gt; --host &lt;host&gt; --port &lt;admin-port&gt; &lt;server instance name&gt;</FONT>
+</FONT>
+<P>     <DT> <A NAME="20342"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+You will see <FONT FACE="courier, couriernew, monospaced size">webapp-simple</FONT> listed.
+</FONT>
+<P>  </dl>
+<A NAME="20348"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li value="2"></B>
+Alternately, you may navigate the Admin tool GUI to the following:
+</FONT>
+<P>  <dl>
+     <DT> <A NAME="20354"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+App Server Instances&gt;server1&gt;Applications.  
+</FONT>
+<P>  </dl>
+<A NAME="20355"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+<B>  <li value="3"></B>
+On the left frame, Click on Web Apps to diplay list of applications deployed on server.
+</FONT>
+<P>  <dl>
+     <DT> <A NAME="20378"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="-1">
+You will see <FONT FACE="courier, couriernew, monospaced size">webapp-simple</FONT> listed.
+</FONT>
+<P>  </dl>
+</ol>
+
+<BR>
+<BR>
+
+<A NAME="19746"> </A>
+<A NAME="Running the Sample Application"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Running the Sample Application
+<HR SIZE="2" NOSHADE>
+</FONT>
+<BR>
+
+
+<A NAME="19766"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">You can run the application through the following URL: 
+</FONT>
+<P>
+
+<A NAME="19752"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2"><FONT FACE="courier, couriernew, monospaced size">http://&lt;hostname&gt;:&lt;port&gt;/webapps-simple</FONT>
+</FONT>
+<P>
+
+<A NAME="20404"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">Traverse the JSP and Servlet links to execute each simple web sample application.
+</FONT>
+<P>
+
+<BR>
+<BR>
+
+<A NAME="15009"> </A>
+<A NAME="Troubleshooting"> </A>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="+1">
+Troubleshooting
+<HR SIZE="2" NOSHADE>
+</FONT>
+<BR>
+
+
+<A NAME="19823"> </A><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">If you encounter problems when running the application, review the log files at <FONT FACE="courier, couriernew, monospaced size">&lt;install_root&gt;/domains/domain1/&lt;server-instance&gt;/logs/server.log</FONT> to learn what exactly went wrong. 
+</FONT>
+<P>
+
+
+
+   </BLOCKQUOTE>
+</BOOKCONTENT>
+
+</MAINCONTENT>
+
+</BODY>
+
+
+</HTML>

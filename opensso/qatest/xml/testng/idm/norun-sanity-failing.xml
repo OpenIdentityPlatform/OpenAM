@@ -1,0 +1,25 @@
+   <test name="DeleteIdentitiesTest14">
+        <parameter name="testNum" value="14"/>         
+        <parameter name="testName" value="IDMDeleteIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>             
+            </run>
+        </groups>         
+        <classes>             
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>     
+    <test name="UpdateIdentitiesTest7">
+        <parameter name="testNum" value="7"/>
+        <parameter name="testName" value="IDMUpdateIdentitiesTest"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.idm.IdentitiesTest"/>
+        </classes>
+    </test>
+

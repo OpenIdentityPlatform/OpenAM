@@ -1,0 +1,951 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [2012] [Forgerock AS]"
+ */
+-->
+
+<!DOCTYPE Policies
+PUBLIC "-//Sun Java System Access Manager 7.1 2006Q3 Admin CLI DTD//EN"
+"jar://com/sun/identity/policy/policyAdmin.dtd">
+
+<Policies>
+<Policy name="webagent-policy" referralPolicy="false" active="true" >
+
+<Rule name="http://pordv2.corp..com:80/common-portlets/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/common-portlets/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/common-portlets/block/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/common-portlets/block/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/common-portlets/xmlhttp/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/common-portlets/xmlhttp/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/common-portlets/xmlhttp/*/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/common-portlets/xmlhttp/*/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/common-portlets/xmlhttp/css/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/common-portlets/xmlhttp/css/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/common-portlets/xmlhttp/css/xp/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/common-portlets/xmlhttp/css/xp/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/liquiditylink-portlet/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/liquiditylink-portlet/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/liquiditylink-portlet/block/send-receive-updates*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/liquiditylink-portlet/block/send-receive-updates*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/liquiditylink-portlet/xmlhttp/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/liquiditylink-portlet/xmlhttp/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/liquiditylink-portlet/xmlhttp/*/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/liquiditylink-portlet/xmlhttp/*/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/liquiditylink-portlet/xmlhttp/css/xp/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/liquiditylink-portlet/xmlhttp/css/xp/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/reportlet-portlet/css/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/reportlet-portlet/css/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/reportlet-portlet/images/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/reportlet-portlet/images/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/reportlet-portlet/js/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/reportlet-portlet/js/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/reportlet-portlet*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/reportlet-portlet*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com:80/portal/display_chart?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com:80/portal/display_chart?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/antares/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/antares/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/antares/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/antares/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/antares/*.*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/antares/*.*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/antares/saml/SSO">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/antares/saml/SSO" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/clearway*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/clearway*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2011-theme/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2011-theme/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2011-theme/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2011-theme/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2011-theme/css/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2011-theme/css/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2011-theme/css/main.css*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2011-theme/css/main.css*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2011-theme/css/main.css*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2011-theme/css/main.css*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2-Columns-layouttpl/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2-Columns-layouttpl/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/2-Columns-layouttpl/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/2-Columns-layouttpl/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/3-Columns-layouttpl/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/3-Columns-layouttpl/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/3-Columns-layouttpl/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/3-Columns-layouttpl/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/common-portlets/block/resource/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/common-portlets/block/resource/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/common-portlets/block/resource/*/*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/common-portlets/block/resource/*/*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/fxhistoricalmargininfo-portlet*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/fxhistoricalmargininfo-portlet*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/fxmargininfo-portlet*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/fxmargininfo-portlet*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/liquiditylink-portlet/block/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/liquiditylink-portlet/block/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/liquiditylink-portlet/xmlhttp/css/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/liquiditylink-portlet/xmlhttp/css/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/theme/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/theme/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/theme/css/main.css?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/theme/css/main.css?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/theme/javascript/javascript.js?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/theme/javascript/javascript.js?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/opensso/identity/**">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/opensso/identity/**" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/opensso/identity/attributes">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/opensso/identity/attributes" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/opensso/SSOPOST/metaAlias/IDP">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/opensso/SSOPOST/metaAlias/IDP" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/openssoDistauth/identity/**">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/openssoDistauth/identity/**" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/openssoDistauth/identity/attributes">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/openssoDistauth/identity/attributes" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/c?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/c?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/c/portal/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/c/portal/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/c/portal/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/c/portal/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/c/portal/login?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/c/portal/login?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/c/portal/update_terms_of_use">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/c/portal/update_terms_of_use" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/c/portal/update_terms_of_use?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/c/portal/update_terms_of_use?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/combo?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/combo?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/combo/?*.*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/combo/?*.*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/documents/*/*/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/documents/*/*/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/group/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/group/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/group//*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/group//*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/home?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/home?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/home/?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/home/?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/js/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/js/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/js/barebone.jsp?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/js/barebone.jsp?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/js/everything.jsp?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/js/everything.jsp?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/portal/*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/portal/*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/portal/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/portal/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/portal/css.jsp*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/portal/css.jsp*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/portlet/*/css/main.jsp?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/portlet/*/css/main.jsp?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/portlet/*/js/main.js?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/portlet/*/js/main.js?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/portlet/journal_content/css.jsp?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/portlet/journal_content/css.jsp?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/themes/classic/css/main.css?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/themes/classic/css/main.css?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/themes/classic/js/main.js?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/themes/classic/js/main.js?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/themes/control_panel/css/main.css?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/themes/control_panel/css/main.css?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/html/themes/control_panel/js/main.js?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/html/themes/control_panel/js/main.js?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/image/*?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/image/*?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/image/image_gallery?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/image/image_gallery?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+<Rule name="http://pordv2.corp..com/portal/web/guest/home?*">
+<ServiceName name="iPlanetAMWebAgentService" />
+<ResourceName name="http://pordv2.corp..com/portal/web/guest/home?*" />
+<AttributeValuePair>
+<Attribute name="POST" />
+<Value>allow</Value>
+</AttributeValuePair>
+<AttributeValuePair>
+<Attribute name="GET" />
+<Value>allow</Value>
+</AttributeValuePair>
+</Rule> 
+
+
+</Policy>
+</Policies>

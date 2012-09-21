@@ -1,0 +1,53 @@
+<iwt:Component name="iwtAuthNT"
+        ver="1.0"
+        desc="NT configuration profile"
+        resB="iwtAuthNT"
+        idx="">
+<iwt:Att name="iwtAuthNT-server"
+         desc="NT authentication server"
+         type="string"
+         idx="iwtAuthNT-server-desc"
+         userConfigurable="TRUE">
+         <Rperm>ADMIN</Rperm><Rperm>OWNER</Rperm>
+         <Wperm>ADMIN</Wperm>
+</iwt:Att>
+<iwt:Att name="iwtAuthNT-domain"
+         desc="NT authentication domain"
+         type="string"
+         idx="iwtAuthNT-domain-desc"
+         userConfigurable="TRUE">
+         <Rperm>ADMIN</Rperm><Rperm>OWNER</Rperm>
+         <Wperm>ADMIN</Wperm>
+</iwt:Att>
+<iwt:Att  name="iwtAuthNT-aliases"
+        desc="NT aliases"
+        type="stringlist"
+        idx="iwtAuthNT-aliases-desc"
+        userConfigurable="TRUE">
+        <Rperm>ADMIN</Rperm><Rperm>OWNER</Rperm>
+        <Wperm>ADMIN</Wperm>
+</iwt:Att>
+
+<iwt:Att name="iwtAuthNT-authLevelList"
+    desc="NT module authentication levels"
+    type="stringlist"
+    idx="iwtAuthNT-authLevel-desc"
+    userConfigurable="TRUE">
+    <Val>0</Val>
+    <Rperm>ADMIN</Rperm>
+    <Rperm>OWNER</Rperm>
+    <Wperm>ADMIN</Wperm>
+</iwt:Att>
+
+<iwt:Att name="iwtAuthNT-maxAuthLevel"
+    desc="NT module maximum authentication level"
+    type="number"
+    idx="iwtAuthNT-maxAuthLevel-desc"
+    userConfigurable="TRUE">
+    <Val>0</Val>
+    <Rperm>ADMIN</Rperm>
+    <Rperm>OWNER</Rperm>
+    <Wperm>ADMIN</Wperm>
+</iwt:Att>
+
+</iwt:Component>

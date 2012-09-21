@@ -1,0 +1,31 @@
+   <test name="Hot Swap Web Agents Tests 1">
+            <parameter name="policyIdx" value="0"/>
+            <parameter name="evaluationIdx" value="0"/>
+            <parameter name="testIdx" value="3"/>
+            <parameter name="resourceIdx" value="21"/>
+            <parameter name="agentType" value="3.0WEB"/>
+            <groups>
+                <run>
+                    <include name="@mode@"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sun.identity.qatest.agents.WebAgentHotSwapTests"/>
+            </classes>
+    </test>
+    <test name="Hot Swap Web Agents Tests 2">
+            <parameter name="policyIdx" value="0"/>
+            <parameter name="evaluationIdx" value="0"/>
+            <parameter name="testIdx" value="4"/>
+            <parameter name="resourceIdx" value="21"/>
+            <parameter name="agentType" value="3.0WEB"/>
+            <groups>
+                <run>
+                    <include name="@mode@"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sun.identity.qatest.agents.WebAgentHotSwapTests"/>
+            </classes>
+    </test>
+

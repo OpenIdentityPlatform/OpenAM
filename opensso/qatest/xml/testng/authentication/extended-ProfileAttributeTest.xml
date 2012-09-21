@@ -1,0 +1,25 @@
+
+    <test name="ProfileAttributesDynamicTest">
+        <parameter name="testProfile" value="dynamic"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ProfileAttributesTest"/>
+        </classes>
+    </test>
+    <test name="ProfileAttributesIgnoredTest">
+        <parameter name="testProfile" value="ignored"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ProfileAttributesTest"/>
+        </classes>
+    </test>

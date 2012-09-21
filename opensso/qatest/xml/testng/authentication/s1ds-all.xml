@@ -1,0 +1,241 @@
+
+    <test name="UserAuthAttributeTest_loginstatusNegative">
+        <parameter name="testCaseName" value="loginstatusNegative"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lifeNegative">
+        <parameter name="testCaseName" value="lifeNegative"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>  
+   <test name="UserAuthAttributeTest_nsaccountlockPositive">
+        <parameter name="testCaseName" value="nsaccountlockPositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_nsaccountlockNegative">
+        <parameter name="testCaseName" value="nsaccountlockNegative"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inetPositiveComb">
+        <parameter name="testCaseName" value="inetPositiveComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lifePositiveComb">
+        <parameter name="testCaseName" value="lifePositiveComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_loginPositiveComb">
+        <parameter name="testCaseName" value="loginPositiveComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lockPositiveComb">
+        <parameter name="testCaseName" value="lockPositiveComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inetNegativeComb">
+        <parameter name="testCaseName" value="inetNegativeComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lifeNegativeComb">
+        <parameter name="testCaseName" value="lifeNegativeComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_loginNegativeComb">
+        <parameter name="testCaseName" value="loginNegativeComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lockNegativeComb">
+        <parameter name="testCaseName" value="lockNegativeComb"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inet_lock_Positive">
+        <parameter name="testCaseName" value="inet_lock_Positive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_life_login_Positive">
+        <parameter name="testCaseName" value="life_login_Positive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_inet_login_Positive">
+        <parameter name="testCaseName" value="inet_login_Positive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lock_login_Positive">
+        <parameter name="testCaseName" value="lock_login_Positive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_lock_life_Positive">
+        <parameter name="testCaseName" value="lock_life_Positive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_life_inet_Positive">
+        <parameter name="testCaseName" value="life_inet_Positive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_allPositive">
+        <parameter name="testCaseName" value="allPositive"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>
+    <test name="UserAuthAttributeTest_allNegative">
+        <parameter name="testCaseName" value="allNegative"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.UserAuthAttributeTest"/>
+        </classes>
+    </test>

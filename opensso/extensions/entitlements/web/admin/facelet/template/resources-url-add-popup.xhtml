@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: resources-url-add-popup.xhtml,v 1.13 2009/08/04 18:50:48 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:popup
+        type="question"
+        width="400"
+        handler="#{urlResourcesHandler}"
+        title="#{resources['resources-url-add-popup.title']}"
+        visible="#{urlResourcesBean.addPopupVisible}"
+        closeListenerMethod="addPopupCancelListener">
+
+        <ui:define name="body">
+            <ice:panelGroup
+                styleClass="url-resource-add-popup">
+                <ice:panelGroup
+                    style="padding-bottom: 20px">
+                    <ice:outputText
+                        escape="false"
+                        value="#{resources['resources-url-add-popup.info']}"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:outputLabel
+                        for="url-resource-select"
+                        value="URL resource pattern"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:selectOneMenu
+                        id="url-resoure-select"
+                        styleClass="packed-input"
+                        valueChangeListener="#{urlResourcesHandler.addPopupResourceChangedListener}"
+                        value="#{urlResourcesBean.addPopupResourceName}">
+                        <f:selectItems
+                            value="#{urlResourcesBean.addPopupAvailableResourceNameItems}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    rendered="#{urlResourcesBean.addPopupResource != null}">
+                    <ice:panelGroup
+                        style="margin-top: 20px">
+                        <ice:outputLabel
+                            for="url-resource-fields"
+                            value="New URL resource"/>
+                    </ice:panelGroup>
+                    <ice:panelSeries
+                        id="url-resource-fields"
+                        var="urlResourcePart"
+                        value="#{urlResourcesBean.addPopupUrlResourceParts.urlResourceParts}">
+                        <ice:outputText
+                            rendered="#{urlResourcePart.part != '*'}"
+                            value="#{urlResourcePart.part}"/>
+                        <ice:inputText
+                            styleClass="packed-input"
+                            size="#{urlResourcePart.valueLength}"
+                            partialSubmit="true"
+                            onkeyup="submitNow(this);"
+                            rendered="#{urlResourcePart.part == '*'}"
+                            value="#{urlResourcePart.value}"/>
+                    </ice:panelSeries>
+                </ice:panelGroup>
+                <ice:panelGrid
+                    styleClass="button-group"
+                    columns="2">
+                    <o:button
+                        type="cancel"
+                        bean="#{resourceChooserClient}"
+                        handler="#{urlResourcesHandler}"
+                        listenerMethod="addPopupCancelListener"/>
+                    <o:button
+                        type="ok"
+                        bean="#{resourceChooserClient}"
+                        handler="#{urlResourcesHandler}"
+                        listenerMethod="addPopupOkListener">
+                        <ui:define name="attributes">
+                            <f:attribute
+                                name="availableResources"
+                                value="#{resourcesBean.viewEntitlement.availableResources}"/>
+                            <f:attribute
+                                name="viewEntitlement"
+                                value="#{resourcesBean.viewEntitlement}"/>
+                        </ui:define>
+                    </o:button>
+                </ice:panelGrid>
+            </ice:panelGroup>
+        </ui:define>
+    </o:popup>
+</span>

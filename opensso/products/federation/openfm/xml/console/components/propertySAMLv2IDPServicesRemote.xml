@@ -1,0 +1,282 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2IDPServicesRemote.xml,v 1.5 2009/09/15 00:01:55 asyhuang Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>    
+    <section name="IDPMetaalias" defaultValue="samlv2idp.attribute.label.IDPMetaAlias">
+        <property>
+            <label name="lblIDPMetaalias" 
+                   defaultValue="samlv2idp.attribute.label.IDPMetaAlias"
+                   labelFor="metaAlias" />
+            <cc name="metaAlias" 
+                tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+            <fieldhelp name="helpmetaAlias" defaultValue="samlv2idp.attribute.label.IDPMetaAlias.help" />
+        </property>                
+    </section>
+    <section name="services" defaultValue="samlv2idp.provider.section.title.idpcommonServices" >
+        <property>
+            <label name="lblArtifactResolution" defaultValue="samlv2idp.attribute.label.artifactresolution" />
+            <ccgroup>
+                <property>
+                    <label name="lblisDefault" defaultValue="samlv2idp.attribute.label.isdefault"
+                           labelFor="isDefault" />
+                    <cc name="isDefault" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                <property>
+                    <label name="lblArtifactLocation" defaultValue="samlv2idp.attribute.label.artifactlocation" labelFor="artLocation" />
+                    <cc name="artLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="105" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+                <property>
+                    <label name="lblArtifactIndex" defaultValue="samlv2idp.attribute.label.artifactindex" labelFor="index" />
+                    <cc name="index" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="2" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+            </ccgroup>
+        </property>
+        <property>
+            <label name="lblHttpRedirSingleLogout" defaultValue="samlv2idp.attribute.label.singlelogout" />
+            <ccgroup>
+                <property>
+                <label name="lblsingleChoiceSingleLogOutProfile" defaultValue="samlv2sp.attribute.label.httpartifactassertconsumerservicedefault" labelFor="singleChoiceSingleLogOutProfile" />
+                <cc name="singleChoiceSingleLogOutProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+                    <option label="samlv2idp.attribute.label.none" value="none" />
+                    <option label="samlv2idp.attribute.label.httpredirectsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" />
+                    <option label="samlv2idp.attribute.label.postsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
+                    <option label="samlv2idp.attribute.label.soapsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" />
+                </cc>
+                </property>  
+                <property>
+                    <label name="lblHttpRedirSingleLogout" defaultValue="samlv2idp.attribute.label.httpredirectsinglelogout" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblHttpRedirectLocation" defaultValue="samlv2idp.attribute.label.httpredirectlocation" 
+                                   labelFor="slohttpLocation" />
+                            <cc name="slohttpLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                        <property>
+                            <label name="lblHttpRedirectRespLocation" defaultValue="samlv2idp.attribute.label.httpredirectresplocation" 
+                                   labelFor="slohttpResponseLocation" />
+                            <cc name="slohttpResponseLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>                
+                <property>
+                    <label name="lblPostSingleLogout" defaultValue="samlv2idp.attribute.label.postsinglelogout" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblPostLocation" defaultValue="samlv2idp.attribute.label.httpredirectlocation" 
+                                   labelFor="slopostLocation" />
+                            <cc name="slopostLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                        <property>
+                            <label name="lblPostRespLocation" defaultValue="samlv2idp.attribute.label.httpredirectresplocation" 
+                                   labelFor="slopostResponseLocation" />
+                            <cc name="slopostResponseLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+                <property>
+                    <label name="lblSoapSingleLogout" defaultValue="samlv2idp.attribute.label.soapsinglelogout" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblSoapLocation" defaultValue="samlv2idp.attribute.label.soaplocation" labelFor="slosoapLocation" />
+                            <cc name="slosoapLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>            
+                </property>        
+            </ccgroup>   
+        </property>
+        <property>
+            <label name="lblManageNameId" defaultValue="samlv2idp.attribute.label.managenameid" />
+            <ccgroup>
+                <property>
+                    <label name="lblsingleChoiceMangeNameIDProfile" defaultValue="samlv2sp.attribute.label.httpartifactassertconsumerservicedefault" labelFor="singleChoiceMangeNameIDProfile" />
+                        <cc name="singleChoiceMangeNameIDProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+                        <option label="samlv2idp.attribute.label.none" value="none" />
+                        <option label="samlv2idp.attribute.label.httpredirectsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" />
+                        <option label="samlv2idp.attribute.label.postsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" />
+                        <option label="samlv2idp.attribute.label.soapsinglelogout" value="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" />
+                        </cc>
+                </property>
+                <property>
+                    <label name="lblHttpRedirManageNameIDService" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidservice" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblHttpRedirectManagerNameIDServiceLocation" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidservicelocation" 
+                                   labelFor="mnihttpLocation" />
+                            <cc name="mnihttpLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                        <property>
+                            <label name="lblHttpRedirectManagerNameIDServiceRespLocation" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidserviceresplocation" 
+                                   labelFor="mnihttpResponseLocation" />
+                            <cc name="mnihttpResponseLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+                
+                
+                <property>
+                    <label name="lblPostManageNameIDService" defaultValue="samlv2idp.attribute.label.postmanagenameidservice" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblPostManagerNameIDServiceLocation" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidservicelocation" 
+                                   labelFor="mnipostLocation" />
+                            <cc name="mnipostLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                        <property>
+                            <label name="lblPostManagerNameIDServiceRespLocation" defaultValue="samlv2idp.attribute.label.httpredirectmanagenameidserviceresplocation" 
+                                   labelFor="mnipostResponseLocation" />
+                            <cc name="mnipostResponseLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+                
+                
+                
+                <property>
+                    <label name="lblSoapManageNameIDService" defaultValue="samlv2idp.attribute.label.soapmanagenameidservice" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblSoapManagerNameIDServiceLocation" defaultValue="samlv2idp.attribute.label.soapmanagenameidservicelocation" 
+                                   labelFor="mnisoapLocation" />
+                            <cc name="mnisoapLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+            </ccgroup>   
+        </property>
+        <property>
+            <label name="lblSingleSignOn" defaultValue="samlv2idp.attribute.label.singlesignon" />
+            <ccgroup>   
+                <property>
+                    <label name="lblHttpRedirSingleSignOn" defaultValue="samlv2idp.attribute.label.httpredirectsinglesignon" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblHttpRedirectSSOLocation" defaultValue="samlv2idp.attribute.label.httpredirectssolocation"
+                                   labelFor="ssohttpLocation" />
+                            <cc name="ssohttpLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+                                               
+                <property>
+                    <label name="lblHttpPostSingleSignOnBi" defaultValue="samlv2idp.attribute.label.httppostsinglesignon" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblHttpPostSSOLocation" defaultValue="samlv2idp.attribute.label.httppostssolocation"
+                                   labelFor="ssosoapLocation" />
+                            <cc name="ssosoapLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+                
+                <property>
+                    <label name="lblHttpSoapSingleSignOnBi" defaultValue="samlv2idp.attribute.label.httpsoapsinglesignon" />
+                    <ccgroup>
+                        <property>
+                            <label name="lblHttpPostSSOLocation" defaultValue="samlv2idp.attribute.label.httppostssolocation"
+                                   labelFor="ssosoapsLocation" />
+                            <cc name="ssosoapsLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                                <attribute name="size" value="105" />
+                                <attribute name="autoSubmit" value="false" />
+                                <attribute name="localizeDisplayFieldValue" value="false" />
+                            </cc>
+                        </property>
+                    </ccgroup>
+                </property>
+                
+            </ccgroup>   
+        </property>
+    </section>
+    <section name="nameIDMappingService" defaultValue="samlv2idp.attribute.label.nameIDMappingService">
+        <property>
+            <cc name="NameIDMappingService" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="85" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>                
+    </section>
+   
+</propertysheet>

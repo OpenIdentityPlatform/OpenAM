@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-compatibility'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Policy Agent Compatibility</title>
+
+ <para>This chapter covers both major changes to existing functionality, and
+ also deprecated and removed functionality.</para>
+
+ <section xml:id="web-agent-compatibility">
+  <title>Web Policy Agent Compatibility</title>
+  <para>This section covers OpenAM Web Policy Agents
+  <?eval ${webAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="web-agent-major-changes">
+   <title>Major Changes to Web Policy Agent Functionality</title>
+   <para>TODO</para>
+  </section>
+
+  <section xml:id="web-agent-deprecated">
+   <title>Deprecated Functionality</title>
+   <para>The following functionality is deprecated in OpenAM Web Policy Agents
+   <?eval ${webAgentsDocTargetVersion}?>.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para>TODO</para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="web-agent-removed">
+   <title>Removed Functionality</title>
+   <para>No functionality has been removed in OpenAM Web Policy Agents
+   <?eval ${webAgentsDocTargetVersion}?>.</para>
+
+   <para>No functionality is planned to be removed at this time.</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-compatibility">
+  <title>Java EE Policy Agent Compatibility</title>
+  <para>This section covers OpenAM Java EE Policy Agents
+  <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="javaee-agent-major-changes">
+   <title>Major Changes to Java EE Policy Agent Functionality</title>
+   <para>TODO</para>
+  </section>
+
+  <section xml:id="javaee-agent-deprecated">
+   <title>Deprecated Functionality</title>
+   <para>The following functionality is deprecated in OpenAM Java EE Policy
+   Agents <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para>TODO</para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="javaee-agent-removed">
+   <title>Removed Functionality</title>
+   <para>No functionality has been removed in OpenAM Java EE Policy Agents
+   <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+   <para>No functionality is planned to be removed at this time.</para>
+  </section>
+ </section>
+</chapter>
