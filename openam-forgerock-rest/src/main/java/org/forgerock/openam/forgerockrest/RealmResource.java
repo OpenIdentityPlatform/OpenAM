@@ -15,9 +15,13 @@
  */
 package org.forgerock.openam.forgerockrest;
 
+import java.lang.Exception;
+import java.lang.String;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -42,10 +46,6 @@ import org.forgerock.json.resource.exception.NotFoundException;
 import org.forgerock.json.resource.exception.NotSupportedException;
 import org.forgerock.json.resource.exception.ResourceException;
 import org.forgerock.json.resource.provider.CollectionResourceProvider;
-import org.forgerock.json.resource.provider.SingletonResourceProvider;
-import org.forgerock.json.resource.provider.RequestHandler;
-import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
@@ -55,20 +55,42 @@ import java.security.AccessController;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import com.sun.identity.idsvcs.Token;
+
+import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.Attribute;
+import com.sun.identity.sm.OrganizationConfigManager;
 
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class TestResource implements CollectionResourceProvider {
+public final class RealmResource implements CollectionResourceProvider {
+    // TODO: filters, sorting, paged results.
 
-    public TestResource() {
+    /*
+     * Throughout this example backend we take care not to invoke result
+     * handlers while holding locks since result handlers may perform blocking
+     * IO operations.
+     */
+
+    private Set subRealms = null;
+
+    /**
+     * Creates a new empty backend.
+     */
+    public RealmResource() {
         // No implementation required.
+        this.subRealms = null;
+    }
+    public RealmResource(Set subRealms) {
+        this.subRealms = subRealms;
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void actionCollection(final Context context, final ActionRequest request,
                                  final ResultHandler<JsonValue> handler) {
         final ResourceException e =
@@ -79,77 +101,79 @@ public final class TestResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void actionInstance(final Context context, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
+                new NotSupportedException("Actions are not supported for resource Realms");
         handler.handleError(e);
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void createInstance(final Context context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
+                new NotSupportedException("Create is not supported for resource Realms");
         handler.handleError(e);
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void deleteInstance(final Context context, final DeleteRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
+                new NotSupportedException("Delete is not supported for resource Realms");
         handler.handleError(e);
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void patchInstance(final Context context, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
-        final ResourceException e = new NotSupportedException("Patch operations are not supported");
+        final ResourceException e = new NotSupportedException("Patch operations are not supported for resource Realms");
         handler.handleError(e);
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void queryCollection(final Context context, final QueryRequest request,
                                 final QueryResultHandler handler) {
-        JsonValue val = new JsonValue("Test:queryCollection");
-        Resource resource = new Resource("0","0",val)  ;
-        handler.handleResource(resource);
-        handler.handleResult(new QueryResult());
 
+        for (Object theRealm : subRealms ) {
+            String realm = (String) theRealm;
+            JsonValue val = new JsonValue(realm);
+            Resource resource = new Resource("0","0",val)  ;
+            handler.handleResource(resource);
+        }
+        handler.handleResult(new QueryResult());
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void readInstance(final Context context, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
-        JsonValue val = context.toJsonValue();
-        Resource resource = new Resource("0","0",val);
-        handler.handleResult(resource);
+        final ResourceException e = new NotSupportedException("Read operations are not supported for resource Realms");
+        handler.handleError(e);
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void updateInstance(final Context context, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
-        final ResourceException e = new NotSupportedException("Update operations are not supported");
+        final ResourceException e = new NotSupportedException("Update operations are not supported for resource Realms");
         handler.handleError(e);
     }
 
@@ -179,7 +203,5 @@ public final class TestResource implements CollectionResourceProvider {
                     + "' encountered while updating a resource");
         }
     }
-
-
 
 }

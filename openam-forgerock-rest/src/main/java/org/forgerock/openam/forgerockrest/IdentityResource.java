@@ -85,9 +85,11 @@ public final class IdentityResource implements CollectionResourceProvider {
     public IdentityResource() {
         // No implementation required.
     }
-    public IdentityResource(String userType) {
-        String[] vals = {userType} ;
-        iDSvcsAttrList.add(new Attribute("objecttype",vals)) ;
+    public IdentityResource(String userType,String realm) {
+        String[] userval = {userType} ;
+        String[] realmval = {realm} ;
+        iDSvcsAttrList.add(new Attribute("objecttype",userval)) ;
+        iDSvcsAttrList.add(new Attribute("realm",realmval)) ;
     }
 
     /**
