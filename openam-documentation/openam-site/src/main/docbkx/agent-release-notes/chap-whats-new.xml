@@ -45,12 +45,11 @@
     xlink:show="new">OPENAM-1299</link>).</para>
    </listitem>
    <listitem>
-    <para>If you have already validated the URLs in your web policy agent
-    configuration, you can disable URL validation during the bootstrap phase
-    using the <literal>com.forgerock.agents.ext.url.validation.disable</literal>
-    property (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
-   xlink:show="new">OPENAM-1270</link>).</para>
+    <para>Web policy agents can perform URL validation during the bootstrap
+    phase when you set the
+    <literal>com.forgerock.agents.ext.url.validation.disable</literal> property
+    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
+    xlink:show="new">OPENAM-1270</link>).</para>
    </listitem>
    <listitem>
     <para>Policy agent now allows you to set the Login URL based on the incoming FQDN (<link

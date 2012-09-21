@@ -48,17 +48,17 @@
     <listitem>
      <para>The bootstrap configuration property,
      <literal>com.forgerock.agents.ext.url.validation.disable</literal>, lets
-     you turn off URL validation during the initial bootstrap phase when the
-     policy agent reads its configuration. When you fully disable URL validation
-     the policy agent does not need to connect to OpenAM during the bootstrap
-     phase.</para>
-     <para>Before you disable URL validation, make sure that the URLs in the
-     policy agent configuration are valid and correct. As the policy agent
-     performs no further validation, if the URLs are not correct then the
-     agent is likely to crash.</para>
-     <para>To fully disable URL validation, set the property as shown:</para>
+     you configure naming URL validation during the initial bootstrap phase
+     when the policy agent reads its configuration. When URL validation is fully
+     disabled the policy agent does not need to connect to OpenAM during the
+     bootstrap phase.</para>
+     <para>If you leave URL validation disabled, make sure that the URLs in the
+     policy agent bootstrap configuration file are valid and correct. As the
+     policy agent performs no further validation after the bootstrap phase,
+     incorrect naming URLs can cause the agent to crash.</para>
+     <para>To enable full URL validation, set the property as shown:</para>
      <literallayout class="monospaced"
-     >com.forgerock.agents.ext.url.validation.disable = 2</literallayout>
+     >com.forgerock.agents.ext.url.validation.disable = 0</literallayout>
 
      <variablelist>
       <para>This property can take the following values.</para>
@@ -82,7 +82,7 @@
       </varlistentry>
 
       <varlistentry>
-       <term>2</term>
+       <term>2 (Default)</term>
        <listitem>
         <para>Disable all naming URL validation.</para>
        </listitem>

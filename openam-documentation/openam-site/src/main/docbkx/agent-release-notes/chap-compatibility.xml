@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-compatibility'
@@ -41,7 +41,13 @@
 
   <section xml:id="web-agent-major-changes">
    <title>Major Changes to Web Policy Agent Functionality</title>
-   <para>TODO</para>
+
+   <para>Naming URL validation was introduced after release 3.0.4. The initial
+   implementation of naming URL validation for web policy agents enabled
+   validation by default. Naming URL validation is now fully disabled by
+   default. You can adjust this setting by using the bootstrap configuration
+   property,
+   <literal>com.forgerock.agents.ext.url.validation.disable</literal>. </para>
   </section>
 
   <section xml:id="web-agent-deprecated">
