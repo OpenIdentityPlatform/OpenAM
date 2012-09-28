@@ -42,12 +42,27 @@
   <section xml:id="web-agent-major-changes">
    <title>Major Changes to Web Policy Agent Functionality</title>
 
-   <para>Naming URL validation was introduced after release 3.0.4. The initial
-   implementation of naming URL validation for web policy agents enabled
-   validation by default. Naming URL validation is now fully disabled by
-   default. You can adjust this setting by using the bootstrap configuration
-   property,
-   <literal>com.forgerock.agents.ext.url.validation.disable</literal>. </para>
+   <itemizedlist>
+    <listitem>
+     <para>IIS web policy agents no longer rely on the Windows registry to
+     determine where to find configuration settings. Instead, IIS agents
+     determine the relative location of their configuration properties files
+     based on the location of the web policy agent DLL, and on the Site ID set
+     by IIS at runtime.</para>
+
+     <para>The cleanest upgrade path is to uninstall the previous version of
+     the IIS agent, and then install the new version of the IIS agent.</para>
+    </listitem>
+
+    <listitem>
+     <para>Naming URL validation was introduced after release 3.0.4. The initial
+     implementation of naming URL validation for web policy agents enabled
+     validation by default. Naming URL validation is now fully disabled by
+     default. You can adjust this setting by using the bootstrap configuration
+     property,
+     <literal>com.forgerock.agents.ext.url.validation.disable</literal>.</para>
+    </listitem>
+   </itemizedlist>
   </section>
 
   <section xml:id="web-agent-deprecated">
