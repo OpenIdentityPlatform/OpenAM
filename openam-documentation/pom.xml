@@ -51,8 +51,8 @@
     <url>http://openam.forgerock.org/</url>
 
     <modules>
-        <module>openam-site-helper</module>
-        <module>openam-site</module>
+        <module>openam-doc-content</module>
+        <module>openam-doc-source</module>
     </modules>
 
 </project>

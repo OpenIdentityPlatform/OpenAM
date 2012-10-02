@@ -61,18 +61,18 @@
 
   <menu name="OpenAM Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./openam-documentation/openam-site/doc/release-notes/index.html" />
-   <item name="Installation Guide" href="./openam-documentation/openam-site/doc/install-guide/index.html" />
-   <item name="Admin Guide" href="./openam-documentation/openam-site/doc/admin-guide/index.html" />
-   <item name="Developer Guide" href="./openam-documentation/openam-site/doc/dev-guide/index.html" />
-   <item name="Reference" href="./openam-documentation/openam-site/doc/reference/index.html" />
+   <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/release-notes/index.html" />
+   <item name="Installation Guide" href="./openam-documentation/openam-doc-source/doc/install-guide/index.html" />
+   <item name="Admin Guide" href="./openam-documentation/openam-doc-source/doc/admin-guide/index.html" />
+   <item name="Developer Guide" href="./openam-documentation/openam-doc-source/doc/dev-guide/index.html" />
+   <item name="Reference" href="./openam-documentation/openam-doc-source/doc/reference/index.html" />
    <item name="Javadoc" href="./apidocs/index.html" />
   </menu>
 
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Release Notes" href="./openam-documentation/openam-site/doc/agent-release-notes/index.html" />
-   <item name="Install Guide" href="./openam-documentation/openam-site/doc/agent-install-guide/index.html" />
+   <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/agent-release-notes/index.html" />
+   <item name="Install Guide" href="./openam-documentation/openam-doc-source/doc/agent-install-guide/index.html" />
   </menu>
 
   <menu name="Project Information">

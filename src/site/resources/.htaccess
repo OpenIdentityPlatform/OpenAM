@@ -1,2 +1,4 @@
 # Before Mavenization, doc used to be under http://openam.forgerock.org/doc/.
-RedirectMatch 301 ^/doc/(.*)$ http://openam.forgerock.org/openam-documentation/openam-site/doc/$1
+RedirectMatch 301 ^/doc/(.*)$ http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/$1
+# The following redirect handles the openam-site module being renamed to openam-doc-source.
+RedirectMatch 301 ^/openam-documentation/openam-site/(.*)$ http://openam.forgerock.org/openam-documentation/openam-doc-source/$1
