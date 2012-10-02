@@ -42,7 +42,7 @@
  The <link xlink:href="dev-guide#chap-jdk"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Developer's
  Guide</citetitle></link> describes how to use the Java SDK, and the <link
- xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+ xlink:href="http://openam.forgerock.org/apidocs/index.html"
  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> provides a
  reference to the public APIs.</para>
  

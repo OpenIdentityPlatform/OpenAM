@@ -82,7 +82,7 @@ public void onLogout(
   not when a user's session times out.</para>
   
   <para>See the <link
-  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+  xlink:href="http://openam.forgerock.org/apidocs/index.html"
   ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
   reference.</para>
 

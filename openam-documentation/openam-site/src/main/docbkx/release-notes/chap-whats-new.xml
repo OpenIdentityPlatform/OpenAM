@@ -74,9 +74,11 @@
   </listitem>
    <listitem>
      <para>For SAML 2.0, modify the templates
-     <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/opensso/products/federation/library/resources/saml2login.template?r=HEAD"><filename>saml2login.template</filename></link>
+     <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2login.template?r=HEAD"
+     xlink:show="new"><filename>saml2login.template</filename></link>
      and
-     <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/opensso/products/federation/library/resources/saml2loginwithrelay.template?r=HEAD"><filename>saml2loginwithrelay.template</filename></link>
+     <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2loginwithrelay.template?r=HEAD"
+     xlink:show="new"><filename>saml2loginwithrelay.template</filename></link>
      to change the presentation, retaining the form and JavaScript. Then copy
      your templates under the <filename>WEB-INF/classes/</filename> directory
      where you unpacked the OpenAM web application (for example

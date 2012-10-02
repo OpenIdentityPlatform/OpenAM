@@ -190,7 +190,7 @@
   class, and must implement the methods shown below.</para>
   
   <para>See the <link
-  xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+  xlink:href="http://openam.forgerock.org/apidocs/index.html"
   ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
   reference.</para>
   

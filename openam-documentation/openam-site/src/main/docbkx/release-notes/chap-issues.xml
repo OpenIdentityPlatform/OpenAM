@@ -140,7 +140,7 @@
    </listitem>
    <listitem>
     <para><link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-X1260"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1260"
     xlink:show="new">OPENAM-1260</link>: Error The Directory Server has been configured to deny access
     to LDAPv2 clients. This connection will be closed</para>
    </listitem>

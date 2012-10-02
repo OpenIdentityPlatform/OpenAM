@@ -49,8 +49,8 @@
  <section xml:id="gateway-or-policy-agent">
   <title>Identity Gateway or Policy Agent?</title>
   <indexterm><primary>Identity Gateway</primary></indexterm>
-  <para>OpenAM includes both the <link
-  xlink:href="http://resources.apexidentity.com/projects/docs/wiki">Identity
+  <para>OpenAM includes both the <link xlink:show="new"
+  xlink:href="http://openig.forgerock.org/">Identity
   Gateway</link> and also a variety of policy agents. Both the Identity Gateway
   and also the policy agents enforce policy, redirecting users to authenticate
   when necessary, and controlling access to protected resources. Yet, the
