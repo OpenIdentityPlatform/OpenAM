@@ -108,9 +108,9 @@
     </licenses>
     <properties>
         <serverDocTargetVersion>10.1.0</serverDocTargetVersion>
-        <agentsDocTargetVersion>3</agentsDocTargetVersion>
-        <webAgentsDocTargetVersion>3.0.5</webAgentsDocTargetVersion>
-        <javaEEAgentsDocTargetVersion>3.0.5</javaEEAgentsDocTargetVersion>
+        <agentsDocTargetVersion>3.1.0</agentsDocTargetVersion>
+        <webAgentsDocTargetVersion>3.1.0</webAgentsDocTargetVersion>
+        <javaEEAgentsDocTargetVersion>3.1.0</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
         <oldProjectName>OpenSSO</oldProjectName>
