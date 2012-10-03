@@ -120,12 +120,12 @@ public class SsoadmAP extends AbstractProcessor {
                     name, description, mandatory, optional));
         }
 
-        StringBuilder content = readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.header");
+        StringBuilder content = readFile("openam-documentation/openam-doc-source/src/main/docbkx/reference/man-ssoadm-1.header");
         for (String subCommand : subcommands) {
             content.append(subCommand);
         }
-        content.append(readFile("openam-documentation/openam-site/src/main/docbkx/reference/man-ssoadm-1.footer"));
-        writeFile("openam-documentation/openam-site-helper/target/generated-resources/man-ssoadm-1.xml", content.toString());
+        content.append(readFile("openam-documentation/openam-doc-source/src/main/docbkx/reference/man-ssoadm-1.footer"));
+        writeFile("openam-documentation/openam-doc-content/target/generated-resources/man-ssoadm-1.xml", content.toString());
 
         return true;
     }

@@ -67,7 +67,7 @@
   <xinclude:include href='man-ampassword-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-configurator-jar-1.xml' />
-  <xinclude:include href='../../../../../openam-site-helper/target/generated-resources/man-ssoadm-1.xml' />
+  <xinclude:include href='../../../../../openam-doc-content/target/generated-resources/man-ssoadm-1.xml' />
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />

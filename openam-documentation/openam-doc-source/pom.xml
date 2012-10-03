@@ -37,10 +37,10 @@
 
     <!-- Documentation Module -->
     <groupId>org.forgerock</groupId>
-    <artifactId>openam-site</artifactId>
+    <artifactId>openam-doc-source</artifactId>
     <version>10.1.0-SNAPSHOT</version>
 
-    <name>OpenAM Site Documentation</name>
+    <name>OpenAM Core Documentation Sources</name>
 
     <inceptionYear>2011</inceptionYear>
     <packaging>jar</packaging>
@@ -289,7 +289,7 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock</groupId>
-            <artifactId>openam-site-helper</artifactId>
+            <artifactId>openam-doc-content</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
